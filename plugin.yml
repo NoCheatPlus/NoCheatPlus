@@ -1,7 +1,7 @@
-name: NoFlyPlugin
+name: NoCheatPlugin
 
 author: Evenprime
 
-main: cc.co.evenprime.bukkit.nofly.NoFlyPlugin
-version: 0.2.1
+main: cc.co.evenprime.bukkit.nocheat.NoCheatPlugin
+version: 0.3
 

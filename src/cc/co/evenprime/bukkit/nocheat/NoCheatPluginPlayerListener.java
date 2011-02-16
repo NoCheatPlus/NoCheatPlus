@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nofly;
+package cc.co.evenprime.bukkit.nocheat;
 
 
 import java.util.HashMap;
@@ -16,26 +16,28 @@ import org.bukkit.event.player.PlayerMoveEvent;
  * @author Evenprime
  */
 
-public class NoFlyPluginPlayerListener extends PlayerListener {
+public class NoCheatPluginPlayerListener extends PlayerListener {
 	
 	/**
 	 * Storage for data persistence between events
 	 *
 	 */
-	public class NoFlyPluginData {
+	public class NoCheatPluginData {
 		
 		/**
 		 *  Don't rely on any of these yet, they are likely going to 
 		 * change their name/functionality 
 		 */
 		private int phase = 0; // current jumpingPhase
-		public long previousUpdate = 0; // timestamp of last event
 		public int violations = 0; // number of cancelled events
+		private boolean lastWasInvalid = false; // used to reduce amount logging
+		private long lastSpeedHackCheck = System.currentTimeMillis();; // timestamp of last check for speedhacks
+		private int eventsSinceLastSpeedHackCheck = 0; // used to identify speedhacks
 		
-		private NoFlyPluginData() { }
+		private NoCheatPluginData() { }
 	}
 	
-    private final NoFlyPlugin plugin;
+    private final NoCheatPlugin plugin;
     
     // previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
     // Each entry represents the maximum gain in height per move event.
@@ -45,11 +47,14 @@ public class NoFlyPluginPlayerListener extends PlayerListener {
     private static double maxX = 0.5D;
     private static double maxZ = 0.5D;
     
+    private static final long timeFrameForSpeedHackCheck = 2000; 
+    private static final long eventLimitForSpeedHackCheck = 50;
+    
     // Store data between Events
-    private static Map<String, NoFlyPluginData> playerData = new HashMap<String, NoFlyPluginData>();
+    private static Map<String, NoCheatPluginData> playerData = new HashMap<String, NoCheatPluginData>();
     
 
-    public NoFlyPluginPlayerListener(NoFlyPlugin instance) {
+    public NoCheatPluginPlayerListener(NoCheatPlugin instance) {
         plugin = instance;
     }
 
@@ -73,19 +78,35 @@ public class NoFlyPluginPlayerListener extends PlayerListener {
 		Location to = event.getTo();
 		
 		// Get the player-specific data
-		NoFlyPluginData data = null;
+		NoCheatPluginData data = null;
 		
 		if((data = playerData.get(event.getPlayer().getName())) == null ) {
 			// If we have no data for the player, create some
-			data = new NoFlyPluginData();
+			data = new NoCheatPluginData();
 			playerData.put(event.getPlayer().getName(), data);
 		}
 		
-		// Measure the time since the last move update by the player
-		// Not used currently, but probably will be used in future
+		// Get the time of the server
 		long time = System.currentTimeMillis();
-    	//System.out.print((time - data.previousUpdate) + ",");
-    	data.previousUpdate = time;
+		
+		// Is it time for a speedhack check now?
+		if(time > timeFrameForSpeedHackCheck + data.lastSpeedHackCheck ) {
+			// Yes
+			
+			int limit = (int)((eventLimitForSpeedHackCheck * (time - data.lastSpeedHackCheck)) / timeFrameForSpeedHackCheck);
+			
+			if(data.eventsSinceLastSpeedHackCheck > limit) {
+				// Probably someone is speedhacking here! Better log that
+				NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" probably uses a speedhack. He sent "+ data.eventsSinceLastSpeedHackCheck + " events, but only "+limit+ " were allowed in the timeframe!");
+			}
+			
+			// Reset values for next check
+			data.eventsSinceLastSpeedHackCheck = 0;
+			data.lastSpeedHackCheck = time;
+		}
+		
+		data.eventsSinceLastSpeedHackCheck++;
+
     	
 		// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
@@ -170,27 +191,43 @@ public class NoFlyPluginPlayerListener extends PlayerListener {
     	/**
     	 * Teleport the player back to the last valid position
     	 */
-    	if(event.isCancelled()) {
+    	if(event.isCancelled() && !data.lastWasInvalid) {
     		// Keep count of violations
     		data.violations++;
-    		// Log the violation
-    		NoFlyPlugin.log.info("NoFlyPlugin: At " + data.previousUpdate + " player "+event.getPlayer().getDisplayName()+" triggered. Total Violations: "+data.violations);
-    		NoFlyPlugin.log.info("NoFlyPlugin: He went from " + String.format("%.5f,%.5f,%.5f to %.5f,%.5f,%.5f", from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()));
-    		//event.getPlayer().sendMessage("NoFlyPlugin violation "+data.violations);
+
+	    	// Log the violation
+	    	NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" begins violating constraints. Total Violations: "+data.violations);
+	    	NoCheatPlugin.log.info("NoCheatPlugin: He tried to go from " + String.format("%.5f,%.5f,%.5f to %.5f,%.5f,%.5f", from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()));
+
+    		data.lastWasInvalid = true;
     		
-    		// Reset the player to his old location. This prevents him from getting stuck somewhere and/or getting
+    		// Reset the player to his old location. This should prevent him from getting stuck somewhere and/or getting
     		// out of sync with the server
     		event.getPlayer().teleportTo(event.getFrom());
     		
-    		// To prevent players from getting stuck in an infinite loop
-    		if(data.phase > 7) data.phase = 7; 
+    		// To prevent players from getting stuck in an infinite loop, needs probably more testing
+    		// TODO: Find a better solution
+    		if(data.phase > 7) data.phase = 7;
+    	}
+    	else if(event.isCancelled() && data.lastWasInvalid) {
+    		data.violations++;
+    		
+    		// Reset the player to his old location. This should prevent him from getting stuck somewhere and/or getting
+    		// out of sync with the server
+    		event.getPlayer().teleportTo(event.getFrom());
+    	}
+    	else if(!event.isCancelled() && data.lastWasInvalid) {
+    		data.lastWasInvalid = false;
+    		NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" stopped violating constraints. Total Violations: "+data.violations);
     	}
     }
     
     /**
      * Check the four edges of the player's approximated Bounding Box for blocks or ladders, 
-     * at his own height (values[2]) and below his feet (values[2]-1).
-     * If there is one, the player is considered as standing on it.
+     * at his own height (values[2]) and below his feet (values[2]-1). Also, check at his "head"
+     * for ladders.
+     * 
+     * If there is one, the player is considered as standing on it/hanging to it.
      * 
      * Not perfect at all and will produce some false negatives. Probably will be refined 
      * later.
@@ -204,12 +241,16 @@ public class NoFlyPluginPlayerListener extends PlayerListener {
     	if((w.getBlockAt(values[0], values[2]-1, values[3]).getType() != Material.AIR || 
     	   w.getBlockAt(values[0], values[2]-1, values[4]).getType() != Material.AIR ||
     	   w.getBlockAt(values[0], values[2], values[3]).getType() != Material.AIR || 
-    	   w.getBlockAt(values[0], values[2], values[4]).getType() != Material.AIR) || 
+    	   w.getBlockAt(values[0], values[2], values[4]).getType() != Material.AIR || 
+    	   w.getBlockAt(values[0], values[2]+1, values[3]).getType() == Material.LADDER || 
+    	   w.getBlockAt(values[0], values[2]+1, values[4]).getType() == Material.LADDER) || 
     	   (values[0] != values[1] && // May save some time by skipping half of the tests
     	   (w.getBlockAt(values[1], values[2]-1, values[3]).getType() != Material.AIR ||
     	   w.getBlockAt(values[1], values[2]-1, values[4]).getType() != Material.AIR ||
     	   w.getBlockAt(values[1], values[2], values[3]).getType() != Material.AIR ||
-    	   w.getBlockAt(values[1], values[2], values[4]).getType() != Material.AIR)))
+    	   w.getBlockAt(values[1], values[2], values[4]).getType() != Material.AIR ||
+    	   w.getBlockAt(values[1], values[2]+1, values[3]).getType() == Material.LADDER || 
+    	   w.getBlockAt(values[1], values[2]+1, values[4]).getType() == Material.LADDER)))
     		return true;
     	else
     		return false;

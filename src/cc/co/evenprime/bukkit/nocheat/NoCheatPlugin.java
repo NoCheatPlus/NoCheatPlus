@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nofly;
+package cc.co.evenprime.bukkit.nocheat;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -13,18 +13,18 @@ import org.bukkit.plugin.PluginManager;
 
 /**
 * 
-* NoFlyPlugin
+* NoCheatPlugin
 * 
 * Check PLAYER_MOVE events for their plausibility and cancel them if they are implausible
 * 
 * @author Evenprime
 */
-public class NoFlyPlugin extends JavaPlugin {
-    private final NoFlyPluginPlayerListener playerListener = new NoFlyPluginPlayerListener(this);
+public class NoCheatPlugin extends JavaPlugin {
+    private final NoCheatPluginPlayerListener playerListener = new NoCheatPluginPlayerListener(this);
         
     public static final Logger log = Logger.getLogger("Minecraft");
     
-    public NoFlyPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
+    public NoCheatPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
 
      }
