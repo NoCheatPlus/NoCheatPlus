@@ -3,5 +3,5 @@ name: NoFlyPlugin
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nofly.NoFlyPlugin
-version: 0.2
+version: 0.2.1
 

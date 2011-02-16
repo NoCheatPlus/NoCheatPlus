@@ -39,7 +39,7 @@ public class NoFlyPluginPlayerListener extends PlayerListener {
     
     // previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
     // Each entry represents the maximum gain in height per move event.
-    private static double jumpingPhases[] = new double[]{ 0.43D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.50D };
+    private static double jumpingPhases[] = new double[]{ 0.501D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.50D };
     
     // Very rough estimates
     private static double maxX = 0.5D;
@@ -117,7 +117,11 @@ public class NoFlyPluginPlayerListener extends PlayerListener {
     			data.phase = 0;
     			
     			// Check if the player isn't 'walking' up unrealistically far in one step
-    			if(!(to.getY() - from.getY() <= 0.50001D)) {
+    			// Finally found out why this can happen:
+    			// If a player runs into a wall at an angle from above, the game tries to
+    			// place him above the block he bumped into, by placing him 0.5 m above
+    			// the target block
+    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
         			event.setCancelled(true);
         		}
     		}
@@ -171,7 +175,7 @@ public class NoFlyPluginPlayerListener extends PlayerListener {
     		data.violations++;
     		// Log the violation
     		NoFlyPlugin.log.info("NoFlyPlugin: At " + data.previousUpdate + " player "+event.getPlayer().getDisplayName()+" triggered. Total Violations: "+data.violations);
-    		
+    		NoFlyPlugin.log.info("NoFlyPlugin: He went from " + String.format("%.5f,%.5f,%.5f to %.5f,%.5f,%.5f", from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()));
     		//event.getPlayer().sendMessage("NoFlyPlugin violation "+data.violations);
     		
     		// Reset the player to his old location. This prevents him from getting stuck somewhere and/or getting
