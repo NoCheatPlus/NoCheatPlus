@@ -11,6 +11,10 @@ import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
+import com.nijikokun.bukkit.Permissions.Permissions;
+import com.nijiko.permissions.PermissionHandler;
+import org.bukkit.plugin.Plugin;
+
 /**
 * 
 * NoCheatPlugin
@@ -23,6 +27,7 @@ public class NoCheatPlugin extends JavaPlugin {
     private final NoCheatPluginPlayerListener playerListener = new NoCheatPluginPlayerListener(this);
         
     public static final Logger log = Logger.getLogger("Minecraft");
+    public static PermissionHandler Permissions = null;
     
     public NoCheatPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
@@ -37,7 +42,24 @@ public class NoCheatPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
         
+        
         PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println( pdfFile.getName() + " version " + pdfFile.getVersion() + " is enabled!" );
+        log.info( "NoCheat version " + pdfFile.getVersion() + " is enabled!" );
+        
+        setupPermissions();
+    }
+    
+    public void setupPermissions() {
+    	Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
+
+
+    	if(Permissions == null) {
+    	    if(test != null) {
+    		Permissions = ((Permissions)test).getHandler();
+    	    } else {
+    		log.info("Nocheat couldn't find Permissions plugin. Fallback to OP -> all allowed.");
+    		this.getServer().getPluginManager().disablePlugin(this);
+    	    }
+    	}
     }
 }

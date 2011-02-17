@@ -118,7 +118,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     	types[Material.COBBLESTONE_STAIRS.getId()]= BlockType.UNKNOWN;
     	types[Material.WALL_SIGN.getId()]= BlockType.NONSOLID;
     	types[Material.LEVER.getId()]= BlockType.NONSOLID;
-    	types[Material.STONE_PLATE.getId()]= BlockType.NONSOLID;
+    	types[Material.STONE_PLATE.getId()]= BlockType.UNKNOWN;
     	types[Material.IRON_DOOR_BLOCK.getId()]= BlockType.NONSOLID;
     	types[Material.WOOD_PLATE.getId()]= BlockType.NONSOLID;
     	types[Material.REDSTONE_ORE.getId()]= BlockType.SOLID;
@@ -178,8 +178,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		
     	// If someone cancelled the event already, ignore it
     	// If the player is inside a vehicle, ignore it for now
-	 	// If the player is OP, ignore it for now
-    	if(event.isCancelled() || event.getPlayer().isInsideVehicle() || event.getPlayer().isOp()) {
+    	if(event.isCancelled() || event.getPlayer().isInsideVehicle()) {
     		data.phase = 0;
     		return;
     	}
@@ -192,136 +191,155 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		// Get the time of the server
 		long time = System.currentTimeMillis();
 		
-		// Is it time for a speedhack check now?
-		if(time > timeFrameForSpeedHackCheck + data.lastSpeedHackCheck ) {
-			// Yes
-			
-			int limit = (int)((eventLimitForSpeedHackCheck * (time - data.lastSpeedHackCheck)) / timeFrameForSpeedHackCheck);
-			
-			if(data.eventsSinceLastSpeedHackCheck > limit) {
-				// Probably someone is speedhacking here! Better log that
-				NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" probably uses a speedhack. He sent "+ data.eventsSinceLastSpeedHackCheck + " events, but only "+limit+ " were allowed in the timeframe!");
+		boolean allowSpeedhack = false;
+		if(NoCheatPlugin.Permissions != null && !NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.speedhack")) {
+			allowSpeedhack = true;
+		}
+		else if(NoCheatPlugin.Permissions == null && event.getPlayer().isOp() ) {
+			allowSpeedhack = true;
+		}
+
+    	if(!allowSpeedhack){
+    		
+			// Is it time for a speedhack check now?
+			if(time > timeFrameForSpeedHackCheck + data.lastSpeedHackCheck ) {
+				// Yes
+				
+				int limit = (int)((eventLimitForSpeedHackCheck * (time - data.lastSpeedHackCheck)) / timeFrameForSpeedHackCheck);
+				
+				if(data.eventsSinceLastSpeedHackCheck > limit) {
+					// Probably someone is speedhacking here! Better log that
+					NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" probably uses a speedhack. He sent "+ data.eventsSinceLastSpeedHackCheck + " events, but only "+limit+ " were allowed in the timeframe!");
+				}
+				
+				// Reset values for next check
+				data.eventsSinceLastSpeedHackCheck = 0;
+				data.lastSpeedHackCheck = time;
 			}
 			
-			// Reset values for next check
-			data.eventsSinceLastSpeedHackCheck = 0;
-			data.lastSpeedHackCheck = time;
+			data.eventsSinceLastSpeedHackCheck++;
 		}
 		
-		data.eventsSinceLastSpeedHackCheck++;
-
-    	
-		// First check the distance the player has moved horizontally
-    	// TODO: Make this check much more precise
-		if(!event.isCancelled()) {
-			double xDistance = Math.abs(from.getX() - to.getX());
-			double zDistance = Math.abs(from.getZ() - to.getZ());
-			
-			if(xDistance > maxX || zDistance > maxZ) {
-				event.setCancelled(true);
-			}
+    	boolean allowMoving = false;
+		if(NoCheatPlugin.Permissions != null && !NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.moving")) {
+			allowMoving = true;
 		}
-		
-    	// If we didn't already cancel the event, check the vertical movement
-    	if(!event.isCancelled()) {
+		else if(NoCheatPlugin.Permissions == null && event.getPlayer().isOp() ) {
+			allowMoving = true;
+		}
 
-    		// pre-calculate boundary values that are needed multiple times in the following checks
-    		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-    		int fromValues[] = {(int)Math.floor(from.getX() - 0.3001D), (int)Math.floor(from.getX() + 0.3001D), from.getBlockY(), (int)Math.floor(from.getZ() - 0.3001D),(int)Math.floor(from.getZ() + 0.3001D) };
-    		int toValues[] = {(int)Math.floor(to.getX() - 0.3001D), (int)Math.floor(to.getX() + 0.3001D), to.getBlockY(), (int)Math.floor(to.getZ() - 0.3001D),(int)Math.floor(to.getZ() + 0.3001D) };
+    	if(!allowMoving){
+    		// First check the distance the player has moved horizontally
+    		// TODO: Make this check much more precise
+    		if(!event.isCancelled()) {
+    			double xDistance = Math.abs(from.getX() - to.getX());
+    			double zDistance = Math.abs(from.getZ() - to.getZ());
 
-    		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
-    		boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues);
-    		boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues);
-    			
-    		// Both locations seem to be on solid ground or at a ladder
-    		if(onGroundFrom && onGroundTo)
-    		{
-    			// reset jumping
-    			data.phase = 0;
-    			
-    			// Check if the player isn't 'walking' up unrealistically far in one step
-    			// Finally found out why this can happen:
-    			// If a player runs into a wall at an angle from above, the game tries to
-    			// place him above the block he bumped into, by placing him 0.5 m above
-    			// the target block
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-        			event.setCancelled(true);
-        		}
-    		}
-    		// player is starting to jump (or starting to fall down somewhere)
-    		else if(onGroundFrom && !onGroundTo)
-    		{	
-    			// reset jumping
-    			data.phase = 0;
-    			
-    			// Check if player isn't jumping too high
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-        			event.setCancelled(true);
-        		}
-    			else if(to.getY() <= from.getY()) {
-    				// Very special case if running over a cliff and then immediately jumping. 
-    				// Some sort of "air jump", MC allows it, so we have to do so too.
+    			if(xDistance > maxX || zDistance > maxZ) {
+    				event.setCancelled(true);
     			}
-    			else data.phase++; // Setup next phase of the jump
     		}
-    		// player is probably landing somewhere
-    		else if(!onGroundFrom && onGroundTo)
-    		{
-    			// Check if player isn't landing to high (sounds weird, but has its use)
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-        			event.setCancelled(true);
-        		}
+
+    		// If we didn't already cancel the event, check the vertical movement
+    		if(!event.isCancelled()) {
+
+    			// pre-calculate boundary values that are needed multiple times in the following checks
+    			// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
+    			int fromValues[] = {(int)Math.floor(from.getX() - 0.3001D), (int)Math.floor(from.getX() + 0.3001D), from.getBlockY(), (int)Math.floor(from.getZ() - 0.3001D),(int)Math.floor(from.getZ() + 0.3001D) };
+    			int toValues[] = {(int)Math.floor(to.getX() - 0.3001D), (int)Math.floor(to.getX() + 0.3001D), to.getBlockY(), (int)Math.floor(to.getZ() - 0.3001D),(int)Math.floor(to.getZ() + 0.3001D) };
+
+    			// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
+    			boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues);
+    			boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues);
+
+    			// Both locations seem to be on solid ground or at a ladder
+    			if(onGroundFrom && onGroundTo)
+    			{
+    				// reset jumping
+    				data.phase = 0;
+
+    				// Check if the player isn't 'walking' up unrealistically far in one step
+    				// Finally found out why this can happen:
+    				// If a player runs into a wall at an angle from above, the game tries to
+    				// place him above the block he bumped into, by placing him 0.5 m above
+    				// the target block
+    				if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+    					event.setCancelled(true);
+    				}
+    			}
+    			// player is starting to jump (or starting to fall down somewhere)
+    			else if(onGroundFrom && !onGroundTo)
+    			{	
+    				// reset jumping
+    				data.phase = 0;
+
+    				// Check if player isn't jumping too high
+    				if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+    					event.setCancelled(true);
+    				}
+    				else if(to.getY() <= from.getY()) {
+    					// Very special case if running over a cliff and then immediately jumping. 
+    					// Some sort of "air jump", MC allows it, so we have to do so too.
+    				}
+    				else data.phase++; // Setup next phase of the jump
+    			}
+    			// player is probably landing somewhere
+    			else if(!onGroundFrom && onGroundTo)
+    			{
+    				// Check if player isn't landing to high (sounds weird, but has its use)
+    				if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+    					event.setCancelled(true);
+    				}
+    				else {
+    					data.phase = 0; // He is on ground now, so reset the jump
+    				}
+    			}
+    			// Player is moving through air (during jumping, falling)
     			else {
-    				data.phase = 0; // He is on ground now, so reset the jump
+    				if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+    					event.setCancelled(true);
+    				}
+    				else data.phase++; // Enter next phase of the flight
+    			}
+
+    			// do a security check on the jumping phase, such that we don't get 
+    			// OutOfArrayBoundsExceptions at long air times (falling off high places)
+    			if(!(data.phase < jumpingPhases.length)) {
+    				data.phase = jumpingPhases.length - 1;
     			}
     		}
-    		// Player is moving through air (during jumping, falling)
-    		else {
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-        			event.setCancelled(true);
-        		}
-				else data.phase++; // Enter next phase of the flight
-    		}
-    		
-    		// do a security check on the jumping phase, such that we don't get 
-    		// OutOfArrayBoundsExceptions at long air times (falling off high places)
-    		if(!(data.phase < jumpingPhases.length)) {
-    			data.phase = jumpingPhases.length - 1;
-    		}
-    	}
-    	
-    	/**
-    	 * Teleport the player back to the last valid position
-    	 */
-    	if(event.isCancelled() && !data.lastWasInvalid) {
-    		// Keep count of violations
-    		data.violations++;
 
-	    	// Log the violation
-	    	NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" begins violating constraints. Total Violations: "+data.violations);
-	    	NoCheatPlugin.log.info("NoCheatPlugin: He tried to go from " + String.format("%.5f,%.5f,%.5f to %.5f,%.5f,%.5f", from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()));
+    		if(event.isCancelled() && !data.lastWasInvalid) {
+    			// Keep count of violations
+    			data.violations++;
 
-    		data.lastWasInvalid = true;
-    		
-    		// Reset the player to his old location. This should prevent him from getting stuck somewhere and/or getting
-    		// out of sync with the server
-    		event.getPlayer().teleportTo(event.getFrom());
-    		
-    		// To prevent players from getting stuck in an infinite loop, needs probably more testing
-    		// TODO: Find a better solution
-    		if(data.phase > 6) data.phase = 6;
-    	}
-    	else if(event.isCancelled() && data.lastWasInvalid) {
-    		data.violations++;
-    		
-    		// Reset the player to his old location. This should prevent him from getting stuck somewhere and/or getting
-    		// out of sync with the server
-    		event.getPlayer().teleportTo(event.getFrom());
-    	}
-    	else if(!event.isCancelled() && data.lastWasInvalid) {
-    		data.lastWasInvalid = false;
-    		NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" stopped violating constraints. Total Violations: "+data.violations);
+    			// Log the violation
+    			NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" begins violating constraints. Total Violations: "+data.violations);
+    			NoCheatPlugin.log.info("NoCheatPlugin: He tried to go from " + String.format("%.5f,%.5f,%.5f to %.5f,%.5f,%.5f", from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()));
+
+    			data.lastWasInvalid = true;
+
+    			// Reset the player to his old location. This should prevent him from getting stuck somewhere and/or getting
+    			// out of sync with the server
+    			event.getPlayer().teleportTo(event.getFrom());
+
+    			// To prevent players from getting stuck in an infinite loop, needs probably more testing
+    			// TODO: Find a better solution
+    			if(data.phase > 4) {
+    				data.phase = 4;
+    			}
+    		}
+    		else if(event.isCancelled() && data.lastWasInvalid) {
+    			data.violations++;
+
+    			// Reset the player to his old location. This should prevent him from getting stuck somewhere and/or getting
+    			// out of sync with the server
+    			event.getPlayer().teleportTo(event.getFrom());
+    		}
+    		else if(!event.isCancelled() && data.lastWasInvalid) {
+    			data.lastWasInvalid = false;
+    			NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" stopped violating constraints. Total Violations: "+data.violations);
+    		}
     	}
     }
     
@@ -346,19 +364,25 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     	// Check the blocks below the player. If they aren't not solid (sic!) and the blocks directly above
     	// them aren't solid, The player is considered to be standing on the lower block
     	// Plus the player can hang onto a ladder that is one field above him
-    	if( (types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID && 
+    	if( ((types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID && 
     		 types[w.getBlockTypeIdAt(values[0], values[2], values[3])] != BlockType.SOLID) ||
-    		(types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID && 
+    		 types[w.getBlockTypeIdAt(values[0], values[2], values[3])] == BlockType.UNKNOWN) ||
+    		((types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID && 
     		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] != BlockType.SOLID) ||
-    		(types[w.getBlockTypeIdAt(values[0], values[2]-1, values[4])] != BlockType.NONSOLID && 
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] == BlockType.UNKNOWN) ||
+    		((types[w.getBlockTypeIdAt(values[0], values[2]-1, values[4])] != BlockType.NONSOLID && 
     		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] != BlockType.SOLID) ||
-    		(types[w.getBlockTypeIdAt(values[1], values[2]-1, values[4])] != BlockType.NONSOLID && 
+    		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] == BlockType.UNKNOWN) ||
+    		((types[w.getBlockTypeIdAt(values[1], values[2]-1, values[4])] != BlockType.NONSOLID && 
     		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] != BlockType.SOLID) ||
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] == BlockType.UNKNOWN) ||
     	    (types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3])] == BlockType.LADDER || 
     	     types[w.getBlockTypeIdAt(values[0], values[2]+1, values[4])] == BlockType.LADDER ||
     	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[3])] == BlockType.LADDER || 
-    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] == BlockType.LADDER))
+    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] == BlockType.LADDER)) {
+    		
     		return true;
+    	}
     	else
     		return false;
     }
