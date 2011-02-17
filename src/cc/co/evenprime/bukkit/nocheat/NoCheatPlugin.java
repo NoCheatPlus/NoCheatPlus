@@ -24,7 +24,9 @@ import org.bukkit.plugin.Plugin;
 * @author Evenprime
 */
 public class NoCheatPlugin extends JavaPlugin {
-    private final NoCheatPluginPlayerListener playerListener = new NoCheatPluginPlayerListener(this);
+	
+    private final NoCheatPluginPlayerListener playerListener;
+    private final NoCheatPluginVehicleListener vehicleListener;
         
     public static final Logger log = Logger.getLogger("Minecraft");
     public static PermissionHandler Permissions = null;
@@ -32,6 +34,8 @@ public class NoCheatPlugin extends JavaPlugin {
     public NoCheatPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, folder, plugin, cLoader);
 
+        playerListener = new NoCheatPluginPlayerListener(this);
+        vehicleListener = new NoCheatPluginVehicleListener(this, playerListener);
      }
 
     public void onDisable() { }
@@ -41,6 +45,8 @@ public class NoCheatPlugin extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
+        pm.registerEvent(Event.Type.VEHICLE_EXIT, vehicleListener, Priority.Monitor, this);
+        pm.registerEvent(Event.Type.VEHICLE_DAMAGE, vehicleListener, Priority.Monitor, this);
         
         
         PluginDescriptionFile pdfFile = this.getDescription();

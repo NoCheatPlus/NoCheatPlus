@@ -7,9 +7,13 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 
 /**
  * Handle events for all Player related events
@@ -38,6 +42,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		private boolean lastWasInvalid = false; // used to reduce amount logging
 		private long lastSpeedHackCheck = System.currentTimeMillis();; // timestamp of last check for speedhacks
 		private int eventsSinceLastSpeedHackCheck = 0; // used to identify speedhacks
+		private int vehicleExitCooldown = 0;
 		
 		private NoCheatPluginData() { }
 	}
@@ -152,7 +157,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     private static final long eventLimitForSpeedHackCheck = 60;
     
     // Store data between Events
-    private static Map<String, NoCheatPluginData> playerData = new HashMap<String, NoCheatPluginData>();
+    private static Map<Player, NoCheatPluginData> playerData = new HashMap<Player, NoCheatPluginData>();
     
 
     public NoCheatPluginPlayerListener(NoCheatPlugin instance) {
@@ -161,28 +166,42 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 
     @Override
     public void onPlayerQuit(PlayerEvent event) {
-    	playerData.remove(event.getPlayer().getName());
+    	playerData.remove(event.getPlayer());
+    }
+    
+    
+    public void vehicleUpdate(Entity player) {
+
+    	NoCheatPluginData data = playerData.get(player);
+    	if(data != null) {
+    		data.vehicleExitCooldown = 1;
+    	}
     }
     
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
-
+    	
 		// Get the player-specific data
 		NoCheatPluginData data = null;
 		
-		if((data = playerData.get(event.getPlayer().getName())) == null ) {
+		if((data = playerData.get(event.getPlayer())) == null ) {
 			// If we have no data for the player, create some
 			data = new NoCheatPluginData();
-			playerData.put(event.getPlayer().getName(), data);
+			playerData.put(event.getPlayer(), data);
 		}
 		
     	// If someone cancelled the event already, ignore it
     	// If the player is inside a vehicle, ignore it for now
-    	if(event.isCancelled() || event.getPlayer().isInsideVehicle()) {
+    	if(event.isCancelled()) {
     		data.phase = 0;
     		return;
     	}
     	
+    	if(data.vehicleExitCooldown > 0 ) {
+    		data.vehicleExitCooldown--;
+    		return;
+    	}
+    	    	
     	// Get the two locations of the event
 		Location from = event.getFrom();
 		Location to = event.getTo();
@@ -192,7 +211,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		long time = System.currentTimeMillis();
 		
 		boolean allowSpeedhack = false;
-		if(NoCheatPlugin.Permissions != null && !NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.speedhack")) {
+		if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.speedhack")) {
 			allowSpeedhack = true;
 		}
 		else if(NoCheatPlugin.Permissions == null && event.getPlayer().isOp() ) {
@@ -221,7 +240,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		}
 		
     	boolean allowMoving = false;
-		if(NoCheatPlugin.Permissions != null && !NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.moving")) {
+		if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.moving")) {
 			allowMoving = true;
 		}
 		else if(NoCheatPlugin.Permissions == null && event.getPlayer().isOp() ) {
@@ -325,8 +344,8 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 
     			// To prevent players from getting stuck in an infinite loop, needs probably more testing
     			// TODO: Find a better solution
-    			if(data.phase > 4) {
-    				data.phase = 4;
+    			if(data.phase > 7) {
+    				data.phase = 7;
     			}
     		}
     		else if(event.isCancelled() && data.lastWasInvalid) {
@@ -379,7 +398,11 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     	    (types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3])] == BlockType.LADDER || 
     	     types[w.getBlockTypeIdAt(values[0], values[2]+1, values[4])] == BlockType.LADDER ||
     	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[3])] == BlockType.LADDER || 
-    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] == BlockType.LADDER)) {
+    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] == BlockType.LADDER)||
+    	    (types[w.getBlockTypeIdAt(values[0], values[2], values[3])] == BlockType.LADDER || 
+    	     types[w.getBlockTypeIdAt(values[0], values[2], values[4])] == BlockType.LADDER ||
+    	     types[w.getBlockTypeIdAt(values[1], values[2], values[3])] == BlockType.LADDER || 
+    	     types[w.getBlockTypeIdAt(values[1], values[2], values[4])] == BlockType.LADDER)) {
     		
     		return true;
     	}
