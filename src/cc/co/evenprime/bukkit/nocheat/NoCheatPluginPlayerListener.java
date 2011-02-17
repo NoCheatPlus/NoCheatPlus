@@ -18,6 +18,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 public class NoCheatPluginPlayerListener extends PlayerListener {
 	
+	
+	public enum BlockType {
+		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN;
+	}
+	
 	/**
 	 * Storage for data persistence between events
 	 *
@@ -43,12 +48,108 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     // Each entry represents the maximum gain in height per move event.
     private static double jumpingPhases[] = new double[]{ 0.501D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.50D };
     
+
+    
+    // Until I can think of a better way to determine if a block is solid or not, this is what I'll do
+    private static BlockType types[] = new BlockType[256];
+    static {
+    	
+    	for(int i = 0; i < types.length; i++) {
+    		types[i] = BlockType.UNKNOWN;
+    	}
+    	
+    	types[Material.AIR.getId()] = BlockType.NONSOLID;
+    	types[Material.STONE.getId()] = BlockType.SOLID;
+    	types[Material.GRASS.getId()] = BlockType.SOLID;
+    	types[Material.DIRT.getId()] = BlockType.SOLID;
+    	types[Material.COBBLESTONE.getId()] = BlockType.SOLID;
+    	types[Material.WOOD.getId()] = BlockType.SOLID;
+    	types[Material.SAPLING.getId()] = BlockType.NONSOLID;
+    	types[Material.BEDROCK.getId()] = BlockType.SOLID;
+    	types[Material.WATER.getId()] = BlockType.LIQUID;
+    	types[Material.STATIONARY_WATER.getId()] = BlockType.LIQUID;
+    	types[Material.LAVA.getId()] = BlockType.LIQUID;
+    	types[Material.STATIONARY_LAVA.getId()] = BlockType.LIQUID;
+    	types[Material.SAND.getId()] = BlockType.SOLID;
+    	types[Material.GRAVEL.getId()] = BlockType.SOLID;
+    	types[Material.GOLD_ORE.getId()] = BlockType.SOLID;
+    	types[Material.IRON_ORE.getId()] = BlockType.SOLID;
+    	types[Material.COAL_ORE.getId()] = BlockType.SOLID;
+    	types[Material.LOG.getId()] = BlockType.SOLID;
+    	types[Material.LEAVES.getId()] = BlockType.SOLID;
+    	types[Material.SPONGE.getId()] = BlockType.SOLID;
+    	types[Material.GLASS.getId()] = BlockType.SOLID;
+    	types[Material.LAPIS_ORE.getId()] = BlockType.SOLID;
+    	types[Material.LAPIS_BLOCK.getId()] = BlockType.SOLID;
+    	types[Material.DISPENSER.getId()] = BlockType.SOLID;
+    	types[Material.SANDSTONE.getId()] = BlockType.SOLID;
+    	types[Material.NOTE_BLOCK.getId()]= BlockType.SOLID;
+    	types[Material.WOOL.getId()]= BlockType.SOLID;
+    	types[Material.YELLOW_FLOWER.getId()]= BlockType.NONSOLID;
+    	types[Material.RED_ROSE.getId()]= BlockType.NONSOLID;
+    	types[Material.BROWN_MUSHROOM.getId()]= BlockType.NONSOLID;
+    	types[Material.RED_MUSHROOM.getId()]= BlockType.NONSOLID;
+    	types[Material.GOLD_BLOCK.getId()]= BlockType.SOLID;
+    	types[Material.IRON_BLOCK.getId()]= BlockType.SOLID;
+    	types[Material.DOUBLE_STEP.getId()]= BlockType.UNKNOWN;
+    	types[Material.STEP.getId()]= BlockType.UNKNOWN;
+    	types[Material.BRICK.getId()]= BlockType.SOLID;
+    	types[Material.TNT.getId()]= BlockType.SOLID;
+    	types[Material.BOOKSHELF.getId()]= BlockType.SOLID;
+    	types[Material.MOSSY_COBBLESTONE.getId()]  = BlockType.SOLID;  	                                                                                    
+    	types[Material.OBSIDIAN.getId()]= BlockType.SOLID;
+    	types[Material.TORCH.getId()]= BlockType.NONSOLID;
+    	types[Material.FIRE.getId()]= BlockType.NONSOLID;
+    	types[Material.MOB_SPAWNER.getId()]= BlockType.SOLID;
+    	types[Material.WOOD_STAIRS.getId()]= BlockType.UNKNOWN;
+    	types[Material.CHEST.getId()]= BlockType.SOLID;
+    	types[Material.REDSTONE_WIRE.getId()]= BlockType.NONSOLID;
+    	types[Material.DIAMOND_ORE.getId()]= BlockType.SOLID;
+    	types[Material.DIAMOND_BLOCK.getId()]= BlockType.SOLID;
+    	types[Material.WORKBENCH.getId()]= BlockType.SOLID;
+    	types[Material.CROPS.getId()]= BlockType.NONSOLID;
+    	types[Material.SOIL.getId()]= BlockType.SOLID;
+    	types[Material.FURNACE.getId()]= BlockType.SOLID;
+    	types[Material.BURNING_FURNACE.getId()]= BlockType.SOLID;
+    	types[Material.SIGN_POST.getId()]= BlockType.NONSOLID;
+    	types[Material.WOODEN_DOOR.getId()]= BlockType.NONSOLID;
+    	types[Material.LADDER.getId()]= BlockType.LADDER;
+    	types[Material.RAILS.getId()]= BlockType.NONSOLID;
+    	types[Material.COBBLESTONE_STAIRS.getId()]= BlockType.UNKNOWN;
+    	types[Material.WALL_SIGN.getId()]= BlockType.NONSOLID;
+    	types[Material.LEVER.getId()]= BlockType.NONSOLID;
+    	types[Material.STONE_PLATE.getId()]= BlockType.NONSOLID;
+    	types[Material.IRON_DOOR_BLOCK.getId()]= BlockType.NONSOLID;
+    	types[Material.WOOD_PLATE.getId()]= BlockType.NONSOLID;
+    	types[Material.REDSTONE_ORE.getId()]= BlockType.SOLID;
+    	types[Material.GLOWING_REDSTONE_ORE.getId()]= BlockType.SOLID;
+    	types[Material.REDSTONE_TORCH_OFF.getId()]= BlockType.NONSOLID;
+    	types[Material.REDSTONE_TORCH_ON.getId()]= BlockType.NONSOLID;
+    	types[Material.STONE_BUTTON.getId()]= BlockType.NONSOLID;
+    	types[Material.SNOW.getId()]= BlockType.UNKNOWN;
+    	types[Material.ICE.getId()]= BlockType.UNKNOWN;
+    	types[Material.SNOW_BLOCK.getId()]= BlockType.SOLID;
+    	types[Material.CACTUS.getId()]= BlockType.SOLID;
+    	types[Material.CLAY.getId()]= BlockType.SOLID;
+    	types[Material.SUGAR_CANE_BLOCK.getId()]= BlockType.NONSOLID;
+    	types[Material.JUKEBOX.getId()]= BlockType.SOLID;
+    	types[Material.FENCE.getId()]= BlockType.UNKNOWN;
+    	types[Material.PUMPKIN.getId()]= BlockType.SOLID;
+    	types[Material.NETHERRACK.getId()]= BlockType.SOLID;
+    	types[Material.SOUL_SAND.getId()]= BlockType.UNKNOWN;
+    	types[Material.GLOWSTONE.getId()]= BlockType.SOLID;
+    	types[Material.PORTAL.getId()]= BlockType.NONSOLID;
+    	types[Material.JACK_O_LANTERN.getId()]= BlockType.SOLID;
+    	types[Material.CAKE_BLOCK.getId()]= BlockType.UNKNOWN;
+    	
+    }
+    
     // Very rough estimates
     private static double maxX = 0.5D;
     private static double maxZ = 0.5D;
     
     private static final long timeFrameForSpeedHackCheck = 2000; 
-    private static final long eventLimitForSpeedHackCheck = 50;
+    private static final long eventLimitForSpeedHackCheck = 60;
     
     // Store data between Events
     private static Map<String, NoCheatPluginData> playerData = new HashMap<String, NoCheatPluginData>();
@@ -66,17 +167,6 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
 
-    	// If someone cancelled the event already, ignore it
-    	// If the player is inside a vehicle, ignore it for now
-    	if(event.isCancelled() || event.getPlayer().isInsideVehicle()) {
-    		return;
-    	}
-    	
-    	
-    	// Get the two locations of the event
-		Location from = event.getFrom();
-		Location to = event.getTo();
-		
 		// Get the player-specific data
 		NoCheatPluginData data = null;
 		
@@ -85,6 +175,19 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 			data = new NoCheatPluginData();
 			playerData.put(event.getPlayer().getName(), data);
 		}
+		
+    	// If someone cancelled the event already, ignore it
+    	// If the player is inside a vehicle, ignore it for now
+	 	// If the player is OP, ignore it for now
+    	if(event.isCancelled() || event.getPlayer().isInsideVehicle() || event.getPlayer().isOp()) {
+    		data.phase = 0;
+    		return;
+    	}
+    	
+    	// Get the two locations of the event
+		Location from = event.getFrom();
+		Location to = event.getTo();
+		
 		
 		// Get the time of the server
 		long time = System.currentTimeMillis();
@@ -124,8 +227,8 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 
     		// pre-calculate boundary values that are needed multiple times in the following checks
     		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-    		int fromValues[] = {(int)Math.floor(from.getX() - 0.299999999D), (int)Math.floor(from.getX() + 0.299999999D), from.getBlockY(), (int)Math.floor(from.getZ() - 0.299999999D),(int)Math.floor(from.getZ() + 0.299999999D) };
-    		int toValues[] = {(int)Math.floor(to.getX() - 0.299999999D), (int)Math.floor(to.getX() + 0.299999999D), to.getBlockY(), (int)Math.floor(to.getZ() - 0.299999999D),(int)Math.floor(to.getZ() + 0.299999999D) };
+    		int fromValues[] = {(int)Math.floor(from.getX() - 0.3001D), (int)Math.floor(from.getX() + 0.3001D), from.getBlockY(), (int)Math.floor(from.getZ() - 0.3001D),(int)Math.floor(from.getZ() + 0.3001D) };
+    		int toValues[] = {(int)Math.floor(to.getX() - 0.3001D), (int)Math.floor(to.getX() + 0.3001D), to.getBlockY(), (int)Math.floor(to.getZ() - 0.3001D),(int)Math.floor(to.getZ() + 0.3001D) };
 
     		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
     		boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues);
@@ -207,7 +310,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     		
     		// To prevent players from getting stuck in an infinite loop, needs probably more testing
     		// TODO: Find a better solution
-    		if(data.phase > 7) data.phase = 7;
+    		if(data.phase > 6) data.phase = 6;
     	}
     	else if(event.isCancelled() && data.lastWasInvalid) {
     		data.violations++;
@@ -238,19 +341,23 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
      */
     private boolean playerIsOnGround(World w, int values[]) {
  
-    	if((w.getBlockAt(values[0], values[2]-1, values[3]).getType() != Material.AIR || 
-    	   w.getBlockAt(values[0], values[2]-1, values[4]).getType() != Material.AIR ||
-    	   w.getBlockAt(values[0], values[2], values[3]).getType() != Material.AIR || 
-    	   w.getBlockAt(values[0], values[2], values[4]).getType() != Material.AIR || 
-    	   w.getBlockAt(values[0], values[2]+1, values[3]).getType() == Material.LADDER || 
-    	   w.getBlockAt(values[0], values[2]+1, values[4]).getType() == Material.LADDER) || 
-    	   (values[0] != values[1] && // May save some time by skipping half of the tests
-    	   (w.getBlockAt(values[1], values[2]-1, values[3]).getType() != Material.AIR ||
-    	   w.getBlockAt(values[1], values[2]-1, values[4]).getType() != Material.AIR ||
-    	   w.getBlockAt(values[1], values[2], values[3]).getType() != Material.AIR ||
-    	   w.getBlockAt(values[1], values[2], values[4]).getType() != Material.AIR ||
-    	   w.getBlockAt(values[1], values[2]+1, values[3]).getType() == Material.LADDER || 
-    	   w.getBlockAt(values[1], values[2]+1, values[4]).getType() == Material.LADDER)))
+    	// Completely revamped collision detection
+    	// What it does:
+    	// Check the blocks below the player. If they aren't not solid (sic!) and the blocks directly above
+    	// them aren't solid, The player is considered to be standing on the lower block
+    	// Plus the player can hang onto a ladder that is one field above him
+    	if( (types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID && 
+    		 types[w.getBlockTypeIdAt(values[0], values[2], values[3])] != BlockType.SOLID) ||
+    		(types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID && 
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] != BlockType.SOLID) ||
+    		(types[w.getBlockTypeIdAt(values[0], values[2]-1, values[4])] != BlockType.NONSOLID && 
+    		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] != BlockType.SOLID) ||
+    		(types[w.getBlockTypeIdAt(values[1], values[2]-1, values[4])] != BlockType.NONSOLID && 
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] != BlockType.SOLID) ||
+    	    (types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3])] == BlockType.LADDER || 
+    	     types[w.getBlockTypeIdAt(values[0], values[2]+1, values[4])] == BlockType.LADDER ||
+    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[3])] == BlockType.LADDER || 
+    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] == BlockType.LADDER))
     		return true;
     	else
     		return false;
