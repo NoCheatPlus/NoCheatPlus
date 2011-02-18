@@ -22,11 +22,11 @@ public class NoCheatPluginVehicleListener extends VehicleListener {
    	
     @Override
     public void onVehicleExit(VehicleExitEvent event) {
-    	playerListener.vehicleUpdate(event.getExited());
+    	playerListener.ingoreNextXEvents(event.getExited());
     	
     }
     
     public void onVehicleDamage(VehicleDamageEvent event) {
-    	playerListener.vehicleUpdate(event.getVehicle().getPassenger());
+    	playerListener.ingoreNextXEvents(event.getVehicle().getPassenger());
     }
 }

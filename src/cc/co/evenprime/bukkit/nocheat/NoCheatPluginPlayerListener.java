@@ -8,12 +8,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.vehicle.VehicleExitEvent;
 
 /**
  * Handle events for all Player related events
@@ -42,7 +40,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		private boolean lastWasInvalid = false; // used to reduce amount logging
 		private long lastSpeedHackCheck = System.currentTimeMillis();; // timestamp of last check for speedhacks
 		private int eventsSinceLastSpeedHackCheck = 0; // used to identify speedhacks
-		private int vehicleExitCooldown = 0;
+		private int ignoreNextXEvents = 0;
 		
 		private NoCheatPluginData() { }
 	}
@@ -170,11 +168,11 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     }
     
     
-    public void vehicleUpdate(Entity player) {
+    public void ingoreNextXEvents(Entity player) {
 
     	NoCheatPluginData data = playerData.get(player);
     	if(data != null) {
-    		data.vehicleExitCooldown = 1;
+    		data.ignoreNextXEvents = 1;
     	}
     }
     
@@ -197,8 +195,8 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     		return;
     	}
     	
-    	if(data.vehicleExitCooldown > 0 ) {
-    		data.vehicleExitCooldown--;
+    	if(data.ignoreNextXEvents > 0 ) {
+    		data.ignoreNextXEvents--;
     		return;
     	}
     	    	
@@ -264,12 +262,12 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 
     			// pre-calculate boundary values that are needed multiple times in the following checks
     			// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-    			int fromValues[] = {(int)Math.floor(from.getX() - 0.3001D), (int)Math.floor(from.getX() + 0.3001D), from.getBlockY(), (int)Math.floor(from.getZ() - 0.3001D),(int)Math.floor(from.getZ() + 0.3001D) };
-    			int toValues[] = {(int)Math.floor(to.getX() - 0.3001D), (int)Math.floor(to.getX() + 0.3001D), to.getBlockY(), (int)Math.floor(to.getZ() - 0.3001D),(int)Math.floor(to.getZ() + 0.3001D) };
+    			int fromValues[] = {(int)Math.floor(from.getX() - 0.3D), (int)Math.floor(from.getX() + 0.3D), from.getBlockY(), (int)Math.floor(from.getZ() - 0.3D),(int)Math.floor(from.getZ() + 0.3D) };
+    			int toValues[] = {(int)Math.floor(to.getX() - 0.3D), (int)Math.floor(to.getX() + 0.3D), to.getBlockY(), (int)Math.floor(to.getZ() - 0.3D),(int)Math.floor(to.getZ() + 0.3D) };
 
     			// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
-    			boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues);
-    			boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues);
+    			boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
+    			boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues, to);
 
     			// Both locations seem to be on solid ground or at a ladder
     			if(onGroundFrom && onGroundTo)
@@ -376,36 +374,30 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
      * @param values The coordinates [lowerX, higherX, Y, lowerZ, higherZ]
      * @return
      */
-    private boolean playerIsOnGround(World w, int values[]) {
+    private boolean playerIsOnGround(World w, int values[], Location l) {
  
     	// Completely revamped collision detection
     	// What it does:
     	// Check the blocks below the player. If they aren't not solid (sic!) and the blocks directly above
     	// them aren't solid, The player is considered to be standing on the lower block
     	// Plus the player can hang onto a ladder that is one field above him
-    	if( ((types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID && 
-    		 types[w.getBlockTypeIdAt(values[0], values[2], values[3])] != BlockType.SOLID) ||
-    		 types[w.getBlockTypeIdAt(values[0], values[2], values[3])] == BlockType.UNKNOWN) ||
-    		((types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID && 
-    		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] != BlockType.SOLID) ||
-    		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] == BlockType.UNKNOWN) ||
-    		((types[w.getBlockTypeIdAt(values[0], values[2]-1, values[4])] != BlockType.NONSOLID && 
-    		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] != BlockType.SOLID) ||
-    		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] == BlockType.UNKNOWN) ||
-    		((types[w.getBlockTypeIdAt(values[1], values[2]-1, values[4])] != BlockType.NONSOLID && 
-    		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] != BlockType.SOLID) ||
-    		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] == BlockType.UNKNOWN) ||
-    	    (types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3])] == BlockType.LADDER || 
-    	     types[w.getBlockTypeIdAt(values[0], values[2]+1, values[4])] == BlockType.LADDER ||
-    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[3])] == BlockType.LADDER || 
-    	     types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] == BlockType.LADDER)||
-    	    (types[w.getBlockTypeIdAt(values[0], values[2], values[3])] == BlockType.LADDER || 
-    	     types[w.getBlockTypeIdAt(values[0], values[2], values[4])] == BlockType.LADDER ||
-    	     types[w.getBlockTypeIdAt(values[1], values[2], values[3])] == BlockType.LADDER || 
-    	     types[w.getBlockTypeIdAt(values[1], values[2], values[4])] == BlockType.LADDER)) {
-    		
+    	
+    	// Check the four borders of the players hitbox for something he could be standing on
+    	if(types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID ||
+    	   types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID ||
+    	   types[w.getBlockTypeIdAt(values[0], values[2]-1, values[4])] != BlockType.NONSOLID ||
+    	   types[w.getBlockTypeIdAt(values[1], values[2]-1, values[4])] != BlockType.NONSOLID )
     		return true;
-    	}
+    	// Check if he is hanging onto a ladder
+    	else if(types[w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ())] == BlockType.LADDER || 
+    			types[w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY()+1, l.getBlockZ())] == BlockType.LADDER)
+    		return true;
+    	// check if he is standing "in" an unknown block (we give him the benefit of a doubt and see that as a legit move)
+    	else if(types[w.getBlockTypeIdAt(values[0], values[2], values[3])] == BlockType.UNKNOWN ||
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] == BlockType.UNKNOWN ||
+    		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] == BlockType.UNKNOWN ||
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] == BlockType.UNKNOWN)
+    		return true;
     	else
     		return false;
     }
