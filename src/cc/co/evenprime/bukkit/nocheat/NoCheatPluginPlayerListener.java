@@ -392,11 +392,19 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     	else if(types[w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ())] == BlockType.LADDER || 
     			types[w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY()+1, l.getBlockZ())] == BlockType.LADDER)
     		return true;
-    	// check if he is standing "in" an unknown block (we give him the benefit of a doubt and see that as a legit move)
-    	else if(types[w.getBlockTypeIdAt(values[0], values[2], values[3])] == BlockType.UNKNOWN ||
-    		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] == BlockType.UNKNOWN ||
-    		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] == BlockType.UNKNOWN ||
-    		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] == BlockType.UNKNOWN)
+    	// check if he is standing "in" an block that's potentially solid (we give him the benefit of a doubt and see that as a legit move)
+    	// If it is not legit, the MC server already has a safeguard against that (You'll get "xy moved wrongly" on the console in that case)
+    	else if(types[w.getBlockTypeIdAt(values[0], values[2], values[3])] != BlockType.NONSOLID ||
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[3])] != BlockType.NONSOLID||
+    		 types[w.getBlockTypeIdAt(values[0], values[2], values[4])] != BlockType.NONSOLID ||
+    		 types[w.getBlockTypeIdAt(values[1], values[2], values[4])] != BlockType.NONSOLID)
+    		return true;
+    	// check if his head is "stuck" in an block that's potentially solid (we give him the benefit of a doubt and see that as a legit move)
+    	// If it is not legit, the MC server already has a safeguard against that (You'll get "xy moved wrongly" on the console in that case)
+    	else if(types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3])] != BlockType.NONSOLID ||
+    		 types[w.getBlockTypeIdAt(values[1], values[2]+1, values[3])] != BlockType.NONSOLID ||
+    		 types[w.getBlockTypeIdAt(values[0], values[2]+1, values[4])] != BlockType.NONSOLID ||
+    		 types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] != BlockType.NONSOLID)
     		return true;
     	else
     		return false;
