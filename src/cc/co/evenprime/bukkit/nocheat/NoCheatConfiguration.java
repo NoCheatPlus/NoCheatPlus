@@ -63,10 +63,12 @@ public class NoCheatConfiguration {
 	
 	private static void createStandardConfigFile(File f) {
 		try {
+			f.getParentFile().mkdirs();
+			f.createNewFile();
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 			
 			w.write("logging:"); w.newLine();
-			w.write("    filename: nocheat.log"); w.newLine();
+			w.write("    filename: plugins/NoCheat/nocheat.log"); w.newLine();
 			w.write("    logtofile: info"); w.newLine();
 			w.write("    logtoconsole: severe"); w.newLine();
 			w.flush(); w.close();

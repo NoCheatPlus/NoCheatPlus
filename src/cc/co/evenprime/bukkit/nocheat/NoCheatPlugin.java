@@ -75,7 +75,7 @@ public class NoCheatPlugin extends JavaPlugin {
     }
     
     public void setupConfig() {
-    	NoCheatConfiguration.config(new File("nocheat.yml"));
+    	NoCheatConfiguration.config(new File("plugins/NoCheat/nocheat.yml"));
     	
     	// Test config
     	Logger l = Logger.getLogger(NoCheatConfiguration.loggerName);
