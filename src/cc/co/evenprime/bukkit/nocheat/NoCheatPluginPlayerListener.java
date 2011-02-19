@@ -151,9 +151,6 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     private static double maxX = 0.5D;
     private static double maxZ = 0.5D;
     
-    private static final long timeFrameForSpeedHackCheck = 2000; 
-    private static final long eventLimitForSpeedHackCheck = 60;
-    
     // Store data between Events
     private static Map<Player, NoCheatPluginData> playerData = new HashMap<Player, NoCheatPluginData>();
     
@@ -208,27 +205,31 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		// Get the time of the server
 		long time = System.currentTimeMillis();
 		
-		boolean allowSpeedhack = false;
+		boolean ignoreSpeedhackCheck = false;
+		if(!NoCheatConfiguration.speedhackActive) ignoreSpeedhackCheck = true;
 		if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.speedhack")) {
-			allowSpeedhack = true;
+			ignoreSpeedhackCheck = true;
 		}
 		else if(NoCheatPlugin.Permissions == null && event.getPlayer().isOp() ) {
-			allowSpeedhack = true;
+			ignoreSpeedhackCheck = true;
 		}
 
-    	if(!allowSpeedhack){
+    	if(!ignoreSpeedhackCheck){
     		
 			// Is it time for a speedhack check now?
-			if(time > timeFrameForSpeedHackCheck + data.lastSpeedHackCheck ) {
+			if(time > NoCheatConfiguration.speedhackInterval + data.lastSpeedHackCheck ) {
 				// Yes
 				
-				int limit = (int)((eventLimitForSpeedHackCheck * (time - data.lastSpeedHackCheck)) / timeFrameForSpeedHackCheck);
+				int limitLow = (int)((NoCheatConfiguration.speedhackLow * (time - data.lastSpeedHackCheck)) / NoCheatConfiguration.speedhackInterval);
+				int limitMed = (int)((NoCheatConfiguration.speedhackMed * (time - data.lastSpeedHackCheck)) / NoCheatConfiguration.speedhackInterval);
+				int limitHigh = (int)((NoCheatConfiguration.speedhackHigh * (time - data.lastSpeedHackCheck)) / NoCheatConfiguration.speedhackInterval);
 				
-				if(data.eventsSinceLastSpeedHackCheck > limit) {
-					// Probably someone is speedhacking here! Better log that
-					NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" probably uses a speedhack. He sent "+ data.eventsSinceLastSpeedHackCheck + " events, but only "+limit+ " were allowed in the timeframe!");
-				}
-				
+				if(data.eventsSinceLastSpeedHackCheck > limitHigh)
+					NoCheatPlugin.log.severe("NoCheatPlugin: "+event.getPlayer().getName()+" sent "+ data.eventsSinceLastSpeedHackCheck + " move events, but only "+limitLow+ " were allowed. Speedhack?");
+				else if(data.eventsSinceLastSpeedHackCheck > limitMed)
+					NoCheatPlugin.log.warning("NoCheatPlugin: "+event.getPlayer().getName()+" sent "+ data.eventsSinceLastSpeedHackCheck + " move events, but only "+limitLow+ " were allowed. Speedhack?");
+				else if(data.eventsSinceLastSpeedHackCheck > limitLow)
+					NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getName()+" sent "+ data.eventsSinceLastSpeedHackCheck + " move events, but only "+limitLow+ " were allowed. Speedhack?");
 				// Reset values for next check
 				data.eventsSinceLastSpeedHackCheck = 0;
 				data.lastSpeedHackCheck = time;
@@ -237,15 +238,16 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 			data.eventsSinceLastSpeedHackCheck++;
 		}
 		
-    	boolean allowMoving = false;
-		if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.moving")) {
-			allowMoving = true;
+    	boolean ignoreMovingCheck = false;
+    	if(!NoCheatConfiguration.movingActive) ignoreMovingCheck = true;
+    	else if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.moving")) {
+			ignoreMovingCheck = true;
 		}
 		else if(NoCheatPlugin.Permissions == null && event.getPlayer().isOp() ) {
-			allowMoving = true;
+			ignoreMovingCheck = true;
 		}
 
-    	if(!allowMoving){
+    	if(!ignoreMovingCheck){
     		// First check the distance the player has moved horizontally
     		// TODO: Make this check much more precise
     		if(!event.isCancelled()) {
@@ -262,8 +264,8 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 
     			// pre-calculate boundary values that are needed multiple times in the following checks
     			// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-    			int fromValues[] = {(int)Math.floor(from.getX() - 0.3D), (int)Math.floor(from.getX() + 0.3D), from.getBlockY(), (int)Math.floor(from.getZ() - 0.3D),(int)Math.floor(from.getZ() + 0.3D) };
-    			int toValues[] = {(int)Math.floor(to.getX() - 0.3D), (int)Math.floor(to.getX() + 0.3D), to.getBlockY(), (int)Math.floor(to.getZ() - 0.3D),(int)Math.floor(to.getZ() + 0.3D) };
+    			int fromValues[] = {floor_double(from.getX() - 0.3D), (int)Math.floor(from.getX() + 0.3D), from.getBlockY(), floor_double(from.getZ() - 0.3D),(int)Math.floor(from.getZ() + 0.3D) };
+    			int toValues[] = {floor_double(to.getX() - 0.3D), (int)Math.floor(to.getX() + 0.3D), to.getBlockY(), floor_double(to.getZ() - 0.3D), (int)Math.floor(to.getZ() + 0.3D) };
 
     			// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
     			boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
@@ -313,10 +315,13 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     			}
     			// Player is moving through air (during jumping, falling)
     			else {
+    				// May also be at the very edge of a platform (I seem to not be able to reliably tell if that's the case
     				if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
     					event.setCancelled(true);
     				}
-    				else data.phase++; // Enter next phase of the flight
+    				else {
+    					data.phase++; // Enter next phase of the flight
+    				}
     			}
 
     			// do a security check on the jumping phase, such that we don't get 
@@ -331,8 +336,8 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     			data.violations++;
 
     			// Log the violation
-    			NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" begins violating constraints. Total Violations: "+data.violations);
-    			NoCheatPlugin.log.info("NoCheatPlugin: He tried to go from " + String.format("%.5f,%.5f,%.5f to %.5f,%.5f,%.5f", from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()));
+    			NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getName()+" begins violating constraints. Total Violations: "+data.violations);
+    			NoCheatPlugin.log.info("NoCheatPlugin: Moving from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ()));
 
     			data.lastWasInvalid = true;
 
@@ -355,7 +360,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     		}
     		else if(!event.isCancelled() && data.lastWasInvalid) {
     			data.lastWasInvalid = false;
-    			NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getDisplayName()+" stopped violating constraints. Total Violations: "+data.violations);
+    			NoCheatPlugin.log.info("NoCheatPlugin: "+event.getPlayer().getName()+" stopped violating constraints. Total Violations: "+data.violations);
     		}
     	}
     }
@@ -408,5 +413,11 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     		return true;
     	else
     		return false;
+    }
+    
+    public static int floor_double(double d)
+    {
+        int i = (int)d;
+        return d > (double)i ? i : i - 1;
     }
 }

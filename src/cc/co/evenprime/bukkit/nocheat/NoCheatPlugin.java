@@ -37,7 +37,7 @@ public class NoCheatPlugin extends JavaPlugin {
         playerListener = new NoCheatPluginPlayerListener(this);
         vehicleListener = new NoCheatPluginVehicleListener(this, playerListener);
         
-        setupConfig();
+
         
         log = NoCheatConfiguration.logger;
      }
@@ -58,6 +58,7 @@ public class NoCheatPlugin extends JavaPlugin {
         Logger.getLogger("Minecraft").info( "NoCheat version " + pdfFile.getVersion() + " is enabled!" );
         
         setupPermissions();
+        setupConfig();
     }
     
     public void setupPermissions() {
@@ -76,9 +77,6 @@ public class NoCheatPlugin extends JavaPlugin {
     
     public void setupConfig() {
     	NoCheatConfiguration.config(new File("plugins/NoCheat/nocheat.yml"));
-    	
-    	// Test config
-    	Logger l = Logger.getLogger(NoCheatConfiguration.loggerName);
-  
+    	  
     }
 }

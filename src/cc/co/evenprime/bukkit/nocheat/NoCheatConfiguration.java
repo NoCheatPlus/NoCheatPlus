@@ -8,7 +8,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import org.bukkit.util.config.Configuration;
 
@@ -16,6 +15,16 @@ public class NoCheatConfiguration {
 	
 	public static final String loggerName = "cc.co.evenprime.bukkit.nocheat";
 	public static final Logger logger = Logger.getLogger(loggerName);
+	
+	public static boolean speedhackActive = true;
+	public static boolean movingActive = true;
+	public static int speedhackInterval = 2000;
+	public static int speedhackLow = 60;
+	public static int speedhackMed = 90;
+	public static int speedhackHigh = 120;
+	
+	private static ConsoleHandler ch = null;
+	private static FileHandler fh = null;
 	
 	private NoCheatConfiguration() {}
 	
@@ -30,23 +39,34 @@ public class NoCheatConfiguration {
 		logger.setLevel(Level.INFO);
 		logger.setUseParentHandlers(false);
 				
-		ConsoleHandler ch = new ConsoleHandler();
-
-		ch.setLevel(stringToLevel(c.getString("logging.logtoconsole")));
-		ch.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
-		logger.addHandler(ch);
-		
-		FileHandler fh = null;
-		try {
-			fh = new FileHandler(c.getString("logging.filename"), true);
-			fh.setLevel(stringToLevel(c.getString("logging.logtofile")));
-			fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
-			logger.addHandler(fh);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(ch == null) {
+			ch = new ConsoleHandler();
+	
+			ch.setLevel(stringToLevel(c.getString("logging.logtoconsole")));
+			ch.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
+			logger.addHandler(ch);
 		}
+		
+		if(fh == null) {
+			try {
+				fh = new FileHandler(c.getString("logging.filename"), true);
+				fh.setLevel(stringToLevel(c.getString("logging.logtofile")));
+				fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
+				logger.addHandler(fh);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		speedhackActive = c.getBoolean("active.speedhack", true);
+		movingActive = c.getBoolean("active.moving", true);
+		
+		speedhackInterval = c.getInt("speedhack.interval", 2000);
+		speedhackLow = c.getInt("speedhack.limits.low", 60);
+		speedhackMed = c.getInt("speedhack.limits.med", 90);
+		speedhackHigh = c.getInt("speedhack.limits.high", 120);
 	}
 	
 	private static Level stringToLevel(String string) {
@@ -67,10 +87,22 @@ public class NoCheatConfiguration {
 			f.createNewFile();
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 			
+			w.write("# Logging: potential log levels are info, warn, severe, off"); w.newLine();
 			w.write("logging:"); w.newLine();
 			w.write("    filename: plugins/NoCheat/nocheat.log"); w.newLine();
 			w.write("    logtofile: info"); w.newLine();
 			w.write("    logtoconsole: severe"); w.newLine();
+			w.write("# Checks that are activated (true or false)"); w.newLine();
+			w.write("active:");  w.newLine();
+			w.write("    speedhack: true"); w.newLine();
+			w.write("    moving: true"); w.newLine();
+			w.write("# Speedhack: interval in milliseconds, limits are events in that interval") ;w.newLine();
+			w.write("speedhack:"); w.newLine();
+			w.write("    interval: 2000"); w.newLine();
+			w.write("    limits:"); w.newLine();
+			w.write("        low: 60"); w.newLine();
+			w.write("        med: 90"); w.newLine();
+			w.write("        high: 120"); w.newLine();
 			w.flush(); w.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
