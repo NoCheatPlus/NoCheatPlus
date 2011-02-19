@@ -16,12 +16,16 @@ public class NoCheatConfiguration {
 	public static final String loggerName = "cc.co.evenprime.bukkit.nocheat";
 	public static final Logger logger = Logger.getLogger(loggerName);
 	
-	public static boolean speedhackActive = true;
-	public static boolean movingActive = true;
+	public static boolean speedhackCheckActive = true;
+	public static boolean movingCheckActive = true;
 	public static int speedhackInterval = 2000;
 	public static int speedhackLow = 60;
 	public static int speedhackMed = 90;
 	public static int speedhackHigh = 120;
+	
+	public static double movingDistanceLow = 0.5D;
+	public static double movingDistanceMed = 1.0D;
+	public static double movingDistanceHigh = 5.0D;
 	
 	private static ConsoleHandler ch = null;
 	private static FileHandler fh = null;
@@ -60,8 +64,8 @@ public class NoCheatConfiguration {
 			}
 		}
 		
-		speedhackActive = c.getBoolean("active.speedhack", true);
-		movingActive = c.getBoolean("active.moving", true);
+		speedhackCheckActive = c.getBoolean("active.speedhack", true);
+		movingCheckActive = c.getBoolean("active.moving", true);
 		
 		speedhackInterval = c.getInt("speedhack.interval", 2000);
 		speedhackLow = c.getInt("speedhack.limits.low", 60);
