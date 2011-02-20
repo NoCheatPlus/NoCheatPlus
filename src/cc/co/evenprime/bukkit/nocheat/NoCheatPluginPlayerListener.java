@@ -55,11 +55,11 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     }
     
     
-    public void ingoreNextXEvents(Entity player) {
+    public void ingoreNextXEvents(Entity player, int count) {
 
     	NoCheatPluginData data = playerData.get(player);
     	if(data != null) {
-    		data.ignoreNextXEvents = 1;
+    		data.ignoreNextXEvents = count;
     	}
     }
     

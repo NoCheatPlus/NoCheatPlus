@@ -53,7 +53,6 @@ public class NoCheatPlugin extends JavaPlugin {
         pm.registerEvent(Event.Type.VEHICLE_EXIT, vehicleListener, Priority.Monitor, this);
         pm.registerEvent(Event.Type.VEHICLE_DAMAGE, vehicleListener, Priority.Monitor, this);
         
-        
         PluginDescriptionFile pdfFile = this.getDescription();
         Logger.getLogger("Minecraft").info( "NoCheat version " + pdfFile.getVersion() + " is enabled!" );
         

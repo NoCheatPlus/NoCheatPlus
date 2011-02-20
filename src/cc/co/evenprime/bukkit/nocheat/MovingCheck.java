@@ -264,7 +264,6 @@ public class MovingCheck {
 		if(data.minorViolationsInARow == 0) {
 			// Store the source location for later use
 			data.movingSetBackPoint = event.getFrom().clone();
-			System.out.println("RESET point recorded: "+data.movingSetBackPoint);
 		}
 		
 		data.minorViolationsInARow++;
