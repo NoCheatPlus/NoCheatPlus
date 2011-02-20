@@ -37,8 +37,6 @@ public class NoCheatPlugin extends JavaPlugin {
         playerListener = new NoCheatPluginPlayerListener(this);
         vehicleListener = new NoCheatPluginVehicleListener(this, playerListener);
         
-
-        
         log = NoCheatConfiguration.logger;
      }
 

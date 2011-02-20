@@ -34,6 +34,8 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		int ignoreNextXEvents = 0;
 		
 		int minorViolationsInARow = 0;
+		int normalViolationsInARow = 0;
+		int heavyViolationsInARow = 0;
 		Location movingSetBackPoint = null;
 		
 		private NoCheatPluginData() { }
@@ -48,12 +50,11 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     public NoCheatPluginPlayerListener(NoCheatPlugin instance) {
         plugin = instance;
     }
-
+    
     @Override
     public void onPlayerQuit(PlayerEvent event) {
     	playerData.remove(event.getPlayer());
     }
-    
     
     public void ingoreNextXEvents(Entity player, int count) {
 

@@ -274,24 +274,41 @@ public class MovingCheck {
 		else if(data.minorViolationsInARow % 2 == 0) {
 			// now we need it
 			resetPlayer(data, event);
-			NoCheatPlugin.log.info("NoCheatPlugin: Moving: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+			NoCheatPlugin.log.info("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 		}
 	}
 	
 	protected static void normalViolation(NoCheatPluginData data, PlayerMoveEvent event) {
 		resetPlayer(data, event);
-		// Log the violation
-		NoCheatPlugin.log.warning("NoCheatPlugin: Moving: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+		
+		data.normalViolationsInARow++;
+		// Log the first violation in a row
+		if(data.normalViolationsInARow <= 1)
+			NoCheatPlugin.log.warning("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 	}
 	
 	protected static void heavyViolation(NoCheatPluginData data, PlayerMoveEvent event) {
 		resetPlayer(data, event);
-		// Log the violation
-		NoCheatPlugin.log.severe("NoCheatPlugin: Moving: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+		
+		data.heavyViolationsInARow++;
+		// Log the first violation in a row
+		if(data.heavyViolationsInARow <= 1)
+			NoCheatPlugin.log.severe("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 	}
 	
 	protected static void legitimateMove(NoCheatPluginData data, PlayerMoveEvent event) {
+		// Give some additional logs
+		if(data.heavyViolationsInARow > 0) {
+			NoCheatPlugin.log.severe("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName() + " total Events: "+ data.heavyViolationsInARow);
+			data.heavyViolationsInARow = 0;
+		}
+		else if(data.normalViolationsInARow > 0) {
+			NoCheatPlugin.log.warning("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.normalViolationsInARow);
+			data.normalViolationsInARow = 0;
+		}
 		data.minorViolationsInARow = 0;
+		data.normalViolationsInARow = 0;
+		data.heavyViolationsInARow = 0;
 		data.movingSetBackPoint = null;
 	}
 		
@@ -302,18 +319,23 @@ public class MovingCheck {
 	 * @param event
 	 */
 	private static void resetPlayer(NoCheatPluginData data, PlayerMoveEvent event) {
-		
-		event.setCancelled(true);
-		
+				
 		if(data.phase > 7) {
 			data.phase = 7;
 		}
 
 		if(data.movingSetBackPoint != null) {
+			
+			// Lets try it that way. Maybe now people don't "disappear" any longer
+			event.setFrom(data.movingSetBackPoint);
+			event.setTo(data.movingSetBackPoint);
 			event.getPlayer().teleportTo(data.movingSetBackPoint);
 		}
-		else
+		else {
+			event.setFrom(event.getFrom());
+			event.setTo(event.getFrom().clone());
 			event.getPlayer().teleportTo(event.getFrom());
+		}
 	}
 
 	  
