@@ -332,6 +332,7 @@ public class MovingCheck {
 			event.getPlayer().teleportTo(data.movingSetBackPoint);
 		}
 		else {
+			// Lets try it that way. Maybe now people don't "disappear" any longer
 			event.setFrom(event.getFrom());
 			event.setTo(event.getFrom().clone());
 			event.getPlayer().teleportTo(event.getFrom());
