@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat;
 
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,8 +14,12 @@ public class MovingCheck {
     // Each entry represents the maximum gain in height per move event.
     private static double jumpingPhases[] = new double[]{ 0.501D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.50D };
     
+    private static final int HEAVY = 3;
+    private static final int NORMAL = 2;
+    private static final int MINOR = 1;
+    private static final int NONE = 0;
     
-    public enum BlockType {
+    private enum BlockType {
 		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN;
 	}
     
@@ -112,17 +117,20 @@ public class MovingCheck {
     }
     
 	public static void check(NoCheatPluginData data, PlayerMoveEvent event) {
+			
 		
-		// Get the two locations of the event
-		Location from = event.getFrom();
-		Location to = event.getTo();
-    	
     	if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.moving")) {
 			return;
 		}
 		else if(NoCheatPlugin.Permissions == null && event.getPlayer().isOp() ) {
 			return;
 		}
+    	
+    	// Get the two locations of the event
+		Location from = event.getFrom();
+		Location to = event.getTo();
+		
+		int vl = NONE; // The violation level (none, minor, normal, heavy)
 
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
@@ -132,13 +140,13 @@ public class MovingCheck {
     		
     		// How far are we off?
     		if(xDistance > NoCheatConfiguration.movingDistanceHigh || zDistance > NoCheatConfiguration.movingDistanceHigh) {
-    			heavyViolation(data, event);
+    			vl = vl > HEAVY ? vl : HEAVY;
     		}
     		else if(xDistance > NoCheatConfiguration.movingDistanceMed || zDistance > NoCheatConfiguration.movingDistanceMed) {
-    			normalViolation(data, event);
+    			vl = vl > NORMAL ? vl : NORMAL;
     		}
     		else if(xDistance > NoCheatConfiguration.movingDistanceLow || zDistance > NoCheatConfiguration.movingDistanceLow) {
-    			minorViolation(data, event);
+    			vl = vl > MINOR ? vl : MINOR;
     		}
     	}
 
@@ -169,9 +177,9 @@ public class MovingCheck {
     				
     				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
     				
-    				if(offset > 2D)        heavyViolation(data, event);
-    				else if(offset > 0.6D) normalViolation(data, event);
-    				else                   minorViolation(data, event);
+    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    				else                   vl = vl > MINOR ? vl : MINOR;
     			}
     		}
     		// player is starting to jump (or starting to fall down somewhere)
@@ -185,9 +193,9 @@ public class MovingCheck {
     				
     				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
     				
-    				if(offset > 2D)        heavyViolation(data, event);
-    				else if(offset > 0.6D) normalViolation(data, event);
-    				else                   minorViolation(data, event);
+    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    				else                   vl = vl > MINOR ? vl : MINOR;
     			}
     			else if(to.getY() <= from.getY()) {
     				// Very special case if running over a cliff and then immediately jumping. 
@@ -203,9 +211,9 @@ public class MovingCheck {
     				
     				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
     				
-    				if(offset > 2D)        heavyViolation(data, event);
-    				else if(offset > 0.6D) normalViolation(data, event);
-    				else                   minorViolation(data, event);
+    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    				else                   vl = vl > MINOR ? vl : MINOR;
     			}
     			else {
     				data.phase = 0; // He is on ground now, so reset the jump
@@ -213,14 +221,14 @@ public class MovingCheck {
     		}
     		// Player is moving through air (during jumping, falling)
     		else {
-    			// May also be at the very edge of a platform (I seem to not be able to reliably tell if that's the case
+    			// May also be at the very edge of a platform (I seem to not be able to reliably tell if that's the case)
     			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
 
     				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
     				
-    				if(offset > 2D)        heavyViolation(data, event);
-    				else if(offset > 0.6D) normalViolation(data, event);
-    				else                   minorViolation(data, event);
+    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    				else                   vl = vl > MINOR ? vl : MINOR;
     			}
     			else {
     				data.phase++; // Enter next phase of the flight
@@ -234,73 +242,79 @@ public class MovingCheck {
     		}
     	}
     	
-    	if(!event.isCancelled()) {
-    		if(data.movingViolationsDirty) {
-    			combineViolationCount(data);
-    		}
-    		data.movingSetBackPoint = null;
+    	// Treat the violation(s)
+    	switch(vl) {
+    	case MINOR:
+    		minorViolation(data, event);
+    		break;
+    	case NORMAL:
+    		normalViolation(data, event);
+    		break;
+    	case HEAVY:
+    		heavyViolation(data, event);
+    		break;
+    	default:
+    		legitimateMove(data, event);
     	}
-   
 	}
 	
 	
-	private static void minorViolation(NoCheatPluginData data, PlayerMoveEvent event) {
-		data.movingViolations[0]++;
-		data.movingViolationsDirty = true;
-		if(data.movingViolations[0] == 0) {
+	protected static void minorViolation(NoCheatPluginData data, PlayerMoveEvent event) {
+
+		if(data.minorViolationsInARow == 0) {
 			// Store the source location for later use
 			data.movingSetBackPoint = event.getFrom().clone();
+			System.out.println("RESET point recorded: "+data.movingSetBackPoint);
 		}
-		if(data.movingViolations[0] > 2) {
+		
+		data.minorViolationsInARow++;
+		
+		if(data.minorViolationsInARow % 16 == 0) {
+			normalViolation(data, event);
+		}
+		else if(data.minorViolationsInARow % 2 == 0) {
 			// now we need it
 			resetPlayer(data, event);
 			NoCheatPlugin.log.info("NoCheatPlugin: Moving: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 		}
 	}
 	
-	private static void normalViolation(NoCheatPluginData data, PlayerMoveEvent event) {
-		data.movingViolations[1]++;
-		data.movingViolationsDirty = true;
+	protected static void normalViolation(NoCheatPluginData data, PlayerMoveEvent event) {
 		resetPlayer(data, event);
-		
+		// Log the violation
 		NoCheatPlugin.log.warning("NoCheatPlugin: Moving: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
-
 	}
 	
-	private static void heavyViolation(NoCheatPluginData data, PlayerMoveEvent event) {
-		data.movingViolations[2]++;
-		data.movingViolationsDirty = true;
+	protected static void heavyViolation(NoCheatPluginData data, PlayerMoveEvent event) {
 		resetPlayer(data, event);
 		// Log the violation
 		NoCheatPlugin.log.severe("NoCheatPlugin: Moving: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
-
 	}
 	
-	private static void combineViolationCount(NoCheatPluginData data) {
-		
-		data.movingViolationsTotal[0] += data.movingViolations[0];
-		data.movingViolationsTotal[1] += data.movingViolations[1];
-		data.movingViolationsTotal[2] += data.movingViolations[2];
-		
-		data.movingViolations[0] = 0;
-		data.movingViolations[1] = 0;
-		data.movingViolations[2] = 0;
-		
-		data.movingViolationsDirty = false;
+	protected static void legitimateMove(NoCheatPluginData data, PlayerMoveEvent event) {
+		data.minorViolationsInARow = 0;
+		data.movingSetBackPoint = null;
 	}
-	
+		
+	/** 
+	 * Cancel the event and return the player to a stored location or if that is not available,
+	 * the the previous location.
+	 * @param data
+	 * @param event
+	 */
 	private static void resetPlayer(NoCheatPluginData data, PlayerMoveEvent event) {
 		
 		event.setCancelled(true);
 		
+		if(data.phase > 7) {
+			data.phase = 7;
+		}
+
 		if(data.movingSetBackPoint != null) {
 			event.getPlayer().teleportTo(data.movingSetBackPoint);
-			data.movingSetBackPoint = null;
 		}
 		else
 			event.getPlayer().teleportTo(event.getFrom());
-		
-		combineViolationCount(data);
 	}
 
 	  

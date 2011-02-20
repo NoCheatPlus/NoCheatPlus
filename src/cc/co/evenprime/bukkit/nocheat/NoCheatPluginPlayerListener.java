@@ -33,9 +33,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		int eventsSinceLastSpeedHackCheck = 0; // used to identify speedhacks
 		int ignoreNextXEvents = 0;
 		
-		int movingViolations[] = {0,0,0};
-		int movingViolationsTotal[] = {0,0,0};
-		boolean movingViolationsDirty = false;
+		int minorViolationsInARow = 0;
 		Location movingSetBackPoint = null;
 		
 		private NoCheatPluginData() { }
