@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat;
 
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatPluginPlayerListener.NoCheatPluginData;
 
 public class SpeedhackCheck {
 

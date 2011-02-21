@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatPluginPlayerListener.NoCheatPluginData;
 
 public class MovingCheck {
 
@@ -134,114 +133,109 @@ public class MovingCheck {
 
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
-    	if(!event.isCancelled()) {
-    		double xDistance = Math.abs(from.getX() - to.getX());
-    		double zDistance = Math.abs(from.getZ() - to.getZ());
+   		double xDistance = Math.abs(from.getX() - to.getX());
+    	double zDistance = Math.abs(from.getZ() - to.getZ());
     		
-    		// How far are we off?
-    		if(xDistance > NoCheatConfiguration.movingDistanceHigh || zDistance > NoCheatConfiguration.movingDistanceHigh) {
-    			vl = vl > HEAVY ? vl : HEAVY;
-    		}
-    		else if(xDistance > NoCheatConfiguration.movingDistanceMed || zDistance > NoCheatConfiguration.movingDistanceMed) {
-    			vl = vl > NORMAL ? vl : NORMAL;
-    		}
-    		else if(xDistance > NoCheatConfiguration.movingDistanceLow || zDistance > NoCheatConfiguration.movingDistanceLow) {
-    			vl = vl > MINOR ? vl : MINOR;
-    		}
+    	// How far are we off?
+    	if(xDistance > NoCheatConfiguration.movingDistanceHigh || zDistance > NoCheatConfiguration.movingDistanceHigh) {
+    		vl = vl > HEAVY ? vl : HEAVY;
+    	}
+    	else if(xDistance > NoCheatConfiguration.movingDistanceMed || zDistance > NoCheatConfiguration.movingDistanceMed) {
+    		vl = vl > NORMAL ? vl : NORMAL;
+    	}
+    	else if(xDistance > NoCheatConfiguration.movingDistanceLow || zDistance > NoCheatConfiguration.movingDistanceLow) {
+    		vl = vl > MINOR ? vl : MINOR;
     	}
 
-    	// If we didn't already cancel the event, check the vertical movement
-    	if(!event.isCancelled()) {
 
-    		// pre-calculate boundary values that are needed multiple times in the following checks
-    		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-    		int fromValues[] = {floor_double(from.getX() - 0.3D), (int)Math.floor(from.getX() + 0.3D), from.getBlockY(), floor_double(from.getZ() - 0.3D),(int)Math.floor(from.getZ() + 0.3D) };
-    		int toValues[] = {floor_double(to.getX() - 0.3D), (int)Math.floor(to.getX() + 0.3D), to.getBlockY(), floor_double(to.getZ() - 0.3D), (int)Math.floor(to.getZ() + 0.3D) };
+    	// pre-calculate boundary values that are needed multiple times in the following checks
+    	// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
+    	int fromValues[] = {floor_double(from.getX() - 0.3D), (int)Math.floor(from.getX() + 0.3D), from.getBlockY(), floor_double(from.getZ() - 0.3D),(int)Math.floor(from.getZ() + 0.3D) };
+    	int toValues[] = {floor_double(to.getX() - 0.3D), (int)Math.floor(to.getX() + 0.3D), to.getBlockY(), floor_double(to.getZ() - 0.3D), (int)Math.floor(to.getZ() + 0.3D) };
 
-    		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
-    		boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
-    		boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues, to);
+    	// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
+    	boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
+    	boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues, to);
 
-    		// Both locations seem to be on solid ground or at a ladder
-    		if(onGroundFrom && onGroundTo)
-    		{
-    			// reset jumping
-    			data.phase = 0;
+    	// Both locations seem to be on solid ground or at a ladder
+    	if(onGroundFrom && onGroundTo)
+    	{
+    		// reset jumping
+    		data.phase = 0;
 
-    			// Check if the player isn't 'walking' up unrealistically far in one step
-    			// Finally found out why this can happen:
-    			// If a player runs into a wall at an angle from above, the game tries to
-    			// place him above the block he bumped into, by placing him 0.5 m above
-    			// the target block
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-    				
-    				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
-    				
-    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
-    				else                   vl = vl > MINOR ? vl : MINOR;
-    			}
+    		// Check if the player isn't 'walking' up unrealistically far in one step
+    		// Finally found out why this can happen:
+    		// If a player runs into a wall at an angle from above, the game tries to
+    		// place him above the block he bumped into, by placing him 0.5 m above
+    		// the target block
+    		if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+
+    			double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
+
+    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else                   vl = vl > MINOR ? vl : MINOR;
     		}
-    		// player is starting to jump (or starting to fall down somewhere)
-    		else if(onGroundFrom && !onGroundTo)
-    		{	
-    			// reset jumping
-    			data.phase = 0;
+    	}
+    	// player is starting to jump (or starting to fall down somewhere)
+    	else if(onGroundFrom && !onGroundTo)
+    	{	
+    		// reset jumping
+    		data.phase = 0;
 
-    			// Check if player isn't jumping too high
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-    				
-    				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
-    				
-    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
-    				else                   vl = vl > MINOR ? vl : MINOR;
-    			}
-    			else if(to.getY() <= from.getY()) {
-    				// Very special case if running over a cliff and then immediately jumping. 
-    				// Some sort of "air jump", MC allows it, so we have to do so too.
-    			}
-    			else data.phase++; // Setup next phase of the jump
+    		// Check if player isn't jumping too high
+    		if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+
+    			double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
+
+    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else                   vl = vl > MINOR ? vl : MINOR;
     		}
-    		// player is probably landing somewhere
-    		else if(!onGroundFrom && onGroundTo)
-    		{
-    			// Check if player isn't landing to high (sounds weird, but has its use)
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-    				
-    				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
-    				
-    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
-    				else                   vl = vl > MINOR ? vl : MINOR;
-    			}
-    			else {
-    				data.phase = 0; // He is on ground now, so reset the jump
-    			}
+    		else if(to.getY() <= from.getY()) {
+    			// Very special case if running over a cliff and then immediately jumping. 
+    			// Some sort of "air jump", MC allows it, so we have to do so too.
     		}
-    		// Player is moving through air (during jumping, falling)
+    		else data.phase++; // Setup next phase of the jump
+    	}
+    	// player is probably landing somewhere
+    	else if(!onGroundFrom && onGroundTo)
+    	{
+    		// Check if player isn't landing to high (sounds weird, but has its use)
+    		if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+
+    			double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
+
+    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else                   vl = vl > MINOR ? vl : MINOR;
+    		}
     		else {
-    			// May also be at the very edge of a platform (I seem to not be able to reliably tell if that's the case)
-    			if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
-
-    				double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
-    				
-    				if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    				else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
-    				else                   vl = vl > MINOR ? vl : MINOR;
-    			}
-    			else {
-    				data.phase++; // Enter next phase of the flight
-    			}
-    		}
-
-    		// do a security check on the jumping phase, such that we don't get 
-    		// OutOfArrayBoundsExceptions at long air times (falling off high places)
-    		if(!(data.phase < jumpingPhases.length)) {
-    			data.phase = jumpingPhases.length - 1;
+    			data.phase = 0; // He is on ground now, so reset the jump
     		}
     	}
-    	
+    	// Player is moving through air (during jumping, falling)
+    	else {
+    		// May also be at the very edge of a platform (I seem to not be able to reliably tell if that's the case)
+    		if(!(to.getY() - from.getY() < jumpingPhases[data.phase])) {
+
+    			double offset = (to.getY() - from.getY()) - jumpingPhases[data.phase];
+
+    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
+    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else                   vl = vl > MINOR ? vl : MINOR;
+    		}
+    		else {
+    			data.phase++; // Enter next phase of the flight
+    		}
+    	}
+
+    	// do a security check on the jumping phase, such that we don't get 
+    	// OutOfArrayBoundsExceptions at long air times (falling off high places)
+    	if(!(data.phase < jumpingPhases.length)) {
+    		data.phase = jumpingPhases.length - 1;
+    	}
+
     	// Treat the violation(s)
     	switch(vl) {
     	case MINOR:
@@ -273,27 +267,30 @@ public class MovingCheck {
 		}
 		else if(data.minorViolationsInARow % 2 == 0) {
 			// now we need it
-			resetPlayer(data, event);
 			NoCheatPlugin.log.info("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+			resetPlayer(data, event);
 		}
 	}
 	
 	protected static void normalViolation(NoCheatPluginData data, PlayerMoveEvent event) {
-		resetPlayer(data, event);
-		
-		data.normalViolationsInARow++;
 		// Log the first violation in a row
 		if(data.normalViolationsInARow <= 1)
 			NoCheatPlugin.log.warning("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
-	}
+	
+		resetPlayer(data, event);
+		
+		data.normalViolationsInARow++;
+		}
 	
 	protected static void heavyViolation(NoCheatPluginData data, PlayerMoveEvent event) {
+		
+		if(data.heavyViolationsInARow == 0)
+			NoCheatPlugin.log.severe("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+	
 		resetPlayer(data, event);
 		
 		data.heavyViolationsInARow++;
 		// Log the first violation in a row
-		if(data.heavyViolationsInARow <= 1)
-			NoCheatPlugin.log.severe("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 	}
 	
 	protected static void legitimateMove(NoCheatPluginData data, PlayerMoveEvent event) {

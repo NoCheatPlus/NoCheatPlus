@@ -12,11 +12,9 @@ import org.bukkit.event.vehicle.VehicleListener;
 
 public class NoCheatPluginVehicleListener extends VehicleListener {
 	
-    private final NoCheatPlugin plugin;
     private final NoCheatPluginPlayerListener playerListener;
     
-    public NoCheatPluginVehicleListener(NoCheatPlugin plugin, NoCheatPluginPlayerListener playerListener) {
-    	this.plugin = plugin;
+    public NoCheatPluginVehicleListener(NoCheatPluginPlayerListener playerListener) {
     	this.playerListener = playerListener;
     }
    	
