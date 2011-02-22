@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
  * Handle events for all Player related events
+ * 
  * @author Evenprime
  */
 
@@ -27,7 +28,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 
     	NoCheatPluginData data = NoCheatPlugin.playerData.get(player);
     	if(data != null) {
-    		data.ignoreNextXEvents = count;
+    		data.movingIgnoreNextXEvents = count;
     	}
     }
     
@@ -37,8 +38,8 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
 		// Get the player-specific data
 		NoCheatPluginData data = NoCheatPlugin.getPlayerData(event.getPlayer());
 	
-		if(data.ignoreNextXEvents > 0 ) {
-    		data.ignoreNextXEvents--;
+		if(data.movingIgnoreNextXEvents > 0 ) {
+    		data.movingIgnoreNextXEvents--;
     		return;
     	}
     	

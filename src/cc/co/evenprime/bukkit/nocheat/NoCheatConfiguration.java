@@ -11,31 +11,50 @@ import java.util.logging.Logger;
 
 import org.bukkit.util.config.Configuration;
 
+/**
+ * Central location for everything that's described in the configuration file
+ * 
+ * @author Evenprime
+ *
+ */
 public class NoCheatConfiguration {
 	
+	// Our personal logger
 	public static final String loggerName = "cc.co.evenprime.bukkit.nocheat";
 	public static final Logger logger = Logger.getLogger(loggerName);
 	
+	// Which checks are active
 	public static boolean speedhackCheckActive = true;
 	public static boolean movingCheckActive = true;
 	public static boolean airbuildCheckActive = false;
 	
+	// Limits for the speedhack check
 	public static int speedhackInterval = 2000;
 	public static int speedhackLow = 60;
 	public static int speedhackMed = 90;
 	public static int speedhackHigh = 120;
 	
+	// Limits for the moving check
 	public static double movingDistanceLow = 0.5D;
 	public static double movingDistanceMed = 1.0D;
 	public static double movingDistanceHigh = 5.0D;
 	
+	// Should moving violations be punished?
 	public static boolean movingLogOnly = false;
 	
+	// The log level above which players with the permission nocheat.notify will get informed about violations
+	public static Level notifyLevel = Level.OFF;
+	
+	// Our two log outputs, the console and a file
 	private static ConsoleHandler ch = null;
 	private static FileHandler fh = null;
 	
 	private NoCheatConfiguration() {}
 	
+	/**
+	 * Read the configuration file and assign either standard values or whatever is declared in the file
+	 * @param configurationFile
+	 */
 	public static void config(File configurationFile) {
 		
 		if(!configurationFile.exists()) {
@@ -46,7 +65,8 @@ public class NoCheatConfiguration {
 		
 		logger.setLevel(Level.INFO);
 		logger.setUseParentHandlers(false);
-				
+
+		
 		if(ch == null) {
 			ch = new ConsoleHandler();
 	
@@ -55,9 +75,10 @@ public class NoCheatConfiguration {
 			logger.addHandler(ch);
 		}
 		
+		
 		if(fh == null) {
 			try {
-				fh = new FileHandler(c.getString("logging.filename"), true);
+				fh = new FileHandler(c.getString("logging.filename"), 2000, 2, true);
 				fh.setLevel(stringToLevel(c.getString("logging.logtofile")));
 				fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
 				logger.addHandler(fh);
@@ -67,6 +88,8 @@ public class NoCheatConfiguration {
 				e.printStackTrace();
 			}
 		}
+		
+		notifyLevel = stringToLevel(c.getString("logging.logtonotify"));
 		
 		speedhackCheckActive = c.getBoolean("active.speedhack", true);
 		movingCheckActive = c.getBoolean("active.moving", true);
@@ -80,6 +103,11 @@ public class NoCheatConfiguration {
 		movingLogOnly = c.getBoolean("moving.logonly", false);
 	}
 	
+	/**
+	 * Convert a string into a log level
+	 * @param string
+	 * @return
+	 */
 	private static Level stringToLevel(String string) {
 		
 		if(string == null) {
@@ -92,6 +120,10 @@ public class NoCheatConfiguration {
 		return Level.OFF;
 	}
 	
+	/**
+	 * Standard configuration file for people who haven't got one yet
+	 * @param f
+	 */
 	private static void createStandardConfigFile(File f) {
 		try {
 			f.getParentFile().mkdirs();
@@ -103,6 +135,7 @@ public class NoCheatConfiguration {
 			w.write("    filename: plugins/NoCheat/nocheat.log"); w.newLine();
 			w.write("    logtofile: info"); w.newLine();
 			w.write("    logtoconsole: severe"); w.newLine();
+			w.write("    logtonotify: warn"); w.newLine();
 			w.write("# Checks that are activated (true or false)"); w.newLine();
 			w.write("active:");  w.newLine();
 			w.write("    speedhack: true"); w.newLine();

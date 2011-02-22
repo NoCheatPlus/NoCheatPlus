@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Server;
@@ -22,32 +23,60 @@ import org.bukkit.plugin.Plugin;
 * 
 * NoCheatPlugin
 * 
-* Check PLAYER_MOVE events for their plausibility and cancel them if they are implausible
+* Check various player events for their plausibilty and log/deny them based on configuration
 * 
 * @author Evenprime
 */
 public class NoCheatPlugin extends JavaPlugin {
 	
+	// Various listeners needed for different Checks
     private final NoCheatPluginPlayerListener playerListener;
     private final NoCheatPluginVehicleListener vehicleListener;
     private final NoCheatPluginBlockListener blockListener;
             
-    public static Logger log;
+    // My main logger
+    private static Logger log;
+    
+    // Permissions 2.0, if available
     public static PermissionHandler Permissions = null;
+    
+    // A reference to the instance of the plugin
+    private static NoCheatPlugin p = null;
     
     // Store data between Events
     public static Map<Player, NoCheatPluginData> playerData = new HashMap<Player, NoCheatPluginData>();
 
+    /**
+     * Ridiculously long constructor to keep supporting older bukkit versions, as long as it is possible
+     * 
+     * @param pluginLoader
+     * @param instance
+     * @param desc
+     * @param f1
+     * @param f2
+     * @param cLoader
+     */
     public NoCheatPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File f1, File f2, ClassLoader cLoader) {
         super(pluginLoader, instance, desc, f1, f2, cLoader);
 
+        // Create our listeners and feed them with neccessary information
     	playerListener = new NoCheatPluginPlayerListener();
     	vehicleListener = new NoCheatPluginVehicleListener(playerListener);
     	blockListener  = new NoCheatPluginBlockListener();
 
     	log = NoCheatConfiguration.logger;
+    	
+    	p = this;
     }
     
+    /**
+     * Main access to data that needs to be stored between different events.
+     * Always returns a NoCheatPluginData object, because if there isn't one
+     * for the specified player, one will be created.
+     * 
+     * @param p
+     * @return
+     */
     public static NoCheatPluginData getPlayerData(Player p) {
     	NoCheatPluginData data = null;
     	
@@ -71,19 +100,30 @@ public class NoCheatPlugin extends JavaPlugin {
     public void onEnable() {
 
     	PluginManager pm = getServer().getPluginManager();
-    	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this);
-    	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
-    	pm.registerEvent(Event.Type.VEHICLE_EXIT, vehicleListener, Priority.Monitor, this);
-    	pm.registerEvent(Event.Type.VEHICLE_DAMAGE, vehicleListener, Priority.Monitor, this);
-    	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this);
+    	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this); // needed for speedhack and moving checks
+    	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this); // used to delete old data of users
+    	pm.registerEvent(Event.Type.VEHICLE_EXIT, vehicleListener, Priority.Monitor, this); // used for moving check
+    	pm.registerEvent(Event.Type.VEHICLE_DAMAGE, vehicleListener, Priority.Monitor, this); // used for moving check
+    	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this); // used for airbuild check
 
     	PluginDescriptionFile pdfFile = this.getDescription();
-    	Logger.getLogger("Minecraft").info( "NoCheat version " + pdfFile.getVersion() + " is enabled!" );
-
+    	
+    	// Get, if available, the Permissions 2.0 plugin
     	setupPermissions();
+    	
+    	// parse the nocheat.yml config file
     	setupConfig();
+    	
+    	String checks = (NoCheatConfiguration.movingCheckActive ? "moving ": "") + 
+    	                (NoCheatConfiguration.speedhackCheckActive ? "speedhack " : "") +
+    	                (NoCheatConfiguration.airbuildCheckActive ? "airbuild " : "");
+    	
+    	Logger.getLogger("Minecraft").info( "NoCheatPlugin version " + pdfFile.getVersion() + " is enabled with the following checks: "+checks);
     }
 
+    /**
+     * Get, if available, a reference to the Permissions-plugin
+     */
     public void setupPermissions() {
     	Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 
@@ -94,9 +134,56 @@ public class NoCheatPlugin extends JavaPlugin {
     		this.getServer().getPluginManager().disablePlugin(this);
     	}
     }
+    
+    /**
+     * Log a minor violation message to all locations declared in the config file
+     * @param message
+     */
+    public static void logMinor(String message) {
+    	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.INFO.intValue()) {
+    		for(Player player : p.getServer().getOnlinePlayers()) {
+    			if(Permissions.has(player, "nocheat.notify")) {
+    				player.sendMessage("[INFO] " + message);
+    			}
+    		}
+    	}
+    	log.info(message);
+    }
 
+    /**
+     * Log a normal violation message to all locations declared in the config file
+     * @param message
+     */
+    public static void logNormal(String message) {
+    	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.WARNING.intValue()) {
+    		for(Player player : p.getServer().getOnlinePlayers()) {
+    			if(Permissions.has(player, "nocheat.notify")) {
+    				player.sendMessage("[WARNING] " + message);
+    			}
+    		}
+    	}
+    	log.warning(message);
+    }
+    
+    /**
+     * Log a heavy violation message to all locations declared in the config file
+     * @param message
+     */
+    public static void logHeavy(String message) {
+    	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.SEVERE.intValue()) {
+	    	for(Player player : p.getServer().getOnlinePlayers()) {
+	    		if(Permissions.has(player, "nocheat.notify")) {
+	    			player.sendMessage("[SEVERE] " + message);
+	    		}
+	    	}
+    	}
+    	log.severe(message);
+    }
+    
+    /**
+     * Read the config file
+     */
     public void setupConfig() {
     	NoCheatConfiguration.config(new File("plugins/NoCheat/nocheat.yml"));
-
     }
 }

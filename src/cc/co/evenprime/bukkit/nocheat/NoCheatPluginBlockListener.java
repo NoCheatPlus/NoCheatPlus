@@ -3,6 +3,12 @@ package cc.co.evenprime.bukkit.nocheat;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+/**
+ * Handle events for all Block related events
+ * 
+ * @author Evenprime
+ *
+ */
 public class NoCheatPluginBlockListener extends BlockListener {
 
 	
