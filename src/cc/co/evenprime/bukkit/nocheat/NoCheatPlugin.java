@@ -142,7 +142,8 @@ public class NoCheatPlugin extends JavaPlugin {
     public static void logMinor(String message) {
     	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.INFO.intValue()) {
     		for(Player player : p.getServer().getOnlinePlayers()) {
-    			if(Permissions.has(player, "nocheat.notify")) {
+    			if((Permissions != null && Permissions.has(player, "nocheat.notify")) ||
+    			   (Permissions == null && player.isOp())) {
     				player.sendMessage("[INFO] " + message);
     			}
     		}
@@ -157,7 +158,8 @@ public class NoCheatPlugin extends JavaPlugin {
     public static void logNormal(String message) {
     	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.WARNING.intValue()) {
     		for(Player player : p.getServer().getOnlinePlayers()) {
-    			if(Permissions.has(player, "nocheat.notify")) {
+    			if((Permissions != null && Permissions.has(player, "nocheat.notify")) ||
+ 			   (Permissions == null && player.isOp())) {
     				player.sendMessage("[WARNING] " + message);
     			}
     		}
@@ -172,7 +174,8 @@ public class NoCheatPlugin extends JavaPlugin {
     public static void logHeavy(String message) {
     	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.SEVERE.intValue()) {
 	    	for(Player player : p.getServer().getOnlinePlayers()) {
-	    		if(Permissions.has(player, "nocheat.notify")) {
+	    		if((Permissions != null && Permissions.has(player, "nocheat.notify")) ||
+ 			   (Permissions == null && player.isOp())) {
 	    			player.sendMessage("[SEVERE] " + message);
 	    		}
 	    	}
