@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -36,7 +38,8 @@ public class NoCheatPlugin extends JavaPlugin {
     // Store data between Events
     public static Map<Player, NoCheatPluginData> playerData = new HashMap<Player, NoCheatPluginData>();
 
-    public NoCheatPlugin() {
+    public NoCheatPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File f1, File f2, ClassLoader cLoader) {
+        super(pluginLoader, instance, desc, f1, f2, cLoader);
 
     	playerListener = new NoCheatPluginPlayerListener();
     	vehicleListener = new NoCheatPluginVehicleListener(playerListener);
