@@ -18,6 +18,8 @@ public class MovingCheck {
     private static final int MINOR = 1;
     private static final int NONE = 0;
     
+    private static final int freeIllegalMoves = 1;
+    
     private enum BlockType {
 		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN;
 	}
@@ -225,9 +227,8 @@ public class MovingCheck {
     			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
     			else                   vl = vl > MINOR ? vl : MINOR;
     		}
-    		else {
-    			data.phase++; // Enter next phase of the flight
-    		}
+
+    		data.phase++; // Enter next phase of the flight
     	}
 
     	// do a security check on the jumping phase, such that we don't get 
@@ -260,27 +261,33 @@ public class MovingCheck {
 			data.movingSetBackPoint = event.getFrom().clone();
 		}
 		
+		// Start logging only after the freebee illegal moves are over
+		if(data.minorViolationsInARow == freeIllegalMoves + 1) {
+			NoCheatPlugin.log.info("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+			
+		}
+		
 		data.minorViolationsInARow++;
 		
+		// 16 minor violations in a row count as one normal violation
 		if(data.minorViolationsInARow % 16 == 0) {
 			normalViolation(data, event);
 		}
-		else if(data.minorViolationsInARow % 2 == 0) {
+		else if(data.minorViolationsInARow % (freeIllegalMoves+1) == 0) {
 			// now we need it
-			NoCheatPlugin.log.info("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 			resetPlayer(data, event);
 		}
 	}
 	
 	protected static void normalViolation(NoCheatPluginData data, PlayerMoveEvent event) {
 		// Log the first violation in a row
-		if(data.normalViolationsInARow <= 1)
+		if(data.normalViolationsInARow == 0)
 			NoCheatPlugin.log.warning("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 	
 		resetPlayer(data, event);
 		
 		data.normalViolationsInARow++;
-		}
+	}
 	
 	protected static void heavyViolation(NoCheatPluginData data, PlayerMoveEvent event) {
 		
@@ -303,9 +310,14 @@ public class MovingCheck {
 			NoCheatPlugin.log.warning("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.normalViolationsInARow);
 			data.normalViolationsInARow = 0;
 		}
-		data.minorViolationsInARow = 0;
-		data.normalViolationsInARow = 0;
-		data.heavyViolationsInARow = 0;
+		else if(data.minorViolationsInARow > freeIllegalMoves) {
+			NoCheatPlugin.log.info("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.minorViolationsInARow);
+			data.minorViolationsInARow = 0;
+		}
+		else {
+			data.minorViolationsInARow = 0;
+		}
+		
 		data.movingSetBackPoint = null;
 	}
 		
@@ -316,7 +328,10 @@ public class MovingCheck {
 	 * @param event
 	 */
 	private static void resetPlayer(NoCheatPluginData data, PlayerMoveEvent event) {
-				
+		
+		// If we only log, we never reset the player to his original location
+		if(NoCheatConfiguration.movingLogOnly) return;
+		
 		if(data.phase > 7) {
 			data.phase = 7;
 		}

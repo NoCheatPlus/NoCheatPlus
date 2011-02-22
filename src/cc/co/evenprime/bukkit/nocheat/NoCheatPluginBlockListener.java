@@ -13,7 +13,7 @@ public class NoCheatPluginBlockListener extends BlockListener {
 	@Override
 	public void onBlockPlace(BlockPlaceEvent event) {
 
-		if(!event.isCancelled() && NoCheatConfiguration.speedhackCheckActive)
+		if(!event.isCancelled() && NoCheatConfiguration.airbuildCheckActive)
 			BlockPlacingCheck.check(event);
 	}
 }
