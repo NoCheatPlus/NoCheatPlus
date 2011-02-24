@@ -56,8 +56,7 @@ public class NoCheatPlugin extends JavaPlugin {
      * @param f2
      * @param cLoader
      */
-    public NoCheatPlugin(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File f1, File f2, ClassLoader cLoader) {
-        super(pluginLoader, instance, desc, f1, f2, cLoader);
+    public NoCheatPlugin() {
 
         // Create our listeners and feed them with neccessary information
     	playerListener = new NoCheatPluginPlayerListener();
@@ -95,6 +94,9 @@ public class NoCheatPlugin extends JavaPlugin {
     }
 
     public void onDisable() { 
+    	PluginDescriptionFile pdfFile = this.getDescription();
+    	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is disabled.");
+    	   
     }
 
     public void onEnable() {
@@ -108,9 +110,9 @@ public class NoCheatPlugin extends JavaPlugin {
 
     	PluginDescriptionFile pdfFile = this.getDescription();
     	
-    	// Get, if available, the Permissions 2.0 plugin
+    	// Get, if available, the Permissions plugin
     	setupPermissions();
-    	
+    	   	
     	// parse the nocheat.yml config file
     	setupConfig();
     	
@@ -118,20 +120,27 @@ public class NoCheatPlugin extends JavaPlugin {
     	                (NoCheatConfiguration.speedhackCheckActive ? "speedhack " : "") +
     	                (NoCheatConfiguration.airbuildCheckActive ? "airbuild " : "");
     	
-    	Logger.getLogger("Minecraft").info( "NoCheatPlugin version " + pdfFile.getVersion() + " is enabled with the following checks: "+checks);
+    	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+checks);
     }
 
     /**
      * Get, if available, a reference to the Permissions-plugin
      */
     public void setupPermissions() {
+    	Permissions = null;
+    	
     	Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 
    		if(test != null) {
+   			Permissions = ((Permissions)test).getHandler();
+   			if(Permissions == null) {
+   				this.getServer().getPluginManager().enablePlugin(test);
+   			}
     		Permissions = ((Permissions)test).getHandler();
-    	} else {
+    	}
+   		
+   		if(Permissions == null) {
     		log.info("Nocheat couldn't find Permissions plugin. Fallback to 'isOp()' equals 'all allowed'.");
-    		this.getServer().getPluginManager().disablePlugin(this);
     	}
     }
     
