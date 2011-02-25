@@ -16,7 +16,7 @@ public class MovingCheck {
 
 	// previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
     // Each entry represents the maximum gain in height per move event.
-    private static double jumpingPhases[] = new double[]{ 0.501D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.50D };
+    private static double jumpingPhases[] = new double[]{ 0.501D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.49D };
     
     // Violation levels
     private static final int HEAVY = 3;
@@ -181,7 +181,7 @@ public class MovingCheck {
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
     			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
     			else                   vl = vl > MINOR ? vl : MINOR;
     		}
     	}
@@ -197,7 +197,7 @@ public class MovingCheck {
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
     			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
     			else                   vl = vl > MINOR ? vl : MINOR;
     		}
     		else if(to.getY() <= from.getY()) {
@@ -215,7 +215,7 @@ public class MovingCheck {
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
     			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
     			else                   vl = vl > MINOR ? vl : MINOR;
     		}
     		else {
@@ -275,8 +275,8 @@ public class MovingCheck {
 		
 		data.movingMinorViolationsInARow++;
 		
-		// 16 minor violations in a row count as one normal violation
-		if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves+10) == 0) {
+		// using up all free moves 4 times in a row counts as one normal violation
+		if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves * 4) == 0) {
 			normalViolation(data, event);
 		}
 		// Each time the freebee moves are all used up, we may reset the player to his old location
