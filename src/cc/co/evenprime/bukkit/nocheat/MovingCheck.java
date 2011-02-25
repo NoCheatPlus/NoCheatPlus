@@ -23,10 +23,7 @@ public class MovingCheck {
     private static final int NORMAL = 2;
     private static final int MINOR = 1;
     private static final int NONE = 0;
-    
-    // Every player gets freebee moves to prevent them from getting stuck to easy
-    private static final int freeIllegalMoves = 1;
-    
+        
     // Block types that may be treated specially
     private enum BlockType {
 		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN;
@@ -271,7 +268,7 @@ public class MovingCheck {
 		}
 		
 		// Start logging only after the freebee illegal moves have all been used
-		if(data.movingMinorViolationsInARow == freeIllegalMoves + 1) {
+		if(data.movingMinorViolationsInARow == NoCheatConfiguration.movingFreeMoves + 1) {
 			NoCheatPlugin.logMinor("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 			
 		}
@@ -279,11 +276,11 @@ public class MovingCheck {
 		data.movingMinorViolationsInARow++;
 		
 		// 16 minor violations in a row count as one normal violation
-		if(data.movingMinorViolationsInARow % 16 == 0) {
+		if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves+10) == 0) {
 			normalViolation(data, event);
 		}
 		// Each time the freebee moves are all used up, we may reset the player to his old location
-		else if(data.movingMinorViolationsInARow % (freeIllegalMoves + 1) == 0) {
+		else if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves + 1) == 0) {
 			resetPlayer(data, event);
 		}
 	}
@@ -319,7 +316,7 @@ public class MovingCheck {
 			NoCheatPlugin.logNormal("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
 			data.movingNormalViolationsInARow = 0;
 		}
-		else if(data.movingMinorViolationsInARow > freeIllegalMoves) {
+		else if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves) {
 			NoCheatPlugin.logMinor("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
 			data.movingMinorViolationsInARow = 0;
 		}
