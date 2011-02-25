@@ -230,7 +230,7 @@ public class MovingCheck {
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
     			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 0.6D) vl = vl > NORMAL ? vl : NORMAL;
+    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
     			else                   vl = vl > MINOR ? vl : MINOR;
     		}
 
