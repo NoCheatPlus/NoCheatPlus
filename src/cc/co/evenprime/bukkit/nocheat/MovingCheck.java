@@ -154,6 +154,11 @@ public class MovingCheck {
     	else if(xDistance > NoCheatConfiguration.movingDistanceLow || zDistance > NoCheatConfiguration.movingDistanceLow) {
     		vl = vl > MINOR ? vl : MINOR;
     	}
+    	
+    	// If the target is a bed, allow it
+    	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && vl <= NORMAL) {
+    		return; // players are allowed to "teleport" into a bed over short distances
+    	}
 
 
     	// pre-calculate boundary values that are needed multiple times in the following checks

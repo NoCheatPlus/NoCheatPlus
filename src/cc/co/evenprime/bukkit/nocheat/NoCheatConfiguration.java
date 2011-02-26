@@ -80,7 +80,7 @@ public class NoCheatConfiguration {
 		
 		if(fh == null) {
 			try {
-				fh = new FileHandler(c.getString("logging.filename"), 2000, 2, true);
+				fh = new FileHandler(c.getString("logging.filename"), true);
 				fh.setLevel(stringToLevel(c.getString("logging.logtofile")));
 				fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
 				logger.addHandler(fh);
