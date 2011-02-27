@@ -3,5 +3,5 @@ name: NoCheatPlugin
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheatPlugin
-version: 0.5.7
+version: 0.5.8
 

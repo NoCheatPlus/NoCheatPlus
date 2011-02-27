@@ -34,12 +34,7 @@ public class NoCheatConfiguration {
 	public static int speedhackMed = 90;
 	public static int speedhackHigh = 120;
 	
-	// Limits for the moving check
-	public static double movingDistanceLow = 0.5D;
-	public static double movingDistanceMed = 1.0D;
-	public static double movingDistanceHigh = 5.0D;
-	
-	public static int movingFreeMoves = 5;
+	public static int movingFreeMoves = 10;
 	
 	// Should moving violations be punished?
 	public static boolean movingLogOnly = false;
@@ -103,7 +98,9 @@ public class NoCheatConfiguration {
 		speedhackHigh = c.getInt("speedhack.limits.high", 120);
 		
 		movingLogOnly = c.getBoolean("moving.logonly", false);
-		movingFreeMoves = c.getInt("moving.freemoves", 5);
+		movingFreeMoves = c.getInt("moving.freemoves", 10);
+		
+		if(movingFreeMoves < 5) movingFreeMoves = 5;
 	}
 	
 	/**
@@ -153,7 +150,7 @@ public class NoCheatConfiguration {
 			w.write("        high: 120"); w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("    logonly: false"); w.newLine();
-			w.write("    freemoves: 5"); w.newLine();
+			w.write("    freemoves: 10"); w.newLine();
 			w.flush(); w.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

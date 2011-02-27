@@ -23,6 +23,11 @@ public class MovingCheck {
     private static final int NORMAL = 2;
     private static final int MINOR = 1;
     private static final int NONE = 0;
+    
+	// Limits for the moving check
+	public static double movingDistanceLow = 0.05D;
+	public static double movingDistanceMed = 0.15D;
+	public static double movingDistanceHigh = 5.0D;
         
     // Block types that may be treated specially
     private enum BlockType {
@@ -143,18 +148,19 @@ public class MovingCheck {
     	// TODO: Make this check much more precise
    		double xDistance = Math.abs(from.getX() - to.getX());
     	double zDistance = Math.abs(from.getZ() - to.getZ());
-    		
+    	double combined = xDistance * xDistance + zDistance * zDistance;	
     	// How far are we off?
-    	if(xDistance > NoCheatConfiguration.movingDistanceHigh || zDistance > NoCheatConfiguration.movingDistanceHigh) {
+    	
+    	if(combined > movingDistanceHigh) {
     		vl = vl > HEAVY ? vl : HEAVY;
     	}
-    	else if(xDistance > NoCheatConfiguration.movingDistanceMed || zDistance > NoCheatConfiguration.movingDistanceMed) {
+    	else if(combined > movingDistanceMed) {
     		vl = vl > NORMAL ? vl : NORMAL;
     	}
-    	else if(xDistance > NoCheatConfiguration.movingDistanceLow || zDistance > NoCheatConfiguration.movingDistanceLow) {
+    	else if(combined > movingDistanceLow) {
     		vl = vl > MINOR ? vl : MINOR;
     	}
-    	
+    	    	
     	// If the target is a bed, allow it
     	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && vl <= NORMAL) {
     		return; // players are allowed to "teleport" into a bed over short distances
