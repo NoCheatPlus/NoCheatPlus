@@ -25,8 +25,8 @@ public class MovingCheck {
     private static final int NONE = 0;
     
 	// Limits for the moving check
-	public static double movingDistanceLow = 0.05D;
-	public static double movingDistanceMed = 0.15D;
+	public static double movingDistanceLow = 0.1D;
+	public static double movingDistanceMed = 2.0D;
 	public static double movingDistanceHigh = 5.0D;
         
     // Block types that may be treated specially

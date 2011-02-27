@@ -100,7 +100,7 @@ public class NoCheatConfiguration {
 		movingLogOnly = c.getBoolean("moving.logonly", false);
 		movingFreeMoves = c.getInt("moving.freemoves", 10);
 		
-		if(movingFreeMoves < 5) movingFreeMoves = 5;
+		if(movingFreeMoves < 10) movingFreeMoves = 10;
 	}
 	
 	/**
