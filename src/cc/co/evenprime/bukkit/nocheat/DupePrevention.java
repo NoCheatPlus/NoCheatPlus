@@ -25,7 +25,7 @@ public class DupePrevention {
 			for(ItemStack drop : drops) {
 				for(int i = 0; i < playerInventory.getSize(); i++) {
 					if(playerInventory.getItem(i).equals(drop)) {
-						p.getInventory().clear(i);
+						playerInventory.clear(i);
 						i = playerInventory.getSize();
 					}
 				}

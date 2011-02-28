@@ -48,9 +48,7 @@ public class SpeedhackCheck {
 			else if(data.speedhackEventsSinceLastCheck > limitMed) vl = NORMAL;
 			else if(data.speedhackEventsSinceLastCheck > limitLow) vl = MINOR;
 
-			// Reset values for next check
-			data.speedhackEventsSinceLastCheck = 0;
-			data.speedhackLastCheck = time;
+		
 			
 			if(vl > NONE) data.speedhackViolationsInARow++;
 			else data.speedhackViolationsInARow = 0;
@@ -63,6 +61,10 @@ public class SpeedhackCheck {
 				case MINOR:  NoCheatPlugin.logMinor(message); break;
 				}
 			}
+			
+			// Reset values for next check
+			data.speedhackEventsSinceLastCheck = 0;
+			data.speedhackLastCheck = time;
 			
 		}
 		data.speedhackEventsSinceLastCheck++;
