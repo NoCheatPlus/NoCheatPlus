@@ -27,12 +27,12 @@ public class NoCheatConfiguration {
 	public static boolean speedhackCheckActive = true;
 	public static boolean movingCheckActive = true;
 	public static boolean airbuildCheckActive = false;
+	public static boolean dupebydeathCheckActive = false;
 	
 	// Limits for the speedhack check
-	public static int speedhackInterval = 2000;
-	public static int speedhackLow = 60;
-	public static int speedhackMed = 90;
-	public static int speedhackHigh = 120;
+	public static int speedhackLow = 30;
+	public static int speedhackMed = 45;
+	public static int speedhackHigh = 60;
 	
 	public static int movingFreeMoves = 10;
 	
@@ -91,11 +91,11 @@ public class NoCheatConfiguration {
 		speedhackCheckActive = c.getBoolean("active.speedhack", true);
 		movingCheckActive = c.getBoolean("active.moving", true);
 		airbuildCheckActive = c.getBoolean("active.airbuild", false);
+		dupebydeathCheckActive = c.getBoolean("active.dupebydeath", false);
 		
-		speedhackInterval = c.getInt("speedhack.interval", 2000);
-		speedhackLow = c.getInt("speedhack.limits.low", 60);
-		speedhackMed = c.getInt("speedhack.limits.med", 90);
-		speedhackHigh = c.getInt("speedhack.limits.high", 120);
+		speedhackLow = c.getInt("speedhack.limits.low", 30);
+		speedhackMed = c.getInt("speedhack.limits.med", 45);
+		speedhackHigh = c.getInt("speedhack.limits.high", 60);
 		
 		movingLogOnly = c.getBoolean("moving.logonly", false);
 		movingFreeMoves = c.getInt("moving.freemoves", 10);
@@ -141,13 +141,13 @@ public class NoCheatConfiguration {
 			w.write("    speedhack: true"); w.newLine();
 			w.write("    moving: true"); w.newLine();
 			w.write("    airbuild: false"); w.newLine();
+			w.write("    dupebydeath: false"); w.newLine();
 			w.write("# Speedhack: interval in milliseconds, limits are events in that interval") ;w.newLine();
 			w.write("speedhack:"); w.newLine();
-			w.write("    interval: 2000"); w.newLine();
 			w.write("    limits:"); w.newLine();
-			w.write("        low: 60"); w.newLine();
-			w.write("        med: 90"); w.newLine();
-			w.write("        high: 120"); w.newLine();
+			w.write("        low: 30"); w.newLine();
+			w.write("        med: 45"); w.newLine();
+			w.write("        high: 60"); w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("    logonly: false"); w.newLine();
 			w.write("    freemoves: 10"); w.newLine();

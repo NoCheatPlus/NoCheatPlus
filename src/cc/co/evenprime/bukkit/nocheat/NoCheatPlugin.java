@@ -6,12 +6,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -33,6 +31,7 @@ public class NoCheatPlugin extends JavaPlugin {
     private final NoCheatPluginPlayerListener playerListener;
     private final NoCheatPluginVehicleListener vehicleListener;
     private final NoCheatPluginBlockListener blockListener;
+    private final NoCheatEntityListener entityListener;
             
     // My main logger
     private static Logger log;
@@ -62,6 +61,7 @@ public class NoCheatPlugin extends JavaPlugin {
     	playerListener = new NoCheatPluginPlayerListener();
     	vehicleListener = new NoCheatPluginVehicleListener(playerListener);
     	blockListener  = new NoCheatPluginBlockListener();
+    	entityListener = new NoCheatEntityListener();
 
     	log = NoCheatConfiguration.logger;
     	
@@ -107,6 +107,7 @@ public class NoCheatPlugin extends JavaPlugin {
     	pm.registerEvent(Event.Type.VEHICLE_EXIT, vehicleListener, Priority.Monitor, this); // used for moving check
     	pm.registerEvent(Event.Type.VEHICLE_DAMAGE, vehicleListener, Priority.Monitor, this); // used for moving check
     	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this); // used for airbuild check
+    	pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Highest, this); // used for dupebydeath check
 
     	PluginDescriptionFile pdfFile = this.getDescription();
     	
@@ -118,7 +119,8 @@ public class NoCheatPlugin extends JavaPlugin {
     	
     	String checks = (NoCheatConfiguration.movingCheckActive ? "moving ": "") + 
     	                (NoCheatConfiguration.speedhackCheckActive ? "speedhack " : "") +
-    	                (NoCheatConfiguration.airbuildCheckActive ? "airbuild " : "");
+    	                (NoCheatConfiguration.airbuildCheckActive ? "airbuild " : "") +
+    	                (NoCheatConfiguration.dupebydeathCheckActive ? "dupebydeath " : "");
     	
     	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+checks);
     }
