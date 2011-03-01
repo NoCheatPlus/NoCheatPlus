@@ -1,6 +1,10 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.checks;
 
 import org.bukkit.event.player.PlayerMoveEvent;
+
+import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.NoCheatData;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
 /**
  * Log if a player sends to many move events in a specific time frame, usually the result of tinkering with the system clock
@@ -19,7 +23,7 @@ public class SpeedhackCheck {
     private static final long interval = 1000;
     private static final int violationsLimit = 3;
     
-	public static void check(NoCheatPluginData data, PlayerMoveEvent event) {
+	public static void check(NoCheatData data, PlayerMoveEvent event) {
 		
 		// Should we check at all?
 		if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.speedhack")) {
@@ -39,9 +43,9 @@ public class SpeedhackCheck {
 			// Yes
 			// TODO: Needs some better handling for server lag
 
-			int limitLow = (int)((NoCheatConfiguration.speedhackLow * (time - data.speedhackLastCheck)) / interval);
-			int limitMed = (int)((NoCheatConfiguration.speedhackMed * (time - data.speedhackLastCheck)) / interval);
-			int limitHigh = (int)((NoCheatConfiguration.speedhackHigh * (time - data.speedhackLastCheck)) / interval);
+			int limitLow = (int)((NoCheatConfiguration.speedhackLimitLow * (time - data.speedhackLastCheck)) / interval);
+			int limitMed = (int)((NoCheatConfiguration.speedhackLimitMed * (time - data.speedhackLastCheck)) / interval);
+			int limitHigh = (int)((NoCheatConfiguration.speedhackLimitHigh * (time - data.speedhackLastCheck)) / interval);
 
 			
 			if(data.speedhackEventsSinceLastCheck > limitHigh) vl = HEAVY;

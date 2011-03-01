@@ -1,9 +1,11 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.checks;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.block.BlockPlaceEvent;
+
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
 
 /**

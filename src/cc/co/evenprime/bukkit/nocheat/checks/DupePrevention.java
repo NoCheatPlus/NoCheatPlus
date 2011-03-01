@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.List;
 
@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
 public class DupePrevention {
 
@@ -19,6 +21,14 @@ public class DupePrevention {
 
 			Player p = (Player)event.getEntity();
 
+			// Should we prevent at all?
+			if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(p, "nocheat.dupebydeath")) {
+				return;
+			}
+			else if(NoCheatPlugin.Permissions == null && p.isOp() ) {
+				return;
+			}
+			
 			PlayerInventory playerInventory = p.getInventory(); 
 			List<ItemStack> drops = event.getDrops();
 

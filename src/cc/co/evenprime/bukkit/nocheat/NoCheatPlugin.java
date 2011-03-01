@@ -13,6 +13,11 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatBlockListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatEntityListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatPlayerListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatVehicleListener;
+
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.plugin.Plugin;
@@ -28,63 +33,43 @@ import org.bukkit.plugin.Plugin;
 public class NoCheatPlugin extends JavaPlugin {
 	
 	// Various listeners needed for different Checks
-    private final NoCheatPluginPlayerListener playerListener;
-    private final NoCheatPluginVehicleListener vehicleListener;
-    private final NoCheatPluginBlockListener blockListener;
-    private final NoCheatEntityListener entityListener;
+    private NoCheatPlayerListener playerListener;
+    private NoCheatVehicleListener vehicleListener;
+    private NoCheatBlockListener blockListener;
+    private NoCheatEntityListener entityListener;
             
     // My main logger
     private static Logger log;
     
+    private static NoCheatPlugin p;
+    
     // Permissions 2.0, if available
     public static PermissionHandler Permissions = null;
-    
-    // A reference to the instance of the plugin
-    private static NoCheatPlugin p = null;
-    
+       
     // Store data between Events
-    public static Map<Player, NoCheatPluginData> playerData = new HashMap<Player, NoCheatPluginData>();
+    public static Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
 
-    /**
-     * Ridiculously long constructor to keep supporting older bukkit versions, as long as it is possible
-     * 
-     * @param pluginLoader
-     * @param instance
-     * @param desc
-     * @param f1
-     * @param f2
-     * @param cLoader
-     */
-    public NoCheatPlugin() {
-
-        // Create our listeners and feed them with neccessary information
-    	playerListener = new NoCheatPluginPlayerListener();
-    	vehicleListener = new NoCheatPluginVehicleListener(playerListener);
-    	blockListener  = new NoCheatPluginBlockListener();
-    	entityListener = new NoCheatEntityListener();
-
-    	log = NoCheatConfiguration.logger;
-    	
+    public NoCheatPlugin() { 
     	p = this;
     }
     
     /**
      * Main access to data that needs to be stored between different events.
-     * Always returns a NoCheatPluginData object, because if there isn't one
+     * Always returns a NoCheatData object, because if there isn't one
      * for the specified player, one will be created.
      * 
      * @param p
      * @return
      */
-    public static NoCheatPluginData getPlayerData(Player p) {
-    	NoCheatPluginData data = null;
+    public static NoCheatData getPlayerData(Player p) {
+    	NoCheatData data = null;
     	
 		if((data = playerData.get(p)) == null ) {
 			synchronized(playerData) {
 				data = playerData.get(p);
 				if(data == null) {
 					// If we have no data for the player, create some
-					data = new NoCheatPluginData();
+					data = new NoCheatData();
 					playerData.put(p, data);
 				}
 			}
@@ -96,11 +81,17 @@ public class NoCheatPlugin extends JavaPlugin {
     public void onDisable() { 
     	PluginDescriptionFile pdfFile = this.getDescription();
     	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is disabled.");
-    	   
     }
 
     public void onEnable() {
+    	// Create our listeners and feed them with neccessary information
+    	playerListener = new NoCheatPlayerListener();
+    	vehicleListener = new NoCheatVehicleListener(playerListener);
+    	blockListener  = new NoCheatBlockListener();
+    	entityListener = new NoCheatEntityListener();
 
+    	log = NoCheatConfiguration.logger;
+    	    	
     	PluginManager pm = getServer().getPluginManager();
     	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this); // needed for speedhack and moving checks
     	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this); // used to delete old data of users

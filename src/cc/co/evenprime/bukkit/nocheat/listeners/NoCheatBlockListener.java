@@ -1,7 +1,10 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.listeners;
 
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
+
+import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.checks.BlockPlacingCheck;
 
 /**
  * Handle events for all Block related events
@@ -9,10 +12,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
  * @author Evenprime
  *
  */
-public class NoCheatPluginBlockListener extends BlockListener {
+public class NoCheatBlockListener extends BlockListener {
 
 	
-	public NoCheatPluginBlockListener() {
+	public NoCheatBlockListener() {
 
 	}
 	

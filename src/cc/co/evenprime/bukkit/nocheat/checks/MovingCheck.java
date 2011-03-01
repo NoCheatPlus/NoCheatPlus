@@ -1,10 +1,14 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.checks;
 
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.player.PlayerMoveEvent;
+
+import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.NoCheatData;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
 /**
  * Check if the player should be allowed to make that move, e.g. is he allowed to jump here or move that far in one step
@@ -128,7 +132,7 @@ public class MovingCheck {
     }
     
 
-	public static void check(NoCheatPluginData data, PlayerMoveEvent event) {
+	public static void check(NoCheatData data, PlayerMoveEvent event) {
 			
 		// Should we check at all
     	if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(event.getPlayer(), "nocheat.moving")) {
@@ -271,7 +275,7 @@ public class MovingCheck {
 	}
 	
 	
-	protected static void minorViolation(NoCheatPluginData data, PlayerMoveEvent event) {
+	protected static void minorViolation(NoCheatData data, PlayerMoveEvent event) {
 
 		// If it is the first violation, store the "from" location for potential later use
 		if(data.movingMinorViolationsInARow == 0) {
@@ -296,7 +300,7 @@ public class MovingCheck {
 		}
 	}
 	
-	protected static void normalViolation(NoCheatPluginData data, PlayerMoveEvent event) {
+	protected static void normalViolation(NoCheatData data, PlayerMoveEvent event) {
 		// Log the first violation in a row
 		if(data.movingNormalViolationsInARow == 0)
 			NoCheatPlugin.logNormal("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
@@ -306,7 +310,7 @@ public class MovingCheck {
 		data.movingNormalViolationsInARow++;
 	}
 	
-	protected static void heavyViolation(NoCheatPluginData data, PlayerMoveEvent event) {
+	protected static void heavyViolation(NoCheatData data, PlayerMoveEvent event) {
 		
 		// Log the first violation in a row
 		if(data.movingHeavyViolationsInARow == 0)
@@ -317,7 +321,7 @@ public class MovingCheck {
 		data.movingHeavyViolationsInARow++;
 	}
 	
-	protected static void legitimateMove(NoCheatPluginData data, PlayerMoveEvent event) {
+	protected static void legitimateMove(NoCheatData data, PlayerMoveEvent event) {
 		// Give some additional logs about now ending violations
 		if(data.movingHeavyViolationsInARow > 0) {
 			NoCheatPlugin.logHeavy("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
@@ -345,7 +349,7 @@ public class MovingCheck {
 	 * @param data
 	 * @param event
 	 */
-	private static void resetPlayer(NoCheatPluginData data, PlayerMoveEvent event) {
+	private static void resetPlayer(NoCheatData data, PlayerMoveEvent event) {
 		
 		// If we only log, we never reset the player to his original location and can end here already
 		if(NoCheatConfiguration.movingLogOnly) return;

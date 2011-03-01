@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.listeners;
 
 
 
@@ -7,17 +7,23 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.NoCheatData;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
+
 /**
  * Handle events for all Player related events
  * 
  * @author Evenprime
  */
 
-public class NoCheatPluginPlayerListener extends PlayerListener {
+public class NoCheatPlayerListener extends PlayerListener {
 	
  
  
-    public NoCheatPluginPlayerListener() {  }
+    public NoCheatPlayerListener() {  }
     
     @Override
     public void onPlayerQuit(PlayerEvent event) {
@@ -26,7 +32,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     
     public void ingoreNextXEvents(Entity player, int count) {
 
-    	NoCheatPluginData data = NoCheatPlugin.playerData.get(player);
+    	NoCheatData data = NoCheatPlugin.playerData.get(player);
     	if(data != null) {
     		data.movingIgnoreNextXEvents = count;
     	}
@@ -36,7 +42,7 @@ public class NoCheatPluginPlayerListener extends PlayerListener {
     public void onPlayerMove(PlayerMoveEvent event) {
     	
 		// Get the player-specific data
-		NoCheatPluginData data = NoCheatPlugin.getPlayerData(event.getPlayer());
+		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
 	
 		if(data.movingIgnoreNextXEvents > 0 ) {
     		data.movingIgnoreNextXEvents--;

@@ -1,9 +1,10 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.listeners;
 
 
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleListener;
+
 
 /**
  * Handle events for all Player related events
@@ -11,11 +12,11 @@ import org.bukkit.event.vehicle.VehicleListener;
  * @author Evenprime
  */
 
-public class NoCheatPluginVehicleListener extends VehicleListener {
+public class NoCheatVehicleListener extends VehicleListener {
 	
-    private final NoCheatPluginPlayerListener playerListener;
+    private final NoCheatPlayerListener playerListener;
     
-    public NoCheatPluginVehicleListener(NoCheatPluginPlayerListener playerListener) {
+    public NoCheatVehicleListener(NoCheatPlayerListener playerListener) {
     	this.playerListener = playerListener;
     }
    	

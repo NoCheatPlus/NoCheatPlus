@@ -24,20 +24,29 @@ public class NoCheatConfiguration {
 	public static final Logger logger = Logger.getLogger(loggerName);
 	
 	// Which checks are active
-	public static boolean speedhackCheckActive = true;
-	public static boolean movingCheckActive = true;
-	public static boolean airbuildCheckActive = false;
-	public static boolean dupebydeathCheckActive = false;
+	public static boolean speedhackCheckActive;
+	public static boolean movingCheckActive;
+	public static boolean airbuildCheckActive;
+	public static boolean dupebydeathCheckActive;
 	
 	// Limits for the speedhack check
-	public static int speedhackLow = 30;
-	public static int speedhackMed = 45;
-	public static int speedhackHigh = 60;
+	public static int speedhackLimitLow;
+	public static int speedhackLimitMed;
+	public static int speedhackLimitHigh;
+	
+	// How should speedhack violations be treated?
+	public static String speedhackActionMinor = "";
+	public static String speedhackActionNormal = "";
+	public static String speedhackActionHeavy = "";
 	
 	public static int movingFreeMoves = 10;
 	
-	// Should moving violations be punished?
-	public static boolean movingLogOnly = false;
+	// How should moving violations be treated?
+	public static String movingActionMinor = "";
+	public static String movingActionNormal = "";
+	public static String movingActionHeavy = "";
+	
+	public static boolean movingLogOnly;
 	
 	// The log level above which players with the permission nocheat.notify will get informed about violations
 	public static Level notifyLevel = Level.OFF;
@@ -93,12 +102,21 @@ public class NoCheatConfiguration {
 		airbuildCheckActive = c.getBoolean("active.airbuild", false);
 		dupebydeathCheckActive = c.getBoolean("active.dupebydeath", false);
 		
-		speedhackLow = c.getInt("speedhack.limits.low", 30);
-		speedhackMed = c.getInt("speedhack.limits.med", 45);
-		speedhackHigh = c.getInt("speedhack.limits.high", 60);
+		speedhackLimitLow = c.getInt("speedhack.limits.low", 30);
+		speedhackLimitMed = c.getInt("speedhack.limits.med", 45);
+		speedhackLimitHigh = c.getInt("speedhack.limits.high", 60);
 		
 		movingLogOnly = c.getBoolean("moving.logonly", false);
+		
 		movingFreeMoves = c.getInt("moving.freemoves", 10);
+		
+		movingActionMinor = c.getString("moving.action.low", "log reset");
+		movingActionNormal = c.getString("moving.action.med", "log reset");
+		movingActionHeavy = c.getString("moving.action.high", "log reset");
+		
+		speedhackActionMinor = c.getString("speedhack.action.low", "log");
+		speedhackActionNormal = c.getString("speedhack.action.med", "log");
+		speedhackActionHeavy = c.getString("speedhack.action.high", "log");
 		
 		if(movingFreeMoves < 10) movingFreeMoves = 10;
 	}
@@ -114,9 +132,9 @@ public class NoCheatConfiguration {
 			return Level.OFF;
 		}
 		
-		if(string.trim().equals("info")) return Level.INFO;
-		if(string.trim().equals("warn")) return Level.WARNING;
-		if(string.trim().equals("severe")) return Level.SEVERE;
+		if(string.trim().equals("info") || string.trim().equals("low")) return Level.INFO;
+		if(string.trim().equals("warn") || string.trim().equals("med")) return Level.WARNING;
+		if(string.trim().equals("severe")|| string.trim().equals("high")) return Level.SEVERE;
 		return Level.OFF;
 	}
 	
@@ -130,27 +148,35 @@ public class NoCheatConfiguration {
 			f.createNewFile();
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 			
-			w.write("# Logging: potential log levels are info, warn, severe, off"); w.newLine();
+			w.write("# Logging: potential log levels are low (info), med (warn), high (severe), off"); w.newLine();
 			w.write("logging:"); w.newLine();
 			w.write("    filename: plugins/NoCheat/nocheat.log"); w.newLine();
-			w.write("    logtofile: info"); w.newLine();
-			w.write("    logtoconsole: severe"); w.newLine();
-			w.write("    logtonotify: warn"); w.newLine();
-			w.write("# Checks that are activated (true or false)"); w.newLine();
+			w.write("    logtofile: low"); w.newLine();
+			w.write("    logtoconsole: high"); w.newLine();
+			w.write("    logtonotify: med"); w.newLine();
+			w.write("# Checks and Preventions that are activated (true or false)"); w.newLine();
 			w.write("active:");  w.newLine();
 			w.write("    speedhack: true"); w.newLine();
 			w.write("    moving: true"); w.newLine();
 			w.write("    airbuild: false"); w.newLine();
 			w.write("    dupebydeath: false"); w.newLine();
-			w.write("# Speedhack: interval in milliseconds, limits are events in that interval") ;w.newLine();
+			w.write("# Speedhack specific options. Limits are move-events per second, action is what should happen in each case") ;w.newLine();
 			w.write("speedhack:"); w.newLine();
 			w.write("    limits:"); w.newLine();
 			w.write("        low: 30"); w.newLine();
 			w.write("        med: 45"); w.newLine();
 			w.write("        high: 60"); w.newLine();
+			w.write("    action:"); w.newLine();
+			w.write("        low: loglow"); w.newLine();
+			w.write("        med: logmed"); w.newLine();
+			w.write("        high: loghigh"); w.newLine();
+			w.write("# Moving specific options. Higher freemoves values mean less strict checks, action is what should happen in each case") ;w.newLine();
 			w.write("moving:"); w.newLine();
-			w.write("    logonly: false"); w.newLine();
 			w.write("    freemoves: 10"); w.newLine();
+			w.write("    action:"); w.newLine();
+			w.write("        low: loglow reset"); w.newLine();
+			w.write("        med: logmed reset"); w.newLine();
+			w.write("        high: loghigh reset"); w.newLine();
 			w.flush(); w.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
