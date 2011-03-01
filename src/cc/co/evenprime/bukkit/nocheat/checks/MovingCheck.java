@@ -303,14 +303,16 @@ public class MovingCheck {
 	 */
 	private static void action(PlayerMoveEvent event, String actions) {
 		
+		if(actions == null) return;
 		// LOGGING IF NEEDED
-		NoCheatPlugin.logAction(actions, "Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
-
-		// RESET IF NEEDED
-		if(NoCheatConfiguration.movingActionMinor.contains("reset")) {
-			resetPlayer(event);
+		if(actions.contains("log")) {
+			NoCheatPlugin.logAction(actions, "Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 		}
 		
+		// RESET IF NEEDED
+		if(actions.contains("reset")) {
+			resetPlayer(event);
+		}
 	}
 
 

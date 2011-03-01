@@ -9,7 +9,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
-public class DupePrevention {
+public class DupebydeathCheck {
 
 	/**
 	 * Explicitly remove all items that are going to be dropped from the players inventory
@@ -32,6 +32,7 @@ public class DupePrevention {
 			PlayerInventory playerInventory = p.getInventory(); 
 			List<ItemStack> drops = event.getDrops();
 
+			// Go through the "to-be-dropped" items and delete the corresponding items from the players inventory
 			for(ItemStack drop : drops) {
 				for(int i = 0; i < playerInventory.getSize(); i++) {
 					if(playerInventory.getItem(i).equals(drop)) {

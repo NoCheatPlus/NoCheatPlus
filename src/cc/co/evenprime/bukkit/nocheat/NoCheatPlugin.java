@@ -167,18 +167,18 @@ public class NoCheatPlugin extends JavaPlugin {
 		// LOGGING IF NEEDED AND WHERE NEEDED
 		Level logLevel = null;
 				
-		if(NoCheatConfiguration.movingActionMinor.contains("loglow")) {
+		if(actions.contains("loglow")) {
 			logLevel = Level.INFO;
 		}
-		if(NoCheatConfiguration.movingActionMinor.contains("logmed")) {
+		if(actions.contains("logmed")) {
 			logLevel = Level.WARNING;
 		}
-		if(NoCheatConfiguration.movingActionMinor.contains("loghigh")) {
+		if(actions.contains("loghigh")) {
 			logLevel = Level.SEVERE;
 		}
 		
 		if(logLevel != null) {
-			NoCheatPlugin.log(logLevel, message);
+			NoCheatPlugin.log(logLevel, "NC: "+message);
 		}
     }
     /**

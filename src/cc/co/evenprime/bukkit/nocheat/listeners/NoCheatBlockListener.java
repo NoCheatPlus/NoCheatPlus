@@ -4,7 +4,7 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
-import cc.co.evenprime.bukkit.nocheat.checks.BlockPlacingCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 
 /**
  * Handle events for all Block related events
@@ -23,6 +23,6 @@ public class NoCheatBlockListener extends BlockListener {
 	public void onBlockPlace(BlockPlaceEvent event) {
 
 		if(!event.isCancelled() && NoCheatConfiguration.airbuildCheckActive)
-			BlockPlacingCheck.check(event);
+			AirbuildCheck.check(event);
 	}
 }

@@ -15,7 +15,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
  * @author Evenprime
  *
  */
-public class BlockPlacingCheck {
+public class AirbuildCheck {
 
 
 	public static void check(BlockPlaceEvent event) {

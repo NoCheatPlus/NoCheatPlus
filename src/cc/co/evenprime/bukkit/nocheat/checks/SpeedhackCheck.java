@@ -46,15 +46,12 @@ public class SpeedhackCheck {
 			else if(data.speedhackEventsSinceLastCheck > limitMed) action = NoCheatConfiguration.speedhackActionNormal;
 			else if(data.speedhackEventsSinceLastCheck > limitLow) action = NoCheatConfiguration.speedhackActionMinor;
 			
-			if(action != null) {
-				if(data.speedhackSetBackPoint == null) {
-					data.speedhackSetBackPoint = event.getFrom().clone();
-				}
-				data.speedhackViolationsInARow++;
+			if(action == null) {
+				data.speedhackSetBackPoint = event.getFrom().clone();
+				data.speedhackViolationsInARow = 0;
 			}
 			else {
-				data.speedhackViolationsInARow = 0;
-				data.speedhackSetBackPoint = null;
+				data.speedhackViolationsInARow++;
 			}
 			
 			if(data.speedhackViolationsInARow >= violationsLimit) {
@@ -66,17 +63,19 @@ public class SpeedhackCheck {
 			data.speedhackLastCheck = time;
 			
 		}
+		
 		data.speedhackEventsSinceLastCheck++;
 	}
 	
 	private static void action(String actions, PlayerMoveEvent event, NoCheatData data) {
 		
+		if(actions == null) return;
 		// LOGGING IF NEEDED
 		if(actions.contains("log")) {
 			NoCheatPlugin.logAction(actions, event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+NoCheatConfiguration.speedhackLimitLow+ " were allowed. Speedhack?");
 		}
 		// RESET IF NEEDED
-		if(NoCheatConfiguration.movingActionMinor.contains("reset")) {
+		if(actions.contains("reset")) {
 			resetPlayer(event, data);
 		}
 	}

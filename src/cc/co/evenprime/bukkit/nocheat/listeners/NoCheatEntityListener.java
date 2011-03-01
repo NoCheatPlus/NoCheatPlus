@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
-import cc.co.evenprime.bukkit.nocheat.checks.DupePrevention;
+import cc.co.evenprime.bukkit.nocheat.checks.DupebydeathCheck;
 
 public class NoCheatEntityListener extends EntityListener {
 
@@ -17,7 +17,7 @@ public class NoCheatEntityListener extends EntityListener {
 	public void onEntityDeath(EntityDeathEvent event) {
 		
 		if(NoCheatConfiguration.dupebydeathCheckActive) {
-			DupePrevention.playerDeath(event);
+			DupebydeathCheck.playerDeath(event);
 		}
 	}
 }
