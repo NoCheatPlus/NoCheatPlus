@@ -46,7 +46,7 @@ public class NoCheatConfiguration {
 	public static String movingActionNormal = "";
 	public static String movingActionHeavy = "";
 	
-	// should airbuild violations be treated?
+	// How should airbuild violations be treated?
 	public static String airbuildAction = "";
 	
 	// The log level above which players with the permission nocheat.notify will get informed about violations

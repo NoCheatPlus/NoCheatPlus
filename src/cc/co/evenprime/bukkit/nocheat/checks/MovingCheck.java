@@ -142,13 +142,13 @@ public class MovingCheck {
 		Location from = event.getFrom();
 		Location to = event.getTo();
 		
-		Level vl = Level.FINEST; // The violation level (none, minor, normal, heavy)
+		Level vl = null; // The violation level (none, minor, normal, heavy)
 
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
    		double xDistance = Math.abs(from.getX() - to.getX());
     	double zDistance = Math.abs(from.getZ() - to.getZ());
-    	double combined = Math.sqrt(xDistance * xDistance + zDistance * zDistance);	
+    	double combined = xDistance * xDistance + zDistance * zDistance;	
     	// How far are we off?
     	
     	if(combined > movingDistanceHigh) {
@@ -162,7 +162,7 @@ public class MovingCheck {
     	}
     	    	
     	// If the target is a bed, allow it
-    	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && vl.intValue() < Level.SEVERE.intValue()) {
+    	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && (vl == null || vl.intValue() < Level.SEVERE.intValue())) {
     		return; // players are allowed to "teleport" into a bed over short distances
     	}
 
@@ -254,45 +254,55 @@ public class MovingCheck {
     		data.movingJumpPhase = jumpingPhases.length - 1;
     	}
 
-
-    	String actions = null;
-    	
-    	// Find out with what actions to treat the violation(s)
-    	if(vl.equals(Level.INFO))  {
+    	if(vl == null) {
+    		legitimateMove(data, event);
+    	}
+    	else {
+        	String actions = null;
+        	boolean log = true;
+        	
     		// If it is the first violation, store the "from" location for potential later use
-    		if(data.movingMinorViolationsInARow == 0) {
+    		if(data.movingSetBackPoint == null) {
     			data.movingSetBackPoint = event.getFrom().clone();
     		}
     		
-    		data.movingMinorViolationsInARow++;
-			actions = NoCheatConfiguration.movingActionMinor;
-    		
-    		// React only after the freebee illegal moves have all been used
-    		if(data.movingMinorViolationsInARow != NoCheatConfiguration.movingFreeMoves + 1) {
-    			vl = Level.FINEST;
-    		}
-    		
-    		// using up all free moves 4 times in a row counts as one normal violation
-    		if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves * 4) == 0) {
-    			vl = Level.WARNING;
-    		}
-    	}
-    	    	
-    	if(vl.equals(Level.WARNING)) {
-    		data.movingNormalViolationsInARow++;
-    		actions = NoCheatConfiguration.movingActionNormal;
-    	}
-    	if(vl.equals(Level.SEVERE)) {
-    		data.movingHeavyViolationsInARow++;
-    		actions = NoCheatConfiguration.movingActionHeavy;
-    	}
-    	if(vl.equals(Level.FINEST)) {
-    		legitimateMove(data, event);
-    		actions = null;
-    	}
+    		// Find out with what actions to treat the violation(s)
+    		if(Level.INFO.equals(vl))  {
+    			data.movingMinorViolationsInARow++;
+
+    			actions = NoCheatConfiguration.movingActionMinor;
+
+    			// React only after the freebee illegal moves have all been used
+    			if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves) != 0) {
+    				vl = null;
+    				actions = null;
+    			}
+    			
+    			if(data.movingMinorViolationsInARow != NoCheatConfiguration.movingFreeMoves) {
+    				log = false;
+    			}
+
+    			// using up all free moves 4 times in a row counts as one normal violation
+    			if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves * 4) == 0) {
+    				vl = Level.WARNING;
+    				log = true;
+    			}
+    		} 	
     	
-    	action(event, actions);
-    	
+    		if(Level.WARNING.equals(vl)) {
+    			if(data.movingNormalViolationsInARow > 0) log = false;
+    			data.movingNormalViolationsInARow++;
+    			actions = NoCheatConfiguration.movingActionNormal;
+    		}
+
+    		if(Level.SEVERE.equals(vl)) {
+    			if(data.movingHeavyViolationsInARow > 0) log = false;
+    			data.movingHeavyViolationsInARow++;
+    			actions = NoCheatConfiguration.movingActionHeavy;
+    		}
+
+    		action(event, actions, log);
+    	}
 	}
 	
 		
@@ -301,11 +311,11 @@ public class MovingCheck {
 	 * @param event
 	 * @param actions
 	 */
-	private static void action(PlayerMoveEvent event, String actions) {
+	private static void action(PlayerMoveEvent event, String actions, boolean log) {
 		
 		if(actions == null) return;
 		// LOGGING IF NEEDED
-		if(actions.contains("log")) {
+		if(log && actions.contains("log")) {
 			NoCheatPlugin.logAction(actions, "Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 		}
 		
@@ -320,15 +330,15 @@ public class MovingCheck {
 	protected static void legitimateMove(NoCheatData data, PlayerMoveEvent event) {
 		// Give some additional logs about now ending violations
 		if(data.movingHeavyViolationsInARow > 0) {
-			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionHeavy, "Moving violation stopped: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
+			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionHeavy, "Moving violation ended: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
 			data.movingHeavyViolationsInARow = 0;
 		}
 		if(data.movingNormalViolationsInARow > 0) {
-			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionNormal, "Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
+			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionNormal, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
 			data.movingNormalViolationsInARow = 0;
 		}
 		if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves) {
-			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionMinor, "Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
+			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionMinor, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
 			data.movingMinorViolationsInARow = 0;
 		}
 		
