@@ -1,7 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
-import java.util.logging.Level;
-
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
@@ -33,31 +31,34 @@ public class SpeedhackCheck {
 		// Get the time of the server
 		long time = System.currentTimeMillis();
 		
-		Level vl = null;
-
 		// Is it time for a speedhack check now?
 		if(time > interval + data.speedhackLastCheck ) {
 			// Yes
 			// TODO: Needs some better handling for server lag
+			String action = null;
 
 			int limitLow = (int)((NoCheatConfiguration.speedhackLimitLow * (time - data.speedhackLastCheck)) / interval);
 			int limitMed = (int)((NoCheatConfiguration.speedhackLimitMed * (time - data.speedhackLastCheck)) / interval);
 			int limitHigh = (int)((NoCheatConfiguration.speedhackLimitHigh * (time - data.speedhackLastCheck)) / interval);
 
 			
-			if(data.speedhackEventsSinceLastCheck > limitHigh) vl = Level.SEVERE;
-			else if(data.speedhackEventsSinceLastCheck > limitMed) vl = Level.WARNING;
-			else if(data.speedhackEventsSinceLastCheck > limitLow) vl = Level.INFO;
-
-		
+			if(data.speedhackEventsSinceLastCheck > limitHigh) action = NoCheatConfiguration.speedhackActionHeavy;
+			else if(data.speedhackEventsSinceLastCheck > limitMed) action = NoCheatConfiguration.speedhackActionNormal;
+			else if(data.speedhackEventsSinceLastCheck > limitLow) action = NoCheatConfiguration.speedhackActionMinor;
 			
-			if(vl != null) data.speedhackViolationsInARow++;
-			else data.speedhackViolationsInARow = 0;
+			if(action != null) {
+				if(data.speedhackSetBackPoint == null) {
+					data.speedhackSetBackPoint = event.getFrom().clone();
+				}
+				data.speedhackViolationsInARow++;
+			}
+			else {
+				data.speedhackViolationsInARow = 0;
+				data.speedhackSetBackPoint = null;
+			}
 			
 			if(data.speedhackViolationsInARow >= violationsLimit) {
-				String message = "NoCheatPlugin: "+event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limitLow+ " were allowed. Speedhack?";
-
-				NoCheatPlugin.log(vl, message);
+				action(action, event, data);
 			}
 			
 			// Reset values for next check
@@ -66,5 +67,35 @@ public class SpeedhackCheck {
 			
 		}
 		data.speedhackEventsSinceLastCheck++;
+	}
+	
+	private static void action(String actions, PlayerMoveEvent event, NoCheatData data) {
+		
+		// LOGGING IF NEEDED
+		if(actions.contains("log")) {
+			NoCheatPlugin.logAction(actions, event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+NoCheatConfiguration.speedhackLimitLow+ " were allowed. Speedhack?");
+		}
+		// RESET IF NEEDED
+		if(NoCheatConfiguration.movingActionMinor.contains("reset")) {
+			resetPlayer(event, data);
+		}
+	}
+	
+	private static void resetPlayer(PlayerMoveEvent event, NoCheatData data) {
+		
+		// If we have stored a location for the player, we put him back there
+		if(data.speedhackSetBackPoint != null) {
+			
+			// Lets try it that way. Maybe now people don't "disappear" any longer
+			event.setFrom(data.speedhackSetBackPoint);
+			event.setTo(data.speedhackSetBackPoint);
+			event.getPlayer().teleportTo(data.speedhackSetBackPoint);
+		}
+		else {
+			// Lets try it that way. Maybe now people don't "disappear" any longer
+			event.setFrom(event.getFrom());
+			event.setTo(event.getFrom().clone());
+			event.getPlayer().teleportTo(event.getFrom());
+		}
 	}
 }

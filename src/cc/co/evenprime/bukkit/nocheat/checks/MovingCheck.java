@@ -318,15 +318,15 @@ public class MovingCheck {
 	protected static void legitimateMove(NoCheatData data, PlayerMoveEvent event) {
 		// Give some additional logs about now ending violations
 		if(data.movingHeavyViolationsInARow > 0) {
-			NoCheatPlugin.log(Level.SEVERE, "NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
+			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionHeavy, "Moving violation stopped: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
 			data.movingHeavyViolationsInARow = 0;
 		}
 		if(data.movingNormalViolationsInARow > 0) {
-			NoCheatPlugin.log(Level.WARNING, "NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
+			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionNormal, "Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
 			data.movingNormalViolationsInARow = 0;
 		}
 		if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves) {
-			NoCheatPlugin.log(Level.INFO, "NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
+			NoCheatPlugin.logAction(NoCheatConfiguration.movingActionMinor, "Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
 			data.movingMinorViolationsInARow = 0;
 		}
 		
@@ -348,9 +348,6 @@ public class MovingCheck {
 	 * @param event
 	 */
 	private static void resetPlayer(PlayerMoveEvent event) {
-		
-		// If we only log, we never reset the player to his original location and can end here already
-		if(NoCheatConfiguration.movingLogOnly) return;
 		
 		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
 		

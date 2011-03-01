@@ -141,7 +141,7 @@ public class NoCheatPlugin extends JavaPlugin {
      * Log a violation message to all locations declared in the config file
      * @param message
      */
-    public static void log(Level l, String message) {
+    private static void log(Level l, String message) {
     	if(l != null) {
 	    	logToChat(l, message);
 	    	log.log(l, message);

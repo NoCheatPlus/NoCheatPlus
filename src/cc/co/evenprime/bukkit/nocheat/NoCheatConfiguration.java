@@ -46,7 +46,8 @@ public class NoCheatConfiguration {
 	public static String movingActionNormal = "";
 	public static String movingActionHeavy = "";
 	
-	public static boolean movingLogOnly;
+	// should airbuild violations be treated?
+	public static String airbuildAction = "";
 	
 	// The log level above which players with the permission nocheat.notify will get informed about violations
 	public static Level notifyLevel = Level.OFF;
@@ -105,18 +106,18 @@ public class NoCheatConfiguration {
 		speedhackLimitLow = c.getInt("speedhack.limits.low", 30);
 		speedhackLimitMed = c.getInt("speedhack.limits.med", 45);
 		speedhackLimitHigh = c.getInt("speedhack.limits.high", 60);
-		
-		movingLogOnly = c.getBoolean("moving.logonly", false);
-		
+			
 		movingFreeMoves = c.getInt("moving.freemoves", 10);
 		
-		movingActionMinor = c.getString("moving.action.low", "log reset");
-		movingActionNormal = c.getString("moving.action.med", "log reset");
-		movingActionHeavy = c.getString("moving.action.high", "log reset");
+		movingActionMinor = c.getString("moving.action.low", "loglow reset");
+		movingActionNormal = c.getString("moving.action.med", "logmed reset");
+		movingActionHeavy = c.getString("moving.action.high", "loghigh reset");
 		
-		speedhackActionMinor = c.getString("speedhack.action.low", "log");
-		speedhackActionNormal = c.getString("speedhack.action.med", "log");
-		speedhackActionHeavy = c.getString("speedhack.action.high", "log");
+		speedhackActionMinor = c.getString("speedhack.action.low", "loglow");
+		speedhackActionNormal = c.getString("speedhack.action.med", "logmed");
+		speedhackActionHeavy = c.getString("speedhack.action.high", "loghigh");
+		
+		airbuildAction = c.getString("airbuild.action", "logmed deny");
 		
 		if(movingFreeMoves < 10) movingFreeMoves = 10;
 	}
@@ -154,29 +155,37 @@ public class NoCheatConfiguration {
 			w.write("    logtofile: low"); w.newLine();
 			w.write("    logtoconsole: high"); w.newLine();
 			w.write("    logtonotify: med"); w.newLine();
-			w.write("# Checks and Preventions that are activated (true or false)"); w.newLine();
+			w.write("# Checks and Bugfixes that are activated (true or false)"); w.newLine();
 			w.write("active:");  w.newLine();
 			w.write("    speedhack: true"); w.newLine();
 			w.write("    moving: true"); w.newLine();
 			w.write("    airbuild: false"); w.newLine();
 			w.write("    dupebydeath: false"); w.newLine();
-			w.write("# Speedhack specific options. Limits are move-events per second, action is what should happen in each case") ;w.newLine();
+			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
 			w.write("    limits:"); w.newLine();
 			w.write("        low: 30"); w.newLine();
 			w.write("        med: 45"); w.newLine();
 			w.write("        high: 60"); w.newLine();
+			w.write("#   Speedhack Action, one or more of loglow logmed loghigh reset"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: loglow"); w.newLine();
 			w.write("        med: logmed"); w.newLine();
 			w.write("        high: loghigh"); w.newLine();
-			w.write("# Moving specific options. Higher freemoves values mean less strict checks, action is what should happen in each case") ;w.newLine();
+			w.write("# Moving specific optionse") ;w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("    freemoves: 10"); w.newLine();
+			w.write("#   Moving Action, one or more of loglow logmed loghigh reset"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: loglow reset"); w.newLine();
 			w.write("        med: logmed reset"); w.newLine();
 			w.write("        high: loghigh reset"); w.newLine();
+			w.write("# Airbuild specific options"); w.newLine();
+			w.write("airbuild:"); w.newLine();
+			w.write("#   Airbuild Action, one or more of loglow logmed loghigh deny"); w.newLine();
+			w.write("    action: logmed deny"); w.newLine();
+			w.write("# Dupebydeath specific options (none exist yet)"); w.newLine();
+			w.write("dupebydeath:"); w.newLine();
 			w.flush(); w.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
