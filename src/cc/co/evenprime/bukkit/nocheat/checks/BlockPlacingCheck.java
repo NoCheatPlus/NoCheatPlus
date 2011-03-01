@@ -1,5 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -39,7 +41,7 @@ public class BlockPlacingCheck {
 				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()-1) == airId &&
 				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()+1) == airId) {
 			event.setCancelled(true);
-			NoCheatPlugin.logNormal("NoCheatPlugin: Airbuild violation: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ());
+			NoCheatPlugin.log(Level.WARNING, "NoCheatPlugin: Airbuild violation: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ());
 		}
 	}
 }

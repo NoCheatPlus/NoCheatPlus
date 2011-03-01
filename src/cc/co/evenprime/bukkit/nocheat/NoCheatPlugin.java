@@ -138,53 +138,49 @@ public class NoCheatPlugin extends JavaPlugin {
     }
     
     /**
-     * Log a minor violation message to all locations declared in the config file
+     * Log a violation message to all locations declared in the config file
      * @param message
      */
-    public static void logMinor(String message) {
-    	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.INFO.intValue()) {
-    		for(Player player : p.getServer().getOnlinePlayers()) {
-    			if((Permissions != null && Permissions.has(player, "nocheat.notify")) ||
-    			   (Permissions == null && player.isOp())) {
-    				player.sendMessage("[INFO] " + message);
-    			}
-    		}
+    public static void log(Level l, String message) {
+    	if(l != null) {
+	    	logToChat(l, message);
+	    	log.log(l, message);
     	}
-    	log.info(message);
     }
 
-    /**
-     * Log a normal violation message to all locations declared in the config file
-     * @param message
-     */
-    public static void logNormal(String message) {
-    	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.WARNING.intValue()) {
-    		for(Player player : p.getServer().getOnlinePlayers()) {
-    			if((Permissions != null && Permissions.has(player, "nocheat.notify")) ||
- 			   (Permissions == null && player.isOp())) {
-    				player.sendMessage("[WARNING] " + message);
-    			}
-    		}
-    	}
-    	log.warning(message);
-    }
     
-    /**
-     * Log a heavy violation message to all locations declared in the config file
-     * @param message
-     */
-    public static void logHeavy(String message) {
-    	if(NoCheatConfiguration.notifyLevel.intValue() <= Level.SEVERE.intValue()) {
+    
+    private static void logToChat(Level l, String message) {
+    	if(NoCheatConfiguration.notifyLevel.intValue() <= l.intValue()) {
 	    	for(Player player : p.getServer().getOnlinePlayers()) {
 	    		if((Permissions != null && Permissions.has(player, "nocheat.notify")) ||
  			   (Permissions == null && player.isOp())) {
-	    			player.sendMessage("[SEVERE] " + message);
+	    			player.sendMessage("["+l.getName()+"] " + message);
 	    		}
 	    	}
     	}
-    	log.severe(message);
     }
     
+    public static void logAction(String actions, String message) {
+    	if(actions == null) return;
+		
+		// LOGGING IF NEEDED AND WHERE NEEDED
+		Level logLevel = null;
+				
+		if(NoCheatConfiguration.movingActionMinor.contains("loglow")) {
+			logLevel = Level.INFO;
+		}
+		if(NoCheatConfiguration.movingActionMinor.contains("logmed")) {
+			logLevel = Level.WARNING;
+		}
+		if(NoCheatConfiguration.movingActionMinor.contains("loghigh")) {
+			logLevel = Level.SEVERE;
+		}
+		
+		if(logLevel != null) {
+			NoCheatPlugin.log(logLevel, message);
+		}
+    }
     /**
      * Read the config file
      */

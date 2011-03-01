@@ -1,5 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import java.util.logging.Level;
+
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
@@ -14,12 +16,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
  */
 public class SpeedhackCheck {
 
-    // Violation levels
-    private static final int HEAVY = 3;
-    private static final int NORMAL = 2;
-    private static final int MINOR = 1;
-    private static final int NONE = 0;
-    
+   
     private static final long interval = 1000;
     private static final int violationsLimit = 3;
     
@@ -36,7 +33,7 @@ public class SpeedhackCheck {
 		// Get the time of the server
 		long time = System.currentTimeMillis();
 		
-		int vl = NONE;
+		Level vl = null;
 
 		// Is it time for a speedhack check now?
 		if(time > interval + data.speedhackLastCheck ) {
@@ -48,22 +45,19 @@ public class SpeedhackCheck {
 			int limitHigh = (int)((NoCheatConfiguration.speedhackLimitHigh * (time - data.speedhackLastCheck)) / interval);
 
 			
-			if(data.speedhackEventsSinceLastCheck > limitHigh) vl = HEAVY;
-			else if(data.speedhackEventsSinceLastCheck > limitMed) vl = NORMAL;
-			else if(data.speedhackEventsSinceLastCheck > limitLow) vl = MINOR;
+			if(data.speedhackEventsSinceLastCheck > limitHigh) vl = Level.SEVERE;
+			else if(data.speedhackEventsSinceLastCheck > limitMed) vl = Level.WARNING;
+			else if(data.speedhackEventsSinceLastCheck > limitLow) vl = Level.INFO;
 
 		
 			
-			if(vl > NONE) data.speedhackViolationsInARow++;
+			if(vl != null) data.speedhackViolationsInARow++;
 			else data.speedhackViolationsInARow = 0;
 			
 			if(data.speedhackViolationsInARow >= violationsLimit) {
 				String message = "NoCheatPlugin: "+event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limitLow+ " were allowed. Speedhack?";
-				switch(vl) {
-				case HEAVY: NoCheatPlugin.logHeavy(message); break;
-				case NORMAL:  NoCheatPlugin.logNormal(message); break;
-				case MINOR:  NoCheatPlugin.logMinor(message); break;
-				}
+
+				NoCheatPlugin.log(vl, message);
 			}
 			
 			// Reset values for next check

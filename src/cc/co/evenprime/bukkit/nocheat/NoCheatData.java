@@ -13,8 +13,6 @@ public class NoCheatData {
 	/**
 	 * Don't rely on any of these yet, they are likely going to change their name/functionality 
 	 */
-
-
 	
 	public int movingJumpPhase = 0; // current jumpingPhase
 	public int movingMinorViolationsInARow = 0; 

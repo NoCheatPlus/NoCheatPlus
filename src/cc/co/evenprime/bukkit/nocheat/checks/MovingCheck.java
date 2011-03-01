@@ -1,6 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,13 +23,7 @@ public class MovingCheck {
 	// previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
     // Each entry represents the maximum gain in height per move event.
     private static double jumpingPhases[] = new double[]{ 0.501D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.49D };
-    
-    // Violation levels
-    private static final int HEAVY = 3;
-    private static final int NORMAL = 2;
-    private static final int MINOR = 1;
-    private static final int NONE = 0;
-    
+        
 	// Limits for the moving check
 	public static double movingDistanceLow = 0.1D;
 	public static double movingDistanceMed = 2.0D;
@@ -146,27 +142,27 @@ public class MovingCheck {
 		Location from = event.getFrom();
 		Location to = event.getTo();
 		
-		int vl = NONE; // The violation level (none, minor, normal, heavy)
+		Level vl = Level.FINEST; // The violation level (none, minor, normal, heavy)
 
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
    		double xDistance = Math.abs(from.getX() - to.getX());
     	double zDistance = Math.abs(from.getZ() - to.getZ());
-    	double combined = xDistance * xDistance + zDistance * zDistance;	
+    	double combined = Math.sqrt(xDistance * xDistance + zDistance * zDistance);	
     	// How far are we off?
     	
     	if(combined > movingDistanceHigh) {
-    		vl = vl > HEAVY ? vl : HEAVY;
+    		vl = max(vl, Level.SEVERE);
     	}
     	else if(combined > movingDistanceMed) {
-    		vl = vl > NORMAL ? vl : NORMAL;
+    		vl = max(vl, Level.WARNING);
     	}
     	else if(combined > movingDistanceLow) {
-    		vl = vl > MINOR ? vl : MINOR;
+    		vl =  max(vl, Level.INFO);
     	}
     	    	
     	// If the target is a bed, allow it
-    	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && vl <= NORMAL) {
+    	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && vl.intValue() < Level.SEVERE.intValue()) {
     		return; // players are allowed to "teleport" into a bed over short distances
     	}
 
@@ -195,9 +191,9 @@ public class MovingCheck {
 
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
-    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
-    			else                   vl = vl > MINOR ? vl : MINOR;
+    			if(offset > 2D)        vl = max(vl, Level.SEVERE);
+    			else if(offset > 1D)   vl = max(vl, Level.WARNING);
+    			else                   vl = max(vl, Level.INFO);
     		}
     	}
     	// player is starting to jump (or starting to fall down somewhere)
@@ -211,9 +207,9 @@ public class MovingCheck {
 
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
-    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
-    			else                   vl = vl > MINOR ? vl : MINOR;
+    			if(offset > 2D)        vl = max(vl, Level.SEVERE);
+    			else if(offset > 1D)   vl = max(vl, Level.WARNING);
+    			else                   vl = max(vl, Level.INFO);
     		}
     		else if(to.getY() <= from.getY()) {
     			// Very special case if running over a cliff and then immediately jumping. 
@@ -229,9 +225,9 @@ public class MovingCheck {
 
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
-    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
-    			else                   vl = vl > MINOR ? vl : MINOR;
+    			if(offset > 2D)        vl = max(vl, Level.SEVERE);
+    			else if(offset > 1D)   vl = max(vl, Level.WARNING);
+    			else                   vl = max(vl, Level.INFO);
     		}
     		else {
     			data.movingJumpPhase = 0; // He is on ground now, so reset the jump
@@ -244,9 +240,9 @@ public class MovingCheck {
 
     			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
 
-    			if(offset > 2D)        vl = vl > HEAVY ? vl : HEAVY;
-    			else if(offset > 1D) vl = vl > NORMAL ? vl : NORMAL;
-    			else                   vl = vl > MINOR ? vl : MINOR;
+    			if(offset > 2D)        vl = max(vl, Level.SEVERE);
+    			else if(offset > 1D)   vl = max(vl, Level.WARNING);
+    			else                   vl = max(vl, Level.INFO);
     		}
 
     		data.movingJumpPhase++; // Enter next phase of the flight
@@ -258,101 +254,105 @@ public class MovingCheck {
     		data.movingJumpPhase = jumpingPhases.length - 1;
     	}
 
-    	// Treat the violation(s) according to their level
-    	switch(vl) {
-    	case MINOR:
-    		minorViolation(data, event);
-    		break;
-    	case NORMAL:
-    		normalViolation(data, event);
-    		break;
-    	case HEAVY:
-    		heavyViolation(data, event);
-    		break;
-    	default:
-    		legitimateMove(data, event);
-    	}
-	}
-	
-	
-	protected static void minorViolation(NoCheatData data, PlayerMoveEvent event) {
 
-		// If it is the first violation, store the "from" location for potential later use
-		if(data.movingMinorViolationsInARow == 0) {
-			data.movingSetBackPoint = event.getFrom().clone();
-		}
-		
-		// Start logging only after the freebee illegal moves have all been used
-		if(data.movingMinorViolationsInARow == NoCheatConfiguration.movingFreeMoves + 1) {
-			NoCheatPlugin.logMinor("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
-			
-		}
-		
-		data.movingMinorViolationsInARow++;
-		
-		// using up all free moves 4 times in a row counts as one normal violation
-		if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves * 4) == 0) {
-			normalViolation(data, event);
-		}
-		// Each time the freebee moves are all used up, we may reset the player to his old location
-		else if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves + 1) == 0) {
-			resetPlayer(data, event);
-		}
+    	String actions = null;
+    	
+    	// Find out with what actions to treat the violation(s)
+    	if(vl.equals(Level.INFO))  {
+    		// If it is the first violation, store the "from" location for potential later use
+    		if(data.movingMinorViolationsInARow == 0) {
+    			data.movingSetBackPoint = event.getFrom().clone();
+    		}
+    		
+    		data.movingMinorViolationsInARow++;
+			actions = NoCheatConfiguration.movingActionMinor;
+    		
+    		// React only after the freebee illegal moves have all been used
+    		if(data.movingMinorViolationsInARow != NoCheatConfiguration.movingFreeMoves + 1) {
+    			vl = Level.FINEST;
+    		}
+    		
+    		// using up all free moves 4 times in a row counts as one normal violation
+    		if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves * 4) == 0) {
+    			vl = Level.WARNING;
+    		}
+    	}
+    	    	
+    	if(vl.equals(Level.WARNING)) {
+    		data.movingNormalViolationsInARow++;
+    		actions = NoCheatConfiguration.movingActionNormal;
+    	}
+    	if(vl.equals(Level.SEVERE)) {
+    		data.movingHeavyViolationsInARow++;
+    		actions = NoCheatConfiguration.movingActionHeavy;
+    	}
+    	if(vl.equals(Level.FINEST)) {
+    		legitimateMove(data, event);
+    		actions = null;
+    	}
+    	
+    	action(event, actions);
+    	
 	}
 	
-	protected static void normalViolation(NoCheatData data, PlayerMoveEvent event) {
-		// Log the first violation in a row
-		if(data.movingNormalViolationsInARow == 0)
-			NoCheatPlugin.logNormal("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
-	
-		resetPlayer(data, event);
 		
-		data.movingNormalViolationsInARow++;
+	/**
+	 * Perform actions that were specified by the player
+	 * @param event
+	 * @param actions
+	 */
+	private static void action(PlayerMoveEvent event, String actions) {
+		
+		// LOGGING IF NEEDED
+		NoCheatPlugin.logAction(actions, "Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+
+		// RESET IF NEEDED
+		if(NoCheatConfiguration.movingActionMinor.contains("reset")) {
+			resetPlayer(event);
+		}
+		
 	}
-	
-	protected static void heavyViolation(NoCheatData data, PlayerMoveEvent event) {
-		
-		// Log the first violation in a row
-		if(data.movingHeavyViolationsInARow == 0)
-			NoCheatPlugin.logHeavy("NoCheatPlugin: Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
-	
-		resetPlayer(data, event);
-		
-		data.movingHeavyViolationsInARow++;
-	}
-	
+
+
+
 	protected static void legitimateMove(NoCheatData data, PlayerMoveEvent event) {
 		// Give some additional logs about now ending violations
 		if(data.movingHeavyViolationsInARow > 0) {
-			NoCheatPlugin.logHeavy("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
+			NoCheatPlugin.log(Level.SEVERE, "NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
 			data.movingHeavyViolationsInARow = 0;
 		}
-		else if(data.movingNormalViolationsInARow > 0) {
-			NoCheatPlugin.logNormal("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
+		if(data.movingNormalViolationsInARow > 0) {
+			NoCheatPlugin.log(Level.WARNING, "NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
 			data.movingNormalViolationsInARow = 0;
 		}
-		else if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves) {
-			NoCheatPlugin.logMinor("NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
-			data.movingMinorViolationsInARow = 0;
-		}
-		else {
+		if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves) {
+			NoCheatPlugin.log(Level.INFO, "NoCheatPlugin: Moving violation stopped: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
 			data.movingMinorViolationsInARow = 0;
 		}
 		
-		// Setback point isn't needed anymore
+		data.movingMinorViolationsInARow = 0;
+
 		data.movingSetBackPoint = null;
 	}
 		
+	private static Level max(Level l1, Level l2) {
+		if(l1 == null) return l2;
+		if(l2 == null) return l1; 
+		if(l1.intValue() > l2.intValue()) return l1;
+		else return l2;
+	}
 	/** 
 	 * Return the player to a stored location or if that is not available,
 	 * the previous location.
 	 * @param data
 	 * @param event
 	 */
-	private static void resetPlayer(NoCheatData data, PlayerMoveEvent event) {
+	private static void resetPlayer(PlayerMoveEvent event) {
 		
 		// If we only log, we never reset the player to his original location and can end here already
 		if(NoCheatConfiguration.movingLogOnly) return;
+		
+		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
 		
 		// Still not a perfect solution. After resetting a player his vertical momentum gets lost
 		// Therefore we can't expect him to fall big distances in his next move, therefore we have to
