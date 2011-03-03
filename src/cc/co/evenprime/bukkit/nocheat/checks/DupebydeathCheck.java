@@ -37,7 +37,7 @@ public class DupebydeathCheck {
 				for(int i = 0; i < playerInventory.getSize(); i++) {
 					if(playerInventory.getItem(i).equals(drop)) {
 						playerInventory.clear(i);
-						i = playerInventory.getSize();
+						break;
 					}
 				}
 			}

@@ -142,15 +142,20 @@ public class MovingCheck {
 		Location from = event.getFrom();
 		Location to = event.getTo();
 		
-		Level vl = null; // The violation level (none, minor, normal, heavy)
-
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
    		double xDistance = Math.abs(from.getX() - to.getX());
     	double zDistance = Math.abs(from.getZ() - to.getZ());
     	double combined = xDistance * xDistance + zDistance * zDistance;	
-    	// How far are we off?
     	
+		// If the target is a bed and distance not too big, allow it
+    	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && xDistance < 5.0D && zDistance < 5.0D) {
+    		return; // players are allowed to "teleport" into a bed over short distances
+    	}
+    	   	
+		Level vl = null; // The violation level (none, minor, normal, heavy)
+		
+    	// How far are we off?
     	if(combined > movingDistanceHigh) {
     		vl = max(vl, Level.SEVERE);
     	}
@@ -160,18 +165,12 @@ public class MovingCheck {
     	else if(combined > movingDistanceLow) {
     		vl =  max(vl, Level.INFO);
     	}
-    	    	
-    	// If the target is a bed, allow it
-    	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && (vl == null || vl.intValue() < Level.SEVERE.intValue())) {
-    		return; // players are allowed to "teleport" into a bed over short distances
-    	}
-
 
     	// pre-calculate boundary values that are needed multiple times in the following checks
     	// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
     	int fromValues[] = {floor_double(from.getX() - 0.3D), (int)Math.floor(from.getX() + 0.3D), from.getBlockY(), floor_double(from.getZ() - 0.3D),(int)Math.floor(from.getZ() + 0.3D) };
     	int toValues[] = {floor_double(to.getX() - 0.3D), (int)Math.floor(to.getX() + 0.3D), to.getBlockY(), floor_double(to.getZ() - 0.3D), (int)Math.floor(to.getZ() + 0.3D) };
-
+    	
     	// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
     	boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
     	boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues, to);
@@ -433,9 +432,15 @@ public class MovingCheck {
     		 types[w.getBlockTypeIdAt(values[0], values[2]+1, values[4])] != BlockType.NONSOLID ||
     		 types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] != BlockType.NONSOLID)
     		return true;
+    	// Allow using a bug called "water elevator"
+    	else if(types[w.getBlockTypeIdAt(values[0]+1, values[2]-1, values[3]+1)] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0]+1, values[2], values[3]+1)] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0]+1, values[2]+1, values[3]+1)] == BlockType.LIQUID)
+    		return true;
     	else
     		return false;
     }
+    
     
     public static int floor_double(double d)
     {
