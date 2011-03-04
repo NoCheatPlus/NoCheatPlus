@@ -9,6 +9,11 @@ import org.bukkit.inventory.PlayerInventory;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
+/**
+ * 
+ * @author Evenprime
+ *
+ */
 public class DupebydeathCheck {
 
 	/**
@@ -16,7 +21,7 @@ public class DupebydeathCheck {
 	 * @param event
 	 */
 	public static void playerDeath(EntityDeathEvent event) {
-		
+
 		if(event.getEntity() instanceof Player) {
 
 			Player p = (Player)event.getEntity();
@@ -28,7 +33,7 @@ public class DupebydeathCheck {
 			else if(NoCheatPlugin.Permissions == null && p.isOp() ) {
 				return;
 			}
-			
+
 			PlayerInventory playerInventory = p.getInventory(); 
 			List<ItemStack> drops = event.getDrops();
 

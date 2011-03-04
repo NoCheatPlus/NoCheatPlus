@@ -40,17 +40,17 @@ public class AirbuildCheck {
 				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()-1) == airId &&
 				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()+1) == airId)
 			action(NoCheatConfiguration.airbuildAction, event);
-			
+
 	}
-	
+
 	private static void action(String action, BlockPlaceEvent event) {
-		
+
 		// LOG IF NEEDED
 		if(action.contains("log")) {
 			Location l = event.getBlockPlaced().getLocation();
 			NoCheatPlugin.logAction(action, "NoCheatPlugin: Airbuild violation: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ());
 		}
-		
+
 		// DENY IF NEEDED
 		if(action.contains("deny")) {
 			event.setCancelled(true);
