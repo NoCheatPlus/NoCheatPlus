@@ -107,7 +107,8 @@ public class NoCheatPlugin extends JavaPlugin {
     	String checks = (NoCheatConfiguration.movingCheckActive ? "moving ": "") + 
     	                (NoCheatConfiguration.speedhackCheckActive ? "speedhack " : "") +
     	                (NoCheatConfiguration.airbuildCheckActive ? "airbuild " : "") +
-    	                (NoCheatConfiguration.dupebydeathCheckActive ? "dupebydeath " : "");
+    	                (NoCheatConfiguration.dupebydeathCheckActive ? "dupebydeath " : "") +
+    					(NoCheatConfiguration.bedteleportCheckActive ? "bedteleport " : "");
     	
     	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+checks);
     }
