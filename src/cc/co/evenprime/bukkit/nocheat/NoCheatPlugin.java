@@ -16,7 +16,6 @@ import org.bukkit.plugin.PluginManager;
 import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatBlockListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatEntityListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatPlayerListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatVehicleListener;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
@@ -34,7 +33,6 @@ public class NoCheatPlugin extends JavaPlugin {
 	
 	// Various listeners needed for different Checks
     private NoCheatPlayerListener playerListener;
-    private NoCheatVehicleListener vehicleListener;
     private NoCheatBlockListener blockListener;
     private NoCheatEntityListener entityListener;
             
@@ -86,7 +84,6 @@ public class NoCheatPlugin extends JavaPlugin {
     public void onEnable() {
     	// Create our listeners and feed them with neccessary information
     	playerListener = new NoCheatPlayerListener();
-    	vehicleListener = new NoCheatVehicleListener(playerListener);
     	blockListener  = new NoCheatBlockListener();
     	entityListener = new NoCheatEntityListener();
 
@@ -95,10 +92,9 @@ public class NoCheatPlugin extends JavaPlugin {
     	PluginManager pm = getServer().getPluginManager();
     	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this); // needed for speedhack and moving checks
     	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this); // used to delete old data of users
-    	pm.registerEvent(Event.Type.VEHICLE_EXIT, vehicleListener, Priority.Monitor, this); // used for moving check
-    	pm.registerEvent(Event.Type.VEHICLE_DAMAGE, vehicleListener, Priority.Monitor, this); // used for moving check
     	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this); // used for airbuild check
     	pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Highest, this); // used for dupebydeath check
+    	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this); // used for teleportfrombed check
 
     	PluginDescriptionFile pdfFile = this.getDescription();
     	

@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
 
@@ -43,17 +44,19 @@ public class NoCheatPlayerListener extends PlayerListener {
     	
 		// Get the player-specific data
 		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
-	
-		if(data.movingIgnoreNextXEvents > 0 ) {
-    		data.movingIgnoreNextXEvents--;
-    		return;
-    	}
-    	
+	    	
 		if(!event.isCancelled() && NoCheatConfiguration.speedhackCheckActive)
     		SpeedhackCheck.check(data, event);
     	    	
 		if(!event.isCancelled() && NoCheatConfiguration.movingCheckActive)
 			MovingCheck.check(data, event);
 		
+    }
+    @Override
+    public void onPlayerTeleport(PlayerMoveEvent event) {
+
+		if(!event.isCancelled() && NoCheatConfiguration.bedteleportCheckActive) {
+			BedteleportCheck.check(event);
+		}
     }
 }

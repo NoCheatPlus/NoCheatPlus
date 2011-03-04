@@ -142,6 +142,7 @@ public class MovingCheck {
 		Location from = event.getFrom();
 		Location to = event.getTo();
 		
+		System.out.println(from.getY() + " " + to.getY());
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
    		double xDistance = Math.abs(from.getX() - to.getX());

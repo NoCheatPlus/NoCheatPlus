@@ -28,6 +28,7 @@ public class NoCheatConfiguration {
 	public static boolean movingCheckActive;
 	public static boolean airbuildCheckActive;
 	public static boolean dupebydeathCheckActive;
+	public static boolean bedteleportCheckActive;
 	
 	// Limits for the speedhack check
 	public static int speedhackLimitLow;
@@ -101,7 +102,8 @@ public class NoCheatConfiguration {
 		speedhackCheckActive = c.getBoolean("active.speedhack", true);
 		movingCheckActive = c.getBoolean("active.moving", true);
 		airbuildCheckActive = c.getBoolean("active.airbuild", false);
-		dupebydeathCheckActive = c.getBoolean("active.dupebydeath", false);
+		dupebydeathCheckActive = c.getBoolean("active.dupebydeath", true);
+		bedteleportCheckActive = c.getBoolean("active.bedteleport", true);
 		
 		speedhackLimitLow = c.getInt("speedhack.limits.low", 30);
 		speedhackLimitMed = c.getInt("speedhack.limits.med", 45);
@@ -160,7 +162,8 @@ public class NoCheatConfiguration {
 			w.write("    speedhack: true"); w.newLine();
 			w.write("    moving: true"); w.newLine();
 			w.write("    airbuild: false"); w.newLine();
-			w.write("    dupebydeath: false"); w.newLine();
+			w.write("    dupebydeath: true"); w.newLine();
+			w.write("    bedteleport: true"); w.newLine();
 			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
 			w.write("    limits:"); w.newLine();
@@ -169,9 +172,9 @@ public class NoCheatConfiguration {
 			w.write("        high: 60"); w.newLine();
 			w.write("#   Speedhack Action, one or more of loglow logmed loghigh reset"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: loglow"); w.newLine();
-			w.write("        med: logmed"); w.newLine();
-			w.write("        high: loghigh"); w.newLine();
+			w.write("        low: loglow reset"); w.newLine();
+			w.write("        med: logmed reset"); w.newLine();
+			w.write("        high: loghigh reset"); w.newLine();
 			w.write("# Moving specific optionse") ;w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("    freemoves: 10"); w.newLine();
@@ -186,6 +189,9 @@ public class NoCheatConfiguration {
 			w.write("    action: logmed deny"); w.newLine();
 			w.write("# Dupebydeath specific options (none exist yet)"); w.newLine();
 			w.write("dupebydeath:"); w.newLine();
+			w.write("# Bedteleport specific options (none exist yet)"); w.newLine();
+			w.write("bedteleport:"); w.newLine();
+
 			w.flush(); w.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
