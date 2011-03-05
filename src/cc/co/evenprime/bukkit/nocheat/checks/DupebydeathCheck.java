@@ -9,11 +9,6 @@ import org.bukkit.inventory.PlayerInventory;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
-/**
- * 
- * @author Evenprime
- *
- */
 public class DupebydeathCheck {
 
 	/**
@@ -21,19 +16,15 @@ public class DupebydeathCheck {
 	 * @param event
 	 */
 	public static void playerDeath(EntityDeathEvent event) {
-
+		
 		if(event.getEntity() instanceof Player) {
 
 			Player p = (Player)event.getEntity();
 
 			// Should we prevent at all?
-			if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(p, "nocheat.dupebydeath")) {
+			if(NoCheatPlugin.hasPermission(p, "nocheat.dupebydeath")) 
 				return;
-			}
-			else if(NoCheatPlugin.Permissions == null && p.isOp() ) {
-				return;
-			}
-
+			
 			PlayerInventory playerInventory = p.getInventory(); 
 			List<ItemStack> drops = event.getDrops();
 

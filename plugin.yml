@@ -3,5 +3,13 @@ name: NoCheatPlugin
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheatPlugin
-version: 0.6.3a
+version: 0.6.4
 
+commands:
+  nocheat:
+    description: Provides information about the current status of the NoCheatPlugin
+    usage: |
+           /<command>
+           Example: /<command> | Displays version, enabled checks and bugfixes
+           Example: /<command> -p | Get your permissions, * = check disabled globally
+           Example: /<command> -p [player] | Get permissions of the player, * = check disabled globally

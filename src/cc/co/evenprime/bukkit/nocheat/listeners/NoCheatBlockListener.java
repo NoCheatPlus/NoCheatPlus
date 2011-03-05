@@ -14,11 +14,11 @@ import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
  */
 public class NoCheatBlockListener extends BlockListener {
 
-
+	
 	public NoCheatBlockListener() {
 
 	}
-
+	
 	@Override
 	public void onBlockPlace(BlockPlaceEvent event) {
 
