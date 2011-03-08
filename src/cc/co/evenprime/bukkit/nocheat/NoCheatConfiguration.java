@@ -40,7 +40,7 @@ public class NoCheatConfiguration {
 	public static String speedhackActionNormal = "";
 	public static String speedhackActionHeavy = "";
 	
-	public static int movingFreeMoves = 10;
+	public static int movingFreeMoves = 5;
 	
 	// How should moving violations be treated?
 	public static String movingActionMinor = "";
@@ -109,7 +109,7 @@ public class NoCheatConfiguration {
 		speedhackLimitMed = c.getInt("speedhack.limits.med", 45);
 		speedhackLimitHigh = c.getInt("speedhack.limits.high", 60);
 			
-		movingFreeMoves = c.getInt("moving.freemoves", 10);
+		movingFreeMoves = c.getInt("moving.freemoves", 5);
 		
 		movingActionMinor = c.getString("moving.action.low", "loglow reset");
 		movingActionNormal = c.getString("moving.action.med", "logmed reset");
@@ -121,7 +121,7 @@ public class NoCheatConfiguration {
 		
 		airbuildAction = c.getString("airbuild.action", "logmed deny");
 		
-		if(movingFreeMoves < 10) movingFreeMoves = 10;
+		if(movingFreeMoves < 5) movingFreeMoves = 5;
 	}
 	
 	/**

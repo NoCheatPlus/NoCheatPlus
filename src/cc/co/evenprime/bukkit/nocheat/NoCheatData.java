@@ -15,6 +15,7 @@ public class NoCheatData {
 	 */
 
 	public int movingJumpPhase = 0; // current jumpingPhase
+	public int movingLegitMovesInARow = 0;
 	public int movingMinorViolationsInARow = 0; 
 	public int movingNormalViolationsInARow = 0;
 	public int movingHeavyViolationsInARow = 0;
