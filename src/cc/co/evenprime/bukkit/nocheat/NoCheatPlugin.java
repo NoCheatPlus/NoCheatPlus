@@ -140,6 +140,7 @@ public class NoCheatPlugin extends JavaPlugin {
     	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this); // used to delete old data of users
     	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this); // used for airbuild check
     	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this); // used for teleportfrombed check
+    	pm.registerEvent(Event.Type.ENTITY_DAMAGED, entityListener, Priority.Lowest, this); // used for moving check to reset jumpingphase
 
     	PluginDescriptionFile pdfFile = this.getDescription();
     	
