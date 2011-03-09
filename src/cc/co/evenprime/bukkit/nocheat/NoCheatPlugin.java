@@ -139,7 +139,6 @@ public class NoCheatPlugin extends JavaPlugin {
     	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this); // used for speedhack and moving checks
     	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this); // used to delete old data of users
     	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this); // used for airbuild check
-    	pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Priority.Highest, this); // used for dupebydeath check
     	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this); // used for teleportfrombed check
 
     	PluginDescriptionFile pdfFile = this.getDescription();
@@ -248,7 +247,6 @@ public class NoCheatPlugin extends JavaPlugin {
     	return (NoCheatConfiguration.movingCheckActive ? "moving ": "") + 
         (NoCheatConfiguration.speedhackCheckActive ? "speedhack " : "") +
         (NoCheatConfiguration.airbuildCheckActive ? "airbuild " : "") +
-        (NoCheatConfiguration.dupebydeathCheckActive ? "dupebydeath " : "") +
 		(NoCheatConfiguration.bedteleportCheckActive ? "bedteleport " : "");
 	}
     
@@ -257,7 +255,6 @@ public class NoCheatPlugin extends JavaPlugin {
 		return (!NoCheatConfiguration.movingCheckActive ? "moving* ": (hasPermission(p, "nocheat.moving") ? "moving " : "") + 
         (!NoCheatConfiguration.speedhackCheckActive ? "speedhack* " : (hasPermission(p, "nocheat.speedhack") ? "speedhack " : "")) +
         (!NoCheatConfiguration.airbuildCheckActive ? "airbuild* " : (hasPermission(p, "nocheat.airbuild") ? "airbuild " : "")) +
-        (!NoCheatConfiguration.dupebydeathCheckActive ? "dupebydeath* " : (hasPermission(p, "nocheat.dupebydeath") ? "dupebydeath " : "")) +
 		(!NoCheatConfiguration.bedteleportCheckActive ? "bedteleport* " : (hasPermission(p, "nocheat.bedteleport") ? "bedteleport " : "")) +
 		(hasPermission(p, "nocheat.notify") ? "notify " : ""));
 

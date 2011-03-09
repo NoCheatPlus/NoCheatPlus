@@ -27,7 +27,6 @@ public class NoCheatConfiguration {
 	public static boolean speedhackCheckActive;
 	public static boolean movingCheckActive;
 	public static boolean airbuildCheckActive;
-	public static boolean dupebydeathCheckActive;
 	public static boolean bedteleportCheckActive;
 	
 	// Limits for the speedhack check
@@ -102,7 +101,6 @@ public class NoCheatConfiguration {
 		speedhackCheckActive = c.getBoolean("active.speedhack", true);
 		movingCheckActive = c.getBoolean("active.moving", true);
 		airbuildCheckActive = c.getBoolean("active.airbuild", false);
-		dupebydeathCheckActive = c.getBoolean("active.dupebydeath", true);
 		bedteleportCheckActive = c.getBoolean("active.bedteleport", true);
 		
 		speedhackLimitLow = c.getInt("speedhack.limits.low", 30);
@@ -177,7 +175,7 @@ public class NoCheatConfiguration {
 			w.write("        high: loghigh reset"); w.newLine();
 			w.write("# Moving specific optionse") ;w.newLine();
 			w.write("moving:"); w.newLine();
-			w.write("    freemoves: 10"); w.newLine();
+			w.write("    freemoves: 5"); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: loglow reset"); w.newLine();
@@ -187,8 +185,6 @@ public class NoCheatConfiguration {
 			w.write("airbuild:"); w.newLine();
 			w.write("#   Airbuild Action, one or more of 'loglow logmed loghigh deny'"); w.newLine();
 			w.write("    action: logmed deny"); w.newLine();
-			w.write("# Dupebydeath specific options (none exist yet)"); w.newLine();
-			w.write("dupebydeath:"); w.newLine();
 			w.write("# Bedteleport specific options (none exist yet)"); w.newLine();
 			w.write("bedteleport:"); w.newLine();
 
