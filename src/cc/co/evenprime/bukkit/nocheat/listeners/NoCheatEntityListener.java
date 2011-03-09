@@ -11,11 +11,9 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 public class NoCheatEntityListener extends EntityListener {
 
 	@Override
-	public void onEntityDamage(EntityDamageEvent event) {
+	public void onEntityDamage(EntityDamageEvent event) {	
 		
-		
-		if(event.getEntity() instanceof Player) {
-			
+		if(event.getEntity() instanceof Player) {	
 			Player p = (Player)event.getEntity();
 			
 			NoCheatPlugin.getPlayerData(p).movingJumpPhase = 0;

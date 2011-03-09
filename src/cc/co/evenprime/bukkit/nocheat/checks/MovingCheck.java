@@ -169,7 +169,7 @@ public class MovingCheck {
     	// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
     	int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), from.getBlockY(), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
     	int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), to.getBlockY(), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
-    	
+    			
     	// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
     	boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
     	boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues, to);
@@ -453,19 +453,27 @@ public class MovingCheck {
         return d > (double)i ? i : i - 1;
     }
     
-    public static int lowerBorder(double d1) {
+	public static int lowerBorder(double d1) {
 		double floor = Math.floor(d1);
-		double d4 = (d1 - floor) - magic;
-		//System.out.println(d4);
-		return (int) (floor + d4);
+		double d4 = floor + magic;
+		
+		if(d4 <= d1)
+			d4 = 0;
+		else
+			d4 = 1;
+		
+		return (int) (floor - d4);
 	}
 
 	public static int upperBorder(double d1) {
 		double floor = Math.floor(d1);
-		double d4 = (d1 - floor) - magic2;
-		//System.out.println(d4);
-		int tmp = (int) (floor - d4);
+		double d4 = floor + magic2;
 
-		return tmp < floor ? tmp + 2 : (int)floor ;
+		if(d4 < d1)
+			d4 = -1;
+		else
+			d4 = 0;
+
+		return (int) (floor - d4);
 	}
 }
