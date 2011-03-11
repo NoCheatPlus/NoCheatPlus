@@ -50,6 +50,10 @@ public class SpeedhackCheck {
 				data.speedhackViolationsInARow = 0;
 			}
 			else {
+				// If we haven't already got a setback point, create one now
+				if(data.speedhackSetBackPoint == null) {
+					data.speedhackSetBackPoint = event.getFrom().clone();
+				}
 				data.speedhackViolationsInARow++;
 			}
 			

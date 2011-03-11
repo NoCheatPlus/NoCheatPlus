@@ -274,6 +274,11 @@ public class MovingCheck {
     		
     		data.movingLegitMovesInARow = 0;
     		
+    		// If we haven't already got a setback point, make this location the new setback point
+    		if(data.movingSetBackPoint == null) {
+    			data.movingSetBackPoint = event.getFrom().clone();
+    		}
+    		
         	String actions = null;
         	boolean log = true;
         	   		
@@ -381,9 +386,10 @@ public class MovingCheck {
 		
 		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
 		
-		// Still not a perfect solution. After resetting a player his vertical momentum gets lost
-		// Therefore we can't expect him to fall big distances in his next move, therefore we have to
-		// set his flying phase to something he can work with.
+		// Reset the jumpphase. We choose the setback-point such that it should be
+		// on solid ground, but in case it isn't (maybe the ground is gone now) we
+		// still have to allow the player some freedom with vertical movement due
+		// to lost vertical momentum to prevent him from getting stuck
 		data.movingJumpPhase = 0;
 
 		// If we have stored a location for the player, we put him back there
