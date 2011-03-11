@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import org.bukkit.Location;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
@@ -85,13 +86,14 @@ public class SpeedhackCheck {
 	
 	private static void resetPlayer(PlayerMoveEvent event, NoCheatData data) {
 		
+		Location l = data.speedhackSetBackPoint;
 		// If we have stored a location for the player, we put him back there
-		if(data.speedhackSetBackPoint != null) {
+		if(l != null) {
 			
 			// Lets try it that way. Maybe now people don't "disappear" any longer
-			event.setFrom(data.speedhackSetBackPoint);
-			event.setTo(data.speedhackSetBackPoint);
-			event.getPlayer().teleportTo(data.speedhackSetBackPoint);
+			event.setFrom(l);
+			event.setTo(l);
+			event.getPlayer().teleportTo(l);
 		}
 		else {
 			// Lets try it that way. Maybe now people don't "disappear" any longer

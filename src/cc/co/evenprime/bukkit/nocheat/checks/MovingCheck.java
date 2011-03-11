@@ -392,12 +392,13 @@ public class MovingCheck {
 		// to lost vertical momentum to prevent him from getting stuck
 		data.movingJumpPhase = 0;
 
+		Location l = data.movingSetBackPoint;
 		// If we have stored a location for the player, we put him back there
-		if(data.movingSetBackPoint != null) {
+		if(l != null) {
 			// Lets try it that way. Maybe now people don't "disappear" any longer
-			event.setFrom(data.movingSetBackPoint);
-			event.setTo(data.movingSetBackPoint);
-			event.getPlayer().teleportTo(data.movingSetBackPoint);
+			event.setFrom(l);
+			event.setTo(l);
+			event.getPlayer().teleportTo(l);
 		}
 		else {
 			// Lets try it that way. Maybe now people don't "disappear" any longer
