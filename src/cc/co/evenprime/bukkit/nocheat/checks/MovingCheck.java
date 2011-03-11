@@ -129,17 +129,28 @@ public class MovingCheck {
     	types[Material.JACK_O_LANTERN.getId()]= BlockType.SOLID;
     	types[Material.CAKE_BLOCK.getId()]= BlockType.UNKNOWN;
     }
-    
-
-    public static void check(NoCheatData data, PlayerMoveEvent event) {
+        
+    public static void check(PlayerMoveEvent event) {
 
     	// Should we check at all
     	if(NoCheatPlugin.hasPermission(event.getPlayer(), "nocheat.moving"))
     	return;
 
+		// Get the player-specific data
+		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
+		
     	// Get the two locations of the event
     	Location from = event.getFrom();
     	Location to = event.getTo();
+    	
+    	if(from.getWorld() != to.getWorld()) {
+    		// Moving between different worlds is considered ok
+    		// Also prevent accidential back teleporting by discarding old-world coordinates
+    		data.movingSetBackPoint = null;
+    		data.speedhackSetBackPoint = null;
+    		return;
+    	}
+    			
     			
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise

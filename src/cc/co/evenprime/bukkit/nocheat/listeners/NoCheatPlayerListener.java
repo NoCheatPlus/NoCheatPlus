@@ -32,14 +32,12 @@ public class NoCheatPlayerListener extends PlayerListener {
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
     	
-		// Get the player-specific data
-		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
-	    	
+
 		if(!event.isCancelled() && NoCheatConfiguration.speedhackCheckActive)
-    		SpeedhackCheck.check(data, event);
+    		SpeedhackCheck.check(event);
     	    	
 		if(!event.isCancelled() && NoCheatConfiguration.movingCheckActive)
-			MovingCheck.check(data, event);
+			MovingCheck.check(event);
 		
     }
     @Override
@@ -47,6 +45,14 @@ public class NoCheatPlayerListener extends PlayerListener {
 
 		if(!event.isCancelled() && NoCheatConfiguration.bedteleportCheckActive) {
 			BedteleportCheck.check(event);
+		}
+		
+		if(!event.isCancelled()) {		
+			NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
+			if(!event.getTo().equals(data.movingSetBackPoint) && !event.getTo().equals(data.speedhackSetBackPoint)) {
+				data.speedhackSetBackPoint = null;
+				data.movingSetBackPoint = null;
+			}
 		}
     }
 }

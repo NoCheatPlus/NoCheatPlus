@@ -18,11 +18,14 @@ public class SpeedhackCheck {
     private static final long interval = 1000;
     private static final int violationsLimit = 3;
     
-	public static void check(NoCheatData data, PlayerMoveEvent event) {
+	public static void check(PlayerMoveEvent event) {
 		
 		// Should we check at all?
 		if(NoCheatPlugin.hasPermission(event.getPlayer(), "nocheat.speedhack")) 
 			return;
+		
+		// Get the player-specific data
+		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
 		
 		// Get the time of the server
 		long time = System.currentTimeMillis();
