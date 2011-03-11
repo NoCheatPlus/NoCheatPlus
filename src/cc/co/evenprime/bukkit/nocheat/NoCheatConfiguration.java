@@ -119,7 +119,7 @@ public class NoCheatConfiguration {
 		
 		airbuildAction = c.getString("airbuild.action", "logmed deny");
 		
-		if(movingFreeMoves < 5) movingFreeMoves = 5;
+		if(movingFreeMoves < 1) movingFreeMoves = 1;
 	}
 	
 	/**

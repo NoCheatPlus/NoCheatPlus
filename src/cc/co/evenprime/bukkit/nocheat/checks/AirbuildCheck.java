@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
@@ -24,18 +23,10 @@ public class AirbuildCheck {
 		if(NoCheatPlugin.hasPermission(event.getPlayer(), "nocheat.airbuild")) 
 			return;
 
-		Location l = event.getBlockPlaced().getLocation();
-		World w = event.getBlock().getWorld();
-		int airId = Material.AIR.getId();
 
 		// Are all 6 sides "air-blocks" -> cancel the event
-		if(w.getBlockTypeIdAt(l.getBlockX()-1, l.getBlockY(), l.getBlockZ()) == airId &&
-				w.getBlockTypeIdAt(l.getBlockX()+1, l.getBlockY(), l.getBlockZ()) == airId &&
-				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY()-1, l.getBlockZ()) == airId &&
-				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY()+1, l.getBlockZ()) == airId &&
-				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()-1) == airId &&
-				w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ()+1) == airId)
-			action(NoCheatConfiguration.airbuildAction, event);
+		if(event.getBlockAgainst().getType() == Material.AIR)
+		    action(NoCheatConfiguration.airbuildAction, event);
 			
 	}
 	
