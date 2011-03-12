@@ -119,6 +119,9 @@ public class NoCheatConfiguration {
 		
 		airbuildAction = c.getString("airbuild.action", "logmed deny");
 		
+		// 1 is minimum. This is needed to smooth over some minecraft bugs like 
+		// when a minecart gets broken while a player is inside it (which causes the player to "move"
+		// up 1.0D which is much more than a usual jump would allow in 1 event
 		if(movingFreeMoves < 1) movingFreeMoves = 1;
 	}
 	
@@ -175,6 +178,7 @@ public class NoCheatConfiguration {
 			w.write("        high: loghigh reset"); w.newLine();
 			w.write("# Moving specific optionse") ;w.newLine();
 			w.write("moving:"); w.newLine();
+			w.write("#   After how many minor violations should the plugin react (minimum 1)"); w.newLine();
 			w.write("    freemoves: 5"); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();

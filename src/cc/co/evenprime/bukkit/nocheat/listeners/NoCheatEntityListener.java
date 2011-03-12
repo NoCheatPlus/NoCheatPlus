@@ -18,9 +18,5 @@ public class NoCheatEntityListener extends EntityListener {
 			
 			NoCheatPlugin.getPlayerData(p).movingJumpPhase = 0;
 		}
-		
-		
 	}
-	                                                      
-	                                                   
 }

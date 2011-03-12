@@ -290,17 +290,17 @@ public class MovingCheck {
     			actions = NoCheatConfiguration.movingActionMinor;
 
     			// React only after the freebee illegal moves have all been used
-    			if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves) != 0) {
+    			if(data.movingMinorViolationsInARow <= NoCheatConfiguration.movingFreeMoves) {
     				vl = null;
     				actions = null;
     			}
     			
-    			if(data.movingMinorViolationsInARow != NoCheatConfiguration.movingFreeMoves) {
+    			if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves+1) {
     				log = false;
     			}
 
-    			// using up all free moves 4 times in a row counts as one normal violation
-    			if(data.movingMinorViolationsInARow % (NoCheatConfiguration.movingFreeMoves * 4) == 0) {
+    			// after a set number of minor violations a normal violation gets thrown
+    			if(data.movingMinorViolationsInARow % 40 == 0) {
     				vl = Level.WARNING;
     				log = true;
     			}
@@ -361,7 +361,7 @@ public class MovingCheck {
 				NoCheatPlugin.logAction(NoCheatConfiguration.movingActionNormal, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
 				data.movingNormalViolationsInARow = 0;
 			}
-			if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves) {
+			if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves +1) {
 				NoCheatPlugin.logAction(NoCheatConfiguration.movingActionMinor, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
 				data.movingMinorViolationsInARow = 0;
 			}
