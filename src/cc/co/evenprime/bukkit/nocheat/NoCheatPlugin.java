@@ -19,6 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatBlockListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatEntityListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatPlayerListener;
 
+import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.plugin.Plugin;
@@ -37,7 +38,7 @@ public class NoCheatPlugin extends JavaPlugin {
     private NoCheatPlayerListener playerListener;
     private NoCheatBlockListener blockListener;
     private NoCheatEntityListener entityListener;
-            
+
     // My main logger
     private static Logger log;
     
@@ -45,6 +46,9 @@ public class NoCheatPlugin extends JavaPlugin {
     
     // Permissions 2.0, if available
     public static PermissionHandler Permissions = null;
+    
+    // CraftIRC 2.0, if available
+    public static CraftIRC Irc = null;
        
     // Store data between Events
     public static Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
@@ -123,6 +127,8 @@ public class NoCheatPlugin extends JavaPlugin {
 
 
 	public void onDisable() { 
+
+		
     	PluginDescriptionFile pdfFile = this.getDescription();
     	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is disabled.");
     }
@@ -144,16 +150,17 @@ public class NoCheatPlugin extends JavaPlugin {
 
     	PluginDescriptionFile pdfFile = this.getDescription();
     	
-    	// Get, if available, the Permissions plugin
-    	setupPermissions();
-    	   	
     	// parse the nocheat.yml config file
     	setupConfig();
-    	    	
+    			
+    	// Get, if available, the Permissions and irc plugin
+    	setupPermissions();
+    	setupIRC();
+    	    	    	   	
     	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
     }
 
-    /**
+	/**
      * Get, if available, a reference to the Permissions-plugin
      */
     public void setupPermissions() {
@@ -161,7 +168,7 @@ public class NoCheatPlugin extends JavaPlugin {
 
     	Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 
-    	if(test != null) {
+    	if(test != null && test instanceof Permissions) {
     		p = ((Permissions)test).getHandler();
     		if(p == null) {
     			this.getServer().getPluginManager().enablePlugin(test);
@@ -171,13 +178,32 @@ public class NoCheatPlugin extends JavaPlugin {
 
     	if(p == null) {
         	PluginDescriptionFile pdfFile = this.getDescription();
-    		log.info("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
-    		Permissions = null;
+        	Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
     	}
-    	else 
-    		Permissions = p;
+
+    	Permissions = p;
     }
     
+    /**
+     * Get, if available, a reference to the Permissions-plugin
+     */
+    public void setupIRC() {
+    	CraftIRC p = null;
+
+    	Plugin test = this.getServer().getPluginManager().getPlugin("CraftIRC");
+
+    	if(test != null && test instanceof CraftIRC) {
+    		p = (CraftIRC)test;
+    	}
+    	
+    	if(p == null) {
+        	PluginDescriptionFile pdfFile = this.getDescription();
+        	Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find CrafTIRC plugin. Disabling logging to IRC.");
+    	}
+
+    	Irc = p;
+    }
+        
     /**
      * Log a violation message to all locations declared in the config file
      * @param message
@@ -185,18 +211,24 @@ public class NoCheatPlugin extends JavaPlugin {
     private static void log(Level l, String message) {
     	if(l != null) {
 	    	logToChat(l, message);
+	    	logToIRC(l, message);
 	    	log.log(l, message);
     	}
     }
     
     
     private static void logToChat(Level l, String message) {
-    	if(NoCheatConfiguration.notifyLevel.intValue() <= l.intValue()) {
+    	if(NoCheatConfiguration.chatLevel.intValue() <= l.intValue()) {
     		for(Player player : p.getServer().getOnlinePlayers()) {
     			if(hasPermission(player, "nocheat.notify")) {
     				player.sendMessage("["+l.getName()+"] " + message);
     			}
     		}
+    	}
+    }
+    private static void logToIRC(Level l, String message) {
+    	if(Irc != null && NoCheatConfiguration.ircLevel.intValue() <= l.intValue()) {
+    		Irc.sendMessageToTag("["+l.getName()+"] " + message , NoCheatConfiguration.ircTag);
     	}
     }
     
@@ -233,13 +265,12 @@ public class NoCheatPlugin extends JavaPlugin {
     		return true;
     	else
     		return false;
-
     }
     
     /**
      * Read the config file
      */
-    public void setupConfig() {
+    private void setupConfig() {
     	NoCheatConfiguration.config(new File("plugins/NoCheat/nocheat.yml"));
     }
     

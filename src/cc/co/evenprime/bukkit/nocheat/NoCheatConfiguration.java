@@ -50,7 +50,10 @@ public class NoCheatConfiguration {
 	public static String airbuildAction = "";
 	
 	// The log level above which players with the permission nocheat.notify will get informed about violations
-	public static Level notifyLevel = Level.OFF;
+	public static Level chatLevel = Level.OFF;
+	public static Level ircLevel = Level.OFF;
+	
+	public static String ircTag = "";
 	
 	// Our two log outputs, the console and a file
 	private static ConsoleHandler ch = null;
@@ -96,7 +99,11 @@ public class NoCheatConfiguration {
 			}
 		}
 		
-		notifyLevel = stringToLevel(c.getString("logging.logtonotify"));
+		chatLevel = stringToLevel(c.getString("logging.logtonotify")); // deprecated, will be deleted eventually
+		chatLevel = stringToLevel(c.getString("logging.logtochat"));
+		
+		ircLevel = stringToLevel(c.getString("logging.logtoirc"));
+		ircTag = c.getString("logging.logtoirctag", "nocheat");
 		
 		speedhackCheckActive = c.getBoolean("active.speedhack", true);
 		movingCheckActive = c.getBoolean("active.moving", true);
@@ -157,7 +164,9 @@ public class NoCheatConfiguration {
 			w.write("    filename: plugins/NoCheat/nocheat.log"); w.newLine();
 			w.write("    logtofile: low"); w.newLine();
 			w.write("    logtoconsole: high"); w.newLine();
-			w.write("    logtonotify: med"); w.newLine();
+			w.write("    logtochat: med"); w.newLine();
+			w.write("    logtoirc: med"); w.newLine();
+			w.write("    logtoirctag: nocheat"); w.newLine();
 			w.write("# Checks and Bugfixes that are activated (true or false)"); w.newLine();
 			w.write("active:");  w.newLine();
 			w.write("    speedhack: true"); w.newLine();

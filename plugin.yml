@@ -3,7 +3,7 @@ name: NoCheatPlugin
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheatPlugin
-version: 0.6.7b
+version: 0.6.7c
 
 commands:
   nocheat:
