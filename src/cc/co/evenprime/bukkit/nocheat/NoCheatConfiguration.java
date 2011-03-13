@@ -184,7 +184,7 @@ public class NoCheatConfiguration {
 			w.write("        low: loglow reset"); w.newLine();
 			w.write("        med: logmed reset"); w.newLine();
 			w.write("        high: loghigh reset"); w.newLine();
-			w.write("# Moving specific optionse") ;w.newLine();
+			w.write("# Moving specific options") ; w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("#   After how many minor violations should the plugin react (minimum 1)"); w.newLine();
 			w.write("    freemoves: 5"); w.newLine();

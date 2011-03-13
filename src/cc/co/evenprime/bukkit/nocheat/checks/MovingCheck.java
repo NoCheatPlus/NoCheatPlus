@@ -398,12 +398,13 @@ public class MovingCheck {
 			event.setFrom(l);
 			event.setTo(l);
 			event.getPlayer().teleportTo(l);
+			event.setCancelled(true);
 		}
 		else {
 			// Lets try it that way. Maybe now people don't "disappear" any longer
-			event.setFrom(event.getFrom());
 			event.setTo(event.getFrom().clone());
-			event.getPlayer().teleportTo(event.getFrom());
+			event.getPlayer().teleportTo(event.getFrom().clone());
+			event.setCancelled(true);
 		}
 	}
 

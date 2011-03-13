@@ -89,16 +89,15 @@ public class SpeedhackCheck {
 		Location l = data.speedhackSetBackPoint;
 		// If we have stored a location for the player, we put him back there
 		if(l != null) {
-			
-			// Lets try it that way. Maybe now people don't "disappear" any longer
 			event.setFrom(l);
 			event.setTo(l);
+			event.setCancelled(true);
 			event.getPlayer().teleportTo(l);
 		}
 		else {
-			// Lets try it that way. Maybe now people don't "disappear" any longer
 			event.setFrom(event.getFrom());
 			event.setTo(event.getFrom().clone());
+			event.setCancelled(true);
 			event.getPlayer().teleportTo(event.getFrom());
 		}
 	}

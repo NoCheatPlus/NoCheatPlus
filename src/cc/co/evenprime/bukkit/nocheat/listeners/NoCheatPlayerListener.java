@@ -47,7 +47,7 @@ public class NoCheatPlayerListener extends PlayerListener {
 			BedteleportCheck.check(event);
 		}
 		
-		if(!event.isCancelled()) {		
+		if(!event.isCancelled()) {
 			NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
 			if(!event.getTo().equals(data.movingSetBackPoint) && !event.getTo().equals(data.speedhackSetBackPoint)) {
 				data.speedhackSetBackPoint = null;
