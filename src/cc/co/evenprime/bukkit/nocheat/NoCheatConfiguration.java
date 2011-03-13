@@ -172,7 +172,6 @@ public class NoCheatConfiguration {
 			w.write("    speedhack: true"); w.newLine();
 			w.write("    moving: true"); w.newLine();
 			w.write("    airbuild: false"); w.newLine();
-			w.write("    dupebydeath: true"); w.newLine();
 			w.write("    bedteleport: true"); w.newLine();
 			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
