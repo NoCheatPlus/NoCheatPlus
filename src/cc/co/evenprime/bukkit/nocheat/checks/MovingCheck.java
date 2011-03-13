@@ -272,7 +272,7 @@ public class MovingCheck {
     	}
     	else if(vl != null) {
     		
-    		data.movingLegitMovesInARow = 0;
+    		data.movingLastViolationTime = System.currentTimeMillis();
     		
     		// If we haven't already got a setback point, make this location the new setback point
     		if(data.movingSetBackPoint == null) {
@@ -346,11 +346,10 @@ public class MovingCheck {
 
 	protected static void legitimateMove(NoCheatData data, PlayerMoveEvent event) {
 		
-		data.movingLegitMovesInARow++;
-		
-		if(data.movingLegitMovesInARow > 40) {
+		// Give some logging about violations if the player hasn't done any for at least two seconds
+		if(data.movingLastViolationTime != 0 && data.movingLastViolationTime < System.currentTimeMillis() + 2000L) {
 			
-			data.movingLegitMovesInARow = 0;
+			data.movingLastViolationTime = 0;
 			
 			// Give some additional logs about now ending violations
 			if(data.movingHeavyViolationsInARow > 0) {
