@@ -347,7 +347,7 @@ public class MovingCheck {
 	protected static void legitimateMove(NoCheatData data, PlayerMoveEvent event) {
 		
 		// Give some logging about violations if the player hasn't done any for at least two seconds
-		if(data.movingLastViolationTime != 0 && data.movingLastViolationTime < System.currentTimeMillis() + 2000L) {
+		if(data.movingLastViolationTime != 0 && data.movingLastViolationTime + 1000L > System.currentTimeMillis()) {
 			
 			data.movingLastViolationTime = 0;
 			
@@ -395,9 +395,9 @@ public class MovingCheck {
 		// If we have stored a location for the player, we put him back there
 		if(l != null) {
 			// Lets try it that way. Maybe now people don't "disappear" any longer
-			event.setFrom(l);
-			event.setTo(l);
-			event.getPlayer().teleportTo(l);
+			event.setFrom(l.clone());
+			event.setTo(l.clone());
+			event.getPlayer().teleportTo(l.clone());
 			event.setCancelled(true);
 		}
 		else {
