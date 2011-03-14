@@ -52,6 +52,7 @@ public class NoCheatPlayerListener extends PlayerListener {
 			if(!event.getTo().equals(data.movingSetBackPoint) && !event.getTo().equals(data.speedhackSetBackPoint)) {
 				data.speedhackSetBackPoint = null;
 				data.movingSetBackPoint = null;
+				data.movingJumpPhase = 0;
 			}
 		}
     }

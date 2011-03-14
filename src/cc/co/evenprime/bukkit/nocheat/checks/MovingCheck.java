@@ -458,7 +458,13 @@ public class MovingCheck {
     	// Allow using a bug called "water elevator"
     	else if(types[w.getBlockTypeIdAt(values[0]+1, values[2]-1, values[3]+1)] == BlockType.LIQUID ||
     		 types[w.getBlockTypeIdAt(values[0]+1, values[2], values[3]+1)] == BlockType.LIQUID ||
-    		 types[w.getBlockTypeIdAt(values[0]+1, values[2]+1, values[3]+1)] == BlockType.LIQUID)
+    		 types[w.getBlockTypeIdAt(values[0]+1, values[2]+1, values[3]+1)] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0]+1, values[2]-1, values[3])] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0]+1, values[2], values[3])] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0]+1, values[2]+1, values[3])] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0], values[2], values[3])] == BlockType.LIQUID ||
+    		 types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3])] == BlockType.LIQUID)
     		return true;
     	else
     		return false;
