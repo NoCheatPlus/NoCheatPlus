@@ -19,6 +19,8 @@ public class NoCheatData {
 	public int movingMinorViolationsInARow = 0; 
 	public int movingNormalViolationsInARow = 0;
 	public int movingHeavyViolationsInARow = 0;
+	
+	public int movingHorizFreeMoves = 4;
 	public Location movingSetBackPoint = null;
 
 	public long speedhackLastCheck = System.currentTimeMillis(); // timestamp of last check for speedhacks

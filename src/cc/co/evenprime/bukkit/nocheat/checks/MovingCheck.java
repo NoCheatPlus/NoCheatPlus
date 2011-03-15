@@ -175,7 +175,13 @@ public class MovingCheck {
     		vl = max(vl, Level.WARNING);
     	}
     	else if(combined > movingDistanceLow) {
-    		vl =  max(vl, Level.INFO);
+    		if(data.movingHorizFreeMoves > 0) {
+    			data.movingHorizFreeMoves--;
+    		}
+    		else vl =  max(vl, Level.INFO);
+    	}
+    	else{
+    		data.movingHorizFreeMoves = 4;
     	}
 
     	// pre-calculate boundary values that are needed multiple times in the following checks

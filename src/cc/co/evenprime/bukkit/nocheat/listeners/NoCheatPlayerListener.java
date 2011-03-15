@@ -49,6 +49,7 @@ public class NoCheatPlayerListener extends PlayerListener {
 		
 		if(!event.isCancelled()) {
 			NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
+			// If it wasn't our plugin that ordered the teleport, forget all our information to start from scratch at the new location
 			if(!event.getTo().equals(data.movingSetBackPoint) && !event.getTo().equals(data.speedhackSetBackPoint)) {
 				data.speedhackSetBackPoint = null;
 				data.movingSetBackPoint = null;
