@@ -40,7 +40,8 @@ public class NoCheatPlugin extends JavaPlugin {
     private NoCheatEntityListener entityListener;
 
     // My main logger
-    private static Logger log;
+    private static Logger consoleLogger;
+    private static Logger fileLogger;
     
     private static NoCheatPlugin p;
     
@@ -139,7 +140,8 @@ public class NoCheatPlugin extends JavaPlugin {
     	blockListener  = new NoCheatBlockListener();
     	entityListener = new NoCheatEntityListener();
 
-    	log = NoCheatConfiguration.logger;
+    	fileLogger = NoCheatConfiguration.logger;
+    	consoleLogger = Logger.getLogger("Minecraft");
     	    	
     	PluginManager pm = getServer().getPluginManager();
     	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this); // used for speedhack and moving checks
@@ -212,7 +214,8 @@ public class NoCheatPlugin extends JavaPlugin {
     	if(l != null) {
 	    	logToChat(l, message);
 	    	logToIRC(l, message);
-	    	log.log(l, message);
+	    	logToConsole(l, message);
+	    	fileLogger.log(l, message);
     	}
     }
     
@@ -229,6 +232,12 @@ public class NoCheatPlugin extends JavaPlugin {
     private static void logToIRC(Level l, String message) {
     	if(Irc != null && NoCheatConfiguration.ircLevel.intValue() <= l.intValue()) {
     		Irc.sendMessageToTag("["+l.getName()+"] " + message , NoCheatConfiguration.ircTag);
+    	}
+    }
+    
+    private static void logToConsole(Level l, String message) {
+    	if( NoCheatConfiguration.consoleLevel.intValue() <= l.intValue()) {
+    		consoleLogger.log(l, message);
     	}
     }
     

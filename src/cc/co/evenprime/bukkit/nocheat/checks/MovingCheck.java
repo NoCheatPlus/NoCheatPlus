@@ -22,7 +22,9 @@ public class MovingCheck {
 
 	// previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
     // Each entry represents the maximum gain in height per move event.
-    private static double jumpingPhases[] = new double[]{ 0.501D, 0.34D, 0.26D, 0.17D, 0.09D, 0.02D, 0.00D, -0.07D, -0.15D, -0.22D, -0.29D, -0.36D, -0.43D, -0.49D };
+	static final int jumpingLimit = 3;
+	static final double jumpingHeightLimit = 1.3D;
+	static double stepHeight = 0.501D;
         
 	// Limits for the moving check
 	public static double movingDistanceLow = 0.1D;
@@ -183,7 +185,7 @@ public class MovingCheck {
     			
     	// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
     	boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
-    	boolean onGroundTo = playerIsOnGround(from.getWorld(), toValues, to);
+    	boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
 
     	
     	// Both locations seem to be on solid ground or at a ladder
@@ -194,9 +196,9 @@ public class MovingCheck {
     		// If a player runs into a wall, the game tries to
     		// place him above the block he bumped into, by placing him 0.5 m above
     		// the target block
-    		if(!(to.getY() - from.getY() < jumpingPhases[0])) {
+    		if(!(to.getY() - from.getY() < stepHeight)) {
 
-    			double offset = (to.getY() - from.getY()) - jumpingPhases[0];
+    			double offset = (to.getY() - from.getY()) - stepHeight;
 
     			if(offset > 2D)        vl = max(vl, Level.SEVERE);
     			else if(offset > 0.5D) vl = max(vl, Level.WARNING);
@@ -206,17 +208,19 @@ public class MovingCheck {
     		{
     			// reset jumping
         		data.movingJumpPhase = 0;
-    			data.movingSetBackPoint = event.getTo().clone();
+    			data.movingSetBackPoint = from.clone();
     		}
     	}
     	// player is starting to jump (or starting to fall down somewhere)
     	else if(onGroundFrom && !onGroundTo)
     	{	
     		// Check if player isn't jumping too high
-    		if(!(to.getY() - from.getY() < jumpingPhases[0])) {
+    		double limit = jumpingHeightLimit;
+    		
+    		if(to.getY() - from.getY() > limit) {
 
-    			double offset = (to.getY() - from.getY()) - jumpingPhases[0];
-
+    			double offset = (to.getY() - from.getY()) - limit;
+    			
     			if(offset > 2D)        vl = max(vl, Level.SEVERE);
     			else if(offset > 0.5D) vl = max(vl, Level.WARNING);
     			else                   vl = max(vl, Level.INFO);
@@ -224,16 +228,21 @@ public class MovingCheck {
     		else {
     			 // Setup next phase of the jump
     			data.movingJumpPhase = 1;
-        		data.movingSetBackPoint = event.getFrom().clone();
+        		data.movingSetBackPoint = from.clone();
     		}
     	}
     	// player is probably landing somewhere
     	else if(!onGroundFrom && onGroundTo)
     	{
     		// Check if player isn't landing to high (sounds weird, but has its use)
-    		if(!(to.getY() - from.getY() < Math.max(jumpingPhases[data.movingJumpPhase], 0D))) {
+    		Location l = data.movingSetBackPoint;
+    		if(l == null) { l = from; }
+    		
+    		double limit = jumpingHeightLimit;
+    		 
+    		if(to.getY() - l.getY() > limit) {
 
-    			double offset = (to.getY() - from.getY()) - Math.max(jumpingPhases[data.movingJumpPhase], 0D);
+    			double offset = (to.getY() - l.getY()) - limit;
 
     			if(offset > 2D)        vl = max(vl, Level.SEVERE);
     			else if(offset > 0.5D) vl = max(vl, Level.WARNING);
@@ -241,30 +250,33 @@ public class MovingCheck {
     		}
     		else {
     			data.movingJumpPhase = 0; // He is on ground now, so reset the jump
-    			data.movingSetBackPoint = event.getTo().clone();
+    			data.movingSetBackPoint = to.clone();
     		}
     	}
     	// Player is moving through air (during jumping, falling)
     	else {
+    		// Check if player isn't landing to high (sounds weird, but has its use)
+    		Location l = data.movingSetBackPoint;
+    		if(l == null) { l = from; }
     		
-    		if(!(to.getY() - from.getY() < jumpingPhases[data.movingJumpPhase]))
+    		// The expected fall velocity is a rough estimate - players usually accelerate by that value
+    		double limit = (data.movingJumpPhase > jumpingLimit) ? jumpingHeightLimit - (data.movingJumpPhase-jumpingLimit) * 0.2D : jumpingHeightLimit;
+    		
+    		if(to.getY() - l.getY() > limit)
     		{
-    			double offset = (to.getY() - from.getY()) - jumpingPhases[data.movingJumpPhase];
-
+    			double offset = (to.getY() - l.getY()) - limit;
+    			
     			if(offset > 2D)        vl = max(vl, Level.SEVERE);
-    			else if(offset > 1D)   vl = max(vl, Level.WARNING);
+    			else if(offset > 0.5D) vl = max(vl, Level.WARNING);
     			else                   vl = max(vl, Level.INFO);
     		}
     		else {
     			data.movingJumpPhase++; // Enter next phase of the flight
-    			// Setback point stays the same
+    			// Setback point stays the same. IF we don't have one, take the "from" location as a setback point for now
+    			if(data.movingSetBackPoint == null) {
+    				data.movingSetBackPoint = from.clone();
+    			}
     		}
-    	}
-
-    	// do a security check on the jumping phase, such that we don't get 
-    	// OutOfArrayBoundsExceptions at long air times (falling off high places)
-    	if(!(data.movingJumpPhase < jumpingPhases.length)) {
-    		data.movingJumpPhase = jumpingPhases.length - 1;
     	}
 
     	if(vl == null && (onGroundFrom || onGroundTo)) {
@@ -317,14 +329,14 @@ public class MovingCheck {
     			data.movingHeavyViolationsInARow++;
     			actions = NoCheatConfiguration.movingActionHeavy;
     		}
-
+    		
     		action(event, actions, log);
     	}
 	}
 	
 		
 	/**
-	 * Perform actions that were specified by the player
+	 * Perform actions that were specified by the admin
 	 * @param event
 	 * @param actions
 	 */
@@ -347,7 +359,7 @@ public class MovingCheck {
 	protected static void legitimateMove(NoCheatData data, PlayerMoveEvent event) {
 		
 		// Give some logging about violations if the player hasn't done any for at least two seconds
-		if(data.movingLastViolationTime != 0 && data.movingLastViolationTime + 1000L > System.currentTimeMillis()) {
+		if(data.movingLastViolationTime != 0 && data.movingLastViolationTime + 2000L < System.currentTimeMillis()) {
 			
 			data.movingLastViolationTime = 0;
 			
@@ -360,7 +372,7 @@ public class MovingCheck {
 				NoCheatPlugin.logAction(NoCheatConfiguration.movingActionNormal, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
 				data.movingNormalViolationsInARow = 0;
 			}
-			if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves +1) {
+			if(data.movingMinorViolationsInARow > NoCheatConfiguration.movingFreeMoves) {
 				NoCheatPlugin.logAction(NoCheatConfiguration.movingActionMinor, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
 				data.movingMinorViolationsInARow = 0;
 			}

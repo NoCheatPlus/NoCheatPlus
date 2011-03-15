@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +19,7 @@ import org.bukkit.util.config.Configuration;
 public class NoCheatConfiguration {
 	
 	// Our personal logger
-	public static final String loggerName = "cc.co.evenprime.bukkit.nocheat";
+	public static final String loggerName = "cc.co.evenprime.nocheat";
 	public static final Logger logger = Logger.getLogger(loggerName);
 	
 	// Which checks are active
@@ -39,7 +38,7 @@ public class NoCheatConfiguration {
 	public static String speedhackActionNormal = "";
 	public static String speedhackActionHeavy = "";
 	
-	public static int movingFreeMoves = 5;
+	public static int movingFreeMoves = 1;
 	
 	// How should moving violations be treated?
 	public static String movingActionMinor = "";
@@ -49,14 +48,14 @@ public class NoCheatConfiguration {
 	// How should airbuild violations be treated?
 	public static String airbuildAction = "";
 	
-	// The log level above which players with the permission nocheat.notify will get informed about violations
+	// The log level above which information gets logged to the specified logger
 	public static Level chatLevel = Level.OFF;
 	public static Level ircLevel = Level.OFF;
+	public static Level consoleLevel = Level.OFF;
 	
 	public static String ircTag = "";
 	
-	// Our two log outputs, the console and a file
-	private static ConsoleHandler ch = null;
+	// Our log output to a file
 	private static FileHandler fh = null;
 	
 	private NoCheatConfiguration() {}
@@ -75,16 +74,6 @@ public class NoCheatConfiguration {
 		
 		logger.setLevel(Level.INFO);
 		logger.setUseParentHandlers(false);
-
-		
-		if(ch == null) {
-			ch = new ConsoleHandler();
-	
-			ch.setLevel(stringToLevel(c.getString("logging.logtoconsole")));
-			ch.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
-			logger.addHandler(ch);
-		}
-		
 		
 		if(fh == null) {
 			try {
@@ -101,6 +90,7 @@ public class NoCheatConfiguration {
 		
 		chatLevel = stringToLevel(c.getString("logging.logtonotify")); // deprecated, will be deleted eventually
 		chatLevel = stringToLevel(c.getString("logging.logtochat"));
+		consoleLevel = stringToLevel(c.getString("logging.logtoconsole"));
 		
 		ircLevel = stringToLevel(c.getString("logging.logtoirc"));
 		ircTag = c.getString("logging.logtoirctag", "nocheat");
@@ -114,7 +104,7 @@ public class NoCheatConfiguration {
 		speedhackLimitMed = c.getInt("speedhack.limits.med", 45);
 		speedhackLimitHigh = c.getInt("speedhack.limits.high", 60);
 			
-		movingFreeMoves = c.getInt("moving.freemoves", 5);
+		movingFreeMoves = c.getInt("moving.freemoves", 1);
 		
 		movingActionMinor = c.getString("moving.action.low", "loglow reset");
 		movingActionNormal = c.getString("moving.action.med", "logmed reset");
@@ -187,7 +177,7 @@ public class NoCheatConfiguration {
 			w.write("# Moving specific options") ; w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("#   After how many minor violations should the plugin react (minimum 1)"); w.newLine();
-			w.write("    freemoves: 5"); w.newLine();
+			w.write("    freemoves: 1"); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: loglow reset"); w.newLine();
