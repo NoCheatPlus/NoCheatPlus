@@ -144,7 +144,7 @@ public class MovingCheck {
     	// Get the two locations of the event
     	Location from = event.getFrom();
     	Location to = event.getTo();
-    	
+    	   	
     	if(from.getWorld() != to.getWorld()) {
     		// Moving between different worlds is considered ok
     		// Also prevent accidential back teleporting by discarding old-world coordinates
@@ -152,7 +152,6 @@ public class MovingCheck {
     		data.speedhackSetBackPoint = null;
     		return;
     	}
-    			
     			
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
@@ -193,7 +192,6 @@ public class MovingCheck {
     	boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
     	boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
 
-    	
     	// Both locations seem to be on solid ground or at a ladder
     	if(onGroundFrom && onGroundTo)
     	{
@@ -273,7 +271,7 @@ public class MovingCheck {
     			double offset = (to.getY() - l.getY()) - limit;
     			
     			if(offset > 2D)        vl = max(vl, Level.SEVERE);
-    			else if(offset > 0.5D) vl = max(vl, Level.WARNING);
+    			else if(offset > 0.5D)   vl = max(vl, Level.WARNING);
     			else                   vl = max(vl, Level.INFO);
     		}
     		else {
@@ -351,7 +349,7 @@ public class MovingCheck {
 		if(actions == null) return;
 		// LOGGING IF NEEDED
 		if(log && actions.contains("log")) {
-			NoCheatPlugin.logAction(actions, "Moving violation: "+event.getPlayer().getName()+" from " + String.format("(%.5f, %.5f, %.5f) to (%.5f, %.5f, %.5f)", event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+			NoCheatPlugin.logAction(actions, "Moving violation: "+event.getPlayer().getName()+" from " + String.format("%s (%.5f, %.5f, %.5f) to %s (%.5f, %.5f, %.5f)", event.getFrom().getWorld().getName(), event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getWorld().getName(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
 		}
 		
 		// RESET IF NEEDED
@@ -410,6 +408,8 @@ public class MovingCheck {
 		data.movingJumpPhase = 0;
 
 		Location l = data.movingSetBackPoint;
+		
+		data.reset = true;
 		// If we have stored a location for the player, we put him back there
 		if(l != null) {
 			// Lets try it that way. Maybe now people don't "disappear" any longer

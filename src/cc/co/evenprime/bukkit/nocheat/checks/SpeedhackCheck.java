@@ -87,6 +87,8 @@ public class SpeedhackCheck {
 	private static void resetPlayer(PlayerMoveEvent event, NoCheatData data) {
 		
 		Location l = data.speedhackSetBackPoint;
+		
+		data.reset = true;
 		// If we have stored a location for the player, we put him back there
 		if(l != null) {
 			event.setFrom(l);

@@ -20,6 +20,8 @@ public class NoCheatData {
 	public int movingNormalViolationsInARow = 0;
 	public int movingHeavyViolationsInARow = 0;
 	
+	public boolean reset = false;
+	
 	public int movingHorizFreeMoves = 4;
 	public Location movingSetBackPoint = null;
 

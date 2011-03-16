@@ -17,6 +17,7 @@ import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatBlockListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatPlayerListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatPlayerListenerMonitor;
 
 import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -35,6 +36,7 @@ public class NoCheatPlugin extends JavaPlugin {
 	
 	// Various listeners needed for different Checks
     private NoCheatPlayerListener playerListener;
+    private NoCheatPlayerListenerMonitor playerListenerMonitor;
     private NoCheatBlockListener blockListener;
 
     // My main logger
@@ -135,6 +137,7 @@ public class NoCheatPlugin extends JavaPlugin {
     public void onEnable() {
     	// Create our listeners and feed them with neccessary information
     	playerListener = new NoCheatPlayerListener();
+    	playerListenerMonitor = new NoCheatPlayerListenerMonitor();
     	blockListener  = new NoCheatBlockListener();
 
     	fileLogger = NoCheatConfiguration.logger;
@@ -144,7 +147,8 @@ public class NoCheatPlugin extends JavaPlugin {
     	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this); // used for speedhack and moving checks
     	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this); // used to delete old data of users
     	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this); // used for airbuild check
-    	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this); // used for moving, speedhack and teleportfrombed check
+    	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this); // used for teleportfrombed check
+    	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListenerMonitor, Priority.Monitor, this); // used for moving, speedhack check
 
     	PluginDescriptionFile pdfFile = this.getDescription();
     	
