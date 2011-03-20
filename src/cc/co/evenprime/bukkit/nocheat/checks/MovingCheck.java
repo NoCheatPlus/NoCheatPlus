@@ -136,34 +136,62 @@ public class MovingCheck {
 
     	// Should we check at all
     	if(NoCheatPlugin.hasPermission(event.getPlayer(), "nocheat.moving"))
-    	return;
+    		return;
 
-		// Get the player-specific data
-		NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
-		
+    	// Get the player-specific data
+    	NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
+
+    	// Notice to myself: How world changes with e.g. command /world work:
+    	// 1. TeleportEvent from the players current position to another position in the _same_ world
+    	// 2. MoveEvent(s) (yes, multiple events can be triggered) from that position in the _new_ world 
+    	//    to the actual target position in the new world
+    	// strange...
+
+    	// I've no real way to get informed about a world change, therefore I have to
+    	// store the "lastWorld" and compare it to the world of the next event
+    	// Fun fact: Move event locations always have the same world in from/to, therefore
+    	// it doesn't matter which one I use
+    	if(data.movingLastWorld != event.getFrom().getWorld()) {
+    		
+    		data.movingLastWorld = event.getFrom().getWorld();
+    		// "Forget" previous setback points
+    		data.movingSetBackPoint = null;
+    		data.speedhackSetBackPoint = null;
+
+    		// Store the destination that this move goes to for later use
+    		data.movingLocation = event.getTo();
+
+    		// the world changed since our last check, therefore I can't check anything
+    		// for this event (reliably)
+    		return;
+    	}
+
+    	if(data.movingLocation != null && data.movingLocation.equals(event.getTo())) {
+    		// If we are still trying to reach that location, accept the move
+    		return;
+    	}
+    	else if(data.movingLocation != null) {
+    		// If we try to go somewhere else, delete the location. It is no longer needed
+    		data.movingLocation = null;
+    	}
+
+    	// The actual movingCheck starts here
+
     	// Get the two locations of the event
     	Location from = event.getFrom();
     	Location to = event.getTo();
-    	   	
-    	if(from.getWorld() != to.getWorld()) {
-    		// Moving between different worlds is considered ok
-    		// Also prevent accidential back teleporting by discarding old-world coordinates
-    		data.movingSetBackPoint = null;
-    		data.speedhackSetBackPoint = null;
-    		return;
-    	}
-    			
+
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
    		double xDistance = Math.abs(from.getX() - to.getX());
     	double zDistance = Math.abs(from.getZ() - to.getZ());
     	double combined = xDistance * xDistance + zDistance * zDistance;	
-    	
+
 		// If the target is a bed and distance not too big, allow it
     	if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && xDistance < 5.0D && zDistance < 5.0D) {
     		return; // players are allowed to "teleport" into a bed over short distances
     	}
-    	   	
+
 		Level vl = null; // The violation level (none, minor, normal, heavy)
 		
     	// How far are we off?

@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 /**
  * Storage for data persistence between events
@@ -19,6 +20,7 @@ public class NoCheatData {
 	public int movingMinorViolationsInARow = 0; 
 	public int movingNormalViolationsInARow = 0;
 	public int movingHeavyViolationsInARow = 0;
+	public World movingLastWorld = null;
 	
 	public boolean reset = false;
 	
@@ -29,6 +31,7 @@ public class NoCheatData {
 	public Location speedhackSetBackPoint = null;
 	public int speedhackEventsSinceLastCheck = 0; // used to identify speedhacks
 	public int speedhackViolationsInARow = 0;
+	public Location movingLocation = null;
 
 	NoCheatData() { }
 }
