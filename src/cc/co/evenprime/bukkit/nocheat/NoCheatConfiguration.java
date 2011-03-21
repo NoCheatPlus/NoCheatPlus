@@ -110,11 +110,13 @@ public class NoCheatConfiguration {
 		movingActionNormal = c.getString("moving.action.med", "logmed reset");
 		movingActionHeavy = c.getString("moving.action.high", "loghigh reset");
 		
-		speedhackActionMinor = c.getString("speedhack.action.low", "loglow");
-		speedhackActionNormal = c.getString("speedhack.action.med", "logmed");
-		speedhackActionHeavy = c.getString("speedhack.action.high", "loghigh");
+		speedhackActionMinor = c.getString("speedhack.action.low", "loglow reset");
+		speedhackActionNormal = c.getString("speedhack.action.med", "logmed reset");
+		speedhackActionHeavy = c.getString("speedhack.action.high", "loghigh reset");
 		
 		airbuildAction = c.getString("airbuild.action", "logmed deny");
+		
+		System.out.println(airbuildAction);
 		
 		// 1 is minimum. This is needed to smooth over some minecraft bugs like 
 		// when a minecart gets broken while a player is inside it (which causes the player to "move"

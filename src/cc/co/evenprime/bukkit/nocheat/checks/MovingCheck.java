@@ -22,7 +22,7 @@ public class MovingCheck {
 
 	// previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
     // Each entry represents the maximum gain in height per move event.
-	static final int jumpingLimit = 3;
+	static final int jumpingLimit = 4;
 	static final double jumpingHeightLimit = 1.3D;
 	static double stepHeight = 0.501D;
         
@@ -175,12 +175,18 @@ public class MovingCheck {
     		data.movingLocation = null;
     	}
 
+    	
+    	if(event.getPlayer().isInsideVehicle()) {
+    		data.movingSetBackPoint = null;
+    		data.speedhackSetBackPoint = null;
+    		return;
+    	}
     	// The actual movingCheck starts here
 
     	// Get the two locations of the event
     	Location from = event.getFrom();
     	Location to = event.getTo();
-
+    	
     	// First check the distance the player has moved horizontally
     	// TODO: Make this check much more precise
    		double xDistance = Math.abs(from.getX() - to.getX());
