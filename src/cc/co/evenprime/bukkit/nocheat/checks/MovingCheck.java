@@ -20,13 +20,16 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
  */
 public class MovingCheck {
 
-	// previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
-    // Each entry represents the maximum gain in height per move event.
-	static final int jumpingLimit = 1;
+    // How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
+	static final int jumpingLimit = 3;
+	
+	// How high may a player get compared to his last location with ground contact
 	static final double jumpingHeightLimit = 1.3D;
+	
+	// How high may a player move in one event on ground
 	static double stepHeight = 0.501D;
         
-	// Limits for the moving check
+	// Limits for the horizontal moving check
 	public static double movingDistanceLow = 0.1D;
 	public static double movingDistanceMed = 2.0D;
 	public static double movingDistanceHigh = 5.0D;
@@ -140,7 +143,7 @@ public class MovingCheck {
 
     	// Get the player-specific data
     	NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
-    	
+
     	// Notice to myself: How world changes with e.g. command /world work:
     	// 1. TeleportEvent from the players current position to another position in the _same_ world
     	// 2. MoveEvent(s) (yes, multiple events can be triggered) from that position in the _new_ world 
@@ -152,7 +155,7 @@ public class MovingCheck {
     	// Fun fact: Move event locations always have the same world in from/to, therefore
     	// it doesn't matter which one I use
     	if(data.movingLastWorld != event.getFrom().getWorld()) {
-    		
+
     		data.movingLastWorld = event.getFrom().getWorld();
     		// "Forget" previous setback points
     		data.movingSetBackPoint = null;
@@ -181,13 +184,15 @@ public class MovingCheck {
     		data.speedhackSetBackPoint = null;
     		return;
     	}
-    	
-    	// The server believes the player should be moved upward, so we ignore this
+
+    	// The server believes the player should be moving up, so we ignore this event
     	if(event.getPlayer().getVelocity().getY() > 0) {
     		data.movingSetBackPoint = null;
     		data.speedhackSetBackPoint = null;
     		return;
     	}
+
+
     	// The actual movingCheck starts here
 
     	// Get the two locations of the event
@@ -283,7 +288,7 @@ public class MovingCheck {
     		Location l = data.movingSetBackPoint;
     		if(l == null) { l = from; }
     		
-    		double limit = jumpingHeightLimit;
+    		double limit = jumpingHeightLimit + stepHeight;
     		 
     		if(to.getY() - l.getY() > limit) {
 
@@ -300,7 +305,6 @@ public class MovingCheck {
     	}
     	// Player is moving through air (during jumping, falling)
     	else {
-    		// Check if player isn't landing to high (sounds weird, but has its use)
     		Location l = data.movingSetBackPoint;
     		if(l == null) { l = from; }
     		
