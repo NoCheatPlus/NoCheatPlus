@@ -21,17 +21,19 @@ public class NoCheatData {
 	public int movingNormalViolationsInARow = 0;
 	public int movingHeavyViolationsInARow = 0;
 	public World movingLastWorld = null;
-	
-	public boolean reset = false;
-	
 	public int movingHorizFreeMoves = 4;
 	public Location movingSetBackPoint = null;
-
+	public Location movingLocation = null;
+	public boolean reset = false;
+	
 	public long speedhackLastCheck = System.currentTimeMillis(); // timestamp of last check for speedhacks
 	public Location speedhackSetBackPoint = null;
 	public int speedhackEventsSinceLastCheck = 0; // used to identify speedhacks
 	public int speedhackViolationsInARow = 0;
-	public Location movingLocation = null;
+
+	public int airbuildPerSecond = 0;
+	public Runnable airbuildRunnable = null;
+
 
 	NoCheatData() { }
 }

@@ -46,7 +46,15 @@ public class NoCheatConfiguration {
 	public static String movingActionHeavy = "";
 	
 	// How should airbuild violations be treated?
-	public static String airbuildAction = "";
+	public static String airbuildActionLow = "";
+	public static String airbuildActionMed = "";
+	public static String airbuildActionHigh = "";
+	
+	public static Runnable airbuildRunnable = null;
+	
+	public static int airbuildLimitLow = 1;
+	public static int airbuildLimitMed = 3;
+	public static int airbuildLimitHigh = 10;
 	
 	// The log level above which information gets logged to the specified logger
 	public static Level chatLevel = Level.OFF;
@@ -87,37 +95,42 @@ public class NoCheatConfiguration {
 				e.printStackTrace();
 			}
 		}
-		
+
 		chatLevel = stringToLevel(c.getString("logging.logtonotify")); // deprecated, will be deleted eventually
 		chatLevel = stringToLevel(c.getString("logging.logtochat"));
 		consoleLevel = stringToLevel(c.getString("logging.logtoconsole"));
-		
+
 		ircLevel = stringToLevel(c.getString("logging.logtoirc"));
 		ircTag = c.getString("logging.logtoirctag", "nocheat");
-		
+
 		speedhackCheckActive = c.getBoolean("active.speedhack", true);
 		movingCheckActive = c.getBoolean("active.moving", true);
 		airbuildCheckActive = c.getBoolean("active.airbuild", false);
 		bedteleportCheckActive = c.getBoolean("active.bedteleport", true);
-		
+
 		speedhackLimitLow = c.getInt("speedhack.limits.low", 30);
 		speedhackLimitMed = c.getInt("speedhack.limits.med", 45);
 		speedhackLimitHigh = c.getInt("speedhack.limits.high", 60);
-			
+
 		movingFreeMoves = c.getInt("moving.freemoves", 1);
-		
+
 		movingActionMinor = c.getString("moving.action.low", "loglow reset");
 		movingActionNormal = c.getString("moving.action.med", "logmed reset");
 		movingActionHeavy = c.getString("moving.action.high", "loghigh reset");
-		
+
 		speedhackActionMinor = c.getString("speedhack.action.low", "loglow reset");
 		speedhackActionNormal = c.getString("speedhack.action.med", "logmed reset");
 		speedhackActionHeavy = c.getString("speedhack.action.high", "loghigh reset");
+
+		airbuildLimitLow = c.getInt("airbuild.limits.low", 1);
+		airbuildLimitMed = c.getInt("airbuild.limits.med", 3);
+		airbuildLimitHigh = c.getInt("airbuild.limits.high", 10);
 		
-		airbuildAction = c.getString("airbuild.action", "logmed deny");
-		
-		System.out.println(airbuildAction);
-		
+		airbuildActionLow = c.getString("airbuild.action.low", "loglow deny");
+		airbuildActionMed = c.getString("airbuild.action.med", "logmed deny");
+		airbuildActionHigh = c.getString("airbuild.action.high", "loghigh deny");
+
+
 		// 1 is minimum. This is needed to smooth over some minecraft bugs like 
 		// when a minecart gets broken while a player is inside it (which causes the player to "move"
 		// up 1.0D which is much more than a usual jump would allow in 1 event
@@ -140,7 +153,7 @@ public class NoCheatConfiguration {
 		if(string.trim().equals("severe")|| string.trim().equals("high")) return Level.SEVERE;
 		return Level.OFF;
 	}
-	
+
 	/**
 	 * Standard configuration file for people who haven't got one yet
 	 * @param f
@@ -150,7 +163,7 @@ public class NoCheatConfiguration {
 			f.getParentFile().mkdirs();
 			f.createNewFile();
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
-			
+
 			w.write("# Logging: potential log levels are low (info), med (warn), high (severe), off"); w.newLine();
 			w.write("logging:"); w.newLine();
 			w.write("    filename: plugins/NoCheat/nocheat.log"); w.newLine();
@@ -187,8 +200,16 @@ public class NoCheatConfiguration {
 			w.write("        high: loghigh reset"); w.newLine();
 			w.write("# Airbuild specific options"); w.newLine();
 			w.write("airbuild:"); w.newLine();
+			w.write("#   How many blocks per second are placed by the player in midair (determines log level)"); w.newLine();
+			w.write("    limits:"); w.newLine();
+			w.write("        low: 1"); w.newLine();
+			w.write("        med: 3"); w.newLine();
+			w.write("        high: 10"); w.newLine();
 			w.write("#   Airbuild Action, one or more of 'loglow logmed loghigh deny'"); w.newLine();
-			w.write("    action: logmed deny"); w.newLine();
+			w.write("    action:"); w.newLine();
+			w.write("        low: loglow deny"); w.newLine();
+			w.write("        med: logmed deny"); w.newLine();
+			w.write("        high: loghigh deny"); w.newLine();
 			w.write("# Bedteleport specific options (none exist yet)"); w.newLine();
 			w.write("bedteleport:"); w.newLine();
 

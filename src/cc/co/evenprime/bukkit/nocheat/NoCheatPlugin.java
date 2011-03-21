@@ -43,7 +43,7 @@ public class NoCheatPlugin extends JavaPlugin {
     private static Logger consoleLogger;
     private static Logger fileLogger;
     
-    private static NoCheatPlugin p;
+    public static NoCheatPlugin p;
     
     // Permissions 2.0, if available
     public static PermissionHandler Permissions = null;

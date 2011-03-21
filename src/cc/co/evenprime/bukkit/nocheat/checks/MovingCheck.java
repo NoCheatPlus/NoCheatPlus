@@ -22,7 +22,7 @@ public class MovingCheck {
 
 	// previously-calculated upper bound values for jumps. Minecraft is very deterministic when it comes to jumps
     // Each entry represents the maximum gain in height per move event.
-	static final int jumpingLimit = 4;
+	static final int jumpingLimit = 1;
 	static final double jumpingHeightLimit = 1.3D;
 	static double stepHeight = 0.501D;
         
@@ -132,7 +132,7 @@ public class MovingCheck {
     	types[Material.CAKE_BLOCK.getId()]= BlockType.UNKNOWN;
     }
         
-    public static void check(PlayerMoveEvent event) {
+    public static void check(final PlayerMoveEvent event) {
 
     	// Should we check at all
     	if(NoCheatPlugin.hasPermission(event.getPlayer(), "nocheat.moving"))
@@ -140,7 +140,7 @@ public class MovingCheck {
 
     	// Get the player-specific data
     	NoCheatData data = NoCheatPlugin.getPlayerData(event.getPlayer());
-
+    	
     	// Notice to myself: How world changes with e.g. command /world work:
     	// 1. TeleportEvent from the players current position to another position in the _same_ world
     	// 2. MoveEvent(s) (yes, multiple events can be triggered) from that position in the _new_ world 
@@ -175,8 +175,15 @@ public class MovingCheck {
     		data.movingLocation = null;
     	}
 
-    	
+    	// Ignore vehicles
     	if(event.getPlayer().isInsideVehicle()) {
+    		data.movingSetBackPoint = null;
+    		data.speedhackSetBackPoint = null;
+    		return;
+    	}
+    	
+    	// The server believes the player should be moved upward, so we ignore this
+    	if(event.getPlayer().getVelocity().getY() > 0) {
     		data.movingSetBackPoint = null;
     		data.speedhackSetBackPoint = null;
     		return;
