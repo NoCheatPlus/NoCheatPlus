@@ -17,79 +17,52 @@ import org.bukkit.util.config.Configuration;
  *
  */
 public class NoCheatConfiguration {
-	
+
 	// Our personal logger
-	public static final String loggerName = "cc.co.evenprime.nocheat";
-	public static final Logger logger = Logger.getLogger(loggerName);
-	
-	// Which checks are active
-	public static boolean speedhackCheckActive;
-	public static boolean movingCheckActive;
-	public static boolean airbuildCheckActive;
-	public static boolean bedteleportCheckActive;
-	
-	// Limits for the speedhack check
-	public static int speedhackLimitLow;
-	public static int speedhackLimitMed;
-	public static int speedhackLimitHigh;
-	
-	// How should speedhack violations be treated?
-	public static String speedhackActionMinor = "";
-	public static String speedhackActionNormal = "";
-	public static String speedhackActionHeavy = "";
-	
-	public static int movingFreeMoves = 1;
-	
-	// How should moving violations be treated?
-	public static String movingActionMinor = "";
-	public static String movingActionNormal = "";
-	public static String movingActionHeavy = "";
-	
-	// How should airbuild violations be treated?
-	public static String airbuildActionLow = "";
-	public static String airbuildActionMed = "";
-	public static String airbuildActionHigh = "";
-	
-	public static Runnable airbuildRunnable = null;
-	
-	public static int airbuildLimitLow = 1;
-	public static int airbuildLimitMed = 3;
-	public static int airbuildLimitHigh = 10;
-	
+	private final String loggerName = "cc.co.evenprime.nocheat";
+	public final Logger logger = Logger.getLogger(loggerName);
+
 	// The log level above which information gets logged to the specified logger
-	public static Level chatLevel = Level.OFF;
-	public static Level ircLevel = Level.OFF;
-	public static Level consoleLevel = Level.OFF;
-	
-	public static String ircTag = "";
-	
+	public Level chatLevel = Level.OFF;
+	public Level ircLevel = Level.OFF;
+	public Level consoleLevel = Level.OFF;
+
+	public String ircTag = "";
+
 	// Our log output to a file
-	private static FileHandler fh = null;
-	
-	private NoCheatConfiguration() {}
-	
+	private FileHandler fh = null;
+
+	private final NoCheatPlugin plugin;
+
+	public NoCheatConfiguration(File configurationFile, NoCheatPlugin plugin) {
+
+		this.plugin = plugin;
+
+		this.config(configurationFile);
+	}
+
 	/**
 	 * Read the configuration file and assign either standard values or whatever is declared in the file
 	 * @param configurationFile
 	 */
-	public static void config(File configurationFile) {
-		
+	public void config(File configurationFile) {
+
 		if(!configurationFile.exists()) {
 			createStandardConfigFile(configurationFile);
 		}
 		Configuration c = new Configuration(configurationFile);
 		c.load();
-		
+
 		logger.setLevel(Level.INFO);
 		logger.setUseParentHandlers(false);
-		
+
 		if(fh == null) {
 			try {
 				fh = new FileHandler(c.getString("logging.filename"), true);
 				fh.setLevel(stringToLevel(c.getString("logging.logtofile")));
 				fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
 				logger.addHandler(fh);
-				
+
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -103,51 +76,43 @@ public class NoCheatConfiguration {
 		ircLevel = stringToLevel(c.getString("logging.logtoirc"));
 		ircTag = c.getString("logging.logtoirctag", "nocheat");
 
-		speedhackCheckActive = c.getBoolean("active.speedhack", true);
-		movingCheckActive = c.getBoolean("active.moving", true);
-		airbuildCheckActive = c.getBoolean("active.airbuild", false);
-		bedteleportCheckActive = c.getBoolean("active.bedteleport", true);
+		plugin.speedhackCheck.limitLow = c.getInt("speedhack.limits.low", plugin.speedhackCheck.limitLow);
+		plugin.speedhackCheck.limitMed = c.getInt("speedhack.limits.med", plugin.speedhackCheck.limitMed);
+		plugin.speedhackCheck.limitHigh = c.getInt("speedhack.limits.high", plugin.speedhackCheck.limitHigh);
 
-		speedhackLimitLow = c.getInt("speedhack.limits.low", 30);
-		speedhackLimitMed = c.getInt("speedhack.limits.med", 45);
-		speedhackLimitHigh = c.getInt("speedhack.limits.high", 60);
+		plugin.movingCheck.actionLow = c.getString("moving.action.low", plugin.movingCheck.actionLow);
+		plugin.movingCheck.actionMed = c.getString("moving.action.med", plugin.movingCheck.actionMed);
+		plugin.movingCheck.actionHigh = c.getString("moving.action.high", plugin.movingCheck.actionHigh);
 
-		movingFreeMoves = c.getInt("moving.freemoves", 1);
+		plugin.speedhackCheck.actionLow = c.getString("speedhack.action.low", plugin.speedhackCheck.actionLow);
+		plugin.speedhackCheck.actionMed = c.getString("speedhack.action.med", plugin.speedhackCheck.actionMed);
+		plugin.speedhackCheck.actionHigh = c.getString("speedhack.action.high", plugin.speedhackCheck.actionHigh);
 
-		movingActionMinor = c.getString("moving.action.low", "loglow reset");
-		movingActionNormal = c.getString("moving.action.med", "logmed reset");
-		movingActionHeavy = c.getString("moving.action.high", "loghigh reset");
+		plugin.airbuildCheck.limitLow = c.getInt("airbuild.limits.low", plugin.airbuildCheck.limitLow);
+		plugin.airbuildCheck.limitMed = c.getInt("airbuild.limits.med", plugin.airbuildCheck.limitMed);
+		plugin.airbuildCheck.limitHigh = c.getInt("airbuild.limits.high", plugin.airbuildCheck.limitHigh);
 
-		speedhackActionMinor = c.getString("speedhack.action.low", "loglow reset");
-		speedhackActionNormal = c.getString("speedhack.action.med", "logmed reset");
-		speedhackActionHeavy = c.getString("speedhack.action.high", "loghigh reset");
+		plugin.airbuildCheck.actionLow = c.getString("airbuild.action.low", plugin.airbuildCheck.actionLow);
+		plugin.airbuildCheck.actionMed = c.getString("airbuild.action.med", plugin.airbuildCheck.actionMed);
+		plugin.airbuildCheck.actionHigh = c.getString("airbuild.action.high", plugin.airbuildCheck.actionHigh);
 
-		airbuildLimitLow = c.getInt("airbuild.limits.low", 1);
-		airbuildLimitMed = c.getInt("airbuild.limits.med", 3);
-		airbuildLimitHigh = c.getInt("airbuild.limits.high", 10);
-		
-		airbuildActionLow = c.getString("airbuild.action.low", "loglow deny");
-		airbuildActionMed = c.getString("airbuild.action.med", "logmed deny");
-		airbuildActionHigh = c.getString("airbuild.action.high", "loghigh deny");
-
-
-		// 1 is minimum. This is needed to smooth over some minecraft bugs like 
-		// when a minecart gets broken while a player is inside it (which causes the player to "move"
-		// up 1.0D which is much more than a usual jump would allow in 1 event
-		if(movingFreeMoves < 1) movingFreeMoves = 1;
+		plugin.speedhackCheck.setActive(c.getBoolean("active.speedhack", plugin.speedhackCheck.isActive()));
+		plugin.movingCheck.setActive(c.getBoolean("active.moving", plugin.movingCheck.isActive()));
+		plugin.airbuildCheck.setActive(c.getBoolean("active.airbuild", plugin.airbuildCheck.isActive()));
+		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", plugin.bedteleportCheck.isActive()));
 	}
-	
+
 	/**
 	 * Convert a string into a log level
 	 * @param string
 	 * @return
 	 */
 	private static Level stringToLevel(String string) {
-		
+
 		if(string == null) {
 			return Level.OFF;
 		}
-		
+
 		if(string.trim().equals("info") || string.trim().equals("low")) return Level.INFO;
 		if(string.trim().equals("warn") || string.trim().equals("med")) return Level.WARNING;
 		if(string.trim().equals("severe")|| string.trim().equals("high")) return Level.SEVERE;
@@ -158,7 +123,7 @@ public class NoCheatConfiguration {
 	 * Standard configuration file for people who haven't got one yet
 	 * @param f
 	 */
-	private static void createStandardConfigFile(File f) {
+	private void createStandardConfigFile(File f) {
 		try {
 			f.getParentFile().mkdirs();
 			f.createNewFile();
@@ -174,42 +139,40 @@ public class NoCheatConfiguration {
 			w.write("    logtoirctag: nocheat"); w.newLine();
 			w.write("# Checks and Bugfixes that are activated (true or false)"); w.newLine();
 			w.write("active:");  w.newLine();
-			w.write("    speedhack: true"); w.newLine();
-			w.write("    moving: true"); w.newLine();
-			w.write("    airbuild: false"); w.newLine();
-			w.write("    bedteleport: true"); w.newLine();
+			w.write("    speedhack: "+plugin.speedhackCheck.isActive()); w.newLine();
+			w.write("    moving: "+plugin.movingCheck.isActive()); w.newLine();
+			w.write("    airbuild: "+plugin.airbuildCheck.isActive()); w.newLine();
+			w.write("    bedteleport: "+plugin.bedteleportCheck.isActive()); w.newLine();
 			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
 			w.write("    limits:"); w.newLine();
-			w.write("        low: 30"); w.newLine();
-			w.write("        med: 45"); w.newLine();
-			w.write("        high: 60"); w.newLine();
+			w.write("        low: "+plugin.speedhackCheck.limitLow); w.newLine();
+			w.write("        med: "+plugin.speedhackCheck.limitMed); w.newLine();
+			w.write("        high: "+plugin.speedhackCheck.limitHigh); w.newLine();
 			w.write("#   Speedhack Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: loglow reset"); w.newLine();
-			w.write("        med: logmed reset"); w.newLine();
-			w.write("        high: loghigh reset"); w.newLine();
+			w.write("        low: "+plugin.speedhackCheck.actionLow); w.newLine();
+			w.write("        med: "+plugin.speedhackCheck.actionMed); w.newLine();
+			w.write("        high: "+plugin.speedhackCheck.actionHigh); w.newLine();
 			w.write("# Moving specific options") ; w.newLine();
 			w.write("moving:"); w.newLine();
-			w.write("#   After how many minor violations should the plugin react (minimum 1)"); w.newLine();
-			w.write("    freemoves: 1"); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: loglow reset"); w.newLine();
-			w.write("        med: logmed reset"); w.newLine();
-			w.write("        high: loghigh reset"); w.newLine();
+			w.write("        low: "+plugin.movingCheck.actionLow); w.newLine();
+			w.write("        med: "+plugin.movingCheck.actionMed); w.newLine();
+			w.write("        high: "+plugin.movingCheck.actionHigh); w.newLine();
 			w.write("# Airbuild specific options"); w.newLine();
 			w.write("airbuild:"); w.newLine();
 			w.write("#   How many blocks per second are placed by the player in midair (determines log level)"); w.newLine();
 			w.write("    limits:"); w.newLine();
-			w.write("        low: 1"); w.newLine();
-			w.write("        med: 3"); w.newLine();
-			w.write("        high: 10"); w.newLine();
+			w.write("        low: "+plugin.airbuildCheck.limitLow); w.newLine();
+			w.write("        med: "+plugin.airbuildCheck.limitMed); w.newLine();
+			w.write("        high: "+plugin.airbuildCheck.limitHigh); w.newLine();
 			w.write("#   Airbuild Action, one or more of 'loglow logmed loghigh deny'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: loglow deny"); w.newLine();
-			w.write("        med: logmed deny"); w.newLine();
-			w.write("        high: loghigh deny"); w.newLine();
+			w.write("        low: "+plugin.airbuildCheck.actionLow); w.newLine();
+			w.write("        med: "+plugin.airbuildCheck.actionMed); w.newLine();
+			w.write("        high: "+plugin.airbuildCheck.actionHigh); w.newLine();
 			w.write("# Bedteleport specific options (none exist yet)"); w.newLine();
 			w.write("bedteleport:"); w.newLine();
 

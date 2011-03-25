@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.listeners;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 
 /**
@@ -12,17 +11,17 @@ import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
  * @author Evenprime
  *
  */
-public class NoCheatBlockListener extends BlockListener {
+public class AirbuildListener extends BlockListener {
 
-	
-	public NoCheatBlockListener() {
-
+	private AirbuildCheck check;
+	public AirbuildListener(AirbuildCheck check) {
+		this.check = check;
 	}
-	
+
 	@Override
 	public void onBlockPlace(BlockPlaceEvent event) {
 
-		if(!event.isCancelled() && NoCheatConfiguration.airbuildCheckActive)
-			AirbuildCheck.check(event);
+		if(!event.isCancelled() && check.isActive())
+			check.check(event);
 	}
 }

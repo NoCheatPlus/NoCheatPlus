@@ -15,9 +15,15 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
-import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatBlockListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatPlayerListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.NoCheatPlayerListenerMonitor;
+import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
+import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.MovingListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.MovingMonitor;
+import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackListener;
 
 import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -25,50 +31,52 @@ import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.plugin.Plugin;
 
 /**
-* 
-* NoCheatPlugin
-* 
-* Check various player events for their plausibilty and log/deny them based on configuration
-* 
-* @author Evenprime
-*/
+ * 
+ * NoCheatPlugin
+ * 
+ * Check various player events for their plausibility and log/deny them based on configuration
+ * 
+ * @author Evenprime
+ */
 public class NoCheatPlugin extends JavaPlugin {
+
+	public final MovingCheck movingCheck;
+	public final BedteleportCheck bedteleportCheck;
+	public final SpeedhackCheck speedhackCheck;
+	public final AirbuildCheck airbuildCheck;
 	
-	// Various listeners needed for different Checks
-    private NoCheatPlayerListener playerListener;
-    private NoCheatPlayerListenerMonitor playerListenerMonitor;
-    private NoCheatBlockListener blockListener;
+	private NoCheatConfiguration config;
 
-    // My main logger
-    private static Logger consoleLogger;
-    private static Logger fileLogger;
-    
-    public static NoCheatPlugin p;
-    
-    // Permissions 2.0, if available
-    public static PermissionHandler Permissions = null;
-    
-    // CraftIRC 2.0, if available
-    public static CraftIRC Irc = null;
-       
-    // Store data between Events
-    public static Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
+	// Permissions 2.x, if available
+	private PermissionHandler permissions;
 
-    public NoCheatPlugin() { 
-    	p = this;
-    }
-    
-    /**
-     * Main access to data that needs to be stored between different events.
-     * Always returns a NoCheatData object, because if there isn't one
-     * for the specified player, one will be created.
-     * 
-     * @param p
-     * @return
-     */
-    public static NoCheatData getPlayerData(Player p) {
-    	NoCheatData data = null;
-    	
+	// CraftIRC 2.x, if available
+	private CraftIRC irc;
+
+	// Store data between Events
+	private final Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
+
+	public NoCheatPlugin() { 	
+		movingCheck = new MovingCheck(this);
+		bedteleportCheck = new BedteleportCheck(this);
+		speedhackCheck = new SpeedhackCheck(this);
+		airbuildCheck = new AirbuildCheck(this);
+		
+		// parse the nocheat.yml config file
+		setupConfig();
+	}
+
+	/**
+	 * Main access to data that needs to be stored between different events.
+	 * Always returns a NoCheatData object, because if there isn't one
+	 * for the specified player, one will be created.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public NoCheatData getPlayerData(Player p) {
+		NoCheatData data = null;
+
 		if((data = playerData.get(p)) == null ) {
 			synchronized(playerData) {
 				data = playerData.get(p);
@@ -79,174 +87,178 @@ public class NoCheatPlugin extends JavaPlugin {
 				}
 			}
 		}
-		
-		return data;
-    }
-    
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
-    {
-    	if(sender instanceof Player) {
-    		if(!hasPermission((Player)sender, "nocheat.p")) {
-    			sender.sendMessage("NC: You are not allowed to use this command.");
-    			return false;
-    		}
-    	}
 
-        if(args.length == 0) {
-        	sender.sendMessage("NC: Using "+ ((Permissions == null) ? "isOp()" : "Permissions") + ". Activated checks/bugfixes: " + getActiveChecksAsString());
-        	return true;
-        }
-        else if(args.length == 1 && args[0] != null && args[0].trim().equals("-p")) { 
-        	if(sender instanceof Player) {
-        		Player p = (Player) sender;
-        		
-        		sender.sendMessage("NC: You have permissions: " + getPermissionsForPlayerAsString(p));
-        		return true;
-        	}
-        	else {
-        		sender.sendMessage("NC: You have to be a player to use this command");
-        		return true;
-        	}
-        }
-        else if(args.length == 2 && args[0] != null && args[0].trim().equals("-p")) {
-        	Player p = getServer().getPlayer(args[1]);
-        	
-        	if(p != null) {
-        		sender.sendMessage("NC: "+p.getName() + " has permissions: " + getPermissionsForPlayerAsString(p));
-        		return true;
-        	}
-        	else {
-        		sender.sendMessage("NC: Player " + args[1] + " was not found.");
-        		return true;
-        	}
-        }
-        
-        return false;
-    }
+		return data;
+	}
+
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
+	{
+		if(sender instanceof Player) {
+			if(!hasPermission((Player)sender, "nocheat.p")) {
+				sender.sendMessage("NC: You are not allowed to use this command.");
+				return false;
+			}
+		}
+
+		if(args.length == 0) {
+			sender.sendMessage("NC: Using "+ ((permissions == null) ? "isOp()" : "Permissions") + ". Activated checks/bugfixes: " + getActiveChecksAsString());
+			return true;
+		}
+		else if(args.length == 1 && args[0] != null && args[0].trim().equals("-p")) { 
+			if(sender instanceof Player) {
+				Player p = (Player) sender;
+
+				sender.sendMessage("NC: You have permissions: " + getPermissionsForPlayerAsString(p));
+				return true;
+			}
+			else {
+				sender.sendMessage("NC: You have to be a player to use this command");
+				return true;
+			}
+		}
+		else if(args.length == 2 && args[0] != null && args[0].trim().equals("-p")) {
+			Player p = getServer().getPlayer(args[1]);
+
+			if(p != null) {
+				sender.sendMessage("NC: "+p.getName() + " has permissions: " + getPermissionsForPlayerAsString(p));
+				return true;
+			}
+			else {
+				sender.sendMessage("NC: Player " + args[1] + " was not found.");
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 
 
 	public void onDisable() { 
 
-		
-    	PluginDescriptionFile pdfFile = this.getDescription();
-    	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is disabled.");
-    }
+		PluginDescriptionFile pdfFile = this.getDescription();
+		Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is disabled.");
+	}
 
-    public void onEnable() {
-    	// Create our listeners and feed them with neccessary information
-    	playerListener = new NoCheatPlayerListener();
-    	playerListenerMonitor = new NoCheatPlayerListenerMonitor();
-    	blockListener  = new NoCheatBlockListener();
+	public void onEnable() {
+		// Create our listeners and feed them with neccessary information
 
-    	fileLogger = NoCheatConfiguration.logger;
-    	consoleLogger = Logger.getLogger("Minecraft");
-    	    	
-    	PluginManager pm = getServer().getPluginManager();
-    	pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Priority.Lowest, this); // used for speedhack and moving checks
-    	pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this); // used to delete old data of users
-    	pm.registerEvent(Event.Type.BLOCK_PLACED, blockListener, Priority.Low, this); // used for airbuild check
-    	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Lowest, this); // used for teleportfrombed check
-    	pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListenerMonitor, Priority.Monitor, this); // used for moving, speedhack check
+		PluginManager pm = getServer().getPluginManager();
 
-    	PluginDescriptionFile pdfFile = this.getDescription();
-    	
-    	// parse the nocheat.yml config file
-    	setupConfig();
-    			
-    	// Get, if available, the Permissions and irc plugin
-    	setupPermissions();
-    	setupIRC();
-    	    	    	   	
-    	Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
-    }
+		// parse the nocheat.yml config file
+		setupConfig();
+
+		// Register listeners for moving check
+		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingListener(movingCheck), Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingMonitor(movingCheck), Priority.Monitor, this);
+
+		// Register listeners for speedhack check
+		pm.registerEvent(Event.Type.PLAYER_MOVE, new SpeedhackListener(speedhackCheck), Priority.High, this);
+
+		// Register listeners for airbuild check
+		pm.registerEvent(Event.Type.BLOCK_PLACED, new AirbuildListener(airbuildCheck), Priority.Low, this);
+
+		// Register listeners for bedteleport check
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new BedteleportListener(bedteleportCheck), Priority.Lowest, this);
+
+		PluginDescriptionFile pdfFile = this.getDescription();
+
+
+
+		// Get, if available, the Permissions and irc plugin
+		setupPermissions();
+		setupIRC();
+
+		Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
+	}
 
 	/**
-     * Get, if available, a reference to the Permissions-plugin
-     */
-    public void setupPermissions() {
-    	PermissionHandler p = null;
+	 * Get, if available, a reference to the Permissions-plugin
+	 */
+	private void setupPermissions() {
+		PermissionHandler p = null;
 
-    	Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
+		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
 
-    	if(test != null && test instanceof Permissions) {
-    		p = ((Permissions)test).getHandler();
-    		if(p == null) {
-    			this.getServer().getPluginManager().enablePlugin(test);
-    		}
-    		p = ((Permissions)test).getHandler();
-    	}
+		if(test != null && test instanceof Permissions) {
+			p = ((Permissions)test).getHandler();
+			if(p == null) {
+				this.getServer().getPluginManager().enablePlugin(test);
+			}
+			p = ((Permissions)test).getHandler();
+		}
 
-    	if(p == null) {
-        	PluginDescriptionFile pdfFile = this.getDescription();
-        	Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
-    	}
+		if(p == null) {
+			PluginDescriptionFile pdfFile = this.getDescription();
+			Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
+		}
 
-    	Permissions = p;
-    }
-    
-    /**
-     * Get, if available, a reference to the Permissions-plugin
-     */
-    public void setupIRC() {
-    	CraftIRC p = null;
+		permissions = p;
+	}
 
-    	Plugin test = this.getServer().getPluginManager().getPlugin("CraftIRC");
+	/**
+	 * Get, if available, a reference to the Permissions-plugin
+	 */
+	private void setupIRC() {
+		CraftIRC p = null;
 
-    	if(test != null && test instanceof CraftIRC) {
-    		p = (CraftIRC)test;
-    	}
-    	
-    	if(p == null) {
-        	PluginDescriptionFile pdfFile = this.getDescription();
-        	Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find CrafTIRC plugin. Disabling logging to IRC.");
-    	}
+		Plugin test = this.getServer().getPluginManager().getPlugin("CraftIRC");
 
-    	Irc = p;
-    }
-        
-    /**
-     * Log a violation message to all locations declared in the config file
-     * @param message
-     */
-    private static void log(Level l, String message) {
-    	if(l != null) {
-	    	logToChat(l, message);
-	    	logToIRC(l, message);
-	    	logToConsole(l, message);
-	    	fileLogger.log(l, message);
-    	}
-    }
-    
-    
-    private static void logToChat(Level l, String message) {
-    	if(NoCheatConfiguration.chatLevel.intValue() <= l.intValue()) {
-    		for(Player player : p.getServer().getOnlinePlayers()) {
-    			if(hasPermission(player, "nocheat.notify")) {
-    				player.sendMessage("["+l.getName()+"] " + message);
-    			}
-    		}
-    	}
-    }
-    private static void logToIRC(Level l, String message) {
-    	if(Irc != null && NoCheatConfiguration.ircLevel.intValue() <= l.intValue()) {
-    		Irc.sendMessageToTag("["+l.getName()+"] " + message , NoCheatConfiguration.ircTag);
-    	}
-    }
-    
-    private static void logToConsole(Level l, String message) {
-    	if( NoCheatConfiguration.consoleLevel.intValue() <= l.intValue()) {
-    		consoleLogger.log(l, message);
-    	}
-    }
-    
-    public static void logAction(String actions, String message) {
-    	if(actions == null) return;
-		
+		if(test != null && test instanceof CraftIRC) {
+			p = (CraftIRC)test;
+		}
+
+		if(p == null) {
+			PluginDescriptionFile pdfFile = this.getDescription();
+			Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find CrafTIRC plugin. Disabling logging to IRC.");
+		}
+
+		irc = p;
+	}
+
+	/**
+	 * Log a violation message to all locations declared in the config file
+	 * @param message
+	 */
+	private void log(Level l, String message) {
+		if(l != null) {
+			logToChat(l, message);
+			logToIRC(l, message);
+			logToConsole(l, message);
+			config.logger.log(l, message);
+		}
+	}
+
+
+	private void logToChat(Level l, String message) {
+		if(config.chatLevel.intValue() <= l.intValue()) {
+			for(Player player : getServer().getOnlinePlayers()) {
+				if(hasPermission(player, "nocheat.notify")) {
+					player.sendMessage("["+l.getName()+"] " + message);
+				}
+			}
+		}
+	}
+
+	private void logToIRC(Level l, String message) {
+		if(irc != null && config.ircLevel.intValue() <= l.intValue()) {
+			irc.sendMessageToTag("["+l.getName()+"] " + message , config.ircTag);
+		}
+	}
+
+	private void logToConsole(Level l, String message) {
+		if( config.consoleLevel.intValue() <= l.intValue()) {
+			Logger.getLogger("Minecraft").log(l, message);
+		}
+	}
+
+	public void logAction(String actions, String message) {
+		if(actions == null) return;
+
 		// LOGGING IF NEEDED AND WHERE NEEDED
 		Level logLevel = null;
-				
+
 		if(actions.contains("loglow")) {
 			logLevel = Level.INFO;
 		}
@@ -256,48 +268,50 @@ public class NoCheatPlugin extends JavaPlugin {
 		if(actions.contains("loghigh")) {
 			logLevel = Level.SEVERE;
 		}
-		
+
 		if(logLevel != null) {
-			NoCheatPlugin.log(logLevel, "NC: "+message);
+			log(logLevel, "NC: "+message);
 		}
-    }
-    
-    public static boolean hasPermission(Player player, String permission) {
-
-    	if(player == null || permission == null) {
-    		return false;
-    	}
-
-    	if(NoCheatPlugin.Permissions != null && NoCheatPlugin.Permissions.has(player, permission))
-    		return true;
-    	else if(NoCheatPlugin.Permissions == null && player.isOp())
-    		return true;
-    	else
-    		return false;
-    }
-    
-    /**
-     * Read the config file
-     */
-    private void setupConfig() {
-    	NoCheatConfiguration.config(new File("plugins/NoCheat/nocheat.yml"));
-    }
-    
-
-    private String getActiveChecksAsString() {
-    	return (NoCheatConfiguration.movingCheckActive ? "moving ": "") + 
-        (NoCheatConfiguration.speedhackCheckActive ? "speedhack " : "") +
-        (NoCheatConfiguration.airbuildCheckActive ? "airbuild " : "") +
-		(NoCheatConfiguration.bedteleportCheckActive ? "bedteleport " : "");
 	}
-    
+
+	public boolean hasPermission(Player player, String permission) {
+
+		if(player == null || permission == null) {
+			return false;
+		}
+
+		if(permissions != null && permissions.has(player, permission))
+			return true;
+		else if(permissions == null && player.isOp())
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Read the config file
+	 */
+	private void setupConfig() {
+		if(this.config == null)
+			this.config = new NoCheatConfiguration(new File("plugins/NoCheat/nocheat.yml"), this);
+		else
+			this.config.config(new File("plugins/NoCheat/nocheat.yml"));
+	}
+
+
+	private String getActiveChecksAsString() {
+		return (movingCheck.isActive() ? movingCheck.getName() + " " : "") + 
+		(speedhackCheck.isActive() ? speedhackCheck.getName() + " " : "") +
+		(airbuildCheck.isActive() ? airbuildCheck.getName() + " " : "") +
+		(bedteleportCheck.isActive() ? bedteleportCheck.getName() + " " : "");
+	}
+
 
 	private String getPermissionsForPlayerAsString(Player p) {
-		return (!NoCheatConfiguration.movingCheckActive ? "moving* ": (hasPermission(p, "nocheat.moving") ? "moving " : "") + 
-        (!NoCheatConfiguration.speedhackCheckActive ? "speedhack* " : (hasPermission(p, "nocheat.speedhack") ? "speedhack " : "")) +
-        (!NoCheatConfiguration.airbuildCheckActive ? "airbuild* " : (hasPermission(p, "nocheat.airbuild") ? "airbuild " : "")) +
-		(!NoCheatConfiguration.bedteleportCheckActive ? "bedteleport* " : (hasPermission(p, "nocheat.bedteleport") ? "bedteleport " : "")) +
-		(hasPermission(p, "nocheat.notify") ? "notify " : ""));
-
+		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, "nocheat.moving") ? movingCheck.getName() + " " : "") + 
+				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, "nocheat.speedhack") ? speedhackCheck.getName() + " " : "")) +
+				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, "nocheat.airbuild") ? airbuildCheck.getName() + " " : "")) +
+				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, "nocheat.bedteleport") ? bedteleportCheck.getName() + " " : "")) +
+				(hasPermission(p, "nocheat.notify") ? "notify " : ""));
 	}
 }

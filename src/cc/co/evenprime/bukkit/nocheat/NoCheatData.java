@@ -25,7 +25,7 @@ public class NoCheatData {
 	public Location movingSetBackPoint = null;
 	public Location movingLocation = null;
 	public boolean reset = false;
-	
+
 	public long speedhackLastCheck = System.currentTimeMillis(); // timestamp of last check for speedhacks
 	public Location speedhackSetBackPoint = null;
 	public int speedhackEventsSinceLastCheck = 0; // used to identify speedhacks
