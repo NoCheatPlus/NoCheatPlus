@@ -1,8 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
-
-import java.util.logging.Level;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -25,26 +22,24 @@ public class MovingCheck extends Check {
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
-	static final int jumpingLimit = 4;
+	private final int jumpingLimit = 4;
 
 	// How high may a player get compared to his last location with ground contact
-	static final double jumpingHeightLimit = 1.3D;
+	private final double jumpHeight = 1.3D;
 
 	// How high may a player move in one event on ground
-	static double stepHeight = 0.501D;
+	private double stepHeight = 0.501D;
 
-	// Limits for the horizontal moving check
-	public static double movingDistanceLow = 0.1D;
-	public static double movingDistanceMed = 2.0D;
-	public static double movingDistanceHigh = 5.0D;
+	// Limits
+	public final double moveLimits[] = { 0.1D, 2.0D, 5.0D };
 	
-	// How should moving violations be treated?
-	public String actionLow = "loglow reset";
-	public String actionMed = "logmed reset";
-	public String actionHigh = "loghigh reset";
+	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
 
-	final static double magic =  0.30000001192092896D;
-	final static double magic2 = 0.69999998807907103D;
+	// How should moving violations be treated?
+	public final String actions[] = { "loglow reset", "logmed reset", "loghigh reset" };
+
+	private static final double magic =  0.30000001192092896D;
+	private static final double magic2 = 0.69999998807907103D;
 
 	// Block types that may be treated specially
 	private enum BlockType {
@@ -220,20 +215,20 @@ public class MovingCheck extends Check {
 			return; // players are allowed to "teleport" into a bed over short distances
 		}
 
-		Level vl = null; // The violation level (none, minor, normal, heavy)
+		int vlx = -1;
 
 		// How far are we off?
-		if(combined > movingDistanceHigh) {
-			vl = max(vl, Level.SEVERE);
+		if(combined > moveLimits[2]) {
+			vlx = max(vlx, 2);
 		}
-		else if(combined > movingDistanceMed) {
-			vl = max(vl, Level.WARNING);
+		else if(combined > moveLimits[1]) {
+			vlx = max(vlx, 1);
 		}
-		else if(combined > movingDistanceLow) {
+		else if(combined > moveLimits[0]) {
 			if(data.movingHorizFreeMoves > 0) {
 				data.movingHorizFreeMoves--;
 			}
-			else vl =  max(vl, Level.INFO);
+			else vlx =  max(vlx, 0);
 		}
 		else{
 			data.movingHorizFreeMoves = 4;
@@ -248,88 +243,75 @@ public class MovingCheck extends Check {
 		boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
 		boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
 
-		// Both locations seem to be on solid ground or at a ladder
+		// Handle 4 distinct cases: Walk, Jump, Land, Fly
+		
+		// Walk
 		if(onGroundFrom && onGroundTo)
 		{
-			// Check if the player isn't 'walking' up unrealistically far in one step
-			// Finally found out why this can happen:
-			// If a player runs into a wall, the game tries to
-			// place him above the block he bumped into, by placing him 0.5 m above
-			// the target block
-			if(!(to.getY() - from.getY() < stepHeight)) {
+			double limit = stepHeight;
+			double distance = to.getY() - from.getY();
 
-				double offset = (to.getY() - from.getY()) - stepHeight;
+			vlx = max(vlx, heightLimitCheck(limit, distance));
 
-				if(offset > 2D)        vl = max(vl, Level.SEVERE);
-				else if(offset > 0.5D) vl = max(vl, Level.WARNING);
-				else                   vl = max(vl, Level.INFO);
-			}
-			else
+			if(vlx < 0)
 			{
 				// reset jumping
 				data.movingJumpPhase = 0;
 				data.movingSetBackPoint = from.clone();
 			}
 		}
-		// player is starting to jump (or starting to fall down somewhere)
+		// Jump
 		else if(onGroundFrom && !onGroundTo)
 		{	
+			double limit = jumpHeight;
+			double distance = to.getY() - from.getY();
+			
 			// Check if player isn't jumping too high
-			double limit = jumpingHeightLimit;
+			vlx = max(vlx, heightLimitCheck(limit, distance));
 
-			if(to.getY() - from.getY() > limit) {
-
-				double offset = (to.getY() - from.getY()) - limit;
-
-				if(offset > 2D)        vl = max(vl, Level.SEVERE);
-				else if(offset > 0.5D) vl = max(vl, Level.WARNING);
-				else                   vl = max(vl, Level.INFO);
-			}
-			else {
+			if(vlx < 0) {
 				// Setup next phase of the jump
 				data.movingJumpPhase = 1;
 				data.movingSetBackPoint = from.clone();
 			}
 		}
-		// player is probably landing somewhere
+		// Land
 		else if(!onGroundFrom && onGroundTo)
 		{
-			// Check if player isn't landing to high (sounds weird, but has its use)
-			Location l = data.movingSetBackPoint;
-			if(l == null) { l = from; }
+			Location l = data.movingSetBackPoint == null ? from : data.movingSetBackPoint;
 
-			double limit = jumpingHeightLimit + stepHeight;
+			double limit;
 
-			if(to.getY() - l.getY() > limit) {
+			if(data.movingJumpPhase > jumpingLimit)
+				limit = jumpHeight + stepHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
+			else limit = jumpHeight;
 
-				double offset = (to.getY() - l.getY()) - limit;
+			double distance = to.getY() - l.getY();
 
-				if(offset > 2D)        vl = max(vl, Level.SEVERE);
-				else if(offset > 0.5D) vl = max(vl, Level.WARNING);
-				else                   vl = max(vl, Level.INFO);
-			}
-			else {
+			// Check if player isn't jumping too high
+			vlx = max(vlx, heightLimitCheck(limit, distance));
+
+			if(vlx < 0) {
 				data.movingJumpPhase = 0; // He is on ground now, so reset the jump
 				data.movingSetBackPoint = to.clone();
 			}
 		}
 		// Player is moving through air (during jumping, falling)
 		else {
-			Location l = data.movingSetBackPoint;
-			if(l == null) { l = from; }
+			Location l = data.movingSetBackPoint == null ? from : data.movingSetBackPoint;
 
-			// The expected fall velocity is a rough estimate - players usually accelerate by that value
-			double limit = (data.movingJumpPhase > jumpingLimit) ? jumpingHeightLimit - (data.movingJumpPhase-jumpingLimit) * 0.2D : jumpingHeightLimit;
+			double limit;
 
-			if(to.getY() - l.getY() > limit)
-			{
-				double offset = (to.getY() - l.getY()) - limit;
+			if(data.movingJumpPhase > jumpingLimit)
+				limit = jumpHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
+			else limit = jumpHeight;
+			
+			double distance = to.getY() - l.getY();
 
-				if(offset > 2D)        vl = max(vl, Level.SEVERE);
-				else if(offset > 0.5D)   vl = max(vl, Level.WARNING);
-				else                   vl = max(vl, Level.INFO);
-			}
-			else {
+			// Check if player isn't jumping too high
+			vlx = max(vlx, heightLimitCheck(limit, distance));
+
+			if(vlx < 0) {
 				data.movingJumpPhase++; // Enter next phase of the flight
 				// Setback point stays the same. IF we don't have one, take the "from" location as a setback point for now
 				if(data.movingSetBackPoint == null) {
@@ -338,10 +320,10 @@ public class MovingCheck extends Check {
 			}
 		}
 
-		if(vl == null && (onGroundFrom || onGroundTo)) {
+		if(vlx < 0 && (onGroundFrom || onGroundTo)) {
 			legitimateMove(data, event);
 		}
-		else if(vl != null) {
+		else if(vlx >= 0) {
 
 			data.movingLastViolationTime = System.currentTimeMillis();
 
@@ -350,35 +332,35 @@ public class MovingCheck extends Check {
 				data.movingSetBackPoint = event.getFrom().clone();
 			}
 
-			String actions = null;
+			String action = null;
 			boolean log = true;
 
 			// Find out with what actions to treat the violation(s)
-			if(Level.INFO.equals(vl))  {
-				if(data.movingMinorViolationsInARow > 0) log = false;
-				data.movingMinorViolationsInARow++;
-				actions = actionLow;
+			if(vlx == 0)  {
+				if(data.movingViolationsInARow[0] > 0) log = false;
+				data.movingViolationsInARow[0]++;
+				action = actions[0];
 
 				// after a set number of minor violations a normal violation gets thrown
-				if(data.movingMinorViolationsInARow % 40 == 0) {
-					vl = Level.WARNING;
+				if(data.movingViolationsInARow[0] % 40 == 0) {
+					vlx = 1;
 					log = true;
 				}
 			} 	
 
-			if(Level.WARNING.equals(vl)) {
-				if(data.movingNormalViolationsInARow > 0) log = false;
-				data.movingNormalViolationsInARow++;
-				actions = actionMed;
+			if(vlx == 1) {
+				if(data.movingViolationsInARow[1] > 0) log = false;
+				data.movingViolationsInARow[1]++;
+				action = actions[1];
 			}
 
-			if(Level.SEVERE.equals(vl)) {
-				if(data.movingHeavyViolationsInARow > 0) log = false;
-				data.movingHeavyViolationsInARow++;
-				actions = actionHigh;
+			if(vlx == 2) {
+				if(data.movingViolationsInARow[2] > 0) log = false;
+				data.movingViolationsInARow[2]++;
+				action = actions[2];
 			}
 
-			action(event, actions, log);
+			action(event, action, log);
 		}
 	}
 
@@ -427,28 +409,41 @@ public class MovingCheck extends Check {
 			data.movingLastViolationTime = 0;
 
 			// Give some additional logs about now ending violations
-			if(data.movingHeavyViolationsInARow > 0) {
-				plugin.logAction(actionHigh, "Moving violation ended: "+event.getPlayer().getName() + " total Events: "+ data.movingHeavyViolationsInARow);
-				data.movingHeavyViolationsInARow = 0;
+			if(data.movingViolationsInARow[2] > 0) {
+				plugin.logAction(actions[2], "Moving violation ended: "+event.getPlayer().getName() + " total Events: "+ data.movingViolationsInARow[2]);
+				data.movingViolationsInARow[2] = 0;
 			}
-			if(data.movingNormalViolationsInARow > 0) {
-				plugin.logAction(actionMed, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingNormalViolationsInARow);
-				data.movingNormalViolationsInARow = 0;
+			if(data.movingViolationsInARow[1] > 0) {
+				plugin.logAction(actions[1], "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingViolationsInARow[1]);
+				data.movingViolationsInARow[1] = 0;
 			}
-			if(data.movingMinorViolationsInARow > 0) {
-				plugin.logAction(actionLow, "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingMinorViolationsInARow);
-				data.movingMinorViolationsInARow = 0;
+			if(data.movingViolationsInARow[0] > 0) {
+				plugin.logAction(actions[0], "Moving violation ended: "+event.getPlayer().getName()+ " total Events: "+ data.movingViolationsInARow[0]);
+				data.movingViolationsInARow[0] = 0;
 			}
 
-			data.movingMinorViolationsInARow = 0;
+			data.movingViolationsInARow[0] = 0;
 		}
 	}
+	
+	private int heightLimitCheck(double limit, double value) {
+		
+		double offset = value - limit;
+		
+		for(int i = heightLimits.length - 1; i >= 0; i--) {
+			if(offset > heightLimits[i]) {
+				return i;
+			}
+		}
 
-	private static Level max(Level l1, Level l2) {
-		if(l1 == null) return l2;
-		if(l2 == null) return l1; 
-		if(l1.intValue() > l2.intValue()) return l1;
-		else return l2;
+		return -1;
+	}
+	
+	private static int max(int a, int b) {
+		if(a > b) {
+			return a;
+		}
+		return b;
 	}
 	/** 
 	 * Return the player to a stored location or if that is not available,

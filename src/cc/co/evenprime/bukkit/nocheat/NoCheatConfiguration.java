@@ -80,21 +80,21 @@ public class NoCheatConfiguration {
 		plugin.speedhackCheck.limitMed = c.getInt("speedhack.limits.med", plugin.speedhackCheck.limitMed);
 		plugin.speedhackCheck.limitHigh = c.getInt("speedhack.limits.high", plugin.speedhackCheck.limitHigh);
 
-		plugin.movingCheck.actionLow = c.getString("moving.action.low", plugin.movingCheck.actionLow);
-		plugin.movingCheck.actionMed = c.getString("moving.action.med", plugin.movingCheck.actionMed);
-		plugin.movingCheck.actionHigh = c.getString("moving.action.high", plugin.movingCheck.actionHigh);
+		plugin.movingCheck.actions[0] = c.getString("moving.action.low", plugin.movingCheck.actions[0]);
+		plugin.movingCheck.actions[1] = c.getString("moving.action.med", plugin.movingCheck.actions[1]);
+		plugin.movingCheck.actions[2] = c.getString("moving.action.high", plugin.movingCheck.actions[2]);
 
 		plugin.speedhackCheck.actionLow = c.getString("speedhack.action.low", plugin.speedhackCheck.actionLow);
 		plugin.speedhackCheck.actionMed = c.getString("speedhack.action.med", plugin.speedhackCheck.actionMed);
 		plugin.speedhackCheck.actionHigh = c.getString("speedhack.action.high", plugin.speedhackCheck.actionHigh);
 
-		plugin.airbuildCheck.limitLow = c.getInt("airbuild.limits.low", plugin.airbuildCheck.limitLow);
-		plugin.airbuildCheck.limitMed = c.getInt("airbuild.limits.med", plugin.airbuildCheck.limitMed);
-		plugin.airbuildCheck.limitHigh = c.getInt("airbuild.limits.high", plugin.airbuildCheck.limitHigh);
+		plugin.airbuildCheck.limits[0] = c.getInt("airbuild.limits.low", plugin.airbuildCheck.limits[0]);
+		plugin.airbuildCheck.limits[1] = c.getInt("airbuild.limits.med", plugin.airbuildCheck.limits[1]);
+		plugin.airbuildCheck.limits[2] = c.getInt("airbuild.limits.high", plugin.airbuildCheck.limits[2]);
 
-		plugin.airbuildCheck.actionLow = c.getString("airbuild.action.low", plugin.airbuildCheck.actionLow);
-		plugin.airbuildCheck.actionMed = c.getString("airbuild.action.med", plugin.airbuildCheck.actionMed);
-		plugin.airbuildCheck.actionHigh = c.getString("airbuild.action.high", plugin.airbuildCheck.actionHigh);
+		plugin.airbuildCheck.actions[0] = c.getString("airbuild.action.low", plugin.airbuildCheck.actions[0]);
+		plugin.airbuildCheck.actions[1] = c.getString("airbuild.action.med", plugin.airbuildCheck.actions[1]);
+		plugin.airbuildCheck.actions[2] = c.getString("airbuild.action.high", plugin.airbuildCheck.actions[2]);
 
 		plugin.speedhackCheck.setActive(c.getBoolean("active.speedhack", plugin.speedhackCheck.isActive()));
 		plugin.movingCheck.setActive(c.getBoolean("active.moving", plugin.movingCheck.isActive()));
@@ -158,21 +158,21 @@ public class NoCheatConfiguration {
 			w.write("moving:"); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: "+plugin.movingCheck.actionLow); w.newLine();
-			w.write("        med: "+plugin.movingCheck.actionMed); w.newLine();
-			w.write("        high: "+plugin.movingCheck.actionHigh); w.newLine();
+			w.write("        low: "+plugin.movingCheck.actions[0]); w.newLine();
+			w.write("        med: "+plugin.movingCheck.actions[1]); w.newLine();
+			w.write("        high: "+plugin.movingCheck.actions[2]); w.newLine();
 			w.write("# Airbuild specific options"); w.newLine();
 			w.write("airbuild:"); w.newLine();
 			w.write("#   How many blocks per second are placed by the player in midair (determines log level)"); w.newLine();
 			w.write("    limits:"); w.newLine();
-			w.write("        low: "+plugin.airbuildCheck.limitLow); w.newLine();
-			w.write("        med: "+plugin.airbuildCheck.limitMed); w.newLine();
-			w.write("        high: "+plugin.airbuildCheck.limitHigh); w.newLine();
+			w.write("        low: "+plugin.airbuildCheck.limits[0]); w.newLine();
+			w.write("        med: "+plugin.airbuildCheck.limits[1]); w.newLine();
+			w.write("        high: "+plugin.airbuildCheck.limits[2]); w.newLine();
 			w.write("#   Airbuild Action, one or more of 'loglow logmed loghigh deny'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: "+plugin.airbuildCheck.actionLow); w.newLine();
-			w.write("        med: "+plugin.airbuildCheck.actionMed); w.newLine();
-			w.write("        high: "+plugin.airbuildCheck.actionHigh); w.newLine();
+			w.write("        low: "+plugin.airbuildCheck.actions[0]); w.newLine();
+			w.write("        med: "+plugin.airbuildCheck.actions[1]); w.newLine();
+			w.write("        high: "+plugin.airbuildCheck.actions[2]); w.newLine();
 			w.write("# Bedteleport specific options (none exist yet)"); w.newLine();
 			w.write("bedteleport:"); w.newLine();
 

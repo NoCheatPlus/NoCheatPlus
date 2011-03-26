@@ -17,9 +17,7 @@ public class NoCheatData {
 
 	public int movingJumpPhase = 0; // current jumpingPhase
 	public long movingLastViolationTime = 0;
-	public int movingMinorViolationsInARow = 0; 
-	public int movingNormalViolationsInARow = 0;
-	public int movingHeavyViolationsInARow = 0;
+	public int movingViolationsInARow[] =  { 0, 0, 0 }; 
 	public World movingLastWorld = null;
 	public int movingHorizFreeMoves = 4;
 	public Location movingSetBackPoint = null;

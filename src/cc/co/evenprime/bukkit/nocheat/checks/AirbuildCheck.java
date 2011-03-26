@@ -18,13 +18,9 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 public class AirbuildCheck extends Check {
 
 	// How should airbuild violations be treated?
-	public String actionLow = "loglow deny";
-	public String actionMed = "logmed deny";
-	public String actionHigh = "loghigh deny";
-		
-	public int limitLow = 1;
-	public int limitMed = 3;
-	public int limitHigh = 10;
+	public final String actions[] = { "loglow deny", "logmed deny", "loghigh deny" };
+
+	public final int limits[] = { 1, 3, 10 };
 
 	public AirbuildCheck(NoCheatPlugin plugin) {
 		super(plugin);
@@ -60,28 +56,17 @@ public class AirbuildCheck extends Check {
 			data.airbuildPerSecond++;
 
 			boolean log = false;
-			// Only explicitly log certain "milestones"
-			if(data.airbuildPerSecond >= limitHigh) {
-				if(data.airbuildPerSecond == limitHigh) {
-					log = true;
+
+			// which limit has been reached
+			for(int i = limits.length-1; i >= 0; i--) {
+				if(data.airbuildPerSecond >= limits[i]) {
+					// Only explicitly log certain "milestones"
+					if(data.airbuildPerSecond == limits[i]) {
+						log = true;
+					}
+					action(actions[i], event, log);
+					break;
 				}
-				action(actionHigh, event, log);
-			}
-			else if(data.airbuildPerSecond >= limitMed) {
-				if(data.airbuildPerSecond == limitMed) {
-					log = true;
-				}
-				action(actionMed, event, log);
-			}
-			else if(data.airbuildPerSecond >= limitLow) {
-				if(data.airbuildPerSecond == limitLow) {
-					log = true;
-				}
-				action(actionLow, event, log);
-			}
-			else
-			{
-				// ignore for now
 			}
 		}
 	}
@@ -102,17 +87,12 @@ public class AirbuildCheck extends Check {
 
 	private void summary(Player player, NoCheatData data) {
 
-		String logLine = "Airbuild violation summary: " +player.getName() + " total events per second: " + data.airbuildPerSecond;
-
 		// Give a summary according to the highest violation level we encountered in that second
-		if(data.airbuildPerSecond >= limitHigh) {
-			plugin.logAction(actionHigh, logLine);
-		}
-		else if(data.airbuildPerSecond >= limitMed) {
-			plugin.logAction(actionMed, logLine);
-		}
-		else if(data.airbuildPerSecond >= limitLow) {
-			plugin.logAction(actionLow, logLine);
+		for(int i = limits.length-1; i >= 0; i--) {
+			if(data.airbuildPerSecond >= limits[i]) {
+				plugin.logAction(actions[i], "Airbuild violation summary: " +player.getName() + " total events per second: " + data.airbuildPerSecond);
+				break;
+			}
 		}
 
 		data.airbuildPerSecond = 0;
