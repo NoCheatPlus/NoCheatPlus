@@ -76,17 +76,17 @@ public class NoCheatConfiguration {
 		ircLevel = stringToLevel(c.getString("logging.logtoirc"));
 		ircTag = c.getString("logging.logtoirctag", "nocheat");
 
-		plugin.speedhackCheck.limitLow = c.getInt("speedhack.limits.low", plugin.speedhackCheck.limitLow);
-		plugin.speedhackCheck.limitMed = c.getInt("speedhack.limits.med", plugin.speedhackCheck.limitMed);
-		plugin.speedhackCheck.limitHigh = c.getInt("speedhack.limits.high", plugin.speedhackCheck.limitHigh);
+		plugin.speedhackCheck.limits[0] = c.getInt("speedhack.limits.low", plugin.speedhackCheck.limits[0]);
+		plugin.speedhackCheck.limits[1] = c.getInt("speedhack.limits.med", plugin.speedhackCheck.limits[1]);
+		plugin.speedhackCheck.limits[2] = c.getInt("speedhack.limits.high", plugin.speedhackCheck.limits[2]);
 
 		plugin.movingCheck.actions[0] = c.getString("moving.action.low", plugin.movingCheck.actions[0]);
 		plugin.movingCheck.actions[1] = c.getString("moving.action.med", plugin.movingCheck.actions[1]);
 		plugin.movingCheck.actions[2] = c.getString("moving.action.high", plugin.movingCheck.actions[2]);
 
-		plugin.speedhackCheck.actionLow = c.getString("speedhack.action.low", plugin.speedhackCheck.actionLow);
-		plugin.speedhackCheck.actionMed = c.getString("speedhack.action.med", plugin.speedhackCheck.actionMed);
-		plugin.speedhackCheck.actionHigh = c.getString("speedhack.action.high", plugin.speedhackCheck.actionHigh);
+		plugin.speedhackCheck.actions[0] = c.getString("speedhack.action.low", plugin.speedhackCheck.actions[0]);
+		plugin.speedhackCheck.actions[1] = c.getString("speedhack.action.med", plugin.speedhackCheck.actions[1]);
+		plugin.speedhackCheck.actions[2] = c.getString("speedhack.action.high", plugin.speedhackCheck.actions[2]);
 
 		plugin.airbuildCheck.limits[0] = c.getInt("airbuild.limits.low", plugin.airbuildCheck.limits[0]);
 		plugin.airbuildCheck.limits[1] = c.getInt("airbuild.limits.med", plugin.airbuildCheck.limits[1]);
@@ -146,14 +146,14 @@ public class NoCheatConfiguration {
 			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
 			w.write("    limits:"); w.newLine();
-			w.write("        low: "+plugin.speedhackCheck.limitLow); w.newLine();
-			w.write("        med: "+plugin.speedhackCheck.limitMed); w.newLine();
-			w.write("        high: "+plugin.speedhackCheck.limitHigh); w.newLine();
+			w.write("        low: "+plugin.speedhackCheck.limits[0]); w.newLine();
+			w.write("        med: "+plugin.speedhackCheck.limits[1]); w.newLine();
+			w.write("        high: "+plugin.speedhackCheck.limits[2]); w.newLine();
 			w.write("#   Speedhack Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: "+plugin.speedhackCheck.actionLow); w.newLine();
-			w.write("        med: "+plugin.speedhackCheck.actionMed); w.newLine();
-			w.write("        high: "+plugin.speedhackCheck.actionHigh); w.newLine();
+			w.write("        low: "+plugin.speedhackCheck.actions[0]); w.newLine();
+			w.write("        med: "+plugin.speedhackCheck.actions[1]); w.newLine();
+			w.write("        high: "+plugin.speedhackCheck.actions[2]); w.newLine();
 			w.write("# Moving specific options") ; w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();

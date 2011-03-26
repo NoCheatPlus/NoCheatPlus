@@ -49,8 +49,8 @@ public class AirbuildCheck extends Check {
 					}
 				};
 
-				// Give a summary in 50 ticks ~ 1 second
-				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.airbuildRunnable, 50);
+				// Give a summary in 20 ticks ~ 1 second
+				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.airbuildRunnable, 20);
 			}
 
 			data.airbuildPerSecond++;

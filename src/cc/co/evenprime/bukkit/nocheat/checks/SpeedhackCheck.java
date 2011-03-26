@@ -23,14 +23,10 @@ public class SpeedhackCheck extends Check {
 	private static final int violationsLimit = 3;
 	
 	// Limits for the speedhack check
-	public int limitLow = 30;
-	public int limitMed = 45;
-	public int limitHigh = 60;
+	public int limits[] = { 30, 45, 60 };
 	
 	// How should speedhack violations be treated?
-	public String actionLow = "loglow reset";
-	public String actionMed = "logmed reset";
-	public String actionHigh = "loghigh reset";
+	public String actions[] = { "loglow reset", "logmed reset", "loghigh reset" };
 
 	public void check(PlayerMoveEvent event) {
 
@@ -41,6 +37,16 @@ public class SpeedhackCheck extends Check {
 		// Get the player-specific data
 		NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
+		// Ignore events if the player has positive y-Velocity (these can be the cause of event spam between server and client)
+		if(event.getPlayer().getVelocity().getY() > 0.0D) {
+			return;
+		}
+		
+		// Ignore events of players in vehicles (these can be the cause of event spam between server and client)
+		if(event.getPlayer().isInsideVehicle()) {
+			return;
+		}
+		
 		// Get the time of the server
 		long time = System.currentTimeMillis();
 
@@ -50,14 +56,14 @@ public class SpeedhackCheck extends Check {
 			// TODO: Needs some better handling for server lag
 			String action = null;
 
-			int low = (int)((limitLow * (time - data.speedhackLastCheck)) / interval);
-			int med = (int)((limitMed * (time - data.speedhackLastCheck)) / interval);
-			int high = (int)((limitHigh * (time - data.speedhackLastCheck)) / interval);
+			int low = (int)((limits[0] * (time - data.speedhackLastCheck)) / interval);
+			int med = (int)((limits[1] * (time - data.speedhackLastCheck)) / interval);
+			int high = (int)((limits[2] * (time - data.speedhackLastCheck)) / interval);
 
 
-			if(data.speedhackEventsSinceLastCheck > high) action = actionLow;
-			else if(data.speedhackEventsSinceLastCheck > med) action = actionMed;
-			else if(data.speedhackEventsSinceLastCheck > low) action = actionHigh;
+			if(data.speedhackEventsSinceLastCheck > high) action = actions[2];
+			else if(data.speedhackEventsSinceLastCheck > med) action = actions[1];
+			else if(data.speedhackEventsSinceLastCheck > low) action = actions[0];
 
 			if(action == null) {
 				data.speedhackSetBackPoint = event.getFrom().clone();
@@ -89,7 +95,7 @@ public class SpeedhackCheck extends Check {
 		if(actions == null) return;
 		// LOGGING IF NEEDED
 		if(actions.contains("log")) {
-			plugin.logAction(actions, event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limitLow+ " were allowed. Speedhack?");
+			plugin.logAction(actions, event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limits[0]+ " were allowed. Speedhack?");
 		}
 		// RESET IF NEEDED
 		if(actions.contains("reset")) {
