@@ -372,10 +372,11 @@ public class MovingCheck extends Check {
 		}
 		else {
 			if(!event.isCancelled()) {
-				// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch at the new location
-				data.speedhackSetBackPoint = event.getTo().clone();
+				// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
+				// Setback points are created automatically the next time a move event is handled
+				data.speedhackSetBackPoint = null;
+				data.movingSetBackPoint = null;
 				data.speedhackEventsSinceLastCheck = 0;
-				data.movingSetBackPoint = event.getTo().clone();
 				data.movingJumpPhase = 0;
 			}
 		}
