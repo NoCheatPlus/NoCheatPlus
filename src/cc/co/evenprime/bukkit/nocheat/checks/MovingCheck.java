@@ -32,7 +32,7 @@ public class MovingCheck extends Check {
 	private double stepHeight = 0.501D;
 
 	// Limits
-	public final double moveLimits[] = { 0.1D, 2.0D, 5.0D };
+	public final double moveLimits[] = { 0.0D, 0.5D, 2.0D };
 	
 	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
 
@@ -201,13 +201,14 @@ public class MovingCheck extends Check {
 		
 		// First check the distance the player has moved horizontally
 		// TODO: Make this check much more precise
-		double xDistance = Math.abs(from.getX() - to.getX());
-		double zDistance = Math.abs(from.getZ() - to.getZ());
-		double combined = xDistance * xDistance + zDistance * zDistance;	
+		double xDistance = from.getX()-to.getX();
+		double zDistance = from.getZ()-to.getZ();
+		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance)) - 0.6D;
 
+		System.out.println(combined);
 		// If the target is a bed and distance not too big, allow it
-		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && xDistance < 5.0D && zDistance < 5.0D) {
-			return; // players are allowed to "teleport" into a bed over short distances
+		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && xDistance < 8.0D && zDistance < 8.0D) {
+			return; // players are allowed to "teleport" into a bed over "short" distances
 		}
 
 		int vl = -1;
@@ -231,8 +232,8 @@ public class MovingCheck extends Check {
 
 		// pre-calculate boundary values that are needed multiple times in the following checks
 		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-		int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), from.getBlockY(), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
-		int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), to.getBlockY(), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
+		int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), (int)Math.floor(from.getY()+0.5D), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
+		int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), (int)Math.floor(to.getY()+0.5D), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
 
 		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
 		boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
@@ -250,7 +251,7 @@ public class MovingCheck extends Check {
 		// Walk
 		if(onGroundFrom && onGroundTo)
 		{
-			double limit = stepHeight;
+			double limit = jumpHeight;
 			double distance = to.getY() - from.getY();
 
 			vl = max(vl, heightLimitCheck(limit, distance));
@@ -459,13 +460,13 @@ public class MovingCheck extends Check {
 			// Lets try it that way. Maybe now people don't "disappear" any longer
 			event.setFrom(l.clone());
 			event.setTo(l.clone());
-			event.getPlayer().teleportTo(l.clone());
+			event.getPlayer().teleport(l.clone());
 			event.setCancelled(true);
 		}
 		else {
 			// Lets try it that way. Maybe now people don't "disappear" any longer
 			event.setTo(event.getFrom().clone());
-			event.getPlayer().teleportTo(event.getFrom().clone());
+			event.getPlayer().teleport(event.getFrom().clone());
 			event.setCancelled(true);
 		}
 	}

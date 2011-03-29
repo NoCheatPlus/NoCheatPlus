@@ -113,13 +113,13 @@ public class SpeedhackCheck extends Check {
 			event.setFrom(l);
 			event.setTo(l);
 			event.setCancelled(true);
-			event.getPlayer().teleportTo(l);
+			event.getPlayer().teleport(l);
 		}
 		else {
 			event.setFrom(event.getFrom());
 			event.setTo(event.getFrom().clone());
 			event.setCancelled(true);
-			event.getPlayer().teleportTo(event.getFrom());
+			event.getPlayer().teleport(event.getFrom());
 		}
 	}
 

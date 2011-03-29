@@ -1,7 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.listeners;
 
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 
@@ -14,7 +14,7 @@ public class MovingMonitor extends PlayerListener {
 	}
 
 	@Override
-	public void onPlayerTeleport(PlayerMoveEvent event) {
+	public void onPlayerTeleport(PlayerTeleportEvent event) {
 
 		check.teleported(event);
 	}

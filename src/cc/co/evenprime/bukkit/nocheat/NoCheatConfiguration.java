@@ -37,8 +37,8 @@ public class NoCheatConfiguration {
 	public NoCheatConfiguration(File configurationFile, NoCheatPlugin plugin) {
 
 		this.plugin = plugin;
-
-		this.config(configurationFile);
+		
+		config(configurationFile);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class NoCheatConfiguration {
 	 * @param configurationFile
 	 */
 	public void config(File configurationFile) {
-
+		
 		if(!configurationFile.exists()) {
 			createStandardConfigFile(configurationFile);
 		}

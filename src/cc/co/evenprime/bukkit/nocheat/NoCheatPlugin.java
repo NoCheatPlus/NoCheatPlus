@@ -157,7 +157,7 @@ public class NoCheatPlugin extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new SpeedhackListener(speedhackCheck), Priority.High, this);
 
 		// Register listeners for airbuild check
-		pm.registerEvent(Event.Type.BLOCK_PLACED, new AirbuildListener(airbuildCheck), Priority.Low, this);
+		pm.registerEvent(Event.Type.BLOCK_PLACE, new AirbuildListener(airbuildCheck), Priority.Low, this);
 
 		// Register listeners for bedteleport check
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new BedteleportListener(bedteleportCheck), Priority.Lowest, this);
