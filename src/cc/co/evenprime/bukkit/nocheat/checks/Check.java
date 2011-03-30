@@ -2,7 +2,11 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 
-
+/**
+ *
+ * @author Evenprime
+ *
+ */
 public abstract class Check {
 
 	public Check(NoCheatPlugin plugin) {

@@ -44,7 +44,7 @@ public class NoCheatPlugin extends JavaPlugin {
 	public final BedteleportCheck bedteleportCheck;
 	public final SpeedhackCheck speedhackCheck;
 	public final AirbuildCheck airbuildCheck;
-	
+
 	private NoCheatConfiguration config;
 
 	// Permissions 2.x, if available
@@ -61,7 +61,7 @@ public class NoCheatPlugin extends JavaPlugin {
 		bedteleportCheck = new BedteleportCheck(this);
 		speedhackCheck = new SpeedhackCheck(this);
 		airbuildCheck = new AirbuildCheck(this);
-		
+
 		// parse the nocheat.yml config file
 		setupConfig();
 	}
@@ -89,6 +89,22 @@ public class NoCheatPlugin extends JavaPlugin {
 		}
 
 		return data;
+	}
+	
+	/**
+	 * Go through the playerData HashMap and remove players that are no longer online
+	 * from the map. This should be called in long, regular intervals (e.g. every 10 minutes)
+	 * to keep the memory footprint of the plugin low
+	 */
+	public void cleanPlayerDataCollection() {
+		synchronized(playerData) {
+			Player[] storedPlayers = (Player[]) playerData.keySet().toArray();
+			for(Player p : storedPlayers) {
+				if(!p.isOnline()) {
+					playerData.remove(p);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -222,7 +238,7 @@ public class NoCheatPlugin extends JavaPlugin {
 	 * @param message
 	 */
 	private void log(Level l, String message) {
-		if(l != null) {
+		if(l != null && message != null) {
 			logToChat(l, message);
 			logToIRC(l, message);
 			logToConsole(l, message);
@@ -280,12 +296,12 @@ public class NoCheatPlugin extends JavaPlugin {
 			return false;
 		}
 		try {
-		if(permissions != null && permissions.has(player, permission))
-			return true;
-		else if(permissions == null && player.isOp())
-			return true;
-		else
-			return false;
+			if(permissions != null && permissions.has(player, permission))
+				return true;
+			else if(permissions == null && player.isOp())
+				return true;
+			else
+				return false;
 		}
 		catch(Throwable e) {
 			log(Level.SEVERE, "Asking Permissions-Plugin if "+player.getName()+" has permission "+permission+" caused the Exception: "+e.toString() + " . Full error message recorded to log-file");

@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 
 /**
- * Handle events for all Player related events
+ * Handle events for Player related events
  * 
  * @author Evenprime
  */

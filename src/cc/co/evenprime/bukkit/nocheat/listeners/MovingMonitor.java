@@ -5,6 +5,11 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 
+/**
+ * 
+ * @author Evenprime
+ *
+ */
 public class MovingMonitor extends PlayerListener {
 
 	private MovingCheck check;

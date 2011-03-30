@@ -26,8 +26,6 @@ public class NoCheatData {
 	// WORKAROUND for changed PLAYER_MOVE logic
 	public Location movingTeleportTo = null;
 	
-	public int legitMoves = 0;
-	
 	public boolean reset = false;
 
 	public long speedhackLastCheck = System.currentTimeMillis(); // timestamp of last check for speedhacks
@@ -39,5 +37,5 @@ public class NoCheatData {
 	public Runnable airbuildRunnable = null;
 
 
-	NoCheatData() { }
+	public NoCheatData() { }
 }

@@ -5,6 +5,11 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
 
+/**
+ * 
+ * @author Evenprime
+ *
+ */
 public class SpeedhackListener extends PlayerListener {
 
 	private SpeedhackCheck check;

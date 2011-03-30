@@ -27,7 +27,7 @@ public class NoCheatConfiguration {
 	public Level ircLevel = Level.OFF;
 	public Level consoleLevel = Level.OFF;
 
-	public String ircTag = "";
+	public String ircTag = "nocheat";
 
 	// Our log output to a file
 	private FileHandler fh = null;
@@ -37,7 +37,7 @@ public class NoCheatConfiguration {
 	public NoCheatConfiguration(File configurationFile, NoCheatPlugin plugin) {
 
 		this.plugin = plugin;
-		
+
 		config(configurationFile);
 	}
 
@@ -46,10 +46,11 @@ public class NoCheatConfiguration {
 	 * @param configurationFile
 	 */
 	public void config(File configurationFile) {
-		
+
 		if(!configurationFile.exists()) {
 			createStandardConfigFile(configurationFile);
 		}
+
 		Configuration c = new Configuration(configurationFile);
 		c.load();
 

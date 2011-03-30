@@ -30,12 +30,14 @@ public class MovingCheck extends Check {
 	private final double jumpHeight = 1.3D;
 
 	// How high may a player move in one event on ground
-	private double stepHeight = 0.501D;
+	private final double stepHeight = 0.501D;
 
 	// Limits
 	public final double moveLimits[] = { 0.0D, 0.5D, 2.0D };
 	
 	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
+	
+	public int ticksBeforeSummary = 100;
 
 	// How should moving violations be treated?
 	public final String actions[] = { "loglow reset", "logmed reset", "loghigh reset" };
@@ -149,13 +151,13 @@ public class MovingCheck extends Check {
 			return;
 
 		// Get the player-specific data
-		NoCheatData data = plugin.getPlayerData(event.getPlayer());
+		final NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
 		// Get the two locations of the event
-		Location to = event.getTo();
+		final Location to = event.getTo();
 		
 		// WORKAROUND for changed PLAYER_MOVE logic
-		Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
+		final Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
 		data.movingTeleportTo = null;
 		
 		// Notice to myself: How world changes with e.g. command /world work:
@@ -206,7 +208,6 @@ public class MovingCheck extends Check {
 		
 		
 		// First check the distance the player has moved horizontally
-		// TODO: Make this check much more precise
 		double xDistance = from.getX()-to.getX();
 		double zDistance = from.getZ()-to.getZ();
 		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance)) - 0.6D ;
@@ -246,8 +247,8 @@ public class MovingCheck extends Check {
 		int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), (int)Math.floor(to.getY()+0.5D), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
 
 		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
-		boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
-		boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
+		final boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
+		final boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
 
 		// Ignore events if the player has positive y-Velocity
 		if(event.getPlayer().getVelocity().getY() > 0.0D) {
@@ -326,21 +327,18 @@ public class MovingCheck extends Check {
 
 			if(vl < 0) {
 				data.movingJumpPhase++; // Enter next phase of the flight
-				// Setback point stays the same. IF we don't have one, take the "from" location as a setback point for now
+				// Setback point stays the same. If we don't have one, take the "from" location as a setback point for now
 				if(data.movingSetBackPoint == null) {
 					data.movingSetBackPoint = from.clone();
 				}
 			}
 		}
 
-		if(vl < 0 && (onGroundFrom || onGroundTo) && data.legitMoves < 100) {
-			data.legitMoves++;
-		}
-		else if(vl >= 0) {
-
+		if(vl >= 0) {
 			final Player p = event.getPlayer();
 			final NoCheatData d = data;
 
+			// Setup task to display summary later
 			if(data.movingRunnable == null) {
 				data.movingRunnable = new Runnable() {
 
@@ -352,8 +350,8 @@ public class MovingCheck extends Check {
 					}
 				};
 
-				// Give a summary in 100 ticks ~ 5 second
-				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.movingRunnable, 100);
+				// Give a summary in x ticks. 20 ticks ~ 1 second
+				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.movingRunnable, ticksBeforeSummary);
 			}
 
 			// If we haven't already got a setback point, make this location the new setback point
@@ -386,8 +384,8 @@ public class MovingCheck extends Check {
 			if(!event.isCancelled()) {
 				// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
 				// Setback points are created automatically the next time a move event is handled
-				data.speedhackSetBackPoint = event.getTo();
-				data.movingSetBackPoint = event.getTo();
+				data.speedhackSetBackPoint = event.getTo().clone();
+				data.movingSetBackPoint = event.getTo().clone();
 				data.speedhackEventsSinceLastCheck = 0;
 				data.movingJumpPhase = 0;
 			}
@@ -479,7 +477,7 @@ public class MovingCheck extends Check {
 			event.setCancelled(true);
 		}
 		else {
-			// Lets try it that way. Maybe now people don't "disappear" any longer
+			// If we don't have a setback point, we'll have to use the from location
 			event.setFrom(from.clone());
 			event.setTo(from.clone());
 			event.getPlayer().teleport(from.clone());

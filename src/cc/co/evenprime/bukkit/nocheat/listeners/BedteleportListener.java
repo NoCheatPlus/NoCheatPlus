@@ -5,6 +5,11 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
 
+/**
+ *
+ * @author Evenprime
+ *
+ */
 public class BedteleportListener extends PlayerListener {
 
 	private BedteleportCheck check;

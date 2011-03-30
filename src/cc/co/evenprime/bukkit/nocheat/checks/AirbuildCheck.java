@@ -55,16 +55,16 @@ public class AirbuildCheck extends Check {
 
 			data.airbuildPerSecond++;
 
-			boolean log = false;
-
 			// which limit has been reached
 			for(int i = limits.length-1; i >= 0; i--) {
 				if(data.airbuildPerSecond >= limits[i]) {
 					// Only explicitly log certain "milestones"
 					if(data.airbuildPerSecond == limits[i]) {
-						log = true;
+						action(actions[i], event, true);
 					}
-					action(actions[i], event, log);
+					else {
+						action(actions[i], event, false);
+					}
 					break;
 				}
 			}
