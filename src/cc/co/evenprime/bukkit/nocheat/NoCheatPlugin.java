@@ -279,13 +279,21 @@ public class NoCheatPlugin extends JavaPlugin {
 		if(player == null || permission == null) {
 			return false;
 		}
-
+		try {
 		if(permissions != null && permissions.has(player, permission))
 			return true;
 		else if(permissions == null && player.isOp())
 			return true;
 		else
 			return false;
+		}
+		catch(Throwable e) {
+			log(Level.SEVERE, "Asking Permissions-Plugin if "+player.getName()+" has permission "+permission+" caused the Exception: "+e.toString() + " . Full error message recorded to log-file");
+			for(StackTraceElement s : e.getStackTrace()) {
+				config.logger.log(Level.SEVERE, s.toString());
+			}
+			return false;
+		}
 	}
 
 	/**

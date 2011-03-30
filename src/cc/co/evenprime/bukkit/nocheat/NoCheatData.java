@@ -18,10 +18,13 @@ public class NoCheatData {
 	public int movingJumpPhase = 0; // current jumpingPhase
 	public int movingViolationsInARow[] =  { 0, 0, 0 }; 
 	public World movingLastWorld = null;
-	public int movingHorizFreeMoves = 4;
+	public int movingHorizFreeMoves = 2;
 	public Location movingSetBackPoint = null;
 	public Location movingLocation = null;
 	public Runnable movingRunnable = null;
+	
+	// WORKAROUND for changed PLAYER_MOVE logic
+	public Location movingTeleportTo = null;
 	
 	public int legitMoves = 0;
 	

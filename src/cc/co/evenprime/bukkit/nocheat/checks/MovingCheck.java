@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
@@ -150,6 +151,13 @@ public class MovingCheck extends Check {
 		// Get the player-specific data
 		NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
+		// Get the two locations of the event
+		Location to = event.getTo();
+		
+		// WORKAROUND for changed PLAYER_MOVE logic
+		Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
+		data.movingTeleportTo = null;
+		
 		// Notice to myself: How world changes with e.g. command /world work:
 		// 1. TeleportEvent from the players current position to another position in the _same_ world
 		// 2. MoveEvent(s) (yes, multiple events can be triggered) from that position in the _new_ world 
@@ -160,22 +168,22 @@ public class MovingCheck extends Check {
 		// store the "lastWorld" and compare it to the world of the next event
 		// Fun fact: Move event locations always have the same world in from/to, therefore
 		// it doesn't matter which one I use
-		if(data.movingLastWorld != event.getFrom().getWorld()) {
+		if(data.movingLastWorld != from.getWorld()) {
 
-			data.movingLastWorld = event.getFrom().getWorld();
+			data.movingLastWorld = from.getWorld();
 			// "Forget" previous setback points
 			data.movingSetBackPoint = null;
 			data.speedhackSetBackPoint = null;
 
 			// Store the destination that this move goes to for later use
-			data.movingLocation = event.getTo();
+			data.movingLocation = to;
 
 			// the world changed since our last check, therefore I can't check anything
 			// for this event (reliably)
 			return;
 		}
 
-		if(data.movingLocation != null && data.movingLocation.equals(event.getTo())) {
+		if(data.movingLocation != null && data.movingLocation.equals(to)) {
 			// If we are still trying to reach that location, accept the move
 			return;
 		}
@@ -195,17 +203,19 @@ public class MovingCheck extends Check {
 
 		// The actual movingCheck starts here
 
-		// Get the two locations of the event
-		Location from = event.getFrom();
-		Location to = event.getTo();
+		
 		
 		// First check the distance the player has moved horizontally
 		// TODO: Make this check much more precise
 		double xDistance = from.getX()-to.getX();
 		double zDistance = from.getZ()-to.getZ();
-		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance)) - 0.6D;
-
-		System.out.println(combined);
+		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance)) - 0.6D ;
+		
+		// Give additional movement based on velocity (not too precise yet, but still better than false positives)
+		Vector v = event.getPlayer().getVelocity();
+		combined -= Math.abs(v.getX()*2);
+		combined -= Math.abs(v.getZ()*2);
+		
 		// If the target is a bed and distance not too big, allow it
 		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && xDistance < 8.0D && zDistance < 8.0D) {
 			return; // players are allowed to "teleport" into a bed over "short" distances
@@ -227,7 +237,7 @@ public class MovingCheck extends Check {
 			else vl =  max(vl, 0);
 		}
 		else{
-			data.movingHorizFreeMoves = 4;
+			data.movingHorizFreeMoves = 2;
 		}
 
 		// pre-calculate boundary values that are needed multiple times in the following checks
@@ -361,10 +371,11 @@ public class MovingCheck extends Check {
 				action = actions[vl];
 			} 	
 
-			action(event, action, log);
+			action(event, event.getPlayer(), from, to, action, log);
 		}
 	}
 
+	
 	public void teleported(PlayerMoveEvent event) {
 		NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
@@ -375,12 +386,16 @@ public class MovingCheck extends Check {
 			if(!event.isCancelled()) {
 				// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
 				// Setback points are created automatically the next time a move event is handled
-				data.speedhackSetBackPoint = null;
-				data.movingSetBackPoint = null;
+				data.speedhackSetBackPoint = event.getTo();
+				data.movingSetBackPoint = event.getTo();
 				data.speedhackEventsSinceLastCheck = 0;
 				data.movingJumpPhase = 0;
 			}
 		}
+		
+		
+		// WORKAROUND for changed PLAYER_MOVE logic
+		data.movingTeleportTo = event.getTo();
 	}
 
 	/**
@@ -388,17 +403,17 @@ public class MovingCheck extends Check {
 	 * @param event
 	 * @param actions
 	 */
-	private void action(PlayerMoveEvent event, String actions, boolean log) {
+	private void action(PlayerMoveEvent event, Player player, Location from, Location to, String actions, boolean log) {
 
 		if(actions == null) return;
 		// LOGGING IF NEEDED
 		if(log && actions.contains("log")) {
-			plugin.logAction(actions, "Moving violation: "+event.getPlayer().getName()+" from " + String.format("%s (%.5f, %.5f, %.5f) to %s (%.5f, %.5f, %.5f)", event.getFrom().getWorld().getName(), event.getFrom().getX(), event.getFrom().getY(), event.getFrom().getZ(), event.getTo().getWorld().getName(), event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()));
+			plugin.logAction(actions, "Moving violation: "+player.getName()+" from " + String.format("%s (%.5f, %.5f, %.5f) to %s (%.5f, %.5f, %.5f)", from.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getWorld().getName(), to.getX(), to.getY(), to.getZ()));
 		}
 
 		// RESET IF NEEDED
 		if(actions.contains("reset")) {
-			resetPlayer(event);
+			resetPlayer(event, from);
 		}
 	}
 	
@@ -442,7 +457,7 @@ public class MovingCheck extends Check {
 	 * @param data
 	 * @param event
 	 */
-	private void resetPlayer(PlayerMoveEvent event) {
+	private void resetPlayer(PlayerMoveEvent event, Location from) {
 
 		NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
@@ -465,8 +480,9 @@ public class MovingCheck extends Check {
 		}
 		else {
 			// Lets try it that way. Maybe now people don't "disappear" any longer
-			event.setTo(event.getFrom().clone());
-			event.getPlayer().teleport(event.getFrom().clone());
+			event.setFrom(from.clone());
+			event.setTo(from.clone());
+			event.getPlayer().teleport(from.clone());
 			event.setCancelled(true);
 		}
 	}
