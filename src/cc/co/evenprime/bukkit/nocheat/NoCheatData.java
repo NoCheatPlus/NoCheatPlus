@@ -18,7 +18,9 @@ public class NoCheatData {
 	public int movingJumpPhase = 0; // current jumpingPhase
 	public int movingViolationsInARow[] =  { 0, 0, 0 }; 
 	public World movingLastWorld = null;
-	public int movingHorizFreeMoves = 2;
+	public double movingHorizFreedom = 0.0D;
+	public double movingVertFreedom = 0.0D;
+	public int movingVertFreedomCounter = 0;
 	public Location movingSetBackPoint = null;
 	public Location movingLocation = null;
 	public Runnable movingRunnable = null;
@@ -35,6 +37,9 @@ public class NoCheatData {
 
 	public int airbuildPerSecond = 0;
 	public Runnable airbuildRunnable = null;
+
+
+
 
 
 	public NoCheatData() { }

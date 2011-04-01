@@ -4,11 +4,17 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.util.config.Configuration;
+
+import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
+import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 
 /**
  * Central location for everything that's described in the configuration file
@@ -81,26 +87,59 @@ public class NoCheatConfiguration {
 		plugin.speedhackCheck.limits[1] = c.getInt("speedhack.limits.med", plugin.speedhackCheck.limits[1]);
 		plugin.speedhackCheck.limits[2] = c.getInt("speedhack.limits.high", plugin.speedhackCheck.limits[2]);
 
-		plugin.movingCheck.actions[0] = c.getString("moving.action.low", plugin.movingCheck.actions[0]);
-		plugin.movingCheck.actions[1] = c.getString("moving.action.med", plugin.movingCheck.actions[1]);
-		plugin.movingCheck.actions[2] = c.getString("moving.action.high", plugin.movingCheck.actions[2]);
+		plugin.movingCheck.actions[0] = stringToActions(c.getString("moving.action.low"), plugin.movingCheck.actions[0]);
+		plugin.movingCheck.actions[1] = stringToActions(c.getString("moving.action.med"), plugin.movingCheck.actions[1]);
+		plugin.movingCheck.actions[2] = stringToActions(c.getString("moving.action.high"), plugin.movingCheck.actions[2]);
 
-		plugin.speedhackCheck.actions[0] = c.getString("speedhack.action.low", plugin.speedhackCheck.actions[0]);
-		plugin.speedhackCheck.actions[1] = c.getString("speedhack.action.med", plugin.speedhackCheck.actions[1]);
-		plugin.speedhackCheck.actions[2] = c.getString("speedhack.action.high", plugin.speedhackCheck.actions[2]);
+		plugin.speedhackCheck.actions[0] = stringToActions(c.getString("speedhack.action.low"), plugin.speedhackCheck.actions[0]);
+		plugin.speedhackCheck.actions[1] = stringToActions(c.getString("speedhack.action.med"), plugin.speedhackCheck.actions[1]);
+		plugin.speedhackCheck.actions[2] = stringToActions(c.getString("speedhack.action.high"), plugin.speedhackCheck.actions[2]);
 
 		plugin.airbuildCheck.limits[0] = c.getInt("airbuild.limits.low", plugin.airbuildCheck.limits[0]);
 		plugin.airbuildCheck.limits[1] = c.getInt("airbuild.limits.med", plugin.airbuildCheck.limits[1]);
 		plugin.airbuildCheck.limits[2] = c.getInt("airbuild.limits.high", plugin.airbuildCheck.limits[2]);
 
-		plugin.airbuildCheck.actions[0] = c.getString("airbuild.action.low", plugin.airbuildCheck.actions[0]);
-		plugin.airbuildCheck.actions[1] = c.getString("airbuild.action.med", plugin.airbuildCheck.actions[1]);
-		plugin.airbuildCheck.actions[2] = c.getString("airbuild.action.high", plugin.airbuildCheck.actions[2]);
+		plugin.airbuildCheck.actions[0] = stringToActions(c.getString("airbuild.action.low"), plugin.airbuildCheck.actions[0]);
+		plugin.airbuildCheck.actions[1] = stringToActions(c.getString("airbuild.action.med"), plugin.airbuildCheck.actions[1]);
+		plugin.airbuildCheck.actions[2] = stringToActions(c.getString("airbuild.action.high"), plugin.airbuildCheck.actions[2]);
 
 		plugin.speedhackCheck.setActive(c.getBoolean("active.speedhack", plugin.speedhackCheck.isActive()));
 		plugin.movingCheck.setActive(c.getBoolean("active.moving", plugin.movingCheck.isActive()));
 		plugin.airbuildCheck.setActive(c.getBoolean("active.airbuild", plugin.airbuildCheck.isActive()));
 		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", plugin.bedteleportCheck.isActive()));
+	}
+
+	private Action[] stringToActions(String string, Action[] actions) {
+		
+		if(string == null) return actions;
+		
+		List<Action> as = new LinkedList<Action>();
+		String[] parts = string.split(" ");
+		
+		for(String s : parts) {
+			if(s.equals("loglow"))
+				as.add(LogAction.logLow);
+			else if(s.equals("logmed"))
+				as.add(LogAction.logMed);
+			else if(s.equals("loghigh"))
+				as.add(LogAction.logHigh);
+			else if(s.equals("deny"))
+				as.add(CancelAction.deny);
+			else if(s.equals("reset"))
+				as.add(CancelAction.reset);
+			else if(s.startsWith("custom")) {
+				try {
+					// TODO: Implement Custom Action
+					//as.add(new CustomAction(Integer.parseInt(s.substring(6))));
+				}
+				catch(Exception e) {
+					plugin.log(Level.WARNING, "Couldn't parse number of custom action '" + s + "'");
+				}
+			}
+		}
+		
+		
+		return as.toArray(actions);
 	}
 
 	/**

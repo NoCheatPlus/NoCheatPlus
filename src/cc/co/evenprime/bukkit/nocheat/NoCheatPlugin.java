@@ -237,16 +237,16 @@ public class NoCheatPlugin extends JavaPlugin {
 	 * Log a violation message to all locations declared in the config file
 	 * @param message
 	 */
-	private void log(Level l, String message) {
+	public void log(Level l, String message) {
 		if(l != null && message != null) {
+			message = "NC: " + message;
 			logToChat(l, message);
 			logToIRC(l, message);
 			logToConsole(l, message);
 			config.logger.log(l, message);
 		}
 	}
-
-
+	
 	private void logToChat(Level l, String message) {
 		if(config.chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
@@ -269,26 +269,6 @@ public class NoCheatPlugin extends JavaPlugin {
 		}
 	}
 
-	public void logAction(String actions, String message) {
-		if(actions == null) return;
-
-		// LOGGING IF NEEDED AND WHERE NEEDED
-		Level logLevel = null;
-
-		if(actions.contains("loglow")) {
-			logLevel = Level.INFO;
-		}
-		if(actions.contains("logmed")) {
-			logLevel = Level.WARNING;
-		}
-		if(actions.contains("loghigh")) {
-			logLevel = Level.SEVERE;
-		}
-
-		if(logLevel != null) {
-			log(logLevel, "NC: "+message);
-		}
-	}
 
 	public boolean hasPermission(Player player, String permission) {
 

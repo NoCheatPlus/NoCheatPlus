@@ -9,6 +9,9 @@ import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
+import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 
 /**
  * Check if the player should be allowed to make that move, e.g. is he allowed to jump here or move that far in one step
@@ -34,13 +37,16 @@ public class MovingCheck extends Check {
 
 	// Limits
 	public final double moveLimits[] = { 0.0D, 0.5D, 2.0D };
-	
+
 	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
-	
+
 	public int ticksBeforeSummary = 100;
 
 	// How should moving violations be treated?
-	public final String actions[] = { "loglow reset", "logmed reset", "loghigh reset" };
+	public final Action actions[][] = { 
+			{ LogAction.logLow, CancelAction.reset },
+			{ LogAction.logMed, CancelAction.reset },
+			{ LogAction.logHigh, CancelAction.reset } };
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
@@ -155,11 +161,11 @@ public class MovingCheck extends Check {
 
 		// Get the two locations of the event
 		final Location to = event.getTo();
-		
+
 		// WORKAROUND for changed PLAYER_MOVE logic
 		final Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
 		data.movingTeleportTo = null;
-		
+
 		// Notice to myself: How world changes with e.g. command /world work:
 		// 1. TeleportEvent from the players current position to another position in the _same_ world
 		// 2. MoveEvent(s) (yes, multiple events can be triggered) from that position in the _new_ world 
@@ -168,17 +174,15 @@ public class MovingCheck extends Check {
 
 		// I've no real way to get informed about a world change, therefore I have to
 		// store the "lastWorld" and compare it to the world of the next event
-		// Fun fact: Move event locations always have the same world in from/to, therefore
-		// it doesn't matter which one I use
-		if(data.movingLastWorld != from.getWorld()) {
+		if(data.movingLastWorld != to.getWorld()) {
 
-			data.movingLastWorld = from.getWorld();
+			data.movingLastWorld = to.getWorld();
 			// "Forget" previous setback points
 			data.movingSetBackPoint = null;
 			data.speedhackSetBackPoint = null;
 
 			// Store the destination that this move goes to for later use
-			data.movingLocation = to;
+			data.movingLocation = to.clone();
 
 			// the world changed since our last check, therefore I can't check anything
 			// for this event (reliably)
@@ -200,46 +204,45 @@ public class MovingCheck extends Check {
 			data.speedhackSetBackPoint = null;
 			return;
 		}
-		
-	
 
 		// The actual movingCheck starts here
 
-		
-		
 		// First check the distance the player has moved horizontally
 		double xDistance = from.getX()-to.getX();
 		double zDistance = from.getZ()-to.getZ();
-		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance)) - 0.6D ;
-		
-		// Give additional movement based on velocity (not too precise yet, but still better than false positives)
-		Vector v = event.getPlayer().getVelocity();
-		combined -= Math.abs(v.getX()*2);
-		combined -= Math.abs(v.getZ()*2);
-		
+
 		// If the target is a bed and distance not too big, allow it
 		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && xDistance < 8.0D && zDistance < 8.0D) {
 			return; // players are allowed to "teleport" into a bed over "short" distances
 		}
 
-		int vl = -1;
+		// Calculate the horizontal distance
+		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance)) - 0.6D ;
+
+		// Give additional movement based on velocity (not too precise, but still better than false positives)
+		Vector v = event.getPlayer().getVelocity();
+
+		// Compare the velocity vector to the existing movement freedom that we've from previous events
+		double tmp = Math.abs(v.getX()*5D) + Math.abs(v.getZ()*5D);
+		data.movingHorizFreedom = tmp > data.movingHorizFreedom * 0.9D ? tmp : data.movingHorizFreedom * 0.9D;
+
+		// subtract the additional freedom
+		combined -= data.movingHorizFreedom;
+
+		// Violation level
+		int vl1 = -1;
 
 		// How far are we off?
 		if(combined > moveLimits[2]) {
-			vl = max(vl, 2);
+			vl1 = max(vl1, 2);
 		}
 		else if(combined > moveLimits[1]) {
-			vl = max(vl, 1);
+			vl1 = max(vl1, 1);
 		}
 		else if(combined > moveLimits[0]) {
-			if(data.movingHorizFreeMoves > 0) {
-				data.movingHorizFreeMoves--;
-			}
-			else vl =  max(vl, 0);
+			vl1 =  max(vl1, 0);
 		}
-		else{
-			data.movingHorizFreeMoves = 2;
-		}
+
 
 		// pre-calculate boundary values that are needed multiple times in the following checks
 		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
@@ -250,24 +253,53 @@ public class MovingCheck extends Check {
 		final boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
 		final boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
 
-		// Ignore events if the player has positive y-Velocity
-		if(event.getPlayer().getVelocity().getY() > 0.0D) {
-			data.movingSetBackPoint = from.clone();
-			data.movingJumpPhase = 0;
-			return;
-		}
-		
+
 		// Handle 4 distinct cases: Walk, Jump, Land, Fly
+
+		int vl2 = -1;
+
+		// A halfway lag-resistant method of allowing vertical acceleration without allowing blatant cheating
 		
+		// FACT: Minecraft server sends player "velocity" to the client and lets the client calculate the movement
+		// PROBLEM: There may be an arbitrary amount of other move events between the server sending the data
+		//          and the client accepting it/reacting to it. The server can't know when the client starts to
+		//          consider the sent "velocity" in its movement.
+		// SOLUTION: Give the client at least 10 events after sending "velocity" to actually use the velocity for
+		//           its movement, plus additional events if the "velocity" was big and can cause longer flights
+		
+		// The server sent the player a "velocity" a short time ago
+		if(v.getY() > 0.0D) {
+			if(data.movingVertFreedomCounter < 10)
+				data.movingVertFreedomCounter = 10;
+
+			// Be generous with the height limit for the client
+			data.movingVertFreedom += v.getY()*3D;
+
+			// Set a top limit for how many events a client has to "consume" the sent velocity
+			if(data.movingVertFreedomCounter < 30)
+				data.movingVertFreedomCounter++;
+		}
+		// If the server no longer has a positive velocity, start consuming the event counter for this client
+		else if(data.movingVertFreedomCounter > 0) {
+			data.movingVertFreedomCounter--;
+		}
+
+		// If the event counter has been consumed, remove the vertical movement limit increase
+		if(data.movingVertFreedomCounter <= 0) {
+			data.movingVertFreedom = 0.0D;
+		}
+
+		double limit = data.movingVertFreedom;
+
 		// Walk
 		if(onGroundFrom && onGroundTo)
 		{
-			double limit = jumpHeight;
+			limit += jumpHeight;
 			double distance = to.getY() - from.getY();
 
-			vl = max(vl, heightLimitCheck(limit, distance));
+			vl2 = heightLimitCheck(limit, distance);
 
-			if(vl < 0)
+			if(vl1 < 0 && vl2 < 0)
 			{
 				// reset jumping
 				data.movingJumpPhase = 0;
@@ -277,13 +309,13 @@ public class MovingCheck extends Check {
 		// Jump
 		else if(onGroundFrom && !onGroundTo)
 		{	
-			double limit = jumpHeight;
+			limit += jumpHeight;
 			double distance = to.getY() - from.getY();
-			
-			// Check if player isn't jumping too high
-			vl = max(vl, heightLimitCheck(limit, distance));
 
-			if(vl < 0) {
+			// Check if player isn't jumping too high
+			vl2 = heightLimitCheck(limit, distance);
+
+			if(vl1 < 0 && vl2 < 0) {
 				// Setup next phase of the jump
 				data.movingJumpPhase = 1;
 				data.movingSetBackPoint = from.clone();
@@ -294,18 +326,16 @@ public class MovingCheck extends Check {
 		{
 			Location l = data.movingSetBackPoint == null ? from : data.movingSetBackPoint;
 
-			double limit;
-
 			if(data.movingJumpPhase > jumpingLimit)
-				limit = jumpHeight + stepHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
-			else limit = jumpHeight;
+				limit += jumpHeight + stepHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
+			else limit += jumpHeight;
 
 			double distance = to.getY() - l.getY();
 
 			// Check if player isn't jumping too high
-			vl = max(vl, heightLimitCheck(limit, distance));
+			vl2 = heightLimitCheck(limit, distance);
 
-			if(vl < 0) {
+			if(vl1 < 0 && vl2 < 0) {
 				data.movingJumpPhase = 0; // He is on ground now, so reset the jump
 				data.movingSetBackPoint = to.clone();
 			}
@@ -314,18 +344,16 @@ public class MovingCheck extends Check {
 		else {
 			Location l = data.movingSetBackPoint == null ? from : data.movingSetBackPoint;
 
-			double limit;
-
 			if(data.movingJumpPhase > jumpingLimit)
-				limit = jumpHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
-			else limit = jumpHeight;
-			
+				limit += jumpHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
+			else limit += jumpHeight;
+
 			double distance = to.getY() - l.getY();
 
 			// Check if player isn't jumping too high
-			vl = max(vl, heightLimitCheck(limit, distance));
+			vl2 = heightLimitCheck(limit, distance);
 
-			if(vl < 0) {
+			if(vl1 < 0 && vl2 < 0) {
 				data.movingJumpPhase++; // Enter next phase of the flight
 				// Setback point stays the same. If we don't have one, take the "from" location as a setback point for now
 				if(data.movingSetBackPoint == null) {
@@ -333,6 +361,8 @@ public class MovingCheck extends Check {
 				}
 			}
 		}
+
+		int vl = max(vl1, vl2);
 
 		if(vl >= 0) {
 			final Player p = event.getPlayer();
@@ -359,21 +389,19 @@ public class MovingCheck extends Check {
 				data.movingSetBackPoint = event.getFrom().clone();
 			}
 
-			String action = null;
+			Action action[] = null;
 			boolean log = true;
 
 			// Find out with what actions to treat the violation(s)
-			if(vl >= 0)  {
-				if(data.movingViolationsInARow[vl] > 0) log = false; // only log the first violation of that level
-				data.movingViolationsInARow[vl]++;
-				action = actions[vl];
-			} 	
+			if(data.movingViolationsInARow[vl] > 0) log = false; // only log the first violation of that level
+			data.movingViolationsInARow[vl]++;
+			action = actions[vl];	
 
 			action(event, event.getPlayer(), from, to, action, log);
 		}
 	}
 
-	
+
 	public void teleported(PlayerMoveEvent event) {
 		NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
@@ -390,8 +418,7 @@ public class MovingCheck extends Check {
 				data.movingJumpPhase = 0;
 			}
 		}
-		
-		
+
 		// WORKAROUND for changed PLAYER_MOVE logic
 		data.movingTeleportTo = event.getTo();
 	}
@@ -399,41 +426,43 @@ public class MovingCheck extends Check {
 	/**
 	 * Perform actions that were specified by the admin
 	 * @param event
-	 * @param actions
+	 * @param action
 	 */
-	private void action(PlayerMoveEvent event, Player player, Location from, Location to, String actions, boolean log) {
+	private void action(PlayerMoveEvent event, Player player, Location from, Location to, Action[] actions, boolean log) {
 
 		if(actions == null) return;
-		// LOGGING IF NEEDED
-		if(log && actions.contains("log")) {
-			plugin.logAction(actions, "Moving violation: "+player.getName()+" from " + String.format("%s (%.5f, %.5f, %.5f) to %s (%.5f, %.5f, %.5f)", from.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getWorld().getName(), to.getX(), to.getY(), to.getZ()));
-		}
 
-		// RESET IF NEEDED
-		if(actions.contains("reset")) {
-			resetPlayer(event, from);
+		for(Action a : actions) {
+			if(a instanceof LogAction) 
+				plugin.log(((LogAction)a).getLevel(), "Moving violation: "+player.getName()+" from " + String.format("%s (%.5f, %.5f, %.5f) to %s (%.5f, %.5f, %.5f)", from.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getWorld().getName(), to.getX(), to.getY(), to.getZ()));
+			else if(a.equals(CancelAction.reset))
+				resetPlayer(event, from);
 		}
 	}
-	
+
 	private void summary(Player p, NoCheatData data) {
-		String action;
-		// Give a summary (to the highest violation level that occured)
-		if(data.movingViolationsInARow[2] > 0) action = actions[2];
-		else if(data.movingViolationsInARow[1] > 0) action = actions[1];
-		else if(data.movingViolationsInARow[0] > 0) action = actions[0];
-		else action = "";
-		
-		plugin.logAction(action, "Moving summary of last ~5 seconds: "+p.getName() + " total Violations: ("+ data.movingViolationsInARow[0] + "," + data.movingViolationsInARow[1] + "," + data.movingViolationsInARow[2] + ")");
 
-		data.movingViolationsInARow[2] = 0;
-		data.movingViolationsInARow[1] = 0;
-		data.movingViolationsInARow[0] = 0;
+		LogAction log = null;
+
+		String logString =  "Moving summary of last ~" + (ticksBeforeSummary/20) + " seconds: "+p.getName() + " total Violations: ("+ data.movingViolationsInARow[0] + "," + data.movingViolationsInARow[1] + "," + data.movingViolationsInARow[2] + ")";
+		// Find out the biggest applicable log level
+		for(int i = 0; i < data.movingViolationsInARow.length; i++) {
+			if(data.movingViolationsInARow[i] > 0)
+				for(Action a : actions[i]) 
+					if(a instanceof LogAction)
+						if(log == null || ((LogAction)a).getIndex() > log.getIndex())
+							log = (LogAction)a;
+			data.movingViolationsInARow[i] = 0;
+		}
+
+		if(log != null)
+			plugin.log(log.getLevel(), logString);
 	}
-	
+
 	private int heightLimitCheck(double limit, double value) {
-		
+
 		double offset = value - limit;
-		
+
 		for(int i = heightLimits.length - 1; i >= 0; i--) {
 			if(offset > heightLimits[i]) {
 				return i;
@@ -442,7 +471,7 @@ public class MovingCheck extends Check {
 
 		return -1;
 	}
-	
+
 	private static int max(int a, int b) {
 		if(a > b) {
 			return a;
@@ -464,6 +493,7 @@ public class MovingCheck extends Check {
 		// still have to allow the player some freedom with vertical movement due
 		// to lost vertical momentum to prevent him from getting stuck
 		data.movingJumpPhase = 0;
+		data.movingVertFreedom = 0.0D;
 
 		Location l = data.movingSetBackPoint;
 

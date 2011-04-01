@@ -7,6 +7,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
+import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 
 
 /**
@@ -18,7 +21,10 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 public class AirbuildCheck extends Check {
 
 	// How should airbuild violations be treated?
-	public final String actions[] = { "loglow deny", "logmed deny", "loghigh deny" };
+	public final Action actions[][] = { 
+			{ LogAction.logLow,  CancelAction.deny }, 
+			{ LogAction.logMed,  CancelAction.deny },
+			{ LogAction.logHigh, CancelAction.deny } };
 
 	public final int limits[] = { 1, 3, 10 };
 
@@ -71,17 +77,15 @@ public class AirbuildCheck extends Check {
 		}
 	}
 
-	private void action(String action, BlockPlaceEvent event, boolean log) {
+	private void action(Action actions[], BlockPlaceEvent event, boolean log) {
 
-		// LOG IF NEEDED
-		if(log && action.contains("log")) {
-			Location l = event.getBlockPlaced().getLocation();
-			plugin.logAction(action, "Airbuild violation: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ());
-		}
-
-		// DENY IF NEEDED
-		if(action.contains("deny")) {
-			event.setCancelled(true);
+		for(Action a : actions) {
+			if(log && a instanceof LogAction) {
+				final Location l = event.getBlockPlaced().getLocation();
+				plugin.log(((LogAction)a).getLevel(), "Airbuild: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ());
+			}
+			else if(a instanceof CancelAction)
+				event.setCancelled(true);
 		}
 	}
 
@@ -90,7 +94,7 @@ public class AirbuildCheck extends Check {
 		// Give a summary according to the highest violation level we encountered in that second
 		for(int i = limits.length-1; i >= 0; i--) {
 			if(data.airbuildPerSecond >= limits[i]) {
-				plugin.logAction(actions[i], "Airbuild violation summary: " +player.getName() + " total events per second: " + data.airbuildPerSecond);
+				plugin.log(LogAction.log[i].getLevel(), "Airbuild summary: " +player.getName() + " total violations per second: " + data.airbuildPerSecond);
 				break;
 			}
 		}

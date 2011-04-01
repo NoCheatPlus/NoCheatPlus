@@ -5,6 +5,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
+import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 
 /**
  * Log if a player sends to many move events in a specific time frame, usually the result of tinkering with the system clock
@@ -26,7 +29,10 @@ public class SpeedhackCheck extends Check {
 	public int limits[] = { 30, 45, 60 };
 	
 	// How should speedhack violations be treated?
-	public String actions[] = { "loglow reset", "logmed reset", "loghigh reset" };
+	public Action actions[][] = { 
+			{ LogAction.logLow, CancelAction.reset }, 
+			{ LogAction.logMed, CancelAction.reset },
+			{ LogAction.logHigh, CancelAction.reset } };
 
 	public void check(PlayerMoveEvent event) {
 
@@ -54,7 +60,7 @@ public class SpeedhackCheck extends Check {
 		if(time > interval + data.speedhackLastCheck ) {
 			// Yes
 			// TODO: Needs some better handling for server lag
-			String action = null;
+			Action action[] = null;
 
 			int low = (int)((limits[0] * (time - data.speedhackLastCheck)) / interval);
 			int med = (int)((limits[1] * (time - data.speedhackLastCheck)) / interval);
@@ -90,16 +96,15 @@ public class SpeedhackCheck extends Check {
 		data.speedhackEventsSinceLastCheck++;
 	}
 
-	private void action(String actions, PlayerMoveEvent event, NoCheatData data) {
+	private void action(Action actions[], PlayerMoveEvent event, NoCheatData data) {
 
 		if(actions == null) return;
-		// LOGGING IF NEEDED
-		if(actions.contains("log")) {
-			plugin.logAction(actions, event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limits[0]+ " were allowed. Speedhack?");
-		}
-		// RESET IF NEEDED
-		if(actions.contains("reset")) {
-			resetPlayer(event, data);
+		
+		for(Action a : actions) {
+			if(a instanceof LogAction) 
+				plugin.log(((LogAction)a).getLevel(), event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limits[0]+ " were allowed. Speedhack?");
+			else if(a.equals(CancelAction.reset))
+				resetPlayer(event, data);
 		}
 	}
 
