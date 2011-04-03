@@ -16,4 +16,15 @@ public class LogAction extends Action {
 		super(firstAfter, repeat);
 		this.level = level;
 	}
+	
+	public String getName() {
+		if(level.equals(Level.INFO)) 
+			return "loglow";
+		else if(level.equals(Level.WARNING))
+			return "logmed";
+		else if(level.equals(Level.SEVERE))
+			return "loghigh";
+		else
+			return "";
+	}
 }

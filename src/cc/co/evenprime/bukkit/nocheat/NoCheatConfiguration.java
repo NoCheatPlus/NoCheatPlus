@@ -29,9 +29,12 @@ public class NoCheatConfiguration {
 	public final Logger logger = Logger.getLogger(loggerName);
 
 	// The log level above which information gets logged to the specified logger
-	public Level chatLevel = Level.OFF;
-	public Level ircLevel = Level.OFF;
-	public Level consoleLevel = Level.OFF;
+	public Level chatLevel = Level.WARNING;
+	public Level ircLevel = Level.WARNING;
+	public Level consoleLevel = Level.SEVERE;
+	public Level fileLevel = Level.INFO;
+
+	public String fileName = "plugins/NoCheat/nocheat.log";
 
 	public String ircTag = "nocheat";
 
@@ -63,10 +66,16 @@ public class NoCheatConfiguration {
 		logger.setLevel(Level.INFO);
 		logger.setUseParentHandlers(false);
 
+		chatLevel = stringToLevel(c.getString("logging.logtochat"), chatLevel);
+		consoleLevel = stringToLevel(c.getString("logging.logtoconsole"), consoleLevel);
+		fileLevel = stringToLevel(c.getString("logging.logtofile"), fileLevel);
+		ircLevel = stringToLevel(c.getString("logging.logtoirc"), ircLevel);
+		ircTag = c.getString("logging.logtoirctag", ircTag);
+
 		if(fh == null) {
 			try {
-				fh = new FileHandler(c.getString("logging.filename"), true);
-				fh.setLevel(stringToLevel(c.getString("logging.logtofile")));
+				fh = new FileHandler(fileName, true);
+				fh.setLevel(fileLevel);
 				fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
 				logger.addHandler(fh);
 
@@ -75,13 +84,6 @@ public class NoCheatConfiguration {
 				e.printStackTrace();
 			}
 		}
-
-		chatLevel = stringToLevel(c.getString("logging.logtonotify")); // deprecated, will be deleted eventually
-		chatLevel = stringToLevel(c.getString("logging.logtochat"));
-		consoleLevel = stringToLevel(c.getString("logging.logtoconsole"));
-
-		ircLevel = stringToLevel(c.getString("logging.logtoirc"));
-		ircTag = c.getString("logging.logtoirctag", "nocheat");
 
 		plugin.speedhackCheck.limits[0] = c.getInt("speedhack.limits.low", plugin.speedhackCheck.limits[0]);
 		plugin.speedhackCheck.limits[1] = c.getInt("speedhack.limits.med", plugin.speedhackCheck.limits[1]);
@@ -109,15 +111,14 @@ public class NoCheatConfiguration {
 		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", plugin.bedteleportCheck.isActive()));
 	}
 
-	private Action[] stringToActions(String string, Action[] actions) {
-		
-		if(string == null) return actions;
-		
+	private Action[] stringToActions(String string, Action[] def) {
+
+		if(string == null) return def;
+		System.out.println(string);
 		List<Action> as = new LinkedList<Action>();
 		String[] parts = string.split(" ");
-		
+
 		for(String s : parts) {
-			s = s.trim();
 			if(s.equals("loglow"))
 				as.add(LogAction.loglow);
 			else if(s.equals("logmed"))
@@ -136,33 +137,59 @@ public class NoCheatConfiguration {
 					//as.add(new CustomAction(Integer.parseInt(s.substring(6))));
 				}
 				catch(Exception e) {
-					plugin.log(Level.WARNING, "Couldn't parse number of custom action '" + s + "'");
+					System.out.println("NC: Couldn't parse number of custom action '" + s + "'");
 				}
 			}
 			else {
-				plugin.log(Level.WARNING, "Can't parse action "+ s);
+				System.out.println("NC: Can't parse action "+ s);
+			}
+		}
+
+
+		return as.toArray(def);
+	}
+
+	private String actionsToString(Action[] actions) {
+		
+		String s = "";
+		
+		if(actions != null) {
+			for(Action a : actions) {
+				s = s + " " + a.getName();
 			}
 		}
 		
-		
-		return as.toArray(actions);
+		return s.trim();
 	}
-
 	/**
 	 * Convert a string into a log level
 	 * @param string
 	 * @return
 	 */
-	private static Level stringToLevel(String string) {
+	private static Level stringToLevel(String string, Level def) {
 
 		if(string == null) {
-			return Level.OFF;
+			return def;
 		}
 
 		if(string.trim().equals("info") || string.trim().equals("low")) return Level.INFO;
 		if(string.trim().equals("warn") || string.trim().equals("med")) return Level.WARNING;
 		if(string.trim().equals("severe")|| string.trim().equals("high")) return Level.SEVERE;
+
 		return Level.OFF;
+	}
+
+	private static String levelToString(Level level) {
+
+		if(level == null) {
+			return "off";
+		}
+
+		if(level.equals(Level.INFO)) return "low";
+		else if(level.equals(Level.WARNING)) return "med";
+		else if(level.equals(Level.SEVERE)) return "high";
+
+		return "off";
 	}
 
 	/**
@@ -177,12 +204,12 @@ public class NoCheatConfiguration {
 
 			w.write("# Logging: potential log levels are low (info), med (warn), high (severe), off"); w.newLine();
 			w.write("logging:"); w.newLine();
-			w.write("    filename: plugins/NoCheat/nocheat.log"); w.newLine();
-			w.write("    logtofile: low"); w.newLine();
-			w.write("    logtoconsole: high"); w.newLine();
-			w.write("    logtochat: med"); w.newLine();
-			w.write("    logtoirc: med"); w.newLine();
-			w.write("    logtoirctag: nocheat"); w.newLine();
+			w.write("    filename: "+fileName); w.newLine();
+			w.write("    logtofile: "+levelToString(fileLevel)); w.newLine();
+			w.write("    logtoconsole: "+levelToString(consoleLevel)); w.newLine();
+			w.write("    logtochat: "+levelToString(chatLevel)); w.newLine();
+			w.write("    logtoirc: "+levelToString(ircLevel)); w.newLine();
+			w.write("    logtoirctag: "+ircTag); w.newLine();
 			w.write("# Checks and Bugfixes that are activated (true or false)"); w.newLine();
 			w.write("active:");  w.newLine();
 			w.write("    speedhack: "+plugin.speedhackCheck.isActive()); w.newLine();
@@ -197,16 +224,16 @@ public class NoCheatConfiguration {
 			w.write("        high: "+plugin.speedhackCheck.limits[2]); w.newLine();
 			w.write("#   Speedhack Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: "+plugin.speedhackCheck.actions[0]); w.newLine();
-			w.write("        med: "+plugin.speedhackCheck.actions[1]); w.newLine();
-			w.write("        high: "+plugin.speedhackCheck.actions[2]); w.newLine();
+			w.write("        low: "+actionsToString(plugin.speedhackCheck.actions[0])); w.newLine();
+			w.write("        med: "+actionsToString(plugin.speedhackCheck.actions[1])); w.newLine();
+			w.write("        high: "+actionsToString(plugin.speedhackCheck.actions[2])); w.newLine();
 			w.write("# Moving specific options") ; w.newLine();
 			w.write("moving:"); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: "+plugin.movingCheck.actions[0]); w.newLine();
-			w.write("        med: "+plugin.movingCheck.actions[1]); w.newLine();
-			w.write("        high: "+plugin.movingCheck.actions[2]); w.newLine();
+			w.write("        low: "+actionsToString(plugin.movingCheck.actions[0])); w.newLine();
+			w.write("        med: "+actionsToString(plugin.movingCheck.actions[1])); w.newLine();
+			w.write("        high: "+actionsToString(plugin.movingCheck.actions[2])); w.newLine();
 			w.write("# Airbuild specific options"); w.newLine();
 			w.write("airbuild:"); w.newLine();
 			w.write("#   How many blocks per second are placed by the player in midair (determines log level)"); w.newLine();
@@ -216,9 +243,9 @@ public class NoCheatConfiguration {
 			w.write("        high: "+plugin.airbuildCheck.limits[2]); w.newLine();
 			w.write("#   Airbuild Action, one or more of 'loglow logmed loghigh deny'"); w.newLine();
 			w.write("    action:"); w.newLine();
-			w.write("        low: "+plugin.airbuildCheck.actions[0]); w.newLine();
-			w.write("        med: "+plugin.airbuildCheck.actions[1]); w.newLine();
-			w.write("        high: "+plugin.airbuildCheck.actions[2]); w.newLine();
+			w.write("        low: "+actionsToString(plugin.airbuildCheck.actions[0])); w.newLine();
+			w.write("        med: "+actionsToString(plugin.airbuildCheck.actions[1])); w.newLine();
+			w.write("        high: "+actionsToString(plugin.airbuildCheck.actions[2])); w.newLine();
 			w.write("# Bedteleport specific options (none exist yet)"); w.newLine();
 			w.write("bedteleport:"); w.newLine();
 

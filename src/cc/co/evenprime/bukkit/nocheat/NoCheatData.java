@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat;
 import java.util.logging.Level;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 
 /**
  * Storage for data persistence between events
@@ -17,15 +16,13 @@ public class NoCheatData {
 	 * Don't rely on any of these yet, they are likely going to change their name/functionality 
 	 */
 
-	public int movingJumpPhase = 0; // current jumpingPhase
+	public int movingJumpPhase = 0;
 	public int movingViolationsInARow[] =  { 0, 0, 0 }; 
-	public World movingLastWorld = null;
 	public double movingHorizFreedom = 0.0D;
 	public double movingVertFreedom = 0.0D;
 	public int movingVertFreedomCounter = 0;
 	public Location movingSetBackPoint = null;
-	public Location movingLocation = null;
-	public Runnable movingRunnable = null;
+	public Runnable movingSummaryTask = null;
 	public Level movingHighestLogLevel = null;
 	
 	// WORKAROUND for changed PLAYER_MOVE logic
@@ -39,12 +36,7 @@ public class NoCheatData {
 	public int speedhackViolationsInARow = 0;
 
 	public int airbuildPerSecond = 0;
-	public Runnable airbuildRunnable = null;
-
-
-
-
-
+	public Runnable airbuildSummaryTask = null;
 
 	public NoCheatData() { }
 }

@@ -19,7 +19,7 @@ public class BedteleportCheck extends Check {
 			return;
 
 		if(event.getFrom().getWorld().getBlockTypeIdAt(event.getFrom()) == Material.BED_BLOCK.getId()) {
-			double yRest = Math.floor(event.getFrom().getY()) - event.getFrom().getY();
+			double yRest = event.getFrom().getY() - Math.floor(event.getFrom().getY());
 			if(yRest > 0.099 && yRest < 0.101)
 				// Don't allow the teleport
 				event.setCancelled(true);

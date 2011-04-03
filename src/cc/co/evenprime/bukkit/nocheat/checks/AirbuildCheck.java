@@ -45,19 +45,19 @@ public class AirbuildCheck extends Check {
 			final NoCheatData data = plugin.getPlayerData(event.getPlayer());
 			final Player p = event.getPlayer();
 
-			if(data.airbuildRunnable == null) {
-				data.airbuildRunnable = new Runnable() {
+			if(data.airbuildSummaryTask == null) {
+				data.airbuildSummaryTask = new Runnable() {
 
 					@Override
 					public void run() {
 						summary(p, data);
 						// deleting its own reference
-						data.airbuildRunnable = null;
+						data.airbuildSummaryTask = null;
 					}
 				};
 
 				// Give a summary in 20 ticks ~ 1 second
-				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.airbuildRunnable, 20);
+				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.airbuildSummaryTask, 20);
 			}
 
 			data.airbuildPerSecond++;

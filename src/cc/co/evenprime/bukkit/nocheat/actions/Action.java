@@ -9,4 +9,6 @@ public abstract class Action {
 		this.firstAfter = firstAfter;
 		this.repeat = repeat;
 	}
+	
+	public abstract String getName();
 }

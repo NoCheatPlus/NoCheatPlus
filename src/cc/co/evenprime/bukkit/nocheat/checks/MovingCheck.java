@@ -1,10 +1,13 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
@@ -53,7 +56,7 @@ public class MovingCheck extends Check {
 
 	// Block types that may be treated specially
 	private enum BlockType {
-		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN;
+		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN, FENCE;
 	}
 
 	// Until I can think of a better way to determine if a block is solid or not, this is what I'll do
@@ -139,7 +142,7 @@ public class MovingCheck extends Check {
 		types[Material.CLAY.getId()]= BlockType.SOLID;
 		types[Material.SUGAR_CANE_BLOCK.getId()]= BlockType.NONSOLID;
 		types[Material.JUKEBOX.getId()]= BlockType.SOLID;
-		types[Material.FENCE.getId()]= BlockType.UNKNOWN;
+		types[Material.FENCE.getId()]= BlockType.FENCE;
 		types[Material.PUMPKIN.getId()]= BlockType.SOLID;
 		types[Material.NETHERRACK.getId()]= BlockType.SOLID;
 		types[Material.SOUL_SAND.getId()]= BlockType.UNKNOWN;
@@ -158,49 +161,17 @@ public class MovingCheck extends Check {
 
 		// Get the player-specific data
 		final NoCheatData data = plugin.getPlayerData(event.getPlayer());
-		
+
 		// Get the two locations of the event
 		final Location to = event.getTo();
+
 		// WORKAROUND for changed PLAYER_MOVE logic
 		final Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
 		data.movingTeleportTo = null;
-		
-		// Notice to myself: How world changes with e.g. command /world work:
-		// 1. TeleportEvent from the players current position to another position in the _same_ world
-		// 2. MoveEvent(s) (yes, multiple events can be triggered) from that position in the _new_ world 
-		//    to the actual target position in the new world
-		// strange...
 
-		// I've no real way to get informed about a world change, therefore I have to
-		// store the "lastWorld" and compare it to the world of the next event
-		if(data.movingLastWorld != to.getWorld()) {
-
-			data.movingLastWorld = to.getWorld();
-			// "Forget" previous setback points
-			data.movingSetBackPoint = null;
-			data.speedhackSetBackPoint = null;
-
-			// Store the destination that this move goes to for later use
-			data.movingLocation = to.clone();
-
-			// the world changed since our last check, therefore I can't check anything
-			// for this event (reliably)
-			return;
-		}
-
-		if(data.movingLocation != null && data.movingLocation.equals(to)) {
-			// If we are still trying to reach that location, accept the move
-			return;
-		}
-		else if(data.movingLocation != null) {
-			// If we try to go somewhere else, delete the location. It is no longer needed
-			data.movingLocation = null;
-		}
-
-		// Ignore vehicles
+		// vehicles are a special case
 		if(event.getPlayer().isInsideVehicle()) {
-			data.movingSetBackPoint = null;
-			data.speedhackSetBackPoint = null;
+			resetData(data, event.getTo());
 			return;
 		}
 
@@ -211,7 +182,7 @@ public class MovingCheck extends Check {
 		double zDistance = Math.abs(from.getZ()-to.getZ());
 
 		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
-		
+
 		// If the target is a bed and distance not too big, allow it
 		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && combined < 8.0D) {
 			return; // players are allowed to "teleport" into a bed over "short" distances
@@ -273,7 +244,7 @@ public class MovingCheck extends Check {
 		double limit = data.movingVertFreedom;
 
 		Location newSetBack = null;
-		
+
 		// Walk or start Jump
 		if(onGroundFrom)
 		{
@@ -324,19 +295,17 @@ public class MovingCheck extends Check {
 			}
 		}
 
-		int vl = max(vl1, vl2);
-		
-
+		int vl = vl1 > vl2 ? vl1 : vl2;
 
 		if(vl < 0) {
 			data.movingSetBackPoint = newSetBack == null ? data.movingSetBackPoint : newSetBack;
 		}
-		
+
 		// If we haven't already got a setback point by now, make this location the new setback point
 		if(data.movingSetBackPoint == null) {
 			data.movingSetBackPoint = event.getFrom().clone();
 		}
-		
+
 		if(vl >= 0) {
 			setupSummaryTask(event.getPlayer(), data);
 
@@ -347,47 +316,57 @@ public class MovingCheck extends Check {
 		}
 	}
 
-	private void setupSummaryTask(final Player player, final NoCheatData data) {
+	private void setupSummaryTask(final Player p, final NoCheatData data) {
 		// Setup task to display summary later
-		if(data.movingRunnable == null) {
-			data.movingRunnable = new Runnable() {
+		if(data.movingSummaryTask == null) {
+			data.movingSummaryTask = new Runnable() {
 
 				@Override
 				public void run() {
-					summary(player, data);
+					if(data.movingHighestLogLevel != null) {
+						String logString =  "Moving summary of last ~" + (ticksBeforeSummary/20) + " seconds: "+p.getName() + " total Violations: ("+ data.movingViolationsInARow[0] + "," + data.movingViolationsInARow[1] + "," + data.movingViolationsInARow[2] + ")";
+						plugin.log(data.movingHighestLogLevel, logString);
+					}
 					// deleting its own reference
-					data.movingRunnable = null;
+					data.movingSummaryTask = null;
+					
+					data.movingViolationsInARow[0] = 0;
+					data.movingViolationsInARow[1] = 0;
+					data.movingViolationsInARow[2] = 0;
 				}
 			};
 
 			// Give a summary in x ticks. 20 ticks ~ 1 second
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.movingRunnable, ticksBeforeSummary);
+			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.movingSummaryTask, ticksBeforeSummary);
 		}
-		
 	}
-	public void teleported(PlayerMoveEvent event) {
+
+	/**
+	 * Call this when a player got successfully teleported with the corresponding event to set new "setback" points
+	 * and reset data (if necessary)
+	 * 
+	 * @param event
+	 */
+	public void teleported(PlayerTeleportEvent event) {
 		NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
-		if(data.reset) { // My plugin requested this teleport, so we don't do anything
+		if(data.reset) { // My plugin requested this teleport while handling another event
 			data.reset = false;
 		}
 		else {
 			if(!event.isCancelled()) {
 				// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
-				// Setback points are created automatically the next time a move event is handled
-				data.speedhackSetBackPoint = event.getTo().clone();
-				data.movingSetBackPoint = event.getTo().clone();
-				data.speedhackEventsSinceLastCheck = 0;
-				data.movingJumpPhase = 0;
+				resetData(data, event.getTo());
 			}
 		}
 
-		// WORKAROUND for changed PLAYER_MOVE logic
+		// WORKAROUND for changed PLAYER_MOVE logic - I need to remember the "to" location of teleports and use it as a from-Location
+		// for the move event that comes next
 		data.movingTeleportTo = event.getTo();
 	}
 
 	/**
-	 * Perform actions that were specified by the admin
+	 * Perform actions that were specified in the config file
 	 * @param event
 	 * @param action
 	 */
@@ -396,7 +375,7 @@ public class MovingCheck extends Check {
 		if(actions == null) return;
 		boolean cancelled = false;
 
-		// prepare log message if neccessary
+		// prepare log message if necessary
 		String logMessage = null;
 
 		if(loggingAllowed) {
@@ -404,9 +383,10 @@ public class MovingCheck extends Check {
 		}
 
 		for(Action a : actions) {
-			if(a instanceof LogAction)  {
+			if(loggingAllowed && a instanceof LogAction)  {
 				plugin.log(((LogAction)a).level, logMessage);
-				data.movingHighestLogLevel = ((LogAction)a).level.intValue() > data.movingHighestLogLevel.intValue() ? ((LogAction)a).level : data.movingHighestLogLevel;
+				if(data.movingHighestLogLevel == null) data.movingHighestLogLevel = Level.ALL;
+				if(data.movingHighestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.movingHighestLogLevel = ((LogAction)a).level;
 			}
 			else if(!cancelled && a instanceof CancelAction) {
 				resetPlayer(event, from);
@@ -415,13 +395,6 @@ public class MovingCheck extends Check {
 			else if(a instanceof CustomAction)
 				plugin.handleCustomAction(a, player);
 		}
-	}
-
-	private void summary(Player p, NoCheatData data) {
-
-		String logString =  "Moving summary of last ~" + (ticksBeforeSummary/20) + " seconds: "+p.getName() + " total Violations: ("+ data.movingViolationsInARow[0] + "," + data.movingViolationsInARow[1] + "," + data.movingViolationsInARow[2] + ")";
-
-		plugin.log(data.movingHighestLogLevel, logString);
 	}
 
 	private int limitCheck(double value, double limits[]) {
@@ -435,12 +408,6 @@ public class MovingCheck extends Check {
 		return -1;
 	}
 
-	private static int max(int a, int b) {
-		if(a > b) {
-			return a;
-		}
-		return b;
-	}
 	/** 
 	 * Return the player to a stored location or if that is not available,
 	 * the previous location.
@@ -455,27 +422,22 @@ public class MovingCheck extends Check {
 		// on solid ground, but in case it isn't (maybe the ground is gone now) we
 		// still have to allow the player some freedom with vertical movement due
 		// to lost vertical momentum to prevent him from getting stuck
-		data.movingJumpPhase = 0;
-		data.movingVertFreedom = 0.0D;
 
-		Location l = data.movingSetBackPoint;
+		if(data.movingSetBackPoint == null) data.movingSetBackPoint = from.clone();
 
+		// Set a flag that gets used while handling teleport events
 		data.reset = true;
-		// If we have stored a location for the player, we put him back there
-		if(l != null) {
-			// Lets try it that way. Maybe now people don't "disappear" any longer
-			event.setFrom(l.clone());
-			event.setTo(l.clone());
-			event.getPlayer().teleport(l.clone());
-			event.setCancelled(true);
-		}
-		else {
-			// If we don't have a setback point, we'll have to use the from location
-			event.setFrom(from.clone());
-			event.setTo(from.clone());
-			event.getPlayer().teleport(from.clone());
-			event.setCancelled(true);
-		}
+		
+		resetData(data, data.movingSetBackPoint);
+
+		// Put the player back to the chosen location
+		event.setFrom(data.movingSetBackPoint.clone());
+		event.setTo(data.movingSetBackPoint.clone());
+		event.getPlayer().teleport(data.movingSetBackPoint.clone());
+		event.setCancelled(true);
+		
+
+
 	}
 
 
@@ -496,8 +458,8 @@ public class MovingCheck extends Check {
 				types[w.getBlockTypeIdAt(values[1], values[2]-1, values[4])] != BlockType.NONSOLID )
 			return true;
 		// Check if he is hanging onto a ladder
-		else if(types[w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY(), l.getBlockZ())] == BlockType.LADDER || 
-				types[w.getBlockTypeIdAt(l.getBlockX(), l.getBlockY()+1, l.getBlockZ())] == BlockType.LADDER)
+		else if(types[w.getBlockTypeIdAt(l.getBlockX(), values[2], l.getBlockZ())] == BlockType.LADDER || 
+				types[w.getBlockTypeIdAt(l.getBlockX(), values[2]+1, l.getBlockZ())] == BlockType.LADDER)
 			return true;
 		// check if he is standing "in" a block that's potentially solid (we give him the benefit of a doubt and see that as a legit move)
 		// If it is not legit, the MC server already has a safeguard against that (You'll get "xy moved wrongly" on the console in that case)
@@ -523,6 +485,12 @@ public class MovingCheck extends Check {
 				types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3]+1)] == BlockType.LIQUID ||
 				types[w.getBlockTypeIdAt(values[0], values[2], values[3]+1)] == BlockType.LIQUID ||
 				types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3]+1)] == BlockType.LIQUID)
+			return true;
+		// Running on fences
+		else if(types[w.getBlockTypeIdAt(values[0], values[2]-2, values[3])] == BlockType.FENCE ||
+				types[w.getBlockTypeIdAt(values[1], values[2]-2, values[3])] == BlockType.FENCE ||
+				types[w.getBlockTypeIdAt(values[0], values[2]-2, values[4])] == BlockType.FENCE ||
+				types[w.getBlockTypeIdAt(values[1], values[2]-2, values[4])] == BlockType.FENCE )
 			return true;
 		else
 			return false;
@@ -550,6 +518,15 @@ public class MovingCheck extends Check {
 			d4 = 0;
 
 		return (int) (floor - d4);
+	}
+
+	private void resetData(NoCheatData data, Location l) {
+		// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
+		data.speedhackSetBackPoint = l;
+		data.movingSetBackPoint = l;
+		data.speedhackEventsSinceLastCheck = 0;
+		data.movingJumpPhase = 0;
+		data.movingTeleportTo = null;
 	}
 
 	@Override
