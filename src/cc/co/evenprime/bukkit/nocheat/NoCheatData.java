@@ -1,5 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat;
 
+import java.util.logging.Level;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -24,6 +26,7 @@ public class NoCheatData {
 	public Location movingSetBackPoint = null;
 	public Location movingLocation = null;
 	public Runnable movingRunnable = null;
+	public Level movingHighestLogLevel = null;
 	
 	// WORKAROUND for changed PLAYER_MOVE logic
 	public Location movingTeleportTo = null;
@@ -37,6 +40,7 @@ public class NoCheatData {
 
 	public int airbuildPerSecond = 0;
 	public Runnable airbuildRunnable = null;
+
 
 
 

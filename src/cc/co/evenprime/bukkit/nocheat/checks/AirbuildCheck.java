@@ -9,6 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
+import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 
 
@@ -22,9 +23,9 @@ public class AirbuildCheck extends Check {
 
 	// How should airbuild violations be treated?
 	public final Action actions[][] = { 
-			{ LogAction.logLow,  CancelAction.deny }, 
-			{ LogAction.logMed,  CancelAction.deny },
-			{ LogAction.logHigh, CancelAction.deny } };
+			{ LogAction.loglow,  CancelAction.cancel }, 
+			{ LogAction.logmed,  CancelAction.cancel },
+			{ LogAction.loghigh, CancelAction.cancel } };
 
 	public final int limits[] = { 1, 3, 10 };
 
@@ -77,15 +78,31 @@ public class AirbuildCheck extends Check {
 		}
 	}
 
-	private void action(Action actions[], BlockPlaceEvent event, boolean log) {
+	private void action(Action actions[], BlockPlaceEvent event, boolean loggingAllowed) {
 
+		if(actions == null) return;
+		
+		boolean cancelled = false;
+
+		// Prepare log message if needed
+		String logMessage = null;
+		if(loggingAllowed) {
+			final Location l = event.getBlockPlaced().getLocation();
+			logMessage = "Airbuild: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ();
+		}
+
+		// Execute actions in order
 		for(Action a : actions) {
-			if(log && a instanceof LogAction) {
-				final Location l = event.getBlockPlaced().getLocation();
-				plugin.log(((LogAction)a).getLevel(), "Airbuild: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ());
+			if(loggingAllowed && a instanceof LogAction) {
+				plugin.log(((LogAction)a).level, logMessage);
 			}
-			else if(a instanceof CancelAction)
+			else if(!cancelled && a instanceof CancelAction) {
 				event.setCancelled(true);
+				cancelled = true;
+			}
+			else if(a instanceof CustomAction) {
+				plugin.handleCustomAction(a, event.getPlayer());
+			}
 		}
 	}
 
@@ -94,7 +111,7 @@ public class AirbuildCheck extends Check {
 		// Give a summary according to the highest violation level we encountered in that second
 		for(int i = limits.length-1; i >= 0; i--) {
 			if(data.airbuildPerSecond >= limits[i]) {
-				plugin.log(LogAction.log[i].getLevel(), "Airbuild summary: " +player.getName() + " total violations per second: " + data.airbuildPerSecond);
+				plugin.log(LogAction.log[i].level, "Airbuild summary: " +player.getName() + " total violations per second: " + data.airbuildPerSecond);
 				break;
 			}
 		}

@@ -15,6 +15,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
@@ -317,5 +318,10 @@ public class NoCheatPlugin extends JavaPlugin {
 				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, "nocheat.airbuild") ? airbuildCheck.getName() + " " : "")) +
 				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, "nocheat.bedteleport") ? bedteleportCheck.getName() + " " : "")) +
 				(hasPermission(p, "nocheat.notify") ? "notify " : ""));
+	}
+
+	public void handleCustomAction(Action a, Player player) {
+		// TODO Auto-generated method stub
+		
 	}
 }

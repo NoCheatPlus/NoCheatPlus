@@ -7,6 +7,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
+import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 
 /**
@@ -30,9 +31,9 @@ public class SpeedhackCheck extends Check {
 	
 	// How should speedhack violations be treated?
 	public Action actions[][] = { 
-			{ LogAction.logLow, CancelAction.reset }, 
-			{ LogAction.logMed, CancelAction.reset },
-			{ LogAction.logHigh, CancelAction.reset } };
+			{ LogAction.loglow, CancelAction.cancel }, 
+			{ LogAction.logmed, CancelAction.cancel },
+			{ LogAction.loghigh, CancelAction.cancel } };
 
 	public void check(PlayerMoveEvent event) {
 
@@ -100,11 +101,15 @@ public class SpeedhackCheck extends Check {
 
 		if(actions == null) return;
 		
+		String logMessage = event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limits[0]+ " were allowed. Speedhack?";
+		
 		for(Action a : actions) {
 			if(a instanceof LogAction) 
-				plugin.log(((LogAction)a).getLevel(), event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limits[0]+ " were allowed. Speedhack?");
-			else if(a.equals(CancelAction.reset))
+				plugin.log(((LogAction)a).level, logMessage);
+			else if(a instanceof CancelAction)
 				resetPlayer(event, data);
+			else if(a instanceof CustomAction)
+				plugin.handleCustomAction(a, event.getPlayer());
 		}
 	}
 

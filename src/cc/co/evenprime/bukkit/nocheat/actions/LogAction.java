@@ -2,27 +2,18 @@ package cc.co.evenprime.bukkit.nocheat.actions;
 
 import java.util.logging.Level;
 
-public class LogAction implements Action {
+public class LogAction extends Action {
 
-	private final int index;
-	private final Level level;
+	public final Level level;
 	
-	public final static LogAction logLow = new LogAction(0, Level.INFO);
-	public final static LogAction logMed = new LogAction(1, Level.WARNING);
-	public final static LogAction logHigh = new LogAction(2, Level.SEVERE);
+	public final static LogAction loglow = new LogAction(1, false, Level.INFO);
+	public final static LogAction logmed = new LogAction(1, false, Level.WARNING);
+	public final static LogAction loghigh = new LogAction(1, false, Level.SEVERE);
 	
-	public final static LogAction log[] = { logLow, logMed, logHigh };
+	public final static LogAction[] log = { loglow, logmed, loghigh };
 	
-	private LogAction(int index, Level level) {
-		this.index = index;
+	public LogAction(int firstAfter, boolean repeat, Level level) {
+		super(firstAfter, repeat);
 		this.level = level;
-	}
-	
-	public Level getLevel() {
-		return level;
-	}
-	
-	public int getIndex() {
-		return index;
 	}
 }

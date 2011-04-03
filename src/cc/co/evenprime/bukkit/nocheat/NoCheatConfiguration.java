@@ -117,16 +117,19 @@ public class NoCheatConfiguration {
 		String[] parts = string.split(" ");
 		
 		for(String s : parts) {
+			s = s.trim();
 			if(s.equals("loglow"))
-				as.add(LogAction.logLow);
+				as.add(LogAction.loglow);
 			else if(s.equals("logmed"))
-				as.add(LogAction.logMed);
+				as.add(LogAction.logmed);
 			else if(s.equals("loghigh"))
-				as.add(LogAction.logHigh);
+				as.add(LogAction.loghigh);
 			else if(s.equals("deny"))
-				as.add(CancelAction.deny);
+				as.add(CancelAction.cancel);
 			else if(s.equals("reset"))
-				as.add(CancelAction.reset);
+				as.add(CancelAction.cancel);
+			else if(s.equals("cancel"))
+				as.add(CancelAction.cancel);
 			else if(s.startsWith("custom")) {
 				try {
 					// TODO: Implement Custom Action
@@ -135,6 +138,9 @@ public class NoCheatConfiguration {
 				catch(Exception e) {
 					plugin.log(Level.WARNING, "Couldn't parse number of custom action '" + s + "'");
 				}
+			}
+			else {
+				plugin.log(Level.WARNING, "Can't parse action "+ s);
 			}
 		}
 		
