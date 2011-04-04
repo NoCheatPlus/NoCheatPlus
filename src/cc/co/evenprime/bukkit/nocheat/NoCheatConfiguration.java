@@ -24,6 +24,9 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
  */
 public class NoCheatConfiguration {
 
+	
+	public final String configFile = "plugins/NoCheat/nocheat.yml";
+	
 	// Our personal logger
 	private final String loggerName = "cc.co.evenprime.nocheat";
 	public final Logger logger = Logger.getLogger(loggerName);
@@ -43,19 +46,21 @@ public class NoCheatConfiguration {
 
 	private final NoCheatPlugin plugin;
 
-	public NoCheatConfiguration(File configurationFile, NoCheatPlugin plugin) {
+	public NoCheatConfiguration(NoCheatPlugin plugin) {
 
 		this.plugin = plugin;
 
-		config(configurationFile);
+		config();
 	}
 
 	/**
 	 * Read the configuration file and assign either standard values or whatever is declared in the file
 	 * @param configurationFile
 	 */
-	public void config(File configurationFile) {
+	public void config() {
 
+		File configurationFile = new File(configFile);
+		
 		if(!configurationFile.exists()) {
 			createStandardConfigFile(configurationFile);
 		}

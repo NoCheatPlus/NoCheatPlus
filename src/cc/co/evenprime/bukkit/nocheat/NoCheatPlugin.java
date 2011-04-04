@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -298,9 +297,9 @@ public class NoCheatPlugin extends JavaPlugin {
 	 */
 	private void setupConfig() {
 		if(this.config == null)
-			this.config = new NoCheatConfiguration(new File("plugins/NoCheat/nocheat.yml"), this);
+			this.config = new NoCheatConfiguration(this);
 		else
-			this.config.config(new File("plugins/NoCheat/nocheat.yml"));
+			this.config.config();
 	}
 
 
