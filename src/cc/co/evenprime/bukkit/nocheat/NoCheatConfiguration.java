@@ -44,9 +44,9 @@ public class NoCheatConfiguration {
 	// Our log output to a file
 	private FileHandler fh = null;
 
-	private final NoCheatPlugin plugin;
+	private final NoCheat plugin;
 
-	public NoCheatConfiguration(NoCheatPlugin plugin) {
+	public NoCheatConfiguration(NoCheat plugin) {
 
 		this.plugin = plugin;
 
@@ -98,6 +98,10 @@ public class NoCheatConfiguration {
 		plugin.movingCheck.actions[1] = stringToActions(c.getString("moving.action.med"), plugin.movingCheck.actions[1]);
 		plugin.movingCheck.actions[2] = stringToActions(c.getString("moving.action.high"), plugin.movingCheck.actions[2]);
 
+		
+		plugin.movingCheck.logMessage = c.getString("moving.logmessage", plugin.movingCheck.logMessage);
+		plugin.movingCheck.summaryMessage = c.getString("moving.summarymessage", plugin.movingCheck.summaryMessage);
+		
 		plugin.speedhackCheck.actions[0] = stringToActions(c.getString("speedhack.action.low"), plugin.speedhackCheck.actions[0]);
 		plugin.speedhackCheck.actions[1] = stringToActions(c.getString("speedhack.action.med"), plugin.speedhackCheck.actions[1]);
 		plugin.speedhackCheck.actions[2] = stringToActions(c.getString("speedhack.action.high"), plugin.speedhackCheck.actions[2]);
@@ -227,26 +231,28 @@ public class NoCheatConfiguration {
 			w.write("        low: "+plugin.speedhackCheck.limits[0]); w.newLine();
 			w.write("        med: "+plugin.speedhackCheck.limits[1]); w.newLine();
 			w.write("        high: "+plugin.speedhackCheck.limits[2]); w.newLine();
-			w.write("#   Speedhack Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
+			w.write("#   Speedhack Action, one or more of 'loglow logmed loghigh cancel'"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: "+actionsToString(plugin.speedhackCheck.actions[0])); w.newLine();
 			w.write("        med: "+actionsToString(plugin.speedhackCheck.actions[1])); w.newLine();
 			w.write("        high: "+actionsToString(plugin.speedhackCheck.actions[2])); w.newLine();
 			w.write("# Moving specific options") ; w.newLine();
 			w.write("moving:"); w.newLine();
-			w.write("#   Moving Action, one or more of 'loglow logmed loghigh reset'"); w.newLine();
+			w.write("    logmessage: \"" + plugin.movingCheck.logMessage+"\""); w.newLine();
+			w.write("    summarymessage: \"" + plugin.movingCheck.summaryMessage+"\""); w.newLine();
+			w.write("#   Moving Action, one or more of 'loglow logmed loghigh cancel'"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: "+actionsToString(plugin.movingCheck.actions[0])); w.newLine();
 			w.write("        med: "+actionsToString(plugin.movingCheck.actions[1])); w.newLine();
 			w.write("        high: "+actionsToString(plugin.movingCheck.actions[2])); w.newLine();
 			w.write("# Airbuild specific options"); w.newLine();
 			w.write("airbuild:"); w.newLine();
-			w.write("#   How many blocks per second are placed by the player in midair (determines log level)"); w.newLine();
+			w.write("#   How many blocks per second are placed by the player in midair to trigger corresponding action"); w.newLine();
 			w.write("    limits:"); w.newLine();
 			w.write("        low: "+plugin.airbuildCheck.limits[0]); w.newLine();
 			w.write("        med: "+plugin.airbuildCheck.limits[1]); w.newLine();
 			w.write("        high: "+plugin.airbuildCheck.limits[2]); w.newLine();
-			w.write("#   Airbuild Action, one or more of 'loglow logmed loghigh deny'"); w.newLine();
+			w.write("#   Airbuild Action, one or more of 'loglow logmed loghigh cancel'"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: "+actionsToString(plugin.airbuildCheck.actions[0])); w.newLine();
 			w.write("        med: "+actionsToString(plugin.airbuildCheck.actions[1])); w.newLine();

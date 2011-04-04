@@ -32,13 +32,13 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * 
- * NoCheatPlugin
+ * NoCheat
  * 
  * Check various player events for their plausibility and log/deny them based on configuration
  * 
  * @author Evenprime
  */
-public class NoCheatPlugin extends JavaPlugin {
+public class NoCheat extends JavaPlugin {
 
 	public final MovingCheck movingCheck;
 	public final BedteleportCheck bedteleportCheck;
@@ -56,7 +56,7 @@ public class NoCheatPlugin extends JavaPlugin {
 	// Store data between Events
 	private final Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
 
-	public NoCheatPlugin() { 	
+	public NoCheat() { 	
 		movingCheck = new MovingCheck(this);
 		bedteleportCheck = new BedteleportCheck(this);
 		speedhackCheck = new SpeedhackCheck(this);
@@ -154,7 +154,7 @@ public class NoCheatPlugin extends JavaPlugin {
 	public void onDisable() { 
 
 		PluginDescriptionFile pdfFile = this.getDescription();
-		Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is disabled.");
+		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
 	}
 
 	public void onEnable() {
@@ -186,7 +186,7 @@ public class NoCheatPlugin extends JavaPlugin {
 		setupPermissions();
 		setupIRC();
 
-		Logger.getLogger("Minecraft").info( "[NoCheatPlugin] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
+		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class NoCheatPlugin extends JavaPlugin {
 
 		if(p == null) {
 			PluginDescriptionFile pdfFile = this.getDescription();
-			Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
+			Logger.getLogger("Minecraft").warning("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
 		}
 
 		permissions = p;
@@ -227,7 +227,7 @@ public class NoCheatPlugin extends JavaPlugin {
 
 		if(p == null) {
 			PluginDescriptionFile pdfFile = this.getDescription();
-			Logger.getLogger("Minecraft").warning("[NoCheatPlugin] version [" + pdfFile.getVersion() + "] couldn't find CrafTIRC plugin. Disabling logging to IRC.");
+			Logger.getLogger("Minecraft").warning("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find CrafTIRC plugin. Disabling logging to IRC.");
 		}
 
 		irc = p;

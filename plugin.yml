@@ -1,13 +1,13 @@
-name: NoCheatPlugin
+name: NoCheat
 
 author: Evenprime
 
-main: cc.co.evenprime.bukkit.nocheat.NoCheatPlugin
-version: 0.7.8
+main: cc.co.evenprime.bukkit.nocheat.NoCheat
+version: 0.7.8a
 
 commands:
   nocheat:
-    description: Provides information about the current status of the NoCheatPlugin
+    description: Provides information about the current status of the NoCheat plugin
     usage: |
            /<command>
            Example: /<command> | Displays version, enabled checks and bugfixes

@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
-import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
@@ -25,7 +25,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
  */
 public class MovingCheck extends Check {
 
-	public MovingCheck(NoCheatPlugin plugin) {
+	public MovingCheck(NoCheat plugin) {
 		super(plugin);
 		setActive(true);
 	}
@@ -42,7 +42,7 @@ public class MovingCheck extends Check {
 	// Limits
 	public final double moveLimits[] =   { 0.0D, 0.5D, 2.0D };
 	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
-
+	
 	public int ticksBeforeSummary = 100;
 
 	// How should moving violations be treated?
@@ -50,6 +50,9 @@ public class MovingCheck extends Check {
 			{ LogAction.loglow,  CancelAction.cancel },
 			{ LogAction.logmed,  CancelAction.cancel },
 			{ LogAction.loghigh, CancelAction.cancel } };
+	
+	public String logMessage = "Moving violation: %1$s from %2$s (%4$.5f, %5$.5f, %6$.5f) to %3$s (%7$.5f, %8$.5f, %9$.5f)";
+	public String summaryMessage = "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)";
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
@@ -324,7 +327,7 @@ public class MovingCheck extends Check {
 				@Override
 				public void run() {
 					if(data.movingHighestLogLevel != null) {
-						String logString =  "Moving summary of last ~" + (ticksBeforeSummary/20) + " seconds: "+p.getName() + " total Violations: ("+ data.movingViolationsInARow[0] + "," + data.movingViolationsInARow[1] + "," + data.movingViolationsInARow[2] + ")";
+						String logString =  String.format(summaryMessage, p.getName(), ticksBeforeSummary/20, data.movingViolationsInARow[0], data.movingViolationsInARow[1],data.movingViolationsInARow[2]);
 						plugin.log(data.movingHighestLogLevel, logString);
 					}
 					// deleting its own reference
@@ -376,15 +379,15 @@ public class MovingCheck extends Check {
 		boolean cancelled = false;
 
 		// prepare log message if necessary
-		String logMessage = null;
+		String log = null;
 
 		if(loggingAllowed) {
-			logMessage = "Moving violation: "+player.getName()+" from " + String.format("%s (%.5f, %.5f, %.5f) to %s (%.5f, %.5f, %.5f)", from.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getWorld().getName(), to.getX(), to.getY(), to.getZ());
+			log = String.format(logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
 		}
 
 		for(Action a : actions) {
 			if(loggingAllowed && a instanceof LogAction)  {
-				plugin.log(((LogAction)a).level, logMessage);
+				plugin.log(((LogAction)a).level, log);
 				if(data.movingHighestLogLevel == null) data.movingHighestLogLevel = Level.ALL;
 				if(data.movingHighestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.movingHighestLogLevel = ((LogAction)a).level;
 			}

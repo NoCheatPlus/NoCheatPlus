@@ -3,11 +3,11 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 import org.bukkit.Material;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
 
 public class BedteleportCheck extends Check {
 
-	public BedteleportCheck(NoCheatPlugin plugin) {
+	public BedteleportCheck(NoCheat plugin) {
 		super(plugin);
 		setActive(true);
 	}

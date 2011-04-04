@@ -1,6 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
 
 /**
  *
@@ -9,12 +9,12 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
  */
 public abstract class Check {
 
-	public Check(NoCheatPlugin plugin) {
+	public Check(NoCheat plugin) {
 		this.plugin = plugin;
 	}
 
 	private boolean active = true;
-	protected NoCheatPlugin plugin;
+	protected NoCheat plugin;
 
 	public boolean isActive() {
 		return active;

@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
-import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
@@ -29,7 +29,7 @@ public class AirbuildCheck extends Check {
 
 	public final int limits[] = { 1, 3, 10 };
 
-	public AirbuildCheck(NoCheatPlugin plugin) {
+	public AirbuildCheck(NoCheat plugin) {
 		super(plugin);
 		setActive(false);
 	}

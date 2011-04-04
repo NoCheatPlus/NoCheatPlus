@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
-import cc.co.evenprime.bukkit.nocheat.NoCheatPlugin;
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
@@ -18,7 +18,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
  */
 public class SpeedhackCheck extends Check {
 
-	public SpeedhackCheck(NoCheatPlugin plugin) {
+	public SpeedhackCheck(NoCheat plugin) {
 		super(plugin);
 		setActive(true);
 	}
