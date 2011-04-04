@@ -434,10 +434,7 @@ public class MovingCheck extends Check {
 		event.setFrom(data.movingSetBackPoint.clone());
 		event.setTo(data.movingSetBackPoint.clone());
 		event.getPlayer().teleport(data.movingSetBackPoint.clone());
-		event.setCancelled(true);
-		
-
-
+		event.setCancelled(true);	
 	}
 
 

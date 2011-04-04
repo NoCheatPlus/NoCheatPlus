@@ -24,9 +24,9 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
  */
 public class NoCheatConfiguration {
 
-	
+
 	public final String configFile = "plugins/NoCheat/nocheat.yml";
-	
+
 	// Our personal logger
 	private final String loggerName = "cc.co.evenprime.nocheat";
 	public final Logger logger = Logger.getLogger(loggerName);
@@ -60,7 +60,7 @@ public class NoCheatConfiguration {
 	public void config() {
 
 		File configurationFile = new File(configFile);
-		
+
 		if(!configurationFile.exists()) {
 			createStandardConfigFile(configurationFile);
 		}
@@ -119,7 +119,7 @@ public class NoCheatConfiguration {
 	private Action[] stringToActions(String string, Action[] def) {
 
 		if(string == null) return def;
-		System.out.println(string);
+
 		List<Action> as = new LinkedList<Action>();
 		String[] parts = string.split(" ");
 
@@ -155,15 +155,15 @@ public class NoCheatConfiguration {
 	}
 
 	private String actionsToString(Action[] actions) {
-		
+
 		String s = "";
-		
+
 		if(actions != null) {
 			for(Action a : actions) {
 				s = s + " " + a.getName();
 			}
 		}
-		
+
 		return s.trim();
 	}
 	/**
