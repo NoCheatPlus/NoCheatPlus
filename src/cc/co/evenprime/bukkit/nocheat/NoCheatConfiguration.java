@@ -94,6 +94,8 @@ public class NoCheatConfiguration {
 		plugin.speedhackCheck.limits[1] = c.getInt("speedhack.limits.med", plugin.speedhackCheck.limits[1]);
 		plugin.speedhackCheck.limits[2] = c.getInt("speedhack.limits.high", plugin.speedhackCheck.limits[2]);
 
+		plugin.speedhackCheck.logMessage = c.getString("speedhack.logmessage", plugin.speedhackCheck.logMessage);
+		
 		plugin.movingCheck.actions[0] = stringToActions(c.getString("moving.action.low"), plugin.movingCheck.actions[0]);
 		plugin.movingCheck.actions[1] = stringToActions(c.getString("moving.action.med"), plugin.movingCheck.actions[1]);
 		plugin.movingCheck.actions[2] = stringToActions(c.getString("moving.action.high"), plugin.movingCheck.actions[2]);
@@ -227,6 +229,7 @@ public class NoCheatConfiguration {
 			w.write("    bedteleport: "+plugin.bedteleportCheck.isActive()); w.newLine();
 			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
+			w.write("    logmessage: \"" + plugin.speedhackCheck.logMessage+"\""); w.newLine();
 			w.write("    limits:"); w.newLine();
 			w.write("        low: "+plugin.speedhackCheck.limits[0]); w.newLine();
 			w.write("        med: "+plugin.speedhackCheck.limits[1]); w.newLine();

@@ -34,6 +34,8 @@ public class SpeedhackCheck extends Check {
 			{ LogAction.loglow, CancelAction.cancel }, 
 			{ LogAction.logmed, CancelAction.cancel },
 			{ LogAction.loghigh, CancelAction.cancel } };
+	
+	public String logMessage = "%1$s sent %2$d move events, but only %3$d were allowed. Speedhack?";
 
 	public void check(PlayerMoveEvent event) {
 
@@ -101,11 +103,11 @@ public class SpeedhackCheck extends Check {
 
 		if(actions == null) return;
 		
-		String logMessage = event.getPlayer().getName()+" sent "+ data.speedhackEventsSinceLastCheck + " move events, but only "+limits[0]+ " were allowed. Speedhack?";
+		String log = String.format(logMessage, event.getPlayer().getName(), data.speedhackEventsSinceLastCheck, limits[0]);
 		
 		for(Action a : actions) {
 			if(a instanceof LogAction) 
-				plugin.log(((LogAction)a).level, logMessage);
+				plugin.log(((LogAction)a).level, log);
 			else if(a instanceof CancelAction)
 				resetPlayer(event, data);
 			else if(a instanceof CustomAction)

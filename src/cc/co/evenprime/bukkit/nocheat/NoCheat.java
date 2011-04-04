@@ -251,6 +251,7 @@ public class NoCheat extends JavaPlugin {
 		if(config.chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
 				if(hasPermission(player, "nocheat.notify")) {
+					System.out.println("logged to chat");
 					player.sendMessage("["+l.getName()+"] " + message);
 				}
 			}
