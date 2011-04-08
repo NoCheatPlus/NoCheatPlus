@@ -46,6 +46,8 @@ public class NoCheat extends JavaPlugin {
 	public final AirbuildCheck airbuildCheck;
 
 	private NoCheatConfiguration config;
+	
+	private boolean exceptionWithPermissions = false;
 
 	// Permissions 2.x, if available
 	private PermissionHandler permissions;
@@ -251,7 +253,6 @@ public class NoCheat extends JavaPlugin {
 		if(config.chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
 				if(hasPermission(player, "nocheat.notify")) {
-					System.out.println("logged to chat");
 					player.sendMessage("["+l.getName()+"] " + message);
 				}
 			}
@@ -285,9 +286,15 @@ public class NoCheat extends JavaPlugin {
 				return false;
 		}
 		catch(Throwable e) {
-			log(Level.SEVERE, "Asking Permissions-Plugin if "+player.getName()+" has permission "+permission+" caused the Exception: "+e.toString() + " . Full error message recorded to log-file");
-			for(StackTraceElement s : e.getStackTrace()) {
-				config.logger.log(Level.SEVERE, s.toString());
+			if(!this.exceptionWithPermissions) {
+				// Prevent spam and recursion by definitely doing this only once
+				this.exceptionWithPermissions = true;
+				
+				String logtext = "Asking Permissions-Plugin if "+player.getName()+" has permission "+permission+" caused an Exception "+ e.getMessage() + ". Please review your permissions config file. This message is only displayed once, the player is considered to not have that permission from now on. The full stack trace is written into the nocheat logfile.";
+				log(Level.SEVERE, logtext);
+				for(StackTraceElement s : e.getStackTrace()) {
+					config.logger.log(Level.SEVERE, s.toString());
+				}
 			}
 			return false;
 		}
