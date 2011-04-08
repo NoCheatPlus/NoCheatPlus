@@ -242,10 +242,11 @@ public class NoCheat extends JavaPlugin {
 	public void log(Level l, String message) {
 		if(l != null && message != null) {
 			message = "NC: " + message;
+			config.logger.log(l, message);
+			logToConsole(l, message);
 			logToChat(l, message);
 			logToIRC(l, message);
-			logToConsole(l, message);
-			config.logger.log(l, message);
+
 		}
 	}
 	
