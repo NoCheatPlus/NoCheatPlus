@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,9 +48,9 @@ public class NoCheat extends JavaPlugin {
 	public final AirbuildCheck airbuildCheck;
 
 	private NoCheatConfiguration config;
-	
+
 	private boolean exceptionWithPermissions = false;
-	
+
 	private boolean cleanUpTaskSetup = false;
 
 	// Permissions 2.x, if available
@@ -95,7 +96,7 @@ public class NoCheat extends JavaPlugin {
 
 		return data;
 	}
-	
+
 	/**
 	 * Go through the playerData HashMap and remove players that are no longer online
 	 * from the map. This should be called in long, regular intervals (e.g. every 10 minutes)
@@ -103,10 +104,11 @@ public class NoCheat extends JavaPlugin {
 	 */
 	public void cleanPlayerDataCollection() {
 		synchronized(playerData) {
-			for(Player p : playerData.keySet()) {
-				if(!p.isOnline()) {
-					playerData.remove(p);
-				}
+			Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>)it.next();
+				if(!pairs.getKey().isOnline())
+					it.remove();
 			}
 		}
 	}
@@ -191,25 +193,25 @@ public class NoCheat extends JavaPlugin {
 		setupIRC();
 
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
-		
+
 		setupCleanupTask();
 	}
 
 	private void setupCleanupTask() {
-		
+
 		if(cleanUpTaskSetup) return;
-		
+
 		cleanUpTaskSetup = true;
-		
+
 		Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 
 			@Override
 			public void run() {
 				cleanPlayerDataCollection();
 			}
-			
+
 		}, 5000, 5000);
-		
+
 	}
 
 	/**
@@ -270,7 +272,7 @@ public class NoCheat extends JavaPlugin {
 
 		}
 	}
-	
+
 	private void logToChat(Level l, String message) {
 		if(config.chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
@@ -311,7 +313,7 @@ public class NoCheat extends JavaPlugin {
 			if(!this.exceptionWithPermissions) {
 				// Prevent spam and recursion by definitely doing this only once
 				this.exceptionWithPermissions = true;
-				
+
 				String logtext = "Asking Permissions-Plugin if "+player.getName()+" has permission "+permission+" caused an Exception "+ e.getMessage() + ". Please review your permissions config file. This message is only displayed once, the player is considered to not have that permission from now on. The full stack trace is written into the nocheat logfile.";
 				log(Level.SEVERE, logtext);
 				for(StackTraceElement s : e.getStackTrace()) {
@@ -352,6 +354,6 @@ public class NoCheat extends JavaPlugin {
 
 	public void handleCustomAction(Action a, Player player) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
