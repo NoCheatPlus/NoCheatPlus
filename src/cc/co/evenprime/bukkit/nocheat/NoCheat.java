@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -48,6 +49,8 @@ public class NoCheat extends JavaPlugin {
 	private NoCheatConfiguration config;
 	
 	private boolean exceptionWithPermissions = false;
+	
+	private boolean cleanUpTaskSetup = false;
 
 	// Permissions 2.x, if available
 	private PermissionHandler permissions;
@@ -100,8 +103,7 @@ public class NoCheat extends JavaPlugin {
 	 */
 	public void cleanPlayerDataCollection() {
 		synchronized(playerData) {
-			Player[] storedPlayers = (Player[]) playerData.keySet().toArray();
-			for(Player p : storedPlayers) {
+			for(Player p : playerData.keySet()) {
 				if(!p.isOnline()) {
 					playerData.remove(p);
 				}
@@ -189,6 +191,25 @@ public class NoCheat extends JavaPlugin {
 		setupIRC();
 
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
+		
+		setupCleanupTask();
+	}
+
+	private void setupCleanupTask() {
+		
+		if(cleanUpTaskSetup) return;
+		
+		cleanUpTaskSetup = true;
+		
+		Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+
+			@Override
+			public void run() {
+				cleanPlayerDataCollection();
+			}
+			
+		}, 5000, 5000);
+		
 	}
 
 	/**
@@ -322,6 +343,7 @@ public class NoCheat extends JavaPlugin {
 
 	private String getPermissionsForPlayerAsString(Player p) {
 		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, "nocheat.moving") ? movingCheck.getName() + " " : "") + 
+				(!movingCheck.isActive() ? "flying* " : (hasPermission(p, "nocheat.flying") ? "flying " : "")) + 
 				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, "nocheat.speedhack") ? speedhackCheck.getName() + " " : "")) +
 				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, "nocheat.airbuild") ? airbuildCheck.getName() + " " : "")) +
 				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, "nocheat.bedteleport") ? bedteleportCheck.getName() + " " : "")) +

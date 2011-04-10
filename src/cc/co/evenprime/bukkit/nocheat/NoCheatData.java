@@ -19,6 +19,7 @@ public class NoCheatData {
 	public int movingJumpPhase = 0;
 	public int movingViolationsInARow[] =  { 0, 0, 0 }; 
 	public double movingHorizFreedom = 0.0D;
+	public int movingHorizFreedomCounter = 0;
 	public double movingVertFreedom = 0.0D;
 	public int movingVertFreedomCounter = 0;
 	public Location movingSetBackPoint = null;

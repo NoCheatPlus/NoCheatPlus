@@ -104,6 +104,8 @@ public class NoCheatConfiguration {
 		plugin.movingCheck.logMessage = c.getString("moving.logmessage", plugin.movingCheck.logMessage);
 		plugin.movingCheck.summaryMessage = c.getString("moving.summarymessage", plugin.movingCheck.summaryMessage);
 		
+		plugin.movingCheck.preciseVelocity = c.getBoolean("moving.precisevelocity", plugin.movingCheck.preciseVelocity);
+		
 		plugin.speedhackCheck.actions[0] = stringToActions(c.getString("speedhack.action.low"), plugin.speedhackCheck.actions[0]);
 		plugin.speedhackCheck.actions[1] = stringToActions(c.getString("speedhack.action.med"), plugin.speedhackCheck.actions[1]);
 		plugin.speedhackCheck.actions[2] = stringToActions(c.getString("speedhack.action.high"), plugin.speedhackCheck.actions[2]);
@@ -243,6 +245,8 @@ public class NoCheatConfiguration {
 			w.write("moving:"); w.newLine();
 			w.write("    logmessage: \"" + plugin.movingCheck.logMessage+"\""); w.newLine();
 			w.write("    summarymessage: \"" + plugin.movingCheck.summaryMessage+"\""); w.newLine();
+			w.write("#   If you get problems with plugins that accellerate players movement, try setting this to false"); w.newLine();
+			w.write("    precisevelocity: \"" + plugin.movingCheck.preciseVelocity+"\""); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh cancel'"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: "+actionsToString(plugin.movingCheck.actions[0])); w.newLine();
