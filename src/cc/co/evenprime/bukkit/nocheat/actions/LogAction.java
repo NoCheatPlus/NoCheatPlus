@@ -1,5 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat.actions;
 
+/**
+ * 
+ * @author Evenprime
+ *
+ */
 import java.util.logging.Level;
 
 public class LogAction extends Action {

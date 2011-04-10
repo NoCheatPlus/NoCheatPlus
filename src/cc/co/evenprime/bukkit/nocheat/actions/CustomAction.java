@@ -1,5 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat.actions;
 
+/**
+ * 
+ * @author Evenprime
+ *
+ */
 
 public class CustomAction extends Action {
 

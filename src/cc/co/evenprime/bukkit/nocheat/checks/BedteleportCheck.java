@@ -4,6 +4,12 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 
+/**
+ * 
+ * @author Evenprime
+ *
+ */
+
 public class BedteleportCheck extends Check {
 
 	public BedteleportCheck(NoCheat plugin) {

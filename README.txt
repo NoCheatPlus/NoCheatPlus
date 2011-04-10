@@ -1,0 +1,4 @@
+Copyright (c) 2011 Wilfried Pasquazzo (Evenprime) <wilfried.pasquazzo@gmail.com>
+
+This software is provided under the MIT License, 
+see file LICENSE.txt for the full licensing terms.
