@@ -25,6 +25,7 @@ import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingMonitor;
+import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackListener;
 
 import com.ensifera.animosity.craftirc.CraftIRC;
@@ -174,7 +175,10 @@ public class NoCheat extends JavaPlugin {
 		// Register listeners for moving check
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingListener(movingCheck), Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingMonitor(movingCheck), Priority.Monitor, this);
-
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, new MovingMonitor(movingCheck), Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingMonitor(movingCheck), Priority.Monitor, this);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(movingCheck), Priority.Monitor, this);
+		
 		// Register listeners for speedhack check
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new SpeedhackListener(speedhackCheck), Priority.High, this);
 

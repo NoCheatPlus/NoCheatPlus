@@ -38,6 +38,7 @@ public class NoCheatData {
 
 	public int airbuildPerSecond = 0;
 	public Runnable airbuildSummaryTask = null;
+	public double maxYVelocity = 0.0D;
 
 	public NoCheatData() { }
 }

@@ -45,7 +45,7 @@ public class MovingCheck extends Check {
 
 	public int ticksBeforeSummary = 100;
 
-	public int ticksDelayForVelocity = 40;
+	public boolean allowFlying = false;
 
 	// How should moving violations be treated?
 	public final Action actions[][] = { 
@@ -55,8 +55,6 @@ public class MovingCheck extends Check {
 
 	public String logMessage = "Moving violation: %1$s from %2$s (%4$.5f, %5$.5f, %6$.5f) to %3$s (%7$.5f, %8$.5f, %9$.5f)";
 	public String summaryMessage = "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)";
-
-	public boolean preciseVelocity = true;
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
@@ -167,10 +165,10 @@ public class MovingCheck extends Check {
 		if(plugin.hasPermission(event.getPlayer(), "nocheat.moving"))
 			return;
 
-		boolean flyingAllowed = false;
+		boolean canFly = false;
 
-		if(plugin.hasPermission(event.getPlayer(), "nocheat.flying"))
-			flyingAllowed = true;
+		if(allowFlying || plugin.hasPermission(event.getPlayer(), "nocheat.flying"))
+			canFly = true;
 
 		// Get the player-specific data
 		final NoCheatData data = plugin.getPlayerData(event.getPlayer());
@@ -202,38 +200,19 @@ public class MovingCheck extends Check {
 			return; // players are allowed to "teleport" into a bed over "short" distances
 		}
 
-		// Give additional movement based on velocity (not too precise, but still better than false positives)
-		Vector v = event.getPlayer().getVelocity();
+		updateVelocity(event.getPlayer());
+		/**** Horizontal movement check START ****/
 
 		int vl1 = -1;
 
-		if(preciseVelocity) {
-			// Compare the velocity vector to the existing movement freedom that we've from previous events
-			double tmp = Math.abs(v.getX()*5D) + Math.abs(v.getZ()*5D);
-			if(tmp > data.movingHorizFreedom)
-				data.movingHorizFreedom = tmp;
-			else
-				data.movingHorizFreedom *= 0.9;
+		vl1 = limitCheck(combined - (data.movingHorizFreedom + 0.6D), moveLimits);
 
-			// Violation level
-			vl1 = limitCheck(combined - (data.movingHorizFreedom + 0.6D), moveLimits);
-		}
-		else
-		{
-			// Compare the velocity vector to the existing movement freedom that we've from previous events
-			double tmp = Math.abs(v.getX()) + Math.abs(v.getZ());
+		// Reduce horiz moving freedom with each event
+		data.movingHorizFreedom *= 0.9;
 
-			if(tmp > data.movingHorizFreedom || tmp > 1.0D)
-				data.movingHorizFreedomCounter = 20;
-			else if(data.movingHorizFreedomCounter > 0 )
-				data.movingHorizFreedomCounter--;
+		/**** Horizontal movement check END ****/
 
-			data.movingHorizFreedom = tmp;
-
-			// Violation level
-			vl1 = limitCheck(combined - ((data.movingHorizFreedomCounter > 0 ? 15.0D : 0.6D)), moveLimits);
-		}
-		
+		/**** Vertical movement check START ****/
 		// pre-calculate boundary values that are needed multiple times in the following checks
 		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
 		int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), (int)Math.floor(from.getY()+0.5D), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
@@ -255,14 +234,16 @@ public class MovingCheck extends Check {
 		//           its movement, plus additional events if the "velocity" was big and can cause longer flights
 
 		// The server sent the player a "velocity" packet a short time ago
-		if(v.getY() > 0.0D) {
-			data.movingVertFreedomCounter = ticksDelayForVelocity;
+		if(data.maxYVelocity > 0.0D) {
+			data.movingVertFreedomCounter = 30;
 
 			// Be generous with the height limit for the client
-			data.movingVertFreedom += v.getY()*3D;
+			data.movingVertFreedom += data.maxYVelocity*2D;
+			data.maxYVelocity = 0.0D;
 		}
-		// If the server no longer has a positive velocity, start consuming the event counter for this client
-		else if(data.movingVertFreedomCounter > 0) {
+
+		// consume a counter for this client
+		if(data.movingVertFreedomCounter > 0) {
 			data.movingVertFreedomCounter--;
 		}
 
@@ -277,10 +258,10 @@ public class MovingCheck extends Check {
 		Location newSetBack = null;
 
 		// there's no use for counting this
-		if(flyingAllowed) data.movingJumpPhase = 0;
-		
+		if(canFly) data.movingJumpPhase = 0;
+
 		// Handle 4 distinct cases: Walk, Jump, Land, Fly
-		
+
 		// Walk or start Jump
 		if(onGroundFrom)
 		{
@@ -304,13 +285,13 @@ public class MovingCheck extends Check {
 		else
 		{
 			Location l = null;
-			
-			if(data.movingSetBackPoint == null || flyingAllowed)
+
+			if(data.movingSetBackPoint == null || canFly)
 				l = from;
 			else
 				l = data.movingSetBackPoint;
 
-			if(!flyingAllowed && data.movingJumpPhase > jumpingLimit)
+			if(!canFly && data.movingJumpPhase > jumpingLimit)
 				limit += jumpHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
 			else limit += jumpHeight;
 
@@ -406,6 +387,21 @@ public class MovingCheck extends Check {
 		data.movingTeleportTo = event.getTo();
 	}
 
+
+	public void updateVelocity(Player player) {
+		NoCheatData data = plugin.getPlayerData(player);
+
+		Vector v = player.getVelocity();
+
+		// Compare the velocity vector to the existing movement freedom that we've from previous events
+		double tmp = Math.abs(v.getX()*2D) + Math.abs(v.getZ()*2D);
+		if(tmp > data.movingHorizFreedom)
+			data.movingHorizFreedom = tmp;
+
+		if(v.getY() > data.maxYVelocity) {
+			data.maxYVelocity = v.getY();
+		}
+	}
 	/**
 	 * Perform actions that were specified in the config file
 	 * @param event

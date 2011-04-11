@@ -25,4 +25,5 @@ public class MovingListener extends PlayerListener {
 		if(!event.isCancelled() && check.isActive())
 			check.check(event);
 	}
+
 }
