@@ -345,6 +345,7 @@ public class NoCheat extends JavaPlugin {
 
 	private String getActiveChecksAsString() {
 		return (movingCheck.isActive() ? movingCheck.getName() + " " : "") + 
+		(!movingCheck.allowFlying ? "flying " : "") + 
 		(speedhackCheck.isActive() ? speedhackCheck.getName() + " " : "") +
 		(airbuildCheck.isActive() ? airbuildCheck.getName() + " " : "") +
 		(bedteleportCheck.isActive() ? bedteleportCheck.getName() + " " : "");
@@ -353,7 +354,7 @@ public class NoCheat extends JavaPlugin {
 
 	private String getPermissionsForPlayerAsString(Player p) {
 		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, "nocheat.moving") ? movingCheck.getName() + " " : "") + 
-				(!movingCheck.isActive() ? "flying* " : (hasPermission(p, "nocheat.flying") ? "flying " : "")) + 
+				(!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, "nocheat.flying") ? "flying " : "")) + 
 				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, "nocheat.speedhack") ? speedhackCheck.getName() + " " : "")) +
 				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, "nocheat.airbuild") ? airbuildCheck.getName() + " " : "")) +
 				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, "nocheat.bedteleport") ? bedteleportCheck.getName() + " " : "")) +
