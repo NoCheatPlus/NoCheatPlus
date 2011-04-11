@@ -345,7 +345,7 @@ public class NoCheat extends JavaPlugin {
 
 	private String getActiveChecksAsString() {
 		return (movingCheck.isActive() ? movingCheck.getName() + " " : "") + 
-		(!movingCheck.allowFlying ? "flying " : "") + 
+		(movingCheck.isActive() && !movingCheck.allowFlying ? "flying " : "") + 
 		(speedhackCheck.isActive() ? speedhackCheck.getName() + " " : "") +
 		(airbuildCheck.isActive() ? airbuildCheck.getName() + " " : "") +
 		(bedteleportCheck.isActive() ? bedteleportCheck.getName() + " " : "");

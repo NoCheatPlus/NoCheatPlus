@@ -104,7 +104,7 @@ public class NoCheatConfiguration {
 		plugin.movingCheck.logMessage = c.getString("moving.logmessage", plugin.movingCheck.logMessage);
 		plugin.movingCheck.summaryMessage = c.getString("moving.summarymessage", plugin.movingCheck.summaryMessage);
 
-		plugin.movingCheck.allowFlying = c.getBoolean("moving.allowFlying", plugin.movingCheck.allowFlying);
+		plugin.movingCheck.allowFlying = c.getBoolean("moving.allowflying", plugin.movingCheck.allowFlying);
 
 		plugin.speedhackCheck.actions[0] = stringToActions(c.getString("speedhack.action.low"), plugin.speedhackCheck.actions[0]);
 		plugin.speedhackCheck.actions[1] = stringToActions(c.getString("speedhack.action.med"), plugin.speedhackCheck.actions[1]);
@@ -261,7 +261,7 @@ public class NoCheatConfiguration {
 			w.write("    logmessage: \"" + plugin.movingCheck.logMessage+"\""); w.newLine();
 			w.write("    summarymessage: \"" + plugin.movingCheck.summaryMessage+"\""); w.newLine();
 			w.write("#   Should (normal speed) flying be generally allowed?"); w.newLine();
-			w.write("    allowflying: \"" + plugin.movingCheck.allowFlying+"\""); w.newLine();
+			w.write("    allowflying: " + plugin.movingCheck.allowFlying); w.newLine();
 			w.write("#   Moving Action, one or more of 'loglow logmed loghigh cancel'"); w.newLine();
 			w.write("    action:"); w.newLine();
 			w.write("        low: "+actionsToString(plugin.movingCheck.actions[0])); w.newLine();
