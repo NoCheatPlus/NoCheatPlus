@@ -123,6 +123,21 @@ public class NoCheatConfiguration {
 		plugin.airbuildCheck.setActive(c.getBoolean("active.airbuild", plugin.airbuildCheck.isActive()));
 		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", plugin.bedteleportCheck.isActive()));
 	}
+	
+	public void cleanup() {
+
+		if(fh != null) {
+			try {
+				logger.removeHandler(fh);
+				fh.flush();
+				fh.close();
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private Action[] stringToActions(String string, Action[] def) {
 

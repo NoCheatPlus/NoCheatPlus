@@ -161,6 +161,10 @@ public class NoCheat extends JavaPlugin {
 	public void onDisable() { 
 
 		PluginDescriptionFile pdfFile = this.getDescription();
+		
+		if(config != null)
+			config.cleanup();
+		
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
 	}
 
