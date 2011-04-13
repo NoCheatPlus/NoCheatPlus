@@ -39,8 +39,12 @@ public class MovingCheck extends Check {
 	// How high may a player move in one event on ground
 	private final double stepHeight = 0.501D;
 
+	private final double stepWidth = 0.6D;
+	private final double sneakStepWidth = 0.25D;
+	
 	// Limits
 	public final double moveLimits[] =   { 0.0D, 0.5D, 2.0D };
+	public final double sneakLimits[] =  { 0.0D, 0.5D, 2.0D };
 	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
 
 	public int ticksBeforeSummary = 100;
@@ -161,6 +165,7 @@ public class MovingCheck extends Check {
 	public void check(final PlayerMoveEvent event) {
 
 
+
 		// Should we check at all
 		if(plugin.hasPermission(event.getPlayer(), "nocheat.moving"))
 			return;
@@ -194,6 +199,7 @@ public class MovingCheck extends Check {
 
 		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
 
+		System.out.println(combined);
 		// If the target is a bed and distance not too big, allow it
 		// Bukkit prevents using blocks behind walls already, so I don't have to check for that
 		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && combined < 8.0D) {
@@ -205,7 +211,10 @@ public class MovingCheck extends Check {
 
 		int vl1 = -1;
 
-		vl1 = limitCheck(combined - (data.movingHorizFreedom + 0.6D), moveLimits);
+		if(event.getPlayer().isSneaking())
+			vl1 = limitCheck(combined - (data.movingHorizFreedom + sneakStepWidth), moveLimits);
+		else
+			vl1 = limitCheck(combined - (data.movingHorizFreedom + stepWidth), moveLimits);
 
 		// Reduce horiz moving freedom with each event
 		data.movingHorizFreedom *= 0.9;
