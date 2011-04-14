@@ -48,6 +48,8 @@ public class MovingCheck extends Check {
 	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
 
 	public int ticksBeforeSummary = 100;
+	
+	public long statisticElapsedTimeNano = 0;
 
 	public boolean allowFlying = false;
 
@@ -59,6 +61,8 @@ public class MovingCheck extends Check {
 
 	public String logMessage = "Moving violation: %1$s from %2$s (%4$.5f, %5$.5f, %6$.5f) to %3$s (%7$.5f, %8$.5f, %9$.5f)";
 	public String summaryMessage = "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)";
+
+	public long statisticTotalEvents = 0;
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
@@ -164,17 +168,11 @@ public class MovingCheck extends Check {
 
 	public void check(final PlayerMoveEvent event) {
 
-
-
-		// Should we check at all
-		if(plugin.hasPermission(event.getPlayer(), "nocheat.moving"))
-			return;
+		long startTime = System.nanoTime();
 
 		boolean canFly = false;
-
-		if(allowFlying || plugin.hasPermission(event.getPlayer(), "nocheat.flying"))
-			canFly = true;
-
+		boolean stopEarly = false;
+		
 		// Get the player-specific data
 		final NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
@@ -184,11 +182,17 @@ public class MovingCheck extends Check {
 		// WORKAROUND for changed PLAYER_MOVE logic
 		final Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
 		data.movingTeleportTo = null;
+		
+		// Should we check at all
+		if(plugin.hasPermission(event.getPlayer(), "nocheat.moving"))
+			stopEarly = true;
+		else if(allowFlying || plugin.hasPermission(event.getPlayer(), "nocheat.flying"))
+			canFly = true;
 
 		// vehicles are a special case, I ignore them because the server controls them
-		if(event.getPlayer().isInsideVehicle()) {
+		if(!stopEarly && event.getPlayer().isInsideVehicle()) {
 			resetData(data, event.getTo());
-			return;
+			stopEarly = true;
 		}
 
 		// The actual movingCheck starts here
@@ -199,14 +203,19 @@ public class MovingCheck extends Check {
 
 		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
 
-		System.out.println(combined);
 		// If the target is a bed and distance not too big, allow it
 		// Bukkit prevents using blocks behind walls already, so I don't have to check for that
 		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && combined < 8.0D) {
-			return; // players are allowed to "teleport" into a bed over "short" distances
+			stopEarly = true; // players are allowed to "teleport" into a bed over "short" distances
 		}
 
 		updateVelocity(event.getPlayer());
+		
+		if(stopEarly) {
+			statisticElapsedTimeNano += System.nanoTime() - startTime;
+			statisticTotalEvents++;
+			return;
+		}
 		/**** Horizontal movement check START ****/
 
 		int vl1 = -1;
@@ -224,7 +233,7 @@ public class MovingCheck extends Check {
 		/**** Vertical movement check START ****/
 		// pre-calculate boundary values that are needed multiple times in the following checks
 		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-		int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), (int)Math.floor(from.getY()+0.5D), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
+		int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), (int)Math.floor(from.getY()), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
 		int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), (int)Math.floor(to.getY()+0.5D), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
 
 		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
@@ -345,6 +354,9 @@ public class MovingCheck extends Check {
 
 			action(event, event.getPlayer(), from, to, actions[vl], log, data);
 		}
+		
+		statisticElapsedTimeNano += System.nanoTime() - startTime;
+		statisticTotalEvents++;
 	}
 
 	private void setupSummaryTask(final Player p, final NoCheatData data) {

@@ -125,7 +125,7 @@ public class NoCheat extends JavaPlugin {
 		}
 
 		if(args.length == 0) {
-			sender.sendMessage("NC: Using "+ ((permissions == null) ? "isOp()" : "Permissions") + ". Activated checks/bugfixes: " + getActiveChecksAsString());
+			sender.sendMessage("NC: Using "+ ((permissions == null) ? "isOp()" : "Permissions") + ". Activated checks/bugfixes: " + getActiveChecksAsString() + ". Total time used for moving check so far: " + (movingCheck.statisticElapsedTimeNano / 1000000L + " ms. Average time per move event: " + (movingCheck.statisticElapsedTimeNano/1000L)/movingCheck.statisticTotalEvents + " us"));
 			return true;
 		}
 		else if(args.length == 1 && args[0] != null && args[0].trim().equals("-p")) { 
@@ -305,7 +305,7 @@ public class NoCheat extends JavaPlugin {
 
 
 	public boolean hasPermission(Player player, String permission) {
-
+		
 		if(player == null || permission == null) {
 			return false;
 		}
