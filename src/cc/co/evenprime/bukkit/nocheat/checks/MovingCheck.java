@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
@@ -41,14 +42,13 @@ public class MovingCheck extends Check {
 
 	private final double stepWidth = 0.6D;
 	private final double sneakStepWidth = 0.25D;
-	
+
 	// Limits
 	public final double moveLimits[] =   { 0.0D, 0.5D, 2.0D };
-	public final double sneakLimits[] =  { 0.0D, 0.5D, 2.0D };
 	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
 
 	public int ticksBeforeSummary = 100;
-	
+
 	public long statisticElapsedTimeNano = 0;
 
 	public boolean allowFlying = false;
@@ -170,11 +170,24 @@ public class MovingCheck extends Check {
 
 		long startTime = System.nanoTime();
 
-		boolean canFly = false;
-		boolean stopEarly = false;
-		
+		final Player player = event.getPlayer();
+
+		// Should we check at all
+		if(plugin.hasPermission(player, NoCheatData.PERMISSION_MOVING)) {
+			statisticElapsedTimeNano += System.nanoTime() - startTime;
+			statisticTotalEvents++;
+			return;
+		}
+
 		// Get the player-specific data
-		final NoCheatData data = plugin.getPlayerData(event.getPlayer());
+		final NoCheatData data = NoCheatData.getPlayerData(player);
+
+		if(data.respawned != null && data.respawned.equals(event.getTo()))
+			return;
+		else
+			data.respawned = null;
+
+		updateVelocity(player.getVelocity(), data);
 
 		// Get the two locations of the event
 		final Location to = event.getTo();
@@ -182,45 +195,42 @@ public class MovingCheck extends Check {
 		// WORKAROUND for changed PLAYER_MOVE logic
 		final Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
 		data.movingTeleportTo = null;
-		
-		// Should we check at all
-		if(plugin.hasPermission(event.getPlayer(), "nocheat.moving"))
-			stopEarly = true;
-		else if(allowFlying || plugin.hasPermission(event.getPlayer(), "nocheat.flying"))
-			canFly = true;
 
 		// vehicles are a special case, I ignore them because the server controls them
-		if(!stopEarly && event.getPlayer().isInsideVehicle()) {
-			resetData(data, event.getTo());
-			stopEarly = true;
-		}
-
-		// The actual movingCheck starts here
-
-		// First check the distance the player has moved horizontally
-		double xDistance = Math.abs(from.getX()-to.getX());
-		double zDistance = Math.abs(from.getZ()-to.getZ());
-
-		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
-
-		// If the target is a bed and distance not too big, allow it
-		// Bukkit prevents using blocks behind walls already, so I don't have to check for that
-		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && combined < 8.0D) {
-			stopEarly = true; // players are allowed to "teleport" into a bed over "short" distances
-		}
-
-		updateVelocity(event.getPlayer());
-		
-		if(stopEarly) {
+		if(player.isInsideVehicle()) {
+			resetData(data, to);
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
 		}
+
+		boolean canFly = false;
+
+		if(allowFlying || plugin.hasPermission(player, NoCheatData.PERMISSION_FLYING))
+			canFly = true;
+
+		// The actual movingCheck starts here
+
+		// First check the distance the player has moved horizontally
+		final double xDistance = Math.abs(from.getX()-to.getX());
+		final double zDistance = Math.abs(from.getZ()-to.getZ());
+
+		final double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
+
+		// If the target is a bed and distance not too big, allow it
+		// Bukkit prevents using blocks behind walls already, so I don't have to check for that
+		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && combined < 8.0D) {
+			statisticElapsedTimeNano += System.nanoTime() - startTime;
+			statisticTotalEvents++;
+			return;
+		}
+
 		/**** Horizontal movement check START ****/
 
 		int vl1 = -1;
 
-		if(event.getPlayer().isSneaking())
+		//if(player.isSneaking())
+		if(false) // Currently disabled, still needs some additional work
 			vl1 = limitCheck(combined - (data.movingHorizFreedom + sneakStepWidth), moveLimits);
 		else
 			vl1 = limitCheck(combined - (data.movingHorizFreedom + stepWidth), moveLimits);
@@ -354,7 +364,7 @@ public class MovingCheck extends Check {
 
 			action(event, event.getPlayer(), from, to, actions[vl], log, data);
 		}
-		
+
 		statisticElapsedTimeNano += System.nanoTime() - startTime;
 		statisticTotalEvents++;
 	}
@@ -384,6 +394,14 @@ public class MovingCheck extends Check {
 		}
 	}
 
+
+	public void respawned(PlayerRespawnEvent event) {
+		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+
+		data.respawned = event.getRespawnLocation();
+	}
+
+	
 	/**
 	 * Call this when a player got successfully teleported with the corresponding event to set new "setback" points
 	 * and reset data (if necessary)
@@ -391,31 +409,34 @@ public class MovingCheck extends Check {
 	 * @param event
 	 */
 	public void teleported(PlayerTeleportEvent event) {
-		NoCheatData data = plugin.getPlayerData(event.getPlayer());
 
-		if(data.reset) { // My plugin requested this teleport while handling another event
-			data.reset = false;
+		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+
+		if(event.getTo().equals(data.reset)) { // My plugin requested this teleport while handling another event
+
+			// DANGEROUS, but I have no real choice on that one thanks to Essentials jail simply blocking ALL kinds of teleports
+			// even the respawn teleport, the player moved wrongly teleport, the "get player out of the void" teleport", ...
+			
+			// TODO: Make this optional OR detect Essentials and make this dependent on essential
+			event.setCancelled(false);
 		}
-		else {
-			if(!event.isCancelled()) {
-				// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
-				resetData(data, event.getTo());
-			}
+		else if(!event.isCancelled()) {
+			data.reset = null;
+			// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
+			resetData(data, event.getTo());
 		}
 
-		// WORKAROUND for changed PLAYER_MOVE logic - I need to remember the "to" location of teleports and use it as a from-Location
-		// for the move event that comes next
-		data.movingTeleportTo = event.getTo();
+		if(!event.isCancelled()) {
+			// WORKAROUND for changed PLAYER_MOVE logic - I need to remember the "to" location of teleports and use it as a from-Location
+			// for the move event that comes next
+			data.movingTeleportTo = event.getTo();
+		}
 	}
 
-
-	public void updateVelocity(Player player) {
-		NoCheatData data = plugin.getPlayerData(player);
-
-		Vector v = player.getVelocity();
+	public static void updateVelocity(Vector v, NoCheatData data) {
 
 		// Compare the velocity vector to the existing movement freedom that we've from previous events
-		double tmp = Math.abs(v.getX()*2D) + Math.abs(v.getZ()*2D);
+		double tmp = (Math.abs(v.getX()) + Math.abs(v.getZ())) * 2D;
 		if(tmp > data.movingHorizFreedom)
 			data.movingHorizFreedom = tmp;
 
@@ -474,7 +495,7 @@ public class MovingCheck extends Check {
 	 */
 	private void resetPlayer(PlayerMoveEvent event, Location from) {
 
-		NoCheatData data = plugin.getPlayerData(event.getPlayer());
+		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
 
 		// Reset the jumpphase. We choose the setback-point such that it should be
 		// on solid ground, but in case it isn't (maybe the ground is gone now) we
@@ -483,16 +504,21 @@ public class MovingCheck extends Check {
 
 		if(data.movingSetBackPoint == null) data.movingSetBackPoint = from.clone();
 
-		// Set a flag that gets used while handling teleport events
-		data.reset = true;
+		// Set a flag that gets used while handling teleport events (to determine if
+		// it was my teleport or someone else'
+		data.reset = data.movingSetBackPoint;
 
 		resetData(data, data.movingSetBackPoint);
 
-		// Put the player back to the chosen location
-		event.setFrom(data.movingSetBackPoint.clone());
-		event.setTo(data.movingSetBackPoint.clone());
-		event.getPlayer().teleport(data.movingSetBackPoint.clone());
-		event.setCancelled(true);	
+		// Only reset player and cancel event if teleport is successful
+		if(event.getPlayer().teleport(data.movingSetBackPoint)) {
+
+			// Put the player back to the chosen location
+			event.setFrom(data.movingSetBackPoint);
+			event.setTo(data.movingSetBackPoint);
+
+			event.setCancelled(true);
+		}
 	}
 
 
@@ -588,4 +614,6 @@ public class MovingCheck extends Check {
 	public String getName() {
 		return "moving";
 	}
+
+
 }

@@ -4,6 +4,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityListener;
 
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 
 public class MovingEntityListener extends EntityListener {
@@ -18,7 +20,7 @@ public class MovingEntityListener extends EntityListener {
 	@Override
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(event.getEntity() instanceof Player) {
-			check.updateVelocity((Player)event.getEntity());
+			MovingCheck.updateVelocity(event.getEntity().getVelocity(), NoCheatData.getPlayerData((Player)event.getEntity()));
 		}
 		
 	}

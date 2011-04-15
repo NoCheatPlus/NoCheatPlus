@@ -37,12 +37,12 @@ public class AirbuildCheck extends Check {
 	public void check(BlockPlaceEvent event) {
 
 		// Should we check at all?
-		if(plugin.hasPermission(event.getPlayer(), "nocheat.airbuild")) 
+		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_AIRBUILD)) 
 			return;
 
 		// Are all 6 sides "air-blocks" -> cancel the event
 		if(event.getBlockAgainst().getType() == Material.AIR) {
-			final NoCheatData data = plugin.getPlayerData(event.getPlayer());
+			final NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
 			final Player p = event.getPlayer();
 
 			if(data.airbuildSummaryTask == null) {
@@ -81,7 +81,7 @@ public class AirbuildCheck extends Check {
 	private void action(Action actions[], BlockPlaceEvent event, boolean loggingAllowed) {
 
 		if(actions == null) return;
-		
+
 		boolean cancelled = false;
 
 		// Prepare log message if needed

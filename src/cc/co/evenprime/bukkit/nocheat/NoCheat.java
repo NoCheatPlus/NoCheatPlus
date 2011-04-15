@@ -1,8 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,9 +58,6 @@ public class NoCheat extends JavaPlugin {
 	// CraftIRC 2.x, if available
 	private CraftIRC irc;
 
-	// Store data between Events
-	private final Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
-
 	public NoCheat() { 	
 		movingCheck = new MovingCheck(this);
 		bedteleportCheck = new BedteleportCheck(this);
@@ -73,52 +68,11 @@ public class NoCheat extends JavaPlugin {
 		setupConfig();
 	}
 
-	/**
-	 * Main access to data that needs to be stored between different events.
-	 * Always returns a NoCheatData object, because if there isn't one
-	 * for the specified player, one will be created.
-	 * 
-	 * @param p
-	 * @return
-	 */
-	public NoCheatData getPlayerData(Player p) {
-		NoCheatData data = null;
-
-		if((data = playerData.get(p)) == null ) {
-			synchronized(playerData) {
-				data = playerData.get(p);
-				if(data == null) {
-					// If we have no data for the player, create some
-					data = new NoCheatData();
-					playerData.put(p, data);
-				}
-			}
-		}
-
-		return data;
-	}
-
-	/**
-	 * Go through the playerData HashMap and remove players that are no longer online
-	 * from the map. This should be called in long, regular intervals (e.g. every 10 minutes)
-	 * to keep the memory footprint of the plugin low
-	 */
-	public void cleanPlayerDataCollection() {
-		synchronized(playerData) {
-			Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>)it.next();
-				if(!pairs.getKey().isOnline())
-					it.remove();
-			}
-		}
-	}
-
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
 	{
 		if(sender instanceof Player) {
-			if(!hasPermission((Player)sender, "nocheat.p")) {
+			if(!hasPermission((Player)sender, NoCheatData.PERMISSION_P)) {
 				sender.sendMessage("NC: You are not allowed to use this command.");
 				return false;
 			}
@@ -161,10 +115,10 @@ public class NoCheat extends JavaPlugin {
 	public void onDisable() { 
 
 		PluginDescriptionFile pdfFile = this.getDescription();
-		
+
 		if(config != null)
 			config.cleanup();
-		
+
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
 	}
 
@@ -181,8 +135,9 @@ public class NoCheat extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingMonitor(movingCheck), Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, new MovingMonitor(movingCheck), Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingMonitor(movingCheck), Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, new MovingMonitor(movingCheck), Priority.Monitor, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(movingCheck), Priority.Monitor, this);
-		
+
 		// Register listeners for speedhack check
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new SpeedhackListener(speedhackCheck), Priority.High, this);
 
@@ -215,7 +170,7 @@ public class NoCheat extends JavaPlugin {
 
 			@Override
 			public void run() {
-				cleanPlayerDataCollection();
+				NoCheatData.cleanPlayerDataCollection();
 			}
 
 		}, 5000, 5000);
@@ -284,7 +239,7 @@ public class NoCheat extends JavaPlugin {
 	private void logToChat(Level l, String message) {
 		if(config.chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
-				if(hasPermission(player, "nocheat.notify")) {
+				if(hasPermission(player, NoCheatData.PERMISSION_NOTIFY)) {
 					player.sendMessage("["+l.getName()+"] " + message);
 				}
 			}
@@ -304,18 +259,23 @@ public class NoCheat extends JavaPlugin {
 	}
 
 
-	public boolean hasPermission(Player player, String permission) {
-		
-		if(player == null || permission == null) {
+	public boolean hasPermission(Player player, int permission) {
+
+		if(player == null) {
 			return false;
 		}
+
 		try {
-			if(permissions != null && permissions.has(player, permission))
-				return true;
-			else if(permissions == null && player.isOp())
-				return true;
-			else
-				return false;
+			if(permissions == null)
+				return player.isOp();
+			else {
+				NoCheatData data = NoCheatData.getPlayerData(player);
+				if(data.permissionsLastUpdate + 10000 < System.currentTimeMillis()) {
+					data.permissionsLastUpdate = System.currentTimeMillis();
+					updatePermissions(player, data);
+				}
+				return data.permissionsCache[permission];
+			}
 		}
 		catch(Throwable e) {
 			if(!this.exceptionWithPermissions) {
@@ -330,6 +290,18 @@ public class NoCheat extends JavaPlugin {
 			}
 			return false;
 		}
+	}
+
+	private void updatePermissions(Player player, NoCheatData data) {
+
+		data.permissionsCache[NoCheatData.PERMISSION_AIRBUILD] = permissions.has(player, "nocheat.airbuild");
+		data.permissionsCache[NoCheatData.PERMISSION_BEDTELEPORT] = permissions.has(player, "nocheat.bedteleport");
+		data.permissionsCache[NoCheatData.PERMISSION_FLYING] = permissions.has(player, "nocheat.flying");
+		data.permissionsCache[NoCheatData.PERMISSION_MOVING] = permissions.has(player, "nocheat.moving");
+		data.permissionsCache[NoCheatData.PERMISSION_P] = permissions.has(player, "nocheat.p");
+		data.permissionsCache[NoCheatData.PERMISSION_SPEEDHACK] = permissions.has(player, "nocheat.speedhack");
+		data.permissionsCache[NoCheatData.PERMISSION_NOTIFY] = permissions.has(player, "nocheat.notify");
+
 	}
 
 	/**
@@ -353,12 +325,12 @@ public class NoCheat extends JavaPlugin {
 
 
 	private String getPermissionsForPlayerAsString(Player p) {
-		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, "nocheat.moving") ? movingCheck.getName() + " " : "") + 
-				(!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, "nocheat.flying") ? "flying " : "")) + 
-				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, "nocheat.speedhack") ? speedhackCheck.getName() + " " : "")) +
-				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, "nocheat.airbuild") ? airbuildCheck.getName() + " " : "")) +
-				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, "nocheat.bedteleport") ? bedteleportCheck.getName() + " " : "")) +
-				(hasPermission(p, "nocheat.notify") ? "notify " : ""));
+		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_MOVING) ? movingCheck.getName() + " " : "") + 
+				(!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, NoCheatData.PERMISSION_FLYING) ? "flying " : "")) + 
+				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_SPEEDHACK) ? speedhackCheck.getName() + " " : "")) +
+				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_AIRBUILD) ? airbuildCheck.getName() + " " : "")) +
+				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_BEDTELEPORT) ? bedteleportCheck.getName() + " " : "")) +
+				(hasPermission(p, NoCheatData.PERMISSION_NOTIFY) ? "notify " : ""));
 	}
 
 	public void handleCustomAction(Action a, Player player) {

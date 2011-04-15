@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
-import org.bukkit.Location;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
@@ -40,11 +39,11 @@ public class SpeedhackCheck extends Check {
 	public void check(PlayerMoveEvent event) {
 
 		// Should we check at all?
-		if(plugin.hasPermission(event.getPlayer(), "nocheat.speedhack")) 
+		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_SPEEDHACK)) 
 			return;
 
 		// Get the player-specific data
-		NoCheatData data = plugin.getPlayerData(event.getPlayer());
+		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
 
 		// Ignore events if the player has positive y-Velocity (these can be the cause of event spam between server and client)
 		if(event.getPlayer().getVelocity().getY() > 0.0D) {
@@ -117,21 +116,16 @@ public class SpeedhackCheck extends Check {
 
 	private static void resetPlayer(PlayerMoveEvent event, NoCheatData data) {
 
-		Location l = data.speedhackSetBackPoint;
+		if(data.speedhackSetBackPoint == null) data.speedhackSetBackPoint = event.getFrom().clone();
 
-		data.reset = true;
+		data.reset = data.speedhackSetBackPoint;
+		
 		// If we have stored a location for the player, we put him back there
-		if(l != null) {
-			event.setFrom(l);
-			event.setTo(l);
+
+		if(event.getPlayer().teleport(data.speedhackSetBackPoint)) {
+			event.setFrom(data.speedhackSetBackPoint);
+			event.setTo(data.speedhackSetBackPoint);
 			event.setCancelled(true);
-			event.getPlayer().teleport(l);
-		}
-		else {
-			event.setFrom(event.getFrom());
-			event.setTo(event.getFrom().clone());
-			event.setCancelled(true);
-			event.getPlayer().teleport(event.getFrom());
 		}
 	}
 
