@@ -528,16 +528,19 @@ public class MovingCheck extends Check {
 
 		// Set a flag that gets used while handling teleport events (to determine if
 		// it was my teleport or someone else'
-		data.teleportInitializedByMe = data.movingSetBackPoint;
+		Location t = data.movingSetBackPoint;
 
-		resetData(data, data.movingSetBackPoint);
+		t = new Location(t.getWorld(), t.getX(),  t.getY(), t.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
+		data.teleportInitializedByMe = t;
+
+		resetData(data, t);
 
 		// Only reset player and cancel event if teleport is successful
-		if(event.getPlayer().teleport(data.movingSetBackPoint)) {
+		if(event.getPlayer().teleport(t)) {
 
 			// Put the player back to the chosen location
-			event.setFrom(data.movingSetBackPoint);
-			event.setTo(data.movingSetBackPoint);
+			event.setFrom(t);
+			event.setTo(t);
 
 			event.setCancelled(true);
 		}
