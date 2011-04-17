@@ -118,7 +118,7 @@ public class SpeedhackCheck extends Check {
 
 		if(data.speedhackSetBackPoint == null) data.speedhackSetBackPoint = event.getFrom().clone();
 
-		data.reset = data.speedhackSetBackPoint;
+		data.teleportInitializedByMe = data.speedhackSetBackPoint;
 		
 		// If we have stored a location for the player, we put him back there
 

@@ -32,10 +32,11 @@ public class NoCheatData {
 
 	// WORKAROUND for changed PLAYER_MOVE logic
 	public Location movingTeleportTo = null;
+	public Location movingLastLocation = null;
 
-	public Location reset = null;
-	
-	public Location respawned = null;
+	public Location teleportInitializedByMe = null;
+	public boolean worldChanged = false;
+	public boolean respawned = false;
 
 	public long speedhackLastCheck = System.currentTimeMillis(); // timestamp of last check for speedhacks
 	public Location speedhackSetBackPoint = null;
@@ -48,6 +49,7 @@ public class NoCheatData {
 
 	public long permissionsLastUpdate = 0;
 	public boolean permissionsCache[] = new boolean[7];
+
 
 	public static final int PERMISSION_MOVING = 0;
 	public static final int PERMISSION_FLYING = 1;

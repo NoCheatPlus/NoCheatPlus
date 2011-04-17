@@ -39,6 +39,8 @@ public class MovingMonitor extends PlayerListener {
 	
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		MovingCheck.updateVelocity(event.getPlayer().getVelocity(), NoCheatData.getPlayerData(event.getPlayer()));
+		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+		data.movingLastLocation = event.getTo();
+		MovingCheck.updateVelocity(event.getPlayer().getVelocity(), data);
 	}
 }

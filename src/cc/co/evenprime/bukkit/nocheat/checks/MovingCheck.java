@@ -179,37 +179,34 @@ public class MovingCheck extends Check {
 			return;
 		}
 
+		final boolean canFly;
+		if(allowFlying || plugin.hasPermission(player, NoCheatData.PERMISSION_FLYING))
+			canFly = true;
+		else
+			canFly = false;
+
 		// Get the player-specific data
 		final NoCheatData data = NoCheatData.getPlayerData(player);
 
-		if(data.respawned != null && data.respawned.equals(event.getTo()))
-			return;
-		else
-			data.respawned = null;
-
-		updateVelocity(player.getVelocity(), data);
-
 		// Get the two locations of the event
 		final Location to = event.getTo();
+		Location from = event.getFrom();
 
 		// WORKAROUND for changed PLAYER_MOVE logic
-		final Location from = data.movingTeleportTo == null ? event.getFrom() : data.movingTeleportTo;
-		data.movingTeleportTo = null;
+		if(data.movingTeleportTo != null) {
+			from = data.movingTeleportTo;
+			data.movingTeleportTo = null;
+		}
 
-		// vehicles are a special case, I ignore them because the server controls them
-		if(player.isInsideVehicle()) {
-			resetData(data, to);
+		// The use of event.getFrom() is intentional
+		if(shouldBeIgnored(player, data, event.getFrom(), to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
 		}
 
-		boolean canFly = false;
-
-		if(allowFlying || plugin.hasPermission(player, NoCheatData.PERMISSION_FLYING))
-			canFly = true;
-
 		// The actual movingCheck starts here
+		updateVelocity(player.getVelocity(), data);
 
 		// First check the distance the player has moved horizontally
 		final double xDistance = Math.abs(from.getX()-to.getX());
@@ -369,6 +366,29 @@ public class MovingCheck extends Check {
 		statisticTotalEvents++;
 	}
 
+	private boolean shouldBeIgnored(Player player, NoCheatData data, Location from, Location to) {
+		if(from.equals(to)) // Both locations are perfectly identical
+			return true;
+		else if(!from.equals(data.movingLastLocation)) { // The player was moved somehow without causing a move event
+			resetData(data, to);
+			return true;
+		}
+		else if(data.respawned) {
+			data.respawned = false;
+			return true;
+		}
+		else if(data.worldChanged) {
+			data.worldChanged = false;
+			return true;
+		}
+		// vehicles are a special case, I ignore them because the server controls them
+		else if(player.isInsideVehicle()) {
+			return true;
+		}
+		return false;
+	}
+
+
 	private void setupSummaryTask(final Player p, final NoCheatData data) {
 		// Setup task to display summary later
 		if(data.movingSummaryTask == null) {
@@ -394,14 +414,6 @@ public class MovingCheck extends Check {
 		}
 	}
 
-
-	public void respawned(PlayerRespawnEvent event) {
-		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
-
-		data.respawned = event.getRespawnLocation();
-	}
-
-	
 	/**
 	 * Call this when a player got successfully teleported with the corresponding event to set new "setback" points
 	 * and reset data (if necessary)
@@ -412,25 +424,35 @@ public class MovingCheck extends Check {
 
 		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
 
-		if(event.getTo().equals(data.reset)) { // My plugin requested this teleport while handling another event
+		if(event.getTo().equals(data.teleportInitializedByMe)) { // My plugin requested this teleport while handling another event
 
 			// DANGEROUS, but I have no real choice on that one thanks to Essentials jail simply blocking ALL kinds of teleports
 			// even the respawn teleport, the player moved wrongly teleport, the "get player out of the void" teleport", ...
-			
+
 			// TODO: Make this optional OR detect Essentials and make this dependent on essential
 			event.setCancelled(false);
+			data.teleportInitializedByMe = null;
+			//data.movingTeleportTo = event.getTo();
 		}
 		else if(!event.isCancelled()) {
-			data.reset = null;
 			// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
 			resetData(data, event.getTo());
-		}
 
-		if(!event.isCancelled()) {
-			// WORKAROUND for changed PLAYER_MOVE logic - I need to remember the "to" location of teleports and use it as a from-Location
-			// for the move event that comes next
-			data.movingTeleportTo = event.getTo();
+			if(event.getFrom().getWorld().equals(event.getTo().getWorld())) {
+				// WORKAROUND for changed PLAYER_MOVE logic - I need to remember the "to" location of teleports and use it as a from-Location
+				// for the move event that comes next
+				data.movingTeleportTo = event.getTo();
+			}
+			else
+				data.worldChanged = true;
 		}
+	}
+
+	public void respawned(PlayerRespawnEvent event) {
+		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+
+		data.respawned = true;
+
 	}
 
 	public static void updateVelocity(Vector v, NoCheatData data) {
@@ -506,7 +528,7 @@ public class MovingCheck extends Check {
 
 		// Set a flag that gets used while handling teleport events (to determine if
 		// it was my teleport or someone else'
-		data.reset = data.movingSetBackPoint;
+		data.teleportInitializedByMe = data.movingSetBackPoint;
 
 		resetData(data, data.movingSetBackPoint);
 
@@ -614,6 +636,4 @@ public class MovingCheck extends Check {
 	public String getName() {
 		return "moving";
 	}
-
-
 }
