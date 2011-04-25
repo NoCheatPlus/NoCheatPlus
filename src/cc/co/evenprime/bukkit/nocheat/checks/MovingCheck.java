@@ -2,13 +2,18 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
@@ -17,6 +22,9 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerMonitor;
 
 /**
  * Check if the player should be allowed to make that move, e.g. is he allowed to jump here or move that far in one step
@@ -27,8 +35,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 public class MovingCheck extends Check {
 
 	public MovingCheck(NoCheat plugin) {
-		super(plugin);
-		setActive(true);
+		super(plugin, "moving", NoCheatData.PERMISSION_MOVING);
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
@@ -173,7 +180,7 @@ public class MovingCheck extends Check {
 		final Player player = event.getPlayer();
 
 		// Should we check at all
-		if(plugin.hasPermission(player, NoCheatData.PERMISSION_MOVING)) {
+		if(hasPermission(player)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
@@ -628,15 +635,23 @@ public class MovingCheck extends Check {
 
 	private void resetData(NoCheatData data, Location l) {
 		// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
-		data.speedhackSetBackPoint = l;
 		data.movingSetBackPoint = l;
-		data.speedhackEventsSinceLastCheck = 0;
 		data.movingJumpPhase = 0;
 		data.movingTeleportTo = null;
 	}
 
 	@Override
-	public String getName() {
-		return "moving";
+	protected void registerListeners() {
+		PluginManager pm = Bukkit.getServer().getPluginManager();
+		
+		Listener movingPlayerMonitor = new MovingPlayerMonitor(this);
+		
+		// Register listeners for moving check
+		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingPlayerListener(this), Priority.Lowest, plugin);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, movingPlayerMonitor, Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, movingPlayerMonitor, Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, movingPlayerMonitor, Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(this), Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingPlayerMonitor(this), Priority.Monitor, plugin);		
 	}
 }

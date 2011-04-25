@@ -14,11 +14,11 @@ import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
  * @author Evenprime
  *
  */
-public class MovingMonitor extends PlayerListener {
+public class MovingPlayerMonitor extends PlayerListener {
 
 	private MovingCheck check;
 
-	public MovingMonitor(MovingCheck check) {
+	public MovingPlayerMonitor(MovingCheck check) {
 		this.check = check;
 	}
 

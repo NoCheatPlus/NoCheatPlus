@@ -15,7 +15,6 @@ public class MovingEntityListener extends EntityListener {
 		this.check = check;
 	}
 	
-	
 	@Override
 	public void onEntityDamage(EntityDamageEvent event) {
 		if(event.getEntity() instanceof Player) {

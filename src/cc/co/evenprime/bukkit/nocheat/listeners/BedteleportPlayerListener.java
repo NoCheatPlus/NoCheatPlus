@@ -10,19 +10,17 @@ import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
  * @author Evenprime
  *
  */
-public class BedteleportListener extends PlayerListener {
+public class BedteleportPlayerListener extends PlayerListener {
 
 	private BedteleportCheck check;
 
-	public BedteleportListener(BedteleportCheck check) {
+	public BedteleportPlayerListener(BedteleportCheck check) {
 		this.check = check;
 	}
 
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 
-		if(!event.isCancelled() && check.isActive()) {
-			check.check(event);
-		}
+		if(!event.isCancelled()) check.check(event);
 	}
 }

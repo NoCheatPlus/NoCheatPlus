@@ -11,17 +11,16 @@ import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
  * @author Evenprime
  *
  */
-public class AirbuildListener extends BlockListener {
+public class AirbuildBlockListener extends BlockListener {
 
 	private AirbuildCheck check;
-	public AirbuildListener(AirbuildCheck check) {
+	public AirbuildBlockListener(AirbuildCheck check) {
 		this.check = check;
 	}
 
 	@Override
 	public void onBlockPlace(BlockPlaceEvent event) {
 
-		if(!event.isCancelled() && check.isActive())
-			check.check(event);
+		if(!event.isCancelled()) check.check(event);
 	}
 }

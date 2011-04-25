@@ -1,9 +1,13 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -11,6 +15,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
 
 
 /**
@@ -30,15 +35,13 @@ public class AirbuildCheck extends Check {
 	public final int limits[] = { 1, 3, 10 };
 
 	public AirbuildCheck(NoCheat plugin) {
-		super(plugin);
-		setActive(false);
+		super(plugin, "airbuild", NoCheatData.PERMISSION_AIRBUILD);
 	}
 
 	public void check(BlockPlaceEvent event) {
 
 		// Should we check at all?
-		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_AIRBUILD)) 
-			return;
+		if(hasPermission(event.getPlayer())) return;
 
 		// Are all 6 sides "air-blocks" -> cancel the event
 		if(event.getBlockAgainst().getType() == Material.AIR) {
@@ -120,7 +123,11 @@ public class AirbuildCheck extends Check {
 	}
 
 	@Override
-	public String getName() {
-		return "airbuild";
+	protected void registerListeners() {
+		PluginManager pm = Bukkit.getServer().getPluginManager();
+			
+		// Register listeners for airbuild check
+		pm.registerEvent(Event.Type.BLOCK_PLACE, new AirbuildBlockListener(this), Priority.Low, plugin);
+		
 	}
 }

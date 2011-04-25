@@ -6,24 +6,23 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 
-public class ItemdupeListener extends PlayerListener {
+public class ItemdupePlayerListener extends PlayerListener {
 
-	
 	ItemdupeCheck check;
 	
-	public ItemdupeListener(ItemdupeCheck itemdupeCheck) {
+	public ItemdupePlayerListener(ItemdupeCheck itemdupeCheck) {
 		check = itemdupeCheck;
 	}
 
 	@Override
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
 		
-		if(check.isActive()) check.check(event);
+		if(!event.isCancelled()) check.check(event);
 	}
 	
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		
-		if(check.isActive()) check.check(event);
+		if(!event.isCancelled()) check.check(event);
 	}
 }

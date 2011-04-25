@@ -1,6 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -8,6 +14,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackPlayerListener;
 
 /**
  * Log if a player sends to many move events in a specific time frame, usually the result of tinkering with the system clock
@@ -18,8 +25,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 public class SpeedhackCheck extends Check {
 
 	public SpeedhackCheck(NoCheat plugin) {
-		super(plugin);
-		setActive(true);
+		super(plugin, "speedhack", NoCheatData.PERMISSION_SPEEDHACK);
 	}
 
 	private static final long interval = 1000;
@@ -39,8 +45,7 @@ public class SpeedhackCheck extends Check {
 	public void check(PlayerMoveEvent event) {
 
 		// Should we check at all?
-		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_SPEEDHACK)) 
-			return;
+		if(hasPermission(event.getPlayer())) return;
 
 		// Get the player-specific data
 		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
@@ -130,7 +135,21 @@ public class SpeedhackCheck extends Check {
 	}
 
 	@Override
-	public String getName() {
-		return "speedhack";
+	protected void registerListeners() {
+		PluginManager pm = Bukkit.getServer().getPluginManager();
+		
+		Listener speedhackPlayerListener = new SpeedhackPlayerListener(this);
+		// Register listeners for speedhack check
+		pm.registerEvent(Event.Type.PLAYER_MOVE, speedhackPlayerListener, Priority.High, plugin);
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, speedhackPlayerListener, Priority.Monitor, plugin);		
+		
+	}
+
+	public void teleported(PlayerTeleportEvent event) {
+		
+		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+
+		data.speedhackSetBackPoint = event.getTo();
+		data.speedhackEventsSinceLastCheck = 0;
 	}
 }

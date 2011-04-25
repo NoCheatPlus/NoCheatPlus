@@ -1,9 +1,14 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
+import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportPlayerListener;
 
 /**
  * 
@@ -14,14 +19,13 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 public class BedteleportCheck extends Check {
 
 	public BedteleportCheck(NoCheat plugin) {
-		super(plugin);
-		setActive(true);
+		super(plugin, "bedteleport",  NoCheatData.PERMISSION_BEDTELEPORT);
 	}
 
 	public void check(PlayerMoveEvent event) {
 
 		// Should we check at all?
-		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_BEDTELEPORT)) 
+		if(hasPermission(event.getPlayer())) 
 			return;
 
 		if(event.getPlayer().isSleeping())
@@ -29,7 +33,11 @@ public class BedteleportCheck extends Check {
 	}
 
 	@Override
-	public String getName() {
-		return "bedteleport";
+	protected void registerListeners() {
+		PluginManager pm = Bukkit.getServer().getPluginManager();
+		
+		// Register listeners for bedteleport check
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new BedteleportPlayerListener(this), Priority.Lowest, plugin);
+		
 	}
 }

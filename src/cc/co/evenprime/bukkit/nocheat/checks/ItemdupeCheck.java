@@ -2,26 +2,30 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Item;
+import org.bukkit.event.Event;
+import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
+import cc.co.evenprime.bukkit.nocheat.listeners.ItemdupePlayerListener;
 
 public class ItemdupeCheck extends Check {
 	
 	public ItemdupeCheck(NoCheat plugin){
-		super(plugin);
-		this.setActive(false);
+		super(plugin, "itemdupe", NoCheatData.PERMISSION_ITEMDUPE);
 	}
 	
 	public void check(PlayerPickupItemEvent event) {
 		
 		// Should we check at all?
-		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_ITEMDUPE)) 
-			return;
+		if(hasPermission(event.getPlayer())) return;
 		
 		Item i = event.getItem();
 		if(i != null) {
@@ -49,9 +53,16 @@ public class ItemdupeCheck extends Check {
 	}
 
 	@Override
-	public String getName() {
+	protected void registerListeners() {
+		PluginManager pm = Bukkit.getServer().getPluginManager();
 		
-		return "itemdupe";
+		// Register listeners for itemdupe check
+		Listener itemdupePlayerListener = new ItemdupePlayerListener(this);
+		
+		// Register listeners for itemdupe check
+		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, itemdupePlayerListener, Priority.Lowest, plugin);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, itemdupePlayerListener, Priority.Lowest, plugin);
+		
+		
 	}
-
 }

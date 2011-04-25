@@ -8,11 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event;
+
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
@@ -20,13 +18,6 @@ import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
-import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.MovingListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.MovingMonitor;
-import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.ItemdupeListener;
-import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackListener;
 
 import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -130,32 +121,8 @@ public class NoCheat extends JavaPlugin {
 		// parse the nocheat.yml config file
 		setupConfig();
 		
-		// Create our listeners and feed them with neccessary information
-		PluginManager pm = getServer().getPluginManager();
-
-		// Register listeners for moving check
-		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingListener(movingCheck), Priority.Lowest, this);
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingMonitor(movingCheck), Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, new MovingMonitor(movingCheck), Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingMonitor(movingCheck), Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, new MovingMonitor(movingCheck), Priority.Monitor, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(movingCheck), Priority.Monitor, this);
-		
-		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, new ItemdupeListener(itemdupeCheck), Priority.Lowest, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, new ItemdupeListener(itemdupeCheck), Priority.Lowest, this);
-
-		// Register listeners for speedhack check
-		pm.registerEvent(Event.Type.PLAYER_MOVE, new SpeedhackListener(speedhackCheck), Priority.High, this);
-
-		// Register listeners for airbuild check
-		pm.registerEvent(Event.Type.BLOCK_PLACE, new AirbuildListener(airbuildCheck), Priority.Low, this);
-
-		// Register listeners for bedteleport check
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new BedteleportListener(bedteleportCheck), Priority.Lowest, this);
 
 		PluginDescriptionFile pdfFile = this.getDescription();
-
-
 
 		// Get, if available, the Permissions and irc plugin
 		setupPermissions();

@@ -118,11 +118,11 @@ public class NoCheatConfiguration {
 		plugin.airbuildCheck.actions[1] = stringToActions(c.getString("airbuild.action.med"), plugin.airbuildCheck.actions[1]);
 		plugin.airbuildCheck.actions[2] = stringToActions(c.getString("airbuild.action.high"), plugin.airbuildCheck.actions[2]);
 
-		plugin.speedhackCheck.setActive(c.getBoolean("active.speedhack", plugin.speedhackCheck.isActive()));
-		plugin.movingCheck.setActive(c.getBoolean("active.moving", plugin.movingCheck.isActive()));
-		plugin.airbuildCheck.setActive(c.getBoolean("active.airbuild", plugin.airbuildCheck.isActive()));
-		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", plugin.bedteleportCheck.isActive()));
-		plugin.itemdupeCheck.setActive(c.getBoolean("active.itemdupe", plugin.itemdupeCheck.isActive()));
+		plugin.speedhackCheck.setActive(c.getBoolean("active.speedhack", true));
+		plugin.movingCheck.setActive(c.getBoolean("active.moving", true));
+		plugin.airbuildCheck.setActive(c.getBoolean("active.airbuild", false));
+		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", true));
+		plugin.itemdupeCheck.setActive(c.getBoolean("active.itemdupe", false));
 	}
 	
 	public void cleanup() {
@@ -241,11 +241,11 @@ public class NoCheatConfiguration {
 			w.write("    logtoirctag: "+ircTag); w.newLine();
 			w.write("# Checks and Bugfixes that are activated (true or false)"); w.newLine();
 			w.write("active:");  w.newLine();
-			w.write("    speedhack: "+plugin.speedhackCheck.isActive()); w.newLine();
-			w.write("    moving: "+plugin.movingCheck.isActive()); w.newLine();
-			w.write("    airbuild: "+plugin.airbuildCheck.isActive()); w.newLine();
-			w.write("    bedteleport: "+plugin.bedteleportCheck.isActive()); w.newLine();
-			w.write("    itemdupe: "+plugin.itemdupeCheck.isActive()); w.newLine();
+			w.write("    speedhack: true"); w.newLine();
+			w.write("    moving: true"); w.newLine();
+			w.write("    airbuild: false"); w.newLine();
+			w.write("    bedteleport: true"); w.newLine();
+			w.write("    itemdupe: false"); w.newLine();
 			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
 			w.write("    logmessage: \"" + plugin.speedhackCheck.logMessage+"\""); w.newLine();
