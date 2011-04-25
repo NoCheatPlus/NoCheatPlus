@@ -17,6 +17,7 @@ import org.bukkit.plugin.PluginManager;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
 import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildListener;
@@ -24,6 +25,7 @@ import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingMonitor;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.ItemdupeListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackListener;
 
 import com.ensifera.animosity.craftirc.CraftIRC;
@@ -41,10 +43,11 @@ import org.bukkit.plugin.Plugin;
  */
 public class NoCheat extends JavaPlugin {
 
-	public final MovingCheck movingCheck;
-	public final BedteleportCheck bedteleportCheck;
-	public final SpeedhackCheck speedhackCheck;
-	public final AirbuildCheck airbuildCheck;
+	public MovingCheck movingCheck;
+	public BedteleportCheck bedteleportCheck;
+	public SpeedhackCheck speedhackCheck;
+	public AirbuildCheck airbuildCheck;
+	public ItemdupeCheck itemdupeCheck;
 
 	private NoCheatConfiguration config;
 
@@ -59,13 +62,7 @@ public class NoCheat extends JavaPlugin {
 	private CraftIRC irc;
 
 	public NoCheat() { 	
-		movingCheck = new MovingCheck(this);
-		bedteleportCheck = new BedteleportCheck(this);
-		speedhackCheck = new SpeedhackCheck(this);
-		airbuildCheck = new AirbuildCheck(this);
 
-		// parse the nocheat.yml config file
-		setupConfig();
 	}
 
 	@Override
@@ -123,12 +120,18 @@ public class NoCheat extends JavaPlugin {
 	}
 
 	public void onEnable() {
-		// Create our listeners and feed them with neccessary information
-
-		PluginManager pm = getServer().getPluginManager();
+		
+		movingCheck = new MovingCheck(this);
+		bedteleportCheck = new BedteleportCheck(this);
+		speedhackCheck = new SpeedhackCheck(this);
+		airbuildCheck = new AirbuildCheck(this);
+		itemdupeCheck = new ItemdupeCheck(this);
 
 		// parse the nocheat.yml config file
 		setupConfig();
+		
+		// Create our listeners and feed them with neccessary information
+		PluginManager pm = getServer().getPluginManager();
 
 		// Register listeners for moving check
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingListener(movingCheck), Priority.Lowest, this);
@@ -137,6 +140,9 @@ public class NoCheat extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingMonitor(movingCheck), Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, new MovingMonitor(movingCheck), Priority.Monitor, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(movingCheck), Priority.Monitor, this);
+		
+		pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, new ItemdupeListener(itemdupeCheck), Priority.Lowest, this);
+		pm.registerEvent(Event.Type.PLAYER_INTERACT, new ItemdupeListener(itemdupeCheck), Priority.Lowest, this);
 
 		// Register listeners for speedhack check
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new SpeedhackListener(speedhackCheck), Priority.High, this);
@@ -320,7 +326,8 @@ public class NoCheat extends JavaPlugin {
 		(movingCheck.isActive() && !movingCheck.allowFlying ? "flying " : "") + 
 		(speedhackCheck.isActive() ? speedhackCheck.getName() + " " : "") +
 		(airbuildCheck.isActive() ? airbuildCheck.getName() + " " : "") +
-		(bedteleportCheck.isActive() ? bedteleportCheck.getName() + " " : "");
+		(bedteleportCheck.isActive() ? bedteleportCheck.getName() + " " : "") +
+		(itemdupeCheck.isActive() ? itemdupeCheck.getName() + " " : "");
 	}
 
 
@@ -330,6 +337,7 @@ public class NoCheat extends JavaPlugin {
 				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_SPEEDHACK) ? speedhackCheck.getName() + " " : "")) +
 				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_AIRBUILD) ? airbuildCheck.getName() + " " : "")) +
 				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_BEDTELEPORT) ? bedteleportCheck.getName() + " " : "")) +
+				(!itemdupeCheck.isActive() ? itemdupeCheck.getName() + "* " : " ") +
 				(hasPermission(p, NoCheatData.PERMISSION_NOTIFY) ? "notify " : ""));
 	}
 
