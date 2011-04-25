@@ -307,6 +307,7 @@ public class NoCheat extends JavaPlugin {
 		data.permissionsCache[NoCheatData.PERMISSION_P] = permissions.has(player, "nocheat.p");
 		data.permissionsCache[NoCheatData.PERMISSION_SPEEDHACK] = permissions.has(player, "nocheat.speedhack");
 		data.permissionsCache[NoCheatData.PERMISSION_NOTIFY] = permissions.has(player, "nocheat.notify");
+		data.permissionsCache[NoCheatData.PERMISSION_ITEMDUPE] = permissions.has(player, "nocheat.itemdupe");
 
 	}
 
@@ -337,7 +338,7 @@ public class NoCheat extends JavaPlugin {
 				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_SPEEDHACK) ? speedhackCheck.getName() + " " : "")) +
 				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_AIRBUILD) ? airbuildCheck.getName() + " " : "")) +
 				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_BEDTELEPORT) ? bedteleportCheck.getName() + " " : "")) +
-				(!itemdupeCheck.isActive() ? itemdupeCheck.getName() + "* " : " ") +
+				(!itemdupeCheck.isActive() ? itemdupeCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_ITEMDUPE) ? itemdupeCheck.getName() + " " : "")) +
 				(hasPermission(p, NoCheatData.PERMISSION_NOTIFY) ? "notify " : ""));
 	}
 

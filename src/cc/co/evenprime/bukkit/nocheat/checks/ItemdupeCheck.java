@@ -8,6 +8,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 
 public class ItemdupeCheck extends Check {
 	
@@ -17,6 +18,10 @@ public class ItemdupeCheck extends Check {
 	}
 	
 	public void check(PlayerPickupItemEvent event) {
+		
+		// Should we check at all?
+		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_ITEMDUPE)) 
+			return;
 		
 		Item i = event.getItem();
 		if(i != null) {
@@ -32,6 +37,10 @@ public class ItemdupeCheck extends Check {
 	}
 	
 	public void check(PlayerInteractEvent event) {
+		
+		if(plugin.hasPermission(event.getPlayer(), NoCheatData.PERMISSION_ITEMDUPE)) 
+			return;
+		
 		if(event.hasItem() && event.getItem().getAmount() <= 0) {// buggy item
 			event.setCancelled(true);
 			plugin.log(Level.WARNING, event.getPlayer().getName() + " tried to use an invalid item. Item will be removed now.");

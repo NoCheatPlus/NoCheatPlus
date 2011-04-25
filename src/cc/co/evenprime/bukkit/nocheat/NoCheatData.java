@@ -48,7 +48,7 @@ public class NoCheatData {
 	public double maxYVelocity = 0.0D;
 
 	public long permissionsLastUpdate = 0;
-	public boolean permissionsCache[] = new boolean[7];
+	public boolean permissionsCache[] = new boolean[8];
 
 
 	public static final int PERMISSION_MOVING = 0;
@@ -58,6 +58,7 @@ public class NoCheatData {
 	public static final int PERMISSION_BEDTELEPORT = 4;
 	public static final int PERMISSION_P = 5;
 	public static final int PERMISSION_NOTIFY = 6;
+	public static final int PERMISSION_ITEMDUPE = 7;
 
 	// Store data between Events
 	private static final Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
