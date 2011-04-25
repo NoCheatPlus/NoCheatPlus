@@ -124,7 +124,7 @@ public class NoCheatConfiguration {
 		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", true));
 		plugin.itemdupeCheck.setActive(c.getBoolean("active.itemdupe", false));
 	}
-	
+
 	public void cleanup() {
 
 		if(fh != null) {

@@ -18,6 +18,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
+import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 
 import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -60,7 +61,7 @@ public class NoCheat extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
 	{
 		if(sender instanceof Player) {
-			if(!hasPermission((Player)sender, NoCheatData.PERMISSION_P)) {
+			if(!hasPermission((Player)sender, PermissionData.PERMISSION_P)) {
 				sender.sendMessage("NC: You are not allowed to use this command.");
 				return false;
 			}
@@ -111,7 +112,7 @@ public class NoCheat extends JavaPlugin {
 	}
 
 	public void onEnable() {
-		
+
 		movingCheck = new MovingCheck(this);
 		bedteleportCheck = new BedteleportCheck(this);
 		speedhackCheck = new SpeedhackCheck(this);
@@ -120,7 +121,7 @@ public class NoCheat extends JavaPlugin {
 
 		// parse the nocheat.yml config file
 		setupConfig();
-		
+
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
@@ -212,7 +213,7 @@ public class NoCheat extends JavaPlugin {
 	private void logToChat(Level l, String message) {
 		if(config.chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
-				if(hasPermission(player, NoCheatData.PERMISSION_NOTIFY)) {
+				if(hasPermission(player, PermissionData.PERMISSION_NOTIFY)) {
 					player.sendMessage("["+l.getName()+"] " + message);
 				}
 			}
@@ -234,15 +235,13 @@ public class NoCheat extends JavaPlugin {
 
 	public boolean hasPermission(Player player, int permission) {
 
-		if(player == null) {
-			return false;
-		}
+		if(player == null) return false;
 
 		try {
 			if(permissions == null)
 				return player.isOp();
 			else {
-				NoCheatData data = NoCheatData.getPlayerData(player);
+				PermissionData data = PermissionData.get(player);
 				if(data.permissionsLastUpdate + 10000 < System.currentTimeMillis()) {
 					data.permissionsLastUpdate = System.currentTimeMillis();
 					updatePermissions(player, data);
@@ -265,16 +264,16 @@ public class NoCheat extends JavaPlugin {
 		}
 	}
 
-	private void updatePermissions(Player player, NoCheatData data) {
+	private void updatePermissions(Player player, PermissionData data) {
 
-		data.permissionsCache[NoCheatData.PERMISSION_AIRBUILD] = permissions.has(player, "nocheat.airbuild");
-		data.permissionsCache[NoCheatData.PERMISSION_BEDTELEPORT] = permissions.has(player, "nocheat.bedteleport");
-		data.permissionsCache[NoCheatData.PERMISSION_FLYING] = permissions.has(player, "nocheat.flying");
-		data.permissionsCache[NoCheatData.PERMISSION_MOVING] = permissions.has(player, "nocheat.moving");
-		data.permissionsCache[NoCheatData.PERMISSION_P] = permissions.has(player, "nocheat.p");
-		data.permissionsCache[NoCheatData.PERMISSION_SPEEDHACK] = permissions.has(player, "nocheat.speedhack");
-		data.permissionsCache[NoCheatData.PERMISSION_NOTIFY] = permissions.has(player, "nocheat.notify");
-		data.permissionsCache[NoCheatData.PERMISSION_ITEMDUPE] = permissions.has(player, "nocheat.itemdupe");
+		data.permissionsCache[PermissionData.PERMISSION_AIRBUILD] = permissions.has(player, "nocheat.airbuild");
+		data.permissionsCache[PermissionData.PERMISSION_BEDTELEPORT] = permissions.has(player, "nocheat.bedteleport");
+		data.permissionsCache[PermissionData.PERMISSION_FLYING] = permissions.has(player, "nocheat.flying");
+		data.permissionsCache[PermissionData.PERMISSION_MOVING] = permissions.has(player, "nocheat.moving");
+		data.permissionsCache[PermissionData.PERMISSION_P] = permissions.has(player, "nocheat.p");
+		data.permissionsCache[PermissionData.PERMISSION_SPEEDHACK] = permissions.has(player, "nocheat.speedhack");
+		data.permissionsCache[PermissionData.PERMISSION_NOTIFY] = permissions.has(player, "nocheat.notify");
+		data.permissionsCache[PermissionData.PERMISSION_ITEMDUPE] = permissions.has(player, "nocheat.itemdupe");
 
 	}
 
@@ -300,13 +299,13 @@ public class NoCheat extends JavaPlugin {
 
 
 	private String getPermissionsForPlayerAsString(Player p) {
-		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_MOVING) ? movingCheck.getName() + " " : "") + 
-				(!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, NoCheatData.PERMISSION_FLYING) ? "flying " : "")) + 
-				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_SPEEDHACK) ? speedhackCheck.getName() + " " : "")) +
-				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_AIRBUILD) ? airbuildCheck.getName() + " " : "")) +
-				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_BEDTELEPORT) ? bedteleportCheck.getName() + " " : "")) +
-				(!itemdupeCheck.isActive() ? itemdupeCheck.getName() + "* " : (hasPermission(p, NoCheatData.PERMISSION_ITEMDUPE) ? itemdupeCheck.getName() + " " : "")) +
-				(hasPermission(p, NoCheatData.PERMISSION_NOTIFY) ? "notify " : ""));
+		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_MOVING) ? movingCheck.getName() + " " : "") + 
+				(!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING) ? "flying " : "")) + 
+				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_SPEEDHACK) ? speedhackCheck.getName() + " " : "")) +
+				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_AIRBUILD) ? airbuildCheck.getName() + " " : "")) +
+				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_BEDTELEPORT) ? bedteleportCheck.getName() + " " : "")) +
+				(!itemdupeCheck.isActive() ? itemdupeCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_ITEMDUPE) ? itemdupeCheck.getName() + " " : "")) +
+				(hasPermission(p, PermissionData.PERMISSION_NOTIFY) ? "notify " : ""));
 	}
 
 	public void handleCustomAction(Action a, Player player) {

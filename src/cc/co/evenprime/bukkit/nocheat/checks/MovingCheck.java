@@ -16,12 +16,13 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData;
+import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerMonitor;
@@ -35,7 +36,7 @@ import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerMonitor;
 public class MovingCheck extends Check {
 
 	public MovingCheck(NoCheat plugin) {
-		super(plugin, "moving", NoCheatData.PERMISSION_MOVING);
+		super(plugin, "moving", PermissionData.PERMISSION_MOVING);
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
@@ -187,22 +188,22 @@ public class MovingCheck extends Check {
 		}
 
 		final boolean canFly;
-		if(allowFlying || plugin.hasPermission(player, NoCheatData.PERMISSION_FLYING))
+		if(allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING))
 			canFly = true;
 		else
 			canFly = false;
 
 		// Get the player-specific data
-		final NoCheatData data = NoCheatData.getPlayerData(player);
+		final MovingData data = MovingData.get(player);
 
 		// Get the two locations of the event
 		final Location to = event.getTo();
 		Location from = event.getFrom();
 
 		// WORKAROUND for changed PLAYER_MOVE logic
-		if(data.movingTeleportTo != null) {
-			from = data.movingTeleportTo;
-			data.movingTeleportTo = null;
+		if(data.teleportTo != null) {
+			from = data.teleportTo;
+			data.teleportTo = null;
 		}
 
 		// The use of event.getFrom() is intentional
@@ -235,12 +236,12 @@ public class MovingCheck extends Check {
 
 		//if(player.isSneaking())
 		if(false) // Currently disabled, still needs some additional work
-			vl1 = limitCheck(combined - (data.movingHorizFreedom + sneakStepWidth), moveLimits);
+			vl1 = limitCheck(combined - (data.horizFreedom + sneakStepWidth), moveLimits);
 		else
-			vl1 = limitCheck(combined - (data.movingHorizFreedom + stepWidth), moveLimits);
+			vl1 = limitCheck(combined - (data.horizFreedom + stepWidth), moveLimits);
 
 		// Reduce horiz moving freedom with each event
-		data.movingHorizFreedom *= 0.9;
+		data.horizFreedom *= 0.9;
 
 		/**** Horizontal movement check END ****/
 
@@ -267,30 +268,30 @@ public class MovingCheck extends Check {
 
 		// The server sent the player a "velocity" packet a short time ago
 		if(data.maxYVelocity > 0.0D) {
-			data.movingVertFreedomCounter = 30;
+			data.vertFreedomCounter = 30;
 
 			// Be generous with the height limit for the client
-			data.movingVertFreedom += data.maxYVelocity*2D;
+			data.vertFreedom += data.maxYVelocity*2D;
 			data.maxYVelocity = 0.0D;
 		}
 
 		// consume a counter for this client
-		if(data.movingVertFreedomCounter > 0) {
-			data.movingVertFreedomCounter--;
+		if(data.vertFreedomCounter > 0) {
+			data.vertFreedomCounter--;
 		}
 
-		double limit = data.movingVertFreedom;
+		double limit = data.vertFreedom;
 
 		// If the event counter has been consumed, remove the vertical movement limit increase when landing the next time
-		if(data.movingVertFreedomCounter <= 0 && (onGroundFrom || onGroundTo)) {
-			data.movingVertFreedom = 0.0D;
+		if(data.vertFreedomCounter <= 0 && (onGroundFrom || onGroundTo)) {
+			data.vertFreedom = 0.0D;
 		}
 
 		// The location we'd use as a new setback if there are no violations
 		Location newSetBack = null;
 
 		// there's no use for counting this
-		if(canFly) data.movingJumpPhase = 0;
+		if(canFly) data.jumpPhase = 0;
 
 		// Handle 4 distinct cases: Walk, Jump, Land, Fly
 
@@ -306,9 +307,9 @@ public class MovingCheck extends Check {
 			{
 				// reset jumping
 				if(onGroundTo)
-					data.movingJumpPhase = 0; // Walk
+					data.jumpPhase = 0; // Walk
 				else
-					data.movingJumpPhase = 1; // Jump
+					data.jumpPhase = 1; // Jump
 
 				newSetBack = from.clone();
 			}
@@ -318,13 +319,13 @@ public class MovingCheck extends Check {
 		{
 			Location l = null;
 
-			if(data.movingSetBackPoint == null || canFly)
+			if(data.setBackPoint == null || canFly)
 				l = from;
 			else
-				l = data.movingSetBackPoint;
+				l = data.setBackPoint;
 
-			if(!canFly && data.movingJumpPhase > jumpingLimit)
-				limit += jumpHeight - (data.movingJumpPhase-jumpingLimit) * 0.2D;
+			if(!canFly && data.jumpPhase > jumpingLimit)
+				limit += jumpHeight - (data.jumpPhase-jumpingLimit) * 0.2D;
 			else limit += jumpHeight;
 
 			if(onGroundTo) limit += stepHeight;
@@ -336,13 +337,13 @@ public class MovingCheck extends Check {
 
 			if(vl2 < 0) {
 				if(onGroundTo) { // Land
-					data.movingJumpPhase = 0; // He is on ground now, so reset the jump
+					data.jumpPhase = 0; // He is on ground now, so reset the jump
 					newSetBack = to.clone();
 				}
 				else { // Fly
-					data.movingJumpPhase++; // Enter next phase of the flight
+					data.jumpPhase++; // Enter next phase of the flight
 					// If we have no setback point, create one now
-					if(data.movingSetBackPoint == null) { 
+					if(data.setBackPoint == null) { 
 						newSetBack = from.clone();
 					}
 				}
@@ -352,19 +353,19 @@ public class MovingCheck extends Check {
 		int vl = vl1 > vl2 ? vl1 : vl2;
 
 		if(vl < 0 && newSetBack != null) {
-			data.movingSetBackPoint = newSetBack;
+			data.setBackPoint = newSetBack;
 		}
 
 		// If we haven't already got a setback point by now, make this location the new setback point
-		if(data.movingSetBackPoint == null) {
-			data.movingSetBackPoint = from.clone();
+		if(data.setBackPoint == null) {
+			data.setBackPoint = from.clone();
 		}
 
 		if(vl >= 0) {
 			setupSummaryTask(event.getPlayer(), data);
 
-			boolean log = !(data.movingViolationsInARow[vl] > 0);
-			data.movingViolationsInARow[vl]++;
+			boolean log = !(data.violationsInARow[vl] > 0);
+			data.violationsInARow[vl]++;
 
 			action(event, event.getPlayer(), from, to, actions[vl], log, data);
 		}
@@ -373,10 +374,10 @@ public class MovingCheck extends Check {
 		statisticTotalEvents++;
 	}
 
-	private boolean shouldBeIgnored(Player player, NoCheatData data, Location from, Location to) {
+	private boolean shouldBeIgnored(Player player, MovingData data, Location from, Location to) {
 		if(from.equals(to)) // Both locations are perfectly identical
 			return true;
-		else if(!from.equals(data.movingLastLocation)) { // The player was moved somehow without causing a move event
+		else if(!from.equals(data.lastLocation)) { // The player was moved somehow without causing a move event
 			resetData(data, to);
 			return true;
 		}
@@ -396,28 +397,28 @@ public class MovingCheck extends Check {
 	}
 
 
-	private void setupSummaryTask(final Player p, final NoCheatData data) {
+	private void setupSummaryTask(final Player p, final MovingData data) {
 		// Setup task to display summary later
-		if(data.movingSummaryTask == null) {
-			data.movingSummaryTask = new Runnable() {
+		if(data.summaryTask == null) {
+			data.summaryTask = new Runnable() {
 
 				@Override
 				public void run() {
-					if(data.movingHighestLogLevel != null) {
-						String logString =  String.format(summaryMessage, p.getName(), ticksBeforeSummary/20, data.movingViolationsInARow[0], data.movingViolationsInARow[1],data.movingViolationsInARow[2]);
-						plugin.log(data.movingHighestLogLevel, logString);
+					if(data.highestLogLevel != null) {
+						String logString =  String.format(summaryMessage, p.getName(), ticksBeforeSummary/20, data.violationsInARow[0], data.violationsInARow[1],data.violationsInARow[2]);
+						plugin.log(data.highestLogLevel, logString);
 					}
 					// deleting its own reference
-					data.movingSummaryTask = null;
+					data.summaryTask = null;
 
-					data.movingViolationsInARow[0] = 0;
-					data.movingViolationsInARow[1] = 0;
-					data.movingViolationsInARow[2] = 0;
+					data.violationsInARow[0] = 0;
+					data.violationsInARow[1] = 0;
+					data.violationsInARow[2] = 0;
 				}
 			};
 
 			// Give a summary in x ticks. 20 ticks ~ 1 second
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.movingSummaryTask, ticksBeforeSummary);
+			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.summaryTask, ticksBeforeSummary);
 		}
 	}
 
@@ -429,7 +430,7 @@ public class MovingCheck extends Check {
 	 */
 	public void teleported(PlayerTeleportEvent event) {
 
-		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+		MovingData data = MovingData.get(event.getPlayer());
 
 		if(event.getTo().equals(data.teleportInitializedByMe)) { // My plugin requested this teleport while handling another event
 
@@ -448,7 +449,7 @@ public class MovingCheck extends Check {
 			if(event.getFrom().getWorld().equals(event.getTo().getWorld())) {
 				// WORKAROUND for changed PLAYER_MOVE logic - I need to remember the "to" location of teleports and use it as a from-Location
 				// for the move event that comes next
-				data.movingTeleportTo = event.getTo();
+				data.teleportTo = event.getTo();
 			}
 			else
 				data.worldChanged = true;
@@ -456,18 +457,18 @@ public class MovingCheck extends Check {
 	}
 
 	public void respawned(PlayerRespawnEvent event) {
-		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+		MovingData data = MovingData.get(event.getPlayer());
 
 		data.respawned = true;
 
 	}
 
-	public static void updateVelocity(Vector v, NoCheatData data) {
+	public void updateVelocity(Vector v, MovingData data) {
 
 		// Compare the velocity vector to the existing movement freedom that we've from previous events
 		double tmp = (Math.abs(v.getX()) + Math.abs(v.getZ())) * 2D;
-		if(tmp > data.movingHorizFreedom)
-			data.movingHorizFreedom = tmp;
+		if(tmp > data.horizFreedom)
+			data.horizFreedom = tmp;
 
 		if(v.getY() > data.maxYVelocity) {
 			data.maxYVelocity = v.getY();
@@ -478,7 +479,7 @@ public class MovingCheck extends Check {
 	 * @param event
 	 * @param action
 	 */
-	private void action(PlayerMoveEvent event, Player player, Location from, Location to, Action[] actions, boolean loggingAllowed, NoCheatData data) {
+	private void action(PlayerMoveEvent event, Player player, Location from, Location to, Action[] actions, boolean loggingAllowed, MovingData data) {
 
 		if(actions == null) return;
 		boolean cancelled = false;
@@ -493,8 +494,8 @@ public class MovingCheck extends Check {
 		for(Action a : actions) {
 			if(loggingAllowed && a instanceof LogAction)  {
 				plugin.log(((LogAction)a).level, log);
-				if(data.movingHighestLogLevel == null) data.movingHighestLogLevel = Level.ALL;
-				if(data.movingHighestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.movingHighestLogLevel = ((LogAction)a).level;
+				if(data.highestLogLevel == null) data.highestLogLevel = Level.ALL;
+				if(data.highestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.highestLogLevel = ((LogAction)a).level;
 			}
 			else if(!cancelled && a instanceof CancelAction) {
 				resetPlayer(event, from);
@@ -524,18 +525,18 @@ public class MovingCheck extends Check {
 	 */
 	private void resetPlayer(PlayerMoveEvent event, Location from) {
 
-		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+		MovingData data = MovingData.get(event.getPlayer());
 
 		// Reset the jumpphase. We choose the setback-point such that it should be
 		// on solid ground, but in case it isn't (maybe the ground is gone now) we
 		// still have to allow the player some freedom with vertical movement due
 		// to lost vertical momentum to prevent him from getting stuck
 
-		if(data.movingSetBackPoint == null) data.movingSetBackPoint = from.clone();
+		if(data.setBackPoint == null) data.setBackPoint = from.clone();
 
 		// Set a flag that gets used while handling teleport events (to determine if
 		// it was my teleport or someone else'
-		Location t = data.movingSetBackPoint;
+		Location t = data.setBackPoint;
 
 		t = new Location(t.getWorld(), t.getX(),  t.getY(), t.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
 		data.teleportInitializedByMe = t;
@@ -633,19 +634,19 @@ public class MovingCheck extends Check {
 		return (int) (floor - d4);
 	}
 
-	private void resetData(NoCheatData data, Location l) {
+	private void resetData(MovingData data, Location l) {
 		// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
-		data.movingSetBackPoint = l;
-		data.movingJumpPhase = 0;
-		data.movingTeleportTo = null;
+		data.setBackPoint = l;
+		data.jumpPhase = 0;
+		data.teleportTo = null;
 	}
 
 	@Override
 	protected void registerListeners() {
 		PluginManager pm = Bukkit.getServer().getPluginManager();
-		
+
 		Listener movingPlayerMonitor = new MovingPlayerMonitor(this);
-		
+
 		// Register listeners for moving check
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingPlayerListener(this), Priority.Lowest, plugin);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, movingPlayerMonitor, Priority.Monitor, plugin);

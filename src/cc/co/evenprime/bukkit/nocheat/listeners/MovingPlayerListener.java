@@ -19,6 +19,7 @@ public class MovingPlayerListener extends PlayerListener {
 	public MovingPlayerListener(MovingCheck check) {
 		this.check = check;
 	}
+
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
 

@@ -6,8 +6,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
  * 
@@ -26,21 +26,21 @@ public class MovingPlayerMonitor extends PlayerListener {
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		check.respawned(event);
 	}
-	
+
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		check.teleported(event);
 	}
-	
+
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		MovingCheck.updateVelocity(event.getPlayer().getVelocity(), NoCheatData.getPlayerData(event.getPlayer()));
+		check.updateVelocity(event.getPlayer().getVelocity(), MovingData.get(event.getPlayer()));
 	}
-	
+
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
-		data.movingLastLocation = event.getTo();
-		MovingCheck.updateVelocity(event.getPlayer().getVelocity(), data);
+		MovingData data = MovingData.get(event.getPlayer());
+		data.lastLocation = event.getTo();
+		check.updateVelocity(event.getPlayer().getVelocity(), data);
 	}
 }

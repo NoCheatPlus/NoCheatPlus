@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.NoCheatData;
+import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportPlayerListener;
 
 /**
@@ -19,7 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportPlayerListener;
 public class BedteleportCheck extends Check {
 
 	public BedteleportCheck(NoCheat plugin) {
-		super(plugin, "bedteleport",  NoCheatData.PERMISSION_BEDTELEPORT);
+		super(plugin, "bedteleport",  PermissionData.PERMISSION_BEDTELEPORT);
 	}
 
 	public void check(PlayerMoveEvent event) {
@@ -35,9 +35,9 @@ public class BedteleportCheck extends Check {
 	@Override
 	protected void registerListeners() {
 		PluginManager pm = Bukkit.getServer().getPluginManager();
-		
+
 		// Register listeners for bedteleport check
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new BedteleportPlayerListener(this), Priority.Lowest, plugin);
-		
+
 	}
 }

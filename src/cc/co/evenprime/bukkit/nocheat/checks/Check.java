@@ -30,7 +30,7 @@ public abstract class Check {
 	}
 
 	protected abstract void registerListeners();
-		
+
 	public boolean isActive() {
 		return active;
 	}
@@ -42,7 +42,7 @@ public abstract class Check {
 				registerListeners();
 			}
 		}
-		
+
 		// There is no way to unregister listeners ...
 		this.active = active;
 	}

@@ -9,12 +9,13 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
+import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
 
 
@@ -35,7 +36,7 @@ public class AirbuildCheck extends Check {
 	public final int limits[] = { 1, 3, 10 };
 
 	public AirbuildCheck(NoCheat plugin) {
-		super(plugin, "airbuild", NoCheatData.PERMISSION_AIRBUILD);
+		super(plugin, "airbuild", PermissionData.PERMISSION_AIRBUILD);
 	}
 
 	public void check(BlockPlaceEvent event) {
@@ -45,31 +46,31 @@ public class AirbuildCheck extends Check {
 
 		// Are all 6 sides "air-blocks" -> cancel the event
 		if(event.getBlockAgainst().getType() == Material.AIR) {
-			final NoCheatData data = NoCheatData.getPlayerData(event.getPlayer());
+			final AirbuildData data = AirbuildData.get(event.getPlayer());
 			final Player p = event.getPlayer();
 
-			if(data.airbuildSummaryTask == null) {
-				data.airbuildSummaryTask = new Runnable() {
+			if(data.summaryTask == null) {
+				data.summaryTask = new Runnable() {
 
 					@Override
 					public void run() {
 						summary(p, data);
 						// deleting its own reference
-						data.airbuildSummaryTask = null;
+						data.summaryTask = null;
 					}
 				};
 
 				// Give a summary in 20 ticks ~ 1 second
-				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.airbuildSummaryTask, 20);
+				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.summaryTask, 20);
 			}
 
-			data.airbuildPerSecond++;
+			data.perSecond++;
 
 			// which limit has been reached
 			for(int i = limits.length-1; i >= 0; i--) {
-				if(data.airbuildPerSecond >= limits[i]) {
+				if(data.perSecond >= limits[i]) {
 					// Only explicitly log certain "milestones"
-					if(data.airbuildPerSecond == limits[i]) {
+					if(data.perSecond == limits[i]) {
 						action(actions[i], event, true);
 					}
 					else {
@@ -109,25 +110,25 @@ public class AirbuildCheck extends Check {
 		}
 	}
 
-	private void summary(Player player, NoCheatData data) {
+	private void summary(Player player, AirbuildData data) {
 
 		// Give a summary according to the highest violation level we encountered in that second
 		for(int i = limits.length-1; i >= 0; i--) {
-			if(data.airbuildPerSecond >= limits[i]) {
-				plugin.log(LogAction.log[i].level, "Airbuild summary: " +player.getName() + " total violations per second: " + data.airbuildPerSecond);
+			if(data.perSecond >= limits[i]) {
+				plugin.log(LogAction.log[i].level, "Airbuild summary: " +player.getName() + " total violations per second: " + data.perSecond);
 				break;
 			}
 		}
 
-		data.airbuildPerSecond = 0;
+		data.perSecond = 0;
 	}
 
 	@Override
 	protected void registerListeners() {
 		PluginManager pm = Bukkit.getServer().getPluginManager();
-			
+
 		// Register listeners for airbuild check
 		pm.registerEvent(Event.Type.BLOCK_PLACE, new AirbuildBlockListener(this), Priority.Low, plugin);
-		
+
 	}
 }

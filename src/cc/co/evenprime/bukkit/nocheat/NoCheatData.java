@@ -3,13 +3,16 @@ package cc.co.evenprime.bukkit.nocheat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData;
+import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
+import cc.co.evenprime.bukkit.nocheat.data.SpeedhackData;
+
 /**
- * Storage for data persistence between events
+ * per player storage for data persistence between events 
  * 
  * @author Evenprime
  *
@@ -19,46 +22,13 @@ public class NoCheatData {
 	/**
 	 * Don't rely on any of these yet, they are likely going to change their name/functionality 
 	 */
+	public MovingData moving; 
+	public SpeedhackData speedhack; 
+	public AirbuildData airbuild;
 
-	public int movingJumpPhase = 0;
-	public int movingViolationsInARow[] =  { 0, 0, 0 }; 
-	public double movingHorizFreedom = 0.0D;
-	public int movingHorizFreedomCounter = 0;
-	public double movingVertFreedom = 0.0D;
-	public int movingVertFreedomCounter = 0;
-	public Location movingSetBackPoint = null;
-	public Runnable movingSummaryTask = null;
-	public Level movingHighestLogLevel = null;
-
-	// WORKAROUND for changed PLAYER_MOVE logic
-	public Location movingTeleportTo = null;
-	public Location movingLastLocation = null;
-
-	public Location teleportInitializedByMe = null;
-	public boolean worldChanged = false;
-	public boolean respawned = false;
-
-	public long speedhackLastCheck = System.currentTimeMillis(); // timestamp of last check for speedhacks
-	public Location speedhackSetBackPoint = null;
-	public int speedhackEventsSinceLastCheck = 0; // used to identify speedhacks
-	public int speedhackViolationsInARow = 0;
-
-	public int airbuildPerSecond = 0;
-	public Runnable airbuildSummaryTask = null;
-	public double maxYVelocity = 0.0D;
-
-	public long permissionsLastUpdate = 0;
-	public boolean permissionsCache[] = new boolean[8];
+	public PermissionData permission;
 
 
-	public static final int PERMISSION_MOVING = 0;
-	public static final int PERMISSION_FLYING = 1;
-	public static final int PERMISSION_SPEEDHACK = 2;
-	public static final int PERMISSION_AIRBUILD = 3;
-	public static final int PERMISSION_BEDTELEPORT = 4;
-	public static final int PERMISSION_P = 5;
-	public static final int PERMISSION_NOTIFY = 6;
-	public static final int PERMISSION_ITEMDUPE = 7;
 
 	// Store data between Events
 	private static final Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
@@ -72,17 +42,12 @@ public class NoCheatData {
 	 * @return
 	 */
 	public static NoCheatData getPlayerData(Player p) {
-		NoCheatData data = null;
+		NoCheatData data = playerData.get(p);
 
-		if((data = playerData.get(p)) == null ) {
-			synchronized(playerData) {
-				data = playerData.get(p);
-				if(data == null) {
-					// If we have no data for the player, create some
-					data = new NoCheatData();
-					playerData.put(p, data);
-				}
-			}
+		if(data == null) {
+			// If we have no data for the player, create some
+			data = new NoCheatData();
+			playerData.put(p, data);
 		}
 
 		return data;

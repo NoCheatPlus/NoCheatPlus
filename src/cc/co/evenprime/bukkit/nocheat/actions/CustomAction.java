@@ -14,7 +14,7 @@ public class CustomAction extends Action {
 		super(firstAfter, repeat);
 		this.command = command;
 	}
-	
+
 	public String getName() {
 		return "custom";
 	}
