@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.Check;
 import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
@@ -41,11 +42,18 @@ public class NoCheat extends JavaPlugin {
 	public AirbuildCheck airbuildCheck;
 	public ItemdupeCheck itemdupeCheck;
 
+	public Check[] checks;
+
 	private NoCheatConfiguration config;
 
 	private boolean exceptionWithPermissions = false;
 
 	private boolean cleanUpTaskSetup = false;
+	private boolean serverLagMeasureTaskSetup = false;
+
+	private int serverTicks = 0;
+	private long serverLagInMilliSeconds = 0;
+	private long lastServerTime = 0;
 
 	// Permissions 2.x, if available
 	private PermissionHandler permissions;
@@ -119,6 +127,9 @@ public class NoCheat extends JavaPlugin {
 		airbuildCheck = new AirbuildCheck(this);
 		itemdupeCheck = new ItemdupeCheck(this);
 
+		// just for convenience
+		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, itemdupeCheck };
+
 		// parse the nocheat.yml config file
 		setupConfig();
 
@@ -132,6 +143,8 @@ public class NoCheat extends JavaPlugin {
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled with the following checks: "+getActiveChecksAsString());
 
 		setupCleanupTask();
+
+		setupServerLagMeasureTask();
 	}
 
 	private void setupCleanupTask() {
@@ -146,9 +159,25 @@ public class NoCheat extends JavaPlugin {
 			public void run() {
 				NoCheatData.cleanPlayerDataCollection();
 			}
-
 		}, 5000, 5000);
+	}
 
+	private void setupServerLagMeasureTask() {
+
+		if(serverLagMeasureTaskSetup) return;
+
+		serverLagMeasureTaskSetup = true;
+
+		Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+
+			@Override
+			public void run() {
+				serverTicks += 10;
+				long time = System.currentTimeMillis();
+				serverLagInMilliSeconds = (time - lastServerTime - 500)*2;
+				lastServerTime = time;
+			}
+		}, 10, 10);
 	}
 
 	/**
@@ -289,23 +318,39 @@ public class NoCheat extends JavaPlugin {
 
 
 	private String getActiveChecksAsString() {
-		return (movingCheck.isActive() ? movingCheck.getName() + " " : "") + 
-		(movingCheck.isActive() && !movingCheck.allowFlying ? "flying " : "") + 
-		(speedhackCheck.isActive() ? speedhackCheck.getName() + " " : "") +
-		(airbuildCheck.isActive() ? airbuildCheck.getName() + " " : "") +
-		(bedteleportCheck.isActive() ? bedteleportCheck.getName() + " " : "") +
-		(itemdupeCheck.isActive() ? itemdupeCheck.getName() + " " : "");
+
+		String s = "";
+
+		for(Check c : checks) {
+			s = s + (c.isActive() ? c.getName() + " " : "");
+		}
+
+		s = s + (movingCheck.isActive() && !movingCheck.allowFlying ? "flying " : "");
+		
+		return s;
 	}
 
 
 	private String getPermissionsForPlayerAsString(Player p) {
-		return (!movingCheck.isActive() ? movingCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_MOVING) ? movingCheck.getName() + " " : "") + 
-				(!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING) ? "flying " : "")) + 
-				(!speedhackCheck.isActive() ? speedhackCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_SPEEDHACK) ? speedhackCheck.getName() + " " : "")) +
-				(!airbuildCheck.isActive() ? airbuildCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_AIRBUILD) ? airbuildCheck.getName() + " " : "")) +
-				(!bedteleportCheck.isActive() ? bedteleportCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_BEDTELEPORT) ? bedteleportCheck.getName() + " " : "")) +
-				(!itemdupeCheck.isActive() ? itemdupeCheck.getName() + "* " : (hasPermission(p, PermissionData.PERMISSION_ITEMDUPE) ? itemdupeCheck.getName() + " " : "")) +
-				(hasPermission(p, PermissionData.PERMISSION_NOTIFY) ? "notify " : ""));
+
+		String s = "";
+
+		for(Check c : checks) {
+			s = s + (!c.isActive() ? c.getName() + "* " : (c.hasPermission(p) ? c.getName() + " " : ""));
+		}
+
+		s = s + (!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING) ? "flying " : ""));
+		s = s + (hasPermission(p, PermissionData.PERMISSION_NOTIFY) ? "notify " : "");
+		
+		return s;
+	}
+
+	public int getServerTicks() {
+		return serverTicks;
+	}
+
+	public long getServerLag() {
+		return this.serverLagInMilliSeconds;
 	}
 
 	public void handleCustomAction(Action a, Player player) {

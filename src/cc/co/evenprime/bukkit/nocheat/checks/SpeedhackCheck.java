@@ -1,6 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Listener;
@@ -29,10 +31,9 @@ public class SpeedhackCheck extends Check {
 		super(plugin, "speedhack", PermissionData.PERMISSION_SPEEDHACK);
 	}
 
-	private static final long interval = 1000;
-	private static final int violationsLimit = 3;
+	private static final int violationsLimit = 2;
 
-	// Limits for the speedhack check
+	// Limits for the speedhack check per second
 	public int limits[] = { 30, 45, 60 };
 
 	// How should speedhack violations be treated?
@@ -45,70 +46,81 @@ public class SpeedhackCheck extends Check {
 
 	public void check(PlayerMoveEvent event) {
 
+		Player player = event.getPlayer();
 		// Should we check at all?
-		if(hasPermission(event.getPlayer())) return;
-
-		// Get the player-specific data
-		SpeedhackData data = SpeedhackData.get(event.getPlayer());
-
-		// Ignore events if the player has positive y-Velocity (these can be the cause of event spam between server and client)
-		if(event.getPlayer().getVelocity().getY() > 0.0D) {
-			return;
-		}
+		if(hasPermission(player)) return;
 
 		// Ignore events of players in vehicles (these can be the cause of event spam between server and client)
-		if(event.getPlayer().isInsideVehicle()) {
+		// Ignore events if the player has positive y-Velocity (these can be the cause of event spam between server and client)
+		if(player.isInsideVehicle() || player.getVelocity().getY() > 0.0D) {
 			return;
 		}
 
-		// Get the time of the server
-		long time = System.currentTimeMillis();
+		// Get the player-specific data
+		SpeedhackData data = SpeedhackData.get(player);
 
-		// Is it time for a speedhack check now?
-		if(time > interval + data.lastCheck ) {
-			// Yes
-			// TODO: Needs some better handling for server lag
-			Action action[] = null;
+		// Count the event
+		data.eventsSinceLastCheck++;
 
-			int low = (int)((limits[0] * (time - data.lastCheck)) / interval);
-			int med = (int)((limits[1] * (time - data.lastCheck)) / interval);
-			int high = (int)((limits[2] * (time - data.lastCheck)) / interval);
+		// Get the ticks of the server
+		int ticks = plugin.getServerTicks();
 
+		// Roughly half a second (= 10 ticks) passed
+		if(data.lastCheckTicks + 10 == ticks) {
 
-			if(data.eventsSinceLastCheck > high) action = actions[2];
-			else if(data.eventsSinceLastCheck > med) action = actions[1];
-			else if(data.eventsSinceLastCheck > low) action = actions[0];
-
-			if(action == null) {
+			// If we haven't already got a setback point, create one now
+			if(data.setBackPoint == null) {
 				data.setBackPoint = event.getFrom().clone();
-				data.violationsInARow = 0;
+			}
+
+			if(plugin.getServerLag() > 200) {
+				// Any data would likely be unreliable with that lag
+				resetData(data, event.getFrom().clone(), ticks);
 			}
 			else {
-				// If we haven't already got a setback point, create one now
-				if(data.setBackPoint == null) {
-					data.setBackPoint = event.getFrom().clone();
+				Action action[] = null;
+
+				final int low  = (limits[0]+1) / 2;
+				final int med  = (limits[1]+1) / 2;
+				final int high = (limits[2]+1) / 2;
+
+				if(data.eventsSinceLastCheck > high) action = actions[2];
+				else if(data.eventsSinceLastCheck > med) action = actions[1];
+				else if(data.eventsSinceLastCheck > low) action = actions[0];
+				else resetData(data, event.getFrom().clone(), ticks);
+
+
+				if(action != null)	data.violationsInARow++;
+
+				if(data.violationsInARow >= violationsLimit) {
+					action(action, event, data);
 				}
-				data.violationsInARow++;
+
+				// Reset value for next check
+				data.eventsSinceLastCheck = 0;
 			}
 
-			if(data.violationsInARow >= violationsLimit) {
-				action(action, event, data);
-			}
-
-			// Reset values for next check
-			data.eventsSinceLastCheck = 0;
-			data.lastCheck = time;
-
+			data.lastCheckTicks = ticks;
 		}
+		else if(data.lastCheckTicks + 10 < ticks)
+		{
+			// The player didn't move for the last 10 ticks
+			resetData(data, event.getFrom().clone(), ticks);
+		}
+	}
 
-		data.eventsSinceLastCheck++;
+	private static void resetData(SpeedhackData data, Location l, int ticks) {
+		data.violationsInARow = 0;
+		data.eventsSinceLastCheck = 0;
+		data.setBackPoint = l;
+		data.lastCheckTicks = ticks;
 	}
 
 	private void action(Action actions[], PlayerMoveEvent event, SpeedhackData data) {
 
 		if(actions == null) return;
 
-		String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck, limits[0]);
+		String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);
 
 		for(Action a : actions) {
 			if(a instanceof LogAction) 

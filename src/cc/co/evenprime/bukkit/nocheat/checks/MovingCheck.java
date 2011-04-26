@@ -67,10 +67,10 @@ public class MovingCheck extends Check {
 			{ LogAction.logmed,  CancelAction.cancel },
 			{ LogAction.loghigh, CancelAction.cancel } };
 
-	public String logMessage = "Moving violation: %1$s from %2$s (%4$.5f, %5$.5f, %6$.5f) to %3$s (%7$.5f, %8$.5f, %9$.5f)";
+	public String logMessage = "Moving violation: %1$s from %2$s (%4$.1f, %5$.1f, %6$.1f) to %3$s (%7$.1f, %8$.1f, %9$.1f)";
 	public String summaryMessage = "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)";
 
-	public long statisticTotalEvents = 0;
+	public long statisticTotalEvents = 1; // Prevent accidental division by 0
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
