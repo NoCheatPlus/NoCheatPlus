@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.listeners;
 
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
@@ -21,8 +22,16 @@ public class ItemdupePlayerListener extends PlayerListener {
 	}
 
 	@Override
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		
+		check.check(event);
+	}
+	
+	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
 
 		if(!event.isCancelled()) check.check(event);
 	}
+	
+	
 }
