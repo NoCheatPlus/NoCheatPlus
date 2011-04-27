@@ -14,7 +14,7 @@ public class PermissionData {
 	public static final int PERMISSION_SPEEDHACK = 2;
 	public static final int PERMISSION_AIRBUILD = 3;
 	public static final int PERMISSION_BEDTELEPORT = 4;
-	public static final int PERMISSION_P = 5;
+	public static final int PERMISSION_BOGUSITEMS = 5;
 	public static final int PERMISSION_NOTIFY = 6;
 	public static final int PERMISSION_ITEMDUPE = 7;
 

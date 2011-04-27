@@ -122,7 +122,8 @@ public class NoCheatConfiguration {
 		plugin.movingCheck.setActive(c.getBoolean("active.moving", true));
 		plugin.airbuildCheck.setActive(c.getBoolean("active.airbuild", false));
 		plugin.bedteleportCheck.setActive(c.getBoolean("active.bedteleport", true));
-		plugin.itemdupeCheck.setActive(c.getBoolean("active.itemdupe", false));
+		plugin.itemdupeCheck.setActive(c.getBoolean("active.itemdupe", true));
+		plugin.bogusitemsCheck.setActive(c.getBoolean("active.bogusitems", false));
 	}
 
 	public void cleanup() {
@@ -245,7 +246,8 @@ public class NoCheatConfiguration {
 			w.write("    moving: true"); w.newLine();
 			w.write("    airbuild: false"); w.newLine();
 			w.write("    bedteleport: true"); w.newLine();
-			w.write("    itemdupe: false"); w.newLine();
+			w.write("    itemdupe: true"); w.newLine();
+			w.write("    bogusitems: false"); w.newLine();
 			w.write("# Speedhack specific options"); w.newLine();
 			w.write("speedhack:"); w.newLine();
 			w.write("    logmessage: \"" + plugin.speedhackCheck.logMessage+"\""); w.newLine();
@@ -285,6 +287,8 @@ public class NoCheatConfiguration {
 			w.write("bedteleport:"); w.newLine();
 			w.write("# Itemdupe specific options (none exist yet)"); w.newLine();
 			w.write("itemdupe:"); w.newLine();
+			w.write("# Bogusitems specific options (none exist yet)"); w.newLine();
+			w.write("bogusitems:"); w.newLine();
 
 			w.flush(); w.close();
 		} catch (IOException e) {

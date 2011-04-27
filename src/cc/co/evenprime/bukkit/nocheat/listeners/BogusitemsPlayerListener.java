@@ -5,14 +5,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
-import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.BogusitemsCheck;
 
-public class ItemdupePlayerListener extends PlayerListener {
+public class BogusitemsPlayerListener extends PlayerListener {
 
-	ItemdupeCheck check;
+	BogusitemsCheck check;
 
-	public ItemdupePlayerListener(ItemdupeCheck itemdupeCheck) {
-		check = itemdupeCheck;
+	public BogusitemsPlayerListener(BogusitemsCheck bogusitemsCheck) {
+		check = bogusitemsCheck;
 	}
 
 	@Override

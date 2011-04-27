@@ -15,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.BogusitemsCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
@@ -41,6 +42,7 @@ public class NoCheat extends JavaPlugin {
 	public SpeedhackCheck speedhackCheck;
 	public AirbuildCheck airbuildCheck;
 	public ItemdupeCheck itemdupeCheck;
+	public BogusitemsCheck bogusitemsCheck;
 
 	public Check[] checks;
 
@@ -68,12 +70,12 @@ public class NoCheat extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
 	{
-		if(sender instanceof Player) {
+		/*if(sender instanceof Player) {
 			if(!hasPermission((Player)sender, PermissionData.PERMISSION_P)) {
 				sender.sendMessage("NC: You are not allowed to use this command.");
 				return false;
 			}
-		}
+		}*/
 
 		if(args.length == 0) {
 			sender.sendMessage("NC: Using "+ ((permissions == null) ? "isOp()" : "Permissions") + ". Activated checks/bugfixes: " + getActiveChecksAsString() + ". Total time used for moving check so far: " + (movingCheck.statisticElapsedTimeNano / 1000000L + " ms. Average time per move event: " + (movingCheck.statisticElapsedTimeNano/1000L)/movingCheck.statisticTotalEvents + " us"));
@@ -126,9 +128,10 @@ public class NoCheat extends JavaPlugin {
 		speedhackCheck = new SpeedhackCheck(this);
 		airbuildCheck = new AirbuildCheck(this);
 		itemdupeCheck = new ItemdupeCheck(this);
+		bogusitemsCheck = new BogusitemsCheck(this);
 
 		// just for convenience
-		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, itemdupeCheck };
+		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, itemdupeCheck, bogusitemsCheck };
 
 		// parse the nocheat.yml config file
 		setupConfig();
@@ -299,7 +302,7 @@ public class NoCheat extends JavaPlugin {
 		data.permissionsCache[PermissionData.PERMISSION_BEDTELEPORT] = permissions.has(player, "nocheat.bedteleport");
 		data.permissionsCache[PermissionData.PERMISSION_FLYING] = permissions.has(player, "nocheat.flying");
 		data.permissionsCache[PermissionData.PERMISSION_MOVING] = permissions.has(player, "nocheat.moving");
-		data.permissionsCache[PermissionData.PERMISSION_P] = permissions.has(player, "nocheat.p");
+		data.permissionsCache[PermissionData.PERMISSION_BOGUSITEMS] = permissions.has(player, "nocheat.bogusitems");
 		data.permissionsCache[PermissionData.PERMISSION_SPEEDHACK] = permissions.has(player, "nocheat.speedhack");
 		data.permissionsCache[PermissionData.PERMISSION_NOTIFY] = permissions.has(player, "nocheat.notify");
 		data.permissionsCache[PermissionData.PERMISSION_ITEMDUPE] = permissions.has(player, "nocheat.itemdupe");
