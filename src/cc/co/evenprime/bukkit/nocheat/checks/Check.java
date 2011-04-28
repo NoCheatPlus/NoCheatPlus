@@ -24,7 +24,7 @@ public abstract class Check {
 		this.name = name;
 	}
 
-	public boolean hasPermission(Player player) {
+	public boolean skipCheck(Player player) {
 		// Should we check at all?
 		return !active || plugin.hasPermission(player, permission); 
 	}

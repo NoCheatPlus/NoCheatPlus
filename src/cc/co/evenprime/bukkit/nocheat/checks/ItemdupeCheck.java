@@ -22,7 +22,7 @@ public class ItemdupeCheck extends Check {
 	public void check(EntityDeathEvent event) {
 
 		if(event.getEntity() instanceof CraftPlayer) {
-			if(hasPermission((CraftPlayer)event.getEntity())) return;
+			if(skipCheck((CraftPlayer)event.getEntity())) return;
 
 			((CraftPlayer)event.getEntity()).getHandle().x(); // close all inventory screens
 		}

@@ -28,7 +28,7 @@ public class BogusitemsCheck extends Check {
 	public void check(PlayerPickupItemEvent event) {
 
 		// Should we check at all?
-		if(hasPermission(event.getPlayer())) return;
+		if(skipCheck(event.getPlayer())) return;
 
 		Item i = event.getItem();
 		if(i != null) {
@@ -47,7 +47,7 @@ public class BogusitemsCheck extends Check {
 
 	public void check(PlayerInteractEvent event) {
 
-		if(hasPermission(event.getPlayer())) return;
+		if(skipCheck(event.getPlayer())) return;
 
 		if(event.hasItem() && event.getItem().getAmount() <= 0) {// buggy item
 			event.setCancelled(true);
@@ -60,7 +60,7 @@ public class BogusitemsCheck extends Check {
 
 	public void check(PlayerDropItemEvent event) {
 
-		if(hasPermission(event.getPlayer())) return;
+		if(skipCheck(event.getPlayer())) return;
 
 		Item item = event.getItemDrop();
 

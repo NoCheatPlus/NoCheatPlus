@@ -42,7 +42,7 @@ public class AirbuildCheck extends Check {
 	public void check(BlockPlaceEvent event) {
 
 		// Should we check at all?
-		if(hasPermission(event.getPlayer())) return;
+		if(skipCheck(event.getPlayer())) return;
 
 		// Are all 6 sides "air-blocks" -> cancel the event
 		if(event.getBlockAgainst().getType() == Material.AIR) {

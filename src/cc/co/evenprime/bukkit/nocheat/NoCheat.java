@@ -274,11 +274,12 @@ public class NoCheat extends JavaPlugin {
 				return player.isOp();
 			else {
 				PermissionData data = PermissionData.get(player);
-				if(data.permissionsLastUpdate + 10000 < System.currentTimeMillis()) {
-					data.permissionsLastUpdate = System.currentTimeMillis();
-					updatePermissions(player, data);
+				long time = System.currentTimeMillis();
+				if(data.lastUpdate[permission] + 10000 < time) {
+					data.lastUpdate[permission] = time;
+					data.cache[permission] = permissions.has(player, PermissionData.permissionNames[permission]);
 				}
-				return data.permissionsCache[permission];
+				return data.cache[permission];
 			}
 		}
 		catch(Throwable e) {
@@ -294,19 +295,6 @@ public class NoCheat extends JavaPlugin {
 			}
 			return false;
 		}
-	}
-
-	private void updatePermissions(Player player, PermissionData data) {
-
-		data.permissionsCache[PermissionData.PERMISSION_AIRBUILD] = permissions.has(player, "nocheat.airbuild");
-		data.permissionsCache[PermissionData.PERMISSION_BEDTELEPORT] = permissions.has(player, "nocheat.bedteleport");
-		data.permissionsCache[PermissionData.PERMISSION_FLYING] = permissions.has(player, "nocheat.flying");
-		data.permissionsCache[PermissionData.PERMISSION_MOVING] = permissions.has(player, "nocheat.moving");
-		data.permissionsCache[PermissionData.PERMISSION_BOGUSITEMS] = permissions.has(player, "nocheat.bogusitems");
-		data.permissionsCache[PermissionData.PERMISSION_SPEEDHACK] = permissions.has(player, "nocheat.speedhack");
-		data.permissionsCache[PermissionData.PERMISSION_NOTIFY] = permissions.has(player, "nocheat.notify");
-		data.permissionsCache[PermissionData.PERMISSION_ITEMDUPE] = permissions.has(player, "nocheat.itemdupe");
-
 	}
 
 	/**
@@ -339,7 +327,7 @@ public class NoCheat extends JavaPlugin {
 		String s = "";
 
 		for(Check c : checks) {
-			s = s + (!c.isActive() ? c.getName() + "* " : (c.hasPermission(p) ? c.getName() + " " : ""));
+			s = s + (!c.isActive() ? c.getName() + "* " : (c.skipCheck(p) ? c.getName() + " " : ""));
 		}
 
 		s = s + (!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING) ? "flying " : ""));

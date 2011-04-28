@@ -48,7 +48,7 @@ public class SpeedhackCheck extends Check {
 
 		Player player = event.getPlayer();
 		// Should we check at all?
-		if(hasPermission(player)) return;
+		if(skipCheck(player)) return;
 
 		// Ignore events of players in vehicles (these can be the cause of event spam between server and client)
 		// Ignore events if the player has positive y-Velocity (these can be the cause of event spam between server and client)

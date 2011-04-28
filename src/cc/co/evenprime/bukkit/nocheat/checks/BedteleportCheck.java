@@ -25,7 +25,7 @@ public class BedteleportCheck extends Check {
 	public void check(PlayerMoveEvent event) {
 
 		// Should we check at all?
-		if(hasPermission(event.getPlayer())) 
+		if(skipCheck(event.getPlayer())) 
 			return;
 
 		if(event.getPlayer().isSleeping())

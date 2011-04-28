@@ -22,6 +22,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData.BlockType;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerListener;
@@ -75,105 +76,6 @@ public class MovingCheck extends Check {
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
 
-	// Block types that may be treated specially
-	private enum BlockType {
-		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN, FENCE;
-	}
-
-	// Until I can think of a better way to determine if a block is solid or not, this is what I'll do
-	private static BlockType types[] = new BlockType[256];
-	static {
-
-		for(int i = 0; i < types.length; i++) {
-			types[i] = BlockType.UNKNOWN;
-		}
-
-		types[Material.AIR.getId()] = BlockType.NONSOLID;
-		types[Material.STONE.getId()] = BlockType.SOLID;
-		types[Material.GRASS.getId()] = BlockType.SOLID;
-		types[Material.DIRT.getId()] = BlockType.SOLID;
-		types[Material.COBBLESTONE.getId()] = BlockType.SOLID;
-		types[Material.WOOD.getId()] = BlockType.SOLID;
-		types[Material.SAPLING.getId()] = BlockType.NONSOLID;
-		types[Material.BEDROCK.getId()] = BlockType.SOLID;
-		types[Material.WATER.getId()] = BlockType.LIQUID;
-		types[Material.STATIONARY_WATER.getId()] = BlockType.LIQUID;
-		types[Material.LAVA.getId()] = BlockType.LIQUID;
-		types[Material.STATIONARY_LAVA.getId()] = BlockType.LIQUID;
-		types[Material.SAND.getId()] = BlockType.SOLID;
-		types[Material.GRAVEL.getId()] = BlockType.SOLID;
-		types[Material.GOLD_ORE.getId()] = BlockType.SOLID;
-		types[Material.IRON_ORE.getId()] = BlockType.SOLID;
-		types[Material.COAL_ORE.getId()] = BlockType.SOLID;
-		types[Material.LOG.getId()] = BlockType.SOLID;
-		types[Material.LEAVES.getId()] = BlockType.SOLID;
-		types[Material.SPONGE.getId()] = BlockType.SOLID;
-		types[Material.GLASS.getId()] = BlockType.SOLID;
-		types[Material.LAPIS_ORE.getId()] = BlockType.SOLID;
-		types[Material.LAPIS_BLOCK.getId()] = BlockType.SOLID;
-		types[Material.DISPENSER.getId()] = BlockType.SOLID;
-		types[Material.SANDSTONE.getId()] = BlockType.SOLID;
-		types[Material.NOTE_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.WOOL.getId()]= BlockType.SOLID;
-		types[Material.YELLOW_FLOWER.getId()]= BlockType.NONSOLID;
-		types[Material.RED_ROSE.getId()]= BlockType.NONSOLID;
-		types[Material.BROWN_MUSHROOM.getId()]= BlockType.NONSOLID;
-		types[Material.RED_MUSHROOM.getId()]= BlockType.NONSOLID;
-		types[Material.GOLD_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.IRON_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.DOUBLE_STEP.getId()]= BlockType.UNKNOWN;
-		types[Material.STEP.getId()]= BlockType.UNKNOWN;
-		types[Material.BRICK.getId()]= BlockType.SOLID;
-		types[Material.TNT.getId()]= BlockType.SOLID;
-		types[Material.BOOKSHELF.getId()]= BlockType.SOLID;
-		types[Material.MOSSY_COBBLESTONE.getId()]  = BlockType.SOLID;  	                                                                                    
-		types[Material.OBSIDIAN.getId()]= BlockType.SOLID;
-		types[Material.TORCH.getId()]= BlockType.NONSOLID;
-		types[Material.FIRE.getId()]= BlockType.NONSOLID;
-		types[Material.MOB_SPAWNER.getId()]= BlockType.SOLID;
-		types[Material.WOOD_STAIRS.getId()]= BlockType.UNKNOWN;
-		types[Material.CHEST.getId()]= BlockType.SOLID;
-		types[Material.REDSTONE_WIRE.getId()]= BlockType.NONSOLID;
-		types[Material.DIAMOND_ORE.getId()]= BlockType.SOLID;
-		types[Material.DIAMOND_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.WORKBENCH.getId()]= BlockType.SOLID;
-		types[Material.CROPS.getId()]= BlockType.NONSOLID;
-		types[Material.SOIL.getId()]= BlockType.SOLID;
-		types[Material.FURNACE.getId()]= BlockType.SOLID;
-		types[Material.BURNING_FURNACE.getId()]= BlockType.SOLID;
-		types[Material.SIGN_POST.getId()]= BlockType.NONSOLID;
-		types[Material.WOODEN_DOOR.getId()]= BlockType.NONSOLID;
-		types[Material.LADDER.getId()]= BlockType.LADDER;
-		types[Material.RAILS.getId()]= BlockType.NONSOLID;
-		types[Material.COBBLESTONE_STAIRS.getId()]= BlockType.UNKNOWN;
-		types[Material.WALL_SIGN.getId()]= BlockType.NONSOLID;
-		types[Material.LEVER.getId()]= BlockType.NONSOLID;
-		types[Material.STONE_PLATE.getId()]= BlockType.UNKNOWN;
-		types[Material.IRON_DOOR_BLOCK.getId()]= BlockType.NONSOLID;
-		types[Material.WOOD_PLATE.getId()]= BlockType.NONSOLID;
-		types[Material.REDSTONE_ORE.getId()]= BlockType.SOLID;
-		types[Material.GLOWING_REDSTONE_ORE.getId()]= BlockType.SOLID;
-		types[Material.REDSTONE_TORCH_OFF.getId()]= BlockType.NONSOLID;
-		types[Material.REDSTONE_TORCH_ON.getId()]= BlockType.NONSOLID;
-		types[Material.STONE_BUTTON.getId()]= BlockType.NONSOLID;
-		types[Material.SNOW.getId()]= BlockType.UNKNOWN;
-		types[Material.ICE.getId()]= BlockType.UNKNOWN;
-		types[Material.SNOW_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.CACTUS.getId()]= BlockType.SOLID;
-		types[Material.CLAY.getId()]= BlockType.SOLID;
-		types[Material.SUGAR_CANE_BLOCK.getId()]= BlockType.NONSOLID;
-		types[Material.JUKEBOX.getId()]= BlockType.SOLID;
-		types[Material.FENCE.getId()]= BlockType.FENCE;
-		types[Material.PUMPKIN.getId()]= BlockType.SOLID;
-		types[Material.NETHERRACK.getId()]= BlockType.SOLID;
-		types[Material.SOUL_SAND.getId()]= BlockType.UNKNOWN;
-		types[Material.GLOWSTONE.getId()]= BlockType.SOLID;
-		types[Material.PORTAL.getId()]= BlockType.NONSOLID;
-		types[Material.JACK_O_LANTERN.getId()]= BlockType.SOLID;
-		types[Material.CAKE_BLOCK.getId()]= BlockType.UNKNOWN;
-	}
-
-
 	public void check(final PlayerMoveEvent event) {
 
 		long startTime = System.nanoTime();
@@ -181,7 +83,7 @@ public class MovingCheck extends Check {
 		final Player player = event.getPlayer();
 
 		// Should we check at all
-		if(hasPermission(player)) {
+		if(skipCheck(player)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
@@ -565,6 +467,8 @@ public class MovingCheck extends Check {
 	 */
 	private static boolean playerIsOnGround(World w, int values[], Location l) {
 
+		BlockType types[] = MovingData.types;
+		
 		// Check the four borders of the players hitbox for something he could be standing on
 		if(types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID ||
 				types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID ||
