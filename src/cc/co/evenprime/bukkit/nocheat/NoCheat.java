@@ -70,13 +70,6 @@ public class NoCheat extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
 	{
-		/*if(sender instanceof Player) {
-			if(!hasPermission((Player)sender, PermissionData.PERMISSION_P)) {
-				sender.sendMessage("NC: You are not allowed to use this command.");
-				return false;
-			}
-		}*/
-
 		if(args.length == 0) {
 			sender.sendMessage("NC: Using "+ ((permissions == null) ? "isOp()" : "Permissions") + ". Activated checks/bugfixes: " + getActiveChecksAsString() + ". Total time used for moving check so far: " + (movingCheck.statisticElapsedTimeNano / 1000000L + " ms. Average time per move event: " + (movingCheck.statisticElapsedTimeNano/1000L)/movingCheck.statisticTotalEvents + " us"));
 			return true;
@@ -221,7 +214,7 @@ public class NoCheat extends JavaPlugin {
 
 		if(p == null) {
 			PluginDescriptionFile pdfFile = this.getDescription();
-			Logger.getLogger("Minecraft").warning("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find CrafTIRC plugin. Disabling logging to IRC.");
+			Logger.getLogger("Minecraft").info("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find CrafTIRC plugin. Disabling logging to IRC.");
 		}
 
 		irc = p;
@@ -287,7 +280,7 @@ public class NoCheat extends JavaPlugin {
 				// Prevent spam and recursion by definitely doing this only once
 				this.exceptionWithPermissions = true;
 
-				String logtext = "Asking Permissions-Plugin if "+player.getName()+" has permission "+permission+" caused an Exception "+ e.getMessage() + ". Please review your permissions config file. This message is only displayed once, the player is considered to not have that permission from now on. The full stack trace is written into the nocheat logfile.";
+				String logtext = "Asking Permissions-Plugin if "+player.getName()+" has permission "+PermissionData.permissionNames[permission]+" caused an Exception "+ e.getMessage() + ". Please review your permissions config file. This message is only displayed once, the player is considered to not have that permission from now on. The full stack trace is written into the nocheat logfile.";
 				log(Level.SEVERE, logtext);
 				for(StackTraceElement s : e.getStackTrace()) {
 					config.logger.log(Level.SEVERE, s.toString());
@@ -317,7 +310,8 @@ public class NoCheat extends JavaPlugin {
 		}
 
 		s = s + (movingCheck.isActive() && !movingCheck.allowFlying ? "flying " : "");
-		
+		s = s + (movingCheck.isActive() && !movingCheck.allowFakeSneak ? "fakesneak " : "");
+
 		return s;
 	}
 
@@ -331,8 +325,9 @@ public class NoCheat extends JavaPlugin {
 		}
 
 		s = s + (!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING) ? "flying " : ""));
+		s = s + (!movingCheck.isActive() || movingCheck.allowFakeSneak ? "fakesneak* " : (hasPermission(p, PermissionData.PERMISSION_FAKESNEAK) ? "fakesneak " : ""));
 		s = s + (hasPermission(p, PermissionData.PERMISSION_NOTIFY) ? "notify " : "");
-		
+
 		return s;
 	}
 

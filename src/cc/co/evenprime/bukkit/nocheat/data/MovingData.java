@@ -19,6 +19,8 @@ public class MovingData {
 	public Runnable summaryTask = null;
 	public Level highestLogLevel = null;
 	public double maxYVelocity = 0.0D;
+	public int sneakingFreedomCounter = 10;
+	public double sneakingLastDistance = 0.0D;
 
 	public boolean worldChanged = false;
 	public boolean respawned = false;

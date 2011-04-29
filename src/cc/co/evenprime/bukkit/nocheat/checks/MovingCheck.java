@@ -61,6 +61,7 @@ public class MovingCheck extends Check {
 	public long statisticElapsedTimeNano = 0;
 
 	public boolean allowFlying = false;
+	public boolean allowFakeSneak = true;
 
 	// How should moving violations be treated?
 	public final Action actions[][] = { 
@@ -71,29 +72,27 @@ public class MovingCheck extends Check {
 	public String logMessage = "Moving violation: %1$s from %2$s (%4$.1f, %5$.1f, %6$.1f) to %3$s (%7$.1f, %8$.1f, %9$.1f)";
 	public String summaryMessage = "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)";
 
-	public long statisticTotalEvents = 1; // Prevent accidental division by 0
+	public long statisticTotalEvents = 1; // Prevent accidental division by 0 at some point
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
 
+	/**
+	 * The actual check.
+	 * First find out if the event needs to be handled at all
+	 * Second check if the player moved too far horizontally
+	 * Third check if the player moved too high vertically
+	 * Fourth treat any occured violations as configured
+	 * @param event
+	 */
 	public void check(final PlayerMoveEvent event) {
-
-		long startTime = System.nanoTime();
 
 		final Player player = event.getPlayer();
 
 		// Should we check at all
-		if(skipCheck(player)) {
-			statisticElapsedTimeNano += System.nanoTime() - startTime;
-			statisticTotalEvents++;
-			return;
-		}
+		if(skipCheck(player)) {	return;	}
 
-		final boolean canFly;
-		if(allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING))
-			canFly = true;
-		else
-			canFly = false;
+		long startTime = System.nanoTime();
 
 		// Get the player-specific data
 		final MovingData data = MovingData.get(player);
@@ -102,21 +101,18 @@ public class MovingCheck extends Check {
 		final Location to = event.getTo();
 		Location from = event.getFrom();
 
-		// WORKAROUND for changed PLAYER_MOVE logic
-		if(data.teleportTo != null) {
-			from = data.teleportTo;
-			data.teleportTo = null;
-		}
-
 		// The use of event.getFrom() is intentional
-		if(shouldBeIgnored(player, data, event.getFrom(), to)) {
+		if(shouldBeIgnored(player, data, from, to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
 		}
 
-		// The actual movingCheck starts here
-		updateVelocity(player.getVelocity(), data);
+		// WORKAROUND for changed PLAYER_MOVE logic
+		if(data.teleportTo != null) {
+			from = data.teleportTo;
+			data.teleportTo = null;
+		}
 
 		// First check the distance the player has moved horizontally
 		final double xDistance = Math.abs(from.getX()-to.getX());
@@ -132,15 +128,60 @@ public class MovingCheck extends Check {
 			return;
 		}
 
+		// pre-calculate boundary values that are needed multiple times in the following checks
+		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
+		final int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), (int)Math.floor(from.getY()), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
+		final int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), (int)Math.floor(to.getY()+0.5D), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
+
+		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
+		final boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
+		final boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
+
+		final boolean canFly;
+		if(allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING)) {
+			canFly = true;
+			data.jumpPhase = 0;
+		}
+		else
+			canFly = false;
+		
+		final boolean canFakeSneak;
+		if(allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK)) {
+			canFakeSneak = true;
+		}
+		else
+			canFakeSneak = false;
+
 		/**** Horizontal movement check START ****/
 
-		int vl1 = -1;
+		int violationLevelSneaking = -1;
 
-		//if(player.isSneaking())
-		if(false) // Currently disabled, still needs some additional work
-			vl1 = limitCheck(combined - (data.horizFreedom + sneakStepWidth), moveLimits);
-		else
-			vl1 = limitCheck(combined - (data.horizFreedom + stepWidth), moveLimits);
+		if(!canFakeSneak && player.isSneaking()) {
+			violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakStepWidth), moveLimits);
+			if(violationLevelSneaking >= 0) {
+				if(combined >= data.sneakingLastDistance)
+					data.sneakingFreedomCounter -= 2;
+				else
+				{
+					violationLevelSneaking = -1;
+				}
+			}
+
+			data.sneakingLastDistance = combined;
+		}
+
+		if(violationLevelSneaking >= 0 && data.sneakingFreedomCounter > 0) {
+			violationLevelSneaking = -1;
+		}
+		else if(violationLevelSneaking < 0 && data.sneakingFreedomCounter < 10){
+			data.sneakingFreedomCounter += 1;
+		}
+
+		int violationLevelHorizontal = -1;
+
+		limitCheck(combined - (data.horizFreedom + stepWidth), moveLimits);
+
+		violationLevelHorizontal = violationLevelHorizontal > violationLevelSneaking ? violationLevelHorizontal : violationLevelSneaking;
 
 		// Reduce horiz moving freedom with each event
 		data.horizFreedom *= 0.9;
@@ -148,16 +189,101 @@ public class MovingCheck extends Check {
 		/**** Horizontal movement check END ****/
 
 		/**** Vertical movement check START ****/
-		// pre-calculate boundary values that are needed multiple times in the following checks
-		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-		int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), (int)Math.floor(from.getY()), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
-		int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), (int)Math.floor(to.getY()+0.5D), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
 
-		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
-		final boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
-		final boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
+		int violationLevelVertical = -1;
 
-		int vl2 = -1;
+		// The location we'd use as a new setback if there are no violations
+		Location newSetBack = null;
+
+		double limit = calculateVerticalLimit(data, onGroundFrom, onGroundTo);
+
+		// Handle 4 distinct cases: Walk, Jump, Land, Fly
+
+		// Walk or start Jump
+		if(onGroundFrom)
+		{
+			limit += jumpHeight;
+			double distance = to.getY() - from.getY();
+
+			violationLevelVertical = limitCheck(distance - limit, heightLimits);
+
+			if(violationLevelVertical < 0)
+			{
+				// reset jumping
+				if(onGroundTo)
+					data.jumpPhase = 0; // Walk
+				else
+					data.jumpPhase = 1; // Jump
+
+				newSetBack = from.clone();
+			}
+		}
+		// Land or Fly/Fall
+		else
+		{
+			Location l = null;
+
+			if(data.setBackPoint == null || canFly)
+				l = from;
+			else
+				l = data.setBackPoint;
+
+			if(!canFly && data.jumpPhase > jumpingLimit)
+				limit += jumpHeight - (data.jumpPhase-jumpingLimit) * 0.2D;
+			else limit += jumpHeight;
+
+			if(onGroundTo) limit += stepHeight;
+
+			double distance = to.getY() - l.getY();
+
+			// Check if player isn't jumping too high
+			violationLevelVertical = limitCheck(distance - limit, heightLimits);
+
+			if(violationLevelVertical < 0) {
+				if(onGroundTo) { // Land
+					data.jumpPhase = 0; // He is on ground now, so reset the jump
+					newSetBack = to.clone();
+				}
+				else { // Fly
+					data.jumpPhase++; // Enter next phase of the flight
+					// If we have no setback point, create one now
+					if(data.setBackPoint == null) { 
+						newSetBack = from.clone();
+					}
+				}
+			}
+		}
+
+		/**** Vertical movement check END ****/
+
+		/****** Violation Handling START *****/
+		int violationLevel = violationLevelHorizontal > violationLevelVertical ? violationLevelHorizontal : violationLevelVertical;
+
+		if(violationLevel < 0 && newSetBack != null) {
+			data.setBackPoint = newSetBack;
+		}
+
+		// If we haven't already got a setback point by now, make this location the new setback point
+		if(data.setBackPoint == null) {
+			data.setBackPoint = from.clone();
+		}
+
+		if(violationLevel >= 0) {
+			setupSummaryTask(event.getPlayer(), data);
+
+			boolean log = !(data.violationsInARow[violationLevel] > 0);
+			data.violationsInARow[violationLevel]++;
+
+			action(event, event.getPlayer(), from, to, actions[violationLevel], log, data);
+		}
+
+		/****** Violation Handling END *****/
+
+		statisticElapsedTimeNano += System.nanoTime() - startTime;
+		statisticTotalEvents++;
+	}
+
+	private double calculateVerticalLimit(MovingData data, boolean onGroundFrom, boolean onGroundTo) {
 
 		// A halfway lag-resistant method of allowing vertical acceleration without allowing blatant cheating
 
@@ -189,109 +315,37 @@ public class MovingCheck extends Check {
 			data.vertFreedom = 0.0D;
 		}
 
-		// The location we'd use as a new setback if there are no violations
-		Location newSetBack = null;
-
-		// there's no use for counting this
-		if(canFly) data.jumpPhase = 0;
-
-		// Handle 4 distinct cases: Walk, Jump, Land, Fly
-
-		// Walk or start Jump
-		if(onGroundFrom)
-		{
-			limit += jumpHeight;
-			double distance = to.getY() - from.getY();
-
-			vl2 = limitCheck(distance - limit, heightLimits);
-
-			if(vl2 < 0)
-			{
-				// reset jumping
-				if(onGroundTo)
-					data.jumpPhase = 0; // Walk
-				else
-					data.jumpPhase = 1; // Jump
-
-				newSetBack = from.clone();
-			}
-		}
-		// Land or Fly/Fall
-		else
-		{
-			Location l = null;
-
-			if(data.setBackPoint == null || canFly)
-				l = from;
-			else
-				l = data.setBackPoint;
-
-			if(!canFly && data.jumpPhase > jumpingLimit)
-				limit += jumpHeight - (data.jumpPhase-jumpingLimit) * 0.2D;
-			else limit += jumpHeight;
-
-			if(onGroundTo) limit += stepHeight;
-
-			double distance = to.getY() - l.getY();
-
-			// Check if player isn't jumping too high
-			vl2 = limitCheck(distance - limit, heightLimits);
-
-			if(vl2 < 0) {
-				if(onGroundTo) { // Land
-					data.jumpPhase = 0; // He is on ground now, so reset the jump
-					newSetBack = to.clone();
-				}
-				else { // Fly
-					data.jumpPhase++; // Enter next phase of the flight
-					// If we have no setback point, create one now
-					if(data.setBackPoint == null) { 
-						newSetBack = from.clone();
-					}
-				}
-			}
-		}
-
-		int vl = vl1 > vl2 ? vl1 : vl2;
-
-		if(vl < 0 && newSetBack != null) {
-			data.setBackPoint = newSetBack;
-		}
-
-		// If we haven't already got a setback point by now, make this location the new setback point
-		if(data.setBackPoint == null) {
-			data.setBackPoint = from.clone();
-		}
-
-		if(vl >= 0) {
-			setupSummaryTask(event.getPlayer(), data);
-
-			boolean log = !(data.violationsInARow[vl] > 0);
-			data.violationsInARow[vl]++;
-
-			action(event, event.getPlayer(), from, to, actions[vl], log, data);
-		}
-
-		statisticElapsedTimeNano += System.nanoTime() - startTime;
-		statisticTotalEvents++;
+		return limit;
 	}
 
+	/**
+	 * Various corner cases that would cause this check to fail or require special treatment
+	 * @param player
+	 * @param data
+	 * @param from
+	 * @param to
+	 * @return
+	 */
 	private boolean shouldBeIgnored(Player player, MovingData data, Location from, Location to) {
-		if(from.equals(to)) // Both locations are perfectly identical
+		// Identical locations - just ignore the event
+		if(from.equals(to))
 			return true;
-		else if(!from.equals(data.lastLocation)) { // The player was moved somehow without causing a move event
+		// Something or someone moved the player without causing a move event - Can't do much with that
+		else if(!from.equals(data.lastLocation)) {
 			resetData(data, to);
 			return true;
 		}
+		// Player was respawned just before, this causes all kinds of weirdness - better ignore it
 		else if(data.respawned) {
 			data.respawned = false;
 			return true;
 		}
+		// Player changed the world before, which makes any location information basically useless
 		else if(data.worldChanged) {
 			data.worldChanged = false;
 			return true;
 		}
-		// vehicles are a special case, I ignore them because the server controls them
+		// Player is inside a vehicle, this causes all kinds of weirdness - better ignore it
 		else if(player.isInsideVehicle()) {
 			return true;
 		}
@@ -299,6 +353,12 @@ public class MovingCheck extends Check {
 	}
 
 
+	/**
+	 * Register a task with bukkit that will be run a short time from now, displaying how many
+	 * violations happened in that timeframe
+	 * @param p
+	 * @param data
+	 */
 	private void setupSummaryTask(final Player p, final MovingData data) {
 		// Setup task to display summary later
 		if(data.summaryTask == null) {
@@ -358,6 +418,10 @@ public class MovingCheck extends Check {
 		}
 	}
 
+	/**
+	 * Set a flag to declare that the player recently respawned
+	 * @param event
+	 */
 	public void respawned(PlayerRespawnEvent event) {
 		MovingData data = MovingData.get(event.getPlayer());
 
@@ -365,10 +429,16 @@ public class MovingCheck extends Check {
 
 	}
 
+	/**
+	 * Update the cached values for players velocity to be prepared to
+	 * give them additional movement freedom in their next move events
+	 * @param v
+	 * @param data
+	 */
 	public void updateVelocity(Vector v, MovingData data) {
 
 		// Compare the velocity vector to the existing movement freedom that we've from previous events
-		double tmp = (Math.abs(v.getX()) + Math.abs(v.getZ())) * 2D;
+		double tmp = (Math.abs(v.getX()) + Math.abs(v.getZ())) * 3D;
 		if(tmp > data.horizFreedom)
 			data.horizFreedom = tmp;
 
@@ -376,6 +446,7 @@ public class MovingCheck extends Check {
 			data.maxYVelocity = v.getY();
 		}
 	}
+
 	/**
 	 * Perform actions that were specified in the config file
 	 * @param event
@@ -408,6 +479,13 @@ public class MovingCheck extends Check {
 		}
 	}
 
+	/**
+	 * Check a value against an array of sorted values to find out
+	 * where it fits in
+	 * @param value
+	 * @param limits
+	 * @return
+	 */
 	private int limitCheck(double value, double limits[]) {
 
 		for(int i = limits.length - 1; i >= 0; i--) {
@@ -453,22 +531,23 @@ public class MovingCheck extends Check {
 			event.setTo(t);
 
 			event.setCancelled(true);
+
 		}
 	}
 
 
 	/**
-	 * Check if certain coordinates are considered "on ground" or in air
+	 * Check if certain coordinates are considered "on ground"
 	 * 
 	 * @param w	The world the coordinates belong to
-	 * @param values The coordinates [lowerX, higherX, Y, lowerZ, higherZ]
-	 * @param l The location that was used for calculation of "values"
+	 * @param values The coordinates [lowerX, higherX, Y, lowerZ, higherZ] to be checked
+	 * @param l The precise location that was used for calculation of "values"
 	 * @return
 	 */
 	private static boolean playerIsOnGround(World w, int values[], Location l) {
 
 		BlockType types[] = MovingData.types;
-		
+
 		// Check the four borders of the players hitbox for something he could be standing on
 		if(types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID ||
 				types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID ||
@@ -514,6 +593,11 @@ public class MovingCheck extends Check {
 			return false;
 	}
 
+	/**
+	 * Personal Rounding function to determine if a player is still touching a block or not
+	 * @param d1
+	 * @return
+	 */
 	private static int lowerBorder(double d1) {
 		double floor = Math.floor(d1);
 		double d4 = floor + magic;
@@ -526,6 +610,11 @@ public class MovingCheck extends Check {
 		return (int) (floor - d4);
 	}
 
+	/**
+	 * Personal Rounding function to determine if a player is still touching a block or not
+	 * @param d1
+	 * @return
+	 */
 	private static int upperBorder(double d1) {
 		double floor = Math.floor(d1);
 		double d4 = floor + magic2;
@@ -538,8 +627,13 @@ public class MovingCheck extends Check {
 		return (int) (floor - d4);
 	}
 
+	/**
+	 * Reset all temporary information of this check
+	 * @param data
+	 * @param l
+	 */
 	private void resetData(MovingData data, Location l) {
-		// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
+
 		data.setBackPoint = l;
 		data.jumpPhase = 0;
 		data.teleportTo = null;
