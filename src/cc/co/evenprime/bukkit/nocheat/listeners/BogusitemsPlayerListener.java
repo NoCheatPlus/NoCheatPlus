@@ -9,7 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.BogusitemsCheck;
 
 public class BogusitemsPlayerListener extends PlayerListener {
 
-	BogusitemsCheck check;
+	private BogusitemsCheck check;
 
 	public BogusitemsPlayerListener(BogusitemsCheck bogusitemsCheck) {
 		check = bogusitemsCheck;

@@ -12,7 +12,6 @@ public class MovingData {
 	public int jumpPhase = 0;
 	public int violationsInARow[] =  { 0, 0, 0 }; 
 	public double horizFreedom = 0.0D;
-	public int horizFreedomCounter = 0;
 	public double vertFreedom = 0.0D;
 	public int vertFreedomCounter = 0;
 	public Location setBackPoint = null;
@@ -32,109 +31,115 @@ public class MovingData {
 	public Location teleportInitializedByMe = null;
 
 	// Block types that may be treated specially
-	public enum BlockType {
-		SOLID, NONSOLID, LADDER, LIQUID, UNKNOWN, FENCE;
-	}
+	public static final int SOLID = 0;
+	public static final int NONSOLID = 1;
+	public static final int LADDER = 2;
+	public static final int LIQUID = 3;
+	public static final int UNKNOWN = 4;
+	public static final int FENCE = 5;
 
+	
 	// Until I can think of a better way to determine if a block is solid or not, this is what I'll do
-	public static BlockType types[] = new BlockType[256];
+	public static final int types[] = new int[256];
+	
 	static {
 
 		for(int i = 0; i < types.length; i++) {
-			types[i] = BlockType.UNKNOWN;
+			types[i] = UNKNOWN;
 		}
 
-		types[Material.AIR.getId()] = BlockType.NONSOLID;
-		types[Material.STONE.getId()] = BlockType.SOLID;
-		types[Material.GRASS.getId()] = BlockType.SOLID;
-		types[Material.DIRT.getId()] = BlockType.SOLID;
-		types[Material.COBBLESTONE.getId()] = BlockType.SOLID;
-		types[Material.WOOD.getId()] = BlockType.SOLID;
-		types[Material.SAPLING.getId()] = BlockType.NONSOLID;
-		types[Material.BEDROCK.getId()] = BlockType.SOLID;
-		types[Material.WATER.getId()] = BlockType.LIQUID;
-		types[Material.STATIONARY_WATER.getId()] = BlockType.LIQUID;
-		types[Material.LAVA.getId()] = BlockType.LIQUID;
-		types[Material.STATIONARY_LAVA.getId()] = BlockType.LIQUID;
-		types[Material.SAND.getId()] = BlockType.SOLID;
-		types[Material.GRAVEL.getId()] = BlockType.SOLID;
-		types[Material.GOLD_ORE.getId()] = BlockType.SOLID;
-		types[Material.IRON_ORE.getId()] = BlockType.SOLID;
-		types[Material.COAL_ORE.getId()] = BlockType.SOLID;
-		types[Material.LOG.getId()] = BlockType.SOLID;
-		types[Material.LEAVES.getId()] = BlockType.SOLID;
-		types[Material.SPONGE.getId()] = BlockType.SOLID;
-		types[Material.GLASS.getId()] = BlockType.SOLID;
-		types[Material.LAPIS_ORE.getId()] = BlockType.SOLID;
-		types[Material.LAPIS_BLOCK.getId()] = BlockType.SOLID;
-		types[Material.DISPENSER.getId()] = BlockType.SOLID;
-		types[Material.SANDSTONE.getId()] = BlockType.SOLID;
-		types[Material.NOTE_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.WOOL.getId()]= BlockType.SOLID;
-		types[Material.YELLOW_FLOWER.getId()]= BlockType.NONSOLID;
-		types[Material.RED_ROSE.getId()]= BlockType.NONSOLID;
-		types[Material.BROWN_MUSHROOM.getId()]= BlockType.NONSOLID;
-		types[Material.RED_MUSHROOM.getId()]= BlockType.NONSOLID;
-		types[Material.GOLD_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.IRON_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.DOUBLE_STEP.getId()]= BlockType.UNKNOWN;
-		types[Material.STEP.getId()]= BlockType.UNKNOWN;
-		types[Material.BRICK.getId()]= BlockType.SOLID;
-		types[Material.TNT.getId()]= BlockType.SOLID;
-		types[Material.BOOKSHELF.getId()]= BlockType.SOLID;
-		types[Material.MOSSY_COBBLESTONE.getId()]  = BlockType.SOLID;  	                                                                                    
-		types[Material.OBSIDIAN.getId()]= BlockType.SOLID;
-		types[Material.TORCH.getId()]= BlockType.NONSOLID;
-		types[Material.FIRE.getId()]= BlockType.NONSOLID;
-		types[Material.MOB_SPAWNER.getId()]= BlockType.SOLID;
-		types[Material.WOOD_STAIRS.getId()]= BlockType.UNKNOWN;
-		types[Material.CHEST.getId()]= BlockType.SOLID;
-		types[Material.REDSTONE_WIRE.getId()]= BlockType.NONSOLID;
-		types[Material.DIAMOND_ORE.getId()]= BlockType.SOLID;
-		types[Material.DIAMOND_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.WORKBENCH.getId()]= BlockType.SOLID;
-		types[Material.CROPS.getId()]= BlockType.NONSOLID;
-		types[Material.SOIL.getId()]= BlockType.SOLID;
-		types[Material.FURNACE.getId()]= BlockType.SOLID;
-		types[Material.BURNING_FURNACE.getId()]= BlockType.SOLID;
-		types[Material.SIGN_POST.getId()]= BlockType.NONSOLID;
-		types[Material.WOODEN_DOOR.getId()]= BlockType.NONSOLID;
-		types[Material.LADDER.getId()]= BlockType.LADDER;
-		types[Material.RAILS.getId()]= BlockType.NONSOLID;
-		types[Material.COBBLESTONE_STAIRS.getId()]= BlockType.UNKNOWN;
-		types[Material.WALL_SIGN.getId()]= BlockType.NONSOLID;
-		types[Material.LEVER.getId()]= BlockType.NONSOLID;
-		types[Material.STONE_PLATE.getId()]= BlockType.UNKNOWN;
-		types[Material.IRON_DOOR_BLOCK.getId()]= BlockType.NONSOLID;
-		types[Material.WOOD_PLATE.getId()]= BlockType.NONSOLID;
-		types[Material.REDSTONE_ORE.getId()]= BlockType.SOLID;
-		types[Material.GLOWING_REDSTONE_ORE.getId()]= BlockType.SOLID;
-		types[Material.REDSTONE_TORCH_OFF.getId()]= BlockType.NONSOLID;
-		types[Material.REDSTONE_TORCH_ON.getId()]= BlockType.NONSOLID;
-		types[Material.STONE_BUTTON.getId()]= BlockType.NONSOLID;
-		types[Material.SNOW.getId()]= BlockType.UNKNOWN;
-		types[Material.ICE.getId()]= BlockType.UNKNOWN;
-		types[Material.SNOW_BLOCK.getId()]= BlockType.SOLID;
-		types[Material.CACTUS.getId()]= BlockType.SOLID;
-		types[Material.CLAY.getId()]= BlockType.SOLID;
-		types[Material.SUGAR_CANE_BLOCK.getId()]= BlockType.NONSOLID;
-		types[Material.JUKEBOX.getId()]= BlockType.SOLID;
-		types[Material.FENCE.getId()]= BlockType.FENCE;
-		types[Material.PUMPKIN.getId()]= BlockType.SOLID;
-		types[Material.NETHERRACK.getId()]= BlockType.SOLID;
-		types[Material.SOUL_SAND.getId()]= BlockType.UNKNOWN;
-		types[Material.GLOWSTONE.getId()]= BlockType.SOLID;
-		types[Material.PORTAL.getId()]= BlockType.NONSOLID;
-		types[Material.JACK_O_LANTERN.getId()]= BlockType.SOLID;
-		types[Material.CAKE_BLOCK.getId()]= BlockType.UNKNOWN;
+		types[Material.AIR.getId()] = NONSOLID;
+		types[Material.STONE.getId()] = SOLID;
+		types[Material.GRASS.getId()] = SOLID;
+		types[Material.DIRT.getId()] = SOLID;
+		types[Material.COBBLESTONE.getId()] = SOLID;
+		types[Material.WOOD.getId()] = SOLID;
+		types[Material.SAPLING.getId()] = NONSOLID;
+		types[Material.BEDROCK.getId()] = SOLID;
+		types[Material.WATER.getId()] = LIQUID;
+		types[Material.STATIONARY_WATER.getId()] = LIQUID;
+		types[Material.LAVA.getId()] = LIQUID;
+		types[Material.STATIONARY_LAVA.getId()] = LIQUID;
+		types[Material.SAND.getId()] = SOLID;
+		types[Material.GRAVEL.getId()] = SOLID;
+		types[Material.GOLD_ORE.getId()] = SOLID;
+		types[Material.IRON_ORE.getId()] = SOLID;
+		types[Material.COAL_ORE.getId()] = SOLID;
+		types[Material.LOG.getId()] = SOLID;
+		types[Material.LEAVES.getId()] = SOLID;
+		types[Material.SPONGE.getId()] = SOLID;
+		types[Material.GLASS.getId()] = SOLID;
+		types[Material.LAPIS_ORE.getId()] = SOLID;
+		types[Material.LAPIS_BLOCK.getId()] = SOLID;
+		types[Material.DISPENSER.getId()] = SOLID;
+		types[Material.SANDSTONE.getId()] = SOLID;
+		types[Material.NOTE_BLOCK.getId()]= SOLID;
+		types[Material.WOOL.getId()]= SOLID;
+		types[Material.YELLOW_FLOWER.getId()]= NONSOLID;
+		types[Material.RED_ROSE.getId()]= NONSOLID;
+		types[Material.BROWN_MUSHROOM.getId()]= NONSOLID;
+		types[Material.RED_MUSHROOM.getId()]= NONSOLID;
+		types[Material.GOLD_BLOCK.getId()]= SOLID;
+		types[Material.IRON_BLOCK.getId()]= SOLID;
+		types[Material.DOUBLE_STEP.getId()]= UNKNOWN;
+		types[Material.STEP.getId()]= UNKNOWN;
+		types[Material.BRICK.getId()]= SOLID;
+		types[Material.TNT.getId()]= SOLID;
+		types[Material.BOOKSHELF.getId()]= SOLID;
+		types[Material.MOSSY_COBBLESTONE.getId()]  = SOLID;  	                                                                                    
+		types[Material.OBSIDIAN.getId()]= SOLID;
+		types[Material.TORCH.getId()]= NONSOLID;
+		types[Material.FIRE.getId()]= NONSOLID;
+		types[Material.MOB_SPAWNER.getId()]= SOLID;
+		types[Material.WOOD_STAIRS.getId()]= UNKNOWN;
+		types[Material.CHEST.getId()]= SOLID;
+		types[Material.REDSTONE_WIRE.getId()]= NONSOLID;
+		types[Material.DIAMOND_ORE.getId()]= SOLID;
+		types[Material.DIAMOND_BLOCK.getId()]= SOLID;
+		types[Material.WORKBENCH.getId()]= SOLID;
+		types[Material.CROPS.getId()]= NONSOLID;
+		types[Material.SOIL.getId()]= SOLID;
+		types[Material.FURNACE.getId()]= SOLID;
+		types[Material.BURNING_FURNACE.getId()]= SOLID;
+		types[Material.SIGN_POST.getId()]= NONSOLID;
+		types[Material.WOODEN_DOOR.getId()]= NONSOLID;
+		types[Material.LADDER.getId()]= LADDER;
+		types[Material.RAILS.getId()]= NONSOLID;
+		types[Material.COBBLESTONE_STAIRS.getId()]= UNKNOWN;
+		types[Material.WALL_SIGN.getId()]= NONSOLID;
+		types[Material.LEVER.getId()]= NONSOLID;
+		types[Material.STONE_PLATE.getId()]= UNKNOWN;
+		types[Material.IRON_DOOR_BLOCK.getId()]= NONSOLID;
+		types[Material.WOOD_PLATE.getId()]= NONSOLID;
+		types[Material.REDSTONE_ORE.getId()]= SOLID;
+		types[Material.GLOWING_REDSTONE_ORE.getId()]= SOLID;
+		types[Material.REDSTONE_TORCH_OFF.getId()]= NONSOLID;
+		types[Material.REDSTONE_TORCH_ON.getId()]= NONSOLID;
+		types[Material.STONE_BUTTON.getId()]= NONSOLID;
+		types[Material.SNOW.getId()]= UNKNOWN;
+		types[Material.ICE.getId()]= UNKNOWN;
+		types[Material.SNOW_BLOCK.getId()]= SOLID;
+		types[Material.CACTUS.getId()]= SOLID;
+		types[Material.CLAY.getId()]= SOLID;
+		types[Material.SUGAR_CANE_BLOCK.getId()]= NONSOLID;
+		types[Material.JUKEBOX.getId()]= SOLID;
+		types[Material.FENCE.getId()]= FENCE;
+		types[Material.PUMPKIN.getId()]= SOLID;
+		types[Material.NETHERRACK.getId()]= SOLID;
+		types[Material.SOUL_SAND.getId()]= UNKNOWN;
+		types[Material.GLOWSTONE.getId()]= SOLID;
+		types[Material.PORTAL.getId()]= NONSOLID;
+		types[Material.JACK_O_LANTERN.getId()]= SOLID;
+		types[Material.CAKE_BLOCK.getId()]= UNKNOWN;
 	}
 	
-	public static MovingData get(Player p) {
+	public static MovingData get(final Player p) {
 
-		NoCheatData data = NoCheatData.getPlayerData(p);
+		final NoCheatData data = NoCheatData.getPlayerData(p);
 
 		if(data.moving == null) {
 			data.moving = new MovingData();
+			data.moving.lastLocation = p.getLocation();
 		}
 
 		return data.moving;

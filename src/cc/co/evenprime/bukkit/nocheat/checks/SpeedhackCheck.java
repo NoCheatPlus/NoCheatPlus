@@ -70,12 +70,12 @@ public class SpeedhackCheck extends Check {
 
 			// If we haven't already got a setback point, create one now
 			if(data.setBackPoint == null) {
-				data.setBackPoint = event.getFrom().clone();
+				data.setBackPoint = event.getFrom();
 			}
 
 			if(plugin.getServerLag() > 200) {
 				// Any data would likely be unreliable with that lag
-				resetData(data, event.getFrom().clone(), ticks);
+				resetData(data, event.getFrom(), ticks);
 			}
 			else {
 				Action action[] = null;
@@ -87,7 +87,7 @@ public class SpeedhackCheck extends Check {
 				if(data.eventsSinceLastCheck > high) action = actions[2];
 				else if(data.eventsSinceLastCheck > med) action = actions[1];
 				else if(data.eventsSinceLastCheck > low) action = actions[0];
-				else resetData(data, event.getFrom().clone(), ticks);
+				else resetData(data, event.getFrom(), ticks);
 
 
 				if(action != null)	data.violationsInARow++;
@@ -105,7 +105,7 @@ public class SpeedhackCheck extends Check {
 		else if(data.lastCheckTicks + 10 < ticks)
 		{
 			// The player didn't move for the last 10 ticks
-			resetData(data, event.getFrom().clone(), ticks);
+			resetData(data, event.getFrom(), ticks);
 		}
 	}
 
@@ -134,7 +134,7 @@ public class SpeedhackCheck extends Check {
 
 	private static void resetPlayer(PlayerMoveEvent event, SpeedhackData data) {
 
-		if(data.setBackPoint == null) data.setBackPoint = event.getFrom().clone();
+		if(data.setBackPoint == null) data.setBackPoint = event.getFrom();
 
 		// If we have stored a location for the player, we put him back there
 

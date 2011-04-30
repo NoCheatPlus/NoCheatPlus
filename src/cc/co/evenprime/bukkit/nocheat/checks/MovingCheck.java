@@ -22,7 +22,6 @@ import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData.BlockType;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerListener;
@@ -41,20 +40,16 @@ public class MovingCheck extends Check {
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
-	private final int jumpingLimit = 4;
+	private final static int jumpingLimit = 4;
 
 	// How high may a player get compared to his last location with ground contact
-	private final double jumpHeight = 1.3D;
+	private final static double jumpHeight = 1.3D;
 
 	// How high may a player move in one event on ground
-	private final double stepHeight = 0.501D;
+	private final static double stepHeight = 0.501D;
 
-	private final double stepWidth = 0.6D;
-	private final double sneakStepWidth = 0.25D;
-
-	// Limits
-	public final double moveLimits[] =   { 0.0D, 0.5D, 2.0D };
-	public final double heightLimits[] = { 0.0D, 0.5D, 2.0D };
+	private final static double stepWidth = 0.6D;
+	private final static double sneakStepWidth = 0.25D;
 
 	public int ticksBeforeSummary = 100;
 
@@ -92,7 +87,7 @@ public class MovingCheck extends Check {
 		// Should we check at all
 		if(skipCheck(player)) {	return;	}
 
-		long startTime = System.nanoTime();
+		final long startTime = System.nanoTime();
 
 		// Get the player-specific data
 		final MovingData data = MovingData.get(player);
@@ -100,6 +95,9 @@ public class MovingCheck extends Check {
 		// Get the two locations of the event
 		final Location to = event.getTo();
 		Location from = event.getFrom();
+
+		shouldBeIgnored(player, data, from, to);
+
 
 		// The use of event.getFrom() is intentional
 		if(shouldBeIgnored(player, data, from, to)) {
@@ -114,11 +112,13 @@ public class MovingCheck extends Check {
 			data.teleportTo = null;
 		}
 
-		// First check the distance the player has moved horizontally
-		final double xDistance = Math.abs(from.getX()-to.getX());
-		final double zDistance = Math.abs(from.getZ()-to.getZ());
 
-		final double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
+		// First check the distance the player has moved horizontally
+		final double xDistance = from.getX()-to.getX();
+		final double zDistance = from.getZ()-to.getZ();
+
+		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
+
 
 		// If the target is a bed and distance not too big, allow it
 		// Bukkit prevents using blocks behind walls already, so I don't have to check for that
@@ -128,14 +128,8 @@ public class MovingCheck extends Check {
 			return;
 		}
 
-		// pre-calculate boundary values that are needed multiple times in the following checks
-		// the array each contains [lowerX, higherX, Y, lowerZ, higherZ]
-		final int fromValues[] = {lowerBorder(from.getX()), upperBorder(from.getX()), (int)Math.floor(from.getY()), lowerBorder(from.getZ()),upperBorder(from.getZ()) };
-		final int toValues[] = {lowerBorder(to.getX()), upperBorder(to.getX()), (int)Math.floor(to.getY()+0.5D), lowerBorder(to.getZ()), upperBorder(to.getZ()) };
 
-		// compare locations to the world to guess if the player is standing on the ground, a half-block or next to a ladder
-		final boolean onGroundFrom = playerIsOnGround(from.getWorld(), fromValues, from);
-		final boolean onGroundTo = playerIsOnGround(to.getWorld(), toValues, to);
+		final boolean onGroundFrom = playerIsOnGround(from, 0.0D);		
 
 		final boolean canFly;
 		if(allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING)) {
@@ -144,7 +138,7 @@ public class MovingCheck extends Check {
 		}
 		else
 			canFly = false;
-		
+
 		final boolean canFakeSneak;
 		if(allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK)) {
 			canFakeSneak = true;
@@ -157,7 +151,7 @@ public class MovingCheck extends Check {
 		int violationLevelSneaking = -1;
 
 		if(!canFakeSneak && player.isSneaking()) {
-			violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakStepWidth), moveLimits);
+			violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakStepWidth));
 			if(violationLevelSneaking >= 0) {
 				if(combined >= data.sneakingLastDistance)
 					data.sneakingFreedomCounter -= 2;
@@ -177,9 +171,7 @@ public class MovingCheck extends Check {
 			data.sneakingFreedomCounter += 1;
 		}
 
-		int violationLevelHorizontal = -1;
-
-		violationLevelHorizontal = limitCheck(combined - (data.horizFreedom + stepWidth), moveLimits);
+		int violationLevelHorizontal = limitCheck(combined - (data.horizFreedom + stepWidth));
 
 		violationLevelHorizontal = violationLevelHorizontal > violationLevelSneaking ? violationLevelHorizontal : violationLevelSneaking;
 
@@ -195,7 +187,7 @@ public class MovingCheck extends Check {
 		// The location we'd use as a new setback if there are no violations
 		Location newSetBack = null;
 
-		double limit = calculateVerticalLimit(data, onGroundFrom, onGroundTo);
+		double limit = calculateVerticalLimit(data, onGroundFrom);
 
 		// Handle 4 distinct cases: Walk, Jump, Land, Fly
 
@@ -203,25 +195,22 @@ public class MovingCheck extends Check {
 		if(onGroundFrom)
 		{
 			limit += jumpHeight;
-			double distance = to.getY() - from.getY();
+			final double distance = to.getY() - from.getY();
 
-			violationLevelVertical = limitCheck(distance - limit, heightLimits);
+			violationLevelVertical = limitCheck(distance - limit);
 
 			if(violationLevelVertical < 0)
-			{
+			{				
 				// reset jumping
-				if(onGroundTo)
-					data.jumpPhase = 0; // Walk
-				else
-					data.jumpPhase = 1; // Jump
+				data.jumpPhase = 0;
 
-				newSetBack = from.clone();
+				newSetBack = from;
 			}
 		}
 		// Land or Fly/Fall
 		else
 		{
-			Location l = null;
+			final Location l;
 
 			if(data.setBackPoint == null || canFly)
 				l = from;
@@ -232,23 +221,25 @@ public class MovingCheck extends Check {
 				limit += jumpHeight - (data.jumpPhase-jumpingLimit) * 0.2D;
 			else limit += jumpHeight;
 
+			final boolean onGroundTo = playerIsOnGround(to, 0.5D);
+
 			if(onGroundTo) limit += stepHeight;
 
-			double distance = to.getY() - l.getY();
+			final double distance = to.getY() - l.getY();
 
 			// Check if player isn't jumping too high
-			violationLevelVertical = limitCheck(distance - limit, heightLimits);
+			violationLevelVertical = limitCheck(distance - limit);
 
 			if(violationLevelVertical < 0) {
 				if(onGroundTo) { // Land
 					data.jumpPhase = 0; // He is on ground now, so reset the jump
-					newSetBack = to.clone();
+					newSetBack = to;
 				}
 				else { // Fly
 					data.jumpPhase++; // Enter next phase of the flight
 					// If we have no setback point, create one now
 					if(data.setBackPoint == null) { 
-						newSetBack = from.clone();
+						newSetBack = from;
 					}
 				}
 			}
@@ -265,7 +256,7 @@ public class MovingCheck extends Check {
 
 		// If we haven't already got a setback point by now, make this location the new setback point
 		if(data.setBackPoint == null) {
-			data.setBackPoint = from.clone();
+			data.setBackPoint = from;
 		}
 
 		if(violationLevel >= 0) {
@@ -283,7 +274,7 @@ public class MovingCheck extends Check {
 		statisticTotalEvents++;
 	}
 
-	private double calculateVerticalLimit(MovingData data, boolean onGroundFrom, boolean onGroundTo) {
+	private double calculateVerticalLimit(final MovingData data, final boolean onGroundFrom) {
 
 		// A halfway lag-resistant method of allowing vertical acceleration without allowing blatant cheating
 
@@ -308,10 +299,10 @@ public class MovingCheck extends Check {
 			data.vertFreedomCounter--;
 		}
 
-		double limit = data.vertFreedom;
+		final double limit = data.vertFreedom;
 
 		// If the event counter has been consumed, remove the vertical movement limit increase when landing the next time
-		if(data.vertFreedomCounter <= 0 && (onGroundFrom || onGroundTo)) {
+		if(onGroundFrom && data.vertFreedomCounter <= 0) {
 			data.vertFreedom = 0.0D;
 		}
 
@@ -326,12 +317,18 @@ public class MovingCheck extends Check {
 	 * @param to
 	 * @return
 	 */
-	private boolean shouldBeIgnored(Player player, MovingData data, Location from, Location to) {
+	private boolean shouldBeIgnored(final Player player, final MovingData data, final Location from, final Location to) {
+
 		// Identical locations - just ignore the event
-		if(from.equals(to))
+		final double x = from.getX();
+		final double y = from.getY();
+		final double z = from.getZ();
+		final Location l = data.lastLocation;
+
+		if(x == to.getX() && z == to.getZ() && y == to.getY() )
 			return true;
 		// Something or someone moved the player without causing a move event - Can't do much with that
-		else if(!from.equals(data.lastLocation)) {
+		if(!(x == l.getX() && z == l.getZ() && y == l.getY())){
 			resetData(data, to);
 			return true;
 		}
@@ -486,14 +483,14 @@ public class MovingCheck extends Check {
 	 * @param limits
 	 * @return
 	 */
-	private int limitCheck(double value, double limits[]) {
+	private static int limitCheck(final double value) {
 
-		for(int i = limits.length - 1; i >= 0; i--) {
-			if(value > limits[i]) {
-				return i;
-			}
-		}
-
+		if(value > 0.0D) {
+			if(value > 0.5D) {
+				if(value > 2.0D) 
+					return 2;
+				return 1; }
+			return 0; }
 		return -1;
 	}
 
@@ -512,7 +509,7 @@ public class MovingCheck extends Check {
 		// still have to allow the player some freedom with vertical movement due
 		// to lost vertical momentum to prevent him from getting stuck
 
-		if(data.setBackPoint == null) data.setBackPoint = from.clone();
+		if(data.setBackPoint == null) data.setBackPoint = from;
 
 		// Set a flag that gets used while handling teleport events (to determine if
 		// it was my teleport or someone else'
@@ -544,54 +541,64 @@ public class MovingCheck extends Check {
 	 * @param l The precise location that was used for calculation of "values"
 	 * @return
 	 */
-	private static boolean playerIsOnGround(World w, int values[], Location l) {
+	private static boolean playerIsOnGround(final Location l, final double ymod) {
 
-		BlockType types[] = MovingData.types;
+		final int types[] = MovingData.types;
+
+		final World w = l.getWorld();
+
+		final int lowerX = lowerBorder(l.getX());
+		final int upperX = upperBorder(l.getX());
+		final int Y = (int)Math.floor(l.getY() + ymod);
+		final int lowerZ = lowerBorder(l.getZ());
+		final int higherZ = upperBorder(l.getZ());
+
 
 		// Check the four borders of the players hitbox for something he could be standing on
-		if(types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[1], values[2]-1, values[3])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[0], values[2]-1, values[4])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[1], values[2]-1, values[4])] != BlockType.NONSOLID )
+		if(types[w.getBlockTypeIdAt(lowerX, Y-1, lowerZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(upperX, Y-1, lowerZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(lowerX, Y-1, higherZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(upperX, Y-1, higherZ)] != MovingData.NONSOLID )
 			return true;
 		// Check if he is hanging onto a ladder
-		else if(types[w.getBlockTypeIdAt(l.getBlockX(), values[2], l.getBlockZ())] == BlockType.LADDER || 
-				types[w.getBlockTypeIdAt(l.getBlockX(), values[2]+1, l.getBlockZ())] == BlockType.LADDER)
+		else if(types[w.getBlockTypeIdAt(l.getBlockX(), Y, l.getBlockZ())] == MovingData.LADDER || 
+				types[w.getBlockTypeIdAt(l.getBlockX(), Y+1, l.getBlockZ())] == MovingData.LADDER)
 			return true;
 		// check if he is standing "in" a block that's potentially solid (we give him the benefit of a doubt and see that as a legit move)
 		// If it is not legit, the MC server already has a safeguard against that (You'll get "xy moved wrongly" on the console in that case)
-		else if(types[w.getBlockTypeIdAt(values[0], values[2], values[3])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[1], values[2], values[3])] != BlockType.NONSOLID||
-				types[w.getBlockTypeIdAt(values[0], values[2], values[4])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[1], values[2], values[4])] != BlockType.NONSOLID)
+		else if(types[w.getBlockTypeIdAt(lowerX, Y, lowerZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(upperX, Y, lowerZ)] != MovingData.NONSOLID||
+				types[w.getBlockTypeIdAt(lowerX, Y, higherZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(upperX, Y, higherZ)] != MovingData.NONSOLID)
 			return true;
 		// check if his head is "stuck" in an block that's potentially solid (we give him the benefit of a doubt and see that as a legit move)
 		// If it is not legit, the MC server already has a safeguard against that (You'll get "xy moved wrongly" on the console in that case)
-		else if(types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[1], values[2]+1, values[3])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[0], values[2]+1, values[4])] != BlockType.NONSOLID ||
-				types[w.getBlockTypeIdAt(values[1], values[2]+1, values[4])] != BlockType.NONSOLID)
+		else if(types[w.getBlockTypeIdAt(lowerX, Y+1, lowerZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(upperX, Y+1, lowerZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(lowerX, Y+1, higherZ)] != MovingData.NONSOLID ||
+				types[w.getBlockTypeIdAt(upperX, Y+1, higherZ)] != MovingData.NONSOLID)
 			return true;
 		// Allow using a bug called "water elevator" by checking northwest of the players location for liquids
-		else if(types[w.getBlockTypeIdAt(values[0]+1, values[2]-1, values[3]+1)] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0]+1, values[2], values[3]+1)] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0]+1, values[2]+1, values[3]+1)] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0]+1, values[2]-1, values[3])] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0]+1, values[2], values[3])] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0]+1, values[2]+1, values[3])] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0], values[2]-1, values[3]+1)] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0], values[2], values[3]+1)] == BlockType.LIQUID ||
-				types[w.getBlockTypeIdAt(values[0], values[2]+1, values[3]+1)] == BlockType.LIQUID)
+		else if(types[w.getBlockTypeIdAt(lowerX+1, Y-1, lowerZ+1)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX+1, Y, lowerZ+1)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX+1, Y+1, lowerZ+1)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX+1, Y-1, lowerZ)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX+1, Y, lowerZ)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX+1, Y+1, lowerZ)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX, Y-1, lowerZ+1)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX, Y, lowerZ+1)] == MovingData.LIQUID ||
+				types[w.getBlockTypeIdAt(lowerX, Y+1, lowerZ+1)] == MovingData.LIQUID)
 			return true;
 		// Running on fences
-		else if(types[w.getBlockTypeIdAt(values[0], values[2]-2, values[3])] == BlockType.FENCE ||
-				types[w.getBlockTypeIdAt(values[1], values[2]-2, values[3])] == BlockType.FENCE ||
-				types[w.getBlockTypeIdAt(values[0], values[2]-2, values[4])] == BlockType.FENCE ||
-				types[w.getBlockTypeIdAt(values[1], values[2]-2, values[4])] == BlockType.FENCE )
+		else if(types[w.getBlockTypeIdAt(lowerX, Y-2, lowerZ)] == MovingData.FENCE ||
+				types[w.getBlockTypeIdAt(upperX, Y-2, lowerZ)] == MovingData.FENCE ||
+				types[w.getBlockTypeIdAt(lowerX, Y-2, higherZ)] == MovingData.FENCE ||
+				types[w.getBlockTypeIdAt(upperX, Y-2, higherZ)] == MovingData.FENCE )
 			return true;
 		else
 			return false;
 	}
+
 
 	/**
 	 * Personal Rounding function to determine if a player is still touching a block or not
@@ -599,6 +606,7 @@ public class MovingCheck extends Check {
 	 * @return
 	 */
 	private static int lowerBorder(double d1) {
+
 		double floor = Math.floor(d1);
 		double d4 = floor + magic;
 
@@ -616,6 +624,7 @@ public class MovingCheck extends Check {
 	 * @return
 	 */
 	private static int upperBorder(double d1) {
+
 		double floor = Math.floor(d1);
 		double d4 = floor + magic2;
 

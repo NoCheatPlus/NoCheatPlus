@@ -44,7 +44,7 @@ public class NoCheat extends JavaPlugin {
 	public ItemdupeCheck itemdupeCheck;
 	public BogusitemsCheck bogusitemsCheck;
 
-	public Check[] checks;
+	private Check[] checks;
 
 	private NoCheatConfiguration config;
 

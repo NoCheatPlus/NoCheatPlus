@@ -7,7 +7,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 
 public class ItemdupeEntityListener extends EntityListener {
 
-	ItemdupeCheck check;
+	private ItemdupeCheck check;
 
 	public ItemdupeEntityListener(ItemdupeCheck itemdupeCheck) {
 		check = itemdupeCheck;

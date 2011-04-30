@@ -25,10 +25,10 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 public class NoCheatConfiguration {
 
 
-	public final String configFile = "plugins/NoCheat/nocheat.yml";
+	private final static String configFile = "plugins/NoCheat/nocheat.yml";
 
 	// Our personal logger
-	private final String loggerName = "cc.co.evenprime.nocheat";
+	private final static String loggerName = "cc.co.evenprime.nocheat";
 	public final Logger logger = Logger.getLogger(loggerName);
 
 	// The log level above which information gets logged to the specified logger
@@ -182,15 +182,15 @@ public class NoCheatConfiguration {
 
 	private String actionsToString(Action[] actions) {
 
-		String s = "";
+		StringBuffer s = new StringBuffer();
 
 		if(actions != null) {
 			for(Action a : actions) {
-				s = s + " " + a.getName();
+				s.append(' ').append(a.getName());
 			}
 		}
 
-		return s.trim();
+		return s.toString().trim();
 	}
 	/**
 	 * Convert a string into a log level
