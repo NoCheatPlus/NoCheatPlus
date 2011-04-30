@@ -179,7 +179,7 @@ public class MovingCheck extends Check {
 
 		int violationLevelHorizontal = -1;
 
-		limitCheck(combined - (data.horizFreedom + stepWidth), moveLimits);
+		violationLevelHorizontal = limitCheck(combined - (data.horizFreedom + stepWidth), moveLimits);
 
 		violationLevelHorizontal = violationLevelHorizontal > violationLevelSneaking ? violationLevelHorizontal : violationLevelSneaking;
 
