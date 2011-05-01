@@ -322,10 +322,11 @@ public class MovingCheck extends Check {
 		final double z = from.getZ();
 		final Location l = data.lastLocation;
 
-		if(x == to.getX() && z == to.getZ() && y == to.getY() )
+		if(x == to.getX() && z == to.getZ() && y == to.getY() ) {
 			return true;
+		}
 		// Something or someone moved the player without causing a move event - Can't do much with that
-		if(!(x == l.getX() && z == l.getZ() && y == l.getY())){
+		else if(!(x == l.getX() && z == l.getZ() && y == l.getY())){
 			resetData(data, to);
 			return true;
 		}
