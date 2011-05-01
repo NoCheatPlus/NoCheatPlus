@@ -96,9 +96,6 @@ public class MovingCheck extends Check {
 		final Location to = event.getTo();
 		Location from = event.getFrom();
 
-		shouldBeIgnored(player, data, from, to);
-
-
 		// The use of event.getFrom() is intentional
 		if(shouldBeIgnored(player, data, from, to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
