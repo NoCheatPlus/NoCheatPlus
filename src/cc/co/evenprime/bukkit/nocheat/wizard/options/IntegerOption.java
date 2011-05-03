@@ -1,0 +1,29 @@
+package cc.co.evenprime.bukkit.nocheat.wizard.options;
+
+
+public class IntegerOption extends TextFieldOption {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2258827414736580449L;
+		
+	public IntegerOption(String name, int initialValue) {
+		
+		super(name, String.valueOf(initialValue), 5);		
+	}
+
+	@Override
+	public boolean isValid(String value) {
+		
+		if(!super.isValid(value)) return false;
+		
+		try {
+			Integer.parseInt(value);
+			return true;
+		}
+		catch(Exception e) {
+			return false;
+		}
+	}
+}
