@@ -10,11 +10,13 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.data.SpeedhackData;
 import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackPlayerListener;
@@ -27,22 +29,22 @@ import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackPlayerListener;
  */
 public class SpeedhackCheck extends Check {
 
-	public SpeedhackCheck(NoCheat plugin) {
-		super(plugin, "speedhack", PermissionData.PERMISSION_SPEEDHACK);
+	public SpeedhackCheck(NoCheat plugin, NoCheatConfiguration config) {
+		super(plugin, "speedhack", PermissionData.PERMISSION_SPEEDHACK, config);
 	}
 
 	private static final int violationsLimit = 2;
 
 	// Limits for the speedhack check per second
-	public int limits[] = { 30, 45, 60 };
+	private int limits[];
+
+	private String logMessage;
 
 	// How should speedhack violations be treated?
-	public Action actions[][] = { 
+	private Action actions[][] = { 
 			{ LogAction.loglow, CancelAction.cancel }, 
 			{ LogAction.logmed, CancelAction.cancel },
 			{ LogAction.loghigh, CancelAction.cancel } };
-
-	public String logMessage = "%1$s sent %2$d move events, but only %3$d were allowed. Speedhack?";
 
 	public void check(PlayerMoveEvent event) {
 
@@ -144,6 +146,28 @@ public class SpeedhackCheck extends Check {
 			event.setCancelled(true);
 		}
 	}
+
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+
+			limits = new int[3];
+			
+			limits[0] = config.getIntegerValue("speedhack.limits.low");
+			limits[1] = config.getIntegerValue("speedhack.limits.med");
+			limits[2] = config.getIntegerValue("speedhack.limits.high");
+
+			logMessage = config.getStringValue("speedhack.logmessage");
+
+			setActive(config.getBooleanValue("active.speedhack"));
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
+	}
+
+
 
 	@Override
 	protected void registerListeners() {

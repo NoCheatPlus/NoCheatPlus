@@ -10,10 +10,10 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import cc.co.evenprime.bukkit.nocheat.wizard.options.BooleanOption;
-import cc.co.evenprime.bukkit.nocheat.wizard.options.ChildOption;
-import cc.co.evenprime.bukkit.nocheat.wizard.options.LogLevelOption;
-import cc.co.evenprime.bukkit.nocheat.wizard.options.TextFieldOption;
+import cc.co.evenprime.bukkit.nocheat.config.BooleanOption;
+import cc.co.evenprime.bukkit.nocheat.config.ChildOption;
+import cc.co.evenprime.bukkit.nocheat.config.LevelOption;
+import cc.co.evenprime.bukkit.nocheat.config.TextFieldOption;
 
 public class ChildOptionGuiFactory {
 
@@ -25,18 +25,18 @@ public class ChildOptionGuiFactory {
 		else if(option instanceof TextFieldOption) {
 			return createTextField((TextFieldOption)option);
 		}
-		else if(option instanceof LogLevelOption) {
-			return createLogLevel((LogLevelOption)option);
+		else if(option instanceof LevelOption) {
+			return createLogLevel((LevelOption)option);
 		}
 
 		throw new RuntimeException("Unknown ChildOption " + option);
 	}
 
-	private static JComboBox createLogLevel(final LogLevelOption option) {
+	private static JComboBox createLogLevel(final LevelOption option) {
 
 		final JComboBox comboBox = new JComboBox();
 
-		for(LogLevelOption.Options o : LogLevelOption.Options.values())
+		for(LevelOption.LogLevel o : LevelOption.LogLevel.values())
 			comboBox.addItem(o);
 
 		comboBox.setSelectedItem(option.getOptionValue());
@@ -45,7 +45,7 @@ public class ChildOptionGuiFactory {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				option.setValue((LogLevelOption.Options)comboBox.getSelectedItem());
+				option.setValue((LevelOption.LogLevel)comboBox.getSelectedItem());
 
 			}
 

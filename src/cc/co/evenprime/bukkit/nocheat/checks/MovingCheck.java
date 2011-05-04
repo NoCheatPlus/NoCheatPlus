@@ -16,11 +16,13 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
@@ -35,8 +37,9 @@ import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerMonitor;
  */
 public class MovingCheck extends Check {
 
-	public MovingCheck(NoCheat plugin) {
-		super(plugin, "moving", PermissionData.PERMISSION_MOVING);
+	public MovingCheck(NoCheat plugin, NoCheatConfiguration config) {
+		super(plugin, "moving", PermissionData.PERMISSION_MOVING, config);
+
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
@@ -51,21 +54,21 @@ public class MovingCheck extends Check {
 	private final static double stepWidth = 0.6D;
 	private final static double sneakStepWidth = 0.25D;
 
-	public int ticksBeforeSummary = 100;
+	private int ticksBeforeSummary = 100;
 
 	public long statisticElapsedTimeNano = 0;
 
-	public boolean allowFlying = false;
-	public boolean allowFakeSneak = true;
+	public boolean allowFlying;
+	public boolean allowFakeSneak;
+
+	private String logMessage;
+	private String summaryMessage;
 
 	// How should moving violations be treated?
-	public final Action actions[][] = { 
+	private final Action actions[][] = { 
 			{ LogAction.loglow,  CancelAction.cancel },
 			{ LogAction.logmed,  CancelAction.cancel },
 			{ LogAction.loghigh, CancelAction.cancel } };
-
-	public String logMessage = "Moving violation: %1$s from %2$s (%4$.1f, %5$.1f, %6$.1f) to %3$s (%7$.1f, %8$.1f, %9$.1f)";
-	public String summaryMessage = "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)";
 
 	public long statisticTotalEvents = 1; // Prevent accidental division by 0 at some point
 
@@ -644,6 +647,24 @@ public class MovingCheck extends Check {
 		data.setBackPoint = l;
 		data.jumpPhase = 0;
 		data.teleportTo = null;
+	}
+
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+			allowFlying = config.getBooleanValue("moving.allowflying");
+			allowFakeSneak = config.getBooleanValue("moving.allowfakesneak");
+
+			logMessage = config.getStringValue("moving.logmessage");
+			summaryMessage = config.getStringValue("moving.summarymessage");
+
+			setActive(config.getBooleanValue("active.moving"));
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override

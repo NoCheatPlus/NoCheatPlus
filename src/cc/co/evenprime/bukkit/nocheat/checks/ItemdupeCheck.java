@@ -8,14 +8,16 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.ItemdupeEntityListener;
 
 public class ItemdupeCheck extends Check {
 
-	public ItemdupeCheck(NoCheat plugin){
-		super(plugin, "itemdupe", PermissionData.PERMISSION_ITEMDUPE);
+	public ItemdupeCheck(NoCheat plugin, NoCheatConfiguration config){
+		super(plugin, "itemdupe", PermissionData.PERMISSION_ITEMDUPE, config);
 	}
 
 
@@ -28,6 +30,16 @@ public class ItemdupeCheck extends Check {
 		}
 	}
 
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+			setActive(config.getBooleanValue("active.itemdupe"));
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	protected void registerListeners() {

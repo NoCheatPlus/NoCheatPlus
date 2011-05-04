@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.wizard.options;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 public abstract class ChildOption extends Option {
 
@@ -14,4 +14,9 @@ public abstract class ChildOption extends Option {
 	
 	
 	public abstract String getValue();
+	
+	@Override
+	public String toYAMLString(String prefix) {
+		return prefix + getIdentifier() + ": \"" + getValue() + "\"\r\n";
+	}
 }

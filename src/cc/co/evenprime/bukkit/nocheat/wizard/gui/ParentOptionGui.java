@@ -11,9 +11,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import cc.co.evenprime.bukkit.nocheat.wizard.options.ChildOption;
-import cc.co.evenprime.bukkit.nocheat.wizard.options.Option;
-import cc.co.evenprime.bukkit.nocheat.wizard.options.ParentOption;
+import cc.co.evenprime.bukkit.nocheat.config.ChildOption;
+import cc.co.evenprime.bukkit.nocheat.config.Option;
+import cc.co.evenprime.bukkit.nocheat.config.ParentOption;
 
 public class ParentOptionGui extends JPanel {
 
@@ -31,7 +31,7 @@ public class ParentOptionGui extends JPanel {
 		if(option.getIdentifier().length() > 0) {
 			this.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5,5,5,5), BorderFactory.createCompoundBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createMatteBorder(2, 2,
-					        2, 2, Color.BLACK), "  " + option.getIdentifier() + "  "), 
+					        2, 2, Color.BLACK), "  " + option.getIdentifier() + ":  "), 
 					BorderFactory.createEmptyBorder(5,5,5,5))));
 		}
 		this.setLayout(new GridBagLayout());
@@ -42,7 +42,7 @@ public class ParentOptionGui extends JPanel {
 		}
 	}	
 
-	public void add(Option option) {
+	private void add(Option option) {
 		if(option instanceof ParentOption) {
 			GridBagConstraints c = new GridBagConstraints();
 

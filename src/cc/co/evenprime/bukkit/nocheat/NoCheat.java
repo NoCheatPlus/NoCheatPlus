@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat;
 
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +21,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.Check;
 import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 
 import com.ensifera.animosity.craftirc.CraftIRC;
@@ -37,12 +39,12 @@ import org.bukkit.plugin.Plugin;
  */
 public class NoCheat extends JavaPlugin {
 
-	public MovingCheck movingCheck;
-	public BedteleportCheck bedteleportCheck;
-	public SpeedhackCheck speedhackCheck;
-	public AirbuildCheck airbuildCheck;
-	public ItemdupeCheck itemdupeCheck;
-	public BogusitemsCheck bogusitemsCheck;
+	private MovingCheck movingCheck;
+	private BedteleportCheck bedteleportCheck;
+	private SpeedhackCheck speedhackCheck;
+	private AirbuildCheck airbuildCheck;
+	private ItemdupeCheck itemdupeCheck;
+	private BogusitemsCheck bogusitemsCheck;
 
 	private Check[] checks;
 
@@ -63,6 +65,12 @@ public class NoCheat extends JavaPlugin {
 	// CraftIRC 2.x, if available
 	private CraftIRC irc;
 
+	private Level chatLevel;
+	private Level ircLevel;
+	private Level consoleLevel;
+	private String ircTag;
+
+	
 	public NoCheat() { 	
 
 	}
@@ -116,20 +124,19 @@ public class NoCheat extends JavaPlugin {
 
 	public void onEnable() {
 
-		movingCheck = new MovingCheck(this);
-		bedteleportCheck = new BedteleportCheck(this);
-		speedhackCheck = new SpeedhackCheck(this);
-		airbuildCheck = new AirbuildCheck(this);
-		itemdupeCheck = new ItemdupeCheck(this);
-		bogusitemsCheck = new BogusitemsCheck(this);
+		// parse the nocheat.yml config file
+		setupConfig();
+		
+		movingCheck = new MovingCheck(this, config);
+		bedteleportCheck = new BedteleportCheck(this, config);
+		speedhackCheck = new SpeedhackCheck(this, config);
+		airbuildCheck = new AirbuildCheck(this, config);
+		itemdupeCheck = new ItemdupeCheck(this, config);
+		bogusitemsCheck = new BogusitemsCheck(this, config);
 
 		// just for convenience
 		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, itemdupeCheck, bogusitemsCheck };
-
-		// parse the nocheat.yml config file
-		setupConfig();
-
-
+		
 		PluginDescriptionFile pdfFile = this.getDescription();
 
 		// Get, if available, the Permissions and irc plugin
@@ -236,7 +243,7 @@ public class NoCheat extends JavaPlugin {
 	}
 
 	private void logToChat(Level l, String message) {
-		if(config.chatLevel.intValue() <= l.intValue()) {
+		if(chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
 				if(hasPermission(player, PermissionData.PERMISSION_NOTIFY)) {
 					player.sendMessage("["+l.getName()+"] " + message);
@@ -246,13 +253,13 @@ public class NoCheat extends JavaPlugin {
 	}
 
 	private void logToIRC(Level l, String message) {
-		if(irc != null && config.ircLevel.intValue() <= l.intValue()) {
-			irc.sendMessageToTag("["+l.getName()+"] " + message , config.ircTag);
+		if(irc != null && ircLevel.intValue() <= l.intValue()) {
+			irc.sendMessageToTag("["+l.getName()+"] " + message , ircTag);
 		}
 	}
 
 	private void logToConsole(Level l, String message) {
-		if( config.consoleLevel.intValue() <= l.intValue()) {
+		if( consoleLevel.intValue() <= l.intValue()) {
 			Logger.getLogger("Minecraft").log(l, message);
 		}
 	}
@@ -295,9 +302,22 @@ public class NoCheat extends JavaPlugin {
 	 */
 	private void setupConfig() {
 		if(this.config == null)
-			this.config = new NoCheatConfiguration(this);
+			this.config = new NoCheatConfiguration(new File(NoCheatConfiguration.configFile));
 		else
-			this.config.config();
+			this.config.config(new File(NoCheatConfiguration.configFile));
+		
+		config.setupFileLogger();
+
+		try {
+			this.chatLevel = config.getLogLevelValue("logging.logtochat");
+			this.ircLevel = config.getLogLevelValue("logging.logtoirc");
+			this.consoleLevel = config.getLogLevelValue("logging.logtoconsole");
+			this.ircTag = config.getStringValue("logging.logtoirctag");
+		} catch (ConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			this.setEnabled(false);
+		}
 	}
 
 

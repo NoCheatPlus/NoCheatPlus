@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.wizard.options;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 public class ShortStringOption extends TextFieldOption {
 

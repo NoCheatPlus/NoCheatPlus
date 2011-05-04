@@ -1,7 +1,7 @@
-package cc.co.evenprime.bukkit.nocheat.wizard.options;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 
-public class Option {
+public abstract class Option {
 			
 	private final String identifier;
 	
@@ -11,5 +11,9 @@ public class Option {
 	
 	public String getIdentifier() {
 		return identifier;
+	}
+	
+	public String toYAMLString(String prefix) {
+		return prefix + "\r\n";
 	}
 }

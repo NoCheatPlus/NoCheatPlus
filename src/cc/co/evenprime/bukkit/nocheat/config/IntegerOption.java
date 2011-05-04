@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.wizard.options;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 
 public class IntegerOption extends TextFieldOption {
@@ -25,5 +25,9 @@ public class IntegerOption extends TextFieldOption {
 		catch(Exception e) {
 			return false;
 		}
+	}
+
+	public int getIntegerValue() {
+		return Integer.parseInt(this.getValue());
 	}
 }

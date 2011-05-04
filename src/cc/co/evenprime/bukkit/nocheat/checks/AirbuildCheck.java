@@ -9,11 +9,13 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
@@ -28,15 +30,15 @@ import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
 public class AirbuildCheck extends Check {
 
 	// How should airbuild violations be treated?
-	public final Action actions[][] = { 
+	private final Action actions[][] = { 
 			{ LogAction.loglow,  CancelAction.cancel }, 
 			{ LogAction.logmed,  CancelAction.cancel },
 			{ LogAction.loghigh, CancelAction.cancel } };
 
-	public final int limits[] = { 1, 3, 10 };
+	private int limits[];
 
-	public AirbuildCheck(NoCheat plugin) {
-		super(plugin, "airbuild", PermissionData.PERMISSION_AIRBUILD);
+	public AirbuildCheck(NoCheat plugin, NoCheatConfiguration config) {
+		super(plugin, "airbuild", PermissionData.PERMISSION_AIRBUILD, config);
 	}
 
 	public void check(BlockPlaceEvent event) {
@@ -121,6 +123,24 @@ public class AirbuildCheck extends Check {
 		}
 
 		data.perSecond = 0;
+	}
+
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+			limits = new int[3];
+			
+			limits[0] = config.getIntegerValue("airbuild.limits.low");
+			limits[1] = config.getIntegerValue("airbuild.limits.med");
+			limits[2] = config.getIntegerValue("airbuild.limits.high");
+
+			setActive(config.getBooleanValue("active.airbuild"));
+
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
 	}
 
 	@Override

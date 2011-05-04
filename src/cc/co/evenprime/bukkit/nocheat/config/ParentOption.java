@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.wizard.options;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,9 +23,28 @@ public class ParentOption extends Option {
 	}
 
 	public final void add(Option option) {
-
+		
 		children.addLast(option);
+	}
+	
+	@Override
+	public String toYAMLString(String prefix) {
 
-
+		String s = "";
+		if(getIdentifier().length() > 0) {
+			s += prefix + getIdentifier() + ":\r\n";
+			
+			for(Option o : getChildOptions()) {
+				s += o.toYAMLString(prefix + "    ");
+			}
+		}
+		else
+		{
+			for(Option o : getChildOptions()) {
+				s += o.toYAMLString(prefix);
+			}
+		}
+		
+		return s;
 	}
 }
