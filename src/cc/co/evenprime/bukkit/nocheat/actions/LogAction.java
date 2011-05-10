@@ -11,6 +11,7 @@ public class LogAction extends Action {
 
 	public final Level level;
 
+	// Log messages are shown after 1 violation and don't get repeated
 	public final static LogAction loglow = new LogAction(1, 0, Level.INFO);
 	public final static LogAction logmed = new LogAction(1, 0, Level.WARNING);
 	public final static LogAction loghigh = new LogAction(1, 0, Level.SEVERE);

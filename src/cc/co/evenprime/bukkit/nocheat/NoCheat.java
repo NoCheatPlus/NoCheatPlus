@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BogusitemsCheck;
@@ -359,8 +359,8 @@ public class NoCheat extends JavaPlugin {
 		return this.serverLagInMilliSeconds;
 	}
 
-	public void handleCustomAction(Action a, Player player) {
-		// TODO Auto-generated method stub
+	public void handleCustomAction(CustomAction a, Player player) {
+		System.out.println("Would execute "+a.command + " now for Player " + player.getName() );
 
 	}
 }

@@ -259,10 +259,9 @@ public class MovingCheck extends Check {
 		if(violationLevel >= 0) {
 			setupSummaryTask(event.getPlayer(), data);
 
-			boolean log = !(data.violationsInARow[violationLevel] > 0);
 			data.violationsInARow[violationLevel]++;
 
-			action(event, event.getPlayer(), from, to, actions[violationLevel], log, data);
+			action(event, event.getPlayer(), from, to, actions[violationLevel], data.violationsInARow[violationLevel], data);
 		}
 
 		/****** Violation Handling END *****/
@@ -447,30 +446,33 @@ public class MovingCheck extends Check {
 	 * @param event
 	 * @param action
 	 */
-	private void action(PlayerMoveEvent event, Player player, Location from, Location to, Action[] actions, boolean loggingAllowed, MovingData data) {
+	private void action(PlayerMoveEvent event, Player player, Location from, Location to, Action[] actions, int violations, MovingData data) {
 
 		if(actions == null) return;
 		boolean cancelled = false;
 
-		// prepare log message if necessary
-		String log = null;
-
-		if(loggingAllowed) {
-			log = String.format(logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
-		}
-
+		
 		for(Action a : actions) {
-			if(loggingAllowed && a instanceof LogAction)  {
-				plugin.log(((LogAction)a).level, log);
-				if(data.highestLogLevel == null) data.highestLogLevel = Level.ALL;
-				if(data.highestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.highestLogLevel = ((LogAction)a).level;
+			if(a.firstAfter >= violations) {
+				if(a.firstAfter == violations || (a.repeat > 0 && (violations - a.firstAfter) % a.repeat == 0)) {
+					if(a instanceof LogAction)  {
+						// prepare log message if necessary
+						String log = String.format(logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
+
+						plugin.log(((LogAction)a).level, log);
+						
+						// Remember the highest log level we encountered to determine what level the summary log message should have
+						if(data.highestLogLevel == null) data.highestLogLevel = Level.ALL;
+						if(data.highestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.highestLogLevel = ((LogAction)a).level;
+					}
+					else if(!cancelled && a instanceof CancelAction) {
+						resetPlayer(event, from);
+						cancelled = true;
+					}
+					else if(a instanceof CustomAction)
+						plugin.handleCustomAction((CustomAction)a, player);
+				}
 			}
-			else if(!cancelled && a instanceof CancelAction) {
-				resetPlayer(event, from);
-				cancelled = true;
-			}
-			else if(a instanceof CustomAction)
-				plugin.handleCustomAction(a, player);
 		}
 	}
 

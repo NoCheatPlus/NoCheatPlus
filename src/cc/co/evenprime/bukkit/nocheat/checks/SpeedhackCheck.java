@@ -83,16 +83,21 @@ public class SpeedhackCheck extends Check {
 				final int med  = (limits[1]+1) / 2;
 				final int high = (limits[2]+1) / 2;
 
-				if(data.eventsSinceLastCheck > high) action = actions[2];
-				else if(data.eventsSinceLastCheck > med) action = actions[1];
-				else if(data.eventsSinceLastCheck > low) action = actions[0];
+				int level = -1;
+
+				if(data.eventsSinceLastCheck > high) level = 2;
+				else if(data.eventsSinceLastCheck > med)  level = 1;
+				else if(data.eventsSinceLastCheck > low)  level = 0;
 				else resetData(data, event.getFrom(), ticks);
 
 
-				if(action != null)	data.violationsInARow++;
+				if(level >= 0)	{
+					data.violationsInARowTotal++;
+				}
 
-				if(data.violationsInARow >= violationsLimit) {
-					action(action, event, data);
+				if(data.violationsInARowTotal >= violationsLimit) {
+					data.violationsInARow[level]++;
+					action(action, event, data.violationsInARow[level], data);
 				}
 
 				// Reset value for next check
@@ -109,25 +114,34 @@ public class SpeedhackCheck extends Check {
 	}
 
 	private static void resetData(SpeedhackData data, Location l, int ticks) {
-		data.violationsInARow = 0;
+		data.violationsInARow[0] = 0;
+		data.violationsInARow[1] = 0;
+		data.violationsInARow[2] = 0;
+		data.violationsInARowTotal = 0;
 		data.eventsSinceLastCheck = 0;
 		data.setBackPoint = l;
 		data.lastCheckTicks = ticks;
 	}
 
-	private void action(Action actions[], PlayerMoveEvent event, SpeedhackData data) {
+	private void action(Action actions[], PlayerMoveEvent event, int violations, SpeedhackData data) {
 
 		if(actions == null) return;
 
-		String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);
-
 		for(Action a : actions) {
-			if(a instanceof LogAction) 
-				plugin.log(((LogAction)a).level, log);
-			else if(a instanceof CancelAction)
-				resetPlayer(event, data);
-			else if(a instanceof CustomAction)
-				plugin.handleCustomAction(a, event.getPlayer());
+			if(a.firstAfter >= violations) {
+				if(a.firstAfter == violations || (a.repeat > 0 && (violations - a.firstAfter) % a.repeat == 0)) {
+					if(a instanceof LogAction) {
+						String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);
+						plugin.log(((LogAction)a).level, log);
+					}
+					else if(a instanceof CancelAction) {
+						resetPlayer(event, data);
+					}
+					else if(a instanceof CustomAction) {
+						plugin.handleCustomAction((CustomAction)a, event.getPlayer());
+					}
+				}
+			}
 		}
 	}
 
@@ -150,7 +164,7 @@ public class SpeedhackCheck extends Check {
 		try {
 
 			limits = new int[3];
-			
+
 			limits[0] = config.getIntegerValue("speedhack.limits.low");
 			limits[1] = config.getIntegerValue("speedhack.limits.med");
 			limits[2] = config.getIntegerValue("speedhack.limits.high");
@@ -158,11 +172,11 @@ public class SpeedhackCheck extends Check {
 			logMessage = config.getStringValue("speedhack.logmessage");
 
 			actions = new Action[3][];
-			
+
 			actions[0] = config.getActionValue("speedhack.action.low");
 			actions[1] = config.getActionValue("speedhack.action.med");
 			actions[2] = config.getActionValue("speedhack.action.high");
-			
+
 			setActive(config.getBooleanValue("active.speedhack"));
 		} catch (ConfigurationException e) {
 			setActive(false);
