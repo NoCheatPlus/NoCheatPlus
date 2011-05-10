@@ -9,7 +9,7 @@ public class CancelAction extends Action {
 
 	public final static CancelAction cancel = new CancelAction();
 
-	private CancelAction() { super(1, true); }
+	private CancelAction() { super(1, 1); }
 
 	public String getName() {
 		return "cancel";

@@ -30,10 +30,7 @@ import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
 public class AirbuildCheck extends Check {
 
 	// How should airbuild violations be treated?
-	private final Action actions[][] = { 
-			{ LogAction.loglow,  CancelAction.cancel }, 
-			{ LogAction.logmed,  CancelAction.cancel },
-			{ LogAction.loghigh, CancelAction.cancel } };
+	private Action actions[][];
 
 	private int limits[];
 
@@ -134,6 +131,12 @@ public class AirbuildCheck extends Check {
 			limits[0] = config.getIntegerValue("airbuild.limits.low");
 			limits[1] = config.getIntegerValue("airbuild.limits.med");
 			limits[2] = config.getIntegerValue("airbuild.limits.high");
+			
+			actions = new Action[3][];
+			
+			actions[0] = config.getActionValue("airbuild.action.low");
+			actions[1] = config.getActionValue("airbuild.action.med");
+			actions[2] = config.getActionValue("airbuild.action.high");
 
 			setActive(config.getBooleanValue("active.airbuild"));
 

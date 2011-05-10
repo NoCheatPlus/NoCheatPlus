@@ -41,10 +41,7 @@ public class SpeedhackCheck extends Check {
 	private String logMessage;
 
 	// How should speedhack violations be treated?
-	private Action actions[][] = { 
-			{ LogAction.loglow, CancelAction.cancel }, 
-			{ LogAction.logmed, CancelAction.cancel },
-			{ LogAction.loghigh, CancelAction.cancel } };
+	private Action actions[][];
 
 	public void check(PlayerMoveEvent event) {
 
@@ -160,6 +157,12 @@ public class SpeedhackCheck extends Check {
 
 			logMessage = config.getStringValue("speedhack.logmessage");
 
+			actions = new Action[3][];
+			
+			actions[0] = config.getActionValue("speedhack.action.low");
+			actions[1] = config.getActionValue("speedhack.action.med");
+			actions[2] = config.getActionValue("speedhack.action.high");
+			
 			setActive(config.getBooleanValue("active.speedhack"));
 		} catch (ConfigurationException e) {
 			setActive(false);

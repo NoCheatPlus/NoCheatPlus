@@ -48,7 +48,7 @@ public class ParentOptionGui extends JPanel {
 
 			c.gridx = 0;
 			c.gridy = children.size();
-			c.gridwidth = 3; // Spans over both columns
+			c.gridwidth = 3; // Spans over three columns
 			c.anchor = GridBagConstraints.WEST;
 			c.ipadx = 5;
 			c.ipady = 15;
@@ -63,7 +63,7 @@ public class ParentOptionGui extends JPanel {
 
 			c.gridx = 0;
 			c.gridy = children.size();
-			c.gridwidth = 1; // Spans over both columns
+			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.WEST;
 			c.ipadx = 10;
 			c.weightx = 0;
@@ -72,10 +72,11 @@ public class ParentOptionGui extends JPanel {
 			
 			c.gridx = 1;
 			c.gridy = children.size();
-			c.gridwidth = 1; // Spans over both columns
+			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.WEST;
 			c.ipadx = 5;
 			c.weightx = 0;
+			c.fill = GridBagConstraints.HORIZONTAL;
 			
 			JComponent child = ChildOptionGuiFactory.create((ChildOption)option);
 			
@@ -83,11 +84,11 @@ public class ParentOptionGui extends JPanel {
 			
 			c.gridx = 2;
 			c.gridy = children.size();
-			c.gridwidth = 1; // Spans over both columns
+			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.WEST;
 			c.ipadx = 5;
 			c.weightx = 1;
-			c.fill = GridBagConstraints.HORIZONTAL;
+
 						
 			this.add(Box.createHorizontalGlue(), c);
 			

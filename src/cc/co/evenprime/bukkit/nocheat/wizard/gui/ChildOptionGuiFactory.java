@@ -1,17 +1,21 @@
 package cc.co.evenprime.bukkit.nocheat.wizard.gui;
 
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.InputVerifier;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import cc.co.evenprime.bukkit.nocheat.config.BooleanOption;
 import cc.co.evenprime.bukkit.nocheat.config.ChildOption;
+import cc.co.evenprime.bukkit.nocheat.config.CustomActionOption;
 import cc.co.evenprime.bukkit.nocheat.config.LevelOption;
 import cc.co.evenprime.bukkit.nocheat.config.TextFieldOption;
 
@@ -27,6 +31,9 @@ public class ChildOptionGuiFactory {
 		}
 		else if(option instanceof LevelOption) {
 			return createLogLevel((LevelOption)option);
+		}
+		else if(option instanceof CustomActionOption) {
+			return createCustomAction((CustomActionOption)option);
 		}
 
 		throw new RuntimeException("Unknown ChildOption " + option);
@@ -54,6 +61,75 @@ public class ChildOptionGuiFactory {
 		return comboBox;
 	}
 
+	private static JPanel createCustomAction(final CustomActionOption option) {
+
+		final JPanel panel = new JPanel();
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+		final JTextField command = new JTextField(option.getCommandValue());
+
+		command.setColumns(55);
+		command.setInputVerifier(new InputVerifier() {
+
+			@Override
+			public boolean verify(JComponent arg0) {
+				option.setCommandValue(command.getText());
+				return true;
+			}
+		});
+
+		final JTextField repeat = new JTextField(String.valueOf(option.getRepeatValue()));
+
+		repeat.setColumns(3);
+
+		repeat.setInputVerifier(new InputVerifier() {
+
+			@Override
+			public boolean verify(JComponent arg0) {
+				int value;
+				try {
+					value = Integer.parseInt(repeat.getText());
+					option.setRepeatValue(value);
+					return true;
+				}
+				catch(Exception e) {
+					JOptionPane.showMessageDialog(repeat, "Illegal value for this field");
+					repeat.setText(String.valueOf(option.getRepeatValue()));
+					return false;
+				}
+			}
+		});
+
+		final JTextField firstAfter = new JTextField(String.valueOf(option.getFirstAfterValue()));
+
+		firstAfter.setColumns(3);
+
+		firstAfter.setInputVerifier(new InputVerifier() {
+
+			@Override
+			public boolean verify(JComponent arg0) {
+				int value;
+				try {
+					value = Integer.parseInt(firstAfter.getText());
+					option.setFirsttAfterValue(value);
+					return true;
+				}
+				catch(Exception e) {
+					JOptionPane.showMessageDialog(firstAfter, "Illegal value for this field");
+					firstAfter.setText(String.valueOf(option.getFirstAfterValue()));
+					return false;
+				}
+			}
+		});
+
+		panel.add(firstAfter);
+		panel.add(repeat);
+		panel.add(command);
+
+		return panel;
+	}
+
 	private static JCheckBox createBoolean(final BooleanOption option) {
 
 		final JCheckBox checkBox = new JCheckBox();
@@ -73,11 +149,11 @@ public class ChildOptionGuiFactory {
 	private static JTextField createTextField(final TextFieldOption option) {
 
 		final JTextField textField = new JTextField(option.getValue());
-		
+
 		if(option.hasPreferredLength()) {
 			textField.setColumns(option.getPreferredLength());
 		}
-		
+
 		textField.setInputVerifier(new InputVerifier() {
 
 			@Override

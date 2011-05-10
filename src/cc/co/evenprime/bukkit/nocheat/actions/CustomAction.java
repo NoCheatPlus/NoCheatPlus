@@ -10,7 +10,7 @@ public class CustomAction extends Action {
 
 	public final String command;
 
-	public CustomAction(int firstAfter, boolean repeat, String command) {
+	public CustomAction(int firstAfter, int repeat, String command) {
 		super(firstAfter, repeat);
 		this.command = command;
 	}

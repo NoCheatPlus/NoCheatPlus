@@ -65,10 +65,7 @@ public class MovingCheck extends Check {
 	private String summaryMessage;
 
 	// How should moving violations be treated?
-	private final Action actions[][] = { 
-			{ LogAction.loglow,  CancelAction.cancel },
-			{ LogAction.logmed,  CancelAction.cancel },
-			{ LogAction.loghigh, CancelAction.cancel } };
+	private Action actions[][];
 
 	public long statisticTotalEvents = 1; // Prevent accidental division by 0 at some point
 
@@ -659,6 +656,12 @@ public class MovingCheck extends Check {
 			logMessage = config.getStringValue("moving.logmessage");
 			summaryMessage = config.getStringValue("moving.summarymessage");
 
+			actions = new Action[3][];
+			
+			actions[0] = config.getActionValue("moving.action.low");
+			actions[1] = config.getActionValue("moving.action.med");
+			actions[2] = config.getActionValue("moving.action.high");
+			
 			setActive(config.getBooleanValue("active.moving"));
 		} catch (ConfigurationException e) {
 			setActive(false);

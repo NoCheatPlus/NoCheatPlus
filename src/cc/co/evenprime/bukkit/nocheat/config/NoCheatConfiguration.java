@@ -208,6 +208,21 @@ public class NoCheatConfiguration {
 			ParentOption bogusitemsNode = new ParentOption("bogusitems");
 			root.add(bogusitemsNode);
 		}
+		
+		/*** CUSTOMACTIONS section ***/
+		{
+			ParentOption customActionsNode = new ParentOption("customactions");
+			root.add(customActionsNode);
+			
+			customActionsNode.add(new CustomActionOption("mycommand", 
+					CONFIG.getString("customactions.mycommand", "[4,8] TESTCOMMAND")));
+			
+			customActionsNode.add(new CustomActionOption("mycommand2", 
+					CONFIG.getString("customactions.mycommand2", "TESTCOMMAND2")));
+			
+			customActionsNode.add(new CustomActionOption("mycommand3", 
+					CONFIG.getString("customactions.mycommand3", "[7] TESTCOMMAND3")));
+		}
 
 		if(!configurationFile.exists()) {
 			writeConfigFile(configurationFile, this);
@@ -246,9 +261,7 @@ public class NoCheatConfiguration {
 		}
 	}
 
-	private Action[] stringToActions(String string, Action[] def) {
-
-		if(string == null) return def;
+	public static Action[] stringToActions(String string) {
 
 		List<Action> as = new LinkedList<Action>();
 		String[] parts = string.split(" ");
@@ -280,8 +293,7 @@ public class NoCheatConfiguration {
 			}
 		}
 
-
-		return as.toArray(def);
+		return as.toArray(new Action[as.size()]);
 	}
 
 	private String actionsToString(Action[] actions) {
@@ -298,37 +310,6 @@ public class NoCheatConfiguration {
 	}
 
 	/**
-	 * Convert a string into a log level
-	 * @param string
-	 * @return
-	 */
-	private static Level stringToLevel(String string, Level def) {
-
-		if(string == null) {
-			return def;
-		}
-
-		if(string.trim().equals("info") || string.trim().equals("low")) return Level.INFO;
-		if(string.trim().equals("warn") || string.trim().equals("med")) return Level.WARNING;
-		if(string.trim().equals("severe")|| string.trim().equals("high")) return Level.SEVERE;
-
-		return Level.OFF;
-	}
-
-	private static String levelToString(Level level) {
-
-		if(level == null) {
-			return "off";
-		}
-
-		if(level.equals(Level.INFO)) return "low";
-		else if(level.equals(Level.WARNING)) return "med";
-		else if(level.equals(Level.SEVERE)) return "high";
-
-		return "off";
-	}
-
-	/**
 	 * Write configuration file to specific filename
 	 * @param f
 	 */
@@ -336,6 +317,7 @@ public class NoCheatConfiguration {
 		try {
 			if(f.getParentFile() != null)
 				f.getParentFile().mkdirs();
+			
 			f.createNewFile();
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 
@@ -347,7 +329,11 @@ public class NoCheatConfiguration {
 		}
 	}
 
-
+	public Action[] getActionValue(String optionName) throws ConfigurationException {
+		return stringToActions(getStringOption(optionName).getValue());
+	}
+	
+	
 	public int getIntegerValue(String optionName) throws ConfigurationException {	
 		return getIntegerOption(optionName).getIntegerValue();
 	}
