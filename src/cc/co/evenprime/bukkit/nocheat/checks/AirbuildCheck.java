@@ -82,7 +82,7 @@ public class AirbuildCheck extends Check {
 		// Execute actions in order
 		for(Action a : actions) {
 			if(a.firstAfter >= violations) {
-				if(a.firstAfter == violations || (a.repeat > 0 && (violations - a.firstAfter) % a.repeat == 0)) {
+				if(a.firstAfter == violations || a.repeat) {
 					if(a instanceof LogAction) {
 						final Location l = event.getBlockPlaced().getLocation();
 						String logMessage = "Airbuild: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ();

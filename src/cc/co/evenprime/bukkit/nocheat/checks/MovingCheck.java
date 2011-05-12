@@ -454,7 +454,7 @@ public class MovingCheck extends Check {
 		
 		for(Action a : actions) {
 			if(a.firstAfter >= violations) {
-				if(a.firstAfter == violations || (a.repeat > 0 && (violations - a.firstAfter) % a.repeat == 0)) {
+				if(a.firstAfter == violations || a.repeat) {
 					if(a instanceof LogAction)  {
 						// prepare log message if necessary
 						String log = String.format(logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());

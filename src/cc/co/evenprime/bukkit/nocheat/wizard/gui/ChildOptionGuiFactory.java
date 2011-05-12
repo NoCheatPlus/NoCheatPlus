@@ -79,26 +79,16 @@ public class ChildOptionGuiFactory {
 			}
 		});
 
-		final JTextField repeat = new JTextField(String.valueOf(option.getRepeatValue()));
+		final JCheckBox repeat = new JCheckBox();
+		repeat.setSelected(option.getRepeatValue());
 
-		repeat.setColumns(3);
-
-		repeat.setInputVerifier(new InputVerifier() {
+		repeat.addActionListener(new ActionListener() {
 
 			@Override
-			public boolean verify(JComponent arg0) {
-				int value;
-				try {
-					value = Integer.parseInt(repeat.getText());
-					option.setRepeatValue(value);
-					return true;
-				}
-				catch(Exception e) {
-					JOptionPane.showMessageDialog(repeat, "Illegal value for this field");
-					repeat.setText(String.valueOf(option.getRepeatValue()));
-					return false;
-				}
+			public void actionPerformed(ActionEvent arg0) {
+				option.setRepeatValue(repeat.isSelected());
 			}
+		
 		});
 
 		final JTextField firstAfter = new JTextField(String.valueOf(option.getFirstAfterValue()));

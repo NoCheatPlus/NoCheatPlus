@@ -5,7 +5,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 public class CustomActionOption extends ChildOption {
 
 	private int firstAfter;
-	private int repeat;
+	private boolean repeat;
 	private String command;
 	
 	
@@ -19,33 +19,33 @@ public class CustomActionOption extends ChildOption {
 	
 	private void parseCommand(String command) {
 		
-		if(command.matches("\\[[0-9]*,[0-9]*\\] .*")) {
+		if(command.matches("\\[[0-9]*,[a-z]*\\] .*")) {
 			String s[] = command.split(" ", 2);
 			String s2[] = s[0].replace("[", "").replace("]", "").split(",");
 			this.firstAfter = Integer.parseInt(s2[0]);
-			this.repeat = Integer.parseInt(s2[1]);
+			this.repeat = Boolean.parseBoolean(s2[1]);
 			this.command = s[1];
 		}
 		else if(command.matches("\\[[0-9]*\\] .*")) {
 			String s[] = command.split(" ", 2);
 			this.firstAfter = Integer.parseInt(s[0].replace("[", "").replace("]", ""));
-			this.repeat = 1;
+			this.repeat = true;
 			this.command = s[1];
 		}
 		else
 		{
 			this.command = command;
 			this.firstAfter = 1;
-			this.repeat = 1;
+			this.repeat = true;
 		}
 	}
 	
 	@Override
 	public String getValue() {
-		if(firstAfter <= 1) {
+		if(firstAfter <= 1 && repeat) {
 			return command;
 		}
-		else if(repeat <= 0) {
+		else if(repeat) {
 			return "["+firstAfter+"] "+ command;
 		}
 		else {
@@ -66,12 +66,12 @@ public class CustomActionOption extends ChildOption {
 		this.command = command;
 	}
 
-	public void setRepeatValue(int value) {
+	public void setRepeatValue(boolean value) {
 		this.repeat = value;
 		
 	}
 
-	public int getRepeatValue() {
+	public boolean getRepeatValue() {
 		return repeat;
 	}
 
