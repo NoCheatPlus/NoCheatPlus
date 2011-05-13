@@ -37,7 +37,7 @@ import org.bukkit.plugin.Plugin;
  * 
  * @author Evenprime
  */
-public class NoCheat extends JavaPlugin {
+public class NoCheat extends JavaPlugin implements CommandSender {
 
 	private MovingCheck movingCheck;
 	private BedteleportCheck bedteleportCheck;
@@ -70,7 +70,7 @@ public class NoCheat extends JavaPlugin {
 	private Level consoleLevel;
 	private String ircTag;
 
-	
+
 	public NoCheat() { 	
 
 	}
@@ -126,7 +126,7 @@ public class NoCheat extends JavaPlugin {
 
 		// parse the nocheat.yml config file
 		setupConfig();
-		
+
 		movingCheck = new MovingCheck(this, config);
 		bedteleportCheck = new BedteleportCheck(this, config);
 		speedhackCheck = new SpeedhackCheck(this, config);
@@ -136,7 +136,7 @@ public class NoCheat extends JavaPlugin {
 
 		// just for convenience
 		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, itemdupeCheck, bogusitemsCheck };
-		
+
 		PluginDescriptionFile pdfFile = this.getDescription();
 
 		// Get, if available, the Permissions and irc plugin
@@ -305,7 +305,7 @@ public class NoCheat extends JavaPlugin {
 			this.config = new NoCheatConfiguration(new File(NoCheatConfiguration.configFile));
 		else
 			this.config.config(new File(NoCheatConfiguration.configFile));
-		
+
 		config.setupFileLogger();
 
 		try {
@@ -360,7 +360,23 @@ public class NoCheat extends JavaPlugin {
 	}
 
 	public void handleCustomAction(CustomAction a, Player player) {
+
+		Bukkit.getServer().dispatchCommand(this, a.command.replace("[player]", player.getName()));
 		System.out.println("Would execute "+a.command + " now for Player " + player.getName() );
 
+	}
+
+
+
+	@Override
+	public void sendMessage(String message) {
+		// we don't receive messages
+
+	}
+
+	@Override
+	public boolean isOp() {
+		// We declare ourselves to be OP to be allowed to do more commands
+		return true;
 	}
 }

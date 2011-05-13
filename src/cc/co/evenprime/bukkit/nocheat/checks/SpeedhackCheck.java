@@ -128,7 +128,7 @@ public class SpeedhackCheck extends Check {
 		if(actions == null) return;
 
 		for(Action a : actions) {
-			if(a.firstAfter >= violations) {
+			if(a.firstAfter <= violations) {
 				if(a.firstAfter == violations || a.repeat) {
 					if(a instanceof LogAction) {
 						String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);

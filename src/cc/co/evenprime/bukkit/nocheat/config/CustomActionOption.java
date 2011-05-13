@@ -15,28 +15,27 @@ public class CustomActionOption extends ChildOption {
 		
 		this.parseCommand(command);
 	}
-
 	
-	private void parseCommand(String command) {
+	private void parseCommand(String com) {
 		
-		if(command.matches("\\[[0-9]*,[a-z]*\\] .*")) {
-			String s[] = command.split(" ", 2);
+		if(com.matches("\\[[0-9]*,[a-z]*\\] .*")) {
+			String s[] = com.split(" ", 2);
 			String s2[] = s[0].replace("[", "").replace("]", "").split(",");
-			this.firstAfter = Integer.parseInt(s2[0]);
-			this.repeat = Boolean.parseBoolean(s2[1]);
-			this.command = s[1];
+			firstAfter = Integer.parseInt(s2[0]);
+			repeat = Boolean.parseBoolean(s2[1]);
+			command = s[1];
 		}
-		else if(command.matches("\\[[0-9]*\\] .*")) {
-			String s[] = command.split(" ", 2);
-			this.firstAfter = Integer.parseInt(s[0].replace("[", "").replace("]", ""));
-			this.repeat = true;
-			this.command = s[1];
+		else if(com.matches("\\[[0-9]*\\] .*")) {
+			String s[] = com.split(" ", 2);
+			firstAfter = Integer.parseInt(s[0].replace("[", "").replace("]", ""));
+			repeat = true;
+			command = s[1];
 		}
 		else
 		{
-			this.command = command;
-			this.firstAfter = 1;
-			this.repeat = true;
+			firstAfter = 1;
+			repeat = true;
+			command = com;
 		}
 	}
 	

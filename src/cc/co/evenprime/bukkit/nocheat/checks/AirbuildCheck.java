@@ -81,7 +81,7 @@ public class AirbuildCheck extends Check {
 
 		// Execute actions in order
 		for(Action a : actions) {
-			if(a.firstAfter >= violations) {
+			if(a.firstAfter <= violations) {
 				if(a.firstAfter == violations || a.repeat) {
 					if(a instanceof LogAction) {
 						final Location l = event.getBlockPlaced().getLocation();

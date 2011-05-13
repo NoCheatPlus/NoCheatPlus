@@ -453,7 +453,7 @@ public class MovingCheck extends Check {
 
 		
 		for(Action a : actions) {
-			if(a.firstAfter >= violations) {
+			if(a.firstAfter <= violations) {
 				if(a.firstAfter == violations || a.repeat) {
 					if(a instanceof LogAction)  {
 						// prepare log message if necessary

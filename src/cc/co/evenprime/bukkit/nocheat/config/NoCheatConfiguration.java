@@ -4,8 +4,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +32,8 @@ public class NoCheatConfiguration {
 	public final static String configFile = "plugins/NoCheat/nocheat.yml";
 
 	private ParentOption root;
+
+	private Map<String, Action> actionMap = new HashMap<String,Action>();
 
 	// Our personal logger
 	private final static String loggerName = "cc.co.evenprime.nocheat";
@@ -208,20 +212,22 @@ public class NoCheatConfiguration {
 			ParentOption bogusitemsNode = new ParentOption("bogusitems");
 			root.add(bogusitemsNode);
 		}
-		
+
 		/*** CUSTOMACTIONS section ***/
 		{
 			ParentOption customActionsNode = new ParentOption("customactions");
 			root.add(customActionsNode);
-			
-			customActionsNode.add(new CustomActionOption("mycommand", 
-					CONFIG.getString("customactions.mycommand", "[4,8] TESTCOMMAND")));
-			
-			customActionsNode.add(new CustomActionOption("mycommand2", 
-					CONFIG.getString("customactions.mycommand2", "TESTCOMMAND2")));
-			
-			customActionsNode.add(new CustomActionOption("mycommand3", 
-					CONFIG.getString("customactions.mycommand3", "[7] TESTCOMMAND3")));
+
+			List<String> customs = CONFIG.getKeys("customactions");
+			if(customs != null) {
+				for(String s : customs) {
+
+					CustomActionOption o = new CustomActionOption(s, CONFIG.getString("customactions."+s, "unknown"));
+
+					customActionsNode.add(o);
+					actionMap.put(s, o.getCustomActionValue());
+				}
+			}
 		}
 
 		if(!configurationFile.exists()) {
@@ -261,7 +267,7 @@ public class NoCheatConfiguration {
 		}
 	}
 
-	public static Action[] stringToActions(String string) {
+	public Action[] stringToActions(String string) {
 
 		List<Action> as = new LinkedList<Action>();
 		String[] parts = string.split(" ");
@@ -273,40 +279,17 @@ public class NoCheatConfiguration {
 				as.add(LogAction.logmed);
 			else if(s.equals("loghigh"))
 				as.add(LogAction.loghigh);
-			else if(s.equals("deny"))
-				as.add(CancelAction.cancel);
-			else if(s.equals("reset"))
-				as.add(CancelAction.cancel);
 			else if(s.equals("cancel"))
 				as.add(CancelAction.cancel);
-			else if(s.startsWith("custom")) {
-				try {
-					// TODO: Implement Custom Action
-					//as.add(new CustomAction(Integer.parseInt(s.substring(6))));
-				}
-				catch(Exception e) {
-					System.out.println("NC: Couldn't parse number of custom action '" + s + "'");
-				}
-			}
-			else {
-				System.out.println("NC: Can't parse action "+ s);
+			else if(actionMap.get(s) != null)
+				as.add(actionMap.get(s));
+			else
+			{
+				System.out.println("NC: Couldn't parse custom action '" + s + "'");
 			}
 		}
 
 		return as.toArray(new Action[as.size()]);
-	}
-
-	private String actionsToString(Action[] actions) {
-
-		StringBuffer s = new StringBuffer();
-
-		if(actions != null) {
-			for(Action a : actions) {
-				s.append(' ').append(a.getName());
-			}
-		}
-
-		return s.toString().trim();
 	}
 
 	/**
@@ -317,7 +300,7 @@ public class NoCheatConfiguration {
 		try {
 			if(f.getParentFile() != null)
 				f.getParentFile().mkdirs();
-			
+
 			f.createNewFile();
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 
@@ -332,8 +315,8 @@ public class NoCheatConfiguration {
 	public Action[] getActionValue(String optionName) throws ConfigurationException {
 		return stringToActions(getStringOption(optionName).getValue());
 	}
-	
-	
+
+
 	public int getIntegerValue(String optionName) throws ConfigurationException {	
 		return getIntegerOption(optionName).getIntegerValue();
 	}
