@@ -8,17 +8,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.bukkit.util.config.Configuration;
 
 import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 import cc.co.evenprime.bukkit.nocheat.config.LevelOption.LogLevel;
+import cc.co.evenprime.bukkit.nocheat.yaml.SimpleYaml;
 
 /**
  * Central location for everything that's described in the configuration file
@@ -34,6 +34,8 @@ public class NoCheatConfiguration {
 	private ParentOption root;
 
 	private Map<String, Action> actionMap = new HashMap<String,Action>();
+
+	private Map<String, Object> yamlContent = new HashMap<String, Object>();
 
 	// Our personal logger
 	private final static String loggerName = "cc.co.evenprime.nocheat";
@@ -54,8 +56,13 @@ public class NoCheatConfiguration {
 	 */
 	public void config(File configurationFile) {
 
-		Configuration CONFIG = new Configuration(configurationFile);
-		CONFIG.load();
+
+		try {
+			yamlContent = (Map<String, Object>) SimpleYaml.read(configurationFile);
+		} catch (Exception e) {
+			yamlContent = new HashMap<String, Object>();
+		}
+
 
 		root = new ParentOption("");
 
@@ -66,19 +73,19 @@ public class NoCheatConfiguration {
 			root.add(loggingNode);
 
 			loggingNode.add(new MediumStringOption("filename", 
-					CONFIG.getString("logging.filename", "plugins/NoCheat/nocheat.log")));
+					SimpleYaml.getString("logging.filename", "plugins/NoCheat/nocheat.log", yamlContent)));
 
 			loggingNode.add(new LevelOption("logtofile", 
-					LogLevel.getLogLevelFromString(CONFIG.getString("logging.logtofile", LogLevel.LOW.asString()))));
+					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtofile", LogLevel.LOW.asString(), yamlContent))));
 			loggingNode.add(new LevelOption("logtoconsole",
-					LogLevel.getLogLevelFromString(CONFIG.getString("logging.logtoconsole", LogLevel.HIGH.asString()))));
+					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtoconsole", LogLevel.HIGH.asString(), yamlContent))));
 			loggingNode.add(new LevelOption("logtochat", 
-					LogLevel.getLogLevelFromString(CONFIG.getString("logging.logtochat", LogLevel.MED.asString()))));
+					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtochat", LogLevel.MED.asString(), yamlContent))));
 			loggingNode.add(new LevelOption("logtoirc",
-					LogLevel.getLogLevelFromString(CONFIG.getString("logging.logtoirc", LogLevel.MED.asString()))));
+					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtoirc", LogLevel.MED.asString(), yamlContent))));
 
 			loggingNode.add(new ShortStringOption("logtoirctag", 
-					CONFIG.getString("logging.logtoirctag", "nocheat")));
+					SimpleYaml.getString("logging.logtoirctag", "nocheat", yamlContent)));
 		}
 
 		/*** ACTIVE section ***/
@@ -87,17 +94,17 @@ public class NoCheatConfiguration {
 			root.add(activeNode);
 
 			activeNode.add(new BooleanOption("speedhack", 
-					CONFIG.getBoolean("active.speedhack", true)));
+					SimpleYaml.getBoolean("active.speedhack", true, yamlContent)));
 			activeNode.add(new BooleanOption("moving", 
-					CONFIG.getBoolean("active.moving", true)));
+					SimpleYaml.getBoolean("active.moving", true, yamlContent)));
 			activeNode.add(new BooleanOption("airbuild",
-					CONFIG.getBoolean("active.airbuild", false)));
+					SimpleYaml.getBoolean("active.airbuild", false, yamlContent)));
 			activeNode.add(new BooleanOption("bedteleport",
-					CONFIG.getBoolean("active.bedteleport", true)));
+					SimpleYaml.getBoolean("active.bedteleport", true, yamlContent)));
 			activeNode.add(new BooleanOption("itemdupe", 
-					CONFIG.getBoolean("active.itemdupe", true)));
+					SimpleYaml.getBoolean("active.itemdupe", true, yamlContent)));
 			activeNode.add(new BooleanOption("bogusitems",
-					CONFIG.getBoolean("active.bogusitems", false)));
+					SimpleYaml.getBoolean("active.bogusitems", false, yamlContent)));
 		}
 
 		/*** SPEEDHACK section ***/
@@ -106,7 +113,7 @@ public class NoCheatConfiguration {
 			root.add(speedhackNode);
 
 			speedhackNode.add(new LongStringOption("logmessage", 
-					CONFIG.getString("logging.filename", "%1$s sent %2$d move events, but only %3$d were allowed. Speedhack?")));
+					SimpleYaml.getString("logging.filename", "%1$s sent %2$d move events, but only %3$d were allowed. Speedhack?", yamlContent)));
 
 			/*** SPEEDHACK LIMITS section ***/
 			{
@@ -114,11 +121,11 @@ public class NoCheatConfiguration {
 				speedhackNode.add(speedhackLimitsNode);
 
 				speedhackLimitsNode.add(new IntegerOption("low", 
-						CONFIG.getInt("speedhack.limits.low", 30)));
+						SimpleYaml.getInt("speedhack.limits.low", 30, yamlContent)));
 				speedhackLimitsNode.add(new IntegerOption("med",
-						CONFIG.getInt("speedhack.limits.med", 45)));
+						SimpleYaml.getInt("speedhack.limits.med", 45, yamlContent)));
 				speedhackLimitsNode.add(new IntegerOption("high",
-						CONFIG.getInt("speedhack.limits.high", 60)));
+						SimpleYaml.getInt("speedhack.limits.high", 60, yamlContent)));
 			}
 
 			/*** SPEEDHACK ACTIONS section ***/
@@ -127,11 +134,11 @@ public class NoCheatConfiguration {
 				speedhackNode.add(speedhackActionNode);
 
 				speedhackActionNode.add(new MediumStringOption("low", 
-						CONFIG.getString("speedhack.action.low", "loglow cancel")));
+						SimpleYaml.getString("speedhack.action.low", "loglow cancel", yamlContent)));
 				speedhackActionNode.add(new MediumStringOption("med", 
-						CONFIG.getString("speedhack.action.med", "logmed cancel")));
+						SimpleYaml.getString("speedhack.action.med", "logmed cancel", yamlContent)));
 				speedhackActionNode.add(new MediumStringOption("high", 
-						CONFIG.getString("speedhack.action.high", "loghigh cancel")));
+						SimpleYaml.getString("speedhack.action.high", "loghigh cancel", yamlContent)));
 			}
 		}
 
@@ -141,13 +148,13 @@ public class NoCheatConfiguration {
 			root.add(movingNode);
 
 			movingNode.add(new LongStringOption("logmessage",
-					CONFIG.getString("moving.logmessage", "Moving violation: %1$s from %2$s (%4$.1f, %5$.1f, %6$.1f) to %3$s (%7$.1f, %8$.1f, %9$.1f)")));
+					SimpleYaml.getString("moving.logmessage", "Moving violation: %1$s from %2$s (%4$.1f, %5$.1f, %6$.1f) to %3$s (%7$.1f, %8$.1f, %9$.1f)", yamlContent)));
 			movingNode.add(new LongStringOption("summarymessage", 
-					CONFIG.getString("moving.summarymessage", "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)")));
+					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)", yamlContent)));
 			movingNode.add(new BooleanOption("allowflying", 
-					CONFIG.getBoolean("moving.allowflying", false)));
+					SimpleYaml.getBoolean("moving.allowflying", false, yamlContent)));
 			movingNode.add(new BooleanOption("allowfakesneak", 
-					CONFIG.getBoolean("moving.allowfakesneak", true)));
+					SimpleYaml.getBoolean("moving.allowfakesneak", true, yamlContent)));
 
 			/*** MOVING ACTION section ***/
 			{
@@ -155,11 +162,11 @@ public class NoCheatConfiguration {
 				movingNode.add(movingActionNode);
 
 				movingActionNode.add(new MediumStringOption("low", 
-						CONFIG.getString("moving.action.low", "loglow cancel")));
+						SimpleYaml.getString("moving.action.low", "loglow cancel", yamlContent)));
 				movingActionNode.add(new MediumStringOption("med", 
-						CONFIG.getString("moving.action.med", "logmed cancel")));
+						SimpleYaml.getString("moving.action.med", "logmed cancel", yamlContent)));
 				movingActionNode.add(new MediumStringOption("high", 
-						CONFIG.getString("moving.action.high", "loghigh cancel")));
+						SimpleYaml.getString("moving.action.high", "loghigh cancel", yamlContent)));
 			}
 		}
 
@@ -174,11 +181,11 @@ public class NoCheatConfiguration {
 				airbuildNode.add(airbuildLimitsNode);
 
 				airbuildLimitsNode.add(new IntegerOption("low", 
-						CONFIG.getInt("airbuild.limits.low", 1)));
+						SimpleYaml.getInt("airbuild.limits.low", 1, yamlContent)));
 				airbuildLimitsNode.add(new IntegerOption("med",
-						CONFIG.getInt("airbuild.limits.med", 3)));
+						SimpleYaml.getInt("airbuild.limits.med", 3, yamlContent)));
 				airbuildLimitsNode.add(new IntegerOption("high",
-						CONFIG.getInt("airbuild.limits.high", 10)));
+						SimpleYaml.getInt("airbuild.limits.high", 10, yamlContent)));
 			}
 
 			/*** AIRBUILD ACTION section ***/
@@ -187,11 +194,11 @@ public class NoCheatConfiguration {
 				airbuildNode.add(airbuildActionNode);
 
 				airbuildActionNode.add(new MediumStringOption("low", 
-						CONFIG.getString("airbuild.action.low", "loglow cancel")));
+						SimpleYaml.getString("airbuild.action.low", "loglow cancel", yamlContent)));
 				airbuildActionNode.add(new MediumStringOption("med",
-						CONFIG.getString("airbuild.action.med", "logmed cancel")));
+						SimpleYaml.getString("airbuild.action.med", "logmed cancel", yamlContent)));
 				airbuildActionNode.add(new MediumStringOption("high",
-						CONFIG.getString("airbuild.action.high", "loghigh cancel")));
+						SimpleYaml.getString("airbuild.action.high", "loghigh cancel", yamlContent)));
 			}
 		}
 
@@ -218,15 +225,14 @@ public class NoCheatConfiguration {
 			ParentOption customActionsNode = new ParentOption("customactions");
 			root.add(customActionsNode);
 
-			List<String> customs = CONFIG.getKeys("customactions");
-			if(customs != null) {
-				for(String s : customs) {
+			Set<String> customs = SimpleYaml.getKeys("customactions", yamlContent);
 
-					CustomActionOption o = new CustomActionOption(s, CONFIG.getString("customactions."+s, "unknown"));
+			for(String s : customs) {
 
-					customActionsNode.add(o);
-					actionMap.put(s, o.getCustomActionValue());
-				}
+				CustomActionOption o = new CustomActionOption(s, SimpleYaml.getString("customactions."+s, "unknown", yamlContent));
+
+				customActionsNode.add(o);
+				actionMap.put(s, o.getCustomActionValue());
 			}
 		}
 
