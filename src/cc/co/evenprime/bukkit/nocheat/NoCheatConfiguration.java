@@ -81,7 +81,7 @@ public class NoCheatConfiguration {
 			try {
 				fh = new FileHandler(fileName, true);
 				fh.setLevel(fileLevel);
-				fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
+				fh.setFormatter(new LogFileFormatter());
 				logger.addHandler(fh);
 
 			} catch (Exception e) {
