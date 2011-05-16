@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat;
 
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +27,7 @@ import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.config.Configuration;
 
 /**
  * 
@@ -62,6 +64,7 @@ public class NoCheat extends JavaPlugin {
 
 	// CraftIRC 2.x, if available
 	private CraftIRC irc;
+	private boolean allowFlightSet;
 
 	public NoCheat() { 	
 
@@ -129,6 +132,9 @@ public class NoCheat extends JavaPlugin {
 		// parse the nocheat.yml config file
 		setupConfig();
 
+		if(allowFlightSet && movingCheck.isActive()) {
+			Logger.getLogger("Minecraft").warning( "[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
+		}
 
 		PluginDescriptionFile pdfFile = this.getDescription();
 
@@ -298,6 +304,10 @@ public class NoCheat extends JavaPlugin {
 			this.config = new NoCheatConfiguration(this);
 		else
 			this.config.config();
+		
+		Configuration serverConfig = new Configuration(new File("server.properties"));
+		
+		allowFlightSet = serverConfig.getBoolean("allow-flight", false);
 	}
 
 
