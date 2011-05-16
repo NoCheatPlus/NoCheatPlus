@@ -104,7 +104,7 @@ public class SimpleYaml {
 			return ((Map<String, Object>)getProperty(path, node)).keySet();
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			return new HashSet<String>();
 		}
 	}
