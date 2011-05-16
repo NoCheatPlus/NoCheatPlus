@@ -6,7 +6,9 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportPlayerListener;
 
@@ -18,8 +20,8 @@ import cc.co.evenprime.bukkit.nocheat.listeners.BedteleportPlayerListener;
 
 public class BedteleportCheck extends Check {
 
-	public BedteleportCheck(NoCheat plugin) {
-		super(plugin, "bedteleport",  PermissionData.PERMISSION_BEDTELEPORT);
+	public BedteleportCheck(NoCheat plugin, NoCheatConfiguration config) {
+		super(plugin, "bedteleport",  PermissionData.PERMISSION_BEDTELEPORT, config);
 	}
 
 	public void check(PlayerMoveEvent event) {
@@ -31,7 +33,18 @@ public class BedteleportCheck extends Check {
 		if(event.getPlayer().isSleeping())
 			event.setCancelled(true);
 	}
-
+	
+	@Override
+	public void configure(NoCheatConfiguration config) {
+		
+		try {
+			setActive(config.getBooleanValue("active.bedteleport"));
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	protected void registerListeners() {
 		PluginManager pm = Bukkit.getServer().getPluginManager();

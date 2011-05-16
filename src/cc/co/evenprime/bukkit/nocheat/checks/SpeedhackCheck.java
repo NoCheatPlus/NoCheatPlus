@@ -10,11 +10,13 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.data.SpeedhackData;
 import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackPlayerListener;
@@ -27,22 +29,19 @@ import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackPlayerListener;
  */
 public class SpeedhackCheck extends Check {
 
-	public SpeedhackCheck(NoCheat plugin) {
-		super(plugin, "speedhack", PermissionData.PERMISSION_SPEEDHACK);
+	public SpeedhackCheck(NoCheat plugin, NoCheatConfiguration config) {
+		super(plugin, "speedhack", PermissionData.PERMISSION_SPEEDHACK, config);
 	}
 
 	private static final int violationsLimit = 2;
 
 	// Limits for the speedhack check per second
-	public int limits[] = { 30, 45, 60 };
+	private int limits[];
+
+	private String logMessage;
 
 	// How should speedhack violations be treated?
-	public Action actions[][] = { 
-			{ LogAction.loglow, CancelAction.cancel }, 
-			{ LogAction.logmed, CancelAction.cancel },
-			{ LogAction.loghigh, CancelAction.cancel } };
-
-	public String logMessage = "%1$s sent %2$d move events, but only %3$d were allowed. Speedhack?";
+	private Action actions[][];
 
 	public void check(PlayerMoveEvent event) {
 
@@ -84,16 +83,21 @@ public class SpeedhackCheck extends Check {
 				final int med  = (limits[1]+1) / 2;
 				final int high = (limits[2]+1) / 2;
 
-				if(data.eventsSinceLastCheck > high) action = actions[2];
-				else if(data.eventsSinceLastCheck > med) action = actions[1];
-				else if(data.eventsSinceLastCheck > low) action = actions[0];
+				int level = -1;
+
+				if(data.eventsSinceLastCheck > high) level = 2;
+				else if(data.eventsSinceLastCheck > med)  level = 1;
+				else if(data.eventsSinceLastCheck > low)  level = 0;
 				else resetData(data, event.getFrom(), ticks);
 
 
-				if(action != null)	data.violationsInARow++;
+				if(level >= 0)	{
+					data.violationsInARowTotal++;
+				}
 
-				if(data.violationsInARow >= violationsLimit) {
-					action(action, event, data);
+				if(data.violationsInARowTotal >= violationsLimit) {
+					data.violationsInARow[level]++;
+					action(action, event, data.violationsInARow[level], data);
 				}
 
 				// Reset value for next check
@@ -110,25 +114,34 @@ public class SpeedhackCheck extends Check {
 	}
 
 	private static void resetData(SpeedhackData data, Location l, int ticks) {
-		data.violationsInARow = 0;
+		data.violationsInARow[0] = 0;
+		data.violationsInARow[1] = 0;
+		data.violationsInARow[2] = 0;
+		data.violationsInARowTotal = 0;
 		data.eventsSinceLastCheck = 0;
 		data.setBackPoint = l;
 		data.lastCheckTicks = ticks;
 	}
 
-	private void action(Action actions[], PlayerMoveEvent event, SpeedhackData data) {
+	private void action(Action actions[], PlayerMoveEvent event, int violations, SpeedhackData data) {
 
 		if(actions == null) return;
 
-		String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);
-
 		for(Action a : actions) {
-			if(a instanceof LogAction) 
-				plugin.log(((LogAction)a).level, log);
-			else if(a instanceof CancelAction)
-				resetPlayer(event, data);
-			else if(a instanceof CustomAction)
-				plugin.handleCustomAction(a, event.getPlayer());
+			if(a.firstAfter <= violations) {
+				if(a.firstAfter == violations || a.repeat) {
+					if(a instanceof LogAction) {
+						String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);
+						plugin.log(((LogAction)a).level, log);
+					}
+					else if(a instanceof CancelAction) {
+						resetPlayer(event, data);
+					}
+					else if(a instanceof CustomAction) {
+						plugin.handleCustomAction((CustomAction)a, event.getPlayer());
+					}
+				}
+			}
 		}
 	}
 
@@ -144,6 +157,34 @@ public class SpeedhackCheck extends Check {
 			event.setCancelled(true);
 		}
 	}
+
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+
+			limits = new int[3];
+
+			limits[0] = config.getIntegerValue("speedhack.limits.low");
+			limits[1] = config.getIntegerValue("speedhack.limits.med");
+			limits[2] = config.getIntegerValue("speedhack.limits.high");
+
+			logMessage = config.getStringValue("speedhack.logmessage");
+
+			actions = new Action[3][];
+
+			actions[0] = config.getActionValue("speedhack.action.low");
+			actions[1] = config.getActionValue("speedhack.action.med");
+			actions[2] = config.getActionValue("speedhack.action.high");
+
+			setActive(config.getBooleanValue("active.speedhack"));
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
+	}
+
+
 
 	@Override
 	protected void registerListeners() {

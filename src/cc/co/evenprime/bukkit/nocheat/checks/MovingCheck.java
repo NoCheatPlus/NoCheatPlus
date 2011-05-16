@@ -16,11 +16,13 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingEntityListener;
@@ -35,8 +37,9 @@ import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerMonitor;
  */
 public class MovingCheck extends Check {
 
-	public MovingCheck(NoCheat plugin) {
-		super(plugin, "moving", PermissionData.PERMISSION_MOVING);
+	public MovingCheck(NoCheat plugin, NoCheatConfiguration config) {
+		super(plugin, "moving", PermissionData.PERMISSION_MOVING, config);
+
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
@@ -51,21 +54,18 @@ public class MovingCheck extends Check {
 	private final static double stepWidth = 0.6D;
 	private final static double sneakStepWidth = 0.25D;
 
-	public int ticksBeforeSummary = 100;
+	private int ticksBeforeSummary = 100;
 
 	public long statisticElapsedTimeNano = 0;
 
-	public boolean allowFlying = false;
-	public boolean allowFakeSneak = true;
+	public boolean allowFlying;
+	public boolean allowFakeSneak;
+
+	private String logMessage;
+	private String summaryMessage;
 
 	// How should moving violations be treated?
-	public final Action actions[][] = { 
-			{ LogAction.loglow,  CancelAction.cancel },
-			{ LogAction.logmed,  CancelAction.cancel },
-			{ LogAction.loghigh, CancelAction.cancel } };
-
-	public String logMessage = "Moving violation: %1$s from %2$s (%4$.1f, %5$.1f, %6$.1f) to %3$s (%7$.1f, %8$.1f, %9$.1f)";
-	public String summaryMessage = "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)";
+	private Action actions[][];
 
 	public long statisticTotalEvents = 1; // Prevent accidental division by 0 at some point
 
@@ -259,10 +259,9 @@ public class MovingCheck extends Check {
 		if(violationLevel >= 0) {
 			setupSummaryTask(event.getPlayer(), data);
 
-			boolean log = !(data.violationsInARow[violationLevel] > 0);
 			data.violationsInARow[violationLevel]++;
 
-			action(event, event.getPlayer(), from, to, actions[violationLevel], log, data);
+			action(event, event.getPlayer(), from, to, actions[violationLevel], data.violationsInARow[violationLevel], data);
 		}
 
 		/****** Violation Handling END *****/
@@ -447,30 +446,33 @@ public class MovingCheck extends Check {
 	 * @param event
 	 * @param action
 	 */
-	private void action(PlayerMoveEvent event, Player player, Location from, Location to, Action[] actions, boolean loggingAllowed, MovingData data) {
+	private void action(PlayerMoveEvent event, Player player, Location from, Location to, Action[] actions, int violations, MovingData data) {
 
 		if(actions == null) return;
 		boolean cancelled = false;
 
-		// prepare log message if necessary
-		String log = null;
-
-		if(loggingAllowed) {
-			log = String.format(logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
-		}
-
+		
 		for(Action a : actions) {
-			if(loggingAllowed && a instanceof LogAction)  {
-				plugin.log(((LogAction)a).level, log);
-				if(data.highestLogLevel == null) data.highestLogLevel = Level.ALL;
-				if(data.highestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.highestLogLevel = ((LogAction)a).level;
+			if(a.firstAfter <= violations) {
+				if(a.firstAfter == violations || a.repeat) {
+					if(a instanceof LogAction)  {
+						// prepare log message if necessary
+						String log = String.format(logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
+
+						plugin.log(((LogAction)a).level, log);
+						
+						// Remember the highest log level we encountered to determine what level the summary log message should have
+						if(data.highestLogLevel == null) data.highestLogLevel = Level.ALL;
+						if(data.highestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.highestLogLevel = ((LogAction)a).level;
+					}
+					else if(!cancelled && a instanceof CancelAction) {
+						resetPlayer(event, from);
+						cancelled = true;
+					}
+					else if(a instanceof CustomAction)
+						plugin.handleCustomAction((CustomAction)a, player);
+				}
 			}
-			else if(!cancelled && a instanceof CancelAction) {
-				resetPlayer(event, from);
-				cancelled = true;
-			}
-			else if(a instanceof CustomAction)
-				plugin.handleCustomAction(a, player);
 		}
 	}
 
@@ -644,6 +646,30 @@ public class MovingCheck extends Check {
 		data.setBackPoint = l;
 		data.jumpPhase = 0;
 		data.teleportTo = null;
+	}
+
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+			allowFlying = config.getBooleanValue("moving.allowflying");
+			allowFakeSneak = config.getBooleanValue("moving.allowfakesneak");
+
+			logMessage = config.getStringValue("moving.logmessage");
+			summaryMessage = config.getStringValue("moving.summarymessage");
+
+			actions = new Action[3][];
+			
+			actions[0] = config.getActionValue("moving.action.low");
+			actions[1] = config.getActionValue("moving.action.med");
+			actions[2] = config.getActionValue("moving.action.high");
+			
+			setActive(config.getBooleanValue("active.moving"));
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override

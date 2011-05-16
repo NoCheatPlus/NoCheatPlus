@@ -18,4 +18,16 @@ public class CustomAction extends Action {
 	public String getName() {
 		return "custom";
 	}
+	
+	public String getValue() {
+		if(firstAfter <= 1 && repeat) {
+			return command;
+		}
+		else if(repeat) {
+			return "["+firstAfter+"] "+ command;
+		}
+		else {
+			return "["+firstAfter+","+repeat+"] "+ command;
+		}
+	}
 }

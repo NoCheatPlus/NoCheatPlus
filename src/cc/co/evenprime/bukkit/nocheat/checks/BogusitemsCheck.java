@@ -15,14 +15,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.BogusitemsPlayerListener;
 
 public class BogusitemsCheck extends Check {
 
-	public BogusitemsCheck(NoCheat plugin){
-		super(plugin, "bogusitems", PermissionData.PERMISSION_BOGUSITEMS);
+	public BogusitemsCheck(NoCheat plugin, NoCheatConfiguration config){
+		super(plugin, "bogusitems", PermissionData.PERMISSION_BOGUSITEMS, config);
 	}
 
 	public void check(PlayerPickupItemEvent event) {
@@ -86,8 +88,19 @@ public class BogusitemsCheck extends Check {
 		for(int i = 0; i < stacks.length; i++) {
 			if(stacks[i] != null && stacks[i].getAmount() <= 0) {
 				inv.clear(i);
-				plugin.log(Level.WARNING, "Removed illegal item from inventory of " + player.getName());
+				plugin.log(Level.WARNING, "Removed invalid item from inventory of " + player.getName());
 			}
+		}
+	}
+
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+			setActive(config.getBooleanValue("active.bogusitems"));
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
 		}
 	}
 

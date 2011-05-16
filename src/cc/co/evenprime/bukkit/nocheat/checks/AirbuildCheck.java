@@ -9,11 +9,13 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
@@ -28,15 +30,12 @@ import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
 public class AirbuildCheck extends Check {
 
 	// How should airbuild violations be treated?
-	public final Action actions[][] = { 
-			{ LogAction.loglow,  CancelAction.cancel }, 
-			{ LogAction.logmed,  CancelAction.cancel },
-			{ LogAction.loghigh, CancelAction.cancel } };
+	private Action actions[][];
 
-	public final int limits[] = { 1, 3, 10 };
+	private int limits[];
 
-	public AirbuildCheck(NoCheat plugin) {
-		super(plugin, "airbuild", PermissionData.PERMISSION_AIRBUILD);
+	public AirbuildCheck(NoCheat plugin, NoCheatConfiguration config) {
+		super(plugin, "airbuild", PermissionData.PERMISSION_AIRBUILD, config);
 	}
 
 	public void check(BlockPlaceEvent event) {
@@ -60,52 +59,42 @@ public class AirbuildCheck extends Check {
 					}
 				};
 
-				// Give a summary in 20 ticks ~ 1 second
-				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.summaryTask, 20);
+				// Give a summary in 100 ticks ~ 1 second
+				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.summaryTask, 100);
 			}
 
-			data.perSecond++;
+			data.perFiveSeconds++;
 
 			// which limit has been reached
 			for(int i = limits.length-1; i >= 0; i--) {
-				if(data.perSecond >= limits[i]) {
-					// Only explicitly log certain "milestones"
-					if(data.perSecond == limits[i]) {
-						action(actions[i], event, true);
-					}
-					else {
-						action(actions[i], event, false);
-					}
+				if(data.perFiveSeconds >= limits[i]) {
+					action(actions[i], event, data.perFiveSeconds - limits[i]+1);
 					break;
 				}
 			}
 		}
 	}
 
-	private void action(Action actions[], BlockPlaceEvent event, boolean loggingAllowed) {
+	private void action(Action actions[], BlockPlaceEvent event, int violations) {
 
 		if(actions == null) return;
 
-		boolean cancelled = false;
-
-		// Prepare log message if needed
-		String logMessage = null;
-		if(loggingAllowed) {
-			final Location l = event.getBlockPlaced().getLocation();
-			logMessage = "Airbuild: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ();
-		}
-
 		// Execute actions in order
 		for(Action a : actions) {
-			if(loggingAllowed && a instanceof LogAction) {
-				plugin.log(((LogAction)a).level, logMessage);
-			}
-			else if(!cancelled && a instanceof CancelAction) {
-				event.setCancelled(true);
-				cancelled = true;
-			}
-			else if(a instanceof CustomAction) {
-				plugin.handleCustomAction(a, event.getPlayer());
+			if(a.firstAfter <= violations) {
+				if(a.firstAfter == violations || a.repeat) {
+					if(a instanceof LogAction) {
+						final Location l = event.getBlockPlaced().getLocation();
+						String logMessage = "Airbuild: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ();
+						plugin.log(((LogAction)a).level, logMessage);
+					}
+					else if(a instanceof CancelAction) {
+						event.setCancelled(true);
+					}
+					else if(a instanceof CustomAction) {
+						plugin.handleCustomAction((CustomAction)a, event.getPlayer());
+					}
+				}
 			}
 		}
 	}
@@ -114,13 +103,37 @@ public class AirbuildCheck extends Check {
 
 		// Give a summary according to the highest violation level we encountered in that second
 		for(int i = limits.length-1; i >= 0; i--) {
-			if(data.perSecond >= limits[i]) {
-				plugin.log(LogAction.log[i].level, "Airbuild summary: " +player.getName() + " total violations per second: " + data.perSecond);
+			if(data.perFiveSeconds >= limits[i]) {
+				plugin.log(LogAction.log[i].level, "Airbuild summary: " +player.getName() + " total violations per 5 seconds: " + data.perFiveSeconds);
 				break;
 			}
 		}
 
-		data.perSecond = 0;
+		data.perFiveSeconds = 0;
+	}
+
+	@Override
+	public void configure(NoCheatConfiguration config) {
+
+		try {
+			limits = new int[3];
+
+			limits[0] = config.getIntegerValue("airbuild.limits.low");
+			limits[1] = config.getIntegerValue("airbuild.limits.med");
+			limits[2] = config.getIntegerValue("airbuild.limits.high");
+
+			actions = new Action[3][];
+
+			actions[0] = config.getActionValue("airbuild.action.low");
+			actions[1] = config.getActionValue("airbuild.action.med");
+			actions[2] = config.getActionValue("airbuild.action.high");
+
+			setActive(config.getBooleanValue("active.airbuild"));
+
+		} catch (ConfigurationException e) {
+			setActive(false);
+			e.printStackTrace();
+		}
 	}
 
 	@Override
