@@ -13,9 +13,11 @@ public class ParentOption extends Option {
 	private static final long serialVersionUID = 3162246550749560727L;
 
 	private LinkedList<Option> children = new LinkedList<Option>();
+	private boolean editable;
 
-	public ParentOption(String identifier) {
+	public ParentOption(String identifier, boolean editable) {
 		super(identifier);
+		this.editable = editable;
 	}
 
 	public final Collection<Option> getChildOptions() {
@@ -25,6 +27,16 @@ public class ParentOption extends Option {
 	public final void add(Option option) {
 		
 		children.addLast(option);
+	}
+	
+	public final void remove(Option option) {
+		
+		if(editable)
+		children.remove(option);
+	}
+	
+	public boolean isEditable() {
+		return editable;
 	}
 	
 	@Override

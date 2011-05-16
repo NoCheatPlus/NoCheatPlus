@@ -41,7 +41,7 @@ public class Wizard extends JFrame {
 		
 		inside.add(root2);
 		
-		JButton b = new JButton("TEST");
+		JButton b = new JButton("Save");
 
 		b.addActionListener(new ActionListener() {
 
@@ -49,16 +49,22 @@ public class Wizard extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				String s = config.getRoot().toYAMLString("");
 
-				JOptionPane.showMessageDialog(null, s);
+
 				
-				NoCheatConfiguration.writeConfigFile(new File("config.yml"), config);
+				NoCheatConfiguration.writeConfigFile(new File("NoCheat/nocheat.yml"), config);
+				
+				JOptionPane.showMessageDialog(null, "Saved");
 			} });
 
 		b.setAlignmentY(0.0F);
 		inside.add(b);
 		
-		inside.doLayout();
+		this.doLayout();
 		
 		this.pack();
+		
+		this.setSize(900, 700);
+		
+		this.setTitle("NoCheat configuration utility");
 	}
 }

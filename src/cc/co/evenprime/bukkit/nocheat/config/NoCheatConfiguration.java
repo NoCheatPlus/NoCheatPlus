@@ -64,12 +64,12 @@ public class NoCheatConfiguration {
 		}
 
 
-		root = new ParentOption("");
+		root = new ParentOption("", false);
 
 
 		/*** LOGGING section ***/
 		{
-			ParentOption loggingNode = new ParentOption("logging");
+			ParentOption loggingNode = new ParentOption("logging", false);
 			root.add(loggingNode);
 
 			loggingNode.add(new MediumStringOption("filename", 
@@ -90,7 +90,7 @@ public class NoCheatConfiguration {
 
 		/*** ACTIVE section ***/
 		{
-			ParentOption activeNode = new ParentOption("active");
+			ParentOption activeNode = new ParentOption("active", false);
 			root.add(activeNode);
 
 			activeNode.add(new BooleanOption("speedhack", 
@@ -109,7 +109,7 @@ public class NoCheatConfiguration {
 
 		/*** SPEEDHACK section ***/
 		{
-			ParentOption speedhackNode = new ParentOption("speedhack");
+			ParentOption speedhackNode = new ParentOption("speedhack", false);
 			root.add(speedhackNode);
 
 			speedhackNode.add(new LongStringOption("logmessage", 
@@ -117,7 +117,7 @@ public class NoCheatConfiguration {
 
 			/*** SPEEDHACK LIMITS section ***/
 			{
-				ParentOption speedhackLimitsNode = new ParentOption("limits");
+				ParentOption speedhackLimitsNode = new ParentOption("limits", false);
 				speedhackNode.add(speedhackLimitsNode);
 
 				speedhackLimitsNode.add(new IntegerOption("low", 
@@ -130,7 +130,7 @@ public class NoCheatConfiguration {
 
 			/*** SPEEDHACK ACTIONS section ***/
 			{
-				ParentOption speedhackActionNode = new ParentOption("action");
+				ParentOption speedhackActionNode = new ParentOption("action", false);
 				speedhackNode.add(speedhackActionNode);
 
 				speedhackActionNode.add(new MediumStringOption("low", 
@@ -144,7 +144,7 @@ public class NoCheatConfiguration {
 
 		/*** MOVING section ***/
 		{
-			ParentOption movingNode = new ParentOption("moving");
+			ParentOption movingNode = new ParentOption("moving", false);
 			root.add(movingNode);
 
 			movingNode.add(new LongStringOption("logmessage",
@@ -158,7 +158,7 @@ public class NoCheatConfiguration {
 
 			/*** MOVING ACTION section ***/
 			{
-				ParentOption movingActionNode = new ParentOption("action");
+				ParentOption movingActionNode = new ParentOption("action", false);
 				movingNode.add(movingActionNode);
 
 				movingActionNode.add(new MediumStringOption("low", 
@@ -172,12 +172,12 @@ public class NoCheatConfiguration {
 
 		/*** AIRBUILD section ***/
 		{
-			ParentOption airbuildNode = new ParentOption("airbuild");
+			ParentOption airbuildNode = new ParentOption("airbuild", false);
 			root.add(airbuildNode);
 
 			/*** AIRBUILD LIMITS section ***/
 			{
-				ParentOption airbuildLimitsNode = new ParentOption("limits");
+				ParentOption airbuildLimitsNode = new ParentOption("limits", false);
 				airbuildNode.add(airbuildLimitsNode);
 
 				airbuildLimitsNode.add(new IntegerOption("low", 
@@ -190,7 +190,7 @@ public class NoCheatConfiguration {
 
 			/*** AIRBUILD ACTION section ***/
 			{
-				ParentOption airbuildActionNode = new ParentOption("action");
+				ParentOption airbuildActionNode = new ParentOption("action", false);
 				airbuildNode.add(airbuildActionNode);
 
 				airbuildActionNode.add(new MediumStringOption("low", 
@@ -204,25 +204,25 @@ public class NoCheatConfiguration {
 
 		/*** BEDTELEPORT section ***/
 		{
-			ParentOption bedteleportNode = new ParentOption("bedteleport");
+			ParentOption bedteleportNode = new ParentOption("bedteleport", false);
 			root.add(bedteleportNode);
 		}
 
 		/*** ITEMDUPE section ***/
 		{
-			ParentOption itemdupeNode = new ParentOption("itemdupe");
+			ParentOption itemdupeNode = new ParentOption("itemdupe", false);
 			root.add(itemdupeNode);
 		}
 
 		/*** BOGUSITEMS section ***/
 		{
-			ParentOption bogusitemsNode = new ParentOption("bogusitems");
+			ParentOption bogusitemsNode = new ParentOption("bogusitems", false);
 			root.add(bogusitemsNode);
 		}
 
 		/*** CUSTOMACTIONS section ***/
 		{
-			ParentOption customActionsNode = new ParentOption("customactions");
+			ParentOption customActionsNode = new ParentOption("customactions", true);
 			root.add(customActionsNode);
 
 			Set<String> customs = SimpleYaml.getKeys("customactions", yamlContent);
