@@ -1,7 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat;
 
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,7 +145,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		// parse the nocheat.yml config file
 		setupConfig();
 
-		if(allowFlightSet && movingCheck.isActive()) {
+		if(!allowFlightSet && movingCheck.isActive()) {
 			Logger.getLogger("Minecraft").warning( "[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
 		}
 
@@ -328,9 +331,22 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			this.setEnabled(false);
 		}
 		
-		Configuration serverConfig = new Configuration(new File("server.properties"));
+		try {
+		BufferedReader reader = new BufferedReader(new FileReader(new File("server.properties")));
 		
-		allowFlightSet = serverConfig.getBoolean("allow-flight", false);
+		allowFlightSet = true;
+		String s = null;
+
+			while((s = reader.readLine()) != null) {
+				if(s.startsWith("allow-flight=false")) {
+					allowFlightSet = false;
+				}
+			
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			// ignore errors
+		}
 	}
 
 
@@ -375,7 +391,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	public void handleCustomAction(CustomAction a, Player player) {
 
 		Bukkit.getServer().dispatchCommand(this, a.command.replace("[player]", player.getName()));
-		System.out.println("Would execute "+a.command + " now for Player " + player.getName() );
+		//System.out.println("Would execute "+a.command + " now for Player " + player.getName() );
 
 	}
 
