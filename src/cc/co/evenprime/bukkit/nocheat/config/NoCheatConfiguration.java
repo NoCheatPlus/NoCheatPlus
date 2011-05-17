@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
+import cc.co.evenprime.bukkit.nocheat.LogFileFormatter;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.CancelAction;
 import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
@@ -113,7 +114,8 @@ public class NoCheatConfiguration {
 			root.add(speedhackNode);
 
 			speedhackNode.add(new LongStringOption("logmessage", 
-					SimpleYaml.getString("logging.filename", "%1$s sent %2$d move events, but only %3$d were allowed. Speedhack?", yamlContent)));
+					SimpleYaml.getString("speedhack.logmessage", "[player] sent [events] move events, but only [limit] were allowed. Speedhack?", yamlContent).
+					replace("[player]", "%1$s").replace("[events]", "%2$d").replace("[limit]", "%3$d")));
 
 			/*** SPEEDHACK LIMITS section ***/
 			{
@@ -121,11 +123,11 @@ public class NoCheatConfiguration {
 				speedhackNode.add(speedhackLimitsNode);
 
 				speedhackLimitsNode.add(new IntegerOption("low", 
-						SimpleYaml.getInt("speedhack.limits.low", 30, yamlContent)));
+						SimpleYaml.getInt("speedhack.limits.low", 22, yamlContent)));
 				speedhackLimitsNode.add(new IntegerOption("med",
-						SimpleYaml.getInt("speedhack.limits.med", 45, yamlContent)));
+						SimpleYaml.getInt("speedhack.limits.med", 33, yamlContent)));
 				speedhackLimitsNode.add(new IntegerOption("high",
-						SimpleYaml.getInt("speedhack.limits.high", 60, yamlContent)));
+						SimpleYaml.getInt("speedhack.limits.high", 44, yamlContent)));
 			}
 
 			/*** SPEEDHACK ACTIONS section ***/
@@ -148,9 +150,11 @@ public class NoCheatConfiguration {
 			root.add(movingNode);
 
 			movingNode.add(new LongStringOption("logmessage",
-					SimpleYaml.getString("moving.logmessage", "Moving violation: %1$s from %2$s (%4$.1f, %5$.1f, %6$.1f) to %3$s (%7$.1f, %8$.1f, %9$.1f)", yamlContent)));
+					SimpleYaml.getString("moving.logmessage", "Moving violation: [player] from [world] [from] to [to]", yamlContent).
+					replace("[player]", "%1$s").replace("[world]", "%2$s").replace("[from]", "(%4$.1f, %5$.1f, %6$.1f)").replace("[to]", "(%7$.1f, %8$.1f, %9$.1f)")));
 			movingNode.add(new LongStringOption("summarymessage", 
-					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~%2$d seconds: %1$s total Violations: (%3$d,%4$d,%5$d)", yamlContent)));
+					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~[timeframe] seconds: [player] total Violations: [violations]", yamlContent).
+					replace("[timeframe]", "%2$d").replace("[player]", "%1$s").replace("[violations]", "(%3$d,%4$d,%5$d)")));
 			movingNode.add(new BooleanOption("allowflying", 
 					SimpleYaml.getBoolean("moving.allowflying", false, yamlContent)));
 			movingNode.add(new BooleanOption("allowfakesneak", 
@@ -250,7 +254,7 @@ public class NoCheatConfiguration {
 			try {
 				fh = new FileHandler(getStringValue("logging.filename"), true);
 				fh.setLevel(getLogLevelValue("logging.logtofile"));
-				fh.setFormatter(Logger.getLogger("Minecraft").getHandlers()[0].getFormatter());
+				fh.setFormatter(new LogFileFormatter());
 				logger.addHandler(fh);
 
 			} catch (Exception e) {

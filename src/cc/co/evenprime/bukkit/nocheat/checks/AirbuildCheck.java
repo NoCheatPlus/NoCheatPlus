@@ -48,19 +48,19 @@ public class AirbuildCheck extends Check {
 			final AirbuildData data = AirbuildData.get(event.getPlayer());
 			final Player p = event.getPlayer();
 
-			if(data.summaryTask == null) {
-				data.summaryTask = new Runnable() {
+			if(data.summaryTask == -1) {
+				Runnable r = new Runnable() {
 
 					@Override
 					public void run() {
 						summary(p, data);
 						// deleting its own reference
-						data.summaryTask = null;
+						data.summaryTask = -1;
 					}
 				};
 
 				// Give a summary in 100 ticks ~ 1 second
-				plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.summaryTask, 100);
+				data.summaryTask = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, r, 100);
 			}
 
 			data.perFiveSeconds++;

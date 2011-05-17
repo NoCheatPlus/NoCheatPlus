@@ -49,6 +49,8 @@ public class SpeedhackCheck extends Check {
 		// Should we check at all?
 		if(skipCheck(player)) return;
 
+
+
 		// Ignore events of players in vehicles (these can be the cause of event spam between server and client)
 		// Ignore events if the player has positive y-Velocity (these can be the cause of event spam between server and client)
 		if(player.isInsideVehicle() || player.getVelocity().getY() > 0.0D) {
@@ -77,8 +79,6 @@ public class SpeedhackCheck extends Check {
 				resetData(data, event.getFrom(), ticks);
 			}
 			else {
-				Action action[] = null;
-
 				final int low  = (limits[0]+1) / 2;
 				final int med  = (limits[1]+1) / 2;
 				final int high = (limits[2]+1) / 2;
@@ -97,7 +97,7 @@ public class SpeedhackCheck extends Check {
 
 				if(data.violationsInARowTotal >= violationsLimit) {
 					data.violationsInARow[level]++;
-					action(action, event, data.violationsInARow[level], data);
+					action(actions[level], event, data.violationsInARow[level], data);
 				}
 
 				// Reset value for next check
@@ -129,12 +129,12 @@ public class SpeedhackCheck extends Check {
 
 		for(Action a : actions) {
 			if(a.firstAfter <= violations) {
-				if(a.firstAfter == violations || a.repeat) {
-					if(a instanceof LogAction) {
-						String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);
-						plugin.log(((LogAction)a).level, log);
-					}
-					else if(a instanceof CancelAction) {
+				if(a instanceof LogAction) {
+					String log = String.format(logMessage, event.getPlayer().getName(), data.eventsSinceLastCheck*2, limits[0]);
+					plugin.log(((LogAction)a).level, log);
+				}
+				else if(a.firstAfter == violations || a.repeat) {
+					if(a instanceof CancelAction) {
 						resetPlayer(event, data);
 					}
 					else if(a instanceof CustomAction) {

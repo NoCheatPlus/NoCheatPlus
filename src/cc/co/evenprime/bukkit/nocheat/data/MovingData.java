@@ -15,7 +15,7 @@ public class MovingData {
 	public double vertFreedom = 0.0D;
 	public int vertFreedomCounter = 0;
 	public Location setBackPoint = null;
-	public Runnable summaryTask = null;
+	public int summaryTask = -1;
 	public Level highestLogLevel = null;
 	public double maxYVelocity = 0.0D;
 	public int sneakingFreedomCounter = 10;

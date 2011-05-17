@@ -4,7 +4,6 @@ package cc.co.evenprime.bukkit.nocheat;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +30,6 @@ import com.ensifera.animosity.craftirc.CraftIRC;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nijiko.permissions.PermissionHandler;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.config.Configuration;
 
 /**
  * 
@@ -56,8 +54,8 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 	private boolean exceptionWithPermissions = false;
 
-	private boolean cleanUpTaskSetup = false;
-	private boolean serverLagMeasureTaskSetup = false;
+	private int cleanUpTaskId = -1;
+	private int serverLagMeasureTaskSetup = -1;
 
 	private int serverTicks = 0;
 	private long serverLagInMilliSeconds = 0;
@@ -124,6 +122,13 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		if(config != null)
 			config.cleanup();
 
+		try {
+		teardownCleanupTask();
+		teardownServerLagMeasureTask();
+		
+		NoCheatData.cancelPlayerDataTasks();
+		}
+		catch(Exception e) { /* Can't do much in case of error here... */ }
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
 	}
 
@@ -141,9 +146,6 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 		// just for convenience
 		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, itemdupeCheck, bogusitemsCheck };
-
-		// parse the nocheat.yml config file
-		setupConfig();
 
 		if(!allowFlightSet && movingCheck.isActive()) {
 			Logger.getLogger("Minecraft").warning( "[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
@@ -164,11 +166,9 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 	private void setupCleanupTask() {
 
-		if(cleanUpTaskSetup) return;
+		if(cleanUpTaskId != -1) return;
 
-		cleanUpTaskSetup = true;
-
-		Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+		cleanUpTaskId = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 
 			@Override
 			public void run() {
@@ -176,12 +176,15 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			}
 		}, 5000, 5000);
 	}
+	
+	private void teardownCleanupTask() {
+		if(cleanUpTaskId != -1)
+			Bukkit.getServer().getScheduler().cancelTask(cleanUpTaskId);
+	}
 
 	private void setupServerLagMeasureTask() {
 
-		if(serverLagMeasureTaskSetup) return;
-
-		serverLagMeasureTaskSetup = true;
+		if(serverLagMeasureTaskSetup != -1) return;
 
 		Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 
@@ -193,6 +196,11 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 				lastServerTime = time;
 			}
 		}, 10, 10);
+	}
+	
+	private void teardownServerLagMeasureTask() {
+		if(serverLagMeasureTaskSetup == -1)
+			Bukkit.getServer().getScheduler().cancelTask(serverLagMeasureTaskSetup);
 	}
 
 	/**

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
@@ -65,6 +66,31 @@ public class NoCheatData {
 				Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>)it.next();
 				if(!pairs.getKey().isOnline())
 					it.remove();
+			}
+		}
+	}
+	
+	/**
+	 * Go through the playerData HashMap and remove players that are no longer online
+	 * from the map. This should be called in long, regular intervals (e.g. every 10 minutes)
+	 * to keep the memory footprint of the plugin low
+	 */
+	public static void cancelPlayerDataTasks() {
+		synchronized(playerData) {
+			Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>)it.next();
+				
+				int id;
+				id = pairs.getValue().airbuild != null ? pairs.getValue().airbuild.summaryTask : -1;
+				
+				if(id != -1)
+					Bukkit.getServer().getScheduler().cancelTask(id);
+				
+				id = pairs.getValue().moving != null ? pairs.getValue().moving.summaryTask : -1;
+				
+				if(id != -1)
+					Bukkit.getServer().getScheduler().cancelTask(id);
 			}
 		}
 	}

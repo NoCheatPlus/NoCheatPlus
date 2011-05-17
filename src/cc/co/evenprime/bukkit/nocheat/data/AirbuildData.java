@@ -6,7 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 
 public class AirbuildData {
 	public int perFiveSeconds = 0;
-	public Runnable summaryTask = null;
+	public int summaryTask = -1;
 
 	public static AirbuildData get(Player p) {
 

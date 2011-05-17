@@ -355,8 +355,8 @@ public class MovingCheck extends Check {
 	 */
 	private void setupSummaryTask(final Player p, final MovingData data) {
 		// Setup task to display summary later
-		if(data.summaryTask == null) {
-			data.summaryTask = new Runnable() {
+		if(data.summaryTask == -1) {
+			Runnable r = new Runnable() {
 
 				@Override
 				public void run() {
@@ -365,7 +365,7 @@ public class MovingCheck extends Check {
 						plugin.log(data.highestLogLevel, logString);
 					}
 					// deleting its own reference
-					data.summaryTask = null;
+					data.summaryTask = -1;
 
 					data.violationsInARow[0] = 0;
 					data.violationsInARow[1] = 0;
@@ -374,7 +374,7 @@ public class MovingCheck extends Check {
 			};
 
 			// Give a summary in x ticks. 20 ticks ~ 1 second
-			plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, data.summaryTask, ticksBeforeSummary);
+			data.summaryTask = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, r, ticksBeforeSummary);
 		}
 	}
 
