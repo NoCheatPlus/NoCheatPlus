@@ -129,7 +129,9 @@ public class SimpleYaml {
 
 	public static String getString(String path, String defaultValue, Map<String, Object> node) {
 		try {
-			return (String) getProperty(path, node);
+			String result = (String) getProperty(path, node);
+			if(result == null) return defaultValue;
+			return result;
 		}
 		catch(Exception e) {
 			return defaultValue;

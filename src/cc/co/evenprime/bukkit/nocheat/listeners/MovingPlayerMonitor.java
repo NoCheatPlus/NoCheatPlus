@@ -39,7 +39,7 @@ public class MovingPlayerMonitor extends PlayerListener {
 
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		if(!event.getPlayer().isInsideVehicle()) {
+		if(!event.isCancelled() && !event.getPlayer().isInsideVehicle()) {
 			MovingData data = MovingData.get(event.getPlayer());
 			data.lastLocation = event.getTo();
 

@@ -14,14 +14,18 @@ public class MovingData {
 	public double horizFreedom = 0.0D;
 	public double vertFreedom = 0.0D;
 	public int vertFreedomCounter = 0;
+	
+	// setbackpoint is a recommendation - try to teleport to first solid block below it
+	// for better effect
 	public Location setBackPoint = null;
+	
 	public int summaryTask = -1;
 	public Level highestLogLevel = null;
 	public double maxYVelocity = 0.0D;
 	public int sneakingFreedomCounter = 10;
 	public double sneakingLastDistance = 0.0D;
 
-	public boolean worldChanged = false;
+	public int worldChanged = 0;
 	public boolean respawned = false;
 
 	// WORKAROUND for changed PLAYER_MOVE logic

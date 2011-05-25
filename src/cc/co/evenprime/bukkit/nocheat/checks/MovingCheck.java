@@ -94,28 +94,23 @@ public class MovingCheck extends Check {
 
 		// Get the two locations of the event
 		final Location to = event.getTo();
-		Location from = event.getFrom();
 
-		// The use of event.getFrom() is intentional
+		// the from location of the event may be different from the location the player 
+		// actually was - choose appropriately
+		Location from = data.teleportTo != null ? data.teleportTo : event.getFrom();
+		data.teleportTo = null;
+		
 		if(shouldBeIgnored(player, data, from, to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
 		}
 
-		// WORKAROUND for changed PLAYER_MOVE logic
-		if(data.teleportTo != null) {
-			from = data.teleportTo;
-			data.teleportTo = null;
-		}
-
-
 		// First check the distance the player has moved horizontally
 		final double xDistance = from.getX()-to.getX();
 		final double zDistance = from.getZ()-to.getZ();
 
 		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
-
 
 		// If the target is a bed and distance not too big, allow it
 		// Bukkit prevents using blocks behind walls already, so I don't have to check for that
@@ -125,23 +120,7 @@ public class MovingCheck extends Check {
 			return;
 		}
 
-
-		final boolean onGroundFrom = playerIsOnGround(from, 0.0D);		
-
-		final boolean canFly;
-		if(allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING)) {
-			canFly = true;
-			data.jumpPhase = 0;
-		}
-		else
-			canFly = false;
-
-		final boolean canFakeSneak;
-		if(allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK)) {
-			canFakeSneak = true;
-		}
-		else
-			canFakeSneak = false;
+		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK);
 
 		/**** Horizontal movement check START ****/
 
@@ -183,6 +162,8 @@ public class MovingCheck extends Check {
 
 		// The location we'd use as a new setback if there are no violations
 		Location newSetBack = null;
+		
+		final boolean onGroundFrom = playerIsOnGround(from, 0.0D);
 
 		double limit = calculateVerticalLimit(data, onGroundFrom);
 
@@ -208,6 +189,8 @@ public class MovingCheck extends Check {
 		else
 		{
 			final Location l;
+			
+			final boolean canFly = allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING);
 
 			if(data.setBackPoint == null || canFly)
 				l = from;
@@ -326,17 +309,16 @@ public class MovingCheck extends Check {
 		}
 		// Something or someone moved the player without causing a move event - Can't do much with that
 		else if(!(x == l.getX() && z == l.getZ() && y == l.getY())){
-			resetData(data, to);
 			return true;
 		}
-		// Player was respawned just before, this causes all kinds of weirdness - better ignore it
+		// Player respawned just before, this causes all kinds of weirdness - better ignore it
 		else if(data.respawned) {
 			data.respawned = false;
 			return true;
 		}
-		// Player changed the world before, which makes any location information basically useless
-		else if(data.worldChanged) {
-			data.worldChanged = false;
+		// Player respawned just before, this causes all kinds of weirdness - better ignore it
+		else if(data.worldChanged > 0) {
+			data.worldChanged--;
 			return true;
 		}
 		// Player is inside a vehicle, this causes all kinds of weirdness - better ignore it
@@ -379,8 +361,8 @@ public class MovingCheck extends Check {
 	}
 
 	/**
-	 * Call this when a player got successfully teleported with the corresponding event to set new "setback" points
-	 * and reset data (if necessary)
+	 * Call this when a player got successfully teleported with the corresponding event to adjust stored
+	 * data to the new situation
 	 * 
 	 * @param event
 	 */
@@ -388,27 +370,15 @@ public class MovingCheck extends Check {
 
 		MovingData data = MovingData.get(event.getPlayer());
 
-		if(event.getTo().equals(data.teleportInitializedByMe)) { // My plugin requested this teleport while handling another event
-
-			// DANGEROUS, but I have no real choice on that one thanks to Essentials jail simply blocking ALL kinds of teleports
-			// even the respawn teleport, the player moved wrongly teleport, the "get player out of the void" teleport", ...
-
-			// TODO: Make this optional OR detect Essentials and make this dependent on essential
-			event.setCancelled(false);
-			data.teleportInitializedByMe = null;
-			//data.movingTeleportTo = event.getTo();
-		}
-		else if(!event.isCancelled()) {
-			// If it wasn't our plugin that ordered the teleport, forget (almost) all our information and start from scratch
-			resetData(data, event.getTo());
-
-			if(event.getFrom().getWorld().equals(event.getTo().getWorld())) {
-				// WORKAROUND for changed PLAYER_MOVE logic - I need to remember the "to" location of teleports and use it as a from-Location
-				// for the move event that comes next
-				data.teleportTo = event.getTo();
+		if(!event.isCancelled()) {
+			data.lastLocation = event.getTo();
+			data.teleportTo = event.getTo();
+			data.jumpPhase = 0;
+			data.setBackPoint = event.getTo();
+			
+			if(!event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName())) {
+				data.worldChanged = 2; // ignore two events, because teleporting through nether portals is really weird -.-
 			}
-			else
-				data.worldChanged = true;
 		}
 	}
 
@@ -418,7 +388,6 @@ public class MovingCheck extends Check {
 	 */
 	public void respawned(PlayerRespawnEvent event) {
 		MovingData data = MovingData.get(event.getPlayer());
-
 		data.respawned = true;
 
 	}
@@ -466,7 +435,7 @@ public class MovingCheck extends Check {
 						if(data.highestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.highestLogLevel = ((LogAction)a).level;
 					}
 					else if(!cancelled && a instanceof CancelAction) {
-						resetPlayer(event, from);
+						resetPlayer(event);
 						cancelled = true;
 					}
 					else if(a instanceof CustomAction)
@@ -495,30 +464,26 @@ public class MovingCheck extends Check {
 	}
 
 	/** 
-	 * Return the player to a stored location or if that is not available,
-	 * the previous location.
-	 * @param data
+	 * Return the player to the stored setBackPoint location
 	 * @param event
 	 */
-	private void resetPlayer(PlayerMoveEvent event, Location from) {
+	private void resetPlayer(PlayerMoveEvent event) {
 
 		MovingData data = MovingData.get(event.getPlayer());
 
-		// Reset the jumpphase. We choose the setback-point such that it should be
-		// on solid ground, but in case it isn't (maybe the ground is gone now) we
-		// still have to allow the player some freedom with vertical movement due
-		// to lost vertical momentum to prevent him from getting stuck
-
-		if(data.setBackPoint == null) data.setBackPoint = from;
-
-		// Set a flag that gets used while handling teleport events (to determine if
-		// it was my teleport or someone else'
-		Location t = data.setBackPoint;
-
-		t = new Location(t.getWorld(), t.getX(),  t.getY(), t.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
-		data.teleportInitializedByMe = t;
-
-		resetData(data, t);
+		// Make a modified copy of the setBackPoint to prevent other plugins from accidentally modifying it
+		// and keep the current pitch and yaw (setbacks "feel" better that way).
+		
+		double y = data.setBackPoint.getY();
+		// search for the first solid block up to 5 blocks below the setbackpoint and teleport the player there
+		for(int i = 0; i < 20; i++) {
+			if(playerIsOnGround(data.setBackPoint, -0.5*i)) {
+				y -= 0.5*i;
+				break;
+			}
+		}	
+		
+		Location t = new Location(data.setBackPoint.getWorld(), data.setBackPoint.getX(), y, data.setBackPoint.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
 
 		// Only reset player and cancel event if teleport is successful
 		if(event.getPlayer().teleport(t)) {
@@ -528,7 +493,6 @@ public class MovingCheck extends Check {
 			event.setTo(t);
 
 			event.setCancelled(true);
-
 		}
 	}
 
@@ -634,18 +598,6 @@ public class MovingCheck extends Check {
 			d4 = 0;
 
 		return (int) (floor - d4);
-	}
-
-	/**
-	 * Reset all temporary information of this check
-	 * @param data
-	 * @param l
-	 */
-	private void resetData(MovingData data, Location l) {
-
-		data.setBackPoint = l;
-		data.jumpPhase = 0;
-		data.teleportTo = null;
 	}
 
 	@Override
