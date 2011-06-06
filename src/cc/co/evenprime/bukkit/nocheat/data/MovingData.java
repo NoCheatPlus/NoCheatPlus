@@ -36,13 +36,12 @@ public class MovingData {
 
 	public Location teleportInitializedByMe = null;
 
-	// Block types that may be treated specially
-	public static final int SOLID = 0;
-	public static final int NONSOLID = 1;
-	public static final int LADDER = 2;
-	public static final int LIQUID = 3;
-	public static final int UNKNOWN = 4;
-	public static final int FENCE = 5;
+	// Block types that may need to be treated specially
+	public static final int NONSOLID = 0;     // 0x00000000
+	public static final int SOLID = 1;        // 0x00000001
+	public static final int LIQUID = 2;       // 0x00000010
+	public static final int LADDER = 4;       // 0x00000100
+	public static final int FENCE = 8;        // 0x00001000
 
 	
 	// Until I can think of a better way to determine if a block is solid or not, this is what I'll do
@@ -53,8 +52,8 @@ public class MovingData {
 		// Find and define properties of all blocks
 		for(int i = 0; i < types.length; i++) {
 			
-			// Everything is unknown at first
-			types[i] = UNKNOWN;
+			// Everything is considered nonsolid at first
+			types[i] = NONSOLID;
 			
 			if(Block.byId[i] != null) {
 				if(Block.byId[i].material.isSolid()) {
@@ -69,8 +68,8 @@ public class MovingData {
 		}
 		
 		// Special types just for me
-		types[Material.LADDER.getId()]= LADDER;
-		types[Material.FENCE.getId()]= FENCE;
+		types[Material.LADDER.getId()]= LADDER | SOLID;
+		types[Material.FENCE.getId()]= FENCE | SOLID;
 	}
 	
 	public static MovingData get(final Player p) {
