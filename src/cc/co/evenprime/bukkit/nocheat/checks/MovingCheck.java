@@ -53,6 +53,7 @@ public class MovingCheck extends Check {
 
 	private final static double stepWidth = 0.6D;
 	private final static double sneakStepWidth = 0.25D;
+	private final static double swimStepWidth = 0.4D;
 
 	private int ticksBeforeSummary = 100;
 
@@ -120,36 +121,16 @@ public class MovingCheck extends Check {
 			return;
 		}
 
-		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK);
-
 		/**** Horizontal movement check START ****/
 
-		int violationLevelSneaking = -1;
+		final int onGroundFrom = playerIsOnGround(from, 0.0D);
 
-		if(!canFakeSneak && player.isSneaking()) {
-			violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakStepWidth));
-			if(violationLevelSneaking >= 0) {
-				if(combined >= data.sneakingLastDistance)
-					data.sneakingFreedomCounter -= 2;
-				else
-				{
-					violationLevelSneaking = -1;
-				}
-			}
+		int sn = getSneakingViolationLevel(combined, data, player);
+		int sw = getSwimmingViolationLevel(combined, data, onGroundFrom == MovingData.LIQUID);
+		int s = limitCheck(combined - (data.horizFreedom + stepWidth));
 
-			data.sneakingLastDistance = combined;
-		}
-
-		if(violationLevelSneaking >= 0 && data.sneakingFreedomCounter > 0) {
-			violationLevelSneaking = -1;
-		}
-		else if(violationLevelSneaking < 0 && data.sneakingFreedomCounter < 10){
-			data.sneakingFreedomCounter += 1;
-		}
-
-		int violationLevelHorizontal = limitCheck(combined - (data.horizFreedom + stepWidth));
-
-		violationLevelHorizontal = violationLevelHorizontal > violationLevelSneaking ? violationLevelHorizontal : violationLevelSneaking;
+		// The maximum of the three values
+		int violationLevelHorizontal = sn > sw && sn > s ? sn : (sw > s ? sw : s);
 
 		// Reduce horiz moving freedom with each event
 		data.horizFreedom *= 0.9;
@@ -162,8 +143,6 @@ public class MovingCheck extends Check {
 
 		// The location we'd use as a new setback if there are no violations
 		Location newSetBack = null;
-
-		final int onGroundFrom = playerIsOnGround(from, 0.0D);
 
 		double limit = calculateVerticalLimit(data, onGroundFrom);
 
@@ -252,6 +231,67 @@ public class MovingCheck extends Check {
 
 		statisticElapsedTimeNano += System.nanoTime() - startTime;
 		statisticTotalEvents++;
+	}
+
+
+	private int getSneakingViolationLevel(final double combined, final MovingData data, final Player player) {
+
+		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK);
+		int violationLevelSneaking = -1;
+
+		if(!canFakeSneak) {
+			if(player.isSneaking()) {
+				violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakStepWidth));
+				if(violationLevelSneaking >= 0) {
+					if(combined >= data.sneakingLastDistance * 0.9)
+						data.sneakingFreedomCounter -= 2;
+					else
+					{
+						violationLevelSneaking = -1;
+					}
+				}
+
+				data.sneakingLastDistance = combined;
+			}
+
+			if(violationLevelSneaking >= 0 && data.sneakingFreedomCounter > 0) {
+				violationLevelSneaking = -1;
+			}
+			else if(violationLevelSneaking < 0 && data.sneakingFreedomCounter < 10){
+				data.sneakingFreedomCounter += 1;
+			}
+		}
+
+		return violationLevelSneaking;		
+	}
+
+	private int getSwimmingViolationLevel( final double combined, final MovingData data, final boolean isSwimming) {
+
+		int violationLevelSwimming = -1;
+		final double limit = data.horizFreedom + swimStepWidth;
+		
+		if(isSwimming) {
+			violationLevelSwimming = limitCheck(combined - limit);
+			if(violationLevelSwimming >= 0) {
+				if(combined >= data.swimmingLastDistance * 0.9)
+					data.swimmingFreedomCounter -= 2;
+				else
+				{
+					violationLevelSwimming = -1;
+				}
+			}
+	
+			data.swimmingLastDistance = combined;
+		}
+
+		if(violationLevelSwimming >= 0 && data.swimmingFreedomCounter > 0) {
+			violationLevelSwimming = -1;
+		}
+		else if(violationLevelSwimming < 0 && data.swimmingFreedomCounter < 10){
+			data.swimmingFreedomCounter += 1;
+		}
+
+		return violationLevelSwimming;		
 	}
 
 	private double calculateVerticalLimit(final MovingData data, final int onGroundFrom) {
@@ -524,7 +564,7 @@ public class MovingCheck extends Check {
 		// check in what kind of block the player is standing "in"
 		result = types[w.getBlockTypeIdAt(lowerX, Y, lowerZ)] | types[w.getBlockTypeIdAt(upperX, Y, lowerZ)] |
 		types[w.getBlockTypeIdAt(lowerX, Y, higherZ)] | types[w.getBlockTypeIdAt(upperX, Y, higherZ)];
-		
+
 		if((result & MovingData.SOLID) != 0) {
 			// return standing
 			return MovingData.SOLID;
@@ -541,6 +581,11 @@ public class MovingCheck extends Check {
 		if((result & MovingData.SOLID) != 0) {
 			// return standing
 			return MovingData.SOLID;
+		}
+		// TODO : REMOVE THIS
+		else if((result & MovingData.LIQUID) != 0) {
+			// return swimming
+			return MovingData.LIQUID;
 		}
 
 
