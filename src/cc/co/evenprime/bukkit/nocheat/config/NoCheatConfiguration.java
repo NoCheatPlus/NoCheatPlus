@@ -103,8 +103,6 @@ public class NoCheatConfiguration {
 					SimpleYaml.getBoolean("active.airbuild", false, yamlContent)));
 			activeNode.add(new BooleanOption("bedteleport",
 					SimpleYaml.getBoolean("active.bedteleport", true, yamlContent)));
-			activeNode.add(new BooleanOption("itemdupe", 
-					SimpleYaml.getBoolean("active.itemdupe", true, yamlContent)));
 			activeNode.add(new BooleanOption("bogusitems",
 					SimpleYaml.getBoolean("active.bogusitems", false, yamlContent)));
 		}
@@ -162,6 +160,8 @@ public class NoCheatConfiguration {
 					SimpleYaml.getBoolean("moving.allowfakesneak", true, yamlContent)));
 			movingNode.add(new BooleanOption("allowfastswim", 
 					SimpleYaml.getBoolean("moving.allowfastswim", false, yamlContent)));
+			movingNode.add(new BooleanOption("waterelevators", 
+					SimpleYaml.getBoolean("moving.waterelevators", false, yamlContent)));
 
 			/*** MOVING ACTION section ***/
 			{
@@ -213,12 +213,6 @@ public class NoCheatConfiguration {
 		{
 			ParentOption bedteleportNode = new ParentOption("bedteleport", false);
 			root.add(bedteleportNode);
-		}
-
-		/*** ITEMDUPE section ***/
-		{
-			ParentOption itemdupeNode = new ParentOption("itemdupe", false);
-			root.add(itemdupeNode);
 		}
 
 		/*** BOGUSITEMS section ***/

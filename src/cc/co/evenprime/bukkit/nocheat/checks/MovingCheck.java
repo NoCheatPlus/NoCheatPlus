@@ -61,7 +61,10 @@ public class MovingCheck extends Check {
 
 	public boolean allowFlying;
 	public boolean allowFakeSneak;
-	private boolean allowFastSwim;
+	public boolean allowFastSwim;
+	
+	
+	private boolean waterElevators;
 
 	private String logMessage;
 	private String summaryMessage;
@@ -107,7 +110,7 @@ public class MovingCheck extends Check {
 			statisticTotalEvents++;
 			return;
 		}
-	
+
 		/**** Horizontal movement check START ****/
 
 		// First check the distance the player has moved horizontally
@@ -247,12 +250,12 @@ public class MovingCheck extends Check {
 	private int getSneakingViolationLevel(final double combined, final MovingData data, final Player player) {
 
 		int violationLevelSneaking = -1;
-		
+
 		// Maybe the player is allowed to sneak faster than usual?
 		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK);
 
 		if(!canFakeSneak) {
-			
+
 			// Explaination blob:
 			// When a player starts to sneak, he may have a phase where he is still moving faster than he
 			// should be, e.g. because he is in air, on slippery ground, ...
@@ -287,14 +290,14 @@ public class MovingCheck extends Check {
 	private int getSwimmingViolationLevel( final double combined, final MovingData data, final boolean isSwimming, final Player player) {
 
 		int violationLevelSwimming = -1;
-		
+
 		// Maybe the player is allowed to swim faster than usual?
 		final boolean canFastSwim = allowFastSwim || plugin.hasPermission(player, PermissionData.PERMISSION_FASTSWIM);
-		
+
 		if(!canFastSwim) {
-			
+
 			final double limit = data.horizFreedom + swimWidth;
-			
+
 
 			// Explaination blob:
 			// When a player starts to swim, he may have a phase where he is still moving faster than he
@@ -312,10 +315,10 @@ public class MovingCheck extends Check {
 						violationLevelSwimming = -1;
 					}
 				}
-		
+
 				data.swimmingLastDistance = combined;
 			}
-	
+
 			if(violationLevelSwimming >= 0 && data.swimmingFreedomCounter > 0) {
 				violationLevelSwimming = -1;
 			}
@@ -580,7 +583,7 @@ public class MovingCheck extends Check {
 	 * @param l The precise location that was used for calculation of "values"
 	 * @return
 	 */
-	private static int playerIsOnGround(final Location l, final double ymod) {
+	private int playerIsOnGround(final Location l, final double ymod) {
 
 		final int types[] = MovingData.types;
 
@@ -640,6 +643,19 @@ public class MovingCheck extends Check {
 			return MovingData.SOLID;
 		}
 
+		// Water elevators - optional "feature"
+		if(waterElevators) {
+			result = types[w.getBlockTypeIdAt(lowerX+1, Y+1, lowerZ+1)] |
+			types[w.getBlockTypeIdAt(lowerX+1, Y  , lowerZ+1)] |
+			types[w.getBlockTypeIdAt(lowerX,   Y+1, lowerZ+1)] |
+			types[w.getBlockTypeIdAt(lowerX  , Y  , lowerZ+1)] |
+			types[w.getBlockTypeIdAt(lowerX+1, Y+1, lowerZ  )] |
+			types[w.getBlockTypeIdAt(lowerX+1, Y  , lowerZ  )] ;
+
+			if((result & MovingData.LIQUID) != 0) {
+				return MovingData.SOLID; // Solid? Why that? Because that's closer to what the bug actually does than liquid
+			}
+		}
 		// If nothing matches, he is somewhere in the air
 		return MovingData.NONSOLID;
 	}
@@ -688,6 +704,8 @@ public class MovingCheck extends Check {
 			allowFlying = config.getBooleanValue("moving.allowflying");
 			allowFakeSneak = config.getBooleanValue("moving.allowfakesneak");
 			allowFastSwim = config.getBooleanValue("moving.allowfastswim");
+			
+			waterElevators = config.getBooleanValue("moving.waterelevators");
 
 			logMessage = config.getStringValue("moving.logmessage");
 			summaryMessage = config.getStringValue("moving.summarymessage");

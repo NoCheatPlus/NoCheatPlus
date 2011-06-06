@@ -20,7 +20,6 @@ import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BedteleportCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BogusitemsCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
-import cc.co.evenprime.bukkit.nocheat.checks.ItemdupeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
@@ -45,7 +44,6 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	private BedteleportCheck bedteleportCheck;
 	private SpeedhackCheck speedhackCheck;
 	private AirbuildCheck airbuildCheck;
-	private ItemdupeCheck itemdupeCheck;
 	private BogusitemsCheck bogusitemsCheck;
 
 	private Check[] checks;
@@ -141,11 +139,10 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		bedteleportCheck = new BedteleportCheck(this, config);
 		speedhackCheck = new SpeedhackCheck(this, config);
 		airbuildCheck = new AirbuildCheck(this, config);
-		itemdupeCheck = new ItemdupeCheck(this, config);
 		bogusitemsCheck = new BogusitemsCheck(this, config);
 
 		// just for convenience
-		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, itemdupeCheck, bogusitemsCheck };
+		checks = new Check[] { movingCheck, bedteleportCheck, speedhackCheck, airbuildCheck, bogusitemsCheck };
 
 		if(!allowFlightSet && movingCheck.isActive()) {
 			Logger.getLogger("Minecraft").warning( "[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
@@ -332,8 +329,6 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			this.consoleLevel = config.getLogLevelValue("logging.logtoconsole");
 			this.ircTag = config.getStringValue("logging.logtoirctag");
 		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			this.setEnabled(false);
 		}
 
@@ -366,6 +361,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 		s = s + (movingCheck.isActive() && !movingCheck.allowFlying ? "flying " : "");
 		s = s + (movingCheck.isActive() && !movingCheck.allowFakeSneak ? "fakesneak " : "");
+		s = s + (movingCheck.isActive() && !movingCheck.allowFastSwim ? "fastswim " : "");
 
 		return s;
 	}
@@ -381,6 +377,8 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 		s = s + (!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING) ? "flying " : ""));
 		s = s + (!movingCheck.isActive() || movingCheck.allowFakeSneak ? "fakesneak* " : (hasPermission(p, PermissionData.PERMISSION_FAKESNEAK) ? "fakesneak " : ""));
+		s = s + (!movingCheck.isActive() || movingCheck.allowFastSwim ? "fastswim* " : (hasPermission(p, PermissionData.PERMISSION_FASTSWIM) ? "fastswim " : ""));
+		
 		s = s + (hasPermission(p, PermissionData.PERMISSION_NOTIFY) ? "notify " : "");
 
 		return s;
