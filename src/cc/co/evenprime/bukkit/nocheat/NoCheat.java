@@ -123,10 +123,10 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			config.cleanup();
 
 		try {
-		teardownCleanupTask();
-		teardownServerLagMeasureTask();
-		
-		NoCheatData.cancelPlayerDataTasks();
+			teardownCleanupTask();
+			teardownServerLagMeasureTask();
+
+			NoCheatData.cancelPlayerDataTasks();
 		}
 		catch(Exception e) { /* Can't do much in case of error here... */ }
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
@@ -168,15 +168,20 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 		if(cleanUpTaskId != -1) return;
 
-		cleanUpTaskId = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
-
-			@Override
-			public void run() {
-				NoCheatData.cleanPlayerDataCollection();
-			}
-		}, 5000, 5000);
-	}
+		try {
+			cleanUpTaskId = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 	
+				@Override
+				public void run() {
+					NoCheatData.cleanPlayerDataCollection();
+				}
+			}, 5000, 5000);
+		}
+		catch(Exception e) {
+			// It's not THAT important, so if it fails for whatever reason, just let it be. 
+		}
+	}
+
 	private void teardownCleanupTask() {
 		if(cleanUpTaskId != -1)
 			Bukkit.getServer().getScheduler().cancelTask(cleanUpTaskId);
@@ -197,7 +202,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			}
 		}, 10, 10);
 	}
-	
+
 	private void teardownServerLagMeasureTask() {
 		if(serverLagMeasureTaskSetup == -1)
 			Bukkit.getServer().getScheduler().cancelTask(serverLagMeasureTaskSetup);
@@ -207,24 +212,17 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	 * Get, if available, a reference to the Permissions-plugin
 	 */
 	private void setupPermissions() {
-		PermissionHandler p = null;
 
-		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
+		Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
 
-		if(test != null && test instanceof Permissions) {
-			p = ((Permissions)test).getHandler();
-			if(p == null) {
-				this.getServer().getPluginManager().enablePlugin(test);
+		if (this.permissions == null) {
+			if (permissionsPlugin != null) {
+				this.permissions = ((Permissions) permissionsPlugin).getHandler();
+			} else {
+				PluginDescriptionFile pdfFile = this.getDescription();
+				Logger.getLogger("Minecraft").warning("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
 			}
-			p = ((Permissions)test).getHandler();
 		}
-
-		if(p == null) {
-			PluginDescriptionFile pdfFile = this.getDescription();
-			Logger.getLogger("Minecraft").warning("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
-		}
-
-		permissions = p;
 	}
 
 	/**
@@ -338,18 +336,18 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			e.printStackTrace();
 			this.setEnabled(false);
 		}
-		
+
 		try {
-		BufferedReader reader = new BufferedReader(new FileReader(new File("server.properties")));
-		
-		allowFlightSet = true;
-		String s = null;
+			BufferedReader reader = new BufferedReader(new FileReader(new File("server.properties")));
+
+			allowFlightSet = true;
+			String s = null;
 
 			while((s = reader.readLine()) != null) {
 				if(s.startsWith("allow-flight=false")) {
 					allowFlightSet = false;
 				}
-			
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

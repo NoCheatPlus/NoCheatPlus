@@ -5,6 +5,8 @@ author: Evenprime
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
 version: 1.02
 
+softdepend: [ Permissions, CraftIRC ]
+
 commands:
   nocheat:
     description: Provides information about the current status of the NoCheat plugin
