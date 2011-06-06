@@ -52,8 +52,8 @@ public class MovingCheck extends Check {
 	private final static double stepHeight = 0.501D;
 
 	private final static double stepWidth = 0.6D;
-	private final static double sneakStepWidth = 0.25D;
-	private final static double swimStepWidth = 0.4D;
+	private final static double sneakWidth = 0.25D;
+	private final static double swimWidth = 0.4D;
 
 	private int ticksBeforeSummary = 100;
 
@@ -61,6 +61,7 @@ public class MovingCheck extends Check {
 
 	public boolean allowFlying;
 	public boolean allowFakeSneak;
+	private boolean allowFastSwim;
 
 	private String logMessage;
 	private String summaryMessage;
@@ -106,6 +107,8 @@ public class MovingCheck extends Check {
 			statisticTotalEvents++;
 			return;
 		}
+	
+		/**** Horizontal movement check START ****/
 
 		// First check the distance the player has moved horizontally
 		final double xDistance = from.getX()-to.getX();
@@ -113,7 +116,7 @@ public class MovingCheck extends Check {
 
 		double combined = Math.sqrt((xDistance*xDistance + zDistance*zDistance));
 
-		// If the target is a bed and distance not too big, allow it
+		// If the target is a bed and distance not too big, allow it always
 		// Bukkit prevents using blocks behind walls already, so I don't have to check for that
 		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId() && combined < 8.0D) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
@@ -121,15 +124,14 @@ public class MovingCheck extends Check {
 			return;
 		}
 
-		/**** Horizontal movement check START ****/
-
 		final int onGroundFrom = playerIsOnGround(from, 0.0D);
 
+		// Do various checks on the players horizontal movement
 		int sn = getSneakingViolationLevel(combined, data, player);
-		int sw = getSwimmingViolationLevel(combined, data, onGroundFrom == MovingData.LIQUID);
+		int sw = getSwimmingViolationLevel(combined, data, onGroundFrom == MovingData.LIQUID, player);
 		int s = limitCheck(combined - (data.horizFreedom + stepWidth));
 
-		// The maximum of the three values
+		// The maximum of the three values is the biggest violation measured
 		int violationLevelHorizontal = sn > sw && sn > s ? sn : (sw > s ? sw : s);
 
 		// Reduce horiz moving freedom with each event
@@ -234,14 +236,31 @@ public class MovingCheck extends Check {
 	}
 
 
+	/**
+	 * Run a check if a sneaking player is moving too fast
+	 *  
+	 * @param combined Distance moved
+	 * @param data the players data
+	 * @param player the player
+	 * @return violation level
+	 */
 	private int getSneakingViolationLevel(final double combined, final MovingData data, final Player player) {
 
-		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK);
 		int violationLevelSneaking = -1;
+		
+		// Maybe the player is allowed to sneak faster than usual?
+		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK);
 
 		if(!canFakeSneak) {
+			
+			// Explaination blob:
+			// When a player starts to sneak, he may have a phase where he is still moving faster than he
+			// should be, e.g. because he is in air, on slippery ground, ...
+			// Therefore he gets a counter that gets reduced everytime he is too fast and slowly incremented
+			// every time he is slow enough
+			// If the counter reaches zero, his movement is considered a violation.
 			if(player.isSneaking()) {
-				violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakStepWidth));
+				violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakWidth));
 				if(violationLevelSneaking >= 0) {
 					if(combined >= data.sneakingLastDistance * 0.9)
 						data.sneakingFreedomCounter -= 2;
@@ -265,30 +284,45 @@ public class MovingCheck extends Check {
 		return violationLevelSneaking;		
 	}
 
-	private int getSwimmingViolationLevel( final double combined, final MovingData data, final boolean isSwimming) {
+	private int getSwimmingViolationLevel( final double combined, final MovingData data, final boolean isSwimming, final Player player) {
 
 		int violationLevelSwimming = -1;
-		final double limit = data.horizFreedom + swimStepWidth;
 		
-		if(isSwimming) {
-			violationLevelSwimming = limitCheck(combined - limit);
-			if(violationLevelSwimming >= 0) {
-				if(combined >= data.swimmingLastDistance * 0.9)
-					data.swimmingFreedomCounter -= 2;
-				else
-				{
-					violationLevelSwimming = -1;
+		// Maybe the player is allowed to swim faster than usual?
+		final boolean canFastSwim = allowFastSwim || plugin.hasPermission(player, PermissionData.PERMISSION_FASTSWIM);
+		
+		if(!canFastSwim) {
+			
+			final double limit = data.horizFreedom + swimWidth;
+			
+
+			// Explaination blob:
+			// When a player starts to swim, he may have a phase where he is still moving faster than he
+			// should be, e.g. because he jumped into the water ...
+			// Therefore he gets a counter that gets reduced everytime he is too fast and slowly incremented
+			// every time he is slow enough
+			// If the counter reaches zero, his movement is considered a violation.
+			if(isSwimming) {
+				violationLevelSwimming = limitCheck(combined - limit);
+				if(violationLevelSwimming >= 0) {
+					if(combined >= data.swimmingLastDistance * 0.9)
+						data.swimmingFreedomCounter -= 2;
+					else
+					{
+						violationLevelSwimming = -1;
+					}
 				}
+		
+				data.swimmingLastDistance = combined;
 			}
 	
-			data.swimmingLastDistance = combined;
-		}
+			if(violationLevelSwimming >= 0 && data.swimmingFreedomCounter > 0) {
+				violationLevelSwimming = -1;
+			}
+			else if(violationLevelSwimming < 0 && data.swimmingFreedomCounter < 10){
+				data.swimmingFreedomCounter += 1;
+			}
 
-		if(violationLevelSwimming >= 0 && data.swimmingFreedomCounter > 0) {
-			violationLevelSwimming = -1;
-		}
-		else if(violationLevelSwimming < 0 && data.swimmingFreedomCounter < 10){
-			data.swimmingFreedomCounter += 1;
 		}
 
 		return violationLevelSwimming;		
@@ -582,11 +616,6 @@ public class MovingCheck extends Check {
 			// return standing
 			return MovingData.SOLID;
 		}
-		// TODO : REMOVE THIS
-		else if((result & MovingData.LIQUID) != 0) {
-			// return swimming
-			return MovingData.LIQUID;
-		}
 
 
 		// check if his head is "stuck" in an block
@@ -658,6 +687,7 @@ public class MovingCheck extends Check {
 		try {
 			allowFlying = config.getBooleanValue("moving.allowflying");
 			allowFakeSneak = config.getBooleanValue("moving.allowfakesneak");
+			allowFastSwim = config.getBooleanValue("moving.allowfastswim");
 
 			logMessage = config.getStringValue("moving.logmessage");
 			summaryMessage = config.getStringValue("moving.summarymessage");

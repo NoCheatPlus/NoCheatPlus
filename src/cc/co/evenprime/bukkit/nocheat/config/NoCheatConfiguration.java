@@ -61,6 +61,7 @@ public class NoCheatConfiguration {
 		try {
 			yamlContent = (Map<String, Object>) SimpleYaml.read(configurationFile);
 		} catch (Exception e) {
+			e.printStackTrace();
 			yamlContent = new HashMap<String, Object>();
 		}
 
@@ -159,6 +160,8 @@ public class NoCheatConfiguration {
 					SimpleYaml.getBoolean("moving.allowflying", false, yamlContent)));
 			movingNode.add(new BooleanOption("allowfakesneak", 
 					SimpleYaml.getBoolean("moving.allowfakesneak", true, yamlContent)));
+			movingNode.add(new BooleanOption("allowfastswim", 
+					SimpleYaml.getBoolean("moving.allowfastswim", false, yamlContent)));
 
 			/*** MOVING ACTION section ***/
 			{

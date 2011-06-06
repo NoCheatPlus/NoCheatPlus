@@ -111,18 +111,20 @@ public class SimpleYaml {
 
 	public static int getInt(String path, int defaultValue, Map<String, Object> node) {
 		try {
-			return (Integer) getProperty(path, node);
+			return Integer.parseInt((String)getProperty(path, node));
 		}
 		catch(Exception e) {
+			//e.printStackTrace();
 			return defaultValue;
 		}
 	}
 
 	public static boolean getBoolean(String path, boolean defaultValue, Map<String, Object> node) {
 		try {
-			return (Boolean) getProperty(path, node);
+			return Boolean.parseBoolean((String)getProperty(path, node));
 		}
 		catch(Exception e) {
+			//e.printStackTrace();
 			return defaultValue;
 		}
 	}
