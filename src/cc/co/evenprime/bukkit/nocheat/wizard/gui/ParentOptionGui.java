@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat.wizard.gui;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
@@ -12,6 +13,7 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -119,8 +121,8 @@ public class ParentOptionGui extends JPanel {
 			c.gridx = 0;
 			c.gridy = line;
 
-			c.gridwidth = 3; // Spans over three columns
-			if(this.option.isEditable()) c.gridwidth = 4; // Spans over four columns
+			c.gridwidth = 4; // Spans over three columns
+			if(this.option.isEditable()) c.gridwidth = 5; // Spans over four columns
 			c.anchor = GridBagConstraints.WEST;
 			c.ipadx = 5;
 			c.ipady = 15;
@@ -142,7 +144,7 @@ public class ParentOptionGui extends JPanel {
 
 			this.add(new JLabel(child.getIdentifier()  + ":"), c);
 
-			c.gridx = 1;
+			c.gridx++;
 			c.gridy = line;
 			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.WEST;
@@ -153,8 +155,32 @@ public class ParentOptionGui extends JPanel {
 			JComponent tmp = ChildOptionGuiFactory.create((ChildOption)child);
 
 			this.add(tmp, c);
+			/*
+			c.gridx++;
+			c.gridy = line;
+			c.gridwidth = 1;
+			c.anchor = GridBagConstraints.CENTER;
+			c.ipadx = 0;
+			c.insets = new Insets(0, 5, 0, 5);
+			c.weightx = 0;
+			
+			JButton help = new JButton("?");
+			
+			help.addActionListener(new ActionListener() {
 
-			c.gridx = 2;
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					
+					JOptionPane.showMessageDialog(null, "get help", "help is here", JOptionPane.INFORMATION_MESSAGE);
+					
+				}
+				
+			});
+			
+			help.setMargin(new Insets(0, 0, 0, 0));
+			this.add(help, c);*/
+
+			c.gridx++;
 			c.gridy = line;
 			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.WEST;
@@ -165,7 +191,7 @@ public class ParentOptionGui extends JPanel {
 			this.add(Box.createHorizontalGlue(), c);
 
 			if(this.option.isEditable()) {
-				c.gridx = 3;
+				c.gridx++;
 				c.gridy = line;
 				c.gridwidth = 1;
 				c.anchor = GridBagConstraints.WEST;
@@ -185,7 +211,6 @@ public class ParentOptionGui extends JPanel {
 
 				this.add(removeButton, c);
 			}
-
 		}
 
 	}

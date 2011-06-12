@@ -49,11 +49,14 @@ public class SpeedhackCheck extends Check {
 		// Should we check at all?
 		if(skipCheck(player)) return;
 
-
-
 		// Ignore events of players in vehicles (these can be the cause of event spam between server and client)
 		// Ignore events if the player has positive y-Velocity (these can be the cause of event spam between server and client)
 		if(player.isInsideVehicle() || player.getVelocity().getY() > 0.0D) {
+			return;
+		}
+		
+		// During world transfers many events of same location get sent, ignore them all
+		if(event.getFrom().getX() == event.getTo().getX() && event.getFrom().getZ() == event.getTo().getZ() && event.getFrom().getY() == event.getTo().getY()) {
 			return;
 		}
 

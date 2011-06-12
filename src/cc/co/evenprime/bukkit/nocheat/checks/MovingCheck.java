@@ -92,6 +92,7 @@ public class MovingCheck extends Check {
 		// Should we check at all
 		if(skipCheck(player)) {	return;	}
 
+
 		final long startTime = System.nanoTime();
 
 		// Get the player-specific data
@@ -110,7 +111,7 @@ public class MovingCheck extends Check {
 			statisticTotalEvents++;
 			return;
 		}
-
+		
 		/**** Horizontal movement check START ****/
 
 		// First check the distance the player has moved horizontally
@@ -382,6 +383,10 @@ public class MovingCheck extends Check {
 		final double z = from.getZ();
 		final Location l = data.lastLocation;
 
+		// Player is currently changing worlds
+		if(data.worldChanged) {
+			return true;
+		}
 		if(x == to.getX() && z == to.getZ() && y == to.getY() ) {
 			return true;
 		}
@@ -394,13 +399,8 @@ public class MovingCheck extends Check {
 			data.respawned = false;
 			return true;
 		}
-		// Player respawned just before, this causes all kinds of weirdness - better ignore it
-		else if(data.worldChanged > 0) {
-			data.worldChanged--;
-			return true;
-		}
 		// Player is inside a vehicle, this causes all kinds of weirdness - better ignore it
-		else if(player.isInsideVehicle()) {
+		else if(data.insideVehicle || player.isInsideVehicle()) {
 			return true;
 		}
 		return false;
@@ -453,10 +453,8 @@ public class MovingCheck extends Check {
 			data.teleportTo = event.getTo();
 			data.jumpPhase = 0;
 			data.setBackPoint = event.getTo();
-
-			if(!event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName())) {
-				data.worldChanged = 2; // ignore two events, because teleporting through nether portals is really weird -.-
-			}
+					
+			data.worldChanged = !event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName());
 		}
 	}
 

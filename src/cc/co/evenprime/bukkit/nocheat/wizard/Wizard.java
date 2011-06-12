@@ -47,9 +47,6 @@ public class Wizard extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String s = config.getRoot().toYAMLString("");
-
-
 				
 				NoCheatConfiguration.writeConfigFile(new File("NoCheat/nocheat.yml"), config);
 				
