@@ -39,7 +39,6 @@ public class MovingCheck extends Check {
 
 	public MovingCheck(NoCheat plugin, NoCheatConfiguration config) {
 		super(plugin, "moving", PermissionData.PERMISSION_MOVING, config);
-
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
@@ -92,7 +91,7 @@ public class MovingCheck extends Check {
 		// Should we check at all
 		if(skipCheck(player)) {	return;	}
 
-
+	
 		final long startTime = System.nanoTime();
 
 		// Get the player-specific data
@@ -106,6 +105,9 @@ public class MovingCheck extends Check {
 		Location from = data.teleportTo != null ? data.teleportTo : event.getFrom();
 		data.teleportTo = null;
 
+
+		updateVelocity(player.getVelocity(), data);
+		
 		if(shouldBeIgnored(player, data, from, to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
@@ -130,6 +132,7 @@ public class MovingCheck extends Check {
 
 		final int onGroundFrom = playerIsOnGround(from, 0.0D);
 
+		
 		// Do various checks on the players horizontal movement
 		int sn = getSneakingViolationLevel(combined, data, player);
 		int sw = getSwimmingViolationLevel(combined, data, onGroundFrom == MovingData.LIQUID, player);
@@ -377,16 +380,24 @@ public class MovingCheck extends Check {
 	 */
 	private boolean shouldBeIgnored(final Player player, final MovingData data, final Location from, final Location to) {
 
-		// Identical locations - just ignore the event
-		final double x = from.getX();
-		final double y = from.getY();
-		final double z = from.getZ();
+		// First the simple yes/no checks
+		if(data.respawned || data.insideVehicle || player.isInsideVehicle() || data.worldChanged) {
+			return true;
+		}
+		
+		// More sophisticated checks
 		final Location l = data.lastLocation;
 
 		// Player is currently changing worlds
-		if(data.worldChanged) {
+		if(l.getWorld() != from.getWorld()) {
 			return true;
 		}
+		
+		final double x = from.getX();
+		final double y = from.getY();
+		final double z = from.getZ();
+		
+		// Player didn't move at all
 		if(x == to.getX() && z == to.getZ() && y == to.getY() ) {
 			return true;
 		}
@@ -394,15 +405,7 @@ public class MovingCheck extends Check {
 		else if(!(x == l.getX() && z == l.getZ() && y == l.getY())){
 			return true;
 		}
-		// Player respawned just before, this causes all kinds of weirdness - better ignore it
-		else if(data.respawned) {
-			data.respawned = false;
-			return true;
-		}
-		// Player is inside a vehicle, this causes all kinds of weirdness - better ignore it
-		else if(data.insideVehicle || player.isInsideVehicle()) {
-			return true;
-		}
+		
 		return false;
 	}
 
@@ -445,9 +448,11 @@ public class MovingCheck extends Check {
 	 * @param event
 	 */
 	public void teleported(PlayerTeleportEvent event) {
-
+		
 		MovingData data = MovingData.get(event.getPlayer());
 
+		if(data.respawned) data.respawned = false;
+		
 		if(!event.isCancelled()) {
 			data.lastLocation = event.getTo();
 			data.teleportTo = event.getTo();
