@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import java.util.Locale;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -507,7 +508,7 @@ public class MovingCheck extends Check {
 				if(a.firstAfter == violations || a.repeat) {
 					if(a instanceof LogAction)  {
 						// prepare log message if necessary
-						String log = String.format(logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
+						String log = String.format(Locale.US, logMessage, player.getName(), from.getWorld().getName(), to.getWorld().getName(), from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ(), Math.abs(from.getX()-to.getX()),to.getY()-from.getY(), Math.abs(from.getZ()-to.getZ()));
 
 						plugin.log(((LogAction)a).level, log);
 

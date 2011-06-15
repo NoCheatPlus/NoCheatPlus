@@ -84,8 +84,9 @@ public class NoCheatData {
 				int id;
 				id = pairs.getValue().airbuild != null ? pairs.getValue().airbuild.summaryTask : -1;
 				
-				if(id != -1)
+				if(id != -1) {
 					Bukkit.getServer().getScheduler().cancelTask(id);
+				}
 				
 				id = pairs.getValue().moving != null ? pairs.getValue().moving.summaryTask : -1;
 				

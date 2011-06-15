@@ -149,11 +149,16 @@ public class NoCheatConfiguration {
 			root.add(movingNode);
 
 			movingNode.add(new LongStringOption("logmessage",
-					SimpleYaml.getString("moving.logmessage", "Moving violation: [player] from [world] [from] to [to]", yamlContent).
-					replace("[player]", "%1$s").replace("[world]", "%2$s").replace("[from]", "(%4$.1f, %5$.1f, %6$.1f)").replace("[to]", "(%7$.1f, %8$.1f, %9$.1f)")));
+					SimpleYaml.getString("moving.logmessage", "Moving violation: [player] from [world] [from] to [to] distance [distance]", yamlContent).
+					replace("[player]", "%1$s").replace("[world]", "%2$s").
+					replace("[from]", "(%4$.1f, %5$.1f, %6$.1f)").
+					replace("[to]", "(%7$.1f, %8$.1f, %9$.1f)").
+					replace("[distance]", "(%10$.1f, %11$.1f, %12$.1f)")));
+			
 			movingNode.add(new LongStringOption("summarymessage", 
 					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~[timeframe] seconds: [player] total Violations: [violations]", yamlContent).
-					replace("[timeframe]", "%2$d").replace("[player]", "%1$s").replace("[violations]", "(%3$d,%4$d,%5$d)")));
+					replace("[timeframe]", "%2$d").replace("[player]", "%1$s").
+					replace("[violations]", "(%3$d,%4$d,%5$d)")));
 			movingNode.add(new BooleanOption("allowflying", 
 					SimpleYaml.getBoolean("moving.allowflying", false, yamlContent)));
 			movingNode.add(new BooleanOption("allowfakesneak", 

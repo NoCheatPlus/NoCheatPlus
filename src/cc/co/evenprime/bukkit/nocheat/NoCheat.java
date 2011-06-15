@@ -50,7 +50,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 	private NoCheatConfiguration config;
 
-	private boolean exceptionWithPermissions = false;
+	private long exceptionWithPermissions = 0;
 
 	private int cleanUpTaskId = -1;
 	private int serverLagMeasureTaskSetup = -1;
@@ -188,7 +188,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 		if(serverLagMeasureTaskSetup != -1) return;
 
-		Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+		serverLagMeasureTaskSetup = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
 
 			@Override
 			public void run() {
@@ -201,7 +201,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	}
 
 	private void teardownServerLagMeasureTask() {
-		if(serverLagMeasureTaskSetup == -1)
+		if(serverLagMeasureTaskSetup != -1)
 			Bukkit.getServer().getScheduler().cancelTask(serverLagMeasureTaskSetup);
 	}
 
@@ -298,11 +298,11 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			}
 		}
 		catch(Throwable e) {
-			if(!this.exceptionWithPermissions) {
+			if(this.exceptionWithPermissions + 60000 < System.currentTimeMillis()) {
 				// Prevent spam and recursion by definitely doing this only once
-				this.exceptionWithPermissions = true;
+				this.exceptionWithPermissions = System.currentTimeMillis();
 
-				String logtext = "Asking Permissions-Plugin if "+player.getName()+" has permission "+PermissionData.permissionNames[permission]+" caused an Exception "+ e.getMessage() + ". Please review your permissions config file. This message is only displayed once, the player is considered to not have that permission from now on. The full stack trace is written into the nocheat logfile.";
+				String logtext = "Asking Permissions-Plugin if "+player.getName()+" has permission "+PermissionData.permissionNames[permission]+" caused an Exception "+ e.getMessage() + ". Please review your permissions config file. This message is displayed at most once every 60 seconds.";
 				log(Level.SEVERE, logtext);
 				for(StackTraceElement s : e.getStackTrace()) {
 					config.logger.log(Level.SEVERE, s.toString());
