@@ -67,7 +67,7 @@ public class ParentOptionGui extends JPanel {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					option.add(new CustomActionOption(nameField.getText(), "yourcommand [player]"));
+					option.add(new CustomActionOption(nameField.getText(), option.getFullIdentifier(), "yourcommand [player]"));
 					recreateContent();
 				}
 			});
@@ -155,13 +155,13 @@ public class ParentOptionGui extends JPanel {
 			JComponent tmp = ChildOptionGuiFactory.create((ChildOption)child);
 
 			this.add(tmp, c);
-			/*
+			
 			c.gridx++;
 			c.gridy = line;
 			c.gridwidth = 1;
 			c.anchor = GridBagConstraints.CENTER;
 			c.ipadx = 0;
-			c.insets = new Insets(0, 5, 0, 5);
+			c.insets = new Insets(0, 15, 0, 5);
 			c.weightx = 0;
 			
 			JButton help = new JButton("?");
@@ -171,14 +171,14 @@ public class ParentOptionGui extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					
-					JOptionPane.showMessageDialog(null, "get help", "help is here", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, Explainations.get(((ChildOption)child).getFullIdentifier()), "Description", JOptionPane.INFORMATION_MESSAGE);
 					
 				}
 				
 			});
 			
 			help.setMargin(new Insets(0, 0, 0, 0));
-			this.add(help, c);*/
+			this.add(help, c);
 
 			c.gridx++;
 			c.gridy = line;
@@ -187,9 +187,8 @@ public class ParentOptionGui extends JPanel {
 			c.ipadx = 5;
 			c.weightx = 1;
 
-
 			this.add(Box.createHorizontalGlue(), c);
-
+			
 			if(this.option.isEditable()) {
 				c.gridx++;
 				c.gridy = line;

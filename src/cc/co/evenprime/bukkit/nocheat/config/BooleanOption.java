@@ -10,9 +10,9 @@ public class BooleanOption extends ChildOption {
 	
 	private boolean value;
 		
-	public BooleanOption(String name, boolean initialValue) {
+	public BooleanOption(String name, String parentName, boolean initialValue) {
 		
-		super(name);
+		super(name, parentName);
 		this.value = initialValue;
 	}
 	

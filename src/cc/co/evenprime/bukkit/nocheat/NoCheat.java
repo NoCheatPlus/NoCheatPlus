@@ -59,10 +59,10 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	private long serverLagInMilliSeconds = 0;
 	private long lastServerTime = 0;
 
-	// Permissions 2.x, if available
+	// Permissions, if available
 	private PermissionHandler permissions;
 
-	// CraftIRC 2.x, if available
+	// CraftIRC, if available
 	private CraftIRC irc;
 	private boolean allowFlightSet;
 
@@ -260,7 +260,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	private void logToChat(Level l, String message) {
 		if(chatLevel.intValue() <= l.intValue()) {
 			for(Player player : getServer().getOnlinePlayers()) {
-				if(hasPermission(player, PermissionData.PERMISSION_NOTIFY)) {
+				if(hasPermission(player, PermissionData.PERMISSION_NOTIFY, false)) {
 					player.sendMessage("["+l.getName()+"] " + message);
 				}
 			}
@@ -280,13 +280,19 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	}
 
 
-	public boolean hasPermission(Player player, int permission) {
+	public boolean hasPermission(Player player, int permission, boolean checkOPs) {
 
 		if(player == null) return false;
 
 		try {
-			if(permissions == null)
-				return player.isOp();
+			if(permissions == null) {
+				if(checkOPs) {
+					return true;
+				}
+				else {
+					return player.isOp();
+				}
+			}
 			else {
 				PermissionData data = PermissionData.get(player);
 				long time = System.currentTimeMillis();
@@ -375,11 +381,11 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			s = s + (!c.isActive() ? c.getName() + "* " : (c.skipCheck(p) ? c.getName() + " " : ""));
 		}
 
-		s = s + (!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING) ? "flying " : ""));
-		s = s + (!movingCheck.isActive() || movingCheck.allowFakeSneak ? "fakesneak* " : (hasPermission(p, PermissionData.PERMISSION_FAKESNEAK) ? "fakesneak " : ""));
-		s = s + (!movingCheck.isActive() || movingCheck.allowFastSwim ? "fastswim* " : (hasPermission(p, PermissionData.PERMISSION_FASTSWIM) ? "fastswim " : ""));
+		s = s + (!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING, movingCheck.checkOPs) ? "flying " : ""));
+		s = s + (!movingCheck.isActive() || movingCheck.allowFakeSneak ? "fakesneak* " : (hasPermission(p, PermissionData.PERMISSION_FAKESNEAK, movingCheck.checkOPs) ? "fakesneak " : ""));
+		s = s + (!movingCheck.isActive() || movingCheck.allowFastSwim ? "fastswim* " : (hasPermission(p, PermissionData.PERMISSION_FASTSWIM, movingCheck.checkOPs) ? "fastswim " : ""));
 		
-		s = s + (hasPermission(p, PermissionData.PERMISSION_NOTIFY) ? "notify " : "");
+		s = s + (hasPermission(p, PermissionData.PERMISSION_NOTIFY, false) ? "notify " : "");
 
 		return s;
 	}

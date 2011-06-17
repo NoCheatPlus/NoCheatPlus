@@ -56,9 +56,9 @@ public class LevelOption extends ChildOption {
 		}
 	}
 
-	public LevelOption(String identifier, LogLevel initialValue) {
+	public LevelOption(String identifier, String parentName, LogLevel initialValue) {
 
-		super(identifier);
+		super(identifier, parentName);
 		this.option = initialValue;
 	}
 

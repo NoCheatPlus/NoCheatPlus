@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import org.bukkit.entity.Player;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
@@ -18,18 +19,27 @@ public abstract class Check {
 	private int permission;
 	private String name;
 	protected NoCheat plugin;
+	
+	// Should OPs be checked if Permissions plugin is not available?
+	protected boolean checkOPs = false;
 
 	protected Check(NoCheat plugin, String name, int permission, NoCheatConfiguration config) {
 		this.plugin = plugin;
 		this.permission = permission;
 		this.name = name;
 		
+		try {
+			checkOPs = config.getBooleanValue(name + ".checkops");
+		} catch (ConfigurationException e) {
+			checkOPs = false;
+		}
+		
 		configure(config);
 	}
 
 	public boolean skipCheck(Player player) {
 		// Should we check at all?
-		return !active || plugin.hasPermission(player, permission); 
+		return !active || plugin.hasPermission(player, permission, checkOPs);
 	}
 	
 	protected abstract void configure(NoCheatConfiguration config);

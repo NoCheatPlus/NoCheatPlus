@@ -66,176 +66,196 @@ public class NoCheatConfiguration {
 		}
 
 
-		root = new ParentOption("", false);
+		root = new ParentOption("", "", false);
 
 
 		/*** LOGGING section ***/
 		{
-			ParentOption loggingNode = new ParentOption("logging", false);
+			ParentOption loggingNode = new ParentOption("logging", root.getFullIdentifier(), false);
 			root.add(loggingNode);
 
-			loggingNode.add(new MediumStringOption("filename", 
+			loggingNode.add(new MediumStringOption("filename", loggingNode.getFullIdentifier(),
 					SimpleYaml.getString("logging.filename", "plugins/NoCheat/nocheat.log", yamlContent)));
 
-			loggingNode.add(new LevelOption("logtofile", 
+			loggingNode.add(new LevelOption("logtofile", loggingNode.getFullIdentifier(),
 					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtofile", LogLevel.LOW.asString(), yamlContent))));
-			loggingNode.add(new LevelOption("logtoconsole",
+			loggingNode.add(new LevelOption("logtoconsole", loggingNode.getFullIdentifier(),
 					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtoconsole", LogLevel.HIGH.asString(), yamlContent))));
-			loggingNode.add(new LevelOption("logtochat", 
+			loggingNode.add(new LevelOption("logtochat", loggingNode.getFullIdentifier(),
 					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtochat", LogLevel.MED.asString(), yamlContent))));
-			loggingNode.add(new LevelOption("logtoirc",
+			loggingNode.add(new LevelOption("logtoirc", loggingNode.getFullIdentifier(),
 					LogLevel.getLogLevelFromString(SimpleYaml.getString("logging.logtoirc", LogLevel.MED.asString(), yamlContent))));
 
-			loggingNode.add(new ShortStringOption("logtoirctag", 
+			loggingNode.add(new ShortStringOption("logtoirctag", loggingNode.getFullIdentifier(),
 					SimpleYaml.getString("logging.logtoirctag", "nocheat", yamlContent)));
 		}
 
 		/*** ACTIVE section ***/
 		{
-			ParentOption activeNode = new ParentOption("active", false);
+			ParentOption activeNode = new ParentOption("active", root.getFullIdentifier(), false);
 			root.add(activeNode);
 
-			activeNode.add(new BooleanOption("speedhack", 
+			activeNode.add(new BooleanOption("speedhack", activeNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("active.speedhack", true, yamlContent)));
-			activeNode.add(new BooleanOption("moving", 
+			activeNode.add(new BooleanOption("moving", activeNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("active.moving", true, yamlContent)));
-			activeNode.add(new BooleanOption("airbuild",
+			activeNode.add(new BooleanOption("airbuild", activeNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("active.airbuild", false, yamlContent)));
-			activeNode.add(new BooleanOption("bedteleport",
+			activeNode.add(new BooleanOption("bedteleport", activeNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("active.bedteleport", true, yamlContent)));
-			activeNode.add(new BooleanOption("bogusitems",
+			activeNode.add(new BooleanOption("bogusitems", activeNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("active.bogusitems", false, yamlContent)));
 		}
 
 		/*** SPEEDHACK section ***/
 		{
-			ParentOption speedhackNode = new ParentOption("speedhack", false);
+			ParentOption speedhackNode = new ParentOption("speedhack", root.getFullIdentifier(), false);
 			root.add(speedhackNode);
 
-			speedhackNode.add(new LongStringOption("logmessage", 
+			speedhackNode.add(new LongStringOption("logmessage", speedhackNode.getFullIdentifier(),
 					SimpleYaml.getString("speedhack.logmessage", "[player] sent [events] move events, but only [limit] were allowed. Speedhack?", yamlContent).
 					replace("[player]", "%1$s").replace("[events]", "%2$d").replace("[limit]", "%3$d")));
 
+			speedhackNode.add(new BooleanOption("checkops", speedhackNode.getFullIdentifier(),
+					SimpleYaml.getBoolean("speedhack.checkops", false, yamlContent)));
+			
 			/*** SPEEDHACK LIMITS section ***/
 			{
-				ParentOption speedhackLimitsNode = new ParentOption("limits", false);
+				ParentOption speedhackLimitsNode = new ParentOption("limits", speedhackNode.getFullIdentifier(), false);
 				speedhackNode.add(speedhackLimitsNode);
 
-				speedhackLimitsNode.add(new IntegerOption("low", 
+				speedhackLimitsNode.add(new IntegerOption("low", speedhackLimitsNode.getFullIdentifier(),
 						SimpleYaml.getInt("speedhack.limits.low", 22, yamlContent)));
-				speedhackLimitsNode.add(new IntegerOption("med",
+				speedhackLimitsNode.add(new IntegerOption("med", speedhackLimitsNode.getFullIdentifier(),
 						SimpleYaml.getInt("speedhack.limits.med", 33, yamlContent)));
-				speedhackLimitsNode.add(new IntegerOption("high",
+				speedhackLimitsNode.add(new IntegerOption("high", speedhackLimitsNode.getFullIdentifier(),
 						SimpleYaml.getInt("speedhack.limits.high", 44, yamlContent)));
 			}
 
 			/*** SPEEDHACK ACTIONS section ***/
 			{
-				ParentOption speedhackActionNode = new ParentOption("action", false);
+				ParentOption speedhackActionNode = new ParentOption("action", speedhackNode.getFullIdentifier(), false);
 				speedhackNode.add(speedhackActionNode);
 
-				speedhackActionNode.add(new MediumStringOption("low", 
+				speedhackActionNode.add(new MediumStringOption("low", speedhackActionNode.getFullIdentifier(),
 						SimpleYaml.getString("speedhack.action.low", "loglow cancel", yamlContent)));
-				speedhackActionNode.add(new MediumStringOption("med", 
+				speedhackActionNode.add(new MediumStringOption("med", speedhackActionNode.getFullIdentifier(),
 						SimpleYaml.getString("speedhack.action.med", "logmed cancel", yamlContent)));
-				speedhackActionNode.add(new MediumStringOption("high", 
+				speedhackActionNode.add(new MediumStringOption("high", speedhackActionNode.getFullIdentifier(),
 						SimpleYaml.getString("speedhack.action.high", "loghigh cancel", yamlContent)));
 			}
 		}
 
 		/*** MOVING section ***/
 		{
-			ParentOption movingNode = new ParentOption("moving", false);
+			ParentOption movingNode = new ParentOption("moving", root.getFullIdentifier(), false);
 			root.add(movingNode);
 
-			movingNode.add(new LongStringOption("logmessage",
+			movingNode.add(new LongStringOption("logmessage", movingNode.getFullIdentifier(),
 					SimpleYaml.getString("moving.logmessage", "Moving violation: [player] from [world] [from] to [to] distance [distance]", yamlContent).
 					replace("[player]", "%1$s").replace("[world]", "%2$s").
 					replace("[from]", "(%4$.1f, %5$.1f, %6$.1f)").
 					replace("[to]", "(%7$.1f, %8$.1f, %9$.1f)").
 					replace("[distance]", "(%10$.1f, %11$.1f, %12$.1f)")));
 			
-			movingNode.add(new LongStringOption("summarymessage", 
+			movingNode.add(new LongStringOption("summarymessage", movingNode.getFullIdentifier(),
 					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~[timeframe] seconds: [player] total Violations: [violations]", yamlContent).
 					replace("[timeframe]", "%2$d").replace("[player]", "%1$s").
 					replace("[violations]", "(%3$d,%4$d,%5$d)")));
-			movingNode.add(new BooleanOption("allowflying", 
+			movingNode.add(new BooleanOption("allowflying", movingNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("moving.allowflying", false, yamlContent)));
-			movingNode.add(new BooleanOption("allowfakesneak", 
+			movingNode.add(new BooleanOption("allowfakesneak", movingNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("moving.allowfakesneak", true, yamlContent)));
-			movingNode.add(new BooleanOption("allowfastswim", 
+			movingNode.add(new BooleanOption("allowfastswim", movingNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("moving.allowfastswim", false, yamlContent)));
-			movingNode.add(new BooleanOption("waterelevators", 
+			movingNode.add(new BooleanOption("waterelevators", movingNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("moving.waterelevators", false, yamlContent)));
 
+			movingNode.add(new BooleanOption("checkops", movingNode.getFullIdentifier(),
+					SimpleYaml.getBoolean("moving.checkops", false, yamlContent)));
+			
+			movingNode.add(new BooleanOption("enforceteleport", movingNode.getFullIdentifier(),
+					SimpleYaml.getBoolean("moving.enforceteleport", false, yamlContent)));
+			
 			/*** MOVING ACTION section ***/
 			{
-				ParentOption movingActionNode = new ParentOption("action", false);
+				ParentOption movingActionNode = new ParentOption("action", movingNode.getFullIdentifier(), false);
 				movingNode.add(movingActionNode);
 
-				movingActionNode.add(new MediumStringOption("low", 
+				movingActionNode.add(new MediumStringOption("low", movingActionNode.getFullIdentifier(),
 						SimpleYaml.getString("moving.action.low", "loglow cancel", yamlContent)));
-				movingActionNode.add(new MediumStringOption("med", 
+				movingActionNode.add(new MediumStringOption("med", movingActionNode.getFullIdentifier(),
 						SimpleYaml.getString("moving.action.med", "logmed cancel", yamlContent)));
-				movingActionNode.add(new MediumStringOption("high", 
+				movingActionNode.add(new MediumStringOption("high", movingActionNode.getFullIdentifier(),
 						SimpleYaml.getString("moving.action.high", "loghigh cancel", yamlContent)));
 			}
 		}
 
 		/*** AIRBUILD section ***/
 		{
-			ParentOption airbuildNode = new ParentOption("airbuild", false);
+			ParentOption airbuildNode = new ParentOption("airbuild",  root.getFullIdentifier(), false);
 			root.add(airbuildNode);
+			
+			airbuildNode.add(new BooleanOption("checkops", airbuildNode.getFullIdentifier(),
+					SimpleYaml.getBoolean("airbuild.checkops", false, yamlContent)));
 
 			/*** AIRBUILD LIMITS section ***/
 			{
-				ParentOption airbuildLimitsNode = new ParentOption("limits", false);
+				ParentOption airbuildLimitsNode = new ParentOption("limits", airbuildNode.getFullIdentifier(), false);
 				airbuildNode.add(airbuildLimitsNode);
 
-				airbuildLimitsNode.add(new IntegerOption("low", 
+				airbuildLimitsNode.add(new IntegerOption("low", airbuildLimitsNode.getFullIdentifier(),
 						SimpleYaml.getInt("airbuild.limits.low", 1, yamlContent)));
-				airbuildLimitsNode.add(new IntegerOption("med",
+				airbuildLimitsNode.add(new IntegerOption("med", airbuildLimitsNode.getFullIdentifier(),
 						SimpleYaml.getInt("airbuild.limits.med", 3, yamlContent)));
-				airbuildLimitsNode.add(new IntegerOption("high",
+				airbuildLimitsNode.add(new IntegerOption("high", airbuildLimitsNode.getFullIdentifier(),
 						SimpleYaml.getInt("airbuild.limits.high", 10, yamlContent)));
 			}
 
 			/*** AIRBUILD ACTION section ***/
 			{
-				ParentOption airbuildActionNode = new ParentOption("action", false);
+				ParentOption airbuildActionNode = new ParentOption("action", airbuildNode.getFullIdentifier(), false);
 				airbuildNode.add(airbuildActionNode);
 
-				airbuildActionNode.add(new MediumStringOption("low", 
+				airbuildActionNode.add(new MediumStringOption("low", airbuildActionNode.getFullIdentifier(),
 						SimpleYaml.getString("airbuild.action.low", "loglow cancel", yamlContent)));
-				airbuildActionNode.add(new MediumStringOption("med",
+				airbuildActionNode.add(new MediumStringOption("med", airbuildActionNode.getFullIdentifier(),
 						SimpleYaml.getString("airbuild.action.med", "logmed cancel", yamlContent)));
-				airbuildActionNode.add(new MediumStringOption("high",
+				airbuildActionNode.add(new MediumStringOption("high", airbuildActionNode.getFullIdentifier(),
 						SimpleYaml.getString("airbuild.action.high", "loghigh cancel", yamlContent)));
 			}
+			
+			
 		}
 
 		/*** BEDTELEPORT section ***/
 		{
-			ParentOption bedteleportNode = new ParentOption("bedteleport", false);
+			ParentOption bedteleportNode = new ParentOption("bedteleport", root.getFullIdentifier(), false);
 			root.add(bedteleportNode);
+			
+			bedteleportNode.add(new BooleanOption("checkops", bedteleportNode.getFullIdentifier(),
+					SimpleYaml.getBoolean("bedteleport.checkops", false, yamlContent)));
 		}
 
 		/*** BOGUSITEMS section ***/
 		{
-			ParentOption bogusitemsNode = new ParentOption("bogusitems", false);
+			ParentOption bogusitemsNode = new ParentOption("bogusitems", root.getFullIdentifier(), false);
 			root.add(bogusitemsNode);
+			
+			bogusitemsNode.add(new BooleanOption("checkops", bogusitemsNode.getFullIdentifier(),
+					SimpleYaml.getBoolean("bogusitems.checkops", false, yamlContent)));
 		}
 
 		/*** CUSTOMACTIONS section ***/
 		{
-			ParentOption customActionsNode = new ParentOption("customactions", true);
+			ParentOption customActionsNode = new ParentOption("customactions", root.getFullIdentifier(), true);
 			root.add(customActionsNode);
 
 			Set<String> customs = SimpleYaml.getKeys("customactions", yamlContent);
 
 			for(String s : customs) {
 
-				CustomActionOption o = new CustomActionOption(s, SimpleYaml.getString("customactions."+s, "unknown", yamlContent));
+				CustomActionOption o = new CustomActionOption(s, customActionsNode.getFullIdentifier(), SimpleYaml.getString("customactions."+s, "unknown", yamlContent));
 
 				customActionsNode.add(o);
 				actionMap.put(s, o.getCustomActionValue());

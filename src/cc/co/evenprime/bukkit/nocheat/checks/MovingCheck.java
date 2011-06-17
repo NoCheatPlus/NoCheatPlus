@@ -62,7 +62,7 @@ public class MovingCheck extends Check {
 	public boolean allowFlying;
 	public boolean allowFakeSneak;
 	public boolean allowFastSwim;
-	
+	public boolean checkOPs;
 	
 	private boolean waterElevators;
 
@@ -73,6 +73,10 @@ public class MovingCheck extends Check {
 	private Action actions[][];
 
 	public long statisticTotalEvents = 1; // Prevent accidental division by 0 at some point
+
+	private boolean enforceTeleport;
+
+
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
@@ -101,15 +105,13 @@ public class MovingCheck extends Check {
 		// Get the two locations of the event
 		final Location to = event.getTo();
 
-		// the from location of the event may be different from the location the player 
-		// actually was - choose appropriately
-		Location from = data.teleportTo != null ? data.teleportTo : event.getFrom();
-		data.teleportTo = null;
-
+		// use our self-defined from-location, instead of the one from the event
+		Location from = data.lastLocation;
 
 		updateVelocity(player.getVelocity(), data);
 		
-		if(shouldBeIgnored(player, data, from, to)) {
+		// event.getFrom() is intentional here
+		if(shouldBeIgnored(player, data, event.getFrom(), to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
@@ -180,7 +182,7 @@ public class MovingCheck extends Check {
 		{
 			final Location l;
 
-			final boolean canFly = allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING);
+			final boolean canFly = allowFlying || plugin.hasPermission(player, PermissionData.PERMISSION_FLYING, checkOPs);
 
 			if(data.setBackPoint == null || canFly)
 				l = from;
@@ -257,7 +259,7 @@ public class MovingCheck extends Check {
 		int violationLevelSneaking = -1;
 
 		// Maybe the player is allowed to sneak faster than usual?
-		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK);
+		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK, checkOPs);
 
 		if(!canFakeSneak) {
 
@@ -297,7 +299,7 @@ public class MovingCheck extends Check {
 		int violationLevelSwimming = -1;
 
 		// Maybe the player is allowed to swim faster than usual?
-		final boolean canFastSwim = allowFastSwim || plugin.hasPermission(player, PermissionData.PERMISSION_FASTSWIM);
+		final boolean canFastSwim = allowFastSwim || plugin.hasPermission(player, PermissionData.PERMISSION_FASTSWIM, checkOPs);
 
 		if(!canFastSwim) {
 
@@ -454,14 +456,20 @@ public class MovingCheck extends Check {
 
 		if(data.respawned) data.respawned = false;
 		
+		// We can enforce a teleport, if that flag is explicitly set
+		if(event.isCancelled() && enforceTeleport && event.getTo().equals(data.teleportTo)) {
+			event.setCancelled(false);
+		}
+		
 		if(!event.isCancelled()) {
 			data.lastLocation = event.getTo();
-			data.teleportTo = event.getTo();
 			data.jumpPhase = 0;
 			data.setBackPoint = event.getTo();
 					
 			data.worldChanged = !event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName());
 		}
+		
+		data.teleportTo = null;
 	}
 
 	/**
@@ -567,6 +575,7 @@ public class MovingCheck extends Check {
 
 		Location t = new Location(data.setBackPoint.getWorld(), data.setBackPoint.getX(), y, data.setBackPoint.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
 
+		data.teleportTo = t;
 		// Only reset player and cancel event if teleport is successful
 		if(event.getPlayer().teleport(t)) {
 
@@ -576,6 +585,8 @@ public class MovingCheck extends Check {
 
 			event.setCancelled(true);
 		}
+		
+		data.teleportTo = null;
 	}
 
 
@@ -721,6 +732,9 @@ public class MovingCheck extends Check {
 			actions[2] = config.getActionValue("moving.action.high");
 
 			setActive(config.getBooleanValue("active.moving"));
+			
+			enforceTeleport = config.getBooleanValue("moving.enforceteleport");
+			
 		} catch (ConfigurationException e) {
 			setActive(false);
 			e.printStackTrace();

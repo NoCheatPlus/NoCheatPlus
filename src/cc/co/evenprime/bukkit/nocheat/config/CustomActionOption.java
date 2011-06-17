@@ -9,9 +9,9 @@ public class CustomActionOption extends ChildOption {
 	private String command;
 	
 	
-	public CustomActionOption(String identifier, String command) {
+	public CustomActionOption(String identifier, String parentName, String command) {
 			
-		super(identifier);
+		super(identifier, parentName);
 		
 		this.parseCommand(command);
 	}

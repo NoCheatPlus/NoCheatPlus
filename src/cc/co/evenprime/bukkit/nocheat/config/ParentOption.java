@@ -15,8 +15,8 @@ public class ParentOption extends Option {
 	private LinkedList<Option> children = new LinkedList<Option>();
 	private boolean editable;
 
-	public ParentOption(String identifier, boolean editable) {
-		super(identifier);
+	public ParentOption(String identifier, String parentName, boolean editable) {
+		super(identifier, parentName);
 		this.editable = editable;
 	}
 
