@@ -171,7 +171,7 @@ public class ParentOptionGui extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					
-					JOptionPane.showMessageDialog(null, Explainations.get(((ChildOption)child).getFullIdentifier()), "Description", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, Explainations.get(((ChildOption)child).getFullIdentifier()), "Description of "+ ((ChildOption)child).getFullIdentifier(), JOptionPane.INFORMATION_MESSAGE);
 					
 				}
 				
