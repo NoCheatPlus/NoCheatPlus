@@ -62,7 +62,7 @@ public class NoCheatConfiguration {
 		try {
 			yamlContent = (Map<String, Object>) SimpleYaml.read(configurationFile);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("Couldn't use existing nocheat.yml, creating a new file.");
 			yamlContent = new HashMap<String, Object>();
 		}
 
@@ -114,8 +114,7 @@ public class NoCheatConfiguration {
 			root.add(speedhackNode);
 
 			speedhackNode.add(new LongStringOption("logmessage", speedhackNode.getFullIdentifier(),
-					SimpleYaml.getString("speedhack.logmessage", "[player] sent [events] move events, but only [limit] were allowed. Speedhack?", yamlContent).
-					replace("[player]", "%1$s").replace("[events]", "%2$d").replace("[limit]", "%3$d")));
+					SimpleYaml.getString("speedhack.logmessage", "[player] sent [events] move events, but only [limit] were allowed. Speedhack?", yamlContent)));
 
 			speedhackNode.add(new BooleanOption("checkops", speedhackNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("speedhack.checkops", false, yamlContent)));
@@ -153,18 +152,11 @@ public class NoCheatConfiguration {
 			root.add(movingNode);
 
 			movingNode.add(new LongStringOption("logmessage", movingNode.getFullIdentifier(),
-					SimpleYaml.getString("moving.logmessage", "Moving violation: [player] from [world] [from] to [to] distance [distance]", yamlContent).
-					replace("[player]", "%1$s").
-					replace("[world]", "%2$s").
-					replace("[from]", "(%4$.1f, %5$.1f, %6$.1f)").
-					replace("[to]", "(%7$.1f, %8$.1f, %9$.1f)").
-					replace("[distance]", "(%10$.1f, %11$.1f, %12$.1f)")));
+					SimpleYaml.getString("moving.logmessage", "Moving violation: [player] from [world] [from] to [to] distance [distance]", yamlContent)));
 			
 			movingNode.add(new LongStringOption("summarymessage", movingNode.getFullIdentifier(),
-					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~[timeframe] seconds: [player] total Violations: [violations]", yamlContent).
-					replace("[timeframe]", "%2$d").
-					replace("[player]", "%1$s").
-					replace("[violations]", "(%3$d,%4$d,%5$d)")));
+					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~[timeframe] seconds: [player] total Violations: [violations]", yamlContent)));
+			
 			movingNode.add(new BooleanOption("allowflying", movingNode.getFullIdentifier(),
 					SimpleYaml.getBoolean("moving.allowflying", false, yamlContent)));
 			movingNode.add(new BooleanOption("allowfakesneak", movingNode.getFullIdentifier(),

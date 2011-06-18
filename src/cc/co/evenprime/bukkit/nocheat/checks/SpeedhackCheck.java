@@ -172,7 +172,8 @@ public class SpeedhackCheck extends Check {
 			limits[1] = config.getIntegerValue("speedhack.limits.med");
 			limits[2] = config.getIntegerValue("speedhack.limits.high");
 
-			logMessage = config.getStringValue("speedhack.logmessage");
+			logMessage = config.getStringValue("speedhack.logmessage").
+					replace("[player]", "%1$s").replace("[events]", "%2$d").replace("[limit]", "%3$d");
 
 			actions = new Action[3][];
 

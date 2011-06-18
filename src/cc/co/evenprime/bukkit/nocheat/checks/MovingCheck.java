@@ -720,8 +720,17 @@ public class MovingCheck extends Check {
 			
 			waterElevators = config.getBooleanValue("moving.waterelevators");
 
-			logMessage = config.getStringValue("moving.logmessage");
-			summaryMessage = config.getStringValue("moving.summarymessage");
+			logMessage = config.getStringValue("moving.logmessage").
+			replace("[player]", "%1$s").
+			replace("[world]", "%2$s").
+			replace("[from]", "(%4$.1f, %5$.1f, %6$.1f)").
+			replace("[to]", "(%7$.1f, %8$.1f, %9$.1f)").
+			replace("[distance]", "(%10$.1f, %11$.1f, %12$.1f)");
+			
+			summaryMessage = config.getStringValue("moving.summarymessage").
+			replace("[timeframe]", "%2$d").
+			replace("[player]", "%1$s").
+			replace("[violations]", "(%3$d,%4$d,%5$d)");
 
 			actions = new Action[3][];
 
