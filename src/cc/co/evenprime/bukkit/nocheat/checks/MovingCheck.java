@@ -468,8 +468,6 @@ public class MovingCheck extends Check {
 					
 			data.worldChanged = !event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName());
 		}
-		
-		data.teleportTo = null;
 	}
 
 	/**
@@ -584,9 +582,9 @@ public class MovingCheck extends Check {
 			event.setTo(t);
 
 			event.setCancelled(true);
+			
+			data.teleportTo = null;
 		}
-		
-		data.teleportTo = null;
 	}
 
 
