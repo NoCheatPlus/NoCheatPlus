@@ -35,7 +35,7 @@ public class Wizard extends JFrame {
 		
 		inside.setLayout(new BoxLayout(inside,BoxLayout.Y_AXIS));
 		
-		final NoCheatConfiguration config = new NoCheatConfiguration(new File("NoCheat/nocheat.yml"));
+		final NoCheatConfiguration config = new NoCheatConfiguration(new File("NoCheat/nocheat.yml"), new File("NoCheat/descriptions.txt"));
 		
 		ParentOptionGui root2 = new ParentOptionGui(config.getRoot());
 		

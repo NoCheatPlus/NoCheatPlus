@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.config;
 
+
 public abstract class ChildOption extends Option {
 
 	/**
@@ -18,5 +19,10 @@ public abstract class ChildOption extends Option {
 	@Override
 	public String toYAMLString(String prefix) {
 		return prefix + getIdentifier() + ": \"" + getValue() + "\"\r\n";
+	}
+	
+	@Override
+	public String toDescriptionString(String prefix) {
+		return prefix + getIdentifier() + ": \"" + getDescription().replace("\n", "\r\n" + prefix + "\t\t") + "\"\r\n";
 	}
 }

@@ -59,4 +59,26 @@ public class ParentOption extends Option {
 		
 		return s;
 	}
+	
+	@Override
+	public String toDescriptionString(String prefix) {
+		
+		String s = "";
+		if(getIdentifier().length() > 0) {
+			s += prefix + getIdentifier() + ":\r\n";
+			
+			for(Option o : getChildOptions()) {
+				s += o.toDescriptionString(prefix + "    ");
+			}
+		}
+		else
+		{
+			for(Option o : getChildOptions()) {
+				s += o.toDescriptionString(prefix);
+			}
+		}
+		
+		return s;
+		
+	}
 }

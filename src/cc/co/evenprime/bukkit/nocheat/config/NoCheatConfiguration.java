@@ -31,6 +31,7 @@ public class NoCheatConfiguration {
 
 
 	public final static String configFile = "plugins/NoCheat/nocheat.yml";
+	public final static String descriptionsFile = "plugins/NoCheat/descriptions.txt";
 
 	private ParentOption root;
 
@@ -45,17 +46,17 @@ public class NoCheatConfiguration {
 	// Our log output to a file
 	private FileHandler fh = null;
 
-	public NoCheatConfiguration(File configurationFile) {
+	public NoCheatConfiguration(File configurationFile, File descriptionsFile) {
 
 		// Setup the configuration tree
-		config(configurationFile);
+		config(configurationFile, descriptionsFile);
 	}
 
 	/**
 	 * Read the configuration file and assign either standard values or whatever is declared in the file
 	 * @param configurationFile
 	 */
-	public void config(File configurationFile) {
+	public void config(File configurationFile, File descriptionsFile) {
 
 
 		try {
@@ -264,9 +265,8 @@ public class NoCheatConfiguration {
 			}
 		}
 
-		if(!configurationFile.exists()) {
-			writeConfigFile(configurationFile, this);
-		}
+		writeConfigFile(configurationFile, this);		
+		writeDescriptionFile(descriptionsFile, this);
 	}
 
 	public void setupFileLogger() {
@@ -339,6 +339,26 @@ public class NoCheatConfiguration {
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 
 			w.write(configuration.getRoot().toYAMLString(""));
+
+			w.flush(); w.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Write a file with the descriptions of all options
+	 * @param f
+	 */
+	public static void writeDescriptionFile(File f, NoCheatConfiguration configuration) {
+		try {
+			if(f.getParentFile() != null)
+				f.getParentFile().mkdirs();
+
+			f.createNewFile();
+			BufferedWriter w = new BufferedWriter(new FileWriter(f));
+
+			w.write(configuration.getRoot().toDescriptionString(""));
 
 			w.flush(); w.close();
 		} catch (IOException e) {

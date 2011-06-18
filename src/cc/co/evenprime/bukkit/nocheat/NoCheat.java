@@ -323,9 +323,9 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	 */
 	private void setupConfig() {
 		if(this.config == null)
-			this.config = new NoCheatConfiguration(new File(NoCheatConfiguration.configFile));
+			this.config = new NoCheatConfiguration(new File(NoCheatConfiguration.configFile), new File(NoCheatConfiguration.descriptionsFile));
 		else
-			this.config.config(new File(NoCheatConfiguration.configFile));
+			this.config.config(new File(NoCheatConfiguration.configFile), new File(NoCheatConfiguration.descriptionsFile));
 
 		config.setupFileLogger();
 
