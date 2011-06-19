@@ -33,7 +33,7 @@ public class SpeedhackCheck extends Check {
 		super(plugin, "speedhack", PermissionData.PERMISSION_SPEEDHACK, config);
 	}
 
-	private static final int violationsLimit = 2;
+	private static final int violationsLimit = 3;
 
 	// Limits for the speedhack check per second
 	private int limits[];
@@ -56,7 +56,7 @@ public class SpeedhackCheck extends Check {
 		}
 		
 		// During world transfers many events of same location get sent, ignore them all
-		if(event.getFrom().getX() == event.getTo().getX() && event.getFrom().getZ() == event.getTo().getZ() && event.getFrom().getY() == event.getTo().getY()) {
+		if(event.getFrom().equals(event.getTo())) {
 			return;
 		}
 
@@ -77,9 +77,9 @@ public class SpeedhackCheck extends Check {
 				data.setBackPoint = event.getFrom();
 			}
 
-			if(plugin.getServerLag() > 200) {
+			if(plugin.getServerLag() > 150) {
 				// Any data would likely be unreliable with that lag
-				resetData(data, event.getFrom(), ticks);
+				resetData(data, event.getFrom());
 			}
 			else {
 				final int low  = (limits[0]+1) / 2;
@@ -91,8 +91,9 @@ public class SpeedhackCheck extends Check {
 				if(data.eventsSinceLastCheck > high) level = 2;
 				else if(data.eventsSinceLastCheck > med)  level = 1;
 				else if(data.eventsSinceLastCheck > low)  level = 0;
-				else resetData(data, event.getFrom(), ticks);
-
+				else {
+					resetData(data, event.getFrom());
+				}
 
 				if(level >= 0)	{
 					data.violationsInARowTotal++;
@@ -112,18 +113,18 @@ public class SpeedhackCheck extends Check {
 		else if(data.lastCheckTicks + 10 < ticks)
 		{
 			// The player didn't move for the last 10 ticks
-			resetData(data, event.getFrom(), ticks);
+			resetData(data, event.getFrom());
+			data.lastCheckTicks = ticks;
 		}
 	}
 
-	private static void resetData(SpeedhackData data, Location l, int ticks) {
+	private static void resetData(SpeedhackData data, Location l) {
 		data.violationsInARow[0] = 0;
 		data.violationsInARow[1] = 0;
 		data.violationsInARow[2] = 0;
 		data.violationsInARowTotal = 0;
 		data.eventsSinceLastCheck = 0;
 		data.setBackPoint = l;
-		data.lastCheckTicks = ticks;
 	}
 
 	private void action(Action actions[], PlayerMoveEvent event, int violations, SpeedhackData data) {
@@ -202,10 +203,7 @@ public class SpeedhackCheck extends Check {
 	}
 
 	public void teleported(PlayerTeleportEvent event) {
-
 		SpeedhackData data = SpeedhackData.get(event.getPlayer());
-
-		data.setBackPoint = event.getTo();
-		data.eventsSinceLastCheck = 0;
+		resetData(data,  event.getTo());
 	}
 }

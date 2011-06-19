@@ -13,8 +13,8 @@ public class LevelOption extends ChildOption {
 	private LogLevel option;
 
 	public enum LogLevel {
-		
-		
+
+
 		OFF("off", "never", Level.OFF), 
 		LOW("low", "all messages", Level.INFO), 
 		MED("med", "important messages", Level.WARNING), 
@@ -56,9 +56,9 @@ public class LevelOption extends ChildOption {
 		}
 	}
 
-	public LevelOption(String identifier, String parentName, LogLevel initialValue) {
+	public LevelOption(String identifier, LogLevel initialValue) {
 
-		super(identifier, parentName);
+		super(identifier);
 		this.option = initialValue;
 	}
 
@@ -75,7 +75,7 @@ public class LevelOption extends ChildOption {
 	public LogLevel getOptionValue() {
 		return this.option;
 	}
-	
+
 	public Level getLevelValue() {
 		return this.option.getLevel();
 	}

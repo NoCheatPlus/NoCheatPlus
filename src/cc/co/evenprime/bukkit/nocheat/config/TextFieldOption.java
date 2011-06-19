@@ -10,16 +10,16 @@ public abstract class TextFieldOption extends ChildOption {
 	private String value;
 	private int length = -1;
 
-	public TextFieldOption(String name, String parentName, String initialValue, int preferredLength) {
+	public TextFieldOption(String name, String initialValue, int preferredLength) {
 
-		super(name, parentName);
+		super(name);
 		this.value = initialValue;
 		this.length = preferredLength;
 	}
 	
 	public TextFieldOption(String name, String parentName, String initialValue) {
 
-		super(name, parentName);
+		super(name);
 		this.value = initialValue;
 	}
 

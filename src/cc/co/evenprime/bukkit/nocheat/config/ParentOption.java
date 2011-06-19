@@ -15,8 +15,8 @@ public class ParentOption extends Option {
 	private LinkedList<Option> children = new LinkedList<Option>();
 	private boolean editable;
 
-	public ParentOption(String identifier, String parentName, boolean editable) {
-		super(identifier, parentName);
+	public ParentOption(String identifier, boolean editable) {
+		super(identifier);
 		this.editable = editable;
 	}
 
@@ -25,27 +25,26 @@ public class ParentOption extends Option {
 	}
 
 	public final void add(Option option) {
-		
 		children.addLast(option);
+		option.setParent(this);
 	}
-	
+
 	public final void remove(Option option) {
-		
 		if(editable)
-		children.remove(option);
+			children.remove(option);
 	}
-	
+
 	public boolean isEditable() {
 		return editable;
 	}
-	
+
 	@Override
 	public String toYAMLString(String prefix) {
 
 		String s = "";
 		if(getIdentifier().length() > 0) {
 			s += prefix + getIdentifier() + ":\r\n";
-			
+
 			for(Option o : getChildOptions()) {
 				s += o.toYAMLString(prefix + "    ");
 			}
@@ -56,17 +55,17 @@ public class ParentOption extends Option {
 				s += o.toYAMLString(prefix);
 			}
 		}
-		
+
 		return s;
 	}
-	
+
 	@Override
 	public String toDescriptionString(String prefix) {
-		
+
 		String s = "";
 		if(getIdentifier().length() > 0) {
 			s += prefix + getIdentifier() + ":\r\n";
-			
+
 			for(Option o : getChildOptions()) {
 				s += o.toDescriptionString(prefix + "    ");
 			}
@@ -77,8 +76,8 @@ public class ParentOption extends Option {
 				s += o.toDescriptionString(prefix);
 			}
 		}
-		
+
 		return s;
-		
+
 	}
 }

@@ -194,7 +194,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			public void run() {
 				serverTicks += 10;
 				long time = System.currentTimeMillis();
-				serverLagInMilliSeconds = (time - lastServerTime - 500)*2;
+				serverLagInMilliSeconds = Math.abs((time - lastServerTime - 500)*2);
 				lastServerTime = time;
 			}
 		}, 10, 10);
@@ -287,7 +287,8 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		try {
 			if(permissions == null) {
 				if(checkOPs) {
-					return true;
+					// OPs don't get special treatment
+					return false;
 				}
 				else {
 					return player.isOp();

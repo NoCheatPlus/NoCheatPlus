@@ -67,7 +67,7 @@ public class ParentOptionGui extends JPanel {
 
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					option.add(new CustomActionOption(nameField.getText(), option.getFullIdentifier(), "yourcommand [player]"));
+					option.add(new CustomActionOption(nameField.getText(), "yourcommand [player]"));
 					recreateContent();
 				}
 			});

@@ -7,7 +7,7 @@ public class ShortStringOption extends TextFieldOption {
 	 */
 	private static final long serialVersionUID = 2258827414736580449L;
 		
-	public ShortStringOption(String name, String parentName, String initialValue) {
-		super(name, parentName, initialValue, 10);
+	public ShortStringOption(String name, String initialValue) {
+		super(name, initialValue, 10);
 	}
 }

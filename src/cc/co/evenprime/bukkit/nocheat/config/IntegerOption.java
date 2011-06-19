@@ -8,9 +8,9 @@ public class IntegerOption extends TextFieldOption {
 	 */
 	private static final long serialVersionUID = 2258827414736580449L;
 		
-	public IntegerOption(String name, String parentName, int initialValue) {
+	public IntegerOption(String name, int initialValue) {
 		
-		super(name, parentName, String.valueOf(initialValue), 5);		
+		super(name, String.valueOf(initialValue), 5);		
 	}
 
 	@Override

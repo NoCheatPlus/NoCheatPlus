@@ -7,17 +7,17 @@ public class CustomActionOption extends ChildOption {
 	private int firstAfter;
 	private boolean repeat;
 	private String command;
-	
-	
-	public CustomActionOption(String identifier, String parentName, String command) {
-			
-		super(identifier, parentName);
-		
+
+
+	public CustomActionOption(String identifier, String command) {
+
+		super(identifier);
+
 		this.parseCommand(command);
 	}
-	
+
 	private void parseCommand(String com) {
-		
+
 		if(com.matches("\\[[0-9]*,[a-z]*\\] .*")) {
 			String s[] = com.split(" ", 2);
 			String s2[] = s[0].replace("[", "").replace("]", "").split(",");
@@ -38,7 +38,7 @@ public class CustomActionOption extends ChildOption {
 			command = com;
 		}
 	}
-	
+
 	@Override
 	public String getValue() {
 		if(firstAfter <= 1 && repeat) {
@@ -51,8 +51,8 @@ public class CustomActionOption extends ChildOption {
 			return "["+firstAfter+","+repeat+"] "+ command;
 		}
 	}
-	
-	
+
+
 	public CustomAction getCustomActionValue() {
 		return new CustomAction(firstAfter, repeat, command);		
 	}
@@ -60,14 +60,14 @@ public class CustomActionOption extends ChildOption {
 	public String getCommandValue() {
 		return command;
 	}
-	
+
 	public void setCommandValue(String command) {
 		this.command = command;
 	}
 
 	public void setRepeatValue(boolean value) {
 		this.repeat = value;
-		
+
 	}
 
 	public boolean getRepeatValue() {
@@ -80,7 +80,7 @@ public class CustomActionOption extends ChildOption {
 
 	public void setFirsttAfterValue(int value) {
 		this.firstAfter = value;
-		
+
 	}
 
 }
