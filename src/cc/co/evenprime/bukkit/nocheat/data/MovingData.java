@@ -29,8 +29,6 @@ public class MovingData {
 	public double sneakingLastDistance = 0.0D;
 	public double swimmingLastDistance = 0.0D;
 
-	public boolean worldChanged = false;
-	public boolean respawned = false;
 	public boolean insideVehicle = false;
 
 	// WORKAROUND for changed PLAYER_MOVE logic

@@ -20,6 +20,5 @@ public class MovingEntityListener extends EntityListener {
 		if(event.getEntity() instanceof Player) {
 			check.updateVelocity(event.getEntity().getVelocity(), MovingData.get((Player)event.getEntity()));
 		}
-
 	}
 }

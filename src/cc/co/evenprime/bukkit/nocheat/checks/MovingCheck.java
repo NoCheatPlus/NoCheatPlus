@@ -384,7 +384,7 @@ public class MovingCheck extends Check {
 	private boolean shouldBeIgnored(final Player player, final MovingData data, final Location from, final Location to) {
 
 		// First the simple yes/no checks
-		if(data.respawned || data.insideVehicle || player.isInsideVehicle() || data.worldChanged) {
+		if(/*data.respawned ||*/ data.insideVehicle || player.isInsideVehicle()) {
 			return true;
 		}
 		
@@ -453,9 +453,7 @@ public class MovingCheck extends Check {
 	public void teleported(PlayerTeleportEvent event) {
 		
 		MovingData data = MovingData.get(event.getPlayer());
-
-		if(data.respawned) data.respawned = false;
-		
+	
 		// We can enforce a teleport, if that flag is explicitly set
 		if(event.isCancelled() && enforceTeleport && event.getTo().equals(data.teleportTo)) {
 			event.setCancelled(false);
@@ -465,8 +463,6 @@ public class MovingCheck extends Check {
 			data.lastLocation = event.getTo();
 			data.jumpPhase = 0;
 			data.setBackPoint = event.getTo();
-					
-			data.worldChanged = !event.getFrom().getWorld().getName().equals(event.getTo().getWorld().getName());
 		}
 	}
 
@@ -476,8 +472,7 @@ public class MovingCheck extends Check {
 	 */
 	public void respawned(PlayerRespawnEvent event) {
 		MovingData data = MovingData.get(event.getPlayer());
-		data.respawned = true;
-
+		data.lastLocation = event.getRespawnLocation(); // We expect the player to be there next
 	}
 
 	/**

@@ -107,7 +107,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 				return true;
 			}
 		}
-
+		
 		return false;
 	}
 
@@ -167,7 +167,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 		try {
 			cleanUpTaskId = Bukkit.getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
-	
+
 				@Override
 				public void run() {
 					NoCheatData.cleanPlayerDataCollection();
@@ -385,7 +385,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		s = s + (!movingCheck.isActive() || movingCheck.allowFlying ? "flying* " : (hasPermission(p, PermissionData.PERMISSION_FLYING, movingCheck.checkOPs) ? "flying " : ""));
 		s = s + (!movingCheck.isActive() || movingCheck.allowFakeSneak ? "fakesneak* " : (hasPermission(p, PermissionData.PERMISSION_FAKESNEAK, movingCheck.checkOPs) ? "fakesneak " : ""));
 		s = s + (!movingCheck.isActive() || movingCheck.allowFastSwim ? "fastswim* " : (hasPermission(p, PermissionData.PERMISSION_FASTSWIM, movingCheck.checkOPs) ? "fastswim " : ""));
-		
+
 		s = s + (hasPermission(p, PermissionData.PERMISSION_NOTIFY, false) ? "notify " : "");
 
 		return s;
@@ -405,8 +405,6 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		//System.out.println("Would execute "+a.command + " now for Player " + player.getName() );
 
 	}
-
-
 
 	@Override
 	public void sendMessage(String message) {
