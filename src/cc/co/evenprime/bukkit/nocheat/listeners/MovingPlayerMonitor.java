@@ -42,9 +42,13 @@ public class MovingPlayerMonitor extends PlayerListener {
 		if(!event.isCancelled()) {
 			MovingData data = MovingData.get(event.getPlayer());
 			data.lastLocation = event.getTo();
-			if(!event.getPlayer().isInsideVehicle()) {
+			if(event.getPlayer().isInsideVehicle()) {
+				data.setBackPoint = event.getTo();	
+			}
+			else {
 				data.insideVehicle = false;
 			}
+
 			check.updateVelocity(event.getPlayer().getVelocity(), data);
 		}
 	}
