@@ -63,8 +63,8 @@ public class SpeedhackCheck extends Check {
 		// Get the player-specific data
 		SpeedhackData data = SpeedhackData.get(player);
 
-		// Count the event
-		data.eventsSinceLastCheck++;
+		// Count the event (twice, to interpolate from 0.5 seconds to 1 second
+		data.eventsSinceLastCheck += 2;
 
 		// Get the ticks of the server
 		int ticks = plugin.getServerTicks();
@@ -82,15 +82,12 @@ public class SpeedhackCheck extends Check {
 				resetData(data, event.getFrom());
 			}
 			else {
-				final int low  = (limits[0]+1) / 2;
-				final int med  = (limits[1]+1) / 2;
-				final int high = (limits[2]+1) / 2;
 
 				int level = -1;
 
-				if(data.eventsSinceLastCheck > high) level = 2;
-				else if(data.eventsSinceLastCheck > med)  level = 1;
-				else if(data.eventsSinceLastCheck > low)  level = 0;
+				if(data.eventsSinceLastCheck > limits[2]) level = 2;
+				else if(data.eventsSinceLastCheck > limits[1])  level = 1;
+				else if(data.eventsSinceLastCheck > limits[0])  level = 0;
 				else {
 					resetData(data, event.getFrom());
 				}
@@ -154,12 +151,7 @@ public class SpeedhackCheck extends Check {
 		if(data.setBackPoint == null) data.setBackPoint = event.getFrom();
 
 		// If we have stored a location for the player, we put him back there
-
-		if(event.getPlayer().teleport(data.setBackPoint)) {
-			event.setFrom(data.setBackPoint);
-			event.setTo(data.setBackPoint);
-			event.setCancelled(true);
-		}
+		event.setTo(data.setBackPoint);
 	}
 
 	@Override

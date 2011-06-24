@@ -102,8 +102,6 @@ public class NoCheatConfiguration {
 					SimpleYaml.getBoolean("active.moving", true, yamlContent)));
 			activeNode.add(new BooleanOption("airbuild",
 					SimpleYaml.getBoolean("active.airbuild", false, yamlContent)));
-			activeNode.add(new BooleanOption("bedteleport", 
-					SimpleYaml.getBoolean("active.bedteleport", true, yamlContent)));
 			activeNode.add(new BooleanOption("bogusitems", 
 					SimpleYaml.getBoolean("active.bogusitems", false, yamlContent)));
 		}
@@ -221,15 +219,6 @@ public class NoCheatConfiguration {
 			}
 
 
-		}
-
-		/*** BEDTELEPORT section ***/
-		{
-			ParentOption bedteleportNode = new ParentOption("bedteleport", false);
-			root.add(bedteleportNode);
-
-			bedteleportNode.add(new BooleanOption("checkops", 
-					SimpleYaml.getBoolean("bedteleport.checkops", false, yamlContent)));
 		}
 
 		/*** BOGUSITEMS section ***/

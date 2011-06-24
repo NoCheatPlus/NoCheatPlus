@@ -36,7 +36,7 @@ public class BogusitemsCheck extends Check {
 		if(i != null) {
 			ItemStack s = i.getItemStack();
 			if(s != null) {
-				if(s.getAmount() <= 0) {// buggy item
+				if(s.getAmount() < 0) {// buggy item
 					event.getItem().remove();
 					event.setCancelled(true);
 					plugin.log(Level.WARNING, event.getPlayer().getName() + " tried to pick up an invalid item. Item was removed.");

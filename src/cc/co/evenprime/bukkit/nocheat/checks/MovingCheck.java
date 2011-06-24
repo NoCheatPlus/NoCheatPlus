@@ -63,7 +63,7 @@ public class MovingCheck extends Check {
 	public boolean allowFakeSneak;
 	public boolean allowFastSwim;
 	public boolean checkOPs;
-	
+
 	private boolean waterElevators;
 
 	private String logMessage;
@@ -96,7 +96,7 @@ public class MovingCheck extends Check {
 		// Should we check at all
 		if(skipCheck(player)) {	return;	}
 
-	
+
 		final long startTime = System.nanoTime();
 
 		// Get the player-specific data
@@ -109,14 +109,14 @@ public class MovingCheck extends Check {
 		Location from = data.lastLocation;
 
 		updateVelocity(player.getVelocity(), data);
-		
+
 		// event.getFrom() is intentional here
 		if(shouldBeIgnored(player, data, event.getFrom(), to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
 		}
-		
+
 		/**** Horizontal movement check START ****/
 
 		// First check the distance the player has moved horizontally
@@ -135,7 +135,7 @@ public class MovingCheck extends Check {
 
 		final int onGroundFrom = playerIsOnGround(from, 0.0D);
 
-		
+
 		// Do various checks on the players horizontal movement
 		int sn = getSneakingViolationLevel(combined, data, player);
 		int sw = getSwimmingViolationLevel(combined, data, onGroundFrom == MovingData.LIQUID, player);
@@ -384,10 +384,10 @@ public class MovingCheck extends Check {
 	private boolean shouldBeIgnored(final Player player, final MovingData data, final Location from, final Location to) {
 
 		// First the simple yes/no checks
-		if(/*data.respawned ||*/ data.insideVehicle || player.isInsideVehicle()) {
+		if(data.insideVehicle || player.isInsideVehicle()) {
 			return true;
 		}
-		
+
 		// More sophisticated checks
 		final Location l = data.lastLocation;
 
@@ -395,11 +395,11 @@ public class MovingCheck extends Check {
 		if(l.getWorld() != from.getWorld()) {
 			return true;
 		}
-		
+
 		final double x = from.getX();
 		final double y = from.getY();
 		final double z = from.getZ();
-		
+
 		// Player didn't move at all
 		if(x == to.getX() && z == to.getZ() && y == to.getY() ) {
 			return true;
@@ -408,7 +408,7 @@ public class MovingCheck extends Check {
 		else if(!(x == l.getX() && z == l.getZ() && y == l.getY())){
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -451,14 +451,14 @@ public class MovingCheck extends Check {
 	 * @param event
 	 */
 	public void teleported(PlayerTeleportEvent event) {
-		
+
 		MovingData data = MovingData.get(event.getPlayer());
-	
+
 		// We can enforce a teleport, if that flag is explicitly set
 		if(event.isCancelled() && enforceTeleport && event.getTo().equals(data.teleportTo)) {
 			event.setCancelled(false);
 		}
-		
+
 		if(!event.isCancelled()) {
 			data.lastLocation = event.getTo();
 			data.jumpPhase = 0;
@@ -518,8 +518,26 @@ public class MovingCheck extends Check {
 						if(data.highestLogLevel.intValue() < ((LogAction)a).level.intValue()) data.highestLogLevel = ((LogAction)a).level;
 					}
 					else if(!cancelled && a instanceof CancelAction) {
-						resetPlayer(event);
-						cancelled = true;
+						// Make a modified copy of the setBackPoint to prevent other plugins from accidentally modifying it
+						// and keep the current pitch and yaw (setbacks "feel" better that way). Plus try to adapt the Y-coord
+						// to place the player close to ground
+
+						double y = data.setBackPoint.getY();
+
+						// search for the first solid block up to 5 blocks below the setbackpoint and teleport the player there
+						for(int i = 0; i < 20; i++) {
+							if(playerIsOnGround(data.setBackPoint, -0.5*i) != MovingData.NONSOLID) {
+								y -= 0.5*i;
+								break;
+							}
+						}	
+
+						// Remember the location we send the player to, to identify teleports that were started by us
+						data.teleportTo = new Location(data.setBackPoint.getWorld(), data.setBackPoint.getX(), y, data.setBackPoint.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
+
+						event.setTo(data.teleportTo);
+
+						cancelled = true; // just prevent us from treating more than one "cancel" action, which would make no sense
 					}
 					else if(a instanceof CustomAction)
 						plugin.handleCustomAction((CustomAction)a, player);
@@ -544,42 +562,6 @@ public class MovingCheck extends Check {
 				return 1; }
 			return 0; }
 		return -1;
-	}
-
-	/** 
-	 * Return the player to the stored setBackPoint location
-	 * @param event
-	 */
-	private void resetPlayer(PlayerMoveEvent event) {
-
-		MovingData data = MovingData.get(event.getPlayer());
-
-		// Make a modified copy of the setBackPoint to prevent other plugins from accidentally modifying it
-		// and keep the current pitch and yaw (setbacks "feel" better that way).
-
-		double y = data.setBackPoint.getY();
-		// search for the first solid block up to 5 blocks below the setbackpoint and teleport the player there
-		for(int i = 0; i < 20; i++) {
-			if(playerIsOnGround(data.setBackPoint, -0.5*i) != MovingData.NONSOLID) {
-				y -= 0.5*i;
-				break;
-			}
-		}	
-
-		Location t = new Location(data.setBackPoint.getWorld(), data.setBackPoint.getX(), y, data.setBackPoint.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
-
-		data.teleportTo = t;
-		// Only reset player and cancel event if teleport is successful
-		if(event.getPlayer().teleport(t)) {
-
-			// Put the player back to the chosen location
-			event.setFrom(t);
-			event.setTo(t);
-
-			event.setCancelled(true);
-			
-			data.teleportTo = null;
-		}
 	}
 
 
@@ -712,7 +694,7 @@ public class MovingCheck extends Check {
 			allowFlying = config.getBooleanValue("moving.allowflying");
 			allowFakeSneak = config.getBooleanValue("moving.allowfakesneak");
 			allowFastSwim = config.getBooleanValue("moving.allowfastswim");
-			
+
 			waterElevators = config.getBooleanValue("moving.waterelevators");
 
 			logMessage = config.getStringValue("moving.logmessage").
@@ -721,7 +703,7 @@ public class MovingCheck extends Check {
 			replace("[from]", "(%4$.1f, %5$.1f, %6$.1f)").
 			replace("[to]", "(%7$.1f, %8$.1f, %9$.1f)").
 			replace("[distance]", "(%10$.1f, %11$.1f, %12$.1f)");
-			
+
 			summaryMessage = config.getStringValue("moving.summarymessage").
 			replace("[timeframe]", "%2$d").
 			replace("[player]", "%1$s").
@@ -734,9 +716,9 @@ public class MovingCheck extends Check {
 			actions[2] = config.getActionValue("moving.action.high");
 
 			setActive(config.getBooleanValue("active.moving"));
-			
+
 			enforceTeleport = config.getBooleanValue("moving.enforceteleport");
-			
+
 		} catch (ConfigurationException e) {
 			setActive(false);
 			e.printStackTrace();
