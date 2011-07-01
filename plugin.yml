@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 1.06a
+version: 1.07
 
 softdepend: [ Permissions, CraftIRC ]
 

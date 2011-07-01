@@ -31,7 +31,7 @@ public class MovingPlayerMonitor extends PlayerListener {
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		check.teleported(event);
 	}
-
+	
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		check.updateVelocity(event.getPlayer().getVelocity(), MovingData.get(event.getPlayer()));

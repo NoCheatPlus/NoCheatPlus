@@ -43,10 +43,10 @@ public class MovingCheck extends Check {
 	}
 
 	// How many move events can a player have in air before he is expected to lose altitude (or land somewhere)
-	private final static int jumpingLimit = 4;
+	private final static int jumpingLimit = 5;
 
 	// How high may a player get compared to his last location with ground contact
-	private final static double jumpHeight = 1.3D;
+	private final static double jumpHeight = 1.35D;
 
 	// How high may a player move in one event on ground
 	private final static double stepHeight = 0.501D;
@@ -102,21 +102,24 @@ public class MovingCheck extends Check {
 		// Get the player-specific data
 		final MovingData data = MovingData.get(player);
 
+		
 		// Get the two locations of the event
 		final Location to = event.getTo();
 
-		// use our self-defined from-location, instead of the one from the event
-		Location from = data.lastLocation;
+		Location from = event.getFrom();
 
 		updateVelocity(player.getVelocity(), data);
 
 		// event.getFrom() is intentional here
-		if(shouldBeIgnored(player, data, event.getFrom(), to)) {
+		if(shouldBeIgnored(player, data, from, to)) {
 			statisticElapsedTimeNano += System.nanoTime() - startTime;
 			statisticTotalEvents++;
 			return;
 		}
 
+		if(to.distanceSquared(data.lastLocation) < to.distanceSquared(from)) {
+			from = data.lastLocation;
+		}
 		/**** Horizontal movement check START ****/
 
 		// First check the distance the player has moved horizontally
@@ -193,7 +196,7 @@ public class MovingCheck extends Check {
 				limit += jumpHeight - (data.jumpPhase-jumpingLimit) * 0.2D;
 			else limit += jumpHeight;
 
-			final int onGroundTo = playerIsOnGround(to, 0.5D);
+			final int onGroundTo = playerIsOnGround(to, 0.0D);
 
 			if(onGroundTo != MovingData.NONSOLID) limit += stepHeight;
 
@@ -205,7 +208,7 @@ public class MovingCheck extends Check {
 			if(violationLevelVertical < 0) {
 				if(onGroundTo != MovingData.NONSOLID) { // Land
 					data.jumpPhase = 0; // He is on ground now, so reset the jump
-					newSetBack = to;
+					//newSetBack = to;
 				}
 				else { // Fly
 					data.jumpPhase++; // Enter next phase of the flight
@@ -387,12 +390,12 @@ public class MovingCheck extends Check {
 		if(data.insideVehicle || player.isInsideVehicle()) {
 			return true;
 		}
-
-		// More sophisticated checks
-		final Location l = data.lastLocation;
-
-		// Player is currently changing worlds
-		if(!l.getWorld().equals(from.getWorld())) {
+		
+		if(!from.getWorld().equals(data.lastLocation.getWorld())) {
+			return true;
+		}
+		
+		if(data.teleportTo != null && from.getX() == data.teleportTo.getX() && from.getY() == data.teleportTo.getY() && from.getZ() == data.teleportTo.getZ()) {
 			return true;
 		}
 
@@ -402,10 +405,6 @@ public class MovingCheck extends Check {
 
 		// Player didn't move at all
 		if(x == to.getX() && z == to.getZ() && y == to.getY() ) {
-			return true;
-		}
-		// Something or someone moved the player without causing a move event - Can't do much with that
-		else if(!(x == l.getX() && z == l.getZ() && y == l.getY())){
 			return true;
 		}
 
@@ -460,8 +459,9 @@ public class MovingCheck extends Check {
 		}
 
 		if(!event.isCancelled()) {
-			data.lastLocation = event.getTo();
 			data.jumpPhase = 0;
+			data.teleportTo = event.getTo().clone();
+			data.lastLocation = event.getTo().clone();
 			data.setBackPoint = event.getTo().clone();
 		}
 	}
@@ -472,7 +472,6 @@ public class MovingCheck extends Check {
 	 */
 	public void respawned(PlayerRespawnEvent event) {
 		MovingData data = MovingData.get(event.getPlayer());
-		data.lastLocation = event.getRespawnLocation();
 		data.setBackPoint = event.getRespawnLocation().clone();
 	}
 
