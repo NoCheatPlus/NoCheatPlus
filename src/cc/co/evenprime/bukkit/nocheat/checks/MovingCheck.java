@@ -1,3 +1,4 @@
+
 package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.Locale;
@@ -102,7 +103,7 @@ public class MovingCheck extends Check {
 		// Get the player-specific data
 		final MovingData data = MovingData.get(player);
 
-		
+
 		// Get the two locations of the event
 		final Location to = event.getTo();
 
@@ -117,9 +118,6 @@ public class MovingCheck extends Check {
 			return;
 		}
 
-		if(to.distanceSquared(data.lastLocation) < to.distanceSquared(from)) {
-			from = data.lastLocation;
-		}
 		/**** Horizontal movement check START ****/
 
 		// First check the distance the player has moved horizontally
@@ -386,25 +384,31 @@ public class MovingCheck extends Check {
 	 */
 	private boolean shouldBeIgnored(final Player player, final MovingData data, final Location from, final Location to) {
 
-		// First the simple yes/no checks
-		if(data.insideVehicle || player.isInsideVehicle()) {
-			return true;
-		}
-		
-		if(!from.getWorld().equals(data.lastLocation.getWorld())) {
-			return true;
-		}
-		
-		if(data.teleportTo != null && from.getX() == data.teleportTo.getX() && from.getY() == data.teleportTo.getY() && from.getZ() == data.teleportTo.getZ()) {
-			return true;
-		}
+		// Now it gets complicated: (a friendly reminder to myself why this actually works in CB 950+)
 
-		final double x = from.getX();
-		final double y = from.getY();
-		final double z = from.getZ();
-
-		// Player didn't move at all
-		if(x == to.getX() && z == to.getZ() && y == to.getY() ) {
+		// data.teleportTo gets a location assigned if a teleport event is successfully executed.
+		// But there is a delay between the serverside execution of the teleport (instantly) and
+		// the execution on the client side (may take an arbitrary time). During that time, the
+		// client may send new move events relative to his old location. These events get treated
+		// by bukkit as PLAYER_MOVE events, despite the server not accepting them (the players 
+		// serverside location won't get updated). Therefore comparing the teleport destination
+		// with the servers location of the player (which is almost the same as the "from" location 
+		// in the move event) tells us if the server is still waiting for the clientside teleporting
+		// to be executed. We are only interested in client's move events after it executed the
+		// teleport, therefore just ignore all events before that.
+		if(data.teleportTo != null && data.teleportTo.distanceSquared(from) < 0.01D) {
+			return true;
+		}
+		else {
+			data.teleportTo = null;
+		}
+		// Dead or in vehicles -> I don't care
+		if(player.isDead() || data.insideVehicle || player.isInsideVehicle()) {
+			return true;
+		}
+		// If the player moved between worlds between events, don't check (wouldn't make sense
+		// to check coordinates between different worlds...)
+		if(!from.getWorld().equals(data.lastLocation)) {
 			return true;
 		}
 
@@ -453,16 +457,18 @@ public class MovingCheck extends Check {
 
 		MovingData data = MovingData.get(event.getPlayer());
 
-		// We can enforce a teleport, if that flag is explicitly set
-		if(event.isCancelled() && enforceTeleport && event.getTo().equals(data.teleportTo)) {
+		// We can enforce a teleport, if that flag is explicitly set (but I'd rather have other plugins
+		// not arbitrarily cancel teleport events in the first place...
+		if(data.teleportInitializedByMe != null && event.isCancelled() &&  enforceTeleport && event.getTo().equals(data.teleportInitializedByMe)) {
 			event.setCancelled(false);
+			data.teleportInitializedByMe = null;
 		}
 
 		if(!event.isCancelled()) {
 			data.jumpPhase = 0;
 			data.teleportTo = event.getTo().clone();
-			data.lastLocation = event.getTo().clone();
 			data.setBackPoint = event.getTo().clone();
+			//data.lastLocation = event.getTo().clone();
 		}
 	}
 
@@ -471,8 +477,8 @@ public class MovingCheck extends Check {
 	 * @param event
 	 */
 	public void respawned(PlayerRespawnEvent event) {
-		MovingData data = MovingData.get(event.getPlayer());
-		data.setBackPoint = event.getRespawnLocation().clone();
+		//MovingData data = MovingData.get(event.getPlayer());
+		//data.setBackPoint = event.getRespawnLocation().clone();
 	}
 
 	/**
@@ -536,9 +542,9 @@ public class MovingCheck extends Check {
 						data.setBackPoint.setY(y);
 
 						// Remember the location we send the player to, to identify teleports that were started by us
-						data.teleportTo = new Location(data.setBackPoint.getWorld(), data.setBackPoint.getX(), y, data.setBackPoint.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
+						data.teleportInitializedByMe = new Location(data.setBackPoint.getWorld(), data.setBackPoint.getX(), y, data.setBackPoint.getZ(), event.getTo().getYaw(), event.getTo().getPitch());
 
-						event.setTo(data.teleportTo);
+						event.setTo(data.teleportInitializedByMe);
 
 						cancelled = true; // just prevent us from treating more than one "cancel" action, which would make no sense
 					}
@@ -739,7 +745,6 @@ public class MovingCheck extends Check {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingPlayerListener(this), Priority.Lowest, plugin);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, movingPlayerMonitor, Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(this), Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
 	}

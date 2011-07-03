@@ -6,6 +6,7 @@ import net.minecraft.server.Block;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
@@ -31,9 +32,11 @@ public class MovingData {
 
 	public boolean insideVehicle = false;
 
-	// WORKAROUND for changed PLAYER_MOVE logic
+	// Use to determine if an move event should be handled
 	public Location teleportTo = null;
-	public Location lastLocation = null;
+
+	// Use to track the world the player is in
+	public World lastLocation = null;
 
 	public Location teleportInitializedByMe = null;
 
@@ -81,7 +84,7 @@ public class MovingData {
 
 		if(data.moving == null) {
 			data.moving = new MovingData();
-			data.moving.lastLocation = p.getLocation();
+			data.moving.lastLocation = p.getLocation().getWorld();
 		}
 
 		return data.moving;
