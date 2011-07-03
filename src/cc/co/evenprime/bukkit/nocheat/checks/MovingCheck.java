@@ -396,12 +396,15 @@ public class MovingCheck extends Check {
 		// in the move event) tells us if the server is still waiting for the clientside teleporting
 		// to be executed. We are only interested in client's move events after it executed the
 		// teleport, therefore just ignore all events before that.
-		if(data.teleportTo != null && data.teleportTo.distanceSquared(from) < 0.01D) {
-			return true;
+		if(data.teleportTo != null && data.teleportTo.getWorld().equals(from.getWorld())) {
+			if(data.teleportTo.distanceSquared(from) < 0.01D) {
+				return true;
+			}
+			else {
+				data.teleportTo = null;
+			}
 		}
-		else {
-			data.teleportTo = null;
-		}
+		
 		// Dead or in vehicles -> I don't care
 		if(player.isDead() || data.insideVehicle || player.isInsideVehicle()) {
 			return true;
