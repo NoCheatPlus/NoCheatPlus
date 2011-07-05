@@ -384,8 +384,13 @@ public class MovingCheck extends Check {
 	 */
 	private boolean shouldBeIgnored(final Player player, final MovingData data, final Location from, final Location to) {
 
+		if(data.firstEventAfterRespawn) {
+			data.firstEventAfterRespawn = false;
+			data.teleportTo = from.clone();
+		}
+		
 		// Now it gets complicated: (a friendly reminder to myself why this actually works in CB 950+)
-
+		
 		// data.teleportTo gets a location assigned if a teleport event is successfully executed.
 		// But there is a delay between the serverside execution of the teleport (instantly) and
 		// the execution on the client side (may take an arbitrary time). During that time, the
@@ -411,7 +416,7 @@ public class MovingCheck extends Check {
 		}
 		// If the player moved between worlds between events, don't check (wouldn't make sense
 		// to check coordinates between different worlds...)
-		if(!from.getWorld().equals(data.lastLocation)) {
+		if(!from.getWorld().equals(data.lastSeenInWorld)) {
 			return true;
 		}
 
@@ -468,11 +473,13 @@ public class MovingCheck extends Check {
 		}
 
 		if(!event.isCancelled()) {
-			data.jumpPhase = 0;
 			data.teleportTo = event.getTo().clone();
 			data.setBackPoint = event.getTo().clone();
 			//data.lastLocation = event.getTo().clone();
 		}
+		
+		// reset anyway - if another plugin cancelled our teleport it's no use to try and be precise
+		data.jumpPhase = 0;
 	}
 
 	/**
@@ -480,8 +487,10 @@ public class MovingCheck extends Check {
 	 * @param event
 	 */
 	public void respawned(PlayerRespawnEvent event) {
-		//MovingData data = MovingData.get(event.getPlayer());
-		//data.setBackPoint = event.getRespawnLocation().clone();
+		MovingData data = MovingData.get(event.getPlayer());
+		data.firstEventAfterRespawn = true;
+		data.jumpPhase = 0;
+		data.setBackPoint = null;
 	}
 
 	/**
@@ -750,5 +759,6 @@ public class MovingCheck extends Check {
 		pm.registerEvent(Event.Type.PLAYER_MOVE, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(this), Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
 	}
 }

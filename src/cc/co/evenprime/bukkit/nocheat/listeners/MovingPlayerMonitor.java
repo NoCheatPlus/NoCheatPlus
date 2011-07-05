@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat.listeners;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
@@ -25,6 +26,11 @@ public class MovingPlayerMonitor extends PlayerListener {
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		check.teleported(event);
 	}
+	
+	@Override
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		this.check.respawned(event);
+	}
 
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
@@ -35,7 +41,7 @@ public class MovingPlayerMonitor extends PlayerListener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		if(!event.isCancelled()) {
 			MovingData data = MovingData.get(event.getPlayer());
-			data.lastLocation = event.getPlayer().getLocation().getWorld();
+			data.lastSeenInWorld = event.getPlayer().getLocation().getWorld();
 			if( event.getPlayer().isInsideVehicle()) {
 				data.setBackPoint = event.getTo();	
 			}

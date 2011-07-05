@@ -36,9 +36,10 @@ public class MovingData {
 	public Location teleportTo = null;
 
 	// Use to track the world the player is in
-	public World lastLocation = null;
+	public World lastSeenInWorld = null;
 
 	public Location teleportInitializedByMe = null;
+	public boolean firstEventAfterRespawn = false;
 
 
 
@@ -84,7 +85,7 @@ public class MovingData {
 
 		if(data.moving == null) {
 			data.moving = new MovingData();
-			data.moving.lastLocation = p.getLocation().getWorld();
+			data.moving.lastSeenInWorld = p.getLocation().getWorld();
 		}
 
 		return data.moving;
