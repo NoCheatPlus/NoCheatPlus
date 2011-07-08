@@ -32,6 +32,10 @@ public class Explainations {
 				"If one of your plugins intentionally produces such bogus items, you should not activate this (or you'll likely lose them).\n" +
 				"By default OPs are not checked (can be changed in the 'bogusitems' section).\n" +
 				"(Permissions plugin): Only players that don't have the permission 'nocheat.bogusitems' will be checked.");
+		set("active.nuke", "If activated, players will no longer be allowed to destroy blocks that are not in front of them.\n" +
+				"Because this is done by most 'nuke' hack-clients, it is easy to prevent (for now). If a player tries destroying\n" +
+				"blocks that are outside his field of sight, he'll get kicked from the server.\n" +
+				"This is only a temporary solution (and will probably not hold for long), but it's better than nothing, I guess...");
 		
 		set("logging.filename", "Determines where the various messages by NoCheat are stored at, if logging to file is activated.");
 		set("logging.logtofile", "Determine what severeness messages need to have to be printed to the logfile.\n" +
@@ -171,6 +175,12 @@ public class Explainations {
 				"to not check them, e.g. they got the relevant permission from a Permissions plugin.");
 		
 		set("bedteleport.checkops", "Also check players with OP-status, unless there is another reason\n" +
+				"to not check them, e.g. they got the relevant permission from a Permissions plugin.");
+		
+		set("nuke.logmessage", "The message that appears in your logs if somebody gets kicked for trying to nuke\n" +
+				"the server map");
+		set("nuke.kickmessage", "The message that is shown to players that get kicked for nuking");
+		set("nuke.checkops",  "Also check players with OP-status, unless there is another reason\n" +
 				"to not check them, e.g. they got the relevant permission from a Permissions plugin.");
 	}
 	

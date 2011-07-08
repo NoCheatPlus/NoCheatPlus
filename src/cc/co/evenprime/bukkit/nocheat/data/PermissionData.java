@@ -6,10 +6,10 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 
 public class PermissionData {
 
-	public long lastUpdate[] = new long[10];
-	public boolean cache[] = new boolean[10];
+	public long lastUpdate[] = new long[11];
+	public boolean cache[] = new boolean[11];
 	
-	public static final String[] permissionNames = new String[10];
+	public static final String[] permissionNames = new String[11];
 	
 	public static final int PERMISSION_MOVING = 0;
 	public static final int PERMISSION_FLYING = 1;
@@ -21,6 +21,7 @@ public class PermissionData {
 	public static final int PERMISSION_ITEMDUPE = 7;
 	public static final int PERMISSION_FAKESNEAK = 8;
 	public static final int PERMISSION_FASTSWIM = 9;
+	public static final int PERMISSION_NUKE = 10;
 	
 	static {
 		permissionNames[PERMISSION_AIRBUILD] = "nocheat.airbuild";
@@ -33,6 +34,7 @@ public class PermissionData {
 		permissionNames[PERMISSION_ITEMDUPE] = "nocheat.itemdupe";
 		permissionNames[PERMISSION_FAKESNEAK] = "nocheat.fakesneak";
 		permissionNames[PERMISSION_FASTSWIM] = "nocheat.fastswim";
+		permissionNames[PERMISSION_NUKE] = "nocheat.nuke";
 	}
 	
 	public static PermissionData get(Player p) {

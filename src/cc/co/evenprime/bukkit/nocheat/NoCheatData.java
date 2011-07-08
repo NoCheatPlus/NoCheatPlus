@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
+import cc.co.evenprime.bukkit.nocheat.data.NukeData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.data.SpeedhackData;
@@ -28,6 +29,7 @@ public class NoCheatData {
 	public AirbuildData airbuild;
 
 	public PermissionData permission;
+	public NukeData nuke;
 
 
 

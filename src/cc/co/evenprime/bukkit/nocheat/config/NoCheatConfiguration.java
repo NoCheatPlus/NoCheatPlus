@@ -104,6 +104,8 @@ public class NoCheatConfiguration {
 					SimpleYaml.getBoolean("active.airbuild", false, yamlContent)));
 			activeNode.add(new BooleanOption("bogusitems", 
 					SimpleYaml.getBoolean("active.bogusitems", false, yamlContent)));
+			activeNode.add(new BooleanOption("nuke", 
+					SimpleYaml.getBoolean("active.nuke", false, yamlContent)));
 		}
 
 		/*** SPEEDHACK section ***/
@@ -228,6 +230,21 @@ public class NoCheatConfiguration {
 
 			bogusitemsNode.add(new BooleanOption("checkops", 
 					SimpleYaml.getBoolean("bogusitems.checkops", false, yamlContent)));
+		}
+		
+
+		/*** NUKE section ***/
+		{
+			ParentOption nukeNode = new ParentOption("nuke", false);
+			root.add(nukeNode);
+			
+			nukeNode.add(new BooleanOption("checkops", 
+					SimpleYaml.getBoolean("nuke.checkops", false, yamlContent)));
+			nukeNode.add(new LongStringOption("logmessage", 
+					SimpleYaml.getString("nuke.logmessage", "Nuke: [player] tried to nuke the world", yamlContent)));
+			nukeNode.add(new LongStringOption("kickmessage", 
+					SimpleYaml.getString("nuke.kickmessage", "No nuking allowed", yamlContent)));
+			
 		}
 
 		/*** CUSTOMACTIONS section ***/

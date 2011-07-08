@@ -19,6 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.CustomAction;
 import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.BogusitemsCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
+import cc.co.evenprime.bukkit.nocheat.checks.NukeCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
@@ -68,6 +69,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	private Level ircLevel;
 	private Level consoleLevel;
 	private String ircTag;
+	private NukeCheck instantmineCheck;
 
 
 	public NoCheat() { 	
@@ -137,9 +139,10 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		speedhackCheck = new SpeedhackCheck(this, config);
 		airbuildCheck = new AirbuildCheck(this, config);
 		bogusitemsCheck = new BogusitemsCheck(this, config);
-
+		instantmineCheck = new NukeCheck(this, config);
+		
 		// just for convenience
-		checks = new Check[] { movingCheck, speedhackCheck, airbuildCheck, bogusitemsCheck };
+		checks = new Check[] { movingCheck, speedhackCheck, airbuildCheck, bogusitemsCheck, instantmineCheck };
 
 		if(!allowFlightSet && movingCheck.isActive()) {
 			Logger.getLogger("Minecraft").warning( "[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
