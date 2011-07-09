@@ -26,6 +26,8 @@ public class NukeCheck extends Check {
 	private String kickMessage;
 	private String logMessage;
 	
+	private boolean limitReach;
+	
 	public NukeCheck(NoCheat plugin, NoCheatConfiguration config) {
 
 		super(plugin, "nuke", PermissionData.PERMISSION_NUKE, config);
@@ -41,6 +43,8 @@ public class NukeCheck extends Check {
 			kickMessage = config.getStringValue("nuke.kickmessage");
 			logMessage = config.getStringValue("nuke.logmessage").
 			replace("[player]", "%1$s");
+			
+			limitReach = config.getBooleanValue("nuke.limitreach");
 			
 			setActive(config.getBooleanValue("active.nuke"));
 		} catch (ConfigurationException e) {
@@ -72,9 +76,11 @@ public class NukeCheck extends Check {
 		final double y2 = y1 + 2;
 		final double z2 = z1 + 2;
 
-		double factor = new Vector(x1 + 1, y1 + 1, z1 + 1).length();	
+		double factor = new Vector(x1 + 1, y1 + 1, z1 + 1).length();
 		
-		if(factor * direction.getX() >= x1 && factor * direction.getY() >= y1 && factor * direction.getZ() >= z1 &&
+		boolean tooFarAway = limitReach && factor > 4.85D;
+		
+		if(!tooFarAway && factor * direction.getX() >= x1 && factor * direction.getY() >= y1 && factor * direction.getZ() >= z1 &&
 		   factor * direction.getX() <= x2 && factor * direction.getY() <= y2 && factor * direction.getZ() <= z2) {
 			if(data.counter > 0) {
 				data.counter--;

@@ -244,6 +244,8 @@ public class NoCheatConfiguration {
 					SimpleYaml.getString("nuke.logmessage", "Nuke: [player] tried to nuke the world", yamlContent)));
 			nukeNode.add(new LongStringOption("kickmessage", 
 					SimpleYaml.getString("nuke.kickmessage", "No nuking allowed", yamlContent)));
+			nukeNode.add(new BooleanOption("limitreach", 
+					SimpleYaml.getBoolean("nuke.limitreach", true, yamlContent)));
 			
 		}
 

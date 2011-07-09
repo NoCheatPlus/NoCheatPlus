@@ -182,6 +182,8 @@ public class Explainations {
 		set("nuke.kickmessage", "The message that is shown to players that get kicked for nuking");
 		set("nuke.checkops",  "Also check players with OP-status, unless there is another reason\n" +
 				"to not check them, e.g. they got the relevant permission from a Permissions plugin.");
+		set("nuke.limitreach",  "Deny blockbreaking over longer distances than the standard minecraft\n" +
+				"client allows.");
 	}
 	
 	private static void set(String id, String text) {

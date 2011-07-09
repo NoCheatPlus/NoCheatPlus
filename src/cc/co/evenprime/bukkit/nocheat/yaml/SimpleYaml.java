@@ -121,7 +121,14 @@ public class SimpleYaml {
 
 	public static boolean getBoolean(String path, boolean defaultValue, Map<String, Object> node) {
 		try {
-			return Boolean.parseBoolean((String)getProperty(path, node));
+			if(((String)getProperty(path, node)).equals("true")) {
+				return true;
+			} else if(((String)getProperty(path, node)).equals("false")) {
+				return false;
+			}
+			else {
+				return defaultValue;
+			}
 		}
 		catch(Exception e) {
 			//e.printStackTrace();
