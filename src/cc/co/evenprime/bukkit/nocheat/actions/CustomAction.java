@@ -12,7 +12,7 @@ public class CustomAction extends Action {
 
 	public CustomAction(int firstAfter, boolean repeat, String command) {
 		super(firstAfter, repeat);
-		this.command = command;
+		this.command = command.trim();
 	}
 
 	public String getName() {

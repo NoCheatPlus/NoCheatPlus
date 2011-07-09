@@ -10,7 +10,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
@@ -63,20 +62,20 @@ public class NukeCheck extends Check {
 		Location eyes = event.getPlayer().getEyeLocation();
 		Vector direction = eyes.getDirection();
 
-		double x1 = (double)block.getX() - eyes.getX();
-		double y1 = (double)block.getY() - eyes.getY();
-		double z1 = (double)block.getZ() - eyes.getZ();
+		// Because it's not very precise on very short distances, 
+		// consider the length of the side of a block to be 2.0 instead of 1.0
+		final double x1 = ((double)block.getX()) - eyes.getX() - 0.5;
+		final double y1 = ((double)block.getY()) - eyes.getY() - 0.5;
+		final double z1 = ((double)block.getZ()) - eyes.getZ() - 0.5;
 
-		double x2 = x1 + 1;
-		double y2 = y1 + 1;
-		double z2 = z1 + 1;
+		final double x2 = x1 + 2;
+		final double y2 = y1 + 2;
+		final double z2 = z1 + 2;
 
-		double factor = 1 + direction.distance(new Vector(x1 + 0.5, y1 + 0.5, z1 + 0.5));
-		double errorMargin = 1.2 / factor;
+		double factor = new Vector(x1 + 1, y1 + 1, z1 + 1).length();	
 		
-
-		if(factor * direction.getX() >= x1 - errorMargin && factor * direction.getY() >= y1 - errorMargin && factor * direction.getZ() >= z1 - errorMargin &&
-		   factor * direction.getX() <= x2 + errorMargin && factor * direction.getY() <= y2 + errorMargin && factor * direction.getZ() <= z2 + errorMargin) {
+		if(factor * direction.getX() >= x1 && factor * direction.getY() >= y1 && factor * direction.getZ() >= z1 &&
+		   factor * direction.getX() <= x2 && factor * direction.getY() <= y2 && factor * direction.getZ() <= z2) {
 			if(data.counter > 0) {
 				data.counter--;
 			}
@@ -85,7 +84,7 @@ public class NukeCheck extends Check {
 			data.counter++;
 			event.setCancelled(true);
 			
-			if(data.counter > 20) {
+			if(data.counter > 10) {
 				
 				String log = String.format(Locale.US, logMessage, event.getPlayer().getName());
 				
@@ -99,9 +98,6 @@ public class NukeCheck extends Check {
 		
 	}
 
-	public void check(BlockDamageEvent event) {
-
-	}
 
 	@Override
 	protected void registerListeners() {

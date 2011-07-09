@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -401,9 +402,32 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 	public void handleCustomAction(CustomAction a, Player player) {
 
-		Bukkit.getServer().dispatchCommand(this, a.command.replace("[player]", player.getName()));
-		//System.out.println("Would execute "+a.command + " now for Player " + player.getName() );
-
+		String command = a.command.replace("[player]", player.getName());
+		try {
+			String[] commandParts = command.split(" ", 2);
+			String commandName = commandParts[0];
+			PluginCommand com = Bukkit.getServer().getPluginCommand(commandName);
+			
+			// If there's a plugin that can handle it
+			if(com != null) {
+				if(commandParts.length > 1) { // Command + parameters
+					String[] commandArgs = commandParts[1].split(" ");
+					com.execute(this, commandName, commandArgs);
+				}
+				else {
+					String[] commandArgs = new String[0];
+					com.execute(this, commandName, commandArgs);
+				}
+			}
+			else
+			{
+				// The standard server should do it
+				Bukkit.getServer().dispatchCommand(this, command);
+			}
+		}
+		catch(Exception e) {
+			this.log(Level.WARNING, "NoCheat couldn't execute custom server command: \""+command+"\"");
+		}
 	}
 
 	@Override
