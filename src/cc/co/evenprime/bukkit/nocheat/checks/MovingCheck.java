@@ -52,9 +52,9 @@ public class MovingCheck extends Check {
 	// How high may a player move in one event on ground
 	private final static double stepHeight = 0.501D;
 
-	private final static double stepWidth = 0.6D;
-	private final static double sneakWidth = 0.25D;
-	private final static double swimWidth = 0.4D;
+	private final static double stepWidth = 0.25D;
+	private final static double sneakWidth = 0.14D;
+	private final static double swimWidth = 0.18D;
 
 	private int ticksBeforeSummary = 100;
 
@@ -136,16 +136,24 @@ public class MovingCheck extends Check {
 
 		final int onGroundFrom = playerIsOnGround(from, 0.0D);
 
+		double overLimit = 0.0D;
 
-		// Do various checks on the players horizontal movement
-		int sn = getSneakingViolationLevel(combined, data, player);
-		int sw = getSwimmingViolationLevel(combined, data, onGroundFrom == MovingData.LIQUID, player);
-		int s = limitCheck(combined - (data.horizFreedom + stepWidth));
+		if(player.isSneaking() && !allowFakeSneak && !plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK, checkOPs)) {
+			overLimit = Math.max(0.0D, combined - (data.horizFreedom + sneakWidth));
+		}
+		else if(onGroundFrom == MovingData.LIQUID && !allowFastSwim && !plugin.hasPermission(player, PermissionData.PERMISSION_FASTSWIM, checkOPs)) {
+			overLimit = Math.max(0.0D, combined - (data.horizFreedom + swimWidth));
+		}
+		else {
+			overLimit = Math.max(0.0D, combined - (data.horizFreedom + stepWidth));
+		}
 
-		// The maximum of the three values is the biggest violation measured
-		int violationLevelHorizontal = sn > sw && sn > s ? sn : (sw > s ? sw : s);
+		data.runningThreshold += overLimit;
+		
+		int violationLevelHorizontal = limitCheck(data.runningThreshold - 1);
 
 		// Reduce horiz moving freedom with each event
+		data.runningThreshold *= 0.95;
 		data.horizFreedom *= 0.9;
 
 		/**** Horizontal movement check END ****/
@@ -246,99 +254,6 @@ public class MovingCheck extends Check {
 		statisticTotalEvents++;
 	}
 
-
-	/**
-	 * Run a check if a sneaking player is moving too fast
-	 *  
-	 * @param combined Distance moved
-	 * @param data the players data
-	 * @param player the player
-	 * @return violation level
-	 */
-	private int getSneakingViolationLevel(final double combined, final MovingData data, final Player player) {
-
-		int violationLevelSneaking = -1;
-
-		// Maybe the player is allowed to sneak faster than usual?
-		final boolean canFakeSneak = allowFakeSneak || plugin.hasPermission(player, PermissionData.PERMISSION_FAKESNEAK, checkOPs);
-
-		if(!canFakeSneak) {
-
-			// Explaination blob:
-			// When a player starts to sneak, he may have a phase where he is still moving faster than he
-			// should be, e.g. because he is in air, on slippery ground, ...
-			// Therefore he gets a counter that gets reduced everytime he is too fast and slowly incremented
-			// every time he is slow enough
-			// If the counter reaches zero, his movement is considered a violation.
-			if(player.isSneaking()) {
-				violationLevelSneaking = limitCheck(combined - (data.horizFreedom + sneakWidth));
-				if(violationLevelSneaking >= 0) {
-					if(combined >= data.sneakingLastDistance * 0.9)
-						data.sneakingFreedomCounter -= 2;
-					else
-					{
-						violationLevelSneaking = -1;
-					}
-				}
-
-				data.sneakingLastDistance = combined;
-			}
-
-			if(violationLevelSneaking >= 0 && data.sneakingFreedomCounter > 0) {
-				violationLevelSneaking = -1;
-			}
-			else if(violationLevelSneaking < 0 && data.sneakingFreedomCounter < 10){
-				data.sneakingFreedomCounter += 1;
-			}
-		}
-
-		return violationLevelSneaking;		
-	}
-
-	private int getSwimmingViolationLevel( final double combined, final MovingData data, final boolean isSwimming, final Player player) {
-
-		int violationLevelSwimming = -1;
-
-		// Maybe the player is allowed to swim faster than usual?
-		final boolean canFastSwim = allowFastSwim || plugin.hasPermission(player, PermissionData.PERMISSION_FASTSWIM, checkOPs);
-
-		if(!canFastSwim) {
-
-			final double limit = data.horizFreedom + swimWidth;
-
-
-			// Explaination blob:
-			// When a player starts to swim, he may have a phase where he is still moving faster than he
-			// should be, e.g. because he jumped into the water ...
-			// Therefore he gets a counter that gets reduced everytime he is too fast and slowly incremented
-			// every time he is slow enough
-			// If the counter reaches zero, his movement is considered a violation.
-			if(isSwimming) {
-				violationLevelSwimming = limitCheck(combined - limit);
-				if(violationLevelSwimming >= 0) {
-					if(combined >= data.swimmingLastDistance * 0.9)
-						data.swimmingFreedomCounter -= 2;
-					else
-					{
-						violationLevelSwimming = -1;
-					}
-				}
-
-				data.swimmingLastDistance = combined;
-			}
-
-			if(violationLevelSwimming >= 0 && data.swimmingFreedomCounter > 0) {
-				violationLevelSwimming = -1;
-			}
-			else if(violationLevelSwimming < 0 && data.swimmingFreedomCounter < 10){
-				data.swimmingFreedomCounter += 1;
-			}
-
-		}
-
-		return violationLevelSwimming;		
-	}
-
 	private double calculateVerticalLimit(final MovingData data, final int onGroundFrom) {
 
 		// A halfway lag-resistant method of allowing vertical acceleration without allowing blatant cheating
@@ -388,9 +303,9 @@ public class MovingCheck extends Check {
 			data.firstEventAfterRespawn = false;
 			data.teleportTo = from.clone();
 		}
-		
+
 		// Now it gets complicated: (a friendly reminder to myself why this actually works in CB 950+)
-		
+
 		// data.teleportTo gets a location assigned if a teleport event is successfully executed.
 		// But there is a delay between the serverside execution of the teleport (instantly) and
 		// the execution on the client side (may take an arbitrary time). During that time, the
@@ -409,7 +324,7 @@ public class MovingCheck extends Check {
 				data.teleportTo = null;
 			}
 		}
-		
+
 		// Dead or in vehicles -> I don't care
 		if(player.isDead() || data.insideVehicle || player.isInsideVehicle()) {
 			return true;
@@ -477,7 +392,7 @@ public class MovingCheck extends Check {
 			data.setBackPoint = event.getTo().clone();
 			//data.lastLocation = event.getTo().clone();
 		}
-		
+
 		// reset anyway - if another plugin cancelled our teleport it's no use to try and be precise
 		data.jumpPhase = 0;
 	}

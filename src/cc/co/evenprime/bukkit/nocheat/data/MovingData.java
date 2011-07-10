@@ -25,10 +25,7 @@ public class MovingData {
 	public int summaryTask = -1;
 	public Level highestLogLevel = null;
 	public double maxYVelocity = 0.0D;
-	public int sneakingFreedomCounter = 10;
-	public int swimmingFreedomCounter = 10;
-	public double sneakingLastDistance = 0.0D;
-	public double swimmingLastDistance = 0.0D;
+	public double runningThreshold = 0.0D;
 
 	public boolean insideVehicle = false;
 
@@ -40,8 +37,6 @@ public class MovingData {
 
 	public Location teleportInitializedByMe = null;
 	public boolean firstEventAfterRespawn = false;
-
-
 
 	// Block types that may need to be treated specially
 	public static final int NONSOLID = 0;     // 0x00000000
