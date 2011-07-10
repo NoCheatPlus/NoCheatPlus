@@ -52,7 +52,7 @@ public class MovingCheck extends Check {
 	// How high may a player move in one event on ground
 	private final static double stepHeight = 0.501D;
 
-	private final static double stepWidth = 0.25D;
+	private final static double stepWidth = 0.22D;
 	private final static double sneakWidth = 0.14D;
 	private final static double swimWidth = 0.18D;
 
@@ -149,11 +149,11 @@ public class MovingCheck extends Check {
 		}
 
 		data.runningThreshold += overLimit;
-		
+
 		int violationLevelHorizontal = limitCheck(data.runningThreshold - 1);
 
 		// Reduce horiz moving freedom with each event
-		data.runningThreshold *= 0.95;
+		data.runningThreshold *= 0.97;
 		data.horizFreedom *= 0.9;
 
 		/**** Horizontal movement check END ****/
