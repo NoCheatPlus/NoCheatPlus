@@ -6,8 +6,8 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 
 public class PermissionData {
 
-	public long lastUpdate[] = new long[11];
-	public boolean cache[] = new boolean[11];
+	public final long lastUpdate[] = new long[11];
+	public final boolean cache[] = new boolean[11];
 	
 	public static final String[] permissionNames = new String[11];
 	

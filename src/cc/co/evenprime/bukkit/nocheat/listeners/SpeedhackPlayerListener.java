@@ -13,7 +13,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.SpeedhackCheck;
  */
 public class SpeedhackPlayerListener extends PlayerListener {
 
-	private SpeedhackCheck check;
+	private final SpeedhackCheck check;
 
 	public SpeedhackPlayerListener(SpeedhackCheck check) {
 		this.check = check;

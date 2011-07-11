@@ -7,7 +7,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.NukeCheck;
 
 public class NukeBlockListener extends BlockListener {
 
-	private NukeCheck check;
+	private final NukeCheck check;
 	
 	public NukeBlockListener(NukeCheck check) {
 		this.check = check;

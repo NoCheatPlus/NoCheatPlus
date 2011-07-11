@@ -8,19 +8,13 @@ public abstract class TextFieldOption extends ChildOption {
 	private static final long serialVersionUID = -8189248456599421250L;
 
 	private String value;
-	private int length = -1;
+	private final int length;
 
 	public TextFieldOption(String name, String initialValue, int preferredLength) {
 
 		super(name);
 		this.value = initialValue;
 		this.length = preferredLength;
-	}
-	
-	public TextFieldOption(String name, String parentName, String initialValue) {
-
-		super(name);
-		this.value = initialValue;
 	}
 
 	@Override

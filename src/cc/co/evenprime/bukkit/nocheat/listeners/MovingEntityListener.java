@@ -9,7 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 public class MovingEntityListener extends EntityListener {
 
-	private MovingCheck check;
+	private final MovingCheck check;
 
 	public MovingEntityListener(MovingCheck check) {
 		this.check = check;

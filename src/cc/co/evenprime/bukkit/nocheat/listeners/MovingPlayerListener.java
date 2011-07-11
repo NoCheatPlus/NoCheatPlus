@@ -1,10 +1,13 @@
 package cc.co.evenprime.bukkit.nocheat.listeners;
 
 
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
  * Handle events for Player related events
@@ -14,7 +17,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 
 public class MovingPlayerListener extends PlayerListener {
 
-	private MovingCheck check;
+	private final MovingCheck check;
 
 	public MovingPlayerListener(MovingCheck check) {
 		this.check = check;
@@ -23,6 +26,28 @@ public class MovingPlayerListener extends PlayerListener {
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
 
-		if(!event.isCancelled()) check.check(event);
+		if(event.isCancelled()) return;
+
+		final Player player = event.getPlayer();
+
+		// Is there something to do at all?
+		if(!check.skipCheck(player)) {
+
+			final MovingData data = MovingData.get(player);
+			final Location from = event.getFrom();
+			final Location to = event.getTo();
+
+			Location newTo = null;
+
+			if(check.shouldBeApplied(player, data, from, to)) {
+				// Check it
+				newTo = check.check(player, from, to, data);
+			}
+
+			// Did the checks decide we need a new To-Location?
+			if(newTo != null) {
+				event.setTo(new Location(newTo.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), event.getTo().getYaw(), event.getTo().getPitch()));
+			}
+		}
 	}
 }

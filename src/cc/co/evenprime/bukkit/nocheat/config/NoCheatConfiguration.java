@@ -35,7 +35,7 @@ public class NoCheatConfiguration {
 
 	private ParentOption root;
 
-	private Map<String, Action> actionMap = new HashMap<String,Action>();
+	private final Map<String, Action> actionMap = new HashMap<String,Action>();
 
 	private Map<String, Object> yamlContent = new HashMap<String, Object>();
 
@@ -50,6 +50,7 @@ public class NoCheatConfiguration {
 
 		// Setup the configuration tree
 		config(configurationFile, descriptionsFile);
+		
 	}
 
 	/**
@@ -266,7 +267,7 @@ public class NoCheatConfiguration {
 		}
 
 		writeConfigFile(configurationFile, this);		
-		//writeDescriptionFile(descriptionsFile, this);
+		writeDescriptionFile(descriptionsFile, this);
 	}
 
 	public void setupFileLogger() {
@@ -301,7 +302,7 @@ public class NoCheatConfiguration {
 		}
 	}
 
-	public Action[] stringToActions(String string) {
+	private Action[] stringToActions(String string) {
 
 		List<Action> as = new LinkedList<Action>();
 		String[] parts = string.split(" ");
@@ -350,7 +351,7 @@ public class NoCheatConfiguration {
 	 * Write a file with the descriptions of all options
 	 * @param f
 	 */
-	public static void writeDescriptionFile(File f, NoCheatConfiguration configuration) {
+	private static void writeDescriptionFile(File f, NoCheatConfiguration configuration) {
 		try {
 			if(f.getParentFile() != null)
 				f.getParentFile().mkdirs();
@@ -374,7 +375,7 @@ public class NoCheatConfiguration {
 	public int getIntegerValue(String optionName) throws ConfigurationException {	
 		return getIntegerOption(optionName).getIntegerValue();
 	}
-	public IntegerOption getIntegerOption(String optionName) throws ConfigurationException {
+	private IntegerOption getIntegerOption(String optionName) throws ConfigurationException {
 
 		Option o = getOption(optionName) ;
 		if(o instanceof IntegerOption) {
@@ -387,7 +388,7 @@ public class NoCheatConfiguration {
 	public String getStringValue(String optionName) throws ConfigurationException {
 		return getStringOption(optionName).getValue();
 	}
-	public TextFieldOption getStringOption(String optionName) throws ConfigurationException {
+	private TextFieldOption getStringOption(String optionName) throws ConfigurationException {
 
 		Option o = getOption(optionName);
 		if(o instanceof TextFieldOption) {
@@ -400,7 +401,7 @@ public class NoCheatConfiguration {
 	public Level getLogLevelValue(String optionName) throws ConfigurationException {
 		return getLogLevelOption(optionName).getLevelValue();
 	}
-	public LevelOption getLogLevelOption(String optionName) throws ConfigurationException {
+	private LevelOption getLogLevelOption(String optionName) throws ConfigurationException {
 
 		Option o = getOption(optionName);
 		if(o instanceof LevelOption) {
@@ -414,7 +415,8 @@ public class NoCheatConfiguration {
 	public boolean getBooleanValue(String optionName) throws ConfigurationException {
 		return getBooleanOption(optionName).getBooleanValue();
 	}
-	public BooleanOption getBooleanOption(String optionName) throws ConfigurationException {
+	
+	private BooleanOption getBooleanOption(String optionName) throws ConfigurationException {
 
 		Option o = getOption(optionName);
 		if(o instanceof BooleanOption) {

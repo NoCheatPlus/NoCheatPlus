@@ -13,7 +13,8 @@ import cc.co.evenprime.bukkit.nocheat.checks.AirbuildCheck;
  */
 public class AirbuildBlockListener extends BlockListener {
 
-	private AirbuildCheck check;
+	private final AirbuildCheck check;
+
 	public AirbuildBlockListener(AirbuildCheck check) {
 		this.check = check;
 	}

@@ -6,14 +6,13 @@ import net.minecraft.server.Block;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 
 public class MovingData {
 	public int jumpPhase = 0;
-	public int violationsInARow[] =  { 0, 0, 0 }; 
+	public final int violationsInARow[] =  { 0, 0, 0 }; 
 	public double horizFreedom = 0.0D;
 	public double vertFreedom = 0.0D;
 	public int vertFreedomCounter = 0;
@@ -25,18 +24,13 @@ public class MovingData {
 	public int summaryTask = -1;
 	public Level highestLogLevel = null;
 	public double maxYVelocity = 0.0D;
-	public double runningThreshold = 0.0D;
+	public double violationLevel = 0.0D;
 
 	public boolean insideVehicle = false;
 
-	// Use to determine if an move event should be handled
-	public Location teleportTo = null;
-
-	// Use to track the world the player is in
-	public World lastSeenInWorld = null;
-
 	public Location teleportInitializedByMe = null;
-	public boolean firstEventAfterRespawn = false;
+	public boolean wasTeleported = true;
+	public Location teleportedTo;
 
 	// Block types that may need to be treated specially
 	public static final int NONSOLID = 0;     // 0x00000000
@@ -80,7 +74,7 @@ public class MovingData {
 
 		if(data.moving == null) {
 			data.moving = new MovingData();
-			data.moving.lastSeenInWorld = p.getLocation().getWorld();
+			data.moving.teleportedTo = p.getLocation();
 		}
 
 		return data.moving;

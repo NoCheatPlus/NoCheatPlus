@@ -12,8 +12,8 @@ public class ParentOption extends Option {
 	 */
 	private static final long serialVersionUID = 3162246550749560727L;
 
-	private LinkedList<Option> children = new LinkedList<Option>();
-	private boolean editable;
+	private final LinkedList<Option> children = new LinkedList<Option>();
+	private final boolean editable;
 
 	public ParentOption(String identifier, boolean editable) {
 		super(identifier);

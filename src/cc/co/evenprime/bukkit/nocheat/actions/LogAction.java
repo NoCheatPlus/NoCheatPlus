@@ -17,7 +17,7 @@ public class LogAction extends Action {
 
 	public final static LogAction[] log = { loglow, logmed, loghigh };
 
-	public LogAction(int firstAfter, boolean repeat, Level level) {
+	private LogAction(int firstAfter, boolean repeat, Level level) {
 		super(firstAfter, repeat);
 		this.level = level;
 	}

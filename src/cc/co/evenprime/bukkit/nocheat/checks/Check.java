@@ -16,23 +16,24 @@ public abstract class Check {
 
 	private boolean active = false;
 	private boolean listenersRegistered = false;
-	private int permission;
-	private String name;
-	protected NoCheat plugin;
+	private final int permission;
+	private final String name;
+	protected final NoCheat plugin;
 	
 	// Should OPs be checked if Permissions plugin is not available?
-	protected boolean checkOPs = false;
+	public boolean checkOPs;
 
 	protected Check(NoCheat plugin, String name, int permission, NoCheatConfiguration config) {
 		this.plugin = plugin;
 		this.permission = permission;
 		this.name = name;
-		
+
 		try {
-			checkOPs = config.getBooleanValue(name + ".checkops");
+			checkOPs= config.getBooleanValue(name + ".checkops");
 		} catch (ConfigurationException e) {
 			checkOPs = false;
 		}
+		
 		
 		configure(config);
 	}

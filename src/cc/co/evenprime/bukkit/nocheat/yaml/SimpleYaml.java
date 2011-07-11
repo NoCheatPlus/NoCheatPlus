@@ -87,7 +87,7 @@ public class SimpleYaml {
 	/* Convenience methods for retrieving values start here */
 	
 	@SuppressWarnings("unchecked")
-	public static Object getProperty(String path, Map<String, Object> node) {
+	private final static Object getProperty(String path, Map<String, Object> node) {
 		if (!path.contains(".")) {
 			return node.get(path);
 		}

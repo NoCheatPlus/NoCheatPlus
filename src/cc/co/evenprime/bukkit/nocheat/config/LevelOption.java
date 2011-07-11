@@ -21,8 +21,8 @@ public class LevelOption extends ChildOption {
 		HIGH("high", "very important messages", Level.SEVERE);
 
 		private final String value;
-		private String description;
-		private Level level;
+		private final String description;
+		private final Level level;
 
 		private LogLevel(String value, String description, Level level) {
 			this.value = value;
