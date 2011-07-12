@@ -4,6 +4,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
@@ -20,6 +21,12 @@ public class MovingPlayerMonitor extends PlayerListener {
 
 	public MovingPlayerMonitor(MovingCheck check) {
 		this.check = check;
+	}
+	
+	@Override
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		MovingData data = MovingData.get(event.getPlayer());
+		data.wasTeleported = true;
 	}
 
 	@Override

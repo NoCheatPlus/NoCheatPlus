@@ -6,9 +6,9 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 public class RunningCheck {
 
-	private final static double stepWidth = 0.22D;
-	private final static double sneakWidth = 0.14D;
-	private final static double swimWidth = 0.18D;
+	public final static double stepWidth = 0.22D;
+	public final static double sneakWidth = 0.14D;
+	public final static double swimWidth = 0.18D;
 		
 	public RunningCheck() {	}
  

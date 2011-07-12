@@ -118,7 +118,7 @@ public class MovingCheck extends Check {
 
 			if(runCheck) {
 				result += Math.max(0D, runningCheck.check(from, to, 
-						player.isSneaking(), (fromType & toType & MovingEventHelper.LIQUID) > 0, data));
+						!allowFakeSneak && player.isSneaking(), !allowFastSwim && (fromType & toType & MovingEventHelper.LIQUID) > 0, data));
 			}
 
 
@@ -539,6 +539,7 @@ public class MovingCheck extends Check {
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(this), Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
 	}
 
 
