@@ -45,7 +45,7 @@ public class MovingCheck extends Check {
 		runningCheck = new RunningCheck();
 	}
 
-	private final int ticksBeforeSummary = 100;
+	private int ticksBeforeSummary;
 
 	public long statisticElapsedTimeNano = 0;
 
@@ -508,6 +508,8 @@ public class MovingCheck extends Check {
 			replace("[timeframe]", "%2$d").
 			replace("[player]", "%1$s").
 			replace("[violations]", "(%3$d,%4$d,%5$d)");
+			
+			ticksBeforeSummary = config.getIntegerValue("moving.summaryafter")*20;
 
 			actions = new Action[3][];
 

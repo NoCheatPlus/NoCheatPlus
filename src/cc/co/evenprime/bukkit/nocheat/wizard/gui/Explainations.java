@@ -110,6 +110,8 @@ public class Explainations {
 				"[player] will be replaced with the name of the player,\n" +
 				"[timeframe] will be replaced with the number of seconds that were observed,\n" +
 				"[violations] will be replaced with the number of violations of each severeness during that time.");
+		set("moving.summaryafter", "After how many seconds should a summary of all violations in that timeframe\n" +
+				"be displayed?");
 		set("moving.allowflying", "If true, all players are allowed to fly (at normal walking speeds)\n" +
 				"(Permissions plugin): Players with permission 'nocheat.flying' are allowed to fly independent of\n" +
 				"the setting of this option.");

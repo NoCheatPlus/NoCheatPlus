@@ -157,6 +157,9 @@ public class NoCheatConfiguration {
 
 			movingNode.add(new LongStringOption("summarymessage", 
 					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~[timeframe] seconds: [player] total Violations: [violations]", yamlContent)));
+			
+			movingNode.add(new IntegerOption("summaryafter", 
+					SimpleYaml.getInt("moving.summaryafter", 15, yamlContent)));
 
 			movingNode.add(new BooleanOption("allowflying", 
 					SimpleYaml.getBoolean("moving.allowflying", false, yamlContent)));
