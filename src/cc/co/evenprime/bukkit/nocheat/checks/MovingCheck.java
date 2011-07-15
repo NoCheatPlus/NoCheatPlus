@@ -539,9 +539,9 @@ public class MovingCheck extends Check {
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(this), Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_PORTAL, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.PLAYER_RESPAWN, new MovingPlayerMonitor(this), Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, movingPlayerMonitor, Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_PORTAL, movingPlayerMonitor, Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.PLAYER_RESPAWN, movingPlayerMonitor, Priority.Monitor, plugin);
 	}
 
 

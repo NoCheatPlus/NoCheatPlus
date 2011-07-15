@@ -27,6 +27,8 @@ public class MovingPlayerMonitor extends PlayerListener {
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		MovingData data = MovingData.get(event.getPlayer());
 		data.wasTeleported = true;
+		data.setBackPoint = null;
+		data.jumpPhase = 0;
 	}
 
 	@Override
