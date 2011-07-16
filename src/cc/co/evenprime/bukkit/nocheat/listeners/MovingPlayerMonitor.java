@@ -22,7 +22,7 @@ public class MovingPlayerMonitor extends PlayerListener {
 	public MovingPlayerMonitor(MovingCheck check) {
 		this.check = check;
 	}
-	
+
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		MovingData data = MovingData.get(event.getPlayer());
@@ -35,12 +35,12 @@ public class MovingPlayerMonitor extends PlayerListener {
 	public void onPlayerPortal(PlayerPortalEvent event) {
 		check.teleported(event);		
 	}
-	
+
 	@Override
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		check.teleported(event);
 	}
-	
+
 
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
@@ -49,17 +49,17 @@ public class MovingPlayerMonitor extends PlayerListener {
 
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
+		MovingData data = MovingData.get(event.getPlayer());
+
+		check.updateVelocity(event.getPlayer().getVelocity(), data);
+
 		if(!event.isCancelled()) {
-			MovingData data = MovingData.get(event.getPlayer());
-			
 			if( event.getPlayer().isInsideVehicle()) {
 				data.setBackPoint = event.getTo();	
 			}
 			else {
 				data.insideVehicle = false;
 			}
-
-			check.updateVelocity(event.getPlayer().getVelocity(), data);
 		}
 	}
 }

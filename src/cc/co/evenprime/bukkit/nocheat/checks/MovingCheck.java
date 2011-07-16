@@ -120,8 +120,7 @@ public class MovingCheck extends Check {
 				result += Math.max(0D, runningCheck.check(from, to, 
 						!allowFakeSneak && player.isSneaking(), !allowFastSwim && (fromType & toType & MovingEventHelper.LIQUID) > 0, data));
 			}
-
-
+			
 			/********* HANDLE/COMBINE THE RESULTS OF THE CHECKS ***********/
 
 			data.jumpPhase++;

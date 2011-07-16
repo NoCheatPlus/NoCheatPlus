@@ -34,6 +34,6 @@ public class RunningCheck {
 			distanceAboveLimit = totalDistance - stepWidth;
 		}
 		
-		return distanceAboveLimit;
+		return distanceAboveLimit - data.horizFreedom;
 	}
 }

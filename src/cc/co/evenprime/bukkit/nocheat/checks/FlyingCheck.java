@@ -89,6 +89,7 @@ public class FlyingCheck {
 
 		// The server sent the player a "velocity" packet a short time ago
 		if(data.maxYVelocity > 0.0D) {
+
 			data.vertFreedomCounter = 30;
 
 			// Be generous with the height limit for the client
@@ -100,7 +101,7 @@ public class FlyingCheck {
 		if(data.vertFreedomCounter > 0) {
 			data.vertFreedomCounter--;
 		}
-
+		
 		final double limit = data.vertFreedom;
 
 		// If the event counter has been consumed, remove the vertical movement limit increase when landing the next time
