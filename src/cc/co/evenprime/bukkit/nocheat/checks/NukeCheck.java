@@ -59,7 +59,7 @@ public class NukeCheck extends Check {
 			return;
 		}
 		
-		NukeData data = NukeData.get(event.getPlayer());
+		NukeData data = plugin.getDataManager().getNukeData(event.getPlayer());
 		
 		Block block = event.getBlock();
 

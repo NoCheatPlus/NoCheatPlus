@@ -70,9 +70,11 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 	private Level ircLevel;
 	private Level consoleLevel;
 	private String ircTag;
-	private NukeCheck instantmineCheck;
+	private NukeCheck nukeCheck;
 
 
+	private DataManager dataManager;
+	
 	public NoCheat() { 	
 
 	}
@@ -125,7 +127,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 			teardownCleanupTask();
 			teardownServerLagMeasureTask();
 
-			NoCheatData.cancelPlayerDataTasks();
+			dataManager.cancelPlayerDataTasks();
 		}
 		catch(Exception e) { /* Can't do much in case of error here... */ }
 		Logger.getLogger("Minecraft").info( "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
@@ -133,6 +135,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 	public void onEnable() {
 
+		dataManager = new DataManager();
 		// parse the nocheat.yml config file
 		setupConfig();
 
@@ -140,10 +143,10 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 		speedhackCheck = new SpeedhackCheck(this, config);
 		airbuildCheck = new AirbuildCheck(this, config);
 		bogusitemsCheck = new BogusitemsCheck(this, config);
-		instantmineCheck = new NukeCheck(this, config);
+		nukeCheck = new NukeCheck(this, config);
 		
 		// just for convenience
-		checks = new Check[] { movingCheck, speedhackCheck, airbuildCheck, bogusitemsCheck, instantmineCheck };
+		checks = new Check[] { movingCheck, speedhackCheck, airbuildCheck, bogusitemsCheck, nukeCheck };
 
 		if(!allowFlightSet && movingCheck.isActive()) {
 			Logger.getLogger("Minecraft").warning( "[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
@@ -161,6 +164,10 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 		setupServerLagMeasureTask();
 	}
+	
+	public DataManager getDataManager() {
+		return dataManager;
+	}
 
 	private void setupCleanupTask() {
 
@@ -171,7 +178,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 
 				@Override
 				public void run() {
-					NoCheatData.cleanPlayerDataCollection();
+					dataManager.cleanPlayerDataCollection();
 				}
 			}, 5000, 5000);
 		}
@@ -296,7 +303,7 @@ public class NoCheat extends JavaPlugin implements CommandSender {
 				}
 			}
 			else {
-				PermissionData data = PermissionData.get(player);
+				PermissionData data = dataManager.getPermissionData(player);
 				long time = System.currentTimeMillis();
 				if(data.lastUpdate[permission] + 10000 < time) {
 					data.lastUpdate[permission] = time;

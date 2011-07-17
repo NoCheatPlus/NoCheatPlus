@@ -6,9 +6,7 @@ import net.minecraft.server.Block;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 
 public class MovingData {
 	public int jumpPhase = 0;
@@ -66,17 +64,5 @@ public class MovingData {
 		// Special types just for me
 		types[Material.LADDER.getId()]= LADDER | SOLID;
 		types[Material.FENCE.getId()]= FENCE | SOLID;
-	}
-
-	public static MovingData get(final Player p) {
-
-		final NoCheatData data = NoCheatData.getPlayerData(p);
-
-		if(data.moving == null) {
-			data.moving = new MovingData();
-			data.moving.teleportedTo = p.getLocation();
-		}
-
-		return data.moving;
 	}
 }

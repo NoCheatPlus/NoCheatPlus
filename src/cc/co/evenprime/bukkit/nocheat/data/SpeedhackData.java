@@ -1,9 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.data;
 
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
-import cc.co.evenprime.bukkit.nocheat.NoCheatData;
 
 public class SpeedhackData {
 
@@ -13,14 +10,4 @@ public class SpeedhackData {
 	public final int violationsInARow[] =  { 0, 0, 0 };
 	public int violationsInARowTotal = 0;
 
-	public static SpeedhackData get(Player p) {
-
-		NoCheatData data = NoCheatData.getPlayerData(p);
-
-		if(data.speedhack == null) {
-			data.speedhack = new SpeedhackData();
-		}
-
-		return data.speedhack;
-	}
 }

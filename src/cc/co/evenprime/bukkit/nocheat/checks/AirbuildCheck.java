@@ -45,7 +45,7 @@ public class AirbuildCheck extends Check {
 
 		// Are all 6 sides "air-blocks" -> cancel the event
 		if( event.getBlockAgainst().getType() == Material.AIR && event.getBlockPlaced().getType() != Material.AIR ) {
-			final AirbuildData data = AirbuildData.get(event.getPlayer());
+			final AirbuildData data = plugin.getDataManager().getAirbuildData(event.getPlayer());
 			final Player p = event.getPlayer();
 
 			if(data.summaryTask == -1) {

@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import cc.co.evenprime.bukkit.nocheat.DataManager;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
@@ -18,14 +19,16 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class MovingPlayerMonitor extends PlayerListener {
 
 	private final MovingCheck check;
+	private final DataManager dataManager;
 
-	public MovingPlayerMonitor(MovingCheck check) {
+	public MovingPlayerMonitor(DataManager dataManager, MovingCheck check) {
+		this.dataManager = dataManager;
 		this.check = check;
 	}
 
 	@Override
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
-		MovingData data = MovingData.get(event.getPlayer());
+		MovingData data = dataManager.getMovingData(event.getPlayer());
 		data.wasTeleported = true;
 		data.setBackPoint = null;
 		data.jumpPhase = 0;
@@ -44,12 +47,12 @@ public class MovingPlayerMonitor extends PlayerListener {
 
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event) {
-		check.updateVelocity(event.getPlayer().getVelocity(), MovingData.get(event.getPlayer()));
+		check.updateVelocity(event.getPlayer().getVelocity(), dataManager.getMovingData(event.getPlayer()));
 	}
 
 	@Override
 	public void onPlayerMove(PlayerMoveEvent event) {
-		MovingData data = MovingData.get(event.getPlayer());
+		MovingData data = dataManager.getMovingData(event.getPlayer());
 
 		check.updateVelocity(event.getPlayer().getVelocity(), data);
 

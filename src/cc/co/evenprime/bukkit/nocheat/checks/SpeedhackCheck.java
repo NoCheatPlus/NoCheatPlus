@@ -61,7 +61,7 @@ public class SpeedhackCheck extends Check {
 		}
 
 		// Get the player-specific data
-		SpeedhackData data = SpeedhackData.get(player);
+		SpeedhackData data = plugin.getDataManager().getSpeedhackData(player);
 
 		// Count the event (twice, to interpolate from 0.5 seconds to 1 second
 		data.eventsSinceLastCheck += 2;
@@ -195,7 +195,7 @@ public class SpeedhackCheck extends Check {
 	}
 
 	public void teleported(PlayerTeleportEvent event) {
-		SpeedhackData data = SpeedhackData.get(event.getPlayer());
+		SpeedhackData data = plugin.getDataManager().getSpeedhackData(event.getPlayer());
 		resetData(data,  event.getTo());
 	}
 }

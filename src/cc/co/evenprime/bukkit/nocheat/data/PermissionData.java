@@ -1,9 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.data;
 
-import org.bukkit.entity.Player;
-
-import cc.co.evenprime.bukkit.nocheat.NoCheatData;
-
 public class PermissionData {
 
 	public final long lastUpdate[] = new long[11];
@@ -36,16 +32,4 @@ public class PermissionData {
 		permissionNames[PERMISSION_FASTSWIM] = "nocheat.fastswim";
 		permissionNames[PERMISSION_NUKE] = "nocheat.nuke";
 	}
-	
-	public static PermissionData get(Player p) {
-
-		NoCheatData data = NoCheatData.getPlayerData(p);
-
-		if(data.permission == null) {
-			data.permission = new PermissionData();
-		}
-
-		return data.permission;
-	}
-
 }

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import cc.co.evenprime.bukkit.nocheat.DataManager;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
@@ -18,8 +19,10 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class MovingPlayerListener extends PlayerListener {
 
 	private final MovingCheck check;
+	private final DataManager dataManager;
 
-	public MovingPlayerListener(MovingCheck check) {
+	public MovingPlayerListener(DataManager dataManager, MovingCheck check) {
+		this.dataManager = dataManager;
 		this.check = check;
 	}
 
@@ -33,7 +36,7 @@ public class MovingPlayerListener extends PlayerListener {
 		// Is there something to do at all?
 		if(!check.skipCheck(player)) {
 
-			final MovingData data = MovingData.get(player);
+			final MovingData data = dataManager.getMovingData(player);
 			final Location from = event.getFrom();
 			final Location to = event.getTo();
 

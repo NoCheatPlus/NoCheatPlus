@@ -245,7 +245,7 @@ public class MovingCheck extends Check {
 	 */
 	public void teleported(PlayerTeleportEvent event) {
 
-		MovingData data = MovingData.get(event.getPlayer());
+		MovingData data = plugin.getDataManager().getMovingData(event.getPlayer());
 
 		// We can enforce a teleport, if that flag is explicitly set (but I'd rather have other plugins
 		// not arbitrarily cancel teleport events in the first place...
@@ -531,17 +531,15 @@ public class MovingCheck extends Check {
 	protected void registerListeners() {
 		PluginManager pm = Bukkit.getServer().getPluginManager();
 
-		Listener movingPlayerMonitor = new MovingPlayerMonitor(this);
+		Listener movingPlayerMonitor = new MovingPlayerMonitor(plugin.getDataManager(), this);
 
 		// Register listeners for moving check
-		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingPlayerListener(this), Priority.Lowest, plugin);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingPlayerListener(plugin.getDataManager(), this), Priority.Lowest, plugin);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, movingPlayerMonitor, Priority.Monitor, plugin);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(this), Priority.Monitor, plugin);
+		pm.registerEvent(Event.Type.ENTITY_DAMAGE, new MovingEntityListener(plugin.getDataManager(), this), Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_TELEPORT, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_PORTAL, movingPlayerMonitor, Priority.Monitor, plugin);
 		pm.registerEvent(Event.Type.PLAYER_RESPAWN, movingPlayerMonitor, Priority.Monitor, plugin);
 	}
-
-
 }
