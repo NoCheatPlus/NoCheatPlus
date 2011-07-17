@@ -50,7 +50,7 @@ public class NoCheatConfiguration {
 
 		// Setup the configuration tree
 		config(configurationFile, descriptionsFile);
-		
+
 	}
 
 	/**
@@ -157,7 +157,7 @@ public class NoCheatConfiguration {
 
 			movingNode.add(new LongStringOption("summarymessage", 
 					SimpleYaml.getString("moving.summarymessage", "Moving summary of last ~[timeframe] seconds: [player] total Violations: [violations]", yamlContent)));
-			
+
 			movingNode.add(new IntegerOption("summaryafter", 
 					SimpleYaml.getInt("moving.summaryafter", 15, yamlContent)));
 
@@ -175,6 +175,20 @@ public class NoCheatConfiguration {
 
 			movingNode.add(new BooleanOption("enforceteleport", 
 					SimpleYaml.getBoolean("moving.enforceteleport", false, yamlContent)));
+
+
+			/*** MOVING LIMITS section ***/
+			{
+				ParentOption movingLimitsNode = new ParentOption("limits", false);
+				movingNode.add(movingLimitsNode);
+
+				movingLimitsNode.add(new IntegerOption("walking", 
+						SimpleYaml.getInt("moving.limits.walking", 22, yamlContent)));
+				movingLimitsNode.add(new IntegerOption("sneaking", 
+						SimpleYaml.getInt("moving.limits.sneaking", 14, yamlContent)));
+				movingLimitsNode.add(new IntegerOption("swimming", 
+						SimpleYaml.getInt("moving.limits.swimming", 18, yamlContent)));
+			}
 
 			/*** MOVING ACTION section ***/
 			{
@@ -235,13 +249,13 @@ public class NoCheatConfiguration {
 			bogusitemsNode.add(new BooleanOption("checkops", 
 					SimpleYaml.getBoolean("bogusitems.checkops", false, yamlContent)));
 		}
-		
+
 
 		/*** NUKE section ***/
 		{
 			ParentOption nukeNode = new ParentOption("nuke", false);
 			root.add(nukeNode);
-			
+
 			nukeNode.add(new BooleanOption("checkops", 
 					SimpleYaml.getBoolean("nuke.checkops", false, yamlContent)));
 			nukeNode.add(new LongStringOption("logmessage", 
@@ -250,7 +264,7 @@ public class NoCheatConfiguration {
 					SimpleYaml.getString("nuke.kickmessage", "No nuking allowed", yamlContent)));
 			nukeNode.add(new BooleanOption("limitreach", 
 					SimpleYaml.getBoolean("nuke.limitreach", true, yamlContent)));
-			
+
 		}
 
 		/*** CUSTOMACTIONS section ***/
@@ -418,7 +432,7 @@ public class NoCheatConfiguration {
 	public boolean getBooleanValue(String optionName) throws ConfigurationException {
 		return getBooleanOption(optionName).getBooleanValue();
 	}
-	
+
 	private BooleanOption getBooleanOption(String optionName) throws ConfigurationException {
 
 		Option o = getOption(optionName);

@@ -135,6 +135,22 @@ public class Explainations {
 				"of other plugins to prevent/cancel the teleport. This is usually a 'not-so-nice' thing to do,\n" +
 				"but sometimes the only way to get the plugin to work properly in combination with others.");
 		
+		set("moving.limits.walking", "How far can a player move with one step. The value doesn't represent any\n" +
+				"real distance units, it's just an indicator. 22 is about the normal walking speed of players.\n" +
+				"If you want to let them move faster, increase that number. If you decrease that number, players\n" +
+				"will have to move slower, but that will only work if they have a client mod that allows them to\n" +
+				"move slower than normal.");
+		set("moving.limits.sneaking", "How far can a player move while sneaking in one step. The value doesn't represent any\n" +
+				"real distance units, it's just an indicator. 14 is about the normal sneaking speed of players.\n" +
+				"If you want to let them sneak faster, increase that number. If you decrease that number, players\n" +
+				"will have to move even slower, but that will only work if they have a client mod that allows them to\n" +
+				"move slower than normal. If you have set \"allowfakesneak\" to true, this value is meaningless.");
+		set("moving.limits.swimming", "How far can a player move while swimming in one step. The value doesn't represent any\n" +
+				"real distance units, it's just an indicator. 18 is about the normal swimming speed of players.\n" +
+				"If you want to let them swim faster, increase that number. If you decrease that number, players\n" +
+				"will have to move even slower, but that will only work if they have a client mod that allows them to\n" +
+				"move slower than normal. If you have set \"allowfastswim\" to true, this value is meaningless.");
+		
 		set("moving.action.low", "Execute these actions when a player moves further/higher in one step than the\n" +
 				"limits defined by this plugin allow.\n" +
 				"Actions are executed in order. Available actions are loglow = log a message with low severeness,\n" +

@@ -53,6 +53,10 @@ public class MovingCheck extends Check {
 	public boolean allowFakeSneak;
 	public boolean allowFastSwim;
 
+	public double stepWidth;
+	public double sneakWidth;
+	public double swimWidth;
+	
 	private boolean waterElevators;
 
 	private String logMessage;
@@ -72,6 +76,8 @@ public class MovingCheck extends Check {
 
 	private static final double magic =  0.30000001192092896D;
 	private static final double magic2 = 0.69999998807907103D;
+	
+	
 
 	/**
 	 * The actual check.
@@ -118,7 +124,7 @@ public class MovingCheck extends Check {
 
 			if(runCheck) {
 				result += Math.max(0D, runningCheck.check(from, to, 
-						!allowFakeSneak && player.isSneaking(), !allowFastSwim && (fromType & toType & MovingEventHelper.LIQUID) > 0, data));
+						!allowFakeSneak && player.isSneaking(), !allowFastSwim && (fromType & toType & MovingEventHelper.LIQUID) > 0, data, this));
 			}
 			
 			/********* HANDLE/COMBINE THE RESULTS OF THE CHECKS ***********/
@@ -519,6 +525,10 @@ public class MovingCheck extends Check {
 			setActive(config.getBooleanValue("active.moving"));
 
 			enforceTeleport = config.getBooleanValue("moving.enforceteleport");
+			
+			stepWidth =  ((double)config.getIntegerValue("moving.limits.walking")) /100D;
+			sneakWidth = ((double)config.getIntegerValue("moving.limits.sneaking"))/100D;
+			swimWidth =  ((double)config.getIntegerValue("moving.limits.swimming"))/100D;
 
 		} catch (ConfigurationException e) {
 			setActive(false);
