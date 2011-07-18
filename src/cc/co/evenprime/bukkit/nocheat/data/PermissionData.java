@@ -11,10 +11,10 @@ public class PermissionData {
 	public static final int PERMISSION_FLYING = 1;
 	public static final int PERMISSION_SPEEDHACK = 2;
 	public static final int PERMISSION_AIRBUILD = 3;
-	public static final int PERMISSION_BEDTELEPORT = 4;
+	public static final int PERMISSION_BEDTELEPORT = 4; // No longer used
 	public static final int PERMISSION_BOGUSITEMS = 5;
 	public static final int PERMISSION_NOTIFY = 6;
-	public static final int PERMISSION_ITEMDUPE = 7;
+	public static final int PERMISSION_ITEMDUPE = 7; // No longer used
 	public static final int PERMISSION_FAKESNEAK = 8;
 	public static final int PERMISSION_FASTSWIM = 9;
 	public static final int PERMISSION_NUKE = 10;

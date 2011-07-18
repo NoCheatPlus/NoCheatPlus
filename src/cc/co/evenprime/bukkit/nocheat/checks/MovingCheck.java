@@ -223,6 +223,8 @@ public class MovingCheck extends Check {
 
 				@Override
 				public void run() {
+				    
+				    try {
 					if(data.highestLogLevel != null) {
 						String logString =  String.format(summaryMessage, p.getName(), ticksBeforeSummary/20, data.violationsInARow[0], data.violationsInARow[1],data.violationsInARow[2]);
 						plugin.log(data.highestLogLevel, logString);
@@ -235,6 +237,8 @@ public class MovingCheck extends Check {
 					data.violationsInARow[0] = 0;
 					data.violationsInARow[1] = 0;
 					data.violationsInARow[2] = 0;
+				    }
+				    catch(Exception e) { }
 				}
 			};
 

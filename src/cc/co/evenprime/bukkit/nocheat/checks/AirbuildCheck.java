@@ -53,9 +53,11 @@ public class AirbuildCheck extends Check {
 
 					@Override
 					public void run() {
+					    try {
 						summary(p, data);
 						// deleting its own reference
 						data.summaryTask = -1;
+					    }catch(Exception e) {}
 					}
 				};
 

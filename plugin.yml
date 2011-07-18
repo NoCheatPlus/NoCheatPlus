@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 1.10a
+version: 1.11
 
 softdepend: [ Permissions, CraftIRC ]
 
@@ -15,3 +15,46 @@ commands:
            Example: /<command> | Displays version, enabled checks and bugfixes
            Example: /<command> -p | Get your permissions, * = check disabled globally
            Example: /<command> -p [player] | Get permissions of the player, * = check disabled globally
+
+permissions:
+  nocheat.all:
+    description: Allow the player to do everything (except for getting log messages)
+    children:
+      nocheat.moving: true
+      nocheat.speedhack: true
+      nocheat.airbuild: true
+      nocheat.bogusitems: true
+      nocheat.nuke: true
+      nocheat.flying: true
+      nocheat.fakesneak: true
+      nocheat.fastswim: true
+  nocheat.moving:
+    description: Allow to player to move/fly without getting checked at all
+    default: op
+  nocheat.speedhack:
+    description: Don't observe the number of move events sent by the player
+    default: op
+  nocheat.airbuild:
+    description: Allow placing blocks against air/in midair
+    default: op
+  nocheat.bogusitems:
+    description: Allow the use of items with invalid values e.g. negative stacksize
+    default: op
+  nocheat.nuke:
+    description: Allow breaking of blocks that are not in the field of view of the player
+    default: op
+  nocheat.notify:
+    description: Receive log messages in chat
+    default: op
+  nocheat.flying:
+    description: Allow the player to fly at normal walking speed
+    default: op
+  nocheat.fakesneak:
+    description: Allow the player to sneak at normal walking speed
+    default: op
+  nocheat.fastswim:
+    description: Allow the player to swim at normal walking speed
+    default: op
+
+
+        

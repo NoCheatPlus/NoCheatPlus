@@ -37,6 +37,11 @@ public class Explainations {
 				"blocks that are outside his field of sight, he'll get kicked from the server.\n" +
 				"This is only a temporary solution (and will probably not hold for long), but it's better than nothing, I guess...");
 		
+		set("newpermsystem", "If activated, NoCheat will fully rely on the new Permission system of Bukkit, introduced with build 1000.\n" +
+				"This only makes sense if you also have a permission plugin that is capable of managing permissions in the new system.");
+		set("showinfomessages", "If activated, NoCheat will give useful advice and information on startup, about recent changes and potential \n" +
+				"problems with your servers configuration or conflicts with other plugins.");
+		
 		set("logging.filename", "Determines where the various messages by NoCheat are stored at, if logging to file is activated.");
 		set("logging.logtofile", "Determine what severeness messages need to have to be printed to the logfile.\n" +
 				"The values that can be used are:\n" +

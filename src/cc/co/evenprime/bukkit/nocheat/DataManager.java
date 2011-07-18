@@ -32,8 +32,12 @@ public class DataManager {
 			Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
 			while (it.hasNext()) {
 				Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>)it.next();
-				if(!pairs.getKey().isOnline())
-					it.remove();
+				if(!pairs.getKey().isOnline()) {
+				    // Cancel all referenced tasks before removing the entry
+				    cancelTasks(pairs.getValue());
+                    it.remove();
+				}
+
 			}
 		}
 	}
@@ -127,37 +131,39 @@ public class DataManager {
 		synchronized(playerData) {
 			Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
 			while (it.hasNext()) {
-				Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>)it.next();
-				
-				AirbuildData d = pairs.getValue().airbuild;
-				
-				if(d != null) {
-					int id = d.summaryTask;
-					
-					if(id != -1) {
-						Bukkit.getServer().getScheduler().cancelTask(id);
-					}
-					else {
-						// To prevent accidentially creating a new one while cleaning up
-						d.summaryTask = 1; 
-					}
-				}
-				
-				MovingData d2 = pairs.getValue().moving;
-				
-				if(d2 != null) {
-					int id = d2.summaryTask;
-					
-					if(id != -1) {
-						Bukkit.getServer().getScheduler().cancelTask(id);
-					}
-					else {
-						// To prevent accidentially creating a new one while cleaning up
-						d2.summaryTask = 1; 
-					}
-				}
+				cancelTasks(it.next().getValue());
 			}
 		}
 	}
-
+	
+	private void cancelTasks(NoCheatData data) {
+        
+        AirbuildData d = data.airbuild;
+        
+        if(d != null) {
+            int id = d.summaryTask;
+            
+            if(id != -1) {
+                Bukkit.getServer().getScheduler().cancelTask(id);
+            }
+            else {
+                // To prevent accidentially creating a new one while cleaning up
+                d.summaryTask = 1; 
+            }
+        }
+        
+        MovingData d2 = data.moving;
+        
+        if(d2 != null) {
+            int id = d2.summaryTask;
+            
+            if(id != -1) {
+                Bukkit.getServer().getScheduler().cancelTask(id);
+            }
+            else {
+                // To prevent accidentially creating a new one while cleaning up
+                d2.summaryTask = 1; 
+            }
+        }
+	}
 }

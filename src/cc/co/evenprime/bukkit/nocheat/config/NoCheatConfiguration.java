@@ -91,6 +91,9 @@ public class NoCheatConfiguration {
 			loggingNode.add(new ShortStringOption("logtoirctag",
 					SimpleYaml.getString("logging.logtoirctag", "nocheat", yamlContent)));
 		}
+		
+		root.add(new BooleanOption("newpermsystem", SimpleYaml.getBoolean("newpermsystem", false, yamlContent)));
+		root.add(new BooleanOption("showinfomessages", SimpleYaml.getBoolean("showinfomessages", true, yamlContent)));
 
 		/*** ACTIVE section ***/
 		{
