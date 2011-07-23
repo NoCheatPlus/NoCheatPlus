@@ -46,8 +46,8 @@ public class MovingData {
 		// Find and define properties of all blocks
 		for(int i = 0; i < types.length; i++) {
 
-			// Everything is considered nonsolid at first
-			types[i] = NONSOLID;
+			// Everything is considered solid at first
+			types[i] = SOLID;
 
 			if(Block.byId[i] != null) {
 				if(Block.byId[i].material.isSolid()) {
@@ -57,6 +57,9 @@ public class MovingData {
 				else if(Block.byId[i].material.isLiquid()){
 					// WATER, LAVA
 					types[i] = LIQUID;
+				}
+				else {
+				    types[i] = NONSOLID;
 				}
 			}
 		}
