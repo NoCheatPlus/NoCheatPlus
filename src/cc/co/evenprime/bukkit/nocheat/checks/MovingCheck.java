@@ -121,6 +121,11 @@ public class MovingCheck extends Check {
 			if(flyCheck) {
 				result += Math.max(0D, flyingCheck.check(player, from, fromOnGround, to, toOnGround, data));
 			}
+			else
+			{
+			    // If players are allowed to fly, there's no need to remember the last location on ground
+			    data.setBackPoint = from;
+			}
 
 			if(runCheck) {
 				result += Math.max(0D, runningCheck.check(from, to, 
@@ -131,21 +136,19 @@ public class MovingCheck extends Check {
 
 			data.jumpPhase++;
 			
-			if(result <= 0) {
-				if(fromOnGround) {
-					data.setBackPoint = from;
-					data.jumpPhase = 0;
-				}
-				else if(toOnGround) {
-					data.jumpPhase = 0;
-				}
-			}
-			else if(result > 0) {
+			if(fromOnGround) {
+                data.setBackPoint = from;
+                data.jumpPhase = 0;
+            }
+            else if(result <= 0 && toOnGround) {
+                data.jumpPhase = 0;
+            }
+			
+			if(result > 0) {
 				// Increment violation counter
 				data.violationLevel += result;
 				if(data.setBackPoint == null) data.setBackPoint = from;
 			}
-
 
 			if(result > 0 && data.violationLevel > 1) {
 	
