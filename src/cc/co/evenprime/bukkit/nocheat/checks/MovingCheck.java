@@ -183,7 +183,7 @@ public class MovingCheck extends Check {
 	 */
 	public boolean shouldBeApplied(final Player player, final MovingData data, final Location from, final Location to) {
 
-		if(player.isDead() || player.isInsideVehicle() || data.insideVehicle) return false;
+		if(player.isDead() || player.isInsideVehicle()) return false;
 
 		if(data.wasTeleported) {
 			// Remember this location

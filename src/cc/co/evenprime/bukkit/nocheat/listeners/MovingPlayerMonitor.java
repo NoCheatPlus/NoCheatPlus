@@ -60,9 +60,6 @@ public class MovingPlayerMonitor extends PlayerListener {
 			if( event.getPlayer().isInsideVehicle()) {
 				data.setBackPoint = event.getTo();	
 			}
-			else {
-				data.insideVehicle = false;
-			}
 		}
 	}
 }

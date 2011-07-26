@@ -24,8 +24,6 @@ public class MovingData {
 	public double maxYVelocity = 0.0D;
 	public double violationLevel = 0.0D;
 
-	public boolean insideVehicle = false;
-
 	public Location teleportInitializedByMe = null;
 	public boolean wasTeleported = true;
 	public Location teleportedTo;
