@@ -6,8 +6,6 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
@@ -73,12 +71,6 @@ public class MovingCheck extends Check {
 	private final FlyingCheck flyingCheck;
 	private final RunningCheck runningCheck;
 
-
-	private static final double magic =  0.30000001192092896D;
-	private static final double magic2 = 0.69999998807907103D;
-	
-	
-
 	/**
 	 * The actual check.
 	 * First find out if the event needs to be handled at all
@@ -107,8 +99,8 @@ public class MovingCheck extends Check {
 						
 			// In both cases it will be interesting to know the type of underground the player 
 			// is in or goes to
-			final int fromType = helper.isLocationOnGround(from.getWorld(), from.getX(), from.getY(), from.getZ(), false);
-			final int toType = helper.isLocationOnGround(to.getWorld(), to.getX(), to.getY(),to.getZ(), false);
+			final int fromType = helper.isLocationOnGround(from.getWorld(), from.getX(), from.getY(), from.getZ(), waterElevators);
+			final int toType = helper.isLocationOnGround(to.getWorld(), to.getX(), to.getY(),to.getZ(), waterElevators);
 
 			final boolean fromOnGround = fromType != MovingEventHelper.NONSOLID;
 			final boolean toOnGround = toType != MovingEventHelper.NONSOLID;
@@ -158,7 +150,7 @@ public class MovingCheck extends Check {
 				
 				data.violationsInARow[level]++;
 
-				newToLocation = action(player, from, to, actions[level], data.violationsInARow[level], data);
+				newToLocation = action(player, from, to, actions[level], data.violationsInARow[level], data, helper);
 			}
 		}
 		
@@ -296,7 +288,7 @@ public class MovingCheck extends Check {
 	 * @param action
 	 * @return 
 	 */
-	private Location action( Player player, Location from, Location to, Action[] actions, int violations, MovingData data) {
+	private Location action( Player player, Location from, Location to, Action[] actions, int violations, MovingData data, MovingEventHelper helper) {
 
 
 		Location newToLocation = null;
@@ -327,7 +319,7 @@ public class MovingCheck extends Check {
 						// search for the first solid block up to 5 blocks below the setbackpoint and teleport the player there
 						int i = 0;
 						for(; i < 20; i++) {
-							if(playerIsOnGround(data.setBackPoint, -0.5*i) != MovingData.NONSOLID) {
+							if(helper.isLocationOnGround(data.setBackPoint.getWorld(), data.setBackPoint.getX(), data.setBackPoint.getY() - 0.5*i, data.setBackPoint.getZ(), waterElevators) != MovingData.NONSOLID) {
 								break;
 							}
 						}	
@@ -368,130 +360,7 @@ public class MovingCheck extends Check {
 			return 0; }
 		return -1;
 	}
-
-
-	/**
-	 * Check if certain coordinates are considered "on ground"
-	 * 
-	 * @param w	The world the coordinates belong to
-	 * @param values The coordinates [lowerX, higherX, Y, lowerZ, higherZ] to be checked
-	 * @param l The precise location that was used for calculation of "values"
-	 * @return
-	 */
-	private int playerIsOnGround(final Location l, final double ymod) {
-
-		final int types[] = MovingData.types;
-
-		final World w = l.getWorld();
-
-		final int lowerX = lowerBorder(l.getX());
-		final int upperX = upperBorder(l.getX());
-		final int Y = (int)Math.floor(l.getY() + ymod);
-		final int lowerZ = lowerBorder(l.getZ());
-		final int higherZ = upperBorder(l.getZ());
-
-
-		int result;
-
-		// check in what kind of block the player is standing "in"
-		result = types[w.getBlockTypeIdAt(lowerX, Y, lowerZ)] | types[w.getBlockTypeIdAt(upperX, Y, lowerZ)] |
-		types[w.getBlockTypeIdAt(lowerX, Y, higherZ)] | types[w.getBlockTypeIdAt(upperX, Y, higherZ)];
-
-		if((result & MovingData.SOLID) != 0) {
-			// return standing
-			return MovingData.SOLID;
-		}
-		else if((result & MovingData.LIQUID) != 0) {
-			// return swimming
-			return MovingData.LIQUID;
-		}
-
-		// Check the four borders of the players hitbox for something he could be standing on
-		result = types[w.getBlockTypeIdAt(lowerX, Y-1, lowerZ)] | types[w.getBlockTypeIdAt(upperX, Y-1, lowerZ)] |
-		types[w.getBlockTypeIdAt(lowerX, Y-1, higherZ)] | types[w.getBlockTypeIdAt(upperX, Y-1, higherZ)];
-
-		if((result & MovingData.SOLID) != 0) {
-			// return standing
-			return MovingData.SOLID;
-		}
-
-
-		// check if his head is "stuck" in an block
-		result = types[w.getBlockTypeIdAt(lowerX, Y+1, lowerZ)] | types[w.getBlockTypeIdAt(upperX, Y+1, lowerZ)] |
-		types[w.getBlockTypeIdAt(lowerX, Y+1, higherZ)] | types[w.getBlockTypeIdAt(upperX, Y+1, higherZ)];
-
-		if((result & MovingData.SOLID) != 0) {
-			// return standing
-			return  MovingData.SOLID;
-		}
-		else if((result & MovingData.LIQUID) != 0) {
-			// return swimming
-			return MovingData.LIQUID;
-		}
-
-		// Running on fences causes problems if not treated specially
-		result = types[w.getBlockTypeIdAt(lowerX, Y-2, lowerZ)] | types[w.getBlockTypeIdAt(upperX, Y-2, lowerZ)] |
-		types[w.getBlockTypeIdAt(lowerX, Y-2, higherZ)] | types[w.getBlockTypeIdAt(upperX, Y-2, higherZ)];
-
-		if((result & MovingData.FENCE) != 0) {
-			// return standing
-			return MovingData.SOLID;
-		}
-
-		// Water elevators - optional "feature"
-		if(waterElevators) {
-			result = types[w.getBlockTypeIdAt(lowerX+1, Y+1, lowerZ+1)] |
-			types[w.getBlockTypeIdAt(lowerX+1, Y  , lowerZ+1)] |
-			types[w.getBlockTypeIdAt(lowerX,   Y+1, lowerZ+1)] |
-			types[w.getBlockTypeIdAt(lowerX  , Y  , lowerZ+1)] |
-			types[w.getBlockTypeIdAt(lowerX+1, Y+1, lowerZ  )] |
-			types[w.getBlockTypeIdAt(lowerX+1, Y  , lowerZ  )] ;
-
-			if((result & MovingData.LIQUID) != 0) {
-				return MovingData.SOLID; // Solid? Why that? Because that's closer to what the bug actually does than liquid
-			}
-		}
-		// If nothing matches, he is somewhere in the air
-		return MovingData.NONSOLID;
-	}
-
-
-	/**
-	 * Personal Rounding function to determine if a player is still touching a block or not
-	 * @param d1
-	 * @return
-	 */
-	private static int lowerBorder(double d1) {
-
-		double floor = Math.floor(d1);
-		double d4 = floor + magic;
-
-		if(d4 <= d1)
-			d4 = 0;
-		else
-			d4 = 1;
-
-		return (int) (floor - d4);
-	}
-
-	/**
-	 * Personal Rounding function to determine if a player is still touching a block or not
-	 * @param d1
-	 * @return
-	 */
-	private static int upperBorder(double d1) {
-
-		double floor = Math.floor(d1);
-		double d4 = floor + magic2;
-
-		if(d4 < d1)
-			d4 = -1;
-		else
-			d4 = 0;
-
-		return (int) (floor - d4);
-	}
-
+	
 	@Override
 	public void configure(NoCheatConfiguration config) {
 
