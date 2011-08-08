@@ -204,11 +204,6 @@ public class MovingCheck extends Check {
 			}
 		}
 
-		// If the target is a bed, don't check (going to bed is a kind of mini teleport...)
-		if(to.getWorld().getBlockTypeIdAt(to) == Material.BED_BLOCK.getId()) {
-			return false;
-		}
-
 		return true;
 	}
 

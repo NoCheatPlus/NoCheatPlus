@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 1.11b
+version: 1.11c
 
 softdepend: [ Permissions, CraftIRC ]
 
@@ -17,6 +17,11 @@ commands:
            Example: /<command> -p [player] | Get permissions of the player, * = check disabled globally
 
 permissions:
+  nocheat.*:
+    description: Allow the player to do everything (and get log messages)
+    children:
+      nocheat.all: true
+      nocheat.notify: true
   nocheat.all:
     description: Allow the player to do everything (except for getting log messages)
     children:
