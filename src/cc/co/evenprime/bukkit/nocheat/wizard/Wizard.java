@@ -16,52 +16,52 @@ import cc.co.evenprime.bukkit.nocheat.wizard.gui.ParentOptionGui;
 
 public class Wizard extends JFrame {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8798111079958779207L;
+    private static final long serialVersionUID = 8798111079958779207L;
 
-	
-	public Wizard() {
-		
-		JScrollPane scrollable = new JScrollPane();
+    public Wizard() {
 
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		
-		this.setContentPane(scrollable);
-		
-		JPanel inside = new JPanel();
-		scrollable.setViewportView(inside);
-		
-		inside.setLayout(new BoxLayout(inside,BoxLayout.Y_AXIS));
-		
-		final NoCheatConfiguration config = new NoCheatConfiguration(new File("NoCheat/nocheat.yml"), new File("NoCheat/descriptions.txt"));
-		
-		ParentOptionGui root2 = new ParentOptionGui(config.getRoot());
-		
-		inside.add(root2);
-		
-		JButton b = new JButton("Save");
+        JScrollPane scrollable = new JScrollPane();
 
-		b.addActionListener(new ActionListener() {
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				
-				NoCheatConfiguration.writeConfigFile(new File("NoCheat/nocheat.yml"), config);
-				
-				JOptionPane.showMessageDialog(null, "Saved");
-			} });
+        this.setContentPane(scrollable);
 
-		b.setAlignmentY(0.0F);
-		inside.add(b);
-		
-		this.doLayout();
-		
-		this.pack();
-		
-		this.setSize(900, 700);
-		
-		this.setTitle("NoCheat configuration utility");
-	}
+        JPanel inside = new JPanel();
+        scrollable.setViewportView(inside);
+
+        inside.setLayout(new BoxLayout(inside, BoxLayout.Y_AXIS));
+
+        final NoCheatConfiguration config = new NoCheatConfiguration(new File("NoCheat/nocheat.yml"), new File("NoCheat/descriptions.txt"));
+
+        ParentOptionGui root2 = new ParentOptionGui(config.getRoot());
+
+        inside.add(root2);
+
+        JButton b = new JButton("Save");
+
+        b.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+
+                NoCheatConfiguration.writeConfigFile(new File("NoCheat/nocheat.yml"), config);
+
+                JOptionPane.showMessageDialog(null, "Saved");
+            }
+        });
+
+        b.setAlignmentY(0.0F);
+        inside.add(b);
+
+        this.doLayout();
+
+        this.pack();
+
+        this.setSize(900, 700);
+
+        this.setTitle("NoCheat configuration utility");
+    }
 }

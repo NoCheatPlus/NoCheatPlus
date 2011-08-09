@@ -20,130 +20,131 @@ import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.AirbuildBlockListener;
 
-
 /**
- * Check if the player tries to place blocks in midair (which shouldn't be possible)
+ * Check if the player tries to place blocks in midair (which shouldn't be
+ * possible)
  * 
  * @author Evenprime
- *
+ * 
  */
 public class AirbuildCheck extends Check {
 
-	// How should airbuild violations be treated?
-	private Action actions[][];
+    // How should airbuild violations be treated?
+    private Action actions[][];
 
-	private int limits[];
+    private int    limits[];
 
-	public AirbuildCheck(NoCheat plugin, NoCheatConfiguration config) {
-		super(plugin, "airbuild", PermissionData.PERMISSION_AIRBUILD, config);
-	}
+    public AirbuildCheck(NoCheat plugin, NoCheatConfiguration config) {
+        super(plugin, "airbuild", PermissionData.PERMISSION_AIRBUILD, config);
+    }
 
-	public void check(BlockPlaceEvent event) {
+    public void check(BlockPlaceEvent event) {
 
-		// Should we check at all?
-		if(skipCheck(event.getPlayer())) return;
+        // Should we check at all?
+        if(skipCheck(event.getPlayer()))
+            return;
 
-		// Are all 6 sides "air-blocks" -> cancel the event
-		if( event.getBlockAgainst().getType() == Material.AIR && event.getBlockPlaced().getType() != Material.AIR ) {
-			final AirbuildData data = plugin.getDataManager().getAirbuildData(event.getPlayer());
-			final Player p = event.getPlayer();
+        // Are all 6 sides "air-blocks" -> cancel the event
+        if(event.getBlockAgainst().getType() == Material.AIR && event.getBlockPlaced().getType() != Material.AIR) {
+            final AirbuildData data = plugin.getDataManager().getAirbuildData(event.getPlayer());
+            final Player p = event.getPlayer();
 
-			if(data.summaryTask == -1) {
-				Runnable r = new Runnable() {
+            if(data.summaryTask == -1) {
+                Runnable r = new Runnable() {
 
-					@Override
-					public void run() {
-					    try {
-						summary(p, data);
-						// deleting its own reference
-						data.summaryTask = -1;
-					    }catch(Exception e) {}
-					}
-				};
+                    @Override
+                    public void run() {
+                        try {
+                            summary(p, data);
+                            // deleting its own reference
+                            data.summaryTask = -1;
+                        } catch(Exception e) {}
+                    }
+                };
 
-				// Give a summary in 100 ticks ~ 1 second
-				data.summaryTask = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, r, 100);
-			}
+                // Give a summary in 100 ticks ~ 1 second
+                data.summaryTask = plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, r, 100);
+            }
 
-			data.perFiveSeconds++;
+            data.perFiveSeconds++;
 
-			// which limit has been reached
-			for(int i = limits.length-1; i >= 0; i--) {
-				if(data.perFiveSeconds >= limits[i]) {
-					action(actions[i], event, data.perFiveSeconds - limits[i]+1);
-					break;
-				}
-			}
-		}
-	}
+            // which limit has been reached
+            for(int i = limits.length - 1; i >= 0; i--) {
+                if(data.perFiveSeconds >= limits[i]) {
+                    action(actions[i], event, data.perFiveSeconds - limits[i] + 1);
+                    break;
+                }
+            }
+        }
+    }
 
-	private void action(Action actions[], BlockPlaceEvent event, int violations) {
+    private void action(Action actions[], BlockPlaceEvent event, int violations) {
 
-		if(actions == null) return;
+        if(actions == null)
+            return;
 
-		// Execute actions in order
-		for(Action a : actions) {
-			if(a.firstAfter <= violations) {
-				if(a.firstAfter == violations || a.repeat) {
-					if(a instanceof LogAction) {
-						final Location l = event.getBlockPlaced().getLocation();
-						String logMessage = "Airbuild: "+event.getPlayer().getName()+" tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() +"," + l.getBlockZ();
-						plugin.log(((LogAction)a).level, logMessage);
-					}
-					else if(a instanceof CancelAction) {
-						event.setCancelled(true);
-					}
-					else if(a instanceof CustomAction) {
-						plugin.handleCustomAction((CustomAction)a, event.getPlayer());
-					}
-				}
-			}
-		}
-	}
+        // Execute actions in order
+        for(Action a : actions) {
+            if(a.firstAfter <= violations) {
+                if(a.firstAfter == violations || a.repeat) {
+                    if(a instanceof LogAction) {
+                        final Location l = event.getBlockPlaced().getLocation();
+                        String logMessage = "Airbuild: " + event.getPlayer().getName() + " tried to place block " + event.getBlockPlaced().getType() + " in the air at " + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ();
+                        plugin.log(((LogAction) a).level, logMessage);
+                    } else if(a instanceof CancelAction) {
+                        event.setCancelled(true);
+                    } else if(a instanceof CustomAction) {
+                        plugin.handleCustomAction((CustomAction) a, event.getPlayer());
+                    }
+                }
+            }
+        }
+    }
 
-	private void summary(Player player, AirbuildData data) {
+    private void summary(Player player, AirbuildData data) {
 
-		// Give a summary according to the highest violation level we encountered in that second
-		for(int i = limits.length-1; i >= 0; i--) {
-			if(data.perFiveSeconds >= limits[i]) {
-				plugin.log(LogAction.log[i].level, "Airbuild summary: " +player.getName() + " total violations per 5 seconds: " + data.perFiveSeconds);
-				break;
-			}
-		}
+        // Give a summary according to the highest violation level we
+        // encountered in that second
+        for(int i = limits.length - 1; i >= 0; i--) {
+            if(data.perFiveSeconds >= limits[i]) {
+                plugin.log(LogAction.log[i].level, "Airbuild summary: " + player.getName() + " total violations per 5 seconds: " + data.perFiveSeconds);
+                break;
+            }
+        }
 
-		data.perFiveSeconds = 0;
-	}
+        data.perFiveSeconds = 0;
+    }
 
-	@Override
-	public void configure(NoCheatConfiguration config) {
+    @Override
+    public void configure(NoCheatConfiguration config) {
 
-		try {
-			limits = new int[3];
+        try {
+            limits = new int[3];
 
-			limits[0] = config.getIntegerValue("airbuild.limits.low");
-			limits[1] = config.getIntegerValue("airbuild.limits.med");
-			limits[2] = config.getIntegerValue("airbuild.limits.high");
+            limits[0] = config.getIntegerValue("airbuild.limits.low");
+            limits[1] = config.getIntegerValue("airbuild.limits.med");
+            limits[2] = config.getIntegerValue("airbuild.limits.high");
 
-			actions = new Action[3][];
+            actions = new Action[3][];
 
-			actions[0] = config.getActionValue("airbuild.action.low");
-			actions[1] = config.getActionValue("airbuild.action.med");
-			actions[2] = config.getActionValue("airbuild.action.high");
+            actions[0] = config.getActionValue("airbuild.action.low");
+            actions[1] = config.getActionValue("airbuild.action.med");
+            actions[2] = config.getActionValue("airbuild.action.high");
 
-			setActive(config.getBooleanValue("active.airbuild"));
+            setActive(config.getBooleanValue("active.airbuild"));
 
-		} catch (ConfigurationException e) {
-			setActive(false);
-			e.printStackTrace();
-		}
-	}
+        } catch(ConfigurationException e) {
+            setActive(false);
+            e.printStackTrace();
+        }
+    }
 
-	@Override
-	protected void registerListeners() {
-		PluginManager pm = Bukkit.getServer().getPluginManager();
+    @Override
+    protected void registerListeners() {
+        PluginManager pm = Bukkit.getServer().getPluginManager();
 
-		// Register listeners for airbuild check
-		pm.registerEvent(Event.Type.BLOCK_PLACE, new AirbuildBlockListener(this), Priority.Low, plugin);
+        // Register listeners for airbuild check
+        pm.registerEvent(Event.Type.BLOCK_PLACE, new AirbuildBlockListener(this), Priority.Low, plugin);
 
-	}
+    }
 }

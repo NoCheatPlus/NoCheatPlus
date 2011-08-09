@@ -42,8 +42,7 @@ public class CustomCommandSender implements CommandSender {
     }
 
     @Override
-    public PermissionAttachment addAttachment(Plugin plugin, String name,
-            boolean value) {
+    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
         // Whatever it is, I don't care
         return null;
     }
@@ -55,8 +54,7 @@ public class CustomCommandSender implements CommandSender {
     }
 
     @Override
-    public PermissionAttachment addAttachment(Plugin plugin, String name,
-            boolean value, int ticks) {
+    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value, int ticks) {
         // Whatever it is, I don't care
         return null;
     }

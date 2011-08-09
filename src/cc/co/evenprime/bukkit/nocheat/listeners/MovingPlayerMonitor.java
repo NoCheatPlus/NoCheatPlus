@@ -14,7 +14,7 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 /**
  * 
  * @author Evenprime
- *
+ * 
  */
 public class MovingPlayerMonitor extends PlayerListener {
 
@@ -29,21 +29,20 @@ public class MovingPlayerMonitor extends PlayerListener {
     @Override
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         MovingData data = dataManager.getMovingData(event.getPlayer());
-        data.wasTeleported = true;
         data.setBackPoint = null;
         data.jumpPhase = 0;
     }
 
     @Override
     public void onPlayerPortal(PlayerPortalEvent event) {
-        check.teleported(event);		
+        check.teleported(event);
     }
 
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         check.teleported(event);
     }
-    
+
     @Override
     public void onPlayerVelocity(PlayerVelocityEvent event) {
         check.updateVelocity(event.getVelocity(), dataManager.getMovingData(event.getPlayer()));
@@ -53,9 +52,9 @@ public class MovingPlayerMonitor extends PlayerListener {
     public void onPlayerMove(PlayerMoveEvent event) {
 
         if(!event.isCancelled()) {
-            if( event.getPlayer().isInsideVehicle()) {
+            if(event.getPlayer().isInsideVehicle()) {
                 MovingData data = dataManager.getMovingData(event.getPlayer());
-                data.setBackPoint = event.getTo();	
+                data.setBackPoint = null;
             }
         }
     }

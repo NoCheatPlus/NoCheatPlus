@@ -7,17 +7,18 @@ import cc.co.evenprime.bukkit.nocheat.checks.NukeCheck;
 
 public class NukeBlockListener extends BlockListener {
 
-	private final NukeCheck check;
-	
-	public NukeBlockListener(NukeCheck check) {
-		this.check = check;
-		
-	}
-	
-	@Override
-	public void onBlockBreak(BlockBreakEvent event) {
-		//System.out.println("Break "+ event.getPlayer() + " " + event.getBlock());
-		check.check(event);
-	}
-	
+    private final NukeCheck check;
+
+    public NukeBlockListener(NukeCheck check) {
+        this.check = check;
+
+    }
+
+    @Override
+    public void onBlockBreak(BlockBreakEvent event) {
+        // System.out.println("Break "+ event.getPlayer() + " " +
+        // event.getBlock());
+        check.check(event);
+    }
+
 }

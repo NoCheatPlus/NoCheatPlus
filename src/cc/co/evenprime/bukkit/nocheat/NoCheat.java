@@ -125,7 +125,7 @@ public class NoCheat extends JavaPlugin {
 
         try {
             dataManager.cancelPlayerDataTasks();
-            
+
             teardownCleanupTask();
             teardownServerLagMeasureTask();
         } catch(Exception e) { /* Can't do much in case of error here... */
@@ -323,7 +323,9 @@ public class NoCheat extends JavaPlugin {
             return false;
 
         if(useNewPermissionSystem) {
-            //System.out.println("New permissions system asked for " + PermissionData.permissionNames[permission] + " got " + player.hasPermission(PermissionData.permissionNames[permission]));
+            // System.out.println("New permissions system asked for " +
+            // PermissionData.permissionNames[permission] + " got " +
+            // player.hasPermission(PermissionData.permissionNames[permission]));
             return player.hasPermission(PermissionData.permissionNames[permission]);
         }
 

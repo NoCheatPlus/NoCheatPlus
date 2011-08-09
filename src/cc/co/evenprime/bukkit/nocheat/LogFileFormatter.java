@@ -7,6 +7,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 public class LogFileFormatter extends Formatter {
+
     private final SimpleDateFormat date;
 
     public LogFileFormatter() {
@@ -25,7 +26,7 @@ public class LogFileFormatter extends Formatter {
         builder.append(record.getMessage());
         builder.append('\n');
 
-        if (ex != null) {
+        if(ex != null) {
             StringWriter writer = new StringWriter();
             ex.printStackTrace(new PrintWriter(writer));
             builder.append(writer);
@@ -33,5 +34,5 @@ public class LogFileFormatter extends Formatter {
 
         return builder.toString();
     }
-    
+
 }

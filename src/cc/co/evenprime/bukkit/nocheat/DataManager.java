@@ -14,156 +14,154 @@ import cc.co.evenprime.bukkit.nocheat.data.NukeData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.data.SpeedhackData;
 
-
 public class DataManager {
 
-	// Store data between Events
-	private final Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
-	
-	public DataManager() { }
-	
-	/**
-	 * Go through the playerData HashMap and remove players that are no longer online
-	 * from the map. This should be called in long, regular intervals (e.g. every 10 minutes)
-	 * to keep the memory footprint of the plugin low
-	 */
-	public void cleanPlayerDataCollection() {
-		synchronized(playerData) {
-			Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
-			while (it.hasNext()) {
-				Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>)it.next();
-				if(!pairs.getKey().isOnline()) {
-				    // Cancel all referenced tasks before removing the entry
-				    cancelTasks(pairs.getValue());
+    // Store data between Events
+    private final Map<Player, NoCheatData> playerData = new HashMap<Player, NoCheatData>();
+
+    public DataManager() {}
+
+    /**
+     * Go through the playerData HashMap and remove players that are no longer
+     * online
+     * from the map. This should be called in long, regular intervals (e.g.
+     * every 10 minutes)
+     * to keep the memory footprint of the plugin low
+     */
+    public void cleanPlayerDataCollection() {
+        synchronized(playerData) {
+            Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
+            while(it.hasNext()) {
+                Map.Entry<Player, NoCheatData> pairs = (Map.Entry<Player, NoCheatData>) it.next();
+                if(!pairs.getKey().isOnline()) {
+                    // Cancel all referenced tasks before removing the entry
+                    cancelTasks(pairs.getValue());
                     it.remove();
-				}
+                }
 
-			}
-		}
-	}
-	
+            }
+        }
+    }
 
-	/**
-	 * Main access to data that needs to be stored between different events.
-	 * Always returns a NoCheatData object, because if there isn't one
-	 * for the specified player, one will be created.
-	 * 
-	 * @param p
-	 * @return
-	 */
-	public NoCheatData getPlayerData(Player p) {
-		NoCheatData data = playerData.get(p);
+    /**
+     * Main access to data that needs to be stored between different events.
+     * Always returns a NoCheatData object, because if there isn't one
+     * for the specified player, one will be created.
+     * 
+     * @param p
+     * @return
+     */
+    private NoCheatData getPlayerData(final Player p) {
+        NoCheatData data = playerData.get(p);
 
-		if(data == null) {
-			synchronized(playerData) {
-				// If we have no data for the player, create some
-				data = new NoCheatData();
-				playerData.put(p, data);
-			}
-		}
+        if(data == null) {
+            synchronized(playerData) {
+                // If we have no data for the player, create some
+                data = new NoCheatData();
+                playerData.put(p, data);
+            }
+        }
 
-		return data;
-	}
-	
-	public AirbuildData getAirbuildData(Player p) {
+        return data;
+    }
 
-		NoCheatData data = getPlayerData(p);
+    public AirbuildData getAirbuildData(Player p) {
 
-		if(data.airbuild == null) {
-			data.airbuild = new AirbuildData();
-		}
+        NoCheatData data = getPlayerData(p);
 
-		return data.airbuild;
-	}
-	
-	public MovingData getMovingData(final Player p) {
+        if(data.airbuild == null) {
+            data.airbuild = new AirbuildData();
+        }
 
-		final NoCheatData data = getPlayerData(p);
+        return data.airbuild;
+    }
 
-		if(data.moving == null) {
-			data.moving = new MovingData();
-			data.moving.teleportedTo = p.getLocation();
-		}
+    public MovingData getMovingData(final Player p) {
 
-		return data.moving;
-	}
-	
-	public NukeData getNukeData(Player p) {
+        final NoCheatData data = getPlayerData(p);
 
-		NoCheatData data = getPlayerData(p);
+        if(data.moving == null) {
+            data.moving = new MovingData();
+        }
 
-		if(data.nuke == null) {
-			data.nuke = new NukeData();
-		}
+        return data.moving;
+    }
 
-		return data.nuke;
-	}
-	
-	public PermissionData getPermissionData(Player p) {
+    public NukeData getNukeData(Player p) {
 
-		NoCheatData data = getPlayerData(p);
+        NoCheatData data = getPlayerData(p);
 
-		if(data.permission == null) {
-			data.permission = new PermissionData();
-		}
+        if(data.nuke == null) {
+            data.nuke = new NukeData();
+        }
 
-		return data.permission;
-	}
-	
-	public SpeedhackData getSpeedhackData(Player p) {
+        return data.nuke;
+    }
 
-		NoCheatData data = getPlayerData(p);
+    public PermissionData getPermissionData(Player p) {
 
-		if(data.speedhack == null) {
-			data.speedhack = new SpeedhackData();
-		}
+        NoCheatData data = getPlayerData(p);
 
-		return data.speedhack;
-	}
-	
+        if(data.permission == null) {
+            data.permission = new PermissionData();
+        }
 
-	/**
-	 * Go through the playerData HashMap and remove players that are no longer online
-	 * from the map. This should be called in long, regular intervals (e.g. every 10 minutes)
-	 * to keep the memory footprint of the plugin low
-	 */
-	public void cancelPlayerDataTasks() {
-		synchronized(playerData) {
-			Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
-			while (it.hasNext()) {
-				cancelTasks(it.next().getValue());
-			}
-		}
-	}
-	
-	private void cancelTasks(NoCheatData data) {
-        
+        return data.permission;
+    }
+
+    public SpeedhackData getSpeedhackData(Player p) {
+
+        NoCheatData data = getPlayerData(p);
+
+        if(data.speedhack == null) {
+            data.speedhack = new SpeedhackData();
+        }
+
+        return data.speedhack;
+    }
+
+    /**
+     * Go through the playerData HashMap and remove players that are no longer
+     * online
+     * from the map. This should be called in long, regular intervals (e.g.
+     * every 10 minutes)
+     * to keep the memory footprint of the plugin low
+     */
+    public void cancelPlayerDataTasks() {
+        synchronized(playerData) {
+            Iterator<Map.Entry<Player, NoCheatData>> it = playerData.entrySet().iterator();
+            while(it.hasNext()) {
+                cancelTasks(it.next().getValue());
+            }
+        }
+    }
+
+    private void cancelTasks(NoCheatData data) {
+
         AirbuildData d = data.airbuild;
-        
+
         if(d != null) {
             int id = d.summaryTask;
-            
+
             if(id != -1) {
                 Bukkit.getServer().getScheduler().cancelTask(id);
-            }
-            else {
+            } else {
                 // To prevent accidentially creating a new one while cleaning up
-                d.summaryTask = 1; 
+                d.summaryTask = 1;
             }
         }
-        
+
         MovingData d2 = data.moving;
-        
+
         if(d2 != null) {
             int id = d2.summaryTask;
-            
+
             if(id != -1) {
                 Bukkit.getServer().getScheduler().cancelTask(id);
-            }
-            else {
+            } else {
                 // To prevent accidentially creating a new one while cleaning up
-                d2.summaryTask = 1; 
+                d2.summaryTask = 1;
             }
         }
-	}
+    }
 }

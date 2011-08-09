@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
-
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.ConfigurationException;
@@ -8,64 +7,62 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
 /**
- *
+ * 
  * @author Evenprime
- *
+ * 
  */
 public abstract class Check {
 
-	private boolean active = false;
-	private boolean listenersRegistered = false;
-	private final int permission;
-	private final String name;
-	protected final NoCheat plugin;
-	
-	// Should OPs be checked if Permissions plugin is not available?
-	public boolean checkOPs;
+    private boolean         active              = false;
+    private boolean         listenersRegistered = false;
+    private final int       permission;
+    private final String    name;
+    protected final NoCheat plugin;
 
-	protected Check(NoCheat plugin, String name, int permission, NoCheatConfiguration config) {
-		this.plugin = plugin;
-		this.permission = permission;
-		this.name = name;
+    // Should OPs be checked if Permissions plugin is not available?
+    public boolean          checkOPs;
 
-		try {
-			checkOPs= config.getBooleanValue(name + ".checkops");
-		} catch (ConfigurationException e) {
-			checkOPs = false;
-		}
-		
-		
-		configure(config);
-	}
+    protected Check(NoCheat plugin, String name, int permission, NoCheatConfiguration config) {
+        this.plugin = plugin;
+        this.permission = permission;
+        this.name = name;
 
-	public boolean skipCheck(Player player) {
-		// Should we check at all?
-		return !active || plugin.hasPermission(player, permission, checkOPs);
-	}
-	
-	protected abstract void configure(NoCheatConfiguration config);
+        try {
+            checkOPs = config.getBooleanValue(name + ".checkops");
+        } catch(ConfigurationException e) {
+            checkOPs = false;
+        }
 
-	protected abstract void registerListeners();
+        configure(config);
+    }
 
-	public boolean isActive() {
-		return active;
-	}
+    public boolean skipCheck(Player player) {
+        // Should we check at all?
+        return !active || plugin.hasPermission(player, permission, checkOPs);
+    }
 
-	protected void setActive(boolean active) {
-		synchronized(this) {
-			if(active && !listenersRegistered) {
-				listenersRegistered = true;
-				registerListeners();
-			}
-		}
+    protected abstract void configure(NoCheatConfiguration config);
 
-		// There is no way to unregister listeners ...
-		this.active = active;
-	}
+    protected abstract void registerListeners();
 
-	public String getName() {
-		return name;
-	}
+    public boolean isActive() {
+        return active;
+    }
 
+    protected void setActive(boolean active) {
+        synchronized(this) {
+            if(active && !listenersRegistered) {
+                listenersRegistered = true;
+                registerListeners();
+            }
+        }
+
+        // There is no way to unregister listeners ...
+        this.active = active;
+    }
+
+    public String getName() {
+        return name;
+    }
 
 }

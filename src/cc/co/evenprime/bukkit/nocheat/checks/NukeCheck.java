@@ -20,102 +20,93 @@ import cc.co.evenprime.bukkit.nocheat.data.NukeData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.listeners.NukeBlockListener;
 
-
 public class NukeCheck extends Check {
 
-	private String kickMessage;
-	private String logMessage;
-	
-	private boolean limitReach;
-	
-	public NukeCheck(NoCheat plugin, NoCheatConfiguration config) {
+    private String  kickMessage;
+    private String  logMessage;
 
-		super(plugin, "nuke", PermissionData.PERMISSION_NUKE, config);
+    private boolean limitReach;
 
-	}
+    public NukeCheck(NoCheat plugin, NoCheatConfiguration config) {
 
-	@Override
-	protected void configure(NoCheatConfiguration config) {
+        super(plugin, "nuke", PermissionData.PERMISSION_NUKE, config);
 
-		
-		
-		try {
-			kickMessage = config.getStringValue("nuke.kickmessage");
-			logMessage = config.getStringValue("nuke.logmessage").
-			replace("[player]", "%1$s");
-			
-			limitReach = config.getBooleanValue("nuke.limitreach");
-			
-			setActive(config.getBooleanValue("active.nuke"));
-		} catch (ConfigurationException e) {
-			setActive(false);
-			e.printStackTrace();
-		}
-	}
+    }
 
-	public void check(BlockBreakEvent event) {
+    @Override
+    protected void configure(NoCheatConfiguration config) {
 
-		if(skipCheck(event.getPlayer())) {
-			return;
-		}
-		
-		NukeData data = plugin.getDataManager().getNukeData(event.getPlayer());
-		
-		Block block = event.getBlock();
+        try {
+            kickMessage = config.getStringValue("nuke.kickmessage");
+            logMessage = config.getStringValue("nuke.logmessage").replace("[player]", "%1$s");
 
-		Location eyes = event.getPlayer().getEyeLocation();
-		Vector direction = eyes.getDirection();
+            limitReach = config.getBooleanValue("nuke.limitreach");
 
-		// Because it's not very precise on very short distances, 
-		// consider the length of the side of a block to be 2.0 instead of 1.0
-		final double x1 = ((double)block.getX()) - eyes.getX() - 0.5;
-		final double y1 = ((double)block.getY()) - eyes.getY() - 0.5;
-		final double z1 = ((double)block.getZ()) - eyes.getZ() - 0.5;
+            setActive(config.getBooleanValue("active.nuke"));
+        } catch(ConfigurationException e) {
+            setActive(false);
+            e.printStackTrace();
+        }
+    }
 
-		final double x2 = x1 + 2;
-		final double y2 = y1 + 2;
-		final double z2 = z1 + 2;
+    public void check(BlockBreakEvent event) {
 
-		double factor = new Vector(x1 + 1, y1 + 1, z1 + 1).length();
-		
-		boolean tooFarAway = limitReach && factor > 4.85D;
-		
-		if(!tooFarAway && factor * direction.getX() >= x1 && factor * direction.getY() >= y1 && factor * direction.getZ() >= z1 &&
-		   factor * direction.getX() <= x2 && factor * direction.getY() <= y2 && factor * direction.getZ() <= z2) {
-			if(data.counter > 0) {
-				data.counter--;
-			}
-		}
-		else {
-			data.counter++;
-			event.setCancelled(true);
-			
-			if(data.counter > 10) {
-				
-				String log = String.format(Locale.US, logMessage, event.getPlayer().getName());
-				
-				plugin.log(Level.SEVERE, log);
-				
-				event.getPlayer().kickPlayer(kickMessage);
-				data.counter = 0; // Reset to prevent problems on next login
-			}
-		}
+        if(skipCheck(event.getPlayer())) {
+            return;
+        }
 
-		
-	}
+        NukeData data = plugin.getDataManager().getNukeData(event.getPlayer());
 
+        Block block = event.getBlock();
 
-	@Override
-	protected void registerListeners() {
-		PluginManager pm = Bukkit.getServer().getPluginManager();
+        Location eyes = event.getPlayer().getEyeLocation();
+        Vector direction = eyes.getDirection();
 
-		Listener blockListener = new NukeBlockListener(this);
+        // Because it's not very precise on very short distances,
+        // consider the length of the side of a block to be 2.0 instead of 1.0
+        final double x1 = ((double) block.getX()) - eyes.getX() - 0.5;
+        final double y1 = ((double) block.getY()) - eyes.getY() - 0.5;
+        final double z1 = ((double) block.getZ()) - eyes.getZ() - 0.5;
 
-		// Register listeners for moving check
-		pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Lowest, plugin);
-		pm.registerEvent(Event.Type.BLOCK_DAMAGE, blockListener, Priority.Monitor, plugin);
+        final double x2 = x1 + 2;
+        final double y2 = y1 + 2;
+        final double z2 = z1 + 2;
 
+        double factor = new Vector(x1 + 1, y1 + 1, z1 + 1).length();
 
-	}
+        boolean tooFarAway = limitReach && factor > 4.85D;
+
+        if(!tooFarAway && factor * direction.getX() >= x1 && factor * direction.getY() >= y1 && factor * direction.getZ() >= z1 && factor * direction.getX() <= x2 && factor * direction.getY() <= y2 && factor * direction.getZ() <= z2) {
+            if(data.counter > 0) {
+                data.counter--;
+            }
+        } else {
+            data.counter++;
+            event.setCancelled(true);
+
+            if(data.counter > 10) {
+
+                String log = String.format(Locale.US, logMessage, event.getPlayer().getName());
+
+                plugin.log(Level.SEVERE, log);
+
+                event.getPlayer().kickPlayer(kickMessage);
+                data.counter = 0; // Reset to prevent problems on next login
+            }
+        }
+
+    }
+
+    @Override
+    protected void registerListeners() {
+        PluginManager pm = Bukkit.getServer().getPluginManager();
+
+        Listener blockListener = new NukeBlockListener(this);
+
+        // Register listeners for moving check
+        pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Lowest, plugin);
+        pm.registerEvent(Event.Type.BLOCK_DAMAGE, blockListener, Priority.Monitor, plugin);
+
+    }
 
 }
