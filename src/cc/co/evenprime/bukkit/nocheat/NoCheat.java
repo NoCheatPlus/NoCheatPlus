@@ -140,6 +140,12 @@ public class NoCheat extends JavaPlugin {
         sender = new CustomCommandSender(getServer());
         // parse the nocheat.yml config file
         setupConfig();
+        
+
+        for(String s : getMessagesOfTheDay()) {
+            if(showStartupMessages)
+                Logger.getLogger("Minecraft").info("(NoCheat) Did you know? " + s);
+        }
 
         movingCheck = new MovingCheck(this, config);
         speedhackCheck = new SpeedhackCheck(this, config);
@@ -154,10 +160,6 @@ public class NoCheat extends JavaPlugin {
             Logger.getLogger("Minecraft").warning("[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
         }
 
-        for(String s : getMessagesOfTheDay()) {
-            if(showStartupMessages)
-                Logger.getLogger("Minecraft").info("(NoCheat) Did you know? " + s);
-        }
 
         PluginDescriptionFile pdfFile = this.getDescription();
 
