@@ -37,7 +37,7 @@ public class MovingPlayerListener extends PlayerListener {
 		if(!check.skipCheck(player)) {
 
 			final MovingData data = dataManager.getMovingData(player);
-			final Location from = event.getFrom();
+			final Location from = player.getLocation();
 			final Location to = event.getTo();
 
 			Location newTo = null;

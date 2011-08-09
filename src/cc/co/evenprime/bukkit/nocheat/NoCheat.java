@@ -1,8 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,7 +64,6 @@ public class NoCheat extends JavaPlugin {
 
     // CraftIRC, if available
     private CraftIRC             irc;
-    private boolean              allowFlightSet;
 
     private Level                chatLevel;
     private Level                ircLevel;
@@ -85,7 +82,7 @@ public class NoCheat extends JavaPlugin {
 
     public String[] getMessagesOfTheDay() {
 
-        return new String[] {"NoCheat now supports the new Bukkit-Permission system. You can activate it in the config file.", "There will be a change in the near future to how movement in CraftBukkit works, which will break NoCheats moving-check(s) completely, causing tons of false positives. Be careful if you tend to run bleeding edge builds of CraftBukkit.", "This version of NoCheat was written for CraftBukkit RB 1000, but may still work for some older or newer versions.", "You can find detailed information about all configuration options of NoCheat in the file \"descriptions.txt\" in your \"plugins/NoCheat\" folder", "You can deactivate these Messages in the config file, if they annoy you."};
+        return new String[] {"This version of NoCheat was written for CraftBukkit CB #1046, it will NOT work on older versions.", "NoCheat supports the new SuperPerms system. You can activate it in the config file.", "You can find detailed information about all configuration options of NoCheat in the file \"descriptions.txt\" in your \"plugins/NoCheat\" folder", "You can deactivate these Messages in the config file, if they annoy you."};
     }
 
     @Override
@@ -153,7 +150,7 @@ public class NoCheat extends JavaPlugin {
         // just for convenience
         checks = new Check[] {movingCheck, speedhackCheck, airbuildCheck, bogusitemsCheck, nukeCheck};
 
-        if(!allowFlightSet && movingCheck.isActive()) {
+        if(!this.getServer().getAllowFlight() && movingCheck.isActive()) {
             Logger.getLogger("Minecraft").warning("[NoCheat] you have set \"allow-flight=false\" in your server.properties file. That builtin anti-flying-mechanism will likely conflict with this plugin. Please consider deactivating it by setting it to \"true\"");
         }
 
@@ -385,24 +382,6 @@ public class NoCheat extends JavaPlugin {
             e.printStackTrace();
             this.setEnabled(false);
         }
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(new File("server.properties")));
-
-            allowFlightSet = true;
-            String s = null;
-
-            while((s = reader.readLine()) != null) {
-                if(s.startsWith("allow-flight=false")) {
-                    allowFlightSet = false;
-                }
-
-            }
-        } catch(Exception e) {
-            e.printStackTrace();
-            // ignore errors
-        }
-
     }
 
     private String getActiveChecksAsString() {

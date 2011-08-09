@@ -88,18 +88,12 @@ public class FlyingCheck {
 		//           its movement, plus additional events if the "velocity" was big and can cause longer flights
 
 		// The server sent the player a "velocity" packet a short time ago
-		if(data.maxYVelocity > 0.0D) {
-
-			data.vertFreedomCounter = 30;
-
-			// Be generous with the height limit for the client
-			data.vertFreedom += data.maxYVelocity*2D;
-			data.maxYVelocity = 0.0D;
-		}
 
 		// consume a counter for this client
 		if(data.vertFreedomCounter > 0) {
 			data.vertFreedomCounter--;
+			data.vertFreedom += data.maxYVelocity*2D;
+			data.maxYVelocity *= 0.90D;
 		}
 		
 		final double limit = data.vertFreedom;
