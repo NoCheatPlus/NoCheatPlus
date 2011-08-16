@@ -231,7 +231,9 @@ public class MovingCheck extends Check {
         // We can enforce a teleport, if that flag is explicitly set (but I'd
         // rather have other plugins
         // not arbitrarily cancel teleport events in the first place...
-        if(data.teleportInitializedByMe != null && event.isCancelled() && enforceTeleport && event.getTo().equals(data.teleportInitializedByMe)) {
+        // Ok, it seems that now teleports via portals may have "null" as a to location. Nice that nobody told me that...
+        // So avoid calling methods of the "to" location at all costs
+        if(data.teleportInitializedByMe != null && event.isCancelled() && enforceTeleport && data.teleportInitializedByMe.equals(event.getTo())) {
             event.setCancelled(false);
             data.teleportInitializedByMe = null;
         }
