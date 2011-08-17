@@ -48,7 +48,7 @@ public class FlyingCheck {
 
         // Walk or start Jump
         if(fromOnGround) {
-            distanceAboveLimit = toY - Math.floor(fromY) - limit;
+            distanceAboveLimit = toY - fromY - limit;
         }
         // Land or Fly/Fall
         else {
@@ -66,7 +66,7 @@ public class FlyingCheck {
             if(toOnGround)
                 limit += stepHeight;
 
-            distanceAboveLimit = toY - Math.floor(l.getY()) - limit;
+            distanceAboveLimit = toY - l.getY() - limit;
 
             // Always give some bonus points in case of identical Y values in
             // midair (hovering player)

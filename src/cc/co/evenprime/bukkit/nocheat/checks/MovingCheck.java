@@ -88,6 +88,7 @@ public class MovingCheck extends Check {
 
         Location newToLocation = null;
 
+        System.out.println(from.getY() + " " + to.getY() + (from.getY() > to.getY() ? " down" : "horiz/up"));
         final long startTime = System.nanoTime();
 
         /************* DECIDE WHICH CHECKS NEED TO BE RUN *************/
@@ -128,9 +129,10 @@ public class MovingCheck extends Check {
 
             data.jumpPhase++;
 
-            if(fromOnGround) {
+            if(fromOnGround && from.getY() >= to.getY()) {
                 data.setBackPoint = from;
                 data.jumpPhase = 0;
+                System.out.println("New setback point");
             } else if(result <= 0 && toOnGround) {
                 data.jumpPhase = 0;
             }
