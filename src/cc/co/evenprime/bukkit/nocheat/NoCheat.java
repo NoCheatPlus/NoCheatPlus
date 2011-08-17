@@ -82,7 +82,7 @@ public class NoCheat extends JavaPlugin {
 
     public String[] getMessagesOfTheDay() {
 
-        return new String[] {"This version of NoCheat was written for CraftBukkit CB #1046, it will NOT work on older versions.", "NoCheat supports the new SuperPerms system. You can activate it in the config file.", "You can find detailed information about all configuration options of NoCheat in the file \"descriptions.txt\" in your \"plugins/NoCheat\" folder", "You can deactivate these Messages in the config file, if they annoy you."};
+        return new String[] {"This version of NoCheat was written for CraftBukkit RB #1060", "NoCheat supports the new \"SuperPerms\" system. You can activate it in the config file."};
     }
 
     @Override
@@ -325,9 +325,6 @@ public class NoCheat extends JavaPlugin {
             return false;
 
         if(useNewPermissionSystem) {
-            // System.out.println("New permissions system asked for " +
-            // PermissionData.permissionNames[permission] + " got " +
-            // player.hasPermission(PermissionData.permissionNames[permission]));
             return player.hasPermission(PermissionData.permissionNames[permission]);
         }
 

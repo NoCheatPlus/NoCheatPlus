@@ -18,25 +18,21 @@ public class FlyingCheck {
 
     // How many move events can a player have in air before he is expected to
     // lose altitude (or eventually land somewhere)
-    private final static int    jumpingLimit       = 5;
+    private final static int    jumpingLimit = 6;
 
     // How high may a player get compared to his last location with ground
     // contact
-    private final static double jumpHeight         = 1.31D;
-
-    // How much points should hovering attempts cause?
-    private final static double hoveringPunishment = 0.2D;
-
-    // How high may a player move in one event on ground
-    private final static double stepHeight         = 0.501D;
+    private final static double jumpHeight   = 1.35D;
 
     /**
      * Calculate if and how much the player "failed" this check. The check
      * should not
      * modify any data
      * 
+     * @param fromInGround
+     * 
      */
-    public double check(final Player player, final Location from, final boolean fromOnGround, final Location to, final boolean toOnGround, final MovingData data) {
+    public double check(final Player player, final Location from, final boolean groundContact, final Location to, final MovingData data) {
 
         // How much higher did the player move than expected??
         double distanceAboveLimit = 0.0D;
@@ -44,41 +40,25 @@ public class FlyingCheck {
         final double toY = to.getY();
         final double fromY = from.getY();
 
-        double limit = calculateVerticalLimit(data, fromOnGround) + jumpHeight;
+        double limit = calculateVerticalLimit(data, groundContact) + jumpHeight;
 
-        // Walk or start Jump
-        if(fromOnGround) {
-            distanceAboveLimit = toY - fromY - limit;
+        final Location l;
+
+        if(data.setBackPoint == null)
+            l = from;
+        else
+            l = data.setBackPoint;
+
+        if(data.jumpPhase > jumpingLimit) {
+            limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
         }
-        // Land or Fly/Fall
-        else {
-            final Location l;
 
-            if(data.setBackPoint == null)
-                l = from;
-            else
-                l = data.setBackPoint;
-
-            if(data.jumpPhase > jumpingLimit) {
-                limit -= (data.jumpPhase - jumpingLimit) * 0.2D;
-            }
-
-            if(toOnGround)
-                limit += stepHeight;
-
-            distanceAboveLimit = toY - l.getY() - limit;
-
-            // Always give some bonus points in case of identical Y values in
-            // midair (hovering player)
-            if(fromY == toY && !toOnGround) {
-                distanceAboveLimit = Math.max(hoveringPunishment, distanceAboveLimit + hoveringPunishment);
-            }
-        }
+        distanceAboveLimit = toY - l.getY() - limit;
 
         return distanceAboveLimit;
     }
 
-    private double calculateVerticalLimit(final MovingData data, final boolean onGroundFrom) {
+    private double calculateVerticalLimit(final MovingData data, final boolean groundContact) {
 
         // A halfway lag-resistant method of allowing vertical acceleration
         // without allowing blatant cheating
@@ -108,7 +88,7 @@ public class FlyingCheck {
 
         // If the event counter has been consumed, remove the vertical movement
         // limit increase when landing the next time
-        if(onGroundFrom && data.vertFreedomCounter <= 0) {
+        if(groundContact && data.vertFreedomCounter <= 0) {
             data.vertFreedom = 0.0D;
         }
 

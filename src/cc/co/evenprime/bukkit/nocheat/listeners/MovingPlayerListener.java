@@ -17,12 +17,12 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 public class MovingPlayerListener extends PlayerListener {
 
-    private final MovingCheck check;
+    private final MovingCheck movingCheck;
     private final DataManager dataManager;
 
     public MovingPlayerListener(DataManager dataManager, MovingCheck check) {
         this.dataManager = dataManager;
-        this.check = check;
+        this.movingCheck = check;
     }
 
     @Override
@@ -34,17 +34,17 @@ public class MovingPlayerListener extends PlayerListener {
         final Player player = event.getPlayer();
 
         // Is there something to do at all?
-        if(!check.skipCheck(player)) {
+        if(!movingCheck.skipCheck(player)) {
 
             final MovingData data = dataManager.getMovingData(player);
-            final Location from = player.getLocation();
+            final Location from = event.getFrom();
             final Location to = event.getTo();
 
             Location newTo = null;
 
             if(!player.isInsideVehicle()) {
                 // Check it
-                newTo = check.check(player, from, to, data);
+                newTo = movingCheck.check(player, from, to, data);
             }
 
             // Did the checks decide we need a new To-Location?

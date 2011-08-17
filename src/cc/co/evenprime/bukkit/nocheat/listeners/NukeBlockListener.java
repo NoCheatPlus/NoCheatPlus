@@ -16,8 +16,6 @@ public class NukeBlockListener extends BlockListener {
 
     @Override
     public void onBlockBreak(BlockBreakEvent event) {
-        // System.out.println("Break "+ event.getPlayer() + " " +
-        // event.getBlock());
         check.check(event);
     }
 

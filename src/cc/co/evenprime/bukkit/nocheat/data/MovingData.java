@@ -26,6 +26,7 @@ public class MovingData {
     public double           violationLevel          = 0.0D;
 
     public Location         teleportInitializedByMe = null;
+    public double horizontalBuffer = 0.1D;
 
     // Block types that may need to be treated specially
     public static final int NONSOLID                = 0;           // 0x00000000

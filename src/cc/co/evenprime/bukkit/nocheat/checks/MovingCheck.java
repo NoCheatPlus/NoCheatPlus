@@ -88,7 +88,6 @@ public class MovingCheck extends Check {
 
         Location newToLocation = null;
 
-        System.out.println(from.getY() + " " + to.getY() + (from.getY() > to.getY() ? " down" : "horiz/up"));
         final long startTime = System.nanoTime();
 
         /************* DECIDE WHICH CHECKS NEED TO BE RUN *************/
@@ -96,6 +95,10 @@ public class MovingCheck extends Check {
         final boolean runCheck = true;
 
         /***************** REFINE EVENT DATA FOR CHECKS ***************/
+        
+        if(data.setBackPoint == null) {
+            data.setBackPoint = from;
+        }
 
         if(flyCheck || runCheck) {
 
@@ -105,8 +108,10 @@ public class MovingCheck extends Check {
             final int fromType = helper.isLocationOnGround(from.getWorld(), from.getX(), from.getY(), from.getZ(), waterElevators);
             final int toType = helper.isLocationOnGround(to.getWorld(), to.getX(), to.getY(), to.getZ(), waterElevators);
 
-            final boolean fromOnGround = fromType != MovingEventHelper.NONSOLID;
-            final boolean toOnGround = toType != MovingEventHelper.NONSOLID;
+            final boolean fromOnGround = helper.isOnGround(fromType);
+            final boolean fromInGround = helper.isInGround(fromType);
+            final boolean toOnGround = helper.isOnGround(toType);
+            final boolean toInGround = helper.isInGround(toType);
 
             // Distribute data to checks in the form needed by the checks
 
@@ -114,7 +119,7 @@ public class MovingCheck extends Check {
             double result = 0.0D;
 
             if(flyCheck) {
-                result += Math.max(0D, flyingCheck.check(player, from, fromOnGround, to, toOnGround, data));
+                result += Math.max(0D, flyingCheck.check(player, from, fromOnGround || fromInGround, to, data));
             } else {
                 // If players are allowed to fly, there's no need to remember
                 // the last location on ground
@@ -122,33 +127,39 @@ public class MovingCheck extends Check {
             }
 
             if(runCheck) {
-                result += Math.max(0D, runningCheck.check(from, to, !allowFakeSneak && player.isSneaking(), !allowFastSwim && (fromType & toType & MovingEventHelper.LIQUID) > 0, data, this));
+                result += Math.max(0D, runningCheck.check(from, to, !allowFakeSneak && player.isSneaking(), !allowFastSwim && helper.isLiquid(fromType) && helper.isLiquid(toType), data, this));
             }
 
             /********* HANDLE/COMBINE THE RESULTS OF THE CHECKS ***********/
 
             data.jumpPhase++;
-
-            if(fromOnGround && from.getY() >= to.getY()) {
-                data.setBackPoint = from;
-                data.jumpPhase = 0;
-                System.out.println("New setback point");
-            } else if(result <= 0 && toOnGround) {
-                data.jumpPhase = 0;
+            
+            if(result <= 0) {
+                // On ground -> use as new setback if we were moving down or it is an "upgrade" over the old point
+                if(toInGround && from.getY() >= to.getY()) {
+                    data.setBackPoint = to.clone();
+                    data.setBackPoint.setY(Math.ceil(data.setBackPoint.getY()));
+                    data.jumpPhase = 0;
+                }
+                else if(toOnGround && (from.getY() >= to.getY() || data.setBackPoint.getY() < Math.floor(to.getY()))) {
+                    data.setBackPoint = to.clone();
+                    data.setBackPoint.setY(Math.floor(data.setBackPoint.getY()));
+                    data.jumpPhase = 0;
+                } else if(toOnGround) {
+                    data.jumpPhase = 0;
+                }
             }
 
             if(result > 0) {
                 // Increment violation counter
                 data.violationLevel += result;
-                if(data.setBackPoint == null)
-                    data.setBackPoint = from;
             }
 
-            if(result > 0 && data.violationLevel > 1) {
+            if(result > 0 && data.violationLevel > 0) {
 
                 setupSummaryTask(player, data);
 
-                int level = limitCheck(data.violationLevel - 1);
+                int level = limitCheck(data.violationLevel);
 
                 data.violationsInARow[level]++;
 
@@ -166,20 +177,6 @@ public class MovingCheck extends Check {
         return newToLocation;
     }
 
-    /**
-     * Various corner cases that would cause this check to fail or require
-     * special treatment
-     * 
-     * @param player
-     * @param data
-     * @param from
-     * @param to
-     * @return
-     */
-    public boolean shouldBeApplied(final Player player, final MovingData data, final Location from, final Location to) {
-
-        return true;
-    }
 
     /**
      * Register a task with bukkit that will be run a short time from now,
