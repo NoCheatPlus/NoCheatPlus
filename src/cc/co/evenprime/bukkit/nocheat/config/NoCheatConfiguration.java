@@ -147,7 +147,7 @@ public class NoCheatConfiguration {
 
             movingNode.add(new BooleanOption("checkops", SimpleYaml.getBoolean("moving.checkops", false, yamlContent)));
 
-            movingNode.add(new BooleanOption("enforceteleport", SimpleYaml.getBoolean("moving.enforceteleport", false, yamlContent)));
+            movingNode.add(new BooleanOption("enforceteleport", SimpleYaml.getBoolean("moving.enforceteleport", true, yamlContent)));
 
             /*** MOVING LIMITS section ***/
             {

@@ -135,17 +135,16 @@ public class MovingCheck extends Check {
             data.jumpPhase++;
             
             if(result <= 0) {
-                // On ground -> use as new setback if we were moving down or it is an "upgrade" over the old point
-                if(toInGround && from.getY() >= to.getY()) {
+                if(toInGround && from.getY() >= to.getY() || helper.isLiquid(toType)) {
                     data.setBackPoint = to.clone();
                     data.setBackPoint.setY(Math.ceil(data.setBackPoint.getY()));
                     data.jumpPhase = 0;
                 }
-                else if(toOnGround && (from.getY() >= to.getY() || data.setBackPoint.getY() < Math.floor(to.getY()))) {
+                else if(toOnGround && (from.getY() >= to.getY() || data.setBackPoint.getY() <= Math.floor(to.getY()))) {
                     data.setBackPoint = to.clone();
                     data.setBackPoint.setY(Math.floor(data.setBackPoint.getY()));
                     data.jumpPhase = 0;
-                } else if(toOnGround) {
+                } else if(fromOnGround || fromInGround  || toOnGround || toInGround) {
                     data.jumpPhase = 0;
                 }
             }

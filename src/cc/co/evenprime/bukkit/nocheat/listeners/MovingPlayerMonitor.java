@@ -51,11 +51,12 @@ public class MovingPlayerMonitor extends PlayerListener {
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
 
-        if(!event.isCancelled()) {
-            if(event.getPlayer().isInsideVehicle()) {
-                MovingData data = dataManager.getMovingData(event.getPlayer());
-                data.setBackPoint = null;
-            }
+        if(event.isCancelled())
+            return;
+
+        if(event.getPlayer().isInsideVehicle()) {
+            MovingData data = dataManager.getMovingData(event.getPlayer());
+            data.setBackPoint = null;
         }
     }
 }
