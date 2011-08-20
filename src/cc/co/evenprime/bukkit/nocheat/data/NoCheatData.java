@@ -18,6 +18,8 @@ public class NoCheatData {
 
     public PermissionData permission;
     public NukeData       nuke;
+    
+    public InfinitedurabilityData infinite;
 
     public NoCheatData() {}
 }

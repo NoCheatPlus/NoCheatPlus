@@ -216,6 +216,8 @@ public class Explainations {
 		set("infinitedurability.kick",  "Kick the player if hacking. Please not that if you decide to not kick players,\n" +
 				"the log message about hacking will only appear once, not every time they use the infinite durability\n" +
 				"item. It is strongly recommended to kick the players!");
+	    set("infinitedurability.log", "Log a message in case of violations.");
+	    set("infinitedurability.cancel", "Prevent using of items with infinite durability.");
 	}
 	
 	private static void set(String id, String text) {

@@ -228,7 +228,9 @@ public class NoCheatConfiguration {
             nukeNode.add(new BooleanOption("checkops", SimpleYaml.getBoolean("infinitedurability.checkops", false, yamlContent)));
             nukeNode.add(new LongStringOption("logmessage", SimpleYaml.getString("infinitedurability.logmessage", "InfDur: [player] tries to use an infinite durability hack", yamlContent)));
             nukeNode.add(new LongStringOption("kickmessage", SimpleYaml.getString("infinitedurability.kickmessage", "No infinite durability hacks allowed", yamlContent)));
+            nukeNode.add(new BooleanOption("log", SimpleYaml.getBoolean("infinitedurability.log", true, yamlContent)));
             nukeNode.add(new BooleanOption("kick", SimpleYaml.getBoolean("infinitedurability.kick", true, yamlContent)));
+            nukeNode.add(new BooleanOption("cancel", SimpleYaml.getBoolean("infinitedurability.cancel", true, yamlContent)));
 
         }
         

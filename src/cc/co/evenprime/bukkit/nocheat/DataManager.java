@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.data.AirbuildData;
+import cc.co.evenprime.bukkit.nocheat.data.InfinitedurabilityData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.NoCheatData;
 import cc.co.evenprime.bukkit.nocheat.data.NukeData;
@@ -118,6 +119,18 @@ public class DataManager {
         }
 
         return data.speedhack;
+    }
+    
+
+    public InfinitedurabilityData getInfiniteData(Player p) {
+
+        NoCheatData data = getPlayerData(p);
+
+        if(data.infinite == null) {
+            data.infinite = new InfinitedurabilityData();
+        }
+
+        return data.infinite;
     }
 
     /**
