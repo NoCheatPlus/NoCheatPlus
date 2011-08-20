@@ -36,6 +36,7 @@ public class Explainations {
 				"Because this is done by most 'nuke' hack-clients, it is easy to prevent (for now). If a player tries destroying\n" +
 				"blocks that are outside his field of sight, he'll get kicked from the server.\n" +
 				"This is only a temporary solution (and will probably not hold for long), but it's better than nothing, I guess...");
+		set("active.infinitedurability", "If activated, it will be detected when players activate the infinite durability hack.");
 		
 		set("newpermsystem", "If activated, NoCheat will fully rely on the new Permission system of Bukkit, introduced with build 1000.\n" +
 				"This only makes sense if you also have a permission plugin that is capable of managing permissions in the new system.");
@@ -207,6 +208,14 @@ public class Explainations {
 				"to not check them, e.g. they got the relevant permission from a Permissions plugin.");
 		set("nuke.limitreach",  "Deny blockbreaking over longer distances than the standard minecraft\n" +
 				"client allows.");
+		
+		set("infinitedurability.logmessage", "The message that appears in your logs if somebody tries to use the hack");
+		set("infinitedurability.kickmessage", "The message that is shown to players that get kicked for hacking");
+		set("infinitedurability.checkops",  "Also check players with OP-status, unless there is another reason\n" +
+                "to not check them, e.g. they got the relevant permission from a Permissions plugin.");
+		set("infinitedurability.kick",  "Kick the player if hacking. Please not that if you decide to not kick players,\n" +
+				"the log message about hacking will only appear once, not every time they use the infinite durability\n" +
+				"item. It is strongly recommended to kick the players!");
 	}
 	
 	private static void set(String id, String text) {

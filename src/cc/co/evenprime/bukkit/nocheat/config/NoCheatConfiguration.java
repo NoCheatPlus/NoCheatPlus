@@ -97,6 +97,7 @@ public class NoCheatConfiguration {
             activeNode.add(new BooleanOption("airbuild", SimpleYaml.getBoolean("active.airbuild", false, yamlContent)));
             activeNode.add(new BooleanOption("bogusitems", SimpleYaml.getBoolean("active.bogusitems", false, yamlContent)));
             activeNode.add(new BooleanOption("nuke", SimpleYaml.getBoolean("active.nuke", false, yamlContent)));
+            activeNode.add(new BooleanOption("infinitedurability", SimpleYaml.getBoolean("active.infinitedurability", true, yamlContent)));
         }
 
         /*** SPEEDHACK section ***/
@@ -219,6 +220,18 @@ public class NoCheatConfiguration {
 
         }
 
+        /*** INFINITE_DURABILITY section ***/
+        {
+            ParentOption nukeNode = new ParentOption("infinitedurability", false);
+            root.add(nukeNode);
+
+            nukeNode.add(new BooleanOption("checkops", SimpleYaml.getBoolean("infinitedurability.checkops", false, yamlContent)));
+            nukeNode.add(new LongStringOption("logmessage", SimpleYaml.getString("infinitedurability.logmessage", "InfDur: [player] tries to use an infinite durability hack", yamlContent)));
+            nukeNode.add(new LongStringOption("kickmessage", SimpleYaml.getString("infinitedurability.kickmessage", "No infinite durability hacks allowed", yamlContent)));
+            nukeNode.add(new BooleanOption("kick", SimpleYaml.getBoolean("infinitedurability.kick", true, yamlContent)));
+
+        }
+        
         /*** CUSTOMACTIONS section ***/
         {
             ParentOption customActionsNode = new ParentOption("customactions", true);

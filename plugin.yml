@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 1.13c
+version: 1.14
 
 softdepend: [ Permissions, CraftIRC ]
 
@@ -33,6 +33,7 @@ permissions:
       nocheat.flying: true
       nocheat.fakesneak: true
       nocheat.fastswim: true
+      nocheat.infinitedurability: true
   nocheat.moving:
     description: Allow to player to move/fly without getting checked at all
     default: op
@@ -60,6 +61,6 @@ permissions:
   nocheat.fastswim:
     description: Allow the player to swim at normal walking speed
     default: op
-
-
-        
+  nocheat.infinitedurability:
+    description: Allow the player to use a known infinite item durability hack
+    default: op
