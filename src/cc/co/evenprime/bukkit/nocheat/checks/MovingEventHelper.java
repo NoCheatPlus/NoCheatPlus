@@ -130,7 +130,10 @@ public class MovingEventHelper {
         if(isLiquid(standingIn) || isLiquid(headIn)) {
             return LIQUID;
         }
-
+        
+        if(isLadder(standingIn) || isLadder(headIn)) {
+            return LADDER;
+        }
 
         int standingOn = types[world.getBlockTypeIdAt(x, y - 1, z)];
 
@@ -140,7 +143,7 @@ public class MovingEventHelper {
         }
 
         // Player standing on a block?
-        if((isSolid(standingOn) || types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) && isNonSolid(standingIn) && standingOn != FENCE) {
+        if((isLadder(headIn) || isLadder(standingIn)) || ((isSolid(standingOn) || types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) && isNonSolid(standingIn) && standingOn != FENCE)) {
             result |= ONGROUND;
         }
 
@@ -158,7 +161,19 @@ public class MovingEventHelper {
     private final boolean isNonSolid(int value) {
         return((value & NONSOLID) == NONSOLID);
     }
+    
+    public final boolean isLadder(int value) {
+        return((value & LADDER) == LADDER);
+    }
 
+    public boolean isOnGround(int fromType) {
+        return isLadder(fromType) || (fromType & ONGROUND) == ONGROUND;
+    }
+
+    public boolean isInGround(int fromType) {
+        return isLadder(fromType) || isLiquid(fromType) || (fromType & INGROUND) == INGROUND;
+    }
+    
     /**
      * Personal Rounding function to determine if a player is still touching a
      * block or not
@@ -199,11 +214,5 @@ public class MovingEventHelper {
         return (int) (floor - d4);
     }
 
-    public boolean isOnGround(int fromType) {
-        return (fromType & ONGROUND) == ONGROUND;
-    }
 
-    public boolean isInGround(int fromType) {
-        return isLiquid(fromType) || (fromType & INGROUND) == INGROUND;
-    }
 }
