@@ -30,10 +30,6 @@ public class SpeedhackPlayerListener extends PlayerListener {
 
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-
-        if(event.isCancelled())
-            return;
-
         check.teleported(event);
     }
 }

@@ -50,6 +50,7 @@ public class MovingPlayerListener extends PlayerListener {
             // Did the checks decide we need a new To-Location?
             if(newTo != null) {
                 event.setTo(new Location(newTo.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), event.getTo().getYaw(), event.getTo().getPitch()));
+                data.setBackPoint = null;
             }
         }
     }

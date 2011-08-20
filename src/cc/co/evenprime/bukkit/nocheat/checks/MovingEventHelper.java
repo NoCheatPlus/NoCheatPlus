@@ -122,15 +122,16 @@ public class MovingEventHelper {
     private final int canStand(World world, int x, int y, int z) {
 
         int standingIn = types[world.getBlockTypeIdAt(x, y, z)];
-
+        int headIn = types[world.getBlockTypeIdAt(x, y + 1, z)];
+        
         int result = 0;
 
         // It's either liquid, or something else
-        if(isLiquid(standingIn)) {
+        if(isLiquid(standingIn) || isLiquid(headIn)) {
             return LIQUID;
         }
 
-        int headIn = types[world.getBlockTypeIdAt(x, y + 1, z)];
+
         int standingOn = types[world.getBlockTypeIdAt(x, y - 1, z)];
 
         // Player standing with his feet in a (half) block?

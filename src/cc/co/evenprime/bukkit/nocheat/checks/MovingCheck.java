@@ -98,6 +98,7 @@ public class MovingCheck extends Check {
         
         if(data.setBackPoint == null) {
             data.setBackPoint = from;
+            data.jumpPhase = 0;
         }
 
         if(flyCheck || runCheck) {
@@ -135,7 +136,7 @@ public class MovingCheck extends Check {
             data.jumpPhase++;
             
             if(result <= 0) {
-                if(toInGround && from.getY() >= to.getY() || helper.isLiquid(toType)) {
+                if((toInGround && from.getY() >= to.getY()) || helper.isLiquid(toType)) {
                     data.setBackPoint = to.clone();
                     data.setBackPoint.setY(Math.ceil(data.setBackPoint.getY()));
                     data.jumpPhase = 0;
@@ -236,12 +237,9 @@ public class MovingCheck extends Check {
             data.teleportInitializedByMe = null;
         }
 
-        if(!event.isCancelled()) {
-            data.setBackPoint = null;
-        }
-
         // reset anyway - if another plugin cancelled our teleport it's no use
         // to try and be precise
+        data.setBackPoint = null;
         data.jumpPhase = 0;
     }
 
@@ -306,17 +304,17 @@ public class MovingCheck extends Check {
 
                         double y = data.setBackPoint.getY();
 
-                        // search for the first solid block up to 5 blocks below
+                        /*// search for the first solid block up to 5 blocks below
                         // the setbackpoint and teleport the player there
                         int i = 0;
                         for(; i < 20; i++) {
                             if(helper.isLocationOnGround(data.setBackPoint.getWorld(), data.setBackPoint.getX(), data.setBackPoint.getY() - 0.5 * i, data.setBackPoint.getZ(), waterElevators) != MovingData.NONSOLID) {
-                                break;
+                               break;
                             }
                         }
                         y -= 0.5 * i;
 
-                        data.setBackPoint.setY(y);
+                        data.setBackPoint.setY(y);*/
 
                         // Remember the location we send the player to, to
                         // identify teleports that were started by us
@@ -347,8 +345,8 @@ public class MovingCheck extends Check {
     private static int limitCheck(final double value) {
 
         if(value > 0.0D) {
-            if(value > 0.5D) {
-                if(value > 2.0D)
+            if(value > 1.0D) {
+                if(value > 4.0D)
                     return 2;
                 return 1;
             }

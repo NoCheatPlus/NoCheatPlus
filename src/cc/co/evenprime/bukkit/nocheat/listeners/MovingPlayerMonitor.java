@@ -30,7 +30,6 @@ public class MovingPlayerMonitor extends PlayerListener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         MovingData data = dataManager.getMovingData(event.getPlayer());
         data.setBackPoint = null;
-        data.jumpPhase = 0;
     }
 
     @Override
@@ -50,11 +49,7 @@ public class MovingPlayerMonitor extends PlayerListener {
 
     @Override
     public void onPlayerMove(PlayerMoveEvent event) {
-
-        if(event.isCancelled())
-            return;
-
-        if(event.getPlayer().isInsideVehicle()) {
+        if(event.isCancelled() || event.getPlayer().isInsideVehicle()) {
             MovingData data = dataManager.getMovingData(event.getPlayer());
             data.setBackPoint = null;
         }
