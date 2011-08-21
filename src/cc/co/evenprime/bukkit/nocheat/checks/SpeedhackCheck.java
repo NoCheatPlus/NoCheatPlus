@@ -20,6 +20,7 @@ import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
 import cc.co.evenprime.bukkit.nocheat.data.SpeedhackData;
 import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackPlayerListener;
+import cc.co.evenprime.bukkit.nocheat.listeners.SpeedhackPlayerMonitor;
 
 /**
  * Log if a player sends to many move events in a specific time frame, usually
@@ -190,8 +191,11 @@ public class SpeedhackCheck extends Check {
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
         Listener speedhackPlayerListener = new SpeedhackPlayerListener(this);
+        Listener speedhackPlayerMonitor = new SpeedhackPlayerMonitor(this);
+
         // Register listeners for speedhack check
         pm.registerEvent(Event.Type.PLAYER_MOVE, speedhackPlayerListener, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_MOVE, speedhackPlayerMonitor, Priority.Monitor, plugin);
         pm.registerEvent(Event.Type.PLAYER_TELEPORT, speedhackPlayerListener, Priority.Monitor, plugin);
 
     }
@@ -199,5 +203,10 @@ public class SpeedhackCheck extends Check {
     public void teleported(PlayerTeleportEvent event) {
         SpeedhackData data = plugin.getDataManager().getSpeedhackData(event.getPlayer());
         resetData(data, event.getTo());
+    }
+
+    public void teleported(Player player) {
+        SpeedhackData data = plugin.getDataManager().getSpeedhackData(player);
+        resetData(data, player.getLocation());
     }
 }
