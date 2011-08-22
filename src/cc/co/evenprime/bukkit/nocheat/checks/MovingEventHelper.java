@@ -150,7 +150,7 @@ public class MovingEventHelper {
         return result;
     }
 
-    private final boolean isSolid(int value) {
+    public final boolean isSolid(int value) {
         return (value & SOLID) == SOLID;
     }
 

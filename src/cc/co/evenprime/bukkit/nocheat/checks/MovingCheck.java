@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
@@ -22,6 +23,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.LogAction;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PermissionData;
+import cc.co.evenprime.bukkit.nocheat.listeners.MovingBlockMonitor;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerListener;
 import cc.co.evenprime.bukkit.nocheat.listeners.MovingPlayerMonitor;
 
@@ -263,6 +265,36 @@ public class MovingCheck extends Check {
             data.maxYVelocity += v.getY();
         }
     }
+    
+
+    /** An attempt to work around lag during tower building **/
+    public void blockPlaced(BlockPlaceEvent event) {
+        
+        Player player = event.getPlayer();
+        MovingData data = plugin.getDataManager().getMovingData(player);
+        
+        if(event.getBlockPlaced() == null || data.setBackPoint == null) {
+            return;
+        }
+
+        
+        Location lblock = event.getBlockPlaced().getLocation();
+        Location lplayer = player.getLocation();
+        
+        if(Math.abs(lplayer.getBlockX() - lblock.getBlockX()) <= 1 && Math.abs(lplayer.getBlockZ() - lblock.getBlockZ()) <= 1 && lplayer.getBlockY() - lblock.getBlockY() >= 0 && lplayer.getBlockY() - lblock.getBlockY()<= 2) {
+            
+
+            int type = helper.types[event.getBlockPlaced().getTypeId()];
+            if(helper.isSolid(type) || helper.isLiquid(type)) {
+                if(lblock.getBlockY()+1 >= data.setBackPoint.getY()) {
+                    data.setBackPoint.setY(lblock.getBlockY()+1);
+                    data.jumpPhase = 0;
+                }
+            }
+
+        }
+        
+    }
 
     /**
      * Perform actions that were specified in the config file
@@ -399,13 +431,17 @@ public class MovingCheck extends Check {
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
         Listener movingPlayerMonitor = new MovingPlayerMonitor(plugin.getDataManager(), this);
-
+        Listener movingBlockMonitor = new MovingBlockMonitor(this);
+        
         // Register listeners for moving check
         pm.registerEvent(Event.Type.PLAYER_MOVE, new MovingPlayerListener(plugin.getDataManager(), this), Priority.Lowest, plugin);
         pm.registerEvent(Event.Type.PLAYER_MOVE, movingPlayerMonitor, Priority.Monitor, plugin);
+        pm.registerEvent(Event.Type.BLOCK_PLACE, movingBlockMonitor, Priority.Monitor, plugin);
         pm.registerEvent(Event.Type.PLAYER_TELEPORT, movingPlayerMonitor, Priority.Monitor, plugin);
         pm.registerEvent(Event.Type.PLAYER_PORTAL, movingPlayerMonitor, Priority.Monitor, plugin);
         pm.registerEvent(Event.Type.PLAYER_RESPAWN, movingPlayerMonitor, Priority.Monitor, plugin);
         pm.registerEvent(Event.Type.PLAYER_VELOCITY, movingPlayerMonitor, Priority.Monitor, plugin);
     }
+
+
 }
