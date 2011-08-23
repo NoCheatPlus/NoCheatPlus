@@ -171,6 +171,9 @@ public class NoCheat extends JavaPlugin {
         if(!useNewPermissionSystem) {
             setupPermissions();
         }
+        else {
+            Logger.getLogger("Minecraft").info("[NoCheat] is using SuperPerms system.");
+        }
         setupIRC();
 
         Logger.getLogger("Minecraft").info("[NoCheat] version [" + pdfFile.getVersion() + "] is enabled with the following checks: " + getActiveChecksAsString());
@@ -255,7 +258,8 @@ public class NoCheat extends JavaPlugin {
                 this.permissions = ((Permissions) permissionsPlugin).getHandler();
             } else {
                 PluginDescriptionFile pdfFile = this.getDescription();
-                Logger.getLogger("Minecraft").warning("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find Permissions plugin. Fallback to 'isOp()' equals 'nocheat.*'");
+                Logger.getLogger("Minecraft").warning("[NoCheat] version [" + pdfFile.getVersion() + "] couldn't find \"Permissions\" plugin. Falling back to SuperPerms system.");
+                useNewPermissionSystem = true;
             }
         }
     }
