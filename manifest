@@ -1,3 +1,2 @@
 Manifest-Version: 1.0
-Main-Class: cc.co.evenprime.bukkit.nocheat.Main
-Class-Path: snakeyaml.jar
+Main-Class: cc.co.evenprime.bukkit.nocheat.wizard.Wizard

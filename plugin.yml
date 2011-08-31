@@ -3,64 +3,69 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 1.14e
-
-softdepend: [ Permissions, CraftIRC ]
-
-commands:
-  nocheat:
-    description: Provides information about the current status of the NoCheat plugin
-    usage: |
-           /<command>
-           Example: /<command> | Displays version, enabled checks and bugfixes
-           Example: /<command> -p | Get your permissions, * = check disabled globally
-           Example: /<command> -p [player] | Get permissions of the player, * = check disabled globally
+version: 2.00
 
 permissions:
+
   nocheat.*:
-    description: Allow the player to do everything (and get log messages)
+    description: Allow a player to bypass all checks and give him all admin permissions
     children:
-      nocheat.all: true
-      nocheat.notify: true
-  nocheat.all:
-    description: Allow the player to do everything (except for getting log messages)
+      nocheat.checks.*: true
+      nocheat.admin.*: true
+
+  nocheat.checks.*:
+    description: Allow the player to bypass all checks
     children:
-      nocheat.moving: true
-      nocheat.speedhack: true
-      nocheat.airbuild: true
-      nocheat.bogusitems: true
-      nocheat.nuke: true
-      nocheat.flying: true
-      nocheat.fakesneak: true
-      nocheat.fastswim: true
-      nocheat.infinitedurability: true
-  nocheat.moving:
-    description: Allow to player to move/fly without getting checked at all
+      nocheat.checks.moving.*: true
+      nocheat.checks.blockbreak.*: true
+
+  nocheat.checks.moving.*:
+    description: Allow the player to bypass all moving checks
+    children:
+      nocheat.checks.moving.flying: true
+      nocheat.checks.moving.running: true
+      nocheat.checks.moving.swimming: true
+      nocheat.checks.moving.sneaking: true
+      nocheat.checks.moving.noclip: true
+      nocheat.checks.moving.morepackets: true
+      
+  nocheat.checks.blockbreak.*:
+    description: Allow the player to bypass all blockbreak checks
+    children:
+      nocheat.checks.blockbreak.reach: true
+      nocheat.checks.blockbreak.direction: true
+
+  nocheat.checks.moving.flying:
+    description: Allow a player to move free through the air (implicitly deactivates the "running" check)
     default: op
-  nocheat.speedhack:
-    description: Don't observe the number of move events sent by the player
+  nocheat.checks.moving.running:
+    description: Allow a player to move free, only limited by the flying check, if active (implicitly deactivates the "swimming" and "sneaking" check)
     default: op
-  nocheat.airbuild:
-    description: Allow placing blocks against air/in midair
+  nocheat.checks.moving.swimming:
+    description: Allow a player to move at normal running speed through water
     default: op
-  nocheat.bogusitems:
-    description: Allow the use of items with invalid values e.g. negative stacksize
+  nocheat.checks.moving.sneaking:
+    description: Allow a player to move at normal running speed while sneaking
     default: op
-  nocheat.nuke:
-    description: Allow breaking of blocks that are not in the field of view of the player
+  nocheat.checks.moving.noclip:
+    description: Allow a player to walk through walls
     default: op
-  nocheat.notify:
-    description: Receive log messages in chat
+  nocheat.checks.moving.morepackets:
+    description: Allow a player to send more move-event-packets than normal
     default: op
-  nocheat.flying:
-    description: Allow the player to fly at normal walking speed
+
+  nocheat.checks.blockbreak.reach:
+    description: Allow a player to break blocks at maximum range (about 6-7 blocks)
     default: op
-  nocheat.fakesneak:
-    description: Allow the player to sneak at normal walking speed
+  nocheat.checks.blockbreak.direction:
+    description: Allow a player to break blocks that are not in front of them
     default: op
-  nocheat.fastswim:
-    description: Allow the player to swim at normal walking speed
-    default: op
-  nocheat.infinitedurability:
-    description: Allow the player to use a known infinite item durability hack
+
+  nocheat.admin.*:
+    description: Give a player all admin rights
+    children:
+      nocheat.admin.chatlog: true
+
+  nocheat.admin.chatlog:
+    description: Show log messages in the players chat
     default: op
