@@ -122,9 +122,12 @@ public class NoclipCheck {
             params.put(LogAction.CHECK, "noclip");
 
             boolean cancelled = action.executeActions(player, cc.moving.noclipActions, violationLevel, params, cc);
-            if(cancelled) {
-                return new Location(from.getWorld(), data.noclipX + 0.5, data.noclipY - ((int) bodyHeight), data.noclipZ + 0.5, to.getPitch(), to.getYaw());
-            }
+            
+            // TODO: UNCOMMENT, WHEN THE CHECK WORKS RELIABLY
+            
+            //if(cancelled) {
+            //    return new Location(from.getWorld(), data.noclipX + 0.5, data.noclipY - ((int) bodyHeight), data.noclipZ + 0.5, to.getPitch(), to.getYaw());
+            //}
         }
 
         // We didn't cancel the noclipping, so store the new location

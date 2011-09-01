@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.00
+version: 2.00a
 
 permissions:
 
@@ -18,6 +18,7 @@ permissions:
     children:
       nocheat.checks.moving.*: true
       nocheat.checks.blockbreak.*: true
+      nocheat.checks.interact.*: true
 
   nocheat.checks.moving.*:
     description: Allow the player to bypass all moving checks
@@ -35,8 +36,13 @@ permissions:
       nocheat.checks.blockbreak.reach: true
       nocheat.checks.blockbreak.direction: true
 
+  nocheat.checks.interact.*:
+    description: Allow the player to bypass all interact checks
+    children:
+      nocheat.checks.interact.durability: true
+
   nocheat.checks.moving.flying:
-    description: Allow a player to move free through the air (implicitly deactivates the "running" check)
+    description: Allow a player to move free through the air (if given, the "running" check will be ignored anyway)
     default: op
   nocheat.checks.moving.running:
     description: Allow a player to move free, only limited by the flying check, if active (implicitly deactivates the "swimming" and "sneaking" check)
@@ -59,6 +65,10 @@ permissions:
     default: op
   nocheat.checks.blockbreak.direction:
     description: Allow a player to break blocks that are not in front of them
+    default: op
+    
+  nocheat.checks.interact.durability:
+    description: Allow a player to use an infinite durability item hack
     default: op
 
   nocheat.admin.*:

@@ -16,6 +16,7 @@ public class ConfigurationCache {
     public final CCMoving   moving;
     public final CCLogging  logging;
     public final CCBlockBreak blockbreak;
+    public final CCInteract interact;
 
     /**
      * Instantiate a config cache and populate it with the data of a
@@ -27,6 +28,8 @@ public class ConfigurationCache {
 
         moving = new CCMoving(data);
         blockbreak = new CCBlockBreak(data);
+        interact = new CCInteract(data);
         logging = new CCLogging(data, worldSpecificFileLogger);
+
     }
 }

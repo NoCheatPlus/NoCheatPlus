@@ -9,6 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.PlayerInteractEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
@@ -32,6 +33,7 @@ public class NoCheat extends JavaPlugin {
     private PlayerMoveEventManager     eventPlayerMoveManager;
     private PlayerTeleportEventManager eventPlayerTeleportManager;
     private BlockBreakEventManager     eventBlockBreakManager;
+    private PlayerInteractEventManager eventPlayerInteractManager;
 
     private BlockPlaceEventManager     eventBlockPlaceManager;
 
@@ -64,6 +66,7 @@ public class NoCheat extends JavaPlugin {
         eventPlayerMoveManager = new PlayerMoveEventManager(this);
         eventPlayerTeleportManager = new PlayerTeleportEventManager(this);
         eventBlockBreakManager = new BlockBreakEventManager(this);
+        eventPlayerInteractManager = new PlayerInteractEventManager(this);
 
         eventBlockPlaceManager = new BlockPlaceEventManager(this);
 

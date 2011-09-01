@@ -126,12 +126,12 @@ public class DefaultConfiguration {
                 ParentOption noclipNode = new ParentOption("noclip");
                 movingNode.add(noclipNode);
 
-                noclipNode.add(new BooleanOption("check", true, true));
+                noclipNode.add(new BooleanOption("check", false, true));
                 ActionListOption actions = new ActionListOption("actions");
 
                 noclipNode.add(actions);
 
-                actions.add(1, "noclipLog moveCancel");
+                actions.add(1, "noclipLog");
             }
         }
 
@@ -169,6 +169,28 @@ public class DefaultConfiguration {
                 directionNode.add(actions);
 
                 actions.add(0, "directionLog blockbreakCancel");
+            }
+        }
+        
+        /****** INTERACT ******/
+        {
+            ParentOption interactNode = new ParentOption("interact");
+            root.add(interactNode);
+
+            interactNode.add(new BooleanOption("check", true, true));
+
+            /**** BLOCKBREAK.REACH ****/
+            {
+                ParentOption durabilityNode = new ParentOption("durability");
+                interactNode.add(durabilityNode);
+
+                durabilityNode.add(new BooleanOption("check", true, true));
+
+                ActionListOption actions = new ActionListOption("actions");
+
+                durabilityNode.add(actions);
+
+                actions.add(0, "durabilityLog interactCancel");
             }
         }
         return root;
@@ -238,6 +260,7 @@ public class DefaultConfiguration {
             w(w, "log noclipLog 0 1 high NC: [player] failed [check]: at [location] to [locationto].");
             w(w, "log reachLog 0 1 med NC: [player] failed [check]: tried to destroy a block over distance [distance].");
             w(w, "log directionLog 2 1 med NC: [player] failed [check]: tried to destroy a block out of line of sight.");
+            w(w, "log durabilityLog 0 1 med NC: [player] failed [check]: tried to use infinity durability hack.");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
@@ -249,6 +272,7 @@ public class DefaultConfiguration {
             w(w, "# Cancels the event in case of an violation. Always. No delay. These are equivalent. The different names are just for better readability");
             w(w, "special moveCancel 0 0");
             w(w, "special blockbreakCancel 0 0");
+            w(w, "special interactCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");
