@@ -44,7 +44,7 @@ public class Explainations {
         set("moving.noclip.check", "If true, check if a player is moving into a solid wall. EXPERIMENTAL! DOESN'T WORK RELIABLY! USE WITH CAUTION AND ONLY FOR NOTIFICATIONS!");
         set("moving.noclip.actions", "What should be done if a player moves into a wall.\nUnit is number of walls a player walks into/through.");
 
-        set("blockbreak.check", "If true, do various checks on PlayerInteract events.");
+        set("blockbreak.check", "If true, do various checks on BlockBreak events.");
 
         set("blockbreak.reach.check", "If true, check if a player is breaking blocks that are too far away.");
         set("blockbreak.reach.reachlimit", "Set the distance limit for breaking blocks.\nUnit is 1/100 of a block, default is 485");
@@ -52,6 +52,17 @@ public class Explainations {
 
         set("blockbreak.direction.check", "If true, check if a player is looking at the block that he's breaking.");
         set("blockbreak.direction.actions", "What should be done if a player is breaking blocks that are not in his line of sight.\nUnit is number of break(attempt)s outside the line of sight.");
+        
+        set("blockplace.check", "If true, do various checks on BlockPlace events.");
+
+        set("blockplace.reach.check", "If true, check if a player is placing blocks at locations too far away.");
+        set("blockplace.reach.reachlimit", "Set the distance limit for placing blocks.\nUnit is 1/100 of a block, default is 485");
+        set("blockplace.reach.actions", "What should be done if a player is placing blocks that are too far away.\nUnit is number of place(attempt)s beyond the limit.");
+
+        set("blockplace.onliquid.check", "If true, check if a player is trying to place non-liquid blocks against liquid blocks");
+        set("blockplace.onliquid.actions", "What should be done if a player is is trying to place non-liquid blocks against liquid blocks.\nUnit is number of place(attempt)s.");
+        
+        set("interact.check", "If true, do various checks on PlayerInteract events.");
         
         set("interact.durability.check", "If true, check if a player is using a hack that provides infinite durability items.");
         set("interact.durability.actions", "What should be done if a player is trying to use the hack.\nUnit is number of uses or attempts to use the hack.");

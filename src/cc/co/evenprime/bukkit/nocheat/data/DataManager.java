@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import cc.co.evenprime.bukkit.nocheat.events.InteractData;
 
 /**
  * Provide secure access to player-specific data objects for various checks or
@@ -20,6 +19,7 @@ public class DataManager {
     private final Map<Player, MovingData>     movingData     = new HashMap<Player, MovingData>();
     private final Map<Player, BlockBreakData> blockbreakData = new HashMap<Player, BlockBreakData>();
     private final Map<Player, InteractData>   interactData   = new HashMap<Player, InteractData>();
+    private Map<Player, BlockPlaceData>       blockPlaceData = new HashMap<Player, BlockPlaceData>();
 
     public DataManager() {
 
@@ -67,6 +67,21 @@ public class DataManager {
         if(data == null) {
             data = new InteractData();
             interactData.put(player, data);
+        }
+
+        return data;
+    }
+
+    public BlockPlaceData getBlockPlaceData(Player player) {
+        BlockPlaceData data;
+
+        // intentionally not thread-safe, because bukkit events are handled
+        // in sequence anyway, so zero chance of two events of the same
+        // player being handled at the same time
+        data = blockPlaceData.get(player);
+        if(data == null) {
+            data = new BlockPlaceData();
+            blockPlaceData.put(player, data);
         }
 
         return data;

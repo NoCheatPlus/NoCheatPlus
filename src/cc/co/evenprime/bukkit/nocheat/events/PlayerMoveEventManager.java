@@ -106,7 +106,7 @@ public class PlayerMoveEventManager extends PlayerListener {
             Vector v = event.getVelocity();
 
             double newVal = v.getY();
-            if(newVal > 0.0D) {
+            if(newVal >= 0.0D) {
                 mdata.vertVelocity += newVal;
                 mdata.vertFreedom += mdata.vertVelocity;
                 mdata.vertVelocityCounter = 50;

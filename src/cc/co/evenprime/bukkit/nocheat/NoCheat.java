@@ -33,9 +33,8 @@ public class NoCheat extends JavaPlugin {
     private PlayerMoveEventManager     eventPlayerMoveManager;
     private PlayerTeleportEventManager eventPlayerTeleportManager;
     private BlockBreakEventManager     eventBlockBreakManager;
-    private PlayerInteractEventManager eventPlayerInteractManager;
-
     private BlockPlaceEventManager     eventBlockPlaceManager;
+    private PlayerInteractEventManager eventPlayerInteractManager;
 
     private ActionManager              action;
 
@@ -60,15 +59,15 @@ public class NoCheat extends JavaPlugin {
         this.data = new DataManager();
 
         this.action = new ActionManager(log);
+        
         // parse the nocheat.yml config file
-        this.conf = new ConfigurationManager(ConfigurationManager.rootConfigFolder, action);
+        this.conf = new ConfigurationManager(this.getDataFolder().getPath(), action);
 
         eventPlayerMoveManager = new PlayerMoveEventManager(this);
         eventPlayerTeleportManager = new PlayerTeleportEventManager(this);
         eventBlockBreakManager = new BlockBreakEventManager(this);
-        eventPlayerInteractManager = new PlayerInteractEventManager(this);
-
         eventBlockPlaceManager = new BlockPlaceEventManager(this);
+        eventPlayerInteractManager = new PlayerInteractEventManager(this);
 
         PluginDescriptionFile pdfFile = this.getDescription();
 

@@ -38,7 +38,7 @@ public class DefaultConfiguration {
             root.add(loggingNode);
 
             loggingNode.add(new BooleanOption("active", true, true));
-            loggingNode.add(new MediumStringOption("filename", "plugins/NoCheat/nocheat.log"));
+            loggingNode.add(new MediumStringOption("filename", "nocheat.log"));
             loggingNode.add(new LogLevelOption("filelevel", LogLevel.LOW));
             loggingNode.add(new LogLevelOption("consolelevel", LogLevel.HIGH));
             loggingNode.add(new LogLevelOption("chatlevel", LogLevel.MED));
@@ -172,6 +172,45 @@ public class DefaultConfiguration {
             }
         }
         
+        /****** BLOCKPLACE ******/
+        {
+            ParentOption blockPlaceNode = new ParentOption("blockplace");
+            root.add(blockPlaceNode);
+
+            blockPlaceNode.add(new BooleanOption("check", true, true));
+
+            /**** BLOCKPLACE.REACH ****/
+            {
+                ParentOption reachNode = new ParentOption("reach");
+                blockPlaceNode.add(reachNode);
+
+                reachNode.add(new BooleanOption("check", true, true));
+                reachNode.add(new IntegerOption("reachlimit", 485));
+
+                ActionListOption actions = new ActionListOption("actions");
+
+                reachNode.add(actions);
+
+                actions.add(0, "reachLog blockplaceCancel");
+            }
+            
+            /**** BLOCKPLACE.ONLIQUID ****/
+            {
+                ParentOption onliquidNode = new ParentOption("onliquid");
+                blockPlaceNode.add(onliquidNode);
+
+                onliquidNode.add(new BooleanOption("check", true, true));
+
+                ActionListOption actions = new ActionListOption("actions");
+
+                onliquidNode.add(actions);
+
+                actions.add(0, "onliquidLog blockplaceCancel");
+            }
+            
+
+        }
+        
         /****** INTERACT ******/
         {
             ParentOption interactNode = new ParentOption("interact");
@@ -258,9 +297,10 @@ public class DefaultConfiguration {
             w(w, "");
             w(w, "# Some other log messages that are limited a bit by default, to avoid too extreme spam");
             w(w, "log noclipLog 0 1 high NC: [player] failed [check]: at [location] to [locationto].");
-            w(w, "log reachLog 0 1 med NC: [player] failed [check]: tried to destroy a block over distance [distance].");
+            w(w, "log reachLog 0 1 med NC: [player] failed [check]: tried to interact with a block over distance [distance].");
             w(w, "log directionLog 2 1 med NC: [player] failed [check]: tried to destroy a block out of line of sight.");
             w(w, "log durabilityLog 0 1 med NC: [player] failed [check]: tried to use infinity durability hack.");
+            w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a block on liquids.");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
@@ -272,6 +312,7 @@ public class DefaultConfiguration {
             w(w, "# Cancels the event in case of an violation. Always. No delay. These are equivalent. The different names are just for better readability");
             w(w, "special moveCancel 0 0");
             w(w, "special blockbreakCancel 0 0");
+            w(w, "special blockplaceCancel 0 0");
             w(w, "special interactCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");

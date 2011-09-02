@@ -14,6 +14,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.interact.InteractCheck;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
+import cc.co.evenprime.bukkit.nocheat.data.InteractData;
 
 /**
  * 

@@ -12,6 +12,7 @@ public class Permissions {
     private final static String _CHECKS              = _NOCHEAT + ".checks";
     private final static String _MOVE                = _CHECKS + ".moving";
     private final static String _BLOCKBREAK          = _CHECKS + ".blockbreak";
+    public static final String  _BLOCKPLACE          = _CHECKS + ".blockplace";
     public final static String  _INTERACT            = _CHECKS + ".interact";
 
     public final static String  MOVE                 = _CHECKS + ".moving.*";
@@ -27,7 +28,11 @@ public class Permissions {
     public final static String  BLOCKBREAK_DIRECTION = _BLOCKBREAK + ".direction";
 
     public final static String  INTERACT             = _CHECKS + ".interact.*";
-    public final static String  DURABILITY           = _INTERACT + ".durability";
+    public final static String  INTERACT_DURABILITY  = _INTERACT + ".durability";
+
+    public final static String  BLOCKPLACE           = _CHECKS + ".blockplace.*";
+    public final static String  BLOCKPLACE_ONLIQUID  = _BLOCKPLACE + ".onliquid";
+    public static final String  BLOCKPLACE_REACH     = _BLOCKPLACE + ".reach";
 
     private final static String _ADMIN               = _NOCHEAT + ".admin";
 

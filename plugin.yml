@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.00a
+version: 2.01
 
 permissions:
 
@@ -18,6 +18,7 @@ permissions:
     children:
       nocheat.checks.moving.*: true
       nocheat.checks.blockbreak.*: true
+      nocheat.checks.blockplace.*: true
       nocheat.checks.interact.*: true
 
   nocheat.checks.moving.*:
@@ -35,6 +36,12 @@ permissions:
     children:
       nocheat.checks.blockbreak.reach: true
       nocheat.checks.blockbreak.direction: true
+      
+  nocheat.checks.blockplace.*:
+    description: Allow the player to bypass all blockplace checks
+    children:
+      nocheat.checks.blockplace.reach: true
+      nocheat.checks.blockplace.onliquid: true
 
   nocheat.checks.interact.*:
     description: Allow the player to bypass all interact checks
@@ -65,6 +72,13 @@ permissions:
     default: op
   nocheat.checks.blockbreak.direction:
     description: Allow a player to break blocks that are not in front of them
+    default: op
+    
+  nocheat.checks.blockplace.reach:
+    description: Allow a player to place blocks at maximum range (about 6-7 blocks)
+    default: op
+  nocheat.checks.blockplace.onliquid:
+    description: Allow a player to place non-liquid blocks on liquids
     default: op
     
   nocheat.checks.interact.durability:

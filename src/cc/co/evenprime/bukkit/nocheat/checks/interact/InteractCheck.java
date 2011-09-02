@@ -10,7 +10,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.events.InteractData;
+import cc.co.evenprime.bukkit.nocheat.data.InteractData;
 
 /**
  * 
@@ -29,7 +29,7 @@ public class InteractCheck {
 
         boolean cancel = false;
 
-        final boolean durability = cc.moving.morePacketsCheck && !player.hasPermission(Permissions.DURABILITY);
+        final boolean durability = cc.moving.morePacketsCheck && !player.hasPermission(Permissions.INTERACT_DURABILITY);
 
         if(durability) {
             // It's so simple, I'll just do the check in place

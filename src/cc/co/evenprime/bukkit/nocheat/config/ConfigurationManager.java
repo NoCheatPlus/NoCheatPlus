@@ -43,7 +43,7 @@ public class ConfigurationManager {
     private final static String                   defaultActionFileName     = "default_actions.txt";
     private final static String                   descriptionsFileName      = "descriptions.txt";
 
-    public final static String                    rootConfigFolder          = "plugins/NoCheat/";
+    public final static String                    rootConfigFolder          = "plugins/NoCheat/";                                  // default
 
     private final Map<String, ConfigurationCache> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCache>();
 
@@ -128,7 +128,7 @@ public class ConfigurationManager {
 
         // Create a corresponding Configuration Cache
         // put the global config on the config map
-        worldnameToConfigCacheMap.put(null, new ConfigurationCache(root, setupFileLogger(new File(root.getString("logging.filename")))));
+        worldnameToConfigCacheMap.put(null, new ConfigurationCache(root, setupFileLogger(new File(rootConfigFolder, root.getString("logging.filename")))));
 
         // Try to find world-specific config files
         Map<String, File> worldFiles = getWorldSpecificConfigFiles(rootConfigFolder);
@@ -139,7 +139,7 @@ public class ConfigurationManager {
             try {
                 ConfigurationTree world = createPartialConfigurationTree(root, worldConfigFile);
 
-                worldnameToConfigCacheMap.put(worldName, createConfigurationCache(world));
+                worldnameToConfigCacheMap.put(worldName, createConfigurationCache(rootConfigFolder, world));
 
                 // write the config file back to disk immediately
                 writeConfigFile(worldFiles.get(worldName), world);
@@ -152,9 +152,9 @@ public class ConfigurationManager {
         writeDescriptionFile(new File(rootConfigFolder, descriptionsFileName), defaultTree);
     }
 
-    private ConfigurationCache createConfigurationCache(Configuration configProvider) {
+    private ConfigurationCache createConfigurationCache(String rootConfigFolder, Configuration configProvider) {
 
-        return new ConfigurationCache(configProvider, setupFileLogger(new File(configProvider.getString("logging.filename"))));
+        return new ConfigurationCache(configProvider, setupFileLogger(new File(rootConfigFolder, configProvider.getString("logging.filename"))));
 
     }
 
@@ -273,6 +273,11 @@ public class ConfigurationManager {
 
         if(fh == null) {
             try {
+                try {
+                    logfile.getParentFile().mkdirs();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
                 fh = new FileHandler(logfile.getCanonicalPath(), true);
                 // We decide before logging what gets logged there anyway
                 // because different worlds may use this filehandler and
