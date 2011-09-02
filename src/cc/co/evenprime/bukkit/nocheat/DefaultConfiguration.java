@@ -171,7 +171,7 @@ public class DefaultConfiguration {
                 actions.add(0, "directionLog blockbreakCancel");
             }
         }
-        
+
         /****** BLOCKPLACE ******/
         {
             ParentOption blockPlaceNode = new ParentOption("blockplace");
@@ -193,7 +193,7 @@ public class DefaultConfiguration {
 
                 actions.add(0, "reachLog blockplaceCancel");
             }
-            
+
             /**** BLOCKPLACE.ONLIQUID ****/
             {
                 ParentOption onliquidNode = new ParentOption("onliquid");
@@ -207,10 +207,9 @@ public class DefaultConfiguration {
 
                 actions.add(0, "onliquidLog blockplaceCancel");
             }
-            
 
         }
-        
+
         /****** INTERACT ******/
         {
             ParentOption interactNode = new ParentOption("interact");
@@ -239,8 +238,14 @@ public class DefaultConfiguration {
         BufferedWriter w;
 
         try {
-            if(!file.exists())
-                file.createNewFile();
+            if(!file.exists()) {
+                try {
+                    file.getParentFile().mkdirs();
+                    file.createNewFile();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
             w = new BufferedWriter(new FileWriter(file));
 
@@ -262,8 +267,14 @@ public class DefaultConfiguration {
         BufferedWriter w;
 
         try {
-            if(!file.exists())
-                file.createNewFile();
+            if(!file.exists()) {
+                try {
+                    file.getParentFile().mkdirs();
+                    file.createNewFile();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
             w = new BufferedWriter(new FileWriter(file));
 
