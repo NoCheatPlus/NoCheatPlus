@@ -19,7 +19,7 @@ public class DataManager {
     private final Map<Player, MovingData>     movingData     = new HashMap<Player, MovingData>();
     private final Map<Player, BlockBreakData> blockbreakData = new HashMap<Player, BlockBreakData>();
     private final Map<Player, InteractData>   interactData   = new HashMap<Player, InteractData>();
-    private Map<Player, BlockPlaceData>       blockPlaceData = new HashMap<Player, BlockPlaceData>();
+    private final Map<Player, BlockPlaceData>       blockPlaceData = new HashMap<Player, BlockPlaceData>();
 
     public DataManager() {
 

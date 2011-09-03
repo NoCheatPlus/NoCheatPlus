@@ -117,8 +117,8 @@ public class DefaultConfiguration {
                 morePacketsNode.add(actions);
 
                 actions.add(0, "morepacketsLow moveCancel");
-                actions.add(15, "morepacketsMed moveCancel");
-                actions.add(30, "morepacketsHigh moveCancel");
+                actions.add(30, "morepacketsMed moveCancel");
+                actions.add(60, "morepacketsHigh moveCancel");
             }
 
             /**** MOVING.NOCLIP ****/

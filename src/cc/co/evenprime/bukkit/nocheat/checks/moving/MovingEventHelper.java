@@ -165,7 +165,7 @@ public class MovingEventHelper {
         return((value & NONSOLID) == NONSOLID);
     }
 
-    public final boolean isLadder(int value) {
+    private final boolean isLadder(int value) {
         return((value & LADDER) == LADDER);
     }
 

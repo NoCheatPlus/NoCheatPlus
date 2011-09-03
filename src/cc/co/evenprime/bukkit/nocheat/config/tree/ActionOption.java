@@ -8,8 +8,8 @@ package cc.co.evenprime.bukkit.nocheat.config.tree;
  */
 public class ActionOption extends ChildOption implements Comparable<ActionOption> {
 
-    private int    treshold;
-    private String value;
+    private final int treshold;
+    private String    value;
 
     public ActionOption(Integer treshold, String value) {
 
@@ -28,23 +28,6 @@ public class ActionOption extends ChildOption implements Comparable<ActionOption
     public boolean setStringValue(String value) {
         this.value = value;
         return true;
-    }
-
-    /**
-     * It is recommended to take further action if the treshold
-     * gets changed: If successful, "clone()" this object and
-     * replace the original with it.
-     * 
-     * @param treshold
-     * @return
-     */
-    public boolean setTreshold(String treshold) {
-        try {
-            this.treshold = Integer.parseInt(treshold);
-            return true;
-        } catch(NumberFormatException e) {
-            return false;
-        }
     }
 
     public int getTreshold() {

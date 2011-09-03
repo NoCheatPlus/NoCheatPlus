@@ -9,11 +9,12 @@ package cc.co.evenprime.bukkit.nocheat;
 public class Permissions {
 
     private final static String _NOCHEAT             = "nocheat";
+    private final static String _ADMIN               = _NOCHEAT + ".admin";
     private final static String _CHECKS              = _NOCHEAT + ".checks";
     private final static String _MOVE                = _CHECKS + ".moving";
     private final static String _BLOCKBREAK          = _CHECKS + ".blockbreak";
-    public static final String  _BLOCKPLACE          = _CHECKS + ".blockplace";
-    public final static String  _INTERACT            = _CHECKS + ".interact";
+    private final static String _BLOCKPLACE          = _CHECKS + ".blockplace";
+    private final static String _INTERACT            = _CHECKS + ".interact";
 
     public final static String  MOVE                 = _CHECKS + ".moving.*";
     public final static String  MOVE_FLY             = _MOVE + ".flying";
@@ -34,7 +35,6 @@ public class Permissions {
     public final static String  BLOCKPLACE_ONLIQUID  = _BLOCKPLACE + ".onliquid";
     public static final String  BLOCKPLACE_REACH     = _BLOCKPLACE + ".reach";
 
-    private final static String _ADMIN               = _NOCHEAT + ".admin";
 
     public final static String  ADMIN_CHATLOG        = _ADMIN + ".chatlog";
 

@@ -21,7 +21,7 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
  */
 public class ReachCheck {
 
-    private ActionExecutor action;
+    private final ActionExecutor action;
 
     public ReachCheck(NoCheat plugin) {
         this.action = new ActionExecutorWithHistory(plugin);

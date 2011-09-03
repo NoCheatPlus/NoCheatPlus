@@ -19,7 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
  */
 public class OnLiquidCheck {
 
-    private ActionExecutor action;
+    private final ActionExecutor action;
 
     public OnLiquidCheck(NoCheat plugin) {
         action = new ActionExecutorWithHistory(plugin);

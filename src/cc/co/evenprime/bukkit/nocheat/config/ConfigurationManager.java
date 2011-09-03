@@ -43,8 +43,6 @@ public class ConfigurationManager {
     private final static String                   defaultActionFileName     = "default_actions.txt";
     private final static String                   descriptionsFileName      = "descriptions.txt";
 
-    public final static String                    rootConfigFolder          = "plugins/NoCheat/";                                  // default
-
     private final Map<String, ConfigurationCache> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCache>();
 
     // Only use one filehandler per file, therefore keep open filehandlers in a
@@ -96,7 +94,7 @@ public class ConfigurationManager {
 
     }
 
-    public void initializeActions(String rootConfigFolder, ActionManager action) {
+    private void initializeActions(String rootConfigFolder, ActionManager action) {
 
         FlatActionParser parser = new FlatActionParser();
 

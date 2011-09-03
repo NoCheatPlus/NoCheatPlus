@@ -29,7 +29,7 @@ public class InteractCheck {
 
         boolean cancel = false;
 
-        final boolean durability = cc.moving.morePacketsCheck && !player.hasPermission(Permissions.INTERACT_DURABILITY);
+        final boolean durability = cc.interact.durabilityCheck && !player.hasPermission(Permissions.INTERACT_DURABILITY);
 
         if(durability) {
             // It's so simple, I'll just do the check in place

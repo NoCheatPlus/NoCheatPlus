@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import cc.co.evenprime.bukkit.nocheat.DefaultConfiguration;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 
 /**
@@ -35,7 +36,7 @@ public class FlatActionParser {
         List<String[]> lines = new LinkedList<String[]>();
 
         if(!file.exists()) {
-            createActionFile(file);
+            DefaultConfiguration.writeActionFile(file);
             return lines;
         }
 
@@ -68,23 +69,5 @@ public class FlatActionParser {
 
         return lines;
 
-    }
-
-    public void createActionFile(File file) {
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-
-                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                writer.write("# Use this file to define your own actions.");
-                writer.newLine();
-                writer.write("# Look at \"default_actions.txt\" for inspiration.");
-                writer.newLine();
-                writer.flush();
-                writer.close();
-            } catch(Exception e) {
-                e.printStackTrace();
-            };
-        }
     }
 }

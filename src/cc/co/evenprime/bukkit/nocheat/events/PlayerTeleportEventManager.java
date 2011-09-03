@@ -58,7 +58,6 @@ public class PlayerTeleportEventManager extends PlayerListener {
 
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-
         if(!event.isCancelled())
             handleTeleportation(event.getPlayer(), event.getTo());
 
@@ -73,7 +72,7 @@ public class PlayerTeleportEventManager extends PlayerListener {
         handleTeleportation(event.getPlayer(), event.getRespawnLocation());
     }
 
-    public void handleTeleportation(Player player, Location newLocation) {
+    private void handleTeleportation(Player player, Location newLocation) {
 
         /********* Moving check ************/
         final MovingData data = this.data.getMovingData(player);

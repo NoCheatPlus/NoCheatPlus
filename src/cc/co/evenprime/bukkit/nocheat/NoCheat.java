@@ -36,6 +36,12 @@ public class NoCheat extends JavaPlugin {
     private BlockPlaceEventManager     eventBlockPlaceManager;
     private PlayerInteractEventManager eventPlayerInteractManager;
 
+    private int                        taskId                   = -1;
+    private int                        ingameseconds            = 0;
+    private long                       lastIngamesecondTime     = 0L;
+    private long                       lastIngamesecondDuration = 0L;
+    private boolean                    skipCheck            = false;
+
     private ActionManager              action;
 
     public NoCheat() {
@@ -44,6 +50,10 @@ public class NoCheat extends JavaPlugin {
 
     public void onDisable() {
 
+        if(taskId != -1) {
+            this.getServer().getScheduler().cancelTask(taskId);
+            taskId = -1;
+        }
         PluginDescriptionFile pdfFile = this.getDescription();
 
         if(conf != null)
@@ -59,7 +69,7 @@ public class NoCheat extends JavaPlugin {
         this.data = new DataManager();
 
         this.action = new ActionManager(log);
-        
+
         // parse the nocheat.yml config file
         this.conf = new ConfigurationManager(this.getDataFolder().getPath(), action);
 
@@ -70,6 +80,24 @@ public class NoCheat extends JavaPlugin {
         eventPlayerInteractManager = new PlayerInteractEventManager(this);
 
         PluginDescriptionFile pdfFile = this.getDescription();
+
+        if(taskId == -1) {
+            taskId = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+
+                @Override
+                public void run() {
+                    
+                    // If the previous second took to long, skip checks during this second
+                    skipCheck = lastIngamesecondDuration > 1500;
+                    
+                    long time = System.currentTimeMillis();
+                    lastIngamesecondDuration = time - lastIngamesecondTime;
+                    if(lastIngamesecondDuration < 1000) lastIngamesecondDuration = 1000;
+                    lastIngamesecondTime = time;
+                    ingameseconds++;
+                }
+            }, 0, 20);
+        }
 
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled.");
     }
@@ -88,5 +116,17 @@ public class NoCheat extends JavaPlugin {
 
     public ActionManager getActionManager() {
         return action;
+    }
+
+    public int getIngameSeconds() {
+        return ingameseconds;
+    }
+
+    public long getIngameSecondDuration() {
+        return lastIngamesecondDuration;
+    }
+    
+    public boolean skipCheck() {
+        return skipCheck;
     }
 }

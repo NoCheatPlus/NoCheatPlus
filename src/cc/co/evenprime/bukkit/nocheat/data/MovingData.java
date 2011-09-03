@@ -29,12 +29,12 @@ public class MovingData {
     public double   horizontalBuffer;
 
     public int      morePacketsCounter;
-    public long     morePacketsLastTime;
-
-    public double   morePacketsOverLimit = -50;
-
+    public double   morePacketsBuffer = 50;
     public Location morePacketsSetbackPoint;
+    public double   morePacketsViolationLevel = 0;
 
     public Location teleportTo;
+
+    public int lastElapsedIngameSeconds = 0;
 
 }

@@ -19,7 +19,7 @@ import org.bukkit.plugin.Plugin;
  */
 public class ConsoleCommandSender implements CommandSender {
 
-    private Server                server;
+    private final Server                server;
     private final PermissibleBase perm = new PermissibleBase(this);
 
     public ConsoleCommandSender(Server server) {
