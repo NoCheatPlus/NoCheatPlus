@@ -9,6 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.PlayerItemDropEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerInteractEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
@@ -35,12 +36,13 @@ public class NoCheat extends JavaPlugin {
     private BlockBreakEventManager     eventBlockBreakManager;
     private BlockPlaceEventManager     eventBlockPlaceManager;
     private PlayerInteractEventManager eventPlayerInteractManager;
+    private PlayerItemDropEventManager eventPlayerItemDropManager;
 
     private int                        taskId                   = -1;
     private int                        ingameseconds            = 0;
     private long                       lastIngamesecondTime     = 0L;
     private long                       lastIngamesecondDuration = 0L;
-    private boolean                    skipCheck            = false;
+    private boolean                    skipCheck                = false;
 
     private ActionManager              action;
 
@@ -77,6 +79,7 @@ public class NoCheat extends JavaPlugin {
         eventPlayerTeleportManager = new PlayerTeleportEventManager(this);
         eventBlockBreakManager = new BlockBreakEventManager(this);
         eventBlockPlaceManager = new BlockPlaceEventManager(this);
+        eventPlayerItemDropManager = new PlayerItemDropEventManager(this);
         eventPlayerInteractManager = new PlayerInteractEventManager(this);
 
         PluginDescriptionFile pdfFile = this.getDescription();
@@ -86,13 +89,15 @@ public class NoCheat extends JavaPlugin {
 
                 @Override
                 public void run() {
-                    
-                    // If the previous second took to long, skip checks during this second
+
+                    // If the previous second took to long, skip checks during
+                    // this second
                     skipCheck = lastIngamesecondDuration > 1500;
-                    
+
                     long time = System.currentTimeMillis();
                     lastIngamesecondDuration = time - lastIngamesecondTime;
-                    if(lastIngamesecondDuration < 1000) lastIngamesecondDuration = 1000;
+                    if(lastIngamesecondDuration < 1000)
+                        lastIngamesecondDuration = 1000;
                     lastIngamesecondTime = time;
                     ingameseconds++;
                 }
@@ -125,7 +130,7 @@ public class NoCheat extends JavaPlugin {
     public long getIngameSecondDuration() {
         return lastIngamesecondDuration;
     }
-    
+
     public boolean skipCheck() {
         return skipCheck;
     }
