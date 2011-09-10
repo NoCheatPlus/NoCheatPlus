@@ -81,9 +81,13 @@ public class PlayerTeleportEventManager extends PlayerListener {
         data.morePacketsCounter = 0;
         data.morePacketsSetbackPoint = null;
         data.jumpPhase = 0;
+        
+        if(newLocation != null) {
 
-        data.noclipX = newLocation.getBlockX();
-        data.noclipY = Location.locToBlock(newLocation.getY()+1.1D);
-        data.noclipZ = newLocation.getBlockZ();
+            data.noclipX = newLocation.getBlockX();
+            data.noclipY = Location.locToBlock(newLocation.getY()+1.1D);
+            data.noclipZ = newLocation.getBlockZ();
+            
+        }
     }
 }
