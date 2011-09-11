@@ -9,6 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerItemDropEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerInteractEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
@@ -37,6 +38,7 @@ public class NoCheat extends JavaPlugin {
     private BlockPlaceEventManager     eventBlockPlaceManager;
     private PlayerInteractEventManager eventPlayerInteractManager;
     private PlayerItemDropEventManager eventPlayerItemDropManager;
+    private PlayerChatEventManager     eventPlayerChatManager;
 
     private int                        taskId                   = -1;
     private int                        ingameseconds            = 0;
@@ -81,6 +83,7 @@ public class NoCheat extends JavaPlugin {
         eventBlockPlaceManager = new BlockPlaceEventManager(this);
         eventPlayerItemDropManager = new PlayerItemDropEventManager(this);
         eventPlayerInteractManager = new PlayerInteractEventManager(this);
+        eventPlayerChatManager = new PlayerChatEventManager(this);
 
         PluginDescriptionFile pdfFile = this.getDescription();
 

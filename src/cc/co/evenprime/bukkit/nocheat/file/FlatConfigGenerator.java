@@ -22,7 +22,7 @@ public class FlatConfigGenerator {
         String s = "# Want to know what these options do? Read the descriptions.txt file.\r\n\r\n";
 
         for(Option option : o.getChildOptions()) {
-            s += optionToFlatString(option);
+            s += optionToFlatString(option) + "\r\n";
         }
 
         return s;

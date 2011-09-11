@@ -66,6 +66,14 @@ public class Explainations {
         
         set("interact.durability.check", "If true, check if a player is using a hack that provides infinite durability items.");
         set("interact.durability.actions", "What should be done if a player is trying to use the hack.\nUnit is number of uses or attempts to use the hack.");
+
+        set("chat.check", "If true, do various checks on PlayerChat events.");
+
+        set("chat.spam.check", "If true, check if a player is spamming the chat.");
+        set("interact.spam.timeframe", "Over what timeframe (in seconds) should the messages be counted?");
+        set("interact.spam.limit", "How many messages per timeframe may the player send?");
+        set("interact.spam.actions", "What should be done if a player is trying to spam the chat.\nUnit is number of chat messages above the given limit.");
+
     }
 
     private static void set(String id, String text) {

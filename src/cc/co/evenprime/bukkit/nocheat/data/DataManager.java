@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-
 /**
  * Provide secure access to player-specific data objects for various checks or
  * check groups
@@ -19,7 +18,8 @@ public class DataManager {
     private final Map<Player, MovingData>     movingData     = new HashMap<Player, MovingData>();
     private final Map<Player, BlockBreakData> blockbreakData = new HashMap<Player, BlockBreakData>();
     private final Map<Player, InteractData>   interactData   = new HashMap<Player, InteractData>();
-    private final Map<Player, BlockPlaceData>       blockPlaceData = new HashMap<Player, BlockPlaceData>();
+    private final Map<Player, BlockPlaceData> blockPlaceData = new HashMap<Player, BlockPlaceData>();
+    private final Map<Player, ChatData>       chatData       = new HashMap<Player, ChatData>();
 
     public DataManager() {
 
@@ -82,6 +82,22 @@ public class DataManager {
         if(data == null) {
             data = new BlockPlaceData();
             blockPlaceData.put(player, data);
+        }
+
+        return data;
+    }
+
+    public ChatData getChatData(Player player) {
+        ChatData data;
+
+        // intentionally not thread-safe, because bukkit events are handled
+        // in sequence anyway, so zero chance of two events of the same
+        // player being handled at the same time
+        // And if it still happens by accident, it's no real loss anyway
+        data = chatData.get(player);
+        if(data == null) {
+            data = new ChatData();
+            chatData.put(player, data);
         }
 
         return data;

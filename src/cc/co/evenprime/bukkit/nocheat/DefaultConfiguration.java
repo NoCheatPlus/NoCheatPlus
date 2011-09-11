@@ -231,6 +231,30 @@ public class DefaultConfiguration {
                 actions.add(0, "durabilityLog interactCancel");
             }
         }
+
+        /****** CHAT ******/
+        {
+            ParentOption chatNode = new ParentOption("chat");
+            root.add(chatNode);
+
+            chatNode.add(new BooleanOption("check", true, true));
+
+            /**** CHAT.SPAM ****/
+            {
+                ParentOption spamNode = new ParentOption("spam");
+                chatNode.add(spamNode);
+
+                spamNode.add(new BooleanOption("check", false, true));
+                spamNode.add(new IntegerOption("timeframe", 5));
+                spamNode.add(new IntegerOption("limit", 5));
+
+                ActionListOption actions = new ActionListOption("actions");
+
+                spamNode.add(actions);
+
+                actions.add(0, "spamLog spamCancel");
+            }
+        }
         return root;
     }
 
@@ -312,6 +336,7 @@ public class DefaultConfiguration {
             w(w, "log directionLog 2 1 med NC: [player] failed [check]: tried to destroy a block out of line of sight.");
             w(w, "log durabilityLog 0 1 med NC: [player] failed [check]: tried to use infinity durability hack.");
             w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a block on liquids.");
+            w(w, "log spamLog 0 4 med NC: [player] failed [check]: Last sent message \"[text]\".");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
@@ -325,6 +350,7 @@ public class DefaultConfiguration {
             w(w, "special blockbreakCancel 0 0");
             w(w, "special blockplaceCancel 0 0");
             w(w, "special interactCancel 0 0");
+            w(w, "special spamCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");

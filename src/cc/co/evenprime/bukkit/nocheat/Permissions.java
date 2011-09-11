@@ -15,6 +15,7 @@ public class Permissions {
     private final static String _BLOCKBREAK          = _CHECKS + ".blockbreak";
     private final static String _BLOCKPLACE          = _CHECKS + ".blockplace";
     private final static String _INTERACT            = _CHECKS + ".interact";
+    private final static String _CHAT                = _CHECKS + ".chat";
 
     public final static String  MOVE                 = _CHECKS + ".moving.*";
     public final static String  MOVE_FLY             = _MOVE + ".flying";
@@ -33,9 +34,11 @@ public class Permissions {
 
     public final static String  BLOCKPLACE           = _CHECKS + ".blockplace.*";
     public final static String  BLOCKPLACE_ONLIQUID  = _BLOCKPLACE + ".onliquid";
-    public static final String  BLOCKPLACE_REACH     = _BLOCKPLACE + ".reach";
+    public final static String  BLOCKPLACE_REACH     = _BLOCKPLACE + ".reach";
 
-
+    public final static String  CHAT                 = _CHECKS + ".chat.*";
+    public final static String  CHAT_SPAM            = _CHAT + ".spam";
+    
     public final static String  ADMIN_CHATLOG        = _ADMIN + ".chatlog";
 
     private Permissions() {}

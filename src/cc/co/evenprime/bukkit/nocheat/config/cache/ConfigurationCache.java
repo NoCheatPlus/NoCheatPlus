@@ -13,11 +13,12 @@ import cc.co.evenprime.bukkit.nocheat.config.Configuration;
  */
 public class ConfigurationCache {
 
-    public final CCMoving   moving;
-    public final CCLogging  logging;
+    public final CCMoving     moving;
+    public final CCLogging    logging;
     public final CCBlockBreak blockbreak;
-    public final CCInteract interact;
-    public final CCBlockPlace  blockplace;
+    public final CCInteract   interact;
+    public final CCBlockPlace blockplace;
+    public final CCChat       chat;
 
     /**
      * Instantiate a config cache and populate it with the data of a
@@ -31,6 +32,7 @@ public class ConfigurationCache {
         blockbreak = new CCBlockBreak(data);
         blockplace = new CCBlockPlace(data);
         interact = new CCInteract(data);
+        chat = new CCChat(data);
         logging = new CCLogging(data, worldSpecificFileLogger);
 
     }

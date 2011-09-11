@@ -23,7 +23,8 @@ public class LogAction extends Action {
     public static final String DISTANCE    = "\\[distance\\]";
     public static final String LOCATION_TO = "\\[locationto\\]";
     public static final String CHECK       = "\\[check\\]";
-    public static final String PACKETS     = "\\[packets\\]";    ;
+    public static final String PACKETS     = "\\[packets\\]";
+    public static final String TEXT        = "\\[text\\]";
 
     public final LogLevel      level;
     private final String       message;

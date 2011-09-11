@@ -20,6 +20,7 @@ permissions:
       nocheat.checks.blockbreak.*: true
       nocheat.checks.blockplace.*: true
       nocheat.checks.interact.*: true
+      nocheat.checks.chat.*: true
 
   nocheat.checks.moving.*:
     description: Allow the player to bypass all moving checks
@@ -47,6 +48,11 @@ permissions:
     description: Allow the player to bypass all interact checks
     children:
       nocheat.checks.interact.durability: true
+      
+  nocheat.checks.chat.*:
+    description: Allow the player to bypass all chat checks
+    children:
+      nocheat.checks.chat.spam: true
 
   nocheat.checks.moving.flying:
     description: Allow a player to move free through the air (if given, the "running" check will be ignored anyway)
@@ -83,6 +89,10 @@ permissions:
     
   nocheat.checks.interact.durability:
     description: Allow a player to use an infinite durability item hack
+    default: op
+    
+  nocheat.checks.chat.spam:
+    description: Allow a player to send an infinite amount of chat messages
     default: op
 
   nocheat.admin.*:
