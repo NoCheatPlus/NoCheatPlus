@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.03
+version: 2.03a
 
 permissions:
 
@@ -31,13 +31,13 @@ permissions:
       nocheat.checks.moving.sneaking: true
       nocheat.checks.moving.noclip: true
       nocheat.checks.moving.morepackets: true
-      
+
   nocheat.checks.blockbreak.*:
     description: Allow the player to bypass all blockbreak checks
     children:
       nocheat.checks.blockbreak.reach: true
       nocheat.checks.blockbreak.direction: true
-      
+
   nocheat.checks.blockplace.*:
     description: Allow the player to bypass all blockplace checks
     children:
@@ -48,7 +48,7 @@ permissions:
     description: Allow the player to bypass all interact checks
     children:
       nocheat.checks.interact.durability: true
-      
+
   nocheat.checks.chat.*:
     description: Allow the player to bypass all chat checks
     children:
@@ -79,18 +79,18 @@ permissions:
   nocheat.checks.blockbreak.direction:
     description: Allow a player to break blocks that are not in front of them
     default: op
-    
+
   nocheat.checks.blockplace.reach:
     description: Allow a player to place blocks at maximum range (about 6-7 blocks)
     default: op
   nocheat.checks.blockplace.onliquid:
     description: Allow a player to place non-liquid blocks on liquids
     default: op
-    
+
   nocheat.checks.interact.durability:
     description: Allow a player to use an infinite durability item hack
     default: op
-    
+
   nocheat.checks.chat.spam:
     description: Allow a player to send an infinite amount of chat messages
     default: op
