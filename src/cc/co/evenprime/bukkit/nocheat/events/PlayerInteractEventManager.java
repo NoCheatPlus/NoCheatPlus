@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -21,7 +24,7 @@ import cc.co.evenprime.bukkit.nocheat.data.InteractData;
  * @author Evenprime
  * 
  */
-public class PlayerInteractEventManager extends PlayerListener {
+public class PlayerInteractEventManager extends PlayerListener  implements EventManager {
 
     private final InteractCheck        interactCheck;
     private final DataManager          data;
@@ -63,6 +66,25 @@ public class PlayerInteractEventManager extends PlayerListener {
             }
         }
 
+    }
+
+    @Override
+    public List<String> getActiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(cc.interact.check && cc.interact.durabilityCheck)
+            s.add("interact.durability");
+        return s;
+    }
+
+    @Override
+    public List<String> getInactiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(!(cc.interact.check && cc.interact.durabilityCheck))
+            s.add("interact.durability");
+
+        return s;
     }
 
 }

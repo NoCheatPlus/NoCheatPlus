@@ -1,14 +1,20 @@
 package cc.co.evenprime.bukkit.nocheat;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.bukkit.World;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
+import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerItemDropEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerInteractEventManager;
@@ -28,25 +34,19 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  */
 public class NoCheat extends JavaPlugin {
 
-    private ConfigurationManager       conf;
-    private LogManager                 log;
-    private DataManager                data;
+    private ConfigurationManager conf;
+    private LogManager           log;
+    private DataManager          data;
 
-    private PlayerMoveEventManager     eventPlayerMoveManager;
-    private PlayerTeleportEventManager eventPlayerTeleportManager;
-    private BlockBreakEventManager     eventBlockBreakManager;
-    private BlockPlaceEventManager     eventBlockPlaceManager;
-    private PlayerInteractEventManager eventPlayerInteractManager;
-    private PlayerItemDropEventManager eventPlayerItemDropManager;
-    private PlayerChatEventManager     eventPlayerChatManager;
+    private List<EventManager>   eventManagers            = new LinkedList<EventManager>();
 
-    private int                        taskId                   = -1;
-    private int                        ingameseconds            = 0;
-    private long                       lastIngamesecondTime     = 0L;
-    private long                       lastIngamesecondDuration = 0L;
-    private boolean                    skipCheck                = false;
+    private int                  taskId                   = -1;
+    private int                  ingameseconds            = 0;
+    private long                 lastIngamesecondTime     = 0L;
+    private long                 lastIngamesecondDuration = 0L;
+    private boolean              skipCheck                = false;
 
-    private ActionManager              action;
+    private ActionManager        action;
 
     public NoCheat() {
 
@@ -77,13 +77,13 @@ public class NoCheat extends JavaPlugin {
         // parse the nocheat.yml config file
         this.conf = new ConfigurationManager(this.getDataFolder().getPath(), action);
 
-        eventPlayerMoveManager = new PlayerMoveEventManager(this);
-        eventPlayerTeleportManager = new PlayerTeleportEventManager(this);
-        eventBlockBreakManager = new BlockBreakEventManager(this);
-        eventBlockPlaceManager = new BlockPlaceEventManager(this);
-        eventPlayerItemDropManager = new PlayerItemDropEventManager(this);
-        eventPlayerInteractManager = new PlayerInteractEventManager(this);
-        eventPlayerChatManager = new PlayerChatEventManager(this);
+        eventManagers.add(new PlayerMoveEventManager(this));
+        eventManagers.add(new PlayerTeleportEventManager(this));
+        eventManagers.add(new PlayerItemDropEventManager(this));
+        eventManagers.add(new PlayerInteractEventManager(this));
+        eventManagers.add(new PlayerChatEventManager(this));
+        eventManagers.add(new BlockBreakEventManager(this));
+        eventManagers.add(new BlockPlaceEventManager(this));
 
         PluginDescriptionFile pdfFile = this.getDescription();
 
@@ -105,6 +105,34 @@ public class NoCheat extends JavaPlugin {
                     ingameseconds++;
                 }
             }, 0, 20);
+        }
+
+        log.logToConsole(LogLevel.LOW, "[NoCheat] Active Checks: ");
+
+        for(World world : this.getServer().getWorlds()) {
+
+            StringBuilder line = new StringBuilder("  ").append(world.getName()).append(": ");
+
+            int length = line.length();
+
+            ConfigurationCache cc = this.conf.getConfigurationCacheForWorld(world.getName());
+
+            for(EventManager em : eventManagers) {
+                List<String> checks = em.getActiveChecks(cc);
+                if(checks.size() > 0) {
+                    for(String active : em.getActiveChecks(cc)) {
+                        line.append(active).append(' ');
+                    }
+                    log.logToConsole(LogLevel.LOW, line.toString());
+
+                    line = new StringBuilder(length);
+
+                    for(int i = 0; i < length; i++) {
+                        line.append(' ');
+                    }
+                }
+            }
+
         }
 
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled.");

@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -8,9 +11,7 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
-import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
-import cc.co.evenprime.bukkit.nocheat.log.LogManager;
+import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 
 /**
  * 
@@ -19,7 +20,7 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  * @author Evenprime
  * 
  */
-public class PlayerItemDropEventManager extends PlayerListener {
+public class PlayerItemDropEventManager extends PlayerListener implements EventManager {
 
     public PlayerItemDropEventManager(NoCheat plugin) {
 
@@ -35,5 +36,15 @@ public class PlayerItemDropEventManager extends PlayerListener {
         if(!event.getPlayer().isOnline()) {
             event.setCancelled(true);
         }
+    }
+
+    @Override
+    public List<String> getActiveChecks(ConfigurationCache cc) {
+        return new LinkedList<String>();
+    }
+
+    @Override
+    public List<String> getInactiveChecks(ConfigurationCache cc) {
+        return new LinkedList<String>();
     }
 }

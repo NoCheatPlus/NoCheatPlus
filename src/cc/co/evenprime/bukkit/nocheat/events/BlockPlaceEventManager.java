@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -23,7 +26,7 @@ import cc.co.evenprime.bukkit.nocheat.data.DataManager;
  * @author Evenprime
  * 
  */
-public class BlockPlaceEventManager extends BlockListener {
+public class BlockPlaceEventManager extends BlockListener implements EventManager {
 
     private final MovingCheck          movingCheck;
     private final BlockPlaceCheck      blockPlaceCheck;
@@ -76,5 +79,29 @@ public class BlockPlaceEventManager extends BlockListener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @Override
+    public List<String> getActiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(cc.blockplace.check && cc.blockplace.onliquidCheck)
+            s.add("blockplace.onliquid");
+        if(cc.blockplace.check && cc.blockplace.reachCheck)
+            s.add("blockplace.reach");
+
+        return s;
+    }
+
+    @Override
+    public List<String> getInactiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(!(cc.blockplace.check && cc.blockplace.onliquidCheck))
+            s.add("blockplace.onliquid");
+        if(!(cc.blockplace.check && cc.blockplace.reachCheck))
+            s.add("blockplace.reach");
+
+        return s;
     }
 }

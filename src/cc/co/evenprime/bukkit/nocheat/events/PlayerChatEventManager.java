@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -16,7 +19,12 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
-public class PlayerChatEventManager extends PlayerListener {
+/**
+ * 
+ * @author Evenprime
+ *
+ */
+public class PlayerChatEventManager extends PlayerListener implements EventManager {
 
     private final ChatCheck            chatCheck;
     private final DataManager          data;
@@ -58,5 +66,24 @@ public class PlayerChatEventManager extends PlayerListener {
             }
         }
 
+    }
+
+    @Override
+    public List<String> getActiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(cc.chat.check && cc.chat.spamCheck)
+            s.add("chat.spam");
+        return s;
+    }
+
+    @Override
+    public List<String> getInactiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(!(cc.chat.check && cc.chat.spamCheck))
+            s.add("chat.spam");
+
+        return s;
     }
 }

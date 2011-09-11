@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -18,7 +21,6 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
-import cc.co.evenprime.bukkit.nocheat.log.LogManager;
 
 /**
  * The only place that listens to and modifies player_move events if necessary
@@ -29,17 +31,15 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  * @author Evenprime
  * 
  */
-public class PlayerMoveEventManager extends PlayerListener {
+public class PlayerMoveEventManager extends PlayerListener implements EventManager {
 
     private final MovingCheck          movingCheck;
 
     private final ConfigurationManager config;
-    private final LogManager           log;
     private final DataManager          data;
 
     public PlayerMoveEventManager(NoCheat plugin) {
         this.config = plugin.getConfigurationManager();
-        this.log = plugin.getLogManager();
         this.data = plugin.getDataManager();
 
         this.movingCheck = new MovingCheck(plugin);
@@ -118,5 +118,45 @@ public class PlayerMoveEventManager extends PlayerListener {
                 mdata.horizVelocityCounter = 30;
             }
         }
+    }
+
+    @Override
+    public List<String> getActiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(cc.moving.check && cc.moving.flyingCheck)
+            s.add("moving.flying");
+        if(cc.moving.check && cc.moving.runningCheck)
+            s.add("moving.running");
+        if(cc.moving.check && cc.moving.runningCheck && cc.moving.swimmingCheck)
+            s.add("moving.swimming");
+        if(cc.moving.check && cc.moving.runningCheck && cc.moving.sneakingCheck)
+            s.add("moving.sneaking");
+        if(cc.moving.check && cc.moving.morePacketsCheck)
+            s.add("moving.morepackets");
+        if(cc.moving.check && cc.moving.noclipCheck)
+            s.add("moving.noclip");
+
+        return s;
+    }
+
+    @Override
+    public List<String> getInactiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(!(cc.moving.check && cc.moving.flyingCheck))
+            s.add("moving.flying");
+        if(!(cc.moving.check && cc.moving.runningCheck))
+            s.add("moving.running");
+        if(!(cc.moving.check && cc.moving.runningCheck && cc.moving.swimmingCheck))
+            s.add("moving.running.swimming");
+        if(!(cc.moving.check && cc.moving.runningCheck && cc.moving.sneakingCheck))
+            s.add("moving.running.sneaking");
+        if(!(cc.moving.check && cc.moving.morePacketsCheck))
+            s.add("moving.morepackets");
+        if(!(cc.moving.check && cc.moving.noclipCheck))
+            s.add("moving.noclip");
+
+        return s;
     }
 }

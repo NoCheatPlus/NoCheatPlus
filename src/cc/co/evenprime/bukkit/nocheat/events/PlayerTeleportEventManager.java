@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -12,9 +15,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
-import cc.co.evenprime.bukkit.nocheat.log.LogManager;
 
 /**
  * Only place that listens to Player-teleport related events and dispatches them
@@ -23,14 +26,12 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  * @author Evenprime
  * 
  */
-public class PlayerTeleportEventManager extends PlayerListener {
+public class PlayerTeleportEventManager extends PlayerListener implements EventManager {
 
-    private final LogManager  log;
     private final DataManager data;
 
     public PlayerTeleportEventManager(NoCheat plugin) {
 
-        this.log = plugin.getLogManager();
         this.data = plugin.getDataManager();
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
@@ -89,5 +90,15 @@ public class PlayerTeleportEventManager extends PlayerListener {
             data.noclipZ = newLocation.getBlockZ();
             
         }
+    }
+
+    @Override
+    public List<String> getActiveChecks(ConfigurationCache cc) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<String> getInactiveChecks(ConfigurationCache cc) {
+        return Collections.emptyList();
     }
 }

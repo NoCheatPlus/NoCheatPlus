@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -24,7 +27,7 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
  * @author Evenprime
  * 
  */
-public class BlockBreakEventManager extends BlockListener {
+public class BlockBreakEventManager extends BlockListener implements EventManager {
 
     private final BlockBreakCheck      blockBreakCheck;
     private final DataManager          data;
@@ -57,10 +60,10 @@ public class BlockBreakEventManager extends BlockListener {
         if(cc.blockbreak.check && !player.hasPermission(Permissions.BLOCKBREAK)) {
 
             boolean cancel = false;
-            
+
             // Get the player-specific stored data that applies here
             final BlockBreakData data = this.data.getBlockBreakData(player);
-            
+
             cancel = blockBreakCheck.check(player, event.getBlock(), data, cc);
 
             if(cancel) {
@@ -68,7 +71,7 @@ public class BlockBreakEventManager extends BlockListener {
             }
         }
     }
-    
+
     @Override
     public void onBlockDamage(BlockDamageEvent event) {
 
@@ -76,12 +79,37 @@ public class BlockBreakEventManager extends BlockListener {
         if(!event.isCancelled() && !event.getInstaBreak()) {
             return;
         }
-        
+
         final Player player = event.getPlayer();
         // Get the player-specific stored data that applies here
         final BlockBreakData data = this.data.getBlockBreakData(player);
-        
-        // Remember this location. We ignore block breaks in the block-break direction check that are insta-breaks
+
+        // Remember this location. We ignore block breaks in the block-break
+        // direction check that are insta-breaks
         data.instaBrokeBlockLocation = event.getBlock().getLocation();
+    }
+
+    @Override
+    public List<String> getActiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+
+        if(cc.blockbreak.check && cc.blockbreak.directionCheck)
+            s.add("blockbreak.direction");
+        if(cc.blockbreak.check && cc.blockbreak.reachCheck)
+            s.add("blockbreak.reach");
+
+        return s;
+    }
+
+    @Override
+    public List<String> getInactiveChecks(ConfigurationCache cc) {
+        LinkedList<String> s = new LinkedList<String>();
+        
+        if(!(cc.blockbreak.check && cc.blockbreak.directionCheck))
+            s.add("blockbreak.direction");
+        if(!(cc.blockbreak.check && cc.blockbreak.reachCheck))
+            s.add("blockbreak.reach");
+
+        return s;
     }
 }

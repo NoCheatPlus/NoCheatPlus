@@ -121,7 +121,7 @@ public class NoclipCheck {
             params.put(LogAction.LOCATION_TO, String.format(Locale.US, "%.2f,%.2f,%.2f", to.getX(), to.getY(), to.getZ()));
             params.put(LogAction.CHECK, "noclip");
 
-            boolean cancelled = action.executeActions(player, cc.moving.noclipActions, violationLevel, params, cc);
+            /*boolean cancelled =*/ action.executeActions(player, cc.moving.noclipActions, violationLevel, params, cc);
             
             // TODO: UNCOMMENT, WHEN THE CHECK WORKS RELIABLY
             
