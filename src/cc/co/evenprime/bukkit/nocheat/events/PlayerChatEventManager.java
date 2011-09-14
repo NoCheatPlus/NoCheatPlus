@@ -38,7 +38,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
-        pm.registerEvent(Event.Type.PLAYER_CHAT, this, Priority.High, plugin);
+        pm.registerEvent(Event.Type.PLAYER_CHAT, this, Priority.Lowest, plugin);
     }
 
     @Override
