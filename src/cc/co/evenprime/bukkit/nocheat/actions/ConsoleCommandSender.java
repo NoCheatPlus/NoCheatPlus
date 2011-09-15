@@ -19,11 +19,12 @@ import org.bukkit.plugin.Plugin;
  */
 public class ConsoleCommandSender implements CommandSender {
 
-    private final Server                server;
-    private final PermissibleBase perm = new PermissibleBase(this);
+    private final Server          server;
+    private final PermissibleBase perm;
 
     public ConsoleCommandSender(Server server) {
         this.server = server;
+        this.perm = new PermissibleBase(this);
     }
 
     public void sendMessage(String message) {
@@ -96,5 +97,10 @@ public class ConsoleCommandSender implements CommandSender {
         } catch(Exception e) {
             // TODO: Better error handling
         }
+    }
+
+    @Override
+    public String getName() {
+        return "NoCheat";
     }
 }

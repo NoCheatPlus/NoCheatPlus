@@ -107,33 +107,7 @@ public class NoCheat extends JavaPlugin {
             }, 0, 20);
         }
 
-        log.logToConsole(LogLevel.LOW, "[NoCheat] Active Checks: ");
-
-        for(World world : this.getServer().getWorlds()) {
-
-            StringBuilder line = new StringBuilder("  ").append(world.getName()).append(": ");
-
-            int length = line.length();
-
-            ConfigurationCache cc = this.conf.getConfigurationCacheForWorld(world.getName());
-
-            for(EventManager em : eventManagers) {
-                List<String> checks = em.getActiveChecks(cc);
-                if(checks.size() > 0) {
-                    for(String active : em.getActiveChecks(cc)) {
-                        line.append(active).append(' ');
-                    }
-                    log.logToConsole(LogLevel.LOW, line.toString());
-
-                    line = new StringBuilder(length);
-
-                    for(int i = 0; i < length; i++) {
-                        line.append(' ');
-                    }
-                }
-            }
-
-        }
+        printActiveChecks();
 
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled.");
     }
@@ -164,5 +138,48 @@ public class NoCheat extends JavaPlugin {
 
     public boolean skipCheck() {
         return skipCheck;
+    }
+
+    /**
+     * Print the list of active checks to the console, on a per world basis
+     */
+    private void printActiveChecks() {
+
+        boolean introPrinted = false;
+        String intro = "[NoCheat] Active Checks: ";
+
+        // Print active checks for NoCheat, if needed.
+        for(World world : this.getServer().getWorlds()) {
+
+            StringBuilder line = new StringBuilder("  ").append(world.getName()).append(": ");
+
+            int length = line.length();
+
+            ConfigurationCache cc = this.conf.getConfigurationCacheForWorld(world.getName());
+
+            if(cc.debug.showchecks) {
+                for(EventManager em : eventManagers) {
+                    List<String> checks = em.getActiveChecks(cc);
+                    if(checks.size() > 0) {
+                        for(String active : em.getActiveChecks(cc)) {
+                            line.append(active).append(' ');
+                        }
+
+                        if(!introPrinted) {
+                            log.logToConsole(LogLevel.LOW, intro);
+                            introPrinted = true;
+                        }
+
+                        log.logToConsole(LogLevel.LOW, line.toString());
+
+                        line = new StringBuilder(length);
+
+                        for(int i = 0; i < length; i++) {
+                            line.append(' ');
+                        }
+                    }
+                }
+            }
+        }
     }
 }

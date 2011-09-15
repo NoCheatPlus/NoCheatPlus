@@ -43,6 +43,14 @@ public class DefaultConfiguration {
             loggingNode.add(new LogLevelOption("consolelevel", LogLevel.HIGH));
             loggingNode.add(new LogLevelOption("chatlevel", LogLevel.MED));
         }
+        
+        /*** LOGGING section ***/
+        {
+            ParentOption debugNode = new ParentOption("debug");
+            root.add(debugNode);
+
+            debugNode.add(new BooleanOption("showactivechecks", false, false));
+        }
 
         /*** MOVING ***/
         {

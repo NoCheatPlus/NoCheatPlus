@@ -23,6 +23,8 @@ public class Explainations {
         set("logging.consolelevel", "What log-level need messages to have to get displayed in your server console. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
         set("logging.chatlevel", "What log-level need messages to have to get displayed in the ingame chat. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
 
+        set("debug.showactivechecks", "Print to the console an overview of all checks that are enabled when NoCheat gets loaded.");
+        
         set("moving.check", "If true, do various checks on PlayerMove events.");
 
         set("moving.flying.check", "If true, check if a player is flying too fast.\nIf this and 'running.check' are true, running check will be done instead.");
@@ -59,7 +61,7 @@ public class Explainations {
         set("blockplace.reach.reachlimit", "Set the distance limit for placing blocks.\nUnit is 1/100 of a block, default is 485");
         set("blockplace.reach.actions", "What should be done if a player is placing blocks that are too far away.\nUnit is number of place(attempt)s beyond the limit.");
 
-        set("blockplace.onliquid.check", "If true, check if a player is trying to place non-liquid blocks against liquid blocks");
+        set("blockplace.onliquid.check", "If true, check if a player is trying to place non-liquid blocks against liquid blocks\nIn a normal Minecraft game, it is impossible to place a block without it touching something that is considered solid (neither air nor a liquid).\nBut if people use a modified client, to can do that. This check tries to identify that trick.");
         set("blockplace.onliquid.actions", "What should be done if a player is is trying to place non-liquid blocks against liquid blocks.\nUnit is number of place(attempt)s.");
         
         set("interact.check", "If true, do various checks on PlayerInteract events.");
