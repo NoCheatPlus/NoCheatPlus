@@ -21,7 +21,8 @@ public class CCMoving {
     public final ActionList flyingActions;
 
     public final boolean    runningCheck;
-    public final double     runningSpeedLimit;
+    public final double     walkingSpeedLimit;
+    public final double     sprintingSpeedLimit;
 
     public final ActionList runningActions;
 
@@ -46,7 +47,8 @@ public class CCMoving {
         flyingActions = data.getActionList("moving.flying.actions");
 
         runningCheck = data.getBoolean("moving.running.check");
-        runningSpeedLimit = ((double) data.getInteger("moving.running.speedlimit")) / 100D;
+        walkingSpeedLimit = ((double) data.getInteger("moving.running.walkingspeedlimit")) / 100D;
+        sprintingSpeedLimit = ((double) data.getInteger("moving.running.sprintingspeedlimit")) / 100D;
         runningActions = data.getActionList("moving.running.actions");
         swimmingCheck = data.getBoolean("moving.running.swimming.check");
         swimmingSpeedLimit = ((double) data.getInteger("moving.running.swimming.speedlimit")) / 100D;

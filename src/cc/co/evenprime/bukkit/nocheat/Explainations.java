@@ -33,7 +33,8 @@ public class Explainations {
         set("moving.flying.actions", "What should be done if a player flies faster than the speed limit(s). \nUnits are in 1/100 of a block above the limit.");
 
         set("moving.running.check", "If true, check if a player is running too fast/jumping too high.\nIf this is true, 'flying.check' is ignored.");
-        set("moving.running.speedlimit", "Set the speed limit for moving horizontal under 'normal' conditions.\nUnit is 1/100 of a block, default is 22.");
+        set("moving.running.walkingspeedlimit", "Set the speed limit for moving horizontal under 'normal' conditions.\nUnit is 1/100 of a block, default is 22.");
+        set("moving.running.sprintingspeedlimit", "Set the speed limit for moving horizontal while sprinting.\nUnit is 1/100 of a block, default is 44.");
         set("moving.running.swimming.check", "If 'running.check' and this are active, use a seperate speed limit for swimming players.");
         set("moving.running.swimming.speedlimit", "Set the speed limit for moving horizontal while in water.\nUnit is 1/100 of a block, default is 18");
         set("moving.running.sneaking.check", "If 'running.check' and this are active, use a seperate speed limit for sneaking players.");

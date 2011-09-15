@@ -83,8 +83,9 @@ public class DefaultConfiguration {
                 movingNode.add(runningNode);
 
                 runningNode.add(new BooleanOption("check", true, true));
-                runningNode.add(new IntegerOption("speedlimit", 22));
-
+                runningNode.add(new IntegerOption("walkingspeedlimit", 22));
+                runningNode.add(new IntegerOption("sprintingspeedlimit", 44));
+                
                 /**** MOVING.RUNNING.SWIMMING ****/
                 {
                     ParentOption swimmingNode = new ParentOption("swimming");

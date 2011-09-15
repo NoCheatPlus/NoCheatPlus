@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -129,8 +130,10 @@ public class RunningCheck {
             distanceAboveLimit = totalDistance - cc.moving.sneakingSpeedLimit - data.horizFreedom;
         } else if(cc.moving.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVE_SWIM)) {
             distanceAboveLimit = totalDistance - cc.moving.swimmingSpeedLimit - data.horizFreedom;
+        } else if(player instanceof CraftPlayer && !((CraftPlayer)player).getHandle().at()){
+            distanceAboveLimit = totalDistance - cc.moving.walkingSpeedLimit - data.horizFreedom;
         } else {
-            distanceAboveLimit = totalDistance - cc.moving.runningSpeedLimit - data.horizFreedom;
+            distanceAboveLimit = totalDistance - cc.moving.sprintingSpeedLimit - data.horizFreedom;
         }
 
         // Did he go too far?
