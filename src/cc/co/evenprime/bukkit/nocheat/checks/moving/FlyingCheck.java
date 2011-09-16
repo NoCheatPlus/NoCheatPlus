@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -24,6 +25,8 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class FlyingCheck {
 
     private final ActionExecutor action;
+    
+    private static final double creativeSpeed = 0.60D;
 
     public FlyingCheck(NoCheat plugin) {
         this.action = new ActionExecutorWithHistory(plugin);
@@ -44,11 +47,14 @@ public class FlyingCheck {
 
         double result = 0;
         Location newToLocation = null;
+        
+        // In case of creative gamemode, give at least 0.60 speed limit horizontal
+        final double speedLimitHorizontal = player.getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, cc.moving.flyingSpeedLimitHorizontal) : cc.moving.flyingSpeedLimitHorizontal;
 
         // super simple, just check distance compared to max distance
         result += Math.max(0.0D, yDistance - data.vertFreedom - cc.moving.flyingSpeedLimitVertical);
-        result += Math.max(0.0D, horizontalDistance - data.horizFreedom - cc.moving.flyingSpeedLimitHorizontal);
-
+        result += Math.max(0.0D, horizontalDistance - data.horizFreedom - speedLimitHorizontal);
+        
         result = result * 100;
 
         if(result > 0) {

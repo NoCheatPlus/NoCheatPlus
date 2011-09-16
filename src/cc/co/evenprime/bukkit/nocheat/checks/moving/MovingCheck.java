@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -69,7 +70,7 @@ public class MovingCheck {
 
         /************* DECIDE WHICH CHECKS NEED TO BE RUN *************/
         final boolean flyCheck = cc.moving.flyingCheck && !player.hasPermission(Permissions.MOVE_FLY);
-        final boolean runCheck = cc.moving.runningCheck && !player.hasPermission(Permissions.MOVE_RUN);
+        final boolean runCheck = cc.moving.runningCheck && !player.hasPermission(Permissions.MOVE_RUN) && player.getGameMode() != GameMode.CREATIVE;
         final boolean morepacketsCheck = cc.moving.morePacketsCheck && !player.hasPermission(Permissions.MOVE_MOREPACKETS);
         final boolean noclipCheck = cc.moving.noclipCheck && !player.hasPermission(Permissions.MOVE_NOCLIP);
 
