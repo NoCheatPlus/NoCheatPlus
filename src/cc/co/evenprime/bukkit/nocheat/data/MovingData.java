@@ -12,9 +12,9 @@ public class MovingData {
 
     public int      jumpPhase            = 0;
 
-    public Location movingsetBackPoint   = null;
+    public Location runflySetBackPoint   = null;
 
-    public double   movingViolationLevel = 0.0D;
+    public double   runflyViolationLevel = 0.0D;
 
     public double   vertFreedom          = 0.0D;
     public double   vertVelocity         = 0.0D;
@@ -27,6 +27,7 @@ public class MovingData {
     public int      noclipZ;
 
     public double   horizontalBuffer;
+    public int      bunnyhopdelay = 0;
 
     public int      morePacketsCounter;
     public double   morePacketsBuffer = 50;

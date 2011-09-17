@@ -72,7 +72,7 @@ public class NoCheat extends JavaPlugin {
         this.log = new LogManager(this);
 
         
-        log.logToConsole(LogLevel.MED, "[NoCheat] This version is EXPERIMENTAL and built specifically for CB #1118. It may break at any time and for any other version.");
+        log.logToConsole(LogLevel.MED, "[NoCheat] This version is EXPERIMENTAL and built specifically for CB #1138. It may break at any time and for any other version.");
         
         this.data = new DataManager();
 

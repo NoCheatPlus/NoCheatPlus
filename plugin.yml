@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.04
+version: 2.05
 
 permissions:
 
@@ -25,8 +25,8 @@ permissions:
   nocheat.checks.moving.*:
     description: Allow the player to bypass all moving checks
     children:
+      nocheat.checks.moving.runfly: true
       nocheat.checks.moving.flying: true
-      nocheat.checks.moving.running: true
       nocheat.checks.moving.swimming: true
       nocheat.checks.moving.sneaking: true
       nocheat.checks.moving.noclip: true
@@ -54,23 +54,23 @@ permissions:
     children:
       nocheat.checks.chat.spam: true
 
-  nocheat.checks.moving.flying:
-    description: Allow a player to move free through the air (if given, the "running" check will be ignored anyway)
+  nocheat.checks.moving.runfly:
+    description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
     default: op
-  nocheat.checks.moving.running:
-    description: Allow a player to move free, only limited by the flying check, if active (implicitly deactivates the "swimming" and "sneaking" check)
+  nocheat.checks.moving.flying:
+    description: Allow a player to fly, but only within given speed limits (ignores swimming and sneaking settings)
     default: op
   nocheat.checks.moving.swimming:
-    description: Allow a player to move at normal running speed through water
+    description: Allow a player to move through water without slowdown
     default: op
   nocheat.checks.moving.sneaking:
-    description: Allow a player to move at normal running speed while sneaking
+    description: Allow a player to sneak without slowdown
     default: op
   nocheat.checks.moving.noclip:
     description: Allow a player to walk through walls
     default: op
   nocheat.checks.moving.morepackets:
-    description: Allow a player to send more move-event-packets than normal
+    description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
     default: op
 
   nocheat.checks.blockbreak.reach:

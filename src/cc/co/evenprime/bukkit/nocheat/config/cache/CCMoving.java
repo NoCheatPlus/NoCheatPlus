@@ -13,24 +13,20 @@ import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 public class CCMoving {
 
     public final boolean    check;
-
-    public final boolean    flyingCheck;
-    public final double     flyingSpeedLimitVertical;
-    public final double     flyingSpeedLimitHorizontal;
-
-    public final ActionList flyingActions;
-
-    public final boolean    runningCheck;
+    
+    public final boolean    runflyCheck;
     public final double     walkingSpeedLimit;
     public final double     sprintingSpeedLimit;
-
-    public final ActionList runningActions;
-
+    public final double     jumpheight;
     public final boolean    swimmingCheck;
     public final double     swimmingSpeedLimit;
-
     public final boolean    sneakingCheck;
     public final double     sneakingSpeedLimit;
+    public final ActionList actions;
+    public final boolean    allowFlying;
+    public final double     flyingSpeedLimitVertical;
+    public final double     flyingSpeedLimitHorizontal;
+    public final ActionList flyingActions;
 
     public final boolean    noclipCheck;
     public final ActionList noclipActions;
@@ -41,19 +37,22 @@ public class CCMoving {
     public CCMoving(Configuration data) {
 
         check = data.getBoolean("moving.check");
-        flyingCheck = data.getBoolean("moving.flying.check");
-        flyingSpeedLimitVertical = ((double) data.getInteger("moving.flying.speedlimitvertical")) / 100D;
-        flyingSpeedLimitHorizontal = ((double) data.getInteger("moving.flying.speedlimithorizontal")) / 100D;
-        flyingActions = data.getActionList("moving.flying.actions");
 
-        runningCheck = data.getBoolean("moving.running.check");
-        walkingSpeedLimit = ((double) data.getInteger("moving.running.walkingspeedlimit")) / 100D;
-        sprintingSpeedLimit = ((double) data.getInteger("moving.running.sprintingspeedlimit")) / 100D;
-        runningActions = data.getActionList("moving.running.actions");
-        swimmingCheck = data.getBoolean("moving.running.swimming.check");
-        swimmingSpeedLimit = ((double) data.getInteger("moving.running.swimming.speedlimit")) / 100D;
-        sneakingCheck = data.getBoolean("moving.running.sneaking.check");
-        sneakingSpeedLimit = ((double) data.getInteger("moving.running.sneaking.speedlimit")) / 100D;
+        runflyCheck = data.getBoolean("moving.runfly.check");
+        walkingSpeedLimit = ((double) data.getInteger("moving.runfly.walkingspeedlimit")) / 100D;
+        sprintingSpeedLimit = ((double) data.getInteger("moving.runfly.sprintingspeedlimit")) / 100D;
+        jumpheight = ((double) data.getInteger("moving.runfly.jumpheight")) / 100D;
+        actions = data.getActionList("moving.runfly.actions");
+        
+        swimmingCheck = data.getBoolean("moving.runfly.checkswimming");
+        swimmingSpeedLimit = ((double) data.getInteger("moving.runfly.swimmingspeedlimit")) / 100D;
+        sneakingCheck = data.getBoolean("moving.runfly.checksneaking");
+        sneakingSpeedLimit = ((double) data.getInteger("moving.runfly.sneakingspeedlimit")) / 100D;
+        
+        allowFlying = data.getBoolean("moving.runfly.allowlimitedflying");
+        flyingSpeedLimitVertical = ((double) data.getInteger("moving.runfly.flyingspeedlimitvertical")) / 100D;
+        flyingSpeedLimitHorizontal = ((double) data.getInteger("moving.runfly.flyingspeedlimithorizontal")) / 100D;
+        flyingActions = data.getActionList("moving.runfly.flyingactions");
 
         noclipCheck = data.getBoolean("moving.noclip.check");
         noclipActions = data.getActionList("moving.noclip.actions");

@@ -14,7 +14,7 @@ import org.bukkit.plugin.PluginManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.moving.MovingCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.moving.RunFlyCheck;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
@@ -28,7 +28,7 @@ import cc.co.evenprime.bukkit.nocheat.data.DataManager;
  */
 public class BlockPlaceEventManager extends BlockListener implements EventManager {
 
-    private final MovingCheck          movingCheck;
+    private final RunFlyCheck          movingCheck;
     private final BlockPlaceCheck      blockPlaceCheck;
 
     private final DataManager          data;
@@ -39,7 +39,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
         this.data = plugin.getDataManager();
         this.config = plugin.getConfigurationManager();
 
-        this.movingCheck = new MovingCheck(plugin);
+        this.movingCheck = new RunFlyCheck(plugin);
         this.blockPlaceCheck = new BlockPlaceCheck(plugin);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();

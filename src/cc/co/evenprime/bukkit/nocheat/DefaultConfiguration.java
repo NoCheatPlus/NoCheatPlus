@@ -43,7 +43,7 @@ public class DefaultConfiguration {
             loggingNode.add(new LogLevelOption("consolelevel", LogLevel.HIGH));
             loggingNode.add(new LogLevelOption("chatlevel", LogLevel.MED));
         }
-        
+
         /*** LOGGING section ***/
         {
             ParentOption debugNode = new ParentOption("debug");
@@ -59,59 +59,43 @@ public class DefaultConfiguration {
 
             movingNode.add(new BooleanOption("check", true, true));
 
-            /**** MOVING.FLYING ****/
+            /**** MOVING.WALKING ****/
             {
-                ParentOption flyingNode = new ParentOption("flying");
-                movingNode.add(flyingNode);
+                ParentOption runflyNode = new ParentOption("runfly");
+                movingNode.add(runflyNode);
 
-                flyingNode.add(new BooleanOption("check", true, true));
-                flyingNode.add(new IntegerOption("speedlimitvertical", 100));
-                flyingNode.add(new IntegerOption("speedlimithorizontal", 22));
+                runflyNode.add(new BooleanOption("check", true, true));
 
-                ActionListOption actions = new ActionListOption("actions");
+                runflyNode.add(new IntegerOption("walkingspeedlimit", 22));
+                runflyNode.add(new IntegerOption("sprintingspeedlimit", 40));
+                runflyNode.add(new IntegerOption("jumpheight", 135));
 
-                flyingNode.add(actions);
+                runflyNode.add(new BooleanOption("checksneaking", true, false));
+                runflyNode.add(new IntegerOption("sneakingspeedlimit", 14));
 
-                actions.add(0, "moveLogLowShort moveCancel");
-                actions.add(100, "moveLogMedShort moveCancel");
-                actions.add(400, "moveLogHighShort moveCancel");
-            }
+                runflyNode.add(new BooleanOption("checkswimming", true, false));
+                runflyNode.add(new IntegerOption("swimmingspeedlimit", 18));
 
-            /**** MOVING.RUNNING ****/
-            {
-                ParentOption runningNode = new ParentOption("running");
-                movingNode.add(runningNode);
+                ActionListOption walkactions = new ActionListOption("actions");
 
-                runningNode.add(new BooleanOption("check", true, true));
-                runningNode.add(new IntegerOption("walkingspeedlimit", 22));
-                runningNode.add(new IntegerOption("sprintingspeedlimit", 44));
-                
-                /**** MOVING.RUNNING.SWIMMING ****/
-                {
-                    ParentOption swimmingNode = new ParentOption("swimming");
+                runflyNode.add(walkactions);
 
-                    runningNode.add(swimmingNode);
+                walkactions.add(0, "moveLogLowShort moveCancel");
+                walkactions.add(100, "moveLogMedShort moveCancel");
+                walkactions.add(400, "moveLogHighShort moveCancel");
 
-                    swimmingNode.add(new BooleanOption("check", true, true));
-                    swimmingNode.add(new IntegerOption("speedlimit", 18));
-                }
-                /**** MOVING.RUNNING.SNEAKING ****/
-                {
-                    ParentOption sneakingNode = new ParentOption("sneaking");
+                runflyNode.add(new BooleanOption("allowlimitedflying", false, false));
 
-                    runningNode.add(sneakingNode);
+                runflyNode.add(new IntegerOption("flyingspeedlimitvertical", 100));
+                runflyNode.add(new IntegerOption("flyingspeedlimithorizontal", 60));
 
-                    sneakingNode.add(new BooleanOption("check", true, true));
-                    sneakingNode.add(new IntegerOption("speedlimit", 14));
-                }
+                ActionListOption flyactions = new ActionListOption("flyingactions");
 
-                ActionListOption actions = new ActionListOption("actions");
+                runflyNode.add(flyactions);
 
-                runningNode.add(actions);
-
-                actions.add(0, "moveLogLowShort moveCancel");
-                actions.add(100, "moveLogMedShort moveCancel");
-                actions.add(400, "moveLogHighShort moveCancel");
+                flyactions.add(0, "moveLogLowShort moveCancel");
+                flyactions.add(100, "moveLogMedShort moveCancel");
+                flyactions.add(400, "moveLogHighShort moveCancel");
             }
 
             /**** MOVING.MOREPACKETS ****/

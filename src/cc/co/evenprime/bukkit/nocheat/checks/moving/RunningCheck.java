@@ -16,10 +16,10 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
- * The counterpart to the FlyingCheck. People that are not allowed to fly at all
+ * The counterpart to the FlyingCheck. People that are not allowed to fly
  * get checked by this. It will try to identify when they are jumping, check if
  * they aren't jumping too high or far, check if they aren't moving too fast on
- * normal ground, while sneaking or while swimming.
+ * normal ground, while sprinting, sneaking or swimming.
  * 
  * @author Evenprime
  * 
@@ -31,10 +31,6 @@ public class RunningCheck {
     // How many move events can a player have in air before he is expected to
     // lose altitude (or eventually land somewhere)
     private final static int     jumpingLimit = 6;
-
-    // How high may a player get compared to his last location with ground
-    // contact
-    private final static double  jumpHeight   = 1.35D;
 
     private final ActionExecutor action;
 
@@ -49,8 +45,8 @@ public class RunningCheck {
         final double zDistance = to.getZ() - from.getZ();
         final double horizontalDistance = Math.sqrt((xDistance * xDistance + zDistance * zDistance));
 
-        if(data.movingsetBackPoint == null) {
-            data.movingsetBackPoint = player.getLocation().clone();
+        if(data.runflySetBackPoint == null) {
+            data.runflySetBackPoint = from.clone();
         }
 
         // To know if a player "is on ground" is useful
@@ -69,39 +65,41 @@ public class RunningCheck {
 
         double result = (resultHoriz + resultVert) * 100;
 
+        data.jumpPhase++;
+
         // Slowly reduce the level with each event
-        data.movingViolationLevel *= 0.97;
+        data.runflyViolationLevel *= 0.97;
 
         if(result > 0) {
 
             // Increment violation counter
-            data.movingViolationLevel += result;
+            data.runflyViolationLevel += result;
 
             // Prepare some event-specific values for logging and custom actions
             HashMap<String, String> params = new HashMap<String, String>();
             params.put(LogAction.DISTANCE, String.format(Locale.US, "%.2f,%.2f,%.2f", xDistance, to.getY() - from.getY(), zDistance));
             params.put(LogAction.LOCATION_TO, String.format(Locale.US, "%.2f,%.2f,%.2f", to.getX(), to.getY(), to.getZ()));
             if(resultHoriz > 0 && resultVert > 0)
-                params.put(LogAction.CHECK, "running/both");
+                params.put(LogAction.CHECK, "runfly/both");
             else if(resultHoriz > 0)
-                params.put(LogAction.CHECK, "running/horizontal");
+                params.put(LogAction.CHECK, "runfly/horizontal");
             else if(resultVert > 0)
-                params.put(LogAction.CHECK, "running/vertical");
+                params.put(LogAction.CHECK, "runfly/vertical");
 
-            boolean cancel = action.executeActions(player, cc.moving.runningActions, (int) data.movingViolationLevel, params, cc);
+            boolean cancel = action.executeActions(player, cc.moving.actions, (int) data.runflyViolationLevel, params, cc);
 
             // Was one of the actions a cancel? Then do it
             if(cancel) {
-                newToLocation = data.movingsetBackPoint;
+                newToLocation = data.runflySetBackPoint;
             }
         } else {
             if((toInGround && from.getY() >= to.getY()) || helper.isLiquid(toType)) {
-                data.movingsetBackPoint = to.clone();
-                data.movingsetBackPoint.setY(Math.ceil(data.movingsetBackPoint.getY()));
+                data.runflySetBackPoint = to.clone();
+                data.runflySetBackPoint.setY(Math.ceil(data.runflySetBackPoint.getY()));
                 data.jumpPhase = 0;
-            } else if(toOnGround && (from.getY() >= to.getY() || data.movingsetBackPoint.getY() <= Math.floor(to.getY()))) {
-                data.movingsetBackPoint = to.clone();
-                data.movingsetBackPoint.setY(Math.floor(data.movingsetBackPoint.getY()));
+            } else if(toOnGround && (from.getY() >= to.getY() || data.runflySetBackPoint.getY() <= Math.floor(to.getY()))) {
+                data.runflySetBackPoint = to.clone();
+                data.runflySetBackPoint.setY(Math.floor(data.runflySetBackPoint.getY()));
                 data.jumpPhase = 0;
             } else if(fromOnGround || fromInGround || toOnGround || toInGround) {
                 data.jumpPhase = 0;
@@ -126,17 +124,30 @@ public class RunningCheck {
         // How much further did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
+        boolean sprinting = !(player instanceof CraftPlayer) || ((CraftPlayer) player).getHandle().at();
+
         if(cc.moving.sneakingCheck && player.isSneaking() && !player.hasPermission(Permissions.MOVE_SNEAK)) {
             distanceAboveLimit = totalDistance - cc.moving.sneakingSpeedLimit - data.horizFreedom;
         } else if(cc.moving.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVE_SWIM)) {
             distanceAboveLimit = totalDistance - cc.moving.swimmingSpeedLimit - data.horizFreedom;
-        } else if(player instanceof CraftPlayer && !((CraftPlayer)player).getHandle().at()){
+        } else if(!sprinting) {
             distanceAboveLimit = totalDistance - cc.moving.walkingSpeedLimit - data.horizFreedom;
         } else {
             distanceAboveLimit = totalDistance - cc.moving.sprintingSpeedLimit - data.horizFreedom;
         }
 
+        data.bunnyhopdelay--;
+
         // Did he go too far?
+        if(distanceAboveLimit > 0 && sprinting) {
+
+            // Try to treat it as a the "bunnyhop" problem
+            if(data.bunnyhopdelay <= 0 && distanceAboveLimit > 0.05D && distanceAboveLimit < 0.4D) {
+                data.bunnyhopdelay = 3;
+                distanceAboveLimit = 0;
+            }
+        }
+
         if(distanceAboveLimit > 0) {
             // Try to consume the "buffer"
             distanceAboveLimit -= data.horizontalBuffer;
@@ -145,7 +156,6 @@ public class RunningCheck {
             // Put back the "overconsumed" buffer
             if(distanceAboveLimit < 0) {
                 data.horizontalBuffer = -distanceAboveLimit;
-
             }
         }
         // He was within limits, give the difference as buffer
@@ -168,25 +178,12 @@ public class RunningCheck {
         final double toY = to.getY();
         final double fromY = from.getY();
 
-        double limit = data.vertFreedom + jumpHeight;
+        double limit = data.vertFreedom + cc.moving.jumpheight;
 
-        final Location l;
-
-        if(fromY - toY > 0.5D) {
-            distanceAboveLimit = 0;
-            data.jumpPhase++;
-        } else {
-
-            if(data.movingsetBackPoint == null)
-                l = from;
-            else
-                l = data.movingsetBackPoint;
-
-            if(data.jumpPhase > jumpingLimit) {
-                limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
-            }
-            distanceAboveLimit = toY - l.getY() - limit;
+        if(data.jumpPhase > jumpingLimit) {
+            limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
         }
+        distanceAboveLimit = toY - data.runflySetBackPoint.getY() - limit;
 
         return distanceAboveLimit;
 

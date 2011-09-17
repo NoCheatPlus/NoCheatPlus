@@ -27,20 +27,23 @@ public class Explainations {
         
         set("moving.check", "If true, do various checks on PlayerMove events.");
 
-        set("moving.flying.check", "If true, check if a player is flying too fast.\nIf this and 'running.check' are true, running check will be done instead.");
-        set("moving.flying.speedlimitvertical", "Set the speed limit for moving vertical while flying.\nUnit is 1/100 of a block, default is 100.");
-        set("moving.flying.speedlimithorizontal", "Set the speed limit for moving horizontal while flying.\nUnit is 1/100 of a block, default is 22.");
-        set("moving.flying.actions", "What should be done if a player flies faster than the speed limit(s). \nUnits are in 1/100 of a block above the limit.");
 
-        set("moving.running.check", "If true, check if a player is running too fast/jumping too high.\nIf this is true, 'flying.check' is ignored.");
-        set("moving.running.walkingspeedlimit", "Set the speed limit for moving horizontal under 'normal' conditions.\nUnit is 1/100 of a block, default is 22.");
-        set("moving.running.sprintingspeedlimit", "Set the speed limit for moving horizontal while sprinting.\nUnit is 1/100 of a block, default is 44.");
-        set("moving.running.swimming.check", "If 'running.check' and this are active, use a seperate speed limit for swimming players.");
-        set("moving.running.swimming.speedlimit", "Set the speed limit for moving horizontal while in water.\nUnit is 1/100 of a block, default is 18");
-        set("moving.running.sneaking.check", "If 'running.check' and this are active, use a seperate speed limit for sneaking players.");
-        set("moving.running.sneaking.speedlimit", "Set the speed limit for moving horizontal while sneaking.\nUnit is 1/100 of a block, default is 14");
-        set("moving.running.actions", "What should be done if a player moves faster than the speed limit(s) or jumps higher than allowed.\nUnits are in 1/100 of a block above the limit.");
+        set("moving.runfly.check", "If true, check if a player is walking/sprinting/sneaking/swimming too fast/high.");
+        set("moving.runfly.walkingspeedlimit", "Set the speed limit for moving horizontal under 'normal' conditions.\nUnit is 1/100 of a block, default is 22.");
+        set("moving.runfly.sprintingspeedlimit", "Set the speed limit for moving horizontal while sprinting.\nUnit is 1/100 of a block, default is 40.");
+        set("moving.runfly.jumpheight", "Set how high a player is allowed to jump.\nUnit is 1/100 of a block, default is 135.");
+        set("moving.runfly.checkswimming", "Use a seperate speed limit for swimming players.");
+        set("moving.runfly.swimmingspeedlimit", "Set the speed limit for moving horizontal while in water.\nUnit is 1/100 of a block, default is 18");
+        set("moving.runfly.checksneaking", "Use a seperate speed limit for sneaking players.");
+        set("moving.runfly.sneakingspeedlimit", "Set the speed limit for moving horizontal while sneaking.\nUnit is 1/100 of a block, default is 14");
+        set("moving.runfly.actions", "What should be done if a player moves faster than the speed limit(s) or jumps higher than allowed.\nUnits are in 1/100 of a block above the limit.");
 
+        set("moving.runfly.allowlimitedflying", "If true, instead of doing the above checks for walking/sprinting/swimming/sneaking,\nallow flying and only limit the flying speed.");
+        set("moving.runfly.flyingspeedlimitvertical", "Set the speed limit for moving vertical while flying.\nUnit is 1/100 of a block, default is 100.");
+        set("moving.runfly.flyingspeedlimithorizontal", "Set the speed limit for moving horizontal while flying.\nUnit is 1/100 of a block, default is 60.");
+        set("moving.runfly.flyingactions", "What should be done if a player flies faster than the speed limit(s). \nUnits are in 1/100 of a block above the speedlimit.");
+  
+        
         set("moving.morepackets.check", "If true, check if a player is sending too many 'move-packets' per second. In a normal game, the player won't send more than 22 packets per second.");
         set("moving.morepackets.actions", "What should be done if a player sends more 'move-packets' than normal.\nUnits are packets per second above the limit.");
 

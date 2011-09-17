@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -15,9 +16,9 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
- * A check designed for people that are allowed to fly, but not as fast as they
- * want. The complement to the "RunningCheck", which is for people that aren't
- * allowed to fly, and therefore have tighter rules to obey.
+ * A check designed for people that are allowed to fly. The complement to
+ * the "RunningCheck", which is for people that aren't allowed to fly, and
+ * therefore have tighter rules to obey.
  * 
  * @author Evenprime
  * 
@@ -25,8 +26,8 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class FlyingCheck {
 
     private final ActionExecutor action;
-    
-    private static final double creativeSpeed = 0.60D;
+
+    private static final double  creativeSpeed = 0.60D;
 
     public FlyingCheck(NoCheat plugin) {
         this.action = new ActionExecutorWithHistory(plugin);
@@ -34,8 +35,8 @@ public class FlyingCheck {
 
     public Location check(Player player, Location from, Location to, ConfigurationCache cc, MovingData data) {
 
-        if(data.movingsetBackPoint == null) {
-            data.movingsetBackPoint = player.getLocation().clone();
+        if(data.runflySetBackPoint == null) {
+            data.runflySetBackPoint = player.getLocation().clone();
         }
 
         final double yDistance = to.getY() - from.getY();
@@ -47,45 +48,58 @@ public class FlyingCheck {
 
         double result = 0;
         Location newToLocation = null;
-        
-        // In case of creative gamemode, give at least 0.60 speed limit horizontal
+
+        // In case of creative gamemode, give at least 0.60 speed limit
+        // horizontal
         final double speedLimitHorizontal = player.getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, cc.moving.flyingSpeedLimitHorizontal) : cc.moving.flyingSpeedLimitHorizontal;
 
+        result += Math.max(0.0D, horizontalDistance - data.horizFreedom - speedLimitHorizontal);
+
+        boolean sprinting = !(player instanceof CraftPlayer) || ((CraftPlayer)player).getHandle().at();
+        
+        data.bunnyhopdelay--;
+        
+        // Did he go too far?
+        if(result > 0 && sprinting) {
+            
+            // Try to treat it as a the "bunnyhop" problem
+            if(data.bunnyhopdelay <= 0 && result < 0.4D) {
+                data.bunnyhopdelay = 3;
+                result = 0;
+            }
+        }
+        
         // super simple, just check distance compared to max distance
         result += Math.max(0.0D, yDistance - data.vertFreedom - cc.moving.flyingSpeedLimitVertical);
-        result += Math.max(0.0D, horizontalDistance - data.horizFreedom - speedLimitHorizontal);
-        
         result = result * 100;
 
         if(result > 0) {
 
             // Increment violation counter
-            data.movingViolationLevel += result;
+            data.runflyViolationLevel += result;
 
             // Prepare some event-specific values for logging and custom actions
             HashMap<String, String> params = new HashMap<String, String>();
             params.put(LogAction.DISTANCE, String.format(Locale.US, "%.2f,%.2f,%.2f", xDistance, yDistance, zDistance));
             params.put(LogAction.LOCATION_TO, String.format(Locale.US, "%.2f,%.2f,%.2f", to.getX(), to.getY(), to.getZ()));
-            params.put(LogAction.CHECK, "flyingspeed");
+            params.put(LogAction.CHECK, "flying/toofast");
 
-            boolean cancel = action.executeActions(player, cc.moving.flyingActions, (int) data.movingViolationLevel, params, cc);
+            boolean cancel = action.executeActions(player, cc.moving.flyingActions, (int) data.runflyViolationLevel, params, cc);
 
             // Was one of the actions a cancel? Then really do it
             if(cancel) {
-                newToLocation = data.movingsetBackPoint;
+                newToLocation = data.runflySetBackPoint;
             }
         }
 
         // Slowly reduce the level with each event
-        data.movingViolationLevel *= 0.97;
+        data.runflyViolationLevel *= 0.97;
 
         // Some other cleanup 'n' stuff
         if(newToLocation == null) {
-            data.movingsetBackPoint = to.clone();
+            data.runflySetBackPoint = to.clone();
         }
 
-        data.jumpPhase = 0;
         return newToLocation;
     }
-
 }

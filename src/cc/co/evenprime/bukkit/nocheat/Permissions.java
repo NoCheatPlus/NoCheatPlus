@@ -18,10 +18,10 @@ public class Permissions {
     private final static String _CHAT                = _CHECKS + ".chat";
 
     public final static String  MOVE                 = _CHECKS + ".moving.*";
-    public final static String  MOVE_FLY             = _MOVE + ".flying";
-    public final static String  MOVE_RUN             = _MOVE + ".running";
+    public final static String  MOVE_RUNFLY          = _MOVE + ".runfly";
     public final static String  MOVE_SNEAK           = _MOVE + ".sneaking";
     public final static String  MOVE_SWIM            = _MOVE + ".swimming";
+    public final static String  MOVE_FLY             = _MOVE + ".flying";
     public final static String  MOVE_NOCLIP          = _MOVE + ".noclip";
     public final static String  MOVE_MOREPACKETS     = _MOVE + ".morepackets";
 

@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.Permissions;
-import cc.co.evenprime.bukkit.nocheat.checks.moving.MovingCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.moving.RunFlyCheck;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
@@ -33,7 +33,7 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class PlayerMoveEventManager extends PlayerListener implements EventManager {
 
-    private final MovingCheck          movingCheck;
+    private final RunFlyCheck          movingCheck;
 
     private final ConfigurationManager config;
     private final DataManager          data;
@@ -42,7 +42,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         this.config = plugin.getConfigurationManager();
         this.data = plugin.getDataManager();
 
-        this.movingCheck = new MovingCheck(plugin);
+        this.movingCheck = new RunFlyCheck(plugin);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -124,13 +124,13 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.moving.check && cc.moving.flyingCheck)
+        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying)
+            s.add("moving.runfly");
+        if(cc.moving.check && cc.moving.runflyCheck && cc.moving.allowFlying)
             s.add("moving.flying");
-        if(cc.moving.check && cc.moving.runningCheck)
-            s.add("moving.running");
-        if(cc.moving.check && cc.moving.runningCheck && cc.moving.swimmingCheck)
+        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.swimmingCheck)
             s.add("moving.swimming");
-        if(cc.moving.check && cc.moving.runningCheck && cc.moving.sneakingCheck)
+        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.sneakingCheck)
             s.add("moving.sneaking");
         if(cc.moving.check && cc.moving.morePacketsCheck)
             s.add("moving.morepackets");
@@ -144,13 +144,13 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
     public List<String> getInactiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(!(cc.moving.check && cc.moving.flyingCheck))
+        if(!(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying))
+            s.add("moving.runfly");
+        if(!(cc.moving.check && cc.moving.runflyCheck && cc.moving.allowFlying))
             s.add("moving.flying");
-        if(!(cc.moving.check && cc.moving.runningCheck))
-            s.add("moving.running");
-        if(!(cc.moving.check && cc.moving.runningCheck && cc.moving.swimmingCheck))
+        if(!(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.swimmingCheck))
             s.add("moving.running.swimming");
-        if(!(cc.moving.check && cc.moving.runningCheck && cc.moving.sneakingCheck))
+        if(!(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.sneakingCheck))
             s.add("moving.running.sneaking");
         if(!(cc.moving.check && cc.moving.morePacketsCheck))
             s.add("moving.morepackets");

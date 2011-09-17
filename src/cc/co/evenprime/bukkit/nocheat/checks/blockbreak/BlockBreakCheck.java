@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -33,7 +34,8 @@ public class BlockBreakCheck {
 
         boolean cancel = false;
 
-        boolean reach = cc.blockbreak.reachCheck && !player.hasPermission(Permissions.BLOCKBREAK_REACH);
+        // Reach check only if not in creative mode!
+        boolean reach = cc.blockbreak.reachCheck && !player.hasPermission(Permissions.BLOCKBREAK_REACH) && player.getGameMode() != GameMode.CREATIVE;
         boolean direction = cc.blockbreak.directionCheck && !player.hasPermission(Permissions.BLOCKBREAK_DIRECTION);
 
         if((reach || direction) && brokenBlock != null) {

@@ -18,7 +18,7 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  * @author Evenprime
  * 
  */
-public class MovingCheck {
+public class RunFlyCheck {
 
     private final FlyingCheck       flyingCheck;
     private final RunningCheck      runningCheck;
@@ -27,7 +27,7 @@ public class MovingCheck {
 
     private final MovingEventHelper helper;
 
-    public MovingCheck(NoCheat plugin) {
+    public RunFlyCheck(NoCheat plugin) {
         this.helper = new MovingEventHelper();
 
         this.flyingCheck = new FlyingCheck(plugin);
@@ -69,21 +69,21 @@ public class MovingCheck {
         }
 
         /************* DECIDE WHICH CHECKS NEED TO BE RUN *************/
-        final boolean flyCheck = cc.moving.flyingCheck && !player.hasPermission(Permissions.MOVE_FLY);
-        final boolean runCheck = cc.moving.runningCheck && !player.hasPermission(Permissions.MOVE_RUN) && player.getGameMode() != GameMode.CREATIVE;
+        final boolean runflyCheck = cc.moving.runflyCheck && !player.hasPermission(Permissions.MOVE_RUNFLY);
+        final boolean flyAllowed = cc.moving.allowFlying || player.hasPermission(Permissions.MOVE_FLY) || (player.getGameMode() == GameMode.CREATIVE);
         final boolean morepacketsCheck = cc.moving.morePacketsCheck && !player.hasPermission(Permissions.MOVE_MOREPACKETS);
         final boolean noclipCheck = cc.moving.noclipCheck && !player.hasPermission(Permissions.MOVE_NOCLIP);
 
         /********************* EXECUTE THE FLY/JUMP/RUNNING CHECK ********************/
         // If the player is not allowed to fly and not allowed to run
-        if(flyCheck && runCheck) {
-            newToLocation = runningCheck.check(player, from, to, helper, cc, data);
+        if(runflyCheck) {
+            if(flyAllowed) {
+                newToLocation = flyingCheck.check(player, from, to, cc, data);
+            }
+            else {
+                newToLocation = runningCheck.check(player, from, to, helper, cc, data);
+            }
         }
-        // else if he is not allowed to fly
-        else if(flyCheck) {
-            newToLocation = flyingCheck.check(player, from, to, cc, data);
-        }
-        // else don't do anything
 
         /********* EXECUTE THE MOREPACKETS CHECK ********************/
 
@@ -102,13 +102,15 @@ public class MovingCheck {
      * This is a workaround for people placing blocks below them causing false positives
      * with the move check(s).
      * 
+     * TODO: Check if still needed, maybe this got fixed in 1.8.1
+     * 
      * @param player
      * @param data
      * @param blockPlaced
      */
     public void blockPlaced(Player player, MovingData data, Block blockPlaced) {
 
-        if(blockPlaced == null || data.movingsetBackPoint == null) {
+        if(blockPlaced == null || data.runflySetBackPoint == null) {
             return;
         }
 
@@ -119,8 +121,8 @@ public class MovingCheck {
 
             int type = helper.types[blockPlaced.getTypeId()];
             if(helper.isSolid(type) || helper.isLiquid(type)) {
-                if(lblock.getBlockY() + 1 >= data.movingsetBackPoint.getY()) {
-                    data.movingsetBackPoint.setY(lblock.getBlockY() + 1);
+                if(lblock.getBlockY() + 1 >= data.runflySetBackPoint.getY()) {
+                    data.runflySetBackPoint.setY(lblock.getBlockY() + 1);
                     data.jumpPhase = 0;
                 }
             }
