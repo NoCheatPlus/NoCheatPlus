@@ -86,7 +86,7 @@ public class DefaultConfiguration {
                 runflyNode.add(new IntegerOption("nofallmultiplier", 200));
                 ActionListOption nofallactions = new ActionListOption("nofallactions");
                 runflyNode.add(nofallactions);
-                nofallactions.add(0, "nofallLog nofallCancel");
+                nofallactions.add(0, "nofallLog nofallDamage");
 
                 runflyNode.add(new BooleanOption("allowlimitedflying", false, false));
 
@@ -347,7 +347,7 @@ public class DefaultConfiguration {
             w(w, "special blockplaceCancel 0 0");
             w(w, "special interactCancel 0 0");
             w(w, "special spamCancel 0 0");
-            w(w, "special nofallCancel 0 0");
+            w(w, "special nofallDamage 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");
