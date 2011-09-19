@@ -83,7 +83,7 @@ public class DefaultConfiguration {
                 walkactions.add(400, "moveLogHighShort moveCancel");
 
                 runflyNode.add(new BooleanOption("checknofall", true, false));
-                runflyNode.add(new IntegerOption("nofallmultiplier", 100));
+                runflyNode.add(new IntegerOption("nofallmultiplier", 200));
                 ActionListOption nofallactions = new ActionListOption("nofallactions");
                 runflyNode.add(nofallactions);
                 nofallactions.add(0, "nofallLog nofallCancel");

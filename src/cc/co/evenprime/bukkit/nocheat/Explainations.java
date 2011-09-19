@@ -38,6 +38,10 @@ public class Explainations {
         set("moving.runfly.sneakingspeedlimit", "Set the speed limit for moving horizontal while sneaking.\nUnit is 1/100 of a block, default is 14");
         set("moving.runfly.actions", "What should be done if a player moves faster than the speed limit(s) or jumps higher than allowed.\nUnits are in 1/100 of a block above the limit.");
 
+        set("moving.runfly.checknofall", "If true, check if a player is avoiding fall damage by using a nofall hack. EXPERIMENTAL! Feedback is appreciated.");
+        set("moving.runfly.nofallmultiplier", "How many percent falldamage should be dealt to the player.\nNoCheat will almost always underestimate fall damage, using a value bigger than 100 is advised.\nUnit is percent of the estimated original fall damage, default is 200.");
+        set("moving.runfly.nofallactions", "What should be done if a player is detected as avoiding fall damage.\nUnit is number of blocks the player fell down.");
+        
         set("moving.runfly.allowlimitedflying", "If true, instead of doing the above checks for walking/sprinting/swimming/sneaking,\nallow flying and only limit the flying speed.");
         set("moving.runfly.flyingspeedlimitvertical", "Set the speed limit for moving vertical while flying.\nUnit is 1/100 of a block, default is 100.");
         set("moving.runfly.flyingspeedlimithorizontal", "Set the speed limit for moving horizontal while flying.\nUnit is 1/100 of a block, default is 60.");
