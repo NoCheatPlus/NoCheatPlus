@@ -132,6 +132,8 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
             s.add("moving.swimming");
         if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.sneakingCheck)
             s.add("moving.sneaking");
+        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.nofallCheck)
+            s.add("moving.nofall");
         if(cc.moving.check && cc.moving.morePacketsCheck)
             s.add("moving.morepackets");
         if(cc.moving.check && cc.moving.noclipCheck)
@@ -149,9 +151,11 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         if(!(cc.moving.check && cc.moving.runflyCheck && cc.moving.allowFlying))
             s.add("moving.flying");
         if(!(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.swimmingCheck))
-            s.add("moving.running.swimming");
+            s.add("moving.swimming");
         if(!(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.sneakingCheck))
-            s.add("moving.running.sneaking");
+            s.add("moving.sneaking");
+        if(!(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.nofallCheck))
+            s.add("moving.nofall");
         if(!(cc.moving.check && cc.moving.morePacketsCheck))
             s.add("moving.morepackets");
         if(!(cc.moving.check && cc.moving.noclipCheck))
