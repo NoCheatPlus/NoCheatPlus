@@ -90,6 +90,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
         data.morePacketsCounter = 0;
         data.morePacketsSetbackPoint = null;
         data.jumpPhase = 0;
+        data.fallDistance = 0F;
         
         if(newLocation != null) {
 

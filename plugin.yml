@@ -30,6 +30,7 @@ permissions:
       nocheat.checks.moving.swimming: true
       nocheat.checks.moving.sneaking: true
       nocheat.checks.moving.noclip: true
+      nocheat.checks.moving.nofall: true
       nocheat.checks.moving.morepackets: true
 
   nocheat.checks.blockbreak.*:
@@ -68,6 +69,9 @@ permissions:
     default: op
   nocheat.checks.moving.noclip:
     description: Allow a player to walk through walls
+    default: op
+  nocheat.checks.moving.nofall:
+    description: Allow a player to cheat and not take fall damage at all
     default: op
   nocheat.checks.moving.morepackets:
     description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal

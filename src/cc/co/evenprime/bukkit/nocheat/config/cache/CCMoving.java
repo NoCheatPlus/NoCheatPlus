@@ -13,7 +13,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 public class CCMoving {
 
     public final boolean    check;
-    
+
     public final boolean    runflyCheck;
     public final double     walkingSpeedLimit;
     public final double     sprintingSpeedLimit;
@@ -31,6 +31,10 @@ public class CCMoving {
     public final boolean    noclipCheck;
     public final ActionList noclipActions;
 
+    public final boolean    nofallCheck;
+    public final float      nofallMultiplier;
+    public final ActionList nofallActions;
+
     public final boolean    morePacketsCheck;
     public final ActionList morePacketsActions;
 
@@ -43,16 +47,20 @@ public class CCMoving {
         sprintingSpeedLimit = ((double) data.getInteger("moving.runfly.sprintingspeedlimit")) / 100D;
         jumpheight = ((double) data.getInteger("moving.runfly.jumpheight")) / 100D;
         actions = data.getActionList("moving.runfly.actions");
-        
+
         swimmingCheck = data.getBoolean("moving.runfly.checkswimming");
         swimmingSpeedLimit = ((double) data.getInteger("moving.runfly.swimmingspeedlimit")) / 100D;
         sneakingCheck = data.getBoolean("moving.runfly.checksneaking");
         sneakingSpeedLimit = ((double) data.getInteger("moving.runfly.sneakingspeedlimit")) / 100D;
-        
+
         allowFlying = data.getBoolean("moving.runfly.allowlimitedflying");
         flyingSpeedLimitVertical = ((double) data.getInteger("moving.runfly.flyingspeedlimitvertical")) / 100D;
         flyingSpeedLimitHorizontal = ((double) data.getInteger("moving.runfly.flyingspeedlimithorizontal")) / 100D;
         flyingActions = data.getActionList("moving.runfly.flyingactions");
+
+        nofallCheck = data.getBoolean("moving.runfly.checknofall");
+        nofallMultiplier = ((float) data.getInteger("moving.runfly.nofallmultiplier")) / 100F;
+        nofallActions = data.getActionList("moving.runfly.nofallactions");
 
         noclipCheck = data.getBoolean("moving.noclip.check");
         noclipActions = data.getActionList("moving.noclip.actions");

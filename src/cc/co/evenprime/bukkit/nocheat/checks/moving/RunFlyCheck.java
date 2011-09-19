@@ -23,6 +23,7 @@ public class RunFlyCheck {
     private final FlyingCheck       flyingCheck;
     private final RunningCheck      runningCheck;
     private final NoclipCheck       noclippingCheck;
+    private final NoFallCheck       noFallCheck;
     private final MorePacketsCheck  morePacketsCheck;
 
     private final MovingEventHelper helper;
@@ -31,7 +32,8 @@ public class RunFlyCheck {
         this.helper = new MovingEventHelper();
 
         this.flyingCheck = new FlyingCheck(plugin);
-        this.runningCheck = new RunningCheck(plugin);
+        this.noFallCheck = new NoFallCheck(plugin);
+        this.runningCheck = new RunningCheck(plugin, noFallCheck);
         this.noclippingCheck = new NoclipCheck(plugin);
         this.morePacketsCheck = new MorePacketsCheck(plugin);
     }

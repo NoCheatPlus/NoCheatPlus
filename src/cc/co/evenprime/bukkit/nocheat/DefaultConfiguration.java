@@ -77,12 +77,16 @@ public class DefaultConfiguration {
                 runflyNode.add(new IntegerOption("swimmingspeedlimit", 18));
 
                 ActionListOption walkactions = new ActionListOption("actions");
-
                 runflyNode.add(walkactions);
-
                 walkactions.add(0, "moveLogLowShort moveCancel");
                 walkactions.add(100, "moveLogMedShort moveCancel");
                 walkactions.add(400, "moveLogHighShort moveCancel");
+
+                runflyNode.add(new BooleanOption("checknofall", true, false));
+                runflyNode.add(new IntegerOption("nofallmultiplier", 100));
+                ActionListOption nofallactions = new ActionListOption("nofallactions");
+                runflyNode.add(nofallactions);
+                nofallactions.add(0, "nofallLog nofallCancel");
 
                 runflyNode.add(new BooleanOption("allowlimitedflying", false, false));
 
@@ -90,9 +94,7 @@ public class DefaultConfiguration {
                 runflyNode.add(new IntegerOption("flyingspeedlimithorizontal", 60));
 
                 ActionListOption flyactions = new ActionListOption("flyingactions");
-
                 runflyNode.add(flyactions);
-
                 flyactions.add(0, "moveLogLowShort moveCancel");
                 flyactions.add(100, "moveLogMedShort moveCancel");
                 flyactions.add(400, "moveLogHighShort moveCancel");
@@ -330,6 +332,7 @@ public class DefaultConfiguration {
             w(w, "log durabilityLog 0 1 med NC: [player] failed [check]: tried to use infinity durability hack.");
             w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a block on liquids.");
             w(w, "log spamLog 0 4 med NC: [player] failed [check]: Last sent message \"[text]\".");
+            w(w, "log nofallLog 0 1 med NC: [player] failed [check]: tried to avoid fall damage for ~[distance] blocks.");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
@@ -344,6 +347,7 @@ public class DefaultConfiguration {
             w(w, "special blockplaceCancel 0 0");
             w(w, "special interactCancel 0 0");
             w(w, "special spamCancel 0 0");
+            w(w, "special nofallCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");

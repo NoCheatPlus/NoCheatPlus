@@ -31,11 +31,14 @@ public class RunningCheck {
     // How many move events can a player have in air before he is expected to
     // lose altitude (or eventually land somewhere)
     private final static int     jumpingLimit = 6;
-
+    
     private final ActionExecutor action;
 
-    public RunningCheck(NoCheat plugin) {
+    private final NoFallCheck noFallCheck;
+
+    public RunningCheck(NoCheat plugin, NoFallCheck noFallCheck) {
         this.action = new ActionExecutorWithHistory(plugin);
+        this.noFallCheck = noFallCheck;
     }
 
     public Location check(final Player player, final Location from, final Location to, final MovingEventHelper helper, final ConfigurationCache cc, final MovingData data) {
@@ -104,6 +107,13 @@ public class RunningCheck {
             } else if(fromOnGround || fromInGround || toOnGround || toInGround) {
                 data.jumpPhase = 0;
             }
+        }
+        
+        /********* EXECUTE THE NOFALL CHECK ********************/
+        final boolean checkNoFall = cc.moving.nofallCheck && !player.hasPermission(Permissions.MOVE_NOFALL);
+        
+        if(checkNoFall && newToLocation == null) {
+            noFallCheck.check(player, from, fromOnGround || fromInGround, to, toOnGround || toInGround, cc, data);
         }
 
         return newToLocation;
@@ -176,7 +186,6 @@ public class RunningCheck {
         double distanceAboveLimit = 0.0D;
 
         final double toY = to.getY();
-        final double fromY = from.getY();
 
         double limit = data.vertFreedom + cc.moving.jumpheight;
 

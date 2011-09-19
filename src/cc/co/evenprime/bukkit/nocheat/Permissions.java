@@ -23,6 +23,7 @@ public class Permissions {
     public final static String  MOVE_SWIM            = _MOVE + ".swimming";
     public final static String  MOVE_FLY             = _MOVE + ".flying";
     public final static String  MOVE_NOCLIP          = _MOVE + ".noclip";
+    public final static String  MOVE_NOFALL          = _MOVE + ".nofall";
     public final static String  MOVE_MOREPACKETS     = _MOVE + ".morepackets";
 
     public final static String  BLOCKBREAK           = _CHECKS + ".blockbreak.*";
