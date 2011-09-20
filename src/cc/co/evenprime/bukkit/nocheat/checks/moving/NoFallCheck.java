@@ -41,7 +41,7 @@ public class NoFallCheck {
      * 
      */
     public void check(final Player player, final Location from, final boolean fromOnOrInGround, final Location to, final boolean toOnOrInGround, final ConfigurationCache cc, final MovingData data) {
-
+        
         double oldY = from.getY();
         double newY = to.getY();
 
@@ -50,7 +50,7 @@ public class NoFallCheck {
             // Start with zero fall distance
             data.fallDistance = 0F;
         }
-
+       
         // We want to know if the fallDistance recorded by the game is smaller
         // than the fall distance recorded by the plugin
         float distance = data.fallDistance - player.getFallDistance();
@@ -69,7 +69,6 @@ public class NoFallCheck {
                 // Increase the damage a bit :)
                 float totalDistance = (data.fallDistance - 2.0F)* cc.moving.nofallMultiplier + 2.0F;
                 player.setFallDistance(totalDistance);
-                ((CraftPlayer)player).getHandle().b(totalDistance, true);
             }
             
             data.fallDistance = 0F;
