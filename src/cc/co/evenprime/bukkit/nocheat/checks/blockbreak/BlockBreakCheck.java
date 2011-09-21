@@ -35,7 +35,7 @@ public class BlockBreakCheck {
         boolean cancel = false;
 
         // Reach check only if not in creative mode!
-        boolean reach = cc.blockbreak.reachCheck && !player.hasPermission(Permissions.BLOCKBREAK_REACH) && player.getGameMode() != GameMode.CREATIVE;
+        boolean reach = cc.blockbreak.reachCheck && !player.hasPermission(Permissions.BLOCKBREAK_REACH);
         boolean direction = cc.blockbreak.directionCheck && !player.hasPermission(Permissions.BLOCKBREAK_DIRECTION);
 
         if((reach || direction) && brokenBlock != null) {

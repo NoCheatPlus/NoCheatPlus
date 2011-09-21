@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 import java.util.HashMap;
 import java.util.Locale;
 
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -31,8 +32,10 @@ public class ReachCheck {
 
         boolean cancel = false;
 
-        if(distance > cc.blockbreak.reachDistance) {
+        double limit =  player.getGameMode() == GameMode.CREATIVE ? cc.blockbreak.reachDistance + 2 : cc.blockbreak.reachDistance;
+        if(distance > limit) {
             // Player failed the check
+
 
             // Increment violation counter
             data.reachViolationLevel += 1;
