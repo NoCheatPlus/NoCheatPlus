@@ -3,107 +3,58 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.06b
+version: 2.07
 
 permissions:
-
-  nocheat.*:
+  nocheat:
     description: Allow a player to bypass all checks and give him all admin permissions
     children:
-      nocheat.checks.*: true
-      nocheat.admin.*: true
-
-  nocheat.checks.*:
-    description: Allow the player to bypass all checks
-    children:
-      nocheat.checks.moving.*: true
-      nocheat.checks.blockbreak.*: true
-      nocheat.checks.blockplace.*: true
-      nocheat.checks.interact.*: true
-      nocheat.checks.chat.*: true
-
-  nocheat.checks.moving.*:
-    description: Allow the player to bypass all moving checks
-    children:
-      nocheat.checks.moving.runfly: true
-      nocheat.checks.moving.flying: true
-      nocheat.checks.moving.swimming: true
-      nocheat.checks.moving.sneaking: true
-      nocheat.checks.moving.noclip: true
-      nocheat.checks.moving.nofall: true
-      nocheat.checks.moving.morepackets: true
-
-  nocheat.checks.blockbreak.*:
-    description: Allow the player to bypass all blockbreak checks
-    children:
-      nocheat.checks.blockbreak.reach: true
-      nocheat.checks.blockbreak.direction: true
-
-  nocheat.checks.blockplace.*:
-    description: Allow the player to bypass all blockplace checks
-    children:
-      nocheat.checks.blockplace.reach: true
-      nocheat.checks.blockplace.onliquid: true
-
-  nocheat.checks.interact.*:
-    description: Allow the player to bypass all interact checks
-    children:
-      nocheat.checks.interact.durability: true
-
-  nocheat.checks.chat.*:
-    description: Allow the player to bypass all chat checks
-    children:
-      nocheat.checks.chat.spam: true
-
-  nocheat.checks.moving.runfly:
-    description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
-    default: op
-  nocheat.checks.moving.flying:
-    description: Allow a player to fly, but only within given speed limits (ignores swimming and sneaking settings)
-    default: op
-  nocheat.checks.moving.swimming:
-    description: Allow a player to move through water without slowdown
-    default: op
-  nocheat.checks.moving.sneaking:
-    description: Allow a player to sneak without slowdown
-    default: op
-  nocheat.checks.moving.noclip:
-    description: Allow a player to walk through walls
-    default: op
-  nocheat.checks.moving.nofall:
-    description: Allow a player to cheat and not take fall damage at all
-    default: op
-  nocheat.checks.moving.morepackets:
-    description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
-    default: op
-
-  nocheat.checks.blockbreak.reach:
-    description: Allow a player to break blocks at maximum range (about 6-7 blocks)
-    default: op
-  nocheat.checks.blockbreak.direction:
-    description: Allow a player to break blocks that are not in front of them
-    default: op
-
-  nocheat.checks.blockplace.reach:
-    description: Allow a player to place blocks at maximum range (about 6-7 blocks)
-    default: op
-  nocheat.checks.blockplace.onliquid:
-    description: Allow a player to place non-liquid blocks on liquids
-    default: op
-
-  nocheat.checks.interact.durability:
-    description: Allow a player to use an infinite durability item hack
-    default: op
-
-  nocheat.checks.chat.spam:
-    description: Allow a player to send an infinite amount of chat messages
-    default: op
-
-  nocheat.admin.*:
-    description: Give a player all admin rights
-    children:
-      nocheat.admin.chatlog: true
-
-  nocheat.admin.chatlog:
-    description: Show log messages in the players chat
-    default: op
+      nocheat.admin:
+        description: Give a player all admin rights
+        children:
+          nocheat.admin.chatlog:
+            description: Show log messages in the players chat
+      nocheat.checks:
+        description: Allow the player to bypass all checks
+        children:
+          nocheat.checks.moving: 
+            description: Allow the player to bypass all moving checks
+            children:
+              nocheat.checks.moving.runfly:
+                description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
+              nocheat.checks.moving.flying:
+                description: Allow a player to fly, but only within given speed limits (ignores swimming and sneaking settings)
+              nocheat.checks.moving.swimming:
+                description: Allow a player to move through water without slowdown
+              nocheat.checks.moving.sneaking:
+                description: Allow a player to sneak without slowdown
+              nocheat.checks.moving.noclip:
+                description: Allow a player to walk through walls
+              nocheat.checks.moving.nofall:
+                description: Allow a player to cheat and not take fall damage at all
+              nocheat.checks.moving.morepackets:
+                description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
+          nocheat.checks.blockbreak:
+            description: Allow the player to bypass all blockbreak checks
+            children:
+              nocheat.checks.blockbreak.reach:
+                description: Allow a player to break blocks at maximum range (about 6-7 blocks, in creative mode unlimited)
+              nocheat.checks.blockbreak.direction:
+                description: Allow a player to break blocks that are not in front of them
+          nocheat.checks.blockplace:
+            description: Allow the player to bypass all blockplace checks
+            children:
+              nocheat.checks.blockplace.reach:
+                description: Allow a player to place blocks at maximum range (about 6-7 blocks)
+              nocheat.checks.blockplace.onliquid:
+                description: Allow a player to place non-liquid blocks on liquids
+          nocheat.checks.interact:
+            description: Allow the player to bypass all interact checks
+            children:
+              nocheat.checks.interact.durability:
+                description: Allow a player to use an infinite durability item hack
+          nocheat.checks.chat:
+            description: Allow the player to bypass all chat checks
+            children:
+              nocheat.checks.chat.spam:
+                description: Allow a player to send an infinite amount of chat messages

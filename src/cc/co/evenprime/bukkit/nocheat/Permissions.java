@@ -8,39 +8,34 @@ package cc.co.evenprime.bukkit.nocheat;
  */
 public class Permissions {
 
-    private final static String _NOCHEAT             = "nocheat";
-    private final static String _ADMIN               = _NOCHEAT + ".admin";
-    private final static String _CHECKS              = _NOCHEAT + ".checks";
-    private final static String _MOVE                = _CHECKS + ".moving";
-    private final static String _BLOCKBREAK          = _CHECKS + ".blockbreak";
-    private final static String _BLOCKPLACE          = _CHECKS + ".blockplace";
-    private final static String _INTERACT            = _CHECKS + ".interact";
-    private final static String _CHAT                = _CHECKS + ".chat";
+    private final static String NOCHEAT             = "nocheat";
+    private final static String ADMIN               = NOCHEAT + ".admin";
+    private final static String CHECKS              = NOCHEAT + ".checks";
 
-    public final static String  MOVE                 = _CHECKS + ".moving.*";
-    public final static String  MOVE_RUNFLY          = _MOVE + ".runfly";
-    public final static String  MOVE_SNEAK           = _MOVE + ".sneaking";
-    public final static String  MOVE_SWIM            = _MOVE + ".swimming";
-    public final static String  MOVE_FLY             = _MOVE + ".flying";
-    public final static String  MOVE_NOCLIP          = _MOVE + ".noclip";
-    public final static String  MOVE_NOFALL          = _MOVE + ".nofall";
-    public final static String  MOVE_MOREPACKETS     = _MOVE + ".morepackets";
+    public final static String  MOVE                 = CHECKS + ".moving";
+    public final static String  MOVE_RUNFLY          = MOVE + ".runfly";
+    public final static String  MOVE_SNEAK           = MOVE + ".sneaking";
+    public final static String  MOVE_SWIM            = MOVE + ".swimming";
+    public final static String  MOVE_FLY             = MOVE + ".flying";
+    public final static String  MOVE_NOCLIP          = MOVE + ".noclip";
+    public final static String  MOVE_NOFALL          = MOVE + ".nofall";
+    public final static String  MOVE_MOREPACKETS     = MOVE + ".morepackets";
 
-    public final static String  BLOCKBREAK           = _CHECKS + ".blockbreak.*";
-    public final static String  BLOCKBREAK_REACH     = _BLOCKBREAK + ".reach";
-    public final static String  BLOCKBREAK_DIRECTION = _BLOCKBREAK + ".direction";
+    public final static String  BLOCKBREAK           = CHECKS + ".blockbreak";
+    public final static String  BLOCKBREAK_REACH     = BLOCKBREAK + ".reach";
+    public final static String  BLOCKBREAK_DIRECTION = BLOCKBREAK + ".direction";
 
-    public final static String  INTERACT             = _CHECKS + ".interact.*";
-    public final static String  INTERACT_DURABILITY  = _INTERACT + ".durability";
+    public final static String  INTERACT             = CHECKS + ".interact";
+    public final static String  INTERACT_DURABILITY  = INTERACT + ".durability";
 
-    public final static String  BLOCKPLACE           = _CHECKS + ".blockplace.*";
-    public final static String  BLOCKPLACE_ONLIQUID  = _BLOCKPLACE + ".onliquid";
-    public final static String  BLOCKPLACE_REACH     = _BLOCKPLACE + ".reach";
+    public final static String  BLOCKPLACE           = CHECKS + ".blockplace";
+    public final static String  BLOCKPLACE_ONLIQUID  = BLOCKPLACE + ".onliquid";
+    public final static String  BLOCKPLACE_REACH     = BLOCKPLACE + ".reach";
 
-    public final static String  CHAT                 = _CHECKS + ".chat.*";
-    public final static String  CHAT_SPAM            = _CHAT + ".spam";
+    public final static String  CHAT                 = CHECKS + ".chat";
+    public final static String  CHAT_SPAM            = CHAT + ".spam";
     
-    public final static String  ADMIN_CHATLOG        = _ADMIN + ".chatlog";
+    public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
 
     private Permissions() {}
 }

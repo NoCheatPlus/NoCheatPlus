@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -41,6 +42,14 @@ public class OnLiquidCheck {
             data.onliquidViolationLevel += 1;
             HashMap<String, String> params = new HashMap<String, String>();
             params.put(LogAction.CHECK, "blockplace.onliquid");
+            params.put(LogAction.BLOCK_TYPE, blockPlaced.getType().toString());
+            params.put(LogAction.PLACE_LOCATION, String.format(Locale.US, "%d %d %d", blockPlaced.getX(), blockPlaced.getY(), blockPlaced.getZ()));
+            if(blockPlacedAgainst != null) { 
+                params.put(LogAction.PLACE_AGAINST, String.format(Locale.US, "%d %d %d", blockPlacedAgainst.getX(), blockPlacedAgainst.getY(), blockPlacedAgainst.getZ()));
+            }
+            else {
+                params.put(LogAction.PLACE_AGAINST, "null");
+            }
 
             cancel = action.executeActions(player, cc.blockplace.onliquidActions, (int) data.onliquidViolationLevel, params, cc);
         }

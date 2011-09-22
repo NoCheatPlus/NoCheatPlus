@@ -14,17 +14,21 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 public class LogAction extends Action {
 
     // Default stuff
-    public static final String PLAYER      = "\\[player\\]";
-    public static final String LOCATION    = "\\[location\\]";
-    public static final String WORLD       = "\\[world\\]";
-    public static final String VIOLATIONS  = "\\[violations\\]";
+    public static final String PLAYER         = "\\[player\\]";
+    public static final String LOCATION       = "\\[location\\]";
+    public static final String WORLD          = "\\[world\\]";
+    public static final String VIOLATIONS     = "\\[violations\\]";
 
     // Event dependent stuff
-    public static final String DISTANCE    = "\\[distance\\]";
-    public static final String LOCATION_TO = "\\[locationto\\]";
-    public static final String CHECK       = "\\[check\\]";
-    public static final String PACKETS     = "\\[packets\\]";
-    public static final String TEXT        = "\\[text\\]";
+    public static final String DISTANCE       = "\\[distance\\]";
+    public static final String LOCATION_TO    = "\\[locationto\\]";
+    public static final String CHECK          = "\\[check\\]";
+    public static final String PACKETS        = "\\[packets\\]";
+    public static final String TEXT           = "\\[text\\]";
+
+    public static final String PLACE_LOCATION = "\\[placelocation\\]";
+    public static final String PLACE_AGAINST  = "\\[placeagainst\\]";
+    public static final String BLOCK_TYPE     = "\\[blocktype\\]";
 
     public final LogLevel      level;
     private final String       message;

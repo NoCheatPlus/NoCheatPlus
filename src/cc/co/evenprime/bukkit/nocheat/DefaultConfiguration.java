@@ -330,7 +330,7 @@ public class DefaultConfiguration {
             w(w, "log reachLog 0 1 med NC: [player] failed [check]: tried to interact with a block over distance [distance].");
             w(w, "log directionLog 2 1 med NC: [player] failed [check]: tried to destroy a block out of line of sight.");
             w(w, "log durabilityLog 0 1 med NC: [player] failed [check]: tried to use infinity durability hack.");
-            w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a block on liquids.");
+            w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst].");
             w(w, "log spamLog 0 4 med NC: [player] failed [check]: Last sent message \"[text]\".");
             w(w, "log nofallLog 0 1 med NC: [player] failed [check]: tried to avoid fall damage for ~[distance] blocks.");
             w(w, "");

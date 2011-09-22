@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks.chat;
 
 import java.util.HashMap;
+import java.util.regex.Matcher;
 
 import org.bukkit.entity.Player;
 
@@ -51,7 +52,8 @@ public class ChatCheck {
                 // actions
                 HashMap<String, String> params = new HashMap<String, String>();
                 params.put(LogAction.CHECK, "chat.spam");
-                params.put(LogAction.TEXT, message);
+                // Escape the message, to avoid errors
+                params.put(LogAction.TEXT, Matcher.quoteReplacement(message));
                 cancel = action.executeActions(player, cc.chat.spamActions, data.messageCount - cc.chat.spamLimit, params, cc);
             }
         }
