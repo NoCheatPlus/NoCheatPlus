@@ -109,8 +109,11 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
             if(newVal >= 0.0D) {
                 mdata.vertVelocity += newVal;
                 mdata.vertFreedom += mdata.vertVelocity;
-                mdata.vertVelocityCounter = 50;
             }
+
+            mdata.vertVelocityCounter = 50;
+            
+            mdata.fallDistance = 0.0f; // Don't be too unforgiving with fall damage
 
             newVal = Math.sqrt(Math.pow(v.getX(), 2) + Math.pow(v.getZ(), 2));
             if(newVal > 0.0D) {

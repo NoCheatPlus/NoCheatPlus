@@ -32,7 +32,7 @@ public class OnLiquidCheck {
 
         boolean cancel = false;
 
-        if(blockPlaced == null) {
+        if(blockPlaced == null || blockPlaced.isEmpty()) {
             // all ok
         } else if(blockPlacedAgainst != null && isSolid(blockPlacedAgainst)) {
             // all ok
