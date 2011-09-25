@@ -64,7 +64,6 @@ public class FlyingCheck {
             isRunningMethod = getIsRunningMethod();
         }
         
-        
         boolean sprinting = true;
         
         try {

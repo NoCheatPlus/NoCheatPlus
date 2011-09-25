@@ -30,17 +30,17 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class RunningCheck {
 
-    private final static double  maxBonus     = 1D;
-    
-    private static Method isRunningMethod = null;
+    private final static double  maxBonus        = 1D;
+
+    private static Method        isRunningMethod = null;
 
     // How many move events can a player have in air before he is expected to
     // lose altitude (or eventually land somewhere)
-    private final static int     jumpingLimit = 6;
-    
+    private final static int     jumpingLimit    = 6;
+
     private final ActionExecutor action;
 
-    private final NoFallCheck noFallCheck;
+    private final NoFallCheck    noFallCheck;
 
     public RunningCheck(NoCheat plugin, NoFallCheck noFallCheck) {
         this.action = new ActionExecutorWithHistory(plugin);
@@ -114,10 +114,10 @@ public class RunningCheck {
                 data.jumpPhase = 0;
             }
         }
-        
+
         /********* EXECUTE THE NOFALL CHECK ********************/
         final boolean checkNoFall = cc.moving.nofallCheck && !player.hasPermission(Permissions.MOVE_NOFALL);
-        
+
         if(checkNoFall && newToLocation == null) {
             noFallCheck.check(player, from, fromOnGround || fromInGround, to, toOnGround || toInGround, cc, data);
         }
@@ -143,15 +143,13 @@ public class RunningCheck {
         if(isRunningMethod == null) {
             isRunningMethod = getIsRunningMethod();
         }
-        
+
         boolean sprinting = true;
         try {
             sprinting = !(player instanceof CraftPlayer) || isRunningMethod.invoke(((CraftPlayer) player).getHandle()).equals(true);
         } catch(Exception e) {
             e.printStackTrace();
         }
-        
-        System.out.println("IsSprinting "+sprinting);
 
         if(cc.moving.sneakingCheck && player.isSneaking() && !player.hasPermission(Permissions.MOVE_SNEAK)) {
             distanceAboveLimit = totalDistance - cc.moving.sneakingSpeedLimit - data.horizFreedom;
@@ -214,7 +212,7 @@ public class RunningCheck {
         return distanceAboveLimit;
 
     }
-    
+
     private Method getIsRunningMethod() {
         try {
             return EntityPlayer.class.getMethod("isSprinting");
