@@ -1,7 +1,11 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
+
+import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -27,6 +31,8 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class RunningCheck {
 
     private final static double  maxBonus     = 1D;
+    
+    private static Method isRunningMethod = null;
 
     // How many move events can a player have in air before he is expected to
     // lose altitude (or eventually land somewhere)
@@ -134,7 +140,18 @@ public class RunningCheck {
         // How much further did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
-        boolean sprinting = !(player instanceof CraftPlayer) || ((CraftPlayer) player).getHandle().at();
+        if(isRunningMethod == null) {
+            isRunningMethod = getIsRunningMethod();
+        }
+        
+        boolean sprinting = true;
+        try {
+            sprinting = !(player instanceof CraftPlayer) || isRunningMethod.invoke(((CraftPlayer) player).getHandle()).equals(true);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        
+        System.out.println("IsSprinting "+sprinting);
 
         if(cc.moving.sneakingCheck && player.isSneaking() && !player.hasPermission(Permissions.MOVE_SNEAK)) {
             distanceAboveLimit = totalDistance - cc.moving.sneakingSpeedLimit - data.horizFreedom;
@@ -196,5 +213,19 @@ public class RunningCheck {
 
         return distanceAboveLimit;
 
+    }
+    
+    private Method getIsRunningMethod() {
+        try {
+            return EntityPlayer.class.getMethod("isSprinting");
+        } catch(NoSuchMethodException e) {
+            try {
+                return EntityPlayer.class.getMethod("at");
+            } catch(Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return null;
+            }
+        }
     }
 }

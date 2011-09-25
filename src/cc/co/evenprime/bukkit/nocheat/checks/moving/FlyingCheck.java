@@ -1,7 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
+
+import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -26,6 +29,8 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class FlyingCheck {
 
     private final ActionExecutor action;
+
+    private static Method isRunningMethod;
 
     private static final double  creativeSpeed = 0.60D;
 
@@ -55,7 +60,18 @@ public class FlyingCheck {
 
         result += Math.max(0.0D, horizontalDistance - data.horizFreedom - speedLimitHorizontal);
 
-        boolean sprinting = !(player instanceof CraftPlayer) || ((CraftPlayer)player).getHandle().at();
+        if(isRunningMethod == null) {
+            isRunningMethod = getIsRunningMethod();
+        }
+        
+        
+        boolean sprinting = true;
+        
+        try {
+            sprinting = !(player instanceof CraftPlayer) || isRunningMethod.invoke(((CraftPlayer) player).getHandle()).equals(true);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
         
         data.bunnyhopdelay--;
         
@@ -101,5 +117,19 @@ public class FlyingCheck {
         }
 
         return newToLocation;
+    }
+    
+    private Method getIsRunningMethod() {
+        try {
+            return EntityPlayer.class.getMethod("isSprinting");
+        } catch(NoSuchMethodException e) {
+            try {
+                return EntityPlayer.class.getMethod("at");
+            } catch(Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+                return null;
+            }
+        }
     }
 }
