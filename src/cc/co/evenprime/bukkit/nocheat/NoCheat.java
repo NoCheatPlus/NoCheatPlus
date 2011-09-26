@@ -1,9 +1,15 @@
 package cc.co.evenprime.bukkit.nocheat;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -71,9 +77,8 @@ public class NoCheat extends JavaPlugin {
         // First set up logging
         this.log = new LogManager(this);
 
-        
         log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1185. It may break at any time and for any other version.");
-        
+
         this.data = new DataManager();
 
         this.action = new ActionManager(log);
@@ -185,5 +190,38 @@ public class NoCheat extends JavaPlugin {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        if(command.getName().equalsIgnoreCase("nocheat") && args.length > 0) {
+            if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
+                // permlist command was used CORRECTLY
+                // Get the player names
+                Player player = this.getServer().getPlayerExact(args[1]);
+                if(player == null) {
+                    sender.sendMessage("Unknown player: " + args[1]);
+                    return true;
+                } else {
+                    String prefix = "";
+                    if(args.length == 3) {
+                        prefix = args[2];
+                    }
+                    // Make a copy to allow sorting
+                    List<Permission> perms = new LinkedList<Permission>(this.getDescription().getPermissions());
+                    Collections.reverse(perms);
+
+                    sender.sendMessage("Player " + player.getName() + " has the permission(s):");
+                    for(Permission permission : perms) {
+                        if(permission.getName().startsWith(prefix)) {
+                            sender.sendMessage(permission.getName() + ": " + player.hasPermission(permission));
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

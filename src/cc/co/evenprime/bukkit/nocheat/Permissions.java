@@ -8,9 +8,9 @@ package cc.co.evenprime.bukkit.nocheat;
  */
 public class Permissions {
 
-    private final static String NOCHEAT             = "nocheat";
-    private final static String ADMIN               = NOCHEAT + ".admin";
-    private final static String CHECKS              = NOCHEAT + ".checks";
+    private final static String NOCHEAT              = "nocheat";
+    private final static String ADMIN                = NOCHEAT + ".admin";
+    private final static String CHECKS               = NOCHEAT + ".checks";
 
     public final static String  MOVE                 = CHECKS + ".moving";
     public final static String  MOVE_RUNFLY          = MOVE + ".runfly";
@@ -34,7 +34,7 @@ public class Permissions {
 
     public final static String  CHAT                 = CHECKS + ".chat";
     public final static String  CHAT_SPAM            = CHAT + ".spam";
-    
+
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
 
     private Permissions() {}

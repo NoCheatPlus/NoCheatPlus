@@ -3,7 +3,14 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.07a
+version: 2.08
+
+commands:
+   nocheat:
+      description: NoCheat command(s)
+      permission: nocheat.admin.permlist
+      usage: |
+             /<command> permlist player [permission] to list the NoCheat relevant permissions of the player, optionally only those starting with [permission]
 
 permissions:
   nocheat:
@@ -14,6 +21,8 @@ permissions:
         children:
           nocheat.admin.chatlog:
             description: Show log messages in the players chat
+          nocheat.admin.permlist:
+            description: allow use of the "nocheat permlist" command
       nocheat.checks:
         description: Allow the player to bypass all checks
         children:
