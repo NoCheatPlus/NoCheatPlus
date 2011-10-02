@@ -39,7 +39,7 @@ public class ChatCheck {
 
             int time = plugin.getIngameSeconds();
 
-            if(data.spamLasttime + cc.chat.spamTimeframe <= plugin.getIngameSeconds()) {
+            if(data.spamLasttime + cc.chat.spamTimeframe <= time) {
                 data.spamLasttime = time;
                 data.messageCount = 0;
             }

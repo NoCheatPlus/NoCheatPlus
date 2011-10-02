@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginManager;
 
@@ -39,6 +40,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_CHAT, this, Priority.Lowest, plugin);
+        pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this, Priority.Lowest, plugin);
     }
 
     @Override
@@ -66,6 +68,10 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
             }
         }
 
+    }
+    
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+        onPlayerChat(event);
     }
 
     @Override

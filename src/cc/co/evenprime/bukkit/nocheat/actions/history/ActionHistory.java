@@ -25,11 +25,11 @@ public class ActionHistory {
         public void addCounter(Long time) {
 
             synchronized(executionTimes) {
-                while(executionTimes.size() > 0 && executionTimes.getFirst() < time - monitoredTimeFrame) {
+                while(!executionTimes.isEmpty() && executionTimes.getFirst() < time - monitoredTimeFrame) {
                     executionTimes.removeFirst();
                 }
 
-                executionTimes.add(time);
+                executionTimes.addLast(time);
             }
         }
 
@@ -76,7 +76,7 @@ public class ActionHistory {
 
         if(entry.getCounter() > action.delay) {
             // Execute action?
-            if(entry.getLastExecution() < time - action.repeat * 1000) {
+            if(entry.getLastExecution() <= time - action.repeat * 1000) {
                 // Execute action!
                 entry.setLastExecution(time);
                 return true;
