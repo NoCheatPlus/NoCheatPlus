@@ -72,7 +72,7 @@ public class RunFlyCheck {
 
         /************* DECIDE WHICH CHECKS NEED TO BE RUN *************/
         final boolean runflyCheck = cc.moving.runflyCheck && !player.hasPermission(Permissions.MOVE_RUNFLY);
-        final boolean flyAllowed = cc.moving.allowFlying || player.hasPermission(Permissions.MOVE_FLY) || (player.getGameMode() == GameMode.CREATIVE);
+        final boolean flyAllowed = cc.moving.allowFlying || player.hasPermission(Permissions.MOVE_FLY) || (player.getGameMode() == GameMode.CREATIVE && cc.moving.identifyCreativeMode);
         final boolean morepacketsCheck = cc.moving.morePacketsCheck && !player.hasPermission(Permissions.MOVE_MOREPACKETS);
         final boolean noclipCheck = cc.moving.noclipCheck && !player.hasPermission(Permissions.MOVE_NOCLIP);
 

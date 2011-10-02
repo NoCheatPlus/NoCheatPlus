@@ -13,6 +13,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 public class CCBlockBreak {
 
     public final boolean    check;
+    public final boolean    checkinstabreakblocks;
     public final boolean    reachCheck;
     public final double     reachDistance;
     public final ActionList reachActions;
@@ -22,11 +23,13 @@ public class CCBlockBreak {
     public CCBlockBreak(Configuration data) {
 
         check = data.getBoolean("blockbreak.check");
+
         reachCheck = data.getBoolean("blockbreak.reach.check");
         reachDistance = ((double) data.getInteger("blockbreak.reach.reachlimit")) / 100D;
         reachActions = data.getActionList("blockbreak.reach.actions");
 
         directionCheck = data.getBoolean("blockbreak.direction.check");
         directionActions = data.getActionList("blockbreak.direction.actions");
+        checkinstabreakblocks = data.getBoolean("blockbreak.direction.checkinstabreakblocks");
     }
 }

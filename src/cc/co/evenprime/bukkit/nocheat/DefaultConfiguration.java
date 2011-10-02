@@ -58,6 +58,8 @@ public class DefaultConfiguration {
             root.add(movingNode);
 
             movingNode.add(new BooleanOption("check", true, true));
+            
+            movingNode.add(new BooleanOption("identifycreativemode", true, false));
 
             /**** MOVING.WALKING ****/
             {
@@ -158,6 +160,8 @@ public class DefaultConfiguration {
                 interactNode.add(directionNode);
 
                 directionNode.add(new BooleanOption("check", true, true));
+                
+                directionNode.add(new BooleanOption("checkinstabreakblocks", false, false));
 
                 ActionListOption actions = new ActionListOption("actions");
 

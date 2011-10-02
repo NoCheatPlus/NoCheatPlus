@@ -26,8 +26,8 @@ public class Explainations {
         set("debug.showactivechecks", "Print to the console an overview of all checks that are enabled when NoCheat gets loaded.");
         
         set("moving.check", "If true, do various checks on PlayerMove events.");
-
-
+        set("moving.identifycreativemode", "If true, NoCheat will automatically identify if players are in creative mode and will allow them to fly, avoid fall damage etc.");
+        
         set("moving.runfly.check", "If true, check if a player is walking/sprinting/sneaking/swimming too fast/high.");
         set("moving.runfly.walkingspeedlimit", "Set the speed limit for moving horizontal under 'normal' conditions.\nUnit is 1/100 of a block, default is 22.");
         set("moving.runfly.sprintingspeedlimit", "Set the speed limit for moving horizontal while sprinting.\nUnit is 1/100 of a block, default is 40.");
@@ -61,6 +61,7 @@ public class Explainations {
         set("blockbreak.reach.actions", "What should be done if a player is breaking blocks that are too far away.\nUnit is number of break(attempt)s beyond the limit.");
 
         set("blockbreak.direction.check", "If true, check if a player is looking at the block that he's breaking.");
+        set("blockbreak.direction.checkinstabreakblocks", "If true, NoCheat will also check for direction for Instant-Breaking blocks.\nTHIS WILL CAUSE FALSE POSITIVES, when a player keeps his mouse button pressed and moves the mouse fast over the screen.");
         set("blockbreak.direction.actions", "What should be done if a player is breaking blocks that are not in his line of sight.\nUnit is number of break(attempt)s outside the line of sight.");
         
         set("blockplace.check", "If true, do various checks on BlockPlace events.");

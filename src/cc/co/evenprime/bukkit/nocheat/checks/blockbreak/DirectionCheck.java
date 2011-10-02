@@ -2,6 +2,7 @@ package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import java.util.HashMap;
 
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -27,10 +28,15 @@ public class DirectionCheck {
         this.action = new ActionExecutorWithHistory(plugin);
     }
 
-    public boolean check(Player player, double factor, double x1, double y1, double z1, BlockBreakData data, ConfigurationCache cc) {
+    public boolean check(Player player, double factor, double x1, double y1, double z1, Block brokenBlock, BlockBreakData data, ConfigurationCache cc) {
 
+        // If the block is instabreak and we don't check instabreak, return
+        if(!cc.blockbreak.checkinstabreakblocks && brokenBlock.getLocation().equals(data.instaBrokeBlockLocation)) {
+            return false;
+        }
+        
         boolean cancel = false;
-
+        
         Vector direction = player.getEyeLocation().getDirection();
         final double x2 = x1 + 2;
         final double y2 = y1 + 2;

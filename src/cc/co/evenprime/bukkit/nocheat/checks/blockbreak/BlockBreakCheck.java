@@ -51,8 +51,8 @@ public class BlockBreakCheck {
                 cancel = reachCheck.check(player, factor, data, cc);
             }
 
-            if(!cancel && direction && !brokenBlock.getLocation().equals(data.instaBrokeBlockLocation)) {
-                cancel = directionCheck.check(player, factor, x1, y1, z1, data, cc);
+            if(!cancel && direction) {
+                cancel = directionCheck.check(player, factor, x1, y1, z1, brokenBlock, data, cc);
             }
         }
         return cancel;
