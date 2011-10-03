@@ -24,6 +24,7 @@ public class MovingData {
 
     public double   nofallViolationLevel      = 0.0D;
     public float    fallDistance              = 0.0F;
+    public float    lastAddedFallDistance     = 0.0F;
 
     public int      noclipX;
     public int      noclipY;

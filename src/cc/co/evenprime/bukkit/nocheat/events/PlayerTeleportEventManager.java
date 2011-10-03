@@ -44,7 +44,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
         // This belongs to the move-check
         // Override decision to cancel teleports initialized by NoCheat by
-        // uncancelling them
+        // uncancelling them, if possible
         pm.registerEvent(Event.Type.PLAYER_TELEPORT, new PlayerListener() {
 
             @Override
@@ -91,7 +91,8 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
         data.morePacketsSetbackPoint = null;
         data.jumpPhase = 0;
         data.fallDistance = 0F;
-        
+        data.lastAddedFallDistance = 0F;
+
         if(newLocation != null) {
 
             data.noclipX = newLocation.getBlockX();

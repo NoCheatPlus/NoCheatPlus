@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Locale;
