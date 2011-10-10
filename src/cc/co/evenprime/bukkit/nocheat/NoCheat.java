@@ -230,6 +230,8 @@ public class NoCheat extends JavaPlugin {
 
                 this.conf.cleanup();
                 this.conf = new ConfigurationManager(this.getDataFolder().getPath(), this.action);
+                
+                return true;
             }
         }
         return false;
