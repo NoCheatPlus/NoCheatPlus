@@ -57,11 +57,6 @@ permissions:
                 description: Allow a player to place blocks at maximum range (about 6-7 blocks)
               nocheat.checks.blockplace.onliquid:
                 description: Allow a player to place non-liquid blocks on liquids
-          nocheat.checks.interact:
-            description: Allow the player to bypass all interact checks
-            children:
-              nocheat.checks.interact.durability:
-                description: Allow a player to use an infinite durability item hack
           nocheat.checks.chat:
             description: Allow the player to bypass all chat checks
             children:

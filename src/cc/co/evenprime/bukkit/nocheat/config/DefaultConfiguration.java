@@ -124,17 +124,6 @@ public class DefaultConfiguration extends Configuration {
 
         }
 
-        /*** INTERACT ***/
-        {
-            setValue(INTERACT_CHECK, true);
-            setValue(INTERACT_DURABILITY_CHECK, true);
-
-            ActionList infiniteDurabilityActionList = new ActionList();
-            infiniteDurabilityActionList.setActions(0, action.getActions("durabilityLog interactCancel".split(" ")));
-            setValue(INTERACT_DURABILITY_ACTIONS, infiniteDurabilityActionList);
-
-        }
-
         /*** CHAT ***/
         {
             setValue(CHAT_CHECK, true);
@@ -224,7 +213,6 @@ public class DefaultConfiguration extends Configuration {
             w(w, "# Some other log messages that are limited a bit by default, to avoid too extreme spam");
             w(w, "log reachLog 0 1 med NC: [player] failed [check]: tried to interact with a block over distance [reachdistance].");
             w(w, "log directionLog 2 1 med NC: [player] failed [check]: tried to destroy a block out of line of sight.");
-            w(w, "log durabilityLog 0 1 med NC: [player] failed [check]: tried to use infinity durability hack.");
             w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst].");
             w(w, "log spamLog 0 4 med NC: [player] failed [check]: Last sent message \"[text]\".");
             w(w, "log nofallLog 0 1 med NC: [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks.");
@@ -240,7 +228,6 @@ public class DefaultConfiguration extends Configuration {
             w(w, "special moveCancel 0 0");
             w(w, "special blockbreakCancel 0 0");
             w(w, "special blockplaceCancel 0 0");
-            w(w, "special interactCancel 0 0");
             w(w, "special spamCancel 0 0");
             w(w, "special nofallDamage 0 0");
             w(w, "");

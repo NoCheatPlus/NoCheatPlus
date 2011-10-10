@@ -16,7 +16,6 @@ public class ConfigurationCache {
     public final CCMoving     moving;
     public final CCLogging    logging;
     public final CCBlockBreak blockbreak;
-    public final CCInteract   interact;
     public final CCBlockPlace blockplace;
     public final CCChat       chat;
     public final CCDebug      debug;
@@ -32,7 +31,6 @@ public class ConfigurationCache {
         moving = new CCMoving(data);
         blockbreak = new CCBlockBreak(data);
         blockplace = new CCBlockPlace(data);
-        interact = new CCInteract(data);
         chat = new CCChat(data);
         logging = new CCLogging(data, worldSpecificFileLogger);
         debug = new CCDebug(data);

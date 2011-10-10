@@ -17,7 +17,6 @@ public class DataManager {
     // Store data between Events
     private final Map<Player, MovingData>     movingData     = new HashMap<Player, MovingData>();
     private final Map<Player, BlockBreakData> blockbreakData = new HashMap<Player, BlockBreakData>();
-    private final Map<Player, InteractData>   interactData   = new HashMap<Player, InteractData>();
     private final Map<Player, BlockPlaceData> blockPlaceData = new HashMap<Player, BlockPlaceData>();
     private final Map<Player, ChatData>       chatData       = new HashMap<Player, ChatData>();
     private final Map<Player, LogData>        logData        = new HashMap<Player, LogData>();
@@ -53,21 +52,6 @@ public class DataManager {
         if(data == null) {
             data = new BlockBreakData();
             blockbreakData.put(player, data);
-        }
-
-        return data;
-    }
-
-    public InteractData getInteractData(Player player) {
-        InteractData data;
-
-        // intentionally not thread-safe, because bukkit events are handled
-        // in sequence anyway, so zero chance of two events of the same
-        // player being handled at the same time
-        data = interactData.get(player);
-        if(data == null) {
-            data = new InteractData();
-            interactData.put(player, data);
         }
 
         return data;

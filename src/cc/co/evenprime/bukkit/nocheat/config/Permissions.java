@@ -24,9 +24,6 @@ public class Permissions {
     public final static String  BLOCKBREAK_REACH     = BLOCKBREAK + ".reach";
     public final static String  BLOCKBREAK_DIRECTION = BLOCKBREAK + ".direction";
 
-    public final static String  INTERACT             = CHECKS + ".interact";
-    public final static String  INTERACT_DURABILITY  = INTERACT + ".durability";
-
     public final static String  BLOCKPLACE           = CHECKS + ".blockplace";
     public final static String  BLOCKPLACE_ONLIQUID  = BLOCKPLACE + ".onliquid";
     public final static String  BLOCKPLACE_REACH     = BLOCKPLACE + ".reach";

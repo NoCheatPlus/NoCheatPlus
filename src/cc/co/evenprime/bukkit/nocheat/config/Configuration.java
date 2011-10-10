@@ -82,13 +82,6 @@ public abstract class Configuration {
     public final static OptionNode        BLOCKPLACE_ONLIQUID_CHECK                  = new OptionNode("check", BLOCKPLACE_ONLIQUID, DataType.BOOLEAN);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_ACTIONS                = new OptionNode("actions", BLOCKPLACE_ONLIQUID, DataType.ACTIONLIST);
 
-    public final static OptionNode        INTERACT                                   = new OptionNode("interact", ROOT, DataType.PARENT);
-    public final static OptionNode        INTERACT_CHECK                             = new OptionNode("check", INTERACT, DataType.BOOLEAN);
-
-    public final static OptionNode        INTERACT_DURABILITY                        = new OptionNode("durability", INTERACT, DataType.PARENT);
-    public final static OptionNode        INTERACT_DURABILITY_CHECK                  = new OptionNode("check", INTERACT_DURABILITY, DataType.BOOLEAN);
-    public final static OptionNode        INTERACT_DURABILITY_ACTIONS                = new OptionNode("actions", INTERACT_DURABILITY, DataType.ACTIONLIST);
-
     public final static OptionNode        CHAT                                       = new OptionNode("chat", ROOT, DataType.PARENT);
     public final static OptionNode        CHAT_CHECK                                 = new OptionNode("check", CHAT, DataType.BOOLEAN);
 
