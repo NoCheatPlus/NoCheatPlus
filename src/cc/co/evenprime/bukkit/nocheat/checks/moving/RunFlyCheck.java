@@ -6,7 +6,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
@@ -22,7 +22,6 @@ public class RunFlyCheck {
 
     private final FlyingCheck       flyingCheck;
     private final RunningCheck      runningCheck;
-    private final NoclipCheck       noclippingCheck;
     private final NoFallCheck       noFallCheck;
     private final MorePacketsCheck  morePacketsCheck;
 
@@ -34,7 +33,6 @@ public class RunFlyCheck {
         this.flyingCheck = new FlyingCheck(plugin);
         this.noFallCheck = new NoFallCheck(plugin);
         this.runningCheck = new RunningCheck(plugin, noFallCheck);
-        this.noclippingCheck = new NoclipCheck(plugin);
         this.morePacketsCheck = new MorePacketsCheck(plugin);
     }
 
@@ -74,7 +72,6 @@ public class RunFlyCheck {
         final boolean runflyCheck = cc.moving.runflyCheck && !player.hasPermission(Permissions.MOVE_RUNFLY);
         final boolean flyAllowed = cc.moving.allowFlying || player.hasPermission(Permissions.MOVE_FLY) || (player.getGameMode() == GameMode.CREATIVE && cc.moving.identifyCreativeMode);
         final boolean morepacketsCheck = cc.moving.morePacketsCheck && !player.hasPermission(Permissions.MOVE_MOREPACKETS);
-        final boolean noclipCheck = cc.moving.noclipCheck && !player.hasPermission(Permissions.MOVE_NOCLIP);
 
         /********************* EXECUTE THE FLY/JUMP/RUNNING CHECK ********************/
         // If the player is not allowed to fly and not allowed to run
@@ -92,11 +89,7 @@ public class RunFlyCheck {
         if(newToLocation == null && morepacketsCheck) {
             newToLocation = morePacketsCheck.check(player, cc, data);
         }
-
-        /********* EXECUTE THE NOCLIP CHECK ********************/
-        if(newToLocation == null && noclipCheck) {
-            newToLocation = noclippingCheck.check(player, from, to, helper, cc, data);
-        }
+        
         return newToLocation;
     }
 

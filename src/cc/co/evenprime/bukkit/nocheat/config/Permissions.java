@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 /**
  * The various permission nodes used by NoCheat
@@ -17,7 +17,6 @@ public class Permissions {
     public final static String  MOVE_SNEAK           = MOVE + ".sneaking";
     public final static String  MOVE_SWIM            = MOVE + ".swimming";
     public final static String  MOVE_FLY             = MOVE + ".flying";
-    public final static String  MOVE_NOCLIP          = MOVE + ".noclip";
     public final static String  MOVE_NOFALL          = MOVE + ".nofall";
     public final static String  MOVE_MOREPACKETS     = MOVE + ".morepackets";
 
@@ -36,6 +35,8 @@ public class Permissions {
     public final static String  CHAT_SPAM            = CHAT + ".spam";
 
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
+    public static final String  ADMIN_PERMLIST       = ADMIN + ".permlist";
+    public static final String  ADMIN_RELOAD         = ADMIN + ".reload";
 
     private Permissions() {}
 }

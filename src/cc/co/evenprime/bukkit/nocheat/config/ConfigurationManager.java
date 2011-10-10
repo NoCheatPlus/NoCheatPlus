@@ -1,15 +1,13 @@
 package cc.co.evenprime.bukkit.nocheat.config;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -17,18 +15,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import cc.co.evenprime.bukkit.nocheat.DefaultConfiguration;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
+import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.config.tree.ActionListOption;
-import cc.co.evenprime.bukkit.nocheat.config.tree.ChildOption;
-import cc.co.evenprime.bukkit.nocheat.config.tree.ConfigurationTree;
-import cc.co.evenprime.bukkit.nocheat.config.tree.Option;
-import cc.co.evenprime.bukkit.nocheat.config.tree.ParentOption;
-import cc.co.evenprime.bukkit.nocheat.file.DescriptionGenerator;
-import cc.co.evenprime.bukkit.nocheat.file.FlatActionParser;
-import cc.co.evenprime.bukkit.nocheat.file.FlatConfigGenerator;
-import cc.co.evenprime.bukkit.nocheat.file.FlatConfigParser;
 
 /**
  * Central location for everything that's described in the configuration file(s)
@@ -49,7 +38,7 @@ public class ConfigurationManager {
     // map
     private final Map<File, FileHandler>          fileToFileHandlerMap      = new HashMap<File, FileHandler>();
 
-    private final ConfigurationTree               defaultTree               = DefaultConfiguration.buildDefaultConfigurationTree();
+    private final Configuration                   defaultConfig;
 
     private class LogFileFormatter extends Formatter {
 
@@ -85,23 +74,46 @@ public class ConfigurationManager {
     // private final static String loggerName = "cc.co.evenprime.nocheat";
     // public final Logger logger = Logger.getLogger(loggerName);
 
-    public ConfigurationManager(String rootConfigFolder, ActionManager action) {
+    public ConfigurationManager(String rootConfigFolder, ActionManager actionManager) {
 
         // Parse actions file
-        initializeActions(rootConfigFolder, action);
+        // MOVE TO ACTIONMANAGER PARSER OR SOMETHING
+        initializeActions(rootConfigFolder, actionManager);
+        
+        defaultConfig = new DefaultConfiguration(actionManager);
+        
         // Setup the configuration tree
-        initializeConfig(rootConfigFolder, action);
+        initializeConfig(rootConfigFolder, actionManager);
 
     }
 
-    private void initializeActions(String rootConfigFolder, ActionManager action) {
+    private void initializeActions(String rootConfigFolder, ActionManager actionManager) {
 
-        FlatActionParser parser = new FlatActionParser();
+        File defaultActionsFile = new File(rootConfigFolder, defaultActionFileName);
 
-        DefaultConfiguration.writeDefaultActionFile(new File(rootConfigFolder, defaultActionFileName));
-        parser.read(action, new File(rootConfigFolder, defaultActionFileName));
-        parser.read(action, new File(rootConfigFolder, actionFileName));
+        // Write the current default action file into the target folder
+        DefaultConfiguration.writeDefaultActionFile(defaultActionsFile);
 
+        // now parse that file again
+        FlatFileAction parser = new FlatFileAction(defaultActionsFile);
+        List<Action> defaultActions = parser.read();
+
+        for(Action a : defaultActions) {
+            actionManager.addAction(a);
+        }
+
+        // Check if the "custom" action file exists, if not, create one
+        File customActionsFile = new File(rootConfigFolder, actionFileName);
+        if(!customActionsFile.exists()) {
+            DefaultConfiguration.writeActionFile(customActionsFile);
+        }
+
+        parser = new FlatFileAction(customActionsFile);
+        List<Action> customActions = parser.read();
+
+        for(Action a : customActions) {
+            actionManager.addAction(a);
+        }
     }
 
     /**
@@ -110,23 +122,28 @@ public class ConfigurationManager {
      * 
      * @param configurationFile
      */
-    private void initializeConfig(String rootConfigFolder, ActionManager actionManager) {
+    private void initializeConfig(String rootConfigFolder, ActionManager action) {
 
         // First try to obtain and parse the global config file
-        ConfigurationTree root;
+        FlatFileConfiguration root;
         File globalConfigFile = getGlobalConfigFile(rootConfigFolder);
 
+        root = new FlatFileConfiguration(defaultConfig, true, globalConfigFile);
         try {
-            root = createFullConfigurationTree(defaultTree, globalConfigFile);
+            root.load(action);
         } catch(Exception e) {
-            root = DefaultConfiguration.buildDefaultConfigurationTree();
+
         }
 
-        writeConfigFile(globalConfigFile, root);
+        try {
+            root.save();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
 
         // Create a corresponding Configuration Cache
         // put the global config on the config map
-        worldnameToConfigCacheMap.put(null, new ConfigurationCache(root, setupFileLogger(new File(rootConfigFolder, root.getString("logging.filename")))));
+        worldnameToConfigCacheMap.put(null, new ConfigurationCache(root, setupFileLogger(new File(rootConfigFolder, root.getString(DefaultConfiguration.LOGGING_FILENAME)))));
 
         // Try to find world-specific config files
         Map<String, File> worldFiles = getWorldSpecificConfigFiles(rootConfigFolder);
@@ -134,25 +151,26 @@ public class ConfigurationManager {
         for(String worldName : worldFiles.keySet()) {
 
             File worldConfigFile = worldFiles.get(worldName);
+
+            FlatFileConfiguration world = new FlatFileConfiguration(root, false, worldConfigFile);
+
             try {
-                ConfigurationTree world = createPartialConfigurationTree(root, worldConfigFile);
+                world.load(action);
 
                 worldnameToConfigCacheMap.put(worldName, createConfigurationCache(rootConfigFolder, world));
 
                 // write the config file back to disk immediately
-                writeConfigFile(worldFiles.get(worldName), world);
+                world.save();
+
             } catch(IOException e) {
                 System.out.println("NoCheat: Couldn't load world-specific config for " + worldName);
             }
         }
-
-        // Write the descriptions-file for the default tree
-        writeDescriptionFile(new File(rootConfigFolder, descriptionsFileName), defaultTree);
     }
 
     private ConfigurationCache createConfigurationCache(String rootConfigFolder, Configuration configProvider) {
 
-        return new ConfigurationCache(configProvider, setupFileLogger(new File(rootConfigFolder, configProvider.getString("logging.filename"))));
+        return new ConfigurationCache(configProvider, setupFileLogger(new File(rootConfigFolder, configProvider.getString(DefaultConfiguration.LOGGING_FILENAME))));
 
     }
 
@@ -181,88 +199,6 @@ public class ConfigurationManager {
             }
         }
         return files;
-    }
-
-    /**
-     * Create a full configuration tree based on a default tree and a
-     * configuration file
-     * The resulting tree will have all settings of the defaultTree with entries
-     * replaced,
-     * if existing, by data from the configurationFile
-     * 
-     * @param defaultTree
-     * @param configurationFile
-     * @throws IOException
-     */
-    public static ConfigurationTree createFullConfigurationTree(ConfigurationTree defaultTree, File configurationFile) throws IOException {
-
-        return yamlToTree(defaultTree, configurationFile, true);
-
-    }
-
-    /**
-     * Create a partial configuration tree based on a default tree and a
-     * configuration file
-     * The resulting tree will only have settings from the configurationFile,
-     * but reference
-     * the defaultTree as its parent.
-     * 
-     * @param defaultTree
-     * @param configurationFile
-     * @throws IOException
-     */
-    public static ConfigurationTree createPartialConfigurationTree(ConfigurationTree defaultTree, File configurationFile) throws IOException {
-
-        ConfigurationTree tree = yamlToTree(defaultTree, configurationFile, false);
-        tree.setParent(defaultTree);
-
-        return tree;
-
-    }
-
-    private static ConfigurationTree yamlToTree(ConfigurationTree defaults, File configurationFile, boolean fullCopy) throws IOException {
-
-        FlatConfigParser source = new FlatConfigParser();
-        source.read(configurationFile);
-
-        ConfigurationTree partial = new ConfigurationTree();
-
-        for(Option o : defaults.getAllOptions()) {
-            if(o instanceof ActionListOption) {
-                ActionListOption o2 = ((ActionListOption) o).clone();
-                partial.add(o.getParent().getFullIdentifier(), o2);
-                // Does the new source have a node for this property??
-                Object prop = source.getProperty(o2.getFullIdentifier());
-                if(prop instanceof Map<?, ?> && prop != null) {
-                    // Yes, so we rather take the data from that node
-                    @SuppressWarnings("unchecked")
-                    Map<Object, Object> m = (Map<Object, Object>) prop;
-                    o2.clear();
-                    for(Entry<Object, Object> entry : m.entrySet()) {
-                        try {
-                            o2.add(Integer.parseInt((String) entry.getKey()), (String) entry.getValue());
-                        } catch(Exception e) {
-                            System.out.println("NoCheat: PROBLEM OFFICER?!?!");
-                        }
-                    }
-                }
-                if(!fullCopy && prop == null) {
-                    o2.setActive(false);
-                }
-            } else if(o instanceof ParentOption) {
-                ParentOption o2 = new ParentOption(o.getIdentifier());
-                partial.add(o.getParent().getFullIdentifier(), o2);
-            } else if(o instanceof ChildOption) {
-                ChildOption o2 = ((ChildOption) o).clone();
-                partial.add(o.getParent().getFullIdentifier(), o2);
-                o2.setStringValue(source.getString(o2.getFullIdentifier(), o2.getStringValue()));
-                if(!fullCopy && source.getProperty(o.getFullIdentifier()) == null) {
-                    o2.setActive(false);
-                }
-            }
-        }
-
-        return partial;
     }
 
     private Logger setupFileLogger(File logfile) {
@@ -320,51 +256,6 @@ public class ConfigurationManager {
         for(FileHandler fh : fileToFileHandlerMap.values()) {
             fh.flush();
             fh.close();
-        }
-    }
-
-    /**
-     * Write configuration to specific file
-     * 
-     * @param f
-     */
-    public static void writeConfigFile(File f, ConfigurationTree configuration) {
-        try {
-            if(f.getParentFile() != null)
-                f.getParentFile().mkdirs();
-
-            f.createNewFile();
-            BufferedWriter w = new BufferedWriter(new FileWriter(f));
-
-            w.write(FlatConfigGenerator.treeToFlatFile(configuration));
-
-            w.flush();
-            w.close();
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Write a file with the descriptions of all options of a specific
-     * configuration tree
-     * 
-     * @param f
-     */
-    public static void writeDescriptionFile(File f, ConfigurationTree configuration) {
-        try {
-            if(f.getParentFile() != null)
-                f.getParentFile().mkdirs();
-
-            f.createNewFile();
-            BufferedWriter w = new BufferedWriter(new FileWriter(f));
-
-            w.write(DescriptionGenerator.treeToDescription(configuration));
-
-            w.flush();
-            w.close();
-        } catch(IOException e) {
-            e.printStackTrace();
         }
     }
 

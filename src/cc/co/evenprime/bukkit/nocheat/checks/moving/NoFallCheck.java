@@ -1,22 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
-import java.util.HashMap;
-import java.util.Locale;
-
-import net.minecraft.server.DamageSource;
-
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Type;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
-import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
@@ -29,11 +19,11 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class NoFallCheck {
 
     private final ActionExecutor action;
-    private final NoCheat plugin;
+    private final NoCheat        plugin;
 
     public NoFallCheck(NoCheat plugin) {
-        this.action = new ActionExecutorWithHistory(plugin);
         this.plugin = plugin;
+        this.action = new ActionExecutor(plugin);
     }
 
     /**
@@ -41,7 +31,7 @@ public class NoFallCheck {
      * 
      */
     public void check(final Player player, final Location from, final boolean fromOnOrInGround, final Location to, final boolean toOnOrInGround, final ConfigurationCache cc, final MovingData data) {
-        
+
         double oldY = from.getY();
         double newY = to.getY();
 
@@ -50,34 +40,36 @@ public class NoFallCheck {
             // Start with zero fall distance
             data.fallDistance = 0F;
         }
-        
+
         // If we increased fall height before for no good reason, reduce now by the same amount
         if(player.getFallDistance() > data.lastAddedFallDistance) {
             player.setFallDistance(player.getFallDistance() - data.lastAddedFallDistance);
         }
         
         data.lastAddedFallDistance = 0;
-        
+
         // We want to know if the fallDistance recorded by the game is smaller
         // than the fall distance recorded by the plugin
         float difference = data.fallDistance - player.getFallDistance();
         
         if(difference > 1.0F && toOnOrInGround && data.fallDistance > 2.0F) {
             data.nofallViolationLevel += difference;
-            // Prepare some event-specific values for logging and custom actions
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put(LogAction.DISTANCE, String.format(Locale.US, "%.2f", difference));
-            params.put(LogAction.CHECK, "nofall");
 
-            boolean cancel = action.executeActions(player, cc.moving.nofallActions, (int) data.nofallViolationLevel, params, cc);
+            // Prepare some event-specific values for logging and custom actions
+            LogData ldata = plugin.getDataManager().getLogData(player);
+            ldata.falldistance = data.fallDistance;
+            ldata.check = "moving/nofall";
+
+            boolean cancel = action.executeActions(player, cc.moving.nofallActions, (int) data.nofallViolationLevel, ldata, cc);
 
             // If "cancelled", the fall damage gets dealt in a way that's visible to other plugins
             if(cancel) {
                 // Increase the fall distance a bit :)
                 float totalDistance = data.fallDistance + difference * (cc.moving.nofallMultiplier - 1.0F);
+
                 player.setFallDistance(totalDistance);
             }
-            
+
             data.fallDistance = 0F;
         }
 

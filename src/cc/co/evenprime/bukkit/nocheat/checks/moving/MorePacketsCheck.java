@@ -1,15 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
-import java.util.HashMap;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
-import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
@@ -28,12 +25,12 @@ public class MorePacketsCheck {
 
     private final ActionExecutor action;
 
-    private final long           packetsPerTimeframe = 22;
-    private final double         bufferLimit         = 30;
+    private final int            packetsPerTimeframe = 22;
+    private final int            bufferLimit         = 30;
     private final NoCheat        plugin;
 
     public MorePacketsCheck(NoCheat plugin) {
-        this.action = new ActionExecutorWithHistory(plugin);
+        this.action = new ActionExecutor(plugin);
 
         this.plugin = plugin;
     }
@@ -105,9 +102,9 @@ public class MorePacketsCheck {
         // ticks since last time
         if(ingameSeconds != data.lastElapsedIngameSeconds) {
 
-            long limit = (packetsPerTimeframe * plugin.getIngameSecondDuration()) / 1000L;
+            int limit = (int) ((packetsPerTimeframe * plugin.getIngameSecondDuration()) / 1000L);
 
-            long difference = limit - data.morePacketsCounter;
+            int difference = limit - data.morePacketsCounter;
 
             data.morePacketsBuffer = data.morePacketsBuffer + difference;
             if(data.morePacketsBuffer > bufferLimit)
@@ -125,14 +122,13 @@ public class MorePacketsCheck {
             if(!plugin.skipCheck() && packetsAboveLimit > 0) {
                 data.morePacketsViolationLevel += packetsAboveLimit;
 
-                HashMap<String, String> params = new HashMap<String, String>();
-
+                LogData ldata = plugin.getDataManager().getLogData(player);
                 // Packets above limit
-                params.put(LogAction.PACKETS, String.valueOf(data.morePacketsCounter - limit));
-                params.put(LogAction.CHECK, "morepackets");
+                ldata.packets = data.morePacketsCounter - limit;
+                ldata.check = "moving/morepackets";
 
                 boolean cancel = false;
-                cancel = action.executeActions(player, cc.moving.morePacketsActions, (int) data.morePacketsViolationLevel, params, cc);
+                cancel = action.executeActions(player, cc.moving.morePacketsActions, (int) data.morePacketsViolationLevel, ldata, cc);
 
                 // Only do the cancel if the player didn't change worlds
                 // inbetween

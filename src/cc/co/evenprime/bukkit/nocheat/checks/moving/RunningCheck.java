@@ -1,21 +1,14 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Locale;
-
-import net.minecraft.server.EntityPlayer;
-
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
-import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
@@ -29,20 +22,20 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class RunningCheck {
 
-    private final static double  maxBonus        = 1D;
-
-    private static Method        isRunningMethod = null;
+    private final static double  maxBonus     = 1D;
 
     // How many move events can a player have in air before he is expected to
     // lose altitude (or eventually land somewhere)
-    private final static int     jumpingLimit    = 6;
+    private final static int     jumpingLimit = 6;
 
     private final ActionExecutor action;
+    private final NoCheat        plugin;
 
     private final NoFallCheck    noFallCheck;
 
     public RunningCheck(NoCheat plugin, NoFallCheck noFallCheck) {
-        this.action = new ActionExecutorWithHistory(plugin);
+        this.plugin = plugin;
+        this.action = new ActionExecutor(plugin);
         this.noFallCheck = noFallCheck;
     }
 
@@ -84,17 +77,16 @@ public class RunningCheck {
             data.runflyViolationLevel += result;
 
             // Prepare some event-specific values for logging and custom actions
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put(LogAction.DISTANCE, String.format(Locale.US, "%.2f,%.2f,%.2f", xDistance, to.getY() - from.getY(), zDistance));
-            params.put(LogAction.LOCATION_TO, String.format(Locale.US, "%.2f,%.2f,%.2f", to.getX(), to.getY(), to.getZ()));
+            LogData ldata = plugin.getDataManager().getLogData(player);
+            ldata.toLocation = to;
             if(resultHoriz > 0 && resultVert > 0)
-                params.put(LogAction.CHECK, "runfly/both");
+                ldata.check = "runfly/both";
             else if(resultHoriz > 0)
-                params.put(LogAction.CHECK, "runfly/horizontal");
+                ldata.check = "runfly/horizontal";
             else if(resultVert > 0)
-                params.put(LogAction.CHECK, "runfly/vertical");
+                ldata.check = "runfly/vertical";
 
-            boolean cancel = action.executeActions(player, cc.moving.actions, (int) data.runflyViolationLevel, params, cc);
+            boolean cancel = action.executeActions(player, cc.moving.actions, (int) data.runflyViolationLevel, ldata, cc);
 
             // Was one of the actions a cancel? Then do it
             if(cancel) {
@@ -139,13 +131,9 @@ public class RunningCheck {
         // How much further did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
-        if(isRunningMethod == null) {
-            isRunningMethod = getIsRunningMethod();
-        }
-
         boolean sprinting = true;
         try {
-            sprinting = !(player instanceof CraftPlayer) || isRunningMethod.invoke(((CraftPlayer) player).getHandle()).equals(true);
+            sprinting = !(player instanceof CraftPlayer) || player.isSprinting();
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -210,19 +198,5 @@ public class RunningCheck {
 
         return distanceAboveLimit;
 
-    }
-
-    private Method getIsRunningMethod() {
-        try {
-            return EntityPlayer.class.getMethod("isSprinting");
-        } catch(NoSuchMethodException e) {
-            try {
-                return EntityPlayer.class.getMethod("at");
-            } catch(Exception e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-                return null;
-            }
-        }
     }
 }

@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.actions.types;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
  * Execute a command by imitating an admin typing the command directly into the
@@ -10,24 +9,15 @@ import java.util.Map.Entry;
  * @author Evenprime
  * 
  */
-public class ConsolecommandAction extends Action {
+public class ConsolecommandAction extends ActionWithParameters {
 
-    private final String command;
+    public ConsolecommandAction(String name, int delay, int repeat, String command) {
+        super(name, delay, repeat, command);
 
-    public ConsolecommandAction(int delay, int repeat, String command) {
-        super(delay, repeat);
-
-        this.command = command;
     }
 
-    public String getCommand(Map<String, String> map) {
+    public String getCommand(LogData ldata) {
 
-        String com = command;
-
-        for(Entry<String, String> entry : map.entrySet()) {
-            com = com.replaceAll(entry.getKey(), entry.getValue());
-        }
-
-        return com;
+        return super.getMessage(ldata);
     }
 }

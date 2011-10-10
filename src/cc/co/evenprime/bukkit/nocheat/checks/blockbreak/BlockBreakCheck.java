@@ -1,13 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 

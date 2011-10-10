@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
@@ -21,7 +22,6 @@ import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.PlayerItemDropEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerInteractEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
@@ -42,6 +42,7 @@ public class NoCheat extends JavaPlugin {
     private ConfigurationManager conf;
     private LogManager           log;
     private DataManager          data;
+    private ActionManager        action;
 
     private List<EventManager>   eventManagers            = new LinkedList<EventManager>();
 
@@ -50,8 +51,6 @@ public class NoCheat extends JavaPlugin {
     private long                 lastIngamesecondTime     = 0L;
     private long                 lastIngamesecondDuration = 0L;
     private boolean              skipCheck                = false;
-
-    private ActionManager        action;
 
     public NoCheat() {
 
@@ -76,18 +75,16 @@ public class NoCheat extends JavaPlugin {
         // First set up logging
         this.log = new LogManager(this);
 
-        log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1185. It may break at any time and for any other version.");
+        log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1240. It may break at any time and for any other version.");
 
         this.data = new DataManager();
-
-        this.action = new ActionManager(log);
+        this.action = new ActionManager();
 
         // parse the nocheat.yml config file
         this.conf = new ConfigurationManager(this.getDataFolder().getPath(), action);
 
         eventManagers.add(new PlayerMoveEventManager(this));
         eventManagers.add(new PlayerTeleportEventManager(this));
-        eventManagers.add(new PlayerItemDropEventManager(this));
         eventManagers.add(new PlayerInteractEventManager(this));
         eventManagers.add(new PlayerChatEventManager(this));
         eventManagers.add(new BlockBreakEventManager(this));
@@ -197,6 +194,12 @@ public class NoCheat extends JavaPlugin {
         if(command.getName().equalsIgnoreCase("nocheat") && args.length > 0) {
             if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
                 // permlist command was used CORRECTLY
+
+                // Does the sender have permission?
+                if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERMLIST)) {
+                    return false;
+                }
+
                 // Get the player names
                 Player player = this.getServer().getPlayerExact(args[1]);
                 if(player == null) {
@@ -219,6 +222,16 @@ public class NoCheat extends JavaPlugin {
                     }
                     return true;
                 }
+            } else if(args[0].equalsIgnoreCase("reload")) {
+                // reload command was used
+
+                // Does the sender have permission?
+                if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_RELOAD)) {
+                    return false;
+                }
+
+                this.conf.cleanup();
+                this.conf = new ConfigurationManager(this.getDataFolder().getPath(), this.action);
             }
         }
         return false;

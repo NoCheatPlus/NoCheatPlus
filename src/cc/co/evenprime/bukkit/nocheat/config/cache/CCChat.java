@@ -2,6 +2,7 @@ package cc.co.evenprime.bukkit.nocheat.config.cache;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
+import cc.co.evenprime.bukkit.nocheat.config.DefaultConfiguration;
 
 public class CCChat {
 
@@ -13,11 +14,11 @@ public class CCChat {
 
     public CCChat(Configuration data) {
 
-        check = data.getBoolean("chat.check");
-        spamCheck = data.getBoolean("chat.spam.check");
-        spamTimeframe = data.getInteger("chat.spam.timeframe");
-        spamLimit = data.getInteger("chat.spam.limit");
-        spamActions = data.getActionList("chat.spam.actions");
+        check = data.getBoolean(DefaultConfiguration.CHAT_CHECK);
+        spamCheck = data.getBoolean(DefaultConfiguration.CHAT_SPAM_CHECK);
+        spamTimeframe = data.getInteger(DefaultConfiguration.CHAT_SPAM_TIMEFRAME);
+        spamLimit = data.getInteger(DefaultConfiguration.CHAT_SPAM_LIMIT);
+        spamActions = data.getActionList(DefaultConfiguration.CHAT_SPAM_ACTIONS);
 
     }
 }

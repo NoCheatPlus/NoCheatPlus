@@ -13,11 +13,9 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakCheck;
-import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 
 /**
@@ -30,14 +28,11 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 public class BlockBreakEventManager extends BlockListener implements EventManager {
 
     private final BlockBreakCheck      blockBreakCheck;
-    private final DataManager          data;
-    private final ConfigurationManager config;
+    private final NoCheat plugin;
 
     public BlockBreakEventManager(NoCheat plugin) {
 
-        this.data = plugin.getDataManager();
-        this.config = plugin.getConfigurationManager();
-
+        this.plugin = plugin;
         this.blockBreakCheck = new BlockBreakCheck(plugin);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
@@ -54,7 +49,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
         }
 
         final Player player = event.getPlayer();
-        final ConfigurationCache cc = config.getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
 
         // Find out if checks need to be done for that player
         if(cc.blockbreak.check && !player.hasPermission(Permissions.BLOCKBREAK)) {
@@ -62,7 +57,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
             boolean cancel = false;
 
             // Get the player-specific stored data that applies here
-            final BlockBreakData data = this.data.getBlockBreakData(player);
+            final BlockBreakData data = plugin.getDataManager().getBlockBreakData(player);
 
             cancel = blockBreakCheck.check(player, event.getBlock(), data, cc);
 
@@ -82,7 +77,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
 
         final Player player = event.getPlayer();
         // Get the player-specific stored data that applies here
-        final BlockBreakData data = this.data.getBlockBreakData(player);
+        final BlockBreakData data = plugin.getDataManager().getBlockBreakData(player);
 
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks

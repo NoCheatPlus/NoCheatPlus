@@ -6,7 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 
 /**
  * A class to keep all configurables of the plugin associated with
- * a world, everything unmodifiable.
+ * a world, everything unmodifiable for security/performance
  * 
  * @author Evenprime
  * 

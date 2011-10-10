@@ -15,11 +15,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.checks.moving.RunFlyCheck;
-import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
@@ -33,15 +31,12 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class PlayerMoveEventManager extends PlayerListener implements EventManager {
 
-    private final RunFlyCheck          movingCheck;
-
-    private final ConfigurationManager config;
-    private final DataManager          data;
+    private final NoCheat     plugin;
+    private final RunFlyCheck movingCheck;
 
     public PlayerMoveEventManager(NoCheat plugin) {
-        this.config = plugin.getConfigurationManager();
-        this.data = plugin.getDataManager();
 
+        this.plugin = plugin;
         this.movingCheck = new RunFlyCheck(plugin);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
@@ -59,13 +54,13 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
 
         // Get the world-specific configuration that applies here
         final Player player = event.getPlayer();
-        final ConfigurationCache cc = config.getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
 
         // Find out if checks need to be done for that player
         if(cc.moving.check && !player.hasPermission(Permissions.MOVE)) {
 
             // Get the player-specific stored data that applies here
-            final MovingData data = this.data.getMovingData(player);
+            final MovingData data = plugin.getDataManager().getMovingData(player);
 
             // Get some data that's needed from this event, to avoid passing the
             // event itself on to the checks (and risk to
@@ -101,7 +96,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         if(!event.isCancelled()) {
             Player player = event.getPlayer();
 
-            MovingData mdata = data.getMovingData(player);
+            MovingData mdata = plugin.getDataManager().getMovingData(player);
 
             Vector v = event.getVelocity();
 
@@ -137,8 +132,6 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
             s.add("moving.nofall");
         if(cc.moving.check && cc.moving.morePacketsCheck)
             s.add("moving.morepackets");
-        if(cc.moving.check && cc.moving.noclipCheck)
-            s.add("moving.noclip");
 
         return s;
     }
@@ -159,8 +152,6 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
             s.add("moving.nofall");
         if(!(cc.moving.check && cc.moving.morePacketsCheck))
             s.add("moving.morepackets");
-        if(!(cc.moving.check && cc.moving.noclipCheck))
-            s.add("moving.noclip");
 
         return s;
     }

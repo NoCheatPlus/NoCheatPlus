@@ -1,8 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.actions.types;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 /**
@@ -11,43 +9,17 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
  * @author Evenprime
  * 
  */
-public class LogAction extends Action {
+public class LogAction extends ActionWithParameters {
 
-    // Default stuff
-    public static final String PLAYER         = "\\[player\\]";
-    public static final String LOCATION       = "\\[location\\]";
-    public static final String WORLD          = "\\[world\\]";
-    public static final String VIOLATIONS     = "\\[violations\\]";
-
-    // Event dependent stuff
-    public static final String DISTANCE       = "\\[distance\\]";
-    public static final String LOCATION_TO    = "\\[locationto\\]";
-    public static final String CHECK          = "\\[check\\]";
-    public static final String PACKETS        = "\\[packets\\]";
-    public static final String TEXT           = "\\[text\\]";
-
-    public static final String PLACE_LOCATION = "\\[placelocation\\]";
-    public static final String PLACE_AGAINST  = "\\[placeagainst\\]";
-    public static final String BLOCK_TYPE     = "\\[blocktype\\]";
-
-    public final LogLevel      level;
-    private final String       message;
-
-    public LogAction(int delay, int repeat, LogLevel level, String message) {
-        super(delay, repeat);
+    public final LogLevel level;
+    
+    public LogAction(String name, int delay, int repeat, LogLevel level, String message) {
+        super(name, delay, repeat, message);
 
         this.level = level;
-        this.message = message;
     }
-
-    public String getLogMessage(Map<String, String> values) {
-        String log = message;
-
-        for(Entry<String, String> entry : values.entrySet()) {
-            log = log.replaceAll(entry.getKey(), entry.getValue());
-        }
-
-        return log;
+    
+    public String getMessage(LogData ldata) {
+        return super.getMessage(ldata);
     }
-
 }

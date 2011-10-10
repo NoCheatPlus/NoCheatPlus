@@ -1,13 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.actions.history;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 
 /**
- * Store last 60 seconds of action executions
+ * Store amount of action executions for last 60 seconds
  * 
  * @author Evenprime
  * 
@@ -16,25 +15,61 @@ public class ActionHistory {
 
     private class ExecutionHistoryEntry {
 
-        private final LinkedList<Long> executionTimes     = new LinkedList<Long>();
-        private final long             monitoredTimeFrame = 60000;
-        private long                   lastExecution      = 0;
+        private final int executionTimes[];
+        private long      lastExecution   = 0;
+        private int       totalEntries    = 0;
+        private long      lastClearedTime = 0;
 
-        public ExecutionHistoryEntry() {}
+        public ExecutionHistoryEntry(int monitoredTimeFrame) {
+            this.executionTimes = new int[monitoredTimeFrame];
+        }
 
-        public void addCounter(Long time) {
+        /**
+         * Remember an execution at the specific time
+         */
+        public void addCounter(long time) {
+            // clear out now outdated values from the array
+            if(time - lastClearedTime > 0) {
+                // Clear the next few fields of the array
+                clearTimes(lastClearedTime + 1, time - lastClearedTime);
+                lastClearedTime = time + 1;
+            }
 
-            synchronized(executionTimes) {
-                while(!executionTimes.isEmpty() && executionTimes.getFirst() < time - monitoredTimeFrame) {
-                    executionTimes.removeFirst();
+            executionTimes[(int) (time % executionTimes.length)]++;
+            totalEntries++;
+        }
+
+        /**
+         * Clean parts of the array
+         * 
+         * @param start
+         * @param length
+         */
+        private void clearTimes(long start, long length) {
+
+            if(length <= 0) {
+                return; // nothing to do (yet)
+            }
+            if(length > executionTimes.length) {
+                length = executionTimes.length;
+            }
+
+            int j = (int) start % executionTimes.length;
+
+            for(int i = 0; i < length; i++) {
+                if(j == executionTimes.length) {
+                    j = 0;
                 }
+                
+                totalEntries -= executionTimes[j];
+                executionTimes[j] = 0;
 
-                executionTimes.addLast(time);
+                j++;
             }
         }
 
         public int getCounter() {
-            return executionTimes.size();
+            return totalEntries;
         }
 
         public long getLastExecution() {
@@ -55,11 +90,12 @@ public class ActionHistory {
     /**
      * Returns true, if the action should be executed, because all time
      * criteria have been met. Will add a entry with the time to a list
-     * which will influence further requests, so only use once per
-     * check!
+     * which will influence further requests, so only use once and remember
+     * the result
      * 
      * @param action
      * @param time
+     *            a time IN SECONDS
      * @return
      */
     public boolean executeAction(Action action, long time) {
@@ -67,7 +103,7 @@ public class ActionHistory {
         ExecutionHistoryEntry entry = executionHistory.get(action);
 
         if(entry == null) {
-            entry = new ExecutionHistoryEntry();
+            entry = new ExecutionHistoryEntry(60);
             executionHistory.put(action, entry);
         }
 
@@ -76,7 +112,7 @@ public class ActionHistory {
 
         if(entry.getCounter() > action.delay) {
             // Execute action?
-            if(entry.getLastExecution() <= time - action.repeat * 1000) {
+            if(entry.getLastExecution() <= time - action.repeat) {
                 // Execute action!
                 entry.setLastExecution(time);
                 return true;

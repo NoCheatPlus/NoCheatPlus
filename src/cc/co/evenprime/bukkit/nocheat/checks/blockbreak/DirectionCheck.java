@@ -1,17 +1,14 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
-import java.util.HashMap;
-
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
-import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
  * The DirectionCheck will find out if a player tried to interact with something
@@ -23,9 +20,11 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 public class DirectionCheck {
 
     private final ActionExecutor action;
+    private final NoCheat        plugin;
 
     public DirectionCheck(NoCheat plugin) {
-        this.action = new ActionExecutorWithHistory(plugin);
+        this.plugin = plugin;
+        this.action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, double factor, double x1, double y1, double z1, Block brokenBlock, BlockBreakData data, ConfigurationCache cc) {
@@ -51,10 +50,10 @@ public class DirectionCheck {
             data.directionViolationLevel += 1;
 
             // Prepare some event-specific values for logging and custom actions
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put(LogAction.CHECK, "blockbreak.direction");
+            LogData ldata = plugin.getDataManager().getLogData(player);
+            ldata.check = "blockbreak.direction";
 
-            cancel = action.executeActions(player, cc.blockbreak.directionActions, (int) data.directionViolationLevel, params, cc);
+            cancel = action.executeActions(player, cc.blockbreak.directionActions, (int) data.directionViolationLevel, ldata, cc);
         }
 
         return cancel;

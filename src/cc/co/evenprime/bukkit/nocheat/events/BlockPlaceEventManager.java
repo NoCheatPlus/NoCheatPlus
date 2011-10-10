@@ -12,12 +12,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.moving.RunFlyCheck;
-import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
 /**
  * Central location to listen to Block-related events and dispatching them to
@@ -28,17 +26,14 @@ import cc.co.evenprime.bukkit.nocheat.data.DataManager;
  */
 public class BlockPlaceEventManager extends BlockListener implements EventManager {
 
-    private final RunFlyCheck          movingCheck;
-    private final BlockPlaceCheck      blockPlaceCheck;
+    private final NoCheat         plugin;
+    private final RunFlyCheck     movingCheck;
+    private final BlockPlaceCheck blockPlaceCheck;
 
-    private final DataManager          data;
-    private final ConfigurationManager config;
+    public BlockPlaceEventManager(NoCheat p) {
 
-    public BlockPlaceEventManager(NoCheat plugin) {
-
-        this.data = plugin.getDataManager();
-        this.config = plugin.getConfigurationManager();
-
+        this.plugin = p;
+        
         this.movingCheck = new RunFlyCheck(plugin);
         this.blockPlaceCheck = new BlockPlaceCheck(plugin);
 
@@ -54,7 +49,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
                 if(!event.isCancelled()) {
                     final Player player = event.getPlayer();
                     // Get the player-specific stored data that applies here
-                    movingCheck.blockPlaced(player, data.getMovingData(player), event.getBlockPlaced());
+                    movingCheck.blockPlaced(player, plugin.getDataManager().getMovingData(player), event.getBlockPlaced());
                 }
             }
         }, Priority.Monitor, plugin);
@@ -67,12 +62,12 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
             boolean cancel = false;
 
             final Player player = event.getPlayer();
-            final ConfigurationCache cc = config.getConfigurationCacheForWorld(player.getWorld().getName());
+            final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
 
             // Find out if checks need to be done for that player
             if(cc.blockplace.check && !player.hasPermission(Permissions.BLOCKPLACE)) {
 
-                cancel = blockPlaceCheck.check(player, event.getBlockPlaced(), event.getBlockAgainst(), data.getBlockPlaceData(player), cc);
+                cancel = blockPlaceCheck.check(player, event.getBlockPlaced(), event.getBlockAgainst(), plugin.getDataManager().getBlockPlaceData(player), cc);
             }
 
             if(cancel) {

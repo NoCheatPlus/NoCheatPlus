@@ -17,7 +17,6 @@ import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
@@ -29,11 +28,11 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class PlayerTeleportEventManager extends PlayerListener implements EventManager {
 
-    private final DataManager data;
+    private final NoCheat plugin;
+    
+    public PlayerTeleportEventManager(NoCheat p) {
 
-    public PlayerTeleportEventManager(NoCheat plugin) {
-
-        this.data = plugin.getDataManager();
+        this.plugin = p;
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -49,7 +48,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
             @Override
             public void onPlayerTeleport(PlayerTeleportEvent event) {
-                final MovingData data2 = data.getMovingData(event.getPlayer());
+                final MovingData data2 = plugin.getDataManager().getMovingData(event.getPlayer());
                 if(event.isCancelled()) {
                     if(data2.teleportTo != null && data2.teleportTo.equals(event.getTo())) {
                         event.setCancelled(false);
@@ -84,7 +83,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
     private void handleTeleportation(Player player, Location newLocation) {
 
         /********* Moving check ************/
-        final MovingData data = this.data.getMovingData(player);
+        final MovingData data = plugin.getDataManager().getMovingData(player);
 
         data.runflySetBackPoint = null;
         data.morePacketsCounter = 0;
@@ -92,14 +91,6 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
         data.jumpPhase = 0;
         data.fallDistance = 0F;
         data.lastAddedFallDistance = 0F;
-
-        if(newLocation != null) {
-
-            data.noclipX = newLocation.getBlockX();
-            data.noclipY = Location.locToBlock(newLocation.getY()+1.1D);
-            data.noclipZ = newLocation.getBlockZ();
-            
-        }
     }
 
     @Override

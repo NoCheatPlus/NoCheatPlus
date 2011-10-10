@@ -13,28 +13,24 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatCheck;
-import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
-import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 
 /**
  * 
  * @author Evenprime
- *
+ * 
  */
 public class PlayerChatEventManager extends PlayerListener implements EventManager {
 
-    private final ChatCheck            chatCheck;
-    private final DataManager          data;
-    private final ConfigurationManager config;
+    private final NoCheat   plugin;
+    private final ChatCheck chatCheck;
 
     public PlayerChatEventManager(NoCheat plugin) {
 
-        this.data = plugin.getDataManager();
-        this.config = plugin.getConfigurationManager();
+        this.plugin = plugin;
         this.chatCheck = new ChatCheck(plugin);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
@@ -51,7 +47,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
         }
 
         final Player player = event.getPlayer();
-        final ConfigurationCache cc = config.getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
 
         // Find out if checks need to be done for that player
         if(cc.chat.check && !player.hasPermission(Permissions.CHAT)) {
@@ -59,7 +55,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
             boolean cancel = false;
 
             // Get the player-specific stored data that applies here
-            final ChatData data = this.data.getChatData(player);
+            final ChatData data = plugin.getDataManager().getChatData(player);
 
             cancel = chatCheck.check(player, event.getMessage(), data, cc);
 

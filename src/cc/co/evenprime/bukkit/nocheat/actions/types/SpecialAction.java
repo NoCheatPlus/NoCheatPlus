@@ -9,7 +9,7 @@ package cc.co.evenprime.bukkit.nocheat.actions.types;
  */
 public class SpecialAction extends Action {
 
-    public SpecialAction(int delay, int repeat) {
-        super(delay, repeat);
+    public SpecialAction(String name, int delay, int repeat) {
+        super(name, delay, repeat);
     }
 }

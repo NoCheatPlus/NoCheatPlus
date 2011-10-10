@@ -2,7 +2,11 @@ package cc.co.evenprime.bukkit.nocheat.actions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 
 /**
  * A list of actions, that associates actions and a treshold. It allows to
@@ -14,35 +18,11 @@ import java.util.List;
 public class ActionList {
 
     public ActionList() {}
+    
+    private final static Action[] emptyArray = new Action[0];
 
-    private final List<ActionListEntry> actionList = new ArrayList<ActionListEntry>();
-
-    private class ActionListEntry implements Comparable<ActionListEntry> {
-
-        public final ArrayList<String> actions = new ArrayList<String>();
-        public final double            treshold;
-
-        public ActionListEntry(double treshold, String[] actionNames) {
-
-            this.treshold = treshold;
-
-            for(String actionName : actionNames) {
-                if(actionName != null && actionName.length() > 0) {
-                    actions.add(actionName.toLowerCase());
-                }
-            }
-        }
-
-        @Override
-        public int compareTo(ActionListEntry entry) {
-            if(treshold < entry.treshold) {
-                return -1;
-            } else if(treshold == entry.treshold) {
-                return 0;
-            } else
-                return 1;
-        }
-    }
+    private final Map<Integer, Action[]> actions   = new HashMap<Integer, Action[]>();
+    private final List<Integer>          tresholds = new ArrayList<Integer>();
 
     /**
      * Add an entry to this actionList. The list will be sorted by tresholds
@@ -51,9 +31,14 @@ public class ActionList {
      * @param treshold
      * @param actionNames
      */
-    public void addEntry(double treshold, String[] actionNames) {
-        this.actionList.add(new ActionListEntry(treshold, actionNames));
-        Collections.sort(this.actionList);
+    public void setActions(Integer treshold, Action[] actions) {
+
+        if(!this.tresholds.contains(treshold)) {
+            this.tresholds.add(treshold);
+            Collections.sort(this.tresholds);
+        }
+
+        this.actions.put(treshold, actions);
     }
 
     /**
@@ -64,19 +49,23 @@ public class ActionList {
      * @param violationLevel
      * @return
      */
-    public List<String> getActions(int vl) {
+    public Action[] getActions(Integer vl) {
 
-        ActionListEntry result = null;
-
-        for(ActionListEntry entry : actionList) {
-            if(entry.treshold <= vl) {
-                result = entry;
+        Integer result = null;
+        
+        for(Integer treshold : tresholds) {
+            if(treshold <= vl) {
+                result = treshold;
             }
         }
 
         if(result != null)
-            return result.actions;
+            return actions.get(result);
         else
-            return Collections.emptyList();
+            return emptyArray;
+    }
+
+    public List<Integer> getTresholds() {
+        return tresholds;
     }
 }

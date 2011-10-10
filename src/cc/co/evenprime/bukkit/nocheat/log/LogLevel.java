@@ -10,21 +10,17 @@ import java.util.logging.Level;
  */
 public enum LogLevel {
 
-    OFF("off", "never", Level.OFF), LOW("low", "all messages", Level.INFO), MED("med", "important messages", Level.WARNING), HIGH("high", "very important messages", Level.SEVERE);
+    OFF("off", Level.OFF), LOW("low", Level.INFO), MED("med", Level.WARNING), HIGH("high", Level.SEVERE);
 
     public final String  name;
-    private final String description;
     public final Level   level;
 
-    private LogLevel(String name, String description, Level level) {
+    private LogLevel(String name, Level level) {
         this.name = name;
-        this.description = description;
         this.level = level;
     }
 
     public static LogLevel getLogLevelFromString(String s) {
-        if(s == null)
-            return OFF;
         if("off".equals(s))
             return OFF;
         else if("low".equals(s))
@@ -34,11 +30,11 @@ public enum LogLevel {
         else if("high".equals(s))
             return HIGH;
         else
-            return OFF;
+            throw new IllegalArgumentException("Unknown log level "+s);
     }
 
     public String toString() {
-        return this.name() + ": " + description;
+        return this.name;
     }
 
     /**

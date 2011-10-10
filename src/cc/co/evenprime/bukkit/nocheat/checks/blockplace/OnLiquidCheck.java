@@ -1,8 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
-import java.util.HashMap;
-import java.util.Locale;
-
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -10,10 +7,9 @@ import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
-import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
  * 
@@ -22,10 +18,12 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
  */
 public class OnLiquidCheck {
 
+    private final NoCheat        plugin;
     private final ActionExecutor action;
 
     public OnLiquidCheck(NoCheat plugin) {
-        action = new ActionExecutorWithHistory(plugin);
+        this.plugin = plugin;
+        action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, Block blockPlaced, Block blockPlacedAgainst, BlockPlaceData data, ConfigurationCache cc) {
@@ -40,18 +38,12 @@ public class OnLiquidCheck {
             // all ok
         } else {
             data.onliquidViolationLevel += 1;
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put(LogAction.CHECK, "blockplace.onliquid");
-            params.put(LogAction.BLOCK_TYPE, blockPlaced.getType().toString());
-            params.put(LogAction.PLACE_LOCATION, String.format(Locale.US, "%d %d %d", blockPlaced.getX(), blockPlaced.getY(), blockPlaced.getZ()));
-            if(blockPlacedAgainst != null) { 
-                params.put(LogAction.PLACE_AGAINST, String.format(Locale.US, "%d %d %d", blockPlacedAgainst.getX(), blockPlacedAgainst.getY(), blockPlacedAgainst.getZ()));
-            }
-            else {
-                params.put(LogAction.PLACE_AGAINST, "null");
-            }
+            LogData ldata = plugin.getDataManager().getLogData(player);
+            ldata.check = "blockplace.onliquid";
+            ldata.placed = blockPlaced;
+            ldata.placedAgainst = blockPlacedAgainst;
 
-            cancel = action.executeActions(player, cc.blockplace.onliquidActions, (int) data.onliquidViolationLevel, params, cc);
+            cancel = action.executeActions(player, cc.blockplace.onliquidActions, (int) data.onliquidViolationLevel, ldata, cc);
         }
 
         data.onliquidViolationLevel *= 0.95D; // Reduce level over time

@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 
 /**
@@ -19,10 +19,10 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
  */
 public class LogManager {
 
-    private final NoCheat plugin;
+    //private final NoCheat plugin;
 
     public LogManager(NoCheat plugin) {
-        this.plugin = plugin;
+        //this.plugin = plugin;
     }
 
     /**

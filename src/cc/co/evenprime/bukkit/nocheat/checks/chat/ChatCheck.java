@@ -1,22 +1,18 @@
 package cc.co.evenprime.bukkit.nocheat.checks.chat;
 
-import java.util.HashMap;
-import java.util.regex.Matcher;
-
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
-import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
  * 
  * @author Evenprime
- *
+ * 
  */
 public class ChatCheck {
 
@@ -25,8 +21,8 @@ public class ChatCheck {
 
     public ChatCheck(NoCheat plugin) {
 
-        action = new ActionExecutorWithHistory(plugin);
         this.plugin = plugin;
+        action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, String message, ChatData data, ConfigurationCache cc) {
@@ -50,14 +46,15 @@ public class ChatCheck {
 
                 // Prepare some event-specific values for logging and custom
                 // actions
-                HashMap<String, String> params = new HashMap<String, String>();
-                params.put(LogAction.CHECK, "chat.spam");
-                // Escape the message, to avoid errors
-                params.put(LogAction.TEXT, Matcher.quoteReplacement(message));
-                cancel = action.executeActions(player, cc.chat.spamActions, data.messageCount - cc.chat.spamLimit, params, cc);
+                LogData ldata = plugin.getDataManager().getLogData(player);
+
+                ldata.check = "chat.spam";
+                ldata.text = message;
+
+                cancel = action.executeActions(player, cc.chat.spamActions, data.messageCount - cc.chat.spamLimit, ldata, cc);
             }
         }
-        
+
         return cancel;
     }
 

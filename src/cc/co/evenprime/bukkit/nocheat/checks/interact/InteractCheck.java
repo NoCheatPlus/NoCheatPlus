@@ -1,16 +1,13 @@
 package cc.co.evenprime.bukkit.nocheat.checks.interact;
 
-import java.util.HashMap;
-
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.Permissions;
 import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutorWithHistory;
-import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.InteractData;
+import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
  * 
@@ -19,10 +16,12 @@ import cc.co.evenprime.bukkit.nocheat.data.InteractData;
  */
 public class InteractCheck {
 
+    private final NoCheat        plugin;
     private final ActionExecutor action;
 
     public InteractCheck(NoCheat plugin) {
-        action = new ActionExecutorWithHistory(plugin);
+        this.plugin = plugin;
+        action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, InteractData data, ConfigurationCache cc) {
@@ -36,10 +35,11 @@ public class InteractCheck {
             if(player.getInventory().getHeldItemSlot() == 9) {
 
                 data.violationLevel += 1;
-                HashMap<String, String> params = new HashMap<String, String>();
-                params.put(LogAction.CHECK, "interact.durability");
 
-                cancel = action.executeActions(player, cc.interact.durabilityActions, (int) data.violationLevel, params, cc);
+                LogData ldata = plugin.getDataManager().getLogData(player);
+                ldata.check = "interact.durability";
+
+                cancel = action.executeActions(player, cc.interact.durabilityActions, (int) data.violationLevel, ldata, cc);
             }
 
             data.violationLevel *= 0.95D; // Reduce level over time

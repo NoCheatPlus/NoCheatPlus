@@ -26,15 +26,11 @@ public class MovingData {
     public float    fallDistance              = 0.0F;
     public float    lastAddedFallDistance     = 0.0F;
 
-    public int      noclipX;
-    public int      noclipY;
-    public int      noclipZ;
-
     public double   horizontalBuffer;
     public int      bunnyhopdelay             = 0;
 
     public int      morePacketsCounter;
-    public double   morePacketsBuffer         = 50;
+    public int   morePacketsBuffer         = 50;
     public Location morePacketsSetbackPoint;
     public double   morePacketsViolationLevel = 0;
 
