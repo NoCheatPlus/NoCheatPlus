@@ -77,7 +77,7 @@ public class RunningCheck {
             data.runflyViolationLevel += result;
 
             // Prepare some event-specific values for logging and custom actions
-            LogData ldata = plugin.getDataManager().getLogData(player);
+            LogData ldata = plugin.getDataManager().getData(player).log;
             ldata.toLocation = to;
             if(resultHoriz > 0 && resultVert > 0)
                 ldata.check = "runfly/both";

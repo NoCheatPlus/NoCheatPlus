@@ -30,7 +30,7 @@ public class OptionNode {
         this.type = type;
     }
 
-    public void addChild(OptionNode node) {
+    private void addChild(OptionNode node) {
         if(this.type != DataType.PARENT) {
             throw new IllegalArgumentException("Can't a child to a leaf node.");
         }

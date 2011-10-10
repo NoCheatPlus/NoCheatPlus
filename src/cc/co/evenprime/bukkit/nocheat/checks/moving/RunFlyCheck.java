@@ -97,8 +97,6 @@ public class RunFlyCheck {
      * This is a workaround for people placing blocks below them causing false positives
      * with the move check(s).
      * 
-     * TODO: Check if still needed, maybe this got fixed in 1.8.1
-     * 
      * @param player
      * @param data
      * @param blockPlaced

@@ -22,16 +22,11 @@ public class ActionManager {
         this.actions.put(action.name.toLowerCase(), action);
     }
 
-    public Action getAction(String actionName) {
-
-        return this.actions.get(actionName.toLowerCase());
-    }
-
     public Action[] getActions(String[] actionNames) {
         Action[] result = new Action[actionNames.length];
         
         for(int i = 0; i < actionNames.length; i++) {
-            result[i] = getAction(actionNames[i]);
+            result[i] = this.actions.get(actionNames[i].toLowerCase());
         }
         
         return result;

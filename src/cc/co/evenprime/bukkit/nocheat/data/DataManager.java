@@ -7,100 +7,55 @@ import org.bukkit.entity.Player;
 
 /**
  * Provide secure access to player-specific data objects for various checks or
- * check groups
- * 
- * @author Evenprime
- * 
+ * check groups.
  */
 public class DataManager {
 
     // Store data between Events
-    private final Map<Player, MovingData>     movingData     = new HashMap<Player, MovingData>();
-    private final Map<Player, BlockBreakData> blockbreakData = new HashMap<Player, BlockBreakData>();
-    private final Map<Player, BlockPlaceData> blockPlaceData = new HashMap<Player, BlockPlaceData>();
-    private final Map<Player, ChatData>       chatData       = new HashMap<Player, ChatData>();
-    private final Map<Player, LogData>        logData        = new HashMap<Player, LogData>();
+    private final Map<Player, BaseData> map;
 
     public DataManager() {
-
+        this.map = new HashMap<Player, BaseData>();
     }
 
-    public MovingData getMovingData(Player player) {
+    /**
+     * Get a data object of the specified class. If none is stored yet, create
+     * one.
+     */
+    public BaseData getData(Player player) {
 
-        MovingData data;
-
-        // intentionally not thread-safe, because bukkit events are handled
-        // in sequence anyway, so zero chance of two move events of the same
-        // player being handled at the same time
-        data = movingData.get(player);
-        if(data == null) {
-            data = new MovingData();
-            movingData.put(player, data);
-        }
-
-        return data;
-    }
-
-    public BlockBreakData getBlockBreakData(Player player) {
-
-        BlockBreakData data;
-
-        // intentionally not thread-safe, because bukkit events are handled
-        // in sequence anyway, so zero chance of two move events of the same
-        // player being handled at the same time
-        data = blockbreakData.get(player);
-        if(data == null) {
-            data = new BlockBreakData();
-            blockbreakData.put(player, data);
-        }
-
-        return data;
-    }
-
-    public BlockPlaceData getBlockPlaceData(Player player) {
-        BlockPlaceData data;
+        BaseData data = this.map.get(player);
 
         // intentionally not thread-safe, because bukkit events are handled
         // in sequence anyway, so zero chance of two events of the same
         // player being handled at the same time
-        data = blockPlaceData.get(player);
+        // And if it still happens by accident, it's no real loss anyway, as
+        // losing data of one instance doesn't really hurt at all
         if(data == null) {
-            data = new BlockPlaceData();
-            blockPlaceData.put(player, data);
+            data = new BaseData();
+            data.initialize(player);
+            this.map.put(player, data);
         }
 
         return data;
     }
 
-    public ChatData getChatData(Player player) {
-        ChatData data;
-
-        // intentionally not thread-safe, because bukkit events are handled
-        // in sequence anyway, so zero chance of two events of the same
-        // player being handled at the same time
-        // And if it still happens by accident, it's no real loss anyway
-        data = chatData.get(player);
-        if(data == null) {
-            data = new ChatData();
-            chatData.put(player, data);
-        }
-
-        return data;
+    /**
+     * Remove all data Objects of a specific player
+     * 
+     * @param player
+     */
+    public void removeDataForPlayer(Player player) {
+        this.map.remove(player);
     }
 
-    public LogData getLogData(Player player) {
-        LogData data;
-
-        // intentionally not thread-safe, because bukkit events are handled
-        // in sequence anyway, so zero chance of two events of the same
-        // player being handled at the same time
-        // And if it still happens by accident, it's no real loss anyway
-        data = logData.get(player);
-        if(data == null) {
-            data = new LogData(player);
-            logData.put(player, data);
+    /**
+     * Reset data that may cause problems after e.g. changing the config
+     * 
+     */
+    public void resetAllCriticalData() {
+        for(BaseData b : this.map.values()) {
+            b.clearCriticalData();
         }
-
-        return data;
     }
 }

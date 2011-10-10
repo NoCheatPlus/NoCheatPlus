@@ -50,7 +50,7 @@ public class DirectionCheck {
             data.directionViolationLevel += 1;
 
             // Prepare some event-specific values for logging and custom actions
-            LogData ldata = plugin.getDataManager().getLogData(player);
+            LogData ldata = plugin.getDataManager().getData( player).log;
             ldata.check = "blockbreak.direction";
 
             cancel = action.executeActions(player, cc.blockbreak.directionActions, (int) data.directionViolationLevel, ldata, cc);

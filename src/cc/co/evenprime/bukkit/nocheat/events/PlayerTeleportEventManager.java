@@ -29,7 +29,7 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 public class PlayerTeleportEventManager extends PlayerListener implements EventManager {
 
     private final NoCheat plugin;
-    
+
     public PlayerTeleportEventManager(NoCheat p) {
 
         this.plugin = p;
@@ -48,9 +48,9 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
             @Override
             public void onPlayerTeleport(PlayerTeleportEvent event) {
-                final MovingData data2 = plugin.getDataManager().getMovingData(event.getPlayer());
+                final MovingData data = plugin.getDataManager().getData(event.getPlayer()).moving;
                 if(event.isCancelled()) {
-                    if(data2.teleportTo != null && data2.teleportTo.equals(event.getTo())) {
+                    if(data.teleportTo != null && data.teleportTo.equals(event.getTo())) {
                         event.setCancelled(false);
                     }
                 }
@@ -60,13 +60,15 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        // Intentionally not check for cancelled state, may help with problems with other plugins...
-        handleTeleportation(event.getPlayer(), event.getTo());
+        if(!event.isCancelled()) {
+            handleTeleportation(event.getPlayer(), event.getTo());
+        }
     }
 
     public void onPlayerPortal(PlayerPortalEvent event) {
-        // Intentionally not check for cancelled state, may help with problems with other plugins...
-        handleTeleportation(event.getPlayer(), event.getTo());
+        if(!event.isCancelled()) {
+            handleTeleportation(event.getPlayer(), event.getTo());
+        }
     }
 
     public void onPlayerRespawn(PlayerRespawnEvent event) {
@@ -79,26 +81,16 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
             handleTeleportation(event.getPlayer(), event.getFrom());
         }
     }
-    
+
     private void handleTeleportation(Player player, Location newLocation) {
 
-        /********* Moving check ************/
-        final MovingData data = plugin.getDataManager().getMovingData(player);
-
-        data.runflySetBackPoint = null;
-        data.morePacketsCounter = 0;
-        data.morePacketsSetbackPoint = null;
-        data.jumpPhase = 0;
-        data.fallDistance = 0F;
-        data.lastAddedFallDistance = 0F;
+        plugin.getDataManager().getData(player).clearCriticalData();
     }
 
-    @Override
     public List<String> getActiveChecks(ConfigurationCache cc) {
         return Collections.emptyList();
     }
 
-    @Override
     public List<String> getInactiveChecks(ConfigurationCache cc) {
         return Collections.emptyList();
     }

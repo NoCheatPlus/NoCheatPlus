@@ -21,6 +21,7 @@ import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.PlayerQuitEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
@@ -37,17 +38,17 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  */
 public class NoCheat extends JavaPlugin {
 
-    private ConfigurationManager conf;
-    private LogManager           log;
-    private DataManager          data;
+    private ConfigurationManager     conf;
+    private LogManager               log;
+    private DataManager              data;
 
-    private List<EventManager>   eventManagers            = new LinkedList<EventManager>();
+    private final List<EventManager> eventManagers            = new LinkedList<EventManager>();
 
-    private int                  taskId                   = -1;
-    private int                  ingameseconds            = 0;
-    private long                 lastIngamesecondTime     = 0L;
-    private long                 lastIngamesecondDuration = 0L;
-    private boolean              skipCheck                = false;
+    private int                      taskId                   = -1;
+    private int                      ingameseconds            = 0;
+    private long                     lastIngamesecondTime     = 0L;
+    private long                     lastIngamesecondDuration = 0L;
+    private boolean                  skipCheck                = false;
 
     public NoCheat() {
 
@@ -75,7 +76,7 @@ public class NoCheat extends JavaPlugin {
         log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1240. It may break at any time and for any other version.");
 
         this.data = new DataManager();
-        
+
         // parse the nocheat.yml config file
         this.conf = new ConfigurationManager(this.getDataFolder().getPath());
 
@@ -84,13 +85,13 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new PlayerChatEventManager(this));
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
+        eventManagers.add(new PlayerQuitEventManager(this));
 
         PluginDescriptionFile pdfFile = this.getDescription();
 
         if(taskId == -1) {
             taskId = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 
-                @Override
                 public void run() {
 
                     // If the previous second took to long, skip checks during
@@ -224,10 +225,9 @@ public class NoCheat extends JavaPlugin {
                 sender.sendMessage("[NoCheat] Reloading configuration");
 
                 this.conf.cleanup();
-                DataManager newData = new DataManager();
                 this.conf = new ConfigurationManager(this.getDataFolder().getPath());
-                this.data = newData;
-
+                this.data.resetAllCriticalData();
+                
                 sender.sendMessage("[NoCheat] Configuration loaded");
 
                 return true;

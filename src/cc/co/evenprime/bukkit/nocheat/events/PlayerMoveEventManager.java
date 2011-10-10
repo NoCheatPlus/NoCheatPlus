@@ -60,7 +60,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         if(cc.moving.check && !player.hasPermission(Permissions.MOVE)) {
 
             // Get the player-specific stored data that applies here
-            final MovingData data = plugin.getDataManager().getMovingData(player);
+            final MovingData data = plugin.getDataManager().getData(player).moving;
 
             // Get some data that's needed from this event, to avoid passing the
             // event itself on to the checks (and risk to
@@ -96,7 +96,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         if(!event.isCancelled()) {
             Player player = event.getPlayer();
 
-            MovingData mdata = plugin.getDataManager().getMovingData(player);
+            MovingData mdata = plugin.getDataManager().getData(player).moving;
 
             Vector v = event.getVelocity();
 
@@ -116,7 +116,6 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         }
     }
 
-    @Override
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
@@ -136,7 +135,6 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         return s;
     }
 
-    @Override
     public List<String> getInactiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 

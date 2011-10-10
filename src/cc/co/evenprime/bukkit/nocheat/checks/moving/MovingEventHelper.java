@@ -15,8 +15,8 @@ import org.bukkit.World;
  */
 public class MovingEventHelper {
 
-    private final double     magic    = 0.45D;
-    private final double     magic2   = 0.55D;
+    private final static double     magic    = 0.45D;
+    private final static double     magic2   = 0.55D;
 
     // Block types that may need to be treated specially
     private static final int NONSOLID = 1;                    // 0x00000001
@@ -159,7 +159,7 @@ public class MovingEventHelper {
         return (value & LIQUID) == LIQUID;
     }
 
-    final boolean isNonSolid(int value) {
+    private final boolean isNonSolid(int value) {
         return((value & NONSOLID) == NONSOLID);
     }
 

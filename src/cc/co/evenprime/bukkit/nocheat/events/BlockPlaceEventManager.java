@@ -33,7 +33,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
     public BlockPlaceEventManager(NoCheat p) {
 
         this.plugin = p;
-        
+
         this.movingCheck = new RunFlyCheck(plugin);
         this.blockPlaceCheck = new BlockPlaceCheck(plugin);
 
@@ -49,7 +49,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
                 if(!event.isCancelled()) {
                     final Player player = event.getPlayer();
                     // Get the player-specific stored data that applies here
-                    movingCheck.blockPlaced(player, plugin.getDataManager().getMovingData(player), event.getBlockPlaced());
+                    movingCheck.blockPlaced(player, plugin.getDataManager().getData(player).moving, event.getBlockPlaced());
                 }
             }
         }, Priority.Monitor, plugin);
@@ -67,7 +67,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
             // Find out if checks need to be done for that player
             if(cc.blockplace.check && !player.hasPermission(Permissions.BLOCKPLACE)) {
 
-                cancel = blockPlaceCheck.check(player, event.getBlockPlaced(), event.getBlockAgainst(), plugin.getDataManager().getBlockPlaceData(player), cc);
+                cancel = blockPlaceCheck.check(player, event.getBlockPlaced(), event.getBlockAgainst(), plugin.getDataManager().getData(player).blockplace, cc);
             }
 
             if(cancel) {
@@ -76,7 +76,6 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
         }
     }
 
-    @Override
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
@@ -88,7 +87,6 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
         return s;
     }
 
-    @Override
     public List<String> getInactiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 

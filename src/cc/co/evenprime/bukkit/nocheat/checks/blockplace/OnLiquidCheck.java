@@ -38,7 +38,7 @@ public class OnLiquidCheck {
             // all ok
         } else {
             data.onliquidViolationLevel += 1;
-            LogData ldata = plugin.getDataManager().getLogData(player);
+            LogData ldata = plugin.getDataManager().getData(player).log;
             ldata.check = "blockplace.onliquid";
             ldata.placed = blockPlaced;
             ldata.placedAgainst = blockPlacedAgainst;
@@ -51,7 +51,7 @@ public class OnLiquidCheck {
         return cancel;
     }
 
-    public boolean isSolid(Block block) {
+    private boolean isSolid(Block block) {
         Material m = block.getType();
         return !(m == Material.AIR) || (m == Material.WATER) || (m == Material.STATIONARY_WATER) || (m == Material.LAVA) || (m == Material.STATIONARY_LAVA);
     }

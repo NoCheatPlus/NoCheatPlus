@@ -8,11 +8,11 @@ import org.bukkit.Location;
  * @author Evenprime
  * 
  */
-public class BlockBreakData {
+public class BlockBreakData extends Data {
 
-    public double reachViolationLevel     = 0.0D;
-
-    public double directionViolationLevel = 0.0D;
+    public double   reachViolationLevel     = 0.0D;
+    public double   directionViolationLevel = 0.0D;
 
     public Location instaBrokeBlockLocation = null;
+
 }

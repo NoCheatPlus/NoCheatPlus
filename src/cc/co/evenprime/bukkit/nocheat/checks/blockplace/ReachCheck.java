@@ -47,7 +47,7 @@ public class ReachCheck {
             data.reachViolationLevel += 1;
 
             // Prepare some event-specific values for logging and custom actions
-            LogData ldata = plugin.getDataManager().getLogData(player);
+            LogData ldata = plugin.getDataManager().getData(player).log;
             ldata.check = "blockplace.reach";
             ldata.reachdistance = distance;
 

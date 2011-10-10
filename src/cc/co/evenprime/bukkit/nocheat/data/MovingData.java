@@ -1,41 +1,59 @@
 package cc.co.evenprime.bukkit.nocheat.data;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 /**
- * Playerspecific data for the moving check group
- * 
- * @author Evenprime
- * 
+ * Player specific data for the moving check group
  */
-public class MovingData {
+public class MovingData extends Data {
 
-    public int      jumpPhase                 = 0;
+    public int      jumpPhase;
 
-    public Location runflySetBackPoint        = null;
+    public Location runflySetBackPoint;
 
-    public double   runflyViolationLevel      = 0.0D;
+    public double   runflyViolationLevel;
 
-    public double   vertFreedom               = 0.0D;
-    public double   vertVelocity              = 0.0D;
-    public int      vertVelocityCounter       = 0;
-    public double   horizFreedom              = 0.0D;
-    public int      horizVelocityCounter      = 0;
+    public double   vertFreedom;
+    public double   vertVelocity;
+    public int      vertVelocityCounter;
+    public double   horizFreedom;
+    public int      horizVelocityCounter;
 
-    public double   nofallViolationLevel      = 0.0D;
-    public float    fallDistance              = 0.0F;
-    public float    lastAddedFallDistance     = 0.0F;
+    public double   nofallViolationLevel;
+    public float    fallDistance;
+    public float    lastAddedFallDistance;
 
     public double   horizontalBuffer;
-    public int      bunnyhopdelay             = 0;
+    public int      bunnyhopdelay;
 
     public int      morePacketsCounter;
-    public int   morePacketsBuffer         = 50;
+    public int      morePacketsBuffer;
     public Location morePacketsSetbackPoint;
-    public double   morePacketsViolationLevel = 0;
+    public double   morePacketsViolationLevel;
 
     public Location teleportTo;
 
-    public int      lastElapsedIngameSeconds  = 0;
+    public int      lastElapsedIngameSeconds;
 
+    @Override
+    public void initialize(Player player) {
+        runflySetBackPoint = player.getLocation();
+        morePacketsBuffer = 50;
+        morePacketsSetbackPoint = player.getLocation();
+    }
+
+    @Override
+    public void clearCriticalData() {
+        teleportTo = null;
+        jumpPhase = 0;
+        runflySetBackPoint = null;
+        fallDistance = 0;
+        lastAddedFallDistance = 0;
+        bunnyhopdelay = 0;
+        morePacketsBuffer = 50;
+        morePacketsSetbackPoint = null;
+        lastElapsedIngameSeconds = 0;
+        morePacketsCounter = 0;
+    }
 }

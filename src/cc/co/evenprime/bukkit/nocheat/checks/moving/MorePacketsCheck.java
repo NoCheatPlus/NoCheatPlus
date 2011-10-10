@@ -25,8 +25,8 @@ public class MorePacketsCheck {
 
     private final ActionExecutor action;
 
-    private final int            packetsPerTimeframe = 22;
-    private final int            bufferLimit         = 30;
+    private final static int            packetsPerTimeframe = 22;
+    private final static int            bufferLimit         = 30;
     private final NoCheat        plugin;
 
     public MorePacketsCheck(NoCheat plugin) {
@@ -122,7 +122,7 @@ public class MorePacketsCheck {
             if(!plugin.skipCheck() && packetsAboveLimit > 0) {
                 data.morePacketsViolationLevel += packetsAboveLimit;
 
-                LogData ldata = plugin.getDataManager().getLogData(player);
+                LogData ldata = plugin.getDataManager().getData(player).log;
                 // Packets above limit
                 ldata.packets = data.morePacketsCounter - limit;
                 ldata.check = "moving/morepackets";

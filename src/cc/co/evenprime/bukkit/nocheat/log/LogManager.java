@@ -66,7 +66,7 @@ public class LogManager {
      * @param level
      * @param message
      */
-    public void logToChat(LogLevel level, String message) {
+    private void logToChat(LogLevel level, String message) {
         for(Player player : Bukkit.getServer().getOnlinePlayers()) {
             if(player.hasPermission(Permissions.ADMIN_CHATLOG)) {
                 player.sendMessage(message);
@@ -81,7 +81,7 @@ public class LogManager {
      * @param message
      * @param fileLogger
      */
-    public void logToFile(LogLevel level, String message, Logger fileLogger) {
+    private void logToFile(LogLevel level, String message, Logger fileLogger) {
         fileLogger.log(level.level, message);
     }
 }

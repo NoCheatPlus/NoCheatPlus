@@ -16,7 +16,6 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.ChatData;
 
 /**
  * 
@@ -54,10 +53,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
 
             boolean cancel = false;
 
-            // Get the player-specific stored data that applies here
-            final ChatData data = plugin.getDataManager().getChatData(player);
-
-            cancel = chatCheck.check(player, event.getMessage(), data, cc);
+            cancel = chatCheck.check(player, event.getMessage(), plugin.getDataManager().getData(player).chat, cc);
 
             if(cancel) {
                 event.setCancelled(true);
@@ -70,7 +66,6 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
         onPlayerChat(event);
     }
 
-    @Override
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
@@ -79,7 +74,6 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
         return s;
     }
 
-    @Override
     public List<String> getInactiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 

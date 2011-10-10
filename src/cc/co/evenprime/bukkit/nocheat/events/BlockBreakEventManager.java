@@ -27,8 +27,8 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
  */
 public class BlockBreakEventManager extends BlockListener implements EventManager {
 
-    private final BlockBreakCheck      blockBreakCheck;
-    private final NoCheat plugin;
+    private final BlockBreakCheck blockBreakCheck;
+    private final NoCheat         plugin;
 
     public BlockBreakEventManager(NoCheat plugin) {
 
@@ -57,7 +57,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
             boolean cancel = false;
 
             // Get the player-specific stored data that applies here
-            final BlockBreakData data = plugin.getDataManager().getBlockBreakData(player);
+            final BlockBreakData data = plugin.getDataManager().getData(player).blockbreak;
 
             cancel = blockBreakCheck.check(player, event.getBlock(), data, cc);
 
@@ -77,14 +77,13 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
 
         final Player player = event.getPlayer();
         // Get the player-specific stored data that applies here
-        final BlockBreakData data = plugin.getDataManager().getBlockBreakData(player);
+        final BlockBreakData data = plugin.getDataManager().getData(player).blockbreak;
 
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks
         data.instaBrokeBlockLocation = event.getBlock().getLocation();
     }
 
-    @Override
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
@@ -96,10 +95,9 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
         return s;
     }
 
-    @Override
     public List<String> getInactiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
-        
+
         if(!(cc.blockbreak.check && cc.blockbreak.directionCheck))
             s.add("blockbreak.direction");
         if(!(cc.blockbreak.check && cc.blockbreak.reachCheck))

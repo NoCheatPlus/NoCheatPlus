@@ -20,14 +20,14 @@ public class ActionHistory {
         private int       totalEntries    = 0;
         private long      lastClearedTime = 0;
 
-        public ExecutionHistoryEntry(int monitoredTimeFrame) {
+        private ExecutionHistoryEntry(int monitoredTimeFrame) {
             this.executionTimes = new int[monitoredTimeFrame];
         }
 
         /**
          * Remember an execution at the specific time
          */
-        public void addCounter(long time) {
+        private void addCounter(long time) {
             // clear out now outdated values from the array
             if(time - lastClearedTime > 0) {
                 // Clear the next few fields of the array

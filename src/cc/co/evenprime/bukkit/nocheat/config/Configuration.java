@@ -21,21 +21,21 @@ public abstract class Configuration {
 
     public final static OptionNode        ROOT                                       = new OptionNode(null, null, DataType.PARENT);
 
-    public final static OptionNode        LOGGING                                    = new OptionNode("logging", ROOT, DataType.PARENT);
+    private final static OptionNode       LOGGING                                    = new OptionNode("logging", ROOT, DataType.PARENT);
     public final static OptionNode        LOGGING_ACTIVE                             = new OptionNode("active", LOGGING, DataType.BOOLEAN);
     public final static OptionNode        LOGGING_FILENAME                           = new OptionNode("filename", LOGGING, DataType.STRING);
     public final static OptionNode        LOGGING_FILELEVEL                          = new OptionNode("filelevel", LOGGING, DataType.LOGLEVEL);
     public final static OptionNode        LOGGING_CONSOLELEVEL                       = new OptionNode("consolelevel", LOGGING, DataType.LOGLEVEL);
     public final static OptionNode        LOGGING_CHATLEVEL                          = new OptionNode("chatlevel", LOGGING, DataType.LOGLEVEL);
 
-    public final static OptionNode        DEBUG                                      = new OptionNode("debug", ROOT, DataType.PARENT);
+    private final static OptionNode       DEBUG                                      = new OptionNode("debug", ROOT, DataType.PARENT);
     public final static OptionNode        DEBUG_SHOWACTIVECHECKS                     = new OptionNode("showactivechecks", DEBUG, DataType.BOOLEAN);
 
-    public final static OptionNode        MOVING                                     = new OptionNode("moving", ROOT, DataType.PARENT);
+    private final static OptionNode       MOVING                                     = new OptionNode("moving", ROOT, DataType.PARENT);
     public final static OptionNode        MOVING_CHECK                               = new OptionNode("check", MOVING, DataType.BOOLEAN);
     public final static OptionNode        MOVING_IDENTIFYCREATIVEMODE                = new OptionNode("identifycreativemode", MOVING, DataType.BOOLEAN);
 
-    public final static OptionNode        MOVING_RUNFLY                              = new OptionNode("runfly", MOVING, DataType.PARENT);
+    private final static OptionNode       MOVING_RUNFLY                              = new OptionNode("runfly", MOVING, DataType.PARENT);
     public final static OptionNode        MOVING_RUNFLY_CHECK                        = new OptionNode("check", MOVING_RUNFLY, DataType.BOOLEAN);
     public final static OptionNode        MOVING_RUNFLY_WALKINGSPEEDLIMIT            = new OptionNode("alkingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_SPRINTINGSPEEDLIMIT          = new OptionNode("sprintingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);
@@ -53,39 +53,39 @@ public abstract class Configuration {
     public final static OptionNode        MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL   = new OptionNode("flyingspeedlimithorizontal", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_FLYINGACTIONS                = new OptionNode("flyingactions", MOVING_RUNFLY, DataType.ACTIONLIST);
 
-    public final static OptionNode        MOVING_MOREPACKETS                         = new OptionNode("morepackets", MOVING, DataType.PARENT);
+    private final static OptionNode       MOVING_MOREPACKETS                         = new OptionNode("morepackets", MOVING, DataType.PARENT);
     public final static OptionNode        MOVING_MOREPACKETS_CHECK                   = new OptionNode("check", MOVING_MOREPACKETS, DataType.BOOLEAN);
     public final static OptionNode        MOVING_MOREPACKETS_ACTIONS                 = new OptionNode("actions", MOVING_MOREPACKETS, DataType.ACTIONLIST);
 
-    public final static OptionNode        BLOCKBREAK                                 = new OptionNode("blockbreak", ROOT, DataType.PARENT);
+    private final static OptionNode       BLOCKBREAK                                 = new OptionNode("blockbreak", ROOT, DataType.PARENT);
     public final static OptionNode        BLOCKBREAK_CHECK                           = new OptionNode("check", BLOCKBREAK, DataType.BOOLEAN);
 
-    public final static OptionNode        BLOCKBREAK_REACH                           = new OptionNode("reach", BLOCKBREAK, DataType.PARENT);
+    private final static OptionNode       BLOCKBREAK_REACH                           = new OptionNode("reach", BLOCKBREAK, DataType.PARENT);
     public final static OptionNode        BLOCKBREAK_REACH_CHECK                     = new OptionNode("check", BLOCKBREAK_REACH, DataType.BOOLEAN);
     public final static OptionNode        BLOCKBREAK_REACH_LIMIT                     = new OptionNode("limit", BLOCKBREAK_REACH, DataType.INTEGER);
     public final static OptionNode        BLOCKBREAK_REACH_ACTIONS                   = new OptionNode("actions", BLOCKBREAK_REACH, DataType.ACTIONLIST);
 
-    public final static OptionNode        BLOCKBREAK_DIRECTION                       = new OptionNode("direction", BLOCKBREAK, DataType.PARENT);
+    private final static OptionNode       BLOCKBREAK_DIRECTION                       = new OptionNode("direction", BLOCKBREAK, DataType.PARENT);
     public final static OptionNode        BLOCKBREAK_DIRECTION_CHECK                 = new OptionNode("check", BLOCKBREAK_DIRECTION, DataType.BOOLEAN);
     public static final OptionNode        BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS = new OptionNode("checkinstabreakblocks", BLOCKBREAK_DIRECTION, DataType.BOOLEAN);
     public final static OptionNode        BLOCKBREAK_DIRECTION_ACTIONS               = new OptionNode("actions", BLOCKBREAK_DIRECTION, DataType.ACTIONLIST);
 
-    public final static OptionNode        BLOCKPLACE                                 = new OptionNode("blockplace", ROOT, DataType.PARENT);
+    private final static OptionNode       BLOCKPLACE                                 = new OptionNode("blockplace", ROOT, DataType.PARENT);
     public final static OptionNode        BLOCKPLACE_CHECK                           = new OptionNode("check", BLOCKPLACE, DataType.BOOLEAN);
 
-    public final static OptionNode        BLOCKPLACE_REACH                           = new OptionNode("reach", BLOCKPLACE, DataType.PARENT);
+    private final static OptionNode       BLOCKPLACE_REACH                           = new OptionNode("reach", BLOCKPLACE, DataType.PARENT);
     public final static OptionNode        BLOCKPLACE_REACH_CHECK                     = new OptionNode("check", BLOCKPLACE_REACH, DataType.BOOLEAN);
     public final static OptionNode        BLOCKPLACE_REACH_LIMIT                     = new OptionNode("limit", BLOCKPLACE_REACH, DataType.INTEGER);
     public final static OptionNode        BLOCKPLACE_REACH_ACTIONS                   = new OptionNode("actions", BLOCKPLACE_REACH, DataType.ACTIONLIST);
 
-    public final static OptionNode        BLOCKPLACE_ONLIQUID                        = new OptionNode("onliquid", BLOCKPLACE, DataType.PARENT);
+    private final static OptionNode        BLOCKPLACE_ONLIQUID                        = new OptionNode("onliquid", BLOCKPLACE, DataType.PARENT);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_CHECK                  = new OptionNode("check", BLOCKPLACE_ONLIQUID, DataType.BOOLEAN);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_ACTIONS                = new OptionNode("actions", BLOCKPLACE_ONLIQUID, DataType.ACTIONLIST);
 
-    public final static OptionNode        CHAT                                       = new OptionNode("chat", ROOT, DataType.PARENT);
+    private final static OptionNode       CHAT                                       = new OptionNode("chat", ROOT, DataType.PARENT);
     public final static OptionNode        CHAT_CHECK                                 = new OptionNode("check", CHAT, DataType.BOOLEAN);
 
-    public final static OptionNode        CHAT_SPAM                                  = new OptionNode("spam", CHAT, DataType.PARENT);
+    private final static OptionNode       CHAT_SPAM                                  = new OptionNode("spam", CHAT, DataType.PARENT);
     public final static OptionNode        CHAT_SPAM_CHECK                            = new OptionNode("check", CHAT_SPAM, DataType.BOOLEAN);
     public final static OptionNode        CHAT_SPAM_TIMEFRAME                        = new OptionNode("timeframe", CHAT_SPAM, DataType.INTEGER);
     public final static OptionNode        CHAT_SPAM_LIMIT                            = new OptionNode("limit", CHAT_SPAM, DataType.INTEGER);

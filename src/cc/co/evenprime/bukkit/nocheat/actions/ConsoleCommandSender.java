@@ -96,10 +96,10 @@ public class ConsoleCommandSender implements CommandSender {
             server.dispatchCommand(this, command);
         } catch(Exception e) {
             // TODO: Better error handling
+            System.out.println("[NoCheat] failed to execute the command '"+command + "', please check if everything is setup correct.");
         }
     }
 
-    @Override
     public String getName() {
         return "NoCheat";
     }

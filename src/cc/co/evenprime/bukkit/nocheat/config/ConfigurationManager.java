@@ -30,7 +30,6 @@ public class ConfigurationManager {
     private final static String                   configFileName            = "config.txt";
     private final static String                   actionFileName            = "actions.txt";
     private final static String                   defaultActionFileName     = "default_actions.txt";
-    private final static String                   descriptionsFileName      = "descriptions.txt";
 
     private final Map<String, ConfigurationCache> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCache>();
 
@@ -80,9 +79,9 @@ public class ConfigurationManager {
         // Parse actions file
         // MOVE TO ACTIONMANAGER PARSER OR SOMETHING
         initializeActions(rootConfigFolder, actionManager);
-        
+
         defaultConfig = new DefaultConfiguration(actionManager);
-        
+
         // Setup the configuration tree
         initializeConfig(rootConfigFolder, actionManager);
 
@@ -175,14 +174,14 @@ public class ConfigurationManager {
 
     }
 
-    public static File getGlobalConfigFile(String rootFolder) {
+    private static File getGlobalConfigFile(String rootFolder) {
 
         File globalConfig = new File(rootFolder, configFileName);
 
         return globalConfig;
     }
 
-    public static Map<String, File> getWorldSpecificConfigFiles(String rootConfigFolder) {
+    private static Map<String, File> getWorldSpecificConfigFiles(String rootConfigFolder) {
 
         HashMap<String, File> files = new HashMap<String, File>();
 
@@ -206,6 +205,14 @@ public class ConfigurationManager {
 
         FileHandler fh = fileToFileHandlerMap.get(logfile);
 
+        // this logger will be used ONLY for logging to a single log-file and
+        // only
+        // in this plugin, therefore it doesn't need any namespace
+        Logger l = Logger.getAnonymousLogger();
+        l.setLevel(Level.INFO);
+        // Ignore parent's settings
+        l.setUseParentHandlers(false);
+
         if(fh == null) {
             try {
                 try {
@@ -221,21 +228,14 @@ public class ConfigurationManager {
                 fh.setFormatter(new LogFileFormatter());
                 fileToFileHandlerMap.put(logfile, fh);
 
+                l.addHandler(fh);
+
             } catch(SecurityException e) {
                 e.printStackTrace();
             } catch(IOException e) {
                 e.printStackTrace();
             }
         }
-
-        // this logger will be used ONLY for logging to a single log-file and
-        // only
-        // in this plugin, therefore it doesn't need any namespace
-        Logger l = Logger.getAnonymousLogger();
-        l.setLevel(Level.INFO);
-        // Ignore parent's settings
-        l.setUseParentHandlers(false);
-        l.addHandler(fh);
 
         return l;
     }
@@ -281,18 +281,5 @@ public class ConfigurationManager {
 
             return cache;
         }
-    }
-
-    public static File getDescriptionFile(String rootConfigFolder) {
-
-        return new File(rootConfigFolder, descriptionsFileName);
-    }
-
-    public static File getDefaultActionFile(String rootConfigFolder) {
-        return new File(rootConfigFolder, defaultActionFileName);
-    }
-
-    public static File getActionFile(String rootConfigFolder) {
-        return new File(rootConfigFolder, actionFileName);
     }
 }

@@ -37,7 +37,7 @@ public class ReachCheck {
             // Increment violation counter
             data.reachViolationLevel += 1;
 
-            LogData ldata = plugin.getDataManager().getLogData(player);
+            LogData ldata = plugin.getDataManager().getData(player).log;
 
             ldata.check = "blockbreak.reach";
             ldata.reachdistance = distance;

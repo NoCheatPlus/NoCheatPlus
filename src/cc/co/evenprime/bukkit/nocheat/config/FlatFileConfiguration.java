@@ -221,11 +221,11 @@ public class FlatFileConfiguration extends Configuration {
 
     private void saveActionList(BufferedWriter w, String id, ActionList actionList) throws IOException {        
         for(Integer treshold : actionList.getTresholds()) {
-            String s = "";
+            StringBuilder s = new StringBuilder("");
             for(Action s2 : actionList.getActions(treshold)) {
-                s = s + " " + s2.name;
+                s.append(" ").append(s2.name);
             }
-            saveValue(w, id + "." + treshold, s.trim());
+            saveValue(w, id + "." + treshold, s.toString().trim());
         }
 
     }
@@ -238,7 +238,7 @@ public class FlatFileConfiguration extends Configuration {
         w.write(id + " = " + value + "\r\n");
     }
 
-    protected String removeQuotationMarks(String s) {
+    private String removeQuotationMarks(String s) {
 
         s = s.trim();
 
@@ -251,7 +251,7 @@ public class FlatFileConfiguration extends Configuration {
         return s;
     }
 
-    protected String addQuotationMarks(String s) {
+    private String addQuotationMarks(String s) {
 
         return "\"" + s + "\"";
     }
