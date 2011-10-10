@@ -12,7 +12,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
@@ -41,7 +40,6 @@ public class NoCheat extends JavaPlugin {
     private ConfigurationManager conf;
     private LogManager           log;
     private DataManager          data;
-    private ActionManager        action;
 
     private List<EventManager>   eventManagers            = new LinkedList<EventManager>();
 
@@ -77,10 +75,9 @@ public class NoCheat extends JavaPlugin {
         log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1240. It may break at any time and for any other version.");
 
         this.data = new DataManager();
-        this.action = new ActionManager();
-
+        
         // parse the nocheat.yml config file
-        this.conf = new ConfigurationManager(this.getDataFolder().getPath(), action);
+        this.conf = new ConfigurationManager(this.getDataFolder().getPath());
 
         eventManagers.add(new PlayerMoveEventManager(this));
         eventManagers.add(new PlayerTeleportEventManager(this));
@@ -125,10 +122,6 @@ public class NoCheat extends JavaPlugin {
 
     public DataManager getDataManager() {
         return data;
-    }
-
-    public ActionManager getActionManager() {
-        return action;
     }
 
     public int getIngameSeconds() {
@@ -228,9 +221,15 @@ public class NoCheat extends JavaPlugin {
                     return false;
                 }
 
+                sender.sendMessage("[NoCheat] Reloading configuration");
+
                 this.conf.cleanup();
-                this.conf = new ConfigurationManager(this.getDataFolder().getPath(), this.action);
-                
+                DataManager newData = new DataManager();
+                this.conf = new ConfigurationManager(this.getDataFolder().getPath());
+                this.data = newData;
+
+                sender.sendMessage("[NoCheat] Configuration loaded");
+
                 return true;
             }
         }

@@ -74,8 +74,9 @@ public class ConfigurationManager {
     // private final static String loggerName = "cc.co.evenprime.nocheat";
     // public final Logger logger = Logger.getLogger(loggerName);
 
-    public ConfigurationManager(String rootConfigFolder, ActionManager actionManager) {
+    public ConfigurationManager(String rootConfigFolder) {
 
+        ActionManager actionManager = new ActionManager();
         // Parse actions file
         // MOVE TO ACTIONMANAGER PARSER OR SOMETHING
         initializeActions(rootConfigFolder, actionManager);
