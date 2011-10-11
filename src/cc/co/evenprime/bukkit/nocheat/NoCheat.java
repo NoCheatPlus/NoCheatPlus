@@ -16,6 +16,9 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
+import cc.co.evenprime.bukkit.nocheat.debug.Performance;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
@@ -41,6 +44,7 @@ public class NoCheat extends JavaPlugin {
     private ConfigurationManager     conf;
     private LogManager               log;
     private DataManager              data;
+    private PerformanceManager       performance;
 
     private final List<EventManager> eventManagers            = new LinkedList<EventManager>();
 
@@ -71,15 +75,20 @@ public class NoCheat extends JavaPlugin {
     public void onEnable() {
 
         // First set up logging
-        this.log = new LogManager(this);
+        this.log = new LogManager();
 
         log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1240. It may break at any time and for any other version.");
 
+        // Then set up in memory per player data storage
         this.data = new DataManager();
 
-        // parse the nocheat.yml config file
+        // Then read the configuration files
         this.conf = new ConfigurationManager(this.getDataFolder().getPath());
 
+        // Then set up the performance counters
+        this.performance = new PerformanceManager();
+
+        // Then set up the event listeners
         eventManagers.add(new PlayerMoveEventManager(this));
         eventManagers.add(new PlayerTeleportEventManager(this));
         eventManagers.add(new PlayerChatEventManager(this));
@@ -87,8 +96,7 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new PlayerQuitEventManager(this));
 
-        PluginDescriptionFile pdfFile = this.getDescription();
-
+        // Then set up a task to monitor server lag
         if(taskId == -1) {
             taskId = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 
@@ -108,9 +116,11 @@ public class NoCheat extends JavaPlugin {
             }, 0, 20);
         }
 
+        // Then print a list of active checks per world
         printActiveChecks();
 
-        log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + pdfFile.getVersion() + "] is enabled.");
+        // Tell the server admin that we finished loading NoCheat now
+        log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + this.getDescription().getVersion() + "] is enabled.");
     }
 
     public ConfigurationManager getConfigurationManager() {
@@ -123,6 +133,10 @@ public class NoCheat extends JavaPlugin {
 
     public DataManager getDataManager() {
         return data;
+    }
+
+    public PerformanceManager getPerformanceManager() {
+        return performance;
     }
 
     public int getIngameSeconds() {
@@ -227,12 +241,47 @@ public class NoCheat extends JavaPlugin {
                 this.conf.cleanup();
                 this.conf = new ConfigurationManager(this.getDataFolder().getPath());
                 this.data.resetAllCriticalData();
+
+                sender.sendMessage("[NoCheat] Configuration reloaded");
+
+                return true;
+            }
+
+            else if(args[0].equalsIgnoreCase("performance")) {
+                // performance command was used
+
+                // Does the sender have permission?
+                if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERFORMANCE)) {
+                    return false;
+                }
+
+                sender.sendMessage("[NoCheat] Retrieving performance statistics");
+
+                PerformanceManager pm = this.getPerformanceManager();
+                long totalTime = 0;
                 
-                sender.sendMessage("[NoCheat] Configuration loaded");
+                for(Type type : Type.values()) {
+                    Performance p = pm.get(type);
+                    
+                    long total = p.getTotalTime();
+                    totalTime += total;
+                    long relative = p.getRelativeTime();
+                    long events = p.getCounter();
+
+                    StringBuilder string = new StringBuilder("").append(type.toString());
+                    string.append(": total ").append(pm.convertToAppropriateUnit(total)).append(" ").append(pm.getAppropriateUnit(total));
+                    string.append(", relative ").append(pm.convertToAppropriateUnit(relative)).append(" ").append(pm.getAppropriateUnit(relative));
+                    string.append(" over ").append(events).append(" events.");
+
+                    sender.sendMessage(string.toString());
+                }
+                
+                sender.sendMessage("Total time spent: " + pm.convertToAppropriateUnit(totalTime) + " " + pm.getAppropriateUnit(totalTime));
 
                 return true;
             }
         }
         return false;
     }
+
 }

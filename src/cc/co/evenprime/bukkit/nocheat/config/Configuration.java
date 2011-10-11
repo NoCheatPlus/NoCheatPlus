@@ -19,7 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
  */
 public abstract class Configuration {
 
-    public final static OptionNode        ROOT                                       = new OptionNode(null, null, DataType.PARENT);
+    protected final static OptionNode        ROOT                                       = new OptionNode(null, null, DataType.PARENT);
 
     private final static OptionNode       LOGGING                                    = new OptionNode("logging", ROOT, DataType.PARENT);
     public final static OptionNode        LOGGING_ACTIVE                             = new OptionNode("active", LOGGING, DataType.BOOLEAN);

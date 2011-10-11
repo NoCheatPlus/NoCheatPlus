@@ -13,7 +13,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
  */
 public class ActionHistory {
 
-    private class ExecutionHistoryEntry {
+    private static class ExecutionHistoryEntry {
 
         private final int executionTimes[];
         private long      lastExecution   = 0;

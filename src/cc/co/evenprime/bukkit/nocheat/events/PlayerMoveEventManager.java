@@ -19,6 +19,8 @@ import cc.co.evenprime.bukkit.nocheat.checks.moving.RunFlyCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
+import cc.co.evenprime.bukkit.nocheat.debug.Performance;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 /**
  * The only place that listens to and modifies player_move events if necessary
@@ -34,10 +36,16 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
     private final NoCheat     plugin;
     private final RunFlyCheck movingCheck;
 
+    private final Performance movePerformance;
+    private final Performance velocityPerformance;
+
     public PlayerMoveEventManager(NoCheat plugin) {
 
         this.plugin = plugin;
         this.movingCheck = new RunFlyCheck(plugin);
+
+        this.movePerformance = plugin.getPerformanceManager().get(Type.MOVING);
+        this.velocityPerformance = plugin.getPerformanceManager().get(Type.VELOCITY);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -51,6 +59,13 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         // Cancelled events are ignored
         if(event.isCancelled())
             return;
+
+        // Performance counter setup
+        long nanoTimeStart = 0;
+        final boolean performanceCheck = movePerformance.isEnabled();
+
+        if(performanceCheck)
+            nanoTimeStart = System.nanoTime();
 
         // Get the world-specific configuration that applies here
         final Player player = event.getPlayer();
@@ -85,35 +100,46 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
             }
         }
 
-        // Log some performance data
-        // log.logToConsole(LogLevel.LOW, "Time: " + (System.nanoTime() -
-        // nanoTime));
+        // store performance time
+        if(performanceCheck)
+            movePerformance.addTime(System.nanoTime() - nanoTimeStart);
     }
 
     @Override
     public void onPlayerVelocity(PlayerVelocityEvent event) {
+        if(event.isCancelled())
+            return;
 
-        if(!event.isCancelled()) {
-            Player player = event.getPlayer();
+        // Performance counter setup
+        long nanoTimeStart = 0;
+        final boolean performanceCheck = velocityPerformance.isEnabled();
 
-            MovingData mdata = plugin.getDataManager().getData(player).moving;
+        if(performanceCheck)
+            nanoTimeStart = System.nanoTime();
 
-            Vector v = event.getVelocity();
+        Player player = event.getPlayer();
 
-            double newVal = v.getY();
-            if(newVal >= 0.0D) {
-                mdata.vertVelocity += newVal;
-                mdata.vertFreedom += mdata.vertVelocity;
-            }
+        MovingData mdata = plugin.getDataManager().getData(player).moving;
 
-            mdata.vertVelocityCounter = 50;
+        Vector v = event.getVelocity();
 
-            newVal = Math.sqrt(Math.pow(v.getX(), 2) + Math.pow(v.getZ(), 2));
-            if(newVal > 0.0D) {
-                mdata.horizFreedom += newVal;
-                mdata.horizVelocityCounter = 30;
-            }
+        double newVal = v.getY();
+        if(newVal >= 0.0D) {
+            mdata.vertVelocity += newVal;
+            mdata.vertFreedom += mdata.vertVelocity;
         }
+
+        mdata.vertVelocityCounter = 50;
+
+        newVal = Math.sqrt(Math.pow(v.getX(), 2) + Math.pow(v.getZ(), 2));
+        if(newVal > 0.0D) {
+            mdata.horizFreedom += newVal;
+            mdata.horizVelocityCounter = 30;
+        }
+
+        // store performance time
+        if(performanceCheck)
+            velocityPerformance.addTime(System.nanoTime() - nanoTimeStart);
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

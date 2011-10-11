@@ -12,8 +12,8 @@ public enum LogLevel {
 
     OFF("off", Level.OFF), LOW("low", Level.INFO), MED("med", Level.WARNING), HIGH("high", Level.SEVERE);
 
-    public final String  name;
-    public final Level   level;
+    public final String name;
+    public final Level  level;
 
     private LogLevel(String name, Level level) {
         this.name = name;
@@ -21,16 +21,13 @@ public enum LogLevel {
     }
 
     public static LogLevel getLogLevelFromString(String s) {
-        if("off".equals(s))
-            return OFF;
-        else if("low".equals(s))
-            return LOW;
-        else if("med".equals(s))
-            return MED;
-        else if("high".equals(s))
-            return HIGH;
-        else
-            throw new IllegalArgumentException("Unknown log level "+s);
+        for(LogLevel l : values()) {
+            if(l.name.equalsIgnoreCase(s)) {
+                return l;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown log level " + s);
     }
 
     public String toString() {

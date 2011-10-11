@@ -16,6 +16,8 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.debug.Performance;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 /**
  * 
@@ -24,13 +26,16 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
  */
 public class PlayerChatEventManager extends PlayerListener implements EventManager {
 
-    private final NoCheat   plugin;
-    private final ChatCheck chatCheck;
+    private final NoCheat     plugin;
+    private final ChatCheck   chatCheck;
+    private final Performance chatPerformance;
 
     public PlayerChatEventManager(NoCheat plugin) {
 
         this.plugin = plugin;
         this.chatCheck = new ChatCheck(plugin);
+
+        this.chatPerformance = plugin.getPerformanceManager().get(Type.CHAT);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -44,6 +49,13 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
         if(event.isCancelled()) {
             return;
         }
+
+        // Performance counter setup
+        long nanoTimeStart = 0;
+        final boolean performanceCheck = chatPerformance.isEnabled();
+
+        if(performanceCheck)
+            nanoTimeStart = System.nanoTime();
 
         final Player player = event.getPlayer();
         final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
@@ -60,9 +72,15 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
             }
         }
 
+        // store performance time
+        if(performanceCheck)
+            chatPerformance.addTime(System.nanoTime() - nanoTimeStart);
     }
-    
+
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+
+        // We redirect to the other method anyway, so no need to set up a
+        // performance counter here
         onPlayerChat(event);
     }
 

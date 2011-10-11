@@ -48,11 +48,14 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
             @Override
             public void onPlayerTeleport(PlayerTeleportEvent event) {
+                if(!event.isCancelled()) {
+                    return;
+                }
+
                 final MovingData data = plugin.getDataManager().getData(event.getPlayer()).moving;
-                if(event.isCancelled()) {
-                    if(data.teleportTo != null && data.teleportTo.equals(event.getTo())) {
-                        event.setCancelled(false);
-                    }
+
+                if(data.teleportTo != null && data.teleportTo.equals(event.getTo())) {
+                    event.setCancelled(false);
                 }
             }
         }, Priority.Highest, plugin);
@@ -60,15 +63,17 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
     @Override
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if(!event.isCancelled()) {
-            handleTeleportation(event.getPlayer(), event.getTo());
-        }
+        if(event.isCancelled())
+            return;
+
+        handleTeleportation(event.getPlayer(), event.getTo());
     }
 
     public void onPlayerPortal(PlayerPortalEvent event) {
-        if(!event.isCancelled()) {
-            handleTeleportation(event.getPlayer(), event.getTo());
-        }
+        if(event.isCancelled())
+            return;
+
+        handleTeleportation(event.getPlayer(), event.getTo());
     }
 
     public void onPlayerRespawn(PlayerRespawnEvent event) {
@@ -77,9 +82,11 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
     // Workaround for buggy Playermove cancelling
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(event.isCancelled()) {
-            handleTeleportation(event.getPlayer(), event.getFrom());
+        if(!event.isCancelled()) {
+            return;
         }
+
+        handleTeleportation(event.getPlayer(), event.getFrom());
     }
 
     private void handleTeleportation(Player player, Location newLocation) {

@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -36,7 +37,7 @@ public class ConfigurationManager {
 
     private final Configuration                   defaultConfig;
 
-    private class LogFileFormatter extends Formatter {
+    private static class LogFileFormatter extends Formatter {
 
         private final SimpleDateFormat date;
 
@@ -138,22 +139,22 @@ public class ConfigurationManager {
         // Try to find world-specific config files
         Map<String, File> worldFiles = getWorldSpecificConfigFiles(rootConfigFolder);
 
-        for(String worldName : worldFiles.keySet()) {
+        for(Entry<String, File> worldEntry : worldFiles.entrySet()) {
 
-            File worldConfigFile = worldFiles.get(worldName);
+            File worldConfigFile = worldEntry.getValue();
 
             FlatFileConfiguration world = new FlatFileConfiguration(root, false, worldConfigFile);
 
             try {
                 world.load(action);
 
-                worldnameToConfigCacheMap.put(worldName, createConfigurationCache(rootConfigFolder, world));
+                worldnameToConfigCacheMap.put(worldEntry.getKey(), createConfigurationCache(rootConfigFolder, world));
 
                 // write the config file back to disk immediately
                 world.save();
 
             } catch(IOException e) {
-                System.out.println("NoCheat: Couldn't load world-specific config for " + worldName);
+                System.out.println("NoCheat: Couldn't load world-specific config for " + worldEntry.getKey());
             }
         }
     }

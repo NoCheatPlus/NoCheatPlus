@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 
@@ -19,10 +18,8 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
  */
 public class LogManager {
 
-    //private final NoCheat plugin;
+    public LogManager() {
 
-    public LogManager(NoCheat plugin) {
-        //this.plugin = plugin;
     }
 
     /**
