@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
@@ -23,7 +22,7 @@ public class FlatFileConfiguration extends Configuration {
         this.file = file;
     }
 
-    public void load(ActionManager action) throws IOException {
+    public void load(ActionMapper action) throws IOException {
 
         BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 
@@ -37,7 +36,7 @@ public class FlatFileConfiguration extends Configuration {
 
     }
 
-    private void parse(String line, ActionManager action) throws IOException {
+    private void parse(String line, ActionMapper action) throws IOException {
 
         line = line.trim();
 
@@ -79,7 +78,7 @@ public class FlatFileConfiguration extends Configuration {
         }
     }
 
-    private ActionList parseActionList(OptionNode node, String key, String value, ActionManager action) {
+    private ActionList parseActionList(OptionNode node, String key, String value, ActionMapper action) {
 
         String[] s = key.split("\\.");
         String treshold = s[s.length - 1];

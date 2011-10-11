@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 /**
@@ -18,7 +17,7 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
  */
 public class DefaultConfiguration extends Configuration {
 
-    public DefaultConfiguration(ActionManager action) {
+    public DefaultConfiguration(ActionMapper action) {
         super(null, false);
 
         /*** LOGGING ***/

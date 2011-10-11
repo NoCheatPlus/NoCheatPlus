@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.actions;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,26 +9,26 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
  * @author Evenprime
  * 
  */
-public class ActionManager {
+public class ActionMapper {
 
     private final Map<String, Action> actions;
 
-    public ActionManager() {
+    public ActionMapper() {
         this.actions = new HashMap<String, Action>();
     }
 
     public void addAction(Action action) {
-        
+
         this.actions.put(action.name.toLowerCase(), action);
     }
 
     public Action[] getActions(String[] actionNames) {
         Action[] result = new Action[actionNames.length];
-        
+
         for(int i = 0; i < actionNames.length; i++) {
             result[i] = this.actions.get(actionNames[i].toLowerCase());
         }
-        
+
         return result;
     }
 }

@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -15,8 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
-import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 
 /**
@@ -75,19 +72,20 @@ public class ConfigurationManager {
 
     public ConfigurationManager(String rootConfigFolder) {
 
-        ActionManager actionManager = new ActionManager();
+        ActionMapper actionMapper = new ActionMapper();
+
         // Parse actions file
-        // MOVE TO ACTIONMANAGER PARSER OR SOMETHING
-        initializeActions(rootConfigFolder, actionManager);
+        initializeActions(rootConfigFolder, actionMapper);
 
-        defaultConfig = new DefaultConfiguration(actionManager);
+        // Create a default configuration
+        defaultConfig = new DefaultConfiguration(actionMapper);
 
-        // Setup the configuration tree
-        initializeConfig(rootConfigFolder, actionManager);
+        // Setup the real configuration
+        initializeConfig(rootConfigFolder, actionMapper);
 
     }
 
-    private void initializeActions(String rootConfigFolder, ActionManager actionManager) {
+    private void initializeActions(String rootConfigFolder, ActionMapper actionManager) {
 
         File defaultActionsFile = new File(rootConfigFolder, defaultActionFileName);
 
@@ -96,11 +94,7 @@ public class ConfigurationManager {
 
         // now parse that file again
         FlatFileAction parser = new FlatFileAction(defaultActionsFile);
-        List<Action> defaultActions = parser.read();
-
-        for(Action a : defaultActions) {
-            actionManager.addAction(a);
-        }
+        parser.read(actionManager);
 
         // Check if the "custom" action file exists, if not, create one
         File customActionsFile = new File(rootConfigFolder, actionFileName);
@@ -109,11 +103,7 @@ public class ConfigurationManager {
         }
 
         parser = new FlatFileAction(customActionsFile);
-        List<Action> customActions = parser.read();
-
-        for(Action a : customActions) {
-            actionManager.addAction(a);
-        }
+        parser.read(actionManager);
     }
 
     /**
@@ -122,7 +112,7 @@ public class ConfigurationManager {
      * 
      * @param configurationFile
      */
-    private void initializeConfig(String rootConfigFolder, ActionManager action) {
+    private void initializeConfig(String rootConfigFolder, ActionMapper action) {
 
         // First try to obtain and parse the global config file
         FlatFileConfiguration root;
