@@ -135,6 +135,17 @@ public class DefaultConfiguration extends Configuration {
             spamActionList.setActions(0, action.getActions("spamLog spamCancel".split(" ")));
             setValue(CHAT_SPAM_ACTIONS, spamActionList);
         }
+
+        /*** FIGHT ***/
+        {
+            setValue(FIGHT_CHECK, true);
+
+            setValue(FIGHT_DIRECTION_CHECK, true);
+
+            ActionList directionActionList = new ActionList();
+            directionActionList.setActions(0, action.getActions("fightDirectionLog fightCancel".split(" ")));
+            setValue(FIGHT_DIRECTION_ACTIONS, directionActionList);
+        }
     }
 
     public static void writeActionFile(File file) {
@@ -215,6 +226,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst].");
             w(w, "log spamLog 0 4 med NC: [player] failed [check]: Last sent message \"[text]\".");
             w(w, "log nofallLog 0 1 med NC: [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks.");
+            w(w, "log fightDirectionLog 3 5 med NC: [player] failed [check]: tried to attack out of sight entity.");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
@@ -229,6 +241,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "special blockplaceCancel 0 0");
             w(w, "special spamCancel 0 0");
             w(w, "special nofallDamage 0 0");
+            w(w, "special fightCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");

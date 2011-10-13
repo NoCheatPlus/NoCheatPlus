@@ -19,6 +19,7 @@ public class ConfigurationCache {
     public final CCBlockPlace blockplace;
     public final CCChat       chat;
     public final CCDebug      debug;
+    public final CCFight      fight;
 
     /**
      * Instantiate a config cache and populate it with the data of a
@@ -34,6 +35,7 @@ public class ConfigurationCache {
         chat = new CCChat(data);
         logging = new CCLogging(data, worldSpecificFileLogger);
         debug = new CCDebug(data);
+        fight = new CCFight(data);
 
     }
 }

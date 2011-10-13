@@ -6,7 +6,7 @@ import java.util.Map;
 public class PerformanceManager {
 
     public enum Type {
-        BLOCKBREAK, BLOCKDAMAGE, BLOCKPLACE, CHAT, MOVING, VELOCITY
+        BLOCKBREAK, BLOCKDAMAGE, BLOCKPLACE, CHAT, MOVING, VELOCITY, FIGHT
     }
 
     private static final long            NANO   = 1;

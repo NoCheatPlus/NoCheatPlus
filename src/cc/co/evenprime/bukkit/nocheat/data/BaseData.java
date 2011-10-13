@@ -10,8 +10,10 @@ public class BaseData {
     public final ChatData chat;
     public final LogData log;
     public final MovingData moving;
+    public final FightData fight;
     
     private final Data[] data;
+
     
     public BaseData() {
         this.blockbreak = new BlockBreakData();
@@ -19,8 +21,9 @@ public class BaseData {
         this.chat = new ChatData();
         this.log = new LogData();
         this.moving = new MovingData();
+        this.fight = new FightData();
         
-        data = new Data[] { this.blockbreak, this.blockplace, this.chat, this.log, this.moving };
+        data = new Data[] { this.blockbreak, this.blockplace, this.chat, this.log, this.moving, this.fight };
     }
 
     public void clearCriticalData() {

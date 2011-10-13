@@ -31,6 +31,9 @@ public class Permissions {
     public final static String  CHAT                 = CHECKS + ".chat";
     public final static String  CHAT_SPAM            = CHAT + ".spam";
 
+    public static final String  FIGHT                = CHECKS + ".fight";
+    public static final String  FIGHT_DIRECTION      = FIGHT + ".direction";
+
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
     public static final String  ADMIN_PERMLIST       = ADMIN + ".permlist";
     public static final String  ADMIN_RELOAD         = ADMIN + ".reload";

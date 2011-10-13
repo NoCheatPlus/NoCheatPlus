@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.config.cache;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
-import cc.co.evenprime.bukkit.nocheat.config.DefaultConfiguration;
 
 /**
  * Configurations specific for the "BlockBreak" checks
@@ -23,12 +22,12 @@ public class CCBlockBreak {
 
     public CCBlockBreak(Configuration data) {
 
-        check = data.getBoolean(DefaultConfiguration.BLOCKBREAK_CHECK);
-        reachCheck = data.getBoolean(DefaultConfiguration.BLOCKBREAK_REACH_CHECK);
-        reachDistance = ((double) data.getInteger(DefaultConfiguration.BLOCKBREAK_REACH_LIMIT)) / 100D;
-        reachActions = data.getActionList(DefaultConfiguration.BLOCKBREAK_REACH_ACTIONS);
-        checkinstabreakblocks = data.getBoolean(DefaultConfiguration.BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS);
-        directionCheck = data.getBoolean(DefaultConfiguration.BLOCKBREAK_DIRECTION_CHECK);
-        directionActions = data.getActionList(DefaultConfiguration.BLOCKBREAK_DIRECTION_ACTIONS);
+        check = data.getBoolean(Configuration.BLOCKBREAK_CHECK);
+        reachCheck = data.getBoolean(Configuration.BLOCKBREAK_REACH_CHECK);
+        reachDistance = ((double) data.getInteger(Configuration.BLOCKBREAK_REACH_LIMIT)) / 100D;
+        reachActions = data.getActionList(Configuration.BLOCKBREAK_REACH_ACTIONS);
+        checkinstabreakblocks = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS);
+        directionCheck = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECK);
+        directionActions = data.getActionList(Configuration.BLOCKBREAK_DIRECTION_ACTIONS);
     }
 }

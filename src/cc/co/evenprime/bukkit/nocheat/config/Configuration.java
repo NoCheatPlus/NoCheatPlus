@@ -19,7 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
  */
 public abstract class Configuration {
 
-    protected final static OptionNode        ROOT                                       = new OptionNode(null, null, DataType.PARENT);
+    protected final static OptionNode     ROOT                                       = new OptionNode(null, null, DataType.PARENT);
 
     private final static OptionNode       LOGGING                                    = new OptionNode("logging", ROOT, DataType.PARENT);
     public final static OptionNode        LOGGING_ACTIVE                             = new OptionNode("active", LOGGING, DataType.BOOLEAN);
@@ -78,7 +78,7 @@ public abstract class Configuration {
     public final static OptionNode        BLOCKPLACE_REACH_LIMIT                     = new OptionNode("limit", BLOCKPLACE_REACH, DataType.INTEGER);
     public final static OptionNode        BLOCKPLACE_REACH_ACTIONS                   = new OptionNode("actions", BLOCKPLACE_REACH, DataType.ACTIONLIST);
 
-    private final static OptionNode        BLOCKPLACE_ONLIQUID                        = new OptionNode("onliquid", BLOCKPLACE, DataType.PARENT);
+    private final static OptionNode       BLOCKPLACE_ONLIQUID                        = new OptionNode("onliquid", BLOCKPLACE, DataType.PARENT);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_CHECK                  = new OptionNode("check", BLOCKPLACE_ONLIQUID, DataType.BOOLEAN);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_ACTIONS                = new OptionNode("actions", BLOCKPLACE_ONLIQUID, DataType.ACTIONLIST);
 
@@ -90,6 +90,13 @@ public abstract class Configuration {
     public final static OptionNode        CHAT_SPAM_TIMEFRAME                        = new OptionNode("timeframe", CHAT_SPAM, DataType.INTEGER);
     public final static OptionNode        CHAT_SPAM_LIMIT                            = new OptionNode("limit", CHAT_SPAM, DataType.INTEGER);
     public final static OptionNode        CHAT_SPAM_ACTIONS                          = new OptionNode("actions", CHAT_SPAM, DataType.ACTIONLIST);
+
+    private final static OptionNode       FIGHT                                      = new OptionNode("fight", ROOT, DataType.PARENT);
+    public static final OptionNode        FIGHT_CHECK                                = new OptionNode("check", FIGHT, DataType.BOOLEAN);
+
+    private final static OptionNode       FIGHT_DIRECTION                            = new OptionNode("direction", FIGHT, DataType.PARENT);
+    public final static OptionNode        FIGHT_DIRECTION_CHECK                      = new OptionNode("check", FIGHT_DIRECTION, DataType.BOOLEAN);
+    public final static OptionNode        FIGHT_DIRECTION_ACTIONS                    = new OptionNode("actions", FIGHT_DIRECTION, DataType.ACTIONLIST);
 
     private final Map<OptionNode, Object> values;
     private final Configuration           defaults;

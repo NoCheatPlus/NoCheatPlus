@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.config.cache;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
-import cc.co.evenprime.bukkit.nocheat.config.DefaultConfiguration;
 
 /**
  * Configurations specific for the Move Checks. Every world gets one of these
@@ -39,31 +38,31 @@ public class CCMoving {
 
     public CCMoving(Configuration data) {
 
-        check = data.getBoolean(DefaultConfiguration.MOVING_CHECK);
-        identifyCreativeMode = data.getBoolean(DefaultConfiguration.MOVING_IDENTIFYCREATIVEMODE);
+        check = data.getBoolean(Configuration.MOVING_CHECK);
+        identifyCreativeMode = data.getBoolean(Configuration.MOVING_IDENTIFYCREATIVEMODE);
         
-        runflyCheck = data.getBoolean(DefaultConfiguration.MOVING_RUNFLY_CHECK);
-        walkingSpeedLimit = ((double) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_WALKINGSPEEDLIMIT)) / 100D;
-        sprintingSpeedLimit = ((double) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_SPRINTINGSPEEDLIMIT)) / 100D;
-        jumpheight = ((double) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_JUMPHEIGHT)) / 100D;
-        actions = data.getActionList(DefaultConfiguration.MOVING_RUNFLY_ACTIONS);
+        runflyCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECK);
+        walkingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_WALKINGSPEEDLIMIT)) / 100D;
+        sprintingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SPRINTINGSPEEDLIMIT)) / 100D;
+        jumpheight = ((double) data.getInteger(Configuration.MOVING_RUNFLY_JUMPHEIGHT)) / 100D;
+        actions = data.getActionList(Configuration.MOVING_RUNFLY_ACTIONS);
 
-        swimmingCheck = data.getBoolean(DefaultConfiguration.MOVING_RUNFLY_CHECKSWIMMING);
-        swimmingSpeedLimit = ((double) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_SWIMMINGSPEEDLIMIT)) / 100D;
-        sneakingCheck = data.getBoolean(DefaultConfiguration.MOVING_RUNFLY_CHECKSNEAKING);
-        sneakingSpeedLimit = ((double) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_SNEAKINGSPEEDLIMIT)) / 100D;
+        swimmingCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECKSWIMMING);
+        swimmingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SWIMMINGSPEEDLIMIT)) / 100D;
+        sneakingCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECKSNEAKING);
+        sneakingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SNEAKINGSPEEDLIMIT)) / 100D;
 
-        allowFlying = data.getBoolean(DefaultConfiguration.MOVING_RUNFLY_ALLOWLIMITEDFLYING);
-        flyingSpeedLimitVertical = ((double) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_FLYINGSPEEDLIMITVERTICAL)) / 100D;
-        flyingSpeedLimitHorizontal = ((double) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL)) / 100D;
-        flyingActions = data.getActionList(DefaultConfiguration.MOVING_RUNFLY_FLYINGACTIONS);
+        allowFlying = data.getBoolean(Configuration.MOVING_RUNFLY_ALLOWLIMITEDFLYING);
+        flyingSpeedLimitVertical = ((double) data.getInteger(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITVERTICAL)) / 100D;
+        flyingSpeedLimitHorizontal = ((double) data.getInteger(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL)) / 100D;
+        flyingActions = data.getActionList(Configuration.MOVING_RUNFLY_FLYINGACTIONS);
 
-        nofallCheck = data.getBoolean(DefaultConfiguration.MOVING_RUNFLY_CHECKNOFALL);
-        nofallMultiplier = ((float) data.getInteger(DefaultConfiguration.MOVING_RUNFLY_NOFALLMULTIPLIER)) / 100F;
-        nofallActions = data.getActionList(DefaultConfiguration.MOVING_RUNFLY_NOFALLACTIONS);
+        nofallCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECKNOFALL);
+        nofallMultiplier = ((float) data.getInteger(Configuration.MOVING_RUNFLY_NOFALLMULTIPLIER)) / 100F;
+        nofallActions = data.getActionList(Configuration.MOVING_RUNFLY_NOFALLACTIONS);
 
-        morePacketsCheck = data.getBoolean(DefaultConfiguration.MOVING_MOREPACKETS_CHECK);
-        morePacketsActions = data.getActionList(DefaultConfiguration.MOVING_MOREPACKETS_ACTIONS);
+        morePacketsCheck = data.getBoolean(Configuration.MOVING_MOREPACKETS_CHECK);
+        morePacketsActions = data.getActionList(Configuration.MOVING_MOREPACKETS_ACTIONS);
 
     }
 }

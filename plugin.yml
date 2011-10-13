@@ -65,3 +65,9 @@ permissions:
             children:
               nocheat.checks.chat.spam:
                 description: Allow a player to send an infinite amount of chat messages
+          nocheat.checks.fight:
+            description: Allow the player to bypass all fight checks
+            children:
+              nocheat.checks.fight.direction:
+                description: Allow a player to attack players and monster even if they are not in his field of view
+          

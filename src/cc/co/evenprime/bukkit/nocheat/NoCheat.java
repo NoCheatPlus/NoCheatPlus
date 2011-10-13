@@ -22,6 +22,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.EntityDamageEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerQuitEventManager;
@@ -95,6 +96,7 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new PlayerQuitEventManager(this));
+        eventManagers.add(new EntityDamageEventManager(this));
 
         // Then set up a task to monitor server lag
         if(taskId == -1) {
@@ -259,10 +261,10 @@ public class NoCheat extends JavaPlugin {
 
                 PerformanceManager pm = this.getPerformanceManager();
                 long totalTime = 0;
-                
+
                 for(Type type : Type.values()) {
                     Performance p = pm.get(type);
-                    
+
                     long total = p.getTotalTime();
                     totalTime += total;
                     long relative = p.getRelativeTime();
@@ -275,7 +277,7 @@ public class NoCheat extends JavaPlugin {
 
                     sender.sendMessage(string.toString());
                 }
-                
+
                 sender.sendMessage("Total time spent: " + pm.convertToAppropriateUnit(totalTime) + " " + pm.getAppropriateUnit(totalTime));
 
                 return true;

@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.config.cache;
 import java.util.logging.Logger;
 
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
-import cc.co.evenprime.bukkit.nocheat.config.DefaultConfiguration;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 /**
@@ -22,10 +21,10 @@ public class CCLogging {
 
     public CCLogging(Configuration data, Logger worldSpecificFileLogger) {
 
-        active = data.getBoolean(DefaultConfiguration.LOGGING_ACTIVE);
-        fileLevel = data.getLogLevel(DefaultConfiguration.LOGGING_FILELEVEL);
-        consoleLevel = data.getLogLevel(DefaultConfiguration.LOGGING_CONSOLELEVEL);
-        chatLevel = data.getLogLevel(DefaultConfiguration.LOGGING_CHATLEVEL);
+        active = data.getBoolean(Configuration.LOGGING_ACTIVE);
+        fileLevel = data.getLogLevel(Configuration.LOGGING_FILELEVEL);
+        consoleLevel = data.getLogLevel(Configuration.LOGGING_CONSOLELEVEL);
+        chatLevel = data.getLogLevel(Configuration.LOGGING_CHATLEVEL);
 
         filelogger = worldSpecificFileLogger;
     }
