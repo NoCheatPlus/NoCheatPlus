@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -16,6 +17,8 @@ public class FightCheck {
 
     private final ActionExecutor action;
     private final NoCheat        plugin;
+    
+    private final static float precision = 0.75F;
 
     public FightCheck(NoCheat plugin) {
 
@@ -36,17 +39,28 @@ public class FightCheck {
         if(directionCheck) {
 
             Location eyes = player.getEyeLocation();
+            
+            // Get the width of the damagee
+            net.minecraft.server.Entity entity = ((CraftEntity) damagee).getHandle();
+            
+            float width = entity.length > entity.width ? entity.length : entity.width;
+            double height = 2.0D; // Minecraft server doesn't store the height of entities :(
+            
+            final double p = width/2 + precision;
+            final double h = height/2 + precision;
 
-            final double x1 = ((double) damagee.getLocation().getX()) - eyes.getX() - 1;
-            final double y1 = ((double) damagee.getLocation().getY()) - eyes.getY() - 0.5;
-            final double z1 = ((double) damagee.getLocation().getZ()) - eyes.getZ() - 1;
+            final double x1 = ((double) damagee.getLocation().getX()) - eyes.getX() - p;
+            final double y1 = ((double) damagee.getLocation().getY()) - eyes.getY() - precision;
+            final double z1 = ((double) damagee.getLocation().getZ()) - eyes.getZ() - p;
 
-            double factor = new Vector(x1 + 1, y1 + 1, z1 + 1).length();
+            double factor = new Vector(x1 + p, y1 + h, z1 + p).length();
 
             Vector direction = player.getEyeLocation().getDirection();
-            final double x2 = x1 + 2;
-            final double y2 = y1 + 2.5;
-            final double z2 = z1 + 2;
+            
+            final double x2 = x1 + 2*p;
+            final double y2 = y1 + 2*h;
+            final double z2 = z1 + 2*p;
+            
             if(factor * direction.getX() >= x1 && factor * direction.getY() >= y1 && factor * direction.getZ() >= z1 && factor * direction.getX() <= x2 && factor * direction.getY() <= y2 && factor * direction.getZ() <= z2) {
                 // Player did nothing wrong
                 // reduce violation counter
