@@ -96,7 +96,11 @@ public abstract class Configuration {
 
     private final static OptionNode       FIGHT_DIRECTION                            = new OptionNode("direction", FIGHT, DataType.PARENT);
     public final static OptionNode        FIGHT_DIRECTION_CHECK                      = new OptionNode("check", FIGHT_DIRECTION, DataType.BOOLEAN);
+    public static final OptionNode        FIGHT_DIRECTION_PRECISION                  = new OptionNode("precision", FIGHT_DIRECTION, DataType.INTEGER);
+    public static final OptionNode        FIGHT_DIRECTION_PENALTYTIME                = new OptionNode("penaltytime", FIGHT_DIRECTION, DataType.INTEGER);
     public final static OptionNode        FIGHT_DIRECTION_ACTIONS                    = new OptionNode("actions", FIGHT_DIRECTION, DataType.ACTIONLIST);
+
+
 
     private final Map<OptionNode, Object> values;
     private final Configuration           defaults;
