@@ -24,13 +24,10 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
 public class ActionExecutor {
 
     private final Map<Player, ActionHistory> actionHistory = new HashMap<Player, ActionHistory>();
-    private final NoCheat plugin;
-
-    private final ConsoleCommandSender       ccsender;
+    private final NoCheat                    plugin;
 
     public ActionExecutor(NoCheat plugin) {
         this.plugin = plugin;
-        this.ccsender = new ConsoleCommandSender(plugin.getServer());
     }
 
     public boolean executeActions(Player player, ActionList actions, int violationLevel, LogData data, ConfigurationCache cc) {
@@ -72,6 +69,12 @@ public class ActionExecutor {
     }
 
     private void executeConsoleCommand(String command) {
-        ccsender.executeConsoleCommand(command);
+        try {
+            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+        } catch(Exception e) {
+            // TODO: Better error handling
+            System.out.println("[NoCheat] failed to execute the command '" + command + "', please check if everything is setup correct. ");
+            e.printStackTrace();
+        }
     }
 }

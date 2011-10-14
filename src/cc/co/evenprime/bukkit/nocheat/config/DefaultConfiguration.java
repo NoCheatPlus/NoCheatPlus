@@ -142,7 +142,7 @@ public class DefaultConfiguration extends Configuration {
 
             setValue(FIGHT_DIRECTION_CHECK, true);
             setValue(FIGHT_DIRECTION_PRECISION, 75);
-            setValue(FIGHT_DIRECTION_PENALTYTIME, 400);
+            setValue(FIGHT_DIRECTION_PENALTYTIME, 500);
 
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("fightDirectionLog fightCancel".split(" ")));
