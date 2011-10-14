@@ -16,6 +16,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 
 /**
  * Central location for everything that's described in the configuration file(s)

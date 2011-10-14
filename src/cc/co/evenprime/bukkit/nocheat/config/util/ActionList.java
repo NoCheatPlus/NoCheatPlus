@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.actions;
+package cc.co.evenprime.bukkit.nocheat.config.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,11 +18,11 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 public class ActionList {
 
     public ActionList() {}
-    
-    private final static Action[] emptyArray = new Action[0];
 
-    private final Map<Integer, Action[]> actions   = new HashMap<Integer, Action[]>();
-    private final List<Integer>          tresholds = new ArrayList<Integer>();
+    private final static Action[]        emptyArray = new Action[0];
+
+    private final Map<Integer, Action[]> actions    = new HashMap<Integer, Action[]>();
+    private final List<Integer>          tresholds  = new ArrayList<Integer>();
 
     /**
      * Add an entry to this actionList. The list will be sorted by tresholds
@@ -52,7 +52,7 @@ public class ActionList {
     public Action[] getActions(Integer vl) {
 
         Integer result = null;
-        
+
         for(Integer treshold : tresholds) {
             if(treshold <= vl) {
                 result = treshold;

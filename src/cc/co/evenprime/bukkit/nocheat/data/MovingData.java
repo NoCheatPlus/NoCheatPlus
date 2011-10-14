@@ -3,38 +3,41 @@ package cc.co.evenprime.bukkit.nocheat.data;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+
 /**
  * Player specific data for the moving check group
  */
 public class MovingData extends Data {
 
-    public int      jumpPhase;
+    public int                 jumpPhase;
 
-    public Location runflySetBackPoint;
+    public Location            runflySetBackPoint;
 
-    public double   runflyViolationLevel;
+    public double              runflyViolationLevel;
 
-    public double   vertFreedom;
-    public double   vertVelocity;
-    public int      vertVelocityCounter;
-    public double   horizFreedom;
-    public int      horizVelocityCounter;
+    public double              vertFreedom;
+    public double              vertVelocity;
+    public int                 vertVelocityCounter;
+    public double              horizFreedom;
+    public int                 horizVelocityCounter;
 
-    public double   nofallViolationLevel;
-    public float    fallDistance;
-    public float    lastAddedFallDistance;
+    public double              nofallViolationLevel;
+    public float               fallDistance;
+    public float               lastAddedFallDistance;
 
-    public double   horizontalBuffer;
-    public int      bunnyhopdelay;
+    public double              horizontalBuffer;
+    public int                 bunnyhopdelay;
 
-    public int      morePacketsCounter;
-    public int      morePacketsBuffer;
-    public Location morePacketsSetbackPoint;
-    public double   morePacketsViolationLevel;
+    public int                 morePacketsCounter;
+    public int                 morePacketsBuffer;
+    public Location            morePacketsSetbackPoint;
+    public double              morePacketsViolationLevel;
 
-    public Location teleportTo;
+    public Location            teleportTo;
 
-    public int      lastElapsedIngameSeconds;
+    public int                 lastElapsedIngameSeconds;
+
+    public final ActionData history = new ActionData();
 
     @Override
     public void initialize(Player player) {

@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.FightData;
@@ -19,13 +18,11 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
  */
 public class FightCheck {
 
-    private final ActionExecutor action;
-    private final NoCheat        plugin;
+    private final NoCheat plugin;
 
     public FightCheck(NoCheat plugin) {
 
         this.plugin = plugin;
-        action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, Entity damagee, FightData data, ConfigurationCache cc) {
@@ -35,7 +32,7 @@ public class FightCheck {
         boolean directionCheck = cc.fight.directionCheck && !player.hasPermission(Permissions.FIGHT_DIRECTION);
 
         long time = System.currentTimeMillis();
-        
+
         if(directionCheck) {
 
             Location eyes = player.getEyeLocation();
@@ -50,7 +47,8 @@ public class FightCheck {
             final double p = width / 2 + cc.fight.directionPrecision;
             final double h = height / 2 + cc.fight.directionPrecision;
 
-            // TODO: Move this into a seperate class to recycle it throughout NoCheat
+            // TODO: Move this into a seperate class to recycle it throughout
+            // NoCheat
             final double x1 = ((double) damagee.getLocation().getX()) - eyes.getX() - p;
             final double y1 = ((double) damagee.getLocation().getY()) - eyes.getY() - cc.fight.directionPrecision;
             final double z1 = ((double) damagee.getLocation().getZ()) - eyes.getZ() - p;
@@ -77,7 +75,7 @@ public class FightCheck {
                 LogData ldata = plugin.getDataManager().getData(player).log;
                 ldata.check = "fight.direction";
 
-                cancel = action.executeActions(player, cc.fight.directionActions, (int) data.violationLevel, ldata, cc);
+                cancel = plugin.getActionManager().executeActions(player, cc.fight.directionActions, (int) data.violationLevel, ldata, data.history, cc);
 
                 if(cancel) {
                     // Needed to calculate penalty times

@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.config;
+package cc.co.evenprime.bukkit.nocheat.config.util;
 
 import java.util.LinkedList;
 import java.util.List;

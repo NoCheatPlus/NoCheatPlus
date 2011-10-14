@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
@@ -23,14 +22,11 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class MorePacketsCheck {
 
-    private final ActionExecutor action;
-
-    private final static int            packetsPerTimeframe = 22;
-    private final static int            bufferLimit         = 30;
-    private final NoCheat        plugin;
+    private final static int packetsPerTimeframe = 22;
+    private final static int bufferLimit         = 30;
+    private final NoCheat    plugin;
 
     public MorePacketsCheck(NoCheat plugin) {
-        this.action = new ActionExecutor(plugin);
 
         this.plugin = plugin;
     }
@@ -128,7 +124,7 @@ public class MorePacketsCheck {
                 ldata.check = "moving/morepackets";
 
                 boolean cancel = false;
-                cancel = action.executeActions(player, cc.moving.morePacketsActions, (int) data.morePacketsViolationLevel, ldata, cc);
+                cancel = plugin.getActionManager().executeActions(player, cc.moving.morePacketsActions, (int) data.morePacketsViolationLevel, ldata, data.history, cc);
 
                 // Only do the cancel if the player didn't change worlds
                 // inbetween

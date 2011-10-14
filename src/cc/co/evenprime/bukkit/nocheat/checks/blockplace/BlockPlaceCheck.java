@@ -15,11 +15,11 @@ import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
  */
 public class BlockPlaceCheck {
 
-    private final ReachCheck reachCheck;
+    private final ReachCheck    reachCheck;
     private final OnLiquidCheck onLiquidCheck;
 
     public BlockPlaceCheck(NoCheat plugin) {
-        
+
         reachCheck = new ReachCheck(plugin);
         onLiquidCheck = new OnLiquidCheck(plugin);
     }
@@ -35,7 +35,7 @@ public class BlockPlaceCheck {
         if(!cancel && reach) {
             cancel = reachCheck.check(player, blockPlaced, blockPlacedAgainst, data, cc);
         }
-        
+
         if(!cancel && onliquid) {
             cancel = onLiquidCheck.check(player, blockPlaced, blockPlacedAgainst, data, cc);
         }

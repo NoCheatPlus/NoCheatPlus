@@ -1,7 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.config.cache;
 
-import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
 public class CCChat {
 

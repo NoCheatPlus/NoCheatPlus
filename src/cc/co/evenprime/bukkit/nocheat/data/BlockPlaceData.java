@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.data;
 
+
 /**
  * 
  * @author Evenprime
@@ -7,6 +8,7 @@ package cc.co.evenprime.bukkit.nocheat.data;
  */
 public class BlockPlaceData extends Data {
 
-    public double onliquidViolationLevel = 0.0D;
-    public double reachViolationLevel    = 0.0D;
+    public double              onliquidViolationLevel = 0.0D;
+    public double              reachViolationLevel    = 0.0D;
+    public final ActionData history                = new ActionData();
 }

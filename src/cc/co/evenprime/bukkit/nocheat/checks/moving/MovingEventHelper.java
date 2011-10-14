@@ -15,20 +15,20 @@ import org.bukkit.World;
  */
 public class MovingEventHelper {
 
-    private final static double     magic    = 0.45D;
-    private final static double     magic2   = 0.55D;
+    private final static double magic    = 0.45D;
+    private final static double magic2   = 0.55D;
 
     // Block types that may need to be treated specially
-    private static final int NONSOLID = 1;                    // 0x00000001
-    private static final int SOLID    = 2;                    // 0x00000010
-    private static final int LIQUID   = 4 | NONSOLID;         // 0x00000101
-    private static final int LADDER   = 8 | NONSOLID | SOLID; // 0x00001011
-    private static final int FENCE    = 16 | SOLID;           // 0x00010000
-    private static final int INGROUND = 128;
-    private static final int ONGROUND = 256;
+    private static final int    NONSOLID = 1;                   // 0x00000001
+    private static final int    SOLID    = 2;                   // 0x00000010
+    private static final int    LIQUID   = 4 | NONSOLID;        // 0x00000101
+    private static final int    LADDER   = 8 | NONSOLID | SOLID; // 0x00001011
+    private static final int    FENCE    = 16 | SOLID;          // 0x00010000
+    private static final int    INGROUND = 128;
+    private static final int    ONGROUND = 256;
     // Until I can think of a better way to determine if a block is solid or
     // not, this is what I'll do
-    public final int         types[]  = new int[256];
+    public final int            types[]  = new int[256];
 
     public MovingEventHelper() {
         // Find and define properties of all blocks

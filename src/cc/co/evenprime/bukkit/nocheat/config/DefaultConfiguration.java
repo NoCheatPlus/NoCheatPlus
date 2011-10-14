@@ -5,7 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 /**

@@ -4,7 +4,6 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
@@ -18,12 +17,10 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
  */
 public class ReachCheck {
 
-    private final NoCheat        plugin;
-    private final ActionExecutor action;
+    private final NoCheat plugin;
 
     public ReachCheck(NoCheat plugin) {
         this.plugin = plugin;
-        this.action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, double distance, BlockBreakData data, ConfigurationCache cc) {
@@ -41,7 +38,7 @@ public class ReachCheck {
 
             ldata.check = "blockbreak.reach";
             ldata.reachdistance = distance;
-            cancel = action.executeActions(player, cc.blockbreak.reachActions, (int) data.reachViolationLevel, ldata, cc);
+            cancel = plugin.getActionManager().executeActions(player, cc.blockbreak.reachActions, (int) data.reachViolationLevel, ldata, data.history, cc);
         } else {
             data.reachViolationLevel *= 0.9D;
         }

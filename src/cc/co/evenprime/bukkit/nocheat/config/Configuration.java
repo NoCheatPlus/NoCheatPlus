@@ -3,8 +3,9 @@ package cc.co.evenprime.bukkit.nocheat.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
-import cc.co.evenprime.bukkit.nocheat.config.OptionNode.DataType;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
+import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode.DataType;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 /**
@@ -99,8 +100,6 @@ public abstract class Configuration {
     public static final OptionNode        FIGHT_DIRECTION_PRECISION                  = new OptionNode("precision", FIGHT_DIRECTION, DataType.INTEGER);
     public static final OptionNode        FIGHT_DIRECTION_PENALTYTIME                = new OptionNode("penaltytime", FIGHT_DIRECTION, DataType.INTEGER);
     public final static OptionNode        FIGHT_DIRECTION_ACTIONS                    = new OptionNode("actions", FIGHT_DIRECTION, DataType.ACTIONLIST);
-
-
 
     private final Map<OptionNode, Object> values;
     private final Configuration           defaults;

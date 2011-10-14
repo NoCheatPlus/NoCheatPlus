@@ -5,7 +5,6 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
@@ -22,20 +21,18 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class RunningCheck {
 
-    private final static double  maxBonus     = 1D;
+    private final static double maxBonus     = 1D;
 
     // How many move events can a player have in air before he is expected to
     // lose altitude (or eventually land somewhere)
-    private final static int     jumpingLimit = 6;
+    private final static int    jumpingLimit = 6;
 
-    private final ActionExecutor action;
-    private final NoCheat        plugin;
+    private final NoCheat       plugin;
 
-    private final NoFallCheck    noFallCheck;
+    private final NoFallCheck   noFallCheck;
 
     public RunningCheck(NoCheat plugin, NoFallCheck noFallCheck) {
         this.plugin = plugin;
-        this.action = new ActionExecutor(plugin);
         this.noFallCheck = noFallCheck;
     }
 
@@ -86,7 +83,7 @@ public class RunningCheck {
             else if(resultVert > 0)
                 ldata.check = "runfly/vertical";
 
-            boolean cancel = action.executeActions(player, cc.moving.actions, (int) data.runflyViolationLevel, ldata, cc);
+            boolean cancel = plugin.getActionManager().executeActions(player, cc.moving.actions, (int) data.runflyViolationLevel, ldata, data.history, cc);
 
             // Was one of the actions a cancel? Then do it
             if(cancel) {

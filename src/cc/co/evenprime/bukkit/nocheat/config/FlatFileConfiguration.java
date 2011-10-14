@@ -8,8 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import cc.co.evenprime.bukkit.nocheat.actions.ActionList;
 import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
+import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 public class FlatFileConfiguration extends Configuration {

@@ -22,7 +22,7 @@ public class LogData extends Data {
 
     public void initialize(Player player) {
         this.player = player;
-        check = "";
-        toLocation = player.getLocation();
+        this.check = "";
+        this.toLocation = player.getLocation();
     }
 }

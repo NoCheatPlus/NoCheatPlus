@@ -3,6 +3,8 @@ package cc.co.evenprime.bukkit.nocheat.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
+
 /**
  * Textual explainations of options, will be displayed in the gui tool and the
  * descriptions.txt file.

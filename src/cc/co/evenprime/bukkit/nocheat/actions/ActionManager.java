@@ -1,17 +1,15 @@
 package cc.co.evenprime.bukkit.nocheat.actions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.history.ActionHistory;
 import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.data.ActionData;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
@@ -21,34 +19,32 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
  * @author Evenprime
  * 
  */
-public class ActionExecutor {
+public class ActionManager {
 
-    private final Map<Player, ActionHistory> actionHistory = new HashMap<Player, ActionHistory>();
-    private final NoCheat                    plugin;
+    private final NoCheat plugin;
 
-    public ActionExecutor(NoCheat plugin) {
+    public ActionManager(NoCheat plugin) {
         this.plugin = plugin;
     }
 
-    public boolean executeActions(Player player, ActionList actions, int violationLevel, LogData data, ConfigurationCache cc) {
+    public boolean executeActions(Player player, ActionList actions, int violationLevel, LogData data, ActionData history, ConfigurationCache cc) {
 
         boolean special = false;
 
         // Always set this here "by hand"
         data.violationLevel = violationLevel;
 
-        long time = System.currentTimeMillis() / 1000;
+        final long time = System.currentTimeMillis() / 1000;
 
         for(Action ac : actions.getActions(violationLevel)) {
 
-            if(getHistory(player).executeAction(ac, time)) {
+            if(history.executeAction(ac, time)) {
                 if(ac instanceof LogAction) {
-                    LogAction l = (LogAction) ac;
-                    plugin.getLogManager().log(l.level, l.getMessage(data), cc);
+                    executeLogAction((LogAction) ac, data, cc);
                 } else if(ac instanceof SpecialAction) {
                     special = true;
                 } else if(ac instanceof ConsolecommandAction) {
-                    executeConsoleCommand(((ConsolecommandAction) ac).getCommand(data));
+                    executeConsoleCommand((ConsolecommandAction) ac, data);
                 }
             }
         }
@@ -56,19 +52,12 @@ public class ActionExecutor {
         return special;
     }
 
-    private ActionHistory getHistory(Player player) {
-
-        ActionHistory history = actionHistory.get(player);
-
-        if(history == null) {
-            history = new ActionHistory();
-            actionHistory.put(player, history);
-        }
-
-        return history;
+    private void executeLogAction(LogAction l, LogData data, ConfigurationCache cc) {
+        plugin.getLogManager().log(l.level, l.getMessage(data), cc);
     }
 
-    private void executeConsoleCommand(String command) {
+    private void executeConsoleCommand(ConsolecommandAction action, LogData data) {
+        String command = action.getCommand(data);
         try {
             plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
         } catch(Exception e) {

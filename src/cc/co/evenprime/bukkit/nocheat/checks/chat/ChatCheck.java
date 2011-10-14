@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.chat;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
@@ -16,13 +15,11 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
  */
 public class ChatCheck {
 
-    private final ActionExecutor action;
-    private final NoCheat        plugin;
+    private final NoCheat plugin;
 
     public ChatCheck(NoCheat plugin) {
 
         this.plugin = plugin;
-        action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, String message, ChatData data, ConfigurationCache cc) {
@@ -51,7 +48,7 @@ public class ChatCheck {
                 ldata.check = "chat.spam";
                 ldata.text = message;
 
-                cancel = action.executeActions(player, cc.chat.spamActions, data.messageCount - cc.chat.spamLimit, ldata, cc);
+                cancel = plugin.getActionManager().executeActions(player, cc.chat.spamActions, data.messageCount - cc.chat.spamLimit, ldata, data.history, cc);
             }
         }
 

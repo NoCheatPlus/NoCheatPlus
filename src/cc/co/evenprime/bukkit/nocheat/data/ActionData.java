@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.actions.history;
+package cc.co.evenprime.bukkit.nocheat.data;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
  * @author Evenprime
  * 
  */
-public class ActionHistory {
+public class ActionData {
 
     private static class ExecutionHistoryEntry {
 
@@ -60,7 +60,7 @@ public class ActionHistory {
                 if(j == executionTimes.length) {
                     j = 0;
                 }
-                
+
                 totalEntries -= executionTimes[j];
                 executionTimes[j] = 0;
 
@@ -83,9 +83,11 @@ public class ActionHistory {
 
     // Store data between Events
     // time + action + action-counter
-    private final Map<Action, ExecutionHistoryEntry> executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
+    private final Map<Action, ExecutionHistoryEntry> executionHistory;
 
-    public ActionHistory() {}
+    public ActionData() {
+        executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
+    }
 
     /**
      * Returns true, if the action should be executed, because all time

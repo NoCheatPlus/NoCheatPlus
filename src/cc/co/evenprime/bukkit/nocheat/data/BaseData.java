@@ -2,21 +2,19 @@ package cc.co.evenprime.bukkit.nocheat.data;
 
 import org.bukkit.entity.Player;
 
-
-public class BaseData {
+public class BaseData extends Data {
 
     public final BlockBreakData blockbreak;
     public final BlockPlaceData blockplace;
-    public final ChatData chat;
-    public final LogData log;
-    public final MovingData moving;
-    public final FightData fight;
-    
-    private final Data[] data;
-    
-    private long removalTime;
+    public final ChatData       chat;
+    public final LogData        log;
+    public final MovingData     moving;
+    public final FightData      fight;
 
-    
+    private final Data[]        data;
+
+    private long                removalTime;
+
     public BaseData() {
         this.blockbreak = new BlockBreakData();
         this.blockplace = new BlockPlaceData();
@@ -24,10 +22,11 @@ public class BaseData {
         this.log = new LogData();
         this.moving = new MovingData();
         this.fight = new FightData();
-        
+
         this.removalTime = 0;
-        
-        data = new Data[] { this.blockbreak, this.blockplace, this.chat, this.log, this.moving, this.fight };
+
+        data = new Data[] {this.blockbreak, this.blockplace, this.chat,
+                this.log, this.moving, this.fight};
     }
 
     public void clearCriticalData() {
@@ -41,17 +40,17 @@ public class BaseData {
             d.initialize(player);
         }
     }
-    
+
     public void markForRemoval(boolean removal) {
         if(removal) {
             // 1 minute in the future
             this.removalTime = System.currentTimeMillis() + 60000;
-        }
-        else {
+        } else {
             this.removalTime = 0;
         }
     }
-    public boolean shouldBeRemoved() { 
+
+    public boolean shouldBeRemoved() {
         return removalTime != 0 && removalTime < System.currentTimeMillis();
     }
 }

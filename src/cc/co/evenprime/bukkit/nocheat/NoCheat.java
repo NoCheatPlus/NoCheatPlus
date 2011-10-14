@@ -12,6 +12,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
@@ -46,6 +47,7 @@ public class NoCheat extends JavaPlugin {
     private LogManager               log;
     private DataManager              data;
     private PerformanceManager       performance;
+    private ActionManager            action;
 
     private final List<EventManager> eventManagers            = new LinkedList<EventManager>();
 
@@ -89,6 +91,9 @@ public class NoCheat extends JavaPlugin {
         // Then set up the performance counters
         this.performance = new PerformanceManager();
 
+        // Then set up the Action Manager
+        this.action = new ActionManager(this);
+
         // Then set up the event listeners
         eventManagers.add(new PlayerMoveEventManager(this));
         eventManagers.add(new PlayerTeleportEventManager(this));
@@ -114,7 +119,7 @@ public class NoCheat extends JavaPlugin {
                         lastIngamesecondDuration = 1000;
                     lastIngamesecondTime = time;
                     ingameseconds++;
-                    
+
                     // Check if some data is outdated now and let it be removed
                     getDataManager().cleanDataMap();
                 }
@@ -142,6 +147,10 @@ public class NoCheat extends JavaPlugin {
 
     public PerformanceManager getPerformanceManager() {
         return performance;
+    }
+
+    public ActionManager getActionManager() {
+        return action;
     }
 
     public int getIngameSeconds() {

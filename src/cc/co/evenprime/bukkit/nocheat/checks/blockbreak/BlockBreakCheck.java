@@ -11,9 +11,9 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 
 /**
- * The main Check class for blockbreak event checking. It will decide which checks
- * need to be executed and in which order. It will also precalculate some values
- * that are needed by multiple checks.
+ * The main Check class for blockbreak event checking. It will decide which
+ * checks need to be executed and in which order. It will also precalculate
+ * some values that are needed by multiple checks.
  * 
  * @author Evenprime
  * 

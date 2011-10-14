@@ -6,7 +6,6 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
@@ -21,14 +20,12 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class FlyingCheck {
 
-    private final NoCheat        plugin;
-    private final ActionExecutor action;
+    private final NoCheat       plugin;
 
-    private static final double  creativeSpeed = 0.60D;
+    private static final double creativeSpeed = 0.60D;
 
     public FlyingCheck(NoCheat plugin) {
         this.plugin = plugin;
-        this.action = new ActionExecutor(plugin);
     }
 
     public Location check(Player player, Location from, Location to, ConfigurationCache cc, MovingData data) {
@@ -88,7 +85,7 @@ public class FlyingCheck {
             ldata.toLocation = to;
             ldata.check = "flying/toofast";
 
-            boolean cancel = action.executeActions(player, cc.moving.flyingActions, (int) data.runflyViolationLevel, ldata, cc);
+            boolean cancel = plugin.getActionManager().executeActions(player, cc.moving.flyingActions, (int) data.runflyViolationLevel, ldata, data.history, cc);
 
             // Was one of the actions a cancel? Then really do it
             if(cancel) {

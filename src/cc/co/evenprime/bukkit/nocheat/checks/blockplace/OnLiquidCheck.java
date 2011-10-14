@@ -6,7 +6,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
@@ -18,12 +17,10 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
  */
 public class OnLiquidCheck {
 
-    private final NoCheat        plugin;
-    private final ActionExecutor action;
+    private final NoCheat plugin;
 
     public OnLiquidCheck(NoCheat plugin) {
         this.plugin = plugin;
-        action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, Block blockPlaced, Block blockPlacedAgainst, BlockPlaceData data, ConfigurationCache cc) {
@@ -43,7 +40,7 @@ public class OnLiquidCheck {
             ldata.placed = blockPlaced;
             ldata.placedAgainst = blockPlacedAgainst;
 
-            cancel = action.executeActions(player, cc.blockplace.onliquidActions, (int) data.onliquidViolationLevel, ldata, cc);
+            cancel = plugin.getActionManager().executeActions(player, cc.blockplace.onliquidActions, (int) data.onliquidViolationLevel, ldata, data.history, cc);
         }
 
         data.onliquidViolationLevel *= 0.95D; // Reduce level over time

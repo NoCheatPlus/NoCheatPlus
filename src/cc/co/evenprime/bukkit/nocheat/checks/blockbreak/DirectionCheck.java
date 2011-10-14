@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
@@ -19,12 +18,10 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
  */
 public class DirectionCheck {
 
-    private final ActionExecutor action;
-    private final NoCheat        plugin;
+    private final NoCheat plugin;
 
     public DirectionCheck(NoCheat plugin) {
         this.plugin = plugin;
-        this.action = new ActionExecutor(plugin);
     }
 
     public boolean check(Player player, double factor, double x1, double y1, double z1, Block brokenBlock, BlockBreakData data, ConfigurationCache cc) {
@@ -33,9 +30,9 @@ public class DirectionCheck {
         if(!cc.blockbreak.checkinstabreakblocks && brokenBlock.getLocation().equals(data.instaBrokeBlockLocation)) {
             return false;
         }
-        
+
         boolean cancel = false;
-        
+
         Vector direction = player.getEyeLocation().getDirection();
         final double x2 = x1 + 2;
         final double y2 = y1 + 2;
@@ -50,10 +47,10 @@ public class DirectionCheck {
             data.directionViolationLevel += 1;
 
             // Prepare some event-specific values for logging and custom actions
-            LogData ldata = plugin.getDataManager().getData( player).log;
+            LogData ldata = plugin.getDataManager().getData(player).log;
             ldata.check = "blockbreak.direction";
 
-            cancel = action.executeActions(player, cc.blockbreak.directionActions, (int) data.directionViolationLevel, ldata, cc);
+            cancel = plugin.getActionManager().executeActions(player, cc.blockbreak.directionActions, (int) data.directionViolationLevel, ldata, data.history, cc);
         }
 
         return cancel;

@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionExecutor;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
@@ -18,12 +17,10 @@ import cc.co.evenprime.bukkit.nocheat.data.MovingData;
  */
 public class NoFallCheck {
 
-    private final ActionExecutor action;
-    private final NoCheat        plugin;
+    private final NoCheat plugin;
 
     public NoFallCheck(NoCheat plugin) {
         this.plugin = plugin;
-        this.action = new ActionExecutor(plugin);
     }
 
     /**
@@ -41,17 +38,18 @@ public class NoFallCheck {
             data.fallDistance = 0F;
         }
 
-        // If we increased fall height before for no good reason, reduce now by the same amount
+        // If we increased fall height before for no good reason, reduce now by
+        // the same amount
         if(player.getFallDistance() > data.lastAddedFallDistance) {
             player.setFallDistance(player.getFallDistance() - data.lastAddedFallDistance);
         }
-        
+
         data.lastAddedFallDistance = 0;
 
         // We want to know if the fallDistance recorded by the game is smaller
         // than the fall distance recorded by the plugin
         float difference = data.fallDistance - player.getFallDistance();
-        
+
         if(difference > 1.0F && toOnOrInGround && data.fallDistance > 2.0F) {
             data.nofallViolationLevel += difference;
 
@@ -60,9 +58,10 @@ public class NoFallCheck {
             ldata.falldistance = data.fallDistance;
             ldata.check = "moving/nofall";
 
-            boolean cancel = action.executeActions(player, cc.moving.nofallActions, (int) data.nofallViolationLevel, ldata, cc);
+            boolean cancel = plugin.getActionManager().executeActions(player, cc.moving.nofallActions, (int) data.nofallViolationLevel, ldata, data.history, cc);
 
-            // If "cancelled", the fall damage gets dealt in a way that's visible to other plugins
+            // If "cancelled", the fall damage gets dealt in a way that's
+            // visible to other plugins
             if(cancel) {
                 // Increase the fall distance a bit :)
                 float totalDistance = data.fallDistance + difference * (cc.moving.nofallMultiplier - 1.0F);
@@ -73,27 +72,29 @@ public class NoFallCheck {
             data.fallDistance = 0F;
         }
 
-        // Increase the fall distance that is recorded by the plugin, AND set the fall distance of the player
-        // to whatever he would get with this move event. This modifies Minecrafts fall damage calculation
-        // slightly, but that's still better than ignoring players that try to use "teleports" or "stepdown"
-        // to avoid falldamage. It is only added for big height differences anyway, as to avoid to much deviation
+        // Increase the fall distance that is recorded by the plugin, AND set
+        // the fall distance of the player
+        // to whatever he would get with this move event. This modifies
+        // Minecrafts fall damage calculation
+        // slightly, but that's still better than ignoring players that try to
+        // use "teleports" or "stepdown"
+        // to avoid falldamage. It is only added for big height differences
+        // anyway, as to avoid to much deviation
         // from the original Minecraft feeling.
         if(oldY > newY) {
             float dist = (float) (oldY - newY);
             data.fallDistance += dist;
-            
+
             if(dist > 1.0F) {
                 data.lastAddedFallDistance = dist;
                 player.setFallDistance(player.getFallDistance() + dist);
-            }
-            else {
+            } else {
                 data.lastAddedFallDistance = 0.0F;
             }
-        }
-        else {
+        } else {
             data.lastAddedFallDistance = 0.0F;
         }
-        
+
         // Reduce falldamage violation level
         data.nofallViolationLevel *= 0.99D;
     }
