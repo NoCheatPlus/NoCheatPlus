@@ -13,6 +13,8 @@ public class BaseData {
     public final FightData fight;
     
     private final Data[] data;
+    
+    private long removalTime;
 
     
     public BaseData() {
@@ -22,6 +24,8 @@ public class BaseData {
         this.log = new LogData();
         this.moving = new MovingData();
         this.fight = new FightData();
+        
+        this.removalTime = 0;
         
         data = new Data[] { this.blockbreak, this.blockplace, this.chat, this.log, this.moving, this.fight };
     }
@@ -36,5 +40,18 @@ public class BaseData {
         for(Data d : data) {
             d.initialize(player);
         }
+    }
+    
+    public void markForRemoval(boolean removal) {
+        if(removal) {
+            // 1 minute in the future
+            this.removalTime = System.currentTimeMillis() + 60000;
+        }
+        else {
+            this.removalTime = 0;
+        }
+    }
+    public boolean shouldBeRemoved() { 
+        return removalTime != 0 && removalTime < System.currentTimeMillis();
     }
 }

@@ -78,7 +78,7 @@ public class NoCheat extends JavaPlugin {
         // First set up logging
         this.log = new LogManager();
 
-        log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1240. It may break at any time and for any other version.");
+        log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1240 and CB #1317. It may break at any time and for any other version.");
 
         // Then set up in memory per player data storage
         this.data = new DataManager();
@@ -114,6 +114,9 @@ public class NoCheat extends JavaPlugin {
                         lastIngamesecondDuration = 1000;
                     lastIngamesecondTime = time;
                     ingameseconds++;
+                    
+                    // Check if some data is outdated now and let it be removed
+                    getDataManager().cleanDataMap();
                 }
             }, 0, 20);
         }

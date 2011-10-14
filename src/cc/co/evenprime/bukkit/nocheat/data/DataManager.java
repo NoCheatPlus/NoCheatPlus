@@ -1,7 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.entity.Player;
 
@@ -41,15 +44,6 @@ public class DataManager {
     }
 
     /**
-     * Remove all data Objects of a specific player
-     * 
-     * @param player
-     */
-    public void removeDataForPlayer(Player player) {
-        this.map.remove(player);
-    }
-
-    /**
      * Reset data that may cause problems after e.g. changing the config
      * 
      */
@@ -58,4 +52,44 @@ public class DataManager {
             b.clearCriticalData();
         }
     }
+
+    /**
+     * put a players data on the queue for later deletion (unless it comes back
+     * before)
+     * 
+     */
+    public void queueForRemoval(Player player) {
+        BaseData bd = this.map.get(player);
+
+        if(bd != null) {
+            bd.markForRemoval(true);
+        }
+    }
+
+    public void unqueueForRemoval(Player player) {
+        BaseData bd = this.map.get(player);
+
+        if(bd != null) {
+            bd.markForRemoval(false);
+        }
+    }
+
+    /**
+     * check if queued for removal data is ready to get removed
+     * 
+     */
+    public void cleanDataMap() {
+        List<Player> removals = new ArrayList<Player>();
+
+        for(Entry<Player, BaseData> p : this.map.entrySet()) {
+            if(p.getValue().shouldBeRemoved()) {
+                removals.add(p.getKey());
+            }
+        }
+
+        for(Player p : removals) {
+            this.map.remove(p);
+        }
+    }
+
 }
