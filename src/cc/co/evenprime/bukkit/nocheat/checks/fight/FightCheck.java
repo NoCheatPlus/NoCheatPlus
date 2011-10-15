@@ -61,14 +61,29 @@ public class FightCheck {
             final double y2 = y1 + 2 * h;
             final double z2 = z1 + 2 * p;
 
-            if(factor * direction.getX() >= x1 && factor * direction.getY() >= y1 && factor * direction.getZ() >= z1 && factor * direction.getX() <= x2 && factor * direction.getY() <= y2 && factor * direction.getZ() <= z2) {
-                // Player did nothing wrong
+            final double xPrediction = factor * direction.getX();
+            final double yPrediction = factor * direction.getY();
+            final double zPrediction = factor * direction.getZ();
+            
+            double off = 0.0D;
+            
+            off += Math.max(x1 - xPrediction, 0.0D);
+            off += Math.max(y1 - yPrediction, 0.0D);
+            off += Math.max(z1 - zPrediction, 0.0D);
+            off += Math.max(xPrediction - x2, 0.0D);
+            off += Math.max(yPrediction - y2, 0.0D);
+            off += Math.max(zPrediction - z2, 0.0D);
+            
+            if(off < 0.1D) {
+                // Player did probably nothing wrong
                 // reduce violation counter
-                data.violationLevel *= 0.95D;
+                data.violationLevel *= 0.80D;
             } else {
                 // Player failed the check
                 // Increment violation counter
-                data.violationLevel += 1;
+                if(!plugin.skipCheck()) {
+                    data.violationLevel += Math.sqrt(off);
+                }
 
                 // Prepare some event-specific values for logging and custom
                 // actions
