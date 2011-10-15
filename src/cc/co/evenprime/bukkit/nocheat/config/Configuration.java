@@ -38,7 +38,7 @@ public abstract class Configuration {
 
     private final static OptionNode       MOVING_RUNFLY                              = new OptionNode("runfly", MOVING, DataType.PARENT);
     public final static OptionNode        MOVING_RUNFLY_CHECK                        = new OptionNode("check", MOVING_RUNFLY, DataType.BOOLEAN);
-    public final static OptionNode        MOVING_RUNFLY_WALKINGSPEEDLIMIT            = new OptionNode("alkingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);
+    public final static OptionNode        MOVING_RUNFLY_WALKINGSPEEDLIMIT            = new OptionNode("walkingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_SPRINTINGSPEEDLIMIT          = new OptionNode("sprintingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_JUMPHEIGHT                   = new OptionNode("jumpheight", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_CHECKSNEAKING                = new OptionNode("checksneaking", MOVING_RUNFLY, DataType.BOOLEAN);
