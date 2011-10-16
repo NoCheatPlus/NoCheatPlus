@@ -121,10 +121,13 @@ public class ConfigurationManager {
         File globalConfigFile = getGlobalConfigFile(rootConfigFolder);
 
         root = new FlatFileConfiguration(defaultConfig, true, globalConfigFile);
-        try {
-            root.load(action);
-        } catch(Exception e) {
 
+        if(globalConfigFile.exists()) {
+            try {
+                root.load(action);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -156,6 +159,7 @@ public class ConfigurationManager {
 
             } catch(IOException e) {
                 System.out.println("NoCheat: Couldn't load world-specific config for " + worldEntry.getKey());
+                e.printStackTrace();
             }
         }
     }
@@ -222,9 +226,7 @@ public class ConfigurationManager {
 
                 l.addHandler(fh);
 
-            } catch(SecurityException e) {
-                e.printStackTrace();
-            } catch(IOException e) {
+            } catch(Exception e) {
                 e.printStackTrace();
             }
         }

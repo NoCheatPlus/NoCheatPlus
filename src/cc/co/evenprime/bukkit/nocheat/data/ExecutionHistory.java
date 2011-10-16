@@ -11,7 +11,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
  * @author Evenprime
  * 
  */
-public class ActionData {
+public class ExecutionHistory {
 
     private static class ExecutionHistoryEntry {
 
@@ -85,7 +85,7 @@ public class ActionData {
     // time + action + action-counter
     private final Map<Action, ExecutionHistoryEntry> executionHistory;
 
-    public ActionData() {
+    public ExecutionHistory() {
         executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
     }
 

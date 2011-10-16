@@ -65,7 +65,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
 
             boolean cancel = false;
 
-            cancel = chatCheck.check(player, event.getMessage(), plugin.getDataManager().getData(player).chat, cc);
+            cancel = chatCheck.check(player, event.getMessage(), cc);
 
             if(cancel) {
                 event.setCancelled(true);
@@ -89,15 +89,6 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
 
         if(cc.chat.check && cc.chat.spamCheck)
             s.add("chat.spam");
-        return s;
-    }
-
-    public List<String> getInactiveChecks(ConfigurationCache cc) {
-        LinkedList<String> s = new LinkedList<String>();
-
-        if(!(cc.chat.check && cc.chat.spamCheck))
-            s.add("chat.spam");
-
         return s;
     }
 }

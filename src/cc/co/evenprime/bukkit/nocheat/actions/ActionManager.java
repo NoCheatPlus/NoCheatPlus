@@ -9,7 +9,8 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
-import cc.co.evenprime.bukkit.nocheat.data.ActionData;
+import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
@@ -27,12 +28,13 @@ public class ActionManager {
         this.plugin = plugin;
     }
 
-    public boolean executeActions(Player player, ActionList actions, int violationLevel, LogData data, ActionData history, ConfigurationCache cc) {
+    public boolean executeActions(Player player, ActionList actions, int violationLevel, ExecutionHistory history, ConfigurationCache cc) {
 
         boolean special = false;
 
+        BaseData data = plugin.getPlayerData(player);
         // Always set this here "by hand"
-        data.violationLevel = violationLevel;
+        data.log.violationLevel = violationLevel;
 
         final long time = System.currentTimeMillis() / 1000;
 
@@ -40,11 +42,11 @@ public class ActionManager {
 
             if(history.executeAction(ac, time)) {
                 if(ac instanceof LogAction) {
-                    executeLogAction((LogAction) ac, data, cc);
+                    executeLogAction((LogAction) ac, data.log, cc);
                 } else if(ac instanceof SpecialAction) {
                     special = true;
                 } else if(ac instanceof ConsolecommandAction) {
-                    executeConsoleCommand((ConsolecommandAction) ac, data);
+                    executeConsoleCommand((ConsolecommandAction) ac, data.log);
                 }
             }
         }
@@ -61,7 +63,6 @@ public class ActionManager {
         try {
             plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
         } catch(Exception e) {
-            // TODO: Better error handling
             System.out.println("[NoCheat] failed to execute the command '" + command + "', please check if everything is setup correct. ");
             e.printStackTrace();
         }

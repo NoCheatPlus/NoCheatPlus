@@ -57,7 +57,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
 
                 final Player player = event.getPlayer();
                 // Get the player-specific stored data that applies here
-                movingCheck.blockPlaced(player, plugin.getDataManager().getData(player).moving, event.getBlockPlaced());
+                movingCheck.blockPlaced(player, event.getBlockPlaced());
 
             }
         }, Priority.Monitor, plugin);
@@ -83,7 +83,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
 
         // Find out if checks need to be done for that player
         if(cc.blockplace.check && !player.hasPermission(Permissions.BLOCKPLACE)) {
-            cancel = blockPlaceCheck.check(player, event.getBlockPlaced(), event.getBlockAgainst(), plugin.getDataManager().getData(player).blockplace, cc);
+            cancel = blockPlaceCheck.check(player, event.getBlockPlaced(), event.getBlockAgainst(), cc);
         }
 
         if(cancel) {
@@ -101,17 +101,6 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
         if(cc.blockplace.check && cc.blockplace.onliquidCheck)
             s.add("blockplace.onliquid");
         if(cc.blockplace.check && cc.blockplace.reachCheck)
-            s.add("blockplace.reach");
-
-        return s;
-    }
-
-    public List<String> getInactiveChecks(ConfigurationCache cc) {
-        LinkedList<String> s = new LinkedList<String>();
-
-        if(!(cc.blockplace.check && cc.blockplace.onliquidCheck))
-            s.add("blockplace.onliquid");
-        if(!(cc.blockplace.check && cc.blockplace.reachCheck))
             s.add("blockplace.reach");
 
         return s;

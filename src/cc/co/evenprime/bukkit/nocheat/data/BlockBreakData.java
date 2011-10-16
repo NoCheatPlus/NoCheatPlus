@@ -15,6 +15,6 @@ public class BlockBreakData extends Data {
     public double              directionViolationLevel = 0.0D;
 
     public Location            instaBrokeBlockLocation = null;
-    public final ActionData history                 = new ActionData();
+    public final ExecutionHistory history                 = new ExecutionHistory();
 
 }

@@ -17,7 +17,7 @@ import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData;
+import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
 /**
  * Only place that listens to Player-teleport related events and dispatches them
@@ -52,9 +52,9 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
                     return;
                 }
 
-                final MovingData data = plugin.getDataManager().getData(event.getPlayer()).moving;
+                final BaseData data = plugin.getPlayerData(event.getPlayer());
 
-                if(data.teleportTo != null && data.teleportTo.equals(event.getTo())) {
+                if(data.moving.teleportTo != null && data.moving.teleportTo.equals(event.getTo())) {
                     event.setCancelled(false);
                 }
             }
@@ -91,14 +91,10 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
     private void handleTeleportation(Player player, Location newLocation) {
 
-        plugin.getDataManager().getData(player).clearCriticalData();
+        plugin.clearCriticalPlayerData(player);
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {
-        return Collections.emptyList();
-    }
-
-    public List<String> getInactiveChecks(ConfigurationCache cc) {
         return Collections.emptyList();
     }
 }

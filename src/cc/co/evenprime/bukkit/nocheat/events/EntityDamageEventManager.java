@@ -71,7 +71,7 @@ public class EntityDamageEventManager extends EntityListener implements EventMan
 
             boolean cancel = false;
 
-            cancel = fightCheck.check(player, damagee, plugin.getDataManager().getData(player).fight, cc);
+            cancel = fightCheck.check(player, damagee, cc);
 
             if(cancel) {
                 event.setCancelled(true);
@@ -83,19 +83,10 @@ public class EntityDamageEventManager extends EntityListener implements EventMan
             fightPerformance.addTime(System.nanoTime() - nanoTimeStart);
     }
 
-
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
         if(cc.fight.check && cc.fight.directionCheck)
-            s.add("fight.direction");
-        return s;
-    }
-
-    public List<String> getInactiveChecks(ConfigurationCache cc) {
-        LinkedList<String> s = new LinkedList<String>();
-
-        if(!(cc.fight.check && cc.fight.directionCheck))
             s.add("fight.direction");
         return s;
     }

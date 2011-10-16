@@ -16,6 +16,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
@@ -121,7 +122,7 @@ public class NoCheat extends JavaPlugin {
                     ingameseconds++;
 
                     // Check if some data is outdated now and let it be removed
-                    getDataManager().cleanDataMap();
+                    data.cleanDataMap();
                 }
             }, 0, 20);
         }
@@ -141,8 +142,20 @@ public class NoCheat extends JavaPlugin {
         return log;
     }
 
-    public DataManager getDataManager() {
-        return data;
+    public BaseData getPlayerData(Player player) {
+        return data.getData(player);
+    }
+
+    public void clearCriticalPlayerData(Player player) {
+        data.clearCriticalData(player);
+    }
+
+    public void playerLeft(Player player) {
+        data.queueForRemoval(player);
+    }
+
+    public void playerJoined(Player player) {
+        data.unqueueForRemoval(player);
     }
 
     public PerformanceManager getPerformanceManager() {
@@ -254,7 +267,7 @@ public class NoCheat extends JavaPlugin {
 
                 this.conf.cleanup();
                 this.conf = new ConfigurationManager(this.getDataFolder().getPath());
-                this.data.resetAllCriticalData();
+                this.data.clearCriticalData();
 
                 sender.sendMessage("[NoCheat] Configuration reloaded");
 

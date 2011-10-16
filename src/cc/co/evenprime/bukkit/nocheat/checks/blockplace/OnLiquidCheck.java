@@ -1,14 +1,13 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
-import cc.co.evenprime.bukkit.nocheat.data.LogData;
+import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
 /**
  * 
@@ -23,33 +22,36 @@ public class OnLiquidCheck {
         this.plugin = plugin;
     }
 
-    public boolean check(Player player, Block blockPlaced, Block blockPlacedAgainst, BlockPlaceData data, ConfigurationCache cc) {
+    public boolean check(Player player, Block blockPlaced, Block blockPlacedAgainst, ConfigurationCache cc) {
 
         boolean cancel = false;
 
-        if(blockPlaced == null || blockPlaced.isEmpty()) {
+        BaseData data = plugin.getPlayerData(player);
+
+        if(blockPlaced == null || blockPlaced.isEmpty() || (blockPlacedAgainst != null && isSolid(blockPlacedAgainst.getTypeId()))) {
             // all ok
-        } else if(blockPlacedAgainst != null && isSolid(blockPlacedAgainst)) {
-            // all ok
-        } else if(isSolid(blockPlaced.getRelative(BlockFace.DOWN)) || isSolid(blockPlaced.getRelative(BlockFace.WEST)) || isSolid(blockPlaced.getRelative(BlockFace.EAST)) || isSolid(blockPlaced.getRelative(BlockFace.NORTH)) || isSolid(blockPlaced.getRelative(BlockFace.SOUTH)) || isSolid(blockPlaced.getRelative(BlockFace.UP))) {
+        } else if(nextToSolid(blockPlaced.getWorld(), blockPlaced.getX(), blockPlaced.getY(), blockPlaced.getZ())) {
             // all ok
         } else {
-            data.onliquidViolationLevel += 1;
-            LogData ldata = plugin.getDataManager().getData(player).log;
-            ldata.check = "blockplace.onliquid";
-            ldata.placed = blockPlaced;
-            ldata.placedAgainst = blockPlacedAgainst;
+            data.blockplace.onliquidViolationLevel += 1;
+            data.log.check = "blockplace.onliquid";
+            data.log.placed = blockPlaced;
+            data.log.placedAgainst = blockPlacedAgainst;
 
-            cancel = plugin.getActionManager().executeActions(player, cc.blockplace.onliquidActions, (int) data.onliquidViolationLevel, ldata, data.history, cc);
+            cancel = plugin.getActionManager().executeActions(player, cc.blockplace.onliquidActions, (int) data.blockplace.onliquidViolationLevel, data.blockplace.history, cc);
         }
 
-        data.onliquidViolationLevel *= 0.95D; // Reduce level over time
+        data.blockplace.onliquidViolationLevel *= 0.95D; // Reduce level over
+                                                         // time
 
         return cancel;
     }
 
-    private boolean isSolid(Block block) {
-        Material m = block.getType();
-        return !(m == Material.AIR) || (m == Material.WATER) || (m == Material.STATIONARY_WATER) || (m == Material.LAVA) || (m == Material.STATIONARY_LAVA);
+    private boolean nextToSolid(World world, int x, int y, int z) {
+        return isSolid(world.getBlockTypeIdAt(x, y - 1, z)) || isSolid(world.getBlockTypeIdAt(x - 1, y, z)) || isSolid(world.getBlockTypeIdAt(x + 1, y, z)) || isSolid(world.getBlockTypeIdAt(x, y, z + 1)) || isSolid(world.getBlockTypeIdAt(x, y, z - 1)) || isSolid(world.getBlockTypeIdAt(x, y + 1, z));
+    }
+
+    private boolean isSolid(int id) {
+        return !((id == Material.AIR.getId()) || (id == Material.WATER.getId()) || (id == Material.STATIONARY_WATER.getId()) || (id == Material.LAVA.getId()) || (id == Material.STATIONARY_LAVA.getId()));
     }
 }

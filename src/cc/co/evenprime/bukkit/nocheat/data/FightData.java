@@ -4,6 +4,6 @@ public class FightData extends Data {
 
     public double           violationLevel             = 0;
     public long             directionLastViolationTime = 0;
-    public final ActionData history                    = new ActionData();
+    public final ExecutionHistory history                    = new ExecutionHistory();
 
 }

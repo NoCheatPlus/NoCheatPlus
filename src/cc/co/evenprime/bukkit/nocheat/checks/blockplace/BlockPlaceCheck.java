@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
 
 /**
  * 
@@ -24,7 +23,7 @@ public class BlockPlaceCheck {
         onLiquidCheck = new OnLiquidCheck(plugin);
     }
 
-    public boolean check(Player player, Block blockPlaced, Block blockPlacedAgainst, BlockPlaceData data, ConfigurationCache cc) {
+    public boolean check(Player player, Block blockPlaced, Block blockPlacedAgainst, ConfigurationCache cc) {
 
         boolean cancel = false;
 
@@ -33,11 +32,11 @@ public class BlockPlaceCheck {
         final boolean reach = cc.blockplace.reachCheck && !player.hasPermission(Permissions.BLOCKPLACE_REACH);
 
         if(!cancel && reach) {
-            cancel = reachCheck.check(player, blockPlaced, blockPlacedAgainst, data, cc);
+            cancel = reachCheck.check(player, blockPlaced, blockPlacedAgainst, cc);
         }
 
         if(!cancel && onliquid) {
-            cancel = onLiquidCheck.check(player, blockPlaced, blockPlacedAgainst, data, cc);
+            cancel = onLiquidCheck.check(player, blockPlaced, blockPlacedAgainst, cc);
         }
 
         return cancel;

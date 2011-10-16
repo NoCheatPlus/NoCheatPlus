@@ -5,8 +5,7 @@ import org.bukkit.entity.Player;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.ChatData;
-import cc.co.evenprime.bukkit.nocheat.data.LogData;
+import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
 /**
  * 
@@ -22,7 +21,7 @@ public class ChatCheck {
         this.plugin = plugin;
     }
 
-    public boolean check(Player player, String message, ChatData data, ConfigurationCache cc) {
+    public boolean check(Player player, String message, ConfigurationCache cc) {
 
         boolean cancel = false;
 
@@ -32,23 +31,24 @@ public class ChatCheck {
 
             int time = plugin.getIngameSeconds();
 
-            if(data.spamLasttime + cc.chat.spamTimeframe <= time) {
-                data.spamLasttime = time;
-                data.messageCount = 0;
+            BaseData data = plugin.getPlayerData(player);
+
+            if(data.chat.spamLasttime + cc.chat.spamTimeframe <= time) {
+                data.chat.spamLasttime = time;
+                data.chat.messageCount = 0;
             }
 
-            data.messageCount++;
+            data.chat.messageCount++;
 
-            if(data.messageCount > cc.chat.spamLimit) {
+            if(data.chat.messageCount > cc.chat.spamLimit) {
 
                 // Prepare some event-specific values for logging and custom
                 // actions
-                LogData ldata = plugin.getDataManager().getData(player).log;
 
-                ldata.check = "chat.spam";
-                ldata.text = message;
+                data.log.check = "chat.spam";
+                data.log.text = message;
 
-                cancel = plugin.getActionManager().executeActions(player, cc.chat.spamActions, data.messageCount - cc.chat.spamLimit, ldata, data.history, cc);
+                cancel = plugin.getActionManager().executeActions(player, cc.chat.spamActions, data.chat.messageCount - cc.chat.spamLimit, data.chat.history, cc);
             }
         }
 

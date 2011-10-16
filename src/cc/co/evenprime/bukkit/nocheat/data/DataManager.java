@@ -47,7 +47,7 @@ public class DataManager {
      * Reset data that may cause problems after e.g. changing the config
      * 
      */
-    public void resetAllCriticalData() {
+    public void clearCriticalData() {
         for(BaseData b : this.map.values()) {
             b.clearCriticalData();
         }
@@ -79,17 +79,26 @@ public class DataManager {
      * 
      */
     public void cleanDataMap() {
-        List<Player> removals = new ArrayList<Player>();
+        try {
+            List<Player> removals = new ArrayList<Player>();
 
-        for(Entry<Player, BaseData> p : this.map.entrySet()) {
-            if(p.getValue().shouldBeRemoved()) {
-                removals.add(p.getKey());
+            for(Entry<Player, BaseData> p : this.map.entrySet()) {
+                if(p.getValue().shouldBeRemoved()) {
+                    removals.add(p.getKey());
+                }
             }
-        }
 
-        for(Player p : removals) {
-            this.map.remove(p);
+            for(Player p : removals) {
+                this.map.remove(p);
+            }
+        } catch(Exception e) {
+            // Ignore problems, as they really don't matter much
         }
+    }
+
+    public void clearCriticalData(Player player) {
+        BaseData data = this.map.get(player);
+        data.clearCriticalData();
     }
 
 }

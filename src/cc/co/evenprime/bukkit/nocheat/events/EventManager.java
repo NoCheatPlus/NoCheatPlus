@@ -8,6 +8,4 @@ public interface EventManager {
 
     public List<String> getActiveChecks(ConfigurationCache cc);
 
-    public List<String> getInactiveChecks(ConfigurationCache cc);
-
 }
