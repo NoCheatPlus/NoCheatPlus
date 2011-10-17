@@ -7,8 +7,6 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
  * Configurations specific for the "BlockBreak" checks
  * Every world gets one of these assigned to it.
  * 
- * @author Evenprime
- * 
  */
 public class CCBlockBreak {
 
@@ -19,6 +17,8 @@ public class CCBlockBreak {
     public final ActionList reachActions;
     public final boolean    directionCheck;
     public final ActionList directionActions;
+    public final double     directionPrecision;
+    public final long       directionPenaltyTime;
 
     public CCBlockBreak(Configuration data) {
 
@@ -28,6 +28,9 @@ public class CCBlockBreak {
         reachActions = data.getActionList(Configuration.BLOCKBREAK_REACH_ACTIONS);
         checkinstabreakblocks = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS);
         directionCheck = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECK);
+        directionPrecision = ((double) data.getInteger(Configuration.BLOCKBREAK_DIRECTION_PRECISION)) / 100D;
+        directionPenaltyTime = data.getInteger(Configuration.BLOCKBREAK_DIRECTION_PENALTYTIME);
         directionActions = data.getActionList(Configuration.BLOCKBREAK_DIRECTION_ACTIONS);
+
     }
 }

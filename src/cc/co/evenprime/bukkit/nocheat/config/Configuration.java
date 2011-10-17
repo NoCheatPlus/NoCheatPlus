@@ -15,8 +15,6 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
  * methods
  * to retrieve and store more complex datatypes based on strings.
  * 
- * @author Evenprime
- * 
  */
 public abstract class Configuration {
 
@@ -68,7 +66,9 @@ public abstract class Configuration {
 
     private final static OptionNode       BLOCKBREAK_DIRECTION                       = new OptionNode("direction", BLOCKBREAK, DataType.PARENT);
     public final static OptionNode        BLOCKBREAK_DIRECTION_CHECK                 = new OptionNode("check", BLOCKBREAK_DIRECTION, DataType.BOOLEAN);
-    public static final OptionNode        BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS = new OptionNode("checkinstabreakblocks", BLOCKBREAK_DIRECTION, DataType.BOOLEAN);
+    public final static OptionNode        BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS = new OptionNode("checkinstabreakblocks", BLOCKBREAK_DIRECTION, DataType.BOOLEAN);
+    public final static OptionNode        BLOCKBREAK_DIRECTION_PRECISION             = new OptionNode("precision", BLOCKBREAK_DIRECTION, DataType.INTEGER);
+    public final static OptionNode        BLOCKBREAK_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKBREAK_DIRECTION, DataType.INTEGER);           ;
     public final static OptionNode        BLOCKBREAK_DIRECTION_ACTIONS               = new OptionNode("actions", BLOCKBREAK_DIRECTION, DataType.ACTIONLIST);
 
     private final static OptionNode       BLOCKPLACE                                 = new OptionNode("blockplace", ROOT, DataType.PARENT);
@@ -93,12 +93,12 @@ public abstract class Configuration {
     public final static OptionNode        CHAT_SPAM_ACTIONS                          = new OptionNode("actions", CHAT_SPAM, DataType.ACTIONLIST);
 
     private final static OptionNode       FIGHT                                      = new OptionNode("fight", ROOT, DataType.PARENT);
-    public static final OptionNode        FIGHT_CHECK                                = new OptionNode("check", FIGHT, DataType.BOOLEAN);
+    public final static OptionNode        FIGHT_CHECK                                = new OptionNode("check", FIGHT, DataType.BOOLEAN);
 
     private final static OptionNode       FIGHT_DIRECTION                            = new OptionNode("direction", FIGHT, DataType.PARENT);
     public final static OptionNode        FIGHT_DIRECTION_CHECK                      = new OptionNode("check", FIGHT_DIRECTION, DataType.BOOLEAN);
-    public static final OptionNode        FIGHT_DIRECTION_PRECISION                  = new OptionNode("precision", FIGHT_DIRECTION, DataType.INTEGER);
-    public static final OptionNode        FIGHT_DIRECTION_PENALTYTIME                = new OptionNode("penaltytime", FIGHT_DIRECTION, DataType.INTEGER);
+    public final static OptionNode        FIGHT_DIRECTION_PRECISION                  = new OptionNode("precision", FIGHT_DIRECTION, DataType.INTEGER);
+    public final static OptionNode        FIGHT_DIRECTION_PENALTYTIME                = new OptionNode("penaltytime", FIGHT_DIRECTION, DataType.INTEGER);
     public final static OptionNode        FIGHT_DIRECTION_ACTIONS                    = new OptionNode("actions", FIGHT_DIRECTION, DataType.ACTIONLIST);
 
     private final Map<OptionNode, Object> values;

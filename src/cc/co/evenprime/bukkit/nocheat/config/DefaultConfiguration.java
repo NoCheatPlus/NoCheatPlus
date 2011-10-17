@@ -13,8 +13,6 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
  * The place where the structure of the configuration tree is defined, the
  * default settings are defined, the default files are defined.
  * 
- * @author Evenprime
- * 
  */
 public class DefaultConfiguration extends Configuration {
 
@@ -99,6 +97,8 @@ public class DefaultConfiguration extends Configuration {
             setValue(BLOCKBREAK_DIRECTION_CHECK, true);
 
             setValue(BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS, false);
+            setValue(BLOCKBREAK_DIRECTION_PRECISION, 50);
+            setValue(BLOCKBREAK_DIRECTION_PENALTYTIME, 300);
 
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("directionLog blockbreakCancel".split(" ")));

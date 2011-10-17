@@ -12,8 +12,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
  * The DirectionCheck will find out if a player tried to interact with something
  * that's not in his field of view.
  * 
- * @author Evenprime
- * 
  */
 public class DirectionCheck {
 
@@ -26,15 +24,17 @@ public class DirectionCheck {
     public boolean check(Player player, Block brokenBlock, ConfigurationCache cc) {
 
         BaseData data = plugin.getPlayerData(player);
-        
+
         // If the block is instabreak and we don't check instabreak, return
         if(!cc.blockbreak.checkinstabreakblocks && brokenBlock.getLocation().equals(data.blockbreak.instaBrokeBlockLocation)) {
             return false;
         }
 
         boolean cancel = false;
-        
-        double off = CheckUtil.directionCheck(player, brokenBlock.getX() + 0.5D, brokenBlock.getY() + 0.5D, brokenBlock.getZ() + 0.5D, 1D, 1D, 0.5D);
+
+        double off = CheckUtil.directionCheck(player, brokenBlock.getX() + 0.5D, brokenBlock.getY() + 0.5D, brokenBlock.getZ() + 0.5D, 1D, 1D, cc.blockbreak.directionPrecision);
+
+        long time = System.currentTimeMillis();
 
         if(off < 0.1D) {
             // Player did nothing wrong
@@ -49,6 +49,16 @@ public class DirectionCheck {
             data.log.check = "blockbreak.direction";
 
             cancel = plugin.getActionManager().executeActions(player, cc.blockbreak.directionActions, (int) data.blockbreak.directionViolationLevel, data.blockbreak.history, cc);
+
+            if(cancel) {
+                // Needed to calculate penalty times
+                data.fight.directionLastViolationTime = time;
+            }
+        }
+
+        // If the player is still in penalty time, cancel the event anyway
+        if(data.blockbreak.directionLastViolationTime + cc.blockbreak.directionPenaltyTime >= time) {
+            return true;
         }
 
         return cancel;

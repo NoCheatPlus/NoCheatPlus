@@ -9,8 +9,6 @@ import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
  * Textual explainations of options, will be displayed in the gui tool and the
  * descriptions.txt file.
  * 
- * @author Evenprime
- * 
  */
 public class Explainations {
 
@@ -60,6 +58,8 @@ public class Explainations {
 
         set(Configuration.BLOCKBREAK_DIRECTION_CHECK, "If true, check if a player is looking at the block that he's breaking.");
         set(Configuration.BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS, "If true, NoCheat will also check for direction for Instant-Breaking blocks.\nTHIS WILL CAUSE FALSE POSITIVES, when a player keeps his mouse button pressed and moves the mouse fast over the screen.");
+        set(Configuration.BLOCKBREAK_DIRECTION_PRECISION, "Define how precise a player has to hit blocks when mining. Lower values mean more precision, higher values less precision.");
+        set(Configuration.BLOCKBREAK_DIRECTION_PENALTYTIME, "Define how long after a failed attempt to dig a player will be disallowed to break another block. \nUnit is milliseconds, default is 300.");
         set(Configuration.BLOCKBREAK_DIRECTION_ACTIONS, "What should be done if a player is breaking blocks that are not in his line of sight.\nUnit is number of break(attempt)s outside the line of sight.");
 
         set(Configuration.BLOCKPLACE_CHECK, "If true, do various checks on BlockPlace events.");
