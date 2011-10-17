@@ -22,6 +22,7 @@ public class DefaultConfiguration extends Configuration {
         /*** LOGGING ***/
         {
             setValue(LOGGING_ACTIVE, true);
+            setValue(LOGGING_PREFIX, "&4NC&f: ");
             setValue(LOGGING_FILENAME, "nocheat.log");
             setValue(LOGGING_FILELEVEL, LogLevel.LOW);
             setValue(LOGGING_CONSOLELEVEL, LogLevel.HIGH);
@@ -134,6 +135,7 @@ public class DefaultConfiguration extends Configuration {
 
             ActionList spamActionList = new ActionList();
             spamActionList.setActions(0, action.getActions("spamLog spamCancel".split(" ")));
+            spamActionList.setActions(50, action.getActions("spamLog spamCancel spamkick".split(" ")));
             setValue(CHAT_SPAM_ACTIONS, spamActionList);
         }
 
@@ -210,27 +212,27 @@ public class DefaultConfiguration extends Configuration {
             w(w, "#   - Then comes the 'message', depending on where the action is used, different keywords in [ ] may be used");
             w(w, "");
             w(w, "# Gives a very short log message of the violation, only containing name, violation type and total violation value, at most once every 15 seconds, only if more than 3 violations happened within the last minute (low) and immediatly (med,high)");
-            w(w, "log moveLogLowShort 3 15 low NC: [player] failed [check]");
-            w(w, "log moveLogMedShort 0 15 med NC: [player] failed [check]");
-            w(w, "log moveLogHighShort 0 15 high NC: [player] failed [check]");
+            w(w, "log moveLogLowShort 3 15 low [player] failed [check]");
+            w(w, "log moveLogMedShort 0 15 med [player] failed [check]");
+            w(w, "log moveLogHighShort 0 15 high [player] failed [check]");
             w(w, "");
             w(w, "# Gives a log message of the violation, only containing name, violation type and total violation value, at most once every second, only if more than 5 violations happened within the last minute (low) and immediatly (med,high)");
-            w(w, "log morepacketsLow 5 1 low NC: [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
-            w(w, "log morepacketsMed 0 1 med NC: [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
-            w(w, "log morepacketsHigh 0 1 high NC: [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
+            w(w, "log morepacketsLow 5 1 low [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
+            w(w, "log morepacketsMed 0 1 med [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
+            w(w, "log morepacketsHigh 0 1 high [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
             w(w, "");
             w(w, "# Gives a lengthy log message of the violation, containing name, location, violation type and total violation, at most once every 15 seconds, only if more than 3 violations happened within the last minute (low) and immediatly (med,high)");
-            w(w, "log moveLogLowLong 3 15 low NC: [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
-            w(w, "log moveLogMedLong 0 15 med NC: [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
-            w(w, "log moveLogHighLong 0 15 high NC: [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
+            w(w, "log moveLogLowLong 3 15 low [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
+            w(w, "log moveLogMedLong 0 15 med [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
+            w(w, "log moveLogHighLong 0 15 high [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
             w(w, "");
             w(w, "# Some other log messages that are limited a bit by default, to avoid too extreme spam");
-            w(w, "log reachLog 0 1 med NC: [player] failed [check]: tried to interact with a block over distance [reachdistance].");
-            w(w, "log directionLog 2 1 med NC: [player] failed [check]: tried to destroy a block out of line of sight.");
-            w(w, "log onliquidLog 2 1 med NC: [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst].");
-            w(w, "log spamLog 0 4 med NC: [player] failed [check]: Last sent message \"[text]\".");
-            w(w, "log nofallLog 0 1 med NC: [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks.");
-            w(w, "log fightDirectionLog 0 5 med NC: [player] failed [check]: tried to attack out of sight entity. Total violation level so far [violations]");
+            w(w, "log reachLog 0 1 med [player] failed [check]: tried to interact with a block over distance [reachdistance].");
+            w(w, "log directionLog 2 1 med [player] failed [check]: tried to destroy a block out of line of sight.");
+            w(w, "log onliquidLog 2 1 med [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst].");
+            w(w, "log spamLog 0 4 med [player] failed [check]: Last sent message \"[text]\".");
+            w(w, "log nofallLog 0 1 med [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks.");
+            w(w, "log fightDirectionLog 0 5 med [player] failed [check]: tried to attack out of sight entity. Total violation level so far [violations]");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
@@ -255,7 +257,8 @@ public class DefaultConfiguration extends Configuration {
             w(w, "#   - Then comes the command. You can use the same [ ] that you use for log actions. You'll most likely want to use [player] at some point.");
             w(w, "");
             w(w, "# E.g. Kick a player");
-            w(w, "consolecommand kick 0 0 kick [player]");
+            w(w, "consolecommand kick 0 1 kick [player]");
+            w(w, "consolecommand spamkick 0 1 kick [player]");
             w.flush();
             w.close();
         } catch(IOException e) {

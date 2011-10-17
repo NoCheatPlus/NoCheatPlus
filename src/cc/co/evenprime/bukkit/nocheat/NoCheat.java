@@ -39,8 +39,6 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  * 
  * Check various player events for their plausibility and log/deny them/react to
  * them based on configuration
- * 
- * @author Evenprime
  */
 public class NoCheat extends JavaPlugin {
 
@@ -118,6 +116,10 @@ public class NoCheat extends JavaPlugin {
                     lastIngamesecondDuration = time - lastIngamesecondTime;
                     if(lastIngamesecondDuration < 1000)
                         lastIngamesecondDuration = 1000;
+                    else if(lastIngamesecondDuration > 3600000) {
+                        lastIngamesecondDuration = 3600000; // top limit of 1
+                                                            // hour per "second"
+                    }
                     lastIngamesecondTime = time;
                     ingameseconds++;
 

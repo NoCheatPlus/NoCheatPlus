@@ -16,8 +16,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
  * It monitors the number of packets sent to the server within 1 second and
  * compares it to the "legal" number of packets for that timeframe (22).
  * 
- * @author Evenprime
- * 
  */
 public class MorePacketsCheck {
 
@@ -103,7 +101,7 @@ public class MorePacketsCheck {
 
             int difference = limit - data.moving.morePacketsCounter;
 
-            data.moving.morePacketsBuffer = data.moving.morePacketsBuffer + difference;
+            data.moving.morePacketsBuffer += difference;
             if(data.moving.morePacketsBuffer > bufferLimit)
                 data.moving.morePacketsBuffer = bufferLimit;
             // Are we over the 22 event limit for that time frame now? (limit

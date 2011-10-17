@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat.log;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
@@ -12,8 +13,6 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
  * Manage logging throughout NoCheat. Messages may be logged directly to a
  * specific place or go through configuration/permissions to decide if and where
  * the message will be visible
- * 
- * @author Evenprime
  * 
  */
 public class LogManager {
@@ -35,11 +34,11 @@ public class LogManager {
             return;
 
         if(cc.logging.fileLevel.matches(level)) {
-            logToFile(level, message, cc.logging.filelogger);
+            logToFile(level, ChatColor.stripColor(message), cc.logging.filelogger);
         }
 
         if(cc.logging.consoleLevel.matches(level)) {
-            logToConsole(level, message);
+            logToConsole(level, ChatColor.stripColor(message));
         }
 
         if(cc.logging.chatLevel.matches(level)) {

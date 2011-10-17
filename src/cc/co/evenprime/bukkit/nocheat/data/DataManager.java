@@ -59,18 +59,18 @@ public class DataManager {
      * 
      */
     public void queueForRemoval(Player player) {
-        BaseData bd = this.map.get(player);
+        BaseData data = this.map.get(player);
 
-        if(bd != null) {
-            bd.markForRemoval(true);
+        if(data != null) {
+            data.markForRemoval(true);
         }
     }
 
     public void unqueueForRemoval(Player player) {
-        BaseData bd = this.map.get(player);
+        BaseData data = this.map.get(player);
 
-        if(bd != null) {
-            bd.markForRemoval(false);
+        if(data != null) {
+            data.markForRemoval(false);
         }
     }
 
@@ -98,7 +98,9 @@ public class DataManager {
 
     public void clearCriticalData(Player player) {
         BaseData data = this.map.get(player);
-        data.clearCriticalData();
+        if(data != null) {
+            data.clearCriticalData();
+        }
     }
 
 }

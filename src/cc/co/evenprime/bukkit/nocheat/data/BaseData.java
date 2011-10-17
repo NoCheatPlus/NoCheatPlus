@@ -11,7 +11,7 @@ public class BaseData extends Data {
     public final MovingData     moving;
     public final FightData      fight;
 
-    private final Data[]        data;
+    private final Data[]        data;       // for convenience
 
     private long                removalTime;
 
