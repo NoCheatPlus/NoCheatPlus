@@ -140,8 +140,8 @@ public class NoCheat extends JavaPlugin {
         return conf;
     }
 
-    public LogManager getLogManager() {
-        return log;
+    public void log(LogLevel level, String message, ConfigurationCache cc) {
+        log.log(level, message, cc);
     }
 
     public BaseData getPlayerData(Player player) {
@@ -312,5 +312,4 @@ public class NoCheat extends JavaPlugin {
         }
         return false;
     }
-
 }

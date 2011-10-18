@@ -53,7 +53,7 @@ public class ActionManager {
     }
 
     private void executeLogAction(LogAction l, LogData data, ConfigurationCache cc) {
-        plugin.getLogManager().log(l.level, cc.logging.prefix + l.getMessage(data), cc);
+        plugin.log(l.level, cc.logging.prefix + l.getMessage(data), cc);
     }
 
     private void executeConsoleCommand(ConsolecommandAction action, LogData data) {
