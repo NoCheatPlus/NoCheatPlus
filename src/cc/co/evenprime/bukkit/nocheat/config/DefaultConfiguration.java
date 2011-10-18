@@ -130,6 +130,7 @@ public class DefaultConfiguration extends Configuration {
             setValue(CHAT_CHECK, true);
 
             setValue(CHAT_SPAM_CHECK, true);
+            setValue(CHAT_SPAM_WHITELIST, "");
             setValue(CHAT_SPAM_TIMEFRAME, 5);
             setValue(CHAT_SPAM_LIMIT, 5);
 

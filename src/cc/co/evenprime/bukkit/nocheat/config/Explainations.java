@@ -74,6 +74,7 @@ public class Explainations {
         set(Configuration.CHAT_CHECK, "If true, do various checks on PlayerChat events.");
 
         set(Configuration.CHAT_SPAM_CHECK, "If true, check if a player is spamming the chat.");
+        set(Configuration.CHAT_SPAM_WHITELIST, "A list of messages that should be ignored by the spam check, seperated by ','. All messages/commands starting with one of these will be let through.");
         set(Configuration.CHAT_SPAM_TIMEFRAME, "Over what timeframe (in seconds) should the messages be counted?\nWhen the time is over, counting starts at 0 again.");
         set(Configuration.CHAT_SPAM_LIMIT, "How many messages per timeframe may the player send without it counting as spamming?");
         set(Configuration.CHAT_SPAM_ACTIONS, "What should be done if a player is trying to spam the chat.\nUnit is number of chat messages above the limit you declared above.");

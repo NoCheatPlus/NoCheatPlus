@@ -9,8 +9,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
 /**
  * 
- * @author Evenprime
- * 
  */
 public class ChatCheck {
 
@@ -28,6 +26,14 @@ public class ChatCheck {
         boolean spamCheck = cc.chat.spamCheck && !player.hasPermission(Permissions.CHAT_SPAM);
 
         if(spamCheck) {
+
+            // Maybe it's a command and on the whitelist
+            for(String s : cc.chat.spamWhitelist) {
+                if(message.startsWith(s)) {
+                    // It is
+                    return false;
+                }
+            }
 
             int time = plugin.getIngameSeconds();
 
