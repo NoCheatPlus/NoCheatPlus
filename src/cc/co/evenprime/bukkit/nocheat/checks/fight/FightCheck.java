@@ -44,7 +44,7 @@ public class FightCheck {
             // height to get the "center" of the hitbox
             double off = CheckUtil.directionCheck(player, entity.locX, entity.locY + 1.0D, entity.locZ, width, 2.0D, cc.fight.directionPrecision);
 
-            BaseData data = plugin.getPlayerData(player);
+            BaseData data = plugin.getData(player);
             
             if(off < 0.1D) {
                 // Player did probably nothing wrong
@@ -61,7 +61,7 @@ public class FightCheck {
                 // actions
                 data.log.check = "fight.direction";
 
-                cancel = plugin.getActionManager().executeActions(player, cc.fight.directionActions, (int) data.fight.violationLevel, data.fight.history, cc);
+                cancel = plugin.execute(player, cc.fight.directionActions, (int) data.fight.violationLevel, data.fight.history, cc);
 
                 if(cancel) {
                     // Needed to calculate penalty times

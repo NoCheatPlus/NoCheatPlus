@@ -23,7 +23,7 @@ public class DirectionCheck {
 
     public boolean check(Player player, Block brokenBlock, ConfigurationCache cc) {
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         // If the block is instabreak and we don't check instabreak, return
         if(!cc.blockbreak.checkinstabreakblocks && brokenBlock.getLocation().equals(data.blockbreak.instaBrokeBlockLocation)) {
@@ -48,11 +48,11 @@ public class DirectionCheck {
             // Prepare some event-specific values for logging and custom actions
             data.log.check = "blockbreak.direction";
 
-            cancel = plugin.getActionManager().executeActions(player, cc.blockbreak.directionActions, (int) data.blockbreak.directionViolationLevel, data.blockbreak.history, cc);
+            cancel = plugin.execute(player, cc.blockbreak.directionActions, (int) data.blockbreak.directionViolationLevel, data.blockbreak.history, cc);
 
             if(cancel) {
                 // Needed to calculate penalty times
-                data.fight.directionLastViolationTime = time;
+                data.blockbreak.directionLastViolationTime = time;
             }
         }
 

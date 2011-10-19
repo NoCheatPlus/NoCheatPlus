@@ -26,7 +26,7 @@ public class OnLiquidCheck {
 
         boolean cancel = false;
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         if(blockPlaced == null || blockPlaced.isEmpty() || (blockPlacedAgainst != null && isSolid(blockPlacedAgainst.getTypeId()))) {
             // all ok
@@ -38,7 +38,7 @@ public class OnLiquidCheck {
             data.log.placed = blockPlaced;
             data.log.placedAgainst = blockPlacedAgainst;
 
-            cancel = plugin.getActionManager().executeActions(player, cc.blockplace.onliquidActions, (int) data.blockplace.onliquidViolationLevel, data.blockplace.history, cc);
+            cancel = plugin.execute(player, cc.blockplace.onliquidActions, (int) data.blockplace.onliquidViolationLevel, data.blockplace.history, cc);
         }
 
         data.blockplace.onliquidViolationLevel *= 0.95D; // Reduce level over

@@ -31,7 +31,7 @@ public class NoFallCheck {
         double oldY = from.getY();
         double newY = to.getY();
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         // This check is pretty much always a step behind for technical reasons.
         if(fromOnOrInGround) {
@@ -58,7 +58,7 @@ public class NoFallCheck {
             data.log.falldistance = data.moving.fallDistance;
             data.log.check = "moving/nofall";
 
-            boolean cancel = plugin.getActionManager().executeActions(player, cc.moving.nofallActions, (int) data.moving.nofallViolationLevel, data.moving.history, cc);
+            boolean cancel = plugin.execute(player, cc.moving.nofallActions, (int) data.moving.nofallViolationLevel, data.moving.history, cc);
 
             // If "cancelled", the fall damage gets dealt in a way that's
             // visible to other plugins

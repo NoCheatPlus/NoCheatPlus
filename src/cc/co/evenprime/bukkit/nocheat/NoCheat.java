@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,8 +17,11 @@ import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
+import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
@@ -42,19 +46,15 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  */
 public class NoCheat extends JavaPlugin {
 
-    private ConfigurationManager     conf;
-    private LogManager               log;
-    private DataManager              data;
-    private PerformanceManager       performance;
-    private ActionManager            action;
+    private ConfigurationManager conf;
+    private LogManager           log;
+    private DataManager          data;
+    private PerformanceManager   performance;
+    private ActionManager        action;
 
-    private final List<EventManager> eventManagers            = new LinkedList<EventManager>();
+    private List<EventManager>   eventManagers;
 
-    private int                      taskId                   = -1;
-    private int                      ingameseconds            = 0;
-    private long                     lastIngamesecondTime     = 0L;
-    private long                     lastIngamesecondDuration = 0L;
-    private boolean                  skipCheck                = false;
+    private LagMeasureTask       lagMeasureTask;
 
     public NoCheat() {
 
@@ -62,14 +62,17 @@ public class NoCheat extends JavaPlugin {
 
     public void onDisable() {
 
-        if(taskId != -1) {
-            this.getServer().getScheduler().cancelTask(taskId);
-            taskId = -1;
-        }
         PluginDescriptionFile pdfFile = this.getDescription();
 
-        if(conf != null)
+        if(lagMeasureTask != null) {
+            lagMeasureTask.cancel();
+            lagMeasureTask = null;
+        }
+
+        if(conf != null) {
             conf.cleanup();
+            conf = null;
+        }
 
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
     }
@@ -93,6 +96,7 @@ public class NoCheat extends JavaPlugin {
         // Then set up the Action Manager
         this.action = new ActionManager(this);
 
+        eventManagers = new ArrayList<EventManager>(8); // Big enough
         // Then set up the event listeners
         eventManagers.add(new PlayerMoveEventManager(this));
         eventManagers.add(new PlayerTeleportEventManager(this));
@@ -103,30 +107,9 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new EntityDamageEventManager(this));
 
         // Then set up a task to monitor server lag
-        if(taskId == -1) {
-            taskId = this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-
-                public void run() {
-
-                    // If the previous second took to long, skip checks during
-                    // this second
-                    skipCheck = lastIngamesecondDuration > 1500;
-
-                    long time = System.currentTimeMillis();
-                    lastIngamesecondDuration = time - lastIngamesecondTime;
-                    if(lastIngamesecondDuration < 1000)
-                        lastIngamesecondDuration = 1000;
-                    else if(lastIngamesecondDuration > 3600000) {
-                        lastIngamesecondDuration = 3600000; // top limit of 1
-                                                            // hour per "second"
-                    }
-                    lastIngamesecondTime = time;
-                    ingameseconds++;
-
-                    // Check if some data is outdated now and let it be removed
-                    data.cleanDataMap();
-                }
-            }, 0, 20);
+        if(lagMeasureTask == null) {
+            lagMeasureTask = new LagMeasureTask(this);
+            lagMeasureTask.start();
         }
 
         // Then print a list of active checks per world
@@ -136,23 +119,26 @@ public class NoCheat extends JavaPlugin {
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + this.getDescription().getVersion() + "] is enabled.");
     }
 
-    public ConfigurationManager getConfigurationManager() {
-        return conf;
+    public ConfigurationCache getConfig(Player player) {
+        return conf.getConfigurationCacheForWorld(player.getWorld().getName());
     }
 
     public void log(LogLevel level, String message, ConfigurationCache cc) {
         log.log(level, message, cc);
     }
 
-    public BaseData getPlayerData(Player player) {
+    public BaseData getData(Player player) {
         return data.getData(player);
     }
 
-    public void clearCriticalPlayerData(Player player) {
+    public void clearCriticalData(Player player) {
         data.clearCriticalData(player);
     }
 
     public void playerLeft(Player player) {
+        // Get rid of the critical data that's stored for player immediately
+        clearCriticalData(player);
+
         data.queueForRemoval(player);
     }
 
@@ -160,24 +146,13 @@ public class NoCheat extends JavaPlugin {
         data.unqueueForRemoval(player);
     }
 
-    public PerformanceManager getPerformanceManager() {
-        return performance;
+    public Performance getPerformance(Type type) {
+        return performance.get(type);
     }
 
-    public ActionManager getActionManager() {
-        return action;
-    }
-
-    public int getIngameSeconds() {
-        return ingameseconds;
-    }
-
-    public long getIngameSecondDuration() {
-        return lastIngamesecondDuration;
-    }
-
-    public boolean skipCheck() {
-        return skipCheck;
+    public void cleanDataMap() {
+        if(data != null)
+            data.cleanDataMap();
     }
 
     /**
@@ -197,119 +172,160 @@ public class NoCheat extends JavaPlugin {
 
             ConfigurationCache cc = this.conf.getConfigurationCacheForWorld(world.getName());
 
-            if(cc.debug.showchecks) {
-                for(EventManager em : eventManagers) {
-                    List<String> checks = em.getActiveChecks(cc);
-                    if(checks.size() > 0) {
-                        for(String active : em.getActiveChecks(cc)) {
-                            line.append(active).append(' ');
-                        }
+            if(!cc.debug.showchecks)
+                continue;
 
-                        if(!introPrinted) {
-                            log.logToConsole(LogLevel.LOW, intro);
-                            introPrinted = true;
-                        }
+            for(EventManager em : eventManagers) {
+                if(em.getActiveChecks(cc).size() == 0)
+                    continue;
 
-                        log.logToConsole(LogLevel.LOW, line.toString());
+                for(String active : em.getActiveChecks(cc)) {
+                    line.append(active).append(' ');
+                }
 
-                        line = new StringBuilder(length);
+                if(!introPrinted) {
+                    log.logToConsole(LogLevel.LOW, intro);
+                    introPrinted = true;
+                }
 
-                        for(int i = 0; i < length; i++) {
-                            line.append(' ');
-                        }
-                    }
+                log.logToConsole(LogLevel.LOW, line.toString());
+
+                line = new StringBuilder(length);
+
+                for(int i = 0; i < length; i++) {
+                    line.append(' ');
                 }
             }
+
         }
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(command.getName().equalsIgnoreCase("nocheat") && args.length > 0) {
-            if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
-                // permlist command was used CORRECTLY
+        // Not our command
+        if(!command.getName().equalsIgnoreCase("nocheat") || args.length == 0)
+            return false;
 
-                // Does the sender have permission?
-                if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERMLIST)) {
-                    return false;
-                }
+        if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
+            // permlist command was used
+            return handlePermlistCommand(sender, args);
 
-                // Get the player names
-                Player player = this.getServer().getPlayerExact(args[1]);
-                if(player == null) {
-                    sender.sendMessage("Unknown player: " + args[1]);
-                    return true;
-                } else {
-                    String prefix = "";
-                    if(args.length == 3) {
-                        prefix = args[2];
-                    }
-                    // Make a copy to allow sorting
-                    List<Permission> perms = new LinkedList<Permission>(this.getDescription().getPermissions());
-                    Collections.reverse(perms);
+        } else if(args[0].equalsIgnoreCase("reload")) {
+            // reload command was used
+            return handleReloadCommand(sender);
+        }
 
-                    sender.sendMessage("Player " + player.getName() + " has the permission(s):");
-                    for(Permission permission : perms) {
-                        if(permission.getName().startsWith(prefix)) {
-                            sender.sendMessage(permission.getName() + ": " + player.hasPermission(permission));
-                        }
-                    }
-                    return true;
-                }
-            } else if(args[0].equalsIgnoreCase("reload")) {
-                // reload command was used
+        else if(args[0].equalsIgnoreCase("performance")) {
+            // performance command was used
+            return handlePerformanceCommand(sender);
+        }
 
-                // Does the sender have permission?
-                if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_RELOAD)) {
-                    return false;
-                }
+        return false;
+    }
 
-                sender.sendMessage("[NoCheat] Reloading configuration");
+    private boolean handlePermlistCommand(CommandSender sender, String[] args) {
+        // Does the sender have permission to use it?
+        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERMLIST)) {
+            return false;
+        }
 
-                this.conf.cleanup();
-                this.conf = new ConfigurationManager(this.getDataFolder().getPath());
-                this.data.clearCriticalData();
+        // Get the player by name
+        Player player = this.getServer().getPlayerExact(args[1]);
+        if(player == null) {
+            sender.sendMessage("Unknown player: " + args[1]);
+            return true;
+        }
 
-                sender.sendMessage("[NoCheat] Configuration reloaded");
+        // Should permissions be filtered by prefix?
+        String prefix = "";
+        if(args.length == 3) {
+            prefix = args[2];
+        }
 
-                return true;
+        // Make a copy to allow sorting
+        List<Permission> perms = new LinkedList<Permission>(this.getDescription().getPermissions());
+        Collections.reverse(perms);
+
+        sender.sendMessage("Player " + player.getName() + " has the permission(s):");
+
+        for(Permission permission : perms) {
+            if(permission.getName().startsWith(prefix)) {
+                sender.sendMessage(permission.getName() + ": " + player.hasPermission(permission));
             }
+        }
+        return true;
+    }
 
-            else if(args[0].equalsIgnoreCase("performance")) {
-                // performance command was used
+    private boolean handleReloadCommand(CommandSender sender) {
+        // Does the sender have permission?
+        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_RELOAD)) {
+            return false;
+        }
 
-                // Does the sender have permission?
-                if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERFORMANCE)) {
-                    return false;
-                }
+        sender.sendMessage("[NoCheat] Reloading configuration");
 
-                sender.sendMessage("[NoCheat] Retrieving performance statistics");
+        this.conf.cleanup();
+        this.conf = new ConfigurationManager(this.getDataFolder().getPath());
+        this.data.clearCriticalData();
 
-                PerformanceManager pm = this.getPerformanceManager();
-                long totalTime = 0;
+        sender.sendMessage("[NoCheat] Configuration reloaded");
 
-                for(Type type : Type.values()) {
-                    Performance p = pm.get(type);
+        return true;
+    }
 
-                    long total = p.getTotalTime();
-                    totalTime += total;
-                    long relative = p.getRelativeTime();
-                    long events = p.getCounter();
+    private boolean handlePerformanceCommand(CommandSender sender) {
+        // Does the sender have permission?
+        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERFORMANCE)) {
+            return false;
+        }
 
-                    StringBuilder string = new StringBuilder("").append(type.toString());
-                    string.append(": total ").append(pm.convertToAppropriateUnit(total)).append(" ").append(pm.getAppropriateUnit(total));
-                    string.append(", relative ").append(pm.convertToAppropriateUnit(relative)).append(" ").append(pm.getAppropriateUnit(relative));
-                    string.append(" over ").append(events).append(" events.");
+        sender.sendMessage("[NoCheat] Retrieving performance statistics");
 
-                    sender.sendMessage(string.toString());
-                }
+        long totalTime = 0;
 
-                sender.sendMessage("Total time spent: " + pm.convertToAppropriateUnit(totalTime) + " " + pm.getAppropriateUnit(totalTime));
+        for(Type type : Type.values()) {
+            Performance p = this.getPerformance(type);
 
-                return true;
-            }
+            long total = p.getTotalTime();
+            totalTime += total;
+
+            StringBuilder string = new StringBuilder("").append(type.toString());
+            string.append(": total ").append(Performance.toString(total));
+            string.append(", relative ").append(Performance.toString(p.getRelativeTime()));
+            string.append(" over ").append(p.getCounter()).append(" events.");
+
+            sender.sendMessage(string.toString());
+        }
+
+        sender.sendMessage("Total time spent: " + Performance.toString(totalTime) + " " + Performance.toString(totalTime));
+
+        return true;
+    }
+
+    public int getIngameSeconds() {
+        if(lagMeasureTask != null)
+            return lagMeasureTask.getIngameSeconds();
+        return 0;
+    }
+
+    public boolean skipCheck() {
+        if(lagMeasureTask != null)
+            return lagMeasureTask.skipCheck();
+        return false;
+    }
+
+    public long getIngameSecondDuration() {
+        if(lagMeasureTask != null)
+            return lagMeasureTask.getIngameSecondDuration();
+        return 1000L;
+    }
+
+    public boolean execute(Player player, ActionList actions, int violationLevel, ExecutionHistory history, ConfigurationCache cc) {
+        if(action != null) {
+            return action.executeActions(player, actions, violationLevel, history, cc);
         }
         return false;
     }
+
 }

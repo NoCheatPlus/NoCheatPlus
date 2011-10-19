@@ -43,7 +43,7 @@ public class RunningCheck {
         final double zDistance = to.getZ() - from.getZ();
         final double horizontalDistance = Math.sqrt((xDistance * xDistance + zDistance * zDistance));
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         if(data.moving.runflySetBackPoint == null) {
             data.moving.runflySetBackPoint = from.clone();
@@ -84,7 +84,7 @@ public class RunningCheck {
             else if(resultVert > 0)
                 data.log.check = "runfly/vertical";
 
-            boolean cancel = plugin.getActionManager().executeActions(player, cc.moving.actions, (int) data.moving.runflyViolationLevel, data.moving.history, cc);
+            boolean cancel = plugin.execute(player, cc.moving.actions, (int) data.moving.runflyViolationLevel, data.moving.history, cc);
 
             // Was one of the actions a cancel? Then do it
             if(cancel) {
@@ -130,7 +130,7 @@ public class RunningCheck {
             e.printStackTrace();
         }
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         if(cc.moving.sneakingCheck && player.isSneaking() && !player.hasPermission(Permissions.MOVE_SNEAK)) {
             distanceAboveLimit = totalDistance - cc.moving.sneakingSpeedLimit - data.moving.horizFreedom;
@@ -183,7 +183,7 @@ public class RunningCheck {
 
         final double toY = to.getY();
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         double limit = data.moving.vertFreedom + cc.moving.jumpheight;
 

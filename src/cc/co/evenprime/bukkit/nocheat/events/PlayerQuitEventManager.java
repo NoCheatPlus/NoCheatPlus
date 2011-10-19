@@ -29,9 +29,6 @@ public class PlayerQuitEventManager extends PlayerListener implements EventManag
 
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
-        // Get rid of the critical data that's stored for player immediately
-        plugin.clearCriticalPlayerData(event.getPlayer());
-
         // But only after a certain time, get rid of the rest of the data
         plugin.playerLeft(event.getPlayer());
     }

@@ -37,7 +37,7 @@ public class ChatCheck {
 
             int time = plugin.getIngameSeconds();
 
-            BaseData data = plugin.getPlayerData(player);
+            BaseData data = plugin.getData(player);
 
             if(data.chat.spamLasttime + cc.chat.spamTimeframe <= time) {
                 data.chat.spamLasttime = time;
@@ -54,7 +54,7 @@ public class ChatCheck {
                 data.log.check = "chat.spam";
                 data.log.text = message;
 
-                cancel = plugin.getActionManager().executeActions(player, cc.chat.spamActions, data.chat.messageCount - cc.chat.spamLimit, data.chat.history, cc);
+                cancel = plugin.execute(player, cc.chat.spamActions, data.chat.messageCount - cc.chat.spamLimit, data.chat.history, cc);
             }
         }
 

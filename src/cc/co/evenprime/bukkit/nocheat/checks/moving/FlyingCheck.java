@@ -29,7 +29,7 @@ public class FlyingCheck {
 
     public Location check(Player player, Location from, Location to, ConfigurationCache cc) {
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         if(data.moving.runflySetBackPoint == null) {
             data.moving.runflySetBackPoint = player.getLocation().clone();
@@ -83,7 +83,7 @@ public class FlyingCheck {
             data.log.toLocation = to;
             data.log.check = "flying/toofast";
 
-            boolean cancel = plugin.getActionManager().executeActions(player, cc.moving.flyingActions, (int) data.moving.runflyViolationLevel, data.moving.history, cc);
+            boolean cancel = plugin.execute(player, cc.moving.flyingActions, (int) data.moving.runflyViolationLevel, data.moving.history, cc);
 
             // Was one of the actions a cancel? Then really do it
             if(cancel) {

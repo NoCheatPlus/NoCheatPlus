@@ -30,7 +30,7 @@ public class ReachCheck {
 
         double distance = CheckUtil.reachCheck(player, brokenBlock.getX() + 0.5D, brokenBlock.getY() + 0.5D, brokenBlock.getZ() + 0.5D, player.getGameMode() == GameMode.CREATIVE ? cc.blockbreak.reachDistance + 2 : cc.blockbreak.reachDistance);
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
         
         if(distance > 0D) {
             // Player failed the check
@@ -42,7 +42,7 @@ public class ReachCheck {
             data.log.check = "blockbreak.reach";
             data.log.reachdistance = distance;
 
-            cancel = plugin.getActionManager().executeActions(player, cc.blockbreak.reachActions, (int) data.blockbreak.reachViolationLevel, data.blockbreak.history, cc);
+            cancel = plugin.execute(player, cc.blockbreak.reachActions, (int) data.blockbreak.reachViolationLevel, data.blockbreak.history, cc);
         } else {
             data.blockbreak.reachViolationLevel *= 0.9D;
         }

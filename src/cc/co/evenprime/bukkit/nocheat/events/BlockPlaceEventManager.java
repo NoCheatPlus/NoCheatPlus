@@ -23,8 +23,6 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  * Central location to listen to Block-related events and dispatching them to
  * checks
  * 
- * @author Evenprime
- * 
  */
 public class BlockPlaceEventManager extends BlockListener implements EventManager {
 
@@ -41,7 +39,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
         this.movingCheck = new RunFlyCheck(plugin);
         this.blockPlaceCheck = new BlockPlaceCheck(plugin);
 
-        this.blockPlacePerformance = p.getPerformanceManager().get(Type.BLOCKPLACE);
+        this.blockPlacePerformance = p.getPerformance(Type.BLOCKPLACE);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -79,7 +77,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
         boolean cancel = false;
 
         final Player player = event.getPlayer();
-        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfig(player);
 
         // Find out if checks need to be done for that player
         if(cc.blockplace.check && !player.hasPermission(Permissions.BLOCKPLACE)) {

@@ -24,8 +24,6 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  * Central location to listen to player-interact events and dispatch them to
  * relevant checks
  * 
- * @author Evenprime
- * 
  */
 public class BlockBreakEventManager extends BlockListener implements EventManager {
 
@@ -38,8 +36,8 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
 
         this.plugin = plugin;
         this.blockBreakCheck = new BlockBreakCheck(plugin);
-        this.blockBreakPerformance = plugin.getPerformanceManager().get(Type.BLOCKBREAK);
-        this.blockDamagePerformance = plugin.getPerformanceManager().get(Type.BLOCKDAMAGE);
+        this.blockBreakPerformance = plugin.getPerformance(Type.BLOCKBREAK);
+        this.blockDamagePerformance = plugin.getPerformance(Type.BLOCKDAMAGE);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -62,7 +60,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
             nanoTimeStart = System.nanoTime();
 
         final Player player = event.getPlayer();
-        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfig(player);
 
         // Find out if checks need to be done for that player
         if(cc.blockbreak.check && !player.hasPermission(Permissions.BLOCKBREAK)) {
@@ -98,7 +96,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
 
         final Player player = event.getPlayer();
         // Get the player-specific stored data that applies here
-        final BaseData data = plugin.getPlayerData(player);
+        final BaseData data = plugin.getData(player);
 
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks

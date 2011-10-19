@@ -21,8 +21,6 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 /**
  * 
- * @author Evenprime
- * 
  */
 public class PlayerChatEventManager extends PlayerListener implements EventManager {
 
@@ -35,7 +33,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
         this.plugin = plugin;
         this.chatCheck = new ChatCheck(plugin);
 
-        this.chatPerformance = plugin.getPerformanceManager().get(Type.CHAT);
+        this.chatPerformance = plugin.getPerformance(Type.CHAT);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -58,7 +56,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
             nanoTimeStart = System.nanoTime();
 
         final Player player = event.getPlayer();
-        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfig(player);
 
         // Find out if checks need to be done for that player
         if(cc.chat.check && !player.hasPermission(Permissions.CHAT)) {

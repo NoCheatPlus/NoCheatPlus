@@ -23,8 +23,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
  * Only place that listens to Player-teleport related events and dispatches them
  * to relevant checks
  * 
- * @author Evenprime
- * 
  */
 public class PlayerTeleportEventManager extends PlayerListener implements EventManager {
 
@@ -52,7 +50,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
                     return;
                 }
 
-                final BaseData data = plugin.getPlayerData(event.getPlayer());
+                final BaseData data = plugin.getData(event.getPlayer());
 
                 if(data.moving.teleportTo != null && data.moving.teleportTo.equals(event.getTo())) {
                     event.setCancelled(false);
@@ -91,7 +89,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
     private void handleTeleportation(Player player, Location newLocation) {
 
-        plugin.clearCriticalPlayerData(player);
+        plugin.clearCriticalData(player);
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

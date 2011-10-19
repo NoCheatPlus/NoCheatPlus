@@ -85,7 +85,7 @@ public class MorePacketsCheck {
 
         Location newToLocation = null;
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         data.moving.morePacketsCounter++;
         if(data.moving.morePacketsSetbackPoint == null) {
@@ -122,7 +122,7 @@ public class MorePacketsCheck {
                 data.log.check = "moving/morepackets";
 
                 boolean cancel = false;
-                cancel = plugin.getActionManager().executeActions(player, cc.moving.morePacketsActions, (int) data.moving.morePacketsViolationLevel, data.moving.history, cc);
+                cancel = plugin.execute(player, cc.moving.morePacketsActions, (int) data.moving.morePacketsViolationLevel, data.moving.history, cc);
 
                 // Only do the cancel if the player didn't change worlds
                 // inbetween

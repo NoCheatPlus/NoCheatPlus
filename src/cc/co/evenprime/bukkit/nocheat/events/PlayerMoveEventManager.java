@@ -28,8 +28,6 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  * Get the event, decide which checks should work on it and in what order,
  * evaluate the check results and decide what to
  * 
- * @author Evenprime
- * 
  */
 public class PlayerMoveEventManager extends PlayerListener implements EventManager {
 
@@ -44,8 +42,8 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         this.plugin = plugin;
         this.movingCheck = new RunFlyCheck(plugin);
 
-        this.movePerformance = plugin.getPerformanceManager().get(Type.MOVING);
-        this.velocityPerformance = plugin.getPerformanceManager().get(Type.VELOCITY);
+        this.movePerformance = plugin.getPerformance(Type.MOVING);
+        this.velocityPerformance = plugin.getPerformance(Type.VELOCITY);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -69,7 +67,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
 
         // Get the world-specific configuration that applies here
         final Player player = event.getPlayer();
-        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfig(player);
 
         // Find out if checks need to be done for that player
         if(cc.moving.check && !player.hasPermission(Permissions.MOVE)) {
@@ -95,7 +93,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
                 event.setTo(l);
 
                 // Get the player-specific stored data that applies here
-                final BaseData data = plugin.getPlayerData(player);
+                final BaseData data = plugin.getData(player);
 
                 data.moving.teleportTo = l;
             }
@@ -120,7 +118,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
 
         Player player = event.getPlayer();
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         Vector v = event.getVelocity();
 

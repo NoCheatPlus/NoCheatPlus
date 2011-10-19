@@ -54,7 +54,7 @@ public class RunFlyCheck {
          */
         Location newToLocation = null;
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         /******** DO GENERAL DATA MODIFICATIONS ONCE FOR EACH EVENT *****/
         if(data.moving.horizVelocityCounter > 0) {
@@ -102,7 +102,7 @@ public class RunFlyCheck {
      */
     public void blockPlaced(Player player, Block blockPlaced) {
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
 
         if(blockPlaced == null || data.moving.runflySetBackPoint == null) {
             return;

@@ -32,7 +32,7 @@ public class EntityDamageEventManager extends EntityListener implements EventMan
         this.plugin = plugin;
         this.fightCheck = new FightCheck(plugin);
 
-        this.fightPerformance = plugin.getPerformanceManager().get(Type.FIGHT);
+        this.fightPerformance = plugin.getPerformance(Type.FIGHT);
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
@@ -64,7 +64,7 @@ public class EntityDamageEventManager extends EntityListener implements EventMan
         // possibilities above
         final Player player = (Player) ((EntityDamageByEntityEvent) event).getDamager();
 
-        final ConfigurationCache cc = plugin.getConfigurationManager().getConfigurationCacheForWorld(player.getWorld().getName());
+        final ConfigurationCache cc = plugin.getConfig(player);
 
         // Find out if checks need to be done for that player
         if(cc.fight.check && !player.hasPermission(Permissions.FIGHT)) {

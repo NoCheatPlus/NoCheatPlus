@@ -30,7 +30,7 @@ public class ActionManager {
 
         boolean special = false;
 
-        BaseData data = plugin.getPlayerData(player);
+        BaseData data = plugin.getData(player);
         // Always set this here "by hand"
         data.log.violationLevel = violationLevel;
 
