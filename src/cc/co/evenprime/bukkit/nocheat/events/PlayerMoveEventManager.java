@@ -144,18 +144,24 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying)
-            s.add("moving.runfly");
-        if(cc.moving.check && cc.moving.runflyCheck && cc.moving.allowFlying)
-            s.add("moving.flying");
-        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.swimmingCheck)
-            s.add("moving.swimming");
-        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.sneakingCheck)
-            s.add("moving.sneaking");
-        if(cc.moving.check && cc.moving.runflyCheck && !cc.moving.allowFlying && cc.moving.nofallCheck)
-            s.add("moving.nofall");
-        if(cc.moving.check && cc.moving.morePacketsCheck)
-            s.add("moving.morepackets");
+        if(cc.moving.check) {
+            if(cc.moving.runflyCheck) {
+
+                if(!cc.moving.allowFlying) {
+                    s.add("moving.runfly");
+                    if(cc.moving.swimmingCheck)
+                        s.add("moving.swimming");
+                    if(cc.moving.sneakingCheck)
+                        s.add("moving.sneaking");
+                    if(cc.moving.nofallCheck)
+                        s.add("moving.nofall");
+                } else
+                    s.add("moving.flying");
+
+            }
+            if(cc.moving.morePacketsCheck)
+                s.add("moving.morepackets");
+        }
 
         return s;
     }

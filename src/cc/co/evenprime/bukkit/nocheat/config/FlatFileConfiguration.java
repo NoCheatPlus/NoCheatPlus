@@ -97,7 +97,6 @@ public class FlatFileConfiguration extends Configuration {
         return al;
     }
 
-
     private OptionNode getOptionNodeForString(OptionNode root, String key) {
         String parts[] = key.split("\\.", 2);
 
@@ -180,17 +179,21 @@ public class FlatFileConfiguration extends Configuration {
 
                 saveRecursive(w, o);
             }
-            
+
             return;
+        } else {
+            saveLeaf(w, node);
         }
 
+    }
+
+    private void saveLeaf(BufferedWriter w, OptionNode node) throws IOException {
         // Save a leaf node, if it's really stored here
         Object object = this.get(node);
 
         if(object == null) {
             return;
         }
-
         // Get the full id of the node
         String id = node.getName();
         OptionNode i = node;
@@ -220,7 +223,7 @@ public class FlatFileConfiguration extends Configuration {
         }
     }
 
-    private void saveActionList(BufferedWriter w, String id, ActionList actionList) throws IOException {        
+    private void saveActionList(BufferedWriter w, String id, ActionList actionList) throws IOException {
         for(Integer treshold : actionList.getTresholds()) {
             StringBuilder s = new StringBuilder("");
             for(Action s2 : actionList.getActions(treshold)) {

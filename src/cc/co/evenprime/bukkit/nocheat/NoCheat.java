@@ -1,26 +1,24 @@
 package cc.co.evenprime.bukkit.nocheat;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
+import cc.co.evenprime.bukkit.nocheat.command.CommandHandler;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.DataManager;
 import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
+import cc.co.evenprime.bukkit.nocheat.debug.ActiveCheckPrinter;
 import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
@@ -113,14 +111,18 @@ public class NoCheat extends JavaPlugin {
         }
 
         // Then print a list of active checks per world
-        printActiveChecks();
+        ActiveCheckPrinter.printActiveChecks(this, eventManagers);
 
         // Tell the server admin that we finished loading NoCheat now
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + this.getDescription().getVersion() + "] is enabled.");
     }
 
     public ConfigurationCache getConfig(Player player) {
-        return conf.getConfigurationCacheForWorld(player.getWorld().getName());
+        return getConfig(player.getWorld());
+    }
+
+    public ConfigurationCache getConfig(World world) {
+        return conf.getConfigurationCacheForWorld(world.getName());
     }
 
     public void log(LogLevel level, String message, ConfigurationCache cc) {
@@ -155,152 +157,9 @@ public class NoCheat extends JavaPlugin {
             data.cleanDataMap();
     }
 
-    /**
-     * Print the list of active checks to the console, on a per world basis
-     */
-    private void printActiveChecks() {
-
-        boolean introPrinted = false;
-        String intro = "[NoCheat] Active Checks: ";
-
-        // Print active checks for NoCheat, if needed.
-        for(World world : this.getServer().getWorlds()) {
-
-            StringBuilder line = new StringBuilder("  ").append(world.getName()).append(": ");
-
-            int length = line.length();
-
-            ConfigurationCache cc = this.conf.getConfigurationCacheForWorld(world.getName());
-
-            if(!cc.debug.showchecks)
-                continue;
-
-            for(EventManager em : eventManagers) {
-                if(em.getActiveChecks(cc).size() == 0)
-                    continue;
-
-                for(String active : em.getActiveChecks(cc)) {
-                    line.append(active).append(' ');
-                }
-
-                if(!introPrinted) {
-                    log.logToConsole(LogLevel.LOW, intro);
-                    introPrinted = true;
-                }
-
-                log.logToConsole(LogLevel.LOW, line.toString());
-
-                line = new StringBuilder(length);
-
-                for(int i = 0; i < length; i++) {
-                    line.append(' ');
-                }
-            }
-
-        }
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        // Not our command
-        if(!command.getName().equalsIgnoreCase("nocheat") || args.length == 0)
-            return false;
-
-        if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
-            // permlist command was used
-            return handlePermlistCommand(sender, args);
-
-        } else if(args[0].equalsIgnoreCase("reload")) {
-            // reload command was used
-            return handleReloadCommand(sender);
-        }
-
-        else if(args[0].equalsIgnoreCase("performance")) {
-            // performance command was used
-            return handlePerformanceCommand(sender);
-        }
-
-        return false;
-    }
-
-    private boolean handlePermlistCommand(CommandSender sender, String[] args) {
-        // Does the sender have permission to use it?
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERMLIST)) {
-            return false;
-        }
-
-        // Get the player by name
-        Player player = this.getServer().getPlayerExact(args[1]);
-        if(player == null) {
-            sender.sendMessage("Unknown player: " + args[1]);
-            return true;
-        }
-
-        // Should permissions be filtered by prefix?
-        String prefix = "";
-        if(args.length == 3) {
-            prefix = args[2];
-        }
-
-        // Make a copy to allow sorting
-        List<Permission> perms = new LinkedList<Permission>(this.getDescription().getPermissions());
-        Collections.reverse(perms);
-
-        sender.sendMessage("Player " + player.getName() + " has the permission(s):");
-
-        for(Permission permission : perms) {
-            if(permission.getName().startsWith(prefix)) {
-                sender.sendMessage(permission.getName() + ": " + player.hasPermission(permission));
-            }
-        }
-        return true;
-    }
-
-    private boolean handleReloadCommand(CommandSender sender) {
-        // Does the sender have permission?
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_RELOAD)) {
-            return false;
-        }
-
-        sender.sendMessage("[NoCheat] Reloading configuration");
-
-        this.conf.cleanup();
-        this.conf = new ConfigurationManager(this.getDataFolder().getPath());
-        this.data.clearCriticalData();
-
-        sender.sendMessage("[NoCheat] Configuration reloaded");
-
-        return true;
-    }
-
-    private boolean handlePerformanceCommand(CommandSender sender) {
-        // Does the sender have permission?
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERFORMANCE)) {
-            return false;
-        }
-
-        sender.sendMessage("[NoCheat] Retrieving performance statistics");
-
-        long totalTime = 0;
-
-        for(Type type : Type.values()) {
-            Performance p = this.getPerformance(type);
-
-            long total = p.getTotalTime();
-            totalTime += total;
-
-            StringBuilder string = new StringBuilder("").append(type.toString());
-            string.append(": total ").append(Performance.toString(total));
-            string.append(", relative ").append(Performance.toString(p.getRelativeTime()));
-            string.append(" over ").append(p.getCounter()).append(" events.");
-
-            sender.sendMessage(string.toString());
-        }
-
-        sender.sendMessage("Total time spent: " + Performance.toString(totalTime) + " " + Performance.toString(totalTime));
-
-        return true;
+        return CommandHandler.handleCommand(this, sender, command, label, args);
     }
 
     public int getIngameSeconds() {
@@ -328,4 +187,16 @@ public class NoCheat extends JavaPlugin {
         return false;
     }
 
+    public void logToConsole(LogLevel low, String message) {
+        if(log != null) {
+            log.logToConsole(low, message);
+        }
+
+    }
+
+    public void reloadConfig() {
+        conf.cleanup();
+        this.conf = new ConfigurationManager(this.getDataFolder().getPath());
+        this.data.clearCriticalData();
+    }
 }
