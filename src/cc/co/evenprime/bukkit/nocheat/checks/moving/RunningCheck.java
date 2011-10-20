@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -80,7 +79,7 @@ public class RunningCheck {
             if(resultHoriz > 0 && resultVert > 0)
                 data.log.check = "runfly/both";
             else if(resultHoriz > 0)
-                data.log.check = "runfly/horizontal";
+                data.log.check = "runfly/" + data.log.check;
             else if(resultVert > 0)
                 data.log.check = "runfly/vertical";
 
@@ -123,23 +122,22 @@ public class RunningCheck {
         // How much further did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
-        boolean sprinting = true;
-        try {
-            sprinting = !(player instanceof CraftPlayer) || player.isSprinting();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        final boolean sprinting = CheckUtil.isSprinting(player);
 
         BaseData data = plugin.getData(player);
 
         if(cc.moving.sneakingCheck && player.isSneaking() && !player.hasPermission(Permissions.MOVE_SNEAK)) {
             distanceAboveLimit = totalDistance - cc.moving.sneakingSpeedLimit - data.moving.horizFreedom;
+            data.log.check = "sneak";
         } else if(cc.moving.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVE_SWIM)) {
             distanceAboveLimit = totalDistance - cc.moving.swimmingSpeedLimit - data.moving.horizFreedom;
+            data.log.check = "swim";
         } else if(!sprinting) {
             distanceAboveLimit = totalDistance - cc.moving.walkingSpeedLimit - data.moving.horizFreedom;
+            data.log.check = "walk";
         } else {
             distanceAboveLimit = totalDistance - cc.moving.sprintingSpeedLimit - data.moving.horizFreedom;
+            data.log.check = "sprint";
         }
 
         data.moving.bunnyhopdelay--;

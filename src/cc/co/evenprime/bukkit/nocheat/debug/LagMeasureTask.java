@@ -4,9 +4,9 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 
 public class LagMeasureTask implements Runnable {
 
-    private int           ingameseconds            = 0;
-    private long          lastIngamesecondTime     = 0L;
-    private long          lastIngamesecondDuration = 0L;
+    private int           ingameseconds            = 1;
+    private long          lastIngamesecondTime     = System.currentTimeMillis();
+    private long          lastIngamesecondDuration = 2000L;
     private boolean       skipCheck                = true;
     private int           lagMeasureTaskId         = -1;
     private final NoCheat plugin;
@@ -16,7 +16,8 @@ public class LagMeasureTask implements Runnable {
     }
 
     public void start() {
-        lagMeasureTaskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 0, 20);
+        // start measuring with a delay of 10 seconds
+        lagMeasureTaskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, this, 20, 20);
     }
 
     public void run() {

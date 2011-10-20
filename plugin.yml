@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.12
+version: 2.12a
 
 commands:
   nocheat:

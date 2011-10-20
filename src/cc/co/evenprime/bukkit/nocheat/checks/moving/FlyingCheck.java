@@ -2,10 +2,10 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
@@ -51,13 +51,7 @@ public class FlyingCheck {
 
         result += Math.max(0.0D, horizontalDistance - data.moving.horizFreedom - speedLimitHorizontal);
 
-        boolean sprinting = true;
-
-        try {
-            sprinting = !(player instanceof CraftPlayer) || player.isSprinting();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        boolean sprinting = CheckUtil.isSprinting(player);
 
         data.moving.bunnyhopdelay--;
 

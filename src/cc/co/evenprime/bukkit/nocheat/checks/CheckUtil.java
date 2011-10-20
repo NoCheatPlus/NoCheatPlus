@@ -5,6 +5,7 @@ import net.minecraft.server.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -107,6 +108,10 @@ public class CheckUtil {
         types[Material.TRAP_DOOR.getId()] |= SOLID | NONSOLID;
     }
 
+    public static boolean isSprinting(Player player) {
+        
+        return !(player instanceof CraftPlayer) || (player.isSprinting() && player.getFoodLevel() > 5);
+    }
     /**
      * Check if certain coordinates are considered "on ground"
      * 
