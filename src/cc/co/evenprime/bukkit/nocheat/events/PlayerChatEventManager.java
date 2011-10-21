@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.events;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -35,7 +34,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
 
         this.chatPerformance = plugin.getPerformance(Type.CHAT);
 
-        PluginManager pm = Bukkit.getServer().getPluginManager();
+        PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_CHAT, this, Priority.Lowest, plugin);
         pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, this, Priority.Lowest, plugin);

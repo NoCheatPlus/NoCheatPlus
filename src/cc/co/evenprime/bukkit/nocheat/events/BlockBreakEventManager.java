@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.events;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -39,7 +38,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
         this.blockBreakPerformance = plugin.getPerformance(Type.BLOCKBREAK);
         this.blockDamagePerformance = plugin.getPerformance(Type.BLOCKDAMAGE);
 
-        PluginManager pm = Bukkit.getServer().getPluginManager();
+        PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.BLOCK_BREAK, this, Priority.Lowest, plugin);
         pm.registerEvent(Event.Type.BLOCK_DAMAGE, this, Priority.Monitor, plugin);
@@ -94,13 +93,12 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
         if(performanceCheck)
             nanoTimeStart = System.nanoTime();
 
-        final Player player = event.getPlayer();
         // Get the player-specific stored data that applies here
-        final BaseData data = plugin.getData(player);
+        final BaseData data = plugin.getData(event.getPlayer().getName());
 
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks
-        data.blockbreak.instaBrokeBlockLocation = event.getBlock().getLocation();
+        data.blockbreak.instaBrokeBlockLocation.setLocation(event.getBlock());
 
         // store performance time
         if(performanceCheck)

@@ -8,8 +8,6 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 /**
  * Store amount of action executions for last 60 seconds
  * 
- * @author Evenprime
- * 
  */
 public class ExecutionHistory {
 

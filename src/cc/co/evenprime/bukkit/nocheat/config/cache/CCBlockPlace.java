@@ -5,8 +5,6 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
 /**
  * 
- * @author Evenprime
- * 
  */
 public class CCBlockPlace {
 

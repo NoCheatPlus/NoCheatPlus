@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.events;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -41,7 +40,7 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
 
         this.blockPlacePerformance = p.getPerformance(Type.BLOCKPLACE);
 
-        PluginManager pm = Bukkit.getServer().getPluginManager();
+        PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.BLOCK_PLACE, this, Priority.Lowest, plugin);
 

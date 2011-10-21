@@ -7,8 +7,6 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
  * Configurations specific for the Move Checks. Every world gets one of these
  * assigned to it.
  * 
- * @author Evenprime
- * 
  */
 public class CCMoving {
 

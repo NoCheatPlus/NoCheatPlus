@@ -1,11 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData;
+import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
  * The morePacketsCheck (previously called SpeedhackCheck) will try to identify
@@ -81,67 +82,63 @@ public class MorePacketsCheck {
      * 8. reset packetCounter, wait for next 20 ticks to pass by.
      * 
      */
-    public Location check(Player player, ConfigurationCache cc) {
+    public PreciseLocation check(final Player player, final BaseData data, final ConfigurationCache cc) {
 
-        Location newToLocation = null;
+        PreciseLocation newToLocation = null;
 
-        BaseData data = plugin.getData(player);
+        final MovingData moving = data.moving;
 
-        data.moving.morePacketsCounter++;
-        if(data.moving.morePacketsSetbackPoint == null) {
-            data.moving.morePacketsSetbackPoint = player.getLocation();
+        moving.morePacketsCounter++;
+        if(!moving.morePacketsSetbackPoint.isSet()) {
+            moving.morePacketsSetbackPoint.set(moving.from);
         }
 
         int ingameSeconds = plugin.getIngameSeconds();
         // Is at least a second gone by and has the server at least processed 20
         // ticks since last time
-        if(ingameSeconds != data.moving.lastElapsedIngameSeconds) {
+        if(ingameSeconds != moving.lastElapsedIngameSeconds) {
 
             int limit = (int) ((packetsPerTimeframe * plugin.getIngameSecondDuration()) / 1000L);
 
-            int difference = limit - data.moving.morePacketsCounter;
+            int difference = limit - moving.morePacketsCounter;
 
-            data.moving.morePacketsBuffer += difference;
-            if(data.moving.morePacketsBuffer > bufferLimit)
-                data.moving.morePacketsBuffer = bufferLimit;
+            moving.morePacketsBuffer += difference;
+            if(moving.morePacketsBuffer > bufferLimit)
+                moving.morePacketsBuffer = bufferLimit;
             // Are we over the 22 event limit for that time frame now? (limit
             // increases with time)
 
-            int packetsAboveLimit = (int) -data.moving.morePacketsBuffer;
+            int packetsAboveLimit = (int) -moving.morePacketsBuffer;
 
-            if(data.moving.morePacketsBuffer < 0)
-                data.moving.morePacketsBuffer = 0;
+            if(moving.morePacketsBuffer < 0)
+                moving.morePacketsBuffer = 0;
 
             // Should we react? Only if the check doesn't get skipped and we
             // went over the limit
             if(!plugin.skipCheck() && packetsAboveLimit > 0) {
-                data.moving.morePacketsViolationLevel += packetsAboveLimit;
+                moving.morePacketsViolationLevel += packetsAboveLimit;
 
                 // Packets above limit
-                data.log.packets = data.moving.morePacketsCounter - limit;
+                data.log.packets = moving.morePacketsCounter - limit;
                 data.log.check = "moving/morepackets";
 
-                boolean cancel = false;
-                cancel = plugin.execute(player, cc.moving.morePacketsActions, (int) data.moving.morePacketsViolationLevel, data.moving.history, cc);
+                final boolean cancel = plugin.execute(player, cc.moving.morePacketsActions, (int) moving.morePacketsViolationLevel, moving.history, cc);
 
-                // Only do the cancel if the player didn't change worlds
-                // inbetween
-                if(cancel && player.getWorld().equals(data.moving.morePacketsSetbackPoint.getWorld())) {
-                    newToLocation = data.moving.morePacketsSetbackPoint;
-                }
+                if(cancel)
+                    newToLocation = moving.morePacketsSetbackPoint;
             }
 
             // No new setbackLocation was chosen
             if(newToLocation == null) {
-                data.moving.morePacketsSetbackPoint = player.getLocation();
+                moving.morePacketsSetbackPoint.set(player.getLocation());
             }
 
-            if(data.moving.morePacketsViolationLevel > 0)
+            if(moving.morePacketsViolationLevel > 0)
                 // Shrink the "over limit" value by 20 % every second
-                data.moving.morePacketsViolationLevel *= 0.8;
+                moving.morePacketsViolationLevel *= 0.8;
 
-            data.moving.morePacketsCounter = 0; // Count from zero again
-            data.moving.lastElapsedIngameSeconds = ingameSeconds;
+            moving.morePacketsCounter = 0; // Count from zero again
+            moving.lastElapsedIngameSeconds = ingameSeconds;
         }
 
         return newToLocation;

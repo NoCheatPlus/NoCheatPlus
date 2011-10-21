@@ -8,10 +8,8 @@ import cc.co.evenprime.bukkit.nocheat.config.Configuration;
  * A class to keep all configurables of the plugin associated with
  * a world, everything unmodifiable for security/performance
  * 
- * @author Evenprime
- * 
  */
-public class ConfigurationCache {
+public class ConfigurationCache  {
 
     public final CCMoving     moving;
     public final CCLogging    logging;

@@ -29,7 +29,7 @@ public class ReachCheck {
 
         double distance = CheckUtil.reachCheck(player, placedAgainstBlock.getX() + 0.5D, placedAgainstBlock.getY() + 0.5D, placedAgainstBlock.getZ() + 0.5D, cc.blockplace.reachDistance);
 
-        BaseData data = plugin.getData(player);
+        BaseData data = plugin.getData(player.getName());
 
         if(distance > 0D) {
             // Player failed the check

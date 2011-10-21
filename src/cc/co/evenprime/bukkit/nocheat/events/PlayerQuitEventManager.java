@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.events;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -21,7 +20,7 @@ public class PlayerQuitEventManager extends PlayerListener implements EventManag
     public PlayerQuitEventManager(NoCheat plugin) {
         this.plugin = plugin;
 
-        PluginManager pm = Bukkit.getServer().getPluginManager();
+        PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_QUIT, this, Priority.Monitor, plugin);
         pm.registerEvent(Event.Type.PLAYER_JOIN, this, Priority.Monitor, plugin);
@@ -30,13 +29,13 @@ public class PlayerQuitEventManager extends PlayerListener implements EventManag
     @Override
     public void onPlayerQuit(PlayerQuitEvent event) {
         // But only after a certain time, get rid of the rest of the data
-        plugin.playerLeft(event.getPlayer());
+        plugin.playerLeft(event.getPlayer().getName());
     }
 
     @Override
     public void onPlayerJoin(PlayerJoinEvent event) {
         // A player came back early, so make sure that his data gets recycled
-        plugin.playerJoined(event.getPlayer());
+        plugin.playerJoined(event.getPlayer().getName());
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

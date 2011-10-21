@@ -23,10 +23,10 @@ public class DirectionCheck {
 
     public boolean check(Player player, Block brokenBlock, ConfigurationCache cc) {
 
-        BaseData data = plugin.getData(player);
+        BaseData data = plugin.getData(player.getName());
 
         // If the block is instabreak and we don't check instabreak, return
-        if(!cc.blockbreak.checkinstabreakblocks && brokenBlock.getLocation().equals(data.blockbreak.instaBrokeBlockLocation)) {
+        if(!cc.blockbreak.checkinstabreakblocks && data.blockbreak.instaBrokeBlockLocation.equals(brokenBlock)) {
             return false;
         }
 
@@ -63,5 +63,4 @@ public class DirectionCheck {
 
         return cancel;
     }
-
 }

@@ -9,10 +9,10 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
+
 /**
  * Some stuff that's used by different checks
- * 
- * @author Evenprime
  * 
  */
 public class CheckUtil {
@@ -21,7 +21,7 @@ public class CheckUtil {
      * Check if a player looks at a target of a specific size, with a specific
      * precision value (roughly)
      */
-    public static double directionCheck(Player player, double targetX, double targetY, double targetZ, double targetWidth, double targetHeight, double precision) {
+    public static final double directionCheck(Player player, double targetX, double targetY, double targetZ, double targetWidth, double targetHeight, double precision) {
 
         // Eye location of the player
         Location eyes = player.getEyeLocation();
@@ -52,7 +52,7 @@ public class CheckUtil {
         return off;
     }
 
-    public static double reachCheck(Player player, double targetX, double targetY, double targetZ, double limit) {
+    public static final double reachCheck(Player player, double targetX, double targetY, double targetZ, double limit) {
 
         Location eyes = player.getEyeLocation();
 
@@ -108,10 +108,11 @@ public class CheckUtil {
         types[Material.TRAP_DOOR.getId()] |= SOLID | NONSOLID;
     }
 
-    public static boolean isSprinting(Player player) {
-        
+    public static final boolean isSprinting(final Player player) {
+
         return !(player instanceof CraftPlayer) || (player.isSprinting() && player.getFoodLevel() > 5);
     }
+
     /**
      * Check if certain coordinates are considered "on ground"
      * 
@@ -124,13 +125,13 @@ public class CheckUtil {
      *            The precise location that was used for calculation of "values"
      * @return
      */
-    public static int isLocationOnGround(final World world, final double x, final double y, final double z, boolean waterElevatorsAllowed) {
+    public static final int isLocationOnGround(final World world, final PreciseLocation location) {
 
-        final int lowerX = lowerBorder(x);
-        final int upperX = upperBorder(x);
-        final int Y = (int) Math.floor(y);
-        final int lowerZ = lowerBorder(z);
-        final int upperZ = upperBorder(z);
+        final int lowerX = lowerBorder(location.x);
+        final int upperX = upperBorder(location.x);
+        final int Y = (int) Math.floor(location.y);
+        final int lowerZ = lowerBorder(location.z);
+        final int upperZ = upperBorder(location.z);
 
         // Check the four borders of the players hitbox for something he could
         // be standing on
@@ -145,20 +146,11 @@ public class CheckUtil {
 
         if(!isInGround(result)) {
             // Original location: X, Z (allow standing in walls this time)
-            if(isSolid(types[world.getBlockTypeIdAt(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z))])) {
+            if(isSolid(types[world.getBlockTypeIdAt(Location.locToBlock(location.x), Location.locToBlock(location.y), Location.locToBlock(location.z))])) {
                 result |= INGROUND;
             }
         }
 
-        // Water elevators - optional "feature"
-        if(waterElevatorsAllowed && result == 0) {
-            result = types[world.getBlockTypeIdAt(lowerX + 1, Y + 1, lowerZ + 1)] | types[world.getBlockTypeIdAt(lowerX, Y + 1, lowerZ + 1)] | types[world.getBlockTypeIdAt(lowerX + 1, Y + 1, lowerZ)];
-
-            if((result & LIQUID) != 0) {
-                return INGROUND | ONGROUND; // WaterElevators don't really count
-                                            // as "water"
-            }
-        }
         return result;
     }
 
@@ -171,10 +163,10 @@ public class CheckUtil {
      * @param z
      * @return
      */
-    private static final int canStand(World world, int x, int y, int z) {
+    private static final int canStand(final World world, final int x, final int y, final int z) {
 
-        int standingIn = types[world.getBlockTypeIdAt(x, y, z)];
-        int headIn = types[world.getBlockTypeIdAt(x, y + 1, z)];
+        final int standingIn = types[world.getBlockTypeIdAt(x, y, z)];
+        final int headIn = types[world.getBlockTypeIdAt(x, y + 1, z)];
 
         int result = 0;
 
@@ -187,7 +179,7 @@ public class CheckUtil {
             return LADDER;
         }
 
-        int standingOn = types[world.getBlockTypeIdAt(x, y - 1, z)];
+        final int standingOn = types[world.getBlockTypeIdAt(x, y - 1, z)];
 
         // Player standing with his feet in a (half) block?
         if((isSolid(standingIn) || standingOn == FENCE) && isNonSolid(headIn) && standingIn != FENCE) {
@@ -202,27 +194,27 @@ public class CheckUtil {
         return result;
     }
 
-    public static final boolean isSolid(int value) {
+    public static final boolean isSolid(final int value) {
         return (value & SOLID) == SOLID;
     }
 
-    public static final boolean isLiquid(int value) {
+    public static final boolean isLiquid(final int value) {
         return (value & LIQUID) == LIQUID;
     }
 
-    private static final boolean isNonSolid(int value) {
+    private static final boolean isNonSolid(final int value) {
         return((value & NONSOLID) == NONSOLID);
     }
 
-    private static final boolean isLadder(int value) {
+    private static final boolean isLadder(final int value) {
         return((value & LADDER) == LADDER);
     }
 
-    public static boolean isOnGround(int fromType) {
+    public static final boolean isOnGround(final int fromType) {
         return isLadder(fromType) || (fromType & ONGROUND) == ONGROUND;
     }
 
-    public static boolean isInGround(int fromType) {
+    public static final boolean isInGround(final int fromType) {
         return isLadder(fromType) || isLiquid(fromType) || (fromType & INGROUND) == INGROUND;
     }
 
@@ -233,17 +225,14 @@ public class CheckUtil {
      * @param d1
      * @return
      */
-    private static final int lowerBorder(double d1) {
+    private static final int lowerBorder(final double d1) {
 
-        double floor = Math.floor(d1);
-        double d4 = floor + magic;
+        final double floor = Math.floor(d1);
 
-        if(d4 <= d1)
-            d4 = 0;
+        if(floor + magic <= d1)
+            return (int) (floor);
         else
-            d4 = 1;
-
-        return (int) (floor - d4);
+            return (int) (floor - 1);
     }
 
     /**
@@ -253,20 +242,17 @@ public class CheckUtil {
      * @param d1
      * @return
      */
-    private static final int upperBorder(double d1) {
+    private static final int upperBorder(final double d1) {
 
-        double floor = Math.floor(d1);
-        double d4 = floor + magic2;
+        final double floor = Math.floor(d1);
 
-        if(d4 < d1)
-            d4 = -1;
+        if(floor + magic2 < d1)
+            return (int) (floor + 1);
         else
-            d4 = 0;
-
-        return (int) (floor - d4);
+            return (int) floor;
     }
 
-    public static int getType(int typeId) {
+    public static int getType(final int typeId) {
         return types[typeId];
     }
 

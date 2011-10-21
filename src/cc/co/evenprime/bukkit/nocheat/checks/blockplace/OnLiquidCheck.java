@@ -26,7 +26,7 @@ public class OnLiquidCheck {
 
         boolean cancel = false;
 
-        BaseData data = plugin.getData(player);
+        BaseData data = plugin.getData(player.getName());
 
         if(blockPlaced == null || blockPlaced.isEmpty() || (blockPlacedAgainst != null && isSolid(blockPlacedAgainst.getTypeId()))) {
             // all ok

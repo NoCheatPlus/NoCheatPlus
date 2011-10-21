@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.entity.Player;
-
 /**
  * Provide secure access to player-specific data objects for various checks or
  * check groups.
@@ -15,19 +13,21 @@ import org.bukkit.entity.Player;
 public class DataManager {
 
     // Store data between Events
-    private final Map<Player, BaseData> map;
+    private final Map<String, BaseData> map;
+    private final List<String>          removals;
 
     public DataManager() {
-        this.map = new HashMap<Player, BaseData>();
+        this.map = new HashMap<String, BaseData>();
+        this.removals = new ArrayList<String>(5);
     }
 
     /**
      * Get a data object of the specified class. If none is stored yet, create
      * one.
      */
-    public BaseData getData(Player player) {
+    public BaseData getData(String playerName) {
 
-        BaseData data = this.map.get(player);
+        BaseData data = this.map.get(playerName);
 
         // intentionally not thread-safe, because bukkit events are handled
         // in sequence anyway, so zero chance of two events of the same
@@ -36,8 +36,8 @@ public class DataManager {
         // losing data of one instance doesn't really hurt at all
         if(data == null) {
             data = new BaseData();
-            data.initialize(player);
-            this.map.put(player, data);
+            data.log.playerName = playerName;
+            this.map.put(playerName, data);
         }
 
         return data;
@@ -58,16 +58,16 @@ public class DataManager {
      * before)
      * 
      */
-    public void queueForRemoval(Player player) {
-        BaseData data = this.map.get(player);
+    public void queueForRemoval(String playerName) {
+        BaseData data = this.map.get(playerName);
 
         if(data != null) {
             data.markForRemoval(true);
         }
     }
 
-    public void unqueueForRemoval(Player player) {
-        BaseData data = this.map.get(player);
+    public void unqueueForRemoval(String playerName) {
+        BaseData data = this.map.get(playerName);
 
         if(data != null) {
             data.markForRemoval(false);
@@ -80,24 +80,25 @@ public class DataManager {
      */
     public void cleanDataMap() {
         try {
-            List<Player> removals = new ArrayList<Player>();
-
-            for(Entry<Player, BaseData> p : this.map.entrySet()) {
+            for(Entry<String, BaseData> p : this.map.entrySet()) {
                 if(p.getValue().shouldBeRemoved()) {
                     removals.add(p.getKey());
                 }
             }
 
-            for(Player p : removals) {
+            for(String p : removals) {
                 this.map.remove(p);
             }
+
+            removals.clear();
         } catch(Exception e) {
             // Ignore problems, as they really don't matter much
         }
+
     }
 
-    public void clearCriticalData(Player player) {
-        BaseData data = this.map.get(player);
+    public void clearCriticalData(String playerName) {
+        BaseData data = this.map.get(playerName);
         if(data != null) {
             data.clearCriticalData();
         }

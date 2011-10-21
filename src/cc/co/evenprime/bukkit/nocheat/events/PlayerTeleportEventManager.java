@@ -3,9 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.events;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerListener;
@@ -32,7 +29,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
 
         this.plugin = p;
 
-        PluginManager pm = Bukkit.getServer().getPluginManager();
+        PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Monitor, plugin);
         pm.registerEvent(Event.Type.PLAYER_TELEPORT, this, Priority.Monitor, plugin);
@@ -50,9 +47,9 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
                     return;
                 }
 
-                final BaseData data = plugin.getData(event.getPlayer());
+                final BaseData data = plugin.getData(event.getPlayer().getName());
 
-                if(data.moving.teleportTo != null && data.moving.teleportTo.equals(event.getTo())) {
+                if(data.moving.teleportTo.isSet() && data.moving.teleportTo.equals(event.getTo())) {
                     event.setCancelled(false);
                 }
             }
@@ -64,18 +61,18 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
         if(event.isCancelled())
             return;
 
-        handleTeleportation(event.getPlayer(), event.getTo());
+        handleTeleportation(event.getPlayer().getName());
     }
 
     public void onPlayerPortal(PlayerPortalEvent event) {
         if(event.isCancelled())
             return;
 
-        handleTeleportation(event.getPlayer(), event.getTo());
+        handleTeleportation(event.getPlayer().getName());
     }
 
     public void onPlayerRespawn(PlayerRespawnEvent event) {
-        handleTeleportation(event.getPlayer(), event.getRespawnLocation());
+        handleTeleportation(event.getPlayer().getName());
     }
 
     // Workaround for buggy Playermove cancelling
@@ -84,12 +81,12 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
             return;
         }
 
-        handleTeleportation(event.getPlayer(), event.getFrom());
+        handleTeleportation(event.getPlayer().getName());
     }
 
-    private void handleTeleportation(Player player, Location newLocation) {
+    private void handleTeleportation(String playerName) {
 
-        plugin.clearCriticalData(player);
+        plugin.clearCriticalData(playerName);
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

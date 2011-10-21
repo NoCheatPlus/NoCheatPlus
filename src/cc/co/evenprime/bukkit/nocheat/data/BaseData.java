@@ -1,7 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.data;
 
-import org.bukkit.entity.Player;
-
 public class BaseData extends Data {
 
     public final BlockBreakData blockbreak;
@@ -32,12 +30,6 @@ public class BaseData extends Data {
     public void clearCriticalData() {
         for(Data d : data) {
             d.clearCriticalData();
-        }
-    }
-
-    public void initialize(Player player) {
-        for(Data d : data) {
-            d.initialize(player);
         }
     }
 

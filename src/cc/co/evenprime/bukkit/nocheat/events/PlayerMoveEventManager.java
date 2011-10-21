@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.events;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -19,6 +18,8 @@ import cc.co.evenprime.bukkit.nocheat.checks.moving.RunFlyCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData;
+import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
@@ -45,14 +46,14 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         this.movePerformance = plugin.getPerformance(Type.MOVING);
         this.velocityPerformance = plugin.getPerformance(Type.VELOCITY);
 
-        PluginManager pm = Bukkit.getServer().getPluginManager();
+        PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Lowest, plugin);
         pm.registerEvent(Event.Type.PLAYER_VELOCITY, this, Priority.Monitor, plugin);
     }
 
     @Override
-    public void onPlayerMove(PlayerMoveEvent event) {
+    public void onPlayerMove(final PlayerMoveEvent event) {
 
         // Cancelled events are ignored
         if(event.isCancelled())
@@ -75,27 +76,25 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
             // Get some data that's needed from this event, to avoid passing the
             // event itself on to the checks (and risk to
             // accidentally modifying the event there)
-            final Location from = event.getFrom();
+            final BaseData data = plugin.getData(player.getName());
+            final MovingData moving = data.moving;
+
             final Location to = event.getTo();
+
+            moving.from.set(event.getFrom());
+            moving.to.set(to);
 
             // This variable will have the modified data of the event (new
             // "to"-location)
-            Location newTo = null;
-
-            // Currently only one check here.
-            newTo = movingCheck.check(player, from, to, cc);
+            final PreciseLocation newTo = movingCheck.check(player, data, cc);
 
             // Did the check(s) decide we need a new "to"-location?
             if(newTo != null) {
                 // Compose a new location based on coordinates of "newTo" and
                 // viewing direction of "event.getTo()"
-                Location l = new Location(newTo.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), to.getYaw(), to.getPitch());
-                event.setTo(l);
+                event.setTo(new Location(player.getWorld(), newTo.x, newTo.y, newTo.z, to.getYaw(), to.getPitch()));
 
-                // Get the player-specific stored data that applies here
-                final BaseData data = plugin.getData(player);
-
-                data.moving.teleportTo = l;
+                data.moving.teleportTo.set(newTo);
             }
         }
 
@@ -116,9 +115,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         if(performanceCheck)
             nanoTimeStart = System.nanoTime();
 
-        Player player = event.getPlayer();
-
-        BaseData data = plugin.getData(player);
+        BaseData data = plugin.getData(event.getPlayer().getName());
 
         Vector v = event.getVelocity();
 

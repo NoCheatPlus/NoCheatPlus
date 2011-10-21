@@ -129,23 +129,23 @@ public class NoCheat extends JavaPlugin {
         log.log(level, message, cc);
     }
 
-    public BaseData getData(Player player) {
-        return data.getData(player);
+    public BaseData getData(String playerName) {
+        return data.getData(playerName);
     }
 
-    public void clearCriticalData(Player player) {
-        data.clearCriticalData(player);
+    public void clearCriticalData(String playerName) {
+        data.clearCriticalData(playerName);
     }
 
-    public void playerLeft(Player player) {
+    public void playerLeft(String playerName) {
         // Get rid of the critical data that's stored for player immediately
-        clearCriticalData(player);
+        clearCriticalData(playerName);
 
-        data.queueForRemoval(player);
+        data.queueForRemoval(playerName);
     }
 
-    public void playerJoined(Player player) {
-        data.unqueueForRemoval(player);
+    public void playerJoined(String playerName) {
+        data.unqueueForRemoval(playerName);
     }
 
     public Performance getPerformance(Type type) {
