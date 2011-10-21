@@ -8,12 +8,11 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 
 /**
  * The reach check will find out if a player interacts with something that's too
  * far away
- * 
- * @author Evenprime
  * 
  */
 public class ReachCheck {
@@ -24,27 +23,27 @@ public class ReachCheck {
         this.plugin = plugin;
     }
 
-    public boolean check(Player player, Block brokenBlock, ConfigurationCache cc) {
+    public boolean check(final Player player, final BaseData data, final Block brokenBlock, final ConfigurationCache cc) {
 
         boolean cancel = false;
 
-        double distance = CheckUtil.reachCheck(player, brokenBlock.getX() + 0.5D, brokenBlock.getY() + 0.5D, brokenBlock.getZ() + 0.5D, player.getGameMode() == GameMode.CREATIVE ? cc.blockbreak.reachDistance + 2 : cc.blockbreak.reachDistance);
+        final BlockBreakData blockbreak = data.blockbreak;
 
-        BaseData data = plugin.getData(player.getName());
-        
+        final double distance = CheckUtil.reachCheck(player, brokenBlock.getX() + 0.5D, brokenBlock.getY() + 0.5D, brokenBlock.getZ() + 0.5D, player.getGameMode() == GameMode.CREATIVE ? cc.blockbreak.reachDistance + 2 : cc.blockbreak.reachDistance);
+
         if(distance > 0D) {
             // Player failed the check
 
             // Increment violation counter
-            data.blockbreak.reachViolationLevel += distance;
-            
+            blockbreak.reachViolationLevel += distance;
+
             // Setup data for logging
             data.log.check = "blockbreak.reach";
             data.log.reachdistance = distance;
 
-            cancel = plugin.execute(player, cc.blockbreak.reachActions, (int) data.blockbreak.reachViolationLevel, data.blockbreak.history, cc);
+            cancel = plugin.execute(player, cc.blockbreak.reachActions, (int) blockbreak.reachViolationLevel, blockbreak.history, cc);
         } else {
-            data.blockbreak.reachViolationLevel *= 0.9D;
+            blockbreak.reachViolationLevel *= 0.9D;
         }
 
         return cancel;

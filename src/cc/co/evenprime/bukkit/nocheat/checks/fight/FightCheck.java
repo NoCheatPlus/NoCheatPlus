@@ -23,15 +23,15 @@ public class FightCheck {
         this.plugin = plugin;
     }
 
-    public boolean check(Player player, Entity damagee, ConfigurationCache cc) {
+    public boolean check(final Player player, final Entity damagee, final ConfigurationCache cc) {
 
         boolean cancel = false;
 
-        boolean directionCheck = cc.fight.directionCheck && !player.hasPermission(Permissions.FIGHT_DIRECTION);
-
-        long time = System.currentTimeMillis();
+        final boolean directionCheck = cc.fight.directionCheck && !player.hasPermission(Permissions.FIGHT_DIRECTION);
 
         if(directionCheck) {
+
+            final long time = System.currentTimeMillis();
 
             // Get the width of the damagee
             net.minecraft.server.Entity entity = ((CraftEntity) damagee).getHandle();
@@ -45,7 +45,7 @@ public class FightCheck {
             double off = CheckUtil.directionCheck(player, entity.locX, entity.locY + 1.0D, entity.locZ, width, 2.0D, cc.fight.directionPrecision);
 
             BaseData data = plugin.getData(player.getName());
-            
+
             if(off < 0.1D) {
                 // Player did probably nothing wrong
                 // reduce violation counter
@@ -68,7 +68,7 @@ public class FightCheck {
                     data.fight.directionLastViolationTime = time;
                 }
             }
-            
+
             // If the player is still in penalty time, cancel the event anyway
             if(data.fight.directionLastViolationTime + cc.fight.directionPenaltyTime >= time) {
                 return true;

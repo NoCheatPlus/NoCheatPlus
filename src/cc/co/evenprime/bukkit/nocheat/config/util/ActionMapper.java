@@ -6,7 +6,6 @@ import java.util.Map;
 import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 
 /**
- * @author Evenprime
  * 
  */
 public class ActionMapper {

@@ -26,11 +26,11 @@ public class ActionManager {
         this.plugin = plugin;
     }
 
-    public boolean executeActions(Player player, ActionList actions, int violationLevel, ExecutionHistory history, ConfigurationCache cc) {
+    public boolean executeActions(final Player player, final ActionList actions, final int violationLevel, final ExecutionHistory history, final ConfigurationCache cc) {
 
         boolean special = false;
 
-        BaseData data = plugin.getData(player.getName());
+        final BaseData data = plugin.getData(player.getName());
         // Always set this here "by hand"
         data.log.violationLevel = violationLevel;
 
@@ -53,7 +53,7 @@ public class ActionManager {
     }
 
     private void executeLogAction(LogAction l, LogData data, ConfigurationCache cc) {
-        plugin.log(l.level, cc.logging.prefix + l.getMessage(data), cc);
+        plugin.log(l.level, cc.logging.prefix + l.getLogMessage(data), cc);
     }
 
     private void executeConsoleCommand(ConsolecommandAction action, LogData data) {

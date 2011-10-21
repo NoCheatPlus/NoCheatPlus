@@ -21,15 +21,15 @@ public class CheckUtil {
      * Check if a player looks at a target of a specific size, with a specific
      * precision value (roughly)
      */
-    public static final double directionCheck(Player player, double targetX, double targetY, double targetZ, double targetWidth, double targetHeight, double precision) {
+    public static final double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision) {
 
         // Eye location of the player
-        Location eyes = player.getEyeLocation();
+        final Location eyes = player.getEyeLocation();
 
-        double factor = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
+        final double factor = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
 
         // View direction of the player
-        Vector direction = player.getEyeLocation().getDirection();
+        final Vector direction = player.getEyeLocation().getDirection();
 
         final double x = ((double) targetX) - eyes.getX();
         final double y = ((double) targetY) - eyes.getY();
@@ -52,11 +52,11 @@ public class CheckUtil {
         return off;
     }
 
-    public static final double reachCheck(Player player, double targetX, double targetY, double targetZ, double limit) {
+    public static final double reachCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double limit) {
 
-        Location eyes = player.getEyeLocation();
+        final Location eyes = player.getEyeLocation();
 
-        double distance = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
+        final double distance = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
 
         return Math.max(distance - limit, 0.0D);
     }

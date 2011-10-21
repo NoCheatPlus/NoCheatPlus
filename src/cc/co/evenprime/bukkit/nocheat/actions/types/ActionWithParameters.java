@@ -5,11 +5,12 @@ import java.util.Locale;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
+import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 public abstract class ActionWithParameters extends Action {
 
@@ -77,12 +78,12 @@ public abstract class ActionWithParameters extends Action {
     }
 
     /**
-     * Get a log message with all the wildcards replaced with data from LogData
+     * Get a string with all the wildcards replaced with data from LogData
      * 
      * @param data
      * @return
      */
-    public String getMessage(LogData data) {
+    protected String getMessage(final LogData data) {
         StringBuilder log = new StringBuilder(100); // Should be big enough most
                                                     // of the time
 
@@ -101,6 +102,7 @@ public abstract class ActionWithParameters extends Action {
         // The == is correct here, as these really are identical objects, not
         // only equal
         switch (wildcard) {
+
         case PLAYER:
             return data.playerName;
 
@@ -160,31 +162,34 @@ public abstract class ActionWithParameters extends Action {
         case TEXT:
             return data.text;
 
-        case PLACE_LOCATION:
-            Block block = data.placed;
-            if(block != null) {
-                return String.format(Locale.US, "%d %d %d", block.getX(), block.getY(), block.getZ());
+        case PLACE_LOCATION: {
+            SimpleLocation l = data.placedLocation;
+            if(l.isSet()) {
+                return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
             } else {
                 return "null";
             }
+        }
 
-        case PLACE_AGAINST:
-            Block blocka = data.placedAgainst;
-            if(blocka == null) {
+        case PLACE_AGAINST: {
+            SimpleLocation l = data.placedAgainstLocation;
+            if(l.isSet()) {
+                return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
+            } else {
                 return "null";
             }
-            return String.format(Locale.US, "%d %d %d", blocka.getX(), blocka.getY(), blocka.getZ());
+        }
 
-        case BLOCK_TYPE:
-            Block blockb = data.placed;
-            if(blockb == null) {
+        case BLOCK_TYPE: {
+            Material type = data.placedType;
+            if(type == null) {
                 return "null";
             }
-            return blockb.getType().toString();
+            return type.toString();
+        }
 
         default:
             return "Evenprime was lazy and forgot to define " + wildcard + ".";
         }
     }
-
 }

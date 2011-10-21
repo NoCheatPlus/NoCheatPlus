@@ -41,7 +41,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
     }
 
     @Override
-    public void onPlayerChat(PlayerChatEvent event) {
+    public void onPlayerChat(final PlayerChatEvent event) {
 
         if(event.isCancelled()) {
             return;
@@ -60,9 +60,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
         // Find out if checks need to be done for that player
         if(cc.chat.check && !player.hasPermission(Permissions.CHAT)) {
 
-            boolean cancel = false;
-
-            cancel = chatCheck.check(player, event.getMessage(), cc);
+            final boolean cancel = chatCheck.check(player, event.getMessage(), cc);
 
             if(cancel) {
                 event.setCancelled(true);
@@ -74,7 +72,7 @@ public class PlayerChatEventManager extends PlayerListener implements EventManag
             chatPerformance.addTime(System.nanoTime() - nanoTimeStart);
     }
 
-    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+    public void onPlayerCommandPreprocess(final PlayerCommandPreprocessEvent event) {
 
         // We redirect to the other method anyway, so no need to set up a
         // performance counter here

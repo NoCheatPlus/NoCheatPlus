@@ -3,8 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.config;
 /**
  * The various permission nodes used by NoCheat
  * 
- * @author Evenprime
- * 
  */
 public class Permissions {
 

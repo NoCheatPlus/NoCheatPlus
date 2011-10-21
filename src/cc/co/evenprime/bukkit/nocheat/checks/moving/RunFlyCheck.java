@@ -19,8 +19,6 @@ import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
  * need to be executed and in which order. It will also precalculate some values
  * that are needed by multiple checks.
  * 
- * @author Evenprime
- * 
  */
 public class RunFlyCheck {
 
@@ -114,7 +112,7 @@ public class RunFlyCheck {
         }
 
         SimpleLocation lblock = new SimpleLocation();
-        lblock.setLocation(blockPlaced);
+        lblock.set(blockPlaced);
         SimpleLocation lplayer = new SimpleLocation();
         lplayer.setLocation(player.getLocation());
 

@@ -5,8 +5,6 @@ package cc.co.evenprime.bukkit.nocheat.actions.types;
  * executed depends on how many executions have occured within the last 60
  * seconds and how much time was between this and the previous execution
  * 
- * @author Evenprime
- * 
  */
 public abstract class Action {
 
@@ -21,6 +19,9 @@ public abstract class Action {
      */
     public final int    repeat;
 
+    /**
+     * The name of the action, to identify it in the config file
+     */
     public final String name;
 
     public Action(String name, int delay, int repeat) {

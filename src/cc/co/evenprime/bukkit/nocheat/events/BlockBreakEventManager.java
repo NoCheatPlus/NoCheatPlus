@@ -98,7 +98,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
 
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks
-        data.blockbreak.instaBrokeBlockLocation.setLocation(event.getBlock());
+        data.blockbreak.instaBrokeBlockLocation.set(event.getBlock());
 
         // store performance time
         if(performanceCheck)

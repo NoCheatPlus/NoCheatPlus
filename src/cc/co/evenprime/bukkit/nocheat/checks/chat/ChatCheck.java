@@ -4,8 +4,10 @@ import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCChat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.ChatData;
 
 /**
  * 
@@ -19,34 +21,37 @@ public class ChatCheck {
         this.plugin = plugin;
     }
 
-    public boolean check(Player player, String message, ConfigurationCache cc) {
+    public boolean check(final Player player, final String message, final ConfigurationCache cc) {
 
         boolean cancel = false;
+        
+        final CCChat ccchat = cc.chat;
 
-        boolean spamCheck = cc.chat.spamCheck && !player.hasPermission(Permissions.CHAT_SPAM);
+        final boolean spamCheck = ccchat.spamCheck && !player.hasPermission(Permissions.CHAT_SPAM);
 
         if(spamCheck) {
 
             // Maybe it's a command and on the whitelist
-            for(String s : cc.chat.spamWhitelist) {
+            for(String s : ccchat.spamWhitelist) {
                 if(message.startsWith(s)) {
                     // It is
                     return false;
                 }
             }
 
-            int time = plugin.getIngameSeconds();
+            final int time = plugin.getIngameSeconds();
 
-            BaseData data = plugin.getData(player.getName());
+            final BaseData data = plugin.getData(player.getName());
+            final ChatData chat = data.chat;
 
-            if(data.chat.spamLasttime + cc.chat.spamTimeframe <= time) {
-                data.chat.spamLasttime = time;
-                data.chat.messageCount = 0;
+            if(chat.spamLasttime + ccchat.spamTimeframe <= time) {
+                chat.spamLasttime = time;
+                chat.messageCount = 0;
             }
 
-            data.chat.messageCount++;
+            chat.messageCount++;
 
-            if(data.chat.messageCount > cc.chat.spamLimit) {
+            if(chat.messageCount > ccchat.spamLimit) {
 
                 // Prepare some event-specific values for logging and custom
                 // actions
@@ -54,7 +59,7 @@ public class ChatCheck {
                 data.log.check = "chat.spam";
                 data.log.text = message;
 
-                cancel = plugin.execute(player, cc.chat.spamActions, data.chat.messageCount - cc.chat.spamLimit, data.chat.history, cc);
+                cancel = plugin.execute(player, ccchat.spamActions, chat.messageCount - ccchat.spamLimit, chat.history, cc);
             }
         }
 

@@ -6,8 +6,6 @@ import cc.co.evenprime.bukkit.nocheat.data.LogData;
  * Execute a command by imitating an admin typing the command directly into the
  * console
  * 
- * @author Evenprime
- * 
  */
 public class ConsolecommandAction extends ActionWithParameters {
 

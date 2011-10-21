@@ -12,8 +12,6 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
  * A list of actions, that associates actions and a treshold. It allows to
  * retrieve all actions that match a certain treshold.
  * 
- * @author Evenprime
- * 
  */
 public class ActionList {
 
@@ -49,7 +47,7 @@ public class ActionList {
      * @param violationLevel
      * @return
      */
-    public Action[] getActions(Integer vl) {
+    public Action[] getActions(int vl) {
 
         Integer result = null;
 

@@ -19,7 +19,7 @@ public class LogAction extends ActionWithParameters {
         this.level = level;
     }
 
-    public String getMessage(LogData ldata) {
+    public String getLogMessage(final LogData ldata) {
         return super.getMessage(ldata);
     }
 }

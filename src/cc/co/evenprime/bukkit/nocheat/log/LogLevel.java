@@ -5,8 +5,6 @@ import java.util.logging.Level;
 /**
  * Define the available log levels (low, med, high, off)
  * 
- * @author Evenprime
- * 
  */
 public enum LogLevel {
 
