@@ -1,7 +1,11 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.MobEffectList;
+
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -13,8 +17,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
  * A check designed for people that are allowed to fly. The complement to
  * the "RunningCheck", which is for people that aren't allowed to fly, and
  * therefore have tighter rules to obey.
- * 
- * @author Evenprime
  * 
  */
 public class FlyingCheck {
@@ -47,8 +49,15 @@ public class FlyingCheck {
 
         // In case of creative gamemode, give at least 0.60 speed limit
         // horizontal
-        final double speedLimitHorizontal = player.getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, cc.moving.flyingSpeedLimitHorizontal) : cc.moving.flyingSpeedLimitHorizontal;
+        double speedLimitHorizontal = player.getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, cc.moving.flyingSpeedLimitHorizontal) : cc.moving.flyingSpeedLimitHorizontal;
 
+        EntityPlayer p = ((CraftPlayer) player).getHandle();
+        
+        if(p.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
+            // Taken directly from Minecraft code, should work
+            speedLimitHorizontal *= 1.0F + 0.2F * (float) (p.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
+        }
+        
         result += Math.max(0.0D, horizontalDistance - data.moving.horizFreedom - speedLimitHorizontal);
 
         boolean sprinting = CheckUtil.isSprinting(player);

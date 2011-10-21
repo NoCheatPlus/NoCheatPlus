@@ -1,6 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.MobEffectList;
+
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -14,8 +18,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
  * get checked by this. It will try to identify when they are jumping, check if
  * they aren't jumping too high or far, check if they aren't moving too fast on
  * normal ground, while sprinting, sneaking or swimming.
- * 
- * @author Evenprime
  * 
  */
 public class RunningCheck {
@@ -78,8 +80,10 @@ public class RunningCheck {
             data.log.toLocation = to;
             if(resultHoriz > 0 && resultVert > 0)
                 data.log.check = "runfly/both";
-            else if(resultHoriz > 0)
-                data.log.check = "runfly/" + data.log.check;
+            else if(resultHoriz > 0) {
+                // We already set the correct value for this
+                // data.log.check = "runfly/something"
+            }
             else if(resultVert > 0)
                 data.log.check = "runfly/vertical";
 
@@ -126,19 +130,36 @@ public class RunningCheck {
 
         BaseData data = plugin.getData(player);
 
+        double limit = 0.0D;
+
+        EntityPlayer p = ((CraftPlayer) player).getHandle();
+
+
         if(cc.moving.sneakingCheck && player.isSneaking() && !player.hasPermission(Permissions.MOVE_SNEAK)) {
-            distanceAboveLimit = totalDistance - cc.moving.sneakingSpeedLimit - data.moving.horizFreedom;
-            data.log.check = "sneak";
+            limit = cc.moving.sneakingSpeedLimit;
+            data.log.check = "runfly/sneak";
         } else if(cc.moving.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVE_SWIM)) {
-            distanceAboveLimit = totalDistance - cc.moving.swimmingSpeedLimit - data.moving.horizFreedom;
-            data.log.check = "swim";
+            limit = cc.moving.swimmingSpeedLimit;
+            data.log.check = "runfly/swim";
         } else if(!sprinting) {
-            distanceAboveLimit = totalDistance - cc.moving.walkingSpeedLimit - data.moving.horizFreedom;
-            data.log.check = "walk";
+            limit = cc.moving.walkingSpeedLimit;
+            data.log.check = "runfly/walk";
         } else {
-            distanceAboveLimit = totalDistance - cc.moving.sprintingSpeedLimit - data.moving.horizFreedom;
-            data.log.check = "sprint";
+            limit = cc.moving.sprintingSpeedLimit;
+            data.log.check = "runfly/sprint";
         }
+        
+        if(p.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
+            // Taken directly from Minecraft code, should work
+           limit *= 1.0F + 0.2F * (float) (p.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
+        }
+        
+        // Ignore slowdowns for now
+        /*if(p.hasEffect(MobEffectList.SLOWER_MOVEMENT)) {
+            limit *= 1.0F - 0.15F * (float) (p.getEffect(MobEffectList.SLOWER_MOVEMENT).getAmplifier() + 1);
+        }*/
+        
+        distanceAboveLimit = totalDistance - limit - data.moving.horizFreedom;
 
         data.moving.bunnyhopdelay--;
 

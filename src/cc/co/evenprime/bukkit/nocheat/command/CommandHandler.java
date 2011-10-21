@@ -111,7 +111,7 @@ public class CommandHandler {
             sender.sendMessage(string.toString());
         }
 
-        sender.sendMessage("Total time spent: " + Performance.toString(totalTime) + " " + Performance.toString(totalTime));
+        sender.sendMessage("Total time spent: " + Performance.toString(totalTime));
 
         return true;
     }
