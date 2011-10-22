@@ -31,6 +31,7 @@ public class Permissions {
 
     public static final String  FIGHT                = CHECKS + ".fight";
     public static final String  FIGHT_DIRECTION      = FIGHT + ".direction";
+    public static final String  FIGHT_SELFHIT        = FIGHT + ".selfhit";
 
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
     public static final String  ADMIN_PERMLIST       = ADMIN + ".permlist";

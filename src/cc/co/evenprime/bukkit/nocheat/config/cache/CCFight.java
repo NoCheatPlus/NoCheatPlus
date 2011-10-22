@@ -10,6 +10,8 @@ public class CCFight {
     public final double     directionPrecision;
     public final ActionList directionActions;
     public final long       directionPenaltyTime;
+    public final boolean    selfhitCheck;
+    public final ActionList selfhitActions;
 
     public CCFight(Configuration data) {
 
@@ -18,5 +20,7 @@ public class CCFight {
         directionPrecision = ((double) (data.getInteger(Configuration.FIGHT_DIRECTION_PRECISION))) / 100D;
         directionPenaltyTime = data.getInteger(Configuration.FIGHT_DIRECTION_PENALTYTIME);
         directionActions = data.getActionList(Configuration.FIGHT_DIRECTION_ACTIONS);
+        selfhitCheck = data.getBoolean(Configuration.FIGHT_SELFHIT_CHECK);
+        selfhitActions = data.getActionList(Configuration.FIGHT_SELFHIT_ACTIONS);
     }
 }

@@ -3,7 +3,7 @@ name: NoCheat
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.13
+version: 2.13a
 
 commands:
   nocheat:
@@ -70,4 +70,5 @@ permissions:
             children:
               nocheat.checks.fight.direction:
                 description: Allow a player to attack players and monster even if they are not in his field of view
-          
+              nocheat.checks.fight.selfhit:
+                description: Allow a player to attack himself with close combat attacks (punching, swords, etc.)

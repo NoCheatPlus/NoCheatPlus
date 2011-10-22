@@ -154,8 +154,15 @@ public class DefaultConfiguration extends Configuration {
 
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("fightCancel".split(" ")));
-            directionActionList.setActions(5, action.getActions("fightDirectionLog fightCancel".split(" ")));
+            directionActionList.setActions(5, action.getActions("fightDirectionLogLow fightCancel".split(" ")));
+            directionActionList.setActions(20, action.getActions("fightDirectionLog fightCancel".split(" ")));
+            directionActionList.setActions(50, action.getActions("fightDirectionLogHigh fightCancel".split(" ")));
             setValue(FIGHT_DIRECTION_ACTIONS, directionActionList);
+            
+            setValue(FIGHT_SELFHIT_CHECK, true);
+            ActionList selfhitActionList = new ActionList();
+            selfhitActionList.setActions(0, action.getActions("fightSelfhitLog fightCancel".split(" ")));
+            setValue(FIGHT_SELFHIT_ACTIONS, selfhitActionList);
         }
     }
 
@@ -235,7 +242,14 @@ public class DefaultConfiguration extends Configuration {
             w(w, "log onliquidLog 2 5 med [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst]. VL [violations]");
             w(w, "log spamLog 0 5 med [player] failed [check]: Last sent message \"[text]\". VL [violations]");
             w(w, "log nofallLog 0 5 med [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations]");
+            w(w, "");
+            w(w, "");
+            w(w, "# Some log messages related to fighting, displaying the same text, but with different level (Info, Warning, Severe)");
+            w(w, "log fightDirectionLogLow 0 5 low [player] failed [check]: tried to attack out of sight entity. Total violation level so far [violations].");
             w(w, "log fightDirectionLog 0 5 med [player] failed [check]: tried to attack out of sight entity. Total violation level so far [violations].");
+            w(w, "log fightDirectionLogHigh 0 5 high [player] failed [check]: tried to attack out of sight entity. Total violation level so far [violations].");
+            w(w, "");
+            w(w, "log fightSelfhitlog 0 1 high [player] failed [check]: tried to attack himself. Total violation level so far [violations].");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
