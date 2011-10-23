@@ -9,6 +9,7 @@ public class LagMeasureTask implements Runnable {
     private long          lastIngamesecondDuration = 2000L;
     private boolean       skipCheck                = true;
     private int           lagMeasureTaskId         = -1;
+
     private final NoCheat plugin;
 
     public LagMeasureTask(NoCheat plugin) {
@@ -38,7 +39,9 @@ public class LagMeasureTask implements Runnable {
         ingameseconds++;
 
         // Check if some data is outdated now and let it be removed
-        plugin.cleanDataMap();
+        if(ingameseconds % 62 == 0) {
+            plugin.cleanDataMap();
+        }
 
     }
 

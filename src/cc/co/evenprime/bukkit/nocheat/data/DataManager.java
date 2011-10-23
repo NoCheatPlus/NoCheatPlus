@@ -40,6 +40,8 @@ public class DataManager {
             this.map.put(playerName, data);
         }
 
+        data.lastUsedTime = System.currentTimeMillis();
+
         return data;
     }
 
@@ -54,47 +56,28 @@ public class DataManager {
     }
 
     /**
-     * put a players data on the queue for later deletion (unless it comes back
-     * before)
-     * 
-     */
-    public void queueForRemoval(String playerName) {
-        BaseData data = this.map.get(playerName);
-
-        if(data != null) {
-            data.markForRemoval(true);
-        }
-    }
-
-    public void unqueueForRemoval(String playerName) {
-        BaseData data = this.map.get(playerName);
-
-        if(data != null) {
-            data.markForRemoval(false);
-        }
-    }
-
-    /**
-     * check if queued for removal data is ready to get removed
+     * check if some data hasn't been used for a while and remove it
      * 
      */
     public void cleanDataMap() {
-        try {
-            for(Entry<String, BaseData> p : this.map.entrySet()) {
-                if(p.getValue().shouldBeRemoved()) {
-                    removals.add(p.getKey());
+        synchronized(removals) {
+            long time = System.currentTimeMillis();
+            try {
+                for(Entry<String, BaseData> p : this.map.entrySet()) {
+                    if(p.getValue().shouldBeRemoved(time)) {
+                        removals.add(p.getKey());
+                    }
                 }
-            }
 
-            for(String p : removals) {
-                this.map.remove(p);
-            }
+                for(String p : removals) {
+                    this.map.remove(p);
+                }
 
-            removals.clear();
-        } catch(Exception e) {
-            // Ignore problems, as they really don't matter much
+                removals.clear();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     public void clearCriticalData(String playerName) {

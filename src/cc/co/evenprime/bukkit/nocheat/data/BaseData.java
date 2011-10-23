@@ -9,9 +9,9 @@ public class BaseData extends Data {
     public final MovingData     moving;
     public final FightData      fight;
 
-    private final Data[]        data;       // for convenience
+    private final Data[]        data;        // for convenience
 
-    private long                removalTime;
+    public long                lastUsedTime;
 
     public BaseData() {
         this.blockbreak = new BlockBreakData();
@@ -20,8 +20,6 @@ public class BaseData extends Data {
         this.log = new LogData();
         this.moving = new MovingData();
         this.fight = new FightData();
-
-        this.removalTime = 0;
 
         data = new Data[] {this.blockbreak, this.blockplace, this.chat,
                 this.log, this.moving, this.fight};
@@ -32,17 +30,8 @@ public class BaseData extends Data {
             d.clearCriticalData();
         }
     }
-
-    public void markForRemoval(boolean removal) {
-        if(removal) {
-            // 1 minute in the future
-            this.removalTime = System.currentTimeMillis() + 60000;
-        } else {
-            this.removalTime = 0;
-        }
-    }
-
-    public boolean shouldBeRemoved() {
-        return removalTime != 0 && removalTime < System.currentTimeMillis();
+    
+    public boolean shouldBeRemoved(long currentTimeInMilliseconds) {
+        return lastUsedTime + 60000L < currentTimeInMilliseconds;
     }
 }

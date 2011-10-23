@@ -29,7 +29,6 @@ import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EntityDamageEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.PlayerQuitEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
@@ -101,7 +100,6 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new PlayerChatEventManager(this));
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
-        eventManagers.add(new PlayerQuitEventManager(this));
         eventManagers.add(new EntityDamageEventManager(this));
 
         // Then set up a task to monitor server lag
@@ -137,24 +135,12 @@ public class NoCheat extends JavaPlugin {
         data.clearCriticalData(playerName);
     }
 
-    public void playerLeft(String playerName) {
-        // Get rid of the critical data that's stored for player immediately
-        clearCriticalData(playerName);
-
-        data.queueForRemoval(playerName);
-    }
-
     public void playerJoined(String playerName) {
-        data.unqueueForRemoval(playerName);
+        clearCriticalData(playerName);
     }
 
     public Performance getPerformance(Type type) {
         return performance.get(type);
-    }
-
-    public void cleanDataMap() {
-        if(data != null)
-            data.cleanDataMap();
     }
 
     @Override
@@ -197,6 +183,16 @@ public class NoCheat extends JavaPlugin {
     public void reloadConfig() {
         conf.cleanup();
         this.conf = new ConfigurationManager(this.getDataFolder().getPath());
-        this.data.clearCriticalData();
+        data.cleanDataMap();
+        data.clearCriticalData();
+    }
+
+    /**
+     * Call this periodically to walk over the stored data map and remove old/unused entries
+     * 
+     */
+    public void cleanDataMap() {
+        data.cleanDataMap();
+        
     }
 }
