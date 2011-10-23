@@ -98,6 +98,12 @@ public class RunningCheck {
             // Was one of the actions a cancel? Then do it
             if(cancel) {
                 newToLocation = setBack;
+            } else if(toOnGround || toInGround) {
+                // In case it only gets logged, not stopped by NoCheat
+                // Update the setback location at least a bit
+                setBack.set(to);
+                moving.jumpPhase = 0;
+
             }
         } else {
             if((toInGround && from.y >= to.y) || CheckUtil.isLiquid(toType)) {
