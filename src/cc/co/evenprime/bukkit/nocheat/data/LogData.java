@@ -18,5 +18,6 @@ public class LogData extends Data {
     public double                reachdistance;
     public float                 falldistance;
     public String                playerName;
+    public int                   godmodeTicksBehind;
 
 }

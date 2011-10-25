@@ -107,6 +107,14 @@ public abstract class Configuration {
     public static final OptionNode        FIGHT_SELFHIT_CHECK                        = new OptionNode("check", FIGHT_SELFHIT, DataType.BOOLEAN);
     public final static OptionNode        FIGHT_SELFHIT_ACTIONS                      = new OptionNode("actions", FIGHT_SELFHIT, DataType.ACTIONLIST);
 
+    private static final OptionNode       TIMED                                      = new OptionNode("timed", ROOT, DataType.PARENT);
+    public static final OptionNode        TIMED_CHECK                                = new OptionNode("check", TIMED, DataType.BOOLEAN);
+
+    private static final OptionNode       TIMED_GODMODE                              = new OptionNode("godmode", TIMED, DataType.PARENT);
+    public static final OptionNode        TIMED_GODMODE_CHECK                        = new OptionNode("check", TIMED_GODMODE, DataType.BOOLEAN);
+    public static final OptionNode        TIMED_GODMODE_TICKSLIMIT                   = new OptionNode("tickslimit", TIMED_GODMODE, DataType.INTEGER);
+    public static final OptionNode        TIMED_GODMODE_ACTIONS                      = new OptionNode("actions", TIMED_GODMODE, DataType.ACTIONLIST);
+
     private final Map<OptionNode, Object> values;
     private final Configuration           defaults;
 

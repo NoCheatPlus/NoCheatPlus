@@ -158,11 +158,24 @@ public class DefaultConfiguration extends Configuration {
             directionActionList.setActions(20, action.getActions("fightDirectionLog fightCancel".split(" ")));
             directionActionList.setActions(50, action.getActions("fightDirectionLogHigh fightCancel".split(" ")));
             setValue(FIGHT_DIRECTION_ACTIONS, directionActionList);
-            
+
             setValue(FIGHT_SELFHIT_CHECK, true);
             ActionList selfhitActionList = new ActionList();
             selfhitActionList.setActions(0, action.getActions("fightSelfhitLog fightCancel".split(" ")));
             setValue(FIGHT_SELFHIT_ACTIONS, selfhitActionList);
+        }
+
+        /*** TIMED ***/
+        {
+            setValue(TIMED_CHECK, true);
+
+            setValue(TIMED_GODMODE_CHECK, true);
+            setValue(TIMED_GODMODE_TICKSLIMIT, 50);
+
+            ActionList directionActionList = new ActionList();
+            directionActionList.setActions(0, action.getActions("godmodeCancel".split(" ")));
+            directionActionList.setActions(100, action.getActions("godmodeLog godmodeCancel".split(" ")));
+            setValue(TIMED_GODMODE_ACTIONS, directionActionList);
         }
     }
 
@@ -242,6 +255,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "log onliquidLog 2 5 med [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst]. VL [violations]");
             w(w, "log spamLog 0 5 med [player] failed [check]: Last sent message \"[text]\". VL [violations]");
             w(w, "log nofallLog 0 5 med [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations]");
+            w(w, "log godmodeLog 0 5 med [player] failed [check]: lagging or using godmode. VL [violations]");
             w(w, "");
             w(w, "");
             w(w, "# Some log messages related to fighting, displaying the same text, but with different level (Info, Warning, Severe)");
@@ -265,6 +279,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "special spamCancel 0 0");
             w(w, "special nofallDamage 0 0");
             w(w, "special fightCancel 0 0");
+            w(w, "special godmodeCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");

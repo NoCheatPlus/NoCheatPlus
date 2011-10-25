@@ -31,6 +31,7 @@ import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.TimedEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
 
@@ -101,6 +102,7 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new EntityDamageEventManager(this));
+        eventManagers.add(new TimedEventManager(this));
 
         // Then set up a task to monitor server lag
         if(lagMeasureTask == null) {
@@ -188,11 +190,12 @@ public class NoCheat extends JavaPlugin {
     }
 
     /**
-     * Call this periodically to walk over the stored data map and remove old/unused entries
+     * Call this periodically to walk over the stored data map and remove
+     * old/unused entries
      * 
      */
     public void cleanDataMap() {
         data.cleanDataMap();
-        
+
     }
 }

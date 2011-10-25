@@ -8,10 +8,11 @@ public class BaseData extends Data {
     public final LogData        log;
     public final MovingData     moving;
     public final FightData      fight;
+    public final TimedData      timed;
 
     private final Data[]        data;        // for convenience
 
-    public long                lastUsedTime;
+    public long                 lastUsedTime;
 
     public BaseData() {
         this.blockbreak = new BlockBreakData();
@@ -20,9 +21,10 @@ public class BaseData extends Data {
         this.log = new LogData();
         this.moving = new MovingData();
         this.fight = new FightData();
+        this.timed = new TimedData();
 
         data = new Data[] {this.blockbreak, this.blockplace, this.chat,
-                this.log, this.moving, this.fight};
+                this.log, this.moving, this.fight, this.timed};
     }
 
     public void clearCriticalData() {
@@ -30,7 +32,7 @@ public class BaseData extends Data {
             d.clearCriticalData();
         }
     }
-    
+
     public boolean shouldBeRemoved(long currentTimeInMilliseconds) {
         return lastUsedTime + 60000L < currentTimeInMilliseconds;
     }

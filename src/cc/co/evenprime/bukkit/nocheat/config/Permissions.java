@@ -33,6 +33,9 @@ public class Permissions {
     public static final String  FIGHT_DIRECTION      = FIGHT + ".direction";
     public static final String  FIGHT_SELFHIT        = FIGHT + ".selfhit";
 
+    public static final String  TIMED                = CHECKS + ".timed";
+    public static final String  TIMED_GODMODE        = TIMED + ".godmode";
+
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
     public static final String  ADMIN_PERMLIST       = ADMIN + ".permlist";
     public static final String  ADMIN_RELOAD         = ADMIN + ".reload";
