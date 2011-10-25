@@ -54,6 +54,8 @@ public class NoCheat extends JavaPlugin {
 
     private LagMeasureTask       lagMeasureTask;
 
+    private int                  taskId = -1;
+
     public NoCheat() {
 
     }
@@ -61,6 +63,11 @@ public class NoCheat extends JavaPlugin {
     public void onDisable() {
 
         PluginDescriptionFile pdfFile = this.getDescription();
+
+        if(taskId != -1) {
+            getServer().getScheduler().cancelTask(taskId);
+            taskId = -1;
+        }
 
         if(lagMeasureTask != null) {
             lagMeasureTask.cancel();
@@ -72,6 +79,9 @@ public class NoCheat extends JavaPlugin {
             conf = null;
         }
 
+        // Just to be sure nothing gets left out
+        getServer().getScheduler().cancelTasks(this);
+
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
     }
 
@@ -80,7 +90,7 @@ public class NoCheat extends JavaPlugin {
         // First set up logging
         this.log = new LogManager();
 
-        log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1317. It may break at any time and for any other version.");
+        log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1337. It may break at any time and for any other version.");
 
         // Then set up in memory per player data storage
         this.data = new DataManager();
@@ -102,7 +112,8 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new EntityDamageEventManager(this));
-        eventManagers.add(new TimedEventManager(this));
+        TimedEventManager m = new TimedEventManager(this);
+        eventManagers.add(m);
 
         // Then set up a task to monitor server lag
         if(lagMeasureTask == null) {

@@ -1,8 +1,14 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.minecraft.server.EntityPlayer;
+
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -20,6 +26,8 @@ public class TimedEventManager implements EventManager {
 
     private final Performance timedPerformance;
 
+    public int                taskId = -1;
+
     public TimedEventManager(final NoCheat plugin) {
         this.plugin = plugin;
 
@@ -28,11 +36,14 @@ public class TimedEventManager implements EventManager {
         this.timedPerformance = plugin.getPerformance(Type.TIMED);
 
         // "register a listener" for passed time
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        taskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
-            private int executions = 0;
-            private int loopsize   = 10;
+            private int                      executions = 0;
+            private int                      loopsize   = 10;
 
+            private final List<EntityPlayer> entities   = new ArrayList<EntityPlayer>(20);
+
+            @SuppressWarnings("unchecked")
             public void run() {
 
                 executions++;
@@ -41,11 +52,33 @@ public class TimedEventManager implements EventManager {
                     executions = 0;
                 }
 
-                for(Player p : plugin.getServer().getOnlinePlayers()) {
-                    if((p.hashCode() & 0x7FFFFFFF) % loopsize == executions) {
-                        onTimedEvent(p, loopsize);
+                // For performance reasons, we take some shortcuts here
+                CraftServer server = (CraftServer) plugin.getServer();
+
+                try {
+                    // Only collect the entities that we want to check this time
+                    for(EntityPlayer p : (List<EntityPlayer>) server.getHandle().players) {
+                        if(p.id % loopsize == executions) {
+                            entities.add(p);
+                        }
+                    }
+                } catch(ConcurrentModificationException e) {
+                    // Bad luck, better luck next time
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+                // Now initialize the checks one by one
+                for(EntityPlayer p : entities) {
+                    try {
+                        onTimedEvent((Player) CraftEntity.getEntity(server, p), loopsize);
+                    } catch(Exception e) {
+                        e.printStackTrace();
                     }
                 }
+
+                // Clear the list for next time
+                entities.clear();
             }
         }, 0, 1);
     }

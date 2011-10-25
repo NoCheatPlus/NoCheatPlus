@@ -6,6 +6,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
@@ -24,61 +25,65 @@ public class TimedCheck {
         if(plugin.skipCheck())
             return;
 
-        boolean cancel = false;
+        if(cc.timed.godmodeCheck && !player.hasPermission(Permissions.TIMED_GODMODE)) {
 
-        BaseData data = plugin.getData(player.getName());
+            boolean cancel = false;
 
-        EntityPlayer p = ((CraftPlayer) player).getHandle();
+            BaseData data = plugin.getData(player.getName());
 
-        // Compare ingame record of players ticks to our last observed value
-        int difference = p.ticksLived - data.timed.ticksLived;
+            EntityPlayer p = ((CraftPlayer) player).getHandle();
 
-        // difference should be >= tickTime for perfect synchronization
-        if(difference > tickTime) {
-            // player was faster than expected, give him credit for the
-            // difference
-            data.timed.ticksBehind -= (difference - tickTime);
-            // Reduce violation level over time
-            data.timed.godmodeVL *= 0.90D;
+            // Compare ingame record of players ticks to our last observed value
+            int difference = p.ticksLived - data.timed.ticksLived;
 
-        } else if(difference >= tickTime / 2) {
-            // close enough, let it pass
+            // difference should be >= tickTime for perfect synchronization
+            if(difference > tickTime) {
+                // player was faster than expected, give him credit for the
+                // difference
+                data.timed.ticksBehind -= (difference - tickTime);
+                // Reduce violation level over time
+                data.timed.godmodeVL *= 0.90D;
 
-            // Reduce violation level over time
-            data.timed.godmodeVL *= 0.95D;
-        } else {
-            // That's a bit suspicious, why is the player more than half the
-            // ticktime behind? Keep that in mind
-            data.timed.ticksBehind += tickTime - difference;
+            } else if(difference >= tickTime / 2) {
+                // close enough, let it pass
 
-            // Is he way too far behind, then correct that
-            if(data.timed.ticksBehind > cc.timed.godmodeTicksLimit) {
+                // Reduce violation level over time
+                data.timed.godmodeVL *= 0.95D;
+            } else {
+                // That's a bit suspicious, why is the player more than half the
+                // ticktime behind? Keep that in mind
+                data.timed.ticksBehind += tickTime - difference;
 
-                data.timed.godmodeVL += tickTime - difference;
+                // Is he way too far behind, then correct that
+                if(data.timed.ticksBehind > cc.timed.godmodeTicksLimit) {
 
-                // Enough is enough
-                data.log.check = "timed.godmode";
-                data.log.godmodeTicksBehind = data.timed.ticksBehind;
+                    data.timed.godmodeVL += tickTime - difference;
 
-                cancel = plugin.execute(player, cc.timed.godmodeActions, (int) data.timed.godmodeVL, data.timed.history, cc);
+                    // Enough is enough
+                    data.log.check = "timed.godmode";
+                    data.log.godmodeTicksBehind = data.timed.ticksBehind;
 
-                // Reduce the time the player is behind accordingly
-                data.timed.ticksBehind -= tickTime;
+                    cancel = plugin.execute(player, cc.timed.godmodeActions, (int) data.timed.godmodeVL, data.timed.history, cc);
+
+                    // Reduce the time the player is behind accordingly
+                    data.timed.ticksBehind -= tickTime;
+                }
             }
-        }
 
-        if(data.timed.ticksBehind < 0) {
-            data.timed.ticksBehind = 0;
-        }
-
-        if(cancel) {
-            // Catch up for at least some of the ticks
-            for(int i = 0; i < tickTime; i++) {
-                p.b(true); // Catch up with the server, one tick at a time
+            if(data.timed.ticksBehind < 0) {
+                data.timed.ticksBehind = 0;
             }
-        }
 
-        // setup data for next time
-        data.timed.ticksLived = p.ticksLived;
+            if(cancel) {
+                // Catch up for at least some of the ticks
+                for(int i = 0; i < tickTime; i++) {
+                    p.b(true); // Catch up with the server, one tick at a time
+                }
+            }
+
+            // setup data for next time
+            data.timed.ticksLived = p.ticksLived;
+
+        }
     }
 }

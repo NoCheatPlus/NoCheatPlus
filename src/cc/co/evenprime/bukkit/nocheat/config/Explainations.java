@@ -18,6 +18,7 @@ public class Explainations {
 
         set(Configuration.LOGGING_ACTIVE, "Should NoCheat related messages get logged at all. Some messages may still appear, e.g. error\n messages, even if this option is deactivated");
 
+        set(Configuration.LOGGING_PREFIX, "The short text that appears in front of messages by NoCheat. Color codes are &0-&9 and &A-&F");
         set(Configuration.LOGGING_FILENAME, "Where logs that go to the logfile are stored. You can have different files for different worlds.");
         set(Configuration.LOGGING_FILELEVEL, "What log-level need messages to have to get stored in the logfile. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
         set(Configuration.LOGGING_CONSOLELEVEL, "What log-level need messages to have to get displayed in your server console. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
@@ -84,6 +85,15 @@ public class Explainations {
         set(Configuration.FIGHT_DIRECTION_PRECISION, "Set how precise the check should be. If you experience the check to be too zealous, increase this value. \nIf you want to make it tighter, reduce this value. Default is 100.");
         set(Configuration.FIGHT_DIRECTION_PENALTYTIME, "If a player fails the check, he will be unable to attack for this amount of time (in milliseconds), default is 500.");
         set(Configuration.FIGHT_DIRECTION_ACTIONS, "What should be done if a player attacks entities that are not in his field of view.\nUnit is number of attacks on entities out of view.");
+
+        set(Configuration.FIGHT_SELFHIT_CHECK, "If true, check if a player is attacking itself, which should normally be impossible.");
+        set(Configuration.FIGHT_SELFHIT_ACTIONS, "What should be done if a player attacks himself.\nUnit is number of attacks on himself.");
+        
+        set(Configuration.TIMED_CHECK, "If true, do various checks on things related to server and client time.");
+        set(Configuration.TIMED_GODMODE_CHECK, "If true, check or prevent if a player made himself invulnerable by exploiting a time-related bug.\nThis 'godmode' exploit looks similar to a player with huge lag, so be careful when punishing people for it.");
+        set(Configuration.TIMED_GODMODE_TICKSLIMIT, "How many ticks may a player be behind the server time before NoCheat reacts. Default is 50.");
+        set(Configuration.TIMED_GODMODE_ACTIONS, "What should be done if a player is considered using 'godmode'.\nUnit is number of ticks of potential godmode usage.");
+
     }
 
     private static void set(OptionNode id, String text) {
@@ -94,6 +104,7 @@ public class Explainations {
         String result = explainations.get(id);
 
         if(result == null) {
+            System.out.println("Missing description for "+id.getName());
             result = "No description available";
         }
 
