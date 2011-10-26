@@ -21,8 +21,8 @@ public class TimedCheck {
 
     public void check(Player player, int tickTime, ConfigurationCache cc) {
 
-        // server lag(ged), skip this
-        if(plugin.skipCheck())
+        // server lag(ged), skip this, or player dead, therefore it's reasonable for him to not move :)
+        if(plugin.skipCheck() || player.isDead())
             return;
 
         if(cc.timed.godmodeCheck && !player.hasPermission(Permissions.TIMED_GODMODE)) {
