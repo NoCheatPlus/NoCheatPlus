@@ -131,8 +131,8 @@ public class DefaultConfiguration extends Configuration {
             setValue(BLOCKPLACE_ONLIQUID_ACTIONS, onliquidActionList);
 
             setValue(BLOCKPLACE_DIRECTION_CHECK, true);
-            setValue(BLOCKPLACE_DIRECTION_PRECISION, 50);
-            setValue(BLOCKPLACE_DIRECTION_PENALTYTIME, 300);
+            setValue(BLOCKPLACE_DIRECTION_PRECISION, 75);
+            setValue(BLOCKPLACE_DIRECTION_PENALTYTIME, 100);
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("blockplaceCancel".split(" ")));
             directionActionList.setActions(10, action.getActions("directionLog blockplaceCancel".split(" ")));
