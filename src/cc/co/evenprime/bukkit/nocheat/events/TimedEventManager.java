@@ -26,7 +26,7 @@ public class TimedEventManager implements EventManager {
 
     private final Performance timedPerformance;
 
-    public int                taskId = -1;
+    public final int          taskId;
 
     public TimedEventManager(final NoCheat plugin) {
         this.plugin = plugin;
@@ -36,7 +36,7 @@ public class TimedEventManager implements EventManager {
         this.timedPerformance = plugin.getPerformance(Type.TIMED);
 
         // "register a listener" for passed time
-        taskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+        this.taskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
 
             private int                      executions = 0;
             private int                      loopsize   = 10;
@@ -83,7 +83,7 @@ public class TimedEventManager implements EventManager {
         }, 0, 1);
     }
 
-    public void onTimedEvent(Player player, int elapsedTicks) {
+    private void onTimedEvent(Player player, int elapsedTicks) {
 
         // Performance counter setup
         long nanoTimeStart = 0;

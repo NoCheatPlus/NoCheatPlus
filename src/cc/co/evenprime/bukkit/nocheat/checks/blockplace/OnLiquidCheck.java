@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -10,6 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
+import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
  * 
@@ -22,29 +22,27 @@ public class OnLiquidCheck {
         this.plugin = plugin;
     }
 
-    public boolean check(final Player player, final BaseData data, final Block blockPlaced, final Block blockPlacedAgainst, final ConfigurationCache cc) {
+    public boolean check(final Player player, final BaseData data, final ConfigurationCache cc) {
 
         boolean cancel = false;
 
         final BlockPlaceData blockplace = data.blockplace;
+        final SimpleLocation blockplaced = blockplace.blockPlaced;
         final LogData log = data.log;
-        
-        if(blockPlaced == null || blockPlaced.isEmpty() || (blockPlacedAgainst != null && isSolid(blockPlacedAgainst.getTypeId()))) {
+
+        if(isSolid(blockplace.placedType.getId())) {
             // all ok
-        } else if(nextToSolid(blockPlaced.getWorld(), blockPlaced.getX(), blockPlaced.getY(), blockPlaced.getZ())) {
+        } else if(nextToSolid(player.getWorld(), blockplaced.x, blockplaced.y, blockplaced.z)) {
             // all ok
         } else {
             blockplace.onliquidViolationLevel += 1;
             log.check = "blockplace.onliquid";
-            log.placedLocation.set(blockPlaced);
-            log.placedType = blockPlaced.getType();
-            log.placedAgainstLocation.set(blockPlacedAgainst);
 
             cancel = plugin.execute(player, cc.blockplace.onliquidActions, (int) blockplace.onliquidViolationLevel, blockplace.history, cc);
         }
 
         blockplace.onliquidViolationLevel *= 0.95D; // Reduce level over
-                                                         // time
+                                                    // time
 
         return cancel;
     }

@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.LogData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
@@ -83,7 +84,7 @@ public abstract class ActionWithParameters extends Action {
      * @param data
      * @return
      */
-    protected String getMessage(final LogData data) {
+    protected String getMessage(final BaseData data) {
         StringBuilder log = new StringBuilder(100); // Should be big enough most
                                                     // of the time
 
@@ -98,9 +99,11 @@ public abstract class ActionWithParameters extends Action {
         return log.toString();
     }
 
-    private String getParameter(WildCard wildcard, LogData data) {
+    private String getParameter(WildCard wildcard, BaseData bdata) {
         // The == is correct here, as these really are identical objects, not
         // only equal
+        final LogData data = bdata.log;
+
         switch (wildcard) {
 
         case PLAYER:
@@ -163,7 +166,7 @@ public abstract class ActionWithParameters extends Action {
             return data.text;
 
         case PLACE_LOCATION: {
-            SimpleLocation l = data.placedLocation;
+            SimpleLocation l = bdata.blockplace.blockPlaced;
             if(l.isSet()) {
                 return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
             } else {
@@ -172,7 +175,7 @@ public abstract class ActionWithParameters extends Action {
         }
 
         case PLACE_AGAINST: {
-            SimpleLocation l = data.placedAgainstLocation;
+            SimpleLocation l = bdata.blockplace.blockPlacedAgainst;
             if(l.isSet()) {
                 return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
             } else {
@@ -181,7 +184,7 @@ public abstract class ActionWithParameters extends Action {
         }
 
         case BLOCK_TYPE: {
-            Material type = data.placedType;
+            Material type = bdata.blockplace.placedType;
             if(type == null) {
                 return "null";
             }

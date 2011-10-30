@@ -104,7 +104,7 @@ public class CommandHandler {
         }
 
         sender.sendMessage("[NoCheat] Reloading configuration");
-        plugin.reloadConfig();
+        plugin.reloadConfiguration();
         sender.sendMessage("[NoCheat] Configuration reloaded");
 
         return true;

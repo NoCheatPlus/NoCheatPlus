@@ -14,7 +14,7 @@ public final class SimpleLocation {
     public int x;
     public int y;
     public int z;
-    
+
     public SimpleLocation() {
         reset();
     }
@@ -34,10 +34,11 @@ public final class SimpleLocation {
         y = location.getBlockY();
         z = location.getBlockZ();
     }
-    
+
     public final boolean isSet() {
         return x != Integer.MAX_VALUE;
     }
+
     public final void reset() {
         x = Integer.MAX_VALUE;
         y = Integer.MAX_VALUE;

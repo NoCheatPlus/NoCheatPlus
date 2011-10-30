@@ -115,6 +115,7 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new EntityDamageEventManager(this));
         eventManagers.add(new SwingEventManager(this));
         TimedEventManager m = new TimedEventManager(this);
+        taskId = m.taskId; // There's a bukkit task, remember its id
         eventManagers.add(m);
 
         // Then set up a task to monitor server lag
@@ -148,10 +149,6 @@ public class NoCheat extends JavaPlugin {
 
     public void clearCriticalData(String playerName) {
         data.clearCriticalData(playerName);
-    }
-
-    public void playerJoined(String playerName) {
-        clearCriticalData(playerName);
     }
 
     public Performance getPerformance(Type type) {
@@ -192,10 +189,9 @@ public class NoCheat extends JavaPlugin {
         if(log != null) {
             log.logToConsole(low, message);
         }
-
     }
 
-    public void reloadConfig() {
+    public void reloadConfiguration() {
         conf.cleanup();
         this.conf = new ConfigurationManager(this.getDataFolder().getPath());
         data.cleanDataMap();

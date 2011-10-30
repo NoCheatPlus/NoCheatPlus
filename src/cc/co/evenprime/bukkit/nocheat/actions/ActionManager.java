@@ -11,7 +11,6 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
-import cc.co.evenprime.bukkit.nocheat.data.LogData;
 
 /**
  * Will trace the history of action executions to decide if an action 'really'
@@ -40,11 +39,11 @@ public class ActionManager {
 
             if(history.executeAction(ac, time)) {
                 if(ac instanceof LogAction) {
-                    executeLogAction((LogAction) ac, data.log, cc);
+                    executeLogAction((LogAction) ac, data, cc);
                 } else if(ac instanceof SpecialAction) {
                     special = true;
                 } else if(ac instanceof ConsolecommandAction) {
-                    executeConsoleCommand((ConsolecommandAction) ac, data.log);
+                    executeConsoleCommand((ConsolecommandAction) ac, data);
                 }
             }
         }
@@ -52,11 +51,11 @@ public class ActionManager {
         return special;
     }
 
-    private void executeLogAction(LogAction l, LogData data, ConfigurationCache cc) {
+    private void executeLogAction(LogAction l, BaseData data, ConfigurationCache cc) {
         plugin.log(l.level, cc.logging.prefix + l.getLogMessage(data), cc);
     }
 
-    private void executeConsoleCommand(ConsolecommandAction action, LogData data) {
+    private void executeConsoleCommand(ConsolecommandAction action, BaseData data) {
         String command = action.getCommand(data);
         try {
             plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);

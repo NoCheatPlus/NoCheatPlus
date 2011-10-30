@@ -41,6 +41,7 @@ public class BlockPlaceCheck {
         if(blockPlaced != null && blockPlacedAgainst != null) {
             data.blockplace.blockPlaced.set(blockPlaced);
             data.blockplace.blockPlacedAgainst.set(blockPlacedAgainst);
+            data.blockplace.placedType = blockPlaced.getType();
 
             if(!cancel && direction) {
                 cancel = directionCheck.check(player, data, cc);
@@ -49,10 +50,10 @@ public class BlockPlaceCheck {
             if(!cancel && reach) {
                 cancel = reachCheck.check(player, data, cc);
             }
-        }
 
-        if(!cancel && onliquid) {
-            cancel = onLiquidCheck.check(player, data, blockPlaced, blockPlacedAgainst, cc);
+            if(!cancel && onliquid) {
+                cancel = onLiquidCheck.check(player, data, cc);
+            }
         }
 
         return cancel;

@@ -70,7 +70,6 @@ public class TimedCheck {
 
                     // Enough is enough
                     data.log.check = "timed.godmode";
-                    data.log.godmodeTicksBehind = data.timed.ticksBehind;
 
                     cancel = plugin.execute(player, cc.timed.godmodeActions, (int) data.timed.godmodeVL, data.timed.history, cc);
 

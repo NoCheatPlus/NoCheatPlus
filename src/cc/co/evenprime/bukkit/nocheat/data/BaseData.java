@@ -12,7 +12,7 @@ public class BaseData extends Data {
 
     private final Data[]        data;        // for convenience
 
-    public long                 lastUsedTime;
+    protected long              lastUsedTime;
 
     public boolean              armswung;
 
