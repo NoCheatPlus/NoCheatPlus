@@ -64,6 +64,29 @@ public class CommandHandler {
         // Make a copy to allow sorting
         List<Permission> perms = new LinkedList<Permission>(plugin.getDescription().getPermissions());
 
+        Collections.sort(perms, new Comparator<Permission>() {
+
+            public int compare(Permission o1, Permission o2) {
+
+                String name1 = o1.getName();
+                String name2 = o2.getName();
+
+                if(name1.equals(name2))
+                    return 0;
+
+                if(name1.startsWith(name2)) {
+                    return -1;
+                }
+
+                if(name2.startsWith(name1)) {
+                    return 1;
+                }
+
+                return name1.compareTo(name2);
+            }
+
+        });
+
         sender.sendMessage("Player " + player.getName() + " has the permission(s):");
 
         for(Permission permission : perms) {
