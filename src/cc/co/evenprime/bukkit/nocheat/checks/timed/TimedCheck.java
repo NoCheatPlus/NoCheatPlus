@@ -27,11 +27,20 @@ public class TimedCheck {
 
         if(cc.timed.godmodeCheck && !player.hasPermission(Permissions.TIMED_GODMODE)) {
 
-            boolean cancel = false;
 
             BaseData data = plugin.getData(player.getName());
-
+            
             EntityPlayer p = ((CraftPlayer) player).getHandle();
+            // Haven't been checking before
+            if(data.timed.ticksLived == 0) {
+                // setup data for next time
+                data.timed.ticksLived = p.ticksLived;
+                
+                // And give up already
+                return;
+            }
+            
+            boolean cancel = false;
 
             // Compare ingame record of players ticks to our last observed value
             int difference = p.ticksLived - data.timed.ticksLived;
