@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -8,6 +7,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
+import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
  * The reach check will find out if a player interacts with something that's too
@@ -22,11 +22,12 @@ public class ReachCheck {
         this.plugin = plugin;
     }
 
-    public boolean check(final Player player, final BaseData data, final Block placedAgainstBlock, final ConfigurationCache cc) {
+    public boolean check(final Player player, final BaseData data, final ConfigurationCache cc) {
 
         boolean cancel = false;
+        final SimpleLocation placedAgainstBlock = data.blockplace.blockPlacedAgainst;
 
-        final double distance = CheckUtil.reachCheck(player, placedAgainstBlock.getX() + 0.5D, placedAgainstBlock.getY() + 0.5D, placedAgainstBlock.getZ() + 0.5D, cc.blockplace.reachDistance);
+        final double distance = CheckUtil.reachCheck(player, placedAgainstBlock.x + 0.5D, placedAgainstBlock.y + 0.5D, placedAgainstBlock.z + 0.5D, cc.blockplace.reachDistance);
 
         BlockPlaceData blockplace = data.blockplace;
 

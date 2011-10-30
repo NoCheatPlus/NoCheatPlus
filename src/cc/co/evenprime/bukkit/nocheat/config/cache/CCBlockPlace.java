@@ -16,8 +16,10 @@ public class CCBlockPlace {
     public final double     reachDistance;
     public final ActionList reachActions;
 
-    public final boolean    noswingCheck;
-    public final ActionList noswingActions;
+    public final boolean    directionCheck;
+    public final ActionList directionActions;
+    public final long       directionPenaltyTime;
+    public final double     directionPrecision;
 
     public CCBlockPlace(Configuration data) {
 
@@ -30,7 +32,10 @@ public class CCBlockPlace {
         reachDistance = data.getInteger(Configuration.BLOCKPLACE_REACH_LIMIT);
         reachActions = data.getActionList(Configuration.BLOCKPLACE_REACH_ACTIONS);
 
-        noswingCheck = data.getBoolean(Configuration.BLOCKPLACE_NOSWING_CHECK);
-        noswingActions = data.getActionList(Configuration.BLOCKPLACE_NOSWING_ACTIONS);
+        directionCheck = data.getBoolean(Configuration.BLOCKPLACE_DIRECTION_CHECK);
+        directionPenaltyTime = data.getInteger(Configuration.BLOCKPLACE_DIRECTION_PENALTYTIME);
+        directionPrecision = ((double) data.getInteger(Configuration.BLOCKPLACE_DIRECTION_PRECISION)) / 100D;
+        directionActions = data.getActionList(Configuration.BLOCKPLACE_DIRECTION_ACTIONS);
+
     }
 }

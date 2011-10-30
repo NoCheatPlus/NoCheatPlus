@@ -26,7 +26,7 @@ public class Permissions {
     public final static String  BLOCKPLACE           = CHECKS + ".blockplace";
     public final static String  BLOCKPLACE_ONLIQUID  = BLOCKPLACE + ".onliquid";
     public final static String  BLOCKPLACE_REACH     = BLOCKPLACE + ".reach";
-    public static final String  BLOCKPLACE_NOSWING   = BLOCKPLACE + ".noswing";
+    public static final String  BLOCKPLACE_DIRECTION = BLOCKPLACE + ".direction";
 
     public final static String  CHAT                 = CHECKS + ".chat";
     public final static String  CHAT_SPAM            = CHAT + ".spam";

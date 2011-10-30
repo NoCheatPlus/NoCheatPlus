@@ -13,10 +13,10 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
  */
 public class BlockPlaceCheck {
 
-    private final ReachCheck    reachCheck;
-    private final OnLiquidCheck onLiquidCheck;
-    private final NoswingCheck  noswingCheck;
-    private final NoCheat       plugin;
+    private final ReachCheck     reachCheck;
+    private final OnLiquidCheck  onLiquidCheck;
+    private final DirectionCheck directionCheck;
+    private final NoCheat        plugin;
 
     public BlockPlaceCheck(NoCheat plugin) {
 
@@ -24,7 +24,7 @@ public class BlockPlaceCheck {
 
         reachCheck = new ReachCheck(plugin);
         onLiquidCheck = new OnLiquidCheck(plugin);
-        noswingCheck = new NoswingCheck(plugin);
+        directionCheck = new DirectionCheck(plugin);
     }
 
     public boolean check(final Player player, final Block blockPlaced, final Block blockPlacedAgainst, final ConfigurationCache cc) {
@@ -34,16 +34,21 @@ public class BlockPlaceCheck {
         // Which checks are going to be executed?
         final boolean onliquid = cc.blockplace.onliquidCheck && !player.hasPermission(Permissions.BLOCKPLACE_ONLIQUID);
         final boolean reach = cc.blockplace.reachCheck && !player.hasPermission(Permissions.BLOCKPLACE_REACH);
-        final boolean noswing = cc.blockplace.noswingCheck && !player.hasPermission(Permissions.BLOCKPLACE_NOSWING);
-
+        final boolean direction = cc.blockplace.directionCheck && !player.hasPermission(Permissions.BLOCKPLACE_DIRECTION);
 
         final BaseData data = plugin.getData(player.getName());
 
-        if(noswing) {
-            cancel = noswingCheck.check(player, data, cc);
-        }
-        if(!cancel && reach) {
-            cancel = reachCheck.check(player, data, blockPlacedAgainst, cc);
+        if(blockPlaced != null && blockPlacedAgainst != null) {
+            data.blockplace.blockPlaced.set(blockPlaced);
+            data.blockplace.blockPlacedAgainst.set(blockPlacedAgainst);
+
+            if(!cancel && direction) {
+                cancel = directionCheck.check(player, data, cc);
+            }
+
+            if(!cancel && reach) {
+                cancel = reachCheck.check(player, data, cc);
+            }
         }
 
         if(!cancel && onliquid) {

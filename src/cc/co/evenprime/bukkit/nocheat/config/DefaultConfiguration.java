@@ -97,11 +97,9 @@ public class DefaultConfiguration extends Configuration {
             setValue(BLOCKBREAK_REACH_ACTIONS, reachActionList);
 
             setValue(BLOCKBREAK_DIRECTION_CHECK, true);
-
             setValue(BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS, true);
             setValue(BLOCKBREAK_DIRECTION_PRECISION, 50);
             setValue(BLOCKBREAK_DIRECTION_PENALTYTIME, 300);
-
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("blockbreakCancel".split(" ")));
             directionActionList.setActions(10, action.getActions("directionLog blockbreakCancel".split(" ")));
@@ -132,11 +130,13 @@ public class DefaultConfiguration extends Configuration {
             onliquidActionList.setActions(3, action.getActions("onliquidLog blockplaceCancel".split(" ")));
             setValue(BLOCKPLACE_ONLIQUID_ACTIONS, onliquidActionList);
 
-            setValue(BLOCKPLACE_NOSWING_CHECK, true);
-            ActionList noswingActionList = new ActionList();
-            noswingActionList.setActions(0, action.getActions("noswingLog blockplaceCancel".split(" ")));
-            setValue(BLOCKPLACE_NOSWING_ACTIONS, noswingActionList);
-
+            setValue(BLOCKPLACE_DIRECTION_CHECK, true);
+            setValue(BLOCKPLACE_DIRECTION_PRECISION, 50);
+            setValue(BLOCKPLACE_DIRECTION_PENALTYTIME, 300);
+            ActionList directionActionList = new ActionList();
+            directionActionList.setActions(0, action.getActions("blockplaceCancel".split(" ")));
+            directionActionList.setActions(10, action.getActions("directionLog blockplaceCancel".split(" ")));
+            setValue(BLOCKPLACE_DIRECTION_ACTIONS, directionActionList);
         }
 
         /*** CHAT ***/

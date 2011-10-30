@@ -62,8 +62,8 @@ permissions:
                 description: Allow a player to place blocks at maximum range (about 6-7 blocks)
               nocheat.checks.blockplace.onliquid:
                 description: Allow a player to place non-liquid blocks on liquids
-              nocheat.checks.blockplace.noswing:
-                description: Allow a player to place blocks without swinging their arm
+              nocheat.checks.blockplace.direction:
+                description: Allow a player to place blocks outside their line of view
           nocheat.checks.chat:
             description: Allow the player to bypass all chat checks
             children:

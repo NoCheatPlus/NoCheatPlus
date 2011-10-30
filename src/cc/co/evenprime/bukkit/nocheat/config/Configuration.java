@@ -69,7 +69,7 @@ public abstract class Configuration {
     public final static OptionNode        BLOCKBREAK_DIRECTION_CHECK                 = new OptionNode("check", BLOCKBREAK_DIRECTION, DataType.BOOLEAN);
     public final static OptionNode        BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS = new OptionNode("checkinstabreakblocks", BLOCKBREAK_DIRECTION, DataType.BOOLEAN);
     public final static OptionNode        BLOCKBREAK_DIRECTION_PRECISION             = new OptionNode("precision", BLOCKBREAK_DIRECTION, DataType.INTEGER);
-    public final static OptionNode        BLOCKBREAK_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKBREAK_DIRECTION, DataType.INTEGER);           ;
+    public final static OptionNode        BLOCKBREAK_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKBREAK_DIRECTION, DataType.INTEGER);
     public final static OptionNode        BLOCKBREAK_DIRECTION_ACTIONS               = new OptionNode("actions", BLOCKBREAK_DIRECTION, DataType.ACTIONLIST);
 
     private final static OptionNode       BLOCKBREAK_NOSWING                         = new OptionNode("noswing", BLOCKBREAK, DataType.PARENT);
@@ -88,9 +88,11 @@ public abstract class Configuration {
     public final static OptionNode        BLOCKPLACE_ONLIQUID_CHECK                  = new OptionNode("check", BLOCKPLACE_ONLIQUID, DataType.BOOLEAN);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_ACTIONS                = new OptionNode("actions", BLOCKPLACE_ONLIQUID, DataType.ACTIONLIST);
 
-    private final static OptionNode       BLOCKPLACE_NOSWING                         = new OptionNode("noswing", BLOCKPLACE, DataType.PARENT);
-    public final static OptionNode        BLOCKPLACE_NOSWING_CHECK                   = new OptionNode("check", BLOCKPLACE_NOSWING, DataType.BOOLEAN);
-    public final static OptionNode        BLOCKPLACE_NOSWING_ACTIONS                 = new OptionNode("actions", BLOCKPLACE_NOSWING, DataType.ACTIONLIST);
+    private final static OptionNode       BLOCKPLACE_DIRECTION                       = new OptionNode("direction", BLOCKPLACE, DataType.PARENT);
+    public static final OptionNode        BLOCKPLACE_DIRECTION_CHECK                 = new OptionNode("check", BLOCKPLACE_DIRECTION, DataType.BOOLEAN);                 ;
+    public static final OptionNode        BLOCKPLACE_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKPLACE_DIRECTION, DataType.INTEGER);
+    public final static OptionNode        BLOCKPLACE_DIRECTION_PRECISION             = new OptionNode("precision", BLOCKPLACE_DIRECTION, DataType.INTEGER);
+    public static final OptionNode        BLOCKPLACE_DIRECTION_ACTIONS               = new OptionNode("actions", BLOCKPLACE_DIRECTION, DataType.ACTIONLIST);
 
     private final static OptionNode       CHAT                                       = new OptionNode("chat", ROOT, DataType.PARENT);
     public final static OptionNode        CHAT_CHECK                                 = new OptionNode("check", CHAT, DataType.BOOLEAN);
