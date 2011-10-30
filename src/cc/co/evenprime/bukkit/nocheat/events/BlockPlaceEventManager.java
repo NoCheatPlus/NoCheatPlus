@@ -99,6 +99,8 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
             s.add("blockplace.onliquid");
         if(cc.blockplace.check && cc.blockplace.reachCheck)
             s.add("blockplace.reach");
+        if(cc.blockplace.check && cc.blockplace.noswingCheck)
+            s.add("blockplace.noswing");
 
         return s;
     }

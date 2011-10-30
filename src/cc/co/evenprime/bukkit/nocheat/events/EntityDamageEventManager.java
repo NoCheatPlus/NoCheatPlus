@@ -87,6 +87,10 @@ public class EntityDamageEventManager extends EntityListener implements EventMan
 
         if(cc.fight.check && cc.fight.directionCheck)
             s.add("fight.direction");
+        if(cc.fight.check && cc.fight.selfhitCheck)
+            s.add("fight.selfhit");
+        if(cc.fight.check && cc.fight.noswingCheck)
+            s.add("fight.noswing");
         return s;
     }
 }

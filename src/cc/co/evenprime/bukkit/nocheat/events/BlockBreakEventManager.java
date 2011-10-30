@@ -112,6 +112,8 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
             s.add("blockbreak.direction");
         if(cc.blockbreak.check && cc.blockbreak.reachCheck)
             s.add("blockbreak.reach");
+        if(cc.blockbreak.check && cc.blockbreak.noswingCheck)
+            s.add("blockbreak.noswing");
 
         return s;
     }
