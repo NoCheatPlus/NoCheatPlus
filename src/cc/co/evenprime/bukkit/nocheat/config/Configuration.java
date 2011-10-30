@@ -72,6 +72,10 @@ public abstract class Configuration {
     public final static OptionNode        BLOCKBREAK_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKBREAK_DIRECTION, DataType.INTEGER);           ;
     public final static OptionNode        BLOCKBREAK_DIRECTION_ACTIONS               = new OptionNode("actions", BLOCKBREAK_DIRECTION, DataType.ACTIONLIST);
 
+    private final static OptionNode       BLOCKBREAK_NOSWING                         = new OptionNode("noswing", BLOCKBREAK, DataType.PARENT);
+    public static final OptionNode        BLOCKBREAK_NOSWING_CHECK                   = new OptionNode("check", BLOCKBREAK_NOSWING, DataType.BOOLEAN);
+    public static final OptionNode        BLOCKBREAK_NOSWING_ACTIONS                 = new OptionNode("actions", BLOCKBREAK_NOSWING, DataType.ACTIONLIST);
+
     private final static OptionNode       BLOCKPLACE                                 = new OptionNode("blockplace", ROOT, DataType.PARENT);
     public final static OptionNode        BLOCKPLACE_CHECK                           = new OptionNode("check", BLOCKPLACE, DataType.BOOLEAN);
 
@@ -83,6 +87,10 @@ public abstract class Configuration {
     private final static OptionNode       BLOCKPLACE_ONLIQUID                        = new OptionNode("onliquid", BLOCKPLACE, DataType.PARENT);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_CHECK                  = new OptionNode("check", BLOCKPLACE_ONLIQUID, DataType.BOOLEAN);
     public final static OptionNode        BLOCKPLACE_ONLIQUID_ACTIONS                = new OptionNode("actions", BLOCKPLACE_ONLIQUID, DataType.ACTIONLIST);
+
+    private final static OptionNode       BLOCKPLACE_NOSWING                         = new OptionNode("noswing", BLOCKPLACE, DataType.PARENT);
+    public final static OptionNode        BLOCKPLACE_NOSWING_CHECK                   = new OptionNode("check", BLOCKPLACE_NOSWING, DataType.BOOLEAN);
+    public final static OptionNode        BLOCKPLACE_NOSWING_ACTIONS                 = new OptionNode("actions", BLOCKPLACE_NOSWING, DataType.ACTIONLIST);
 
     private final static OptionNode       CHAT                                       = new OptionNode("chat", ROOT, DataType.PARENT);
     public final static OptionNode        CHAT_CHECK                                 = new OptionNode("check", CHAT, DataType.BOOLEAN);
@@ -106,6 +114,10 @@ public abstract class Configuration {
     private final static OptionNode       FIGHT_SELFHIT                              = new OptionNode("selfhit", FIGHT, DataType.PARENT);
     public static final OptionNode        FIGHT_SELFHIT_CHECK                        = new OptionNode("check", FIGHT_SELFHIT, DataType.BOOLEAN);
     public final static OptionNode        FIGHT_SELFHIT_ACTIONS                      = new OptionNode("actions", FIGHT_SELFHIT, DataType.ACTIONLIST);
+
+    private final static OptionNode       FIGHT_NOSWING                              = new OptionNode("noswing", FIGHT, DataType.PARENT);
+    public static final OptionNode        FIGHT_NOSWING_CHECK                        = new OptionNode("check", FIGHT_NOSWING, DataType.BOOLEAN);
+    public static final OptionNode        FIGHT_NOSWING_ACTIONS                      = new OptionNode("actions", FIGHT_NOSWING, DataType.ACTIONLIST);
 
     private static final OptionNode       TIMED                                      = new OptionNode("timed", ROOT, DataType.PARENT);
     public static final OptionNode        TIMED_CHECK                                = new OptionNode("check", TIMED, DataType.BOOLEAN);

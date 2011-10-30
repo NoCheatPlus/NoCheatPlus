@@ -31,6 +31,7 @@ import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.SwingEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.TimedEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
@@ -112,6 +113,7 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new EntityDamageEventManager(this));
+        eventManagers.add(new SwingEventManager(this));
         TimedEventManager m = new TimedEventManager(this);
         eventManagers.add(m);
 

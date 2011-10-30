@@ -14,6 +14,10 @@ public class BaseData extends Data {
 
     public long                 lastUsedTime;
 
+    public boolean              armswung;    // This technically does belong to
+                                              // many other checks, so I'll put
+                                              // it here for convenience
+
     public BaseData() {
         this.blockbreak = new BlockBreakData();
         this.blockplace = new BlockPlaceData();

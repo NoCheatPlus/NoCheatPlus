@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.command;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 public class CommandHandler {
-    
+
     private CommandHandler() {}
 
     public static boolean handleCommand(NoCheat plugin, CommandSender sender, Command command, String label, String[] args) {
@@ -62,7 +63,6 @@ public class CommandHandler {
 
         // Make a copy to allow sorting
         List<Permission> perms = new LinkedList<Permission>(plugin.getDescription().getPermissions());
-        Collections.reverse(perms);
 
         sender.sendMessage("Player " + player.getName() + " has the permission(s):");
 

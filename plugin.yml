@@ -53,6 +53,8 @@ permissions:
                 description: Allow a player to break blocks at maximum range (about 6-7 blocks, in creative mode unlimited)
               nocheat.checks.blockbreak.direction:
                 description: Allow a player to break blocks that are not in front of them
+              nocheat.checks.blockbreak.noswing:
+                description: Allow a player to break blocks without swinging their arm
           nocheat.checks.blockplace:
             description: Allow the player to bypass all blockplace checks
             children:
@@ -60,6 +62,8 @@ permissions:
                 description: Allow a player to place blocks at maximum range (about 6-7 blocks)
               nocheat.checks.blockplace.onliquid:
                 description: Allow a player to place non-liquid blocks on liquids
+              nocheat.checks.blockplace.noswing:
+                description: Allow a player to place blocks without swinging their arm
           nocheat.checks.chat:
             description: Allow the player to bypass all chat checks
             children:
@@ -72,6 +76,8 @@ permissions:
                 description: Allow a player to attack players and monster even if they are not in his field of view
               nocheat.checks.fight.selfhit:
                 description: Allow a player to attack himself with close combat attacks (punching, swords, etc.)
+              nocheat.checks.fight.noswing:
+                description: Allow a player to fight without swinging their arm
           nocheat.checks.timed:
             description: Allow the player to bypass all timed checks
             children:

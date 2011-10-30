@@ -6,5 +6,6 @@ public class FightData extends Data {
     public long                   directionLastViolationTime = 0;
     public final ExecutionHistory history                    = new ExecutionHistory();
     public double                 selfhitviolationLevel      = 0;
+    public double                 noswingVL                  = 0.0D;
 
 }

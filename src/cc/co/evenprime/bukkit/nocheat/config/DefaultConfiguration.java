@@ -106,6 +106,11 @@ public class DefaultConfiguration extends Configuration {
             directionActionList.setActions(0, action.getActions("blockbreakCancel".split(" ")));
             directionActionList.setActions(10, action.getActions("directionLog blockbreakCancel".split(" ")));
             setValue(BLOCKBREAK_DIRECTION_ACTIONS, directionActionList);
+
+            setValue(BLOCKBREAK_NOSWING_CHECK, true);
+            ActionList noswingActionList = new ActionList();
+            noswingActionList.setActions(0, action.getActions("noswingLog blockbreakCancel".split(" ")));
+            setValue(BLOCKBREAK_NOSWING_ACTIONS, noswingActionList);
         }
 
         /*** BLOCKPLACE ***/
@@ -126,6 +131,11 @@ public class DefaultConfiguration extends Configuration {
             onliquidActionList.setActions(0, action.getActions("blockplaceCancel".split(" ")));
             onliquidActionList.setActions(3, action.getActions("onliquidLog blockplaceCancel".split(" ")));
             setValue(BLOCKPLACE_ONLIQUID_ACTIONS, onliquidActionList);
+
+            setValue(BLOCKPLACE_NOSWING_CHECK, true);
+            ActionList noswingActionList = new ActionList();
+            noswingActionList.setActions(0, action.getActions("noswingLog blockplaceCancel".split(" ")));
+            setValue(BLOCKPLACE_NOSWING_ACTIONS, noswingActionList);
 
         }
 
@@ -163,6 +173,11 @@ public class DefaultConfiguration extends Configuration {
             ActionList selfhitActionList = new ActionList();
             selfhitActionList.setActions(0, action.getActions("fightSelfhitLog fightCancel".split(" ")));
             setValue(FIGHT_SELFHIT_ACTIONS, selfhitActionList);
+
+            setValue(FIGHT_NOSWING_CHECK, true);
+            ActionList noswingActionList = new ActionList();
+            noswingActionList.setActions(0, action.getActions("noswingLog fightCancel".split(" ")));
+            setValue(FIGHT_NOSWING_ACTIONS, noswingActionList);
         }
 
         /*** TIMED ***/
@@ -256,6 +271,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "log spamLog 0 5 med [player] failed [check]: Last sent message \"[text]\". VL [violations]");
             w(w, "log nofallLog 0 5 med [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations]");
             w(w, "log godmodeLog 0 5 med [player] failed [check]: lagging or using godmode. VL [violations]");
+            w(w, "log noswingLog 2 5 med [player] failed [check]: Didn't swing arm. VL [violations]");
             w(w, "");
             w(w, "");
             w(w, "# Some log messages related to fighting, displaying the same text, but with different level (Info, Warning, Severe)");

@@ -18,6 +18,7 @@ public class BlockBreakCheck {
 
     private final ReachCheck     reachCheck;
     private final DirectionCheck directionCheck;
+    private final NoswingCheck   noswingCheck;
     private final NoCheat        plugin;
 
     public BlockBreakCheck(NoCheat plugin) {
@@ -25,6 +26,7 @@ public class BlockBreakCheck {
         this.plugin = plugin;
         this.reachCheck = new ReachCheck(plugin);
         this.directionCheck = new DirectionCheck(plugin);
+        this.noswingCheck = new NoswingCheck(plugin);
     }
 
     public boolean check(final Player player, final Block brokenBlock, final ConfigurationCache cc) {
@@ -34,12 +36,16 @@ public class BlockBreakCheck {
         // Reach check only if not in creative mode!
         final boolean reach = cc.blockbreak.reachCheck && !player.hasPermission(Permissions.BLOCKBREAK_REACH);
         final boolean direction = cc.blockbreak.directionCheck && !player.hasPermission(Permissions.BLOCKBREAK_DIRECTION);
+        final boolean noswing = cc.blockbreak.noswingCheck && !player.hasPermission(Permissions.BLOCKBREAK_NOSWING);
 
-        if((reach || direction) && brokenBlock != null) {
+        if((noswing || reach || direction) && brokenBlock != null) {
 
             final BaseData data = plugin.getData(player.getName());
 
-            if(reach) {
+            if(noswing) {
+                cancel = noswingCheck.check(player, data, cc);
+            }
+            if(!cancel && reach) {
                 cancel = reachCheck.check(player, data, brokenBlock, cc);
             }
 

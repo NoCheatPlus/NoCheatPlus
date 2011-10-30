@@ -12,6 +12,8 @@ public class CCFight {
     public final long       directionPenaltyTime;
     public final boolean    selfhitCheck;
     public final ActionList selfhitActions;
+    public final boolean    noswingCheck;
+    public final ActionList noswingActions;
 
     public CCFight(Configuration data) {
 
@@ -22,5 +24,7 @@ public class CCFight {
         directionActions = data.getActionList(Configuration.FIGHT_DIRECTION_ACTIONS);
         selfhitCheck = data.getBoolean(Configuration.FIGHT_SELFHIT_CHECK);
         selfhitActions = data.getActionList(Configuration.FIGHT_SELFHIT_ACTIONS);
+        noswingCheck = data.getBoolean(Configuration.FIGHT_NOSWING_CHECK);
+        noswingActions = data.getActionList(Configuration.FIGHT_NOSWING_ACTIONS);
     }
 }

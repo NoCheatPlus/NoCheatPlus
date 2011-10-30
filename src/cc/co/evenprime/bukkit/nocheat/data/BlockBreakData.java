@@ -13,5 +13,6 @@ public class BlockBreakData extends Data {
     public final SimpleLocation   instaBrokeBlockLocation    = new SimpleLocation();
 
     public final ExecutionHistory history                    = new ExecutionHistory();
+    public double                 noswingVL                  = 0.0D;
 
 }

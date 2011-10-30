@@ -63,6 +63,9 @@ public class Explainations {
         set(Configuration.BLOCKBREAK_DIRECTION_PENALTYTIME, "Define how long after a failed attempt to dig a player will be disallowed to break another block. \nUnit is milliseconds, default is 300.");
         set(Configuration.BLOCKBREAK_DIRECTION_ACTIONS, "What should be done if a player is breaking blocks that are not in his line of sight.\nUnit is number of break(attempt)s outside the line of sight.");
 
+        set(Configuration.BLOCKBREAK_NOSWING_CHECK, "If true, check if a player swung his arm before breaking a block, which he should have done.");
+        set(Configuration.BLOCKBREAK_NOSWING_ACTIONS, "What should be done if a player didn't swing his arm.\nUnit is number of blockbreaking without armswinging.");
+
         set(Configuration.BLOCKPLACE_CHECK, "If true, do various checks on BlockPlace events.");
 
         set(Configuration.BLOCKPLACE_REACH_CHECK, "If true, check if a player is placing blocks at locations too far away.");
@@ -71,6 +74,9 @@ public class Explainations {
 
         set(Configuration.BLOCKPLACE_ONLIQUID_CHECK, "If true, check if a player is trying to place non-liquid blocks against liquid blocks\nIn a normal Minecraft game, it is impossible to place a block without it touching something that is considered solid (neither air nor a liquid).\nBut if people use a modified client, to can do that. This check tries to identify that trick.");
         set(Configuration.BLOCKPLACE_ONLIQUID_ACTIONS, "What should be done if a player is is trying to place non-liquid blocks against liquid blocks.\nUnit is number of place(attempt)s.");
+
+        set(Configuration.BLOCKPLACE_NOSWING_CHECK, "If true, check if a player swung his arm before placing a block, which he should have done.");
+        set(Configuration.BLOCKPLACE_NOSWING_ACTIONS, "What should be done if a player didn't swing his arm.\nUnit is number of blockplacing without armswinging.");
 
         set(Configuration.CHAT_CHECK, "If true, do various checks on PlayerChat events.");
 
@@ -88,7 +94,10 @@ public class Explainations {
 
         set(Configuration.FIGHT_SELFHIT_CHECK, "If true, check if a player is attacking itself, which should normally be impossible.");
         set(Configuration.FIGHT_SELFHIT_ACTIONS, "What should be done if a player attacks himself.\nUnit is number of attacks on himself.");
-        
+
+        set(Configuration.FIGHT_NOSWING_CHECK, "If true, check if a player swung his arm before attacking, which he should have done.");
+        set(Configuration.FIGHT_NOSWING_ACTIONS, "What should be done if a player didn't swing his arm.\nUnit is number of attacks without armswinging.");
+
         set(Configuration.TIMED_CHECK, "If true, do various checks on things related to server and client time.");
         set(Configuration.TIMED_GODMODE_CHECK, "If true, check or prevent if a player made himself invulnerable by exploiting a time-related bug.\nThis 'godmode' exploit looks similar to a player with huge lag, so be careful when punishing people for it.");
         set(Configuration.TIMED_GODMODE_TICKSLIMIT, "How many ticks may a player be behind the server time before NoCheat reacts. Default is 50.");
@@ -104,7 +113,7 @@ public class Explainations {
         String result = explainations.get(id);
 
         if(result == null) {
-            System.out.println("Missing description for "+id.getName());
+            System.out.println("Missing description for " + id.getName());
             result = "No description available";
         }
 

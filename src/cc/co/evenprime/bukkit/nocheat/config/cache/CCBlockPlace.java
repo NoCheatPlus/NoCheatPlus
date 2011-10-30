@@ -16,10 +16,13 @@ public class CCBlockPlace {
     public final double     reachDistance;
     public final ActionList reachActions;
 
+    public final boolean    noswingCheck;
+    public final ActionList noswingActions;
+
     public CCBlockPlace(Configuration data) {
 
         check = data.getBoolean(Configuration.BLOCKPLACE_CHECK);
-        
+
         onliquidCheck = data.getBoolean(Configuration.BLOCKPLACE_ONLIQUID_CHECK);
         onliquidActions = data.getActionList(Configuration.BLOCKPLACE_ONLIQUID_ACTIONS);
 
@@ -27,5 +30,7 @@ public class CCBlockPlace {
         reachDistance = data.getInteger(Configuration.BLOCKPLACE_REACH_LIMIT);
         reachActions = data.getActionList(Configuration.BLOCKPLACE_REACH_ACTIONS);
 
+        noswingCheck = data.getBoolean(Configuration.BLOCKPLACE_NOSWING_CHECK);
+        noswingActions = data.getActionList(Configuration.BLOCKPLACE_NOSWING_ACTIONS);
     }
 }

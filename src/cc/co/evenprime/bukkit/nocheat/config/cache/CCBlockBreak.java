@@ -19,6 +19,8 @@ public class CCBlockBreak {
     public final ActionList directionActions;
     public final double     directionPrecision;
     public final long       directionPenaltyTime;
+    public final boolean    noswingCheck;
+    public final ActionList noswingActions;
 
     public CCBlockBreak(Configuration data) {
 
@@ -31,6 +33,8 @@ public class CCBlockBreak {
         directionPrecision = ((double) data.getInteger(Configuration.BLOCKBREAK_DIRECTION_PRECISION)) / 100D;
         directionPenaltyTime = data.getInteger(Configuration.BLOCKBREAK_DIRECTION_PENALTYTIME);
         directionActions = data.getActionList(Configuration.BLOCKBREAK_DIRECTION_ACTIONS);
+        noswingCheck = data.getBoolean(Configuration.BLOCKBREAK_NOSWING_CHECK);
+        noswingActions = data.getActionList(Configuration.BLOCKBREAK_NOSWING_ACTIONS);
 
     }
 }

@@ -18,6 +18,7 @@ public class FightCheck {
 
     private final DirectionCheck directionCheck;
     private final SelfhitCheck   selfhitCheck;
+    private final NoswingCheck   noswingCheck;
 
     public FightCheck(NoCheat plugin) {
 
@@ -25,6 +26,7 @@ public class FightCheck {
 
         this.directionCheck = new DirectionCheck(plugin);
         this.selfhitCheck = new SelfhitCheck(plugin);
+        this.noswingCheck = new NoswingCheck(plugin);
     }
 
     public boolean check(final Player player, final Entity damagee, final ConfigurationCache cc) {
@@ -33,10 +35,14 @@ public class FightCheck {
 
         final boolean selfhitcheck = cc.fight.selfhitCheck && !player.hasPermission(Permissions.FIGHT_SELFHIT);
         final boolean directioncheck = cc.fight.directionCheck && !player.hasPermission(Permissions.FIGHT_DIRECTION);
+        final boolean noswingcheck = cc.fight.noswingCheck && !player.hasPermission(Permissions.FIGHT_NOSWING);
 
         BaseData data = plugin.getData(player.getName());
 
-        if(directioncheck) {
+        if(noswingcheck) {
+            cancel = noswingCheck.check(player, data, cc);
+        }
+        if(!cancel && directioncheck) {
             cancel = directionCheck.check(player, data, damagee, cc);
         }
 
