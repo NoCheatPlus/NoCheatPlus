@@ -75,11 +75,11 @@ public class CommandHandler {
                     return 0;
 
                 if(name1.startsWith(name2)) {
-                    return -1;
+                    return 1;
                 }
 
                 if(name2.startsWith(name1)) {
-                    return 1;
+                    return -1;
                 }
 
                 return name1.compareTo(name2);

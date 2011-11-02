@@ -51,13 +51,13 @@ public class TimedCheck {
                 // difference
                 data.timed.ticksBehind -= (difference - tickTime);
                 // Reduce violation level over time
-                data.timed.godmodeVL *= 0.90D;
+                data.timed.godmodeVL *= 0.9D;
 
             } else if(difference >= tickTime / 2) {
                 // close enough, let it pass
-
+                data.timed.ticksBehind -= tickTime/2;
                 // Reduce violation level over time
-                data.timed.godmodeVL *= 0.95D;
+                data.timed.godmodeVL *= 0.9D;
             } else {
                 // That's a bit suspicious, why is the player more than half the
                 // ticktime behind? Keep that in mind
