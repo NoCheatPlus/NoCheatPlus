@@ -9,8 +9,6 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 public class CCBlockPlace {
 
     public final boolean    check;
-    public final boolean    onliquidCheck;
-    public final ActionList onliquidActions;
 
     public final boolean    reachCheck;
     public final double     reachDistance;
@@ -24,9 +22,6 @@ public class CCBlockPlace {
     public CCBlockPlace(Configuration data) {
 
         check = data.getBoolean(Configuration.BLOCKPLACE_CHECK);
-
-        onliquidCheck = data.getBoolean(Configuration.BLOCKPLACE_ONLIQUID_CHECK);
-        onliquidActions = data.getActionList(Configuration.BLOCKPLACE_ONLIQUID_ACTIONS);
 
         reachCheck = data.getBoolean(Configuration.BLOCKPLACE_REACH_CHECK);
         reachDistance = data.getInteger(Configuration.BLOCKPLACE_REACH_LIMIT);

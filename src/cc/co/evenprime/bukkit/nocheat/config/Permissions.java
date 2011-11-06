@@ -24,7 +24,6 @@ public class Permissions {
     public static final String  BLOCKBREAK_NOSWING   = BLOCKBREAK + ".noswing";
 
     public final static String  BLOCKPLACE           = CHECKS + ".blockplace";
-    public final static String  BLOCKPLACE_ONLIQUID  = BLOCKPLACE + ".onliquid";
     public final static String  BLOCKPLACE_REACH     = BLOCKPLACE + ".reach";
     public static final String  BLOCKPLACE_DIRECTION = BLOCKPLACE + ".direction";
 

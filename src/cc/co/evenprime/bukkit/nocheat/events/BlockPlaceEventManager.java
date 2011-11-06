@@ -95,8 +95,6 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
     public List<String> getActiveChecks(ConfigurationCache cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.blockplace.check && cc.blockplace.onliquidCheck)
-            s.add("blockplace.onliquid");
         if(cc.blockplace.check && cc.blockplace.reachCheck)
             s.add("blockplace.reach");
 

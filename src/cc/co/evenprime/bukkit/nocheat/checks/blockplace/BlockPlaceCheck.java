@@ -14,7 +14,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 public class BlockPlaceCheck {
 
     private final ReachCheck     reachCheck;
-    private final OnLiquidCheck  onLiquidCheck;
     private final DirectionCheck directionCheck;
     private final NoCheat        plugin;
 
@@ -23,7 +22,6 @@ public class BlockPlaceCheck {
         this.plugin = plugin;
 
         reachCheck = new ReachCheck(plugin);
-        onLiquidCheck = new OnLiquidCheck(plugin);
         directionCheck = new DirectionCheck(plugin);
     }
 
@@ -32,7 +30,6 @@ public class BlockPlaceCheck {
         boolean cancel = false;
 
         // Which checks are going to be executed?
-        final boolean onliquid = cc.blockplace.onliquidCheck && !player.hasPermission(Permissions.BLOCKPLACE_ONLIQUID);
         final boolean reach = cc.blockplace.reachCheck && !player.hasPermission(Permissions.BLOCKPLACE_REACH);
         final boolean direction = cc.blockplace.directionCheck && !player.hasPermission(Permissions.BLOCKPLACE_DIRECTION);
 
@@ -49,10 +46,6 @@ public class BlockPlaceCheck {
 
             if(!cancel && reach) {
                 cancel = reachCheck.check(player, data, cc);
-            }
-
-            if(!cancel && onliquid) {
-                cancel = onLiquidCheck.check(player, data, cc);
             }
         }
 

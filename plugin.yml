@@ -60,8 +60,6 @@ permissions:
             children:
               nocheat.checks.blockplace.reach:
                 description: Allow a player to place blocks at maximum range (about 6-7 blocks)
-              nocheat.checks.blockplace.onliquid:
-                description: Allow a player to place non-liquid blocks on liquids
               nocheat.checks.blockplace.direction:
                 description: Allow a player to place blocks outside their line of view
           nocheat.checks.chat:
