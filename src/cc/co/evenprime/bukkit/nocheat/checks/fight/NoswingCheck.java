@@ -1,36 +1,53 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
-import org.bukkit.entity.Player;
+import java.util.Locale;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
+import cc.co.evenprime.bukkit.nocheat.checks.FightCheck;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCFight;
 import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.FightData;
 
-public class NoswingCheck {
-
-    private final NoCheat plugin;
+public class NoswingCheck extends FightCheck {
 
     public NoswingCheck(NoCheat plugin) {
-        this.plugin = plugin;
+        super(plugin, "fight.noswing", Permissions.FIGHT_NOSWING);
     }
 
-    public boolean check(final Player player, final BaseData data, final ConfigurationCache cc) {
+    public boolean check(NoCheatPlayer player, FightData data, CCFight cc) {
 
         boolean cancel = false;
 
+        BaseData d = player.getData();
         // did he swing his arm before?
-        if(data.armswung) {
-            data.armswung = false;
-            data.fight.noswingVL *= 0.90D;
+        if(d.armswung) {
+            d.armswung = false;
+            data.noswingVL *= 0.90D;
         } else {
-            data.fight.noswingVL += 1;
-            // Prepare some event-specific values for logging and custom
-            // actions
-            data.log.check = "fight.noswing";
+            data.noswingVL += 1;
 
-            cancel = plugin.execute(player, cc.fight.noswingActions, (int) data.fight.noswingVL, data.fight.history, cc);
+            cancel = executeActions(player, cc.noswingActions.getActions(data.noswingVL));
         }
 
         return cancel;
+    }
+
+    @Override
+    public boolean isEnabled(CCFight cc) {
+        return cc.noswingCheck;
+    }
+    
+    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+
+        switch (wildcard) {
+
+        case VIOLATIONS:
+            return String.format(Locale.US, "%d", player.getData().fight.noswingVL);
+        default:
+            return super.getParameter(wildcard, player);
+        }
     }
 }

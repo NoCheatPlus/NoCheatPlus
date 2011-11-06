@@ -26,6 +26,8 @@ public class MovingData extends Data {
 
     public int                    morePacketsCounter;
     public int                    morePacketsBuffer       = 50;
+    public int                    packets;
+
     public final PreciseLocation  morePacketsSetbackPoint = new PreciseLocation();
     public double                 morePacketsViolationLevel;
 
@@ -37,6 +39,9 @@ public class MovingData extends Data {
 
     public final PreciseLocation  from                    = new PreciseLocation();
     public final PreciseLocation  to                      = new PreciseLocation();
+
+    public boolean                fromOnOrInGround;
+    public boolean                toOnOrInGround;
 
     @Override
     public void clearCriticalData() {

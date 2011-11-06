@@ -84,10 +84,6 @@ public abstract class Configuration {
     public final static OptionNode        BLOCKPLACE_REACH_LIMIT                     = new OptionNode("limit", BLOCKPLACE_REACH, DataType.INTEGER);
     public final static OptionNode        BLOCKPLACE_REACH_ACTIONS                   = new OptionNode("actions", BLOCKPLACE_REACH, DataType.ACTIONLIST);
 
-    private final static OptionNode       BLOCKPLACE_ONLIQUID                        = new OptionNode("onliquid", BLOCKPLACE, DataType.PARENT);
-    public final static OptionNode        BLOCKPLACE_ONLIQUID_CHECK                  = new OptionNode("check", BLOCKPLACE_ONLIQUID, DataType.BOOLEAN);
-    public final static OptionNode        BLOCKPLACE_ONLIQUID_ACTIONS                = new OptionNode("actions", BLOCKPLACE_ONLIQUID, DataType.ACTIONLIST);
-
     private final static OptionNode       BLOCKPLACE_DIRECTION                       = new OptionNode("direction", BLOCKPLACE, DataType.PARENT);
     public static final OptionNode        BLOCKPLACE_DIRECTION_CHECK                 = new OptionNode("check", BLOCKPLACE_DIRECTION, DataType.BOOLEAN);                 ;
     public static final OptionNode        BLOCKPLACE_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKPLACE_DIRECTION, DataType.INTEGER);

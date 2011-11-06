@@ -1,35 +1,33 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
-import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
+import java.util.Locale;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
+import cc.co.evenprime.bukkit.nocheat.checks.BlockBreakCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockBreak;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
+import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
  * The DirectionCheck will find out if a player tried to interact with something
  * that's not in his field of view.
  * 
  */
-public class DirectionCheck {
-
-    private final NoCheat plugin;
+public class DirectionCheck extends BlockBreakCheck {
 
     public DirectionCheck(NoCheat plugin) {
-        this.plugin = plugin;
+        super(plugin, "blockbreak.direction", Permissions.BLOCKBREAK_DIRECTION);
     }
 
-    public boolean check(final Player player, final BaseData data, final Block brokenBlock, final ConfigurationCache cc) {
+    public boolean check(final NoCheatPlayer player, final BlockBreakData blockbreak, final CCBlockBreak ccblockbreak) {
 
-        final BlockBreakData blockbreak = data.blockbreak;
-        final CCBlockBreak ccblockbreak = cc.blockbreak;
-        
+        final SimpleLocation brokenBlock = blockbreak.brokenBlockLocation;
         final boolean isInstaBreak = blockbreak.instaBrokeBlockLocation.equals(brokenBlock);
-        
+
         // If the block is instabreak and we don't check instabreak, return
         if(isInstaBreak && !ccblockbreak.checkinstabreakblocks) {
             return false;
@@ -37,7 +35,7 @@ public class DirectionCheck {
 
         boolean cancel = false;
 
-        double off = CheckUtil.directionCheck(player, brokenBlock.getX() + 0.5D, brokenBlock.getY() + 0.5D, brokenBlock.getZ() + 0.5D, 1D, 1D, ccblockbreak.directionPrecision);
+        double off = CheckUtil.directionCheck(player, brokenBlock.x + 0.5D, brokenBlock.y + 0.5D, brokenBlock.z + 0.5D, 1D, 1D, ccblockbreak.directionPrecision);
 
         final long time = System.currentTimeMillis();
 
@@ -49,15 +47,13 @@ public class DirectionCheck {
             // Player failed the check
             // Increment violation counter
             if(isInstaBreak) {
-                // Instabreak block failures are very common, so don't be as hard on people failing them
+                // Instabreak block failures are very common, so don't be as
+                // hard on people failing them
                 off /= 10;
             }
             blockbreak.directionViolationLevel += off;
 
-            // Prepare some event-specific values for logging and custom actions
-            data.log.check = "blockbreak.direction";
-
-            cancel = plugin.execute(player, ccblockbreak.directionActions, (int) blockbreak.directionViolationLevel, blockbreak.history, cc);
+            cancel = executeActions(player, ccblockbreak.directionActions.getActions(blockbreak.directionViolationLevel));
 
             if(cancel) {
                 // Needed to calculate penalty times
@@ -66,10 +62,27 @@ public class DirectionCheck {
         }
 
         // If the player is still in penalty time, cancel the event anyway
-        if(blockbreak.directionLastViolationTime + ccblockbreak.directionPenaltyTime >= time) {
+        if(blockbreak.directionLastViolationTime + ccblockbreak.directionPenaltyTime > time) {
             return true;
         }
 
         return cancel;
+    }
+
+    public boolean isEnabled(CCBlockBreak cc) {
+        return cc.directionCheck;
+    }
+
+    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+
+        switch (wildcard) {
+
+        case VIOLATIONS:
+            return String.format(Locale.US, "%d", player.getData().blockbreak.directionViolationLevel);
+
+        default:
+            return super.getParameter(wildcard, player);
+
+        }
     }
 }

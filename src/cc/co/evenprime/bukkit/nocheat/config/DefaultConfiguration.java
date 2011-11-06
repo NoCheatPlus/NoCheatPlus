@@ -123,13 +123,6 @@ public class DefaultConfiguration extends Configuration {
             reachActionList.setActions(5, action.getActions("reachLog blockplaceCancel".split(" ")));
             setValue(BLOCKPLACE_REACH_ACTIONS, reachActionList);
 
-            setValue(BLOCKPLACE_ONLIQUID_CHECK, true);
-
-            ActionList onliquidActionList = new ActionList();
-            onliquidActionList.setActions(0, action.getActions("blockplaceCancel".split(" ")));
-            onliquidActionList.setActions(3, action.getActions("onliquidLog blockplaceCancel".split(" ")));
-            setValue(BLOCKPLACE_ONLIQUID_ACTIONS, onliquidActionList);
-
             setValue(BLOCKPLACE_DIRECTION_CHECK, true);
             setValue(BLOCKPLACE_DIRECTION_PRECISION, 75);
             setValue(BLOCKPLACE_DIRECTION_PENALTYTIME, 100);

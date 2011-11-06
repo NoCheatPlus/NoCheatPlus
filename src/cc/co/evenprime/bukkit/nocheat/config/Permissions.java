@@ -10,13 +10,13 @@ public class Permissions {
     private final static String ADMIN                = NOCHEAT + ".admin";
     private final static String CHECKS               = NOCHEAT + ".checks";
 
-    public final static String  MOVE                 = CHECKS + ".moving";
-    public final static String  MOVE_RUNFLY          = MOVE + ".runfly";
-    public final static String  MOVE_SNEAK           = MOVE + ".sneaking";
-    public final static String  MOVE_SWIM            = MOVE + ".swimming";
-    public final static String  MOVE_FLY             = MOVE + ".flying";
-    public final static String  MOVE_NOFALL          = MOVE + ".nofall";
-    public final static String  MOVE_MOREPACKETS     = MOVE + ".morepackets";
+    public final static String  MOVING                 = CHECKS + ".moving";
+    public final static String  MOVE_RUNFLY          = MOVING + ".runfly";
+    public final static String  MOVE_SNEAK           = MOVING + ".sneaking";
+    public final static String  MOVE_SWIM            = MOVING + ".swimming";
+    public final static String  MOVE_FLY             = MOVING + ".flying";
+    public final static String  MOVE_NOFALL          = MOVING + ".nofall";
+    public final static String  MOVE_MOREPACKETS     = MOVING + ".morepackets";
 
     public final static String  BLOCKBREAK           = CHECKS + ".blockbreak";
     public final static String  BLOCKBREAK_REACH     = BLOCKBREAK + ".reach";

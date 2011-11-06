@@ -9,6 +9,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
@@ -21,15 +22,15 @@ public class CheckUtil {
      * Check if a player looks at a target of a specific size, with a specific
      * precision value (roughly)
      */
-    public static final double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision) {
+    public static final double directionCheck(final NoCheatPlayer player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision) {
 
         // Eye location of the player
-        final Location eyes = player.getEyeLocation();
+        final Location eyes = player.getPlayer().getEyeLocation();
 
         final double factor = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
 
         // View direction of the player
-        final Vector direction = player.getEyeLocation().getDirection();
+        final Vector direction = eyes.getDirection();
 
         final double x = ((double) targetX) - eyes.getX();
         final double y = ((double) targetY) - eyes.getY();
@@ -52,9 +53,9 @@ public class CheckUtil {
         return off;
     }
 
-    public static final double reachCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double limit) {
+    public static final double reachCheck(final NoCheatPlayer player, final double targetX, final double targetY, final double targetZ, final double limit) {
 
-        final Location eyes = player.getEyeLocation();
+        final Location eyes = player.getPlayer().getEyeLocation();
 
         final double distance = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
 

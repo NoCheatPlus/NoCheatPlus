@@ -1,17 +1,18 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
+import java.util.Locale;
+
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
+import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCMoving;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
@@ -21,24 +22,19 @@ import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
  * therefore have tighter rules to obey.
  * 
  */
-public class FlyingCheck {
+public class FlyingCheck extends MovingCheck {
 
-    private final NoCheat       plugin;
+    public FlyingCheck(NoCheat plugin) {
+        super(plugin, "moving.flying", null);
+    }
 
     private static final double creativeSpeed = 0.60D;
 
-    public FlyingCheck(NoCheat plugin) {
-        this.plugin = plugin;
-    }
+    public PreciseLocation check(NoCheatPlayer player, MovingData moving, CCMoving ccmoving) {
 
-    public PreciseLocation check(final Player player, final BaseData data, final ConfigurationCache cc) {
-
-        final MovingData moving = data.moving;
-        final PreciseLocation to = moving.to;
-        final PreciseLocation from = moving.from;
         final PreciseLocation setBack = moving.runflySetBackPoint;
-
-        final CCMoving ccmoving = cc.moving;
+        final PreciseLocation from = moving.from;
+        final PreciseLocation to = moving.to;
 
         if(!setBack.isSet()) {
             setBack.set(from);
@@ -56,7 +52,7 @@ public class FlyingCheck {
 
         // In case of creative gamemode, give at least 0.60 speed limit
         // horizontal
-        double speedLimitHorizontal = player.getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, ccmoving.flyingSpeedLimitHorizontal) : ccmoving.flyingSpeedLimitHorizontal;
+        double speedLimitHorizontal = player.getPlayer().getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, ccmoving.flyingSpeedLimitHorizontal) : ccmoving.flyingSpeedLimitHorizontal;
 
         EntityPlayer p = ((CraftPlayer) player).getHandle();
 
@@ -67,7 +63,7 @@ public class FlyingCheck {
 
         result += Math.max(0.0D, horizontalDistance - moving.horizFreedom - speedLimitHorizontal);
 
-        boolean sprinting = CheckUtil.isSprinting(player);
+        boolean sprinting = player.getPlayer().isSprinting();
 
         moving.bunnyhopdelay--;
 
@@ -90,10 +86,7 @@ public class FlyingCheck {
             // Increment violation counter
             moving.runflyViolationLevel += result;
 
-            data.log.toLocation.set(to);
-            data.log.check = "flying/toofast";
-
-            boolean cancel = plugin.execute(player, ccmoving.flyingActions, (int) moving.runflyViolationLevel, moving.history, cc);
+            boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(moving.runflyViolationLevel));
 
             // Was one of the actions a cancel? Then really do it
             if(cancel) {
@@ -110,5 +103,22 @@ public class FlyingCheck {
         }
 
         return newToLocation;
+    }
+
+    @Override
+    public boolean isEnabled(CCMoving moving) {
+        // TODO Auto-generated method stub
+        return moving.allowFlying && moving.runflyCheck;
+    }
+    
+    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+
+        switch (wildcard) {
+
+        case VIOLATIONS:
+            return String.format(Locale.US, "%d", player.getData().moving.runflyViolationLevel);
+        default:
+            return super.getParameter(wildcard, player);
+        }
     }
 }

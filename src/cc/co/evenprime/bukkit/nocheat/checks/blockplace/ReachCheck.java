@@ -1,11 +1,14 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
-import org.bukkit.entity.Player;
+import java.util.Locale;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
+import cc.co.evenprime.bukkit.nocheat.checks.BlockPlaceCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockPlace;
 import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
@@ -14,39 +17,52 @@ import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
  * far away
  * 
  */
-public class ReachCheck {
-
-    private final NoCheat plugin;
+public class ReachCheck extends BlockPlaceCheck {
 
     public ReachCheck(NoCheat plugin) {
-        this.plugin = plugin;
+        super(plugin, "blockplace.reach", Permissions.BLOCKPLACE_REACH);
     }
 
-    public boolean check(final Player player, final BaseData data, final ConfigurationCache cc) {
+    public boolean check(NoCheatPlayer player, BlockPlaceData data, CCBlockPlace cc) {
 
         boolean cancel = false;
-        final SimpleLocation placedAgainstBlock = data.blockplace.blockPlacedAgainst;
 
-        final double distance = CheckUtil.reachCheck(player, placedAgainstBlock.x + 0.5D, placedAgainstBlock.y + 0.5D, placedAgainstBlock.z + 0.5D, cc.blockplace.reachDistance);
+        final SimpleLocation placedAgainstBlock = data.blockPlacedAgainst;
 
-        BlockPlaceData blockplace = data.blockplace;
+        final double distance = CheckUtil.reachCheck(player, placedAgainstBlock.x + 0.5D, placedAgainstBlock.y + 0.5D, placedAgainstBlock.z + 0.5D, cc.reachDistance);
 
         if(distance > 0D) {
             // Player failed the check
 
             // Increment violation counter
-            blockplace.reachViolationLevel += distance;
+            data.reachViolationLevel += distance;
+            data.reachdistance = distance;
 
-            // Prepare some event-specific values for logging and custom actions
-            data.log.check = "blockplace.reach";
-            data.log.reachdistance = distance;
-
-            cancel = plugin.execute(player, cc.blockplace.reachActions, (int) blockplace.reachViolationLevel, blockplace.history, cc);
+            cancel = executeActions(player, cc.reachActions.getActions(data.reachViolationLevel));
         } else {
-            blockplace.reachViolationLevel *= 0.9D;
+            data.reachViolationLevel *= 0.9D;
         }
 
         return cancel;
     }
 
+    @Override
+    public boolean isEnabled(CCBlockPlace cc) {
+        return cc.reachCheck;
+    }
+
+    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+
+        switch (wildcard) {
+
+        case VIOLATIONS:
+            return String.format(Locale.US, "%d", player.getData().blockplace.reachViolationLevel);
+
+        case REACHDISTANCE:
+            return String.format(Locale.US, "%.2f", player.getData().blockplace.reachdistance);
+
+        default:
+            return super.getParameter(wildcard, player);
+        }
+    }
 }

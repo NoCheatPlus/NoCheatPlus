@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.actions.types;
 
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.checks.Check;
 import cc.co.evenprime.bukkit.nocheat.log.Colors;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
@@ -19,7 +20,7 @@ public class LogAction extends ActionWithParameters {
         this.level = level;
     }
 
-    public String getLogMessage(final BaseData data) {
-        return super.getMessage(data);
+    public String getLogMessage(NoCheatPlayer player, Check check) {
+        return super.getMessage(player, check);
     }
 }

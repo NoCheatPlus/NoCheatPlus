@@ -6,43 +6,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.player.NoCheatPlayerImpl;
+
 /**
  * Provide secure access to player-specific data objects for various checks or
  * check groups.
  */
-public class DataManager {
+public class PlayerManager {
 
     // Store data between Events
-    private final Map<String, BaseData> map;
-    private final List<String>          removals;
+    private final Map<String, NoCheatPlayer> map;
+    private final NoCheat                    plugin;
+    private final List<String>               removals;
 
-    public DataManager() {
-        this.map = new HashMap<String, BaseData>();
+    public PlayerManager(NoCheat plugin) {
+        this.map = new HashMap<String, NoCheatPlayer>();
         this.removals = new ArrayList<String>(5);
+        this.plugin = plugin;
     }
 
     /**
      * Get a data object of the specified class. If none is stored yet, create
      * one.
      */
-    public BaseData getData(String playerName) {
+    public NoCheatPlayer getPlayer(String playerName) {
 
-        BaseData data = this.map.get(playerName);
+        NoCheatPlayer p = this.map.get(playerName);
 
-        // intentionally not thread-safe, because bukkit events are handled
-        // in sequence anyway, so zero chance of two events of the same
-        // player being handled at the same time
-        // And if it still happens by accident, it's no real loss anyway, as
-        // losing data of one instance doesn't really hurt at all
-        if(data == null) {
-            data = new BaseData();
-            data.log.playerName = playerName;
-            this.map.put(playerName, data);
+        if(p == null) {
+            // TODO: Differentiate which player"type" should be created
+            p = new NoCheatPlayerImpl(playerName, plugin, new BaseData());
+            this.map.put(playerName, p);
         }
 
-        data.lastUsedTime = System.currentTimeMillis();
-
-        return data;
+        return p;
     }
 
     /**
@@ -50,8 +49,8 @@ public class DataManager {
      * 
      */
     public void clearCriticalData() {
-        for(BaseData b : this.map.values()) {
-            b.clearCriticalData();
+        for(NoCheatPlayer b : this.map.values()) {
+            b.getData().clearCriticalData();
         }
     }
 
@@ -63,8 +62,8 @@ public class DataManager {
         synchronized(removals) {
             long time = System.currentTimeMillis();
             try {
-                for(Entry<String, BaseData> p : this.map.entrySet()) {
-                    if(p.getValue().shouldBeRemoved(time)) {
+                for(Entry<String, NoCheatPlayer> p : this.map.entrySet()) {
+                    if(p.getValue().getData().shouldBeRemoved(time)) {
                         removals.add(p.getKey());
                     }
                 }
@@ -81,9 +80,9 @@ public class DataManager {
     }
 
     public void clearCriticalData(String playerName) {
-        BaseData data = this.map.get(playerName);
-        if(data != null) {
-            data.clearCriticalData();
+        NoCheatPlayer p = this.map.get(playerName);
+        if(p != null) {
+            p.getData().clearCriticalData();
         }
     }
 

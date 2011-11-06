@@ -1,9 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -12,10 +12,15 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakCheck;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.checks.BlockBreakCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.DirectionCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.NoswingCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.ReachCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockBreak;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
@@ -26,15 +31,21 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  */
 public class BlockBreakEventManager extends BlockListener implements EventManager {
 
-    private final BlockBreakCheck blockBreakCheck;
-    private final NoCheat         plugin;
-    private final Performance     blockBreakPerformance;
-    private final Performance     blockDamagePerformance;
+    private final List<BlockBreakCheck> checks;
+    private final NoCheat               plugin;
+    private final Performance           blockBreakPerformance;
+    private final Performance           blockDamagePerformance;
 
     public BlockBreakEventManager(NoCheat plugin) {
 
         this.plugin = plugin;
-        this.blockBreakCheck = new BlockBreakCheck(plugin);
+
+        // Three checks exist for this event type
+        this.checks = new ArrayList<BlockBreakCheck>(3);
+        this.checks.add(new DirectionCheck(plugin));
+        this.checks.add(new NoswingCheck(plugin));
+        this.checks.add(new ReachCheck(plugin));
+
         this.blockBreakPerformance = plugin.getPerformance(Type.BLOCKBREAK);
         this.blockDamagePerformance = plugin.getPerformance(Type.BLOCKDAMAGE);
 
@@ -42,6 +53,45 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
 
         pm.registerEvent(Event.Type.BLOCK_BREAK, this, Priority.Lowest, plugin);
         pm.registerEvent(Event.Type.BLOCK_DAMAGE, this, Priority.Monitor, plugin);
+    }
+
+    private void handleEvent(BlockBreakEvent event) {
+
+        boolean cancelled = false;
+
+        NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+
+        ConfigurationCache c = player.getConfiguration();
+
+        if(!c.blockbreak.check || player.hasPermission(Permissions.BLOCKBREAK)) {
+            return;
+        }
+
+        CCBlockBreak cc = player.getConfiguration().blockbreak;
+        BlockBreakData data = player.getData().blockbreak;
+
+        data.brokenBlockLocation.set(event.getBlock());
+        
+        for(BlockBreakCheck check : checks) {
+            // If it should be executed, do it
+            if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
+                check.check(player, data, cc);
+            }
+        }
+
+        if(cancelled) {
+            event.setCancelled(cancelled);
+        }
+
+    }
+
+    private void handleEvent(BlockDamageEvent event) {
+        // Get the player-specific stored data that applies here
+        final BlockBreakData data = plugin.getPlayer(event.getPlayer().getName()).getData().blockbreak;
+
+        // Remember this location. We ignore block breaks in the block-break
+        // direction check that are insta-breaks
+        data.instaBrokeBlockLocation.set(event.getBlock());
     }
 
     @Override
@@ -58,20 +108,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
         if(performanceCheck)
             nanoTimeStart = System.nanoTime();
 
-        final Player player = event.getPlayer();
-        final ConfigurationCache cc = plugin.getConfig(player);
-
-        // Find out if checks need to be done for that player
-        if(cc.blockbreak.check && !player.hasPermission(Permissions.BLOCKBREAK)) {
-
-            boolean cancel = false;
-
-            cancel = blockBreakCheck.check(player, event.getBlock(), cc);
-
-            if(cancel) {
-                event.setCancelled(true);
-            }
-        }
+        handleEvent(event);
 
         // store performance time
         if(performanceCheck)
@@ -93,12 +130,7 @@ public class BlockBreakEventManager extends BlockListener implements EventManage
         if(performanceCheck)
             nanoTimeStart = System.nanoTime();
 
-        // Get the player-specific stored data that applies here
-        final BaseData data = plugin.getData(event.getPlayer().getName());
-
-        // Remember this location. We ignore block breaks in the block-break
-        // direction check that are insta-breaks
-        data.blockbreak.instaBrokeBlockLocation.set(event.getBlock());
+        handleEvent(event);
 
         // store performance time
         if(performanceCheck)

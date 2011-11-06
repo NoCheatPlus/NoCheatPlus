@@ -47,7 +47,7 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
                     return;
                 }
 
-                final BaseData data = plugin.getData(event.getPlayer().getName());
+                final BaseData data = plugin.getPlayer(event.getPlayer().getName()).getData();
 
                 if(data.moving.teleportTo.isSet() && data.moving.teleportTo.equals(event.getTo())) {
                     event.setCancelled(false);

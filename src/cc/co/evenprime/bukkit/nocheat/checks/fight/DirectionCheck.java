@@ -1,30 +1,31 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
-import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import java.util.Locale;
 
+import net.minecraft.server.Entity;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.checks.FightCheck;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCFight;
+import cc.co.evenprime.bukkit.nocheat.data.FightData;
 
-public class DirectionCheck {
-
-    private final NoCheat plugin;
+public class DirectionCheck extends FightCheck {
 
     public DirectionCheck(NoCheat plugin) {
-        this.plugin = plugin;
+        super(plugin, "fight.direction", Permissions.FIGHT_DIRECTION);
     }
 
-    public boolean check(final Player player, final BaseData data, final Entity damagee, final ConfigurationCache cc) {
+    public boolean check(NoCheatPlayer player, FightData data, CCFight cc) {
 
         boolean cancel = false;
 
         final long time = System.currentTimeMillis();
 
         // Get the width of the damagee
-        net.minecraft.server.Entity entity = ((CraftEntity) damagee).getHandle();
+        Entity entity = data.damagee;
 
         final float width = entity.length > entity.width ? entity.length : entity.width;
 
@@ -32,37 +33,48 @@ public class DirectionCheck {
         // and that should be enough. Because entityLocations are always set
         // to center bottom of the hitbox, increase "y" location by 1/2
         // height to get the "center" of the hitbox
-        final double off = CheckUtil.directionCheck(player, entity.locX, entity.locY + 1.0D, entity.locZ, width, 2.0D, cc.fight.directionPrecision);
+        final double off = CheckUtil.directionCheck(player, entity.locX, entity.locY + 1.0D, entity.locZ, width, 2.0D, cc.directionPrecision);
 
         if(off < 0.1D) {
             // Player did probably nothing wrong
             // reduce violation counter
-            data.fight.violationLevel *= 0.80D;
+            data.directionVL *= 0.80D;
         } else {
             // Player failed the check
             // Increment violation counter
             if(!plugin.skipCheck()) {
-                data.fight.violationLevel += Math.sqrt(off);
+                data.directionVL += Math.sqrt(off);
             }
 
-            // Prepare some event-specific values for logging and custom
-            // actions
-            data.log.check = "fight.direction";
-
-            cancel = plugin.execute(player, cc.fight.directionActions, (int) data.fight.violationLevel, data.fight.history, cc);
+            cancel = executeActions(player, cc.directionActions.getActions(data.directionVL));
 
             if(cancel) {
                 // Needed to calculate penalty times
-                data.fight.directionLastViolationTime = time;
+                data.directionLastViolationTime = time;
             }
         }
 
         // If the player is still in penalty time, cancel the event anyway
-        if(data.fight.directionLastViolationTime + cc.fight.directionPenaltyTime >= time) {
+        if(data.directionLastViolationTime + cc.directionPenaltyTime > time) {
             return true;
         }
 
         return cancel;
     }
 
+    @Override
+    public boolean isEnabled(CCFight cc) {
+        return cc.directionCheck;
+    }
+
+    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+
+        switch (wildcard) {
+
+        case VIOLATIONS:
+            return String.format(Locale.US, "%d", player.getData().fight.directionVL);
+        default:
+            return super.getParameter(wildcard, player);
+        }
+    }
 }

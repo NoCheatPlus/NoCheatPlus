@@ -8,30 +8,28 @@ import java.util.List;
 import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.checks.timed.TimedCheck;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.checks.TimedCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.timed.GodmodeCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCTimed;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.data.TimedData;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 public class TimedEventManager implements EventManager {
 
-    private final NoCheat     plugin;
-
-    private final TimedCheck  check;
-
-    private final Performance timedPerformance;
-
-    public final int          taskId;
+    private final List<TimedCheck> checks;
+    private final Performance      timedPerformance;
+    public final int               taskId;
 
     public TimedEventManager(final NoCheat plugin) {
-        this.plugin = plugin;
 
-        check = new TimedCheck(plugin);
+        checks = new ArrayList<TimedCheck>(1);
+        checks.add(new GodmodeCheck(plugin));
 
         this.timedPerformance = plugin.getPerformance(Type.TIMED);
 
@@ -71,7 +69,20 @@ public class TimedEventManager implements EventManager {
                 // Now initialize the checks one by one
                 for(EntityPlayer p : entities) {
                     try {
-                        onTimedEvent((Player) CraftEntity.getEntity(server, p), loopsize);
+
+                        // Performance counter setup
+                        long nanoTimeStart = 0;
+                        final boolean performanceCheck = timedPerformance.isEnabled();
+
+                        if(performanceCheck)
+                            nanoTimeStart = System.nanoTime();
+
+                        handleEvent(plugin.getPlayer(p.name));
+
+                        // store performance time
+                        if(performanceCheck)
+                            timedPerformance.addTime(System.nanoTime() - nanoTimeStart);
+
                     } catch(Exception e) {
                         e.printStackTrace();
                     }
@@ -83,24 +94,20 @@ public class TimedEventManager implements EventManager {
         }, 0, 1);
     }
 
-    private void onTimedEvent(Player player, int elapsedTicks) {
+    private void handleEvent(NoCheatPlayer player) {
 
-        // Performance counter setup
-        long nanoTimeStart = 0;
-        final boolean performanceCheck = timedPerformance.isEnabled();
+        TimedData data = player.getData().timed;
+        CCTimed cc = player.getConfiguration().timed;
 
-        if(performanceCheck)
-            nanoTimeStart = System.nanoTime();
-
-        ConfigurationCache cc = plugin.getConfig(player);
-
-        if(cc.timed.check && !player.hasPermission(Permissions.TIMED)) {
-            check.check(player, elapsedTicks, cc);
+        if(!cc.check || player.hasPermission(Permissions.TIMED)) {
+            return;
         }
 
-        // store performance time
-        if(performanceCheck)
-            timedPerformance.addTime(System.nanoTime() - nanoTimeStart);
+        for(TimedCheck check : checks) {
+            if(cc.check && !player.hasPermission(Permissions.TIMED)) {
+                check.check(player, data, cc);
+            }
+        }
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

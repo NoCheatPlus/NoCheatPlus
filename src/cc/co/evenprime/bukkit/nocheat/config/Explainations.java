@@ -72,9 +72,6 @@ public class Explainations {
         set(Configuration.BLOCKPLACE_REACH_LIMIT, "Set the distance limit for placing blocks.\nUnit is 1/100 of a block, default is 485");
         set(Configuration.BLOCKPLACE_REACH_ACTIONS, "What should be done if a player is placing blocks that are too far away.\nUnit is number of place(attempt)s beyond the limit.");
 
-        set(Configuration.BLOCKPLACE_ONLIQUID_CHECK, "If true, check if a player is trying to place non-liquid blocks against liquid blocks\nIn a normal Minecraft game, it is impossible to place a block without it touching something that is considered solid (neither air nor a liquid).\nBut if people use a modified client, to can do that. This check tries to identify that trick.");
-        set(Configuration.BLOCKPLACE_ONLIQUID_ACTIONS, "What should be done if a player is is trying to place non-liquid blocks against liquid blocks.\nUnit is number of place(attempt)s.");
-
         set(Configuration.BLOCKPLACE_DIRECTION_CHECK, "If true, check if a player is looking at the block that he's placing.");
         set(Configuration.BLOCKPLACE_DIRECTION_PRECISION, "Define how precise a player has to be when placing blocks. Lower values mean more precision, higher values less precision. Default 75.");
         set(Configuration.BLOCKPLACE_DIRECTION_PENALTYTIME, "Define how long after a failed attempt to place blocks a player will be disallowed to place another block. \nUnit is milliseconds, default is 100.");

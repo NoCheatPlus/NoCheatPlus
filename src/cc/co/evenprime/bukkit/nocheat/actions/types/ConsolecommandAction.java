@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.actions.types;
 
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.checks.Check;
 
 /**
  * Execute a command by imitating an admin typing the command directly into the
@@ -14,8 +15,8 @@ public class ConsolecommandAction extends ActionWithParameters {
 
     }
 
-    public String getCommand(BaseData data) {
+    public String getCommand(NoCheatPlayer player, Check check) {
 
-        return super.getMessage(data);
+        return super.getMessage(player, check);
     }
 }

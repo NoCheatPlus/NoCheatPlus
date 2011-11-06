@@ -10,14 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import cc.co.evenprime.bukkit.nocheat.actions.ActionManager;
 import cc.co.evenprime.bukkit.nocheat.command.CommandHandler;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
-import cc.co.evenprime.bukkit.nocheat.data.DataManager;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
+import cc.co.evenprime.bukkit.nocheat.data.PlayerManager;
 import cc.co.evenprime.bukkit.nocheat.debug.ActiveCheckPrinter;
 import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
@@ -26,7 +22,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.EntityDamageEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
@@ -47,9 +43,8 @@ public class NoCheat extends JavaPlugin {
 
     private ConfigurationManager conf;
     private LogManager           log;
-    private DataManager          data;
+    private PlayerManager        players;
     private PerformanceManager   performance;
-    private ActionManager        action;
 
     private List<EventManager>   eventManagers;
 
@@ -94,16 +89,13 @@ public class NoCheat extends JavaPlugin {
         log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1337. It may break at any time and for any other version.");
 
         // Then set up in memory per player data storage
-        this.data = new DataManager();
+        this.players = new PlayerManager(this);
 
         // Then read the configuration files
         this.conf = new ConfigurationManager(this.getDataFolder().getPath());
 
         // Then set up the performance counters
         this.performance = new PerformanceManager();
-
-        // Then set up the Action Manager
-        this.action = new ActionManager(this);
 
         eventManagers = new ArrayList<EventManager>(8); // Big enough
         // Then set up the event listeners
@@ -112,7 +104,7 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new PlayerChatEventManager(this));
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
-        eventManagers.add(new EntityDamageEventManager(this));
+        eventManagers.add(new FightEventManager(this));
         eventManagers.add(new SwingEventManager(this));
         TimedEventManager m = new TimedEventManager(this);
         taskId = m.taskId; // There's a bukkit task, remember its id
@@ -132,7 +124,7 @@ public class NoCheat extends JavaPlugin {
     }
 
     public ConfigurationCache getConfig(Player player) {
-        return getConfig(player.getWorld());
+        return conf.getConfigurationCacheForWorld(player.getWorld().getName());
     }
 
     public ConfigurationCache getConfig(World world) {
@@ -143,12 +135,8 @@ public class NoCheat extends JavaPlugin {
         log.log(level, message, cc);
     }
 
-    public BaseData getData(String playerName) {
-        return data.getData(playerName);
-    }
-
     public void clearCriticalData(String playerName) {
-        data.clearCriticalData(playerName);
+        players.clearCriticalData(playerName);
     }
 
     public Performance getPerformance(Type type) {
@@ -178,13 +166,6 @@ public class NoCheat extends JavaPlugin {
         return 1000L;
     }
 
-    public boolean execute(Player player, ActionList actions, int violationLevel, ExecutionHistory history, ConfigurationCache cc) {
-        if(action != null) {
-            return action.executeActions(player, actions, violationLevel, history, cc);
-        }
-        return false;
-    }
-
     public void logToConsole(LogLevel low, String message) {
         if(log != null) {
             log.logToConsole(low, message);
@@ -194,8 +175,8 @@ public class NoCheat extends JavaPlugin {
     public void reloadConfiguration() {
         conf.cleanup();
         this.conf = new ConfigurationManager(this.getDataFolder().getPath());
-        data.cleanDataMap();
-        data.clearCriticalData();
+        players.cleanDataMap();
+        players.clearCriticalData();
     }
 
     /**
@@ -204,7 +185,12 @@ public class NoCheat extends JavaPlugin {
      * 
      */
     public void cleanDataMap() {
-        data.cleanDataMap();
+        players.cleanDataMap();
 
     }
+
+    public NoCheatPlayer getPlayer(String playerName) {
+        return players.getPlayer(playerName);
+    }
+
 }

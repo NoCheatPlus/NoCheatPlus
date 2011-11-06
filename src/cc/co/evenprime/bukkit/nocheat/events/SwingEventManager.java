@@ -34,7 +34,7 @@ public class SwingEventManager extends PlayerListener implements EventManager {
 
     @Override
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
-        plugin.getData(event.getPlayer().getName()).armswung = true;
+        plugin.getPlayer(event.getPlayer().getName()).getData().armswung = true;
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

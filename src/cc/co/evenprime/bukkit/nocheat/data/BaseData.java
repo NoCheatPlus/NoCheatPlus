@@ -5,7 +5,6 @@ public class BaseData extends Data {
     public final BlockBreakData blockbreak;
     public final BlockPlaceData blockplace;
     public final ChatData       chat;
-    public final LogData        log;
     public final MovingData     moving;
     public final FightData      fight;
     public final TimedData      timed;
@@ -20,13 +19,14 @@ public class BaseData extends Data {
         this.blockbreak = new BlockBreakData();
         this.blockplace = new BlockPlaceData();
         this.chat = new ChatData();
-        this.log = new LogData();
         this.moving = new MovingData();
         this.fight = new FightData();
         this.timed = new TimedData();
 
         data = new Data[] {this.blockbreak, this.blockplace, this.chat,
-                this.log, this.moving, this.fight, this.timed};
+                this.moving, this.fight, this.timed};
+
+        this.lastUsedTime = System.currentTimeMillis();
     }
 
     public void clearCriticalData() {

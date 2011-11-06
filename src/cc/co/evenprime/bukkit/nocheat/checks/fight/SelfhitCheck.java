@@ -1,39 +1,50 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import java.util.Locale;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
+import cc.co.evenprime.bukkit.nocheat.checks.FightCheck;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCFight;
+import cc.co.evenprime.bukkit.nocheat.data.FightData;
 
-public class SelfhitCheck {
-
-    private final NoCheat plugin;
+public class SelfhitCheck extends FightCheck {
 
     public SelfhitCheck(NoCheat plugin) {
-        this.plugin = plugin;
+        super(plugin, "fight.selfhit", Permissions.FIGHT_SELFHIT);
     }
 
-    public boolean check(final Player player, final BaseData data, final Entity damagee, final ConfigurationCache cc) {
+    public boolean check(NoCheatPlayer player, FightData data, CCFight cc) {
 
         boolean cancel = false;
 
-        if(player.equals(damagee)) {
-
+        if(player.getPlayer().equals(data.damagee)) {
             // Player failed the check obviously
 
-            data.fight.selfhitviolationLevel += 1;
-            // Prepare some event-specific values for logging and custom
-            // actions
-            data.log.check = "fight.selfhit";
-
-            cancel = plugin.execute(player, cc.fight.selfhitActions, (int) data.fight.selfhitviolationLevel, data.fight.history, cc);
+            data.selfhitVL += 1;
+            cancel = executeActions(player, cc.selfhitActions.getActions(data.selfhitVL));
         } else {
-            data.fight.selfhitviolationLevel *= 0.99D;
+            data.selfhitVL *= 0.99D;
         }
 
         return cancel;
     }
 
+    @Override
+    public boolean isEnabled(CCFight cc) {
+        return cc.selfhitCheck;
+    }
+
+    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+
+        switch (wildcard) {
+
+        case VIOLATIONS:
+            return String.format(Locale.US, "%d", player.getData().fight.selfhitVL);
+        default:
+            return super.getParameter(wildcard, player);
+        }
+    }
 }

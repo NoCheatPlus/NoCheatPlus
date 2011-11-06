@@ -9,6 +9,7 @@ public class CCTimed {
     public final boolean    godmodeCheck;
     public final double     godmodeTicksLimit;
     public final ActionList godmodeActions;
+    public final int        tickTime = 10;
 
     public CCTimed(Configuration data) {
 

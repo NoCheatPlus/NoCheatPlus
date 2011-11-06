@@ -47,12 +47,12 @@ public class ActionList {
      * @param violationLevel
      * @return
      */
-    public Action[] getActions(int vl) {
+    public Action[] getActions(double violationLevel) {
 
         Integer result = null;
 
         for(Integer treshold : tresholds) {
-            if(treshold <= vl) {
+            if(treshold <= violationLevel) {
                 result = treshold;
             }
         }

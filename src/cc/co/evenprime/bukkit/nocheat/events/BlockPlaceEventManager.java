@@ -1,9 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockListener;
@@ -11,10 +11,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.moving.RunFlyCheck;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.checks.BlockPlaceCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.blockplace.DirectionCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.blockplace.ReachCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockPlace;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
@@ -25,45 +29,30 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  */
 public class BlockPlaceEventManager extends BlockListener implements EventManager {
 
-    private final NoCheat         plugin;
-    private final RunFlyCheck     movingCheck;
-    private final BlockPlaceCheck blockPlaceCheck;
+    private final List<BlockPlaceCheck> checks;
+    private final NoCheat               plugin;
 
-    private final Performance     blockPlacePerformance;
+    private final Performance           blockPlacePerformance;
 
     public BlockPlaceEventManager(NoCheat p) {
 
         this.plugin = p;
 
-        this.movingCheck = new RunFlyCheck(plugin);
-        this.blockPlaceCheck = new BlockPlaceCheck(plugin);
+        this.checks = new ArrayList<BlockPlaceCheck>(2);
+        this.checks.add(new DirectionCheck(plugin));
+        this.checks.add(new ReachCheck(plugin));
 
         this.blockPlacePerformance = p.getPerformance(Type.BLOCKPLACE);
 
         PluginManager pm = plugin.getServer().getPluginManager();
 
         pm.registerEvent(Event.Type.BLOCK_PLACE, this, Priority.Lowest, plugin);
-
-        // This is part of a workaround for the moving check
-        pm.registerEvent(Event.Type.BLOCK_PLACE, new BlockListener() {
-
-            @Override
-            public void onBlockPlace(BlockPlaceEvent event) {
-                if(event.isCancelled())
-                    return;
-
-                final Player player = event.getPlayer();
-                // Get the player-specific stored data that applies here
-                movingCheck.blockPlaced(player, event.getBlockPlaced());
-
-            }
-        }, Priority.Monitor, plugin);
     }
 
     @Override
     public void onBlockPlace(BlockPlaceEvent event) {
 
-        if(event.isCancelled())
+        if(event.isCancelled() || event.getBlock() == null)
             return;
 
         // Performance counter setup
@@ -73,23 +62,40 @@ public class BlockPlaceEventManager extends BlockListener implements EventManage
         if(performanceCheck)
             nanoTimeStart = System.nanoTime();
 
-        boolean cancel = false;
-
-        final Player player = event.getPlayer();
-        final ConfigurationCache cc = plugin.getConfig(player);
-
-        // Find out if checks need to be done for that player
-        if(cc.blockplace.check && !player.hasPermission(Permissions.BLOCKPLACE)) {
-            cancel = blockPlaceCheck.check(player, event.getBlockPlaced(), event.getBlockAgainst(), cc);
-        }
-
-        if(cancel) {
-            event.setCancelled(true);
-        }
+        handleEvent(event);
 
         // store performance time
         if(performanceCheck)
             blockPlacePerformance.addTime(System.nanoTime() - nanoTimeStart);
+    }
+
+    private void handleEvent(BlockPlaceEvent event) {
+
+        boolean cancelled = false;
+
+        NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+
+        if(!player.getConfiguration().blockplace.check || player.hasPermission(Permissions.BLOCKPLACE)) {
+            return;
+        }
+
+        CCBlockPlace cc = player.getConfiguration().blockplace;
+        BlockPlaceData data = player.getData().blockplace;
+
+        data.blockPlaced.set(event.getBlock());
+        data.blockPlacedAgainst.set(event.getBlockAgainst());
+        data.placedType = event.getBlock().getType();
+
+        for(BlockPlaceCheck check : checks) {
+            // If it should be executed, do it
+            if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
+                check.check(player, data, cc);
+            }
+        }
+
+        if(cancelled) {
+            event.setCancelled(cancelled);
+        }
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {
