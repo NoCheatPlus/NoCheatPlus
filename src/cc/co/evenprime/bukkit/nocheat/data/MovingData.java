@@ -9,7 +9,7 @@ public class MovingData extends Data {
 
     public final PreciseLocation  runflySetBackPoint      = new PreciseLocation();
 
-    public double                 runflyViolationLevel;
+    public double                 runflyVL;
 
     public double                 vertFreedom;
     public double                 vertVelocity;
@@ -17,7 +17,7 @@ public class MovingData extends Data {
     public double                 horizFreedom;
     public int                    horizVelocityCounter;
 
-    public double                 nofallViolationLevel;
+    public double                 nofallVL;
     public float                  fallDistance;
     public float                  lastAddedFallDistance;
 
@@ -29,7 +29,7 @@ public class MovingData extends Data {
     public int                    packets;
 
     public final PreciseLocation  morePacketsSetbackPoint = new PreciseLocation();
-    public double                 morePacketsViolationLevel;
+    public double                 morePacketsVL;
 
     public final PreciseLocation  teleportTo              = new PreciseLocation();
 

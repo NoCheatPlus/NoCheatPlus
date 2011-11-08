@@ -27,7 +27,7 @@ public class MorePacketsCheck extends MovingCheck {
     private final static int bufferLimit         = 30;
 
     public MorePacketsCheck(NoCheat plugin) {
-        super(plugin, "moving.morepackets", Permissions.MOVE_MOREPACKETS);
+        super(plugin, "moving.morepackets", Permissions.MOVING_MOREPACKETS);
     }
 
     /**
@@ -73,11 +73,11 @@ public class MorePacketsCheck extends MovingCheck {
             // Should we react? Only if the check doesn't get skipped and we
             // went over the limit
             if(!plugin.skipCheck() && packetsAboveLimit > 0) {
-                data.morePacketsViolationLevel += packetsAboveLimit;
+                data.morePacketsVL += packetsAboveLimit;
                 
                 data.packets = packetsAboveLimit;
 
-                final boolean cancel = executeActions(player, cc.morePacketsActions.getActions(data.morePacketsViolationLevel));
+                final boolean cancel = executeActions(player, cc.morePacketsActions.getActions(data.morePacketsVL));
 
                 if(cancel)
                     newToLocation = data.morePacketsSetbackPoint;
@@ -88,9 +88,9 @@ public class MorePacketsCheck extends MovingCheck {
                 data.morePacketsSetbackPoint.set(data.from);
             }
 
-            if(data.morePacketsViolationLevel > 0)
+            if(data.morePacketsVL > 0)
                 // Shrink the "over limit" value by 20 % every second
-                data.morePacketsViolationLevel *= 0.8;
+                data.morePacketsVL *= 0.8;
 
             data.morePacketsCounter = 0; // Count from zero again
             data.lastElapsedIngameSeconds = ingameSeconds;
@@ -109,7 +109,7 @@ public class MorePacketsCheck extends MovingCheck {
 
         switch (wildcard) {
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.morePacketsViolationLevel);
+            return String.format(Locale.US, "%d", player.getData().moving.morePacketsVL);
         case PACKETS:
             return String.valueOf(player.getData().moving.packets);
         default:

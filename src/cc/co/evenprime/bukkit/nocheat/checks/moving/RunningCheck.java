@@ -36,7 +36,7 @@ public class RunningCheck extends MovingCheck {
 
     public RunningCheck(NoCheat plugin) {
 
-        super(plugin, "moving.running", Permissions.MOVE_RUNFLY);
+        super(plugin, "moving.running", Permissions.MOVING_RUNFLY);
 
         this.noFallCheck = new NoFallCheck(plugin);
     }
@@ -76,14 +76,14 @@ public class RunningCheck extends MovingCheck {
         data.jumpPhase++;
 
         // Slowly reduce the level with each event
-        data.runflyViolationLevel *= 0.97;
+        data.runflyVL *= 0.97;
 
         if(result > 0) {
 
             // Increment violation counter
-            data.runflyViolationLevel += result;
+            data.runflyVL += result;
 
-            boolean cancel = executeActions(player, cc.actions.getActions(data.runflyViolationLevel));
+            boolean cancel = executeActions(player, cc.actions.getActions(data.runflyVL));
 
             // Was one of the actions a cancel? Then do it
             if(cancel) {
@@ -110,7 +110,7 @@ public class RunningCheck extends MovingCheck {
         }
 
         /********* EXECUTE THE NOFALL CHECK ********************/
-        final boolean checkNoFall = cc.nofallCheck && !player.hasPermission(Permissions.MOVE_NOFALL);
+        final boolean checkNoFall = cc.nofallCheck && !player.hasPermission(Permissions.MOVING_NOFALL);
 
         if(checkNoFall && newToLocation == null) {
             data.fromOnOrInGround = fromOnGround || fromInGround;
@@ -136,9 +136,9 @@ public class RunningCheck extends MovingCheck {
 
         final EntityPlayer p = ((CraftPlayer) player).getHandle();
 
-        if(ccmoving.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVE_SNEAK)) {
+        if(ccmoving.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
             limit = ccmoving.sneakingSpeedLimit;
-        } else if(ccmoving.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVE_SWIM)) {
+        } else if(ccmoving.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVING_SWIMMING)) {
             limit = ccmoving.swimmingSpeedLimit;
         } else if(!sprinting) {
             limit = ccmoving.walkingSpeedLimit;
@@ -221,7 +221,7 @@ public class RunningCheck extends MovingCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.runflyViolationLevel);
+            return String.format(Locale.US, "%d", player.getData().moving.runflyVL);
         default:
             return super.getParameter(wildcard, player);
         }

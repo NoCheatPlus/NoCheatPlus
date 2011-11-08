@@ -19,7 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 public class NoFallCheck extends MovingCheck {
 
     public NoFallCheck(NoCheat plugin) {
-        super(plugin, "moving.nofall", Permissions.MOVE_NOFALL);
+        super(plugin, "moving.nofall", Permissions.MOVING_NOFALL);
     }
 
     /**
@@ -47,9 +47,9 @@ public class NoFallCheck extends MovingCheck {
         final float difference = data.fallDistance - player.getPlayer().getFallDistance();
 
         if(difference > 1.0F && data.toOnOrInGround && data.fallDistance > 2.0F) {
-            data.nofallViolationLevel += difference;
+            data.nofallVL += difference;
 
-            final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallViolationLevel));
+            final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallVL));
 
             // If "cancelled", the fall damage gets dealt in a way that's
             // visible to other plugins
@@ -91,14 +91,13 @@ public class NoFallCheck extends MovingCheck {
         }
 
         // Reduce falldamage violation level
-        data.nofallViolationLevel *= 0.99D;
+        data.nofallVL *= 0.99D;
 
         return null;
     }
 
     @Override
     public boolean isEnabled(CCMoving moving) {
-        // TODO Auto-generated method stub
         return moving.nofallCheck;
     }
 
@@ -107,7 +106,7 @@ public class NoFallCheck extends MovingCheck {
 
         switch (wildcard) {
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.nofallViolationLevel);
+            return String.format(Locale.US, "%d", player.getData().moving.nofallVL);
         case FALLDISTANCE:
             return String.format(Locale.US, "%.2f", player.getData().moving.fallDistance);
         default:

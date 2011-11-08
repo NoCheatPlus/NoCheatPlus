@@ -42,7 +42,7 @@ public class DirectionCheck extends BlockBreakCheck {
         if(off < 0.1D) {
             // Player did nothing wrong
             // reduce violation counter
-            blockbreak.directionViolationLevel *= 0.9D;
+            blockbreak.directionVL *= 0.9D;
         } else {
             // Player failed the check
             // Increment violation counter
@@ -51,9 +51,9 @@ public class DirectionCheck extends BlockBreakCheck {
                 // hard on people failing them
                 off /= 10;
             }
-            blockbreak.directionViolationLevel += off;
+            blockbreak.directionVL += off;
 
-            cancel = executeActions(player, ccblockbreak.directionActions.getActions(blockbreak.directionViolationLevel));
+            cancel = executeActions(player, ccblockbreak.directionActions.getActions(blockbreak.directionVL));
 
             if(cancel) {
                 // Needed to calculate penalty times
@@ -78,7 +78,7 @@ public class DirectionCheck extends BlockBreakCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().blockbreak.directionViolationLevel);
+            return String.format(Locale.US, "%d", player.getData().blockbreak.directionVL);
 
         default:
             return super.getParameter(wildcard, player);

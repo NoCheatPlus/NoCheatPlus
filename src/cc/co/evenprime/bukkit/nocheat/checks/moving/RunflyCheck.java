@@ -16,7 +16,7 @@ public class RunflyCheck extends MovingCheck {
     private final RunningCheck runningCheck;
 
     public RunflyCheck(NoCheat plugin) {
-        super(plugin, "moving.runfly", Permissions.MOVE_RUNFLY);
+        super(plugin, "moving.runfly", Permissions.MOVING_RUNFLY);
 
         flyingCheck = new FlyingCheck(plugin);
         runningCheck = new RunningCheck(plugin);
@@ -25,8 +25,8 @@ public class RunflyCheck extends MovingCheck {
     @Override
     public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
 
-        final boolean runflyCheck = cc.runflyCheck && !player.hasPermission(Permissions.MOVE_RUNFLY);
-        final boolean flyAllowed = cc.allowFlying || player.hasPermission(Permissions.MOVE_FLY) || (player.getPlayer().getGameMode() == GameMode.CREATIVE && cc.identifyCreativeMode);
+        final boolean runflyCheck = cc.runflyCheck && !player.hasPermission(Permissions.MOVING_RUNFLY);
+        final boolean flyAllowed = cc.allowFlying || player.hasPermission(Permissions.MOVING_FLYING) || (player.getPlayer().getGameMode() == GameMode.CREATIVE && cc.identifyCreativeMode);
 
         /********************* EXECUTE THE FLY/JUMP/RUNNING CHECK ********************/
         // If the player is not allowed to fly and not allowed to run

@@ -84,9 +84,9 @@ public class FlyingCheck extends MovingCheck {
         if(result > 0) {
 
             // Increment violation counter
-            moving.runflyViolationLevel += result;
+            moving.runflyVL += result;
 
-            boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(moving.runflyViolationLevel));
+            boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(moving.runflyVL));
 
             // Was one of the actions a cancel? Then really do it
             if(cancel) {
@@ -95,7 +95,7 @@ public class FlyingCheck extends MovingCheck {
         }
 
         // Slowly reduce the level with each event
-        moving.runflyViolationLevel *= 0.97;
+        moving.runflyVL *= 0.97;
 
         // Some other cleanup 'n' stuff
         if(newToLocation == null) {
@@ -107,7 +107,6 @@ public class FlyingCheck extends MovingCheck {
 
     @Override
     public boolean isEnabled(CCMoving moving) {
-        // TODO Auto-generated method stub
         return moving.allowFlying && moving.runflyCheck;
     }
     
@@ -116,7 +115,7 @@ public class FlyingCheck extends MovingCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.runflyViolationLevel);
+            return String.format(Locale.US, "%d", player.getData().moving.runflyVL);
         default:
             return super.getParameter(wildcard, player);
         }

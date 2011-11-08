@@ -36,7 +36,7 @@ public class PlayerManager {
         NoCheatPlayer p = this.map.get(playerName);
 
         if(p == null) {
-            // TODO: Differentiate which player"type" should be created
+            // TODO: Differentiate which player"type" should be created, e.g. based on bukkit version
             p = new NoCheatPlayerImpl(playerName, plugin, new BaseData());
             this.map.put(playerName, p);
         }

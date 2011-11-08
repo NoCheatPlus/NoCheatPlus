@@ -5,7 +5,7 @@ public class TimedData extends Data {
     public int                    ticksLived;
     public int                    ticksBehind;
     public double                 godmodeVL;
-    public final ExecutionHistory history         = new ExecutionHistory(); ;
+    public final ExecutionHistory history = new ExecutionHistory(); ;
 
     public TimedData() {}
 

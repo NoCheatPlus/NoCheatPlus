@@ -1,85 +1,65 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
  * Only place that listens to Player-teleport related events and dispatches them
  * to relevant checks
  * 
  */
-public class PlayerTeleportEventManager extends PlayerListener implements EventManager {
+public class PlayerTeleportEventManager extends EventManager {
 
-    private final NoCheat plugin;
+    public PlayerTeleportEventManager(NoCheat plugin) {
 
-    public PlayerTeleportEventManager(NoCheat p) {
+        super(plugin);
 
-        this.plugin = p;
-
-        PluginManager pm = plugin.getServer().getPluginManager();
-
-        pm.registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Monitor, plugin);
-        pm.registerEvent(Event.Type.PLAYER_TELEPORT, this, Priority.Monitor, plugin);
-        pm.registerEvent(Event.Type.PLAYER_PORTAL, this, Priority.Monitor, plugin);
-        pm.registerEvent(Event.Type.PLAYER_RESPAWN, this, Priority.Monitor, plugin);
-
-        // This belongs to the move-check
-        // Override decision to cancel teleports initialized by NoCheat by
-        // uncancelling them, if possible
-        pm.registerEvent(Event.Type.PLAYER_TELEPORT, new PlayerListener() {
-
-            @Override
-            public void onPlayerTeleport(PlayerTeleportEvent event) {
-                if(!event.isCancelled()) {
-                    return;
-                }
-
-                final BaseData data = plugin.getPlayer(event.getPlayer().getName()).getData();
-
-                if(data.moving.teleportTo.isSet() && data.moving.teleportTo.equals(event.getTo())) {
-                    event.setCancelled(false);
-                }
-            }
-        }, Priority.Highest, plugin);
+        registerListener(Event.Type.PLAYER_MOVE, Priority.Monitor, false);
+        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Monitor, true);
+        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false);
+        registerListener(Event.Type.PLAYER_PORTAL, Priority.Monitor, true);
+        registerListener(Event.Type.PLAYER_RESPAWN, Priority.Monitor, true);
     }
 
     @Override
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if(event.isCancelled())
-            return;
+    protected void handlePlayerTeleportEvent(PlayerTeleportEvent event, Priority priority) {
+        if(priority.equals(Priority.Monitor)) {
+            handleTeleportation(event.getPlayer().getName());
+        } else {
+            // No typo here, I really want to only handle cancelled events
+            if(!event.isCancelled())
+                return;
 
-        handleTeleportation(event.getPlayer().getName());
-    }
+            final MovingData data = plugin.getPlayer(event.getPlayer().getName()).getData().moving;
 
-    public void onPlayerPortal(PlayerPortalEvent event) {
-        if(event.isCancelled())
-            return;
-
-        handleTeleportation(event.getPlayer().getName());
-    }
-
-    public void onPlayerRespawn(PlayerRespawnEvent event) {
-        handleTeleportation(event.getPlayer().getName());
-    }
-
-    // Workaround for buggy Playermove cancelling
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if(!event.isCancelled()) {
-            return;
+            if(data.teleportTo.isSet() && data.teleportTo.equals(event.getTo())) {
+                event.setCancelled(false);
+            }
         }
+    }
+
+    @Override
+    protected void handlePlayerPortalEvent(PlayerPortalEvent event, Priority priority) {
+        handleTeleportation(event.getPlayer().getName());
+    }
+
+    @Override
+    protected void handlePlayerRespawnEvent(PlayerRespawnEvent event, Priority priority) {
+        handleTeleportation(event.getPlayer().getName());
+    }
+
+    @Override
+    protected void handlePlayerMoveEvent(PlayerMoveEvent event, Priority priority) {
+        // No typo here. I really only handle cancelled events and ignore others
+        if(!event.isCancelled())
+            return;
 
         handleTeleportation(event.getPlayer().getName());
     }
@@ -87,9 +67,5 @@ public class PlayerTeleportEventManager extends PlayerListener implements EventM
     private void handleTeleportation(String playerName) {
 
         plugin.clearCriticalData(playerName);
-    }
-
-    public List<String> getActiveChecks(ConfigurationCache cc) {
-        return Collections.emptyList();
     }
 }

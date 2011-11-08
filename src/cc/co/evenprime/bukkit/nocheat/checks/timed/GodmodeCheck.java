@@ -2,10 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.timed;
 
 import java.util.Locale;
 
-import net.minecraft.server.EntityPlayer;
-
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
@@ -27,11 +23,12 @@ public class GodmodeCheck extends TimedCheck {
         if(plugin.skipCheck() || player.getPlayer().isDead())
             return false;
 
-        EntityPlayer p = ((CraftPlayer) player).getHandle();
+        final int ticksLived = player.getTicksLived();
+
         // Haven't been checking before
         if(data.ticksLived == 0) {
             // setup data for next time
-            data.ticksLived = p.ticksLived;
+            data.ticksLived = ticksLived;
 
             // And give up already
             return false;
@@ -40,7 +37,7 @@ public class GodmodeCheck extends TimedCheck {
         boolean cancel = false;
 
         // Compare ingame record of players ticks to our last observed value
-        int difference = p.ticksLived - data.ticksLived;
+        int difference = ticksLived - data.ticksLived;
 
         // difference should be >= tickTime for perfect synchronization
         if(difference > cc.tickTime) {
@@ -78,13 +75,11 @@ public class GodmodeCheck extends TimedCheck {
 
         if(cancel) {
             // Catch up for at least some of the ticks
-            for(int i = 0; i < cc.tickTime; i++) {
-                p.b(true); // Catch up with the server, one tick at a time
-            }
+            player.increaseAge(cc.tickTime);
         }
 
         // setup data for next time
-        data.ticksLived = p.ticksLived;
+        data.ticksLived = player.getTicksLived();
 
         return cancel;
 

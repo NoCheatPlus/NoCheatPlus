@@ -57,15 +57,15 @@ public class DirectionCheck extends BlockPlaceCheck {
         if(off < 0.1D) {
             // Player did nothing wrong
             // reduce violation counter
-            data.directionViolationLevel *= 0.9D;
+            data.directionVL *= 0.9D;
         } else {
             // Player failed the check
             // Increment violation counter
-            data.directionViolationLevel += off;
+            data.directionVL += off;
 
             // Prepare some event-specific values for logging and custom actions
 
-            cancel = executeActions(player, cc.directionActions.getActions(data.directionViolationLevel));
+            cancel = executeActions(player, cc.directionActions.getActions(data.directionVL));
 
             if(cancel) {
                 // Needed to calculate penalty times
@@ -91,7 +91,7 @@ public class DirectionCheck extends BlockPlaceCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().blockplace.directionViolationLevel);
+            return String.format(Locale.US, "%d", player.getData().blockplace.directionVL);
 
         default:
             return super.getParameter(wildcard, player);

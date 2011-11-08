@@ -20,13 +20,15 @@ import cc.co.evenprime.bukkit.nocheat.data.TimedData;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
-public class TimedEventManager implements EventManager {
+public class TimedEventManager extends EventManager {
 
     private final List<TimedCheck> checks;
     private final Performance      timedPerformance;
     public final int               taskId;
 
     public TimedEventManager(final NoCheat plugin) {
+
+        super(plugin);
 
         checks = new ArrayList<TimedCheck>(1);
         checks.add(new GodmodeCheck(plugin));

@@ -1,6 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.player;
 
+import net.minecraft.server.EntityPlayer;
+
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -38,6 +41,19 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
 
     public String getName() {
         return player.getName();
+    }
+
+    public int getTicksLived() {
+        return player.getTicksLived();
+    }
+
+    public void increaseAge(int ticks) {
+        EntityPlayer p = ((CraftPlayer) player).getHandle();
+        for(int i = 0; i < ticks; i++) {
+            // TODO: This is highly fragile and breaks every update!!
+
+            p.b(true); // Catch up with the server, one tick at a time
+        }
     }
 
 }

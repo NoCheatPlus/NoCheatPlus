@@ -35,12 +35,12 @@ public class ReachCheck extends BlockPlaceCheck {
             // Player failed the check
 
             // Increment violation counter
-            data.reachViolationLevel += distance;
+            data.reachVL += distance;
             data.reachdistance = distance;
 
-            cancel = executeActions(player, cc.reachActions.getActions(data.reachViolationLevel));
+            cancel = executeActions(player, cc.reachActions.getActions(data.reachVL));
         } else {
-            data.reachViolationLevel *= 0.9D;
+            data.reachVL *= 0.9D;
         }
 
         return cancel;
@@ -56,7 +56,7 @@ public class ReachCheck extends BlockPlaceCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().blockplace.reachViolationLevel);
+            return String.format(Locale.US, "%d", player.getData().blockplace.reachVL);
 
         case REACHDISTANCE:
             return String.format(Locale.US, "%.2f", player.getData().blockplace.reachdistance);

@@ -18,7 +18,6 @@ public abstract class TimedCheck extends Check {
 
     @Override
     protected ExecutionHistory getHistory(NoCheatPlayer player) {
-        // TODO Auto-generated method stub
         return player.getData().timed.history;
     }
 }

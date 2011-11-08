@@ -8,12 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -29,8 +26,6 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
-import cc.co.evenprime.bukkit.nocheat.debug.Performance;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 /**
  * The only place that listens to and modifies player_move events if necessary
@@ -39,68 +34,56 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  * evaluate the check results and decide what to
  * 
  */
-public class PlayerMoveEventManager extends PlayerListener implements EventManager {
+public class PlayerMoveEventManager extends EventManager {
 
-    private final NoCheat           plugin;
     private final List<MovingCheck> checks;
-
-    private final Performance       movePerformance;
-    private final Performance       velocityPerformance;
 
     public PlayerMoveEventManager(final NoCheat plugin) {
 
-        this.plugin = plugin;
-        this.checks = new ArrayList<MovingCheck>(5);
+        super(plugin);
+
+        this.checks = new ArrayList<MovingCheck>(2);
 
         checks.add(new RunflyCheck(plugin));
         checks.add(new MorePacketsCheck(plugin));
 
-        this.movePerformance = plugin.getPerformance(Type.MOVING);
-        this.velocityPerformance = plugin.getPerformance(Type.VELOCITY);
-
-        PluginManager pm = plugin.getServer().getPluginManager();
-
-        pm.registerEvent(Event.Type.PLAYER_MOVE, this, Priority.Lowest, plugin);
-        pm.registerEvent(Event.Type.PLAYER_VELOCITY, this, Priority.Monitor, plugin);
-
-        // This is part of a workaround for the moving check
-        pm.registerEvent(Event.Type.BLOCK_PLACE, new BlockListener() {
-
-            @Override
-            public void onBlockPlace(BlockPlaceEvent event) {
-                if(event.isCancelled())
-                    return;
-
-                final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
-                // Get the player-specific stored data that applies here
-                blockPlaced(player, event.getBlockPlaced());
-
-            }
-        }, Priority.Monitor, plugin);
+        registerListener(Event.Type.PLAYER_MOVE, Priority.Lowest, true);
+        registerListener(Event.Type.PLAYER_VELOCITY, Priority.Monitor, true);
+        registerListener(Event.Type.BLOCK_PLACE, Priority.Monitor, true);
     }
 
     @Override
-    public void onPlayerMove(final PlayerMoveEvent event) {
+    protected void handleBlockPlaceEvent(BlockPlaceEvent event, Priority priority) {
 
-        // Cancelled events are ignored
-        if(event.isCancelled())
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        // Get the player-specific stored data that applies here
+        BaseData data = player.getData();
+
+        Block blockPlaced = event.getBlockPlaced();
+
+        if(blockPlaced == null || !data.moving.runflySetBackPoint.isSet()) {
             return;
+        }
 
-        // Performance counter setup
-        long nanoTimeStart = 0;
-        final boolean performanceCheck = movePerformance.isEnabled();
+        SimpleLocation lblock = new SimpleLocation();
+        lblock.set(blockPlaced);
+        SimpleLocation lplayer = new SimpleLocation();
+        lplayer.setLocation(player.getPlayer().getLocation());
 
-        if(performanceCheck)
-            nanoTimeStart = System.nanoTime();
+        if(Math.abs(lplayer.x - lblock.x) <= 1 && Math.abs(lplayer.z - lblock.z) <= 1 && lplayer.y - lblock.y >= 0 && lplayer.y - lblock.y <= 2) {
 
-        handleEvent(event);
-
-        // store performance time
-        if(performanceCheck)
-            movePerformance.addTime(System.nanoTime() - nanoTimeStart);
+            int type = CheckUtil.getType(blockPlaced.getTypeId());
+            if(CheckUtil.isSolid(type) || CheckUtil.isLiquid(type)) {
+                if(lblock.y + 1 >= data.moving.runflySetBackPoint.y) {
+                    data.moving.runflySetBackPoint.y = (lblock.y + 1);
+                    data.moving.jumpPhase = 0;
+                }
+            }
+        }
     }
 
-    public void handleEvent(PlayerMoveEvent event) {
+    @Override
+    protected void handlePlayerMoveEvent(PlayerMoveEvent event, Priority priority) {
 
         // Get the world-specific configuration that applies here
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
@@ -157,16 +140,7 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
     }
 
     @Override
-    public void onPlayerVelocity(PlayerVelocityEvent event) {
-        if(event.isCancelled())
-            return;
-
-        // Performance counter setup
-        long nanoTimeStart = 0;
-        final boolean performanceCheck = velocityPerformance.isEnabled();
-
-        if(performanceCheck)
-            nanoTimeStart = System.nanoTime();
+    protected void handlePlayerVelocityEvent(PlayerVelocityEvent event, Priority priority) {
 
         MovingData data = plugin.getPlayer(event.getPlayer().getName()).getData().moving;
 
@@ -184,39 +158,6 @@ public class PlayerMoveEventManager extends PlayerListener implements EventManag
         if(newVal > 0.0D) {
             data.horizFreedom += newVal;
             data.horizVelocityCounter = 30;
-        }
-
-        // store performance time
-        if(performanceCheck)
-            velocityPerformance.addTime(System.nanoTime() - nanoTimeStart);
-    }
-
-    /**
-     * This is a workaround for people placing blocks below them causing false
-     * positives with the move check(s).
-     */
-    public void blockPlaced(final NoCheatPlayer player, Block blockPlaced) {
-
-        BaseData data = player.getData();
-
-        if(blockPlaced == null || !data.moving.runflySetBackPoint.isSet()) {
-            return;
-        }
-
-        SimpleLocation lblock = new SimpleLocation();
-        lblock.set(blockPlaced);
-        SimpleLocation lplayer = new SimpleLocation();
-        lplayer.setLocation(player.getPlayer().getLocation());
-
-        if(Math.abs(lplayer.x - lblock.x) <= 1 && Math.abs(lplayer.z - lblock.z) <= 1 && lplayer.y - lblock.y >= 0 && lplayer.y - lblock.y <= 2) {
-
-            int type = CheckUtil.getType(blockPlaced.getTypeId());
-            if(CheckUtil.isSolid(type) || CheckUtil.isLiquid(type)) {
-                if(lblock.y + 1 >= data.moving.runflySetBackPoint.y) {
-                    data.moving.runflySetBackPoint.y = (lblock.y + 1);
-                    data.moving.jumpPhase = 0;
-                }
-            }
         }
     }
 

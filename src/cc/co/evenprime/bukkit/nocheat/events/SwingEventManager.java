@@ -1,16 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerListener;
-import org.bukkit.plugin.PluginManager;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 
 /**
  * The only place that listens to and modifies player_move events if necessary
@@ -19,25 +13,17 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
  * evaluate the check results and decide what to
  * 
  */
-public class SwingEventManager extends PlayerListener implements EventManager {
-
-    private final NoCheat plugin;
+public class SwingEventManager extends EventManager {
 
     public SwingEventManager(NoCheat plugin) {
 
-        this.plugin = plugin;
+        super(plugin);
 
-        PluginManager pm = plugin.getServer().getPluginManager();
-
-        pm.registerEvent(Event.Type.PLAYER_ANIMATION, this, Priority.Lowest, plugin);
+        registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false);
     }
 
     @Override
-    public void onPlayerAnimation(final PlayerAnimationEvent event) {
+    protected void handlePlayerAnimationEvent(PlayerAnimationEvent event, Priority priority) {
         plugin.getPlayer(event.getPlayer().getName()).getData().armswung = true;
-    }
-
-    public List<String> getActiveChecks(ConfigurationCache cc) {
-        return Collections.emptyList();
     }
 }
