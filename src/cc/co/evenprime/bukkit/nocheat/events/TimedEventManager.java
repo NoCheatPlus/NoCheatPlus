@@ -96,10 +96,10 @@ public class TimedEventManager extends EventManager {
         }, 0, 1);
     }
 
-    private void handleEvent(NoCheatPlayer player) {
+    private void handleEvent(final NoCheatPlayer player) {
 
-        TimedData data = player.getData().timed;
-        CCTimed cc = player.getConfiguration().timed;
+        final TimedData data = player.getData().timed;
+        final CCTimed cc = player.getConfiguration().timed;
 
         if(!cc.check || player.hasPermission(Permissions.TIMED)) {
             return;

@@ -35,30 +35,30 @@ public class PlayerChatEventManager extends EventManager {
     }
 
     @Override
-    protected void handlePlayerCommandPreprocessEvent(PlayerCommandPreprocessEvent event, Priority priority) {
+    protected void handlePlayerCommandPreprocessEvent(final PlayerCommandPreprocessEvent event, final Priority priority) {
         handleEvent((PlayerChatEvent) event, priority);
     }
 
     @Override
-    protected void handlePlayerChatEvent(PlayerChatEvent event, Priority priority) {
+    protected void handlePlayerChatEvent(final PlayerChatEvent event, final Priority priority) {
 
         boolean cancelled = false;
 
-        NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
-
-        if(!player.getConfiguration().chat.check || player.hasPermission(Permissions.CHAT)) {
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final CCChat cc = player.getConfiguration().chat;
+        
+        if(!cc.check || player.hasPermission(Permissions.CHAT)) {
             return;
         }
 
-        CCChat cc = player.getConfiguration().chat;
-        ChatData data = player.getData().chat;
+        final ChatData data = player.getData().chat;
 
         data.message = event.getMessage();
 
         for(ChatCheck check : checks) {
             // If it should be executed, do it
             if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
-                check.check(player, data, cc);
+                cancelled = check.check(player, data, cc);
             }
         }
 

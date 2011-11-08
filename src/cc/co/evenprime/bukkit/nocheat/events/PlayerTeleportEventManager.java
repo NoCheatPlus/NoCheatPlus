@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -29,9 +30,9 @@ public class PlayerTeleportEventManager extends EventManager {
     }
 
     @Override
-    protected void handlePlayerTeleportEvent(PlayerTeleportEvent event, Priority priority) {
+    protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
         if(priority.equals(Priority.Monitor)) {
-            handleTeleportation(event.getPlayer().getName());
+            handleTeleportation(event.getPlayer());
         } else {
             // No typo here, I really want to only handle cancelled events
             if(!event.isCancelled())
@@ -46,26 +47,25 @@ public class PlayerTeleportEventManager extends EventManager {
     }
 
     @Override
-    protected void handlePlayerPortalEvent(PlayerPortalEvent event, Priority priority) {
-        handleTeleportation(event.getPlayer().getName());
+    protected void handlePlayerPortalEvent(final PlayerPortalEvent event, final Priority priority) {
+        handleTeleportation(event.getPlayer());
     }
 
     @Override
-    protected void handlePlayerRespawnEvent(PlayerRespawnEvent event, Priority priority) {
-        handleTeleportation(event.getPlayer().getName());
+    protected void handlePlayerRespawnEvent(final PlayerRespawnEvent event, final Priority priority) {
+        handleTeleportation(event.getPlayer());
     }
 
     @Override
-    protected void handlePlayerMoveEvent(PlayerMoveEvent event, Priority priority) {
+    protected void handlePlayerMoveEvent(final PlayerMoveEvent event, final Priority priority) {
         // No typo here. I really only handle cancelled events and ignore others
         if(!event.isCancelled())
             return;
 
-        handleTeleportation(event.getPlayer().getName());
+        handleTeleportation(event.getPlayer());
     }
 
-    private void handleTeleportation(String playerName) {
-
-        plugin.clearCriticalData(playerName);
+    private void handleTeleportation(final Player player) {
+        plugin.clearCriticalData(player.getName());
     }
 }

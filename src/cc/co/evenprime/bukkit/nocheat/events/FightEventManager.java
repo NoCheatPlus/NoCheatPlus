@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.server.Entity;
-
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
@@ -41,36 +38,35 @@ public class FightEventManager extends EventManager {
     }
 
     @Override
-    protected void handleEntityDamageEvent(EntityDamageEvent event, Priority priority) {
+    protected void handleEntityDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
 
-        final Entity damagee = ((CraftEntity) event.getEntity()).getHandle();
+        // Our event listener already checked if that cast is valid
+        final Player damager = (Player) event.getDamager();
 
-        // We can cast like crazy here because we ruled out all other
-        // possibilities above
-        final NoCheatPlayer player = plugin.getPlayer(((Player) ((EntityDamageByEntityEvent) event).getDamager()).getName());
-        final FightData data = player.getData().fight;
+        final NoCheatPlayer player = plugin.getPlayer(damager.getName());
         final CCFight cc = player.getConfiguration().fight;
 
         if(!cc.check || player.hasPermission(Permissions.FIGHT)) {
             return;
         }
 
+        final FightData data = player.getData().fight;
+
         boolean cancelled = false;
 
-        data.damagee = damagee;
+        data.damagee = ((CraftEntity) event.getEntity()).getHandle();
 
         for(FightCheck check : checks) {
             // If it should be executed, do it
             if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
-                check.check(player, data, cc);
+                cancelled = check.check(player, data, cc);
             }
         }
 
         data.damagee = null;
 
-        if(cancelled) {
+        if(cancelled)
             event.setCancelled(cancelled);
-        }
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

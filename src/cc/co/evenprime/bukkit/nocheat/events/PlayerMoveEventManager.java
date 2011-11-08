@@ -22,7 +22,6 @@ import cc.co.evenprime.bukkit.nocheat.checks.moving.RunflyCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCMoving;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
@@ -39,7 +38,7 @@ public class PlayerMoveEventManager extends EventManager {
 
     private final List<MovingCheck> checks;
 
-    public PlayerMoveEventManager(final NoCheat plugin) {
+    public PlayerMoveEventManager(NoCheat plugin) {
 
         super(plugin);
 
@@ -54,37 +53,37 @@ public class PlayerMoveEventManager extends EventManager {
     }
 
     @Override
-    protected void handleBlockPlaceEvent(BlockPlaceEvent event, Priority priority) {
+    protected void handleBlockPlaceEvent(final BlockPlaceEvent event, final Priority priority) {
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
         // Get the player-specific stored data that applies here
-        BaseData data = player.getData();
+        final MovingData data = player.getData().moving;
 
-        Block blockPlaced = event.getBlockPlaced();
+        final Block blockPlaced = event.getBlockPlaced();
 
-        if(blockPlaced == null || !data.moving.runflySetBackPoint.isSet()) {
+        if(blockPlaced == null || !data.runflySetBackPoint.isSet()) {
             return;
         }
 
-        SimpleLocation lblock = new SimpleLocation();
+        final SimpleLocation lblock = new SimpleLocation();
         lblock.set(blockPlaced);
-        SimpleLocation lplayer = new SimpleLocation();
+        final SimpleLocation lplayer = new SimpleLocation();
         lplayer.setLocation(player.getPlayer().getLocation());
 
         if(Math.abs(lplayer.x - lblock.x) <= 1 && Math.abs(lplayer.z - lblock.z) <= 1 && lplayer.y - lblock.y >= 0 && lplayer.y - lblock.y <= 2) {
 
-            int type = CheckUtil.getType(blockPlaced.getTypeId());
+            final int type = CheckUtil.getType(blockPlaced.getTypeId());
             if(CheckUtil.isSolid(type) || CheckUtil.isLiquid(type)) {
-                if(lblock.y + 1 >= data.moving.runflySetBackPoint.y) {
-                    data.moving.runflySetBackPoint.y = (lblock.y + 1);
-                    data.moving.jumpPhase = 0;
+                if(lblock.y + 1 >= data.runflySetBackPoint.y) {
+                    data.runflySetBackPoint.y = (lblock.y + 1);
+                    data.jumpPhase = 0;
                 }
             }
         }
     }
 
     @Override
-    protected void handlePlayerMoveEvent(PlayerMoveEvent event, Priority priority) {
+    protected void handlePlayerMoveEvent(final PlayerMoveEvent event, final Priority priority) {
 
         // Get the world-specific configuration that applies here
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
@@ -141,11 +140,11 @@ public class PlayerMoveEventManager extends EventManager {
     }
 
     @Override
-    protected void handlePlayerVelocityEvent(PlayerVelocityEvent event, Priority priority) {
+    protected void handlePlayerVelocityEvent(final PlayerVelocityEvent event, final Priority priority) {
 
-        MovingData data = plugin.getPlayer(event.getPlayer().getName()).getData().moving;
+        final MovingData data = plugin.getPlayer(event.getPlayer().getName()).getData().moving;
 
-        Vector v = event.getVelocity();
+        final Vector v = event.getVelocity();
 
         double newVal = v.getY();
         if(newVal >= 0.0D) {

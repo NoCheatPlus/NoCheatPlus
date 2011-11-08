@@ -47,14 +47,14 @@ public class BlockPlaceEventManager extends EventManager {
 
         boolean cancelled = false;
 
-        NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final CCBlockPlace cc = player.getConfiguration().blockplace;
 
-        if(!player.getConfiguration().blockplace.check || player.hasPermission(Permissions.BLOCKPLACE)) {
+        if(!cc.check || player.hasPermission(Permissions.BLOCKPLACE)) {
             return;
         }
 
-        CCBlockPlace cc = player.getConfiguration().blockplace;
-        BlockPlaceData data = player.getData().blockplace;
+        final BlockPlaceData data = player.getData().blockplace;
 
         data.blockPlaced.set(event.getBlock());
         data.blockPlacedAgainst.set(event.getBlockAgainst());
@@ -63,13 +63,12 @@ public class BlockPlaceEventManager extends EventManager {
         for(BlockPlaceCheck check : checks) {
             // If it should be executed, do it
             if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
-                check.check(player, data, cc);
+                cancelled = check.check(player, data, cc);
             }
         }
 
-        if(cancelled) {
+        if(cancelled)
             event.setCancelled(cancelled);
-        }
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

@@ -45,50 +45,45 @@ public class BlockBreakEventManager extends EventManager {
     }
 
     @Override
-    protected void handleBlockBreakEvent(BlockBreakEvent event, Priority priority) {
+    protected void handleBlockBreakEvent(final BlockBreakEvent event, final Priority priority) {
 
         boolean cancelled = false;
 
-        NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final CCBlockBreak cc = player.getConfiguration().blockbreak;
 
-        ConfigurationCache c = player.getConfiguration();
-
-        if(!c.blockbreak.check || player.hasPermission(Permissions.BLOCKBREAK)) {
+        if(!cc.check || player.hasPermission(Permissions.BLOCKBREAK)) {
             return;
         }
 
-        CCBlockBreak cc = player.getConfiguration().blockbreak;
-        BlockBreakData data = player.getData().blockbreak;
+        final BlockBreakData data = player.getData().blockbreak;
 
         data.brokenBlockLocation.set(event.getBlock());
 
         for(BlockBreakCheck check : checks) {
             // If it should be executed, do it
             if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
-                check.check(player, data, cc);
+                cancelled = check.check(player, data, cc);
             }
         }
 
-        if(cancelled) {
+        if(cancelled)
             event.setCancelled(cancelled);
-        }
-
     }
 
     @Override
-    protected void handleBlockDamageEvent(BlockDamageEvent event, Priority priority) {
+    protected void handleBlockDamageEvent(final BlockDamageEvent event, final Priority priority) {
 
         // Only interested in insta-break events here
-        if(!event.getInstaBreak()) {
+        if(!event.getInstaBreak())
             return;
-        }
 
         // Get the player-specific stored data that applies here
         final BlockBreakData data = plugin.getPlayer(event.getPlayer().getName()).getData().blockbreak;
 
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks
-        data.instaBrokeBlockLocation.set(event.getBlock());
+        data.instaBrokenBlockLocation.set(event.getBlock());
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

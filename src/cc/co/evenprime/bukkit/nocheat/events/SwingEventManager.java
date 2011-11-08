@@ -23,7 +23,7 @@ public class SwingEventManager extends EventManager {
     }
 
     @Override
-    protected void handlePlayerAnimationEvent(PlayerAnimationEvent event, Priority priority) {
+    protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
         plugin.getPlayer(event.getPlayer().getName()).getData().armswung = true;
     }
 }

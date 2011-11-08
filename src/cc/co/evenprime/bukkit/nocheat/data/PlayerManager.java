@@ -17,12 +17,12 @@ import cc.co.evenprime.bukkit.nocheat.player.NoCheatPlayerImpl;
 public class PlayerManager {
 
     // Store data between Events
-    private final Map<String, NoCheatPlayer> map;
+    private final Map<String, NoCheatPlayer> players;
     private final NoCheat                    plugin;
     private final List<String>               removals;
 
     public PlayerManager(NoCheat plugin) {
-        this.map = new HashMap<String, NoCheatPlayer>();
+        this.players = new HashMap<String, NoCheatPlayer>();
         this.removals = new ArrayList<String>(5);
         this.plugin = plugin;
     }
@@ -33,12 +33,12 @@ public class PlayerManager {
      */
     public NoCheatPlayer getPlayer(String playerName) {
 
-        NoCheatPlayer p = this.map.get(playerName);
+        NoCheatPlayer p = this.players.get(playerName);
 
         if(p == null) {
             // TODO: Differentiate which player"type" should be created, e.g. based on bukkit version
             p = new NoCheatPlayerImpl(playerName, plugin, new BaseData());
-            this.map.put(playerName, p);
+            this.players.put(playerName, p);
         }
 
         return p;
@@ -49,7 +49,7 @@ public class PlayerManager {
      * 
      */
     public void clearCriticalData() {
-        for(NoCheatPlayer b : this.map.values()) {
+        for(NoCheatPlayer b : this.players.values()) {
             b.getData().clearCriticalData();
         }
     }
@@ -62,14 +62,14 @@ public class PlayerManager {
         synchronized(removals) {
             long time = System.currentTimeMillis();
             try {
-                for(Entry<String, NoCheatPlayer> p : this.map.entrySet()) {
+                for(Entry<String, NoCheatPlayer> p : this.players.entrySet()) {
                     if(p.getValue().getData().shouldBeRemoved(time)) {
                         removals.add(p.getKey());
                     }
                 }
 
                 for(String p : removals) {
-                    this.map.remove(p);
+                    this.players.remove(p);
                 }
 
                 removals.clear();
@@ -80,7 +80,7 @@ public class PlayerManager {
     }
 
     public void clearCriticalData(String playerName) {
-        NoCheatPlayer p = this.map.get(playerName);
+        NoCheatPlayer p = this.players.get(playerName);
         if(p != null) {
             p.getData().clearCriticalData();
         }

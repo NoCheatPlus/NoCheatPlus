@@ -10,7 +10,7 @@ public class BlockBreakData extends Data {
     public double                 directionVL    = 0.0D;
 
     public long                   directionLastViolationTime = 0;
-    public final SimpleLocation   instaBrokeBlockLocation    = new SimpleLocation();
+    public final SimpleLocation   instaBrokenBlockLocation    = new SimpleLocation();
     public final SimpleLocation   brokenBlockLocation        = new SimpleLocation();
 
     public final ExecutionHistory history                    = new ExecutionHistory();

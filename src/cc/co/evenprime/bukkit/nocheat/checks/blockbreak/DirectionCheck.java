@@ -26,7 +26,7 @@ public class DirectionCheck extends BlockBreakCheck {
     public boolean check(final NoCheatPlayer player, final BlockBreakData blockbreak, final CCBlockBreak ccblockbreak) {
 
         final SimpleLocation brokenBlock = blockbreak.brokenBlockLocation;
-        final boolean isInstaBreak = blockbreak.instaBrokeBlockLocation.equals(brokenBlock);
+        final boolean isInstaBreak = blockbreak.instaBrokenBlockLocation.equals(brokenBlock);
 
         // If the block is instabreak and we don't check instabreak, return
         if(isInstaBreak && !ccblockbreak.checkinstabreakblocks) {
