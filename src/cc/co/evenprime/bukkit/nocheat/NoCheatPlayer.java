@@ -21,5 +21,5 @@ public interface NoCheatPlayer {
     
     public ConfigurationCache getConfiguration();
 
-
+    public int getSpeedAmplifier();
 }

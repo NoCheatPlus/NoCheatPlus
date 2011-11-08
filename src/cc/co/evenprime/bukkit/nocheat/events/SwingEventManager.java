@@ -19,7 +19,7 @@ public class SwingEventManager extends EventManager {
 
         super(plugin);
 
-        registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false);
+        registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false, null);
     }
 
     @Override

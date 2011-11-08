@@ -17,6 +17,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCChat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 public class PlayerChatEventManager extends EventManager {
 
@@ -29,8 +30,8 @@ public class PlayerChatEventManager extends EventManager {
         this.checks = new ArrayList<ChatCheck>(1);
         this.checks.add(new SpamCheck(plugin));
 
-        registerListener(Event.Type.PLAYER_CHAT, Priority.Lowest, true);
-        registerListener(Event.Type.PLAYER_COMMAND_PREPROCESS, Priority.Lowest, true);
+        registerListener(Event.Type.PLAYER_CHAT, Priority.Lowest, true, plugin.getPerformance(Type.CHAT));
+        registerListener(Event.Type.PLAYER_COMMAND_PREPROCESS, Priority.Lowest, true, plugin.getPerformance(Type.CHAT));
     }
 
     @Override

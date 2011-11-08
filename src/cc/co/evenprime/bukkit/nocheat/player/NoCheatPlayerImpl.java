@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.player;
 
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -54,6 +55,10 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
 
             p.b(true); // Catch up with the server, one tick at a time
         }
+    }
+
+    public int getSpeedAmplifier() {
+        return ((CraftPlayer)player).getHandle().getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
     }
 
 }

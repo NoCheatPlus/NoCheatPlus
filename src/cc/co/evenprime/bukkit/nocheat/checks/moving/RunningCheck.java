@@ -134,7 +134,7 @@ public class RunningCheck extends MovingCheck {
 
         double limit = 0.0D;
 
-        final EntityPlayer p = ((CraftPlayer) player).getHandle();
+        final EntityPlayer p = ((CraftPlayer) player.getPlayer()).getHandle();
 
         if(ccmoving.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
             limit = ccmoving.sneakingSpeedLimit;

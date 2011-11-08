@@ -21,11 +21,11 @@ public class PlayerTeleportEventManager extends EventManager {
 
         super(plugin);
 
-        registerListener(Event.Type.PLAYER_MOVE, Priority.Monitor, false);
-        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Monitor, true);
-        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false);
-        registerListener(Event.Type.PLAYER_PORTAL, Priority.Monitor, true);
-        registerListener(Event.Type.PLAYER_RESPAWN, Priority.Monitor, true);
+        registerListener(Event.Type.PLAYER_MOVE, Priority.Monitor, false, null);
+        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Monitor, true, null);
+        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false, null);
+        registerListener(Event.Type.PLAYER_PORTAL, Priority.Monitor, true, null);
+        registerListener(Event.Type.PLAYER_RESPAWN, Priority.Monitor, true, null);
     }
 
     @Override

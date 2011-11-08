@@ -19,6 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockBreak;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 /**
  * Central location to listen to player-interact events and dispatch them to
@@ -39,8 +40,8 @@ public class BlockBreakEventManager extends EventManager {
         this.checks.add(new NoswingCheck(plugin));
         this.checks.add(new ReachCheck(plugin));
 
-        registerListener(Event.Type.BLOCK_BREAK, Priority.Lowest, true);
-        registerListener(Event.Type.BLOCK_DAMAGE, Priority.Monitor, true);
+        registerListener(Event.Type.BLOCK_BREAK, Priority.Lowest, true, plugin.getPerformance(Type.BLOCKBREAK));
+        registerListener(Event.Type.BLOCK_DAMAGE, Priority.Monitor, true, plugin.getPerformance(Type.BLOCKDAMAGE));
     }
 
     @Override
@@ -73,7 +74,7 @@ public class BlockBreakEventManager extends EventManager {
         }
 
     }
-    
+
     @Override
     protected void handleBlockDamageEvent(BlockDamageEvent event, Priority priority) {
 

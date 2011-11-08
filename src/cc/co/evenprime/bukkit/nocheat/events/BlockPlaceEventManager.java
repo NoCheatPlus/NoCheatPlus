@@ -17,6 +17,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockPlace;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
 /**
  * Central location to listen to Block-related events and dispatching them to
@@ -35,7 +36,7 @@ public class BlockPlaceEventManager extends EventManager {
         this.checks.add(new DirectionCheck(plugin));
         this.checks.add(new ReachCheck(plugin));
 
-        registerListener(Event.Type.BLOCK_PLACE, Priority.Lowest, true);
+        registerListener(Event.Type.BLOCK_PLACE, Priority.Lowest, true, plugin.getPerformance(Type.BLOCKPLACE));
     }
 
     @Override
@@ -43,7 +44,7 @@ public class BlockPlaceEventManager extends EventManager {
 
         if(event.getBlock() == null)
             return;
-        
+
         boolean cancelled = false;
 
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
