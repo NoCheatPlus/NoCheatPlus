@@ -52,13 +52,19 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         EntityPlayer p = ((CraftPlayer) player).getHandle();
         for(int i = 0; i < ticks; i++) {
             // TODO: This is highly fragile and breaks every update!!
-
             p.b(true); // Catch up with the server, one tick at a time
         }
     }
 
-    public int getSpeedAmplifier() {
-        return ((CraftPlayer)player).getHandle().getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
+    public float getSpeedAmplifier() {
+        EntityPlayer ep = ((CraftPlayer)player).getHandle();
+        if(ep.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
+            // Taken directly from Minecraft code, should work
+            return 1.0F + 0.2F * ep.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1;
+        }
+        else {
+            return 1.0F;
+        }
     }
 
 }

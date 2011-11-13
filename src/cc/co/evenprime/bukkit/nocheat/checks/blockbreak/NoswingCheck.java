@@ -45,7 +45,7 @@ public class NoswingCheck extends BlockBreakCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().blockbreak.noswingVL);
+            return String.format(Locale.US, "%d", (int)player.getData().blockbreak.noswingVL);
 
         default:
             return super.getParameter(wildcard, player);

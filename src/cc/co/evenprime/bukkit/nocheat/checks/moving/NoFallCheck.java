@@ -106,7 +106,7 @@ public class NoFallCheck extends MovingCheck {
 
         switch (wildcard) {
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.nofallVL);
+            return String.format(Locale.US, "%d", (int)player.getData().moving.nofallVL);
         case FALLDISTANCE:
             return String.format(Locale.US, "%.2f", player.getData().moving.fallDistance);
         default:

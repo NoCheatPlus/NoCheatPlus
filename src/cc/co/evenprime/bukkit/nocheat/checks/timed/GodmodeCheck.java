@@ -17,11 +17,11 @@ public class GodmodeCheck extends TimedCheck {
     }
 
     @Override
-    public boolean check(NoCheatPlayer player, TimedData data, CCTimed cc) {
+    public void check(NoCheatPlayer player, TimedData data, CCTimed cc) {
         // server lag(ged), skip this, or player dead, therefore it's reasonable
         // for him to not move :)
         if(plugin.skipCheck() || player.getPlayer().isDead())
-            return false;
+            return;
 
         final int ticksLived = player.getTicksLived();
 
@@ -31,57 +31,69 @@ public class GodmodeCheck extends TimedCheck {
             data.ticksLived = ticksLived;
 
             // And give up already
-            return false;
+            return;
         }
 
         boolean cancel = false;
 
-        // Compare ingame record of players ticks to our last observed value
-        int difference = ticksLived - data.ticksLived;
-
+        // How far behind is the player with his ticks
+        // expected time - real lived time
+        System.out.println("lived "+ticksLived + " data.ticksLived " + data.ticksLived);
+        int behind = Math.min(10, (data.ticksLived + cc.tickTime) - ticksLived);        
         // difference should be >= tickTime for perfect synchronization
-        if(difference > cc.tickTime) {
-            // player was faster than expected, give him credit for the
-            // difference
-            data.ticksBehind -= (difference - cc.tickTime);
-            // Reduce violation level over time
-            data.godmodeVL *= 0.9D;
-
-        } else if(difference >= cc.tickTime / 2) {
-            // close enough, let it pass
+        if(behind <= 1) {
+            // player as fast as expected, give him credit for that
             data.ticksBehind -= cc.tickTime / 2;
             // Reduce violation level over time
-            data.godmodeVL *= 0.9D;
+            data.godmodeVL -= cc.tickTime / 2.0;
+
+        } else if(behind <= (cc.tickTime / 2)+1) {
+            // close enough, let it pass
+            data.ticksBehind -= cc.tickTime / 4;
+            // Reduce violation level over time
+            data.godmodeVL -= cc.tickTime / 4.0;
         } else {
             // That's a bit suspicious, why is the player more than half the
             // ticktime behind? Keep that in mind
-            data.ticksBehind += cc.tickTime - difference;
+            data.ticksBehind += behind;
 
             // Is he way too far behind, then correct that
             if(data.ticksBehind > cc.godmodeTicksLimit) {
 
-                data.godmodeVL += cc.tickTime - difference;
+                // Over the limit, start increasing VL for the player
+                data.godmodeVL += behind;
 
                 cancel = executeActions(player, cc.godmodeActions.getActions(data.godmodeVL));
 
-                // Reduce the time the player is behind accordingly
-                data.ticksBehind -= cc.tickTime;
+
+                if(cancel) {
+                    // Catch up for at least some of the ticks
+                    try {
+                        player.increaseAge(cc.tickTime);
+                    }
+                    catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                    
+                    // Reduce the time the player is behind accordingly
+                    data.ticksBehind -= cc.tickTime;
+                }
             }
         }
 
         if(data.ticksBehind < 0) {
             data.ticksBehind = 0;
         }
-
-        if(cancel) {
-            // Catch up for at least some of the ticks
-            player.increaseAge(cc.tickTime);
+        
+        if(data.godmodeVL < 0) {
+            data.godmodeVL = 0;
         }
 
+        System.out.println(data.ticksBehind);
         // setup data for next time
         data.ticksLived = player.getTicksLived();
 
-        return cancel;
+        return;
 
     }
 
@@ -95,7 +107,7 @@ public class GodmodeCheck extends TimedCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().timed.godmodeVL);
+            return String.format(Locale.US, "%d", (int)player.getData().timed.godmodeVL);
         default:
             return super.getParameter(wildcard, player);
         }

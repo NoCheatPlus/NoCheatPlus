@@ -57,7 +57,7 @@ public class ReachCheck extends BlockBreakCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().blockbreak.reachVL);
+            return String.format(Locale.US, "%d", (int)player.getData().blockbreak.reachVL);
 
         case REACHDISTANCE:
             return String.format(Locale.US, "%.2f", player.getData().blockbreak.reachDistance);

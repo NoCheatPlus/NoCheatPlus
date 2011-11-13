@@ -45,7 +45,7 @@ public class NoswingCheck extends FightCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().fight.noswingVL);
+            return String.format(Locale.US, "%d", (int)player.getData().fight.noswingVL);
         default:
             return super.getParameter(wildcard, player);
         }

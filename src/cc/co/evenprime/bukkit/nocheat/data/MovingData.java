@@ -43,6 +43,8 @@ public class MovingData extends Data {
     public boolean                fromOnOrInGround;
     public boolean                toOnOrInGround;
 
+    public String                 checknamesuffix         = "";
+
     @Override
     public void clearCriticalData() {
         teleportTo.reset();

@@ -12,7 +12,7 @@ public abstract class TimedCheck extends Check {
         super(plugin, name, permission);
     }
 
-    public abstract boolean check(final NoCheatPlayer player, TimedData data, CCTimed cc);
+    public abstract void check(final NoCheatPlayer player, TimedData data, CCTimed cc);
 
     public abstract boolean isEnabled(CCTimed cc);
 

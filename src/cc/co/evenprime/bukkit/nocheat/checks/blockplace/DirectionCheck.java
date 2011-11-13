@@ -91,7 +91,7 @@ public class DirectionCheck extends BlockPlaceCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().blockplace.directionVL);
+            return String.format(Locale.US, "%d", (int)player.getData().blockplace.directionVL);
 
         default:
             return super.getParameter(wildcard, player);

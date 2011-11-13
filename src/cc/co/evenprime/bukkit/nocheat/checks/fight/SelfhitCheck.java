@@ -20,7 +20,7 @@ public class SelfhitCheck extends FightCheck {
 
         boolean cancel = false;
 
-        if(player.getPlayer().equals(data.damagee)) {
+        if(player.getPlayer().equals(data.damagee.getBukkitEntity())) {
             // Player failed the check obviously
 
             data.selfhitVL += 1;
@@ -42,7 +42,7 @@ public class SelfhitCheck extends FightCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().fight.selfhitVL);
+            return String.format(Locale.US, "%d", (int)player.getData().fight.selfhitVL);
         default:
             return super.getParameter(wildcard, player);
         }

@@ -109,7 +109,7 @@ public class MorePacketsCheck extends MovingCheck {
 
         switch (wildcard) {
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.morePacketsVL);
+            return String.format(Locale.US, "%d", (int)player.getData().moving.morePacketsVL);
         case PACKETS:
             return String.valueOf(player.getData().moving.packets);
         default:

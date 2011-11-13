@@ -2,11 +2,7 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Locale;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MobEffectList;
-
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
@@ -53,14 +49,10 @@ public class FlyingCheck extends MovingCheck {
         // In case of creative gamemode, give at least 0.60 speed limit
         // horizontal
         double speedLimitHorizontal = player.getPlayer().getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, ccmoving.flyingSpeedLimitHorizontal) : ccmoving.flyingSpeedLimitHorizontal;
+        
 
-        EntityPlayer p = ((CraftPlayer) player).getHandle();
-
-        if(p.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
-            // Taken directly from Minecraft code, should work
-            speedLimitHorizontal *= 1.0F + 0.2F * (float) (p.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
-        }
-
+        speedLimitHorizontal *= player.getSpeedAmplifier();
+        
         result += Math.max(0.0D, horizontalDistance - moving.horizFreedom - speedLimitHorizontal);
 
         boolean sprinting = player.getPlayer().isSprinting();
@@ -115,7 +107,7 @@ public class FlyingCheck extends MovingCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.runflyVL);
+            return String.format(Locale.US, "%d", (int)player.getData().moving.runflyVL);
         default:
             return super.getParameter(wildcard, player);
         }

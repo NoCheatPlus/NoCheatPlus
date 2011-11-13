@@ -2,11 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Locale;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MobEffectList;
-
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
@@ -76,7 +71,7 @@ public class RunningCheck extends MovingCheck {
         data.jumpPhase++;
 
         // Slowly reduce the level with each event
-        data.runflyVL *= 0.97;
+        data.runflyVL *= 0.95;
 
         if(result > 0) {
 
@@ -125,7 +120,7 @@ public class RunningCheck extends MovingCheck {
      * Calculate how much the player failed this check
      * 
      */
-    private double checkHorizontal(final NoCheatPlayer player, final MovingData moving, final boolean isSwimming, final double totalDistance, final CCMoving ccmoving) {
+    private double checkHorizontal(final NoCheatPlayer player, final MovingData data, final boolean isSwimming, final double totalDistance, final CCMoving cc) {
 
         // How much further did the player move than expected??
         double distanceAboveLimit = 0.0D;
@@ -134,58 +129,56 @@ public class RunningCheck extends MovingCheck {
 
         double limit = 0.0D;
 
-        final EntityPlayer p = ((CraftPlayer) player.getPlayer()).getHandle();
+        String suffix = null;
 
-        if(ccmoving.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
-            limit = ccmoving.sneakingSpeedLimit;
-        } else if(ccmoving.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVING_SWIMMING)) {
-            limit = ccmoving.swimmingSpeedLimit;
+        if(cc.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
+            limit = cc.sneakingSpeedLimit;
+            suffix = "sneaking";
+        } else if(cc.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVING_SWIMMING)) {
+            limit = cc.swimmingSpeedLimit;
+            suffix = "swimming";
         } else if(!sprinting) {
-            limit = ccmoving.walkingSpeedLimit;
+            limit = cc.walkingSpeedLimit;
+            suffix = "walking";
         } else {
-            limit = ccmoving.sprintingSpeedLimit;
+            limit = cc.sprintingSpeedLimit;
+            suffix = "sprinting";
         }
 
-        if(p.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
-            // Taken directly from Minecraft code, should work
-            limit *= 1.0F + 0.2F * (float) (p.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
-        }
+        // Taken directly from Minecraft code, should work
+        limit *= player.getSpeedAmplifier();
 
-        // Ignore slowdowns for now
-        /*
-         * if(p.hasEffect(MobEffectList.SLOWER_MOVEMENT)) {
-         * limit *= 1.0F - 0.15F * (float)
-         * (p.getEffect(MobEffectList.SLOWER_MOVEMENT).getAmplifier() + 1);
-         * }
-         */
+        distanceAboveLimit = totalDistance - limit - data.horizFreedom;
 
-        distanceAboveLimit = totalDistance - limit - moving.horizFreedom;
-
-        moving.bunnyhopdelay--;
+        data.bunnyhopdelay--;
 
         // Did he go too far?
         if(distanceAboveLimit > 0 && sprinting) {
 
             // Try to treat it as a the "bunnyhop" problem
-            if(moving.bunnyhopdelay <= 0 && distanceAboveLimit > 0.05D && distanceAboveLimit < 0.4D) {
-                moving.bunnyhopdelay = 3;
+            if(data.bunnyhopdelay <= 0 && distanceAboveLimit > 0.05D && distanceAboveLimit < 0.4D) {
+                data.bunnyhopdelay = 3;
                 distanceAboveLimit = 0;
             }
         }
 
         if(distanceAboveLimit > 0) {
             // Try to consume the "buffer"
-            distanceAboveLimit -= moving.horizontalBuffer;
-            moving.horizontalBuffer = 0;
+            distanceAboveLimit -= data.horizontalBuffer;
+            data.horizontalBuffer = 0;
 
             // Put back the "overconsumed" buffer
             if(distanceAboveLimit < 0) {
-                moving.horizontalBuffer = -distanceAboveLimit;
+                data.horizontalBuffer = -distanceAboveLimit;
             }
         }
         // He was within limits, give the difference as buffer
         else {
-            moving.horizontalBuffer = Math.min(maxBonus, moving.horizontalBuffer - distanceAboveLimit);
+            data.horizontalBuffer = Math.min(maxBonus, data.horizontalBuffer - distanceAboveLimit);
+        }
+
+        if(distanceAboveLimit > 0) {
+            data.checknamesuffix = suffix;
         }
 
         return distanceAboveLimit;
@@ -195,18 +188,21 @@ public class RunningCheck extends MovingCheck {
      * Calculate if and how much the player "failed" this check.
      * 
      */
-    private double checkVertical(final MovingData moving, final boolean fromOnGround, final boolean toOnGround, final CCMoving ccmoving) {
+    private double checkVertical(final MovingData data, final boolean fromOnGround, final boolean toOnGround, final CCMoving cc) {
 
         // How much higher did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
-        double limit = moving.vertFreedom + ccmoving.jumpheight;
+        double limit = data.vertFreedom + cc.jumpheight;
 
-        if(moving.jumpPhase > jumpingLimit) {
-            limit -= (moving.jumpPhase - jumpingLimit) * 0.15D;
+        if(data.jumpPhase > jumpingLimit) {
+            limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
         }
-        distanceAboveLimit = moving.to.y - moving.runflySetBackPoint.y - limit;
+        distanceAboveLimit = data.to.y - data.runflySetBackPoint.y - limit;
 
+        if(distanceAboveLimit > 0) {
+            data.checknamesuffix = "vertical";
+        }
         return distanceAboveLimit;
 
     }
@@ -220,8 +216,11 @@ public class RunningCheck extends MovingCheck {
 
         switch (wildcard) {
 
+        case CHECK:
+            // Workaround for something until I find a better way to do it
+            return getName() + "." + player.getData().moving.checknamesuffix;
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", player.getData().moving.runflyVL);
+            return String.format(Locale.US, "%d", (int) player.getData().moving.runflyVL);
         default:
             return super.getParameter(wildcard, player);
         }
