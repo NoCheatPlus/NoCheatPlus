@@ -9,9 +9,7 @@ public class BaseData extends Data {
     public final FightData      fight;
     public final TimedData      timed;
 
-    private final Data[]        data;        // for convenience
-
-    protected long              lastUsedTime;
+    private final Data[]        data;      // for convenience
 
     public boolean              armswung;
 
@@ -26,7 +24,6 @@ public class BaseData extends Data {
         data = new Data[] {this.blockbreak, this.blockplace, this.chat,
                 this.moving, this.fight, this.timed};
 
-        this.lastUsedTime = System.currentTimeMillis();
     }
 
     public void clearCriticalData() {
@@ -35,7 +32,4 @@ public class BaseData extends Data {
         }
     }
 
-    public boolean shouldBeRemoved(long currentTimeInMilliseconds) {
-        return lastUsedTime + 60000L < currentTimeInMilliseconds;
-    }
 }

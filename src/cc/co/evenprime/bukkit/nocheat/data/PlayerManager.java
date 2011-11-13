@@ -17,13 +17,11 @@ import cc.co.evenprime.bukkit.nocheat.player.NoCheatPlayerImpl;
 public class PlayerManager {
 
     // Store data between Events
-    private final Map<String, NoCheatPlayer> players;
-    private final NoCheat                    plugin;
-    private final List<String>               removals;
+    private final Map<String, NoCheatPlayerImpl> players;
+    private final NoCheat                        plugin;
 
     public PlayerManager(NoCheat plugin) {
-        this.players = new HashMap<String, NoCheatPlayer>();
-        this.removals = new ArrayList<String>(5);
+        this.players = new HashMap<String, NoCheatPlayerImpl>();
         this.plugin = plugin;
     }
 
@@ -33,13 +31,16 @@ public class PlayerManager {
      */
     public NoCheatPlayer getPlayer(String playerName) {
 
-        NoCheatPlayer p = this.players.get(playerName);
+        NoCheatPlayerImpl p = this.players.get(playerName);
 
         if(p == null) {
-            // TODO: Differentiate which player"type" should be created, e.g. based on bukkit version
+            // TODO: Differentiate which player"type" should be created, e.g.
+            // based on bukkit version
             p = new NoCheatPlayerImpl(playerName, plugin, new BaseData());
             this.players.put(playerName, p);
         }
+
+        p.setLastUsedTime(System.currentTimeMillis());
 
         return p;
     }
@@ -54,35 +55,25 @@ public class PlayerManager {
         }
     }
 
-    /**
-     * check if some data hasn't been used for a while and remove it
-     * 
-     */
-    public void cleanDataMap() {
-        synchronized(removals) {
-            long time = System.currentTimeMillis();
-            try {
-                for(Entry<String, NoCheatPlayer> p : this.players.entrySet()) {
-                    if(p.getValue().getData().shouldBeRemoved(time)) {
-                        removals.add(p.getKey());
-                    }
-                }
-
-                for(String p : removals) {
-                    this.players.remove(p);
-                }
-
-                removals.clear();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public void clearCriticalData(String playerName) {
         NoCheatPlayer p = this.players.get(playerName);
         if(p != null) {
             p.getData().clearCriticalData();
+        }
+    }
+
+    public void cleanDataMap() {
+        long time = System.currentTimeMillis();
+        List<String> removals = new ArrayList<String>(5);
+        
+        for(Entry<String, NoCheatPlayerImpl> e : this.players.entrySet()) {
+            if(e.getValue().shouldBeRemoved(time)) {
+                removals.add(e.getKey());
+            }
+        }
+
+        for(String key : removals) {
+            this.players.remove(key);
         }
     }
 

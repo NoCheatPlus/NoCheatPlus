@@ -39,7 +39,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.Performance;
  */
 public abstract class EventManager {
 
-    protected NoCheat plugin;
+    protected final NoCheat plugin;
 
     private static class BlockL extends BlockListener {
 

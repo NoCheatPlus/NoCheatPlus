@@ -18,10 +18,14 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     private final NoCheat  plugin;
     private final BaseData data;
 
+    private long           lastUsedTime;
+
     public NoCheatPlayerImpl(String playerName, NoCheat plugin, BaseData data) {
         this.player = Bukkit.getServer().getPlayer(playerName);
         this.plugin = plugin;
         this.data = data;
+
+        this.lastUsedTime = System.currentTimeMillis();
     }
 
     public boolean hasPermission(String permission) {
@@ -57,14 +61,20 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     }
 
     public float getSpeedAmplifier() {
-        EntityPlayer ep = ((CraftPlayer)player).getHandle();
+        EntityPlayer ep = ((CraftPlayer) player).getHandle();
         if(ep.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
             // Taken directly from Minecraft code, should work
             return 1.0F + 0.2F * ep.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1;
-        }
-        else {
+        } else {
             return 1.0F;
         }
     }
+    
+    public void setLastUsedTime(long currentTimeInMilliseconds) {
+        this.lastUsedTime = System.currentTimeMillis();
+    }
 
+    public boolean shouldBeRemoved(long currentTimeInMilliseconds) {
+        return lastUsedTime + 60000L < currentTimeInMilliseconds;
+    }
 }
