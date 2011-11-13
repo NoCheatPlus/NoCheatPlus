@@ -14,6 +14,7 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -254,7 +255,8 @@ public abstract class EventManager {
 
             final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
 
-            if(!(event2.getDamager() instanceof Player))
+            // Only if player really attacked other player
+            if(!(event2.getDamager() instanceof Player) || !event2.getCause().equals(DamageCause.ENTITY_ATTACK))
                 return;
 
             /** Only now measure time and dispatch event */
@@ -288,6 +290,7 @@ public abstract class EventManager {
         case PLAYER:
             Bukkit.getServer().getPluginManager().registerEvent(type, new PlayerL(this, priority, ignoreCancelled, performance), priority, plugin);
             break;
+        case LIVING_ENTITY:
         case ENTITY:
             Bukkit.getServer().getPluginManager().registerEvent(type, new EntityL(this, priority, ignoreCancelled, performance), priority, plugin);
             break;

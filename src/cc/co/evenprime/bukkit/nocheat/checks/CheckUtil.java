@@ -111,7 +111,7 @@ public class CheckUtil {
 
     public static final boolean isSprinting(final Player player) {
 
-        return !(player instanceof CraftPlayer) || (player.isSprinting() && player.getFoodLevel() > 5);
+        return !(player.isSprinting() && player.getFoodLevel() > 5);
     }
 
     /**
