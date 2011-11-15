@@ -23,24 +23,20 @@ public class RunflyCheck extends MovingCheck {
     @Override
     public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
 
-        final boolean runflyCheck = cc.runflyCheck && !player.hasPermission(Permissions.MOVING_RUNFLY);
         final boolean flyAllowed = cc.allowFlying || player.hasPermission(Permissions.MOVING_FLYING) || (player.isCreative() && cc.identifyCreativeMode);
 
         /********************* EXECUTE THE FLY/JUMP/RUNNING CHECK ********************/
         // If the player is not allowed to fly and not allowed to run
-        if(runflyCheck) {
-            if(flyAllowed) {
-                return flyingCheck.check(player, data, cc);
-            } else {
-                return runningCheck.check(player, data, cc);
-            }
-        }
 
-        return null;
+        if(flyAllowed) {
+            return flyingCheck.check(player, data, cc);
+        } else {
+            return runningCheck.check(player, data, cc);
+        }
     }
 
     @Override
     public boolean isEnabled(CCMoving moving) {
-        return runningCheck.isEnabled(moving) || flyingCheck.isEnabled(moving);
+        return moving.runflyCheck;
     }
 }

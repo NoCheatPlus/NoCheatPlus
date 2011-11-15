@@ -30,6 +30,10 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     }
 
     public boolean hasPermission(String permission) {
+        if(permission == null) {
+            System.out.println("NoCheat: Warning, asked for null permission");
+            return false;
+        }
         return player.hasPermission(permission);
     }
 
@@ -70,11 +74,11 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
             return 1.0F;
         }
     }
-    
+
     public boolean isSprinting() {
         return player.isSprinting() && player.getFoodLevel() > 5;
     }
-    
+
     public void setLastUsedTime(long currentTimeInMilliseconds) {
         this.lastUsedTime = System.currentTimeMillis();
     }

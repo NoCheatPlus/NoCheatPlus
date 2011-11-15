@@ -37,8 +37,6 @@ public class GodmodeCheck extends TimedCheck {
         boolean cancel = false;
 
         // How far behind is the player with his ticks
-        // expected time - real lived time
-        System.out.println("lived "+ticksLived + " data.ticksLived " + data.ticksLived);
         int behind = Math.min(10, (data.ticksLived + cc.tickTime) - ticksLived);        
         // difference should be >= tickTime for perfect synchronization
         if(behind <= 1) {
@@ -89,7 +87,6 @@ public class GodmodeCheck extends TimedCheck {
             data.godmodeVL = 0;
         }
 
-        System.out.println(data.ticksBehind);
         // setup data for next time
         data.ticksLived = player.getTicksLived();
 

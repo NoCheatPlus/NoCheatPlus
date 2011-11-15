@@ -31,7 +31,7 @@ public class RunningCheck extends MovingCheck {
 
     public RunningCheck(NoCheat plugin) {
 
-        super(plugin, "moving.running", Permissions.MOVING_RUNFLY);
+        super(plugin, "moving.running", null);
 
         this.noFallCheck = new NoFallCheck(plugin);
     }
