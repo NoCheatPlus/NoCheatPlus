@@ -7,6 +7,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
@@ -22,7 +23,8 @@ public class PlayerTeleportEventManager extends EventManager {
 
         super(plugin);
 
-        registerListener(Event.Type.PLAYER_MOVE, Priority.Monitor, false, null);
+        registerListener(Event.Type.PLAYER_MOVE, Priority.Highest, false, null);
+        registerListener(Event.Type.PLAYER_TOGGLE_SPRINT, Priority.Highest, false, null);
         registerListener(Event.Type.PLAYER_TELEPORT, Priority.Monitor, true, null);
         registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false, null);
         registerListener(Event.Type.PLAYER_PORTAL, Priority.Monitor, true, null);
@@ -63,6 +65,21 @@ public class PlayerTeleportEventManager extends EventManager {
             return;
 
         handleTeleportation(event.getPlayer());
+
+        // Fix a common mistake that other developers make (cancelling move
+        // events is crazy, rather set the target location to the from location
+        if(plugin.getPlayer(event.getPlayer().getName()).getConfiguration().debug.overrideIdiocy) {
+            event.setCancelled(false);
+            event.setTo(event.getFrom().clone());
+        }
+    }
+
+    @Override
+    protected void handlePlayerToggleSprintEvent(final PlayerToggleSprintEvent event, final Priority priority) {
+        if(event.isCancelled() && event.isSprinting()) {
+            if(plugin.getPlayer(event.getPlayer().getName()).getConfiguration().debug.overrideIdiocy)
+                event.setCancelled(false);
+        }
     }
 
     private void handleTeleportation(final Player player) {

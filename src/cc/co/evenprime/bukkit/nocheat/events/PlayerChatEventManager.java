@@ -36,7 +36,7 @@ public class PlayerChatEventManager extends EventManager {
 
     @Override
     protected void handlePlayerCommandPreprocessEvent(final PlayerCommandPreprocessEvent event, final Priority priority) {
-        handleEvent((PlayerChatEvent) event, priority);
+        handlePlayerChatEvent((PlayerChatEvent) event, priority);
     }
 
     @Override

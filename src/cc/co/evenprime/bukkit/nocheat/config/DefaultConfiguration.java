@@ -32,6 +32,7 @@ public class DefaultConfiguration extends Configuration {
         /*** DEBUG ***/
         {
             setValue(DEBUG_SHOWACTIVECHECKS, false);
+            setValue(DEBUG_COMPATIBILITY, true);
         }
 
         /*** MOVING ***/

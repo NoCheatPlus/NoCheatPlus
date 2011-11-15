@@ -25,6 +25,7 @@ public class Explainations {
         set(Configuration.LOGGING_CHATLEVEL, "What log-level need messages to have to get displayed in the ingame chat. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
 
         set(Configuration.DEBUG_SHOWACTIVECHECKS, "Print to the console an overview of all checks that are enabled when NoCheat gets loaded.");
+        set(Configuration.DEBUG_COMPATIBILITY, "Do some voodoo to fix common mistakes of other plugins which interfere with NoCheat.");
 
         set(Configuration.MOVING_CHECK, "If true, do various checks on PlayerMove events.");
         set(Configuration.MOVING_IDENTIFYCREATIVEMODE, "If true, NoCheat will automatically identify if players are in creative mode and will allow them to fly, avoid fall damage etc.");

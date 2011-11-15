@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -224,6 +225,20 @@ public abstract class EventManager {
                 m.handlePlayerAnimationEvent(event, priority);
             }
         }
+        
+        @Override
+        public void onPlayerToggleSprint(final PlayerToggleSprintEvent event) {
+            if(ignoreCancelledEvents && event.isCancelled())
+                return;
+
+            if(measureTime != null && measureTime.isEnabled()) {
+                final long startTime = System.nanoTime();
+                m.handlePlayerToggleSprintEvent(event, priority);
+                measureTime.addTime(System.nanoTime() - startTime);
+            } else {
+                m.handlePlayerToggleSprintEvent(event, priority);
+            }
+        }
     }
 
     private static class EntityL extends EntityListener {
@@ -356,6 +371,10 @@ public abstract class EventManager {
     }
 
     protected void handleEntityDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+        handleEvent(event, priority);
+    }
+
+    protected void handlePlayerToggleSprintEvent(PlayerToggleSprintEvent event, Priority priority) {
         handleEvent(event, priority);
     }
 }
