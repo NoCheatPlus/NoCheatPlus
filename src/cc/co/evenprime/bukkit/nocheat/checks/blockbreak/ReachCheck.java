@@ -2,8 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import java.util.Locale;
 
-import org.bukkit.GameMode;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
@@ -31,7 +29,7 @@ public class ReachCheck extends BlockBreakCheck {
 
         final SimpleLocation brokenBlock = data.brokenBlockLocation;
 
-        final double distance = CheckUtil.reachCheck(player, brokenBlock.x + 0.5D, brokenBlock.y + 0.5D, brokenBlock.z + 0.5D, player.getPlayer().getGameMode() == GameMode.CREATIVE ? cc.reachDistance + 2 : cc.reachDistance);
+        final double distance = CheckUtil.reachCheck(player, brokenBlock.x + 0.5D, brokenBlock.y + 0.5D, brokenBlock.z + 0.5D, player.isCreative() ? cc.reachDistance + 2 : cc.reachDistance);
 
         if(distance > 0D) {
             // Player failed the check

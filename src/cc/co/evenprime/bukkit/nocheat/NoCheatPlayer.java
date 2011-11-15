@@ -15,6 +15,8 @@ public interface NoCheatPlayer {
 
     public BaseData getData();
 
+    public boolean isSprinting();
+    
     public int getTicksLived();
     
     public void increaseAge(int ticks);
@@ -22,4 +24,6 @@ public interface NoCheatPlayer {
     public ConfigurationCache getConfiguration();
 
     public float getSpeedAmplifier();
+
+    public boolean isCreative();
 }

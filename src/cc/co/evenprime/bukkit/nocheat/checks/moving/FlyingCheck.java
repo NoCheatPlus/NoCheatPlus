@@ -2,8 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Locale;
 
-import org.bukkit.GameMode;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
@@ -48,14 +46,14 @@ public class FlyingCheck extends MovingCheck {
 
         // In case of creative gamemode, give at least 0.60 speed limit
         // horizontal
-        double speedLimitHorizontal = player.getPlayer().getGameMode() == GameMode.CREATIVE ? Math.max(creativeSpeed, ccmoving.flyingSpeedLimitHorizontal) : ccmoving.flyingSpeedLimitHorizontal;
+        double speedLimitHorizontal = player.isCreative() ? Math.max(creativeSpeed, ccmoving.flyingSpeedLimitHorizontal) : ccmoving.flyingSpeedLimitHorizontal;
         
 
         speedLimitHorizontal *= player.getSpeedAmplifier();
         
         result += Math.max(0.0D, horizontalDistance - moving.horizFreedom - speedLimitHorizontal);
 
-        boolean sprinting = player.getPlayer().isSprinting();
+        boolean sprinting = player.isSprinting();
 
         moving.bunnyhopdelay--;
 

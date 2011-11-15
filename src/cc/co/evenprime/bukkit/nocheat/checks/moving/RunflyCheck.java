@@ -1,7 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
-import org.bukkit.GameMode;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
@@ -26,7 +24,7 @@ public class RunflyCheck extends MovingCheck {
     public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
 
         final boolean runflyCheck = cc.runflyCheck && !player.hasPermission(Permissions.MOVING_RUNFLY);
-        final boolean flyAllowed = cc.allowFlying || player.hasPermission(Permissions.MOVING_FLYING) || (player.getPlayer().getGameMode() == GameMode.CREATIVE && cc.identifyCreativeMode);
+        final boolean flyAllowed = cc.allowFlying || player.hasPermission(Permissions.MOVING_FLYING) || (player.isCreative() && cc.identifyCreativeMode);
 
         /********************* EXECUTE THE FLY/JUMP/RUNNING CHECK ********************/
         // If the player is not allowed to fly and not allowed to run

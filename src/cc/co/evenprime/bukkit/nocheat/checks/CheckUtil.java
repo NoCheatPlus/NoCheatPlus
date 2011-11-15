@@ -5,7 +5,6 @@ import net.minecraft.server.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
@@ -106,11 +105,6 @@ public class CheckUtil {
         types[Material.PISTON_EXTENSION.getId()] |= SOLID | NONSOLID;
         types[Material.PISTON_MOVING_PIECE.getId()] |= SOLID | NONSOLID;
         types[Material.TRAP_DOOR.getId()] |= SOLID | NONSOLID;
-    }
-
-    public static final boolean isSprinting(final Player player) {
-
-        return !(player.isSprinting() && player.getFoodLevel() > 5);
     }
 
     /**

@@ -4,6 +4,7 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -70,11 +71,19 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         }
     }
     
+    public boolean isSprinting() {
+        return player.isSprinting() && player.getFoodLevel() > 5;
+    }
+    
     public void setLastUsedTime(long currentTimeInMilliseconds) {
         this.lastUsedTime = System.currentTimeMillis();
     }
 
     public boolean shouldBeRemoved(long currentTimeInMilliseconds) {
         return lastUsedTime + 60000L < currentTimeInMilliseconds;
+    }
+
+    public boolean isCreative() {
+        return player.getGameMode().equals(GameMode.CREATIVE);
     }
 }
