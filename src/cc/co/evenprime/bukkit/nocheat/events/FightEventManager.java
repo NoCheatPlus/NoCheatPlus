@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
@@ -35,6 +36,7 @@ public class FightEventManager extends EventManager {
         this.checks.add(new SelfhitCheck(plugin));
 
         registerListener(Event.Type.ENTITY_DAMAGE, Priority.Lowest, true, plugin.getPerformance(Type.FIGHT));
+        registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false, null);
     }
 
     @Override
@@ -67,6 +69,11 @@ public class FightEventManager extends EventManager {
 
         if(cancelled)
             event.setCancelled(cancelled);
+    }
+    
+    @Override
+    protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
+        plugin.getPlayer(event.getPlayer().getName()).getData().fight.armswung = true;
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

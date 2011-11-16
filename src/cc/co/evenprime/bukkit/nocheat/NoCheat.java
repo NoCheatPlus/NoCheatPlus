@@ -24,10 +24,9 @@ import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManager;
-import cc.co.evenprime.bukkit.nocheat.events.PlayerChatEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.PlayerMoveEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.ChatEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.MovingEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.SwingEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.TimedEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
@@ -99,13 +98,12 @@ public class NoCheat extends JavaPlugin {
 
         eventManagers = new ArrayList<EventManager>(8); // Big enough
         // Then set up the event listeners
-        eventManagers.add(new PlayerMoveEventManager(this));
+        eventManagers.add(new MovingEventManager(this));
         eventManagers.add(new PlayerTeleportEventManager(this));
-        eventManagers.add(new PlayerChatEventManager(this));
+        eventManagers.add(new ChatEventManager(this));
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new FightEventManager(this));
-        eventManagers.add(new SwingEventManager(this));
         TimedEventManager m = new TimedEventManager(this);
         taskId = m.taskId; // There's a bukkit task, remember its id
         eventManagers.add(m);

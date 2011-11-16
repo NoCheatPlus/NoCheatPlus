@@ -8,6 +8,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
@@ -42,6 +43,7 @@ public class BlockBreakEventManager extends EventManager {
 
         registerListener(Event.Type.BLOCK_BREAK, Priority.Lowest, true, plugin.getPerformance(Type.BLOCKBREAK));
         registerListener(Event.Type.BLOCK_DAMAGE, Priority.Monitor, true, plugin.getPerformance(Type.BLOCKDAMAGE));
+        registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false, null);
     }
 
     @Override
@@ -84,6 +86,11 @@ public class BlockBreakEventManager extends EventManager {
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks
         data.instaBrokenBlockLocation.set(event.getBlock());
+    }
+    
+    @Override
+    protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
+        plugin.getPlayer(event.getPlayer().getName()).getData().blockbreak.armswung = true;
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

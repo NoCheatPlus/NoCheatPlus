@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
@@ -40,10 +41,13 @@ public class PlayerTeleportEventManager extends EventManager {
             if(!event.isCancelled())
                 return;
 
-            final MovingData data = plugin.getPlayer(event.getPlayer().getName()).getData().moving;
+            NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+            final MovingData data = player.getData().moving;
 
             if(data.teleportTo.isSet() && data.teleportTo.equals(event.getTo())) {
-                event.setCancelled(false);
+                if(player.getConfiguration().debug.overrideIdiocy) {
+                    event.setCancelled(false);
+                }
             }
         }
     }

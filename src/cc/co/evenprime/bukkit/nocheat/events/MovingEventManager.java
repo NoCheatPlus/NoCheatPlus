@@ -34,11 +34,11 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  * evaluate the check results and decide what to
  * 
  */
-public class PlayerMoveEventManager extends EventManager {
+public class MovingEventManager extends EventManager {
 
     private final List<MovingCheck> checks;
 
-    public PlayerMoveEventManager(NoCheat plugin) {
+    public MovingEventManager(NoCheat plugin) {
 
         super(plugin);
 
