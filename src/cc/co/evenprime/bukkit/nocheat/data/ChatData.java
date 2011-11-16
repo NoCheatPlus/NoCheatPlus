@@ -10,5 +10,4 @@ public class ChatData extends Data {
     public final ExecutionHistory history      = new ExecutionHistory();
     public String                 message      = "";
     public int                    spamVL;
-
 }
