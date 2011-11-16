@@ -80,10 +80,14 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     }
 
     public void setLastUsedTime(long currentTimeInMilliseconds) {
-        this.lastUsedTime = System.currentTimeMillis();
+        this.lastUsedTime = currentTimeInMilliseconds;
     }
 
     public boolean shouldBeRemoved(long currentTimeInMilliseconds) {
+        if(lastUsedTime > currentTimeInMilliseconds) {
+            // Should never happen, but if it does, fix it somewhat
+            lastUsedTime = currentTimeInMilliseconds;
+        }
         return lastUsedTime + 60000L < currentTimeInMilliseconds;
     }
 
