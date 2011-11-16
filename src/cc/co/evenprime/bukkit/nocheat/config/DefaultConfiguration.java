@@ -260,7 +260,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "");
             w(w, "# Some other log messages that are limited a bit by default, to avoid too extreme spam");
             w(w, "log reachLog 0 5 med [player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations]");
-            w(w, "log directionLog 2 5 med [player] failed [check]: tried to destroy a block out of line of sight. VL [violations]");
+            w(w, "log directionLog 2 5 med [player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
             w(w, "log onliquidLog 2 5 med [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst]. VL [violations]");
             w(w, "log spamLog 0 5 med [player] failed [check]: Last sent message \"[text]\". VL [violations]");
             w(w, "log nofallLog 0 5 med [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations]");

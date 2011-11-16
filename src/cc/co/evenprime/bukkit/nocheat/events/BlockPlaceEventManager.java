@@ -33,8 +33,8 @@ public class BlockPlaceEventManager extends EventManager {
         super(plugin);
 
         this.checks = new ArrayList<BlockPlaceCheck>(2);
-        this.checks.add(new DirectionCheck(plugin));
         this.checks.add(new ReachCheck(plugin));
+        this.checks.add(new DirectionCheck(plugin));
 
         registerListener(Event.Type.BLOCK_PLACE, Priority.Lowest, true, plugin.getPerformance(Type.BLOCKPLACE));
     }
@@ -42,7 +42,7 @@ public class BlockPlaceEventManager extends EventManager {
     @Override
     protected void handleBlockPlaceEvent(BlockPlaceEvent event, Priority priority) {
 
-        if(event.getBlock() == null)
+        if(event.getBlock() == null || event.getBlockAgainst() == null)
             return;
 
         boolean cancelled = false;
@@ -58,7 +58,6 @@ public class BlockPlaceEventManager extends EventManager {
 
         data.blockPlaced.set(event.getBlock());
         data.blockPlacedAgainst.set(event.getBlockAgainst());
-        data.placedType = event.getBlock().getType();
 
         for(BlockPlaceCheck check : checks) {
             // If it should be executed, do it

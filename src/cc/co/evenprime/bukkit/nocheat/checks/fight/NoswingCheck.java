@@ -8,7 +8,6 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCar
 import cc.co.evenprime.bukkit.nocheat.checks.FightCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCFight;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.FightData;
 
 public class NoswingCheck extends FightCheck {
@@ -20,11 +19,10 @@ public class NoswingCheck extends FightCheck {
     public boolean check(NoCheatPlayer player, FightData data, CCFight cc) {
 
         boolean cancel = false;
-
-        BaseData d = player.getData();
+        
         // did he swing his arm before?
-        if(d.armswung) {
-            d.armswung = false;
+        if(data.armswung) {
+            data.armswung = false;
             data.noswingVL *= 0.90D;
         } else {
             data.noswingVL += 1;

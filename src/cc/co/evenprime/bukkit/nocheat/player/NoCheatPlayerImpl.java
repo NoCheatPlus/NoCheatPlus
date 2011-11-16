@@ -69,14 +69,14 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         EntityPlayer ep = ((CraftPlayer) player).getHandle();
         if(ep.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
             // Taken directly from Minecraft code, should work
-            return 1.0F + 0.2F * ep.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1;
+            return 1.0F + 0.2F * (float)(ep.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
         } else {
             return 1.0F;
         }
     }
 
     public boolean isSprinting() {
-        return player.isSprinting() && player.getFoodLevel() > 5;
+        return player.isSprinting();
     }
 
     public void setLastUsedTime(long currentTimeInMilliseconds) {

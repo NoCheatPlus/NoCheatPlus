@@ -75,6 +75,11 @@ public class DirectionCheck extends BlockPlaceCheck {
 
         // If the player is still in penalty time, cancel the event anyway
         if(data.directionLastViolationTime + cc.directionPenaltyTime > time) {
+            if(data.directionLastViolationTime > time) {
+                System.out.println("Nocheat noted that your time ran backwards for " + (data.directionLastViolationTime - time) + " ms");
+                // Security check for server time changed situations
+                data.directionLastViolationTime = 0;
+            }
             return true;
         }
 

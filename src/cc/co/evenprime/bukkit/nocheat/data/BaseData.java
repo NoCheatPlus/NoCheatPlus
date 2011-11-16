@@ -11,8 +11,6 @@ public class BaseData extends Data {
 
     private final Data[]        data;      // for convenience
 
-    public boolean              armswung;
-
     public BaseData() {
         this.blockbreak = new BlockBreakData();
         this.blockplace = new BlockPlaceData();

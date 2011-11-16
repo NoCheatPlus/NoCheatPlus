@@ -20,6 +20,5 @@ public class BlockPlaceData extends Data {
     public void clearCriticalData() {
         blockPlacedAgainst.reset();
         blockPlaced.reset();
-        placedType = null;
     }
 }

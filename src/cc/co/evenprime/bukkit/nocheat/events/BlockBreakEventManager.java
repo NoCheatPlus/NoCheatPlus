@@ -37,9 +37,9 @@ public class BlockBreakEventManager extends EventManager {
 
         // Three checks exist for this event type
         this.checks = new ArrayList<BlockBreakCheck>(3);
-        this.checks.add(new DirectionCheck(plugin));
         this.checks.add(new NoswingCheck(plugin));
         this.checks.add(new ReachCheck(plugin));
+        this.checks.add(new DirectionCheck(plugin));
 
         registerListener(Event.Type.BLOCK_BREAK, Priority.Lowest, true, plugin.getPerformance(Type.BLOCKBREAK));
         registerListener(Event.Type.BLOCK_DAMAGE, Priority.Monitor, true, plugin.getPerformance(Type.BLOCKDAMAGE));

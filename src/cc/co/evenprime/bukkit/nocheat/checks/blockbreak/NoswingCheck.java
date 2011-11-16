@@ -8,7 +8,6 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCar
 import cc.co.evenprime.bukkit.nocheat.checks.BlockBreakCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockBreak;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 
 public class NoswingCheck extends BlockBreakCheck {
@@ -21,11 +20,9 @@ public class NoswingCheck extends BlockBreakCheck {
 
         boolean cancel = false;
 
-        BaseData d = player.getData();
-
         // did he swing his arm before?
-        if(d.armswung) {
-            d.armswung = false;
+        if(data.armswung) {
+            data.armswung = false;
             data.noswingVL *= 0.90D;
         } else {
             data.noswingVL += 1;
