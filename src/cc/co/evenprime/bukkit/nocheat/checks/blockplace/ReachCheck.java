@@ -29,7 +29,7 @@ public class ReachCheck extends BlockPlaceCheck {
 
         final SimpleLocation placedAgainstBlock = data.blockPlacedAgainst;
 
-        final double distance = CheckUtil.reachCheck(player, placedAgainstBlock.x + 0.5D, placedAgainstBlock.y + 0.5D, placedAgainstBlock.z + 0.5D, cc.reachDistance);
+        final double distance = CheckUtil.reachCheck(player, placedAgainstBlock.x + 0.5D, placedAgainstBlock.y + 0.5D, placedAgainstBlock.z + 0.5D, player.isCreative() ? cc.reachDistance + 2 : cc.reachDistance);
 
         if(distance > 0D) {
             // Player failed the check

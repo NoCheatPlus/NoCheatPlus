@@ -92,6 +92,6 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     }
 
     public boolean isCreative() {
-        return player.getGameMode().equals(GameMode.CREATIVE);
+        return player.getGameMode() == GameMode.CREATIVE;
     }
 }
