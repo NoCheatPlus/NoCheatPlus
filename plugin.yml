@@ -1,9 +1,12 @@
 name: NoCheat
+version: ${project.version}
+description: ${project.description}
 
 author: Evenprime
+website: ${project.url}
 
 main: cc.co.evenprime.bukkit.nocheat.NoCheat
-version: 2.16c
+
 
 commands:
   nocheat:

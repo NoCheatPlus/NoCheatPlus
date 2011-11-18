@@ -42,7 +42,7 @@ public class SelfhitCheck extends FightCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().fight.selfhitVL);
+            return String.format(Locale.US, "%d", (int) player.getData().fight.selfhitVL);
         default:
             return super.getParameter(wildcard, player);
         }

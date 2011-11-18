@@ -74,7 +74,7 @@ public class MorePacketsCheck extends MovingCheck {
             // went over the limit
             if(!plugin.skipCheck() && packetsAboveLimit > 0) {
                 data.morePacketsVL += packetsAboveLimit;
-                
+
                 data.packets = packetsAboveLimit;
 
                 final boolean cancel = executeActions(player, cc.morePacketsActions.getActions(data.morePacketsVL));
@@ -103,13 +103,13 @@ public class MorePacketsCheck extends MovingCheck {
     public boolean isEnabled(CCMoving moving) {
         return moving.morePacketsCheck;
     }
-    
+
     @Override
     public String getParameter(WildCard wildcard, NoCheatPlayer player) {
 
         switch (wildcard) {
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().moving.morePacketsVL);
+            return String.format(Locale.US, "%d", (int) player.getData().moving.morePacketsVL);
         case PACKETS:
             return String.valueOf(player.getData().moving.packets);
         default:

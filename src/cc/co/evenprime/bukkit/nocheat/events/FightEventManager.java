@@ -70,7 +70,7 @@ public class FightEventManager extends EventManager {
         if(cancelled)
             event.setCancelled(cancelled);
     }
-    
+
     @Override
     protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
         plugin.getPlayer(event.getPlayer()).getData().fight.armswung = true;

@@ -6,7 +6,6 @@ public class CCDebug {
 
     public final boolean showchecks;
     public final boolean overrideIdiocy;
-    
 
     public CCDebug(Configuration data) {
 

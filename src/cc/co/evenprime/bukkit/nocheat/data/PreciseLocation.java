@@ -3,9 +3,10 @@ package cc.co.evenprime.bukkit.nocheat.data;
 import org.bukkit.Location;
 
 /**
- * A class to store x,y,z triple data, instead of using bukkits Location objects,
+ * A class to store x,y,z triple data, instead of using bukkits Location
+ * objects,
  * which can't be easily recycled
- *
+ * 
  */
 public final class PreciseLocation {
 
@@ -32,6 +33,7 @@ public final class PreciseLocation {
     public final boolean isSet() {
         return x != Double.MAX_VALUE;
     }
+
     public final void reset() {
         x = Double.MAX_VALUE;
         y = Double.MAX_VALUE;

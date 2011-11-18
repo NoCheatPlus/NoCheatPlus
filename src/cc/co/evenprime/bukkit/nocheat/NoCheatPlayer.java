@@ -8,7 +8,7 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 public interface NoCheatPlayer {
 
     public boolean hasPermission(String permission);
-    
+
     public String getName();
 
     public Player getPlayer();
@@ -16,11 +16,11 @@ public interface NoCheatPlayer {
     public BaseData getData();
 
     public boolean isSprinting();
-    
+
     public int getTicksLived();
-    
+
     public void increaseAge(int ticks);
-    
+
     public ConfigurationCache getConfiguration();
 
     public float getSpeedAmplifier();

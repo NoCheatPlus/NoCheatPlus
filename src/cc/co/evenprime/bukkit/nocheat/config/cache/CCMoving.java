@@ -38,7 +38,7 @@ public class CCMoving {
 
         check = data.getBoolean(Configuration.MOVING_CHECK);
         identifyCreativeMode = data.getBoolean(Configuration.MOVING_IDENTIFYCREATIVEMODE);
-        
+
         runflyCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECK);
         walkingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_WALKINGSPEEDLIMIT)) / 100D;
         sprintingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SPRINTINGSPEEDLIMIT)) / 100D;

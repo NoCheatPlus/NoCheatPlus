@@ -37,7 +37,7 @@ public class GodmodeCheck extends TimedCheck {
         boolean cancel = false;
 
         // How far behind is the player with his ticks
-        int behind = Math.min(10, (data.ticksLived + cc.tickTime) - ticksLived);        
+        int behind = Math.min(10, (data.ticksLived + cc.tickTime) - ticksLived);
         // difference should be >= tickTime for perfect synchronization
         if(behind <= 1) {
             // player as fast as expected, give him credit for that
@@ -45,7 +45,7 @@ public class GodmodeCheck extends TimedCheck {
             // Reduce violation level over time
             data.godmodeVL -= cc.tickTime / 2.0;
 
-        } else if(behind <= (cc.tickTime / 2)+1) {
+        } else if(behind <= (cc.tickTime / 2) + 1) {
             // close enough, let it pass
             data.ticksBehind -= cc.tickTime / 4;
             // Reduce violation level over time
@@ -63,16 +63,14 @@ public class GodmodeCheck extends TimedCheck {
 
                 cancel = executeActions(player, cc.godmodeActions.getActions(data.godmodeVL));
 
-
                 if(cancel) {
                     // Catch up for at least some of the ticks
                     try {
                         player.increaseAge(cc.tickTime);
-                    }
-                    catch(Exception e) {
+                    } catch(Exception e) {
                         e.printStackTrace();
                     }
-                    
+
                     // Reduce the time the player is behind accordingly
                     data.ticksBehind -= cc.tickTime;
                 }
@@ -82,7 +80,7 @@ public class GodmodeCheck extends TimedCheck {
         if(data.ticksBehind < 0) {
             data.ticksBehind = 0;
         }
-        
+
         if(data.godmodeVL < 0) {
             data.godmodeVL = 0;
         }
@@ -104,7 +102,7 @@ public class GodmodeCheck extends TimedCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().timed.godmodeVL);
+            return String.format(Locale.US, "%d", (int) player.getData().timed.godmodeVL);
         default:
             return super.getParameter(wildcard, player);
         }

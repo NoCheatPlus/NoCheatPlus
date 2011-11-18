@@ -82,7 +82,7 @@ public class DirectionCheck extends BlockBreakCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().blockbreak.directionVL);
+            return String.format(Locale.US, "%d", (int) player.getData().blockbreak.directionVL);
 
         default:
             return super.getParameter(wildcard, player);

@@ -77,7 +77,7 @@ public class DirectionCheck extends FightCheck {
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().fight.directionVL);
+            return String.format(Locale.US, "%d", (int) player.getData().fight.directionVL);
         default:
             return super.getParameter(wildcard, player);
         }

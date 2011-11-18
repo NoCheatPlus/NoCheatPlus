@@ -225,7 +225,7 @@ public abstract class EventManager {
                 m.handlePlayerAnimationEvent(event, priority);
             }
         }
-        
+
         @Override
         public void onPlayerToggleSprint(final PlayerToggleSprintEvent event) {
             if(ignoreCancelledEvents && event.isCancelled())

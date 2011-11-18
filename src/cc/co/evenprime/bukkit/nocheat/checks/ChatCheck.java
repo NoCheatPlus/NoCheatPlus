@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;

@@ -17,7 +17,7 @@ public class BlockBreakData extends Data {
     public double                 noswingVL                  = 0.0D;
     public double                 reachDistance;
     public boolean                armswung                   = true;
-    
+
     @Override
     public void clearCriticalData() {
         instaBrokenBlockLocation.reset();

@@ -9,8 +9,6 @@ public class PerformanceManager {
         BLOCKBREAK, BLOCKDAMAGE, BLOCKPLACE, CHAT, MOVING, VELOCITY, FIGHT, TIMED
     }
 
-
-
     private final Map<Type, Performance> map;
 
     public PerformanceManager() {

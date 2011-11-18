@@ -89,7 +89,7 @@ public class MovingEventManager extends EventManager {
         if(event.getPlayer().isInsideVehicle()) {
             return;
         }
-        
+
         // Get the world-specific configuration that applies here
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final CCMoving cc = player.getConfiguration().moving;

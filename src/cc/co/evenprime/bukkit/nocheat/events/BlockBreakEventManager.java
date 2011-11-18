@@ -87,7 +87,7 @@ public class BlockBreakEventManager extends EventManager {
         // direction check that are insta-breaks
         data.instaBrokenBlockLocation.set(event.getBlock());
     }
-    
+
     @Override
     protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
         plugin.getPlayer(event.getPlayer()).getData().blockbreak.armswung = true;

@@ -68,7 +68,7 @@ public class PlayerManager {
     public void cleanDataMap() {
         long time = System.currentTimeMillis();
         List<String> removals = new ArrayList<String>(5);
-        
+
         for(Entry<String, NoCheatPlayerImpl> e : this.players.entrySet()) {
             if(e.getValue().shouldBeRemoved(time)) {
                 removals.add(e.getKey());

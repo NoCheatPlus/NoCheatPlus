@@ -47,10 +47,9 @@ public class FlyingCheck extends MovingCheck {
         // In case of creative gamemode, give at least 0.60 speed limit
         // horizontal
         double speedLimitHorizontal = player.isCreative() ? Math.max(creativeSpeed, ccmoving.flyingSpeedLimitHorizontal) : ccmoving.flyingSpeedLimitHorizontal;
-        
 
         speedLimitHorizontal *= player.getSpeedAmplifier();
-        
+
         result += Math.max(0.0D, horizontalDistance - moving.horizFreedom - speedLimitHorizontal);
 
         boolean sprinting = player.isSprinting();
@@ -99,13 +98,13 @@ public class FlyingCheck extends MovingCheck {
     public boolean isEnabled(CCMoving moving) {
         return moving.allowFlying && moving.runflyCheck;
     }
-    
+
     public String getParameter(WildCard wildcard, NoCheatPlayer player) {
 
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().moving.runflyVL);
+            return String.format(Locale.US, "%d", (int) player.getData().moving.runflyVL);
         default:
             return super.getParameter(wildcard, player);
         }

@@ -36,13 +36,13 @@ public class NoswingCheck extends BlockBreakCheck {
     public boolean isEnabled(CCBlockBreak cc) {
         return cc.noswingCheck;
     }
-    
+
     public String getParameter(WildCard wildcard, NoCheatPlayer player) {
 
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().blockbreak.noswingVL);
+            return String.format(Locale.US, "%d", (int) player.getData().blockbreak.noswingVL);
 
         default:
             return super.getParameter(wildcard, player);

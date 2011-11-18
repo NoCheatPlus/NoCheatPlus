@@ -9,11 +9,10 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.events.EventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
-
 public class ActiveCheckPrinter {
 
     public static void printActiveChecks(NoCheat plugin, List<EventManager> eventManagers) {
-        
+
         boolean introPrinted = false;
         String intro = "[NoCheat] Active Checks: ";
 

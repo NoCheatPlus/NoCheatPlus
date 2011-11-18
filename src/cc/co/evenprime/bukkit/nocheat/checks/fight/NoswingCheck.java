@@ -19,7 +19,7 @@ public class NoswingCheck extends FightCheck {
     public boolean check(NoCheatPlayer player, FightData data, CCFight cc) {
 
         boolean cancel = false;
-        
+
         // did he swing his arm before?
         if(data.armswung) {
             data.armswung = false;
@@ -37,13 +37,13 @@ public class NoswingCheck extends FightCheck {
     public boolean isEnabled(CCFight cc) {
         return cc.noswingCheck;
     }
-    
+
     public String getParameter(WildCard wildcard, NoCheatPlayer player) {
 
         switch (wildcard) {
 
         case VIOLATIONS:
-            return String.format(Locale.US, "%d", (int)player.getData().fight.noswingVL);
+            return String.format(Locale.US, "%d", (int) player.getData().fight.noswingVL);
         default:
             return super.getParameter(wildcard, player);
         }

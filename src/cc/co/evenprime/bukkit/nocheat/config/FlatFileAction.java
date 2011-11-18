@@ -48,7 +48,7 @@ public class FlatFileAction {
         } catch(IOException e) {
             e.printStackTrace();
         }
-        
+
         for(Action a : actions) {
             mapper.addAction(a);
         }
@@ -62,50 +62,45 @@ public class FlatFileAction {
 
         // four pieces is the minimum we need, no matter what it is
         if(parts.length < 4) {
-            throw new IllegalArgumentException("The line "+line+" of the file "+file.getName()+" is malformed. It has not enough parts.");
+            throw new IllegalArgumentException("The line " + line + " of the file " + file.getName() + " is malformed. It has not enough parts.");
         }
-        
+
         String type = parts[0];
         String name = parts[1];
 
         int delay = 0;
         try {
             delay = Integer.parseInt(parts[2]);
+        } catch(Exception e) {
+            throw new IllegalArgumentException("Couldn't parse third parameter of action " + name + " from file " + file.getName() + ". It is " + parts[2] + " but should be a number.");
         }
-        catch(Exception e) {
-            throw new IllegalArgumentException("Couldn't parse third parameter of action "+name+" from file "+file.getName()+". It is "+parts[2]+" but should be a number.");
-        }
-        
+
         int repeat = 0;
         try {
             repeat = Integer.parseInt(parts[3]);
+        } catch(Exception e) {
+            throw new IllegalArgumentException("Couldn't parse fourth parameter of action " + name + " from file " + file.getName() + ". It is " + parts[2] + " but should be a number.");
         }
-        catch(Exception e) {
-            throw new IllegalArgumentException("Couldn't parse fourth parameter of action "+name+" from file "+file.getName()+". It is "+parts[2]+" but should be a number.");
-        }
-                
+
         if(type.equalsIgnoreCase("log")) {
             // A log action, it seems
             if(parts.length < 5) {
-                throw new IllegalArgumentException("Missing fifth parameter of action "+name+" from file "+file.getName()+".");
+                throw new IllegalArgumentException("Missing fifth parameter of action " + name + " from file " + file.getName() + ".");
             }
-            
+
             return readLogAction(name, delay, repeat, parts[4]);
-        }
-        else if(type.equalsIgnoreCase("consolecommand")) {
+        } else if(type.equalsIgnoreCase("consolecommand")) {
             // A consolecommand action, it seems
             if(parts.length < 5) {
-                throw new IllegalArgumentException("Missing fifth parameter of action "+name+" from file "+file.getName()+".");
+                throw new IllegalArgumentException("Missing fifth parameter of action " + name + " from file " + file.getName() + ".");
             }
-            
+
             return new ConsolecommandAction(name, delay, repeat, parts[4]);
-        }
-        else if(type.equalsIgnoreCase("special")) {
+        } else if(type.equalsIgnoreCase("special")) {
             // A "special" actions, it seems
             return new SpecialAction(name, delay, repeat);
-        }
-        else {
-            throw new IllegalArgumentException("Unknown action type "+type+ " of action with name "+name+".");
+        } else {
+            throw new IllegalArgumentException("Unknown action type " + type + " of action with name " + name + ".");
         }
     }
 
@@ -113,19 +108,18 @@ public class FlatFileAction {
     private Action readLogAction(String name, int delay, int repeat, String lastPart) {
 
         String[] rest = lastPart.split("\\s+", 2);
-        
+
         if(rest.length < 2) {
-            throw new IllegalArgumentException("Missing sixth parameter of action "+name+" from file "+file.getName()+".");
+            throw new IllegalArgumentException("Missing sixth parameter of action " + name + " from file " + file.getName() + ".");
         }
-        
+
         LogLevel level;
         try {
             level = LogLevel.getLogLevelFromString(rest[0]);
+        } catch(IllegalArgumentException e) {
+            throw new IllegalArgumentException("Illegal fifth parameter of action " + name + ". " + e.getMessage());
         }
-        catch(IllegalArgumentException e) {
-            throw new IllegalArgumentException("Illegal fifth parameter of action "+name+". "+e.getMessage());
-        }
-        
+
         return new LogAction(name, delay, repeat, level, rest[1]);
     }
 

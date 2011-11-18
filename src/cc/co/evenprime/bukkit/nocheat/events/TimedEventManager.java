@@ -80,7 +80,7 @@ public class TimedEventManager extends EventManager {
                         if(performanceCheck)
                             nanoTimeStart = System.nanoTime();
 
-                        handleEvent(plugin.getPlayer((Player)p.getBukkitEntity()));
+                        handleEvent(plugin.getPlayer((Player) p.getBukkitEntity()));
 
                         // store performance time
                         if(performanceCheck)
