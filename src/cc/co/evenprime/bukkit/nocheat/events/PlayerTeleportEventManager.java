@@ -41,7 +41,7 @@ public class PlayerTeleportEventManager extends EventManager {
             if(!event.isCancelled())
                 return;
 
-            NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+            NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
             final MovingData data = player.getData().moving;
 
             if(data.teleportTo.isSet() && data.teleportTo.equals(event.getTo())) {
@@ -72,7 +72,7 @@ public class PlayerTeleportEventManager extends EventManager {
 
         // Fix a common mistake that other developers make (cancelling move
         // events is crazy, rather set the target location to the from location
-        if(plugin.getPlayer(event.getPlayer().getName()).getConfiguration().debug.overrideIdiocy) {
+        if(plugin.getPlayer(event.getPlayer()).getConfiguration().debug.overrideIdiocy) {
             event.setCancelled(false);
             event.setTo(event.getFrom().clone());
         }
@@ -81,7 +81,7 @@ public class PlayerTeleportEventManager extends EventManager {
     @Override
     protected void handlePlayerToggleSprintEvent(final PlayerToggleSprintEvent event, final Priority priority) {
         if(event.isCancelled() && event.isSprinting()) {
-            if(plugin.getPlayer(event.getPlayer().getName()).getConfiguration().debug.overrideIdiocy)
+            if(plugin.getPlayer(event.getPlayer()).getConfiguration().debug.overrideIdiocy)
                 event.setCancelled(false);
         }
     }

@@ -47,7 +47,7 @@ public class BlockPlaceEventManager extends EventManager {
 
         boolean cancelled = false;
 
-        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final CCBlockPlace cc = player.getConfiguration().blockplace;
 
         if(!cc.check || player.hasPermission(Permissions.BLOCKPLACE)) {

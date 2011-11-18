@@ -51,7 +51,7 @@ public class BlockBreakEventManager extends EventManager {
 
         boolean cancelled = false;
 
-        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final CCBlockBreak cc = player.getConfiguration().blockbreak;
 
         if(!cc.check || player.hasPermission(Permissions.BLOCKBREAK)) {
@@ -81,7 +81,7 @@ public class BlockBreakEventManager extends EventManager {
             return;
 
         // Get the player-specific stored data that applies here
-        final BlockBreakData data = plugin.getPlayer(event.getPlayer().getName()).getData().blockbreak;
+        final BlockBreakData data = plugin.getPlayer(event.getPlayer()).getData().blockbreak;
 
         // Remember this location. We ignore block breaks in the block-break
         // direction check that are insta-breaks
@@ -90,7 +90,7 @@ public class BlockBreakEventManager extends EventManager {
     
     @Override
     protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
-        plugin.getPlayer(event.getPlayer().getName()).getData().blockbreak.armswung = true;
+        plugin.getPlayer(event.getPlayer()).getData().blockbreak.armswung = true;
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

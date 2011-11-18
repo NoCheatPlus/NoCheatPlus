@@ -187,8 +187,8 @@ public class NoCheat extends JavaPlugin {
 
     }
 
-    public NoCheatPlayer getPlayer(String playerName) {
-        return players.getPlayer(playerName);
+    public NoCheatPlayer getPlayer(Player player) {
+        return players.getPlayer(player);
     }
 
 }

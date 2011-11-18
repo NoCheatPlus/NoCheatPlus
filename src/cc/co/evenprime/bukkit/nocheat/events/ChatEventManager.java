@@ -44,7 +44,7 @@ public class ChatEventManager extends EventManager {
 
         boolean cancelled = false;
 
-        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final CCChat cc = player.getConfiguration().chat;
         
         if(!cc.check || player.hasPermission(Permissions.CHAT)) {

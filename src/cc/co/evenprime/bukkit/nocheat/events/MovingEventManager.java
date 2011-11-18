@@ -55,7 +55,7 @@ public class MovingEventManager extends EventManager {
     @Override
     protected void handleBlockPlaceEvent(final BlockPlaceEvent event, final Priority priority) {
 
-        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         // Get the player-specific stored data that applies here
         final MovingData data = player.getData().moving;
 
@@ -91,7 +91,7 @@ public class MovingEventManager extends EventManager {
         }
         
         // Get the world-specific configuration that applies here
-        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer().getName());
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final CCMoving cc = player.getConfiguration().moving;
 
         if(!cc.check || player.hasPermission(Permissions.MOVING)) {
@@ -147,7 +147,7 @@ public class MovingEventManager extends EventManager {
     @Override
     protected void handlePlayerVelocityEvent(final PlayerVelocityEvent event, final Priority priority) {
 
-        final MovingData data = plugin.getPlayer(event.getPlayer().getName()).getData().moving;
+        final MovingData data = plugin.getPlayer(event.getPlayer()).getData().moving;
 
         final Vector v = event.getVelocity();
 

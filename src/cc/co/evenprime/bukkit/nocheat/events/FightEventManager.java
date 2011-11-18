@@ -45,7 +45,7 @@ public class FightEventManager extends EventManager {
         // Our event listener already checked if that cast is valid
         final Player damager = (Player) event.getDamager();
 
-        final NoCheatPlayer player = plugin.getPlayer(damager.getName());
+        final NoCheatPlayer player = plugin.getPlayer(damager);
         final CCFight cc = player.getConfiguration().fight;
 
         if(!cc.check || player.hasPermission(Permissions.FIGHT)) {
@@ -73,7 +73,7 @@ public class FightEventManager extends EventManager {
     
     @Override
     protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
-        plugin.getPlayer(event.getPlayer().getName()).getData().fight.armswung = true;
+        plugin.getPlayer(event.getPlayer()).getData().fight.armswung = true;
     }
 
     public List<String> getActiveChecks(ConfigurationCache cc) {

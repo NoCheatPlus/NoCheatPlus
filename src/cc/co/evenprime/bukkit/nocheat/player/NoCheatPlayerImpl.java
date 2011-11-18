@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.player;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -15,18 +14,21 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
 public class NoCheatPlayerImpl implements NoCheatPlayer {
 
-    private final Player   player;
+    private Player         player;
     private final NoCheat  plugin;
     private final BaseData data;
-
     private long           lastUsedTime;
 
-    public NoCheatPlayerImpl(String playerName, NoCheat plugin, BaseData data) {
-        this.player = Bukkit.getServer().getPlayer(playerName);
+    public NoCheatPlayerImpl(Player player, NoCheat plugin, BaseData data) {
+        this.player = player;
         this.plugin = plugin;
         this.data = data;
 
         this.lastUsedTime = System.currentTimeMillis();
+    }
+
+    public void refresh(Player player) {
+        this.player = player;
     }
 
     public boolean hasPermission(String permission) {
@@ -69,7 +71,7 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         EntityPlayer ep = ((CraftPlayer) player).getHandle();
         if(ep.hasEffect(MobEffectList.FASTER_MOVEMENT)) {
             // Taken directly from Minecraft code, should work
-            return 1.0F + 0.2F * (float)(ep.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
+            return 1.0F + 0.2F * (float) (ep.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
         } else {
             return 1.0F;
         }

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.entity.Player;
+
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.player.NoCheatPlayerImpl;
@@ -29,18 +31,19 @@ public class PlayerManager {
      * Get a data object of the specified class. If none is stored yet, create
      * one.
      */
-    public NoCheatPlayer getPlayer(String playerName) {
+    public NoCheatPlayer getPlayer(Player player) {
 
-        NoCheatPlayerImpl p = this.players.get(playerName);
+        NoCheatPlayerImpl p = this.players.get(player.getName());
 
         if(p == null) {
             // TODO: Differentiate which player"type" should be created, e.g.
             // based on bukkit version
-            p = new NoCheatPlayerImpl(playerName, plugin, new BaseData());
-            this.players.put(playerName, p);
+            p = new NoCheatPlayerImpl(player, plugin, new BaseData());
+            this.players.put(player.getName(), p);
         }
 
         p.setLastUsedTime(System.currentTimeMillis());
+        p.refresh(player);
 
         return p;
     }

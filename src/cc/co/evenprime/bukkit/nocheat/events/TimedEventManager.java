@@ -8,6 +8,7 @@ import java.util.List;
 import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
@@ -79,7 +80,7 @@ public class TimedEventManager extends EventManager {
                         if(performanceCheck)
                             nanoTimeStart = System.nanoTime();
 
-                        handleEvent(plugin.getPlayer(p.name));
+                        handleEvent(plugin.getPlayer((Player)p.getBukkitEntity()));
 
                         // store performance time
                         if(performanceCheck)
