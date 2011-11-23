@@ -36,9 +36,9 @@ public class TimedEventManager extends EventManagerImpl {
         this.timedPerformance = plugin.getPerformance(Type.TIMED);
 
         try {
-            // Get an error thrown if "b" doesn't exist
-            EntityPlayer.class.getMethod("b", Boolean.class);
-
+            // Get an error thrown if "entityPlayer.b(boolean)" doesn't exist
+            EntityPlayer.class.getMethod("b", boolean.class);
+            
             checks.add(new GodmodeCheck(plugin));
 
         } catch(NoSuchMethodException e1) {
