@@ -1,5 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.player;
 
+import java.lang.reflect.Method;
+
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
@@ -14,12 +16,17 @@ import cc.co.evenprime.bukkit.nocheat.data.BaseData;
 
 public class NoCheatPlayerImpl implements NoCheatPlayer {
 
-    private Player         player;
-    private final NoCheat  plugin;
-    private final BaseData data;
-    private long           lastUsedTime;
+    protected Player         player;
+    protected final NoCheat  plugin;
+    protected final BaseData data;
+    protected long           lastUsedTime;
+
+    // The method that's used to artifically "fast-forward" the player
+    protected static Method  incAge = null;
 
     public NoCheatPlayerImpl(Player player, NoCheat plugin, BaseData data) {
+        
+        System.out.println(incAge != null ? incAge.toString() : null);
         this.player = player;
         this.plugin = plugin;
         this.data = data;
@@ -60,11 +67,20 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     }
 
     public void increaseAge(int ticks) {
+
+        if(incAge == null) {
+            player.setTicksLived(player.getTicksLived() + ticks);
+            return;
+        }
+
         EntityPlayer p = ((CraftPlayer) player).getHandle();
 
         for(int i = 0; i < ticks; i++) {
-            // TODO: This is highly fragile and breaks every update!!
-            p.b(true); // Catch up with the server, one tick at a time
+            try {
+                incAge.invoke(p, true);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

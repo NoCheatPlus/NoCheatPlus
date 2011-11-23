@@ -20,15 +20,14 @@ import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
-
-import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
+import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.ChatEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
+import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.MovingEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.TimedEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
 
@@ -50,7 +49,13 @@ public class NoCheat extends JavaPlugin {
 
     private LagMeasureTask         lagMeasureTask;
 
-    private int                    taskId = -1;
+    private int                    taskId    = -1;
+
+    private MCVersion              mcVersion = MCVersion.Unknown;
+
+    public enum MCVersion {
+        MC100, MC181, Unknown
+    }
 
     public NoCheat() {
 
@@ -86,7 +91,15 @@ public class NoCheat extends JavaPlugin {
         // First set up logging
         this.log = new LogManager();
 
-        log.logToConsole(LogLevel.LOW, "[NoCheat] This version is for CB #1337. It may break at any time and for any other version.");
+        // find out Minecraft version
+        if(Bukkit.getVersion().contains("MC: 1.0.0")) {
+            this.mcVersion = MCVersion.MC100;
+        } else if(Bukkit.getVersion().contains("MC: 1.8.1")) {
+            this.mcVersion = MCVersion.MC181;
+        } else {
+            this.mcVersion = MCVersion.Unknown;
+            log.logToConsole(LogLevel.LOW, "[NoCheat] You run an unsupported version of Minecraft. Some parts of NoCheat get disabled for your safety.");
+        }
 
         // Then set up in memory per player data storage
         this.players = new PlayerManager(this);
@@ -106,7 +119,6 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new FightEventManager(this));
 
-        System.out.println(Bukkit.getVersion());
         TimedEventManager m = new TimedEventManager(this);
         taskId = m.taskId; // There's a bukkit task, remember its id
         eventManagers.add(m);
@@ -194,4 +206,7 @@ public class NoCheat extends JavaPlugin {
         return players.getPlayer(player);
     }
 
+    public MCVersion getMCVersion() {
+        return mcVersion;
+    }
 }

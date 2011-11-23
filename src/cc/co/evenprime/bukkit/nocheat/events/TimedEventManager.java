@@ -33,20 +33,8 @@ public class TimedEventManager extends EventManagerImpl {
 
         checks = new ArrayList<TimedCheck>(1);
 
+        checks.add(new GodmodeCheck(plugin));
         this.timedPerformance = plugin.getPerformance(Type.TIMED);
-
-        try {
-            // Get an error thrown if "entityPlayer.b(boolean)" doesn't exist
-            EntityPlayer.class.getMethod("b", boolean.class);
-            
-            checks.add(new GodmodeCheck(plugin));
-
-        } catch(NoSuchMethodException e1) {
-            System.out.println("[NoCheat]: Couldn't find needed method for \"timed.godmode\" check, disabling it. You probably run an incompatible craftbukkit version.");
-            System.out.println("[NoCheat]: This problem may be fixed in a newer version of NoCheat (when available).");
-
-            return;
-        }
 
         // "register a listener" for passed time
         this.taskId = plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
