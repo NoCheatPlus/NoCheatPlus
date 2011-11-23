@@ -25,8 +25,7 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     protected static Method  incAge = null;
 
     public NoCheatPlayerImpl(Player player, NoCheat plugin, BaseData data) {
-        
-        System.out.println(incAge != null ? incAge.toString() : null);
+
         this.player = player;
         this.plugin = plugin;
         this.data = data;

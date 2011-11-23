@@ -24,7 +24,7 @@ public class CCBlockPlace {
         check = data.getBoolean(Configuration.BLOCKPLACE_CHECK);
 
         reachCheck = data.getBoolean(Configuration.BLOCKPLACE_REACH_CHECK);
-        reachDistance = data.getInteger(Configuration.BLOCKPLACE_REACH_LIMIT);
+        reachDistance = 535D / 100D;
         reachActions = data.getActionList(Configuration.BLOCKPLACE_REACH_ACTIONS);
 
         directionCheck = data.getBoolean(Configuration.BLOCKPLACE_DIRECTION_CHECK);

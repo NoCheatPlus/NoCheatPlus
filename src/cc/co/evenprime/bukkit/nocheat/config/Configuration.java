@@ -63,7 +63,6 @@ public abstract class Configuration {
 
     private final static OptionNode       BLOCKBREAK_REACH                           = new OptionNode("reach", BLOCKBREAK, DataType.PARENT);
     public final static OptionNode        BLOCKBREAK_REACH_CHECK                     = new OptionNode("check", BLOCKBREAK_REACH, DataType.BOOLEAN);
-    public final static OptionNode        BLOCKBREAK_REACH_LIMIT                     = new OptionNode("limit", BLOCKBREAK_REACH, DataType.INTEGER);
     public final static OptionNode        BLOCKBREAK_REACH_ACTIONS                   = new OptionNode("actions", BLOCKBREAK_REACH, DataType.ACTIONLIST);
 
     private final static OptionNode       BLOCKBREAK_DIRECTION                       = new OptionNode("direction", BLOCKBREAK, DataType.PARENT);
@@ -82,7 +81,6 @@ public abstract class Configuration {
 
     private final static OptionNode       BLOCKPLACE_REACH                           = new OptionNode("reach", BLOCKPLACE, DataType.PARENT);
     public final static OptionNode        BLOCKPLACE_REACH_CHECK                     = new OptionNode("check", BLOCKPLACE_REACH, DataType.BOOLEAN);
-    public final static OptionNode        BLOCKPLACE_REACH_LIMIT                     = new OptionNode("limit", BLOCKPLACE_REACH, DataType.INTEGER);
     public final static OptionNode        BLOCKPLACE_REACH_ACTIONS                   = new OptionNode("actions", BLOCKPLACE_REACH, DataType.ACTIONLIST);
 
     private final static OptionNode       BLOCKPLACE_DIRECTION                       = new OptionNode("direction", BLOCKPLACE, DataType.PARENT);

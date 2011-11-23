@@ -26,7 +26,7 @@ public class CCBlockBreak {
 
         check = data.getBoolean(Configuration.BLOCKBREAK_CHECK);
         reachCheck = data.getBoolean(Configuration.BLOCKBREAK_REACH_CHECK);
-        reachDistance = ((double) data.getInteger(Configuration.BLOCKBREAK_REACH_LIMIT)) / 100D;
+        reachDistance = 535D / 100D;
         reachActions = data.getActionList(Configuration.BLOCKBREAK_REACH_ACTIONS);
         checkinstabreakblocks = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS);
         directionCheck = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECK);

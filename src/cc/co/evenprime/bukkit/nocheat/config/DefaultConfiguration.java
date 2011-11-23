@@ -90,7 +90,6 @@ public class DefaultConfiguration extends Configuration {
             setValue(BLOCKBREAK_CHECK, true);
 
             setValue(BLOCKBREAK_REACH_CHECK, true);
-            setValue(BLOCKBREAK_REACH_LIMIT, 485);
 
             ActionList reachActionList = new ActionList();
             reachActionList.setActions(0, action.getActions("blockbreakCancel".split(" ")));
@@ -117,7 +116,6 @@ public class DefaultConfiguration extends Configuration {
             setValue(BLOCKPLACE_CHECK, true);
 
             setValue(BLOCKPLACE_REACH_CHECK, true);
-            setValue(BLOCKPLACE_REACH_LIMIT, 485);
 
             ActionList reachActionList = new ActionList();
             reachActionList.setActions(0, action.getActions("blockplaceCancel".split(" ")));

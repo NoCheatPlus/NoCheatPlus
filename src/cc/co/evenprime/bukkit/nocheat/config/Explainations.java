@@ -55,7 +55,6 @@ public class Explainations {
         set(Configuration.BLOCKBREAK_CHECK, "If true, do various checks on BlockBreak events.");
 
         set(Configuration.BLOCKBREAK_REACH_CHECK, "If true, check if a player is breaking blocks that are too far away.");
-        set(Configuration.BLOCKBREAK_REACH_LIMIT, "Set the distance limit for breaking blocks.\nUnit is 1/100 of a block, default is 485");
         set(Configuration.BLOCKBREAK_REACH_ACTIONS, "What should be done if a player is breaking blocks that are too far away.\nUnit is number of break(attempt)s beyond the limit.");
 
         set(Configuration.BLOCKBREAK_DIRECTION_CHECK, "If true, check if a player is looking at the block that he's breaking.");
@@ -70,7 +69,6 @@ public class Explainations {
         set(Configuration.BLOCKPLACE_CHECK, "If true, do various checks on BlockPlace events.");
 
         set(Configuration.BLOCKPLACE_REACH_CHECK, "If true, check if a player is placing blocks at locations too far away.");
-        set(Configuration.BLOCKPLACE_REACH_LIMIT, "Set the distance limit for placing blocks.\nUnit is 1/100 of a block, default is 485");
         set(Configuration.BLOCKPLACE_REACH_ACTIONS, "What should be done if a player is placing blocks that are too far away.\nUnit is number of place(attempt)s beyond the limit.");
 
         set(Configuration.BLOCKPLACE_DIRECTION_CHECK, "If true, check if a player is looking at the block that he's placing.");
