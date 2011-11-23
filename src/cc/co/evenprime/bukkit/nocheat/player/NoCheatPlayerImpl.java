@@ -61,6 +61,7 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
 
     public void increaseAge(int ticks) {
         EntityPlayer p = ((CraftPlayer) player).getHandle();
+
         for(int i = 0; i < ticks; i++) {
             // TODO: This is highly fragile and breaks every update!!
             p.b(true); // Catch up with the server, one tick at a time

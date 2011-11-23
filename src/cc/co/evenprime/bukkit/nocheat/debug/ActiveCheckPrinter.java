@@ -4,14 +4,15 @@ import java.util.List;
 
 import org.bukkit.World;
 
+import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.events.EventManager;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 public class ActiveCheckPrinter {
 
-    public static void printActiveChecks(NoCheat plugin, List<EventManager> eventManagers) {
+    public static void printActiveChecks(NoCheat plugin, List<EventManagerImpl> eventManagers) {
 
         boolean introPrinted = false;
         String intro = "[NoCheat] Active Checks: ";

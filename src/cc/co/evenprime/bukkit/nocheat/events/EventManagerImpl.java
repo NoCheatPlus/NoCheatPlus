@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 
+import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
@@ -38,18 +39,18 @@ import cc.co.evenprime.bukkit.nocheat.debug.Performance;
  * time it takes to handle the event.
  * 
  */
-public abstract class EventManager {
+public abstract class EventManagerImpl implements EventManager {
 
     protected final NoCheat plugin;
 
     private static class BlockL extends BlockListener {
 
-        private final EventManager m;
-        private final Priority     priority;
-        private final boolean      ignoreCancelledEvents;
-        private final Performance  measureTime;
+        private final EventManagerImpl m;
+        private final Priority         priority;
+        private final boolean          ignoreCancelledEvents;
+        private final Performance      measureTime;
 
-        public BlockL(EventManager m, Priority priority, boolean ignoreCancelled, Performance measureTime) {
+        public BlockL(EventManagerImpl m, Priority priority, boolean ignoreCancelled, Performance measureTime) {
             this.m = m;
             this.priority = priority;
             this.ignoreCancelledEvents = ignoreCancelled;
@@ -101,12 +102,12 @@ public abstract class EventManager {
 
     private static class PlayerL extends PlayerListener {
 
-        private final EventManager m;
-        private final Priority     priority;
-        private final boolean      ignoreCancelledEvents;
-        private final Performance  measureTime;
+        private final EventManagerImpl m;
+        private final Priority         priority;
+        private final boolean          ignoreCancelledEvents;
+        private final Performance      measureTime;
 
-        public PlayerL(EventManager m, Priority priority, boolean ignoreCancelled, Performance measureTime) {
+        public PlayerL(EventManagerImpl m, Priority priority, boolean ignoreCancelled, Performance measureTime) {
             this.m = m;
             this.priority = priority;
             this.ignoreCancelledEvents = ignoreCancelled;
@@ -243,12 +244,12 @@ public abstract class EventManager {
 
     private static class EntityL extends EntityListener {
 
-        private final EventManager m;
-        private final Priority     priority;
-        private final boolean      ignoreCancelledEvents;
-        private final Performance  measureTime;
+        private final EventManagerImpl m;
+        private final Priority         priority;
+        private final boolean          ignoreCancelledEvents;
+        private final Performance      measureTime;
 
-        public EntityL(EventManager m, Priority priority, boolean ignoreCancelled, Performance measureTime) {
+        public EntityL(EventManagerImpl m, Priority priority, boolean ignoreCancelled, Performance measureTime) {
             this.m = m;
             this.priority = priority;
             this.ignoreCancelledEvents = ignoreCancelled;
@@ -285,7 +286,7 @@ public abstract class EventManager {
         }
     }
 
-    public EventManager(NoCheat plugin) {
+    public EventManagerImpl(NoCheat plugin) {
         this.plugin = plugin;
     }
 
@@ -314,6 +315,14 @@ public abstract class EventManager {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * cc.co.evenprime.bukkit.nocheat.events.EventManager#getActiveChecks(cc
+     * .co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache)
+     */
+    @Override
     public List<String> getActiveChecks(ConfigurationCache cc) {
         return Collections.emptyList();
     }

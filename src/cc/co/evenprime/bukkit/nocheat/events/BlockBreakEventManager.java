@@ -27,7 +27,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  * relevant checks
  * 
  */
-public class BlockBreakEventManager extends EventManager {
+public class BlockBreakEventManager extends EventManagerImpl {
 
     private final List<BlockBreakCheck> checks;
 

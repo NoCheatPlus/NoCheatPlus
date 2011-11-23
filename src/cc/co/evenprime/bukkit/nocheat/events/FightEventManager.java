@@ -23,7 +23,7 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.FightData;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
-public class FightEventManager extends EventManager {
+public class FightEventManager extends EventManagerImpl {
 
     private final List<FightCheck> checks;
 

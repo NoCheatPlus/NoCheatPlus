@@ -10,6 +10,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
 
@@ -34,7 +35,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
  * evaluate the check results and decide what to
  * 
  */
-public class MovingEventManager extends EventManager {
+public class MovingEventManager extends EventManagerImpl {
 
     private final List<MovingCheck> checks;
 
@@ -50,6 +51,7 @@ public class MovingEventManager extends EventManager {
         registerListener(Event.Type.PLAYER_MOVE, Priority.Lowest, true, plugin.getPerformance(Type.MOVING));
         registerListener(Event.Type.PLAYER_VELOCITY, Priority.Monitor, true, plugin.getPerformance(Type.VELOCITY));
         registerListener(Event.Type.BLOCK_PLACE, Priority.Monitor, true, plugin.getPerformance(Type.BLOCKPLACE));
+        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false, null);
     }
 
     @Override
@@ -80,6 +82,23 @@ public class MovingEventManager extends EventManager {
                 }
             }
         }
+    }
+
+    @Override
+    protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
+
+        // No typo here, I really want to only handle cancelled events
+        if(!event.isCancelled())
+            return;
+
+        NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
+        final MovingData data = player.getData().moving;
+
+        if(data.teleportTo.isSet() && data.teleportTo.equals(event.getTo())) {
+            event.setCancelled(false);
+        }
+        return;
+
     }
 
     @Override

@@ -3,6 +3,7 @@ package cc.co.evenprime.bukkit.nocheat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,10 +24,10 @@ import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.EventManager;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 import cc.co.evenprime.bukkit.nocheat.events.ChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.MovingEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.PlayerTeleportEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.TimedEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
@@ -40,16 +41,16 @@ import cc.co.evenprime.bukkit.nocheat.log.LogManager;
  */
 public class NoCheat extends JavaPlugin {
 
-    private ConfigurationManager conf;
-    private LogManager           log;
-    private PlayerManager        players;
-    private PerformanceManager   performance;
+    private ConfigurationManager   conf;
+    private LogManager             log;
+    private PlayerManager          players;
+    private PerformanceManager     performance;
 
-    private List<EventManager>   eventManagers;
+    private List<EventManagerImpl> eventManagers;
 
-    private LagMeasureTask       lagMeasureTask;
+    private LagMeasureTask         lagMeasureTask;
 
-    private int                  taskId = -1;
+    private int                    taskId = -1;
 
     public NoCheat() {
 
@@ -96,14 +97,16 @@ public class NoCheat extends JavaPlugin {
         // Then set up the performance counters
         this.performance = new PerformanceManager();
 
-        eventManagers = new ArrayList<EventManager>(8); // Big enough
+        eventManagers = new ArrayList<EventManagerImpl>(8); // Big enough
         // Then set up the event listeners
         eventManagers.add(new MovingEventManager(this));
-        eventManagers.add(new PlayerTeleportEventManager(this));
+        eventManagers.add(new WorkaroundsEventManager(this));
         eventManagers.add(new ChatEventManager(this));
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new FightEventManager(this));
+
+        System.out.println(Bukkit.getVersion());
         TimedEventManager m = new TimedEventManager(this);
         taskId = m.taskId; // There's a bukkit task, remember its id
         eventManagers.add(m);

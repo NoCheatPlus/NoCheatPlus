@@ -26,7 +26,7 @@ public class FlatFileConfiguration extends Configuration {
 
     public void load(ActionMapper action) throws IOException {
 
-        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 
         String line = null;
 

@@ -19,7 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
 
-public class ChatEventManager extends EventManager {
+public class ChatEventManager extends EventManagerImpl {
 
     private final List<ChatCheck> checks;
 

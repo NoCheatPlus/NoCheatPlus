@@ -10,46 +10,28 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 
 /**
  * Only place that listens to Player-teleport related events and dispatches them
  * to relevant checks
  * 
  */
-public class PlayerTeleportEventManager extends EventManager {
+public class WorkaroundsEventManager extends EventManagerImpl {
 
-    public PlayerTeleportEventManager(NoCheat plugin) {
+    public WorkaroundsEventManager(NoCheat plugin) {
 
         super(plugin);
 
         registerListener(Event.Type.PLAYER_MOVE, Priority.Highest, false, null);
         registerListener(Event.Type.PLAYER_TOGGLE_SPRINT, Priority.Highest, false, null);
         registerListener(Event.Type.PLAYER_TELEPORT, Priority.Monitor, true, null);
-        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false, null);
         registerListener(Event.Type.PLAYER_PORTAL, Priority.Monitor, true, null);
         registerListener(Event.Type.PLAYER_RESPAWN, Priority.Monitor, true, null);
     }
 
     @Override
     protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
-        if(priority.equals(Priority.Monitor)) {
-            handleTeleportation(event.getPlayer());
-        } else {
-            // No typo here, I really want to only handle cancelled events
-            if(!event.isCancelled())
-                return;
-
-            NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-            final MovingData data = player.getData().moving;
-
-            if(data.teleportTo.isSet() && data.teleportTo.equals(event.getTo())) {
-                if(player.getConfiguration().debug.overrideIdiocy) {
-                    event.setCancelled(false);
-                }
-            }
-        }
+        handleTeleportation(event.getPlayer());
     }
 
     @Override
