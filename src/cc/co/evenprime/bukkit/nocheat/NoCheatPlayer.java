@@ -15,6 +15,8 @@ public interface NoCheatPlayer {
 
     public BaseData getData();
 
+    public boolean isDead();
+    
     public boolean isSprinting();
 
     public int getTicksLived();

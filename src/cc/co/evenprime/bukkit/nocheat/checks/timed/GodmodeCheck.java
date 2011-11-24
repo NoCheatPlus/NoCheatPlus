@@ -20,8 +20,10 @@ public class GodmodeCheck extends TimedCheck {
     public void check(NoCheatPlayer player, TimedData data, CCTimed cc) {
         // server lag(ged), skip this, or player dead, therefore it's reasonable
         // for him to not move :)
-        if(plugin.skipCheck() || player.getPlayer().isDead())
+        if(plugin.skipCheck() || player.isDead()) {
+            data.ticksBehind = 0;
             return;
+        }
 
         final int ticksLived = player.getTicksLived();
 

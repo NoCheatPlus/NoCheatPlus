@@ -104,13 +104,14 @@ public class MovingEventManager extends EventManagerImpl {
     @Override
     protected void handlePlayerMoveEvent(final PlayerMoveEvent event, final Priority priority) {
 
-        // Not interested at all in players in vehicles
-        if(event.getPlayer().isInsideVehicle()) {
+        // Get the world-specific configuration that applies here
+        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
+        
+        // Not interested at all in players in vehicles or dead
+        if(event.getPlayer().isInsideVehicle() || player.isDead()) {
             return;
         }
 
-        // Get the world-specific configuration that applies here
-        final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final CCMoving cc = player.getConfiguration().moving;
 
         if(!cc.check || player.hasPermission(Permissions.MOVING)) {

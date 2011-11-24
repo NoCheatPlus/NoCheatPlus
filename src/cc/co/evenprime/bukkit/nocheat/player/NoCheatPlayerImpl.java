@@ -37,6 +37,9 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         this.player = player;
     }
 
+    public boolean isDead() {
+        return this.player.getHealth() <= 0 || this.player.isDead();
+    }
     public boolean hasPermission(String permission) {
         if(permission == null) {
             System.out.println("NoCheat: Warning, asked for null permission");
