@@ -7,8 +7,11 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 
 import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
@@ -100,8 +103,20 @@ public class FlatFileConfiguration extends Configuration {
             al = new ActionList();
         }
         int th = Integer.parseInt(treshold);
-        al.setActions(th, action.getActions(value.split("\\s+")));
 
+        List<Action> actions = new LinkedList<Action>();
+
+        for(String name : value.split("\\s+")) {
+            Action a2 = action.getAction(name);
+            if(a2 == null) {
+                System.out.println("Nocheat: Action with name " + name + " isn't defined. You need to define it in your actions.txt file to make it work.");
+                actions.add(new DummyAction(name, 0, 0));
+            } else {
+                actions.add(action.getAction(name));
+            }
+        }
+
+        al.setActions(th, actions.toArray(new Action[actions.size()]));
         return al;
     }
 
@@ -184,6 +199,7 @@ public class FlatFileConfiguration extends Configuration {
 
         for(String line : explainationLines) {
             w.write("#    " + line);
+            w.newLine();
         }
     }
 

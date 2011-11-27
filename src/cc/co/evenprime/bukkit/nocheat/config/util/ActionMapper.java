@@ -30,4 +30,9 @@ public class ActionMapper {
 
         return result;
     }
+
+    public Action getAction(String actionName) {
+
+        return this.actions.get(actionName.toLowerCase());
+    }
 }

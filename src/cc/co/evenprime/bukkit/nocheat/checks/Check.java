@@ -9,6 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionWithParameters.WildCard;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
+import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
@@ -51,6 +52,8 @@ public abstract class Check {
                     special = true;
                 } else if(ac instanceof ConsolecommandAction) {
                     executeConsoleCommand((ConsolecommandAction) ac, this, player, cc);
+                } else if(ac instanceof DummyAction) {
+                    // nothing - it's a "DummyAction" after all
                 }
             }
         }
