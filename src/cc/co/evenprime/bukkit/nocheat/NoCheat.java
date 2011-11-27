@@ -105,7 +105,7 @@ public class NoCheat extends JavaPlugin {
         this.players = new PlayerManager(this);
 
         // Then read the configuration files
-        this.conf = new ConfigurationManager(this.getDataFolder().getPath());
+        this.conf = new ConfigurationManager(this.getDataFolder());
 
         // Then set up the performance counters
         this.performance = new PerformanceManager();
@@ -187,7 +187,7 @@ public class NoCheat extends JavaPlugin {
 
     public void reloadConfiguration() {
         conf.cleanup();
-        this.conf = new ConfigurationManager(this.getDataFolder().getPath());
+        this.conf = new ConfigurationManager(this.getDataFolder());
         players.cleanDataMap();
         players.clearCriticalData();
     }

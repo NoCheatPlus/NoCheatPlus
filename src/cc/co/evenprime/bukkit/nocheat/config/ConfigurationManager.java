@@ -70,7 +70,7 @@ public class ConfigurationManager {
     // private final static String loggerName = "cc.co.evenprime.nocheat";
     // public final Logger logger = Logger.getLogger(loggerName);
 
-    public ConfigurationManager(String rootConfigFolder) {
+    public ConfigurationManager(File rootConfigFolder) {
 
         ActionMapper actionMapper = new ActionMapper();
 
@@ -85,7 +85,7 @@ public class ConfigurationManager {
 
     }
 
-    private void initializeActions(String rootConfigFolder, ActionMapper actionManager) {
+    private void initializeActions(File rootConfigFolder, ActionMapper actionManager) {
 
         File defaultActionsFile = new File(rootConfigFolder, defaultActionFileName);
 
@@ -112,7 +112,7 @@ public class ConfigurationManager {
      * 
      * @param configurationFile
      */
-    private void initializeConfig(String rootConfigFolder, ActionMapper action) {
+    private void initializeConfig(File rootConfigFolder, ActionMapper action) {
 
         // First try to obtain and parse the global config file
         FlatFileConfiguration root;
@@ -162,24 +162,23 @@ public class ConfigurationManager {
         }
     }
 
-    private ConfigurationCache createConfigurationCache(String rootConfigFolder, Configuration configProvider) {
+    private ConfigurationCache createConfigurationCache(File rootConfigFolder, Configuration configProvider) {
 
         return new ConfigurationCache(configProvider, setupFileLogger(new File(rootConfigFolder, configProvider.getString(DefaultConfiguration.LOGGING_FILENAME))));
 
     }
 
-    private static File getGlobalConfigFile(String rootFolder) {
+    private static File getGlobalConfigFile(File rootFolder) {
 
         File globalConfig = new File(rootFolder, configFileName);
 
         return globalConfig;
     }
 
-    private static Map<String, File> getWorldSpecificConfigFiles(String rootConfigFolder) {
+    private static Map<String, File> getWorldSpecificConfigFiles(File rootFolder) {
 
         HashMap<String, File> files = new HashMap<String, File>();
 
-        File rootFolder = new File(rootConfigFolder);
         if(rootFolder.isDirectory()) {
             for(File f : rootFolder.listFiles()) {
                 if(f.isFile()) {

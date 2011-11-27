@@ -26,6 +26,14 @@ public class FlatFileConfiguration extends Configuration {
 
     public void load(ActionMapper action) throws IOException {
 
+        if(!file.exists()) {
+            if(file.getParentFile() != null)
+                file.getParentFile().mkdirs();
+            if(file.createNewFile())
+                save();
+            else
+                throw new IOException("Cannot load \"" + file.getPath() + "\": File can not be created!");
+        }
         BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 
         String line = null;
@@ -117,17 +125,22 @@ public class FlatFileConfiguration extends Configuration {
     public void save() {
 
         try {
-            if(file.getParentFile() != null)
-                file.getParentFile().mkdirs();
+            if(!file.exists()) {
+                if(file.getParentFile() != null)
+                    file.getParentFile().mkdirs();
+                if(!file.createNewFile())
+                    throw new IOException("Cannot save to \"" + file.getPath() + "\" : File can not be created!");
+            }
 
-            file.createNewFile();
             BufferedWriter w = new BufferedWriter(new FileWriter(file));
 
-            w.write("# Want to know what these options do? Read at the end of this file.\r\n");
+            w.write("# Want to know what these options do? Read at the end of this file.");
+            w.newLine();
 
             saveRecursive(w, ROOT);
 
-            w.write("\r\n\r\n");
+            w.newLine();
+            w.newLine();
 
             saveDescriptionsRecursive(w, ROOT);
 
@@ -160,11 +173,18 @@ public class FlatFileConfiguration extends Configuration {
             id = i.getName() + "." + id;
         }
 
-        w.write("\r\n\r\n# " + id + ":\r\n#\r\n");
+        w.newLine();
+        w.newLine();
+        w.write("# " + id + ":");
+        w.newLine();
+        w.write("#");
+        w.newLine();
 
-        String explaination = Explainations.get(node);
+        String[] explainationLines = Explainations.get(node).split("\n");
 
-        w.write("#    " + explaination.replaceAll("\n", "\r\n#    "));
+        for(String line : explainationLines) {
+            w.write("#    " + line);
+        }
     }
 
     private void saveRecursive(BufferedWriter w, OptionNode node) throws IOException {
@@ -174,7 +194,7 @@ public class FlatFileConfiguration extends Configuration {
             for(OptionNode o : node.getChildren()) {
 
                 if(node == ROOT) {
-                    w.write("\r\n");
+                    w.newLine();
                 }
 
                 saveRecursive(w, o);
@@ -239,7 +259,8 @@ public class FlatFileConfiguration extends Configuration {
     }
 
     private void saveValue(BufferedWriter w, String id, String value) throws IOException {
-        w.write(id + " = " + value + "\r\n");
+        w.write(id + " = " + value);
+        w.newLine();
     }
 
     private String removeQuotationMarks(String s) {
