@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.player.NoCheatPlayerImpl;
-import cc.co.evenprime.bukkit.nocheat.player.PlayerFactory;
 
 /**
  * Provide secure access to player-specific data objects for various checks or
@@ -37,9 +36,7 @@ public class PlayerManager {
         NoCheatPlayerImpl p = this.players.get(player.getName());
 
         if(p == null) {
-            // PlayerFactory may create different players based on the
-            // MCVersion that we are running
-            p = PlayerFactory.createPlayer(player, plugin);
+            p = new NoCheatPlayerImpl(player, plugin);
             this.players.put(player.getName(), p);
         }
 

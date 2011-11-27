@@ -70,6 +70,8 @@ permissions:
             children:
               nocheat.checks.chat.spam:
                 description: Allow a player to send an infinite amount of chat messages
+              nocheat.checks.chat.empty:
+                description: Allow a player to send empty messages (normally not possible)
           nocheat.checks.fight:
             description: Allow the player to bypass all fight checks
             children:
@@ -79,8 +81,3 @@ permissions:
                 description: Allow a player to attack himself with close combat attacks (punching, swords, etc.)
               nocheat.checks.fight.noswing:
                 description: Allow a player to fight without swinging their arm
-          nocheat.checks.timed:
-            description: Allow the player to bypass all timed checks
-            children:
-              nocheat.checks.timed.godmode:
-                description: Allow a player to use the godmode hack to make himself invincible to damage

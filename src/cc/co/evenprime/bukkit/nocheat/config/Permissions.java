@@ -29,6 +29,7 @@ public class Permissions {
 
     public final static String  CHAT                 = CHECKS + ".chat";
     public final static String  CHAT_SPAM            = CHAT + ".spam";
+    public static final String  CHAT_EMPTY           = CHAT + ".empty";
 
     public static final String  FIGHT                = CHECKS + ".fight";
     public static final String  FIGHT_DIRECTION      = FIGHT + ".direction";

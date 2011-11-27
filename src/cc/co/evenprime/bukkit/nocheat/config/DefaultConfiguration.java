@@ -141,9 +141,15 @@ public class DefaultConfiguration extends Configuration {
             setValue(CHAT_SPAM_LIMIT, 5);
 
             ActionList spamActionList = new ActionList();
-            spamActionList.setActions(0, action.getActions("spamLog spamCancel".split(" ")));
-            spamActionList.setActions(50, action.getActions("spamLog spamCancel spamkick".split(" ")));
+            spamActionList.setActions(0, action.getActions("spamLog chatCancel".split(" ")));
+            spamActionList.setActions(50, action.getActions("spamLog chatCancel spamkick".split(" ")));
             setValue(CHAT_SPAM_ACTIONS, spamActionList);
+
+            setValue(CHAT_EMPTY_CHECK, true);
+
+            ActionList emptyActionList = new ActionList();
+            emptyActionList.setActions(0, action.getActions("emptyChatLog chatCancel emptyChatKick".split(" ")));
+            setValue(CHAT_EMPTY_ACTIONS, emptyActionList);
         }
 
         /*** FIGHT ***/
@@ -170,19 +176,6 @@ public class DefaultConfiguration extends Configuration {
             ActionList noswingActionList = new ActionList();
             noswingActionList.setActions(0, action.getActions("noswingLog fightCancel".split(" ")));
             setValue(FIGHT_NOSWING_ACTIONS, noswingActionList);
-        }
-
-        /*** TIMED ***/
-        {
-            setValue(TIMED_CHECK, true);
-
-            setValue(TIMED_GODMODE_CHECK, true);
-            setValue(TIMED_GODMODE_TICKSLIMIT, 50);
-
-            ActionList directionActionList = new ActionList();
-            directionActionList.setActions(0, action.getActions("godmodeCancel".split(" ")));
-            directionActionList.setActions(100, action.getActions("godmodeLog godmodeCancel".split(" ")));
-            setValue(TIMED_GODMODE_ACTIONS, directionActionList);
         }
     }
 
@@ -259,11 +252,10 @@ public class DefaultConfiguration extends Configuration {
             w(w, "# Some other log messages that are limited a bit by default, to avoid too extreme spam");
             w(w, "log reachLog 0 5 med [player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations]");
             w(w, "log directionLog 2 5 med [player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
-            w(w, "log onliquidLog 2 5 med [player] failed [check]: tried to place a [blocktype] block at [placelocation] against block at [placeagainst]. VL [violations]");
             w(w, "log spamLog 0 5 med [player] failed [check]: Last sent message \"[text]\". VL [violations]");
             w(w, "log nofallLog 0 5 med [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations]");
-            w(w, "log godmodeLog 0 5 med [player] failed [check]: lagging or using godmode. VL [violations]");
             w(w, "log noswingLog 2 5 med [player] failed [check]: Didn't swing arm. VL [violations]");
+            w(w, "log emptyChatLog 0 5 med [player] failed [check]: Sent empty chat message. VL [violations]");
             w(w, "");
             w(w, "");
             w(w, "# Some log messages related to fighting, displaying the same text, but with different level (Info, Warning, Severe)");
@@ -285,9 +277,9 @@ public class DefaultConfiguration extends Configuration {
             w(w, "special blockbreakCancel 0 0");
             w(w, "special blockplaceCancel 0 0");
             w(w, "special spamCancel 0 0");
+            w(w, "special chatCancel 0 0");
             w(w, "special nofallDamage 0 0");
             w(w, "special fightCancel 0 0");
-            w(w, "special godmodeCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");
@@ -299,6 +291,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "# E.g. Kick a player");
             w(w, "consolecommand kick 0 1 kick [player]");
             w(w, "consolecommand spamkick 0 1 kick [player]");
+            w(w, "consolecommand emptyChatKick 0 1 kick [player]");
             w.flush();
             w.close();
         } catch(IOException e) {

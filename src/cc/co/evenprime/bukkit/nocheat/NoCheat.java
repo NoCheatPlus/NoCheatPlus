@@ -26,7 +26,6 @@ import cc.co.evenprime.bukkit.nocheat.events.ChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.MovingEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.TimedEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
@@ -118,10 +117,6 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new FightEventManager(this));
-
-        TimedEventManager m = new TimedEventManager(this);
-        taskId = m.taskId; // There's a bukkit task, remember its id
-        eventManagers.add(m);
 
         // Then set up a task to monitor server lag
         if(lagMeasureTask == null) {

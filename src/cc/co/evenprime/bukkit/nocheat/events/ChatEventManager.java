@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.checks.ChatCheck;
+import cc.co.evenprime.bukkit.nocheat.checks.chat.EmptyCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.chat.SpamCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCChat;
@@ -27,7 +28,8 @@ public class ChatEventManager extends EventManagerImpl {
 
         super(plugin);
 
-        this.checks = new ArrayList<ChatCheck>(1);
+        this.checks = new ArrayList<ChatCheck>(2);
+        this.checks.add(new EmptyCheck(plugin));
         this.checks.add(new SpamCheck(plugin));
 
         registerListener(Event.Type.PLAYER_CHAT, Priority.Lowest, true, plugin.getPerformance(Type.CHAT));
@@ -72,6 +74,8 @@ public class ChatEventManager extends EventManagerImpl {
 
         if(cc.chat.check && cc.chat.spamCheck)
             s.add("chat.spam");
+        if(cc.chat.check && cc.chat.emptyCheck)
+            s.add("chat.empty");
         return s;
     }
 }

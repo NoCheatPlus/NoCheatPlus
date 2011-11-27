@@ -21,8 +21,6 @@ public interface NoCheatPlayer {
 
     public int getTicksLived();
 
-    public void increaseAge(int ticks);
-
     public ConfigurationCache getConfiguration();
 
     public float getSpeedAmplifier();

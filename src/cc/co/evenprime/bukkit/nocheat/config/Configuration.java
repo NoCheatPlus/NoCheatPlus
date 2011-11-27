@@ -99,6 +99,10 @@ public abstract class Configuration {
     public final static OptionNode        CHAT_SPAM_LIMIT                            = new OptionNode("limit", CHAT_SPAM, DataType.INTEGER);
     public final static OptionNode        CHAT_SPAM_ACTIONS                          = new OptionNode("actions", CHAT_SPAM, DataType.ACTIONLIST);
 
+    private final static OptionNode       CHAT_EMPTY                                 = new OptionNode("empty", CHAT, DataType.PARENT);
+    public static final OptionNode        CHAT_EMPTY_CHECK                           = new OptionNode("check", CHAT_EMPTY, DataType.BOOLEAN);
+    public static final OptionNode        CHAT_EMPTY_ACTIONS                         = new OptionNode("actions", CHAT_EMPTY, DataType.ACTIONLIST);
+
     private final static OptionNode       FIGHT                                      = new OptionNode("fight", ROOT, DataType.PARENT);
     public final static OptionNode        FIGHT_CHECK                                = new OptionNode("check", FIGHT, DataType.BOOLEAN);
 
@@ -115,14 +119,6 @@ public abstract class Configuration {
     private final static OptionNode       FIGHT_NOSWING                              = new OptionNode("noswing", FIGHT, DataType.PARENT);
     public static final OptionNode        FIGHT_NOSWING_CHECK                        = new OptionNode("check", FIGHT_NOSWING, DataType.BOOLEAN);
     public static final OptionNode        FIGHT_NOSWING_ACTIONS                      = new OptionNode("actions", FIGHT_NOSWING, DataType.ACTIONLIST);
-
-    private static final OptionNode       TIMED                                      = new OptionNode("timed", ROOT, DataType.PARENT);
-    public static final OptionNode        TIMED_CHECK                                = new OptionNode("check", TIMED, DataType.BOOLEAN);
-
-    private static final OptionNode       TIMED_GODMODE                              = new OptionNode("godmode", TIMED, DataType.PARENT);
-    public static final OptionNode        TIMED_GODMODE_CHECK                        = new OptionNode("check", TIMED_GODMODE, DataType.BOOLEAN);
-    public static final OptionNode        TIMED_GODMODE_TICKSLIMIT                   = new OptionNode("tickslimit", TIMED_GODMODE, DataType.INTEGER);
-    public static final OptionNode        TIMED_GODMODE_ACTIONS                      = new OptionNode("actions", TIMED_GODMODE, DataType.ACTIONLIST);
 
     private final Map<OptionNode, Object> values;
     private final Configuration           defaults;

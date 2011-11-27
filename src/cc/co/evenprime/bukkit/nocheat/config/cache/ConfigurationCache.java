@@ -18,7 +18,6 @@ public class ConfigurationCache {
     public final CCChat       chat;
     public final CCDebug      debug;
     public final CCFight      fight;
-    public final CCTimed      timed;
 
     /**
      * Instantiate a config cache and populate it with the data of a
@@ -35,7 +34,6 @@ public class ConfigurationCache {
         logging = new CCLogging(data, worldSpecificFileLogger);
         debug = new CCDebug(data);
         fight = new CCFight(data);
-        timed = new CCTimed(data);
 
     }
 }

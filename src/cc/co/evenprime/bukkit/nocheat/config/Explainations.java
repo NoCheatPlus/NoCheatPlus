@@ -84,6 +84,9 @@ public class Explainations {
         set(Configuration.CHAT_SPAM_LIMIT, "How many messages per timeframe may the player send without it counting as spamming?");
         set(Configuration.CHAT_SPAM_ACTIONS, "What should be done if a player is trying to spam the chat.\nUnit is number of chat messages above the limit you declared above.");
 
+        set(Configuration.CHAT_EMPTY_CHECK, "If true, check if a player is sending an empty message.");
+        set(Configuration.CHAT_EMPTY_ACTIONS, "What should be done if a player sends an empty message.\nUnit is number of empty chat messages sent by the player.");
+
         set(Configuration.FIGHT_CHECK, "If true, do various checks on Events related to fighting.");
         set(Configuration.FIGHT_DIRECTION_CHECK, "If true, check if a player is really looking at enemies that he attacks.");
         set(Configuration.FIGHT_DIRECTION_PRECISION, "Set how precise the check should be. If you experience the check to be too zealous, increase this value. \nIf you want to make it tighter, reduce this value. Default is 100.");
@@ -95,11 +98,6 @@ public class Explainations {
 
         set(Configuration.FIGHT_NOSWING_CHECK, "If true, check if a player swung his arm before attacking, which he should have done.");
         set(Configuration.FIGHT_NOSWING_ACTIONS, "What should be done if a player didn't swing his arm.\nUnit is number of attacks without armswinging.");
-
-        set(Configuration.TIMED_CHECK, "If true, do various checks on things related to server and client time.");
-        set(Configuration.TIMED_GODMODE_CHECK, "If true, check or prevent if a player made himself invulnerable by exploiting a time-related bug.\nThis 'godmode' exploit looks similar to a player with huge lag, so be careful when punishing people for it.");
-        set(Configuration.TIMED_GODMODE_TICKSLIMIT, "How many ticks may a player be behind the server time before NoCheat reacts. Default is 50.");
-        set(Configuration.TIMED_GODMODE_ACTIONS, "What should be done if a player is considered using 'godmode'.\nUnit is number of ticks of potential godmode usage.");
 
     }
 

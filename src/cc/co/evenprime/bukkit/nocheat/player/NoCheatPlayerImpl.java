@@ -24,11 +24,11 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     // The method that's used to artifically "fast-forward" the player
     protected static Method  incAge = null;
 
-    public NoCheatPlayerImpl(Player player, NoCheat plugin, BaseData data) {
+    public NoCheatPlayerImpl(Player player, NoCheat plugin) {
 
         this.player = player;
         this.plugin = plugin;
-        this.data = data;
+        this.data = new BaseData();
 
         this.lastUsedTime = System.currentTimeMillis();
     }
@@ -40,6 +40,7 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     public boolean isDead() {
         return this.player.getHealth() <= 0 || this.player.isDead();
     }
+
     public boolean hasPermission(String permission) {
         if(permission == null) {
             System.out.println("NoCheat: Warning, asked for null permission");
@@ -66,24 +67,6 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
 
     public int getTicksLived() {
         return player.getTicksLived();
-    }
-
-    public void increaseAge(int ticks) {
-
-        if(incAge == null) {
-            player.setTicksLived(player.getTicksLived() + ticks);
-            return;
-        }
-
-        EntityPlayer p = ((CraftPlayer) player).getHandle();
-
-        for(int i = 0; i < ticks; i++) {
-            try {
-                incAge.invoke(p, true);
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public float getSpeedAmplifier() {
