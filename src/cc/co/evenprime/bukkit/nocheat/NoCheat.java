@@ -13,8 +13,8 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -134,30 +134,32 @@ public class NoCheat extends JavaPlugin {
         // Then print a list of active checks per world
         ActiveCheckPrinter.printActiveChecks(this, eventManagers);
 
-        if(mcVersion == MCVersion.MC100) {
-            
+        if(mcVersion == MCVersion.MC100 && this.conf.getConfigurationCacheForWorld(null).emergencyfix) {
+
             // Tell the server admin that we are activating a workaround
-            log.logToConsole(LogLevel.LOW, "[NoCheat] Activating temporary bugfix for broken player death handling of minecraft.");
-            // Activate workaround, reset death ticks when a player dies
+            log.logToConsole(LogLevel.LOW, "[NoCheat] Activating emergency bugfix for broken player death handling of minecraft.");
+            // reset death ticks on deaths, such that they can go over 20 again
             getServer().getPluginManager().registerEvent(Type.ENTITY_DEATH, new EntityListener() {
 
                 @Override
                 public void onEntityDeath(EntityDeathEvent event) {
                     if(event.getEntity() instanceof CraftPlayer) {
                         CraftPlayer player = (CraftPlayer) event.getEntity();
-                        player.getHandle().deathTicks = 0;
+                        player.getHandle().deathTicks = 19;
                     }
                 }
             }, Priority.Monitor, this);
 
-            // Activate workaround, reset death ticks when a player spawns
-            getServer().getPluginManager().registerEvent(Type.PLAYER_RESPAWN, new PlayerListener() {
+            // reset death ticks on joins, such that they can go over 20 again
+            getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN, new PlayerListener() {
 
                 @Override
-                public void onPlayerRespawn(PlayerRespawnEvent event) {
+                public void onPlayerJoin(PlayerJoinEvent event) {
                     if(event.getPlayer() instanceof CraftPlayer) {
                         CraftPlayer player = (CraftPlayer) event.getPlayer();
-                        player.getHandle().deathTicks = 0;
+                        if(player.getHealth() <= 0) {
+                            player.getHandle().deathTicks = 19;
+                        }
                     }
                 }
             }, Priority.Monitor, this);

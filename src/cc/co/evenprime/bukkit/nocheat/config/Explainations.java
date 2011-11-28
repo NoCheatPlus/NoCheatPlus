@@ -26,6 +26,8 @@ public class Explainations {
 
         set(Configuration.DEBUG_SHOWACTIVECHECKS, "Print to the console an overview of all checks that are enabled when NoCheat gets loaded.");
         set(Configuration.DEBUG_COMPATIBILITY, "Do some voodoo to fix common mistakes of other plugins which interfere with NoCheat.");
+        
+        set(Configuration.EMERGENCYFIX_ENFORCEPLAYERDEATH, "Fix a bug that prevents people from really dying, causing them to not drop XP,\n and still being able to fight, place/destroy blocks etc. in an invulnerable state.");
 
         set(Configuration.MOVING_CHECK, "If true, do various checks on PlayerMove events.");
         set(Configuration.MOVING_IDENTIFYCREATIVEMODE, "If true, NoCheat will automatically identify if players are in creative mode and will allow them to fly, avoid fall damage etc.");

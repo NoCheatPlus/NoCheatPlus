@@ -34,6 +34,11 @@ public class DefaultConfiguration extends Configuration {
             setValue(DEBUG_SHOWACTIVECHECKS, false);
             setValue(DEBUG_COMPATIBILITY, true);
         }
+        
+        /*** EMERGENCY_FIX ***/
+        {
+            setValue(EMERGENCYFIX_ENFORCEPLAYERDEATH, true);
+        }
 
         /*** MOVING ***/
         {

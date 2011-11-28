@@ -106,7 +106,7 @@ public class MovingEventManager extends EventManagerImpl {
 
         // Get the world-specific configuration that applies here
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        
+
         // Not interested at all in players in vehicles or dead
         if(event.getPlayer().isInsideVehicle() || player.isDead()) {
             return;
