@@ -105,6 +105,7 @@ public class CheckUtil {
         types[Material.PISTON_EXTENSION.getId()] |= SOLID | NONSOLID;
         types[Material.PISTON_MOVING_PIECE.getId()] |= SOLID | NONSOLID;
         types[Material.TRAP_DOOR.getId()] |= SOLID | NONSOLID;
+        types[111] |= SOLID | NONSOLID; // Lily pads
     }
 
     /**
