@@ -5,22 +5,22 @@ import java.util.Map;
 
 public class PerformanceManager {
 
-    public enum Type {
+    public enum EventType {
         BLOCKBREAK, BLOCKDAMAGE, BLOCKPLACE, CHAT, MOVING, VELOCITY, FIGHT, TIMED
     }
 
-    private final Map<Type, Performance> map;
+    private final Map<EventType, Performance> map;
 
     public PerformanceManager() {
 
-        map = new HashMap<Type, Performance>();
+        map = new HashMap<EventType, Performance>();
 
-        for(Type type : Type.values()) {
+        for(EventType type : EventType.values()) {
             map.put(type, new Performance(true));
         }
     }
 
-    public Performance get(Type type) {
+    public Performance get(EventType type) {
         return map.get(type);
     }
 }

@@ -13,7 +13,7 @@ import org.bukkit.permissions.Permission;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 
 public class CommandHandler {
 
@@ -120,7 +120,7 @@ public class CommandHandler {
 
         long totalTime = 0;
 
-        for(Type type : Type.values()) {
+        for(EventType type : EventType.values()) {
             Performance p = plugin.getPerformance(type);
 
             long total = p.getTotalTime();

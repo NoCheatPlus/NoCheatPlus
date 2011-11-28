@@ -21,7 +21,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCFight;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.FightData;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 
 public class FightEventManager extends EventManagerImpl {
 
@@ -35,7 +35,7 @@ public class FightEventManager extends EventManagerImpl {
         this.checks.add(new SelfhitCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
 
-        registerListener(Event.Type.ENTITY_DAMAGE, Priority.Lowest, true, plugin.getPerformance(Type.FIGHT));
+        registerListener(Event.Type.ENTITY_DAMAGE, Priority.Lowest, true, plugin.getPerformance(EventType.FIGHT));
         registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false, null);
     }
 

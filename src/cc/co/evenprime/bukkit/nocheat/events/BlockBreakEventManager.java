@@ -20,7 +20,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockBreak;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 
 /**
  * Central location to listen to player-interact events and dispatch them to
@@ -41,8 +41,8 @@ public class BlockBreakEventManager extends EventManagerImpl {
         this.checks.add(new ReachCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
 
-        registerListener(Event.Type.BLOCK_BREAK, Priority.Lowest, true, plugin.getPerformance(Type.BLOCKBREAK));
-        registerListener(Event.Type.BLOCK_DAMAGE, Priority.Monitor, true, plugin.getPerformance(Type.BLOCKDAMAGE));
+        registerListener(Event.Type.BLOCK_BREAK, Priority.Lowest, true, plugin.getPerformance(EventType.BLOCKBREAK));
+        registerListener(Event.Type.BLOCK_DAMAGE, Priority.Monitor, true, plugin.getPerformance(EventType.BLOCKDAMAGE));
         registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false, null);
     }
 

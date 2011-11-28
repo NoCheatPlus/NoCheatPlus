@@ -26,7 +26,7 @@ import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 
 /**
  * The only place that listens to and modifies player_move events if necessary
@@ -48,9 +48,9 @@ public class MovingEventManager extends EventManagerImpl {
         checks.add(new RunflyCheck(plugin));
         checks.add(new MorePacketsCheck(plugin));
 
-        registerListener(Event.Type.PLAYER_MOVE, Priority.Lowest, true, plugin.getPerformance(Type.MOVING));
-        registerListener(Event.Type.PLAYER_VELOCITY, Priority.Monitor, true, plugin.getPerformance(Type.VELOCITY));
-        registerListener(Event.Type.BLOCK_PLACE, Priority.Monitor, true, plugin.getPerformance(Type.BLOCKPLACE));
+        registerListener(Event.Type.PLAYER_MOVE, Priority.Lowest, true, plugin.getPerformance(EventType.MOVING));
+        registerListener(Event.Type.PLAYER_VELOCITY, Priority.Monitor, true, plugin.getPerformance(EventType.VELOCITY));
+        registerListener(Event.Type.BLOCK_PLACE, Priority.Monitor, true, plugin.getPerformance(EventType.BLOCKPLACE));
         registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false, null);
     }
 

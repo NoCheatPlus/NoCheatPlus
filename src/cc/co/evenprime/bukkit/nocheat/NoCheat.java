@@ -7,7 +7,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,7 +26,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.ActiveCheckPrinter;
 import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.Type;
+import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.ChatEventManager;
@@ -127,6 +134,34 @@ public class NoCheat extends JavaPlugin {
         // Then print a list of active checks per world
         ActiveCheckPrinter.printActiveChecks(this, eventManagers);
 
+        if(mcVersion == MCVersion.MC100) {
+            
+            // Tell the server admin that we are activating a workaround
+            log.logToConsole(LogLevel.LOW, "[NoCheat] Activating temporary bugfix for broken player death handling of minecraft.");
+            // Activate workaround, reset death ticks when a player dies
+            getServer().getPluginManager().registerEvent(Type.ENTITY_DEATH, new EntityListener() {
+
+                @Override
+                public void onEntityDeath(EntityDeathEvent event) {
+                    if(event.getEntity() instanceof CraftPlayer) {
+                        CraftPlayer player = (CraftPlayer) event.getEntity();
+                        player.getHandle().deathTicks = 0;
+                    }
+                }
+            }, Priority.Monitor, this);
+
+            // Activate workaround, reset death ticks when a player spawns
+            getServer().getPluginManager().registerEvent(Type.PLAYER_RESPAWN, new PlayerListener() {
+
+                @Override
+                public void onPlayerRespawn(PlayerRespawnEvent event) {
+                    if(event.getPlayer() instanceof CraftPlayer) {
+                        CraftPlayer player = (CraftPlayer) event.getPlayer();
+                        player.getHandle().deathTicks = 0;
+                    }
+                }
+            }, Priority.Monitor, this);
+        }
         // Tell the server admin that we finished loading NoCheat now
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + this.getDescription().getVersion() + "] is enabled.");
     }
@@ -147,7 +182,7 @@ public class NoCheat extends JavaPlugin {
         players.clearCriticalData(playerName);
     }
 
-    public Performance getPerformance(Type type) {
+    public Performance getPerformance(EventType type) {
         return performance.get(type);
     }
 
