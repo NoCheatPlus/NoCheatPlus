@@ -43,6 +43,7 @@ public class Permissions {
     public static final String  ADMIN_PERMLIST       = ADMIN + ".permlist";
     public static final String  ADMIN_RELOAD         = ADMIN + ".reload";
     public static final String  ADMIN_PERFORMANCE    = ADMIN + ".performance";
+    public static final String  ADMIN_PLAYERINFO     = ADMIN + ".playerinfo";
 
     private Permissions() {}
 }

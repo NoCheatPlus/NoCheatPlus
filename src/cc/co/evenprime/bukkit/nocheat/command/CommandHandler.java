@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -39,7 +41,34 @@ public class CommandHandler {
             return handlePerformanceCommand(plugin, sender);
         }
 
+        else if(args[0].equalsIgnoreCase("playerinfo") && args.length >= 2) {
+            // performance command was used
+            return handlePlayerInfoCommand(plugin, sender, args);
+        }
+
         return false;
+    }
+
+    private static boolean handlePlayerInfoCommand(NoCheat plugin, CommandSender sender, String[] args) {
+        // Does the sender have permission?
+        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PLAYERINFO)) {
+            return false;
+        }
+
+        Map<String, Object> map = plugin.getPlayerData(args[1]);
+        String filter = "";
+
+        if(args.length > 2) {
+            filter = args[2];
+        }
+
+        sender.sendMessage("PlayerInfo for " + args[1]);
+        for(Entry<String, Object> entry : map.entrySet()) {
+            if(entry.getKey().contains(filter)) {
+                sender.sendMessage(entry.getKey() + ": " + entry.getValue());
+            }
+        }
+        return true;
     }
 
     private static boolean handlePermlistCommand(NoCheat plugin, CommandSender sender, String[] args) {
