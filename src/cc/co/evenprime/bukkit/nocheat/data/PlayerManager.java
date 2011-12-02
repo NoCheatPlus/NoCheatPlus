@@ -33,11 +33,11 @@ public class PlayerManager {
      */
     public NoCheatPlayer getPlayer(Player player) {
 
-        NoCheatPlayerImpl p = this.players.get(player.getName());
+        NoCheatPlayerImpl p = this.players.get(player.getName().toLowerCase());
 
         if(p == null) {
             p = new NoCheatPlayerImpl(player, plugin);
-            this.players.put(player.getName(), p);
+            this.players.put(player.getName().toLowerCase(), p);
         }
 
         p.setLastUsedTime(System.currentTimeMillis());
@@ -57,7 +57,7 @@ public class PlayerManager {
     }
 
     public void clearCriticalData(String playerName) {
-        NoCheatPlayer p = this.players.get(playerName);
+        NoCheatPlayer p = this.players.get(playerName.toLowerCase());
         if(p != null) {
             p.getData().clearCriticalData();
         }
@@ -80,7 +80,7 @@ public class PlayerManager {
 
     public void getPlayerData(String playerName, Map<String, Object> map) {
 
-        NoCheatPlayer player = this.players.get(playerName);
+        NoCheatPlayer player = this.players.get(playerName.toLowerCase());
 
         if(player != null) {
             BaseData data = player.getData();
