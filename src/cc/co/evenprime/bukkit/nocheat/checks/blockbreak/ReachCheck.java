@@ -36,6 +36,8 @@ public class ReachCheck extends BlockBreakCheck {
 
             // Increment violation counter
             data.reachVL += distance;
+            data.reachTotalVL += distance;
+            data.reachFailed++;
             data.reachDistance = distance;
 
             cancel = executeActions(player, cc.reachActions.getActions(data.reachVL));

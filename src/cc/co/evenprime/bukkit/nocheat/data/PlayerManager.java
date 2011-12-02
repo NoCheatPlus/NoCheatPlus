@@ -78,4 +78,15 @@ public class PlayerManager {
         }
     }
 
+    public void getPlayerData(String playerName, Map<String, Object> map) {
+
+        NoCheatPlayer player = this.players.get(playerName);
+
+        if(player != null) {
+            BaseData data = player.getData();
+
+            data.collectData(map);
+        }
+    }
+
 }

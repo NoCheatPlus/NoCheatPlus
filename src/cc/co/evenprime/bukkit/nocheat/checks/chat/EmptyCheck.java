@@ -19,10 +19,13 @@ public class EmptyCheck extends ChatCheck {
     public boolean check(NoCheatPlayer player, ChatData data, CCChat cc) {
 
         boolean cancel = false;
-        
+
         if(data.message.trim().length() == 0) {
 
             data.emptyVL += 1;
+            data.emptyTotalVL += 1;
+            data.emptyFailed++;
+
             cancel = executeActions(player, cc.emptyActions.getActions(data.emptyVL));
         }
 

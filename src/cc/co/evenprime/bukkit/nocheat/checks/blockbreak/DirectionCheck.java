@@ -23,10 +23,10 @@ public class DirectionCheck extends BlockBreakCheck {
         super(plugin, "blockbreak.direction", Permissions.BLOCKBREAK_DIRECTION);
     }
 
-    public boolean check(final NoCheatPlayer player, final BlockBreakData blockbreak, final CCBlockBreak ccblockbreak) {
+    public boolean check(final NoCheatPlayer player, final BlockBreakData data, final CCBlockBreak ccblockbreak) {
 
-        final SimpleLocation brokenBlock = blockbreak.brokenBlockLocation;
-        final boolean isInstaBreak = blockbreak.instaBrokenBlockLocation.equals(brokenBlock);
+        final SimpleLocation brokenBlock = data.brokenBlockLocation;
+        final boolean isInstaBreak = data.instaBrokenBlockLocation.equals(brokenBlock);
 
         // If the block is instabreak and we don't check instabreak, return
         if(isInstaBreak && !ccblockbreak.checkinstabreakblocks) {
@@ -42,7 +42,7 @@ public class DirectionCheck extends BlockBreakCheck {
         if(off < 0.1D) {
             // Player did nothing wrong
             // reduce violation counter
-            blockbreak.directionVL *= 0.9D;
+            data.directionVL *= 0.9D;
         } else {
             // Player failed the check
             // Increment violation counter
@@ -51,21 +51,23 @@ public class DirectionCheck extends BlockBreakCheck {
                 // hard on people failing them
                 off /= 10;
             }
-            blockbreak.directionVL += off;
+            data.directionVL += off;
+            data.directionTotalVL += off;
+            data.directionFailed++;
 
-            cancel = executeActions(player, ccblockbreak.directionActions.getActions(blockbreak.directionVL));
+            cancel = executeActions(player, ccblockbreak.directionActions.getActions(data.directionVL));
 
             if(cancel) {
                 // Needed to calculate penalty times
-                blockbreak.directionLastViolationTime = time;
+                data.directionLastViolationTime = time;
             }
         }
 
         // If the player is still in penalty time, cancel the event anyway
-        if(blockbreak.directionLastViolationTime + ccblockbreak.directionPenaltyTime > time) {
-            if(blockbreak.directionLastViolationTime > time) {
-                System.out.println("Nocheat noted that your time ran backwards for " + (blockbreak.directionLastViolationTime - time) + " ms");
-                blockbreak.directionLastViolationTime = 0;
+        if(data.directionLastViolationTime + ccblockbreak.directionPenaltyTime > time) {
+            if(data.directionLastViolationTime > time) {
+                System.out.println("Nocheat noted that your time ran backwards for " + (data.directionLastViolationTime - time) + " ms");
+                data.directionLastViolationTime = 0;
             }
             return true;
         }

@@ -39,6 +39,9 @@ public class SpamCheck extends ChatCheck {
         if(data.messageCount > cc.spamLimit) {
 
             data.spamVL = data.messageCount - cc.spamLimit;
+            data.spamTotalVL++;
+            data.spamFailed++;
+
             cancel = executeActions(player, cc.spamActions.getActions(data.spamVL));
         }
 

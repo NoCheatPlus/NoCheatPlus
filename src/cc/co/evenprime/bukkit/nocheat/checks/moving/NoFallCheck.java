@@ -48,6 +48,8 @@ public class NoFallCheck extends MovingCheck {
 
         if(difference > 1.0F && data.toOnOrInGround && data.fallDistance > 2.0F) {
             data.nofallVL += difference;
+            data.nofallTotalVL += difference;
+            data.nofallFailed++;
 
             final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallVL));
 

@@ -77,6 +77,8 @@ public class RunningCheck extends MovingCheck {
 
             // Increment violation counter
             data.runflyVL += result;
+            data.runflyTotalVL += result;
+            data.runflyFailed++;
 
             boolean cancel = executeActions(player, cc.actions.getActions(data.runflyVL));
 

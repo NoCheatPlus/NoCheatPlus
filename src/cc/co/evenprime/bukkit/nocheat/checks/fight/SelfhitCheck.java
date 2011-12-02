@@ -24,6 +24,9 @@ public class SelfhitCheck extends FightCheck {
             // Player failed the check obviously
 
             data.selfhitVL += 1;
+            data.selfhitTotalVL += 1;
+            data.selfhitFailed++;
+
             cancel = executeActions(player, cc.selfhitActions.getActions(data.selfhitVL));
         } else {
             data.selfhitVL *= 0.99D;

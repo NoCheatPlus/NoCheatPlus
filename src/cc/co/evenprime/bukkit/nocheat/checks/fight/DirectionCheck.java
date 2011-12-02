@@ -43,7 +43,10 @@ public class DirectionCheck extends FightCheck {
             // Player failed the check
             // Increment violation counter
             if(!plugin.skipCheck()) {
-                data.directionVL += Math.sqrt(off);
+                double sqrt = Math.sqrt(off);
+                data.directionVL += sqrt;
+                data.directionTotalVL += sqrt;
+                data.directionFailed++;
             }
 
             cancel = executeActions(player, cc.directionActions.getActions(data.directionVL));

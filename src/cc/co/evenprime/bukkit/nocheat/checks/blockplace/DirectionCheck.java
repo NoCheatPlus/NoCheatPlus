@@ -62,6 +62,8 @@ public class DirectionCheck extends BlockPlaceCheck {
             // Player failed the check
             // Increment violation counter
             data.directionVL += off;
+            data.directionTotalVL += off;
+            data.directionFailed++;
 
             // Prepare some event-specific values for logging and custom actions
 

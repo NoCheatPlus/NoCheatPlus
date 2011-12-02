@@ -1,15 +1,27 @@
 package cc.co.evenprime.bukkit.nocheat.data;
 
+import java.util.Map;
+
 /**
  * Player specific data for the moving check group
  */
 public class MovingData extends Data {
 
+    public double                 runflyVL;
+    public double                 runflyTotalVL;
+    public int                    runflyFailed;
+
+    public double                 nofallVL;
+    public double                 nofallTotalVL;
+    public int                    nofallFailed;
+
+    public double                 morePacketsVL;
+    public double                 morePacketsTotalVL;
+    public int                    morePacketsFailed;
+
     public int                    jumpPhase;
 
     public final PreciseLocation  runflySetBackPoint      = new PreciseLocation();
-
-    public double                 runflyVL;
 
     public double                 vertFreedom;
     public double                 vertVelocity;
@@ -17,7 +29,6 @@ public class MovingData extends Data {
     public double                 horizFreedom;
     public int                    horizVelocityCounter;
 
-    public double                 nofallVL;
     public float                  fallDistance;
     public float                  lastAddedFallDistance;
 
@@ -29,7 +40,6 @@ public class MovingData extends Data {
     public int                    packets;
 
     public final PreciseLocation  morePacketsSetbackPoint = new PreciseLocation();
-    public double                 morePacketsVL;
 
     public final PreciseLocation  teleportTo              = new PreciseLocation();
 
@@ -57,5 +67,15 @@ public class MovingData extends Data {
         morePacketsSetbackPoint.reset();
         lastElapsedIngameSeconds = 0;
         morePacketsCounter = 0;
+    }
+
+    @Override
+    public void collectData(Map<String, Object> map) {
+        map.put("moving.runfly.vl", (int) runflyTotalVL);
+        map.put("moving.nofall.vl", (int) nofallTotalVL);
+        map.put("moving.morepackets.vl", (int) morePacketsTotalVL);
+        map.put("moving.runfly.failed", runflyFailed);
+        map.put("moving.nofall.failed", nofallFailed);
+        map.put("moving.morepackets.failed", morePacketsFailed);
     }
 }

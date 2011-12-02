@@ -24,11 +24,11 @@ public class FlyingCheck extends MovingCheck {
 
     private static final double creativeSpeed = 0.60D;
 
-    public PreciseLocation check(NoCheatPlayer player, MovingData moving, CCMoving ccmoving) {
+    public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving ccmoving) {
 
-        final PreciseLocation setBack = moving.runflySetBackPoint;
-        final PreciseLocation from = moving.from;
-        final PreciseLocation to = moving.to;
+        final PreciseLocation setBack = data.runflySetBackPoint;
+        final PreciseLocation from = data.from;
+        final PreciseLocation to = data.to;
 
         if(!setBack.isSet()) {
             setBack.set(from);
@@ -50,32 +50,34 @@ public class FlyingCheck extends MovingCheck {
 
         speedLimitHorizontal *= player.getSpeedAmplifier();
 
-        result += Math.max(0.0D, horizontalDistance - moving.horizFreedom - speedLimitHorizontal);
+        result += Math.max(0.0D, horizontalDistance - data.horizFreedom - speedLimitHorizontal);
 
         boolean sprinting = player.isSprinting();
 
-        moving.bunnyhopdelay--;
+        data.bunnyhopdelay--;
 
         // Did he go too far?
         if(result > 0 && sprinting) {
 
             // Try to treat it as a the "bunnyhop" problem
-            if(moving.bunnyhopdelay <= 0 && result < 0.4D) {
-                moving.bunnyhopdelay = 3;
+            if(data.bunnyhopdelay <= 0 && result < 0.4D) {
+                data.bunnyhopdelay = 3;
                 result = 0;
             }
         }
 
         // super simple, just check distance compared to max distance
-        result += Math.max(0.0D, yDistance - moving.vertFreedom - ccmoving.flyingSpeedLimitVertical);
+        result += Math.max(0.0D, yDistance - data.vertFreedom - ccmoving.flyingSpeedLimitVertical);
         result = result * 100;
 
         if(result > 0) {
 
             // Increment violation counter
-            moving.runflyVL += result;
+            data.runflyVL += result;
+            data.runflyTotalVL += result;
+            data.runflyFailed++;
 
-            boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(moving.runflyVL));
+            boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(data.runflyVL));
 
             // Was one of the actions a cancel? Then really do it
             if(cancel) {
@@ -84,7 +86,7 @@ public class FlyingCheck extends MovingCheck {
         }
 
         // Slowly reduce the level with each event
-        moving.runflyVL *= 0.97;
+        data.runflyVL *= 0.97;
 
         // Some other cleanup 'n' stuff
         if(newToLocation == null) {

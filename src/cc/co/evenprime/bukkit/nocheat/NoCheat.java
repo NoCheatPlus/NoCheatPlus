@@ -2,6 +2,8 @@ package cc.co.evenprime.bukkit.nocheat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -60,7 +62,7 @@ public class NoCheat extends JavaPlugin {
     private MCVersion              mcVersion = MCVersion.Unknown;
 
     public enum MCVersion {
-        MC100, MC181, Unknown
+        MC100, MC181, Unknown, MC101
     }
 
     public NoCheat() {
@@ -100,6 +102,8 @@ public class NoCheat extends JavaPlugin {
         // find out Minecraft version
         if(Bukkit.getVersion().contains("MC: 1.0.0")) {
             this.mcVersion = MCVersion.MC100;
+        } else if(Bukkit.getVersion().contains("MC: 1.0.1")) {
+            this.mcVersion = MCVersion.MC101;
         } else if(Bukkit.getVersion().contains("MC: 1.8.1")) {
             this.mcVersion = MCVersion.MC181;
         } else {
@@ -134,7 +138,7 @@ public class NoCheat extends JavaPlugin {
         // Then print a list of active checks per world
         ActiveCheckPrinter.printActiveChecks(this, eventManagers);
 
-        if(mcVersion == MCVersion.MC100 && this.conf.getConfigurationCacheForWorld(null).emergencyfix) {
+        if((mcVersion == MCVersion.MC100 || mcVersion == MCVersion.MC101) && this.conf.getConfigurationCacheForWorld(null).emergencyfix) {
 
             // Tell the server admin that we are activating a workaround
             log.logToConsole(LogLevel.LOW, "[NoCheat] Activating emergency bugfix for broken player death handling of minecraft.");
@@ -231,7 +235,27 @@ public class NoCheat extends JavaPlugin {
      */
     public void cleanDataMap() {
         players.cleanDataMap();
+    }
 
+    /**
+     * An interface method usable by other plugins to collect information about
+     * a player. It will include the plugin version, two timestamps (beginning
+     * and end of data collection for that player), and various data from
+     * checks)
+     * 
+     * @param playerName
+     *            a player name
+     * @return A newly created map of identifiers and corresponding values
+     */
+    public Map<String, Object> getPlayerData(String playerName) {
+
+        Map<String, Object> map = new TreeMap<String, Object>();
+
+        players.getPlayerData(playerName, map);
+
+        map.put("nocheat.version", this.getDescription().getVersion());
+
+        return map;
     }
 
     public NoCheatPlayer getPlayer(Player player) {

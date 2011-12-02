@@ -74,6 +74,8 @@ public class MorePacketsCheck extends MovingCheck {
             // went over the limit
             if(!plugin.skipCheck() && packetsAboveLimit > 0) {
                 data.morePacketsVL += packetsAboveLimit;
+                data.morePacketsTotalVL += packetsAboveLimit;
+                data.morePacketsFailed++;
 
                 data.packets = packetsAboveLimit;
 
