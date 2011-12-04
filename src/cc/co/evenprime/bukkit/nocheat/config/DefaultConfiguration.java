@@ -40,6 +40,11 @@ public class DefaultConfiguration extends Configuration {
             setValue(EMERGENCYFIX_ENFORCEPLAYERDEATH, true);
         }
 
+        /*** INVENTORY ***/
+        {
+            setValue(INVENTORY_CLOSEOBEFORETELEPORTS, true);
+        }
+        
         /*** MOVING ***/
         {
             setValue(MOVING_CHECK, true);

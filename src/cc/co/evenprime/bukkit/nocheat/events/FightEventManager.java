@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -42,7 +43,23 @@ public class FightEventManager extends EventManagerImpl {
     @Override
     protected void handleEntityDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
 
-        // Our event listener already checked if that cast is valid
+        // Two possibilities: The player attacked directly, or by projectile
+        // We already made sure in the calling method that it is one of those
+        // two
+        if(event.getDamager() instanceof Projectile) {
+            final Player damager = (Player) ((Projectile) event.getDamager()).getShooter();
+            final NoCheatPlayer player = plugin.getPlayer(damager);
+
+            final FightData data = player.getData().fight;
+
+            // Skip the next damage event, because it is with high probability
+            // the same as this one
+            data.skipNext = true;
+
+            return;
+        }
+
+        // Other possibility, the player is the damager directly
         final Player damager = (Player) event.getDamager();
 
         final NoCheatPlayer player = plugin.getPlayer(damager);
@@ -54,6 +71,12 @@ public class FightEventManager extends EventManagerImpl {
 
         final FightData data = player.getData().fight;
 
+        if(data.skipNext) {
+            data.skipNext = false;
+            return;
+        }
+
+        // We are still interested in this event type
         boolean cancelled = false;
 
         data.damagee = ((CraftEntity) event.getEntity()).getHandle();

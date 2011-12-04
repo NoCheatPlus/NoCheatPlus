@@ -21,12 +21,13 @@ public class FightData extends Data {
 
     public Entity                 damagee;
     public boolean                armswung                   = true;
+    public boolean                skipNext                   = false;
 
     @Override
     public void collectData(Map<String, Object> map) {
-        map.put("fight.direction.vl", (int)directionTotalVL);
-        map.put("fight.selfhit.vl", (int)selfhitTotalVL);
-        map.put("fight.noswing.vl", (int)noswingTotalVL);
+        map.put("fight.direction.vl", (int) directionTotalVL);
+        map.put("fight.selfhit.vl", (int) selfhitTotalVL);
+        map.put("fight.noswing.vl", (int) noswingTotalVL);
         map.put("fight.direction.failed", directionFailed);
         map.put("fight.selfhit.failed", selfhitFailed);
         map.put("fight.noswing.failed", noswingFailed);

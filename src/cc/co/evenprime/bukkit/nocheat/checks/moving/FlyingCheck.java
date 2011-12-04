@@ -41,6 +41,8 @@ public class FlyingCheck extends MovingCheck {
         final double zDistance = to.z - from.z;
         final double horizontalDistance = Math.sqrt((xDistance * xDistance + zDistance * zDistance));
 
+        double resultHoriz = 0;
+        double resultVert = 0;
         double result = 0;
         PreciseLocation newToLocation = null;
 
@@ -50,32 +52,42 @@ public class FlyingCheck extends MovingCheck {
 
         speedLimitHorizontal *= player.getSpeedAmplifier();
 
-        result += Math.max(0.0D, horizontalDistance - data.horizFreedom - speedLimitHorizontal);
+        resultHoriz = Math.max(0.0D, horizontalDistance - data.horizFreedom - speedLimitHorizontal);
 
         boolean sprinting = player.isSprinting();
 
         data.bunnyhopdelay--;
 
         // Did he go too far?
-        if(result > 0 && sprinting) {
+        if(resultHoriz > 0 && sprinting) {
 
             // Try to treat it as a the "bunnyhop" problem
-            if(data.bunnyhopdelay <= 0 && result < 0.4D) {
+            if(data.bunnyhopdelay <= 0 && resultHoriz < 0.4D) {
                 data.bunnyhopdelay = 3;
-                result = 0;
+                resultHoriz = 0;
             }
         }
 
+        resultHoriz *= 100;
+        
         // super simple, just check distance compared to max distance
-        result += Math.max(0.0D, yDistance - data.vertFreedom - ccmoving.flyingSpeedLimitVertical);
-        result = result * 100;
+        resultVert = Math.max(0.0D, yDistance - data.vertFreedom - ccmoving.flyingSpeedLimitVertical) * 100;
+        
+        result = resultHoriz + resultVert;
 
         if(result > 0) {
 
             // Increment violation counter
             data.runflyVL += result;
-            data.runflyTotalVL += result;
-            data.runflyFailed++;
+            if(resultHoriz > 0) {
+                data.runflyRunningTotalVL += resultHoriz;
+                data.runflyRunningFailed++;
+            }
+            
+            if(resultVert > 0) {
+                data.runflyFlyingTotalVL += resultVert;
+                data.runflyFlyingFailed++;
+            }
 
             boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(data.runflyVL));
 

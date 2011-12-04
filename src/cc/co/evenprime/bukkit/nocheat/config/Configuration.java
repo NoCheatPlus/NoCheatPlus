@@ -30,10 +30,13 @@ public abstract class Configuration {
 
     private final static OptionNode       DEBUG                                      = new OptionNode("debug", ROOT, DataType.PARENT);
     public final static OptionNode        DEBUG_SHOWACTIVECHECKS                     = new OptionNode("showactivechecks", DEBUG, DataType.BOOLEAN);
-    public static final OptionNode        DEBUG_COMPATIBILITY                        = new OptionNode("compatibility", DEBUG, DataType.BOOLEAN);
+    public final static OptionNode        DEBUG_COMPATIBILITY                        = new OptionNode("compatibility", DEBUG, DataType.BOOLEAN);
 
     private final static OptionNode       EMERGENCYFIX                               = new OptionNode("emergencyfix", ROOT, DataType.PARENT);
     public final static OptionNode        EMERGENCYFIX_ENFORCEPLAYERDEATH            = new OptionNode("enforceplayerdeath", EMERGENCYFIX, DataType.BOOLEAN);
+
+    public final static OptionNode        INVENTORY                                  = new OptionNode("inventory", ROOT, DataType.PARENT);
+    public final static OptionNode        INVENTORY_CLOSEOBEFORETELEPORTS            = new OptionNode("closebeforeteleports", INVENTORY, DataType.BOOLEAN);
 
     private final static OptionNode       MOVING                                     = new OptionNode("moving", ROOT, DataType.PARENT);
     public final static OptionNode        MOVING_CHECK                               = new OptionNode("check", MOVING, DataType.BOOLEAN);
@@ -87,10 +90,10 @@ public abstract class Configuration {
     public final static OptionNode        BLOCKPLACE_REACH_ACTIONS                   = new OptionNode("actions", BLOCKPLACE_REACH, DataType.ACTIONLIST);
 
     private final static OptionNode       BLOCKPLACE_DIRECTION                       = new OptionNode("direction", BLOCKPLACE, DataType.PARENT);
-    public static final OptionNode        BLOCKPLACE_DIRECTION_CHECK                 = new OptionNode("check", BLOCKPLACE_DIRECTION, DataType.BOOLEAN);                 ;
-    public static final OptionNode        BLOCKPLACE_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKPLACE_DIRECTION, DataType.INTEGER);
+    public final static OptionNode        BLOCKPLACE_DIRECTION_CHECK                 = new OptionNode("check", BLOCKPLACE_DIRECTION, DataType.BOOLEAN);                 ;
+    public final static OptionNode        BLOCKPLACE_DIRECTION_PENALTYTIME           = new OptionNode("penaltytime", BLOCKPLACE_DIRECTION, DataType.INTEGER);
     public final static OptionNode        BLOCKPLACE_DIRECTION_PRECISION             = new OptionNode("precision", BLOCKPLACE_DIRECTION, DataType.INTEGER);
-    public static final OptionNode        BLOCKPLACE_DIRECTION_ACTIONS               = new OptionNode("actions", BLOCKPLACE_DIRECTION, DataType.ACTIONLIST);
+    public final static OptionNode        BLOCKPLACE_DIRECTION_ACTIONS               = new OptionNode("actions", BLOCKPLACE_DIRECTION, DataType.ACTIONLIST);
 
     private final static OptionNode       CHAT                                       = new OptionNode("chat", ROOT, DataType.PARENT);
     public final static OptionNode        CHAT_CHECK                                 = new OptionNode("check", CHAT, DataType.BOOLEAN);
@@ -103,8 +106,8 @@ public abstract class Configuration {
     public final static OptionNode        CHAT_SPAM_ACTIONS                          = new OptionNode("actions", CHAT_SPAM, DataType.ACTIONLIST);
 
     private final static OptionNode       CHAT_EMPTY                                 = new OptionNode("empty", CHAT, DataType.PARENT);
-    public static final OptionNode        CHAT_EMPTY_CHECK                           = new OptionNode("check", CHAT_EMPTY, DataType.BOOLEAN);
-    public static final OptionNode        CHAT_EMPTY_ACTIONS                         = new OptionNode("actions", CHAT_EMPTY, DataType.ACTIONLIST);
+    public final static OptionNode        CHAT_EMPTY_CHECK                           = new OptionNode("check", CHAT_EMPTY, DataType.BOOLEAN);
+    public final static OptionNode        CHAT_EMPTY_ACTIONS                         = new OptionNode("actions", CHAT_EMPTY, DataType.ACTIONLIST);
 
     private final static OptionNode       FIGHT                                      = new OptionNode("fight", ROOT, DataType.PARENT);
     public final static OptionNode        FIGHT_CHECK                                = new OptionNode("check", FIGHT, DataType.BOOLEAN);
@@ -116,12 +119,12 @@ public abstract class Configuration {
     public final static OptionNode        FIGHT_DIRECTION_ACTIONS                    = new OptionNode("actions", FIGHT_DIRECTION, DataType.ACTIONLIST);
 
     private final static OptionNode       FIGHT_SELFHIT                              = new OptionNode("selfhit", FIGHT, DataType.PARENT);
-    public static final OptionNode        FIGHT_SELFHIT_CHECK                        = new OptionNode("check", FIGHT_SELFHIT, DataType.BOOLEAN);
+    public final static OptionNode        FIGHT_SELFHIT_CHECK                        = new OptionNode("check", FIGHT_SELFHIT, DataType.BOOLEAN);
     public final static OptionNode        FIGHT_SELFHIT_ACTIONS                      = new OptionNode("actions", FIGHT_SELFHIT, DataType.ACTIONLIST);
 
     private final static OptionNode       FIGHT_NOSWING                              = new OptionNode("noswing", FIGHT, DataType.PARENT);
-    public static final OptionNode        FIGHT_NOSWING_CHECK                        = new OptionNode("check", FIGHT_NOSWING, DataType.BOOLEAN);
-    public static final OptionNode        FIGHT_NOSWING_ACTIONS                      = new OptionNode("actions", FIGHT_NOSWING, DataType.ACTIONLIST);
+    public final static OptionNode        FIGHT_NOSWING_CHECK                        = new OptionNode("check", FIGHT_NOSWING, DataType.BOOLEAN);
+    public final static OptionNode        FIGHT_NOSWING_ACTIONS                      = new OptionNode("actions", FIGHT_NOSWING, DataType.ACTIONLIST);
 
     private final Map<OptionNode, Object> values;
     private final Configuration           defaults;

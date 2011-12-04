@@ -8,8 +8,18 @@ import java.util.Map;
 public class MovingData extends Data {
 
     public double                 runflyVL;
-    public double                 runflyTotalVL;
-    public int                    runflyFailed;
+
+    public double                 runflyRunningTotalVL;
+    public int                    runflyRunningFailed;
+
+    public double                 runflyFlyingTotalVL;
+    public int                    runflyFlyingFailed;
+
+    public double                 runflySneakingTotalVL;
+    public int                    runflySneakingFailed;
+
+    public double                 runflySwimmingTotalVL;
+    public int                    runflySwimmingFailed;
 
     public double                 nofallVL;
     public double                 nofallTotalVL;
@@ -71,10 +81,17 @@ public class MovingData extends Data {
 
     @Override
     public void collectData(Map<String, Object> map) {
-        map.put("moving.runfly.vl", (int) runflyTotalVL);
+        map.put("moving.running.vl", (int) runflyRunningTotalVL);
+        map.put("moving.flying.vl", (int) runflyFlyingTotalVL);
+        map.put("moving.sneaking.vl", (int) runflySneakingTotalVL);
+        map.put("moving.swimming.vl", (int) runflySwimmingTotalVL);
         map.put("moving.nofall.vl", (int) nofallTotalVL);
         map.put("moving.morepackets.vl", (int) morePacketsTotalVL);
-        map.put("moving.runfly.failed", runflyFailed);
+
+        map.put("moving.running.failed", runflyRunningFailed);
+        map.put("moving.flying.failed", runflyFlyingFailed);
+        map.put("moving.sneaking.failed", runflySneakingFailed);
+        map.put("moving.swimming.failed", runflySwimmingFailed);
         map.put("moving.nofall.failed", nofallFailed);
         map.put("moving.morepackets.failed", morePacketsFailed);
     }

@@ -29,6 +29,8 @@ public class Explainations {
         
         set(Configuration.EMERGENCYFIX_ENFORCEPLAYERDEATH, "Fix a bug that prevents people from really dying, causing them to not drop XP,\n and still being able to fight, place/destroy blocks etc. in an invulnerable state.");
 
+        set(Configuration.INVENTORY_CLOSEOBEFORETELEPORTS, "Close inventory screens of players before they get teleported, preventing creation of real or fake duplicates.");
+        
         set(Configuration.MOVING_CHECK, "If true, do various checks on PlayerMove events.");
         set(Configuration.MOVING_IDENTIFYCREATIVEMODE, "If true, NoCheat will automatically identify if players are in creative mode and will allow them to fly, avoid fall damage etc.");
 

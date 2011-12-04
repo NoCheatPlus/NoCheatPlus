@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -69,6 +70,9 @@ public class WorkaroundsEventManager extends EventManagerImpl {
     }
 
     private void handleTeleportation(final Player player) {
+        if(plugin.getPlayer(player).getConfiguration().inventory.closebeforeteleports && player instanceof CraftPlayer) {
+            ((CraftPlayer) player).getHandle().closeInventory();
+        }
         plugin.clearCriticalData(player.getName());
     }
 }

@@ -19,12 +19,11 @@ public class ConfigurationCache {
     public final CCDebug      debug;
     public final CCFight      fight;
     public final boolean      emergencyfix;
+    public final CCInventory  inventory;
 
     /**
      * Instantiate a config cache and populate it with the data of a
      * Config tree (and its parent tree)
-     * 
-     * @param data
      */
     public ConfigurationCache(Configuration data, Logger worldSpecificFileLogger) {
 
@@ -35,6 +34,7 @@ public class ConfigurationCache {
         logging = new CCLogging(data, worldSpecificFileLogger);
         debug = new CCDebug(data);
         fight = new CCFight(data);
+        inventory = new CCInventory(data);
 
         emergencyfix = data.getBoolean(Configuration.EMERGENCYFIX_ENFORCEPLAYERDEATH);
     }

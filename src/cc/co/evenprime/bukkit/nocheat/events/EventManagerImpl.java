@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
@@ -14,7 +15,6 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -271,10 +271,11 @@ public abstract class EventManagerImpl implements EventManager {
 
             final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
 
-            // Only if player really attacked other player
-            if(!(event2.getDamager() instanceof Player) || !event2.getCause().equals(DamageCause.ENTITY_ATTACK))
+            // Only handle if attack done by a player directly or inderictly with a projectile
+            if(!(event2.getDamager() instanceof Player) && !((event2.getDamager() instanceof Projectile) && ((Projectile)event2.getDamager()).getShooter() instanceof Player)) {
                 return;
-
+            }
+            
             /** Only now measure time and dispatch event */
             if(measureTime != null && measureTime.isEnabled()) {
                 final long startTime = System.nanoTime();

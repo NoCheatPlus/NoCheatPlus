@@ -77,8 +77,20 @@ public class RunningCheck extends MovingCheck {
 
             // Increment violation counter
             data.runflyVL += result;
-            data.runflyTotalVL += result;
-            data.runflyFailed++;
+
+            if(data.checknamesuffix.equals("sneaking")) {
+                data.runflySneakingTotalVL += result;
+                data.runflySneakingFailed++;
+            } else if(data.checknamesuffix.equals("swimming")) {
+                data.runflySwimmingTotalVL += result;
+                data.runflySwimmingFailed++;
+            } else if(data.checknamesuffix.equals("vertical")) {
+                data.runflyFlyingTotalVL += result;
+                data.runflyFlyingFailed++;
+            } else {
+                data.runflyRunningTotalVL += result;
+                data.runflyRunningFailed++;
+            }
 
             boolean cancel = executeActions(player, cc.actions.getActions(data.runflyVL));
 
