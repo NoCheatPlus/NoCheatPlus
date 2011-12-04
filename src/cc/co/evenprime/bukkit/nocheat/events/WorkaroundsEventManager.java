@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -32,17 +33,17 @@ public class WorkaroundsEventManager extends EventManagerImpl {
 
     @Override
     protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
-        handleTeleportation(event.getPlayer());
+        handleTeleportation(event.getPlayer(), event.getTo());
     }
 
     @Override
     protected void handlePlayerPortalEvent(final PlayerPortalEvent event, final Priority priority) {
-        handleTeleportation(event.getPlayer());
+        handleTeleportation(event.getPlayer(), event.getTo());
     }
 
     @Override
     protected void handlePlayerRespawnEvent(final PlayerRespawnEvent event, final Priority priority) {
-        handleTeleportation(event.getPlayer());
+        handleTeleportation(event.getPlayer(), event.getRespawnLocation());
     }
 
     @Override
@@ -51,10 +52,10 @@ public class WorkaroundsEventManager extends EventManagerImpl {
         if(!event.isCancelled())
             return;
 
-        handleTeleportation(event.getPlayer());
+        handleTeleportation(event.getPlayer(), event.getTo());
 
         // Fix a common mistake that other developers make (cancelling move
-        // events is crazy, rather set the target location to the from location
+        // events is crazy, rather set the target location to the from location)
         if(plugin.getPlayer(event.getPlayer()).getConfiguration().debug.overrideIdiocy) {
             event.setCancelled(false);
             event.setTo(event.getFrom().clone());
@@ -69,8 +70,8 @@ public class WorkaroundsEventManager extends EventManagerImpl {
         }
     }
 
-    private void handleTeleportation(final Player player) {
-        if(plugin.getPlayer(player).getConfiguration().inventory.closebeforeteleports && player instanceof CraftPlayer) {
+    private void handleTeleportation(final Player player, final Location to) {
+        if(plugin.getPlayer(player).getConfiguration().inventory.closebeforeteleports && player instanceof CraftPlayer && to != null && !(to.getWorld().equals(player.getWorld()))) {
             ((CraftPlayer) player).getHandle().closeInventory();
         }
         plugin.clearCriticalData(player.getName());
