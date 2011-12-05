@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.actions.types.WildCard;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.ChatCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCChat;
@@ -53,7 +53,7 @@ public class SpamCheck extends ChatCheck {
         return cc.spamCheck;
     }
 
-    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+    public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         switch (wildcard) {
 

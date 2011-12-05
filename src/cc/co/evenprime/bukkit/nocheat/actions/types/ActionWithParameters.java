@@ -34,7 +34,7 @@ public abstract class ActionWithParameters extends Action {
             }
             // Found a matching closing brace
             else {
-                WildCard w = WildCard.get(parts2[0]);
+                ParameterName w = ParameterName.get(parts2[0]);
 
                 if(w != null) {
                     // Found an existing wildcard inbetween the braces
@@ -66,7 +66,7 @@ public abstract class ActionWithParameters extends Action {
             if(part instanceof String) {
                 log.append((String) part);
             } else {
-                log.append(check.getParameter((WildCard) part, player));
+                log.append(check.getParameter((ParameterName) part, player));
             }
         }
 

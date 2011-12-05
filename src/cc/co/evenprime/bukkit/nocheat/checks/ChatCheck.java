@@ -2,7 +2,7 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.actions.types.WildCard;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.cache.CCChat;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
 import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
@@ -23,7 +23,7 @@ public abstract class ChatCheck extends Check {
     }
 
     @Override
-    public String getParameter(WildCard wildcard, NoCheatPlayer player) {
+    public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
         switch (wildcard) {
 
         case TEXT: {
