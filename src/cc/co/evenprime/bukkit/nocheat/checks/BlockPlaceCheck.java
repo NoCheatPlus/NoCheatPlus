@@ -30,9 +30,7 @@ public abstract class BlockPlaceCheck extends Check {
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
-        switch (wildcard) {
-
-        case PLACE_LOCATION: {
+        if(wildcard == ParameterName.PLACE_LOCATION) {
             SimpleLocation l = player.getData().blockplace.blockPlaced;
             if(l.isSet()) {
                 return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
@@ -41,7 +39,7 @@ public abstract class BlockPlaceCheck extends Check {
             }
         }
 
-        case PLACE_AGAINST: {
+        else if(wildcard == ParameterName.PLACE_AGAINST) {
             SimpleLocation l = player.getData().blockplace.blockPlacedAgainst;
             if(l.isSet()) {
                 return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
@@ -50,8 +48,7 @@ public abstract class BlockPlaceCheck extends Check {
             }
         }
 
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }

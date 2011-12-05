@@ -109,13 +109,11 @@ public class MorePacketsCheck extends MovingCheck {
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-        case VIOLATIONS:
+        if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) player.getData().moving.morePacketsVL);
-        case PACKETS:
+        else if(wildcard == ParameterName.PACKETS)
             return String.valueOf(player.getData().moving.packets);
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }

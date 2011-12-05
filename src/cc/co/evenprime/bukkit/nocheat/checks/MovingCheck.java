@@ -34,25 +34,18 @@ public abstract class MovingCheck extends Check {
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-
-        case LOCATION: {
+        if(wildcard == ParameterName.LOCATION) {
             PreciseLocation from = player.getData().moving.from;
             return String.format(Locale.US, "%.2f,%.2f,%.2f", from.x, from.y, from.z);
-        }
-
-        case MOVEDISTANCE: {
+        } else if(wildcard == ParameterName.MOVEDISTANCE) {
             PreciseLocation from = player.getData().moving.from;
             PreciseLocation to = player.getData().moving.to;
             return String.format(Locale.US, "%.2f,%.2f,%.2f", to.x - from.x, to.y - from.y, to.z - from.z);
-        }
-
-        case LOCATION_TO:
+        } else if(wildcard == ParameterName.LOCATION_TO) {
             PreciseLocation to = player.getData().moving.to;
             return String.format(Locale.US, "%.2f,%.2f,%.2f", to.x, to.y, to.z);
-
-        default:
+        } else
             return super.getParameter(wildcard, player);
-        }
+
     }
 }

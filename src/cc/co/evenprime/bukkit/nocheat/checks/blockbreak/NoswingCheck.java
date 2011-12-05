@@ -41,15 +41,10 @@ public class NoswingCheck extends BlockBreakCheck {
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-
-        case VIOLATIONS:
+        if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) player.getData().blockbreak.noswingVL);
-
-        default:
+        else
             return super.getParameter(wildcard, player);
-
-        }
     }
 
 }

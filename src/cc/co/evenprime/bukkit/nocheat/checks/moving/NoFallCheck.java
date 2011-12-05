@@ -106,13 +106,11 @@ public class NoFallCheck extends MovingCheck {
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-        case VIOLATIONS:
+        if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) player.getData().moving.nofallVL);
-        case FALLDISTANCE:
+        else if(wildcard == ParameterName.FALLDISTANCE)
             return String.format(Locale.US, "%.2f", player.getData().moving.fallDistance);
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }

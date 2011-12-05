@@ -69,10 +69,10 @@ public class FlyingCheck extends MovingCheck {
         }
 
         resultHoriz *= 100;
-        
+
         // super simple, just check distance compared to max distance
         resultVert = Math.max(0.0D, yDistance - data.vertFreedom - ccmoving.flyingSpeedLimitVertical) * 100;
-        
+
         result = resultHoriz + resultVert;
 
         if(result > 0) {
@@ -83,7 +83,7 @@ public class FlyingCheck extends MovingCheck {
                 data.runflyRunningTotalVL += resultHoriz;
                 data.runflyRunningFailed++;
             }
-            
+
             if(resultVert > 0) {
                 data.runflyFlyingTotalVL += resultVert;
                 data.runflyFlyingFailed++;
@@ -115,12 +115,9 @@ public class FlyingCheck extends MovingCheck {
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-
-        case VIOLATIONS:
+        if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) player.getData().moving.runflyVL);
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }

@@ -228,15 +228,12 @@ public class RunningCheck extends MovingCheck {
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-
-        case CHECK:
+        if(wildcard == ParameterName.CHECK)
             // Workaround for something until I find a better way to do it
             return getName() + "." + player.getData().moving.checknamesuffix;
-        case VIOLATIONS:
+        else if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) player.getData().moving.runflyVL);
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }

@@ -95,13 +95,9 @@ public class DirectionCheck extends BlockPlaceCheck {
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-
-        case VIOLATIONS:
+        if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) player.getData().blockplace.directionVL);
-
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }

@@ -24,14 +24,10 @@ public abstract class ChatCheck extends Check {
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
-        switch (wildcard) {
 
-        case TEXT: {
+        if(wildcard == ParameterName.TEXT)
             return player.getData().chat.message;
-        }
-
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }

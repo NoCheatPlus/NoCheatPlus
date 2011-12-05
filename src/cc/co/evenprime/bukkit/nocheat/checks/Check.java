@@ -10,8 +10,8 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
-import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ParameterName;
+import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
@@ -79,24 +79,17 @@ public abstract class Check {
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-        case PLAYER:
+        if(wildcard == ParameterName.PLAYER)
             return player.getName();
-
-        case CHECK:
+        else if(wildcard == ParameterName.CHECK)
             return getName();
-
-        case LOCATION: {
+        else if(wildcard == ParameterName.LOCATION) {
             Location l = player.getPlayer().getLocation();
             return String.format(Locale.US, "%.2f,%.2f,%.2f", l.getX(), l.getY(), l.getZ());
-        }
-
-        case WORLD: {
+        } else if(wildcard == ParameterName.WORLD)
             return player.getPlayer().getWorld().getName();
-        }
-
-        default:
+        else
             return "Evenprime was lazy and forgot to define " + wildcard + ".";
-        }
+
     }
 }

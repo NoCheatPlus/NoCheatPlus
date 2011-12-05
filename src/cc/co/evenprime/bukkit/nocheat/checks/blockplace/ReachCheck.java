@@ -55,16 +55,11 @@ public class ReachCheck extends BlockPlaceCheck {
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
-        switch (wildcard) {
-
-        case VIOLATIONS:
+        if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) player.getData().blockplace.reachVL);
-
-        case REACHDISTANCE:
+        else if(wildcard == ParameterName.REACHDISTANCE)
             return String.format(Locale.US, "%.2f", player.getData().blockplace.reachdistance);
-
-        default:
+        else
             return super.getParameter(wildcard, player);
-        }
     }
 }
