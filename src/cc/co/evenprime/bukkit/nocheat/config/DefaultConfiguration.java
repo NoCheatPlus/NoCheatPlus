@@ -273,7 +273,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "log fightDirectionLog 0 5 med [player] failed [check]: tried to attack out of sight entity. Total violation level so far [violations].");
             w(w, "log fightDirectionLogHigh 0 5 high [player] failed [check]: tried to attack out of sight entity. Total violation level so far [violations].");
             w(w, "");
-            w(w, "log fightSelfhitlog 0 1 high [player] failed [check]: tried to attack himself. Total violation level so far [violations].");
+            w(w, "log fightSelfhitlog 0 1 med [player] failed [check]: tried to attack himself. Total violation level so far [violations].");
             w(w, "");
             w(w, "# SPECIAL Actions: They will do something check dependant, usually cancel an event.");
             w(w, "#   - They start with the word 'special'");
