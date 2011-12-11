@@ -37,6 +37,7 @@ public class Explainations {
         set(Configuration.MOVING_RUNFLY_CHECK, "If true, check if a player is walking/sprinting/sneaking/swimming too fast/high.");
         set(Configuration.MOVING_RUNFLY_WALKINGSPEEDLIMIT, "Set the speed limit for moving horizontal under 'normal' conditions.\nUnit is 1/100 of a block, default is 22.");
         set(Configuration.MOVING_RUNFLY_SPRINTINGSPEEDLIMIT, "Set the speed limit for moving horizontal while sprinting.\nUnit is 1/100 of a block, default is 40.");
+        set(Configuration.MOVING_RUNFLY_ALLOWHUNGRYSPRINTING, "Should players with a food level of less than 6 be allowed to use the builtin sprint-function?");
         set(Configuration.MOVING_RUNFLY_JUMPHEIGHT, "Set how high a player is allowed to jump.\nUnit is 1/100 of a block, default is 135.");
         set(Configuration.MOVING_RUNFLY_CHECKSWIMMING, "Use a seperate speed limit for swimming players.");
         set(Configuration.MOVING_RUNFLY_SWIMMINGSPEEDLIMIT, "Set the speed limit for moving horizontal while in water.\nUnit is 1/100 of a block, default is 18");

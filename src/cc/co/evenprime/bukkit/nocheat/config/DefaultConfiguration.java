@@ -54,6 +54,7 @@ public class DefaultConfiguration extends Configuration {
 
             setValue(MOVING_RUNFLY_WALKINGSPEEDLIMIT, 22);
             setValue(MOVING_RUNFLY_SPRINTINGSPEEDLIMIT, 40);
+            setValue(MOVING_RUNFLY_ALLOWHUNGRYSPRINTING, false);
             setValue(MOVING_RUNFLY_JUMPHEIGHT, 135);
 
             setValue(MOVING_RUNFLY_CHECKSNEAKING, true);

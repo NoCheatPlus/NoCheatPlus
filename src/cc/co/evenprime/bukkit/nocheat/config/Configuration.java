@@ -46,6 +46,7 @@ public abstract class Configuration {
     public final static OptionNode        MOVING_RUNFLY_CHECK                        = new OptionNode("check", MOVING_RUNFLY, DataType.BOOLEAN);
     public final static OptionNode        MOVING_RUNFLY_WALKINGSPEEDLIMIT            = new OptionNode("walkingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_SPRINTINGSPEEDLIMIT          = new OptionNode("sprintingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);
+    public final static OptionNode        MOVING_RUNFLY_ALLOWHUNGRYSPRINTING         = new OptionNode("allowhungrysprinting", MOVING_RUNFLY, DataType.BOOLEAN);
     public final static OptionNode        MOVING_RUNFLY_JUMPHEIGHT                   = new OptionNode("jumpheight", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_CHECKSNEAKING                = new OptionNode("checksneaking", MOVING_RUNFLY, DataType.BOOLEAN);
     public final static OptionNode        MOVING_RUNFLY_SNEAKINGSPEEDLIMIT           = new OptionNode("sneakingspeedlimit", MOVING_RUNFLY, DataType.INTEGER);

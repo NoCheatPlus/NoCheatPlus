@@ -139,7 +139,9 @@ public class RunningCheck extends MovingCheck {
         // How much further did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
-        final boolean sprinting = player.isSprinting();
+        // A player is considered sprinting if the flag is set and if he has
+        // enough food level (configurable)
+        final boolean sprinting = player.isSprinting() && (player.getPlayer().getFoodLevel() > 5 || cc.allowHungrySprinting);
 
         double limit = 0.0D;
 

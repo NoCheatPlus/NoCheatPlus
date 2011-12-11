@@ -16,6 +16,7 @@ public class CCMoving {
     public final boolean    identifyCreativeMode;
     public final double     walkingSpeedLimit;
     public final double     sprintingSpeedLimit;
+    public final boolean    allowHungrySprinting;
     public final double     jumpheight;
     public final boolean    swimmingCheck;
     public final double     swimmingSpeedLimit;
@@ -42,6 +43,7 @@ public class CCMoving {
         runflyCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECK);
         walkingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_WALKINGSPEEDLIMIT)) / 100D;
         sprintingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SPRINTINGSPEEDLIMIT)) / 100D;
+        allowHungrySprinting = data.getBoolean(Configuration.MOVING_RUNFLY_ALLOWHUNGRYSPRINTING);
         jumpheight = ((double) data.getInteger(Configuration.MOVING_RUNFLY_JUMPHEIGHT)) / 100D;
         actions = data.getActionList(Configuration.MOVING_RUNFLY_ACTIONS);
 
