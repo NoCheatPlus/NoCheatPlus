@@ -32,9 +32,6 @@ public abstract class Configuration {
     public final static OptionNode        DEBUG_SHOWACTIVECHECKS                     = new OptionNode("showactivechecks", DEBUG, DataType.BOOLEAN);
     public final static OptionNode        DEBUG_COMPATIBILITY                        = new OptionNode("compatibility", DEBUG, DataType.BOOLEAN);
 
-    private final static OptionNode       EMERGENCYFIX                               = new OptionNode("emergencyfix", ROOT, DataType.PARENT);
-    public final static OptionNode        EMERGENCYFIX_ENFORCEPLAYERDEATH            = new OptionNode("enforceplayerdeath", EMERGENCYFIX, DataType.BOOLEAN);
-
     public final static OptionNode        INVENTORY                                  = new OptionNode("inventory", ROOT, DataType.PARENT);
     public final static OptionNode        INVENTORY_CLOSEOBEFORETELEPORTS            = new OptionNode("closebeforeteleports", INVENTORY, DataType.BOOLEAN);
 

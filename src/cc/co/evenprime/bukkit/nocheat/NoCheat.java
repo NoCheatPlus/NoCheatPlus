@@ -5,18 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityListener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -57,13 +49,7 @@ public class NoCheat extends JavaPlugin {
 
     private LagMeasureTask         lagMeasureTask;
 
-    private int                    taskId    = -1;
-
-    private MCVersion              mcVersion = MCVersion.Unknown;
-
-    public enum MCVersion {
-        MC100, MC181, Unknown, MC101
-    }
+    private int                    taskId = -1;
 
     public NoCheat() {
 
@@ -72,7 +58,7 @@ public class NoCheat extends JavaPlugin {
     public void onDisable() {
 
         PluginDescriptionFile pdfFile = this.getDescription();
-
+        
         if(taskId != -1) {
             getServer().getScheduler().cancelTask(taskId);
             taskId = -1;
@@ -98,18 +84,6 @@ public class NoCheat extends JavaPlugin {
 
         // First set up logging
         this.log = new LogManager();
-
-        // find out Minecraft version
-        if(Bukkit.getVersion().contains("MC: 1.0.0")) {
-            this.mcVersion = MCVersion.MC100;
-        } else if(Bukkit.getVersion().contains("MC: 1.0.1")) {
-            this.mcVersion = MCVersion.MC101;
-        } else if(Bukkit.getVersion().contains("MC: 1.8.1")) {
-            this.mcVersion = MCVersion.MC181;
-        } else {
-            this.mcVersion = MCVersion.Unknown;
-            log.logToConsole(LogLevel.LOW, "[NoCheat] You run an unsupported version of Minecraft. Some parts of NoCheat get disabled for your safety.");
-        }
 
         // Then set up in memory per player data storage
         this.players = new PlayerManager(this);
@@ -138,36 +112,6 @@ public class NoCheat extends JavaPlugin {
         // Then print a list of active checks per world
         ActiveCheckPrinter.printActiveChecks(this, eventManagers);
 
-        if((mcVersion == MCVersion.MC100 || mcVersion == MCVersion.MC101) && this.conf.getConfigurationCacheForWorld(null).emergencyfix) {
-
-            // Tell the server admin that we are activating a workaround
-            log.logToConsole(LogLevel.LOW, "[NoCheat] Activating emergency bugfix for broken player death handling of minecraft.");
-            // reset death ticks on deaths, such that they can go over 20 again
-            getServer().getPluginManager().registerEvent(Type.ENTITY_DEATH, new EntityListener() {
-
-                @Override
-                public void onEntityDeath(EntityDeathEvent event) {
-                    if(event.getEntity() instanceof CraftPlayer) {
-                        CraftPlayer player = (CraftPlayer) event.getEntity();
-                        player.getHandle().deathTicks = 19;
-                    }
-                }
-            }, Priority.Monitor, this);
-
-            // reset death ticks on joins, such that they can go over 20 again
-            getServer().getPluginManager().registerEvent(Type.PLAYER_JOIN, new PlayerListener() {
-
-                @Override
-                public void onPlayerJoin(PlayerJoinEvent event) {
-                    if(event.getPlayer() instanceof CraftPlayer) {
-                        CraftPlayer player = (CraftPlayer) event.getPlayer();
-                        if(player.getHealth() <= 0) {
-                            player.getHandle().deathTicks = 19;
-                        }
-                    }
-                }
-            }, Priority.Monitor, this);
-        }
         // Tell the server admin that we finished loading NoCheat now
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + this.getDescription().getVersion() + "] is enabled.");
     }
@@ -260,9 +204,5 @@ public class NoCheat extends JavaPlugin {
 
     public NoCheatPlayer getPlayer(Player player) {
         return players.getPlayer(player);
-    }
-
-    public MCVersion getMCVersion() {
-        return mcVersion;
     }
 }

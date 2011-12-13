@@ -18,7 +18,6 @@ public class ConfigurationCache {
     public final CCChat       chat;
     public final CCDebug      debug;
     public final CCFight      fight;
-    public final boolean      emergencyfix;
     public final CCInventory  inventory;
 
     /**
@@ -35,7 +34,5 @@ public class ConfigurationCache {
         debug = new CCDebug(data);
         fight = new CCFight(data);
         inventory = new CCInventory(data);
-
-        emergencyfix = data.getBoolean(Configuration.EMERGENCYFIX_ENFORCEPLAYERDEATH);
     }
 }

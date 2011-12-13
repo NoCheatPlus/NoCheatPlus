@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cc.co.evenprime.bukkit</groupId>
 	<artifactId>NoCheat</artifactId>
-	<version>2.20b</version>
+	<version>2.21</version>
 	<packaging>jar</packaging>
 	<name>NoCheat</name>
 	<properties>
@@ -18,8 +18,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+			<version>1.0.1-R2-20111212.231953-2</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.8.1-R5-20111119.223146-84</version>
+			<version>1.0.1-R2-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
