@@ -84,7 +84,7 @@ public class CheckUtil {
 
     // All fences are solid - fences are treated specially due
     // to being 1.5 blocks high
-    private static final int    FENCE    = 16 | SOLID;          // 0x00010000
+    private static final int    FENCE    = 16 | SOLID;          // 0x00010010
 
     private static final int    INGROUND = 128;
     private static final int    ONGROUND = 256;
@@ -117,6 +117,9 @@ public class CheckUtil {
 
         // Some exceptions where the above method fails
 
+        // du'h
+        types[Material.AIR.getId()] = NONSOLID;
+
         // Webs slow down a players fall extremely, so it makes
         // sense to treat them as optionally solid
         types[Material.WEB.getId()] = SOLID | NONSOLID;
@@ -148,7 +151,10 @@ public class CheckUtil {
 
         for(int i = 0; i < 256; i++) {
             if(Block.byId[i] != null) {
-                //System.out.println(Material.getMaterial(i) + (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i]) ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " : ""));
+                // System.out.println(Material.getMaterial(i) +
+                // (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i])
+                // ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " :
+                // ""));
             }
         }
     }
@@ -211,19 +217,31 @@ public class CheckUtil {
         final int base = types[world.getBlockTypeIdAt(x, y, z)];
         final int below = types[world.getBlockTypeIdAt(x, y - 1, z)];
 
+        // Special case: Standing on a fence
+        // Behave as if there is a block on top of the fence
+        if((below == FENCE) && base != FENCE && isNonSolid(top)) {
+            return INGROUND;
+        }
+
+        // Special case: Fence
+        // Being a bit above a fence
+        if(below != FENCE && isNonSolid(base) && types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) {
+            return ONGROUND;
+        }
+
         if(isNonSolid(top)) {
             // Simplest (and most likely) case:
             // Below the player is a solid block
             if(isSolid(below) && isNonSolid(base)) {
                 return ONGROUND;
             }
-    
+
             // Next (likely) case:
             // There is a ladder
             if(isLadder(base) || isLadder(top)) {
                 return ONGROUND;
             }
-            
+
             // Next (likely) case:
             // At least the block the player stands
             // in is solid
@@ -235,18 +253,6 @@ public class CheckUtil {
         // Last simple case: Player touches liquid
         if(isLiquid(base) || isLiquid(top)) {
             return LIQUID | INGROUND;
-        }
-
-        // Special case: Standing on a fence
-        // Behave as if there is a block on top of the fence
-        if((below == FENCE) && base != FENCE && isNonSolid(top)) {
-            return INGROUND;
-        }
-
-        // Special case: Fence
-        // Being a bit above a fence
-        if(below != FENCE && isNonSolid(base) && types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) {
-            return ONGROUND;
         }
 
         return 0;
