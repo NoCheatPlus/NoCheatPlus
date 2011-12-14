@@ -41,25 +41,8 @@ public class FightEventManager extends EventManagerImpl {
     }
 
     @Override
-    protected void handleEntityDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    protected void handleEntityAttackDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
 
-        // Two possibilities: The player attacked directly, or by projectile
-        // We already made sure in the calling method that it is one of those
-        // two
-        if(event.getDamager() instanceof Projectile) {
-            final Player damager = (Player) ((Projectile) event.getDamager()).getShooter();
-            final NoCheatPlayer player = plugin.getPlayer(damager);
-
-            final FightData data = player.getData().fight;
-
-            // Skip the next damage event, because it is with high probability
-            // the same as this one
-            data.skipNext = true;
-
-            return;
-        }
-
-        // Other possibility, the player is the damager directly
         final Player damager = (Player) event.getDamager();
 
         final NoCheatPlayer player = plugin.getPlayer(damager);
@@ -92,6 +75,22 @@ public class FightEventManager extends EventManagerImpl {
 
         if(cancelled)
             event.setCancelled(cancelled);
+    }
+
+    @Override
+    protected void handleProjectileDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+
+        final Player damager = (Player) ((Projectile) event.getDamager()).getShooter();
+        final NoCheatPlayer player = plugin.getPlayer(damager);
+
+        final FightData data = player.getData().fight;
+
+        // Skip the next damage event, because it is with high probability
+        // the same as this one
+        data.skipNext = true;
+
+        return;
+
     }
 
     @Override

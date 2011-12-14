@@ -53,8 +53,8 @@ public class RunningCheck extends MovingCheck {
         }
 
         // To know if a player "is on ground" is useful
-        final int fromType = CheckUtil.isLocationOnGround(player.getPlayer().getWorld(), from);
-        final int toType = CheckUtil.isLocationOnGround(player.getPlayer().getWorld(), to);
+        final int fromType = CheckUtil.evaluateLocation(player.getPlayer().getWorld(), from);
+        final int toType = CheckUtil.evaluateLocation(player.getPlayer().getWorld(), to);
 
         final boolean fromOnGround = CheckUtil.isOnGround(fromType);
         final boolean fromInGround = CheckUtil.isInGround(fromType);

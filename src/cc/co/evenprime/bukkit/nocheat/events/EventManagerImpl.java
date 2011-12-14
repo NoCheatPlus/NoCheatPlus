@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -262,27 +263,54 @@ public abstract class EventManagerImpl implements EventManager {
                 return;
 
             /**
-             * Some additional limitations - only interested in direct
-             * attacks executed by actual players
+             * Some additional limitations - only interested in
+             * EntityDamageByEntity
              * 
              */
             if(!(event instanceof EntityDamageByEntityEvent))
                 return;
 
-            final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
-
-            // Only handle if attack done by a player directly or inderictly with a projectile
-            if(!(event2.getDamager() instanceof Player) && !((event2.getDamager() instanceof Projectile) && ((Projectile)event2.getDamager()).getShooter() instanceof Player)) {
+            /**
+             * Only interested in PROJECTILE and ENTITY_ATTACK
+             */
+            if(event.getCause() != DamageCause.PROJECTILE && event.getCause() != DamageCause.ENTITY_ATTACK) {
                 return;
             }
-            
-            /** Only now measure time and dispatch event */
-            if(measureTime != null && measureTime.isEnabled()) {
-                final long startTime = System.nanoTime();
-                m.handleEntityDamageByEntityEvent(event2, priority);
-                measureTime.addTime(System.nanoTime() - startTime);
-            } else {
-                m.handleEntityDamageByEntityEvent(event2, priority);
+
+            final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
+
+            if(event2.getCause() == DamageCause.PROJECTILE) {
+
+                // Only handle if attack done by a player indirectly with a
+                // projectile
+                if(!((event2.getDamager() instanceof Projectile) && ((Projectile) event2.getDamager()).getShooter() instanceof Player)) {
+                    return;
+                }
+
+                /** Only now measure time and dispatch event */
+                if(measureTime != null && measureTime.isEnabled()) {
+                    final long startTime = System.nanoTime();
+                    m.handleProjectileDamageByEntityEvent(event2, priority);
+                    measureTime.addTime(System.nanoTime() - startTime);
+                } else {
+                    m.handleProjectileDamageByEntityEvent(event2, priority);
+                }
+            }
+            // Only handle if attack done by a player directly
+            else if(event2.getCause() == DamageCause.ENTITY_ATTACK) {
+
+                if(!(event2.getDamager() instanceof Player)) {
+                    return;
+                }
+
+                /** Only now measure time and dispatch event */
+                if(measureTime != null && measureTime.isEnabled()) {
+                    final long startTime = System.nanoTime();
+                    m.handleEntityAttackDamageByEntityEvent(event2, priority);
+                    measureTime.addTime(System.nanoTime() - startTime);
+                } else {
+                    m.handleEntityAttackDamageByEntityEvent(event2, priority);
+                }
             }
         }
     }
@@ -380,7 +408,11 @@ public abstract class EventManagerImpl implements EventManager {
         handleEvent(event, priority);
     }
 
-    protected void handleEntityDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    protected void handleProjectileDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+        handleEvent(event, priority);
+    }
+
+    protected void handleEntityAttackDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
         handleEvent(event, priority);
     }
 

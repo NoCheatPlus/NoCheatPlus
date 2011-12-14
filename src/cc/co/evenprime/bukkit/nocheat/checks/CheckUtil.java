@@ -51,6 +51,16 @@ public class CheckUtil {
         return off;
     }
 
+    /**
+     * Check if a player is close enough to a target, based on his eye location
+     * 
+     * @param player
+     * @param targetX
+     * @param targetY
+     * @param targetZ
+     * @param limit
+     * @return
+     */
     public static final double reachCheck(final NoCheatPlayer player, final double targetX, final double targetY, final double targetZ, final double limit) {
 
         final Location eyes = player.getPlayer().getEyeLocation();
@@ -63,12 +73,19 @@ public class CheckUtil {
     private final static double magic    = 0.45D;
     private final static double magic2   = 0.55D;
 
-    // Block types that may need to be treated specially
     private static final int    NONSOLID = 1;                   // 0x00000001
     private static final int    SOLID    = 2;                   // 0x00000010
+
+    // All liquids are "nonsolid" too
     private static final int    LIQUID   = 4 | NONSOLID;        // 0x00000101
+
+    // All ladders are "nonsolid" and "solid" too
     private static final int    LADDER   = 8 | NONSOLID | SOLID; // 0x00001011
+
+    // All fences are solid - fences are treated specially due
+    // to being 1.5 blocks high
     private static final int    FENCE    = 16 | SOLID;          // 0x00010000
+
     private static final int    INGROUND = 128;
     private static final int    ONGROUND = 256;
     // Until I can think of a better way to determine if a block is solid or
@@ -77,50 +94,78 @@ public class CheckUtil {
 
     static {
         types = new int[256];
-        // Find and define properties of all blocks
+
+        // Find and define properties of all other blocks
         for(int i = 0; i < types.length; i++) {
 
-            // Everything is considered nonsolid at first
-            types[i] = NONSOLID;
+            // Everything unknown is considered nonsolid and solid
+            types[i] = NONSOLID | SOLID;
 
             if(Block.byId[i] != null) {
                 if(Block.byId[i].material.isSolid()) {
-                    // solid blocks like STONE, CAKE, TRAPDOORS
+                    // STONE, CAKE, LEAFS, ...
                     types[i] = SOLID;
                 } else if(Block.byId[i].material.isLiquid()) {
-                    // WATER, LAVA
+                    // WATER, LAVA, ...
                     types[i] = LIQUID;
+                } else {
+                    // AIR, SAPLINGS, ...
+                    types[i] = NONSOLID;
                 }
             }
         }
 
-        // Some exceptions
+        // Some exceptions where the above method fails
+
+        // Webs slow down a players fall extremely, so it makes
+        // sense to treat them as optionally solid
+        types[Material.WEB.getId()] = SOLID | NONSOLID;
+
+        // Obvious
         types[Material.LADDER.getId()] = LADDER;
         types[Material.FENCE.getId()] = FENCE;
+        types[Material.FENCE_GATE.getId()] = FENCE;
+
+        // These are sometimes solid, sometimes not
+        types[Material.IRON_FENCE.getId()] = SOLID | NONSOLID;
+        types[Material.THIN_GLASS.getId()] = SOLID | NONSOLID;
+
+        // Signs are NOT solid, despite the game claiming they are
         types[Material.WALL_SIGN.getId()] = NONSOLID;
-        types[Material.DIODE_BLOCK_ON.getId()] |= SOLID | NONSOLID;
-        types[Material.DIODE_BLOCK_OFF.getId()] |= SOLID | NONSOLID;
-        types[Material.WOODEN_DOOR.getId()] |= SOLID | NONSOLID;
-        types[Material.IRON_DOOR_BLOCK.getId()] |= SOLID | NONSOLID;
-        types[Material.PISTON_EXTENSION.getId()] |= SOLID | NONSOLID;
-        types[Material.PISTON_MOVING_PIECE.getId()] |= SOLID | NONSOLID;
-        types[Material.TRAP_DOOR.getId()] |= SOLID | NONSOLID;
-        types[111] |= SOLID | NONSOLID; // Lily pads
+        types[Material.SIGN_POST.getId()] = NONSOLID;
+
+        // doors can be solid or not
+        types[Material.WOODEN_DOOR.getId()] = SOLID | NONSOLID;
+        types[Material.IRON_DOOR_BLOCK.getId()] = SOLID | NONSOLID;
+
+        // pressure plates are so slim, you can consider them
+        // nonsolid too
+        types[Material.STONE_PLATE.getId()] = SOLID | NONSOLID;
+        types[Material.WOOD_PLATE.getId()] = SOLID | NONSOLID;
+
+        // Player can stand on and "in" lilipads
+        types[Material.WATER_LILY.getId()] = SOLID | NONSOLID;
+
+        for(int i = 0; i < 256; i++) {
+            if(Block.byId[i] != null) {
+                //System.out.println(Material.getMaterial(i) + (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i]) ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " : ""));
+            }
+        }
     }
 
     /**
-     * Check if certain coordinates are considered "on ground"
+     * Ask NoCheat what it thinks about a certain location.
+     * Is it a place where a player can safely stand, should
+     * it be considered as being inside a liquid etc.
      * 
-     * @param w
+     * @param world
      *            The world the coordinates belong to
-     * @param values
-     *            The coordinates [lowerX, higherX, Y, lowerZ, higherZ] to be
-     *            checked
-     * @param l
-     *            The precise location that was used for calculation of "values"
+     * @param location
+     *            The precise location in the world
+     * 
      * @return
      */
-    public static final int isLocationOnGround(final World world, final PreciseLocation location) {
+    public static final int evaluateLocation(final World world, final PreciseLocation location) {
 
         final int lowerX = lowerBorder(location.x);
         final int upperX = upperBorder(location.x);
@@ -129,15 +174,13 @@ public class CheckUtil {
         final int upperZ = upperBorder(location.z);
 
         // Check the four borders of the players hitbox for something he could
-        // be standing on
-        // Four seperate corners to check
-        // First border: lowerX, lowerZ
+        // be standing on, and combine the results
         int result = 0;
 
-        result |= canStand(world, lowerX, Y, lowerZ);
-        result |= canStand(world, upperX, Y, lowerZ);
-        result |= canStand(world, upperX, Y, upperZ);
-        result |= canStand(world, lowerX, Y, upperZ);
+        result |= evaluateSimpleLocation(world, lowerX, Y, lowerZ);
+        result |= evaluateSimpleLocation(world, upperX, Y, lowerZ);
+        result |= evaluateSimpleLocation(world, upperX, Y, upperZ);
+        result |= evaluateSimpleLocation(world, lowerX, Y, upperZ);
 
         if(!isInGround(result)) {
             // Original location: X, Z (allow standing in walls this time)
@@ -150,43 +193,63 @@ public class CheckUtil {
     }
 
     /**
-     * Potential results are: "LIQUID", "ONGROUND", "INGROUND", mixture or 0
+     * Evaluate a location by only looking at a specific
+     * "column" of the map to find out if that "column"
+     * would allow a player to stand, swim etc. there
      * 
      * @param world
      * @param x
      * @param y
      * @param z
-     * @return
+     * @return Returns INGROUND, ONGROUND, LIQUID, combination of the three or 0
      */
-    private static final int canStand(final World world, final int x, final int y, final int z) {
+    private static final int evaluateSimpleLocation(final World world, final int x, final int y, final int z) {
 
-        final int standingIn = types[world.getBlockTypeIdAt(x, y, z)];
-        final int headIn = types[world.getBlockTypeIdAt(x, y + 1, z)];
+        // First we need to know about the block itself, the block
+        // below it and the block above it
+        final int top = types[world.getBlockTypeIdAt(x, y + 1, z)];
+        final int base = types[world.getBlockTypeIdAt(x, y, z)];
+        final int below = types[world.getBlockTypeIdAt(x, y - 1, z)];
 
-        int result = 0;
-
-        // It's either liquid, or something else
-        if(isLiquid(standingIn) || isLiquid(headIn)) {
-            return LIQUID;
+        if(isNonSolid(top)) {
+            // Simplest (and most likely) case:
+            // Below the player is a solid block
+            if(isSolid(below) && isNonSolid(base)) {
+                return ONGROUND;
+            }
+    
+            // Next (likely) case:
+            // There is a ladder
+            if(isLadder(base) || isLadder(top)) {
+                return ONGROUND;
+            }
+            
+            // Next (likely) case:
+            // At least the block the player stands
+            // in is solid
+            if(isSolid(base)) {
+                return INGROUND;
+            }
+        }
+        
+        // Last simple case: Player touches liquid
+        if(isLiquid(base) || isLiquid(top)) {
+            return LIQUID | INGROUND;
         }
 
-        if(isLadder(standingIn) || isLadder(headIn)) {
-            return LADDER;
+        // Special case: Standing on a fence
+        // Behave as if there is a block on top of the fence
+        if((below == FENCE) && base != FENCE && isNonSolid(top)) {
+            return INGROUND;
         }
 
-        final int standingOn = types[world.getBlockTypeIdAt(x, y - 1, z)];
-
-        // Player standing with his feet in a (half) block?
-        if((isSolid(standingIn) || standingOn == FENCE) && isNonSolid(headIn) && standingIn != FENCE) {
-            result = INGROUND;
+        // Special case: Fence
+        // Being a bit above a fence
+        if(below != FENCE && isNonSolid(base) && types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) {
+            return ONGROUND;
         }
 
-        // Player standing on a block?
-        if((isLadder(headIn) || isLadder(standingIn)) || ((isSolid(standingOn) || types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) && isNonSolid(standingIn) && standingOn != FENCE)) {
-            result |= ONGROUND;
-        }
-
-        return result;
+        return 0;
     }
 
     public static final boolean isSolid(final int value) {
@@ -206,11 +269,11 @@ public class CheckUtil {
     }
 
     public static final boolean isOnGround(final int fromType) {
-        return isLadder(fromType) || (fromType & ONGROUND) == ONGROUND;
+        return (fromType & ONGROUND) == ONGROUND;
     }
 
     public static final boolean isInGround(final int fromType) {
-        return isLadder(fromType) || isLiquid(fromType) || (fromType & INGROUND) == INGROUND;
+        return (fromType & INGROUND) == INGROUND;
     }
 
     /**
