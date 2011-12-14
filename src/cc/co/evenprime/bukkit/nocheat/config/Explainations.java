@@ -64,7 +64,7 @@ public class Explainations {
         set(Configuration.BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS, "If true, NoCheat will also check for direction for Instant-Breaking blocks.\nTHIS WILL CAUSE FALSE POSITIVES, when a player keeps his mouse button pressed and moves the mouse fast over the screen.");
         set(Configuration.BLOCKBREAK_DIRECTION_PRECISION, "Define how precise a player has to hit blocks when mining. Lower values mean more precision, higher values less precision.");
         set(Configuration.BLOCKBREAK_DIRECTION_PENALTYTIME, "Define how long after a failed attempt to dig a player will be disallowed to break another block. \nUnit is milliseconds, default is 300.");
-        set(Configuration.BLOCKBREAK_DIRECTION_ACTIONS, "What should be done if a player is breaking blocks that are not in his line of sight.\nUnit is number of break(attempt)s outside the line of sight.");
+        set(Configuration.BLOCKBREAK_DIRECTION_ACTIONS, "What should be done if a player is breaking blocks that are not in his line of sight.\nUnit is the combined distance in blocks between where the player looked vs. where the block was.");
 
         set(Configuration.BLOCKBREAK_NOSWING_CHECK, "If true, check if a player swung his arm before breaking a block, which he should have done.");
         set(Configuration.BLOCKBREAK_NOSWING_ACTIONS, "What should be done if a player didn't swing his arm.\nUnit is number of blockbreaking without armswinging.");
@@ -94,7 +94,7 @@ public class Explainations {
         set(Configuration.FIGHT_DIRECTION_CHECK, "If true, check if a player is really looking at enemies that he attacks.");
         set(Configuration.FIGHT_DIRECTION_PRECISION, "Set how precise the check should be. If you experience the check to be too zealous, increase this value. \nIf you want to make it tighter, reduce this value. Default is 100.");
         set(Configuration.FIGHT_DIRECTION_PENALTYTIME, "If a player fails the check, he will be unable to attack for this amount of time (in milliseconds), default is 500.");
-        set(Configuration.FIGHT_DIRECTION_ACTIONS, "What should be done if a player attacks entities that are not in his field of view.\nUnit is number of attacks on entities out of view.");
+        set(Configuration.FIGHT_DIRECTION_ACTIONS, "What should be done if a player attacks entities that are not in his field of view.\nUnit is sqare root of the distance in blocks between where the enemy was and where the player looked.");
 
         set(Configuration.FIGHT_SELFHIT_CHECK, "If true, check if a player is attacking itself, which should normally be impossible.");
         set(Configuration.FIGHT_SELFHIT_ACTIONS, "What should be done if a player attacks himself.\nUnit is number of attacks on himself.");
