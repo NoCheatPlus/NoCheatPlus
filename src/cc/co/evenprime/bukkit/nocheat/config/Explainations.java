@@ -77,7 +77,7 @@ public class Explainations {
         set(Configuration.BLOCKPLACE_DIRECTION_CHECK, "If true, check if a player is looking at the block that he's placing.");
         set(Configuration.BLOCKPLACE_DIRECTION_PRECISION, "Define how precise a player has to be when placing blocks. Lower values mean more precision, higher values less precision. Default 75.");
         set(Configuration.BLOCKPLACE_DIRECTION_PENALTYTIME, "Define how long after a failed attempt to place blocks a player will be disallowed to place another block. \nUnit is milliseconds, default is 100.");
-        set(Configuration.BLOCKPLACE_DIRECTION_ACTIONS, "What should be done if a player is placing blocks that are not in his line of sight.\nUnit is number of place(attempt)s outside the line of sight.");
+        set(Configuration.BLOCKPLACE_DIRECTION_ACTIONS, "What should be done if a player is placing blocks that are not in his line of sight.\nUnit is the combined distance in blocks between where the player looked vs. where the block was.");
 
         set(Configuration.CHAT_CHECK, "If true, do various checks on PlayerChat events.");
 

@@ -137,9 +137,10 @@ public class CheckUtil {
         types[Material.WALL_SIGN.getId()] = NONSOLID;
         types[Material.SIGN_POST.getId()] = NONSOLID;
 
-        // doors can be solid or not
+        // (trap)doors can be solid or not
         types[Material.WOODEN_DOOR.getId()] = SOLID | NONSOLID;
         types[Material.IRON_DOOR_BLOCK.getId()] = SOLID | NONSOLID;
+        types[Material.TRAP_DOOR.getId()] = SOLID | NONSOLID;
 
         // pressure plates are so slim, you can consider them
         // nonsolid too
@@ -149,14 +150,14 @@ public class CheckUtil {
         // Player can stand on and "in" lilipads
         types[Material.WATER_LILY.getId()] = SOLID | NONSOLID;
 
-        for(int i = 0; i < 256; i++) {
+        /*for(int i = 0; i < 256; i++) {
             if(Block.byId[i] != null) {
-                // System.out.println(Material.getMaterial(i) +
-                // (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i])
-                // ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " :
-                // ""));
+                System.out.println(Material.getMaterial(i) +
+                 (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i])
+                 ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " :
+                 ""));
             }
-        }
+        }*/
     }
 
     /**
