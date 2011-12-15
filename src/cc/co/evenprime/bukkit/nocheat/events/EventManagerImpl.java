@@ -270,19 +270,12 @@ public abstract class EventManagerImpl implements EventManager {
             if(!(event instanceof EntityDamageByEntityEvent))
                 return;
 
-            /**
-             * Only interested in PROJECTILE and ENTITY_ATTACK
-             */
-            if(event.getCause() != DamageCause.PROJECTILE && event.getCause() != DamageCause.ENTITY_ATTACK) {
-                return;
-            }
+            // Only handle if attack done by a projectile
+            if(event.getCause() == DamageCause.PROJECTILE) {
 
-            final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
+                final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
 
-            if(event2.getCause() == DamageCause.PROJECTILE) {
-
-                // Only handle if attack done by a player indirectly with a
-                // projectile
+                // And only if the shooter was a player
                 if(!((event2.getDamager() instanceof Projectile) && ((Projectile) event2.getDamager()).getShooter() instanceof Player)) {
                     return;
                 }
@@ -290,15 +283,18 @@ public abstract class EventManagerImpl implements EventManager {
                 /** Only now measure time and dispatch event */
                 if(measureTime != null && measureTime.isEnabled()) {
                     final long startTime = System.nanoTime();
-                    m.handleProjectileDamageByEntityEvent(event2, priority);
+                    m.handleProjectileDamageByPlayerEvent(event2, priority);
                     measureTime.addTime(System.nanoTime() - startTime);
                 } else {
-                    m.handleProjectileDamageByEntityEvent(event2, priority);
+                    m.handleProjectileDamageByPlayerEvent(event2, priority);
                 }
             }
-            // Only handle if attack done by a player directly
-            else if(event2.getCause() == DamageCause.ENTITY_ATTACK) {
+            // Only handle if attack done directly
+            else if(event.getCause() == DamageCause.ENTITY_ATTACK) {
 
+                final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
+
+                // And only if done by a player
                 if(!(event2.getDamager() instanceof Player)) {
                     return;
                 }
@@ -306,10 +302,29 @@ public abstract class EventManagerImpl implements EventManager {
                 /** Only now measure time and dispatch event */
                 if(measureTime != null && measureTime.isEnabled()) {
                     final long startTime = System.nanoTime();
-                    m.handleEntityAttackDamageByEntityEvent(event2, priority);
+                    m.handleEntityAttackDamageByPlayerEvent(event2, priority);
                     measureTime.addTime(System.nanoTime() - startTime);
                 } else {
-                    m.handleEntityAttackDamageByEntityEvent(event2, priority);
+                    m.handleEntityAttackDamageByPlayerEvent(event2, priority);
+                }
+            }
+            // Only handle if attack done by "custom"
+            else if(event.getCause() == DamageCause.CUSTOM) {
+
+                final EntityDamageByEntityEvent event2 = (EntityDamageByEntityEvent) event;
+
+                // And only if done by a player
+                if(!(event2.getDamager() instanceof Player)) {
+                    return;
+                }
+
+                /** Only now measure time and dispatch event */
+                if(measureTime != null && measureTime.isEnabled()) {
+                    final long startTime = System.nanoTime();
+                    m.handleCustomDamageByPlayerEvent(event2, priority);
+                    measureTime.addTime(System.nanoTime() - startTime);
+                } else {
+                    m.handleCustomDamageByPlayerEvent(event2, priority);
                 }
             }
         }
@@ -408,15 +423,19 @@ public abstract class EventManagerImpl implements EventManager {
         handleEvent(event, priority);
     }
 
-    protected void handleProjectileDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    protected void handleProjectileDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
         handleEvent(event, priority);
     }
 
-    protected void handleEntityAttackDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    protected void handleEntityAttackDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
         handleEvent(event, priority);
     }
 
     protected void handlePlayerToggleSprintEvent(PlayerToggleSprintEvent event, Priority priority) {
+        handleEvent(event, priority);
+    }
+
+    protected void handleCustomDamageByPlayerEvent(EntityDamageByEntityEvent event, Priority priority) {
         handleEvent(event, priority);
     }
 }

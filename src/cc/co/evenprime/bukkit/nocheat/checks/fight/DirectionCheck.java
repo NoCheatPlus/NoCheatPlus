@@ -3,6 +3,9 @@ package cc.co.evenprime.bukkit.nocheat.checks.fight;
 import java.util.Locale;
 
 import net.minecraft.server.Entity;
+import net.minecraft.server.EntityComplex;
+import net.minecraft.server.EntityComplexPart;
+import net.minecraft.server.EntityGiantZombie;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ParameterName;
@@ -26,6 +29,12 @@ public class DirectionCheck extends FightCheck {
 
         // Get the width of the damagee
         Entity entity = data.damagee;
+
+        // Safeguard, if entity is Giant or Ender Dragon, this check will fail
+        // due to giant and hard to define hitboxes
+        if(entity instanceof EntityComplex || entity instanceof EntityComplexPart || entity instanceof EntityGiantZombie) {
+            return false;
+        }
 
         final float width = entity.length > entity.width ? entity.length : entity.width;
 

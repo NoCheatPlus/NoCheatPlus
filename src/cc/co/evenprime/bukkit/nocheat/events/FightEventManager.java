@@ -41,7 +41,7 @@ public class FightEventManager extends EventManagerImpl {
     }
 
     @Override
-    protected void handleEntityAttackDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    protected void handleEntityAttackDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
 
         final Player damager = (Player) event.getDamager();
 
@@ -54,14 +54,15 @@ public class FightEventManager extends EventManagerImpl {
 
         final FightData data = player.getData().fight;
 
+        // For some reason we decided to skip this event anyway
         if(data.skipNext) {
             data.skipNext = false;
             return;
         }
 
-        // We are still interested in this event type
         boolean cancelled = false;
 
+        // Get the attacked entity
         data.damagee = ((CraftEntity) event.getEntity()).getHandle();
 
         for(FightCheck check : checks) {
@@ -78,19 +79,33 @@ public class FightEventManager extends EventManagerImpl {
     }
 
     @Override
-    protected void handleProjectileDamageByEntityEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    protected void handleProjectileDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
 
         final Player damager = (Player) ((Projectile) event.getDamager()).getShooter();
         final NoCheatPlayer player = plugin.getPlayer(damager);
 
         final FightData data = player.getData().fight;
 
-        // Skip the next damage event, because it is with high probability
-        // the same as this one
+        // Skip the next damage event, because it is the same as this one
+        // just mislabelled as a "direct" attack from one player onto another
         data.skipNext = true;
 
         return;
+    }
 
+    @Override
+    protected void handleCustomDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+
+        final Player damager = (Player) event.getDamager();
+        final NoCheatPlayer player = plugin.getPlayer(damager);
+
+        final FightData data = player.getData().fight;
+
+        // Skip the next damage event, because it is with high probability
+        // something from the Heroes plugin
+        data.skipNext = true;
+
+        return;
     }
 
     @Override
