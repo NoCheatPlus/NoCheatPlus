@@ -23,30 +23,30 @@ public class CommandHandler {
 
     public static boolean handleCommand(NoCheat plugin, CommandSender sender, Command command, String label, String[] args) {
 
+        boolean result = false;
         // Not our command
-        if(!command.getName().equalsIgnoreCase("nocheat") || args.length == 0)
-            return false;
-
-        if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
+        if(!command.getName().equalsIgnoreCase("nocheat") || args.length == 0) {
+            result = false;
+        } else if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
             // permlist command was used
-            return handlePermlistCommand(plugin, sender, args);
+            result = handlePermlistCommand(plugin, sender, args);
 
         } else if(args[0].equalsIgnoreCase("reload")) {
             // reload command was used
-            return handleReloadCommand(plugin, sender);
+            result = handleReloadCommand(plugin, sender);
         }
 
         else if(args[0].equalsIgnoreCase("performance")) {
             // performance command was used
-            return handlePerformanceCommand(plugin, sender);
+            result = handlePerformanceCommand(plugin, sender);
         }
 
         else if(args[0].equalsIgnoreCase("playerinfo") && args.length >= 2) {
             // performance command was used
-            return handlePlayerInfoCommand(plugin, sender, args);
+            result = handlePlayerInfoCommand(plugin, sender, args);
         }
 
-        return false;
+        return result;
     }
 
     private static boolean handlePlayerInfoCommand(NoCheat plugin, CommandSender sender, String[] args) {

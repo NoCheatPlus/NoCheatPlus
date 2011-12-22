@@ -5,10 +5,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -108,6 +113,10 @@ public class NoCheat extends JavaPlugin {
             lagMeasureTask = new LagMeasureTask(this);
             lagMeasureTask.start();
         }
+        
+        Bukkit.getPluginManager().registerEvent(Type.PLAYER_DROP_ITEM, new PlayerListener() { @Override public void onPlayerDropItem(PlayerDropItemEvent event) {
+            System.out.println("Drop");
+        }}, Priority.Low, this);
 
         // Then print a list of active checks per world
         ActiveCheckPrinter.printActiveChecks(this, eventManagers);
@@ -138,7 +147,14 @@ public class NoCheat extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return CommandHandler.handleCommand(this, sender, command, label, args);
+        boolean result = CommandHandler.handleCommand(this, sender, command, label, args);
+        
+        if(!result && sender instanceof Player) {
+            sender.sendMessage("Unknown command. Type \"help\" for help.");
+            return true;
+        }
+        
+        return result;
     }
 
     public int getIngameSeconds() {
