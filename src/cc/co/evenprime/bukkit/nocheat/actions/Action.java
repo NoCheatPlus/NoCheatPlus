@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.actions.types;
+package cc.co.evenprime.bukkit.nocheat.actions;
 
 /**
  * An action gets executed as the result of a failed check. If it 'really' gets

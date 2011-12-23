@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.actions.types;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.ActionWithParameters;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 
 /**

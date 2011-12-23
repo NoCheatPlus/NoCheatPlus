@@ -8,7 +8,7 @@ import net.minecraft.server.EntityComplexPart;
 import net.minecraft.server.EntityGiantZombie;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.actions.types.ParameterName;
+import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.checks.FightCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;

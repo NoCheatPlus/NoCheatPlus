@@ -3,7 +3,7 @@ package cc.co.evenprime.bukkit.nocheat.config.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import cc.co.evenprime.bukkit.nocheat.actions.types.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.Action;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.actions.types;
+package cc.co.evenprime.bukkit.nocheat.actions;
 
 import java.util.ArrayList;
 
