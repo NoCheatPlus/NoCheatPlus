@@ -9,6 +9,7 @@ public class BaseData extends Data {
     public final ChatData       chat;
     public final MovingData     moving;
     public final FightData      fight;
+    public final InventoryData  inventory;
 
     private final Data[]        data;      // for convenience
 
@@ -20,10 +21,11 @@ public class BaseData extends Data {
         this.chat = new ChatData();
         this.moving = new MovingData();
         this.fight = new FightData();
+        this.inventory = new InventoryData();
 
         data = new Data[] {this.blockbreak, this.blockplace, this.chat,
-                this.moving, this.fight};
-        
+                this.moving, this.fight, this.inventory};
+
         this.timestamp = System.currentTimeMillis();
 
     }
@@ -38,7 +40,7 @@ public class BaseData extends Data {
         for(Data d : data) {
             d.collectData(map);
         }
-        
+
         map.put("nocheat.starttime", timestamp);
         map.put("nocheat.endtime", System.currentTimeMillis());
     }

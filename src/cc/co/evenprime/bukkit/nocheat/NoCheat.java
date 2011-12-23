@@ -5,15 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -31,6 +26,7 @@ import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.ChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
+import cc.co.evenprime.bukkit.nocheat.events.InventoryEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.MovingEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
@@ -107,16 +103,13 @@ public class NoCheat extends JavaPlugin {
         eventManagers.add(new BlockBreakEventManager(this));
         eventManagers.add(new BlockPlaceEventManager(this));
         eventManagers.add(new FightEventManager(this));
+        eventManagers.add(new InventoryEventManager(this));
 
         // Then set up a task to monitor server lag
         if(lagMeasureTask == null) {
             lagMeasureTask = new LagMeasureTask(this);
             lagMeasureTask.start();
         }
-        
-        Bukkit.getPluginManager().registerEvent(Type.PLAYER_DROP_ITEM, new PlayerListener() { @Override public void onPlayerDropItem(PlayerDropItemEvent event) {
-            System.out.println("Drop");
-        }}, Priority.Low, this);
 
         // Then print a list of active checks per world
         ActiveCheckPrinter.printActiveChecks(this, eventManagers);

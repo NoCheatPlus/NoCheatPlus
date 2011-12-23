@@ -15,7 +15,7 @@ public class ChatData extends Data {
     public int                    emptyFailed;
 
     public int                    messageCount = 0;
-    public int                    spamLasttime = 0;
+    public long                   spamLastTime = 0;
     public final ExecutionHistory history      = new ExecutionHistory();
     public String                 message      = "";
 

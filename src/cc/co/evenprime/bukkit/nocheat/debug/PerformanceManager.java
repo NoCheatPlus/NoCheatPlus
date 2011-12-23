@@ -6,7 +6,7 @@ import java.util.Map;
 public class PerformanceManager {
 
     public enum EventType {
-        BLOCKBREAK, BLOCKDAMAGE, BLOCKPLACE, CHAT, MOVING, VELOCITY, FIGHT, TIMED
+        BLOCKBREAK, BLOCKDAMAGE, BLOCKPLACE, CHAT, MOVING, VELOCITY, FIGHT, INVENTORY
     }
 
     private final Map<EventType, Performance> map;

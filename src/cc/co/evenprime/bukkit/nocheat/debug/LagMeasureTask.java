@@ -23,24 +23,29 @@ public class LagMeasureTask implements Runnable {
 
     public void run() {
 
-        // If the previous second took to long, skip checks during
-        // this second
-        skipCheck = lastIngamesecondDuration > 1500;
-
-        long time = System.currentTimeMillis();
-        lastIngamesecondDuration = time - lastIngamesecondTime;
-        if(lastIngamesecondDuration < 1000)
-            lastIngamesecondDuration = 1000;
-        else if(lastIngamesecondDuration > 3600000) {
-            lastIngamesecondDuration = 3600000; // top limit of 1
-                                                // hour per "second"
+        try {
+            // If the previous second took to long, skip checks during
+            // this second
+            skipCheck = lastIngamesecondDuration > 1500;
+    
+            long time = System.currentTimeMillis();
+            lastIngamesecondDuration = time - lastIngamesecondTime;
+            if(lastIngamesecondDuration < 1000)
+                lastIngamesecondDuration = 1000;
+            else if(lastIngamesecondDuration > 3600000) {
+                lastIngamesecondDuration = 3600000; // top limit of 1
+                                                    // hour per "second"
+            }
+            lastIngamesecondTime = time;
+            ingameseconds++;
+    
+            // Check if some data is outdated now and let it be removed
+            if(ingameseconds % 62 == 0) {
+                plugin.cleanDataMap();
+            }
         }
-        lastIngamesecondTime = time;
-        ingameseconds++;
-
-        // Check if some data is outdated now and let it be removed
-        if(ingameseconds % 62 == 0) {
-            plugin.cleanDataMap();
+        catch(Exception e) {
+            // Just prevent this thread from dying for whatever reason
         }
 
     }

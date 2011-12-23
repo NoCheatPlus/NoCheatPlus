@@ -45,5 +45,8 @@ public class Permissions {
     public static final String  ADMIN_PERFORMANCE    = ADMIN + ".performance";
     public static final String  ADMIN_PLAYERINFO     = ADMIN + ".playerinfo";
 
+    public static final String  INVENTORY            = CHECKS + ".inventory";
+    public static final String  INVENTORY_DROP       = INVENTORY + ".drop";
+
     private Permissions() {}
 }

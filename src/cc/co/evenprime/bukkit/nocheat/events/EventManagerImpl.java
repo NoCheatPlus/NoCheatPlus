@@ -20,6 +20,7 @@ import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -154,6 +155,20 @@ public abstract class EventManagerImpl implements EventManager {
                 measureTime.addTime(System.nanoTime() - startTime);
             } else {
                 m.handlePlayerMoveEvent(event, priority);
+            }
+        }
+        
+        @Override
+        public void onPlayerDropItem(final PlayerDropItemEvent event) {
+            if(ignoreCancelledEvents && event.isCancelled())
+                return;
+
+            if(measureTime != null && measureTime.isEnabled()) {
+                final long startTime = System.nanoTime();
+                m.handlePlayerDropItemEvent(event, priority);
+                measureTime.addTime(System.nanoTime() - startTime);
+            } else {
+                m.handlePlayerDropItemEvent(event, priority);
             }
         }
 
@@ -436,6 +451,10 @@ public abstract class EventManagerImpl implements EventManager {
     }
 
     protected void handleCustomDamageByPlayerEvent(EntityDamageByEntityEvent event, Priority priority) {
+        handleEvent(event, priority);
+    }
+    
+    protected void handlePlayerDropItemEvent(PlayerDropItemEvent event, Priority priority) {
         handleEvent(event, priority);
     }
 }

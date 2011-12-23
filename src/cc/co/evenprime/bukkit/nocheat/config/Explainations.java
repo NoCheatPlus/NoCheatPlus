@@ -27,7 +27,12 @@ public class Explainations {
         set(Configuration.DEBUG_SHOWACTIVECHECKS, "Print to the console an overview of all checks that are enabled when NoCheat gets loaded.");
         set(Configuration.DEBUG_COMPATIBILITY, "Do some voodoo to fix common mistakes of other plugins which interfere with NoCheat.");
 
-        set(Configuration.INVENTORY_CLOSEOBEFORETELEPORTS, "Close inventory screens of players before they get teleported, preventing creation of real or fake duplicates.");
+        set(Configuration.INVENTORY_PREVENTITEMDUPE, "Close inventories of players before they get teleported between worlds, preventing creation of duplicate items.");
+        set(Configuration.INVENTORY_CHECK, "If true, do various checks on Inventory related things.");
+        set(Configuration.INVENTORY_DROP_CHECK, "If true, prevent players from dropping too many items in a short timeframe to reduce lag");
+        set(Configuration.INVENTORY_DROP_TIMEFRAME , "Over how many seconds should item drops be counted.");
+        set(Configuration.INVENTORY_DROP_LIMIT, "How many seperate items should the player be allowed to drop during that timeframe");
+        set(Configuration.INVENTORY_DROP_ACTIONS, "What should be done if a player drops more items than that.\nUnit is item drops above the limit.");
 
         set(Configuration.MOVING_CHECK, "If true, do various checks on PlayerMove events.");
         set(Configuration.MOVING_IDENTIFYCREATIVEMODE, "If true, NoCheat will automatically identify if players are in creative mode and will allow them to fly, avoid fall damage etc.");

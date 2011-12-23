@@ -27,15 +27,15 @@ public class SpamCheck extends ChatCheck {
             }
         }
 
-        final int time = plugin.getIngameSeconds();
+        final long time = System.currentTimeMillis() / 1000;
 
-        if(data.spamLasttime + cc.spamTimeframe <= time) {
-            data.spamLasttime = time;
+        if(data.spamLastTime + cc.spamTimeframe <= time) {
+            data.spamLastTime = time;
             data.messageCount = 0;
         }
         // Security check, if the system time changes
-        else if(data.spamLasttime > time) {
-            data.spamLasttime = Integer.MIN_VALUE;
+        else if(data.spamLastTime > time) {
+            data.spamLastTime = Integer.MIN_VALUE;
         }
 
         data.messageCount++;
