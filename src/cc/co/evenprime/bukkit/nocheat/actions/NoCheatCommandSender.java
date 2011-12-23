@@ -4,11 +4,25 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissibleBase;
+import org.bukkit.permissions.ServerOperator;
 
 public class NoCheatCommandSender extends PermissibleBase implements CommandSender {
 
+    private static final ServerOperator serverOperator = new ServerOperator() {
+
+                                                           @Override
+                                                           public boolean isOp() {
+                                                               return true;
+                                                           }
+
+                                                           @Override
+                                                           public void setOp(boolean value) {
+                                                               //
+                                                           }
+                                                       };
+
     public NoCheatCommandSender() {
-        super(null);
+        super(serverOperator);
     }
 
     @Override
@@ -18,8 +32,7 @@ public class NoCheatCommandSender extends PermissibleBase implements CommandSend
 
     @Override
     public void sendMessage(String message) {
-        // We don't want to receive messages, as we can't do anything with them
-        // anyway
+        // We don't want messages
     }
 
     @Override

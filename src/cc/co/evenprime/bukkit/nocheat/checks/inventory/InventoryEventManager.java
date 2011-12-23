@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -14,7 +13,6 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 public class InventoryEventManager extends EventManagerImpl {
@@ -25,18 +23,20 @@ public class InventoryEventManager extends EventManagerImpl {
         super(plugin);
 
         this.checks = new ArrayList<InventoryCheck>(1);
-        this.checks.add(new DropCheck(plugin));
+        
+        // Don't use this check now, it's buggy
+        //this.checks.add(new DropCheck(plugin));
 
-        registerListener(Event.Type.PLAYER_DROP_ITEM, Priority.Lowest, true, plugin.getPerformance(EventType.INVENTORY));
+        //registerListener(Event.Type.PLAYER_DROP_ITEM, Priority.Lowest, true, plugin.getPerformance(EventType.INVENTORY));
         registerListener(Event.Type.PLAYER_TELEPORT, Priority.Monitor, true, null);
     }
 
     @Override
     protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
 
-        CraftPlayer player = (CraftPlayer) event.getPlayer();
-        if(InventoryCheck.getConfig(plugin.getPlayer(player).getConfigurationStore()).closebeforeteleports && event.getTo() != null && !(event.getTo().getWorld().equals(player.getWorld()))) {
-            player.getHandle().closeInventory();
+        NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
+        if(InventoryCheck.getConfig(player.getConfigurationStore()).closebeforeteleports && event.getTo() != null && !(event.getTo().getWorld().equals(player.getPlayer().getWorld()))) {
+            player.closeInventory();
         }
     }
 
@@ -62,15 +62,15 @@ public class InventoryEventManager extends EventManagerImpl {
         }
 
         if(cancelled)
-            event.setCancelled(cancelled);
+            event.setCancelled(true);
     }
 
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        CCInventory i = InventoryCheck.getConfig(cc);
+        /*CCInventory i = InventoryCheck.getConfig(cc);
         if(i.check && i.dropCheck)
-            s.add("inventory.dropCheck");
+            s.add("inventory.dropCheck");*/
         return s;
     }
 }

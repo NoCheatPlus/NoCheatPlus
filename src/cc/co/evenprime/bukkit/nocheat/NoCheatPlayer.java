@@ -26,4 +26,6 @@ public interface NoCheatPlayer {
     public float getSpeedAmplifier();
 
     public boolean isCreative();
+
+    public void closeInventory();
 }

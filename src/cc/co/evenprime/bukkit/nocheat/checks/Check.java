@@ -76,6 +76,7 @@ public abstract class Check {
 
         try {
             command = action.getCommand(player, check);
+            System.out.println("Going to execute command "+command);
             plugin.getServer().dispatchCommand(noCheatCommandSender, command);
         } catch(CommandException e) {
             System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct. ");

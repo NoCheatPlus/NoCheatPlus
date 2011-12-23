@@ -7,12 +7,12 @@ import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public class InventoryData implements DataItem {
 
-    public int                    dropVL      = 0;
-    public double                 dropTotalVL = 0;
-    public int                    dropFailed  = 0;
+    public int                    dropVL           = 0;
+    public double                 dropTotalVL      = 0;
+    public int                    dropFailed       = 0;
     public long                   dropLastTime;
     public int                    dropCount;
-    public final ExecutionHistory history     = new ExecutionHistory();
+    public final ExecutionHistory history          = new ExecutionHistory();
 
     @Override
     public void collectData(Map<String, Object> map) {

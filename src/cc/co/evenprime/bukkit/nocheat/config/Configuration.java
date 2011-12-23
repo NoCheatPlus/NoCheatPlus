@@ -20,6 +20,8 @@ public abstract class Configuration {
 
     protected final static OptionNode     ROOT                                       = new OptionNode(null, null, DataType.PARENT);
 
+    protected final static OptionNode     INACTIVE                                   = new OptionNode(null, null, DataType.PARENT);
+
     private final static OptionNode       LOGGING                                    = new OptionNode("logging", ROOT, DataType.PARENT);
     public final static OptionNode        LOGGING_ACTIVE                             = new OptionNode("active", LOGGING, DataType.BOOLEAN);
     public final static OptionNode        LOGGING_PREFIX                             = new OptionNode("prefix", LOGGING, DataType.STRING);
@@ -34,9 +36,9 @@ public abstract class Configuration {
 
     private final static OptionNode       INVENTORY                                  = new OptionNode("inventory", ROOT, DataType.PARENT);
     public final static OptionNode        INVENTORY_PREVENTITEMDUPE                  = new OptionNode("preventitemdupe", INVENTORY, DataType.BOOLEAN);
-    public static final OptionNode        INVENTORY_CHECK                            = new OptionNode("check", INVENTORY, DataType.BOOLEAN);
+    public static final OptionNode        INVENTORY_CHECK                            = new OptionNode("check", INACTIVE, DataType.BOOLEAN);
 
-    private final static OptionNode       INVENTORY_DROP                             = new OptionNode("drop", INVENTORY, DataType.PARENT);
+    private final static OptionNode       INVENTORY_DROP                             = new OptionNode("drop", INACTIVE, DataType.PARENT);
     public final static OptionNode        INVENTORY_DROP_CHECK                       = new OptionNode("check", INVENTORY_DROP, DataType.BOOLEAN);
     public final static OptionNode        INVENTORY_DROP_TIMEFRAME                   = new OptionNode("timeframe", INVENTORY_DROP, DataType.INTEGER);
     public final static OptionNode        INVENTORY_DROP_LIMIT                       = new OptionNode("limit", INVENTORY_DROP, DataType.INTEGER);

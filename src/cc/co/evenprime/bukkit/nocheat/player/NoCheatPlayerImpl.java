@@ -95,4 +95,8 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     public boolean isCreative() {
         return player.getGameMode() == GameMode.CREATIVE;
     }
+
+    public void closeInventory() {
+        ((CraftPlayer) this.player).getHandle().closeInventory();
+    }
 }

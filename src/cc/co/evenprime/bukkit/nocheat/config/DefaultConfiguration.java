@@ -37,8 +37,8 @@ public class DefaultConfiguration extends Configuration {
 
         /*** INVENTORY ***/
         {
-            setValue(INVENTORY_CHECK, true);
             setValue(INVENTORY_PREVENTITEMDUPE, true);
+            /*setValue(INVENTORY_CHECK, true);
 
             setValue(INVENTORY_DROP_CHECK, true);
             setValue(INVENTORY_DROP_TIMEFRAME, 20);
@@ -47,7 +47,7 @@ public class DefaultConfiguration extends Configuration {
             ActionList dropActionList = new ActionList();
             dropActionList.setActions(0, action.getActions("dropLog dropCancel".split(" ")));
             dropActionList.setActions(500, action.getActions("dropLog dropCancel dropkick".split(" ")));
-            setValue(INVENTORY_DROP_ACTIONS, dropActionList);
+            setValue(INVENTORY_DROP_ACTIONS, dropActionList);*/
         }
 
         /*** MOVING ***/
