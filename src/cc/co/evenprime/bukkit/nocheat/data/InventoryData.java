@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class InventoryData extends Data {
 
-    public double                 dropVL      = 0.0D;
-    public double                 dropTotalVL = 0.0D;
+    public int                    dropVL      = 0;
+    public double                 dropTotalVL = 0;
     public int                    dropFailed  = 0;
     public long                   dropLastTime;
     public int                    dropCount;

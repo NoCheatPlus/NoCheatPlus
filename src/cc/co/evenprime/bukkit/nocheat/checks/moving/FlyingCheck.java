@@ -38,10 +38,11 @@ public class FlyingCheck extends MovingCheck {
         
         // Before doing anything, do a basic height check
         // This is silent for now, will log messages later
+        // probably
         if(to.y - data.vertFreedom > ccmoving.flyingHeightLimit) {
             newToLocation = new PreciseLocation();
             newToLocation.set(setBack);
-            newToLocation.y = ccmoving.flyingHeightLimit - 5;
+            newToLocation.y = ccmoving.flyingHeightLimit - 10;
             return newToLocation;
         }
 
