@@ -35,6 +35,8 @@ public class CCMoving {
     public final boolean    morePacketsCheck;
     public final ActionList morePacketsActions;
 
+    public final double flyingHeightLimit;
+
     public CCMoving(Configuration data) {
 
         check = data.getBoolean(Configuration.MOVING_CHECK);
@@ -55,6 +57,7 @@ public class CCMoving {
         allowFlying = data.getBoolean(Configuration.MOVING_RUNFLY_ALLOWLIMITEDFLYING);
         flyingSpeedLimitVertical = ((double) data.getInteger(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITVERTICAL)) / 100D;
         flyingSpeedLimitHorizontal = ((double) data.getInteger(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL)) / 100D;
+        flyingHeightLimit = data.getInteger(Configuration.MOVING_RUNFLY_FLYINGHEIGHTLIMIT);
         flyingActions = data.getActionList(Configuration.MOVING_RUNFLY_FLYINGACTIONS);
 
         nofallCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECKNOFALL);

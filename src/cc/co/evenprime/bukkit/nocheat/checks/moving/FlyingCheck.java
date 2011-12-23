@@ -34,6 +34,17 @@ public class FlyingCheck extends MovingCheck {
             setBack.set(from);
         }
 
+        PreciseLocation newToLocation = null;
+        
+        // Before doing anything, do a basic height check
+        // This is silent for now, will log messages later
+        if(to.y - data.vertFreedom > ccmoving.flyingHeightLimit) {
+            newToLocation = new PreciseLocation();
+            newToLocation.set(setBack);
+            newToLocation.y = ccmoving.flyingHeightLimit - 5;
+            return newToLocation;
+        }
+
         final double yDistance = to.y - from.y;
 
         // Calculate some distances
@@ -44,7 +55,6 @@ public class FlyingCheck extends MovingCheck {
         double resultHoriz = 0;
         double resultVert = 0;
         double result = 0;
-        PreciseLocation newToLocation = null;
 
         // In case of creative gamemode, give at least 0.60 speed limit
         // horizontal

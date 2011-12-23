@@ -6,8 +6,8 @@ import java.util.Map;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
 
 /**
- * Textual explainations of options, will be displayed in the gui tool and the
- * descriptions.txt file.
+ * Textual explainations of options, will be displayed at the end of the
+ * config.txt file
  * 
  */
 public class Explainations {
@@ -50,6 +50,7 @@ public class Explainations {
         set(Configuration.MOVING_RUNFLY_ALLOWLIMITEDFLYING, "If true, instead of doing the above checks for walking/sprinting/swimming/sneaking,\nallow flying and only limit the flying speed.");
         set(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITVERTICAL, "Set the speed limit for moving vertical while flying.\nUnit is 1/100 of a block, default is 100.");
         set(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL, "Set the speed limit for moving horizontal while flying.\nUnit is 1/100 of a block, default is 60.");
+        set(Configuration.MOVING_RUNFLY_FLYINGHEIGHTLIMIT, "Set the absolute height limit that a player may go to when flying.\nUnit is number of blocks, default is 500");
         set(Configuration.MOVING_RUNFLY_FLYINGACTIONS, "What should be done if a player flies faster than the speed limit(s). \nUnits are in 1/100 of a block above the speedlimit.");
 
         set(Configuration.MOVING_MOREPACKETS_CHECK, "If true, check if a player is sending too many 'move-packets' per second. In a normal game, the player won't send more than 22 packets per second.");

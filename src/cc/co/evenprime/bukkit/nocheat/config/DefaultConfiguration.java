@@ -39,7 +39,7 @@ public class DefaultConfiguration extends Configuration {
         {
             setValue(INVENTORY_CLOSEOBEFORETELEPORTS, true);
         }
-        
+
         /*** MOVING ***/
         {
             setValue(MOVING_CHECK, true);
@@ -74,6 +74,7 @@ public class DefaultConfiguration extends Configuration {
             setValue(MOVING_RUNFLY_ALLOWLIMITEDFLYING, false);
             setValue(MOVING_RUNFLY_FLYINGSPEEDLIMITVERTICAL, 100);
             setValue(MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL, 60);
+            setValue(MOVING_RUNFLY_FLYINGHEIGHTLIMIT, 500);
 
             ActionList flyingActionList = new ActionList();
             flyingActionList.setActions(0, action.getActions("moveLogLowShort moveCancel".split(" ")));

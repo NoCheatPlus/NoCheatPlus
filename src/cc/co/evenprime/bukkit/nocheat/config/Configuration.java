@@ -56,6 +56,7 @@ public abstract class Configuration {
     public final static OptionNode        MOVING_RUNFLY_ALLOWLIMITEDFLYING           = new OptionNode("allowlimitedflying", MOVING_RUNFLY, DataType.BOOLEAN);
     public final static OptionNode        MOVING_RUNFLY_FLYINGSPEEDLIMITVERTICAL     = new OptionNode("flyingspeedlimitvertical", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL   = new OptionNode("flyingspeedlimithorizontal", MOVING_RUNFLY, DataType.INTEGER);
+    public final static OptionNode        MOVING_RUNFLY_FLYINGHEIGHTLIMIT                          = new OptionNode("flyingheightlimit", MOVING_RUNFLY, DataType.INTEGER);
     public final static OptionNode        MOVING_RUNFLY_FLYINGACTIONS                = new OptionNode("flyingactions", MOVING_RUNFLY, DataType.ACTIONLIST);
 
     private final static OptionNode       MOVING_MOREPACKETS                         = new OptionNode("morepackets", MOVING, DataType.PARENT);
