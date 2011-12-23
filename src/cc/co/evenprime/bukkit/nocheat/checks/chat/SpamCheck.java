@@ -33,6 +33,10 @@ public class SpamCheck extends ChatCheck {
             data.spamLasttime = time;
             data.messageCount = 0;
         }
+        // Security check, if the system time changes
+        else if(data.spamLasttime > time) {
+            data.spamLasttime = Integer.MIN_VALUE;
+        }
 
         data.messageCount++;
 
