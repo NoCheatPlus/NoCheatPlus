@@ -30,7 +30,7 @@ public class Explainations {
         set(Configuration.INVENTORY_PREVENTITEMDUPE, "Close inventories of players before they get teleported between worlds, preventing creation of duplicate items.");
         set(Configuration.INVENTORY_CHECK, "If true, do various checks on Inventory related things.");
         set(Configuration.INVENTORY_DROP_CHECK, "If true, prevent players from dropping too many items in a short timeframe to reduce lag");
-        set(Configuration.INVENTORY_DROP_TIMEFRAME , "Over how many seconds should item drops be counted.");
+        set(Configuration.INVENTORY_DROP_TIMEFRAME, "Over how many seconds should item drops be counted.");
         set(Configuration.INVENTORY_DROP_LIMIT, "How many seperate items should the player be allowed to drop during that timeframe");
         set(Configuration.INVENTORY_DROP_ACTIONS, "What should be done if a player drops more items than that.\nUnit is item drops above the limit.");
 

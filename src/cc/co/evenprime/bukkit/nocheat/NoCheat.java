@@ -12,22 +12,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakEventManager;
+import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceEventManager;
+import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatEventManager;
+import cc.co.evenprime.bukkit.nocheat.checks.fight.FightEventManager;
+import cc.co.evenprime.bukkit.nocheat.checks.inventory.InventoryEventManager;
+import cc.co.evenprime.bukkit.nocheat.checks.moving.MovingEventManager;
 import cc.co.evenprime.bukkit.nocheat.command.CommandHandler;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.PlayerManager;
 import cc.co.evenprime.bukkit.nocheat.debug.ActiveCheckPrinter;
 import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
-import cc.co.evenprime.bukkit.nocheat.events.BlockBreakEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.BlockPlaceEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.ChatEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
-import cc.co.evenprime.bukkit.nocheat.events.FightEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.InventoryEventManager;
-import cc.co.evenprime.bukkit.nocheat.events.MovingEventManager;
 import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
@@ -59,7 +59,7 @@ public class NoCheat extends JavaPlugin {
     public void onDisable() {
 
         PluginDescriptionFile pdfFile = this.getDescription();
-        
+
         if(taskId != -1) {
             getServer().getScheduler().cancelTask(taskId);
             taskId = -1;
@@ -118,15 +118,15 @@ public class NoCheat extends JavaPlugin {
         log.logToConsole(LogLevel.LOW, "[NoCheat] version [" + this.getDescription().getVersion() + "] is enabled.");
     }
 
-    public ConfigurationCache getConfig(Player player) {
+    public ConfigurationCacheStore getConfig(Player player) {
         return conf.getConfigurationCacheForWorld(player.getWorld().getName());
     }
 
-    public ConfigurationCache getConfig(World world) {
+    public ConfigurationCacheStore getConfig(World world) {
         return conf.getConfigurationCacheForWorld(world.getName());
     }
 
-    public void log(LogLevel level, String message, ConfigurationCache cc) {
+    public void log(LogLevel level, String message, ConfigurationCacheStore cc) {
         log.log(level, message, cc);
     }
 
@@ -141,12 +141,12 @@ public class NoCheat extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         boolean result = CommandHandler.handleCommand(this, sender, command, label, args);
-        
+
         if(!result && sender instanceof Player) {
             sender.sendMessage("Unknown command. Type \"help\" for help.");
             return true;
         }
-        
+
         return result;
     }
 

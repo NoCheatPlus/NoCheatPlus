@@ -5,10 +5,7 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.BlockBreakCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockBreak;
-import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 
 public class NoswingCheck extends BlockBreakCheck {
 
@@ -42,7 +39,7 @@ public class NoswingCheck extends BlockBreakCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) player.getData().blockbreak.noswingVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).noswingVL);
         else
             return super.getParameter(wildcard, player);
     }

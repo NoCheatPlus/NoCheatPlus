@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.events;
+package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,15 +14,10 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.checks.FightCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.fight.DirectionCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.fight.NoswingCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.fight.SelfhitCheck;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCFight;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.FightData;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 public class FightEventManager extends EventManagerImpl {
 
@@ -46,13 +41,13 @@ public class FightEventManager extends EventManagerImpl {
         final Player damager = (Player) event.getDamager();
 
         final NoCheatPlayer player = plugin.getPlayer(damager);
-        final CCFight cc = player.getConfiguration().fight;
+        final CCFight cc = FightCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.FIGHT)) {
             return;
         }
 
-        final FightData data = player.getData().fight;
+        final FightData data = FightCheck.getData(player.getDataStore());
 
         // For some reason we decided to skip this event anyway
         if(data.skipNext) {
@@ -84,7 +79,7 @@ public class FightEventManager extends EventManagerImpl {
         final Player damager = (Player) ((Projectile) event.getDamager()).getShooter();
         final NoCheatPlayer player = plugin.getPlayer(damager);
 
-        final FightData data = player.getData().fight;
+        final FightData data = FightCheck.getData(player.getDataStore());
 
         // Skip the next damage event, because it is the same as this one
         // just mislabelled as a "direct" attack from one player onto another
@@ -99,7 +94,7 @@ public class FightEventManager extends EventManagerImpl {
         final Player damager = (Player) event.getDamager();
         final NoCheatPlayer player = plugin.getPlayer(damager);
 
-        final FightData data = player.getData().fight;
+        final FightData data = FightCheck.getData(player.getDataStore());
 
         // Skip the next damage event, because it is with high probability
         // something from the Heroes plugin
@@ -110,17 +105,19 @@ public class FightEventManager extends EventManagerImpl {
 
     @Override
     protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
-        plugin.getPlayer(event.getPlayer()).getData().fight.armswung = true;
+        FightCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore()).armswung = true;
     }
 
-    public List<String> getActiveChecks(ConfigurationCache cc) {
+    public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.fight.check && cc.fight.directionCheck)
+        CCFight f = FightCheck.getConfig(cc);
+
+        if(f.check && f.directionCheck)
             s.add("fight.direction");
-        if(cc.fight.check && cc.fight.selfhitCheck)
+        if(f.check && f.selfhitCheck)
             s.add("fight.selfhit");
-        if(cc.fight.check && cc.fight.noswingCheck)
+        if(f.check && f.noswingCheck)
             s.add("fight.noswing");
         return s;
     }

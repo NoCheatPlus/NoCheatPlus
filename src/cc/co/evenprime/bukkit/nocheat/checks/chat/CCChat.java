@@ -1,12 +1,13 @@
-package cc.co.evenprime.bukkit.nocheat.config.cache;
+package cc.co.evenprime.bukkit.nocheat.checks.chat;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
-public class CCChat {
+public class CCChat implements ConfigItem {
 
     public final boolean    check;
     public final boolean    spamCheck;

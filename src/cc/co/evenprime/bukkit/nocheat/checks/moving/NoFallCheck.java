@@ -5,10 +5,7 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCMoving;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
@@ -35,13 +32,13 @@ public class NoFallCheck extends MovingCheck {
             data.lastAddedFallDistance = 0F;
             return null;
         }
-        
+
         // This check is pretty much always a step behind for technical reasons.
         if(data.fromOnOrInGround) {
             // Start with zero fall distance
             data.fallDistance = 0F;
         }
-        
+
         // If we increased fall height before for no good reason, reduce now by
         // the same amount
         if(player.getPlayer().getFallDistance() > data.lastAddedFallDistance) {
@@ -115,9 +112,9 @@ public class NoFallCheck extends MovingCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) player.getData().moving.nofallVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).nofallVL);
         else if(wildcard == ParameterName.FALLDISTANCE)
-            return String.format(Locale.US, "%.2f", player.getData().moving.fallDistance);
+            return String.format(Locale.US, "%.2f", getData(player.getDataStore()).fallDistance);
         else
             return super.getParameter(wildcard, player);
     }

@@ -1,8 +1,7 @@
-package cc.co.evenprime.bukkit.nocheat.config.cache;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.util.logging.Logger;
 
-import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.log.Colors;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 

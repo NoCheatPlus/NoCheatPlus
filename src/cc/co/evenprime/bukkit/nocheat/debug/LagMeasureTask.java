@@ -27,7 +27,7 @@ public class LagMeasureTask implements Runnable {
             // If the previous second took to long, skip checks during
             // this second
             skipCheck = lastIngamesecondDuration > 1500;
-    
+
             long time = System.currentTimeMillis();
             lastIngamesecondDuration = time - lastIngamesecondTime;
             if(lastIngamesecondDuration < 1000)
@@ -38,13 +38,12 @@ public class LagMeasureTask implements Runnable {
             }
             lastIngamesecondTime = time;
             ingameseconds++;
-    
+
             // Check if some data is outdated now and let it be removed
             if(ingameseconds % 62 == 0) {
                 plugin.cleanDataMap();
             }
-        }
-        catch(Exception e) {
+        } catch(Exception e) {
             // Just prevent this thread from dying for whatever reason
         }
 

@@ -1,5 +1,6 @@
-package cc.co.evenprime.bukkit.nocheat.config.cache;
+package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
@@ -8,7 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
  * Every world gets one of these assigned to it.
  * 
  */
-public class CCBlockBreak {
+public class CCBlockBreak implements ConfigItem {
 
     public final boolean    check;
     public final boolean    checkinstabreakblocks;

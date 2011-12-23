@@ -2,8 +2,8 @@ package cc.co.evenprime.bukkit.nocheat;
 
 import org.bukkit.entity.Player;
 
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
+import cc.co.evenprime.bukkit.nocheat.data.DataStore;
 
 public interface NoCheatPlayer {
 
@@ -13,15 +13,15 @@ public interface NoCheatPlayer {
 
     public Player getPlayer();
 
-    public BaseData getData();
+    public DataStore getDataStore();
 
     public boolean isDead();
-    
+
     public boolean isSprinting();
 
     public int getTicksLived();
 
-    public ConfigurationCache getConfiguration();
+    public ConfigurationCacheStore getConfigurationStore();
 
     public float getSpeedAmplifier();
 

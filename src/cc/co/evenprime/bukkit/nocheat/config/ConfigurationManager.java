@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 
 /**
@@ -24,17 +23,17 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
  */
 public class ConfigurationManager {
 
-    private final static String                   configFileName            = "config.txt";
-    private final static String                   actionFileName            = "actions.txt";
-    private final static String                   defaultActionFileName     = "default_actions.txt";
+    private final static String                        configFileName            = "config.txt";
+    private final static String                        actionFileName            = "actions.txt";
+    private final static String                        defaultActionFileName     = "default_actions.txt";
 
-    private final Map<String, ConfigurationCache> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCache>();
+    private final Map<String, ConfigurationCacheStore> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCacheStore>();
 
     // Only use one filehandler per file, therefore keep open filehandlers in a
     // map
-    private final Map<File, FileHandler>          fileToFileHandlerMap      = new HashMap<File, FileHandler>();
+    private final Map<File, FileHandler>               fileToFileHandlerMap      = new HashMap<File, FileHandler>();
 
-    private final Configuration                   defaultConfig;
+    private final Configuration                        defaultConfig;
 
     private static class LogFileFormatter extends Formatter {
 
@@ -136,7 +135,7 @@ public class ConfigurationManager {
 
         // Create a corresponding Configuration Cache
         // put the global config on the config map
-        worldnameToConfigCacheMap.put(null, new ConfigurationCache(root, setupFileLogger(new File(rootConfigFolder, root.getString(DefaultConfiguration.LOGGING_FILENAME)))));
+        worldnameToConfigCacheMap.put(null, new ConfigurationCacheStore(root, setupFileLogger(new File(rootConfigFolder, root.getString(DefaultConfiguration.LOGGING_FILENAME)))));
 
         // Try to find world-specific config files
         Map<String, File> worldFiles = getWorldSpecificConfigFiles(rootConfigFolder);
@@ -162,9 +161,9 @@ public class ConfigurationManager {
         }
     }
 
-    private ConfigurationCache createConfigurationCache(File rootConfigFolder, Configuration configProvider) {
+    private ConfigurationCacheStore createConfigurationCache(File rootConfigFolder, Configuration configProvider) {
 
-        return new ConfigurationCache(configProvider, setupFileLogger(new File(rootConfigFolder, configProvider.getString(DefaultConfiguration.LOGGING_FILENAME))));
+        return new ConfigurationCacheStore(configProvider, setupFileLogger(new File(rootConfigFolder, configProvider.getString(DefaultConfiguration.LOGGING_FILENAME))));
 
     }
 
@@ -238,7 +237,7 @@ public class ConfigurationManager {
     public void cleanup() {
 
         // Remove handlers from the logger
-        for(ConfigurationCache c : worldnameToConfigCacheMap.values()) {
+        for(ConfigurationCacheStore c : worldnameToConfigCacheMap.values()) {
             for(Handler h : c.logging.filelogger.getHandlers()) {
                 c.logging.filelogger.removeHandler(h);
             }
@@ -258,9 +257,9 @@ public class ConfigurationManager {
      * @param worldname
      * @return
      */
-    public ConfigurationCache getConfigurationCacheForWorld(String worldname) {
+    public ConfigurationCacheStore getConfigurationCacheForWorld(String worldname) {
 
-        ConfigurationCache cache = worldnameToConfigCacheMap.get(worldname);
+        ConfigurationCacheStore cache = worldnameToConfigCacheMap.get(worldname);
 
         if(cache != null) {
             return cache;

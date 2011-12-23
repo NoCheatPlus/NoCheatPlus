@@ -1,5 +1,6 @@
-package cc.co.evenprime.bukkit.nocheat.config.cache;
+package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
@@ -8,7 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
  * assigned to it.
  * 
  */
-public class CCMoving {
+public class CCMoving implements ConfigItem {
 
     public final boolean    check;
 
@@ -35,7 +36,7 @@ public class CCMoving {
     public final boolean    morePacketsCheck;
     public final ActionList morePacketsActions;
 
-    public final double flyingHeightLimit;
+    public final double     flyingHeightLimit;
 
     public CCMoving(Configuration data) {
 

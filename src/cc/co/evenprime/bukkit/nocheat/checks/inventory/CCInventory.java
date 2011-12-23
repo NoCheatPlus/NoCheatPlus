@@ -1,9 +1,10 @@
-package cc.co.evenprime.bukkit.nocheat.config.cache;
+package cc.co.evenprime.bukkit.nocheat.checks.inventory;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
-public class CCInventory {
+public class CCInventory implements ConfigItem {
 
     public final boolean    closebeforeteleports;
     public final boolean    check;

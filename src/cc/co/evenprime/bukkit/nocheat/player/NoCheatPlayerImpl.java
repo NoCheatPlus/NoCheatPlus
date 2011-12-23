@@ -1,7 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.player;
 
-import java.lang.reflect.Method;
-
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
@@ -11,30 +9,29 @@ import org.bukkit.entity.Player;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BaseData;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
+import cc.co.evenprime.bukkit.nocheat.data.DataStore;
 
 public class NoCheatPlayerImpl implements NoCheatPlayer {
 
-    protected Player         player;
-    protected final NoCheat  plugin;
-    protected final BaseData data;
-    protected long           lastUsedTime;
-
-    // The method that's used to artifically "fast-forward" the player
-    protected static Method  incAge = null;
+    protected Player                  player;
+    protected final NoCheat           plugin;
+    protected final DataStore         data;
+    protected ConfigurationCacheStore config;
+    protected long                    lastUsedTime;
 
     public NoCheatPlayerImpl(Player player, NoCheat plugin) {
 
         this.player = player;
         this.plugin = plugin;
-        this.data = new BaseData();
+        this.data = new DataStore();
 
         this.lastUsedTime = System.currentTimeMillis();
     }
 
     public void refresh(Player player) {
         this.player = player;
+        this.config = plugin.getConfig(player);
     }
 
     public boolean isDead() {
@@ -49,16 +46,16 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         return player.hasPermission(permission);
     }
 
-    public BaseData getData() {
+    public DataStore getDataStore() {
         return data;
+    }
+
+    public ConfigurationCacheStore getConfigurationStore() {
+        return config;
     }
 
     public Player getPlayer() {
         return player;
-    }
-
-    public ConfigurationCache getConfiguration() {
-        return plugin.getConfig(player);
     }
 
     public String getName() {

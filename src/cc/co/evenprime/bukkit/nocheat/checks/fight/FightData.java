@@ -1,10 +1,12 @@
-package cc.co.evenprime.bukkit.nocheat.data;
+package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
 import java.util.Map;
 
 import net.minecraft.server.Entity;
+import cc.co.evenprime.bukkit.nocheat.DataItem;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
-public class FightData extends Data {
+public class FightData implements DataItem {
 
     public double                 directionVL                = 0.0D;
     public double                 directionTotalVL           = 0.0D;
@@ -31,5 +33,10 @@ public class FightData extends Data {
         map.put("fight.direction.failed", directionFailed);
         map.put("fight.selfhit.failed", selfhitFailed);
         map.put("fight.noswing.failed", noswingFailed);
+    }
+
+    @Override
+    public void clearCriticalData() {
+
     }
 }

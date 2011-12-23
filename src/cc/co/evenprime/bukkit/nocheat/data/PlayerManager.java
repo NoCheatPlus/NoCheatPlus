@@ -52,14 +52,14 @@ public class PlayerManager {
      */
     public void clearCriticalData() {
         for(NoCheatPlayer b : this.players.values()) {
-            b.getData().clearCriticalData();
+            b.getDataStore().clearCriticalData();
         }
     }
 
     public void clearCriticalData(String playerName) {
         NoCheatPlayer p = this.players.get(playerName.toLowerCase());
         if(p != null) {
-            p.getData().clearCriticalData();
+            p.getDataStore().clearCriticalData();
         }
     }
 
@@ -83,9 +83,8 @@ public class PlayerManager {
         NoCheatPlayer player = this.players.get(playerName.toLowerCase());
 
         if(player != null) {
-            BaseData data = player.getData();
+            player.getDataStore().collectData(map);
 
-            data.collectData(map);
         }
     }
 

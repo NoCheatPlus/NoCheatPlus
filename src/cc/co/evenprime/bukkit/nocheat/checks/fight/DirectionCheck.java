@@ -10,10 +10,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
-import cc.co.evenprime.bukkit.nocheat.checks.FightCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCFight;
-import cc.co.evenprime.bukkit.nocheat.data.FightData;
 
 public class DirectionCheck extends FightCheck {
 
@@ -87,7 +84,7 @@ public class DirectionCheck extends FightCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) player.getData().fight.directionVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).directionVL);
         else
             return super.getParameter(wildcard, player);
     }

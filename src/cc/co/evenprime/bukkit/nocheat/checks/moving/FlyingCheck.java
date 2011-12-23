@@ -5,9 +5,6 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCMoving;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
@@ -35,7 +32,7 @@ public class FlyingCheck extends MovingCheck {
         }
 
         PreciseLocation newToLocation = null;
-        
+
         // Before doing anything, do a basic height check
         // This is silent for now, will log messages later
         // probably
@@ -127,7 +124,7 @@ public class FlyingCheck extends MovingCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) player.getData().moving.runflyVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).runflyVL);
         else
             return super.getParameter(wildcard, player);
     }

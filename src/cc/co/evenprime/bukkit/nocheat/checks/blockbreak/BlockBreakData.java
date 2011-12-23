@@ -1,12 +1,16 @@
-package cc.co.evenprime.bukkit.nocheat.data;
+package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import java.util.Map;
+
+import cc.co.evenprime.bukkit.nocheat.DataItem;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
+import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
  * Playerspecific data for the blockbreak check group
  * 
  */
-public class BlockBreakData extends Data {
+public class BlockBreakData implements DataItem {
 
     public double                 reachVL                    = 0.0D;
     public double                 reachTotalVL               = 0.0D;
@@ -37,9 +41,9 @@ public class BlockBreakData extends Data {
 
     @Override
     public void collectData(Map<String, Object> map) {
-        map.put("blockbreak.reach.vl", (int)reachTotalVL);
-        map.put("blockbreak.direction.vl", (int)directionTotalVL);
-        map.put("blockbreak.noswing.vl", (int)noswingTotalVL);
+        map.put("blockbreak.reach.vl", (int) reachTotalVL);
+        map.put("blockbreak.direction.vl", (int) directionTotalVL);
+        map.put("blockbreak.noswing.vl", (int) noswingTotalVL);
         map.put("blockbreak.reach.failed", reachFailed);
         map.put("blockbreak.direction.failed", directionFailed);
         map.put("blockbreak.noswing.failed", noswingFailed);

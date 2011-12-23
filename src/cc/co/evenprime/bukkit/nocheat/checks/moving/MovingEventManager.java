@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.events;
+package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -17,16 +17,12 @@ import org.bukkit.util.Vector;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
-import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.moving.MorePacketsCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.moving.RunflyCheck;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCMoving;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 /**
  * The only place that listens to and modifies player_move events if necessary
@@ -59,7 +55,7 @@ public class MovingEventManager extends EventManagerImpl {
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         // Get the player-specific stored data that applies here
-        final MovingData data = player.getData().moving;
+        final MovingData data = MovingCheck.getData(player.getDataStore());
 
         final Block blockPlaced = event.getBlockPlaced();
 
@@ -92,7 +88,7 @@ public class MovingEventManager extends EventManagerImpl {
             return;
 
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final MovingData data = player.getData().moving;
+        final MovingData data = MovingCheck.getData(player.getDataStore());
 
         if(data.teleportTo.isSet() && data.teleportTo.equals(event.getTo())) {
             event.setCancelled(false);
@@ -112,13 +108,13 @@ public class MovingEventManager extends EventManagerImpl {
             return;
         }
 
-        final CCMoving cc = player.getConfiguration().moving;
+        final CCMoving cc = MovingCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.MOVING)) {
             return;
         }
 
-        final MovingData data = player.getData().moving;
+        final MovingData data = MovingCheck.getData(player.getDataStore());
 
         /******** DO GENERAL DATA MODIFICATIONS ONCE FOR EACH EVENT *****/
         if(data.horizVelocityCounter > 0) {
@@ -167,7 +163,7 @@ public class MovingEventManager extends EventManagerImpl {
     @Override
     protected void handlePlayerVelocityEvent(final PlayerVelocityEvent event, final Priority priority) {
 
-        final MovingData data = plugin.getPlayer(event.getPlayer()).getData().moving;
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
 
         final Vector v = event.getVelocity();
 
@@ -186,25 +182,27 @@ public class MovingEventManager extends EventManagerImpl {
         }
     }
 
-    public List<String> getActiveChecks(ConfigurationCache cc) {
+    public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.moving.check) {
-            if(cc.moving.runflyCheck) {
+        CCMoving m = MovingCheck.getConfig(cc);
 
-                if(!cc.moving.allowFlying) {
+        if(m.check) {
+            if(m.runflyCheck) {
+
+                if(!m.allowFlying) {
                     s.add("moving.runfly");
-                    if(cc.moving.swimmingCheck)
+                    if(m.swimmingCheck)
                         s.add("moving.swimming");
-                    if(cc.moving.sneakingCheck)
+                    if(m.sneakingCheck)
                         s.add("moving.sneaking");
-                    if(cc.moving.nofallCheck)
+                    if(m.nofallCheck)
                         s.add("moving.nofall");
                 } else
                     s.add("moving.flying");
 
             }
-            if(cc.moving.morePacketsCheck)
+            if(m.morePacketsCheck)
                 s.add("moving.morepackets");
         }
 

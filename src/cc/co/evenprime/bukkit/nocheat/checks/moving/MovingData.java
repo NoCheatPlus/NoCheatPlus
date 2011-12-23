@@ -1,11 +1,15 @@
-package cc.co.evenprime.bukkit.nocheat.data;
+package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Map;
+
+import cc.co.evenprime.bukkit.nocheat.DataItem;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
+import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
  * Player specific data for the moving check group
  */
-public class MovingData extends Data {
+public class MovingData implements DataItem {
 
     public double                 runflyVL;
 

@@ -150,14 +150,16 @@ public class CheckUtil {
         // Player can stand on and "in" lilipads
         types[Material.WATER_LILY.getId()] = SOLID | NONSOLID;
 
-        /*for(int i = 0; i < 256; i++) {
-            if(Block.byId[i] != null) {
-                System.out.println(Material.getMaterial(i) +
-                 (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i])
-                 ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " :
-                 ""));
-            }
-        }*/
+        /*
+         * for(int i = 0; i < 256; i++) {
+         * if(Block.byId[i] != null) {
+         * System.out.println(Material.getMaterial(i) +
+         * (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i])
+         * ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " :
+         * ""));
+         * }
+         * }
+         */
     }
 
     /**
@@ -250,7 +252,7 @@ public class CheckUtil {
                 return INGROUND;
             }
         }
-        
+
         // Last simple case: Player touches liquid
         if(isLiquid(base) || isLiquid(top)) {
             return LIQUID | INGROUND;

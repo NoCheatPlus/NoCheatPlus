@@ -6,7 +6,7 @@ import org.bukkit.World;
 
 import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
@@ -24,7 +24,7 @@ public class ActiveCheckPrinter {
 
             int length = line.length();
 
-            ConfigurationCache cc = plugin.getConfig(world);
+            ConfigurationCacheStore cc = plugin.getConfig(world);
 
             if(!cc.debug.showchecks)
                 continue;

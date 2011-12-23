@@ -5,10 +5,7 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.InventoryCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCInventory;
-import cc.co.evenprime.bukkit.nocheat.data.InventoryData;
 
 public class DropCheck extends InventoryCheck {
 
@@ -55,7 +52,7 @@ public class DropCheck extends InventoryCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", player.getData().inventory.dropVL);
+            return String.format(Locale.US, "%d", getData(player.getDataStore()).dropVL);
         else
             return super.getParameter(wildcard, player);
     }

@@ -5,9 +5,7 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.ChatCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCChat;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
 
 public class SpamCheck extends ChatCheck {
@@ -60,7 +58,7 @@ public class SpamCheck extends ChatCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", player.getData().chat.spamVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).spamVL);
         else
             return super.getParameter(wildcard, player);
     }

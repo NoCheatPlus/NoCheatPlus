@@ -6,8 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 
 /**
  * Manage logging throughout NoCheat. Messages may be logged directly to a
@@ -28,7 +28,7 @@ public class LogManager {
      * @param message
      * @param cc
      */
-    public void log(LogLevel level, String message, ConfigurationCache cc) {
+    public void log(LogLevel level, String message, ConfigurationCacheStore cc) {
 
         if(!cc.logging.active)
             return;

@@ -1,6 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.config.cache;
-
-import cc.co.evenprime.bukkit.nocheat.config.Configuration;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 public class CCDebug {
 

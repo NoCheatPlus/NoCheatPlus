@@ -1,11 +1,15 @@
-package cc.co.evenprime.bukkit.nocheat.data;
+package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import java.util.Map;
+
+import cc.co.evenprime.bukkit.nocheat.DataItem;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
+import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
  * 
  */
-public class BlockPlaceData extends Data {
+public class BlockPlaceData implements DataItem {
 
     public double                 reachVL                    = 0.0D;
     public double                 reachTotalVL               = 0.0D;

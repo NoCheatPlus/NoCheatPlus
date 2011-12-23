@@ -5,11 +5,8 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.BlockBreakCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockBreak;
-import cc.co.evenprime.bukkit.nocheat.data.BlockBreakData;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
@@ -55,9 +52,9 @@ public class ReachCheck extends BlockBreakCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) player.getData().blockbreak.reachVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).reachVL);
         else if(wildcard == ParameterName.REACHDISTANCE)
-            return String.format(Locale.US, "%.2f", player.getData().blockbreak.reachDistance);
+            return String.format(Locale.US, "%.2f", getData(player.getDataStore()).reachDistance);
         else
             return super.getParameter(wildcard, player);
     }

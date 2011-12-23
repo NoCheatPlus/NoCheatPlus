@@ -5,10 +5,7 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCMoving;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
@@ -110,9 +107,9 @@ public class MorePacketsCheck extends MovingCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) player.getData().moving.morePacketsVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).morePacketsVL);
         else if(wildcard == ParameterName.PACKETS)
-            return String.valueOf(player.getData().moving.packets);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).packets);
         else
             return super.getParameter(wildcard, player);
     }

@@ -1,12 +1,13 @@
-package cc.co.evenprime.bukkit.nocheat.config.cache;
+package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
+import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
 /**
  * 
  */
-public class CCBlockPlace {
+public class CCBlockPlace implements ConfigItem {
 
     public final boolean    check;
 

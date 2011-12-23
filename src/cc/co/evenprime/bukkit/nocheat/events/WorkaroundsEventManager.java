@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.events;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -56,7 +55,7 @@ public class WorkaroundsEventManager extends EventManagerImpl {
 
         // Fix a common mistake that other developers make (cancelling move
         // events is crazy, rather set the target location to the from location)
-        if(plugin.getPlayer(event.getPlayer()).getConfiguration().debug.overrideIdiocy) {
+        if(plugin.getPlayer(event.getPlayer()).getConfigurationStore().debug.overrideIdiocy) {
             event.setCancelled(false);
             event.setTo(event.getFrom().clone());
         }
@@ -65,15 +64,12 @@ public class WorkaroundsEventManager extends EventManagerImpl {
     @Override
     protected void handlePlayerToggleSprintEvent(final PlayerToggleSprintEvent event, final Priority priority) {
         if(event.isCancelled() && event.isSprinting()) {
-            if(plugin.getPlayer(event.getPlayer()).getConfiguration().debug.overrideIdiocy)
+            if(plugin.getPlayer(event.getPlayer()).getConfigurationStore().debug.overrideIdiocy)
                 event.setCancelled(false);
         }
     }
 
     private void handleTeleportation(final Player player, final Location to) {
-        if(plugin.getPlayer(player).getConfiguration().inventory.closebeforeteleports && player instanceof CraftPlayer && to != null && !(to.getWorld().equals(player.getWorld()))) {
-            ((CraftPlayer) player).getHandle().closeInventory();
-        }
         plugin.clearCriticalData(player.getName());
     }
 }

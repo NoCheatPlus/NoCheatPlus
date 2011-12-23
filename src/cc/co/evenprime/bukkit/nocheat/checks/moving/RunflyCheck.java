@@ -2,10 +2,7 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.checks.MovingCheck;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCMoving;
-import cc.co.evenprime.bukkit.nocheat.data.MovingData;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 public class RunflyCheck extends MovingCheck {

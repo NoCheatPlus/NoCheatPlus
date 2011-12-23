@@ -31,7 +31,7 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 
 import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 
 /**
@@ -157,7 +157,7 @@ public abstract class EventManagerImpl implements EventManager {
                 m.handlePlayerMoveEvent(event, priority);
             }
         }
-        
+
         @Override
         public void onPlayerDropItem(final PlayerDropItemEvent event) {
             if(ignoreCancelledEvents && event.isCancelled())
@@ -382,7 +382,7 @@ public abstract class EventManagerImpl implements EventManager {
      * .co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache)
      */
     @Override
-    public List<String> getActiveChecks(ConfigurationCache cc) {
+    public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         return Collections.emptyList();
     }
 
@@ -453,7 +453,7 @@ public abstract class EventManagerImpl implements EventManager {
     protected void handleCustomDamageByPlayerEvent(EntityDamageByEntityEvent event, Priority priority) {
         handleEvent(event, priority);
     }
-    
+
     protected void handlePlayerDropItemEvent(PlayerDropItemEvent event, Priority priority) {
         handleEvent(event, priority);
     }

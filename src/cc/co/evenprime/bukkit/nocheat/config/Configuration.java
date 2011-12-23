@@ -37,10 +37,10 @@ public abstract class Configuration {
     public static final OptionNode        INVENTORY_CHECK                            = new OptionNode("check", INVENTORY, DataType.BOOLEAN);
 
     private final static OptionNode       INVENTORY_DROP                             = new OptionNode("drop", INVENTORY, DataType.PARENT);
-    public final static OptionNode        INVENTORY_DROP_CHECK                        = new OptionNode("check", INVENTORY_DROP, DataType.BOOLEAN);
-    public final static OptionNode        INVENTORY_DROP_TIMEFRAME                    = new OptionNode("timeframe", INVENTORY_DROP, DataType.INTEGER);
-    public final static OptionNode        INVENTORY_DROP_LIMIT                        = new OptionNode("limit", INVENTORY_DROP, DataType.INTEGER);
-    public final static OptionNode        INVENTORY_DROP_ACTIONS                      = new OptionNode("actions", INVENTORY_DROP, DataType.ACTIONLIST);
+    public final static OptionNode        INVENTORY_DROP_CHECK                       = new OptionNode("check", INVENTORY_DROP, DataType.BOOLEAN);
+    public final static OptionNode        INVENTORY_DROP_TIMEFRAME                   = new OptionNode("timeframe", INVENTORY_DROP, DataType.INTEGER);
+    public final static OptionNode        INVENTORY_DROP_LIMIT                       = new OptionNode("limit", INVENTORY_DROP, DataType.INTEGER);
+    public final static OptionNode        INVENTORY_DROP_ACTIONS                     = new OptionNode("actions", INVENTORY_DROP, DataType.ACTIONLIST);
 
     private final static OptionNode       MOVING                                     = new OptionNode("moving", ROOT, DataType.PARENT);
     public final static OptionNode        MOVING_CHECK                               = new OptionNode("check", MOVING, DataType.BOOLEAN);

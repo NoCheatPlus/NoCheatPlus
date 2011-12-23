@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.events;
+package cc.co.evenprime.bukkit.nocheat.checks.chat;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -11,14 +11,11 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.checks.ChatCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.chat.EmptyCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.chat.SpamCheck;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCChat;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 public class ChatEventManager extends EventManagerImpl {
 
@@ -47,13 +44,13 @@ public class ChatEventManager extends EventManagerImpl {
         boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final CCChat cc = player.getConfiguration().chat;
+        final CCChat cc = ChatCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.CHAT)) {
             return;
         }
 
-        final ChatData data = player.getData().chat;
+        final ChatData data = ChatCheck.getData(player.getDataStore());
 
         data.message = event.getMessage();
 
@@ -69,12 +66,13 @@ public class ChatEventManager extends EventManagerImpl {
         }
     }
 
-    public List<String> getActiveChecks(ConfigurationCache cc) {
+    public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.chat.check && cc.chat.spamCheck)
+        CCChat c = ChatCheck.getConfig(cc);
+        if(c.check && c.spamCheck)
             s.add("chat.spam");
-        if(cc.chat.check && cc.chat.emptyCheck)
+        if(c.check && c.emptyCheck)
             s.add("chat.empty");
         return s;
     }

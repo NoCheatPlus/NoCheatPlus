@@ -2,10 +2,12 @@ package cc.co.evenprime.bukkit.nocheat.data;
 
 import java.util.Map;
 
+import cc.co.evenprime.bukkit.nocheat.DataItem;
+
 /**
  * 
  */
-public class ChatData extends Data {
+public class ChatData implements DataItem {
 
     public int                    spamVL;
     public int                    spamTotalVL;
@@ -25,5 +27,10 @@ public class ChatData extends Data {
         map.put("chat.empty.vl", (int) emptyTotalVL);
         map.put("chat.spam.failed", spamFailed);
         map.put("chat.empty.failed", emptyFailed);
+    }
+
+    @Override
+    public void clearCriticalData() {
+
     }
 }

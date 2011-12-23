@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.events;
+package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,14 +10,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.checks.BlockPlaceCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.blockplace.DirectionCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.blockplace.ReachCheck;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockPlace;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 /**
  * Central location to listen to Block-related events and dispatching them to
@@ -48,13 +44,13 @@ public class BlockPlaceEventManager extends EventManagerImpl {
         boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final CCBlockPlace cc = player.getConfiguration().blockplace;
+        final CCBlockPlace cc = BlockPlaceCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.BLOCKPLACE)) {
             return;
         }
 
-        final BlockPlaceData data = player.getData().blockplace;
+        final BlockPlaceData data = BlockPlaceCheck.getData(player.getDataStore());
 
         data.blockPlaced.set(event.getBlock());
         data.blockPlacedAgainst.set(event.getBlockAgainst());
@@ -70,10 +66,12 @@ public class BlockPlaceEventManager extends EventManagerImpl {
             event.setCancelled(cancelled);
     }
 
-    public List<String> getActiveChecks(ConfigurationCache cc) {
+    public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.blockplace.check && cc.blockplace.reachCheck)
+        CCBlockPlace bp = BlockPlaceCheck.getConfig(cc);
+
+        if(bp.check && bp.reachCheck)
             s.add("blockplace.reach");
 
         return s;

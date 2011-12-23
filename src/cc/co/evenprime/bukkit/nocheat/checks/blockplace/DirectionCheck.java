@@ -5,11 +5,8 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.checks.BlockPlaceCheck;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCBlockPlace;
-import cc.co.evenprime.bukkit.nocheat.data.BlockPlaceData;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 public class DirectionCheck extends BlockPlaceCheck {
@@ -96,7 +93,7 @@ public class DirectionCheck extends BlockPlaceCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) player.getData().blockplace.directionVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).directionVL);
         else
             return super.getParameter(wildcard, player);
     }

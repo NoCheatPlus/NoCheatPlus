@@ -1,22 +1,21 @@
-package cc.co.evenprime.bukkit.nocheat.events;
+package cc.co.evenprime.bukkit.nocheat.checks.inventory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.checks.InventoryCheck;
-import cc.co.evenprime.bukkit.nocheat.checks.inventory.DropCheck;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.config.cache.CCInventory;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
-import cc.co.evenprime.bukkit.nocheat.data.InventoryData;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
+import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 public class InventoryEventManager extends EventManagerImpl {
 
@@ -29,19 +28,29 @@ public class InventoryEventManager extends EventManagerImpl {
         this.checks.add(new DropCheck(plugin));
 
         registerListener(Event.Type.PLAYER_DROP_ITEM, Priority.Lowest, true, plugin.getPerformance(EventType.INVENTORY));
+        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Monitor, true, null);
+    }
+
+    @Override
+    protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
+
+        CraftPlayer player = (CraftPlayer) event.getPlayer();
+        if(InventoryCheck.getConfig(plugin.getPlayer(player).getConfigurationStore()).closebeforeteleports && event.getTo() != null && !(event.getTo().getWorld().equals(player.getWorld()))) {
+            player.getHandle().closeInventory();
+        }
     }
 
     @Override
     protected void handlePlayerDropItemEvent(final PlayerDropItemEvent event, final Priority priority) {
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final CCInventory cc = player.getConfiguration().inventory;
+        final CCInventory cc = InventoryCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.INVENTORY)) {
             return;
         }
 
-        final InventoryData data = player.getData().inventory;
+        final InventoryData data = InventoryCheck.getData(player.getDataStore());
 
         boolean cancelled = false;
 
@@ -56,12 +65,12 @@ public class InventoryEventManager extends EventManagerImpl {
             event.setCancelled(cancelled);
     }
 
-    public List<String> getActiveChecks(ConfigurationCache cc) {
+    public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        if(cc.inventory.check && cc.inventory.dropCheck)
+        CCInventory i = InventoryCheck.getConfig(cc);
+        if(i.check && i.dropCheck)
             s.add("inventory.dropCheck");
         return s;
     }
-
 }

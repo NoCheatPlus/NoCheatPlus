@@ -9,12 +9,13 @@ import org.bukkit.command.CommandSender;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.NoCheatCommandSender;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
-import cc.co.evenprime.bukkit.nocheat.config.cache.ConfigurationCache;
+import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public abstract class Check {
@@ -45,7 +46,7 @@ public abstract class Check {
 
         final long time = System.currentTimeMillis() / 1000;
 
-        final ConfigurationCache cc = player.getConfiguration();
+        final ConfigurationCacheStore cc = player.getConfigurationStore();
 
         for(Action ac : actions) {
             if(getHistory(player).executeAction(ac, time)) {
@@ -66,18 +67,18 @@ public abstract class Check {
 
     protected abstract ExecutionHistory getHistory(NoCheatPlayer player);
 
-    private final void executeLogAction(LogAction l, Check check, NoCheatPlayer player, ConfigurationCache cc) {
+    private final void executeLogAction(LogAction l, Check check, NoCheatPlayer player, ConfigurationCacheStore cc) {
         plugin.log(l.level, cc.logging.prefix + l.getLogMessage(player, check), cc);
     }
 
-    private final void executeConsoleCommand(ConsolecommandAction action, Check check, NoCheatPlayer player, ConfigurationCache cc) {
+    private final void executeConsoleCommand(ConsolecommandAction action, Check check, NoCheatPlayer player, ConfigurationCacheStore cc) {
         String command = "";
-        
+
         try {
             command = action.getCommand(player, check);
             plugin.getServer().dispatchCommand(noCheatCommandSender, command);
         } catch(CommandException e) {
-            System.out.println("[NoCheat] failed to execute the command '" + command + "': "+e.getMessage()+", please check if everything is setup correct. ");
+            System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct. ");
         }
     }
 
