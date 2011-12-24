@@ -142,11 +142,6 @@ public class NoCheat extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         boolean result = CommandHandler.handleCommand(this, sender, command, label, args);
 
-        if(!result && sender instanceof Player) {
-            sender.sendMessage("Unknown command. Type \"help\" for help.");
-            return true;
-        }
-
         return result;
     }
 

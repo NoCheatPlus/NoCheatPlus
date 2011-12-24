@@ -23,6 +23,11 @@ public class CommandHandler {
 
     public static boolean handleCommand(NoCheat plugin, CommandSender sender, Command command, String label, String[] args) {
 
+        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PLAYERINFO) && !sender.hasPermission(Permissions.ADMIN_PERMLIST) && !sender.hasPermission(Permissions.ADMIN_RELOAD) && !sender.hasPermission(Permissions.ADMIN_PERFORMANCE)) {
+            sender.sendMessage("Unknown command. Type \"help\" for help.");
+            return true;
+        }
+
         boolean result = false;
         // Not our command
         if(!command.getName().equalsIgnoreCase("nocheat") || args.length == 0) {
