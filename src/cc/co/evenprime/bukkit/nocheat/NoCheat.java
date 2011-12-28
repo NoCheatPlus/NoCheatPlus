@@ -119,11 +119,17 @@ public class NoCheat extends JavaPlugin {
     }
 
     public ConfigurationCacheStore getConfig(Player player) {
-        return conf.getConfigurationCacheForWorld(player.getWorld().getName());
+        if(player != null)
+            return getConfig(player.getWorld());
+        else
+            return conf.getConfigurationCacheForWorld(null);
     }
 
     public ConfigurationCacheStore getConfig(World world) {
-        return conf.getConfigurationCacheForWorld(world.getName());
+        if(world != null)
+            return conf.getConfigurationCacheForWorld(world.getName());
+        else
+            return conf.getConfigurationCacheForWorld(null);
     }
 
     public void log(LogLevel level, String message, ConfigurationCacheStore cc) {
