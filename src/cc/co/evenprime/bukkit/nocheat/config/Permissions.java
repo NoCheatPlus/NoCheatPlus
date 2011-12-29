@@ -33,7 +33,6 @@ public class Permissions {
 
     public static final String  FIGHT                = CHECKS + ".fight";
     public static final String  FIGHT_DIRECTION      = FIGHT + ".direction";
-    public static final String  FIGHT_SELFHIT        = FIGHT + ".selfhit";
     public static final String  FIGHT_NOSWING        = FIGHT + ".noswing";
 
     public static final String  TIMED                = CHECKS + ".timed";

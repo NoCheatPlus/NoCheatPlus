@@ -28,7 +28,6 @@ public class FightEventManager extends EventManagerImpl {
 
         this.checks = new ArrayList<FightCheck>(3);
         this.checks.add(new NoswingCheck(plugin));
-        this.checks.add(new SelfhitCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
 
         registerListener(Event.Type.ENTITY_DAMAGE, Priority.Lowest, true, plugin.getPerformance(EventType.FIGHT));
@@ -115,8 +114,6 @@ public class FightEventManager extends EventManagerImpl {
 
         if(f.check && f.directionCheck)
             s.add("fight.direction");
-        if(f.check && f.selfhitCheck)
-            s.add("fight.selfhit");
         if(f.check && f.noswingCheck)
             s.add("fight.noswing");
         return s;

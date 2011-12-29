@@ -38,16 +38,20 @@ public class DefaultConfiguration extends Configuration {
         /*** INVENTORY ***/
         {
             setValue(INVENTORY_PREVENTITEMDUPE, true);
-            /*setValue(INVENTORY_CHECK, true);
-
-            setValue(INVENTORY_DROP_CHECK, true);
-            setValue(INVENTORY_DROP_TIMEFRAME, 20);
-            setValue(INVENTORY_DROP_LIMIT, 100);
-
-            ActionList dropActionList = new ActionList();
-            dropActionList.setActions(0, action.getActions("dropLog dropCancel".split(" ")));
-            dropActionList.setActions(500, action.getActions("dropLog dropCancel dropkick".split(" ")));
-            setValue(INVENTORY_DROP_ACTIONS, dropActionList);*/
+            /*
+             * setValue(INVENTORY_CHECK, true);
+             * 
+             * setValue(INVENTORY_DROP_CHECK, true);
+             * setValue(INVENTORY_DROP_TIMEFRAME, 20);
+             * setValue(INVENTORY_DROP_LIMIT, 100);
+             * 
+             * ActionList dropActionList = new ActionList();
+             * dropActionList.setActions(0,
+             * action.getActions("dropLog dropCancel".split(" ")));
+             * dropActionList.setActions(500,
+             * action.getActions("dropLog dropCancel dropkick".split(" ")));
+             * setValue(INVENTORY_DROP_ACTIONS, dropActionList);
+             */
         }
 
         /*** MOVING ***/
@@ -183,11 +187,6 @@ public class DefaultConfiguration extends Configuration {
             directionActionList.setActions(20, action.getActions("fightDirectionLog fightCancel".split(" ")));
             directionActionList.setActions(50, action.getActions("fightDirectionLogHigh fightCancel".split(" ")));
             setValue(FIGHT_DIRECTION_ACTIONS, directionActionList);
-
-            setValue(FIGHT_SELFHIT_CHECK, true);
-            ActionList selfhitActionList = new ActionList();
-            selfhitActionList.setActions(0, action.getActions("fightSelfhitLog fightCancel".split(" ")));
-            setValue(FIGHT_SELFHIT_ACTIONS, selfhitActionList);
 
             setValue(FIGHT_NOSWING_CHECK, true);
             ActionList noswingActionList = new ActionList();

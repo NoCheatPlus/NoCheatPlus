@@ -126,10 +126,6 @@ public abstract class Configuration {
     public final static OptionNode        FIGHT_DIRECTION_PENALTYTIME                = new OptionNode("penaltytime", FIGHT_DIRECTION, DataType.INTEGER);
     public final static OptionNode        FIGHT_DIRECTION_ACTIONS                    = new OptionNode("actions", FIGHT_DIRECTION, DataType.ACTIONLIST);
 
-    private final static OptionNode       FIGHT_SELFHIT                              = new OptionNode("selfhit", FIGHT, DataType.PARENT);
-    public final static OptionNode        FIGHT_SELFHIT_CHECK                        = new OptionNode("check", FIGHT_SELFHIT, DataType.BOOLEAN);
-    public final static OptionNode        FIGHT_SELFHIT_ACTIONS                      = new OptionNode("actions", FIGHT_SELFHIT, DataType.ACTIONLIST);
-
     private final static OptionNode       FIGHT_NOSWING                              = new OptionNode("noswing", FIGHT, DataType.PARENT);
     public final static OptionNode        FIGHT_NOSWING_CHECK                        = new OptionNode("check", FIGHT_NOSWING, DataType.BOOLEAN);
     public final static OptionNode        FIGHT_NOSWING_ACTIONS                      = new OptionNode("actions", FIGHT_NOSWING, DataType.ACTIONLIST);
