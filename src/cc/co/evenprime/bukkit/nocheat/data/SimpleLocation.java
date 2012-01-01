@@ -23,6 +23,15 @@ public final class SimpleLocation {
         return block.getX() == x && block.getY() == y && block.getZ() == z;
     }
 
+    public final boolean equals(SimpleLocation simpleLocation) {
+        if(!isSet() && !simpleLocation.isSet())
+            return true;
+        else if(!isSet() || !simpleLocation.isSet())
+            return false;
+
+        return simpleLocation.x == x && simpleLocation.y == y && simpleLocation.z == z;
+    }
+
     public final void set(Block block) {
         x = block.getX();
         y = block.getY();

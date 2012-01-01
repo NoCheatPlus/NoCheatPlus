@@ -57,6 +57,14 @@ public class BlockBreakEventManager extends EventManagerImpl {
 
         data.brokenBlockLocation.set(event.getBlock());
 
+        // Only if the block got damaged before, do the check(s)
+        if(!data.brokenBlockLocation.equals(data.lastDamagedBlock)) {
+            // Something caused a blockbreak event that's not from the player
+            // Don't check it at all
+            data.lastDamagedBlock.reset();
+            return;
+        }
+
         for(BlockBreakCheck check : checks) {
             // If it should be executed, do it
             if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
@@ -71,13 +79,20 @@ public class BlockBreakEventManager extends EventManagerImpl {
     @Override
     protected void handleBlockDamageEvent(final BlockDamageEvent event, final Priority priority) {
 
-        // Only interested in insta-break events here
-        if(!event.getInstaBreak())
-            return;
+        NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
+        BlockBreakData data = BlockBreakCheck.getData(player.getDataStore());
 
-        // Remember this location. We ignore block breaks in the block-break
-        // direction check that are insta-breaks
-        BlockBreakCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore()).instaBrokenBlockLocation.set(event.getBlock());
+        // Only interested in insta-break events here
+        if(event.getInstaBreak()) {
+            // Remember this location. We ignore block breaks in the block-break
+            // direction check that are insta-breaks
+            data.instaBrokenBlockLocation.set(event.getBlock());
+        }
+
+        // Remember this location. Only blockbreakevents for this specific block
+        // will be handled at all
+        data.lastDamagedBlock.set(event.getBlock());
+
     }
 
     @Override

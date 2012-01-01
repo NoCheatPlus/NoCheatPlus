@@ -30,6 +30,7 @@ public class BlockBreakData implements DataItem {
 
     public double                 reachDistance;
     public boolean                armswung                   = true;
+    public final SimpleLocation   lastDamagedBlock           = new SimpleLocation();
 
     @Override
     public void clearCriticalData() {
