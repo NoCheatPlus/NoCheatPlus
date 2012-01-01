@@ -123,12 +123,16 @@ public class MovingEventManager extends EventManagerImpl {
             data.horizFreedom *= 0.90;
         }
 
-        if(data.vertVelocityCounter > 0) {
+        if(data.vertVelocity <= 0.1) {
             data.vertVelocityCounter--;
+        }
+        if(data.vertVelocityCounter > 0) {
+            
             data.vertFreedom += data.vertVelocity;
             data.vertVelocity *= 0.90;
         } else {
-            data.vertFreedom = 0;
+            // Counter has run out, now reduce the vert freedom over time
+            data.vertFreedom *= 0.90;
         }
 
         // Get some data that's needed from this event, to avoid passing the
