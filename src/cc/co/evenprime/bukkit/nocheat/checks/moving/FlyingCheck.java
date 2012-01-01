@@ -71,7 +71,7 @@ public class FlyingCheck extends MovingCheck {
 
             // Try to treat it as a the "bunnyhop" problem
             if(data.bunnyhopdelay <= 0 && resultHoriz < 0.4D) {
-                data.bunnyhopdelay = 3;
+                data.bunnyhopdelay = 9;
                 resultHoriz = 0;
             }
         }

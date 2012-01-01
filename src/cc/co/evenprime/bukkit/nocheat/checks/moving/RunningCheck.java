@@ -170,7 +170,7 @@ public class RunningCheck extends MovingCheck {
 
             // Try to treat it as a the "bunnyhop" problem
             if(data.bunnyhopdelay <= 0 && distanceAboveLimit > 0.05D && distanceAboveLimit < 0.4D) {
-                data.bunnyhopdelay = 3;
+                data.bunnyhopdelay = 9;
                 distanceAboveLimit = 0;
             }
         }
