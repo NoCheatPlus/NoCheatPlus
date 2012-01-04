@@ -2,6 +2,7 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.Locale;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
@@ -72,15 +73,19 @@ public abstract class Check {
     }
 
     private final void executeConsoleCommand(ConsolecommandAction action, Check check, NoCheatPlayer player, ConfigurationCacheStore cc) {
-        String command = "";
+        final String command = action.getCommand(player, check);
 
-        try {
-            command = action.getCommand(player, check);
-            System.out.println("Going to execute command "+command);
-            plugin.getServer().dispatchCommand(noCheatCommandSender, command);
-        } catch(CommandException e) {
-            System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct. ");
-        }
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    plugin.getServer().dispatchCommand(noCheatCommandSender, command);
+                } catch(CommandException e) {
+                    System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct.");
+                }
+            }
+        });
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
