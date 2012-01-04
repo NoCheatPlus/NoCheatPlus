@@ -34,9 +34,13 @@ public class InventoryEventManager extends EventManagerImpl {
     @Override
     protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
 
+        try {
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         if(InventoryCheck.getConfig(player.getConfigurationStore()).closebeforeteleports && event.getTo() != null && !(event.getTo().getWorld().equals(player.getPlayer().getWorld()))) {
             player.closeInventory();
+        }
+        } catch(NullPointerException e) {
+            
         }
     }
 
@@ -61,16 +65,18 @@ public class InventoryEventManager extends EventManagerImpl {
             }
         }
 
-        if(cancelled)
+        if(cancelled) {
             event.setCancelled(true);
+            player.closeInventory();
+        }
     }
 
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        /*CCInventory i = InventoryCheck.getConfig(cc);
+        CCInventory i = InventoryCheck.getConfig(cc);
         if(i.check && i.dropCheck)
-            s.add("inventory.dropCheck");*/
+            s.add("inventory.dropCheck");
         return s;
     }
 }
