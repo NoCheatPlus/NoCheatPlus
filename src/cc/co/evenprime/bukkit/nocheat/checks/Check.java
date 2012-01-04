@@ -83,6 +83,8 @@ public abstract class Check {
                     plugin.getServer().dispatchCommand(noCheatCommandSender, command);
                 } catch(CommandException e) {
                     System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct.");
+                } catch(Exception e) {
+                    // I don't care in this case, your problem if your command fails
                 }
             }
         });

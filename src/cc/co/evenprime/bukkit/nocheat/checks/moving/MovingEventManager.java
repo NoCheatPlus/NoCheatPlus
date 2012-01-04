@@ -111,6 +111,9 @@ public class MovingEventManager extends EventManagerImpl {
         final CCMoving cc = MovingCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.MOVING)) {
+            // Just because he is allowed now, doesn't mean he will always
+            // be. So forget data about the player related to moving
+            player.getDataStore().get("moving").clearCriticalData();
             return;
         }
 
