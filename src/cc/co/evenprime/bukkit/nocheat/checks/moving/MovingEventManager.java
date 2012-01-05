@@ -110,32 +110,16 @@ public class MovingEventManager extends EventManagerImpl {
 
         final CCMoving cc = MovingCheck.getConfig(player.getConfigurationStore());
 
+        final MovingData data = MovingCheck.getData(player.getDataStore());
+
+        // Various calculations related to velocity estimates
+        updateVelocities(data);
+
         if(!cc.check || player.hasPermission(Permissions.MOVING)) {
             // Just because he is allowed now, doesn't mean he will always
             // be. So forget data about the player related to moving
             player.getDataStore().get("moving").clearCriticalData();
             return;
-        }
-
-        final MovingData data = MovingCheck.getData(player.getDataStore());
-
-        /******** DO GENERAL DATA MODIFICATIONS ONCE FOR EACH EVENT *****/
-        if(data.horizVelocityCounter > 0) {
-            data.horizVelocityCounter--;
-        } else {
-            data.horizFreedom *= 0.90;
-        }
-
-        if(data.vertVelocity <= 0.1) {
-            data.vertVelocityCounter--;
-        }
-        if(data.vertVelocityCounter > 0) {
-            
-            data.vertFreedom += data.vertVelocity;
-            data.vertVelocity *= 0.90;
-        } else {
-            // Counter has run out, now reduce the vert freedom over time
-            data.vertFreedom *= 0.90;
         }
 
         // Get some data that's needed from this event, to avoid passing the
@@ -164,6 +148,27 @@ public class MovingEventManager extends EventManagerImpl {
             event.setTo(new Location(player.getPlayer().getWorld(), newTo.x, newTo.y, newTo.z, to.getYaw(), to.getPitch()));
 
             data.teleportTo.set(newTo);
+        }
+    }
+
+    private void updateVelocities(MovingData data) {
+
+        /******** DO GENERAL DATA MODIFICATIONS ONCE FOR EACH EVENT *****/
+        if(data.horizVelocityCounter > 0) {
+            data.horizVelocityCounter--;
+        } else if(data.horizFreedom > 0.001) {
+            data.horizFreedom *= 0.90;
+        }
+
+        if(data.vertVelocity <= 0.1) {
+            data.vertVelocityCounter--;
+        }
+        if(data.vertVelocityCounter > 0) {
+            data.vertFreedom += data.vertVelocity;
+            data.vertVelocity *= 0.90;
+        } else if(data.vertFreedom > 0.001) {
+            // Counter has run out, now reduce the vert freedom over time
+            data.vertFreedom *= 0.93;
         }
     }
 

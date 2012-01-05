@@ -38,20 +38,17 @@ public class DefaultConfiguration extends Configuration {
         /*** INVENTORY ***/
         {
             setValue(INVENTORY_PREVENTITEMDUPE, true);
-            /*
-             * setValue(INVENTORY_CHECK, true);
-             * 
-             * setValue(INVENTORY_DROP_CHECK, true);
-             * setValue(INVENTORY_DROP_TIMEFRAME, 20);
-             * setValue(INVENTORY_DROP_LIMIT, 100);
-             * 
-             * ActionList dropActionList = new ActionList();
-             * dropActionList.setActions(0,
-             * action.getActions("dropLog dropCancel".split(" ")));
-             * dropActionList.setActions(500,
-             * action.getActions("dropLog dropCancel dropkick".split(" ")));
-             * setValue(INVENTORY_DROP_ACTIONS, dropActionList);
-             */
+
+            setValue(INVENTORY_CHECK, true);
+
+            setValue(INVENTORY_DROP_CHECK, true);
+            setValue(INVENTORY_DROP_TIMEFRAME, 20);
+            setValue(INVENTORY_DROP_LIMIT, 100);
+
+            ActionList dropActionList = new ActionList();
+            dropActionList.setActions(0, action.getActions("dropLog dropkick".split(" ")));
+            setValue(INVENTORY_DROP_ACTIONS, dropActionList);
+
         }
 
         /*** MOVING ***/
@@ -297,7 +294,6 @@ public class DefaultConfiguration extends Configuration {
             w(w, "special chatCancel 0 0");
             w(w, "special nofallDamage 0 0");
             w(w, "special fightCancel 0 0");
-            w(w, "special dropCancel 0 0");
             w(w, "");
             w(w, "# CONSOLECOMMAND Actions: They will execute a command as if it were typed into the console.");
             w(w, "#   - They start with the word 'consolecommand'");

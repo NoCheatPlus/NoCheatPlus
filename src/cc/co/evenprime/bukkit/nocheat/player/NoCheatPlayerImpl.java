@@ -40,7 +40,7 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
 
     public boolean hasPermission(String permission) {
         if(permission == null) {
-            System.out.println("NoCheat: Warning, asked for null permission");
+            // System.out.println("NoCheat: Warning, asked for null permission");
             return false;
         }
         return player.hasPermission(permission);

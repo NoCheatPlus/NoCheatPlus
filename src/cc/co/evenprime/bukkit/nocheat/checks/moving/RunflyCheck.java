@@ -11,7 +11,10 @@ public class RunflyCheck extends MovingCheck {
     private final RunningCheck runningCheck;
 
     public RunflyCheck(NoCheat plugin) {
-        super(plugin, "moving.runfly", Permissions.MOVING_RUNFLY);
+        // Permission field intentionally left blank here
+        // We check in the actual "check" method, because
+        // we have to do something beside skipping the test
+        super(plugin, "moving.runfly", null);
 
         flyingCheck = new FlyingCheck(plugin);
         runningCheck = new RunningCheck(plugin);
@@ -20,6 +23,12 @@ public class RunflyCheck extends MovingCheck {
     @Override
     public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
 
+        if(player.hasPermission(Permissions.MOVING_RUNFLY)) {
+            // If the player doesn't get checked for movement
+            // reset his critical data
+            data.clearCriticalData();
+            return null;
+        }
         final boolean flyAllowed = cc.allowFlying || player.hasPermission(Permissions.MOVING_FLYING) || (player.isCreative() && cc.identifyCreativeMode);
 
         /********************* EXECUTE THE FLY/JUMP/RUNNING CHECK ********************/

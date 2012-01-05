@@ -36,9 +36,9 @@ public abstract class Configuration {
 
     private final static OptionNode       INVENTORY                                  = new OptionNode("inventory", ROOT, DataType.PARENT);
     public final static OptionNode        INVENTORY_PREVENTITEMDUPE                  = new OptionNode("preventitemdupe", INVENTORY, DataType.BOOLEAN);
-    public static final OptionNode        INVENTORY_CHECK                            = new OptionNode("check", INACTIVE, DataType.BOOLEAN);
+    public static final OptionNode        INVENTORY_CHECK                            = new OptionNode("check", INVENTORY, DataType.BOOLEAN);
 
-    private final static OptionNode       INVENTORY_DROP                             = new OptionNode("drop", INACTIVE, DataType.PARENT);
+    private final static OptionNode       INVENTORY_DROP                             = new OptionNode("drop", INVENTORY, DataType.PARENT);
     public final static OptionNode        INVENTORY_DROP_CHECK                       = new OptionNode("check", INVENTORY_DROP, DataType.BOOLEAN);
     public final static OptionNode        INVENTORY_DROP_TIMEFRAME                   = new OptionNode("timeframe", INVENTORY_DROP, DataType.INTEGER);
     public final static OptionNode        INVENTORY_DROP_LIMIT                       = new OptionNode("limit", INVENTORY_DROP, DataType.INTEGER);
