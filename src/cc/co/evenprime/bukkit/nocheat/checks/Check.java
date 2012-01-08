@@ -1,12 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.Locale;
-
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
@@ -21,10 +18,10 @@ import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public abstract class Check {
 
-    private final String               name;
-    private final String               permission;
+    private final String name;
+    private final String permission;
     private static final CommandSender noCheatCommandSender = new NoCheatCommandSender();
-    protected final NoCheat            plugin;
+    protected final NoCheat plugin;
 
     public Check(NoCheat plugin, String name, String permission) {
 
@@ -75,19 +72,13 @@ public abstract class Check {
     private final void executeConsoleCommand(ConsolecommandAction action, Check check, NoCheatPlayer player, ConfigurationCacheStore cc) {
         final String command = action.getCommand(player, check);
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    plugin.getServer().dispatchCommand(noCheatCommandSender, command);
-                } catch(CommandException e) {
-                    System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct.");
-                } catch(Exception e) {
-                    // I don't care in this case, your problem if your command fails
-                }
-            }
-        });
+        try {
+            plugin.getServer().dispatchCommand(noCheatCommandSender, command);
+        } catch(CommandException e) {
+            System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct.");
+        } catch(Exception e) {
+            // I don't care in this case, your problem if your command fails
+        }
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
