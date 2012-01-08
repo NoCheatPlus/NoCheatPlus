@@ -1,12 +1,10 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
 import net.minecraft.server.Block;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
@@ -141,6 +139,10 @@ public class CheckUtil {
         types[Material.WOODEN_DOOR.getId()] = SOLID | NONSOLID;
         types[Material.IRON_DOOR_BLOCK.getId()] = SOLID | NONSOLID;
         types[Material.TRAP_DOOR.getId()] = SOLID | NONSOLID;
+        
+        // repeaters are technically half blocks
+        types[Material.DIODE_BLOCK_OFF.getId()] = SOLID | NONSOLID;
+        types[Material.DIODE_BLOCK_ON.getId()] = SOLID | NONSOLID;
 
         // pressure plates are so slim, you can consider them
         // nonsolid too
