@@ -6,14 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.debug.Performance;
 import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 
@@ -22,11 +19,6 @@ public class CommandHandler {
     private CommandHandler() {}
 
     public static boolean handleCommand(NoCheat plugin, CommandSender sender, Command command, String label, String[] args) {
-
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PLAYERINFO) && !sender.hasPermission(Permissions.ADMIN_PERMLIST) && !sender.hasPermission(Permissions.ADMIN_RELOAD) && !sender.hasPermission(Permissions.ADMIN_PERFORMANCE)) {
-            sender.sendMessage("Unknown command. Type \"help\" for help.");
-            return true;
-        }
 
         boolean result = false;
         // Not our command
@@ -55,10 +47,6 @@ public class CommandHandler {
     }
 
     private static boolean handlePlayerInfoCommand(NoCheat plugin, CommandSender sender, String[] args) {
-        // Does the sender have permission?
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PLAYERINFO)) {
-            return false;
-        }
 
         Map<String, Object> map = plugin.getPlayerData(args[1]);
         String filter = "";
@@ -77,10 +65,6 @@ public class CommandHandler {
     }
 
     private static boolean handlePermlistCommand(NoCheat plugin, CommandSender sender, String[] args) {
-        // Does the sender have permission to use it?
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERMLIST)) {
-            return false;
-        }
 
         // Get the player by name
         Player player = plugin.getServer().getPlayerExact(args[1]);
@@ -132,10 +116,6 @@ public class CommandHandler {
     }
 
     private static boolean handleReloadCommand(NoCheat plugin, CommandSender sender) {
-        // Does the sender have permission?
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_RELOAD)) {
-            return false;
-        }
 
         sender.sendMessage("[NoCheat] Reloading configuration");
         plugin.reloadConfiguration();
@@ -145,10 +125,6 @@ public class CommandHandler {
     }
 
     private static boolean handlePerformanceCommand(NoCheat plugin, CommandSender sender) {
-        // Does the sender have permission?
-        if(sender instanceof Player && !sender.hasPermission(Permissions.ADMIN_PERFORMANCE)) {
-            return false;
-        }
 
         sender.sendMessage("[NoCheat] Retrieving performance statistics");
 

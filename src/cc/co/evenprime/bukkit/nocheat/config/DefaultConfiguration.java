@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
@@ -153,6 +152,11 @@ public class DefaultConfiguration extends Configuration {
         {
             setValue(CHAT_CHECK, true);
 
+            setValue(CHAT_COLOR_CHECK, true);
+            ActionList colorActionList = new ActionList();
+            colorActionList.setActions(0, action.getActions("colorLog chatCancel".split(" ")));
+            setValue(CHAT_COLOR_ACTIONS, colorActionList);
+
             setValue(CHAT_SPAM_CHECK, true);
             setValue(CHAT_SPAM_WHITELIST, "");
             setValue(CHAT_SPAM_TIMEFRAME, 5);
@@ -269,6 +273,7 @@ public class DefaultConfiguration extends Configuration {
             w(w, "log nofallLog 0 5 med [player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations]");
             w(w, "log noswingLog 2 5 med [player] failed [check]: Didn't swing arm. VL [violations]");
             w(w, "log emptyChatLog 0 5 med [player] failed [check]: Sent empty chat message. VL [violations]");
+            w(w, "log colorLog 0 5 med [player] failed [check]: Sent colored chat message \"[text]\". VL [violations]");
             w(w, "log dropLog 0 5 med [player] failed [check]: Tried to drop more items than allowed. VL [violations]");
             w(w, "");
             w(w, "");

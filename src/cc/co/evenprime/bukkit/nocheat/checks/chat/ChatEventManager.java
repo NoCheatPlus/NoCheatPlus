@@ -3,12 +3,10 @@ package cc.co.evenprime.bukkit.nocheat.checks.chat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
@@ -25,9 +23,10 @@ public class ChatEventManager extends EventManagerImpl {
 
         super(plugin);
 
-        this.checks = new ArrayList<ChatCheck>(2);
+        this.checks = new ArrayList<ChatCheck>(3);
         this.checks.add(new EmptyCheck(plugin));
         this.checks.add(new SpamCheck(plugin));
+        this.checks.add(new ColorCheck(plugin));
 
         registerListener(Event.Type.PLAYER_CHAT, Priority.Lowest, true, plugin.getPerformance(EventType.CHAT));
         registerListener(Event.Type.PLAYER_COMMAND_PREPROCESS, Priority.Lowest, true, plugin.getPerformance(EventType.CHAT));
@@ -63,7 +62,10 @@ public class ChatEventManager extends EventManagerImpl {
 
         if(cancelled) {
             event.setCancelled(cancelled);
+        } else {
+            event.setMessage(data.message);
         }
+
     }
 
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {

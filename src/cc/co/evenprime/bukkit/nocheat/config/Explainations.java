@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
 
 /**
@@ -87,6 +86,8 @@ public class Explainations {
 
         set(Configuration.CHAT_CHECK, "If true, do various checks on PlayerChat events.");
 
+        set(Configuration.CHAT_COLOR_CHECK, "If true, check if a message sent by the player contains color codes.");
+        set(Configuration.CHAT_COLOR_ACTIONS, "What should be done if a player is trying to send colored messages.\n\"cancel\" means in this case that the color codes get removed from the message.\nUnit is number of colored chat messages sent by the player.");
         set(Configuration.CHAT_SPAM_CHECK, "If true, check if a player is spamming the chat.");
         set(Configuration.CHAT_SPAM_WHITELIST, "A list of messages that should be ignored by the spam check, seperated by ','. All messages/commands starting with one of these will be let through.");
         set(Configuration.CHAT_SPAM_TIMEFRAME, "Over what timeframe (in seconds) should the messages be counted?\nWhen the time is over, counting starts at 0 again.");

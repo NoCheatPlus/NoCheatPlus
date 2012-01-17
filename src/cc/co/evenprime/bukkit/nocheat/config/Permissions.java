@@ -30,6 +30,7 @@ public class Permissions {
     public final static String  CHAT                 = CHECKS + ".chat";
     public final static String  CHAT_SPAM            = CHAT + ".spam";
     public static final String  CHAT_EMPTY           = CHAT + ".empty";
+    public static final String  CHAT_COLOR           = CHAT + ".color";
 
     public static final String  FIGHT                = CHECKS + ".fight";
     public static final String  FIGHT_DIRECTION      = FIGHT + ".direction";
@@ -39,10 +40,7 @@ public class Permissions {
     public static final String  TIMED_GODMODE        = TIMED + ".godmode";
 
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
-    public static final String  ADMIN_PERMLIST       = ADMIN + ".permlist";
-    public static final String  ADMIN_RELOAD         = ADMIN + ".reload";
-    public static final String  ADMIN_PERFORMANCE    = ADMIN + ".performance";
-    public static final String  ADMIN_PLAYERINFO     = ADMIN + ".playerinfo";
+    public static final String  ADMIN_COMMANDS       = ADMIN + ".commands";
 
     public static final String  INVENTORY            = CHECKS + ".inventory";
     public static final String  INVENTORY_DROP       = INVENTORY + ".drop";

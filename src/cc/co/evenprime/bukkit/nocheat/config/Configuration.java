@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode.DataType;
@@ -105,6 +104,10 @@ public abstract class Configuration {
 
     private final static OptionNode       CHAT                                       = new OptionNode("chat", ROOT, DataType.PARENT);
     public final static OptionNode        CHAT_CHECK                                 = new OptionNode("check", CHAT, DataType.BOOLEAN);
+
+    private final static OptionNode       CHAT_COLOR                                 = new OptionNode("color", CHAT, DataType.PARENT);
+    public final static OptionNode        CHAT_COLOR_CHECK                           = new OptionNode("check", CHAT_COLOR, DataType.BOOLEAN);
+    public final static OptionNode        CHAT_COLOR_ACTIONS                         = new OptionNode("actions", CHAT_COLOR, DataType.ACTIONLIST);
 
     private final static OptionNode       CHAT_SPAM                                  = new OptionNode("spam", CHAT, DataType.PARENT);
     public final static OptionNode        CHAT_SPAM_CHECK                            = new OptionNode("check", CHAT_SPAM, DataType.BOOLEAN);
