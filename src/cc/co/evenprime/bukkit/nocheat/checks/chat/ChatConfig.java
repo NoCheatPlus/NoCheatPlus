@@ -6,7 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
-public class CCChat implements ConfigItem {
+public class ChatConfig implements ConfigItem {
 
     public final boolean    check;
     public final boolean    spamCheck;
@@ -17,7 +17,7 @@ public class CCChat implements ConfigItem {
     public final boolean    colorCheck;
     public final ActionList colorActions;
 
-    public CCChat(Configuration data) {
+    public ChatConfig(Configuration data) {
 
         check = data.getBoolean(Configuration.CHAT_CHECK);
         spamCheck = data.getBoolean(Configuration.CHAT_SPAM_CHECK);

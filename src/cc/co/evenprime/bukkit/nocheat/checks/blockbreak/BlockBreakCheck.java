@@ -14,9 +14,9 @@ public abstract class BlockBreakCheck extends Check {
         super(plugin, id, name, permission);
     }
 
-    public abstract boolean check(NoCheatPlayer player, BlockBreakData data, CCBlockBreak cc);
+    public abstract boolean check(NoCheatPlayer player, BlockBreakData data, BlockBreakConfig cc);
 
-    public abstract boolean isEnabled(CCBlockBreak cc);
+    public abstract boolean isEnabled(BlockBreakConfig cc);
 
     public static BlockBreakData getData(DataStore base) {
         BlockBreakData data = base.get(id);
@@ -27,10 +27,10 @@ public abstract class BlockBreakCheck extends Check {
         return data;
     }
 
-    public static CCBlockBreak getConfig(ConfigurationCacheStore cache) {
-        CCBlockBreak config = cache.get(id);
+    public static BlockBreakConfig getConfig(ConfigurationCacheStore cache) {
+        BlockBreakConfig config = cache.get(id);
         if(config == null) {
-            config = new CCBlockBreak(cache.getConfiguration());
+            config = new BlockBreakConfig(cache.getConfiguration());
             cache.set(id, config);
         }
         return config;

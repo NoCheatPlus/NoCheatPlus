@@ -13,7 +13,7 @@ public class NoswingCheck extends FightCheck {
         super(plugin, "fight.noswing", Permissions.FIGHT_NOSWING);
     }
 
-    public boolean check(NoCheatPlayer player, FightData data, CCFight cc) {
+    public boolean check(NoCheatPlayer player, FightData data, FightConfig cc) {
 
         boolean cancel = false;
 
@@ -33,7 +33,7 @@ public class NoswingCheck extends FightCheck {
     }
 
     @Override
-    public boolean isEnabled(CCFight cc) {
+    public boolean isEnabled(FightConfig cc) {
         return cc.noswingCheck;
     }
 

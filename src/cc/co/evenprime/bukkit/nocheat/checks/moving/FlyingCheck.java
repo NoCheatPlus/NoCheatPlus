@@ -21,7 +21,7 @@ public class FlyingCheck extends MovingCheck {
 
     private static final double creativeSpeed = 0.60D;
 
-    public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving ccmoving) {
+    public PreciseLocation check(NoCheatPlayer player, MovingData data, MovingConfig ccmoving) {
 
         final PreciseLocation setBack = data.runflySetBackPoint;
         final PreciseLocation from = data.from;
@@ -117,7 +117,7 @@ public class FlyingCheck extends MovingCheck {
     }
 
     @Override
-    public boolean isEnabled(CCMoving moving) {
+    public boolean isEnabled(MovingConfig moving) {
         return moving.allowFlying && moving.runflyCheck;
     }
 

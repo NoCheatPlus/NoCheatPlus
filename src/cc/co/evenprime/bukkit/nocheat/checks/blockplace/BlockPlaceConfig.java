@@ -7,7 +7,7 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 /**
  * 
  */
-public class CCBlockPlace implements ConfigItem {
+public class BlockPlaceConfig implements ConfigItem {
 
     public final boolean    check;
 
@@ -20,7 +20,7 @@ public class CCBlockPlace implements ConfigItem {
     public final long       directionPenaltyTime;
     public final double     directionPrecision;
 
-    public CCBlockPlace(Configuration data) {
+    public BlockPlaceConfig(Configuration data) {
 
         check = data.getBoolean(Configuration.BLOCKPLACE_CHECK);
 

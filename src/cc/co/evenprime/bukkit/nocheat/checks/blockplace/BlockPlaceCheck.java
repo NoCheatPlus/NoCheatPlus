@@ -20,9 +20,9 @@ public abstract class BlockPlaceCheck extends Check {
         super(plugin, id, name, permission);
     }
 
-    public abstract boolean check(NoCheatPlayer player, BlockPlaceData data, CCBlockPlace cc);
+    public abstract boolean check(NoCheatPlayer player, BlockPlaceData data, BlockPlaceConfig cc);
 
-    public abstract boolean isEnabled(CCBlockPlace cc);
+    public abstract boolean isEnabled(BlockPlaceConfig cc);
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
@@ -57,10 +57,10 @@ public abstract class BlockPlaceCheck extends Check {
         return data;
     }
 
-    public static CCBlockPlace getConfig(ConfigurationCacheStore cache) {
-        CCBlockPlace config = cache.get(id);
+    public static BlockPlaceConfig getConfig(ConfigurationCacheStore cache) {
+        BlockPlaceConfig config = cache.get(id);
         if(config == null) {
-            config = new CCBlockPlace(cache.getConfiguration());
+            config = new BlockPlaceConfig(cache.getConfiguration());
             cache.set(id, config);
         }
         return config;

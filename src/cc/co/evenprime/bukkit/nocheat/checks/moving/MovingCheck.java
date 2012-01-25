@@ -23,9 +23,9 @@ public abstract class MovingCheck extends Check {
      * @param event
      * @return
      */
-    public abstract PreciseLocation check(final NoCheatPlayer player, MovingData data, CCMoving cc);
+    public abstract PreciseLocation check(final NoCheatPlayer player, MovingData data, MovingConfig cc);
 
-    public abstract boolean isEnabled(CCMoving moving);
+    public abstract boolean isEnabled(MovingConfig moving);
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
@@ -54,10 +54,10 @@ public abstract class MovingCheck extends Check {
         return data;
     }
 
-    public static CCMoving getConfig(ConfigurationCacheStore cache) {
-        CCMoving config = cache.get(id);
+    public static MovingConfig getConfig(ConfigurationCacheStore cache) {
+        MovingConfig config = cache.get(id);
         if(config == null) {
-            config = new CCMoving(cache.getConfiguration());
+            config = new MovingConfig(cache.getConfiguration());
             cache.set(id, config);
         }
         return config;

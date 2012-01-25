@@ -12,7 +12,7 @@ public class ColorCheck extends ChatCheck {
         super(plugin, "chat.color", Permissions.CHAT_COLOR);
     }
 
-    public boolean check(NoCheatPlayer player, ChatData data, CCChat cc) {
+    public boolean check(NoCheatPlayer player, ChatData data, ChatConfig cc) {
 
         if(data.message.matches(".*\247.*")) {
 
@@ -32,7 +32,7 @@ public class ColorCheck extends ChatCheck {
     }
 
     @Override
-    public boolean isEnabled(CCChat cc) {
+    public boolean isEnabled(ChatConfig cc) {
         return cc.colorCheck;
     }
 

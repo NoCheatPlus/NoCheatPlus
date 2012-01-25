@@ -14,9 +14,9 @@ public abstract class InventoryCheck extends Check {
         super(plugin, id, name, permission);
     }
 
-    public abstract boolean check(NoCheatPlayer player, InventoryData data, CCInventory cc);
+    public abstract boolean check(NoCheatPlayer player, InventoryData data, InventoryConfig cc);
 
-    public abstract boolean isEnabled(CCInventory cc);
+    public abstract boolean isEnabled(InventoryConfig cc);
 
     public static InventoryData getData(DataStore base) {
         InventoryData data = base.get(id);
@@ -27,10 +27,10 @@ public abstract class InventoryCheck extends Check {
         return data;
     }
 
-    public static CCInventory getConfig(ConfigurationCacheStore cache) {
-        CCInventory config = cache.get(id);
+    public static InventoryConfig getConfig(ConfigurationCacheStore cache) {
+        InventoryConfig config = cache.get(id);
         if(config == null) {
-            config = new CCInventory(cache.getConfiguration());
+            config = new InventoryConfig(cache.getConfiguration());
             cache.set(id, config);
         }
         return config;

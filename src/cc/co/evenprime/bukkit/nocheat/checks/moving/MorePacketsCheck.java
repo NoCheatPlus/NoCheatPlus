@@ -38,7 +38,7 @@ public class MorePacketsCheck extends MovingCheck {
      * 8. reset packetCounter, wait for next 20 ticks to pass by.
      * 
      */
-    public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
+    public PreciseLocation check(NoCheatPlayer player, MovingData data, MovingConfig cc) {
 
         PreciseLocation newToLocation = null;
 
@@ -99,7 +99,7 @@ public class MorePacketsCheck extends MovingCheck {
     }
 
     @Override
-    public boolean isEnabled(CCMoving moving) {
+    public boolean isEnabled(MovingConfig moving) {
         return moving.morePacketsCheck;
     }
 

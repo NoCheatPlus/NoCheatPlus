@@ -9,7 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
  * Every world gets one of these assigned to it.
  * 
  */
-public class CCBlockBreak implements ConfigItem {
+public class BlockBreakConfig implements ConfigItem {
 
     public final boolean    check;
     public final boolean    checkinstabreakblocks;
@@ -23,7 +23,7 @@ public class CCBlockBreak implements ConfigItem {
     public final boolean    noswingCheck;
     public final ActionList noswingActions;
 
-    public CCBlockBreak(Configuration data) {
+    public BlockBreakConfig(Configuration data) {
 
         check = data.getBoolean(Configuration.BLOCKBREAK_CHECK);
         reachCheck = data.getBoolean(Configuration.BLOCKBREAK_REACH_CHECK);

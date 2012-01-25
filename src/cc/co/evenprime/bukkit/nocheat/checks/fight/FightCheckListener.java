@@ -49,7 +49,7 @@ public class FightCheckListener implements Listener, EventManager {
         final Player damager = (Player) event.getDamager();
 
         final NoCheatPlayer player = plugin.getPlayer(damager);
-        final CCFight cc = FightCheck.getConfig(player.getConfigurationStore());
+        final FightConfig cc = FightCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.FIGHT)) {
             return;
@@ -103,7 +103,7 @@ public class FightCheckListener implements Listener, EventManager {
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        CCFight f = FightCheck.getConfig(cc);
+        FightConfig f = FightCheck.getConfig(cc);
 
         if(f.check && f.directionCheck)
             s.add("fight.direction");

@@ -35,7 +35,7 @@ public class InventoryCheckListener implements Listener, EventManager {
             return;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final CCInventory cc = InventoryCheck.getConfig(player.getConfigurationStore());
+        final InventoryConfig cc = InventoryCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.INVENTORY) || player.isDead()) {
             return;
@@ -62,7 +62,7 @@ public class InventoryCheckListener implements Listener, EventManager {
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        CCInventory i = InventoryCheck.getConfig(cc);
+        InventoryConfig i = InventoryCheck.getConfig(cc);
         if(i.check && i.dropCheck)
             s.add("inventory.dropCheck");
         return s;

@@ -18,7 +18,7 @@ public class DirectionCheck extends FightCheck {
         super(plugin, "fight.direction", Permissions.FIGHT_DIRECTION);
     }
 
-    public boolean check(NoCheatPlayer player, FightData data, CCFight cc) {
+    public boolean check(NoCheatPlayer player, FightData data, FightConfig cc) {
 
         boolean cancel = false;
 
@@ -77,7 +77,7 @@ public class DirectionCheck extends FightCheck {
     }
 
     @Override
-    public boolean isEnabled(CCFight cc) {
+    public boolean isEnabled(FightConfig cc) {
         return cc.directionCheck;
     }
 

@@ -18,9 +18,9 @@ public abstract class FightCheck extends Check {
         super(plugin, id, name, permission);
     }
 
-    public abstract boolean check(NoCheatPlayer player, FightData data, CCFight cc);
+    public abstract boolean check(NoCheatPlayer player, FightData data, FightConfig cc);
 
-    public abstract boolean isEnabled(CCFight cc);
+    public abstract boolean isEnabled(FightConfig cc);
 
     public static FightData getData(DataStore base) {
         FightData data = base.get(id);
@@ -31,10 +31,10 @@ public abstract class FightCheck extends Check {
         return data;
     }
 
-    public static CCFight getConfig(ConfigurationCacheStore cache) {
-        CCFight config = cache.get(id);
+    public static FightConfig getConfig(ConfigurationCacheStore cache) {
+        FightConfig config = cache.get(id);
         if(config == null) {
-            config = new CCFight(cache.getConfiguration());
+            config = new FightConfig(cache.getConfiguration());
             cache.set(id, config);
         }
         return config;

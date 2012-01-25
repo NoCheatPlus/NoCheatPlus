@@ -15,9 +15,9 @@ public abstract class ChatCheck extends Check {
         super(plugin, id, name, permission);
     }
 
-    public abstract boolean check(NoCheatPlayer player, ChatData data, CCChat cc);
+    public abstract boolean check(NoCheatPlayer player, ChatData data, ChatConfig cc);
 
-    public abstract boolean isEnabled(CCChat cc);
+    public abstract boolean isEnabled(ChatConfig cc);
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
@@ -37,10 +37,10 @@ public abstract class ChatCheck extends Check {
         return data;
     }
 
-    public static CCChat getConfig(ConfigurationCacheStore cache) {
-        CCChat config = cache.get(id);
+    public static ChatConfig getConfig(ConfigurationCacheStore cache) {
+        ChatConfig config = cache.get(id);
         if(config == null) {
-            config = new CCChat(cache.getConfiguration());
+            config = new ChatConfig(cache.getConfiguration());
             cache.set(id, config);
         }
         return config;

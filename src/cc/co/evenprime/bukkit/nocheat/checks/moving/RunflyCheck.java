@@ -21,7 +21,7 @@ public class RunflyCheck extends MovingCheck {
     }
 
     @Override
-    public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
+    public PreciseLocation check(NoCheatPlayer player, MovingData data, MovingConfig cc) {
 
         if(player.hasPermission(Permissions.MOVING_RUNFLY)) {
             // If the player doesn't get checked for movement
@@ -42,7 +42,7 @@ public class RunflyCheck extends MovingCheck {
     }
 
     @Override
-    public boolean isEnabled(CCMoving moving) {
+    public boolean isEnabled(MovingConfig moving) {
         return moving.runflyCheck;
     }
 }

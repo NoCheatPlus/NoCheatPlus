@@ -4,7 +4,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
-public class CCInventory implements ConfigItem {
+public class InventoryConfig implements ConfigItem {
 
     public final boolean    check;
 
@@ -13,7 +13,7 @@ public class CCInventory implements ConfigItem {
     public final int        dropLimit;
     public final ActionList dropActions;
 
-    public CCInventory(Configuration data) {
+    public InventoryConfig(Configuration data) {
 
         check = data.getBoolean(Configuration.INVENTORY_CHECK);
         dropCheck = data.getBoolean(Configuration.INVENTORY_DROP_CHECK);

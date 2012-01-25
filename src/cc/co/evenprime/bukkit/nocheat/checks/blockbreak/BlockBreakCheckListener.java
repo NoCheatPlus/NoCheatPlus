@@ -45,7 +45,7 @@ public class BlockBreakCheckListener implements Listener, EventManager {
         boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final CCBlockBreak cc = BlockBreakCheck.getConfig(player.getConfigurationStore());
+        final BlockBreakConfig cc = BlockBreakCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.BLOCKBREAK)) {
             return;
@@ -63,6 +63,7 @@ public class BlockBreakCheckListener implements Listener, EventManager {
             return;
         }
 
+        // Go through all "blockbreak" checks
         for(BlockBreakCheck check : checks) {
             // If it should be executed, do it
             if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
@@ -112,7 +113,7 @@ public class BlockBreakCheckListener implements Listener, EventManager {
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        CCBlockBreak bb = BlockBreakCheck.getConfig(cc);
+        BlockBreakConfig bb = BlockBreakCheck.getConfig(cc);
 
         if(bb.check && bb.directionCheck)
             s.add("blockbreak.direction");

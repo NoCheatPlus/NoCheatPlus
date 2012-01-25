@@ -9,7 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
  * assigned to it.
  * 
  */
-public class CCMoving implements ConfigItem {
+public class MovingConfig implements ConfigItem {
 
     public final boolean    check;
 
@@ -38,7 +38,7 @@ public class CCMoving implements ConfigItem {
 
     public final double     flyingHeightLimit;
 
-    public CCMoving(Configuration data) {
+    public MovingConfig(Configuration data) {
 
         check = data.getBoolean(Configuration.MOVING_CHECK);
         identifyCreativeMode = data.getBoolean(Configuration.MOVING_IDENTIFYCREATIVEMODE);

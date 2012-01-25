@@ -13,7 +13,7 @@ public class SpamCheck extends ChatCheck {
         super(plugin, "chat.spam", Permissions.CHAT_SPAM);
     }
 
-    public boolean check(NoCheatPlayer player, ChatData data, CCChat cc) {
+    public boolean check(NoCheatPlayer player, ChatData data, ChatConfig cc) {
 
         boolean cancel = false;
         // Maybe it's a command and on the whitelist
@@ -50,7 +50,7 @@ public class SpamCheck extends ChatCheck {
     }
 
     @Override
-    public boolean isEnabled(CCChat cc) {
+    public boolean isEnabled(ChatConfig cc) {
         return cc.spamCheck;
     }
 

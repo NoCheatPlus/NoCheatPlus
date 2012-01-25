@@ -42,7 +42,7 @@ public class ChatCheckListener implements Listener, EventManager {
         boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final CCChat cc = ChatCheck.getConfig(player.getConfigurationStore());
+        final ChatConfig cc = ChatCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.CHAT)) {
             return;
@@ -70,7 +70,7 @@ public class ChatCheckListener implements Listener, EventManager {
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        CCChat c = ChatCheck.getConfig(cc);
+        ChatConfig c = ChatCheck.getConfig(cc);
         if(c.check && c.spamCheck)
             s.add("chat.spam");
         if(c.check && c.colorCheck)

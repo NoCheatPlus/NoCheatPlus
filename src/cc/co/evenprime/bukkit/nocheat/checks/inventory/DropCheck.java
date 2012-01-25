@@ -13,7 +13,7 @@ public class DropCheck extends InventoryCheck {
     }
 
     @Override
-    public boolean check(NoCheatPlayer player, InventoryData data, CCInventory cc) {
+    public boolean check(NoCheatPlayer player, InventoryData data, InventoryConfig cc) {
 
         boolean cancel = false;
 
@@ -43,7 +43,7 @@ public class DropCheck extends InventoryCheck {
     }
 
     @Override
-    public boolean isEnabled(CCInventory cc) {
+    public boolean isEnabled(InventoryConfig cc) {
         return cc.dropCheck;
     }
 

@@ -20,7 +20,7 @@ public class ReachCheck extends BlockBreakCheck {
         super(plugin, "blockbreak.reach", Permissions.BLOCKBREAK_REACH);
     }
 
-    public boolean check(NoCheatPlayer player, BlockBreakData data, CCBlockBreak cc) {
+    public boolean check(NoCheatPlayer player, BlockBreakData data, BlockBreakConfig cc) {
 
         boolean cancel = false;
 
@@ -45,7 +45,7 @@ public class ReachCheck extends BlockBreakCheck {
         return cancel;
     }
 
-    public boolean isEnabled(CCBlockBreak cc) {
+    public boolean isEnabled(BlockBreakConfig cc) {
         return cc.reachCheck;
     }
 

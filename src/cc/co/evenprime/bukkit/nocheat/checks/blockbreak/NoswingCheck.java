@@ -13,7 +13,7 @@ public class NoswingCheck extends BlockBreakCheck {
         super(plugin, "blockbreak.noswing", Permissions.BLOCKBREAK_NOSWING);
     }
 
-    public boolean check(NoCheatPlayer player, BlockBreakData data, CCBlockBreak cc) {
+    public boolean check(NoCheatPlayer player, BlockBreakData data, BlockBreakConfig cc) {
 
         boolean cancel = false;
 
@@ -32,7 +32,7 @@ public class NoswingCheck extends BlockBreakCheck {
         return cancel;
     }
 
-    public boolean isEnabled(CCBlockBreak cc) {
+    public boolean isEnabled(BlockBreakConfig cc) {
         return cc.noswingCheck;
     }
 

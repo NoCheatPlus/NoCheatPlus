@@ -23,7 +23,7 @@ public class NoFallCheck extends MovingCheck {
      * Calculate if and how much the player "failed" this check.
      * 
      */
-    public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
+    public PreciseLocation check(NoCheatPlayer player, MovingData data, MovingConfig cc) {
 
         // If the player is serverside in creative mode, we have to stop here to
         // avoid hurting him when he switches back to "normal" mode
@@ -104,7 +104,7 @@ public class NoFallCheck extends MovingCheck {
     }
 
     @Override
-    public boolean isEnabled(CCMoving moving) {
+    public boolean isEnabled(MovingConfig moving) {
         return moving.nofallCheck;
     }
 

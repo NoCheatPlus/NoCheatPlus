@@ -20,7 +20,7 @@ public class ReachCheck extends BlockPlaceCheck {
         super(plugin, "blockplace.reach", Permissions.BLOCKPLACE_REACH);
     }
 
-    public boolean check(NoCheatPlayer player, BlockPlaceData data, CCBlockPlace cc) {
+    public boolean check(NoCheatPlayer player, BlockPlaceData data, BlockPlaceConfig cc) {
 
         boolean cancel = false;
 
@@ -46,7 +46,7 @@ public class ReachCheck extends BlockPlaceCheck {
     }
 
     @Override
-    public boolean isEnabled(CCBlockPlace cc) {
+    public boolean isEnabled(BlockPlaceConfig cc) {
         return cc.reachCheck;
     }
 

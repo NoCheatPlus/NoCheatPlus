@@ -15,7 +15,7 @@ public class DirectionCheck extends BlockPlaceCheck {
         super(plugin, "blockplace.direction", Permissions.BLOCKPLACE_DIRECTION);
     }
 
-    public boolean check(NoCheatPlayer player, BlockPlaceData data, CCBlockPlace cc) {
+    public boolean check(NoCheatPlayer player, BlockPlaceData data, BlockPlaceConfig cc) {
 
         boolean cancel = false;
 
@@ -86,7 +86,7 @@ public class DirectionCheck extends BlockPlaceCheck {
     }
 
     @Override
-    public boolean isEnabled(CCBlockPlace cc) {
+    public boolean isEnabled(BlockPlaceConfig cc) {
         return cc.directionCheck;
     }
 

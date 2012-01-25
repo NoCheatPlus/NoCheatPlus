@@ -44,7 +44,7 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
         boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final CCBlockPlace cc = BlockPlaceCheck.getConfig(player.getConfigurationStore());
+        final BlockPlaceConfig cc = BlockPlaceCheck.getConfig(player.getConfigurationStore());
 
         if(!cc.check || player.hasPermission(Permissions.BLOCKPLACE)) {
             return;
@@ -69,7 +69,7 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        CCBlockPlace bp = BlockPlaceCheck.getConfig(cc);
+        BlockPlaceConfig bp = BlockPlaceCheck.getConfig(cc);
 
         if(bp.check && bp.reachCheck)
             s.add("blockplace.reach");

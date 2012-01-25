@@ -4,7 +4,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.config.Configuration;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
-public class CCFight implements ConfigItem {
+public class FightConfig implements ConfigItem {
 
     public final boolean    check;
     public final boolean    directionCheck;
@@ -14,7 +14,7 @@ public class CCFight implements ConfigItem {
     public final boolean    noswingCheck;
     public final ActionList noswingActions;
 
-    public CCFight(Configuration data) {
+    public FightConfig(Configuration data) {
 
         check = data.getBoolean(Configuration.FIGHT_CHECK);
         directionCheck = data.getBoolean(Configuration.FIGHT_DIRECTION_CHECK);

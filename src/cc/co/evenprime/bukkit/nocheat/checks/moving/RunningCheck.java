@@ -33,7 +33,7 @@ public class RunningCheck extends MovingCheck {
         this.noFallCheck = new NoFallCheck(plugin);
     }
 
-    public PreciseLocation check(NoCheatPlayer player, MovingData data, CCMoving cc) {
+    public PreciseLocation check(NoCheatPlayer player, MovingData data, MovingConfig cc) {
 
         // Some shortcuts:
         final PreciseLocation setBack = data.runflySetBackPoint;
@@ -131,7 +131,7 @@ public class RunningCheck extends MovingCheck {
      * Calculate how much the player failed this check
      * 
      */
-    private double checkHorizontal(final NoCheatPlayer player, final MovingData data, final boolean isSwimming, final double totalDistance, final CCMoving cc) {
+    private double checkHorizontal(final NoCheatPlayer player, final MovingData data, final boolean isSwimming, final double totalDistance, final MovingConfig cc) {
 
         // How much further did the player move than expected??
         double distanceAboveLimit = 0.0D;
@@ -201,7 +201,7 @@ public class RunningCheck extends MovingCheck {
      * Calculate if and how much the player "failed" this check.
      * 
      */
-    private double checkVertical(final MovingData data, final boolean fromOnGround, final boolean toOnGround, final CCMoving cc) {
+    private double checkVertical(final MovingData data, final boolean fromOnGround, final boolean toOnGround, final MovingConfig cc) {
 
         // How much higher did the player move than expected??
         double distanceAboveLimit = 0.0D;
@@ -221,7 +221,7 @@ public class RunningCheck extends MovingCheck {
     }
 
     @Override
-    public boolean isEnabled(CCMoving moving) {
+    public boolean isEnabled(MovingConfig moving) {
         return moving.runflyCheck && !moving.allowFlying;
     }
 

@@ -20,7 +20,7 @@ public class DirectionCheck extends BlockBreakCheck {
         super(plugin, "blockbreak.direction", Permissions.BLOCKBREAK_DIRECTION);
     }
 
-    public boolean check(final NoCheatPlayer player, final BlockBreakData data, final CCBlockBreak ccblockbreak) {
+    public boolean check(final NoCheatPlayer player, final BlockBreakData data, final BlockBreakConfig ccblockbreak) {
 
         final SimpleLocation brokenBlock = data.brokenBlockLocation;
         final boolean isInstaBreak = data.instaBrokenBlockLocation.equals(brokenBlock);
@@ -72,7 +72,7 @@ public class DirectionCheck extends BlockBreakCheck {
         return cancel;
     }
 
-    public boolean isEnabled(CCBlockBreak cc) {
+    public boolean isEnabled(BlockBreakConfig cc) {
         return cc.directionCheck;
     }
 

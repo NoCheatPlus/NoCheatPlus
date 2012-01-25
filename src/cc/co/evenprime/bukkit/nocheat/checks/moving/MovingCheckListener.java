@@ -106,7 +106,7 @@ public class MovingCheckListener implements Listener, EventManager {
             return;
         }
 
-        final CCMoving cc = MovingCheck.getConfig(player.getConfigurationStore());
+        final MovingConfig cc = MovingCheck.getConfig(player.getConfigurationStore());
 
         final MovingData data = MovingCheck.getData(player.getDataStore());
 
@@ -196,7 +196,7 @@ public class MovingCheckListener implements Listener, EventManager {
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
-        CCMoving m = MovingCheck.getConfig(cc);
+        MovingConfig m = MovingCheck.getConfig(cc);
 
         if(m.check) {
             if(m.runflyCheck) {
