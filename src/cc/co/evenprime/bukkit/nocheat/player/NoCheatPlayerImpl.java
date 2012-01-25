@@ -2,15 +2,14 @@ package cc.co.evenprime.bukkit.nocheat.player;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
-
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.data.DataStore;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public class NoCheatPlayerImpl implements NoCheatPlayer {
 
@@ -19,12 +18,14 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     protected final DataStore         data;
     protected ConfigurationCacheStore config;
     protected long                    lastUsedTime;
+    protected final ExecutionHistory  history;
 
     public NoCheatPlayerImpl(Player player, NoCheat plugin) {
 
         this.player = player;
         this.plugin = plugin;
         this.data = new DataStore();
+        this.history = new ExecutionHistory();
 
         this.lastUsedTime = System.currentTimeMillis();
     }
@@ -98,5 +99,10 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
 
     public void closeInventory() {
         ((CraftPlayer) this.player).getHandle().closeInventory();
+    }
+
+    @Override
+    public ExecutionHistory getExecutionHistory() {
+        return history;
     }
 }

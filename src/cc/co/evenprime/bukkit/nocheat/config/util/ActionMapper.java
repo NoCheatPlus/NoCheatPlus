@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.config.util;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 
 /**
@@ -25,7 +24,10 @@ public class ActionMapper {
         Action[] result = new Action[actionNames.length];
 
         for(int i = 0; i < actionNames.length; i++) {
-            result[i] = this.actions.get(actionNames[i].toLowerCase());
+            String actionParts[] = actionNames[i].toLowerCase().split(":", 2);
+            result[i] = this.actions.get(actionParts[0]);
+            if(actionParts.length == 2)
+                result[i] = result[i].cloneWithProperties(actionParts[1]);
         }
 
         return result;

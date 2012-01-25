@@ -1,9 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks.inventory;
 
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.DataItem;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public class InventoryData implements DataItem {
 
@@ -12,7 +10,6 @@ public class InventoryData implements DataItem {
     public int                    dropFailed       = 0;
     public long                   dropLastTime;
     public int                    dropCount;
-    public final ExecutionHistory history          = new ExecutionHistory();
 
     @Override
     public void collectData(Map<String, Object> map) {

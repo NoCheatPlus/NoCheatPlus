@@ -1,9 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.config;
 
-import java.util.logging.Logger;
-
 import cc.co.evenprime.bukkit.nocheat.log.Colors;
-import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 /**
  * Configurations specific for logging. Every world gets one of these.
@@ -11,21 +8,18 @@ import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
  */
 public class CCLogging {
 
-    public final LogLevel fileLevel;
-    public final LogLevel consoleLevel;
-    public final LogLevel chatLevel;
-    public final Logger   filelogger;
-    public final boolean  active;
-    public final String   prefix;
+    public final boolean active;
+    public final boolean toFile;
+    public final boolean toConsole;
+    public final boolean toChat;
+    public final String  prefix;
 
-    public CCLogging(Configuration data, Logger worldSpecificFileLogger) {
+    public CCLogging(Configuration data) {
 
         active = data.getBoolean(Configuration.LOGGING_ACTIVE);
         prefix = Colors.replaceColors(data.getString(Configuration.LOGGING_PREFIX));
-        fileLevel = data.getLogLevel(Configuration.LOGGING_FILELEVEL);
-        consoleLevel = data.getLogLevel(Configuration.LOGGING_CONSOLELEVEL);
-        chatLevel = data.getLogLevel(Configuration.LOGGING_CHATLEVEL);
-
-        filelogger = worldSpecificFileLogger;
+        toFile = data.getBoolean(Configuration.LOGGING_LOGTOFILE);
+        toConsole = data.getBoolean(Configuration.LOGGING_LOGTOCONSOLE);
+        toChat = data.getBoolean(Configuration.LOGGING_LOGTOCHAT);
     }
 }

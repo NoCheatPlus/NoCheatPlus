@@ -1,6 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.Locale;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
@@ -14,18 +15,20 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
+import cc.co.evenprime.bukkit.nocheat.log.NoCheatLogEvent;
 
 public abstract class Check {
 
-    private final String name;
-    private final String permission;
+    private final String               name;
+    private final String               groupId;                                          // used to bundle information of multiple checks
+    private final String               permission;
     private static final CommandSender noCheatCommandSender = new NoCheatCommandSender();
-    protected final NoCheat plugin;
+    protected final NoCheat            plugin;
 
-    public Check(NoCheat plugin, String name, String permission) {
+    public Check(NoCheat plugin, String groupId, String name, String permission) {
 
         this.plugin = plugin;
+        this.groupId = groupId;
         this.name = name;
         this.permission = permission;
     }
@@ -47,7 +50,7 @@ public abstract class Check {
         final ConfigurationCacheStore cc = player.getConfigurationStore();
 
         for(Action ac : actions) {
-            if(getHistory(player).executeAction(ac, time)) {
+            if(player.getExecutionHistory().executeAction(groupId, ac, time)) {
                 if(ac instanceof LogAction) {
                     executeLogAction((LogAction) ac, this, player, cc);
                 } else if(ac instanceof SpecialAction) {
@@ -63,10 +66,12 @@ public abstract class Check {
         return special;
     }
 
-    protected abstract ExecutionHistory getHistory(NoCheatPlayer player);
-
     private final void executeLogAction(LogAction l, Check check, NoCheatPlayer player, ConfigurationCacheStore cc) {
-        plugin.log(l.level, cc.logging.prefix + l.getLogMessage(player, check), cc);
+
+        if(!cc.logging.active)
+            return;
+
+        Bukkit.getServer().getPluginManager().callEvent(new NoCheatLogEvent(cc.logging.prefix, l.getLogMessage(player, check), cc.logging.toConsole && l.toConsole(), cc.logging.toChat && l.toChat(), cc.logging.toFile && l.toFile()));
     }
 
     private final void executeConsoleCommand(ConsolecommandAction action, Check check, NoCheatPlayer player, ConfigurationCacheStore cc) {

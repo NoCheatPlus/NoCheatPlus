@@ -6,7 +6,6 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 
 public class CCInventory implements ConfigItem {
 
-    public final boolean    closebeforeteleports;
     public final boolean    check;
 
     public final boolean    dropCheck;
@@ -21,7 +20,5 @@ public class CCInventory implements ConfigItem {
         dropTimeFrame = data.getInteger(Configuration.INVENTORY_DROP_TIMEFRAME);
         dropLimit = data.getInteger(Configuration.INVENTORY_DROP_LIMIT);
         dropActions = data.getActionList(Configuration.INVENTORY_DROP_ACTIONS);
-
-        closebeforeteleports = data.getBoolean(Configuration.INVENTORY_PREVENTITEMDUPE);
     }
 }

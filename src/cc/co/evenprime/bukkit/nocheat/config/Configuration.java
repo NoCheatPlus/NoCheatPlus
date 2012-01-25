@@ -5,7 +5,6 @@ import java.util.Map;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode.DataType;
-import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 /**
  * This class describes a basic configuration for NoCheat. NoCheats
@@ -19,22 +18,19 @@ public abstract class Configuration {
 
     protected final static OptionNode     ROOT                                       = new OptionNode(null, null, DataType.PARENT);
 
-    protected final static OptionNode     INACTIVE                                   = new OptionNode(null, null, DataType.PARENT);
-
     private final static OptionNode       LOGGING                                    = new OptionNode("logging", ROOT, DataType.PARENT);
     public final static OptionNode        LOGGING_ACTIVE                             = new OptionNode("active", LOGGING, DataType.BOOLEAN);
     public final static OptionNode        LOGGING_PREFIX                             = new OptionNode("prefix", LOGGING, DataType.STRING);
     public final static OptionNode        LOGGING_FILENAME                           = new OptionNode("filename", LOGGING, DataType.STRING);
-    public final static OptionNode        LOGGING_FILELEVEL                          = new OptionNode("filelevel", LOGGING, DataType.LOGLEVEL);
-    public final static OptionNode        LOGGING_CONSOLELEVEL                       = new OptionNode("consolelevel", LOGGING, DataType.LOGLEVEL);
-    public final static OptionNode        LOGGING_CHATLEVEL                          = new OptionNode("chatlevel", LOGGING, DataType.LOGLEVEL);
+    public final static OptionNode        LOGGING_LOGTOFILE                          = new OptionNode("logtofile", LOGGING, DataType.BOOLEAN);
+    public final static OptionNode        LOGGING_LOGTOCONSOLE                       = new OptionNode("logtoconsole", LOGGING, DataType.BOOLEAN);
+    public final static OptionNode        LOGGING_LOGTOCHAT                          = new OptionNode("logtochat", LOGGING, DataType.BOOLEAN);
 
     private final static OptionNode       DEBUG                                      = new OptionNode("debug", ROOT, DataType.PARENT);
     public final static OptionNode        DEBUG_SHOWACTIVECHECKS                     = new OptionNode("showactivechecks", DEBUG, DataType.BOOLEAN);
     public final static OptionNode        DEBUG_COMPATIBILITY                        = new OptionNode("compatibility", DEBUG, DataType.BOOLEAN);
 
     private final static OptionNode       INVENTORY                                  = new OptionNode("inventory", ROOT, DataType.PARENT);
-    public final static OptionNode        INVENTORY_PREVENTITEMDUPE                  = new OptionNode("preventitemdupe", INVENTORY, DataType.BOOLEAN);
     public static final OptionNode        INVENTORY_CHECK                            = new OptionNode("check", INVENTORY, DataType.BOOLEAN);
 
     private final static OptionNode       INVENTORY_DROP                             = new OptionNode("drop", INVENTORY, DataType.PARENT);
@@ -116,10 +112,6 @@ public abstract class Configuration {
     public final static OptionNode        CHAT_SPAM_LIMIT                            = new OptionNode("limit", CHAT_SPAM, DataType.INTEGER);
     public final static OptionNode        CHAT_SPAM_ACTIONS                          = new OptionNode("actions", CHAT_SPAM, DataType.ACTIONLIST);
 
-    private final static OptionNode       CHAT_EMPTY                                 = new OptionNode("empty", CHAT, DataType.PARENT);
-    public final static OptionNode        CHAT_EMPTY_CHECK                           = new OptionNode("check", CHAT_EMPTY, DataType.BOOLEAN);
-    public final static OptionNode        CHAT_EMPTY_ACTIONS                         = new OptionNode("actions", CHAT_EMPTY, DataType.ACTIONLIST);
-
     private final static OptionNode       FIGHT                                      = new OptionNode("fight", ROOT, DataType.PARENT);
     public final static OptionNode        FIGHT_CHECK                                = new OptionNode("check", FIGHT, DataType.BOOLEAN);
 
@@ -181,14 +173,6 @@ public abstract class Configuration {
         return (Integer) getRecursive(id);
     }
 
-    public LogLevel getLogLevel(OptionNode id) {
-        if(id.getType() != DataType.LOGLEVEL) {
-            throw new IllegalArgumentException(id + " is no loglevel value!");
-        }
-
-        return (LogLevel) getRecursive(id);
-    }
-
     public ActionList getActionList(OptionNode id) {
 
         if(id.getType() != DataType.ACTIONLIST) {
@@ -201,13 +185,6 @@ public abstract class Configuration {
     public void setValue(OptionNode id, Integer value) {
         if(id.getType() != DataType.INTEGER) {
             throw new IllegalArgumentException(id + " is no integer value!");
-        }
-        set(id, value);
-    }
-
-    public void setValue(OptionNode id, LogLevel value) {
-        if(id.getType() != DataType.LOGLEVEL) {
-            throw new IllegalArgumentException(id + " is no loglevel value!");
         }
         set(id, value);
     }

@@ -1,9 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat;
 
 import org.bukkit.entity.Player;
-
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.data.DataStore;
+import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public interface NoCheatPlayer {
 
@@ -28,4 +28,6 @@ public interface NoCheatPlayer {
     public boolean isCreative();
 
     public void closeInventory();
+
+    public ExecutionHistory getExecutionHistory();
 }

@@ -13,11 +13,9 @@ public class ConsolecommandAction extends ActionWithParameters {
 
     public ConsolecommandAction(String name, int delay, int repeat, String command) {
         super(name, delay, repeat, command);
-
     }
 
     public String getCommand(NoCheatPlayer player, Check check) {
-
         return super.getMessage(player, check);
     }
 }

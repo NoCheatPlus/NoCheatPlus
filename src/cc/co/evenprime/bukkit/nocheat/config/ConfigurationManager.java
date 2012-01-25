@@ -14,7 +14,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
+import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 
 /**
@@ -29,11 +29,10 @@ public class ConfigurationManager {
 
     private final Map<String, ConfigurationCacheStore> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCacheStore>();
 
-    // Only use one filehandler per file, therefore keep open filehandlers in a
-    // map
-    private final Map<File, FileHandler>               fileToFileHandlerMap      = new HashMap<File, FileHandler>();
-
     private final Configuration                        defaultConfig;
+
+    private FileHandler                                fileHandler;
+    private NoCheat plugin;
 
     private static class LogFileFormatter extends Formatter {
 
@@ -69,9 +68,11 @@ public class ConfigurationManager {
     // private final static String loggerName = "cc.co.evenprime.nocheat";
     // public final Logger logger = Logger.getLogger(loggerName);
 
-    public ConfigurationManager(File rootConfigFolder) {
+    public ConfigurationManager(NoCheat plugin, File rootConfigFolder) {
 
         ActionMapper actionMapper = new ActionMapper();
+        
+        this.plugin = plugin;
 
         // Parse actions file
         initializeActions(rootConfigFolder, actionMapper);
@@ -135,7 +136,9 @@ public class ConfigurationManager {
 
         // Create a corresponding Configuration Cache
         // put the global config on the config map
-        worldnameToConfigCacheMap.put(null, new ConfigurationCacheStore(root, setupFileLogger(new File(rootConfigFolder, root.getString(DefaultConfiguration.LOGGING_FILENAME)))));
+        worldnameToConfigCacheMap.put(null, new ConfigurationCacheStore(root));
+
+        plugin.setFileLogger(setupFileLogger(new File(rootConfigFolder, root.getString(DefaultConfiguration.LOGGING_FILENAME))));
 
         // Try to find world-specific config files
         Map<String, File> worldFiles = getWorldSpecificConfigFiles(rootConfigFolder);
@@ -149,7 +152,7 @@ public class ConfigurationManager {
             try {
                 world.load(action);
 
-                worldnameToConfigCacheMap.put(worldEntry.getKey(), createConfigurationCache(rootConfigFolder, world));
+                worldnameToConfigCacheMap.put(worldEntry.getKey(), new ConfigurationCacheStore(world));
 
                 // write the config file back to disk immediately
                 world.save();
@@ -159,12 +162,6 @@ public class ConfigurationManager {
                 e.printStackTrace();
             }
         }
-    }
-
-    private ConfigurationCacheStore createConfigurationCache(File rootConfigFolder, Configuration configProvider) {
-
-        return new ConfigurationCacheStore(configProvider, setupFileLogger(new File(rootConfigFolder, configProvider.getString(DefaultConfiguration.LOGGING_FILENAME))));
-
     }
 
     private static File getGlobalConfigFile(File rootFolder) {
@@ -195,36 +192,33 @@ public class ConfigurationManager {
 
     private Logger setupFileLogger(File logfile) {
 
-        FileHandler fh = fileToFileHandlerMap.get(logfile);
-
-        // this logger will be used ONLY for logging to a single log-file and
-        // only
-        // in this plugin, therefore it doesn't need any namespace
         Logger l = Logger.getAnonymousLogger();
         l.setLevel(Level.INFO);
         // Ignore parent's settings
         l.setUseParentHandlers(false);
+        for(Handler h : l.getHandlers()) {
+            l.removeHandler(h);
+        }
 
-        if(fh == null) {
+        if(fileHandler != null) {
+            fileHandler.close();
+            l.removeHandler(fileHandler);
+            fileHandler = null;
+        }
+
+        try {
             try {
-                try {
-                    logfile.getParentFile().mkdirs();
-                } catch(Exception e) {
-                    e.printStackTrace();
-                }
-                fh = new FileHandler(logfile.getCanonicalPath(), true);
-                // We decide before logging what gets logged there anyway
-                // because different worlds may use this filehandler and
-                // therefore may need to log different message levels
-                fh.setLevel(Level.ALL);
-                fh.setFormatter(new LogFileFormatter());
-                fileToFileHandlerMap.put(logfile, fh);
-
-                l.addHandler(fh);
-
+                logfile.getParentFile().mkdirs();
             } catch(Exception e) {
                 e.printStackTrace();
             }
+            fileHandler = new FileHandler(logfile.getCanonicalPath(), true);
+            fileHandler.setLevel(Level.ALL);
+            fileHandler.setFormatter(new LogFileFormatter());
+
+            l.addHandler(fileHandler);
+        } catch(Exception e) {
+            e.printStackTrace();
         }
 
         return l;
@@ -235,19 +229,11 @@ public class ConfigurationManager {
      * to be able to use them next time without problems
      */
     public void cleanup() {
-
-        // Remove handlers from the logger
-        for(ConfigurationCacheStore c : worldnameToConfigCacheMap.values()) {
-            for(Handler h : c.logging.filelogger.getHandlers()) {
-                c.logging.filelogger.removeHandler(h);
-            }
-        }
-
-        // Close all file handlers
-        for(FileHandler fh : fileToFileHandlerMap.values()) {
-            fh.flush();
-            fh.close();
-        }
+        fileHandler.flush();
+        fileHandler.close();
+        Logger l = Logger.getLogger("NoCheat");
+        l.removeHandler(fileHandler);
+        fileHandler = null;
     }
 
     /**

@@ -1,10 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
 import java.util.Map;
-
 import net.minecraft.server.Entity;
 import cc.co.evenprime.bukkit.nocheat.DataItem;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public class FightData implements DataItem {
 
@@ -19,7 +17,6 @@ public class FightData implements DataItem {
     public int                    noswingFailed              = 0;
 
     public long                   directionLastViolationTime = 0;
-    public final ExecutionHistory history                    = new ExecutionHistory();
 
     public Entity                 damagee;
     public boolean                armswung                   = true;

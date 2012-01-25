@@ -9,13 +9,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
-
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
-import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 public class FlatFileConfiguration extends Configuration {
 
@@ -80,9 +78,6 @@ public class FlatFileConfiguration extends Configuration {
         case INTEGER:
             this.set(node, Integer.valueOf(removeQuotationMarks(value)));
             break;
-        case LOGLEVEL:
-            this.set(node, LogLevel.getLogLevelFromString(removeQuotationMarks(value)));
-            break;
         case BOOLEAN:
             this.set(node, Boolean.valueOf(removeQuotationMarks(value)));
             break;
@@ -107,12 +102,15 @@ public class FlatFileConfiguration extends Configuration {
         List<Action> actions = new LinkedList<Action>();
 
         for(String name : value.split("\\s+")) {
-            Action a2 = action.getAction(name);
+            String nameParts[] = name.split(":", 2);
+            Action a2 = action.getAction(nameParts[0]);
             if(a2 == null) {
-                System.out.println("Nocheat: Action with name " + name + " isn't defined. You need to define it in your actions.txt file to make it work.");
+                System.out.println("Nocheat: Action with name " + nameParts[0] + " isn't defined. You need to define it in your actions.txt file to make it work.");
                 actions.add(new DummyAction(name, 0, 0));
+            } else if(nameParts.length == 2) {
+                actions.add(a2.cloneWithProperties(nameParts[1]));
             } else {
-                actions.add(action.getAction(name));
+                actions.add(a2);
             }
         }
 
@@ -264,6 +262,9 @@ public class FlatFileConfiguration extends Configuration {
             StringBuilder s = new StringBuilder("");
             for(Action s2 : actionList.getActions(treshold)) {
                 s.append(" ").append(s2.name);
+                if(s2.getProperties() != null) {
+                    s.append(":").append(s2.getProperties());
+                }
             }
             saveValue(w, id + "." + treshold, s.toString().trim());
         }

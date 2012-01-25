@@ -8,10 +8,16 @@ import org.bukkit.ChatColor;
  */
 public class Colors {
 
+    /** 
+     * Replace instances of &X with a color
+     * 
+     * @param text
+     * @return
+     */
     public static String replaceColors(String text) {
 
         for(ChatColor c : ChatColor.values()) {
-            text = text.replace("&" + Integer.toHexString(c.getCode()), c.toString());
+            text = text.replace("&" + c.getChar(), c.toString());
         }
 
         return text;

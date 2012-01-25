@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,8 +30,6 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
         this.checks = new ArrayList<BlockPlaceCheck>(2);
         this.checks.add(new ReachCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
-        
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

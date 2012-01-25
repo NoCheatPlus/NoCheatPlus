@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.data;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 
 /**
@@ -81,10 +80,10 @@ public class ExecutionHistory {
 
     // Store data between Events
     // time + action + action-counter
-    private final Map<Action, ExecutionHistoryEntry> executionHistory;
+    private final Map<String, Map<Action, ExecutionHistoryEntry>> executionHistories;
 
     public ExecutionHistory() {
-        executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
+        executionHistories = new HashMap<String, Map<Action, ExecutionHistoryEntry>>();
     }
 
     /**
@@ -93,13 +92,21 @@ public class ExecutionHistory {
      * which will influence further requests, so only use once and remember
      * the result
      * 
+     * @param check
      * @param action
      * @param time
      *            a time IN SECONDS
      * @return
      */
-    public boolean executeAction(Action action, long time) {
+    public boolean executeAction(String check, Action action, long time) {
 
+        Map<Action, ExecutionHistoryEntry> executionHistory = executionHistories.get(check);
+        
+        if(executionHistory == null) {
+            executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
+            executionHistories.put(check, executionHistory);
+        }
+        
         ExecutionHistoryEntry entry = executionHistory.get(action);
 
         if(entry == null) {

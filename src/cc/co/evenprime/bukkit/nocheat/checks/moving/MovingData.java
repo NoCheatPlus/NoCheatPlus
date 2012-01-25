@@ -1,9 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.DataItem;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
@@ -58,8 +56,6 @@ public class MovingData implements DataItem {
     public final PreciseLocation  teleportTo              = new PreciseLocation();
 
     public int                    lastElapsedIngameSeconds;
-
-    public final ExecutionHistory history                 = new ExecutionHistory();
 
     public final PreciseLocation  from                    = new PreciseLocation();
     public final PreciseLocation  to                      = new PreciseLocation();

@@ -3,13 +3,13 @@ package cc.co.evenprime.bukkit.nocheat.checks.fight;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import cc.co.evenprime.bukkit.nocheat.EventManager;
@@ -30,19 +30,17 @@ public class FightCheckListener implements Listener, EventManager {
         this.checks.add(new DirectionCheck(plugin));
 
         this.plugin = plugin;
-
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void entityDamage(final EntityDamageByEntityEvent event) {
-        if(event.isCancelled())
+    public void entityDamage(final EntityDamageEvent event) {
+        if(event.isCancelled() || !(event instanceof EntityDamageByEntityEvent))
             return;
 
         if(event.getCause() == DamageCause.ENTITY_ATTACK) {
-            normalDamage(event);
-        } else {
-            customDamage(event);
+            normalDamage((EntityDamageByEntityEvent) event);
+        } else if(event.getCause() == DamageCause.CUSTOM) {
+            customDamage((EntityDamageByEntityEvent) event);
         }
     }
 

@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.inventory;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,8 +26,6 @@ public class InventoryCheckListener implements Listener, EventManager {
         this.checks.add(new DropCheck(plugin));
 
         this.plugin = plugin;
-        
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

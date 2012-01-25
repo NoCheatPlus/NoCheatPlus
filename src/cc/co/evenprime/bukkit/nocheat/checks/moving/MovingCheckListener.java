@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -43,8 +42,6 @@ public class MovingCheckListener implements Listener, EventManager {
         checks.add(new MorePacketsCheck(plugin));
 
         this.plugin = plugin;
-        
-        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

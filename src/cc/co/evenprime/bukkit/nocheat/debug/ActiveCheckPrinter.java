@@ -5,7 +5,6 @@ import org.bukkit.World;
 import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
-import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 public class ActiveCheckPrinter {
 
@@ -35,11 +34,11 @@ public class ActiveCheckPrinter {
                 }
 
                 if(!introPrinted) {
-                    plugin.logToConsole(LogLevel.LOW, intro);
+                    System.out.println(intro);
                     introPrinted = true;
                 }
 
-                plugin.logToConsole(LogLevel.LOW, line.toString());
+                System.out.println(line.toString());
 
                 line = new StringBuilder(length);
 

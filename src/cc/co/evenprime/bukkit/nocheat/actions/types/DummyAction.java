@@ -12,5 +12,4 @@ public class DummyAction extends Action {
     public DummyAction(String name, int delay, int repeat) {
         super(name, delay, repeat);
     }
-
 }

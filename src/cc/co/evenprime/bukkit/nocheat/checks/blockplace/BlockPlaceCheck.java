@@ -1,14 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import java.util.Locale;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.data.DataStore;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
@@ -19,17 +17,12 @@ public abstract class BlockPlaceCheck extends Check {
     private static final String id = "blockplace";
 
     public BlockPlaceCheck(NoCheat plugin, String name, String permission) {
-        super(plugin, name, permission);
+        super(plugin, id, name, permission);
     }
 
     public abstract boolean check(NoCheatPlayer player, BlockPlaceData data, CCBlockPlace cc);
 
     public abstract boolean isEnabled(CCBlockPlace cc);
-
-    @Override
-    protected final ExecutionHistory getHistory(NoCheatPlayer player) {
-        return getData(player.getDataStore()).history;
-    }
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

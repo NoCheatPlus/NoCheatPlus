@@ -7,13 +7,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
-import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 
 public class FlatFileAction {
 
@@ -88,7 +86,7 @@ public class FlatFileAction {
                 throw new IllegalArgumentException("Missing fifth parameter of action " + name + " from file " + file.getName() + ".");
             }
 
-            return readLogAction(name, delay, repeat, parts[4]);
+            return new LogAction(name, delay, repeat, parts[4]);
         } else if(type.equalsIgnoreCase("consolecommand")) {
             // A consolecommand action, it seems
             if(parts.length < 5) {
@@ -103,24 +101,4 @@ public class FlatFileAction {
             throw new IllegalArgumentException("Unknown action type " + type + " of action with name " + name + ".");
         }
     }
-
-    // Moved outside because of bigger complexity of log message parsing
-    private Action readLogAction(String name, int delay, int repeat, String lastPart) {
-
-        String[] rest = lastPart.split("\\s+", 2);
-
-        if(rest.length < 2) {
-            throw new IllegalArgumentException("Missing sixth parameter of action " + name + " from file " + file.getName() + ".");
-        }
-
-        LogLevel level;
-        try {
-            level = LogLevel.getLogLevelFromString(rest[0]);
-        } catch(IllegalArgumentException e) {
-            throw new IllegalArgumentException("Illegal fifth parameter of action " + name + ". " + e.getMessage());
-        }
-
-        return new LogAction(name, delay, repeat, level, rest[1]);
-    }
-
 }

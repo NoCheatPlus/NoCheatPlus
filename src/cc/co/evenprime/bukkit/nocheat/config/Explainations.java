@@ -19,14 +19,13 @@ public class Explainations {
 
         set(Configuration.LOGGING_PREFIX, "The short text that appears in front of messages by NoCheat. Color codes are &0-&9 and &A-&F");
         set(Configuration.LOGGING_FILENAME, "Where logs that go to the logfile are stored. You can have different files for different worlds.");
-        set(Configuration.LOGGING_FILELEVEL, "What log-level need messages to have to get stored in the logfile. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
-        set(Configuration.LOGGING_CONSOLELEVEL, "What log-level need messages to have to get displayed in your server console. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
-        set(Configuration.LOGGING_CHATLEVEL, "What log-level need messages to have to get displayed in the ingame chat. Values are:\n low: all messages\n med: med and high messages only\n high: high messages only\n off: no messages at all.");
+        set(Configuration.LOGGING_LOGTOFILE, "Should messages get logged to the specified logfile?");
+        set(Configuration.LOGGING_LOGTOCHAT, "Should messages get logged to the ingame chat?");
+        set(Configuration.LOGGING_LOGTOCONSOLE, "Should messages get logged to the server console?");
 
         set(Configuration.DEBUG_SHOWACTIVECHECKS, "Print to the console an overview of all checks that are enabled when NoCheat gets loaded.");
         set(Configuration.DEBUG_COMPATIBILITY, "Do some voodoo to fix common mistakes of other plugins which interfere with NoCheat.");
 
-        set(Configuration.INVENTORY_PREVENTITEMDUPE, "Close inventories of players before they get teleported between worlds, preventing creation of duplicate items.");
         set(Configuration.INVENTORY_CHECK, "If true, do various checks on Inventory related things.");
         set(Configuration.INVENTORY_DROP_CHECK, "If true, prevent players from dropping too many items in a short timeframe to reduce lag");
         set(Configuration.INVENTORY_DROP_TIMEFRAME, "Over how many seconds should item drops be counted.");
@@ -93,9 +92,6 @@ public class Explainations {
         set(Configuration.CHAT_SPAM_TIMEFRAME, "Over what timeframe (in seconds) should the messages be counted?\nWhen the time is over, counting starts at 0 again.");
         set(Configuration.CHAT_SPAM_LIMIT, "How many messages per timeframe may the player send without it counting as spamming?");
         set(Configuration.CHAT_SPAM_ACTIONS, "What should be done if a player is trying to spam the chat.\nUnit is number of chat messages above the limit you declared above.");
-
-        set(Configuration.CHAT_EMPTY_CHECK, "If true, check if a player is sending an empty message.");
-        set(Configuration.CHAT_EMPTY_ACTIONS, "What should be done if a player sends an empty message.\nUnit is number of empty chat messages sent by the player.");
 
         set(Configuration.FIGHT_CHECK, "If true, do various checks on Events related to fighting.");
         set(Configuration.FIGHT_DIRECTION_CHECK, "If true, check if a player is really looking at enemies that he attacks.");

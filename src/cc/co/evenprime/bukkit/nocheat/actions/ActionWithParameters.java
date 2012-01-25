@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.actions;
 
 import java.util.ArrayList;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 

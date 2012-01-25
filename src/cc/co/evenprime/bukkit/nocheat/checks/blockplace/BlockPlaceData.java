@@ -1,9 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.DataItem;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
@@ -18,7 +16,6 @@ public class BlockPlaceData implements DataItem {
     public double                 directionTotalVL           = 0.0D;
     public int                    directionFailed            = 0;
 
-    public final ExecutionHistory history                    = new ExecutionHistory();
     public long                   directionLastViolationTime = 0;
 
     public final SimpleLocation   blockPlacedAgainst         = new SimpleLocation();

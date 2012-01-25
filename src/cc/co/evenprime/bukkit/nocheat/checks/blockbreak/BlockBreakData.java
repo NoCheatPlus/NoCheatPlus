@@ -1,9 +1,7 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.DataItem;
-import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
@@ -25,8 +23,6 @@ public class BlockBreakData implements DataItem {
     public long                   directionLastViolationTime = 0;
     public final SimpleLocation   instaBrokenBlockLocation   = new SimpleLocation();
     public final SimpleLocation   brokenBlockLocation        = new SimpleLocation();
-
-    public final ExecutionHistory history                    = new ExecutionHistory();
 
     public double                 reachDistance;
     public boolean                armswung                   = true;

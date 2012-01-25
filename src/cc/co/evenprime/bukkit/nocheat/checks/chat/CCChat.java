@@ -14,8 +14,6 @@ public class CCChat implements ConfigItem {
     public final int        spamTimeframe;
     public final int        spamLimit;
     public final ActionList spamActions;
-    public final boolean    emptyCheck;
-    public final ActionList emptyActions;
     public final boolean    colorCheck;
     public final ActionList colorActions;
 
@@ -27,8 +25,6 @@ public class CCChat implements ConfigItem {
         spamTimeframe = data.getInteger(Configuration.CHAT_SPAM_TIMEFRAME);
         spamLimit = data.getInteger(Configuration.CHAT_SPAM_LIMIT);
         spamActions = data.getActionList(Configuration.CHAT_SPAM_ACTIONS);
-        emptyCheck = data.getBoolean(Configuration.CHAT_EMPTY_CHECK);
-        emptyActions = data.getActionList(Configuration.CHAT_EMPTY_ACTIONS);
         colorCheck = data.getBoolean(Configuration.CHAT_COLOR_CHECK);
         colorActions = data.getActionList(Configuration.CHAT_COLOR_ACTIONS);
 

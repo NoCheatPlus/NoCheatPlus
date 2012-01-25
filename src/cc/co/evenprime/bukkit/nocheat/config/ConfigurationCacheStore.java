@@ -2,8 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
-
 import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 
 /**
@@ -24,9 +22,9 @@ public class ConfigurationCacheStore {
      * Instantiate a config cache and populate it with the data of a
      * Config tree (and its parent tree)
      */
-    public ConfigurationCacheStore(Configuration data, Logger worldSpecificFileLogger) {
+    public ConfigurationCacheStore(Configuration data) {
 
-        logging = new CCLogging(data, worldSpecificFileLogger);
+        logging = new CCLogging(data);
         debug = new CCDebug(data);
 
         this.data = data;

@@ -29,4 +29,17 @@ public abstract class Action {
         this.delay = delay;
         this.repeat = repeat;
     }
+
+    /**
+     * Make a copy of the action, with some modifications
+     * @param string
+     * @return
+     */
+    public Action cloneWithProperties(String string) {
+        return this;
+    }
+    
+    public String getProperties() {
+        return null;
+    }
 }
