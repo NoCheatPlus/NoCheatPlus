@@ -3,17 +3,18 @@ package cc.co.evenprime.bukkit.nocheat.checks.moving;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
-
+import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
@@ -21,8 +22,6 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
-import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 /**
  * The only place that listens to and modifies player_move events if necessary
@@ -31,27 +30,27 @@ import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
  * evaluate the check results and decide what to
  * 
  */
-public class MovingEventManager extends EventManagerImpl {
+public class MovingCheckListener implements Listener, EventManager {
 
     private final List<MovingCheck> checks;
+    private final NoCheat           plugin;
 
-    public MovingEventManager(NoCheat plugin) {
-
-        super(plugin);
+    public MovingCheckListener(NoCheat plugin) {
 
         this.checks = new ArrayList<MovingCheck>(2);
 
         checks.add(new RunflyCheck(plugin));
         checks.add(new MorePacketsCheck(plugin));
 
-        registerListener(Event.Type.PLAYER_MOVE, Priority.Lowest, true, plugin.getPerformance(EventType.MOVING));
-        registerListener(Event.Type.PLAYER_VELOCITY, Priority.Monitor, true, plugin.getPerformance(EventType.VELOCITY));
-        registerListener(Event.Type.BLOCK_PLACE, Priority.Monitor, true, plugin.getPerformance(EventType.BLOCKPLACE));
-        registerListener(Event.Type.PLAYER_TELEPORT, Priority.Highest, false, null);
+        this.plugin = plugin;
+        
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    @Override
-    protected void handleBlockPlaceEvent(final BlockPlaceEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void blockPlace(final BlockPlaceEvent event) {
+        if(event.isCancelled())
+            return;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         // Get the player-specific stored data that applies here
@@ -80,8 +79,8 @@ public class MovingEventManager extends EventManagerImpl {
         }
     }
 
-    @Override
-    protected void handlePlayerTeleportEvent(final PlayerTeleportEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    protected void teleport(final PlayerTeleportEvent event) {
 
         // No typo here, I really want to only handle cancelled events
         if(!event.isCancelled())
@@ -97,9 +96,11 @@ public class MovingEventManager extends EventManagerImpl {
 
     }
 
-    @Override
-    protected void handlePlayerMoveEvent(final PlayerMoveEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    protected void handlePlayerMoveEvent(final PlayerMoveEvent event) {
 
+        if(event.isCancelled())
+            return;
         // Get the world-specific configuration that applies here
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
 
@@ -172,9 +173,10 @@ public class MovingEventManager extends EventManagerImpl {
         }
     }
 
-    @Override
-    protected void handlePlayerVelocityEvent(final PlayerVelocityEvent event, final Priority priority) {
-
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected void handlePlayerVelocityEvent(final PlayerVelocityEvent event) {
+        if(event.isCancelled())
+            return;
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
 
         final Vector v = event.getVelocity();

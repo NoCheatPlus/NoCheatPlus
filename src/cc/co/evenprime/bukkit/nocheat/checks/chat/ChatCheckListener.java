@@ -3,42 +3,46 @@ package cc.co.evenprime.bukkit.nocheat.checks.chat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.ChatData;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
-import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
-public class ChatEventManager extends EventManagerImpl {
+public class ChatCheckListener implements Listener, EventManager {
 
     private final List<ChatCheck> checks;
+    private NoCheat               plugin;
 
-    public ChatEventManager(NoCheat plugin) {
-
-        super(plugin);
+    public ChatCheckListener(NoCheat plugin) {
 
         this.checks = new ArrayList<ChatCheck>(3);
         this.checks.add(new EmptyCheck(plugin));
         this.checks.add(new SpamCheck(plugin));
         this.checks.add(new ColorCheck(plugin));
 
-        registerListener(Event.Type.PLAYER_CHAT, Priority.Lowest, true, plugin.getPerformance(EventType.CHAT));
-        registerListener(Event.Type.PLAYER_COMMAND_PREPROCESS, Priority.Lowest, true, plugin.getPerformance(EventType.CHAT));
+        this.plugin = plugin;
+        
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    @Override
-    protected void handlePlayerCommandPreprocessEvent(final PlayerCommandPreprocessEvent event, final Priority priority) {
-        handlePlayerChatEvent((PlayerChatEvent) event, priority);
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void commandPreprocess(final PlayerCommandPreprocessEvent event) {
+        chat((PlayerChatEvent) event);
     }
 
-    @Override
-    protected void handlePlayerChatEvent(final PlayerChatEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void chat(final PlayerChatEvent event) {
+
+        if(event.isCancelled())
+            return;
 
         boolean cancelled = false;
 

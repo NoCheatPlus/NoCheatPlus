@@ -3,40 +3,43 @@ package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
-
+import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
-import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 /**
  * Central location to listen to Block-related events and dispatching them to
  * checks
  * 
  */
-public class BlockPlaceEventManager extends EventManagerImpl {
+public class BlockPlaceCheckListener implements Listener, EventManager {
 
     private final List<BlockPlaceCheck> checks;
+    private final NoCheat               plugin;
 
-    public BlockPlaceEventManager(NoCheat plugin) {
+    public BlockPlaceCheckListener(NoCheat plugin) {
 
-        super(plugin);
+        this.plugin = plugin;
 
         this.checks = new ArrayList<BlockPlaceCheck>(2);
         this.checks.add(new ReachCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
-
-        registerListener(Event.Type.BLOCK_PLACE, Priority.Lowest, true, plugin.getPerformance(EventType.BLOCKPLACE));
+        
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    @Override
-    protected void handleBlockPlaceEvent(BlockPlaceEvent event, Priority priority) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    protected void handleBlockPlaceEvent(BlockPlaceEvent event) {
+
+        if(event.isCancelled())
+            return;
 
         if(event.getBlock() == null || event.getBlockAgainst() == null)
             return;

@@ -3,39 +3,50 @@ package cc.co.evenprime.bukkit.nocheat.checks.fight;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerAnimationEvent;
-
+import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
-import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
-public class FightEventManager extends EventManagerImpl {
+public class FightCheckListener implements Listener, EventManager {
 
     private final List<FightCheck> checks;
+    private NoCheat                plugin;
 
-    public FightEventManager(NoCheat plugin) {
-        super(plugin);
+    public FightCheckListener(NoCheat plugin) {
 
         this.checks = new ArrayList<FightCheck>(3);
         this.checks.add(new NoswingCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
 
-        registerListener(Event.Type.ENTITY_DAMAGE, Priority.Lowest, true, plugin.getPerformance(EventType.FIGHT));
-        registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false, null);
+        this.plugin = plugin;
+
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    @Override
-    protected void handleEntityAttackDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void entityDamage(final EntityDamageByEntityEvent event) {
+        if(event.isCancelled())
+            return;
+
+        if(event.getCause() == DamageCause.ENTITY_ATTACK) {
+            normalDamage(event);
+        } else {
+            customDamage(event);
+        }
+    }
+
+    private void normalDamage(final EntityDamageByEntityEvent event) {
 
         final Player damager = (Player) event.getDamager();
 
@@ -72,23 +83,7 @@ public class FightEventManager extends EventManagerImpl {
             event.setCancelled(cancelled);
     }
 
-    @Override
-    protected void handleProjectileDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
-
-        final Player damager = (Player) ((Projectile) event.getDamager()).getShooter();
-        final NoCheatPlayer player = plugin.getPlayer(damager);
-
-        final FightData data = FightCheck.getData(player.getDataStore());
-
-        // Skip the next damage event, because it is the same as this one
-        // just mislabelled as a "direct" attack from one player onto another
-        data.skipNext = true;
-
-        return;
-    }
-
-    @Override
-    protected void handleCustomDamageByPlayerEvent(final EntityDamageByEntityEvent event, final Priority priority) {
+    private void customDamage(final EntityDamageByEntityEvent event) {
 
         final Player damager = (Player) event.getDamager();
         final NoCheatPlayer player = plugin.getPlayer(damager);
@@ -102,8 +97,8 @@ public class FightEventManager extends EventManagerImpl {
         return;
     }
 
-    @Override
-    protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected void armSwing(final PlayerAnimationEvent event) {
         FightCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore()).armswung = true;
     }
 

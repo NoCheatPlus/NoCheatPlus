@@ -4,30 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakEventManager;
-import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceEventManager;
-import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatEventManager;
-import cc.co.evenprime.bukkit.nocheat.checks.fight.FightEventManager;
-import cc.co.evenprime.bukkit.nocheat.checks.inventory.InventoryEventManager;
-import cc.co.evenprime.bukkit.nocheat.checks.moving.MovingEventManager;
+import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakCheckListener;
+import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceCheckListener;
+import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatCheckListener;
+import cc.co.evenprime.bukkit.nocheat.checks.fight.FightCheckListener;
+import cc.co.evenprime.bukkit.nocheat.checks.inventory.InventoryCheckListener;
+import cc.co.evenprime.bukkit.nocheat.checks.moving.MovingCheckListener;
 import cc.co.evenprime.bukkit.nocheat.command.CommandHandler;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
 import cc.co.evenprime.bukkit.nocheat.data.PlayerManager;
 import cc.co.evenprime.bukkit.nocheat.debug.ActiveCheckPrinter;
 import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
-import cc.co.evenprime.bukkit.nocheat.debug.Performance;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
-import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
 import cc.co.evenprime.bukkit.nocheat.log.LogLevel;
 import cc.co.evenprime.bukkit.nocheat.log.LogManager;
@@ -44,9 +38,8 @@ public class NoCheat extends JavaPlugin {
     private ConfigurationManager   conf;
     private LogManager             log;
     private PlayerManager          players;
-    private PerformanceManager     performance;
 
-    private List<EventManagerImpl> eventManagers;
+    private List<EventManager> eventManagers;
 
     private LagMeasureTask         lagMeasureTask;
 
@@ -92,18 +85,15 @@ public class NoCheat extends JavaPlugin {
         // Then read the configuration files
         this.conf = new ConfigurationManager(this.getDataFolder());
 
-        // Then set up the performance counters
-        this.performance = new PerformanceManager();
-
-        eventManagers = new ArrayList<EventManagerImpl>(8); // Big enough
+        eventManagers = new ArrayList<EventManager>(8); // Big enough
         // Then set up the event listeners
-        eventManagers.add(new MovingEventManager(this));
+        eventManagers.add(new MovingCheckListener(this));
         eventManagers.add(new WorkaroundsEventManager(this));
-        eventManagers.add(new ChatEventManager(this));
-        eventManagers.add(new BlockBreakEventManager(this));
-        eventManagers.add(new BlockPlaceEventManager(this));
-        eventManagers.add(new FightEventManager(this));
-        eventManagers.add(new InventoryEventManager(this));
+        eventManagers.add(new ChatCheckListener(this));
+        eventManagers.add(new BlockBreakCheckListener(this));
+        eventManagers.add(new BlockPlaceCheckListener(this));
+        eventManagers.add(new FightCheckListener(this));
+        eventManagers.add(new InventoryCheckListener(this));
 
         // Then set up a task to monitor server lag
         if(lagMeasureTask == null) {
@@ -138,10 +128,6 @@ public class NoCheat extends JavaPlugin {
 
     public void clearCriticalData(String playerName) {
         players.clearCriticalData(playerName);
-    }
-
-    public Performance getPerformance(EventType type) {
-        return performance.get(type);
     }
 
     @Override

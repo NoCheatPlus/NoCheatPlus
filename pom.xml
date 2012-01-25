@@ -9,40 +9,41 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>bukkit-plugins</id>
-			<url>http://repo.bukkit.org/artifactory/plugins-release</url>
-		</pluginRepository>
-	</pluginRepositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
-			<version>1.0.1-R2-20111212.231953-2</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.0.1-R2-SNAPSHOT</version>
+			<version>1.1-R2-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+	<distributionManagement>
+		<repository>
+			<id>repobo-rel</id>
+			<name>repo.bukkit.org Releases</name>
+			<url>http://repo.bukkit.org/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>repobo-snap</id>
+			<name>repo.bukkit.org Snapshots</name>
+			<url>http://repo.bukkit.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<repositories>
 		<repository>
-			<id>bukkit-repo</id>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<url>http://repo.bukkit.org/artifactory/repo</url>
+			<id>repobo-snap</id>
+			<url>http://repo.bukkit.org/content/groups/public</url>
 		</repository>
 	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>bukkit-plugins</id>
+			<url>http://repo.bukkit.org/content/groups/public</url>
+		</pluginRepository>
+	</pluginRepositories>
 	<description>Detect and Fight the exploitation of various Flaws/Bugs in Minecraft.</description>
 	<url>http://dev.bukkit.org/server-mods/nocheat</url>
 	<scm>

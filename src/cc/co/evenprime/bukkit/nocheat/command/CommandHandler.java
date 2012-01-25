@@ -11,8 +11,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.debug.Performance;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
 
 public class CommandHandler {
 
@@ -31,11 +29,6 @@ public class CommandHandler {
         } else if(args[0].equalsIgnoreCase("reload")) {
             // reload command was used
             result = handleReloadCommand(plugin, sender);
-        }
-
-        else if(args[0].equalsIgnoreCase("performance")) {
-            // performance command was used
-            result = handlePerformanceCommand(plugin, sender);
         }
 
         else if(args[0].equalsIgnoreCase("playerinfo") && args.length >= 2) {
@@ -120,31 +113,6 @@ public class CommandHandler {
         sender.sendMessage("[NoCheat] Reloading configuration");
         plugin.reloadConfiguration();
         sender.sendMessage("[NoCheat] Configuration reloaded");
-
-        return true;
-    }
-
-    private static boolean handlePerformanceCommand(NoCheat plugin, CommandSender sender) {
-
-        sender.sendMessage("[NoCheat] Retrieving performance statistics");
-
-        long totalTime = 0;
-
-        for(EventType type : EventType.values()) {
-            Performance p = plugin.getPerformance(type);
-
-            long total = p.getTotalTime();
-            totalTime += total;
-
-            StringBuilder string = new StringBuilder("").append(type.toString());
-            string.append(": total ").append(Performance.toString(total));
-            string.append(", relative ").append(Performance.toString(p.getRelativeTime()));
-            string.append(" over ").append(p.getCounter()).append(" events.");
-
-            sender.sendMessage(string.toString());
-        }
-
-        sender.sendMessage("Total time spent: " + Performance.toString(totalTime));
 
         return true;
     }

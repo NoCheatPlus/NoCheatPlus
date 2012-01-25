@@ -15,7 +15,6 @@ commands:
     usage: |
            /<command> permlist player [permission] - to list the NoCheat relevant permissions of the player, optionally only those starting with [permission]
            /<command> reload - to reload NoCheats configuration file(s), without reloading the plugin itself
-           /<command> performance - to show some performance data of NoCheat
            /<command> playerinfo playername - show the collected data NoCheat collected about a player
 
 permissions:

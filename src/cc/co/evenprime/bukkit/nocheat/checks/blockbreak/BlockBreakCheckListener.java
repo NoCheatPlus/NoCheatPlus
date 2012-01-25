@@ -3,48 +3,47 @@ package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-
+import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.debug.PerformanceManager.EventType;
-import cc.co.evenprime.bukkit.nocheat.events.EventManagerImpl;
 
 /**
- * Central location to listen to player-interact events and dispatch them to
- * relevant checks
+ * Central location to listen to events that are 
+ * relevant for the blockbreak checks
  * 
  */
-public class BlockBreakEventManager extends EventManagerImpl {
+public class BlockBreakCheckListener implements Listener, EventManager {
 
     private final List<BlockBreakCheck> checks;
+    private final NoCheat plugin;
 
-    public BlockBreakEventManager(NoCheat plugin) {
-
-        super(plugin);
+    public BlockBreakCheckListener(NoCheat plugin) {
 
         // Three checks exist for this event type
         this.checks = new ArrayList<BlockBreakCheck>(3);
         this.checks.add(new NoswingCheck(plugin));
         this.checks.add(new ReachCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
-
-        registerListener(Event.Type.BLOCK_BREAK, Priority.Lowest, true, plugin.getPerformance(EventType.BLOCKBREAK));
-        registerListener(Event.Type.BLOCK_DAMAGE, Priority.Monitor, true, null);
-        registerListener(Event.Type.PLAYER_INTERACT, Priority.Monitor, false, null);
-        registerListener(Event.Type.PLAYER_ANIMATION, Priority.Monitor, false, null);
+        
+        this.plugin = plugin;
+        
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    @Override
-    protected void handleBlockBreakEvent(final BlockBreakEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void blockBreak(final BlockBreakEvent event) {
+
+        if(event.isCancelled()) return;
 
         boolean cancelled = false;
 
@@ -78,9 +77,11 @@ public class BlockBreakEventManager extends EventManagerImpl {
             event.setCancelled(cancelled);
     }
 
-    @Override
-    protected void handleBlockDamageEvent(final BlockDamageEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void blockHit(final BlockDamageEvent event) {
 
+        if(event.isCancelled()) return;
+        
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         BlockBreakData data = BlockBreakCheck.getData(player.getDataStore());
 
@@ -93,8 +94,8 @@ public class BlockBreakEventManager extends EventManagerImpl {
 
     }
 
-    @Override
-    protected void handlePlayerInteractEvent(final PlayerInteractEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void blockInteract(final PlayerInteractEvent event) {
 
         if(event.getClickedBlock() == null)
             return;
@@ -106,8 +107,8 @@ public class BlockBreakEventManager extends EventManagerImpl {
         data.lastDamagedBlock.set(event.getClickedBlock());
     }
 
-    @Override
-    protected void handlePlayerAnimationEvent(final PlayerAnimationEvent event, final Priority priority) {
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void armSwing(final PlayerAnimationEvent event) {
         BlockBreakCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore()).armswung = true;
     }
 
