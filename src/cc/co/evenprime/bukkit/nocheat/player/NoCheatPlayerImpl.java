@@ -97,10 +97,6 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         return player.getGameMode() == GameMode.CREATIVE;
     }
 
-    public void closeInventory() {
-        ((CraftPlayer) this.player).getHandle().closeInventory();
-    }
-
     @Override
     public ExecutionHistory getExecutionHistory() {
         return history;

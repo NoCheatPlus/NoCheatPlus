@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.events;
+package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,11 +21,11 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
  * to relevant checks
  * 
  */
-public class WorkaroundsEventManager implements Listener, EventManager {
+public class WorkaroundsListener implements Listener, EventManager {
 
     private final NoCheat plugin;
 
-    public WorkaroundsEventManager(NoCheat plugin) {
+    public WorkaroundsListener(NoCheat plugin) {
 
         this.plugin = plugin;
     }

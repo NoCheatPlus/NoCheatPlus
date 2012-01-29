@@ -1,4 +1,4 @@
-package cc.co.evenprime.bukkit.nocheat.log;
+package cc.co.evenprime.bukkit.nocheat;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -21,6 +21,10 @@ public class NoCheatLogEvent extends Event {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     public String getMessage() {

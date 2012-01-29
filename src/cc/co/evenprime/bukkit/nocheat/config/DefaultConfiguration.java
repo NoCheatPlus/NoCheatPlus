@@ -24,7 +24,7 @@ public class DefaultConfiguration extends Configuration {
             setValue(LOGGING_FILENAME, "nocheat.log");
             setValue(LOGGING_LOGTOFILE, true);
             setValue(LOGGING_LOGTOCONSOLE, true);
-            setValue(LOGGING_LOGTOCHAT, true);
+            setValue(LOGGING_LOGTOINGAMECHAT, true);
         }
 
         /*** DEBUG ***/
@@ -42,7 +42,7 @@ public class DefaultConfiguration extends Configuration {
             setValue(INVENTORY_DROP_LIMIT, 100);
 
             ActionList dropActionList = new ActionList();
-            dropActionList.setActions(0, action.getActions("dropLog:co,ch,fi dropkick".split(" ")));
+            dropActionList.setActions(0, action.getActions("dropLog:0:1:co,ch,fi dropkick".split(" ")));
             setValue(INVENTORY_DROP_ACTIONS, dropActionList);
 
         }
@@ -66,16 +66,16 @@ public class DefaultConfiguration extends Configuration {
             setValue(MOVING_RUNFLY_SWIMMINGSPEEDLIMIT, 18);
 
             ActionList movingActionList = new ActionList();
-            movingActionList.setActions(0, action.getActions("moveLogShort:fi moveCancel".split(" ")));
-            movingActionList.setActions(100, action.getActions("moveLogShort:ch,fi moveCancel".split(" ")));
-            movingActionList.setActions(400, action.getActions("moveLogLong:co,ch,fi moveCancel".split(" ")));
+            movingActionList.setActions(0, action.getActions("moveLogShort:3:5:fi moveCancel".split(" ")));
+            movingActionList.setActions(100, action.getActions("moveLogShort:0:5:ch,fi moveCancel".split(" ")));
+            movingActionList.setActions(400, action.getActions("moveLogLong:0:5:co,ch,fi moveCancel".split(" ")));
             setValue(MOVING_RUNFLY_ACTIONS, movingActionList);
 
             setValue(MOVING_RUNFLY_CHECKNOFALL, true);
             setValue(MOVING_RUNFLY_NOFALLMULTIPLIER, 200);
 
             ActionList nofallActionList = new ActionList();
-            nofallActionList.setActions(0, action.getActions("nofallLog:co,ch,fi nofallDamage".split(" ")));
+            nofallActionList.setActions(0, action.getActions("nofallLog:0:5:co,ch,fi nofallDamage".split(" ")));
             setValue(MOVING_RUNFLY_NOFALLACTIONS, nofallActionList);
 
             setValue(MOVING_RUNFLY_ALLOWLIMITEDFLYING, false);
@@ -84,17 +84,17 @@ public class DefaultConfiguration extends Configuration {
             setValue(MOVING_RUNFLY_FLYINGHEIGHTLIMIT, 250);
 
             ActionList flyingActionList = new ActionList();
-            flyingActionList.setActions(0, action.getActions("moveLogShort:fi moveCancel".split(" ")));
-            flyingActionList.setActions(100, action.getActions("moveLogShort:ch,fi moveCancel".split(" ")));
-            flyingActionList.setActions(400, action.getActions("moveLogShort:co,ch,fi moveCancel".split(" ")));
+            flyingActionList.setActions(0, action.getActions("moveLogShort:3:5:fi moveCancel".split(" ")));
+            flyingActionList.setActions(100, action.getActions("moveLogShort:0:5:ch,fi moveCancel".split(" ")));
+            flyingActionList.setActions(400, action.getActions("moveLogShort:0:5:co,ch,fi moveCancel".split(" ")));
             setValue(MOVING_RUNFLY_FLYINGACTIONS, flyingActionList);
 
             setValue(MOVING_MOREPACKETS_CHECK, true);
 
             ActionList morepacketsActionList = new ActionList();
-            morepacketsActionList.setActions(0, action.getActions("morepackets:fi moveCancel".split(" ")));
-            morepacketsActionList.setActions(30, action.getActions("morepackets:ch,fi moveCancel".split(" ")));
-            morepacketsActionList.setActions(60, action.getActions("morepackets:co,ch,fi moveCancel".split(" ")));
+            morepacketsActionList.setActions(0, action.getActions("morepackets:3:2:fi moveCancel".split(" ")));
+            morepacketsActionList.setActions(30, action.getActions("morepackets:0:2:ch,fi moveCancel".split(" ")));
+            morepacketsActionList.setActions(60, action.getActions("morepackets:0:2:co,ch,fi moveCancel".split(" ")));
             setValue(MOVING_MOREPACKETS_ACTIONS, morepacketsActionList);
 
         }
@@ -107,7 +107,7 @@ public class DefaultConfiguration extends Configuration {
 
             ActionList reachActionList = new ActionList();
             reachActionList.setActions(0, action.getActions("blockbreakCancel".split(" ")));
-            reachActionList.setActions(5, action.getActions("reachLog:fi,ch blockbreakCancel".split(" ")));
+            reachActionList.setActions(5, action.getActions("reachLog:0:2:fi,ch blockbreakCancel".split(" ")));
             setValue(BLOCKBREAK_REACH_ACTIONS, reachActionList);
 
             setValue(BLOCKBREAK_DIRECTION_CHECK, true);
@@ -116,12 +116,12 @@ public class DefaultConfiguration extends Configuration {
             setValue(BLOCKBREAK_DIRECTION_PENALTYTIME, 300);
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("blockbreakCancel".split(" ")));
-            directionActionList.setActions(10, action.getActions("directionLog:fi,co,ch blockbreakCancel".split(" ")));
+            directionActionList.setActions(10, action.getActions("directionLog:0:5:fi,co,ch blockbreakCancel".split(" ")));
             setValue(BLOCKBREAK_DIRECTION_ACTIONS, directionActionList);
 
             setValue(BLOCKBREAK_NOSWING_CHECK, true);
             ActionList noswingActionList = new ActionList();
-            noswingActionList.setActions(0, action.getActions("noswingLog:fi,co,ch blockbreakCancel".split(" ")));
+            noswingActionList.setActions(0, action.getActions("noswingLog:0:2:fi,co,ch blockbreakCancel".split(" ")));
             setValue(BLOCKBREAK_NOSWING_ACTIONS, noswingActionList);
         }
 
@@ -133,7 +133,7 @@ public class DefaultConfiguration extends Configuration {
 
             ActionList reachActionList = new ActionList();
             reachActionList.setActions(0, action.getActions("blockplaceCancel".split(" ")));
-            reachActionList.setActions(5, action.getActions("reachLog:fi,co,ch blockplaceCancel".split(" ")));
+            reachActionList.setActions(5, action.getActions("reachLog:0:2:fi,co,ch blockplaceCancel".split(" ")));
             setValue(BLOCKPLACE_REACH_ACTIONS, reachActionList);
 
             setValue(BLOCKPLACE_DIRECTION_CHECK, true);
@@ -141,7 +141,7 @@ public class DefaultConfiguration extends Configuration {
             setValue(BLOCKPLACE_DIRECTION_PENALTYTIME, 100);
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("blockplaceCancel".split(" ")));
-            directionActionList.setActions(10, action.getActions("directionLog:fi,co,ch blockplaceCancel".split(" ")));
+            directionActionList.setActions(10, action.getActions("directionLog:0:3:fi,co,ch blockplaceCancel".split(" ")));
             setValue(BLOCKPLACE_DIRECTION_ACTIONS, directionActionList);
         }
 
@@ -151,7 +151,7 @@ public class DefaultConfiguration extends Configuration {
 
             setValue(CHAT_COLOR_CHECK, true);
             ActionList colorActionList = new ActionList();
-            colorActionList.setActions(0, action.getActions("colorLog:fi,co,ch chatCancel".split(" ")));
+            colorActionList.setActions(0, action.getActions("colorLog:0:1:fi,co,ch chatCancel".split(" ")));
             setValue(CHAT_COLOR_ACTIONS, colorActionList);
 
             setValue(CHAT_SPAM_CHECK, true);
@@ -160,8 +160,8 @@ public class DefaultConfiguration extends Configuration {
             setValue(CHAT_SPAM_LIMIT, 5);
 
             ActionList spamActionList = new ActionList();
-            spamActionList.setActions(0, action.getActions("spamLog:fi,co,ch chatCancel".split(" ")));
-            spamActionList.setActions(50, action.getActions("spamLog:fi,co,ch chatCancel spamkick".split(" ")));
+            spamActionList.setActions(0, action.getActions("spamLog:0:5:fi,co,ch chatCancel".split(" ")));
+            spamActionList.setActions(50, action.getActions("spamLog:0:5:fi,co,ch chatCancel spamkick".split(" ")));
             setValue(CHAT_SPAM_ACTIONS, spamActionList);
         }
 
@@ -175,14 +175,14 @@ public class DefaultConfiguration extends Configuration {
 
             ActionList directionActionList = new ActionList();
             directionActionList.setActions(0, action.getActions("fightCancel".split(" ")));
-            directionActionList.setActions(5, action.getActions("fightDirectionLog:fi fightCancel".split(" ")));
-            directionActionList.setActions(20, action.getActions("fightDirectionLog:fi,ch fightCancel".split(" ")));
-            directionActionList.setActions(50, action.getActions("fightDirectionLog:fi,ch,co fightCancel".split(" ")));
+            directionActionList.setActions(5, action.getActions("fightDirectionLog:3:5:fi fightCancel".split(" ")));
+            directionActionList.setActions(20, action.getActions("fightDirectionLog:0:5:fi,ch fightCancel".split(" ")));
+            directionActionList.setActions(50, action.getActions("fightDirectionLog:0:5:fi,ch,co fightCancel".split(" ")));
             setValue(FIGHT_DIRECTION_ACTIONS, directionActionList);
 
             setValue(FIGHT_NOSWING_CHECK, true);
             ActionList noswingActionList = new ActionList();
-            noswingActionList.setActions(0, action.getActions("noswingLog fightCancel".split(" ")));
+            noswingActionList.setActions(0, action.getActions("noswingLog:0:5:fi,ch,co fightCancel".split(" ")));
             setValue(FIGHT_NOSWING_ACTIONS, noswingActionList);
         }
     }
@@ -242,21 +242,12 @@ public class DefaultConfiguration extends Configuration {
             w(w, "#   - Then comes the 'message', depending on where the action is used, different keywords in [ ] may be used");
             w(w, "");
             w(w, "# Gives a very short log message of the violation, only containing name, violation type and total violation value, at most once every 15 seconds, only if more than 3 violations happened within the last minute (low) and immediatly (med,high)");
-            w(w, "log moveLogLowShort 3 15 [player] failed [check]. VL [violations]");
-            w(w, "log moveLogMedShort 0 15 [player] failed [check]. VL [violations]");
-            w(w, "log moveLogHighShort 0 15 [player] failed [check]. VL [violations]");
             w(w, "log moveLogShort 0 5 [player] failed [check]. VL [violations]");
             w(w, "");
             w(w, "# Gives a log message of the violation, only containing name, violation type and total violation value, at most once every second, only if more than 5 violations happened within the last minute (low) and immediatly (med,high)");
-            w(w, "log morepacketsLow 5 1 [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
-            w(w, "log morepacketsMed 0 1 [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
-            w(w, "log morepacketsHigh 0 1 [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
             w(w, "log morepackets 0 1 [player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations].");
             w(w, "");
             w(w, "# Gives a lengthy log message of the violation, containing name, location, violation type and total violation, at most once every 15 seconds, only if more than 3 violations happened within the last minute (low) and immediatly (med,high)");
-            w(w, "log moveLogLowLong 3 15 [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
-            w(w, "log moveLogMedLong 0 15 [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
-            w(w, "log moveLogHighLong 0 15 [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
             w(w, "log moveLogLong 0 5 [player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
             w(w, "");
             w(w, "# Some other log messages that are limited a bit by default, to avoid too extreme spam");

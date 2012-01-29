@@ -7,10 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.List;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
-import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 import cc.co.evenprime.bukkit.nocheat.config.util.OptionNode;
@@ -99,22 +96,7 @@ public class FlatFileConfiguration extends Configuration {
         }
         int th = Integer.parseInt(treshold);
 
-        List<Action> actions = new LinkedList<Action>();
-
-        for(String name : value.split("\\s+")) {
-            String nameParts[] = name.split(":", 2);
-            Action a2 = action.getAction(nameParts[0]);
-            if(a2 == null) {
-                System.out.println("Nocheat: Action with name " + nameParts[0] + " isn't defined. You need to define it in your actions.txt file to make it work.");
-                actions.add(new DummyAction(name, 0, 0));
-            } else if(nameParts.length == 2) {
-                actions.add(a2.cloneWithProperties(nameParts[1]));
-            } else {
-                actions.add(a2);
-            }
-        }
-
-        al.setActions(th, actions.toArray(new Action[actions.size()]));
+        al.setActions(th, action.getActions(value.split("\\s+")));
         return al;
     }
 

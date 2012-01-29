@@ -9,61 +9,63 @@ import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
  */
 public class MovingData implements DataItem {
 
-    public double                 runflyVL;
+    public double                runflyVL;
 
-    public double                 runflyRunningTotalVL;
-    public int                    runflyRunningFailed;
+    public double                runflyRunningTotalVL;
+    public int                   runflyRunningFailed;
 
-    public double                 runflyFlyingTotalVL;
-    public int                    runflyFlyingFailed;
+    public double                runflyFlyingTotalVL;
+    public int                   runflyFlyingFailed;
 
-    public double                 runflySneakingTotalVL;
-    public int                    runflySneakingFailed;
+    public double                runflySneakingTotalVL;
+    public int                   runflySneakingFailed;
 
-    public double                 runflySwimmingTotalVL;
-    public int                    runflySwimmingFailed;
+    public double                runflySwimmingTotalVL;
+    public int                   runflySwimmingFailed;
 
-    public double                 nofallVL;
-    public double                 nofallTotalVL;
-    public int                    nofallFailed;
+    public double                nofallVL;
+    public double                nofallTotalVL;
+    public int                   nofallFailed;
 
-    public double                 morePacketsVL;
-    public double                 morePacketsTotalVL;
-    public int                    morePacketsFailed;
+    public double                morePacketsVL;
+    public double                morePacketsTotalVL;
+    public int                   morePacketsFailed;
 
-    public int                    jumpPhase;
+    public int                   jumpPhase;
 
-    public final PreciseLocation  runflySetBackPoint      = new PreciseLocation();
+    public final PreciseLocation runflySetBackPoint      = new PreciseLocation();
 
-    public double                 vertFreedom;
-    public double                 vertVelocity;
-    public int                    vertVelocityCounter;
-    public double                 horizFreedom;
-    public int                    horizVelocityCounter;
+    public double                vertFreedom;
+    public double                vertVelocity;
+    public int                   vertVelocityCounter;
+    public double                horizFreedom;
+    public int                   horizVelocityCounter;
 
-    public float                  fallDistance;
-    public float                  lastAddedFallDistance;
+    public float                 fallDistance;
+    public float                 lastAddedFallDistance;
 
-    public double                 horizontalBuffer;
-    public int                    bunnyhopdelay;
+    public double                horizontalBuffer;
+    public int                   bunnyhopdelay;
 
-    public int                    morePacketsCounter;
-    public int                    morePacketsBuffer       = 50;
-    public int                    packets;
+    public int                   morePacketsCounter;
+    public int                   morePacketsBuffer       = 50;
+    public int                   packets;
 
-    public final PreciseLocation  morePacketsSetbackPoint = new PreciseLocation();
+    public final PreciseLocation morePacketsSetbackPoint = new PreciseLocation();
 
-    public final PreciseLocation  teleportTo              = new PreciseLocation();
+    public final PreciseLocation teleportTo              = new PreciseLocation();
 
-    public int                    lastElapsedIngameSeconds;
+    public int                   lastElapsedIngameSeconds;
 
-    public final PreciseLocation  from                    = new PreciseLocation();
-    public final PreciseLocation  to                      = new PreciseLocation();
+    public final PreciseLocation from                    = new PreciseLocation();
+    public final PreciseLocation to                      = new PreciseLocation();
 
-    public boolean                fromOnOrInGround;
-    public boolean                toOnOrInGround;
+    public boolean               fromOnOrInGround;
+    public boolean               toOnOrInGround;
 
-    public String                 checknamesuffix         = "";
+    public String                checknamesuffix         = "";
+
+    public int                   onIce                   = 0;
 
     @Override
     public void clearCriticalData() {

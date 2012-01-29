@@ -1,7 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Locale;
-
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
@@ -144,6 +145,14 @@ public class RunningCheck extends MovingCheck {
 
         String suffix = null;
 
+        // Player on ice?
+        Block b = player.getPlayer().getLocation().getBlock();
+        if(b.getType() == Material.ICE || b.getRelative(0, -1, 0).getType() == Material.ICE) {
+            data.onIce = 20;
+        } else if(data.onIce > 0) {
+            data.onIce--;
+        }
+
         if(cc.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
             limit = cc.sneakingSpeedLimit;
             suffix = "sneaking";
@@ -156,6 +165,10 @@ public class RunningCheck extends MovingCheck {
         } else {
             limit = cc.sprintingSpeedLimit;
             suffix = "sprinting";
+        }
+
+        if(data.onIce > 0) {
+            limit *= 2.5;
         }
 
         // Taken directly from Minecraft code, should work

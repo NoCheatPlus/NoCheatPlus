@@ -15,6 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import cc.co.evenprime.bukkit.nocheat.checks.WorkaroundsListener;
 import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakCheckListener;
 import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceCheckListener;
 import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatCheckListener;
@@ -28,8 +29,6 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PlayerManager;
 import cc.co.evenprime.bukkit.nocheat.debug.ActiveCheckPrinter;
 import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
-import cc.co.evenprime.bukkit.nocheat.events.WorkaroundsEventManager;
-import cc.co.evenprime.bukkit.nocheat.log.NoCheatLogEvent;
 
 /**
  * 
@@ -46,7 +45,7 @@ public class NoCheat extends JavaPlugin implements Listener {
     private List<EventManager>   eventManagers;
 
     private LagMeasureTask       lagMeasureTask;
-    private Logger fileLogger;
+    private Logger               fileLogger;
 
     public NoCheat() {
 
@@ -83,7 +82,7 @@ public class NoCheat extends JavaPlugin implements Listener {
         eventManagers = new ArrayList<EventManager>(8); // Big enough
         // Then set up the event listeners
         eventManagers.add(new MovingCheckListener(this));
-        eventManagers.add(new WorkaroundsEventManager(this));
+        eventManagers.add(new WorkaroundsListener(this));
         eventManagers.add(new ChatCheckListener(this));
         eventManagers.add(new BlockBreakCheckListener(this));
         eventManagers.add(new BlockPlaceCheckListener(this));
@@ -197,18 +196,20 @@ public class NoCheat extends JavaPlugin implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void logEvent(NoCheatLogEvent event) {
         if(event.toConsole()) {
-            System.out.println(event.getPrefix() + event.getMessage());
+            // Console logs are not colored
+            System.out.println(Colors.removeColors(event.getPrefix() + event.getMessage()));
         }
         if(event.toChat()) {
             for(Player player : Bukkit.getServer().getOnlinePlayers()) {
                 if(player.hasPermission(Permissions.ADMIN_CHATLOG)) {
-                    player.sendMessage(event.getPrefix() + event.getMessage());
+                    // Chat logs are potentially colored
+                    player.sendMessage(Colors.replaceColors(event.getPrefix() + event.getMessage()));
                 }
             }
         }
         if(event.toFile()) {
-            fileLogger.info(event.getMessage());
-            System.out.println("fileend");
+            // File logs are not colored
+            fileLogger.info(Colors.removeColors(event.getMessage()));
         }
     }
 

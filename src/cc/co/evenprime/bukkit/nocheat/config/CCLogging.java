@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.config;
 
-import cc.co.evenprime.bukkit.nocheat.log.Colors;
 
 /**
  * Configurations specific for logging. Every world gets one of these.
@@ -17,9 +16,9 @@ public class CCLogging {
     public CCLogging(Configuration data) {
 
         active = data.getBoolean(Configuration.LOGGING_ACTIVE);
-        prefix = Colors.replaceColors(data.getString(Configuration.LOGGING_PREFIX));
+        prefix = data.getString(Configuration.LOGGING_PREFIX);
         toFile = data.getBoolean(Configuration.LOGGING_LOGTOFILE);
         toConsole = data.getBoolean(Configuration.LOGGING_LOGTOCONSOLE);
-        toChat = data.getBoolean(Configuration.LOGGING_LOGTOCHAT);
+        toChat = data.getBoolean(Configuration.LOGGING_LOGTOINGAMECHAT);
     }
 }

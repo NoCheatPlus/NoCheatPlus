@@ -20,7 +20,7 @@ public class Explainations {
         set(Configuration.LOGGING_PREFIX, "The short text that appears in front of messages by NoCheat. Color codes are &0-&9 and &A-&F");
         set(Configuration.LOGGING_FILENAME, "Where logs that go to the logfile are stored. You can have different files for different worlds.");
         set(Configuration.LOGGING_LOGTOFILE, "Should messages get logged to the specified logfile?");
-        set(Configuration.LOGGING_LOGTOCHAT, "Should messages get logged to the ingame chat?");
+        set(Configuration.LOGGING_LOGTOINGAMECHAT, "Should messages get logged to the ingame chat?");
         set(Configuration.LOGGING_LOGTOCONSOLE, "Should messages get logged to the server console?");
 
         set(Configuration.DEBUG_SHOWACTIVECHECKS, "Print to the console an overview of all checks that are enabled when NoCheat gets loaded.");

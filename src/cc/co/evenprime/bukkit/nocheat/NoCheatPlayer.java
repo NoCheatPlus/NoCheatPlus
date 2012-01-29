@@ -27,7 +27,5 @@ public interface NoCheatPlayer {
 
     public boolean isCreative();
 
-    public void closeInventory();
-
     public ExecutionHistory getExecutionHistory();
 }

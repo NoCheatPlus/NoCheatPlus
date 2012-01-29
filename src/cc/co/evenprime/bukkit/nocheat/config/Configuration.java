@@ -22,9 +22,9 @@ public abstract class Configuration {
     public final static OptionNode        LOGGING_ACTIVE                             = new OptionNode("active", LOGGING, DataType.BOOLEAN);
     public final static OptionNode        LOGGING_PREFIX                             = new OptionNode("prefix", LOGGING, DataType.STRING);
     public final static OptionNode        LOGGING_FILENAME                           = new OptionNode("filename", LOGGING, DataType.STRING);
-    public final static OptionNode        LOGGING_LOGTOFILE                          = new OptionNode("logtofile", LOGGING, DataType.BOOLEAN);
-    public final static OptionNode        LOGGING_LOGTOCONSOLE                       = new OptionNode("logtoconsole", LOGGING, DataType.BOOLEAN);
-    public final static OptionNode        LOGGING_LOGTOCHAT                          = new OptionNode("logtochat", LOGGING, DataType.BOOLEAN);
+    public final static OptionNode        LOGGING_LOGTOFILE                          = new OptionNode("file", LOGGING, DataType.BOOLEAN);
+    public final static OptionNode        LOGGING_LOGTOCONSOLE                       = new OptionNode("console", LOGGING, DataType.BOOLEAN);
+    public final static OptionNode        LOGGING_LOGTOINGAMECHAT                    = new OptionNode("ingamechat", LOGGING, DataType.BOOLEAN);
 
     private final static OptionNode       DEBUG                                      = new OptionNode("debug", ROOT, DataType.PARENT);
     public final static OptionNode        DEBUG_SHOWACTIVECHECKS                     = new OptionNode("showactivechecks", DEBUG, DataType.BOOLEAN);

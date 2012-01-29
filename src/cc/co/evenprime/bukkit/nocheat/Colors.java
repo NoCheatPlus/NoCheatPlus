@@ -1,6 +1,7 @@
-package cc.co.evenprime.bukkit.nocheat.log;
+package cc.co.evenprime.bukkit.nocheat;
 
 import org.bukkit.ChatColor;
+
 
 /**
  * Somehow manage color codes in NoCheat
@@ -8,6 +9,7 @@ import org.bukkit.ChatColor;
  */
 public class Colors {
 
+    
     /** 
      * Replace instances of &X with a color
      * 
@@ -18,6 +20,21 @@ public class Colors {
 
         for(ChatColor c : ChatColor.values()) {
             text = text.replace("&" + c.getChar(), c.toString());
+        }
+
+        return text;
+    }
+    
+    /** 
+     * Remove instances of &X with a color
+     * 
+     * @param text
+     * @return
+     */
+    public static String removeColors(String text) {
+
+        for(ChatColor c : ChatColor.values()) {
+            text = text.replace("&" + c.getChar(), "");
         }
 
         return text;

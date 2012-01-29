@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.NoCheatLogEvent;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.NoCheatCommandSender;
@@ -15,7 +16,6 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
-import cc.co.evenprime.bukkit.nocheat.log.NoCheatLogEvent;
 
 public abstract class Check {
 

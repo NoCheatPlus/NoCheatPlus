@@ -6,6 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
 
 /**
  * Store amount of action executions for last 60 seconds
+ * for various actions
  * 
  */
 public class ExecutionHistory {
@@ -101,12 +102,12 @@ public class ExecutionHistory {
     public boolean executeAction(String check, Action action, long time) {
 
         Map<Action, ExecutionHistoryEntry> executionHistory = executionHistories.get(check);
-        
+
         if(executionHistory == null) {
             executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
             executionHistories.put(check, executionHistory);
         }
-        
+
         ExecutionHistoryEntry entry = executionHistory.get(action);
 
         if(entry == null) {

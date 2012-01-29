@@ -4,8 +4,7 @@ import org.bukkit.Location;
 
 /**
  * A class to store x,y,z triple data, instead of using bukkits Location
- * objects,
- * which can't be easily recycled
+ * objects, which can't be easily recycled
  * 
  */
 public final class PreciseLocation {

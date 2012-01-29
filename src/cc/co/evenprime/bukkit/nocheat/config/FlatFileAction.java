@@ -56,47 +56,25 @@ public class FlatFileAction {
     private Action parseLine(String line) {
 
         // Split the line into some parts
-        String parts[] = line.split("\\s+", 5);
+        String parts[] = line.split("\\s+", 3);
 
         // four pieces is the minimum we need, no matter what it is
-        if(parts.length < 4) {
+        if(parts.length < 3) {
             throw new IllegalArgumentException("The line " + line + " of the file " + file.getName() + " is malformed. It has not enough parts.");
         }
 
         String type = parts[0];
         String name = parts[1];
-
-        int delay = 0;
-        try {
-            delay = Integer.parseInt(parts[2]);
-        } catch(Exception e) {
-            throw new IllegalArgumentException("Couldn't parse third parameter of action " + name + " from file " + file.getName() + ". It is " + parts[2] + " but should be a number.");
-        }
-
-        int repeat = 0;
-        try {
-            repeat = Integer.parseInt(parts[3]);
-        } catch(Exception e) {
-            throw new IllegalArgumentException("Couldn't parse fourth parameter of action " + name + " from file " + file.getName() + ". It is " + parts[2] + " but should be a number.");
-        }
+        String message = parts[2];
 
         if(type.equalsIgnoreCase("log")) {
             // A log action, it seems
-            if(parts.length < 5) {
-                throw new IllegalArgumentException("Missing fifth parameter of action " + name + " from file " + file.getName() + ".");
-            }
-
-            return new LogAction(name, delay, repeat, parts[4]);
+            return new LogAction(name, message);
         } else if(type.equalsIgnoreCase("consolecommand")) {
             // A consolecommand action, it seems
-            if(parts.length < 5) {
-                throw new IllegalArgumentException("Missing fifth parameter of action " + name + " from file " + file.getName() + ".");
-            }
-
-            return new ConsolecommandAction(name, delay, repeat, parts[4]);
+            return new ConsolecommandAction(name, message);
         } else if(type.equalsIgnoreCase("special")) {
-            // A "special" actions, it seems
-            return new SpecialAction(name, delay, repeat);
+            return new SpecialAction(name, message);
         } else {
             throw new IllegalArgumentException("Unknown action type " + type + " of action with name " + name + ".");
         }
