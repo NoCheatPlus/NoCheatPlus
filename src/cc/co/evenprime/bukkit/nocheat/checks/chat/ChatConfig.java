@@ -3,8 +3,9 @@ package cc.co.evenprime.bukkit.nocheat.checks.chat;
 import java.util.LinkedList;
 import java.util.List;
 import cc.co.evenprime.bukkit.nocheat.ConfigItem;
-import cc.co.evenprime.bukkit.nocheat.config.Configuration;
-import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
 public class ChatConfig implements ConfigItem {
 
@@ -17,16 +18,17 @@ public class ChatConfig implements ConfigItem {
     public final boolean    colorCheck;
     public final ActionList colorActions;
 
-    public ChatConfig(Configuration data) {
+    public ChatConfig(NoCheatConfiguration data) {
 
-        check = data.getBoolean(Configuration.CHAT_CHECK);
-        spamCheck = data.getBoolean(Configuration.CHAT_SPAM_CHECK);
-        spamWhitelist = splitWhitelist(data.getString(Configuration.CHAT_SPAM_WHITELIST));
-        spamTimeframe = data.getInteger(Configuration.CHAT_SPAM_TIMEFRAME);
-        spamLimit = data.getInteger(Configuration.CHAT_SPAM_LIMIT);
-        spamActions = data.getActionList(Configuration.CHAT_SPAM_ACTIONS);
-        colorCheck = data.getBoolean(Configuration.CHAT_COLOR_CHECK);
-        colorActions = data.getActionList(Configuration.CHAT_COLOR_ACTIONS);
+        spamCheck = data.getBoolean(ConfPaths.CHAT_SPAM_CHECK);
+        spamWhitelist = splitWhitelist(data.getString(ConfPaths.CHAT_SPAM_WHITELIST));
+        spamTimeframe = data.getInt(ConfPaths.CHAT_SPAM_TIMEFRAME);
+        spamLimit = data.getInt(ConfPaths.CHAT_SPAM_LIMIT);
+        spamActions = data.getActionList(ConfPaths.CHAT_SPAM_ACTIONS);
+        colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
+        colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS);
+
+        check = spamCheck || colorCheck;
 
     }
 

@@ -59,17 +59,14 @@ public class WorkaroundsListener implements Listener, EventManager {
 
         // Fix a common mistake that other developers make (cancelling move
         // events is crazy, rather set the target location to the from location)
-        if(plugin.getPlayer(event.getPlayer()).getConfigurationStore().debug.overrideIdiocy) {
-            event.setCancelled(false);
-            event.setTo(event.getFrom().clone());
-        }
+        event.setCancelled(false);
+        event.setTo(event.getFrom().clone());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void toggleSprint(final PlayerToggleSprintEvent event) {
         if(event.isCancelled() && event.isSprinting()) {
-            if(plugin.getPlayer(event.getPlayer()).getConfigurationStore().debug.overrideIdiocy)
-                event.setCancelled(false);
+            event.setCancelled(false);
         }
     }
 

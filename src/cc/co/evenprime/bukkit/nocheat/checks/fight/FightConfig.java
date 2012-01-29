@@ -1,8 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
 import cc.co.evenprime.bukkit.nocheat.ConfigItem;
-import cc.co.evenprime.bukkit.nocheat.config.Configuration;
-import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
 public class FightConfig implements ConfigItem {
 
@@ -14,14 +15,15 @@ public class FightConfig implements ConfigItem {
     public final boolean    noswingCheck;
     public final ActionList noswingActions;
 
-    public FightConfig(Configuration data) {
+    public FightConfig(NoCheatConfiguration data) {
 
-        check = data.getBoolean(Configuration.FIGHT_CHECK);
-        directionCheck = data.getBoolean(Configuration.FIGHT_DIRECTION_CHECK);
-        directionPrecision = ((double) (data.getInteger(Configuration.FIGHT_DIRECTION_PRECISION))) / 100D;
-        directionPenaltyTime = data.getInteger(Configuration.FIGHT_DIRECTION_PENALTYTIME);
-        directionActions = data.getActionList(Configuration.FIGHT_DIRECTION_ACTIONS);
-        noswingCheck = data.getBoolean(Configuration.FIGHT_NOSWING_CHECK);
-        noswingActions = data.getActionList(Configuration.FIGHT_NOSWING_ACTIONS);
+        directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
+        directionPrecision = ((double) (data.getInt(ConfPaths.FIGHT_DIRECTION_PRECISION))) / 100D;
+        directionPenaltyTime = data.getInt(ConfPaths.FIGHT_DIRECTION_PENALTYTIME);
+        directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS);
+        noswingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
+        noswingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS);
+
+        check = directionCheck || noswingCheck;
     }
 }

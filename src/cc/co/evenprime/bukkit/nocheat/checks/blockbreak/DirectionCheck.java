@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import java.util.Locale;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
@@ -24,12 +23,6 @@ public class DirectionCheck extends BlockBreakCheck {
 
         final SimpleLocation brokenBlock = data.brokenBlockLocation;
         final boolean isInstaBreak = data.instaBrokenBlockLocation.equals(brokenBlock);
-
-        // If the block is instabreak and we don't check instabreak, return
-        if(isInstaBreak && !ccblockbreak.checkinstabreakblocks) {
-            return false;
-        }
-
         boolean cancel = false;
 
         double off = CheckUtil.directionCheck(player, brokenBlock.x + 0.5D, brokenBlock.y + 0.5D, brokenBlock.z + 0.5D, 1D, 1D, ccblockbreak.directionPrecision);

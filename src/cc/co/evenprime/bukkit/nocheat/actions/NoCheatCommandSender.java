@@ -6,6 +6,12 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.ServerOperator;
 
+/**
+ * This class is used to execute commands of other plugins.
+ * It ignores any feedback of other plugins and claims to be
+ * OP when asked.
+ *
+ */
 public class NoCheatCommandSender extends PermissibleBase implements ConsoleCommandSender {
 
     private static final ServerOperator serverOperator = new ServerOperator() {

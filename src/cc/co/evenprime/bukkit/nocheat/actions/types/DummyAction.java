@@ -3,13 +3,20 @@ package cc.co.evenprime.bukkit.nocheat.actions.types;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 
 /**
- * This is only used to not lose config entries in case an action isn't defined
- * correctly
- * 
+ * If an action can't be parsed correctly, at least keep it
+ * stored in this form
+ *
  */
 public class DummyAction extends Action {
 
-    public DummyAction(String name, int delay, int repeat) {
-        super(name, delay, repeat);
+    private String def;
+
+    public DummyAction(String def) {
+        super("dummyAction", 10000, 10000);
+        this.def = def;
+    }
+
+    public String toString() {
+        return def;
     }
 }

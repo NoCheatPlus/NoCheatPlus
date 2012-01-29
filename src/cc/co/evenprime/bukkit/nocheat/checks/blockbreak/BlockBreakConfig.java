@@ -1,8 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import cc.co.evenprime.bukkit.nocheat.ConfigItem;
-import cc.co.evenprime.bukkit.nocheat.config.Configuration;
-import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
 /**
  * Configurations specific for the "BlockBreak" checks
@@ -12,7 +13,6 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
 public class BlockBreakConfig implements ConfigItem {
 
     public final boolean    check;
-    public final boolean    checkinstabreakblocks;
     public final boolean    reachCheck;
     public final double     reachDistance;
     public final ActionList reachActions;
@@ -23,19 +23,19 @@ public class BlockBreakConfig implements ConfigItem {
     public final boolean    noswingCheck;
     public final ActionList noswingActions;
 
-    public BlockBreakConfig(Configuration data) {
+    public BlockBreakConfig(NoCheatConfiguration data) {
 
-        check = data.getBoolean(Configuration.BLOCKBREAK_CHECK);
-        reachCheck = data.getBoolean(Configuration.BLOCKBREAK_REACH_CHECK);
+        reachCheck = data.getBoolean(ConfPaths.BLOCKBREAK_REACH_CHECK);
         reachDistance = 535D / 100D;
-        reachActions = data.getActionList(Configuration.BLOCKBREAK_REACH_ACTIONS);
-        checkinstabreakblocks = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECKINSTABREAKBLOCKS);
-        directionCheck = data.getBoolean(Configuration.BLOCKBREAK_DIRECTION_CHECK);
-        directionPrecision = ((double) data.getInteger(Configuration.BLOCKBREAK_DIRECTION_PRECISION)) / 100D;
-        directionPenaltyTime = data.getInteger(Configuration.BLOCKBREAK_DIRECTION_PENALTYTIME);
-        directionActions = data.getActionList(Configuration.BLOCKBREAK_DIRECTION_ACTIONS);
-        noswingCheck = data.getBoolean(Configuration.BLOCKBREAK_NOSWING_CHECK);
-        noswingActions = data.getActionList(Configuration.BLOCKBREAK_NOSWING_ACTIONS);
+        reachActions = data.getActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS);
+        directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
+        directionPrecision = ((double) data.getInt(ConfPaths.BLOCKBREAK_DIRECTION_PRECISION)) / 100D;
+        directionPenaltyTime = data.getInt(ConfPaths.BLOCKBREAK_DIRECTION_PENALTYTIME);
+        directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS);
+        noswingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
+        noswingActions = data.getActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS);
+
+        check = reachCheck || directionCheck || noswingCheck;
 
     }
 }

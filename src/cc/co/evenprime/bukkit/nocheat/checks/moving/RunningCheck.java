@@ -139,7 +139,7 @@ public class RunningCheck extends MovingCheck {
 
         // A player is considered sprinting if the flag is set and if he has
         // enough food level (configurable)
-        final boolean sprinting = player.isSprinting() && (player.getPlayer().getFoodLevel() > 5 || cc.allowHungrySprinting);
+        final boolean sprinting = player.isSprinting() && (player.getPlayer().getFoodLevel() > 5);
 
         double limit = 0.0D;
 
@@ -156,7 +156,7 @@ public class RunningCheck extends MovingCheck {
         if(cc.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
             limit = cc.sneakingSpeedLimit;
             suffix = "sneaking";
-        } else if(cc.swimmingCheck && isSwimming && !player.hasPermission(Permissions.MOVING_SWIMMING)) {
+        } else if(isSwimming) {
             limit = cc.swimmingSpeedLimit;
             suffix = "swimming";
         } else if(!sprinting) {

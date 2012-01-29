@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -15,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
 
 /**
  * Central location for everything that's described in the configuration file(s)
@@ -23,16 +21,12 @@ import cc.co.evenprime.bukkit.nocheat.config.util.ActionMapper;
  */
 public class ConfigurationManager {
 
-    private final static String                        configFileName            = "config.txt";
-    private final static String                        actionFileName            = "actions.txt";
-    private final static String                        defaultActionFileName     = "default_actions.txt";
+    private final static String                        configFileName            = "config.yml";
 
     private final Map<String, ConfigurationCacheStore> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCacheStore>();
 
-    private final Configuration                        defaultConfig;
-
     private FileHandler                                fileHandler;
-    private NoCheat plugin;
+    private NoCheat                                    plugin;
 
     private static class LogFileFormatter extends Formatter {
 
@@ -64,46 +58,13 @@ public class ConfigurationManager {
         }
     }
 
-    // Our personal logger
-    // private final static String loggerName = "cc.co.evenprime.nocheat";
-    // public final Logger logger = Logger.getLogger(loggerName);
-
     public ConfigurationManager(NoCheat plugin, File rootConfigFolder) {
 
-        ActionMapper actionMapper = new ActionMapper();
-        
         this.plugin = plugin;
 
-        // Parse actions file
-        initializeActions(rootConfigFolder, actionMapper);
-
-        // Create a default configuration
-        defaultConfig = new DefaultConfiguration(actionMapper);
-
         // Setup the real configuration
-        initializeConfig(rootConfigFolder, actionMapper);
+        initializeConfig(rootConfigFolder);
 
-    }
-
-    private void initializeActions(File rootConfigFolder, ActionMapper actionManager) {
-
-        File defaultActionsFile = new File(rootConfigFolder, defaultActionFileName);
-
-        // Write the current default action file into the target folder
-        DefaultConfiguration.writeDefaultActionFile(defaultActionsFile);
-
-        // now parse that file again
-        FlatFileAction parser = new FlatFileAction(defaultActionsFile);
-        parser.read(actionManager);
-
-        // Check if the "custom" action file exists, if not, create one
-        File customActionsFile = new File(rootConfigFolder, actionFileName);
-        if(!customActionsFile.exists()) {
-            DefaultConfiguration.writeActionFile(customActionsFile);
-        }
-
-        parser = new FlatFileAction(customActionsFile);
-        parser.read(actionManager);
     }
 
     /**
@@ -112,33 +73,36 @@ public class ConfigurationManager {
      * 
      * @param configurationFile
      */
-    private void initializeConfig(File rootConfigFolder, ActionMapper action) {
+    private void initializeConfig(File rootConfigFolder) {
 
         // First try to obtain and parse the global config file
-        FlatFileConfiguration root;
-        File globalConfigFile = getGlobalConfigFile(rootConfigFolder);
+        NoCheatConfiguration root = new NoCheatConfiguration();
+        root.setDefaults(new DefaultConfiguration());
+        root.options().copyDefaults(true);
 
-        root = new FlatFileConfiguration(defaultConfig, true, globalConfigFile);
+        File globalConfigFile = getGlobalConfigFile(rootConfigFolder);
 
         if(globalConfigFile.exists()) {
             try {
-                root.load(action);
+                root.load(globalConfigFile);
             } catch(Exception e) {
                 e.printStackTrace();
             }
         }
 
         try {
-            root.save();
+            root.save(globalConfigFile);
         } catch(Exception e) {
             e.printStackTrace();
         }
+
+        root.regenerateActionLists();
 
         // Create a corresponding Configuration Cache
         // put the global config on the config map
         worldnameToConfigCacheMap.put(null, new ConfigurationCacheStore(root));
 
-        plugin.setFileLogger(setupFileLogger(new File(rootConfigFolder, root.getString(DefaultConfiguration.LOGGING_FILENAME))));
+        plugin.setFileLogger(setupFileLogger(new File(rootConfigFolder, root.getString(ConfPaths.LOGGING_FILENAME))));
 
         // Try to find world-specific config files
         Map<String, File> worldFiles = getWorldSpecificConfigFiles(rootConfigFolder);
@@ -147,20 +111,23 @@ public class ConfigurationManager {
 
             File worldConfigFile = worldEntry.getValue();
 
-            FlatFileConfiguration world = new FlatFileConfiguration(root, false, worldConfigFile);
+            NoCheatConfiguration world = new NoCheatConfiguration();
+            world.setDefaults(root);
 
             try {
-                world.load(action);
+                world.load(worldConfigFile);
 
                 worldnameToConfigCacheMap.put(worldEntry.getKey(), new ConfigurationCacheStore(world));
 
                 // write the config file back to disk immediately
-                world.save();
+                world.save(worldConfigFile);
 
-            } catch(IOException e) {
+            } catch(Exception e) {
                 System.out.println("NoCheat: Couldn't load world-specific config for " + worldEntry.getKey());
                 e.printStackTrace();
             }
+
+            world.regenerateActionLists();
         }
     }
 

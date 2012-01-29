@@ -1,11 +1,10 @@
-package cc.co.evenprime.bukkit.nocheat.config.util;
+package cc.co.evenprime.bukkit.nocheat.actions.types;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 
 /**

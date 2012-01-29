@@ -12,20 +12,18 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 public class ConfigurationCacheStore {
 
     public final CCLogging                logging;
-    public final CCDebug                  debug;
 
     private final Map<String, ConfigItem> configMap = new HashMap<String, ConfigItem>();
 
-    private final Configuration           data;
+    private final NoCheatConfiguration               data;
 
     /**
      * Instantiate a config cache and populate it with the data of a
      * Config tree (and its parent tree)
      */
-    public ConfigurationCacheStore(Configuration data) {
+    public ConfigurationCacheStore(NoCheatConfiguration data) {
 
         logging = new CCLogging(data);
-        debug = new CCDebug(data);
 
         this.data = data;
     }
@@ -40,7 +38,7 @@ public class ConfigurationCacheStore {
         configMap.put(id, config);
     }
 
-    public Configuration getConfiguration() {
+    public NoCheatConfiguration getConfiguration() {
         return this.data;
     }
 }

@@ -9,7 +9,7 @@ package cc.co.evenprime.bukkit.nocheat.actions;
 public abstract class Action {
 
     /**
-     * Delay in violations (only do if there were more than "delay" exceptions
+     * Delay in violations (only do if there were more than "delay" violations
      * in last 60 seconds)
      */
     public final int    delay;
@@ -28,18 +28,5 @@ public abstract class Action {
         this.name = name;
         this.delay = delay;
         this.repeat = repeat;
-    }
-
-    /**
-     * Make a copy of the action, with some modifications
-     * @param string
-     * @return
-     */
-    public Action cloneWithProperties(String string) {
-        return this;
-    }
-    
-    public String getProperties() {
-        return null;
     }
 }

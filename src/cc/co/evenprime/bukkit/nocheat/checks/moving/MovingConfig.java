@@ -1,8 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import cc.co.evenprime.bukkit.nocheat.ConfigItem;
-import cc.co.evenprime.bukkit.nocheat.config.Configuration;
-import cc.co.evenprime.bukkit.nocheat.config.util.ActionList;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
+import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
 /**
  * Configurations specific for the Move Checks. Every world gets one of these
@@ -17,9 +18,7 @@ public class MovingConfig implements ConfigItem {
     public final boolean    identifyCreativeMode;
     public final double     walkingSpeedLimit;
     public final double     sprintingSpeedLimit;
-    public final boolean    allowHungrySprinting;
     public final double     jumpheight;
-    public final boolean    swimmingCheck;
     public final double     swimmingSpeedLimit;
     public final boolean    sneakingCheck;
     public final double     sneakingSpeedLimit;
@@ -38,35 +37,34 @@ public class MovingConfig implements ConfigItem {
 
     public final double     flyingHeightLimit;
 
-    public MovingConfig(Configuration data) {
+    public MovingConfig(NoCheatConfiguration data) {
 
-        check = data.getBoolean(Configuration.MOVING_CHECK);
-        identifyCreativeMode = data.getBoolean(Configuration.MOVING_IDENTIFYCREATIVEMODE);
+        identifyCreativeMode = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE);
 
-        runflyCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECK);
-        walkingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_WALKINGSPEEDLIMIT)) / 100D;
-        sprintingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SPRINTINGSPEEDLIMIT)) / 100D;
-        allowHungrySprinting = data.getBoolean(Configuration.MOVING_RUNFLY_ALLOWHUNGRYSPRINTING);
-        jumpheight = ((double) data.getInteger(Configuration.MOVING_RUNFLY_JUMPHEIGHT)) / 100D;
-        actions = data.getActionList(Configuration.MOVING_RUNFLY_ACTIONS);
+        runflyCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECK);
+        walkingSpeedLimit = ((double) 22) / 100D;
+        sprintingSpeedLimit = ((double) 40) / 100D;
+        jumpheight = ((double) 135) / 100D;
+        actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS);
 
-        swimmingCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECKSWIMMING);
-        swimmingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SWIMMINGSPEEDLIMIT)) / 100D;
-        sneakingCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECKSNEAKING);
-        sneakingSpeedLimit = ((double) data.getInteger(Configuration.MOVING_RUNFLY_SNEAKINGSPEEDLIMIT)) / 100D;
+        swimmingSpeedLimit = ((double) 18) / 100D;
+        sneakingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING);
+        sneakingSpeedLimit = ((double) 14) / 100D;
 
-        allowFlying = data.getBoolean(Configuration.MOVING_RUNFLY_ALLOWLIMITEDFLYING);
-        flyingSpeedLimitVertical = ((double) data.getInteger(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITVERTICAL)) / 100D;
-        flyingSpeedLimitHorizontal = ((double) data.getInteger(Configuration.MOVING_RUNFLY_FLYINGSPEEDLIMITHORIZONTAL)) / 100D;
-        flyingHeightLimit = data.getInteger(Configuration.MOVING_RUNFLY_FLYINGHEIGHTLIMIT);
-        flyingActions = data.getActionList(Configuration.MOVING_RUNFLY_FLYINGACTIONS);
+        allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);
+        flyingSpeedLimitVertical = ((double) data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL)) / 100D;
+        flyingSpeedLimitHorizontal = ((double) data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL)) / 100D;
+        flyingHeightLimit = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT);
+        flyingActions = data.getActionList(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS);
 
-        nofallCheck = data.getBoolean(Configuration.MOVING_RUNFLY_CHECKNOFALL);
-        nofallMultiplier = ((float) data.getInteger(Configuration.MOVING_RUNFLY_NOFALLMULTIPLIER)) / 100F;
-        nofallActions = data.getActionList(Configuration.MOVING_RUNFLY_NOFALLACTIONS);
+        nofallCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECKNOFALL);
+        nofallMultiplier = ((float) 200) / 100F;
+        nofallActions = data.getActionList(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS);
 
-        morePacketsCheck = data.getBoolean(Configuration.MOVING_MOREPACKETS_CHECK);
-        morePacketsActions = data.getActionList(Configuration.MOVING_MOREPACKETS_ACTIONS);
+        morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
+        morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS);
+
+        check = runflyCheck || morePacketsCheck;
 
     }
 }

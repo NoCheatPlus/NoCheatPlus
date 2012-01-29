@@ -13,7 +13,6 @@ public class Permissions {
     public final static String  MOVING               = CHECKS + ".moving";
     public final static String  MOVING_RUNFLY        = MOVING + ".runfly";
     public final static String  MOVING_SNEAKING      = MOVING + ".sneaking";
-    public final static String  MOVING_SWIMMING      = MOVING + ".swimming";
     public final static String  MOVING_FLYING        = MOVING + ".flying";
     public final static String  MOVING_NOFALL        = MOVING + ".nofall";
     public final static String  MOVING_MOREPACKETS   = MOVING + ".morepackets";
@@ -29,7 +28,6 @@ public class Permissions {
 
     public final static String  CHAT                 = CHECKS + ".chat";
     public final static String  CHAT_SPAM            = CHAT + ".spam";
-    public static final String  CHAT_EMPTY           = CHAT + ".empty";
     public static final String  CHAT_COLOR           = CHAT + ".color";
 
     public static final String  FIGHT                = CHECKS + ".fight";

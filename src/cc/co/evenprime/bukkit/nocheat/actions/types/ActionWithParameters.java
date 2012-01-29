@@ -1,7 +1,9 @@
-package cc.co.evenprime.bukkit.nocheat.actions;
+package cc.co.evenprime.bukkit.nocheat.actions.types;
 
 import java.util.ArrayList;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
+import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 
 public abstract class ActionWithParameters extends Action {

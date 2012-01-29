@@ -1,8 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.actions.types;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
-import cc.co.evenprime.bukkit.nocheat.actions.Action;
-import cc.co.evenprime.bukkit.nocheat.actions.ActionWithParameters;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 
 /**
@@ -12,14 +10,7 @@ import cc.co.evenprime.bukkit.nocheat.checks.Check;
  */
 public class ConsolecommandAction extends ActionWithParameters {
 
-    private String command;
-
-    public ConsolecommandAction(String name, String command) {
-        super(name, 0, 1, command);
-        this.command = command;
-    }
-
-    private ConsolecommandAction(String name, int delay, int repeat, String command) {
+    public ConsolecommandAction(String name, int delay, int repeat, String command) {
         // Log messages may have color codes now
         super(name, delay, repeat, command);
     }
@@ -28,25 +19,7 @@ public class ConsolecommandAction extends ActionWithParameters {
         return super.getMessage(player, check);
     }
 
-    /**
-     * Make a copy of the action, with some modifications
-     * @param properties
-     * @return
-     */
-    @Override
-    public Action cloneWithProperties(String properties) {
-        String propertyFields[] = properties.split(":");
-
-        int delay = Integer.parseInt(propertyFields[0]);
-        int repeat = 5;
-        if(propertyFields.length > 1)
-            repeat = Integer.parseInt(propertyFields[1]);
-
-        return new ConsolecommandAction(name, delay, repeat, command);
-    }
-    
-    @Override
-    public String getProperties() {
-        return delay + ":" + repeat;
+    public String toString() {
+        return "cmd:" + name + ":" + delay + ":" + repeat;
     }
 }

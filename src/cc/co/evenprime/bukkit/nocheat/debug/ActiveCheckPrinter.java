@@ -22,7 +22,7 @@ public class ActiveCheckPrinter {
 
             ConfigurationCacheStore cc = plugin.getConfig(world);
 
-            if(!cc.debug.showchecks)
+            if(!cc.logging.showactivechecks)
                 continue;
 
             for(EventManager em : eventManagers) {

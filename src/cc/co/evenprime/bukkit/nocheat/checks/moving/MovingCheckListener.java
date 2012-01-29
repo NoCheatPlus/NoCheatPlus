@@ -203,8 +203,6 @@ public class MovingCheckListener implements Listener, EventManager {
 
                 if(!m.allowFlying) {
                     s.add("moving.runfly");
-                    if(m.swimmingCheck)
-                        s.add("moving.swimming");
                     if(m.sneakingCheck)
                         s.add("moving.sneaking");
                     if(m.nofallCheck)
