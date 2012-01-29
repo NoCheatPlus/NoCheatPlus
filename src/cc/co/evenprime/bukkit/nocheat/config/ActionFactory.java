@@ -1,10 +1,15 @@
-package cc.co.evenprime.bukkit.nocheat.actions.types;
+package cc.co.evenprime.bukkit.nocheat.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
+import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
+import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
+import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 
 public class ActionFactory {
 
@@ -121,16 +126,15 @@ public class ActionFactory {
                 continue;
             }
 
-            String[] listEntry = s.split("\\s+", 2);
-
             try {
                 Integer vl;
                 String def;
                 if(first) {
                     first = false;
                     vl = 0;
-                    def = listEntry[0];
+                    def = s;
                 } else {
+                    String[] listEntry = s.split("\\s+", 2);
                     vl = Integer.parseInt(listEntry[0]);
                     def = listEntry[1];
                 }

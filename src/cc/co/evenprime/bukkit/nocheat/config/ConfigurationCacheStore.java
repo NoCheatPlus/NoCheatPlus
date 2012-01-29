@@ -11,7 +11,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
  */
 public class ConfigurationCacheStore {
 
-    public final CCLogging                logging;
+    public final LoggingConfig                logging;
 
     private final Map<String, ConfigItem> configMap = new HashMap<String, ConfigItem>();
 
@@ -23,7 +23,7 @@ public class ConfigurationCacheStore {
      */
     public ConfigurationCacheStore(NoCheatConfiguration data) {
 
-        logging = new CCLogging(data);
+        logging = new LoggingConfig(data);
 
         this.data = data;
     }

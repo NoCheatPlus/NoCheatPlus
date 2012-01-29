@@ -21,7 +21,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 public class FightCheckListener implements Listener, EventManager {
 
     private final List<FightCheck> checks;
-    private NoCheat                plugin;
+    private final NoCheat          plugin;
 
     public FightCheckListener(NoCheat plugin) {
 
@@ -37,10 +37,15 @@ public class FightCheckListener implements Listener, EventManager {
         if(event.isCancelled() || !(event instanceof EntityDamageByEntityEvent))
             return;
 
-        if(event.getCause() == DamageCause.ENTITY_ATTACK) {
-            normalDamage((EntityDamageByEntityEvent) event);
-        } else if(event.getCause() == DamageCause.CUSTOM) {
-            customDamage((EntityDamageByEntityEvent) event);
+        EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+        if(!(e.getDamager() instanceof Player)) {
+            return;
+        }
+
+        if(e.getCause() == DamageCause.ENTITY_ATTACK) {
+            normalDamage(e);
+        } else if(e.getCause() == DamageCause.CUSTOM) {
+            customDamage(e);
         }
     }
 

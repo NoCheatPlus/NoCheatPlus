@@ -94,7 +94,7 @@ public class MovingCheckListener implements Listener, EventManager {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    protected void handlePlayerMoveEvent(final PlayerMoveEvent event) {
+    protected void move(final PlayerMoveEvent event) {
 
         if(event.isCancelled())
             return;
@@ -171,7 +171,7 @@ public class MovingCheckListener implements Listener, EventManager {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    protected void handlePlayerVelocityEvent(final PlayerVelocityEvent event) {
+    protected void velocity(final PlayerVelocityEvent event) {
         if(event.isCancelled())
             return;
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());

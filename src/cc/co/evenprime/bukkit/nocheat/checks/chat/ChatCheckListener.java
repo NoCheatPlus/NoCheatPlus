@@ -17,7 +17,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 public class ChatCheckListener implements Listener, EventManager {
 
     private final List<ChatCheck> checks;
-    private NoCheat               plugin;
+    private final NoCheat         plugin;
 
     public ChatCheckListener(NoCheat plugin) {
 

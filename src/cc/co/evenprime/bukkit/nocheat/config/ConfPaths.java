@@ -15,13 +15,14 @@ public abstract class ConfPaths {
     public final static String  LOGGING_LOGTOINGAMECHAT                   = LOGGING + "ingamechat";
     public final static String  LOGGING_SHOWACTIVECHECKS                  = LOGGING + "showactivechecks";
 
-    private final static String INVENTORY_DROP                            = "inventory.drop.";
+    private final static String CHECKS                                    = "checks.";
+    private final static String INVENTORY_DROP                            = CHECKS + "inventory.drop.";
     public final static String  INVENTORY_DROP_CHECK                      = INVENTORY_DROP + "active";
     public final static String  INVENTORY_DROP_TIMEFRAME                  = INVENTORY_DROP + "time";
     public final static String  INVENTORY_DROP_LIMIT                      = INVENTORY_DROP + "limit";
     public final static String  INVENTORY_DROP_ACTIONS                    = INVENTORY_DROP + "actions";
 
-    private final static String MOVING                                    = "moving.";
+    private final static String MOVING                                    = CHECKS + "moving.";
 
     private final static String MOVING_RUNFLY                             = MOVING + "runfly.";
     public final static String  MOVING_RUNFLY_CHECK                       = MOVING_RUNFLY + "active";
@@ -31,7 +32,7 @@ public abstract class ConfPaths {
     public final static String  MOVING_RUNFLY_CHECKNOFALL                 = MOVING_RUNFLY + "checknofall";
     public final static String  MOVING_RUNFLY_NOFALLACTIONS               = MOVING_RUNFLY + "nofallactions";
 
-    public final static String  MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";
+    private final static String MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";
     public final static String  MOVING_RUNFLY_FLYING_ALLOWALWAYS          = MOVING_RUNFLY_FLYING + "allowflyingalways";
     public final static String  MOVING_RUNFLY_FLYING_ALLOWINCREATIVE      = MOVING_RUNFLY_FLYING + "allowflyingincreative";
     public final static String  MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL   = MOVING_RUNFLY_FLYING + "flyingspeedlimitvertical";
@@ -43,7 +44,7 @@ public abstract class ConfPaths {
     public final static String  MOVING_MOREPACKETS_CHECK                  = MOVING_MOREPACKETS + "active";
     public final static String  MOVING_MOREPACKETS_ACTIONS                = MOVING_MOREPACKETS + "actions";
 
-    private final static String BLOCKBREAK                                = "blockbreak.";
+    private final static String BLOCKBREAK                                = CHECKS + "blockbreak.";
 
     private final static String BLOCKBREAK_REACH                          = BLOCKBREAK + "reach.";
     public final static String  BLOCKBREAK_REACH_CHECK                    = BLOCKBREAK_REACH + "active";
@@ -59,7 +60,7 @@ public abstract class ConfPaths {
     public static final String  BLOCKBREAK_NOSWING_CHECK                  = BLOCKBREAK_NOSWING + "active";
     public static final String  BLOCKBREAK_NOSWING_ACTIONS                = BLOCKBREAK_NOSWING + "actions";
 
-    private final static String BLOCKPLACE                                = "blockplace.";
+    private final static String BLOCKPLACE                                = CHECKS + "blockplace.";
 
     private final static String BLOCKPLACE_REACH                          = BLOCKPLACE + "reach.";
     public final static String  BLOCKPLACE_REACH_CHECK                    = BLOCKPLACE_REACH + "active";
@@ -71,7 +72,7 @@ public abstract class ConfPaths {
     public final static String  BLOCKPLACE_DIRECTION_PENALTYTIME          = BLOCKPLACE_DIRECTION + "penaltytime";
     public final static String  BLOCKPLACE_DIRECTION_ACTIONS              = BLOCKPLACE_DIRECTION + "actions";
 
-    private final static String CHAT                                      = "chat.";
+    private final static String CHAT                                      = CHECKS + "chat.";
 
     private final static String CHAT_COLOR                                = CHAT + "color.";
     public final static String  CHAT_COLOR_CHECK                          = CHAT_COLOR + "active";
@@ -84,7 +85,7 @@ public abstract class ConfPaths {
     public final static String  CHAT_SPAM_LIMIT                           = CHAT_SPAM + "limit";
     public final static String  CHAT_SPAM_ACTIONS                         = CHAT_SPAM + "actions";
 
-    private final static String FIGHT                                     = "fight.";
+    private final static String FIGHT                                     = CHECKS + "fight.";
 
     private final static String FIGHT_DIRECTION                           = FIGHT + "direction.";
     public final static String  FIGHT_DIRECTION_CHECK                     = FIGHT_DIRECTION + "active";

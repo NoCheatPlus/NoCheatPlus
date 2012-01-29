@@ -9,9 +9,9 @@ import cc.co.evenprime.bukkit.nocheat.checks.Check;
  */
 public class LogAction extends ActionWithParameters {
 
-    private boolean toChat    = true;
-    private boolean toConsole = true;
-    private boolean toFile    = true;
+    private final boolean toChat;
+    private final boolean toConsole;
+    private final boolean toFile;
 
     public LogAction(String name, int delay, int repeat, boolean toChat, boolean toConsole, boolean toFile, String message) {
         // Log messages may have color codes now

@@ -13,12 +13,12 @@ import cc.co.evenprime.bukkit.nocheat.data.ExecutionHistory;
 
 public class NoCheatPlayerImpl implements NoCheatPlayer {
 
-    protected Player                  player;
-    protected final NoCheat           plugin;
-    protected final DataStore         data;
-    protected ConfigurationCacheStore config;
-    protected long                    lastUsedTime;
-    protected final ExecutionHistory  history;
+    private Player                  player;
+    private final NoCheat           plugin;
+    private final DataStore         data;
+    private ConfigurationCacheStore config;
+    private long                    lastUsedTime;
+    private final ExecutionHistory  history;
 
     public NoCheatPlayerImpl(Player player, NoCheat plugin) {
 

@@ -5,7 +5,6 @@ import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.yaml.snakeyaml.DumperOptions;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
-import cc.co.evenprime.bukkit.nocheat.actions.types.ActionFactory;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 
 public class NoCheatConfiguration extends YamlConfiguration {
@@ -46,32 +45,22 @@ public class NoCheatConfiguration extends YamlConfiguration {
     }
 
     /**
-     * Create actions from some string representations
-     * @param definitions
-     * @return
-     */
-    public Action[] createActions(String... definitions) {
-
-        return factory.createActions(definitions);
-    }
-
-    /**
      * Savely store ActionLists back into the yml file
      * @param path
      * @param list
      */
     public void set(String path, ActionList list) {
-        String string = "";
+        StringBuffer string = new StringBuffer();
 
         for(int treshold : list.getTresholds()) {
             if(treshold > 0) {
-                string += " vl>" + treshold;
+                string.append(" vl>").append(treshold);
             }
             for(Action action : list.getActions(treshold)) {
-                string += " " + action;
+                string.append(" ").append(action);
             }
         }
 
-        set(path, string.trim());
+        set(path, string.toString().trim());
     }
 }

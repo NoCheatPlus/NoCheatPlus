@@ -26,7 +26,7 @@ public class ConfigurationManager {
     private final Map<String, ConfigurationCacheStore> worldnameToConfigCacheMap = new HashMap<String, ConfigurationCacheStore>();
 
     private FileHandler                                fileHandler;
-    private NoCheat                                    plugin;
+    private final NoCheat                              plugin;
 
     private static class LogFileFormatter extends Formatter {
 
@@ -79,6 +79,7 @@ public class ConfigurationManager {
         NoCheatConfiguration root = new NoCheatConfiguration();
         root.setDefaults(new DefaultConfiguration());
         root.options().copyDefaults(true);
+        root.options().copyHeader(true);
 
         File globalConfigFile = getGlobalConfigFile(rootConfigFolder);
 

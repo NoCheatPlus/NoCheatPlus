@@ -9,7 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
  */
 public class DummyAction extends Action {
 
-    private String def;
+    private final String def;
 
     public DummyAction(String def) {
         super("dummyAction", 10000, 10000);

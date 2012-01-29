@@ -19,17 +19,24 @@ public final class SimpleLocation {
         reset();
     }
 
-    public final boolean equals(Block block) {
-        return block.getX() == x && block.getY() == y && block.getZ() == z;
-    }
+    @Override
+    public final boolean equals(Object object) {
+        if(!(object instanceof SimpleLocation))
+            return false;
 
-    public final boolean equals(SimpleLocation simpleLocation) {
+        SimpleLocation simpleLocation = (SimpleLocation) object;
+
         if(!isSet() && !simpleLocation.isSet())
             return true;
         else if(!isSet() || !simpleLocation.isSet())
             return false;
 
         return simpleLocation.x == x && simpleLocation.y == y && simpleLocation.z == z;
+    }
+
+    @Override
+    public final int hashCode() {
+        return x * 1000000 + y * 1000 + z;
     }
 
     public final void set(Block block) {

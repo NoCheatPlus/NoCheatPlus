@@ -13,6 +13,7 @@ public class NoCheatLogEvent extends Event {
     private boolean                  toConsole, toChat, toFile;
 
     public NoCheatLogEvent(String prefix, String message, boolean toConsole, boolean toChat, boolean toFile) {
+        this.prefix = prefix;
         this.message = message;
         this.toConsole = toConsole;
         this.toChat = toChat;
@@ -60,10 +61,6 @@ public class NoCheatLogEvent extends Event {
     }
 
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 }

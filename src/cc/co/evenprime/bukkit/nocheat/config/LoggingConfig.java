@@ -4,7 +4,7 @@ package cc.co.evenprime.bukkit.nocheat.config;
  * Configurations specific for logging. Every world gets one of these.
  * 
  */
-public class CCLogging {
+public class LoggingConfig {
 
     public final boolean active;
     public final boolean showactivechecks;
@@ -13,7 +13,7 @@ public class CCLogging {
     public final boolean toChat;
     public final String  prefix;
 
-    public CCLogging(NoCheatConfiguration data) {
+    public LoggingConfig(NoCheatConfiguration data) {
 
         active = data.getBoolean(ConfPaths.LOGGING_ACTIVE);
         showactivechecks = data.getBoolean(ConfPaths.LOGGING_SHOWACTIVECHECKS);
