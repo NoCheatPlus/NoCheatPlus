@@ -17,20 +17,15 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import cc.co.evenprime.bukkit.nocheat.checks.WorkaroundsListener;
 import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakCheckListener;
-import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakData;
 import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceCheckListener;
-import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceData;
 import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatCheckListener;
-import cc.co.evenprime.bukkit.nocheat.checks.chat.ChatData;
 import cc.co.evenprime.bukkit.nocheat.checks.fight.FightCheckListener;
-import cc.co.evenprime.bukkit.nocheat.checks.fight.FightData;
 import cc.co.evenprime.bukkit.nocheat.checks.inventory.InventoryCheckListener;
-import cc.co.evenprime.bukkit.nocheat.checks.inventory.InventoryData;
 import cc.co.evenprime.bukkit.nocheat.checks.moving.MovingCheckListener;
-import cc.co.evenprime.bukkit.nocheat.checks.moving.MovingData;
 import cc.co.evenprime.bukkit.nocheat.command.CommandHandler;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationManager;
+import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PlayerManager;
 import cc.co.evenprime.bukkit.nocheat.debug.ActiveCheckPrinter;
@@ -95,13 +90,6 @@ public class NoCheat extends JavaPlugin implements Listener {
         eventManagers.add(new FightCheckListener(this));
         eventManagers.add(new InventoryCheckListener(this));
 
-        new MovingData();
-        new BlockBreakData();
-        new BlockPlaceData();
-        new ChatData();
-        new FightData();
-        new InventoryData();
-
         // Then set up a task to monitor server lag
         if(lagMeasureTask == null) {
             lagMeasureTask = new LagMeasureTask(this);
@@ -117,6 +105,8 @@ public class NoCheat extends JavaPlugin implements Listener {
         }
 
         Bukkit.getPluginManager().registerEvents(this, this);
+
+        NoCheatConfiguration.writeInstructions(this.getDataFolder());
 
         // Tell the server admin that we finished loading NoCheat now
         System.out.println("[NoCheat] version [" + this.getDescription().getVersion() + "] is enabled.");

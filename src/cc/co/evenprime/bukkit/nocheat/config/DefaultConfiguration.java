@@ -10,7 +10,9 @@ public class DefaultConfiguration extends NoCheatConfiguration {
 
     public DefaultConfiguration() {
 
-        this.options().header("Main configuration file for NoCheat.");
+        super();
+
+        this.options().header("Main configuration file for NoCheat. Read \"Instructions.txt\"");
 
         /** LOGGING **/
         set(ConfPaths.LOGGING_ACTIVE, true);

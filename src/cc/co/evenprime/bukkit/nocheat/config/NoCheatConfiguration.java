@@ -1,5 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.config;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -14,7 +17,7 @@ public class NoCheatConfiguration extends YamlConfiguration {
     @Override
     public String saveToString() {
         // Some reflection wizardry to avoid having a lot of 
-        // linebreaks in the yml file
+        // linebreaks in the yml file, and get a "footer" into the file
         try {
             Field op;
             op = YamlConfiguration.class.getDeclaredField("yamlOptions");
@@ -23,7 +26,42 @@ public class NoCheatConfiguration extends YamlConfiguration {
             options.setWidth(200);
         } catch(Exception e) {}
 
-        return super.saveToString();
+        String result = super.saveToString();
+
+        return result;
+    }
+
+    public static void writeInstructions(File rootConfigFolder) {
+        InputStream fis = NoCheatConfiguration.class.getClassLoader().getResourceAsStream("Instructions.txt");
+
+        StringBuffer result = new StringBuffer();
+        try {
+            byte[] buf = new byte[1024];
+            int i = 0;
+            while((i = fis.read(buf)) != -1) {
+                result.append(new String(buf).substring(0, i));
+            }
+
+            File iFile = new File(rootConfigFolder, "Instructions.txt");
+            if(iFile.exists()) {
+                iFile.delete();
+            }
+            FileWriter output = new FileWriter(iFile);
+            String nl = System.getProperty("line.separator");
+            String instructions = result.toString();
+            instructions = instructions.replaceAll("\r\n", "\n");
+            String lines[] = instructions.split("\n");
+
+            for(String line : lines) {
+                output.append(line);
+                output.append(nl);
+            }
+
+            output.flush();
+            output.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

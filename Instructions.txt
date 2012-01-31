@@ -1,0 +1,363 @@
+Configuration file description.
+
+1) Important files, config.yml or "clean up your stuff"
+
+- The config file for NoCheat is called "config.yml" now.
+
+- You can have different config files for different worlds. 
+  To achieve this, copy the "config.yml" and rename the copy to
+  "worldname_config.yml". Settings in that file will now only 
+  affect the world with the name "worldname". You may also delete
+  all settings from that world-specific file that you won't use.
+  They'll be implicitely taken from the master "config.yml" file.
+
+- If you have files ending with "config.txt", "actions.txt" or 
+  "default_actions.txt", please delete them. They are no longer
+  used by NoCheat.
+  
+- Never change the amount of whitespaces in front of options in the config file
+  "config.yml". It will break the configuration.
+
+2) How the "actions" work, how to modify them and how to write your own,
+
+- NoCheat allows to define in detail what should happen when a player fails a
+  check in form of "actions". There are 4 possible things that may be done, read
+  on to learn in detail on how to define your own or modify the existing actions:
+  
+    "cancel" = Depends on the check. Usually prevent something from happening
+    "log" = Create and show/log a message
+    "cmd" = Execute a command of Bukkit or another plugin as if it were
+            typed into the console by the admin.
+    "vl>" = Is meant to symbolize "violation level bigger than". Used to define
+            actions that will be executed only if players reached a certain 
+            violation level. Failing a check usually increases their vl, not
+            failing checks reduces it over time.
+            
+- "cancel" action is just the word "cancel". Read in the detailed option
+  description to find out what it does depending on the check that it is
+  assigned to.
+
+- "log" action is a string of the form "log:string:delay:repeat:target".
+
+    "log" = is simply used to let NoCheat know it is a log action.
+    "string" = is the message that will be logged. Because there is so little
+               space here, you only give a name here and define the actual
+               log message in the "strings" section of the config file.
+    "delay" = a number declaring how many times that action initially has 
+              to be executed before it really leads to logging a message.
+              Use this for situations where it's common to have false
+              positives in checks and you only want the log message to be
+              shown if a player fails the check multiple times within a 
+              short timeframe (1 minute)
+    "repeat" = a number declaring how many seconds have to pass after logging
+               the message before it will be logged again for that player.
+               This is needed to prevent "log-spam". Usually a value of 5
+               seconds is acceptable.
+    "target" = where should the message be logged to? You can use three letters
+               here. "c" means logging to console, "i" means logging to ingame
+               chat and "f" means logging to the log file.
+               
+- "cmd" action is a string of the form "cmd:string:delay:repeat"
+
+    "cmd" = is simply used to let NoCheat know it is a command action.
+    "string" = is the command that will be issued in the console.
+               Because there is so little space here, you only give a 
+               name here and define the actual command in the "strings"
+               section of the config file.
+    "delay" = a number declaring how many times that action initially has 
+              to be executed before it really leads to running the command
+              in the console. Use this to create e.g. a 3-strikes-law by
+              setting it to 3. Only if a player fails the check 3 times
+              within 1 minute, the command will be really run.
+    "repeat" = a number declaring how many seconds have to pass after running
+               the command before it can be run again for that player.
+               Because many commands are expensive (take time, resources), you
+               may want to limit how often they can be called.
+ 
+- "vl>" isn't really an action. It limits all actions that are written
+  afterwards to be only executed if the players violation level has reached
+  the given value. This allows to define layers of actions and handle repeated
+  or severe failing of checks different. For example the spam check will kick
+  players if they reach a certain violation level (vl).
+ 
+3) Now that you know the basics, here is the description of all
+   options that are available in the configuration file.
+
+logging:
+  Anything that has to do with how and where NoCheat shows its messages
+  active:
+    Should messages get logged at all. If you are not interested in messages, 
+    set this to false
+  prefix:
+    Will be placed in front of many log messages. To get colors, use "&" followed by
+    a number (0-9) or a letter (A-F)
+  filename:
+    The name of the logfile that NoCheat will use to log its messages
+  file:
+    Should the logfile be used at all. Set to false if you don't want to use a logfile
+  console:
+    Should the server console be used to display messages. Set to false if you don't
+    want NoCheat to show messages in the console.
+  ingamechat:
+    Should NoCheat display messages in the ingame chat? Set to false if you don't
+    want NoCheat to show messages ingame.
+  showactivechecks:
+    Should NoCheat display lists of checks that are enabled for each world. Set to true
+    if you are unsure if you setup your configuration correctly.
+
+checks:
+  Anything that has to do with the checks that NoCheat executes
+
+  inventory:
+    All checks that have to do with the player inventory
+    drop:
+      The "inventory.drop" check. It limits how many seperate items a player can drop
+      onto the ground within a specific time. Dropping a lot of seperate items at once
+      can cause lag on the server.
+      active:
+        Should the check be enabled. Set to false if you are not interested in this at all
+      time:
+        Over how many seconds should dropped items be counted
+      limit:
+        How many items may be dropped in that timeframe. Please consider that dying causes
+        a player to drop up to 36 seperate items. Therefore this value shouldn't be set
+        below ~50.
+      actions:
+        What should happen when a player goes beyond the set limit. Default settings log
+        a message and kick the player from the server.
+
+  moving:
+    All checks that have to do with player movement
+    runfly:
+      This is a combined check for running, flying and "nofall" hacks
+      active:
+        Should players get checked for movement related hacks at all
+      allowfastsneaking:
+        Should sneaking players be allowed to move as fast as normal players. Set this to
+        true, if you use plugins that enable players to do that (e.g. RPG plugins tend
+        to do that)
+      actions:
+        What should happen when a player sneaks/swims/walks/runs faster than normally 
+        or is flying. Default is to log messages (depending on how severe the cheating
+        is) and teleport the player to a location that he was before ("cancel" the
+        movement)
+      checknofall:
+        Should players be checked for a common type of "nofall" hack, that allows them to
+        avoid taking damage when falling.
+      nofallactions:
+        What should happen if a player is considered to be using a "nofall" hack. Default
+        is to log a message and encourage Bukkit to deal fall damage anyway ("cancel" the
+        hack).
+      flying:
+        Anything related specifically to players that are allowed to fly, but still should
+        be limited in their flying.
+        allowflyingalways:
+          Should all players be allowed to fly always.
+        allowflyingincreative:
+          Should players that are set to "creative mode" be allowed to fly.
+        flyingspeedlimithorizontal:
+          How many 1/100 blocks may a player fly horizontal within one "step". The 
+          official "creative mode" flying reaches speeds of about 0.6 blocks 
+          which means a value of 60 here. 
+        flyingspeedlimitvertical:
+          How many 1/100 blocks may a player fly vertically up within one "step".
+          A value of 100 which means 1 block seems reasonable.
+        flyingheightlimit:
+          What is the maximum height (in blocks) that a player may reach by flying.
+          Some servers experience lag when players fly very, very high. The map is
+          usually 128 high, therefore a value of 250 seems reasonable.
+        actions:
+          What should happen if a player flies faster/higher than defined here?
+          Default is to log messages and to prevent the player from moving ("cancel"
+          his movement)
+    morepackets:
+      The morepackets check is complementary to the "runfly" check. While "runfly"
+      limits the distance a player can move per step, morepackets limits the number
+      of "steps" a player may take per second. A normal value is 20 steps per second.
+      active:
+        Should players be checked for this kind of cheating. If you are not interested
+        in players that cheat that way, set this to false.
+      actions:
+        What should happen if a player is considered to be cheating by taking more steps
+        per second than normal. Default is to log messages and teleport the player back
+        to a location where he was ~1 second before ("cancel" his movement).
+
+  blockbreak:
+    Anything related to checking if players cheat while breaking blocks
+    reach:
+      Players may slightly increase the distance at which they can break blocks. This check
+      will try to identify that by comparing player and block location.
+      active:
+        Should players get checked for this type of hack
+      actions:
+        What should happen if the player is considered to cheat. Default is to prevent him
+        from breaking the block ("cancel" the breaking) and on repeated offenses to log
+        messages about it.
+    direction:
+      Players may break blocks without really looking at them. This is often combined with
+      breaking a lot of blocks surrounding the player at the same time.
+      active:
+        Should players get checked for this type of hack
+      precision:
+        How strict should NoCheat be when comparing the players line of view with the broken
+        block location. The value represents (roughly) the amount of 1/100 blocks that the
+        player is allowed to look past the broken block. 50 (0.5 blocks) seems a good 
+        default value.
+      penaltytime:
+        If a player fails this check, how long should he be prevented from breaking blocks
+        afterwards. In milliseconds. This is intended to make automated destruction of
+        blocks harder. 0.3 seconds, value 300 is the default. Set to 0, if you don't want
+        to limit players at all after failing this check.
+      actions:
+        What should happen if a player fails this check. Default is to prevent the breaking
+        of the block ("cancel" it) and after repeated/more severe offenses to log a message.
+    noswing:
+      Players may break blocks without moving their arm. This is confusing for nearby players,
+      as they won't see who broke the blocks.
+      active:
+        Should players get checked for this type of hack
+      actions:
+        What should happen if the player didn't swing his arm first? Default is to log a
+        message and prevent the breaking of the block ("cancel" it).
+       
+  blockplace:
+    All checks related to placing blocks.
+    reach:
+      Players may place blocks over a bigger distance than usually possible.
+      active:
+        Should players be checked for this type of hack.
+      actions:
+        What should happen if a player placed blocks at bigger distances than usual.
+        Default is to log a message and stop the block placing ("cancel it).
+    direction:
+      Players may place blocks without looking at where they place them.
+      active:
+        Should players be checked for this type of hack.
+      precision:
+        How strict should NoCheat be when checking if a player is looking in the
+        correct direction. 75 (which means a player may be up to 0.75 blocks off)
+        seems to be an ok value.
+      penaltytime:
+        How long after failing this check should the player be prevented from
+        placing any further blocks. This value is in milliseconds, the default
+        is 100, which means 0.1 seconds. If you don't want to have this penalty
+        time, set it to 0.
+      actions:
+        What should be done if a player places blocks outside of his line of
+        sight. Default is to log a message and prevent ("cancel") the block
+        placing.
+
+  chat:
+    All checks related to sending chat messages.
+    color:
+      Players may use colorcodes to send colored messages. This may be used
+      to fool other players into believing they are admins or similar.
+      active:
+        Should player messages get checked for the use of colors in messages.
+      actions:
+        What should be done if a player sends messages with color codes.
+        Default is to log a message and prevent ("cancel") the use of the
+        color codes, by filtering them from the message.
+    spam:
+      Players may send a ton of messages/commands in a short time to cause
+      lag or even crash a server.
+      active:
+        Should player messages get checked for the sending of too many messages.
+      whitelist:
+        A " " (whitespace) seperated list of words. Messages that start with
+        these sequences will not be counted.
+      timeframe:
+        For how many seconds should messages and commands be counted. 
+      messagelimit:
+        How many "normal" chat messages may be sent within the timeframe.
+      commandlimit:
+        How many commands may be issued within the timeframe. Some mods (e.g.
+        TooManyItems) send a command on every mouseclick, which may cause
+        problems if this is set too low.        
+      actions:
+        What should happen if players send more messages/commands? Default is
+        to prevent the message/command from being processed ("cancel" them)
+        and for severe cases where players send a lot of messages/commands,
+        kick them.
+
+  fight:
+    Everything related to fighting
+    direction:
+      Players may attack enemies without looking at them. This check tries to
+      identify such behaviour.
+      active:
+        Should players get checked for such behaviour.
+      precision:
+        How strict should NoCheat be when comparing the line of sight with the
+        position of the target. Default is 75 which means a player may look 
+        0.75 blocks past the actual target. Because the target is moving, this
+        value should be relatively high.
+      penaltytime:
+        If a player fails this check, how long should he be prevented from
+        attacking anything in milliseconds. Default is 500 and therefore 0.5
+        seconds. If you don't want to limit the player like this, set this
+        value to 0.
+      actions:
+        What should happen if the player fails this check. Default is to stop
+        the attack ("cancel" it) and log messages, depending on how much the
+        player fails this check.
+    noswing:
+      Players may attack enemies without moving their arm. This may confuse
+      other players as they can't see who is attacking them or monsters.
+      active:
+        Should players be checked for this behaviour.
+      actions:
+        What should happen if the player fails this check. Default is to stop
+        the attack ("cancel" it) and log messages.
+    reach:
+      Players may attack enemies over a greater distance than usual. This is
+      a significant advantage in fights. Normally attacks are only allowed
+      over a ~4 block distance, but these hacks may increase that to 6 blocks.
+      active:
+        Should players be checked for this behaviour.
+      distance:
+        What is the maximum distance that NoCheat should allow attacks for.
+        Default is 4 blocks (value 400). Setting this even lower will limit
+        the attack distance below the original "legal" distance.
+      penaltytime:
+        If a player fails this check, how long should he be prevented from
+        attacking anything. Default is 0.5 seconds (value 500). If you
+        don't want to limit players like this, set this value to 0.
+      actions:
+        What should happen if the player fails this check. Default is to stop
+        the attack ("cancel" it) and log messages.
+    speed:
+      Players may be attacking extremely fast within a short time by using
+      automated clicking or hacks. This is an advantage in many situations.
+      active:
+        Should players be checked for this behaviour.
+      attacklimit:
+        How many attacks may a player start within 1 second. Consider setting
+        this to a value that's close to how fast you believe players can click
+        their mouse.
+      actions:
+        What should happen if the player fails this check. Default is to stop
+        the attack ("cancel" it) and log messages.
+        
+strings:
+  This is the section that defines various strings for "log" or "cmd" actions.
+  Each has a name (the part in front of ":") and a definition (the part 
+  behind the ":"). Whenever you use a "log" or "cmd" action in one of the 
+  "actions: " options of this config file, the string will be taken from 
+  this section. Arbitrary many additional strings may be defined here, or
+  existing strings may be changed.
+  
+  Most messages/commands use placeholders in [ ], which will be replaced at
+  runtime with relevant information. Some of these may only be available in
+  certain circumstances, only "[player]" can be used everywhere, especially
+  in "cmd" actions.
+
+4) Other stuff
+
+- NoCheat isn't perfect and won't prevent all forms of cheating. It's a best
+  effort approach. 
+  
+- NoCheat may make mistakes. Don't see everything NoCheat says or does as
+  indisputable fact that somebody cheated. It's not possible to be 100% sure
+  if somebody is cheating or not, NoCheat will try to be right most of the
+  time.
