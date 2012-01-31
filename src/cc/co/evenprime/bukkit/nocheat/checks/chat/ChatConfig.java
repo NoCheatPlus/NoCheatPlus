@@ -17,6 +17,7 @@ public class ChatConfig implements ConfigItem {
     public final ActionList spamActions;
     public final boolean    colorCheck;
     public final ActionList colorActions;
+    public final int        commandLimit;
 
     public ChatConfig(NoCheatConfiguration data) {
 
@@ -24,6 +25,7 @@ public class ChatConfig implements ConfigItem {
         spamWhitelist = splitWhitelist(data.getString(ConfPaths.CHAT_SPAM_WHITELIST));
         spamTimeframe = data.getInt(ConfPaths.CHAT_SPAM_TIMEFRAME);
         spamLimit = data.getInt(ConfPaths.CHAT_SPAM_LIMIT);
+        commandLimit = data.getInt(ConfPaths.CHAT_SPAM_COMMANDLIMIT);
         spamActions = data.getActionList(ConfPaths.CHAT_SPAM_ACTIONS);
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS);

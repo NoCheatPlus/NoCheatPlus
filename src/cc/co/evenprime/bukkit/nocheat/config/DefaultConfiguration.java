@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.config;
 
-
 /**
  * These are the default settings for NoCheat. They will be used
  * in addition to/in replacement of configurations given in the
@@ -54,37 +53,38 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.BLOCKBREAK_DIRECTION_CHECK, true);
         set(ConfPaths.BLOCKBREAK_DIRECTION_PRECISION, 50);
         set(ConfPaths.BLOCKBREAK_DIRECTION_PENALTYTIME, 300);
-        set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bbdirection:0:5:cif cancel");
+        set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bbdirection:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:bbnoswing:0:2:cif cancel");
+        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:bbnoswing:0:2:if cancel");
 
         /*** BLOCKPLACE ***/
 
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true);
-        set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:bpreach:0:2:cif cancel");
+        set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:bpreach:0:2:if cancel");
 
         set(ConfPaths.BLOCKPLACE_DIRECTION_CHECK, true);
         set(ConfPaths.BLOCKPLACE_DIRECTION_PRECISION, 75);
         set(ConfPaths.BLOCKPLACE_DIRECTION_PENALTYTIME, 100);
-        set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bpdirection:0:3:cif cancel");
+        set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bpdirection:0:3:if cancel");
 
         /*** CHAT ***/
         set(ConfPaths.CHAT_COLOR_CHECK, true);
-        set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:cif cancel");
+        set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
 
         set(ConfPaths.CHAT_SPAM_CHECK, true);
         set(ConfPaths.CHAT_SPAM_WHITELIST, "");
-        set(ConfPaths.CHAT_SPAM_TIMEFRAME, 5);
-        set(ConfPaths.CHAT_SPAM_LIMIT, 5);
-        set(ConfPaths.CHAT_SPAM_ACTIONS, "log:spam:0:5:cif cancel vl>50 log:spam:0:5:cif cancel cmd:kick");
+        set(ConfPaths.CHAT_SPAM_TIMEFRAME, 3);
+        set(ConfPaths.CHAT_SPAM_LIMIT, 3);
+        set(ConfPaths.CHAT_SPAM_COMMANDLIMIT, 12);
+        set(ConfPaths.CHAT_SPAM_ACTIONS, "log:spam:0:3:if cancel vl>30 log:spam:0:3:cif cancel cmd:kick");
 
         /*** FIGHT ***/
 
         set(ConfPaths.FIGHT_DIRECTION_CHECK, true);
         set(ConfPaths.FIGHT_DIRECTION_PRECISION, 75);
         set(ConfPaths.FIGHT_DIRECTION_PENALTYTIME, 500);
-        set(ConfPaths.FIGHT_DIRECTION_ACTIONS, "cancel vl>5 log:fdirection:3:5:f cancel vl>20 log:fdirection:0:5:cf cancel vl>50 log:fdirection:0:5:cif cancel");
+        set(ConfPaths.FIGHT_DIRECTION_ACTIONS, "cancel vl>5 log:fdirection:3:5:f cancel vl>20 log:fdirection:0:5:if cancel vl>50 log:fdirection:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_NOSWING_CHECK, true);
         set(ConfPaths.FIGHT_NOSWING_ACTIONS, "log:fnoswing:0:5:cif cancel");

@@ -82,7 +82,8 @@ public abstract class ConfPaths {
     public final static String  CHAT_SPAM_CHECK                           = CHAT_SPAM + "active";
     public final static String  CHAT_SPAM_WHITELIST                       = CHAT_SPAM + "whitelist";
     public final static String  CHAT_SPAM_TIMEFRAME                       = CHAT_SPAM + "timeframe";
-    public final static String  CHAT_SPAM_LIMIT                           = CHAT_SPAM + "limit";
+    public final static String  CHAT_SPAM_LIMIT                           = CHAT_SPAM + "messagelimit";
+    public final static String  CHAT_SPAM_COMMANDLIMIT                    = CHAT_SPAM + "commandlimit";
     public final static String  CHAT_SPAM_ACTIONS                         = CHAT_SPAM + "actions";
 
     private final static String FIGHT                                     = CHECKS + "fight.";

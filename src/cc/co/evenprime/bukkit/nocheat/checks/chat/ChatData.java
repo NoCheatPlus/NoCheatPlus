@@ -8,16 +8,17 @@ import cc.co.evenprime.bukkit.nocheat.DataItem;
  */
 public class ChatData implements DataItem {
 
-    public int                    spamVL;
-    public int                    spamTotalVL;
-    public int                    spamFailed;
-    public int                    colorVL;
-    public int                    colorTotalVL;
-    public int                    colorFailed;
+    public int    spamVL;
+    public int    spamTotalVL;
+    public int    spamFailed;
+    public int    colorVL;
+    public int    colorTotalVL;
+    public int    colorFailed;
 
-    public int                    messageCount = 0;
-    public long                   spamLastTime = 0;
-    public String                 message      = "";
+    public int    messageCount = 0;
+    public int    commandCount = 0;
+    public long   spamLastTime = 0;
+    public String message      = "";
 
     @Override
     public void collectData(Map<String, Object> map) {
