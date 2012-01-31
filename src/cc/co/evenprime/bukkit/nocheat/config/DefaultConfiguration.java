@@ -89,6 +89,15 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.FIGHT_NOSWING_CHECK, true);
         set(ConfPaths.FIGHT_NOSWING_ACTIONS, "log:fnoswing:0:5:cif cancel");
 
+        set(ConfPaths.FIGHT_REACH_CHECK, true);
+        set(ConfPaths.FIGHT_REACH_LIMIT, 400);
+        set(ConfPaths.FIGHT_REACH_PENALTYTIME, 500);
+        set(ConfPaths.FIGHT_REACH_ACTIONS, "log:freach:0:5:if cancel");
+
+        set(ConfPaths.FIGHT_SPEED_CHECK, true);
+        set(ConfPaths.FIGHT_SPEED_ATTACKLIMIT, 7);
+        set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
+
         set(ConfPaths.STRINGS + ".drop", "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");
         set(ConfPaths.STRINGS + ".movelong", "[player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations]");
@@ -102,6 +111,8 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.STRINGS + ".color", "[player] failed [check]: Sent colored chat message '[text]'. VL [violations]");
         set(ConfPaths.STRINGS + ".spam", "[player] failed [check]: Last sent message '[text]'. VL [violations]");
         set(ConfPaths.STRINGS + ".fdirection", "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
+        set(ConfPaths.STRINGS + ".freach", "[player] failed [check]: tried to attack entity out of reach. VL [violations]");
+        set(ConfPaths.STRINGS + ".fspeed", "[player] failed [check]: tried to attack too fast. VL [violations]");
         set(ConfPaths.STRINGS + ".fnoswing", "[player] failed [check]: Didn't swing arm. VL [violations]");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
 

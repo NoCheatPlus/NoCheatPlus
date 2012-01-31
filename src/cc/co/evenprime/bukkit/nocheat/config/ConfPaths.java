@@ -98,6 +98,17 @@ public abstract class ConfPaths {
     public final static String  FIGHT_NOSWING_CHECK                       = FIGHT_NOSWING + "active";
     public final static String  FIGHT_NOSWING_ACTIONS                     = FIGHT_NOSWING + "actions";
 
+    private final static String FIGHT_REACH                               = FIGHT + "reach.";
+    public static final String  FIGHT_REACH_CHECK                         = FIGHT_REACH + "active";
+    public static final String  FIGHT_REACH_LIMIT                         = FIGHT_REACH + "distance";
+    public static final String  FIGHT_REACH_PENALTYTIME                   = FIGHT_REACH + "penaltytime";
+    public static final String  FIGHT_REACH_ACTIONS                       = FIGHT_REACH + "actions";
+
+    private final static String FIGHT_SPEED                               = FIGHT + "speed.";
+    public final static String  FIGHT_SPEED_CHECK                         = FIGHT_SPEED + "active";
+    public final static String  FIGHT_SPEED_ATTACKLIMIT                   = FIGHT_SPEED + "attacklimit";
+    public final static String  FIGHT_SPEED_ACTIONS                       = FIGHT_SPEED + "actions";
+
     public final static String  STRINGS                                   = "strings";
 
 }

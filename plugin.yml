@@ -78,6 +78,10 @@ permissions:
                 description: Allow a player to attack players and monster even if they are not in his field of view
               nocheat.checks.fight.noswing:
                 description: Allow a player to fight without swinging their arm
+              nocheat.checks.fight.reach:
+                description: Allow a player to fight over bigger distances than usual
+              nocheat.checks.fight.speed:
+                description: Allow a player to attack faster than usual
           nocheat.checks.inventory:
             description: Allow the player to bypass all inventory checks
             children:

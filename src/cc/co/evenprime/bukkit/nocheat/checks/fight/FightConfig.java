@@ -14,6 +14,13 @@ public class FightConfig implements ConfigItem {
     public final long       directionPenaltyTime;
     public final boolean    noswingCheck;
     public final ActionList noswingActions;
+    public final boolean    reachCheck;
+    public final double     reachLimit;
+    public final long       reachPenaltyTime;
+    public final ActionList reachActions;
+    public final int        speedAttackLimit;
+    public final ActionList speedActions;
+    public final boolean    speedCheck;
 
     public FightConfig(NoCheatConfiguration data) {
 
@@ -23,7 +30,14 @@ public class FightConfig implements ConfigItem {
         directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS);
         noswingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
         noswingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS);
+        reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
+        reachLimit = ((double) (data.getInt(ConfPaths.FIGHT_REACH_LIMIT))) / 100D;
+        reachPenaltyTime = data.getInt(ConfPaths.FIGHT_REACH_PENALTYTIME);
+        reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS);
+        speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
+        speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS);
+        speedAttackLimit = data.getInt(ConfPaths.FIGHT_SPEED_ATTACKLIMIT);
 
-        check = directionCheck || noswingCheck;
+        check = directionCheck || noswingCheck || reachCheck || speedCheck;
     }
 }

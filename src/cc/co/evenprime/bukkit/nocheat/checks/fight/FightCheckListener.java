@@ -26,8 +26,10 @@ public class FightCheckListener implements Listener, EventManager {
     public FightCheckListener(NoCheat plugin) {
 
         this.checks = new ArrayList<FightCheck>(3);
+        this.checks.add(new SpeedCheck(plugin));
         this.checks.add(new NoswingCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
+        this.checks.add(new ReachCheck(plugin));
 
         this.plugin = plugin;
     }
@@ -114,6 +116,10 @@ public class FightCheckListener implements Listener, EventManager {
             s.add("fight.direction");
         if(f.check && f.noswingCheck)
             s.add("fight.noswing");
+        if(f.check && f.reachCheck)
+            s.add("fight.reach");
+        if(f.check && f.speedCheck)
+            s.add("fight.speed");
         return s;
     }
 }
