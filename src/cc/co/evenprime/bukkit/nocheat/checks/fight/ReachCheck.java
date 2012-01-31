@@ -45,6 +45,7 @@ public class ReachCheck extends FightCheck {
         } else {
             // Player failed the check
             // Increment violation counter
+            // This is influenced by lag, so don't do it if there was server lag
             if(!plugin.skipCheck()) {
                 double sqrt = Math.sqrt(off);
                 data.reachVL += sqrt;

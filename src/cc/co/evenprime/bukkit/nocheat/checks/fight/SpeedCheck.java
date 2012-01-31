@@ -48,6 +48,8 @@ public class SpeedCheck extends FightCheck {
 
         if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).speedVL);
+        else if(wildcard == ParameterName.LIMIT)
+            return String.format(Locale.US, "%d", (int) getConfig(player.getConfigurationStore()).speedAttackLimit);
         else
             return super.getParameter(wildcard, player);
     }
