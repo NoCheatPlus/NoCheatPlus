@@ -156,7 +156,7 @@ public class RunningCheck extends MovingCheck {
         if(cc.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
             limit = cc.sneakingSpeedLimit;
             suffix = "sneaking";
-        } else if(isSwimming) {
+        } else if(isSwimming && !player.hasPermission(Permissions.MOVING_SWIMMING)) {
             limit = cc.swimmingSpeedLimit;
             suffix = "swimming";
         } else if(!sprinting) {

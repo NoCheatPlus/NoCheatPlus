@@ -25,14 +25,14 @@ permissions:
         description: Give a player all admin rights
         children:
           nocheat.admin.chatlog:
-            description: Show log messages in the players chat
+            description: Player can see NoCheats log messages in the ingame chat
           nocheat.admin.commands:
-            description: allow use of all of the "nocheat" commands
+            description: allow use of the "nocheat" commands
       nocheat.checks:
         description: Allow the player to bypass all checks
         children:
           nocheat.checks.moving: 
-            description: Allow the player to bypass all moving checks
+            description: Allow the player to bypass all moving related checks
             children:
               nocheat.checks.moving.runfly:
                 description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
@@ -69,8 +69,6 @@ permissions:
                 description: Allow a player to send an infinite amount of chat messages
               nocheat.checks.chat.color:
                 description: Allow a player to send colored chat messages
-              nocheat.checks.chat.empty:
-                description: Allow a player to send empty messages (normally not possible)
           nocheat.checks.fight:
             description: Allow the player to bypass all fight checks
             children:
