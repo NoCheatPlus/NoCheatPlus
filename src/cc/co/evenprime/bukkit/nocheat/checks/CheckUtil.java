@@ -82,7 +82,7 @@ public class CheckUtil {
 
     // All fences are solid - fences are treated specially due
     // to being 1.5 blocks high
-    private static final int    FENCE    = 16 | SOLID;          // 0x00010010
+    private static final int    FENCE    = 16 | SOLID | NONSOLID;          // 0x00010010
 
     private static final int    INGROUND = 128;
     private static final int    ONGROUND = 256;
