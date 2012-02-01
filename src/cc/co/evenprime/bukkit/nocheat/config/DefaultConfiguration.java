@@ -58,7 +58,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bbdirection:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:bbnoswing:0:2:if cancel");
+        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:bbnoswing:3:2:if cancel");
 
         /*** BLOCKPLACE ***/
 
@@ -94,10 +94,10 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.FIGHT_REACH_CHECK, true);
         set(ConfPaths.FIGHT_REACH_LIMIT, 400);
         set(ConfPaths.FIGHT_REACH_PENALTYTIME, 500);
-        set(ConfPaths.FIGHT_REACH_ACTIONS, "log:freach:2:5:if cancel");
+        set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
 
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
-        set(ConfPaths.FIGHT_SPEED_ATTACKLIMIT, 7);
+        set(ConfPaths.FIGHT_SPEED_ATTACKLIMIT, 10);
         set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
 
         set(ConfPaths.STRINGS + ".drop", "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");

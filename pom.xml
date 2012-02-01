@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cc.co.evenprime.bukkit</groupId>
 	<artifactId>NoCheat</artifactId>
-	<version>2.26</version>
+	<version>3.0.0</version>
 	<packaging>jar</packaging>
 	<name>NoCheat</name>
 	<properties>

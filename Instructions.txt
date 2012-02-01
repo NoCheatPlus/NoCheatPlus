@@ -317,15 +317,17 @@ checks:
         Should players be checked for this behaviour.
       distance:
         What is the maximum distance that NoCheat should allow attacks for.
-        Default is 4 blocks (value 400). Setting this even lower will limit
-        the attack distance below the original "legal" distance.
+        Default is ~4 blocks (value 400). Setting this even lower will limit
+        the attack distance below the original "legal" distance and cause
+        false positives.
       penaltytime:
         If a player fails this check, how long should he be prevented from
         attacking anything. Default is 0.5 seconds (value 500). If you
         don't want to limit players like this, set this value to 0.
       actions:
         What should happen if the player fails this check. Default is to stop
-        the attack ("cancel" it) and log messages.
+        the attack ("cancel" it) and if the player reach a certain vl,
+        log a message.
     speed:
       Players may be attacking extremely fast within a short time by using
       automated clicking or hacks. This is an advantage in many situations.
