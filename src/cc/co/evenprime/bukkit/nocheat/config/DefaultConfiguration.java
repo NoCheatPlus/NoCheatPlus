@@ -97,7 +97,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
 
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
-        set(ConfPaths.FIGHT_SPEED_ATTACKLIMIT, 10);
+        set(ConfPaths.FIGHT_SPEED_ATTACKLIMIT, 15);
         set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
 
         set(ConfPaths.STRINGS + ".drop", "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
