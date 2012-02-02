@@ -43,7 +43,7 @@ public class MovingConfig implements ConfigItem {
 
         runflyCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECK);
         walkingSpeedLimit = ((double) 22) / 100D;
-        sprintingSpeedLimit = ((double) 40) / 100D;
+        sprintingSpeedLimit = ((double) 35) / 100D;
         jumpheight = ((double) 135) / 100D;
         actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS);
 
