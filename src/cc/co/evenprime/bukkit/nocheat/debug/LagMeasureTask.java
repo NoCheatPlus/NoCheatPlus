@@ -1,5 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.debug;
 
+import org.bukkit.World;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 
 public class LagMeasureTask implements Runnable {
@@ -28,12 +29,13 @@ public class LagMeasureTask implements Runnable {
             // If the previous second took to long, skip checks during
             // this second
             skipCheck = lastIngamesecondDuration > 1500;
-            
-            if(oldStatus != skipCheck && skipCheck) {
-                System.out.println("[NoCheat] detected server lag, some checks will not work.");
-            }
-            else if(oldStatus != skipCheck && !skipCheck) {
-                System.out.println("[NoCheat] server lag seems to have stopped, reenabling checks.");
+
+            if(plugin.getConfig((World) null).logging.debugmessages) {
+                if(oldStatus != skipCheck && skipCheck) {
+                    System.out.println("[NoCheat] detected server lag, some checks will not work.");
+                } else if(oldStatus != skipCheck && !skipCheck) {
+                    System.out.println("[NoCheat] server lag seems to have stopped, reenabling checks.");
+                }
             }
 
             long time = System.currentTimeMillis();

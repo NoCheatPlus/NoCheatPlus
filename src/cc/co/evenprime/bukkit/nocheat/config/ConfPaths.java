@@ -14,6 +14,7 @@ public abstract class ConfPaths {
     public final static String  LOGGING_LOGTOCONSOLE                      = LOGGING + "console";
     public final static String  LOGGING_LOGTOINGAMECHAT                   = LOGGING + "ingamechat";
     public final static String  LOGGING_SHOWACTIVECHECKS                  = LOGGING + "showactivechecks";
+    public final static String  LOGGING_DEBUGMESSAGES                     = LOGGING + "debugmessages";
 
     private final static String CHECKS                                    = "checks.";
     private final static String INVENTORY_DROP                            = CHECKS + "inventory.drop.";

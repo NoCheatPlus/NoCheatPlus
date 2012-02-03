@@ -104,6 +104,9 @@ logging:
   showactivechecks:
     Should NoCheat display lists of checks that are enabled for each world. Set to true
     if you are unsure if you setup your configuration correctly.
+  debugmessages:
+    Should some additional messages be displayed in the server console, e.g. about
+    NoCheat encountering lag.
 
 checks:
   Anything that has to do with the checks that NoCheat executes

@@ -12,11 +12,13 @@ public class LoggingConfig {
     public final boolean toConsole;
     public final boolean toChat;
     public final String  prefix;
+    public final boolean debugmessages;
 
     public LoggingConfig(NoCheatConfiguration data) {
 
         active = data.getBoolean(ConfPaths.LOGGING_ACTIVE);
         showactivechecks = data.getBoolean(ConfPaths.LOGGING_SHOWACTIVECHECKS);
+        debugmessages = data.getBoolean(ConfPaths.LOGGING_DEBUGMESSAGES);
         prefix = data.getString(ConfPaths.LOGGING_PREFIX);
         toFile = data.getBoolean(ConfPaths.LOGGING_LOGTOFILE);
         toConsole = data.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE);

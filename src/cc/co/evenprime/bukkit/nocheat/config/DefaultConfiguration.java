@@ -17,6 +17,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         /** LOGGING **/
         set(ConfPaths.LOGGING_ACTIVE, true);
         set(ConfPaths.LOGGING_SHOWACTIVECHECKS, false);
+        set(ConfPaths.LOGGING_DEBUGMESSAGES, false);
         set(ConfPaths.LOGGING_PREFIX, "&4NC&f: ");
         set(ConfPaths.LOGGING_FILENAME, "nocheat.log");
         set(ConfPaths.LOGGING_LOGTOFILE, true);
