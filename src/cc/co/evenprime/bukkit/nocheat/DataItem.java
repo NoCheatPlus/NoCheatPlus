@@ -9,7 +9,5 @@ import java.util.Map;
  */
 public interface DataItem {
 
-    public void clearCriticalData();
-
     public abstract void collectData(Map<String, Object> map);
 }

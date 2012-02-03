@@ -26,7 +26,7 @@ public class RunflyCheck extends MovingCheck {
         if(player.hasPermission(Permissions.MOVING_RUNFLY)) {
             // If the player doesn't get checked for movement
             // reset his critical data
-            data.clearCriticalData();
+            data.clearRunFlyData();
             return null;
         }
         final boolean flyAllowed = cc.allowFlying || player.hasPermission(Permissions.MOVING_FLYING) || (player.isCreative() && cc.identifyCreativeMode);

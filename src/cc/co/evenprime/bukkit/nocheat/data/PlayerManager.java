@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import org.bukkit.entity.Player;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.player.NoCheatPlayerImpl;
@@ -44,23 +42,6 @@ public class PlayerManager {
         p.refresh(player);
 
         return p;
-    }
-
-    /**
-     * Reset data that may cause problems after e.g. changing the config
-     * 
-     */
-    public void clearCriticalData() {
-        for(NoCheatPlayer b : this.players.values()) {
-            b.getDataStore().clearCriticalData();
-        }
-    }
-
-    public void clearCriticalData(String playerName) {
-        NoCheatPlayer p = this.players.get(playerName.toLowerCase());
-        if(p != null) {
-            p.getDataStore().clearCriticalData();
-        }
     }
 
     public void cleanDataMap() {

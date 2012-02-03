@@ -10,6 +10,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.util.Vector;
@@ -77,7 +79,7 @@ public class MovingCheckListener implements Listener, EventManager {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    protected void teleport(final PlayerTeleportEvent event) {
+    public void teleport(final PlayerTeleportEvent event) {
 
         // No typo here, I really want to only handle cancelled events
         if(!event.isCancelled())
@@ -86,15 +88,37 @@ public class MovingCheckListener implements Listener, EventManager {
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final MovingData data = MovingCheck.getData(player.getDataStore());
 
+        // If it was a teleport initialized by NoCheat, do it anyway
         if(data.teleportTo.isSet() && data.teleportTo.equals(event.getTo())) {
             event.setCancelled(false);
+        } else {
+            // Only if it wasn't NoCheat, drop data from morepackets check
+            data.clearMorePacketsData();
         }
-        return;
 
+        // Always forget runfly specific data
+        data.teleportTo.reset();
+        data.clearRunFlyData();
+
+        return;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void portal(final PlayerPortalEvent event) {
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
+        data.clearMorePacketsData();
+        data.clearRunFlyData();
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void portal(final PlayerRespawnEvent event) {
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
+        data.clearMorePacketsData();
+        data.clearRunFlyData();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    protected void move(final PlayerMoveEvent event) {
+    public void move(final PlayerMoveEvent event) {
 
         if(event.isCancelled())
             return;
@@ -107,7 +131,6 @@ public class MovingCheckListener implements Listener, EventManager {
         }
 
         final MovingConfig cc = MovingCheck.getConfig(player.getConfigurationStore());
-
         final MovingData data = MovingCheck.getData(player.getDataStore());
 
         // Various calculations related to velocity estimates
@@ -116,7 +139,8 @@ public class MovingCheckListener implements Listener, EventManager {
         if(!cc.check || player.hasPermission(Permissions.MOVING)) {
             // Just because he is allowed now, doesn't mean he will always
             // be. So forget data about the player related to moving
-            player.getDataStore().get("moving").clearCriticalData();
+            data.clearRunFlyData();
+            data.clearMorePacketsData();
             return;
         }
 
@@ -171,7 +195,7 @@ public class MovingCheckListener implements Listener, EventManager {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    protected void velocity(final PlayerVelocityEvent event) {
+    public void velocity(final PlayerVelocityEvent event) {
         if(event.isCancelled())
             return;
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());

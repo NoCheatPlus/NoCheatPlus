@@ -2,15 +2,10 @@ package cc.co.evenprime.bukkit.nocheat.checks;
 
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -30,32 +25,11 @@ public class WorkaroundsListener implements Listener, EventManager {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void teleport(final PlayerTeleportEvent event) {
-        if(event.isCancelled())
-            return;
-        handleTeleportation(event.getPlayer(), event.getTo());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void portal(final PlayerPortalEvent event) {
-        if(event.isCancelled())
-            return;
-        handleTeleportation(event.getPlayer(), event.getTo());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void respawn(final PlayerRespawnEvent event) {
-        handleTeleportation(event.getPlayer(), event.getRespawnLocation());
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void playerMove(final PlayerMoveEvent event) {
         // No typo here. I really only handle cancelled events and ignore others
         if(!event.isCancelled())
             return;
-
-        handleTeleportation(event.getPlayer(), event.getTo());
 
         // Fix a common mistake that other developers make (cancelling move
         // events is crazy, rather set the target location to the from location)
@@ -68,10 +42,6 @@ public class WorkaroundsListener implements Listener, EventManager {
         if(event.isCancelled() && event.isSprinting()) {
             event.setCancelled(false);
         }
-    }
-
-    private void handleTeleportation(final Player player, final Location to) {
-        plugin.clearCriticalData(player.getName());
     }
 
     @Override

@@ -126,10 +126,6 @@ public class NoCheat extends JavaPlugin implements Listener {
             return conf.getConfigurationCacheForWorld(null);
     }
 
-    public void clearCriticalData(String playerName) {
-        players.clearCriticalData(playerName);
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         boolean result = CommandHandler.handleCommand(this, sender, command, label, args);
@@ -159,7 +155,6 @@ public class NoCheat extends JavaPlugin implements Listener {
         conf.cleanup();
         this.conf = new ConfigurationManager(this, this.getDataFolder());
         players.cleanDataMap();
-        players.clearCriticalData();
     }
 
     /**

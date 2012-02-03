@@ -48,7 +48,7 @@ public class MovingData implements DataItem {
     public int                   bunnyhopdelay;
 
     public int                   morePacketsCounter;
-    public int                   morePacketsBuffer       = 50;
+    public int                   morePacketsBuffer       = 30;
     public int                   packets;
 
     public final PreciseLocation morePacketsSetbackPoint = new PreciseLocation();
@@ -67,16 +67,17 @@ public class MovingData implements DataItem {
 
     public int                   onIce                   = 0;
 
-    @Override
-    public void clearCriticalData() {
-        teleportTo.reset();
-        jumpPhase = 0;
+    public void clearRunFlyData() {
         runflySetBackPoint.reset();
+        jumpPhase = 0;
         fallDistance = 0;
         lastAddedFallDistance = 0;
         bunnyhopdelay = 0;
-        morePacketsBuffer = 50;
+    }
+
+    public void clearMorePacketsData() {
         morePacketsSetbackPoint.reset();
+        morePacketsBuffer = 30;
         lastElapsedIngameSeconds = 0;
         morePacketsCounter = 0;
     }

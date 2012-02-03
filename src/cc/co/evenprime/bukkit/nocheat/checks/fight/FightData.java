@@ -38,9 +38,4 @@ public class FightData implements DataItem {
         map.put("fight.noswing.failed", noswingFailed);
         map.put("fight.reach.failed", (int) reachFailed);
     }
-
-    @Override
-    public void clearCriticalData() {
-
-    }
 }

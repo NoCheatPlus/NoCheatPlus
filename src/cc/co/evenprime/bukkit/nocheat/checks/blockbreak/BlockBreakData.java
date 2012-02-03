@@ -29,14 +29,6 @@ public class BlockBreakData implements DataItem {
     public final SimpleLocation   lastDamagedBlock           = new SimpleLocation();
 
     @Override
-    public void clearCriticalData() {
-        instaBrokenBlockLocation.reset();
-        brokenBlockLocation.reset();
-        directionLastViolationTime = 0;
-        armswung = true;
-    }
-
-    @Override
     public void collectData(Map<String, Object> map) {
         map.put("blockbreak.reach.vl", (int) reachTotalVL);
         map.put("blockbreak.direction.vl", (int) directionTotalVL);

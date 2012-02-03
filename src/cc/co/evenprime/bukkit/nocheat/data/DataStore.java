@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.data;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import cc.co.evenprime.bukkit.nocheat.DataItem;
 
 public class DataStore {
@@ -18,12 +17,6 @@ public class DataStore {
 
     public void set(String id, DataItem data) {
         dataMap.put(id, data);
-    }
-
-    public void clearCriticalData() {
-        for(DataItem data : dataMap.values()) {
-            data.clearCriticalData();
-        }
     }
 
     public void collectData(Map<String, Object> map) {

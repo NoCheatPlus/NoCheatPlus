@@ -16,9 +16,4 @@ public class InventoryData implements DataItem {
         map.put("inventory.drop.vl", (int) dropTotalVL);
         map.put("inventory.drop.failed", (int) dropFailed);
     }
-
-    @Override
-    public void clearCriticalData() {
-
-    }
 }

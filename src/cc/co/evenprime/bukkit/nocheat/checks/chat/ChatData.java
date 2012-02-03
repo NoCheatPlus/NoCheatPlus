@@ -27,9 +27,4 @@ public class ChatData implements DataItem {
         map.put("chat.spam.failed", spamFailed);
         map.put("chat.color.failed", colorFailed);
     }
-
-    @Override
-    public void clearCriticalData() {
-
-    }
 }
