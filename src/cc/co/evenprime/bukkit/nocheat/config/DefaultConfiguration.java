@@ -36,6 +36,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.MOVING_RUNFLY_ACTIONS, "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
 
         set(ConfPaths.MOVING_RUNFLY_CHECKNOFALL, true);
+        set(ConfPaths.MOVING_RUNFLY_NOFALLAGGRESSIVE, true);
         set(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS, "log:nofall:0:5:cif cancel");
 
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS, false);

@@ -147,6 +147,9 @@ checks:
       checknofall:
         Should players be checked for a common type of "nofall" hack, that allows them to
         avoid taking damage when falling.
+      nofallaggressivemode:
+        Enable improved version of nofall check, that will catch additional types of
+        "nofall" hacks and deal damage to players directly (experimental).
       nofallactions:
         What should happen if a player is considered to be using a "nofall" hack. Default
         is to log a message and encourage Bukkit to deal fall damage anyway ("cancel" the

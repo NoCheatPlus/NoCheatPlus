@@ -31,6 +31,7 @@ public abstract class ConfPaths {
     public final static String  MOVING_RUNFLY_ACTIONS                     = MOVING_RUNFLY + "actions";
 
     public final static String  MOVING_RUNFLY_CHECKNOFALL                 = MOVING_RUNFLY + "checknofall";
+    public final static String  MOVING_RUNFLY_NOFALLAGGRESSIVE            = MOVING_RUNFLY + "nofallaggressivemode";
     public final static String  MOVING_RUNFLY_NOFALLACTIONS               = MOVING_RUNFLY + "nofallactions";
 
     private final static String MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";

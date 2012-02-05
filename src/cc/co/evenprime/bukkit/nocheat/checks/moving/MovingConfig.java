@@ -29,6 +29,7 @@ public class MovingConfig implements ConfigItem {
     public final ActionList flyingActions;
 
     public final boolean    nofallCheck;
+    public final boolean    nofallaggressive;
     public final float      nofallMultiplier;
     public final ActionList nofallActions;
 
@@ -59,6 +60,7 @@ public class MovingConfig implements ConfigItem {
 
         nofallCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECKNOFALL);
         nofallMultiplier = ((float) 200) / 100F;
+        nofallaggressive = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALLAGGRESSIVE);
         nofallActions = data.getActionList(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS);
 
         morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);

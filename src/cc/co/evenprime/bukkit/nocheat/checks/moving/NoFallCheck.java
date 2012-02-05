@@ -31,15 +31,23 @@ public class NoFallCheck extends MovingCheck {
             data.lastAddedFallDistance = 0F;
             return null;
         }
-        
+
         // This check is pretty much always a step behind for technical reasons.
         if(data.fromOnOrInGround) {
             // Start with zero fall distance
             data.fallDistance = 0F;
         }
-        
-        if(data.fromOnOrInGround && data.toOnOrInGround && data.from.y <= data.to.y && player.getPlayer().getFallDistance() > 2.0F) {
-            player.dealFallDamage();
+
+        if(cc.nofallaggressive && data.fromOnOrInGround && data.toOnOrInGround && data.from.y <= data.to.y && player.getPlayer().getFallDistance() > 3.0F) {
+            data.fallDistance = player.getPlayer().getFallDistance();
+            data.nofallVL += data.fallDistance;
+            data.nofallTotalVL += data.fallDistance;
+            data.nofallFailed++;
+            final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallVL));
+            if(cancel) {
+                player.dealFallDamage();
+            }
+            data.fallDistance = 0F;
         }
 
         // If we increased fall height before for no good reason, reduce now by
