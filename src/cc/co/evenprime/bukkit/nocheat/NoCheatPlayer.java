@@ -25,7 +25,10 @@ public interface NoCheatPlayer {
 
     public float getSpeedAmplifier();
 
+    public float getJumpAmplifier();
+
     public boolean isCreative();
 
     public ExecutionHistory getExecutionHistory();
+
 }

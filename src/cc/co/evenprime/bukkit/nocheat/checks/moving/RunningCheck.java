@@ -62,7 +62,7 @@ public class RunningCheck extends MovingCheck {
         PreciseLocation newToLocation = null;
 
         final double resultHoriz = Math.max(0.0D, checkHorizontal(player, data, CheckUtil.isLiquid(fromType) && CheckUtil.isLiquid(toType), horizontalDistance, cc));
-        final double resultVert = Math.max(0.0D, checkVertical(data, fromOnGround, toOnGround, cc));
+        final double resultVert = Math.max(0.0D, checkVertical(player, data, fromOnGround, toOnGround, cc));
 
         final double result = (resultHoriz + resultVert) * 100;
 
@@ -214,21 +214,34 @@ public class RunningCheck extends MovingCheck {
      * Calculate if and how much the player "failed" this check.
      * 
      */
-    private double checkVertical(final MovingData data, final boolean fromOnGround, final boolean toOnGround, final MovingConfig cc) {
+    private double checkVertical(final NoCheatPlayer player, final MovingData data, final boolean fromOnGround, final boolean toOnGround, final MovingConfig cc) {
 
         // How much higher did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
-        double limit = data.vertFreedom + cc.jumpheight;
+        double jumpAmplifier = player.getJumpAmplifier();
+        if(jumpAmplifier > data.lastJumpAmplifier) {
+            data.lastJumpAmplifier = jumpAmplifier;
+        }
 
-        if(data.jumpPhase > jumpingLimit) {
+        double limit = data.vertFreedom + cc.jumpheight;
+        
+        limit *= data.lastJumpAmplifier;
+
+        if(data.jumpPhase > jumpingLimit + data.lastJumpAmplifier) {
             limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
         }
+
         distanceAboveLimit = data.to.y - data.runflySetBackPoint.y - limit;
 
         if(distanceAboveLimit > 0) {
             data.checknamesuffix = "vertical";
         }
+
+        if(toOnGround || fromOnGround) {
+            data.lastJumpAmplifier = 0;
+        }
+
         return distanceAboveLimit;
 
     }

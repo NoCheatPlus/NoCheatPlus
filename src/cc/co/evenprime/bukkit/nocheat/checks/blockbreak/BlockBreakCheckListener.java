@@ -24,7 +24,7 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 public class BlockBreakCheckListener implements Listener, EventManager {
 
     private final List<BlockBreakCheck> checks;
-    private final NoCheat plugin;
+    private final NoCheat               plugin;
 
     public BlockBreakCheckListener(NoCheat plugin) {
 
@@ -33,14 +33,15 @@ public class BlockBreakCheckListener implements Listener, EventManager {
         this.checks.add(new NoswingCheck(plugin));
         this.checks.add(new ReachCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
-        
+
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void blockBreak(final BlockBreakEvent event) {
 
-        if(event.isCancelled()) return;
+        if(event.isCancelled())
+            return;
 
         boolean cancelled = false;
 
@@ -78,8 +79,9 @@ public class BlockBreakCheckListener implements Listener, EventManager {
     @EventHandler(priority = EventPriority.MONITOR)
     public void blockHit(final BlockDamageEvent event) {
 
-        if(event.isCancelled()) return;
-        
+        if(event.isCancelled())
+            return;
+
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         BlockBreakData data = BlockBreakCheck.getData(player.getDataStore());
 

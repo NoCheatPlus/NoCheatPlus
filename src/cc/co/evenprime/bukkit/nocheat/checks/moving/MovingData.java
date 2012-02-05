@@ -32,6 +32,7 @@ public class MovingData implements DataItem {
     public int                   morePacketsFailed;
 
     public int                   jumpPhase;
+    public double                lastJumpAmplifier;
 
     public final PreciseLocation runflySetBackPoint      = new PreciseLocation();
 

@@ -77,6 +77,22 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
         }
     }
 
+    @Override
+    public float getJumpAmplifier() {
+        EntityPlayer ep = ((CraftPlayer) player).getHandle();
+        if(ep.hasEffect(MobEffectList.JUMP)) {
+            int amp = ep.getEffect(MobEffectList.JUMP).getAmplifier();
+            // Very rough estimates only
+            if(amp > 20) {
+                return 1.5F * (float) (ep.getEffect(MobEffectList.JUMP).getAmplifier() + 1);
+            } else {
+                return 1.2F * (float) (ep.getEffect(MobEffectList.JUMP).getAmplifier() + 1);
+            }
+        } else {
+            return 1.0F;
+        }
+    }
+
     public boolean isSprinting() {
         return player.isSprinting();
     }

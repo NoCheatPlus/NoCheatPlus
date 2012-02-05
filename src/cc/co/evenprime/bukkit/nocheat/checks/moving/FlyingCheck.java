@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Locale;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
@@ -78,8 +77,19 @@ public class FlyingCheck extends MovingCheck {
 
         resultHoriz *= 100;
 
+        double jumpAmplifier = player.getJumpAmplifier();
+        if(jumpAmplifier > data.lastJumpAmplifier) {
+            data.lastJumpAmplifier = jumpAmplifier;
+        }
+
+        double speedLimitVertical = ccmoving.flyingSpeedLimitVertical * data.lastJumpAmplifier;
+
+        if(data.from.y >= data.to.y && data.lastJumpAmplifier > 0) {
+            data.lastJumpAmplifier--;
+        }
+
         // super simple, just check distance compared to max distance
-        resultVert = Math.max(0.0D, yDistance - data.vertFreedom - ccmoving.flyingSpeedLimitVertical) * 100;
+        resultVert = Math.max(0.0D, yDistance - data.vertFreedom - speedLimitVertical) * 100;
 
         result = resultHoriz + resultVert;
 
