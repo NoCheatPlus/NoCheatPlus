@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
 import java.util.Locale;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
@@ -32,11 +31,15 @@ public class NoFallCheck extends MovingCheck {
             data.lastAddedFallDistance = 0F;
             return null;
         }
-
+        
         // This check is pretty much always a step behind for technical reasons.
         if(data.fromOnOrInGround) {
             // Start with zero fall distance
             data.fallDistance = 0F;
+        }
+        
+        if(data.fromOnOrInGround && data.toOnOrInGround && data.from.y <= data.to.y && player.getPlayer().getFallDistance() > 2.0F) {
+            player.dealFallDamage();
         }
 
         // If we increased fall height before for no good reason, reduce now by

@@ -117,4 +117,11 @@ public class NoCheatPlayerImpl implements NoCheatPlayer {
     public ExecutionHistory getExecutionHistory() {
         return history;
     }
+
+    @Override
+    public void dealFallDamage() {
+        EntityPlayer p = ((CraftPlayer) player).getHandle();
+        p.b(0D, true);
+
+    }
 }

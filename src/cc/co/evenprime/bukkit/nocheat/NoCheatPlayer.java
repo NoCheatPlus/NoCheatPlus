@@ -31,4 +31,6 @@ public interface NoCheatPlayer {
 
     public ExecutionHistory getExecutionHistory();
 
+    public void dealFallDamage();
+
 }
