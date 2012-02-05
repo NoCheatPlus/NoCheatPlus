@@ -18,11 +18,11 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
  */
 public class WorkaroundsListener implements Listener, EventManager {
 
-    private final NoCheat plugin;
+    //private final NoCheat plugin;
 
     public WorkaroundsListener(NoCheat plugin) {
 
-        this.plugin = plugin;
+        //this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
