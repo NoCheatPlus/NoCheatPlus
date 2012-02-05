@@ -33,6 +33,7 @@ public class MovingData implements DataItem {
 
     public int                   jumpPhase;
     public double                lastJumpAmplifier;
+    public int                   onIce                   = 0;
 
     public final PreciseLocation runflySetBackPoint      = new PreciseLocation();
 
@@ -48,15 +49,12 @@ public class MovingData implements DataItem {
     public double                horizontalBuffer;
     public int                   bunnyhopdelay;
 
-    public int                   morePacketsCounter;
-    public int                   morePacketsBuffer       = 30;
-    public int                   packets;
+    public long                  morePacketsLastTime;
+    public int                   morePacketsBuffer       = 50;
 
     public final PreciseLocation morePacketsSetbackPoint = new PreciseLocation();
 
     public final PreciseLocation teleportTo              = new PreciseLocation();
-
-    public int                   lastElapsedIngameSeconds;
 
     public final PreciseLocation from                    = new PreciseLocation();
     public final PreciseLocation to                      = new PreciseLocation();
@@ -66,7 +64,7 @@ public class MovingData implements DataItem {
 
     public String                checknamesuffix         = "";
 
-    public int                   onIce                   = 0;
+    public int                   packets;
 
     public void clearRunFlyData() {
         runflySetBackPoint.reset();
@@ -78,9 +76,6 @@ public class MovingData implements DataItem {
 
     public void clearMorePacketsData() {
         morePacketsSetbackPoint.reset();
-        morePacketsBuffer = 30;
-        lastElapsedIngameSeconds = 0;
-        morePacketsCounter = 0;
     }
 
     @Override
