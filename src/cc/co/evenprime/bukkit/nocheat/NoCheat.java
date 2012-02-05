@@ -133,22 +133,10 @@ public class NoCheat extends JavaPlugin implements Listener {
         return result;
     }
 
-    public int getIngameSeconds() {
-        if(lagMeasureTask != null)
-            return lagMeasureTask.getIngameSeconds();
-        return 0;
-    }
-
     public boolean skipCheck() {
         if(lagMeasureTask != null)
             return lagMeasureTask.skipCheck();
         return false;
-    }
-
-    public long getIngameSecondDuration() {
-        if(lagMeasureTask != null)
-            return lagMeasureTask.getIngameSecondDuration();
-        return 1000L;
     }
 
     public void reloadConfiguration() {

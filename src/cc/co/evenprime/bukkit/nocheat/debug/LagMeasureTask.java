@@ -28,7 +28,7 @@ public class LagMeasureTask implements Runnable {
             boolean oldStatus = skipCheck;
             // If the previous second took to long, skip checks during
             // this second
-            skipCheck = lastIngamesecondDuration > 1500;
+            skipCheck = lastIngamesecondDuration > 2000;
 
             if(plugin.getConfig((World) null).logging.debugmessages) {
                 if(oldStatus != skipCheck && skipCheck) {
@@ -68,14 +68,6 @@ public class LagMeasureTask implements Runnable {
             }
             lagMeasureTaskId = -1;
         }
-    }
-
-    public int getIngameSeconds() {
-        return ingameseconds;
-    }
-
-    public long getIngameSecondDuration() {
-        return lastIngamesecondDuration;
     }
 
     public boolean skipCheck() {
