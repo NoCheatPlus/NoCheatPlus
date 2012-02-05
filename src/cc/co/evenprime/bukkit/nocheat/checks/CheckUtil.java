@@ -71,18 +71,18 @@ public class CheckUtil {
     private final static double magic    = 0.45D;
     private final static double magic2   = 0.55D;
 
-    private static final int    NONSOLID = 1;                   // 0x00000001
-    private static final int    SOLID    = 2;                   // 0x00000010
+    private static final int    NONSOLID = 1;                    // 0x00000001
+    private static final int    SOLID    = 2;                    // 0x00000010
 
     // All liquids are "nonsolid" too
-    private static final int    LIQUID   = 4 | NONSOLID;        // 0x00000101
+    private static final int    LIQUID   = 4 | NONSOLID;         // 0x00000101
 
     // All ladders are "nonsolid" and "solid" too
     private static final int    LADDER   = 8 | NONSOLID | SOLID; // 0x00001011
 
     // All fences are solid - fences are treated specially due
     // to being 1.5 blocks high
-    private static final int    FENCE    = 16 | SOLID | NONSOLID;          // 0x00010010
+    private static final int    FENCE    = 16 | SOLID | NONSOLID; // 0x00010010
 
     private static final int    INGROUND = 128;
     private static final int    ONGROUND = 256;
@@ -139,7 +139,7 @@ public class CheckUtil {
         types[Material.WOODEN_DOOR.getId()] = SOLID | NONSOLID;
         types[Material.IRON_DOOR_BLOCK.getId()] = SOLID | NONSOLID;
         types[Material.TRAP_DOOR.getId()] = SOLID | NONSOLID;
-        
+
         // repeaters are technically half blocks
         types[Material.DIODE_BLOCK_OFF.getId()] = SOLID | NONSOLID;
         types[Material.DIODE_BLOCK_ON.getId()] = SOLID | NONSOLID;
@@ -222,45 +222,46 @@ public class CheckUtil {
         final int base = types[world.getBlockTypeIdAt(x, y, z)];
         final int below = types[world.getBlockTypeIdAt(x, y - 1, z)];
 
+        int type = 0;
         // Special case: Standing on a fence
         // Behave as if there is a block on top of the fence
         if((below == FENCE) && base != FENCE && isNonSolid(top)) {
-            return INGROUND;
+            type |= INGROUND;
         }
 
         // Special case: Fence
         // Being a bit above a fence
         if(below != FENCE && isNonSolid(base) && types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) {
-            return ONGROUND;
+            type |= ONGROUND;
         }
 
         if(isNonSolid(top)) {
             // Simplest (and most likely) case:
             // Below the player is a solid block
             if(isSolid(below) && isNonSolid(base)) {
-                return ONGROUND;
+                type |= ONGROUND;
             }
 
             // Next (likely) case:
             // There is a ladder
             if(isLadder(base) || isLadder(top)) {
-                return ONGROUND;
+                type |= ONGROUND;
             }
 
             // Next (likely) case:
             // At least the block the player stands
             // in is solid
             if(isSolid(base)) {
-                return INGROUND;
+                type |= INGROUND;
             }
         }
 
         // Last simple case: Player touches liquid
         if(isLiquid(base) || isLiquid(top)) {
-            return LIQUID | INGROUND;
+            type |= LIQUID | INGROUND;
         }
 
-        return 0;
+        return type;
     }
 
     public static final boolean isSolid(final int value) {

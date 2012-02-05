@@ -225,7 +225,7 @@ public class RunningCheck extends MovingCheck {
         }
 
         double limit = data.vertFreedom + cc.jumpheight;
-        
+
         limit *= data.lastJumpAmplifier;
 
         if(data.jumpPhase > jumpingLimit + data.lastJumpAmplifier) {
@@ -243,7 +243,6 @@ public class RunningCheck extends MovingCheck {
         }
 
         return distanceAboveLimit;
-
     }
 
     @Override
