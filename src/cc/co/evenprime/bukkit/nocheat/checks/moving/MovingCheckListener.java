@@ -80,11 +80,7 @@ public class MovingCheckListener implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void teleport(final PlayerTeleportEvent event) {
-
-        // No typo here, I really want to only handle cancelled events
-        if(!event.isCancelled())
-            return;
-
+        
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final MovingData data = MovingCheck.getData(player.getDataStore());
 
@@ -111,7 +107,7 @@ public class MovingCheckListener implements Listener, EventManager {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void portal(final PlayerRespawnEvent event) {
+    public void respawn(final PlayerRespawnEvent event) {
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
         data.clearMorePacketsData();
         data.clearRunFlyData();
