@@ -39,6 +39,7 @@ public class Permissions {
 
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
     public static final String  ADMIN_COMMANDS       = ADMIN + ".commands";
+    public static final String  ADMIN_RELOAD         = ADMIN + ".reload";
 
     public static final String  INVENTORY            = CHECKS + ".inventory";
     public static final String  INVENTORY_DROP       = INVENTORY + ".drop";

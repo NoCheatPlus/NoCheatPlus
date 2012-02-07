@@ -41,6 +41,7 @@ import cc.co.evenprime.bukkit.nocheat.debug.LagMeasureTask;
 public class NoCheat extends JavaPlugin implements Listener {
 
     private ConfigurationManager conf;
+    private CommandHandler       commandHandler;
     private PlayerManager        players;
 
     private List<EventManager>   eventManagers;
@@ -69,6 +70,8 @@ public class NoCheat extends JavaPlugin implements Listener {
         // Just to be sure nothing gets left out
         getServer().getScheduler().cancelTasks(this);
 
+        commandHandler = null;
+
         System.out.println("[NoCheat] version [" + pdfFile.getVersion() + "] is disabled.");
     }
 
@@ -77,6 +80,7 @@ public class NoCheat extends JavaPlugin implements Listener {
         // Then set up in memory per player data storage
         this.players = new PlayerManager(this);
 
+        this.commandHandler = new CommandHandler(this);
         // Then read the configuration files
         this.conf = new ConfigurationManager(this, this.getDataFolder());
 
@@ -128,7 +132,7 @@ public class NoCheat extends JavaPlugin implements Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        boolean result = CommandHandler.handleCommand(this, sender, command, label, args);
+        boolean result = commandHandler.handleCommand(this, sender, command, label, args);
 
         return result;
     }

@@ -11,12 +11,40 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 public class CommandHandler {
 
-    private CommandHandler() {}
+    private final List<Permission> perms;
+    
+    public CommandHandler(NoCheat plugin) {
+        // Make a copy to allow sorting
+        perms = new LinkedList<Permission>(plugin.getDescription().getPermissions());
 
-    public static boolean handleCommand(NoCheat plugin, CommandSender sender, Command command, String label, String[] args) {
+        Collections.sort(perms, new Comparator<Permission>() {
+
+            public int compare(Permission o1, Permission o2) {
+
+                String name1 = o1.getName();
+                String name2 = o2.getName();
+
+                if(name1.equals(name2))
+                    return 0;
+
+                if(name1.startsWith(name2)) {
+                    return 1;
+                }
+
+                if(name2.startsWith(name1)) {
+                    return -1;
+                }
+
+                return name1.compareTo(name2);
+            }
+        });
+    }
+
+    public boolean handleCommand(NoCheat plugin, CommandSender sender, Command command, String label, String[] args) {
 
         boolean result = false;
         // Not our command
@@ -39,7 +67,7 @@ public class CommandHandler {
         return result;
     }
 
-    private static boolean handlePlayerInfoCommand(NoCheat plugin, CommandSender sender, String[] args) {
+    private boolean handlePlayerInfoCommand(NoCheat plugin, CommandSender sender, String[] args) {
 
         Map<String, Object> map = plugin.getPlayerData(args[1]);
         String filter = "";
@@ -57,7 +85,7 @@ public class CommandHandler {
         return true;
     }
 
-    private static boolean handlePermlistCommand(NoCheat plugin, CommandSender sender, String[] args) {
+    private boolean handlePermlistCommand(NoCheat plugin, CommandSender sender, String[] args) {
 
         // Get the player by name
         Player player = plugin.getServer().getPlayerExact(args[1]);
@@ -72,32 +100,6 @@ public class CommandHandler {
             prefix = args[2];
         }
 
-        // Make a copy to allow sorting
-        List<Permission> perms = new LinkedList<Permission>(plugin.getDescription().getPermissions());
-
-        Collections.sort(perms, new Comparator<Permission>() {
-
-            public int compare(Permission o1, Permission o2) {
-
-                String name1 = o1.getName();
-                String name2 = o2.getName();
-
-                if(name1.equals(name2))
-                    return 0;
-
-                if(name1.startsWith(name2)) {
-                    return 1;
-                }
-
-                if(name2.startsWith(name1)) {
-                    return -1;
-                }
-
-                return name1.compareTo(name2);
-            }
-
-        });
-
         sender.sendMessage("Player " + player.getName() + " has the permission(s):");
 
         for(Permission permission : perms) {
@@ -108,11 +110,17 @@ public class CommandHandler {
         return true;
     }
 
-    private static boolean handleReloadCommand(NoCheat plugin, CommandSender sender) {
+    private boolean handleReloadCommand(NoCheat plugin, CommandSender sender) {
 
-        sender.sendMessage("[NoCheat] Reloading configuration");
-        plugin.reloadConfiguration();
-        sender.sendMessage("[NoCheat] Configuration reloaded");
+        // Players need a special permission for this
+        if(!(sender instanceof Player) || sender.hasPermission(Permissions.ADMIN_RELOAD)) {
+            sender.sendMessage("[NoCheat] Reloading configuration");
+            plugin.reloadConfiguration();
+            sender.sendMessage("[NoCheat] Configuration reloaded");
+        }
+        else {
+            sender.sendMessage("You lack the "+Permissions.ADMIN_RELOAD+ " permission to use 'reload'");
+        }
 
         return true;
     }
