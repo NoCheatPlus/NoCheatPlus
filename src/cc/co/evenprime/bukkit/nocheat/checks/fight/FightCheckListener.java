@@ -58,7 +58,7 @@ public class FightCheckListener implements Listener, EventManager {
         final NoCheatPlayer player = plugin.getPlayer(damager);
         final FightConfig cc = FightCheck.getConfig(player.getConfigurationStore());
 
-        if(!cc.check || player.hasPermission(Permissions.FIGHT)) {
+        if(!cc.damageChecks || player.hasPermission(Permissions.FIGHT)) {
             return;
         }
 
@@ -112,13 +112,13 @@ public class FightCheckListener implements Listener, EventManager {
 
         FightConfig f = FightCheck.getConfig(cc);
 
-        if(f.check && f.directionCheck)
+        if(f.directionCheck)
             s.add("fight.direction");
-        if(f.check && f.noswingCheck)
+        if(f.noswingCheck)
             s.add("fight.noswing");
-        if(f.check && f.reachCheck)
+        if(f.reachCheck)
             s.add("fight.reach");
-        if(f.check && f.speedCheck)
+        if(f.speedCheck)
             s.add("fight.speed");
         return s;
     }

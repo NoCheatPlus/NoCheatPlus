@@ -1,9 +1,12 @@
 package cc.co.evenprime.bukkit.nocheat.checks;
 
+import java.util.HashSet;
+import java.util.Set;
 import net.minecraft.server.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
@@ -68,27 +71,29 @@ public class CheckUtil {
         return Math.max(distance - limit, 0.0D);
     }
 
-    private final static double magic    = 0.45D;
-    private final static double magic2   = 0.55D;
+    private final static double        magic    = 0.45D;
+    private final static double        magic2   = 0.55D;
 
-    private static final int    NONSOLID = 1;                    // 0x00000001
-    private static final int    SOLID    = 2;                    // 0x00000010
+    private static final int           NONSOLID = 1;                      // 0x00000001
+    private static final int           SOLID    = 2;                      // 0x00000010
 
     // All liquids are "nonsolid" too
-    private static final int    LIQUID   = 4 | NONSOLID;         // 0x00000101
+    private static final int           LIQUID   = 4 | NONSOLID;           // 0x00000101
 
     // All ladders are "nonsolid" and "solid" too
-    private static final int    LADDER   = 8 | NONSOLID | SOLID; // 0x00001011
+    private static final int           LADDER   = 8 | NONSOLID | SOLID;   // 0x00001011
 
     // All fences are solid - fences are treated specially due
     // to being 1.5 blocks high
-    private static final int    FENCE    = 16 | SOLID | NONSOLID; // 0x00010010
+    private static final int           FENCE    = 16 | SOLID | NONSOLID;  // 0x00010010
 
-    private static final int    INGROUND = 128;
-    private static final int    ONGROUND = 256;
+    private static final int           INGROUND = 128;
+    private static final int           ONGROUND = 256;
     // Until I can think of a better way to determine if a block is solid or
     // not, this is what I'll do
-    private static final int    types[];
+    private static final int           types[];
+
+    private static final Set<Material> foods    = new HashSet<Material>();
 
     static {
         types = new int[256];
@@ -162,6 +167,22 @@ public class CheckUtil {
          * }
          * }
          */
+        foods.add(Material.APPLE);
+        foods.add(Material.BREAD);
+        foods.add(Material.COOKED_BEEF);
+        foods.add(Material.COOKED_CHICKEN);
+        foods.add(Material.COOKED_FISH);
+        foods.add(Material.COOKIE);
+        foods.add(Material.GOLDEN_APPLE);
+        foods.add(Material.GRILLED_PORK);
+        foods.add(Material.MELON);
+        foods.add(Material.MUSHROOM_SOUP);
+        foods.add(Material.PORK);
+        foods.add(Material.RAW_BEEF);
+        foods.add(Material.RAW_CHICKEN);
+        foods.add(Material.RAW_FISH);
+        foods.add(Material.ROTTEN_FLESH);
+        foods.add(Material.SPIDER_EYE);
     }
 
     /**
@@ -324,6 +345,12 @@ public class CheckUtil {
 
     public static int getType(final int typeId) {
         return types[typeId];
+    }
+
+    public static boolean isFood(ItemStack item) {
+        if(item == null)
+            return false;
+        return foods.contains(item.getType());
     }
 
 }

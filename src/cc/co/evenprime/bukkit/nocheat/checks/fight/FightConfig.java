@@ -7,7 +7,6 @@ import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
 public class FightConfig implements ConfigItem {
 
-    public final boolean    check;
     public final boolean    directionCheck;
     public final double     directionPrecision;
     public final ActionList directionActions;
@@ -21,6 +20,8 @@ public class FightConfig implements ConfigItem {
     public final int        speedAttackLimit;
     public final ActionList speedActions;
     public final boolean    speedCheck;
+
+    public final boolean    damageChecks;
 
     public FightConfig(NoCheatConfiguration data) {
 
@@ -38,6 +39,6 @@ public class FightConfig implements ConfigItem {
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS);
         speedAttackLimit = data.getInt(ConfPaths.FIGHT_SPEED_ATTACKLIMIT);
 
-        check = directionCheck || noswingCheck || reachCheck || speedCheck;
+        damageChecks = directionCheck || noswingCheck || reachCheck || speedCheck;
     }
 }

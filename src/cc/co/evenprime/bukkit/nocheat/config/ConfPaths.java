@@ -17,11 +17,22 @@ public abstract class ConfPaths {
     public final static String  LOGGING_DEBUGMESSAGES                     = LOGGING + "debugmessages";
 
     private final static String CHECKS                                    = "checks.";
-    private final static String INVENTORY_DROP                            = CHECKS + "inventory.drop.";
+
+    private final static String INVENTORY                                 = "CHECKS" + "inventory.";
+
+    private final static String INVENTORY_DROP                            = INVENTORY + "drop.";
     public final static String  INVENTORY_DROP_CHECK                      = INVENTORY_DROP + "active";
     public final static String  INVENTORY_DROP_TIMEFRAME                  = INVENTORY_DROP + "time";
     public final static String  INVENTORY_DROP_LIMIT                      = INVENTORY_DROP + "limit";
     public final static String  INVENTORY_DROP_ACTIONS                    = INVENTORY_DROP + "actions";
+
+    private static final String INVENTORY_INSTANTBOW                      = INVENTORY + "instantbow.";
+    public final static String  INVENTORY_INSTANTBOW_CHECK                = INVENTORY_INSTANTBOW + "active";
+    public static final String  INVENTORY_INSTANTBOW_ACTIONS              = INVENTORY_INSTANTBOW + "actions";
+
+    private static final String INVENTORY_INSTANTEAT                      = INVENTORY + "instanteat.";
+    public final static String  INVENTORY_INSTANTEAT_CHECK                = INVENTORY_INSTANTEAT + "active";
+    public static final String  INVENTORY_INSTANTEAT_ACTIONS              = INVENTORY_INSTANTEAT + "actions";
 
     private final static String MOVING                                    = CHECKS + "moving.";
 

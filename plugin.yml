@@ -87,3 +87,7 @@ permissions:
             children:
               nocheat.checks.inventory.drop:
                 description: Allow a player to drop more items in a short timeframe than the defined limit
+              nocheat.checks.inventory.instanteat:
+                description: Allow a player to eat food faster than normally possible
+              nocheat.checks.inventory.instantbow:
+                description: Allow a player to charge his bow faster than usual

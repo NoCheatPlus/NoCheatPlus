@@ -12,7 +12,6 @@ public class DropCheck extends InventoryCheck {
         super(plugin, "inventory.drop", Permissions.INVENTORY_DROP);
     }
 
-    @Override
     public boolean check(NoCheatPlayer player, InventoryData data, InventoryConfig cc) {
 
         boolean cancel = false;
@@ -40,11 +39,6 @@ public class DropCheck extends InventoryCheck {
         }
 
         return cancel;
-    }
-
-    @Override
-    public boolean isEnabled(InventoryConfig cc) {
-        return cc.dropCheck;
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

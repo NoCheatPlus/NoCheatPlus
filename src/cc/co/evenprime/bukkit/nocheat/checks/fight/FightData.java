@@ -15,6 +15,9 @@ public class FightData implements DataItem {
     public double  reachVL;
     public double  reachTotalVL;
     public int     reachFailed;
+    public int     speedVL;
+    public int     speedTotalVL;
+    public int     speedFailed;
 
     public long    directionLastViolationTime;
     public long    reachLastViolationTime;
@@ -25,17 +28,19 @@ public class FightData implements DataItem {
 
     public long    speedTime;
     public int     speedAttackCount;
-    public int     speedVL;
-    public int     speedTotalVL;
-    public int     speedFailed;
 
     @Override
     public void collectData(Map<String, Object> map) {
         map.put("fight.direction.vl", (int) directionTotalVL);
         map.put("fight.noswing.vl", (int) noswingTotalVL);
         map.put("fight.reach.vl", (int) reachTotalVL);
-        map.put("fight.direction.failed", directionFailed);
-        map.put("fight.noswing.failed", noswingFailed);
+        map.put("fight.speed.vl", (int) speedTotalVL);
+
+     
+        map.put("fight.direction.failed", (int) directionFailed);
+        map.put("fight.noswing.failed", (int) noswingFailed);
         map.put("fight.reach.failed", (int) reachFailed);
+        map.put("fight.speed.failed", (int) speedFailed);
+
     }
 }

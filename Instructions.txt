@@ -128,6 +128,23 @@ checks:
       actions:
         What should happen when a player goes beyond the set limit. Default settings log
         a message and kick the player from the server.
+    instantbow:
+      Players may attack extremely fast and with a fully charged bow without
+      waiting for it to be fully pulled back.
+      active:
+        Should players be checked for this behaviour.
+      actions:
+        What should happen if the player fails this check. Default is to stop
+        the attack ("cancel" it) and log messages.
+    instanteat:
+      Players may eat various kinds of food instantly instead of waiting the
+      usual time munching on the item.
+      active:
+        Should players be checked for this behaviour.
+      actions:
+        What should happen if the player fails this check. Default is to deny
+        them the food level gain ("cancel" it) and log messages. Sadly it's
+        not possible to prevent the food item to get lost anyway.
 
   moving:
     All checks that have to do with player movement

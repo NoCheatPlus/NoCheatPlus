@@ -30,6 +30,12 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
         set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:kick");
 
+        set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);
+        set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "log:ibow:2:5:if cancel");
+
+        set(ConfPaths.INVENTORY_INSTANTEAT_CHECK, true);
+        set(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, "log:ieat:2:5:if cancel");
+
         /*** MOVING ***/
         set(ConfPaths.MOVING_RUNFLY_CHECK, true);
         set(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING, false);
@@ -118,6 +124,8 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.STRINGS + ".freach", "[player] failed [check]: tried to attack entity out of reach. VL [violations]");
         set(ConfPaths.STRINGS + ".fspeed", "[player] failed [check]: tried to attack more than [limit] times per second. VL [violations]");
         set(ConfPaths.STRINGS + ".fnoswing", "[player] failed [check]: Didn't swing arm. VL [violations]");
+        set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: Fires bow to fast. VL [violations]");
+        set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: Eats food [food] too fast. VL [violations]");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
 
         // Update internal factory based on all the new entries to the "actions" section
