@@ -6,6 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
  * A check to see if people cheat by tricking the server to not deal them
@@ -41,8 +42,7 @@ public class NoFallCheck extends MovingCheck {
         if(cc.nofallaggressive && data.fromOnOrInGround && data.toOnOrInGround && data.from.y <= data.to.y && player.getPlayer().getFallDistance() > 3.0F) {
             data.fallDistance = player.getPlayer().getFallDistance();
             data.nofallVL += data.fallDistance;
-            data.nofallTotalVL += data.fallDistance;
-            data.nofallFailed++;
+            incrementStatistics(player, Id.MOV_NOFALL, data.fallDistance);
             final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallVL));
             if(cancel) {
                 player.dealFallDamage();
@@ -64,8 +64,7 @@ public class NoFallCheck extends MovingCheck {
 
         if(difference > 1.0F && data.toOnOrInGround && data.fallDistance > 2.0F) {
             data.nofallVL += difference;
-            data.nofallTotalVL += difference;
-            data.nofallFailed++;
+            incrementStatistics(player, Id.MOV_NOFALL, difference);
 
             final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallVL));
 

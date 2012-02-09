@@ -5,6 +5,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class SpamCheck extends ChatCheck {
 
@@ -44,8 +45,7 @@ public class SpamCheck extends ChatCheck {
 
             data.spamVL = Math.max(0, data.messageCount - cc.spamLimit);
             data.spamVL += Math.max(0, data.commandCount - cc.commandLimit);
-            data.spamTotalVL++;
-            data.spamFailed++;
+            incrementStatistics(player, Id.CHAT_SPAM, 1);
 
             cancel = executeActions(player, cc.spamActions.getActions(data.spamVL));
         }

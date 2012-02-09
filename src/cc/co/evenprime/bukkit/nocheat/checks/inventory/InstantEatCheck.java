@@ -6,6 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class InstantEatCheck extends InventoryCheck {
 
@@ -34,8 +35,7 @@ public class InstantEatCheck extends InventoryCheck {
             // Seems fishy, increase violation level
             int vl = ((int) (expectedTimeWhenEatingFinished - time)) / 100;
             data.instantEatVL += vl;
-            data.instantEatTotalVL += vl;
-            data.instantEatFailed++;
+            incrementStatistics(player, Id.INV_EAT, vl);
             cancelled = executeActions(player, cc.eatActions.getActions(data.instantEatVL));
         }
 
@@ -45,7 +45,7 @@ public class InstantEatCheck extends InventoryCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", getData(player.getDataStore()).instantEatVL);
+            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).instantEatVL);
         else if(wildcard == ParameterName.FOOD)
             return getData(player.getDataStore()).foodMaterial.toString();
         else

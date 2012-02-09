@@ -10,6 +10,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class ReachCheck extends FightCheck {
 
@@ -49,8 +50,7 @@ public class ReachCheck extends FightCheck {
             if(!plugin.skipCheck()) {
                 double sqrt = Math.sqrt(off);
                 data.reachVL += sqrt;
-                data.reachTotalVL += sqrt;
-                data.reachFailed++;
+                incrementStatistics(player, Id.FI_REACH, sqrt);
             }
 
             cancel = executeActions(player, cc.reachActions.getActions(data.reachVL));

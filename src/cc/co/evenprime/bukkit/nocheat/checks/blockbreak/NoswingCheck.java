@@ -1,11 +1,11 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import java.util.Locale;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class NoswingCheck extends BlockBreakCheck {
 
@@ -23,8 +23,7 @@ public class NoswingCheck extends BlockBreakCheck {
             data.noswingVL *= 0.90D;
         } else {
             data.noswingVL += 1;
-            data.noswingTotalVL += 1;
-            data.noswingFailed++;
+            incrementStatistics(player, Id.BB_NOSWING, 1);
 
             cancel = executeActions(player, cc.noswingActions.getActions(data.noswingVL));
         }

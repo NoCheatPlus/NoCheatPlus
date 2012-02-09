@@ -7,6 +7,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
  * The reach check will find out if a player interacts with something that's too
@@ -32,8 +33,7 @@ public class ReachCheck extends BlockBreakCheck {
 
             // Increment violation counter
             data.reachVL += distance;
-            data.reachTotalVL += distance;
-            data.reachFailed++;
+            incrementStatistics(player, Id.BB_REACH, distance);
             data.reachDistance = distance;
 
             cancel = executeActions(player, cc.reachActions.getActions(data.reachVL));

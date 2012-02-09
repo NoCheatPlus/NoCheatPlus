@@ -9,6 +9,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
  * The counterpart to the FlyingCheck. People that are not allowed to fly
@@ -76,19 +77,7 @@ public class RunningCheck extends MovingCheck {
             // Increment violation counter
             data.runflyVL += result;
 
-            if(data.checknamesuffix.equals("sneaking")) {
-                data.runflySneakingTotalVL += result;
-                data.runflySneakingFailed++;
-            } else if(data.checknamesuffix.equals("swimming")) {
-                data.runflySwimmingTotalVL += result;
-                data.runflySwimmingFailed++;
-            } else if(data.checknamesuffix.equals("vertical")) {
-                data.runflyFlyingTotalVL += result;
-                data.runflyFlyingFailed++;
-            } else {
-                data.runflyRunningTotalVL += result;
-                data.runflyRunningFailed++;
-            }
+            incrementStatistics(player, data.statisticCategory, result);
 
             boolean cancel = executeActions(player, cc.actions.getActions(data.runflyVL));
 
@@ -143,7 +132,7 @@ public class RunningCheck extends MovingCheck {
 
         double limit = 0.0D;
 
-        String suffix = null;
+        Id statisticsCategory = null;
 
         // Player on ice?
         Block b = player.getPlayer().getLocation().getBlock();
@@ -155,16 +144,16 @@ public class RunningCheck extends MovingCheck {
 
         if(cc.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
             limit = cc.sneakingSpeedLimit;
-            suffix = "sneaking";
+            statisticsCategory = Id.MOV_SNEAKING;
         } else if(isSwimming && !player.hasPermission(Permissions.MOVING_SWIMMING)) {
             limit = cc.swimmingSpeedLimit;
-            suffix = "swimming";
+            statisticsCategory = Id.MOV_SWIMMING;
         } else if(!sprinting) {
             limit = cc.walkingSpeedLimit;
-            suffix = "walking";
+            statisticsCategory = Id.MOV_RUNNING;
         } else {
             limit = cc.sprintingSpeedLimit;
-            suffix = "sprinting";
+            statisticsCategory = Id.MOV_RUNNING;
         }
 
         if(data.onIce > 0) {
@@ -204,7 +193,7 @@ public class RunningCheck extends MovingCheck {
         }
 
         if(distanceAboveLimit > 0) {
-            data.checknamesuffix = suffix;
+            data.statisticCategory = statisticsCategory;
         }
 
         return distanceAboveLimit;
@@ -235,7 +224,7 @@ public class RunningCheck extends MovingCheck {
         distanceAboveLimit = data.to.y - data.runflySetBackPoint.y - limit;
 
         if(distanceAboveLimit > 0) {
-            data.checknamesuffix = "vertical";
+            data.statisticCategory = Id.MOV_FLYING;
         }
 
         if(toOnGround || fromOnGround) {
@@ -254,7 +243,7 @@ public class RunningCheck extends MovingCheck {
 
         if(wildcard == ParameterName.CHECK)
             // Workaround for something until I find a better way to do it
-            return getName() + "." + getData(player.getDataStore()).checknamesuffix;
+            return getData(player.getDataStore()).statisticCategory.toString();
         else if(wildcard == ParameterName.VIOLATIONS)
             return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).runflyVL);
         else

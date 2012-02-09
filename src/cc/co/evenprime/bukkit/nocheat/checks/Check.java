@@ -16,6 +16,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public abstract class Check {
 
@@ -64,6 +65,10 @@ public abstract class Check {
         }
 
         return special;
+    }
+
+    protected void incrementStatistics(NoCheatPlayer player, Id id, double vl) {
+        player.getDataStore().getStatistics().increment(id, vl);
     }
 
     private final void executeLogAction(LogAction l, Check check, NoCheatPlayer player, ConfigurationCacheStore cc) {

@@ -1,13 +1,13 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockplace;
 
 import java.util.Locale;
-
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class DirectionCheck extends BlockPlaceCheck {
 
@@ -59,8 +59,7 @@ public class DirectionCheck extends BlockPlaceCheck {
             // Player failed the check
             // Increment violation counter
             data.directionVL += off;
-            data.directionTotalVL += off;
-            data.directionFailed++;
+            incrementStatistics(player, Id.BP_DIRECTION, off);
 
             // Prepare some event-specific values for logging and custom actions
 

@@ -1,8 +1,8 @@
 package cc.co.evenprime.bukkit.nocheat.checks.moving;
 
-import java.util.Map;
 import cc.co.evenprime.bukkit.nocheat.DataItem;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
  * Player specific data for the moving check group
@@ -10,26 +10,8 @@ import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 public class MovingData implements DataItem {
 
     public double                runflyVL;
-
-    public double                runflyRunningTotalVL;
-    public int                   runflyRunningFailed;
-
-    public double                runflyFlyingTotalVL;
-    public int                   runflyFlyingFailed;
-
-    public double                runflySneakingTotalVL;
-    public int                   runflySneakingFailed;
-
-    public double                runflySwimmingTotalVL;
-    public int                   runflySwimmingFailed;
-
     public double                nofallVL;
-    public double                nofallTotalVL;
-    public int                   nofallFailed;
-
     public double                morePacketsVL;
-    public double                morePacketsTotalVL;
-    public int                   morePacketsFailed;
 
     public int                   jumpPhase;
     public double                lastJumpAmplifier;
@@ -62,7 +44,7 @@ public class MovingData implements DataItem {
     public boolean               fromOnOrInGround;
     public boolean               toOnOrInGround;
 
-    public String                checknamesuffix         = "";
+    public Id                    statisticCategory       = Id.MOV_RUNNING;
 
     public int                   packets;
 
@@ -76,22 +58,5 @@ public class MovingData implements DataItem {
 
     public void clearMorePacketsData() {
         morePacketsSetbackPoint.reset();
-    }
-
-    @Override
-    public void collectData(Map<String, Object> map) {
-        map.put("moving.running.vl", (int) runflyRunningTotalVL);
-        map.put("moving.flying.vl", (int) runflyFlyingTotalVL);
-        map.put("moving.sneaking.vl", (int) runflySneakingTotalVL);
-        map.put("moving.swimming.vl", (int) runflySwimmingTotalVL);
-        map.put("moving.nofall.vl", (int) nofallTotalVL);
-        map.put("moving.morepackets.vl", (int) morePacketsTotalVL);
-
-        map.put("moving.running.failed", runflyRunningFailed);
-        map.put("moving.flying.failed", runflyFlyingFailed);
-        map.put("moving.sneaking.failed", runflySneakingFailed);
-        map.put("moving.swimming.failed", runflySwimmingFailed);
-        map.put("moving.nofall.failed", nofallFailed);
-        map.put("moving.morepackets.failed", morePacketsFailed);
     }
 }

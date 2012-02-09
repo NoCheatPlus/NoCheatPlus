@@ -5,6 +5,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class DropCheck extends InventoryCheck {
 
@@ -32,8 +33,7 @@ public class DropCheck extends InventoryCheck {
         if(data.dropCount > cc.dropLimit) {
 
             data.dropVL = data.dropCount - cc.dropLimit;
-            data.dropTotalVL++;
-            data.dropFailed++;
+            incrementStatistics(player, Id.INV_DROP, 1);
 
             cancel = executeActions(player, cc.dropActions.getActions(data.dropVL));
         }

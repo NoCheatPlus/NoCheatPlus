@@ -5,6 +5,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class ColorCheck extends ChatCheck {
 
@@ -17,8 +18,7 @@ public class ColorCheck extends ChatCheck {
         if(data.message.matches(".*\247.*")) {
 
             data.colorVL += 1;
-            data.colorTotalVL += 1;
-            data.colorFailed++;
+            incrementStatistics(player, Id.CHAT_COLOR, 1);
 
             boolean filter = executeActions(player, cc.colorActions.getActions(data.colorVL));
 

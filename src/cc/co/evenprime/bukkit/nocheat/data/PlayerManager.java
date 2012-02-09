@@ -59,14 +59,15 @@ public class PlayerManager {
         }
     }
 
-    public void getPlayerData(String playerName, Map<String, Object> map) {
+    public Map<String, Object> getPlayerData(String playerName) {
 
         NoCheatPlayer player = this.players.get(playerName.toLowerCase());
 
         if(player != null) {
-            player.getDataStore().collectData(map);
-
+            return player.getDataStore().collectData();
         }
+
+        return new HashMap<String, Object>();
     }
 
 }

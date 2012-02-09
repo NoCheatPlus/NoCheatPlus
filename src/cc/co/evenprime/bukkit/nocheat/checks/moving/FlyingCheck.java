@@ -5,6 +5,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
  * A check designed for people that are allowed to fly. The complement to
@@ -98,13 +99,11 @@ public class FlyingCheck extends MovingCheck {
             // Increment violation counter
             data.runflyVL += result;
             if(resultHoriz > 0) {
-                data.runflyRunningTotalVL += resultHoriz;
-                data.runflyRunningFailed++;
+                incrementStatistics(player, Id.MOV_RUNNING, resultHoriz);
             }
 
             if(resultVert > 0) {
-                data.runflyFlyingTotalVL += resultVert;
-                data.runflyFlyingFailed++;
+                incrementStatistics(player, Id.MOV_FLYING, resultVert);
             }
 
             boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(data.runflyVL));

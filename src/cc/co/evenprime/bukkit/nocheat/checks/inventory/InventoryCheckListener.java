@@ -78,10 +78,10 @@ public class InventoryCheckListener implements Listener, EventManager {
         } else if(CheckUtil.isFood(event.getItem())) {
             // Remember food Material, because we don't have that info in the other event
             data.foodMaterial = event.getItem().getType();
-            data.lastFoodInteractTime = System.currentTimeMillis();
+            data.lastEatInteractTime = System.currentTimeMillis();
         } else {
             data.lastBowInteractTime = 0;
-            data.lastFoodInteractTime = 0;
+            data.lastEatInteractTime = 0;
             data.foodMaterial = null;
         }
     }

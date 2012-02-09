@@ -7,6 +7,7 @@ import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
  * The DirectionCheck will find out if a player tried to interact with something
@@ -42,8 +43,7 @@ public class DirectionCheck extends BlockBreakCheck {
                 off /= 10;
             }
             data.directionVL += off;
-            data.directionTotalVL += off;
-            data.directionFailed++;
+            incrementStatistics(player, Id.BB_DIRECTION, off);
 
             cancel = executeActions(player, ccblockbreak.directionActions.getActions(data.directionVL));
 

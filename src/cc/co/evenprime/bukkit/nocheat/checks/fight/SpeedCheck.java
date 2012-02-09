@@ -5,6 +5,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class SpeedCheck extends FightCheck {
 
@@ -29,8 +30,7 @@ public class SpeedCheck extends FightCheck {
         if(data.speedAttackCount > cc.speedAttackLimit) {
             if(!plugin.skipCheck()) {
                 data.speedVL += 1;
-                data.speedTotalVL += 1;
-                data.speedFailed++;
+                incrementStatistics(player, Id.FI_SPEED, 1);
             }
 
             cancel = executeActions(player, cc.speedActions.getActions(data.speedVL));

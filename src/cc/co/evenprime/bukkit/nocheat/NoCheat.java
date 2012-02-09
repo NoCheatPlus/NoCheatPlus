@@ -3,7 +3,6 @@ package cc.co.evenprime.bukkit.nocheat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -170,9 +169,7 @@ public class NoCheat extends JavaPlugin implements Listener {
      */
     public Map<String, Object> getPlayerData(String playerName) {
 
-        Map<String, Object> map = new TreeMap<String, Object>();
-
-        players.getPlayerData(playerName, map);
+        Map<String, Object> map = players.getPlayerData(playerName);
 
         map.put("nocheat.version", this.getDescription().getVersion());
 

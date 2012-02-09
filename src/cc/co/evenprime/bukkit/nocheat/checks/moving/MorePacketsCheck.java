@@ -6,6 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
  * The morePacketsCheck (previously called SpeedhackCheck) will try to identify
@@ -51,8 +52,7 @@ public class MorePacketsCheck extends MovingCheck {
         if(data.morePacketsBuffer < 0) {
 
             data.morePacketsVL = -data.morePacketsBuffer;
-            data.morePacketsTotalVL++;
-            data.morePacketsFailed++;
+            incrementStatistics(player, Id.MOV_MOREPACKETS, 1);
 
             data.packets = -data.morePacketsBuffer;
 
@@ -64,7 +64,7 @@ public class MorePacketsCheck extends MovingCheck {
 
         if(data.morePacketsLastTime + 1000 < time) {
             // More than 1 second elapsed, but how many?
-            double seconds = ((double)(time - data.morePacketsLastTime)) / 1000D;
+            double seconds = ((double) (time - data.morePacketsLastTime)) / 1000D;
 
             // For each second, fill the buffer
             data.morePacketsBuffer += packetsPerTimeframe * seconds;
@@ -84,7 +84,7 @@ public class MorePacketsCheck extends MovingCheck {
 
             // Set the new "last" time
             data.morePacketsLastTime = time;
-            
+
             // Set the new "setback" location
             if(newToLocation == null) {
                 data.morePacketsSetbackPoint.set(data.from);

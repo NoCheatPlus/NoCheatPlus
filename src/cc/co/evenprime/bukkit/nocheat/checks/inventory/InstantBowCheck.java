@@ -6,11 +6,12 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class InstantBowCheck extends InventoryCheck {
 
     public InstantBowCheck(NoCheat plugin) {
-        super(plugin, "fight.instantbow", Permissions.INVENTORY_INSTANTBOW);
+        super(plugin, "inventory.instantbow", Permissions.INVENTORY_INSTANTBOW);
     }
 
     public boolean check(NoCheatPlayer player, EntityShootBowEvent event, InventoryData data, InventoryConfig cc) {
@@ -31,8 +32,7 @@ public class InstantBowCheck extends InventoryCheck {
             // Seems fishy, increase violation level
             int vl = ((int) (expectedTimeWhenStringDrawn - time)) / 100;
             data.instantBowVL += vl;
-            data.instantBowTotalVL += vl;
-            data.instantBowFailed++;
+            incrementStatistics(player, Id.INV_BOW, vl);
             cancelled = executeActions(player, cc.bowActions.getActions(data.instantBowVL));
         }
 

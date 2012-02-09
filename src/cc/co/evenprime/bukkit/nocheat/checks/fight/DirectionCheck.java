@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
 import java.util.Locale;
-
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityComplex;
 import net.minecraft.server.EntityComplexPart;
@@ -11,6 +10,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
+import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class DirectionCheck extends FightCheck {
 
@@ -51,8 +51,7 @@ public class DirectionCheck extends FightCheck {
             if(!plugin.skipCheck()) {
                 double sqrt = Math.sqrt(off);
                 data.directionVL += sqrt;
-                data.directionTotalVL += sqrt;
-                data.directionFailed++;
+                incrementStatistics(player, Id.FI_DIRECTION, sqrt);
             }
 
             cancel = executeActions(player, cc.directionActions.getActions(data.directionVL));
