@@ -247,37 +247,37 @@ public class CheckUtil {
         // Special case: Standing on a fence
         // Behave as if there is a block on top of the fence
         if((below == FENCE) && base != FENCE && isNonSolid(top)) {
-            type |= INGROUND;
+            type = INGROUND;
         }
 
         // Special case: Fence
         // Being a bit above a fence
-        if(below != FENCE && isNonSolid(base) && types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) {
-            type |= ONGROUND;
+        else if(below != FENCE && isNonSolid(base) && types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE) {
+            type = ONGROUND;
         }
 
-        if(isNonSolid(top)) {
+        else if(isNonSolid(top)) {
             // Simplest (and most likely) case:
             // Below the player is a solid block
             if(isSolid(below) && isNonSolid(base)) {
-                type |= ONGROUND;
+                type = ONGROUND;
             }
 
             // Next (likely) case:
             // There is a ladder
-            if(isLadder(base) || isLadder(top)) {
-                type |= ONGROUND;
+            else if(isLadder(base) || isLadder(top)) {
+                type = ONGROUND;
             }
 
             // Next (likely) case:
             // At least the block the player stands
             // in is solid
-            if(isSolid(base)) {
-                type |= INGROUND;
+            else if(isSolid(base)) {
+                type = INGROUND;
             }
         }
 
-        // Last simple case: Player touches liquid
+        // (In every case, check for water)
         if(isLiquid(base) || isLiquid(top)) {
             type |= LIQUID | INGROUND;
         }
