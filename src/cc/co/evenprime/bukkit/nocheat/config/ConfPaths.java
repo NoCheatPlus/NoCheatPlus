@@ -18,7 +18,7 @@ public abstract class ConfPaths {
 
     private final static String CHECKS                                    = "checks.";
 
-    private final static String INVENTORY                                 = "CHECKS" + "inventory.";
+    private final static String INVENTORY                                 = CHECKS + "inventory.";
 
     private final static String INVENTORY_DROP                            = INVENTORY + "drop.";
     public final static String  INVENTORY_DROP_CHECK                      = INVENTORY_DROP + "active";
