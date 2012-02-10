@@ -23,7 +23,8 @@ public abstract class ChatCheck extends Check {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.TEXT)
-            return getData(player.getDataStore()).message;
+            // Filter colors from the players message when logging
+            return getData(player.getDataStore()).message.replaceAll("\302\247.", "").replaceAll("\247.", "");
         else
             return super.getParameter(wildcard, player);
     }

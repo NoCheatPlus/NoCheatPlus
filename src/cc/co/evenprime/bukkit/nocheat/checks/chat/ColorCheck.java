@@ -24,7 +24,7 @@ public class ColorCheck extends ChatCheck {
 
             if(filter) {
                 // Remove color codes
-                data.message = data.message.replaceAll("\302\247", "").replaceAll("\247", "");
+                data.message = data.message.replaceAll("\302\247.", "").replaceAll("\247.", "");
             }
         }
 
