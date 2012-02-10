@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -80,7 +81,7 @@ public class MovingCheckListener implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void teleport(final PlayerTeleportEvent event) {
-        
+
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final MovingData data = MovingCheck.getData(player.getDataStore());
 
@@ -97,6 +98,14 @@ public class MovingCheckListener implements Listener, EventManager {
         data.clearRunFlyData();
 
         return;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void worldChange(final PlayerChangedWorldEvent event) {
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
+        data.teleportTo.reset();
+        data.clearRunFlyData();
+        data.clearMorePacketsData();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
