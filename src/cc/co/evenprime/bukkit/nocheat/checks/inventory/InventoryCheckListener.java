@@ -67,7 +67,7 @@ public class InventoryCheckListener implements Listener, EventManager {
     @EventHandler(priority = EventPriority.LOWEST)
     public void interact(final PlayerInteractEvent event) {
 
-        if(!event.hasItem() || event.getAction() != Action.RIGHT_CLICK_AIR || event.getAction() != Action.RIGHT_CLICK_BLOCK)
+        if(!event.hasItem() || !(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))
             return;
 
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
