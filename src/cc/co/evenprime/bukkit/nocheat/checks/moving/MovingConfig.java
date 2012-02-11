@@ -43,14 +43,19 @@ public class MovingConfig implements ConfigItem {
         identifyCreativeMode = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE);
 
         runflyCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECK);
-        walkingSpeedLimit = ((double) 22) / 100D;
-        sprintingSpeedLimit = ((double) 35) / 100D;
-        jumpheight = ((double) 135) / 100D;
-        actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS);
 
-        swimmingSpeedLimit = ((double) 18) / 100D;
+        int walkspeed = data.getInt(ConfPaths.MOVING_RUNFLY_WALKSPEED, 100);
+        int sprintspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SPRINTSPEED, 100);
+        int swimspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SWIMSPEED, 100);
+        int sneakspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SNEAKSPEED, 100);
+        walkingSpeedLimit = ((double) 0.22 * walkspeed) / 100D;
+        sprintingSpeedLimit = ((double) 0.35 * sprintspeed) / 100D;
+        swimmingSpeedLimit = ((double) 0.18 * swimspeed) / 100D;
+        sneakingSpeedLimit = ((double) 0.14 * sneakspeed) / 100D;
+        jumpheight = ((double) 135) / 100D;
+
         sneakingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING);
-        sneakingSpeedLimit = ((double) 14) / 100D;
+        actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS);
 
         allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);
         flyingSpeedLimitVertical = ((double) data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL)) / 100D;

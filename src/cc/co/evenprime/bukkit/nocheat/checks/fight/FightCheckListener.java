@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,6 +22,8 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 public class FightCheckListener implements Listener, EventManager {
 
     private final List<FightCheck> checks;
+
+    private final GodmodeCheck     godmodeCheck;
     private final NoCheat          plugin;
 
     public FightCheckListener(NoCheat plugin) {
@@ -31,15 +34,18 @@ public class FightCheckListener implements Listener, EventManager {
         this.checks.add(new DirectionCheck(plugin));
         this.checks.add(new ReachCheck(plugin));
 
+        this.godmodeCheck = new GodmodeCheck(plugin);
+
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void entityDamage(final EntityDamageEvent event) {
+
         if(event.isCancelled() || !(event instanceof EntityDamageByEntityEvent))
             return;
 
-        EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+        final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
         if(!(e.getDamager() instanceof Player)) {
             return;
         }
@@ -48,6 +54,32 @@ public class FightCheckListener implements Listener, EventManager {
             normalDamage(e);
         } else if(e.getCause() == DamageCause.CUSTOM) {
             customDamage(e);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void entityDamageForGodmodeCheck(final EntityDamageEvent event) {
+
+        if(event.isCancelled())
+            return;
+
+        final Entity entity = event.getEntity();
+        if(!(entity instanceof Player) || entity.isDead()) {
+            return;
+        }
+
+        NoCheatPlayer player = plugin.getPlayer((Player) entity);
+        FightConfig cc = FightCheck.getConfig(player.getConfigurationStore());
+
+        if(!godmodeCheck.isEnabled(cc) || player.hasPermission(godmodeCheck.getPermission())) {
+            return;
+        }
+
+        FightData data = FightCheck.getData(player.getDataStore());
+        boolean cancelled = godmodeCheck.check(plugin.getPlayer((Player) entity), data, cc);
+        if(cancelled) {
+            // Remove the invulnerability from the player
+            player.getPlayer().setNoDamageTicks(0);
         }
     }
 
@@ -120,6 +152,8 @@ public class FightCheckListener implements Listener, EventManager {
             s.add("fight.reach");
         if(f.speedCheck)
             s.add("fight.speed");
+        if(f.godmodeCheck)
+            s.add("fight.godmode");
         return s;
     }
 }

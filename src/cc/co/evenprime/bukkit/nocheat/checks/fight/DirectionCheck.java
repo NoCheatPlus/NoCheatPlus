@@ -80,6 +80,7 @@ public class DirectionCheck extends FightCheck {
         return cc.directionCheck;
     }
 
+    @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)

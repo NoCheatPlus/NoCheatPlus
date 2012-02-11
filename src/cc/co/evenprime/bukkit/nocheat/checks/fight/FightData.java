@@ -9,14 +9,19 @@ public class FightData implements DataItem {
     public double  noswingVL;
     public double  reachVL;
     public int     speedVL;
+    public double  godmodeVL;
 
     public long    directionLastViolationTime;
     public long    reachLastViolationTime;
+    public long    godmodeLastDamageTime;
+    public int     godmodeLastAge;
+    public int     godmodeBuffer = 40;
 
     public Entity  damagee;
-    public boolean armswung = true;
-    public boolean skipNext = false;
+    public boolean armswung      = true;
+    public boolean skipNext      = false;
 
     public long    speedTime;
     public int     speedAttackCount;
+
 }

@@ -102,6 +102,7 @@ public class MovingCheckListener implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void worldChange(final PlayerChangedWorldEvent event) {
+        // Maybe this helps with people teleporting through multiverse portals having problems?
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
         data.teleportTo.reset();
         data.clearRunFlyData();

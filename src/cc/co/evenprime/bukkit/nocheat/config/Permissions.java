@@ -36,6 +36,7 @@ public class Permissions {
     public static final String  FIGHT_NOSWING        = FIGHT + ".noswing";
     public static final String  FIGHT_REACH          = FIGHT + ".reach";
     public static final String  FIGHT_SPEED          = FIGHT + ".speed";
+    public static final String  FIGHT_GODMODE        = FIGHT + ".godmode";
 
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
     public static final String  ADMIN_COMMANDS       = ADMIN + ".commands";

@@ -38,6 +38,13 @@ public abstract class ConfPaths {
 
     private final static String MOVING_RUNFLY                             = MOVING + "runfly.";
     public final static String  MOVING_RUNFLY_CHECK                       = MOVING_RUNFLY + "active";
+
+    // These four are not automatically shown in the config
+    public final static String  MOVING_RUNFLY_WALKSPEED                   = MOVING_RUNFLY + "walkspeed";
+    public final static String  MOVING_RUNFLY_SNEAKSPEED                  = MOVING_RUNFLY + "sneakspeed";
+    public final static String  MOVING_RUNFLY_SWIMSPEED                   = MOVING_RUNFLY + "swimspeed";
+    public final static String  MOVING_RUNFLY_SPRINTSPEED                 = MOVING_RUNFLY + "sprintspeed";
+
     public final static String  MOVING_RUNFLY_ALLOWFASTSNEAKING           = MOVING_RUNFLY + "allowfastsneaking";
     public final static String  MOVING_RUNFLY_ACTIONS                     = MOVING_RUNFLY + "actions";
 
@@ -121,6 +128,10 @@ public abstract class ConfPaths {
     public final static String  FIGHT_SPEED_CHECK                         = FIGHT_SPEED + "active";
     public final static String  FIGHT_SPEED_ATTACKLIMIT                   = FIGHT_SPEED + "attacklimit";
     public final static String  FIGHT_SPEED_ACTIONS                       = FIGHT_SPEED + "actions";
+
+    private final static String FIGHT_GODMODE                             = FIGHT + "godmode.";
+    public static final String  FIGHT_GODMODE_CHECK                       = FIGHT_GODMODE + "active";
+    public final static String  FIGHT_GODMODE_ACTIONS                     = FIGHT_GODMODE + "actions";
 
     public final static String  STRINGS                                   = "strings";
 

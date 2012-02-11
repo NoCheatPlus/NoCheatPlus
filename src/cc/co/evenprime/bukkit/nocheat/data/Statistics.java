@@ -18,7 +18,8 @@ public class Statistics {
         INV_BOW("inventory.instantbow"), INV_EAT("inventory.instanteat"),
         MOV_RUNNING("moving.running"), MOV_FLYING("moving.flying"),
         MOV_MOREPACKETS("moving.morepackets"), MOV_NOFALL("moving.nofall"),
-        MOV_SNEAKING("moving.sneaking"), MOV_SWIMMING("moving.swimming");
+        MOV_SNEAKING("moving.sneaking"), MOV_SWIMMING("moving.swimming"),
+        FI_GODMODE("fight.godmode");
 
         private final String name;
 

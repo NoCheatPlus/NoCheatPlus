@@ -107,6 +107,9 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
         set(ConfPaths.FIGHT_SPEED_ATTACKLIMIT, 15);
         set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
+        
+        set(ConfPaths.FIGHT_GODMODE_CHECK, true);
+        set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:fgod:2:5:if cancel");
 
         set(ConfPaths.STRINGS + ".drop", "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");
@@ -124,6 +127,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.STRINGS + ".freach", "[player] failed [check]: tried to attack entity out of reach. VL [violations]");
         set(ConfPaths.STRINGS + ".fspeed", "[player] failed [check]: tried to attack more than [limit] times per second. VL [violations]");
         set(ConfPaths.STRINGS + ".fnoswing", "[player] failed [check]: Didn't swing arm. VL [violations]");
+        set(ConfPaths.STRINGS + ".fgod", "[player] failed [check]: Avoided taking damage or lagging. VL [violations]");
         set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: Fires bow to fast. VL [violations]");
         set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: Eats food [food] too fast. VL [violations]");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");

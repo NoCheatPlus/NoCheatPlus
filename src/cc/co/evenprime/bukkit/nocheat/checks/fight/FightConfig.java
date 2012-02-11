@@ -20,6 +20,8 @@ public class FightConfig implements ConfigItem {
     public final int        speedAttackLimit;
     public final ActionList speedActions;
     public final boolean    speedCheck;
+    public final boolean    godmodeCheck;
+    public final ActionList godmodeActions;
 
     public final boolean    damageChecks;
 
@@ -38,6 +40,9 @@ public class FightConfig implements ConfigItem {
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS);
         speedAttackLimit = data.getInt(ConfPaths.FIGHT_SPEED_ATTACKLIMIT);
+
+        godmodeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
+        godmodeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS);
 
         damageChecks = directionCheck || noswingCheck || reachCheck || speedCheck;
     }
