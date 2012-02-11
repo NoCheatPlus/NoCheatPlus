@@ -9,13 +9,13 @@ Configuration file description.
   "worldname_config.yml". Settings in that file will now only 
   affect the world with the name "worldname". You may also delete
   all settings from that world-specific file that you won't use.
-  They'll be implicitely taken from the master "config.yml" file.
+  They'll be implicitly taken from the master "config.yml" file.
 
 - If you have files ending with "config.txt", "actions.txt" or 
   "default_actions.txt", please delete them. They are no longer
   used by NoCheat.
   
-- Never change the amount of whitespaces in front of options in the config file
+- Never change the amount of white-spaces in front of options in the config file
   "config.yml". It will break the configuration.
 
 2) How the "actions" work, how to modify them and how to write your own,
@@ -48,7 +48,7 @@ Configuration file description.
               Use this for situations where it's common to have false
               positives in checks and you only want the log message to be
               shown if a player fails the check multiple times within a 
-              short timeframe (1 minute)
+              short time-frame (1 minute)
     "repeat" = a number declaring how many seconds have to pass after logging
                the message before it will be logged again for that player.
                This is needed to prevent "log-spam". Usually a value of 5
@@ -114,8 +114,8 @@ checks:
   inventory:
     All checks that have to do with the player inventory
     drop:
-      The "inventory.drop" check. It limits how many seperate items a player can drop
-      onto the ground within a specific time. Dropping a lot of seperate items at once
+      The "inventory.drop" check. It limits how many separate items a player can drop
+      onto the ground within a specific time. Dropping a lot of separate items at once
       can cause lag on the server.
       active:
         Should the check be enabled. Set to false if you are not interested in this at all
@@ -123,7 +123,7 @@ checks:
         Over how many seconds should dropped items be counted
       limit:
         How many items may be dropped in that timeframe. Please consider that dying causes
-        a player to drop up to 36 seperate items. Therefore this value shouldn't be set
+        a player to drop up to 36 separate items. Therefore this value shouldn't be set
         below ~50.
       actions:
         What should happen when a player goes beyond the set limit. Default settings log
@@ -132,7 +132,7 @@ checks:
       Players may attack extremely fast and with a fully charged bow without
       waiting for it to be fully pulled back.
       active:
-        Should players be checked for this behaviour.
+        Should players be checked for this behavior.
       actions:
         What should happen if the player fails this check. Default is to stop
         the attack ("cancel" it) and log messages.
@@ -140,7 +140,7 @@ checks:
       Players may eat various kinds of food instantly instead of waiting the
       usual time munching on the item.
       active:
-        Should players be checked for this behaviour.
+        Should players be checked for this behavior.
       actions:
         What should happen if the player fails this check. Default is to deny
         them the food level gain ("cancel" it) and log messages. Sadly it's
@@ -152,6 +152,22 @@ checks:
       This is a combined check for running, flying and "nofall" hacks
       active:
         Should players get checked for movement related hacks at all
+      walkspeed:
+        (You'll have to manually add this entry if you want to use it)
+        How fast should the player be allowed to walk. Default is "100", meaning
+        100% of normal walking speed
+      sprintspeed:
+        (You'll have to manually add this entry if you want to use it)
+        How fast should the player be allowed to sprint. Default is "100", meaning
+        100% of normal sprinting speed
+      sneakspeed:
+        (You'll have to manually add this entry if you want to use it)
+        How fast should the player be allowed to sneak. Default is "100", meaning
+        100% of normal sneaking speed
+      swimspeed:
+        (You'll have to manually add this entry if you want to use it)
+        How fast should the player be allowed to swim. Default is "100", meaning
+        100% of normal swimming speed
       allowfastsneaking:
         Should sneaking players be allowed to move as fast as normal players. Set this to
         true, if you use plugins that enable players to do that (e.g. RPG plugins tend
@@ -259,7 +275,7 @@ checks:
       precision:
         How strict should NoCheat be when checking if a player is looking in the
         correct direction. 75 (which means a player may be up to 0.75 blocks off)
-        seems to be an ok value.
+        seems to be a good value.
       penaltytime:
         How long after failing this check should the player be prevented from
         placing any further blocks. This value is in milliseconds, the default
@@ -273,7 +289,7 @@ checks:
   chat:
     All checks related to sending chat messages.
     color:
-      Players may use colorcodes to send colored messages. This may be used
+      Players may use color-codes to send colored messages. This may be used
       to fool other players into believing they are admins or similar.
       active:
         Should player messages get checked for the use of colors in messages.
@@ -287,7 +303,7 @@ checks:
       active:
         Should player messages get checked for the sending of too many messages.
       whitelist:
-        A " " (whitespace) seperated list of words. Messages that start with
+        A " " (whitespace) separated list of words. Messages that start with
         these sequences will not be counted.
       timeframe:
         For how many seconds should messages and commands be counted. 
@@ -295,7 +311,7 @@ checks:
         How many "normal" chat messages may be sent within the timeframe.
       commandlimit:
         How many commands may be issued within the timeframe. Some mods (e.g.
-        TooManyItems) send a command on every mouseclick, which may cause
+        TooManyItems) send a command on every mouse-click, which may cause
         problems if this is set too low.        
       actions:
         What should happen if players send more messages/commands? Default is
@@ -307,9 +323,9 @@ checks:
     Everything related to fighting
     direction:
       Players may attack enemies without looking at them. This check tries to
-      identify such behaviour.
+      identify such behavior.
       active:
-        Should players get checked for such behaviour.
+        Should players get checked for such behavior.
       precision:
         How strict should NoCheat be when comparing the line of sight with the
         position of the target. Default is 75 which means a player may look 
@@ -328,7 +344,7 @@ checks:
       Players may attack enemies without moving their arm. This may confuse
       other players as they can't see who is attacking them or monsters.
       active:
-        Should players be checked for this behaviour.
+        Should players be checked for this behavior.
       actions:
         What should happen if the player fails this check. Default is to stop
         the attack ("cancel" it) and log messages.
@@ -337,7 +353,7 @@ checks:
       a significant advantage in fights. Normally attacks are only allowed
       over a ~4 block distance, but these hacks may increase that to 6 blocks.
       active:
-        Should players be checked for this behaviour.
+        Should players be checked for this behavior.
       distance:
         What is the maximum distance that NoCheat should allow attacks for.
         Default is ~4 blocks (value 400). Setting this even lower will limit
@@ -355,7 +371,7 @@ checks:
       Players may be attacking extremely fast within a short time by using
       automated clicking or hacks. This is an advantage in many situations.
       active:
-        Should players be checked for this behaviour.
+        Should players be checked for this behavior.
       attacklimit:
         How many attacks may a player start within 1 second. Consider setting
         this to a value that's close to how fast you believe players can click
@@ -363,6 +379,18 @@ checks:
       actions:
         What should happen if the player fails this check. Default is to stop
         the attack ("cancel" it) and log messages.
+    godmode:
+      Players may trick Bukkit into not dealing them damage when they get
+      attacked. This will try to identify and correct that behavior.
+      active:
+        Should players be checked for this behavior.
+      attacklimit:
+        How many attacks may a player start within 1 second. Consider setting
+        this to a value that's close to how fast you believe players can click
+        their mouse.
+      actions:
+        What should happen if the player fails this check. Default is to make
+        him vulnerable to the attack ("cancel" his "godmode) and log messages.
         
 strings:
   This is the section that defines various strings for "log" or "cmd" actions.
@@ -372,7 +400,7 @@ strings:
   this section. Arbitrary many additional strings may be defined here, or
   existing strings may be changed.
   
-  Most messages/commands use placeholders in [ ], which will be replaced at
+  Most messages/commands use place-holders in [ ], which will be replaced at
   runtime with relevant information. Some of these may only be available in
   certain circumstances, only "[player]" can be used everywhere, especially
   in "cmd" actions.
