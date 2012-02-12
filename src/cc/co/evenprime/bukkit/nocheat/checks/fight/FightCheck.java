@@ -13,9 +13,11 @@ import cc.co.evenprime.bukkit.nocheat.data.DataStore;
 public abstract class FightCheck extends Check {
 
     private static final String id = "fight";
+    public final String         permission;
 
     public FightCheck(NoCheat plugin, String name, String permission) {
-        super(plugin, id, name, permission);
+        super(plugin, id, name);
+        this.permission = permission;
     }
 
     public abstract boolean check(NoCheatPlayer player, FightData data, FightConfig cc);

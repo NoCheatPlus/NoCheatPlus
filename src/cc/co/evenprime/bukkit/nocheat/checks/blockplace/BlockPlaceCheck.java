@@ -16,13 +16,9 @@ public abstract class BlockPlaceCheck extends Check {
 
     private static final String id = "blockplace";
 
-    public BlockPlaceCheck(NoCheat plugin, String name, String permission) {
-        super(plugin, id, name, permission);
+    public BlockPlaceCheck(NoCheat plugin, String name) {
+        super(plugin, id, name);
     }
-
-    public abstract boolean check(NoCheatPlayer player, BlockPlaceData data, BlockPlaceConfig cc);
-
-    public abstract boolean isEnabled(BlockPlaceConfig cc);
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

@@ -9,8 +9,8 @@ public abstract class InventoryCheck extends Check {
 
     private static final String id = "inventory";
 
-    public InventoryCheck(NoCheat plugin, String name, String permission) {
-        super(plugin, id, name, permission);
+    public InventoryCheck(NoCheat plugin, String name) {
+        super(plugin, id, name);
     }
 
     public static InventoryData getData(DataStore base) {

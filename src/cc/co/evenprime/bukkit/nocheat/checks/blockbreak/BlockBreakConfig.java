@@ -12,7 +12,6 @@ import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
  */
 public class BlockBreakConfig implements ConfigItem {
 
-    public final boolean    check;
     public final boolean    reachCheck;
     public final double     reachDistance;
     public final ActionList reachActions;
@@ -34,8 +33,5 @@ public class BlockBreakConfig implements ConfigItem {
         directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS);
         noswingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
         noswingActions = data.getActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS);
-
-        check = reachCheck || directionCheck || noswingCheck;
-
     }
 }

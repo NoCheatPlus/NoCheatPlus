@@ -4,13 +4,12 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class NoswingCheck extends BlockBreakCheck {
 
     public NoswingCheck(NoCheat plugin) {
-        super(plugin, "blockbreak.noswing", Permissions.BLOCKBREAK_NOSWING);
+        super(plugin, "blockbreak.noswing");
     }
 
     public boolean check(NoCheatPlayer player, BlockBreakData data, BlockBreakConfig cc) {
@@ -29,10 +28,6 @@ public class NoswingCheck extends BlockBreakCheck {
         }
 
         return cancel;
-    }
-
-    public boolean isEnabled(BlockBreakConfig cc) {
-        return cc.noswingCheck;
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

@@ -53,7 +53,7 @@ public class InventoryCheckListener implements Listener, EventManager {
         boolean cancelled = false;
 
         // If it should be executed, do it
-        if(cc.dropCheck && !player.hasPermission(dropCheck.getPermission())) {
+        if(cc.dropCheck && !player.hasPermission(Permissions.INVENTORY_DROP)) {
             cancelled = dropCheck.check(player, data, cc);
         }
 
@@ -93,7 +93,7 @@ public class InventoryCheckListener implements Listener, EventManager {
             final InventoryConfig cc = InventoryCheck.getConfig(player.getConfigurationStore());
             final InventoryData data = InventoryCheck.getData(player.getDataStore());
 
-            if(cc.eatCheck && !player.hasPermission(instantEatCheck.getPermission())) {
+            if(cc.eatCheck && !player.hasPermission(Permissions.INVENTORY_INSTANTEAT)) {
 
                 boolean cancelled = instantEatCheck.check(player, event, data, cc);
                 event.setCancelled(cancelled);
@@ -110,7 +110,7 @@ public class InventoryCheckListener implements Listener, EventManager {
             final NoCheatPlayer player = plugin.getPlayer((Player) event.getEntity());
             final InventoryConfig cc = InventoryCheck.getConfig(player.getConfigurationStore());
 
-            if(cc.bowCheck && !player.hasPermission(instantBowCheck.getPermission())) {
+            if(cc.bowCheck && !player.hasPermission(Permissions.INVENTORY_INSTANTBOW)) {
                 final InventoryData data = InventoryCheck.getData(player.getDataStore());
                 boolean cancelled = instantBowCheck.check(player, event, data, cc);
 

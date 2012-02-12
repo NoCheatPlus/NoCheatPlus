@@ -9,7 +9,6 @@ import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 
 public class ChatConfig implements ConfigItem {
 
-    public final boolean    check;
     public final boolean    spamCheck;
     public final String[]   spamWhitelist;
     public final int        spamTimeframe;
@@ -29,9 +28,6 @@ public class ChatConfig implements ConfigItem {
         spamActions = data.getActionList(ConfPaths.CHAT_SPAM_ACTIONS);
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS);
-
-        check = spamCheck || colorCheck;
-
     }
 
     private String[] splitWhitelist(String string) {

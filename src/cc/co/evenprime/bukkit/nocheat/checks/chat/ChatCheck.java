@@ -11,13 +11,9 @@ public abstract class ChatCheck extends Check {
 
     private static final String id = "chat";
 
-    public ChatCheck(NoCheat plugin, String name, String permission) {
-        super(plugin, id, name, permission);
+    public ChatCheck(NoCheat plugin, String name) {
+        super(plugin, id, name);
     }
-
-    public abstract boolean check(NoCheatPlayer player, ChatData data, ChatConfig cc);
-
-    public abstract boolean isEnabled(ChatConfig cc);
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

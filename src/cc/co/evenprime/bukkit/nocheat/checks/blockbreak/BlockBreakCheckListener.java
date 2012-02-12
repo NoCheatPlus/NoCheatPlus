@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.bukkit.event.EventHandler;
@@ -23,16 +22,16 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
  */
 public class BlockBreakCheckListener implements Listener, EventManager {
 
-    private final List<BlockBreakCheck> checks;
-    private final NoCheat               plugin;
+    private final NoswingCheck   noswingCheck;
+    private final ReachCheck     reachCheck;
+    private final DirectionCheck directionCheck;
+    private final NoCheat        plugin;
 
     public BlockBreakCheckListener(NoCheat plugin) {
 
-        // Three checks exist for this event type
-        this.checks = new ArrayList<BlockBreakCheck>(3);
-        this.checks.add(new NoswingCheck(plugin));
-        this.checks.add(new ReachCheck(plugin));
-        this.checks.add(new DirectionCheck(plugin));
+        noswingCheck = new NoswingCheck(plugin);
+        reachCheck = new ReachCheck(plugin);
+        directionCheck = new DirectionCheck(plugin);
 
         this.plugin = plugin;
     }
@@ -48,10 +47,6 @@ public class BlockBreakCheckListener implements Listener, EventManager {
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final BlockBreakConfig cc = BlockBreakCheck.getConfig(player.getConfigurationStore());
 
-        if(!cc.check || player.hasPermission(Permissions.BLOCKBREAK)) {
-            return;
-        }
-
         final BlockBreakData data = BlockBreakCheck.getData(player.getDataStore());
 
         data.brokenBlockLocation.set(event.getBlock());
@@ -64,12 +59,15 @@ public class BlockBreakCheckListener implements Listener, EventManager {
             return;
         }
 
-        // Go through all "blockbreak" checks
-        for(BlockBreakCheck check : checks) {
-            // If it should be executed, do it
-            if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
-                cancelled = check.check(player, data, cc);
-            }
+        // Now do the actual checks, if still needed
+        if(cc.noswingCheck && !player.hasPermission(Permissions.BLOCKBREAK_NOSWING)) {
+            cancelled = noswingCheck.check(player, data, cc);
+        }
+        if(!cancelled && cc.reachCheck && !player.hasPermission(Permissions.BLOCKBREAK_REACH)) {
+            cancelled = reachCheck.check(player, data, cc);
+        }
+        if(!cancelled && cc.directionCheck && !player.hasPermission(Permissions.BLOCKBREAK_DIRECTION)) {
+            cancelled = directionCheck.check(player, data, cc);
         }
 
         if(cancelled)
@@ -117,11 +115,11 @@ public class BlockBreakCheckListener implements Listener, EventManager {
 
         BlockBreakConfig bb = BlockBreakCheck.getConfig(cc);
 
-        if(bb.check && bb.directionCheck)
+        if(bb.directionCheck)
             s.add("blockbreak.direction");
-        if(bb.check && bb.reachCheck)
+        if(bb.reachCheck)
             s.add("blockbreak.reach");
-        if(bb.check && bb.noswingCheck)
+        if(bb.noswingCheck)
             s.add("blockbreak.noswing");
 
         return s;

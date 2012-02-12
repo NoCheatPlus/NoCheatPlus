@@ -21,33 +21,29 @@ import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 public abstract class Check {
 
     private final String               name;
-    private final String               groupId;                                          // used to bundle information of multiple checks
-    private final String               permission;
+    // used to bundle information of multiple checks
+    private final String               groupId;
     private static final CommandSender noCheatCommandSender = new NoCheatCommandSender();
     protected final NoCheat            plugin;
 
-    public Check(NoCheat plugin, String groupId, String name, String permission) {
-
+    public Check(NoCheat plugin, String groupId, String name) {
         this.plugin = plugin;
         this.groupId = groupId;
         this.name = name;
-        this.permission = permission;
     }
 
-    public final String getName() {
-        return name;
-    }
-
-    public final String getPermission() {
-        return permission;
-    }
-
+    /**
+     * Execute some actions for the specified player
+     * 
+     * @param player
+     * @param actions
+     * @return
+     */
     protected final boolean executeActions(NoCheatPlayer player, Action[] actions) {
 
         boolean special = false;
 
-        final long time = System.currentTimeMillis() / 1000;
-
+        final long time = System.currentTimeMillis() / 1000L;
         final ConfigurationCacheStore cc = player.getConfigurationStore();
 
         for(Action ac : actions) {
@@ -67,6 +63,13 @@ public abstract class Check {
         return special;
     }
 
+    /**
+     * Collect information about the players violations
+     * 
+     * @param player
+     * @param id
+     * @param vl
+     */
     protected void incrementStatistics(NoCheatPlayer player, Id id, double vl) {
         player.getDataStore().getStatistics().increment(id, vl);
     }
@@ -91,12 +94,21 @@ public abstract class Check {
         }
     }
 
+    /**
+     * Replace a parameter for commands or log actions with an actual
+     * value. Individual checks should override this to get their own
+     * parameters handled too.
+     * 
+     * @param wildcard
+     * @param player
+     * @return
+     */
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.PLAYER)
             return player.getName();
         else if(wildcard == ParameterName.CHECK)
-            return getName();
+            return name;
         else if(wildcard == ParameterName.LOCATION) {
             Location l = player.getPlayer().getLocation();
             return String.format(Locale.US, "%.2f,%.2f,%.2f", l.getX(), l.getY(), l.getZ());

@@ -4,13 +4,12 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class ColorCheck extends ChatCheck {
 
     public ColorCheck(NoCheat plugin) {
-        super(plugin, "chat.color", Permissions.CHAT_COLOR);
+        super(plugin, "chat.color");
     }
 
     public boolean check(NoCheatPlayer player, ChatData data, ChatConfig cc) {
@@ -29,11 +28,6 @@ public class ColorCheck extends ChatCheck {
         }
 
         return false;
-    }
-
-    @Override
-    public boolean isEnabled(ChatConfig cc) {
-        return cc.colorCheck;
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

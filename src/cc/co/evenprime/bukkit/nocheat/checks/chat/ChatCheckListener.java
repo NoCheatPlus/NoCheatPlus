@@ -1,6 +1,5 @@
 package cc.co.evenprime.bukkit.nocheat.checks.chat;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.bukkit.event.EventHandler;
@@ -16,16 +15,17 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 public class ChatCheckListener implements Listener, EventManager {
 
-    private final List<ChatCheck> checks;
-    private final NoCheat         plugin;
+    private final SpamCheck  spamCheck;
+    private final ColorCheck colorCheck;
+
+    private final NoCheat    plugin;
 
     public ChatCheckListener(NoCheat plugin) {
 
-        this.checks = new ArrayList<ChatCheck>(3);
-        this.checks.add(new SpamCheck(plugin));
-        this.checks.add(new ColorCheck(plugin));
-
         this.plugin = plugin;
+
+        spamCheck = new SpamCheck(plugin);
+        colorCheck = new ColorCheck(plugin);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -44,19 +44,16 @@ public class ChatCheckListener implements Listener, EventManager {
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final ChatConfig cc = ChatCheck.getConfig(player.getConfigurationStore());
 
-        if(!cc.check || player.hasPermission(Permissions.CHAT)) {
-            return;
-        }
-
         final ChatData data = ChatCheck.getData(player.getDataStore());
 
         data.message = event.getMessage();
 
-        for(ChatCheck check : checks) {
-            // If it should be executed, do it
-            if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
-                cancelled = check.check(player, data, cc);
-            }
+        // Now do the actual checks
+        if(cc.spamCheck && !player.hasPermission(Permissions.CHAT_SPAM)) {
+            cancelled = spamCheck.check(player, data, cc);
+        }
+        if(!cancelled && cc.colorCheck && !player.hasPermission(Permissions.CHAT_COLOR)) {
+            cancelled = colorCheck.check(player, data, cc);
         }
 
         if(cancelled) {
@@ -71,9 +68,9 @@ public class ChatCheckListener implements Listener, EventManager {
         LinkedList<String> s = new LinkedList<String>();
 
         ChatConfig c = ChatCheck.getConfig(cc);
-        if(c.check && c.spamCheck)
+        if(c.spamCheck)
             s.add("chat.spam");
-        if(c.check && c.colorCheck)
+        if(c.colorCheck)
             s.add("chat.color");
         return s;
     }

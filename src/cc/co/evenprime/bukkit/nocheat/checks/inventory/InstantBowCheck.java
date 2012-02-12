@@ -5,13 +5,12 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class InstantBowCheck extends InventoryCheck {
 
     public InstantBowCheck(NoCheat plugin) {
-        super(plugin, "inventory.instantbow", Permissions.INVENTORY_INSTANTBOW);
+        super(plugin, "inventory.instantbow");
     }
 
     public boolean check(NoCheatPlayer player, EntityShootBowEvent event, InventoryData data, InventoryConfig cc) {

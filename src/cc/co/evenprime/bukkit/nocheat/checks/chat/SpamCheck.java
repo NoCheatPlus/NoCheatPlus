@@ -4,13 +4,12 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class SpamCheck extends ChatCheck {
 
     public SpamCheck(NoCheat plugin) {
-        super(plugin, "chat.spam", Permissions.CHAT_SPAM);
+        super(plugin, "chat.spam");
     }
 
     public boolean check(NoCheatPlayer player, ChatData data, ChatConfig cc) {
@@ -51,11 +50,6 @@ public class SpamCheck extends ChatCheck {
         }
 
         return cancel;
-    }
-
-    @Override
-    public boolean isEnabled(ChatConfig cc) {
-        return cc.spamCheck;
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

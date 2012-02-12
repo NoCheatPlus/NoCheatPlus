@@ -4,7 +4,6 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
@@ -23,7 +22,7 @@ public class MorePacketsCheck extends MovingCheck {
     private final static int packetsPerTimeframe = 22;
 
     public MorePacketsCheck(NoCheat plugin) {
-        super(plugin, "moving.morepackets", Permissions.MOVING_MOREPACKETS);
+        super(plugin, "moving.morepackets");
     }
 
     /**
@@ -95,11 +94,6 @@ public class MorePacketsCheck extends MovingCheck {
         }
 
         return newToLocation;
-    }
-
-    @Override
-    public boolean isEnabled(MovingConfig moving) {
-        return moving.morePacketsCheck;
     }
 
     @Override

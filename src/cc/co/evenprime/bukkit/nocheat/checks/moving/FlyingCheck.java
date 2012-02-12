@@ -16,7 +16,7 @@ import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 public class FlyingCheck extends MovingCheck {
 
     public FlyingCheck(NoCheat plugin) {
-        super(plugin, "moving.flying", null);
+        super(plugin, "moving.flying");
     }
 
     private static final double creativeSpeed = 0.60D;
@@ -123,11 +123,6 @@ public class FlyingCheck extends MovingCheck {
         }
 
         return newToLocation;
-    }
-
-    @Override
-    public boolean isEnabled(MovingConfig moving) {
-        return moving.allowFlying && moving.runflyCheck;
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

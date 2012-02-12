@@ -13,19 +13,9 @@ public abstract class MovingCheck extends Check {
 
     private static final String id = "moving";
 
-    public MovingCheck(NoCheat plugin, String name, String permission) {
-        super(plugin, id, name, permission);
+    public MovingCheck(NoCheat plugin, String name) {
+        super(plugin, id, name);
     }
-
-    /**
-     * Return a new destination location or null
-     * 
-     * @param event
-     * @return
-     */
-    public abstract PreciseLocation check(final NoCheatPlayer player, MovingData data, MovingConfig cc);
-
-    public abstract boolean isEnabled(MovingConfig moving);
 
     @Override
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

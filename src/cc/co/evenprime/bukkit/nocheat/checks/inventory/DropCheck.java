@@ -4,13 +4,12 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class DropCheck extends InventoryCheck {
 
     public DropCheck(NoCheat plugin) {
-        super(plugin, "inventory.drop", Permissions.INVENTORY_DROP);
+        super(plugin, "inventory.drop");
     }
 
     public boolean check(NoCheatPlayer player, InventoryData data, InventoryConfig cc) {

@@ -12,8 +12,6 @@ import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
  */
 public class MovingConfig implements ConfigItem {
 
-    public final boolean    check;
-
     public final boolean    runflyCheck;
     public final boolean    identifyCreativeMode;
     public final double     walkingSpeedLimit;
@@ -70,8 +68,5 @@ public class MovingConfig implements ConfigItem {
 
         morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
         morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS);
-
-        check = runflyCheck || morePacketsCheck;
-
     }
 }

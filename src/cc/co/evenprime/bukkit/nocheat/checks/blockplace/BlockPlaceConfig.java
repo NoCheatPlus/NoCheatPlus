@@ -10,8 +10,6 @@ import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
  */
 public class BlockPlaceConfig implements ConfigItem {
 
-    public final boolean    check;
-
     public final boolean    reachCheck;
     public final double     reachDistance;
     public final ActionList reachActions;
@@ -31,8 +29,5 @@ public class BlockPlaceConfig implements ConfigItem {
         directionPenaltyTime = data.getInt(ConfPaths.BLOCKPLACE_DIRECTION_PENALTYTIME);
         directionPrecision = ((double) data.getInt(ConfPaths.BLOCKPLACE_DIRECTION_PRECISION)) / 100D;
         directionActions = data.getActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS);
-
-        check = reachCheck || directionCheck;
-
     }
 }

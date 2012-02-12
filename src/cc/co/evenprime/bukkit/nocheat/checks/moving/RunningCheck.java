@@ -30,7 +30,7 @@ public class RunningCheck extends MovingCheck {
 
     public RunningCheck(NoCheat plugin) {
 
-        super(plugin, "moving.running", null);
+        super(plugin, "moving.running");
 
         this.noFallCheck = new NoFallCheck(plugin);
     }
@@ -235,10 +235,6 @@ public class RunningCheck extends MovingCheck {
     }
 
     @Override
-    public boolean isEnabled(MovingConfig moving) {
-        return moving.runflyCheck && !moving.allowFlying;
-    }
-
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.CHECK)

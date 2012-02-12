@@ -1,7 +1,6 @@
 package cc.co.evenprime.bukkit.nocheat.checks.blockbreak;
 
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
-import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.data.DataStore;
@@ -10,13 +9,9 @@ public abstract class BlockBreakCheck extends Check {
 
     private static final String id = "blockbreak";
 
-    public BlockBreakCheck(NoCheat plugin, String name, String permission) {
-        super(plugin, id, name, permission);
+    public BlockBreakCheck(NoCheat plugin, String name) {
+        super(plugin, id, name);
     }
-
-    public abstract boolean check(NoCheatPlayer player, BlockBreakData data, BlockBreakConfig cc);
-
-    public abstract boolean isEnabled(BlockBreakConfig cc);
 
     public static BlockBreakData getData(DataStore base) {
         BlockBreakData data = base.get(id);

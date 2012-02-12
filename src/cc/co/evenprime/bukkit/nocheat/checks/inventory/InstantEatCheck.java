@@ -5,13 +5,12 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class InstantEatCheck extends InventoryCheck {
 
     public InstantEatCheck(NoCheat plugin) {
-        super(plugin, "inventory.instanteat", Permissions.INVENTORY_INSTANTEAT);
+        super(plugin, "inventory.instanteat");
     }
 
     public boolean check(NoCheatPlayer player, FoodLevelChangeEvent event, InventoryData data, InventoryConfig cc) {

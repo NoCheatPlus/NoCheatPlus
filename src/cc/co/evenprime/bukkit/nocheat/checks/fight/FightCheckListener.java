@@ -71,7 +71,7 @@ public class FightCheckListener implements Listener, EventManager {
         NoCheatPlayer player = plugin.getPlayer((Player) entity);
         FightConfig cc = FightCheck.getConfig(player.getConfigurationStore());
 
-        if(!godmodeCheck.isEnabled(cc) || player.hasPermission(godmodeCheck.getPermission())) {
+        if(!godmodeCheck.isEnabled(cc) || player.hasPermission(godmodeCheck.permission)) {
             return;
         }
 
@@ -109,7 +109,7 @@ public class FightCheckListener implements Listener, EventManager {
 
         for(FightCheck check : checks) {
             // If it should be executed, do it
-            if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.getPermission())) {
+            if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.permission)) {
                 cancelled = check.check(player, data, cc);
             }
         }

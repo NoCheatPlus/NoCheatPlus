@@ -5,7 +5,6 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
@@ -17,7 +16,7 @@ import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 public class DirectionCheck extends BlockBreakCheck {
 
     public DirectionCheck(NoCheat plugin) {
-        super(plugin, "blockbreak.direction", Permissions.BLOCKBREAK_DIRECTION);
+        super(plugin, "blockbreak.direction");
     }
 
     public boolean check(final NoCheatPlayer player, final BlockBreakData data, final BlockBreakConfig ccblockbreak) {
@@ -63,10 +62,6 @@ public class DirectionCheck extends BlockBreakCheck {
         }
 
         return cancel;
-    }
-
-    public boolean isEnabled(BlockBreakConfig cc) {
-        return cc.directionCheck;
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {

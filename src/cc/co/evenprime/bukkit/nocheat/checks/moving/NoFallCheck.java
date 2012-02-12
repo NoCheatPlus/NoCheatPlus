@@ -4,8 +4,6 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
-import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 /**
@@ -16,21 +14,21 @@ import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 public class NoFallCheck extends MovingCheck {
 
     public NoFallCheck(NoCheat plugin) {
-        super(plugin, "moving.nofall", Permissions.MOVING_NOFALL);
+        super(plugin, "moving.nofall");
     }
 
     /**
      * Calculate if and how much the player "failed" this check.
      * 
      */
-    public PreciseLocation check(NoCheatPlayer player, MovingData data, MovingConfig cc) {
+    public void check(NoCheatPlayer player, MovingData data, MovingConfig cc) {
 
         // If the player is serverside in creative mode, we have to stop here to
         // avoid hurting him when he switches back to "normal" mode
         if(player.isCreative()) {
             data.fallDistance = 0F;
             data.lastAddedFallDistance = 0F;
-            return null;
+            return;
         }
 
         // This check is pretty much always a step behind for technical reasons.
@@ -110,12 +108,7 @@ public class NoFallCheck extends MovingCheck {
         // Reduce falldamage violation level
         data.nofallVL *= 0.99D;
 
-        return null;
-    }
-
-    @Override
-    public boolean isEnabled(MovingConfig moving) {
-        return moving.nofallCheck;
+        return;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class MovingData implements DataItem {
 
     public int                   jumpPhase;
     public double                lastJumpAmplifier;
-    public int                   onIce                   = 0;
+    public int                   onIce;
 
     public final PreciseLocation runflySetBackPoint      = new PreciseLocation();
 

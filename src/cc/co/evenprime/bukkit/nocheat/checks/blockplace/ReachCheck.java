@@ -5,7 +5,6 @@ import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
@@ -17,7 +16,7 @@ import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 public class ReachCheck extends BlockPlaceCheck {
 
     public ReachCheck(NoCheat plugin) {
-        super(plugin, "blockplace.reach", Permissions.BLOCKPLACE_REACH);
+        super(plugin, "blockplace.reach");
     }
 
     public boolean check(NoCheatPlayer player, BlockPlaceData data, BlockPlaceConfig cc) {
@@ -42,11 +41,6 @@ public class ReachCheck extends BlockPlaceCheck {
         }
 
         return cancel;
-    }
-
-    @Override
-    public boolean isEnabled(BlockPlaceConfig cc) {
-        return cc.reachCheck;
     }
 
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
