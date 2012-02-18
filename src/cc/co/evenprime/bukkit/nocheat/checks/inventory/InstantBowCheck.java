@@ -23,7 +23,7 @@ public class InstantBowCheck extends InventoryCheck {
 
         if(expectedTimeWhenStringDrawn < time) {
             // Acceptable, reduce VL
-            data.instantBowVL *= 0.98D;
+            data.instantBowVL *= 0.90D;
         } else if(data.lastBowInteractTime > time) {
             // Security, if time ran backwards, reset
             data.lastBowInteractTime = 0;

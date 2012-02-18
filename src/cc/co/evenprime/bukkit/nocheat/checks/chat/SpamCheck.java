@@ -4,6 +4,7 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class SpamCheck extends ChatCheck {
@@ -23,9 +24,23 @@ public class SpamCheck extends ChatCheck {
             }
         }
 
+        int commandLimit = 0;
+        int messageLimit = 0;
+        int timeframe = 0;
+
+        // Set limits depending on "proxy server check" results
+        if(data.botcheckpassed || player.hasPermission(Permissions.CHAT_SPAM_BOT)) {
+            commandLimit = cc.spamCommandLimit;
+            messageLimit = cc.spamMessageLimit;
+            timeframe = cc.spamTimeframe;
+        } else {
+            commandLimit = cc.spambotCommandLimit;
+            messageLimit = cc.spambotMessageLimit;
+            timeframe = cc.spambotTimeframe;
+        }
         final long time = System.currentTimeMillis() / 1000;
 
-        if(data.spamLastTime + cc.spamTimeframe <= time) {
+        if(data.spamLastTime + timeframe <= time) {
             data.spamLastTime = time;
             data.messageCount = 0;
             data.commandCount = 0;
@@ -40,10 +55,10 @@ public class SpamCheck extends ChatCheck {
         else
             data.messageCount++;
 
-        if(data.messageCount > cc.spamLimit || data.commandCount > cc.commandLimit) {
+        if(data.messageCount > messageLimit || data.commandCount > commandLimit) {
 
-            data.spamVL = Math.max(0, data.messageCount - cc.spamLimit);
-            data.spamVL += Math.max(0, data.commandCount - cc.commandLimit);
+            data.spamVL = Math.max(0, data.messageCount - messageLimit);
+            data.spamVL += Math.max(0, data.commandCount - commandLimit);
             incrementStatistics(player, Id.CHAT_SPAM, 1);
 
             cancel = executeActions(player, cc.spamActions.getActions(data.spamVL));

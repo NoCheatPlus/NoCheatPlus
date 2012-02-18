@@ -11,11 +11,11 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
  */
 public class ConfigurationCacheStore {
 
-    public final LoggingConfig                logging;
+    public final LoggingConfig            logging;
 
     private final Map<String, ConfigItem> configMap = new HashMap<String, ConfigItem>();
 
-    private final NoCheatConfiguration               data;
+    private final NoCheatConfiguration    data;
 
     /**
      * Instantiate a config cache and populate it with the data of a

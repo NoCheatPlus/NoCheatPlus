@@ -102,9 +102,17 @@ public abstract class ConfPaths {
     public final static String  CHAT_SPAM_CHECK                           = CHAT_SPAM + "active";
     public final static String  CHAT_SPAM_WHITELIST                       = CHAT_SPAM + "whitelist";
     public final static String  CHAT_SPAM_TIMEFRAME                       = CHAT_SPAM + "timeframe";
-    public final static String  CHAT_SPAM_LIMIT                           = CHAT_SPAM + "messagelimit";
+    public final static String  CHAT_SPAM_MESSAGELIMIT                    = CHAT_SPAM + "messagelimit";
     public final static String  CHAT_SPAM_COMMANDLIMIT                    = CHAT_SPAM + "commandlimit";
     public final static String  CHAT_SPAM_ACTIONS                         = CHAT_SPAM + "actions";
+
+    private final static String CHAT_SPAMBOT                              = CHAT_SPAM + "bot.";
+    public static final String  CHAT_SPAMBOT_CHECK                        = CHAT_SPAMBOT + "active";
+    public static final String  CHAT_SPAMBOT_TIMEFRAME                    = CHAT_SPAMBOT + "timeframe";
+    public static final String  CHAT_SPAMBOT_COMMANDLIMIT                 = CHAT_SPAMBOT + "commandlimit";
+    public static final String  CHAT_SPAMBOT_MESSAGELIMIT                 = CHAT_SPAMBOT + "messagelimit";
+    public static final String  CHAT_SPAMBOT_SERVERS                      = CHAT_SPAMBOT + "servers";
+    public static final String  CHAT_SPAMBOT_ACTIONS                      = CHAT_SPAMBOT + "actions";
 
     private final static String FIGHT                                     = CHECKS + "fight.";
 
