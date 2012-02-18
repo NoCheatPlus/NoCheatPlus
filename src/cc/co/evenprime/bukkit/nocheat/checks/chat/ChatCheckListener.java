@@ -76,9 +76,8 @@ public class ChatCheckListener implements Listener, EventManager {
             data.botcheckpassed = true;
         } else {
             data.botcheckpassed = false;
+            spambotCheck.startTestForProxies(event.getPlayer(), event.getPlayer().getAddress().getAddress().getHostAddress());
         }
-
-        spambotCheck.startTestForProxies(event.getPlayer(), event.getPlayer().getAddress().getAddress().getHostAddress());
     }
 
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {

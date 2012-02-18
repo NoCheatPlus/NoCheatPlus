@@ -9,6 +9,7 @@ import cc.co.evenprime.bukkit.dnsbl.ProxyServerChecker;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 /**
  * The actual spam check is done at "SpamCheck". This will only
@@ -38,7 +39,7 @@ public class SpambotTest extends ChatCheck implements ProxyServerCheckResultHand
 
         boolean cancelled = false;
 
-        if(failures.size() > 0) {
+        if(failures.size() > 0 && config.spambotCheck && !player.hasPermission(Permissions.CHAT_SPAM_BOT)) {
             data.spamBotFailed = new LinkedList<String>(failures);
             // cancelled means the player stays in "spambot" status
             cancelled = executeActions(ncplayer, config.spambotActions.getActions(failures.size()));
