@@ -192,6 +192,10 @@ public class MovingCheckListener implements Listener, EventManager {
         if(event.isCancelled() || event.getPlayer().isInsideVehicle() || event.getPlayer().isDead())
             return;
 
+        if(!event.getFrom().getWorld().equals(event.getTo().getWorld()) || event.getFrom().distanceSquared(event.getTo()) > 400) {
+            return;
+        }
+                        
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
 
         final MovingConfig cc = MovingCheck.getConfig(player.getConfigurationStore());
@@ -206,6 +210,9 @@ public class MovingCheckListener implements Listener, EventManager {
         data.from.set(event.getFrom());
         final Location to = event.getTo();
         data.to.set(to);
+        
+        
+        
 
         PreciseLocation newTo = null;
 
@@ -226,7 +233,7 @@ public class MovingCheckListener implements Listener, EventManager {
         /** MOREPACKETS CHECK SECTION **/
         if(!cc.morePacketsCheck || player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
             data.clearMorePacketsData();
-        } else if(newTo != null) {
+        } else if(newTo == null) {
             newTo = morePacketsCheck.check(player, data, cc);
         }
 
