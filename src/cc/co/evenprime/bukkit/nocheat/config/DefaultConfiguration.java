@@ -93,7 +93,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.CHAT_SPAMBOT_TIMEFRAME, 60);
         set(ConfPaths.CHAT_SPAMBOT_MESSAGELIMIT, 3);
         set(ConfPaths.CHAT_SPAMBOT_COMMANDLIMIT, 12);
-        set(ConfPaths.CHAT_SPAMBOT_SERVERS, "bl.spamcop.net cbl.abuseat.org socks.dnsbl.sorbs.net tor.dnsbl.sectoor.de zen.spamhaus.org");
+        set(ConfPaths.CHAT_SPAMBOT_SERVERS, "bl.spamcop.net cbl.abuseat.org socks.dnsbl.sorbs.net tor.efnet.org xbl.spamhaus.org");
         set(ConfPaths.CHAT_SPAMBOT_ACTIONS, "log:sbot:0:0:cif vl>2 log:sbot:0:0:cif cancel vl>4 log:sbot:0:0:cif cancel cmd:kick");
 
         /*** FIGHT ***/
