@@ -69,9 +69,6 @@ permissions:
             children:
               nocheat.checks.chat.spam:
                 description: Allow a player to send an infinite amount of chat messages
-                children:
-                  nocheat.checks.chat.spam.bot:
-                    description: Exempt players from the proxy server check and always declare them as "not spambot"
               nocheat.checks.chat.color:
                 description: Allow a player to send colored chat messages
           nocheat.checks.fight:

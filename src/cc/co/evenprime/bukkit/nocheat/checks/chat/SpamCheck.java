@@ -4,7 +4,6 @@ import java.util.Locale;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public class SpamCheck extends ChatCheck {
@@ -24,20 +23,10 @@ public class SpamCheck extends ChatCheck {
             }
         }
 
-        int commandLimit = 0;
-        int messageLimit = 0;
-        int timeframe = 0;
+        int commandLimit = cc.spamCommandLimit;
+        int messageLimit = cc.spamMessageLimit;
+        int timeframe = cc.spamTimeframe;
 
-        // Set limits depending on "proxy server check" results
-        if(data.botcheckpassed || player.hasPermission(Permissions.CHAT_SPAM_BOT)) {
-            commandLimit = cc.spamCommandLimit;
-            messageLimit = cc.spamMessageLimit;
-            timeframe = cc.spamTimeframe;
-        } else {
-            commandLimit = cc.spambotCommandLimit;
-            messageLimit = cc.spambotMessageLimit;
-            timeframe = cc.spambotTimeframe;
-        }
         final long time = System.currentTimeMillis() / 1000;
 
         if(data.spamLastTime + timeframe <= time) {

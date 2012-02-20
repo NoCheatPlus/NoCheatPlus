@@ -14,7 +14,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
-import cc.co.evenprime.bukkit.dnsbl.ProxyServerChecker;
 import cc.co.evenprime.bukkit.nocheat.checks.WorkaroundsListener;
 import cc.co.evenprime.bukkit.nocheat.checks.blockbreak.BlockBreakCheckListener;
 import cc.co.evenprime.bukkit.nocheat.checks.blockplace.BlockPlaceCheckListener;
@@ -203,9 +202,5 @@ public class NoCheat extends JavaPlugin implements Listener {
 
     public void setFileLogger(Logger logger) {
         this.fileLogger = logger;
-    }
-
-    public ProxyServerChecker getProxyServerChecker() {
-        return this.conf.getProxyServerChecker();
     }
 }

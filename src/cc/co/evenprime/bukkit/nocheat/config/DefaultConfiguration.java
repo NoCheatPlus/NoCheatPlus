@@ -89,13 +89,6 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.CHAT_SPAM_COMMANDLIMIT, 12);
         set(ConfPaths.CHAT_SPAM_ACTIONS, "log:spam:0:3:if cancel vl>30 log:spam:0:3:cif cancel cmd:kick");
 
-        set(ConfPaths.CHAT_SPAMBOT_CHECK, true);
-        set(ConfPaths.CHAT_SPAMBOT_TIMEFRAME, 60);
-        set(ConfPaths.CHAT_SPAMBOT_MESSAGELIMIT, 3);
-        set(ConfPaths.CHAT_SPAMBOT_COMMANDLIMIT, 12);
-        set(ConfPaths.CHAT_SPAMBOT_SERVERS, "bl.spamcop.net cbl.abuseat.org socks.dnsbl.sorbs.net tor.efnet.org xbl.spamhaus.org");
-        set(ConfPaths.CHAT_SPAMBOT_ACTIONS, "log:sbot:0:0:cif vl>2 log:sbot:0:0:cif cancel vl>4 log:sbot:0:0:cif cancel cmd:kick");
-
         /*** FIGHT ***/
 
         set(ConfPaths.FIGHT_DIRECTION_CHECK, true);
@@ -130,7 +123,6 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.STRINGS + ".bpdirection", "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
         set(ConfPaths.STRINGS + ".color", "[player] failed [check]: Sent colored chat message '[text]'. VL [violations]");
         set(ConfPaths.STRINGS + ".spam", "[player] failed [check]: Last sent message '[text]'. VL [violations]");
-        set(ConfPaths.STRINGS + ".sbot", "[player] failed [check]: Blacklisted at [violations] servers: [servers]");
         set(ConfPaths.STRINGS + ".fdirection", "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
         set(ConfPaths.STRINGS + ".freach", "[player] failed [check]: tried to attack entity out of reach. VL [violations]");
         set(ConfPaths.STRINGS + ".fspeed", "[player] failed [check]: tried to attack more than [limit] times per second. VL [violations]");

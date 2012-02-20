@@ -13,8 +13,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import javax.naming.NamingException;
-import cc.co.evenprime.bukkit.dnsbl.ProxyServerChecker;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 
 /**
@@ -29,8 +27,6 @@ public class ConfigurationManager {
 
     private FileHandler                                fileHandler;
     private final NoCheat                              plugin;
-
-    private ProxyServerChecker                         proxyServerChecker;
 
     private static class LogFileFormatter extends Formatter {
 
@@ -102,15 +98,6 @@ public class ConfigurationManager {
         }
 
         root.regenerateActionLists();
-
-        // Setup spambot checker
-        ProxyServerChecker checker = null;
-        try {
-            checker = new ProxyServerChecker(plugin, root.getString(ConfPaths.CHAT_SPAMBOT_SERVERS).split("\\s+"));
-        } catch(NamingException e1) {
-            System.out.println("Nocheat couldn't setup the 'ProxyServerChecker': " + e1.getMessage());
-        }
-        proxyServerChecker = checker;
 
         // Create a corresponding Configuration Cache
         // put the global config on the config map
@@ -238,9 +225,5 @@ public class ConfigurationManager {
 
             return cache;
         }
-    }
-
-    public ProxyServerChecker getProxyServerChecker() {
-        return proxyServerChecker;
     }
 }

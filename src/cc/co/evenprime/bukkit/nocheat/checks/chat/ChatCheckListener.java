@@ -7,7 +7,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
@@ -17,7 +16,6 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 public class ChatCheckListener implements Listener, EventManager {
 
     private final SpamCheck   spamCheck;
-    private final SpambotTest spambotCheck;
     private final ColorCheck  colorCheck;
 
     private final NoCheat     plugin;
@@ -28,7 +26,6 @@ public class ChatCheckListener implements Listener, EventManager {
 
         spamCheck = new SpamCheck(plugin);
         colorCheck = new ColorCheck(plugin);
-        spambotCheck = new SpambotTest(plugin);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -65,21 +62,6 @@ public class ChatCheckListener implements Listener, EventManager {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void connect(PlayerJoinEvent event) {
-
-        NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        ChatConfig config = ChatCheck.getConfig(player.getConfigurationStore());
-        final ChatData data = ChatCheck.getData(player.getDataStore());
-
-        if(!config.spambotCheck || player.hasPermission(Permissions.CHAT_SPAM_BOT)) {
-            data.botcheckpassed = true;
-        } else {
-            data.botcheckpassed = false;
-            spambotCheck.startTestForProxies(event.getPlayer(), event.getPlayer().getAddress().getAddress().getHostAddress());
-        }
-    }
-
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         LinkedList<String> s = new LinkedList<String>();
 
@@ -88,8 +70,6 @@ public class ChatCheckListener implements Listener, EventManager {
             s.add("chat.spam");
         if(c.colorCheck)
             s.add("chat.color");
-        if(c.spamCheck && c.spambotCheck)
-            s.add("chat.spambot");
         return s;
     }
 }
