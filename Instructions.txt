@@ -119,6 +119,179 @@
 
 ################################################################################
 #                                                                              #
+#                                Permissions                                   #
+#                                                                              #
+################################################################################
+
+
+ NoCheat only supports "SuperPerms", CraftBukkits official permission framework.
+ You'll need to use a permissions plugin that supports "SuperPerms" to use it 
+ with NoCheat. Here are some I know of: 
+
+ - bPermissions
+ - PermissionsEx
+ - Essentials GroupManager
+ - PermissionBukkit
+
+ I personally recommend bPermissions, but any of them will do just fine.
+
+ By default all these permissions are set to "op", which means players with 
+ OP-status have all permissions, unless you change it.
+
+--------------------------------------------------------------------------------
+--------------------------- Permissions for CHECKS -----------------------------
+--------------------------------------------------------------------------------
+
+ These permission nodes are grouped the same way as the options in the config
+ file, based on the event type they belong to. The logic is, that a player 
+ having one of these nodes means he will NOT be checked. Players without the
+ permission node will be checked. 
+
+ Example: A player has permission "nocheat.checks.moving.morepackets". That 
+ means he is allowed to use that hack/cheat because NoCheat won't check/stop it.
+
+
+------------------------ MOVING Permissions for CHECKS -------------------------
+
+ - nocheat.checks.moving.runfly
+    Allows the player to move freely. It also treats the player as if he has
+    the ".flying", ".swimming", ".sneaking" and ".nofall" permission too.
+    
+ - nocheat.checks.moving.flying
+    Allows the player to fly, independent of if he is in "creative mode" or not.
+    He will be limited in speed by the config settings "flyingspeedvertical"
+    and "flyingspeedhorizontal". It also treats the player as if he has the
+    ".nofall" permission too.
+
+ - nocheat.checks.moving.swimming
+    Allows the player to swim as fast as he is allowed to walk. Normally a
+    player swims slower than he walks and NoCheat prevents faster movement in
+    water.
+
+ - nocheat.checks.moving.sneaking
+    Allows the player to sneak faster than he is allowed to walk. Normally a
+    player sneaks a lot slower than he walks and NoCheat prevents faster
+    movement while sneaking.
+
+ - nocheat.checks.moving.nofall
+    Allows the player to avoid fall damage by using hacks. Normally NoCheat
+    will keep track of a players movement and try to rectify the fall-damage
+    calculations of Minecraft in case they seem to be wrong because of players
+    tricking the server.
+
+ - nocheat.checks.moving.morepackets
+    Allows players to make a lot more movements than normally possible. Doing
+    more movements will result in faster overall movement speed and causes the
+    server to spend a lot of additional time for processing these movements.
+
+
+-------------------- BLOCKBREAK Permissions for CHECKS -------------------------
+
+ - nocheat.checks.blockbreak.reach
+    Allows the player to break blocks that are further away than usual.
+
+ - nocheat.checks.blockbreak.direction
+    Don't force players to look at the blocks that they try to destroy.
+
+ - nocheat.checks.blockbreak.noswing
+    Don't force players to swing their arm when breaking blocks.
+
+
+-------------------- BLOCKPLACE Permissions for CHECKS -------------------------
+
+ - nocheat.checks.blockplace.reach
+    Allows the player to place blocks that are further away than usual.
+
+ - nocheat.checks.blockplace.direction
+    Don't force players to look at the blocks that they try to place.
+
+
+--------------------- INVENTORY Permissions for CHECKS -------------------------
+
+ - nocheat.checks.inventory.drop
+    Don't limit the number of items that a player may drop within a short time
+
+ - nocheat.checks.inventory.instantbow
+    Don't prevent players from shooting their bows instantly without taking the
+    usual time to pull the string back
+
+ - nocheat.checks.inventory.instanteat
+    Don't prevent players from eating their food instantly without taking the
+    usual time to munch on it
+
+
+----------------------- CHAT Permissions for CHECKS ----------------------------
+
+ - nocheat.checks.chat.spam
+    Don't limit the number of messages and commands that a player may send in a
+    short timeframe
+
+ - nocheat.checks.chat.color
+    Don't filter color codes from messages that get sent by players, allowing
+    them to use colors in their messages.
+
+
+---------------------- FIGHT Permissions for CHECKS ----------------------------
+
+ - nocheat.checks.fight.direction
+    Don't force players to look at their targets while fighting
+
+ - nocheat.checks.fight.noswing
+    Don't force players to move their arms while fighting
+
+ - nocheat.checks.fight.reach
+    Don't limit the distance for fights
+
+ - nocheat.checks.fight.speed
+    Don't limit the number of attacks that the player can do per second
+
+ - nocheat.checks.fight.godmode
+    Don't prevent the player from keeping the temporary invulnerability that he
+    gets when taking damage
+
+
+--------------------------------------------------------------------------------
+----------------------- Permissions for ADMINISTRATION -------------------------
+--------------------------------------------------------------------------------
+
+ - nocheat.admin.chatlog
+    The player will receive log messages that are directed at the "ingame chat"
+    as a normal chat message ingame.
+
+ - nocheat.admin.commands
+    The player gets access to some of the "/nocheat" commands
+
+ - nocheat.admin.reload
+    In combination with "nocheat.admin.commands", the player gets access to the
+    "/nocheat reload" command, which will cause NoCheat to reread its config
+    files.
+
+
+--------------------------------------------------------------------------------
+---------------------- Things to know about Permissions ------------------------
+--------------------------------------------------------------------------------
+
+ NoCheat defines "parent" nodes for all permissions already for you. That means
+ you can use one of the following:
+
+ - nocheat
+ - nocheat.admin
+ - nocheat.checks
+ - nocheat.checks.moving
+ - nocheat.checks.blockbreak
+ - nocheat.checks.blockplace
+ - nocheat.checks.inventory
+ - nocheat.checks.chat
+ - nocheat.checks.fight
+
+ To give a player all the permissions that start with that permission node.
+ 
+ Especially you don't have to and should not use ".*" anywhere when defining
+ NoCheat permissions.
+
+
+################################################################################
+#                                                                              #
 #                        All available config settings                         #
 #                                                                              #
 ################################################################################
