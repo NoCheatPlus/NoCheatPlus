@@ -131,6 +131,7 @@ public class CheckUtil {
         types[Material.LADDER.getId()] = LADDER;
         types[Material.FENCE.getId()] = FENCE;
         types[Material.FENCE_GATE.getId()] = FENCE;
+        types[Material.NETHER_FENCE.getId()] = FENCE;
 
         // These are sometimes solid, sometimes not
         types[Material.IRON_FENCE.getId()] = SOLID | NONSOLID;
