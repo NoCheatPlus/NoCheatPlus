@@ -4,6 +4,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 public class InventoryConfig implements ConfigItem {
 
@@ -23,12 +24,12 @@ public class InventoryConfig implements ConfigItem {
         dropCheck = data.getBoolean(ConfPaths.INVENTORY_DROP_CHECK);
         dropTimeFrame = data.getInt(ConfPaths.INVENTORY_DROP_TIMEFRAME);
         dropLimit = data.getInt(ConfPaths.INVENTORY_DROP_LIMIT);
-        dropActions = data.getActionList(ConfPaths.INVENTORY_DROP_ACTIONS);
+        dropActions = data.getActionList(ConfPaths.INVENTORY_DROP_ACTIONS, Permissions.INVENTORY_DROP);
 
         bowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
-        bowActions = data.getActionList(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS);
+        bowActions = data.getActionList(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, Permissions.INVENTORY_INSTANTBOW);
 
         eatCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTEAT_CHECK);
-        eatActions = data.getActionList(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS);
+        eatActions = data.getActionList(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, Permissions.INVENTORY_INSTANTEAT);
     }
 }

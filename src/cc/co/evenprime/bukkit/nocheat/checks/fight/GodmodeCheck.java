@@ -39,7 +39,7 @@ public class GodmodeCheck extends FightCheck {
                     // No
                     data.godmodeVL -= data.godmodeBuffer;
                     incrementStatistics(player, Statistics.Id.FI_GODMODE, -data.godmodeBuffer);
-                    cancelled = executeActions(player, cc.godmodeActions.getActions(data.godmodeVL));
+                    cancelled = executeActions(player, cc.godmodeActions, data.godmodeVL);
                 }
             } else {
                 // Give some new points, once a second

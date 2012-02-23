@@ -14,12 +14,15 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
  */
 public class ActionList {
 
-    public ActionList() {}
+    public ActionList(String permission) {
+        this.permissionSilent = permission + ".silent";
+    }
 
     private final static Action[]        emptyArray = new Action[0];
 
     private final Map<Integer, Action[]> actions    = new HashMap<Integer, Action[]>();
     private final List<Integer>          tresholds  = new ArrayList<Integer>();
+    public final String                  permissionSilent;
 
     /**
      * Add an entry to this actionList. The list will be sorted by tresholds

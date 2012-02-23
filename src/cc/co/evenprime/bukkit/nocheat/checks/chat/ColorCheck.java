@@ -19,7 +19,7 @@ public class ColorCheck extends ChatCheck {
             data.colorVL += 1;
             incrementStatistics(player, Id.CHAT_COLOR, 1);
 
-            boolean filter = executeActions(player, cc.colorActions.getActions(data.colorVL));
+            boolean filter = executeActions(player, cc.colorActions, data.colorVL);
 
             if(filter) {
                 // Remove color codes

@@ -62,7 +62,7 @@ public class DirectionCheck extends BlockPlaceCheck {
 
             // Prepare some event-specific values for logging and custom actions
 
-            cancel = executeActions(player, cc.directionActions.getActions(data.directionVL));
+            cancel = executeActions(player, cc.directionActions, data.directionVL);
 
             if(cancel) {
                 // Needed to calculate penalty times

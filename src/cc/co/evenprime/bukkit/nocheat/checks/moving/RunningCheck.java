@@ -79,7 +79,7 @@ public class RunningCheck extends MovingCheck {
 
             incrementStatistics(player, data.statisticCategory, result);
 
-            boolean cancel = executeActions(player, cc.actions.getActions(data.runflyVL));
+            boolean cancel = executeActions(player, cc.actions, data.runflyVL);
 
             // Was one of the actions a cancel? Then do it
             if(cancel) {

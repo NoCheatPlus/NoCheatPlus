@@ -35,7 +35,7 @@ public class InstantEatCheck extends InventoryCheck {
             int vl = ((int) (expectedTimeWhenEatingFinished - time)) / 100;
             data.instantEatVL += vl;
             incrementStatistics(player, Id.INV_EAT, vl);
-            cancelled = executeActions(player, cc.eatActions.getActions(data.instantEatVL));
+            cancelled = executeActions(player, cc.eatActions, data.instantEatVL);
         }
 
         return cancelled;

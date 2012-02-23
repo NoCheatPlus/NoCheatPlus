@@ -39,12 +39,12 @@ public class DirectionCheck extends BlockBreakCheck {
             if(isInstaBreak) {
                 // Instabreak block failures are very common, so don't be as
                 // hard on people failing them
-                off /= 10;
+                off /= 5;
             }
             data.directionVL += off;
             incrementStatistics(player, Id.BB_DIRECTION, off);
 
-            cancel = executeActions(player, ccblockbreak.directionActions.getActions(data.directionVL));
+            cancel = executeActions(player, ccblockbreak.directionActions, data.directionVL);
 
             if(cancel) {
                 // Needed to calculate penalty times

@@ -55,7 +55,7 @@ public class MorePacketsCheck extends MovingCheck {
 
             data.packets = -data.morePacketsBuffer;
 
-            final boolean cancel = executeActions(player, cc.morePacketsActions.getActions(data.morePacketsVL));
+            final boolean cancel = executeActions(player, cc.morePacketsActions, data.morePacketsVL);
 
             if(cancel)
                 newToLocation = data.morePacketsSetbackPoint;

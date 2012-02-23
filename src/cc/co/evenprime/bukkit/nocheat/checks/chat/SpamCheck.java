@@ -50,7 +50,7 @@ public class SpamCheck extends ChatCheck {
             data.spamVL += Math.max(0, data.commandCount - commandLimit);
             incrementStatistics(player, Id.CHAT_SPAM, 1);
 
-            cancel = executeActions(player, cc.spamActions.getActions(data.spamVL));
+            cancel = executeActions(player, cc.spamActions, data.spamVL);
         }
 
         return cancel;

@@ -53,7 +53,7 @@ public class ReachCheck extends FightCheck {
                 incrementStatistics(player, Id.FI_REACH, sqrt);
             }
 
-            cancel = executeActions(player, cc.reachActions.getActions(data.reachVL));
+            cancel = executeActions(player, cc.reachActions, data.reachVL);
 
             if(cancel) {
                 // Needed to calculate penalty times

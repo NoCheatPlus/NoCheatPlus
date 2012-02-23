@@ -4,6 +4,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 /**
  * 
@@ -23,11 +24,11 @@ public class BlockPlaceConfig implements ConfigItem {
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKPLACE_REACH_CHECK);
         reachDistance = 535D / 100D;
-        reachActions = data.getActionList(ConfPaths.BLOCKPLACE_REACH_ACTIONS);
+        reachActions = data.getActionList(ConfPaths.BLOCKPLACE_REACH_ACTIONS, Permissions.BLOCKPLACE_REACH);
 
         directionCheck = data.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
         directionPenaltyTime = data.getInt(ConfPaths.BLOCKPLACE_DIRECTION_PENALTYTIME);
         directionPrecision = ((double) data.getInt(ConfPaths.BLOCKPLACE_DIRECTION_PRECISION)) / 100D;
-        directionActions = data.getActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS);
+        directionActions = data.getActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
     }
 }

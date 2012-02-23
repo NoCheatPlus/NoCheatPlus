@@ -33,7 +33,7 @@ public class SpeedCheck extends FightCheck {
                 incrementStatistics(player, Id.FI_SPEED, 1);
             }
 
-            cancel = executeActions(player, cc.speedActions.getActions(data.speedVL));
+            cancel = executeActions(player, cc.speedActions, data.speedVL);
         }
 
         return cancel;

@@ -113,8 +113,8 @@ public class ActionFactory {
         return actions.toArray(new Action[actions.size()]);
     }
 
-    public ActionList createActionList(String definition) {
-        ActionList list = new ActionList();
+    public ActionList createActionList(String definition, String permission) {
+        ActionList list = new ActionList(permission);
 
         boolean first = true;
 

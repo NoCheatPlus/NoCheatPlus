@@ -1,7 +1,7 @@
 
 ################################################################################
 #                                                                              #
-#           Important files, config.yml or "clean up your stuff                #
+#           Important files, config.yml or "clean up your stuff"                #
 #                                                                              #
 ################################################################################
 
@@ -131,7 +131,6 @@
  - bPermissions
  - PermissionsEx
  - Essentials GroupManager
- - PermissionBukkit
 
  I personally recommend bPermissions, but any of them will do just fine.
 
@@ -288,6 +287,17 @@
  
  Especially you don't have to and should not use ".*" anywhere when defining
  NoCheat permissions.
+ 
+ 
+ You can exclude a specific player from getting logged by appending ".silent"
+ to the relevant permission node of the specific check. E.g. 
+ 
+ - nocheat.checks.moving.nofall.silent
+ 
+ will prevent NoCheat from recording log messages for that player for the
+ "nofall" check, while still executing all other actions as usual. These silent
+ permissions won't show up elsewhere, e.g. when using the "nocheat permlist"
+ command.
 
 
 ################################################################################

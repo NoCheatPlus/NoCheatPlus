@@ -4,6 +4,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 public class FightConfig implements ConfigItem {
 
@@ -30,19 +31,19 @@ public class FightConfig implements ConfigItem {
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
         directionPrecision = ((double) (data.getInt(ConfPaths.FIGHT_DIRECTION_PRECISION))) / 100D;
         directionPenaltyTime = data.getInt(ConfPaths.FIGHT_DIRECTION_PENALTYTIME);
-        directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS);
+        directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
         noswingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
-        noswingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS);
+        noswingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
         reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
         reachLimit = ((double) (data.getInt(ConfPaths.FIGHT_REACH_LIMIT))) / 100D;
         reachPenaltyTime = data.getInt(ConfPaths.FIGHT_REACH_PENALTYTIME);
-        reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS);
+        reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
-        speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS);
+        speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
         speedAttackLimit = data.getInt(ConfPaths.FIGHT_SPEED_ATTACKLIMIT);
 
         godmodeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
-        godmodeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS);
+        godmodeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
 
         damageChecks = directionCheck || noswingCheck || reachCheck || speedCheck;
     }

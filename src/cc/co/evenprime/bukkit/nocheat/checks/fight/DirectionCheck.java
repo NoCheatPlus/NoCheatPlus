@@ -51,7 +51,7 @@ public class DirectionCheck extends FightCheck {
                 incrementStatistics(player, Id.FI_DIRECTION, sqrt);
             }
 
-            cancel = executeActions(player, cc.directionActions.getActions(data.directionVL));
+            cancel = executeActions(player, cc.directionActions, data.directionVL);
 
             if(cancel) {
                 // Needed to calculate penalty times

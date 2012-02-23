@@ -41,7 +41,7 @@ public class NoFallCheck extends MovingCheck {
             data.fallDistance = player.getPlayer().getFallDistance();
             data.nofallVL += data.fallDistance;
             incrementStatistics(player, Id.MOV_NOFALL, data.fallDistance);
-            final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallVL));
+            final boolean cancel = executeActions(player, cc.nofallActions, data.nofallVL);
             if(cancel) {
                 player.dealFallDamage();
             }
@@ -64,7 +64,7 @@ public class NoFallCheck extends MovingCheck {
             data.nofallVL += difference;
             incrementStatistics(player, Id.MOV_NOFALL, difference);
 
-            final boolean cancel = executeActions(player, cc.nofallActions.getActions(data.nofallVL));
+            final boolean cancel = executeActions(player, cc.nofallActions, data.nofallVL);
 
             // If "cancelled", the fall damage gets dealt in a way that's
             // visible to other plugins

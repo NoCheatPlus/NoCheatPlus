@@ -25,7 +25,7 @@ public class NoswingCheck extends FightCheck {
             data.noswingVL += 1;
             incrementStatistics(player, Id.FI_NOSWING, 1);
 
-            cancel = executeActions(player, cc.noswingActions.getActions(data.noswingVL));
+            cancel = executeActions(player, cc.noswingActions, data.noswingVL);
         }
 
         return cancel;

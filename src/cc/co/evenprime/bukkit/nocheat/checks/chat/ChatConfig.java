@@ -6,6 +6,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 public class ChatConfig implements ConfigItem {
 
@@ -25,9 +26,9 @@ public class ChatConfig implements ConfigItem {
         spamTimeframe = data.getInt(ConfPaths.CHAT_SPAM_TIMEFRAME);
         spamMessageLimit = data.getInt(ConfPaths.CHAT_SPAM_MESSAGELIMIT);
         spamCommandLimit = data.getInt(ConfPaths.CHAT_SPAM_COMMANDLIMIT);
-        spamActions = data.getActionList(ConfPaths.CHAT_SPAM_ACTIONS);
+        spamActions = data.getActionList(ConfPaths.CHAT_SPAM_ACTIONS, Permissions.CHAT_SPAM);
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
-        colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS);
+        colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
     }
 
     private String[] splitWhitelist(String string) {

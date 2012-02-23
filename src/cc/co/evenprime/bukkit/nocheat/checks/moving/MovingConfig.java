@@ -4,6 +4,7 @@ import cc.co.evenprime.bukkit.nocheat.ConfigItem;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
+import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 /**
  * Configurations specific for the Move Checks. Every world gets one of these
@@ -53,20 +54,20 @@ public class MovingConfig implements ConfigItem {
         jumpheight = ((double) 135) / 100D;
 
         sneakingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING);
-        actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS);
+        actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS, Permissions.MOVING_RUNFLY);
 
         allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);
         flyingSpeedLimitVertical = ((double) data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL)) / 100D;
         flyingSpeedLimitHorizontal = ((double) data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL)) / 100D;
         flyingHeightLimit = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT);
-        flyingActions = data.getActionList(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS);
+        flyingActions = data.getActionList(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS, Permissions.MOVING_FLYING);
 
         nofallCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECKNOFALL);
         nofallMultiplier = ((float) 200) / 100F;
         nofallaggressive = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALLAGGRESSIVE);
-        nofallActions = data.getActionList(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS);
+        nofallActions = data.getActionList(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS, Permissions.MOVING_NOFALL);
 
         morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
-        morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS);
+        morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
     }
 }

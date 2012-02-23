@@ -76,10 +76,10 @@ public class NoCheatConfiguration extends YamlConfiguration {
      * @param path
      * @return
      */
-    public ActionList getActionList(String path) {
+    public ActionList getActionList(String path, String permission) {
 
         String value = this.getString(path);
-        return factory.createActionList(value);
+        return factory.createActionList(value, permission);
     }
 
     /**

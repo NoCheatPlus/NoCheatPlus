@@ -24,7 +24,7 @@ public class NoswingCheck extends BlockBreakCheck {
             data.noswingVL += 1;
             incrementStatistics(player, Id.BB_NOSWING, 1);
 
-            cancel = executeActions(player, cc.noswingActions.getActions(data.noswingVL));
+            cancel = executeActions(player, cc.noswingActions, data.noswingVL);
         }
 
         return cancel;

@@ -32,7 +32,7 @@ public class InstantBowCheck extends InventoryCheck {
             int vl = ((int) (expectedTimeWhenStringDrawn - time)) / 100;
             data.instantBowVL += vl;
             incrementStatistics(player, Id.INV_BOW, vl);
-            cancelled = executeActions(player, cc.bowActions.getActions(data.instantBowVL));
+            cancelled = executeActions(player, cc.bowActions, data.instantBowVL);
         }
 
         return cancelled;

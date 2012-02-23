@@ -11,6 +11,7 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.NoCheatCommandSender;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
+import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
@@ -39,16 +40,18 @@ public abstract class Check {
      * @param actions
      * @return
      */
-    protected final boolean executeActions(NoCheatPlayer player, Action[] actions) {
+    protected final boolean executeActions(NoCheatPlayer player, ActionList actionList, double violationLevel) {
 
         boolean special = false;
+
+        Action[] actions = actionList.getActions(violationLevel);
 
         final long time = System.currentTimeMillis() / 1000L;
         final ConfigurationCacheStore cc = player.getConfigurationStore();
 
         for(Action ac : actions) {
             if(player.getExecutionHistory().executeAction(groupId, ac, time)) {
-                if(ac instanceof LogAction) {
+                if(ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent)) {
                     executeLogAction((LogAction) ac, this, player, cc);
                 } else if(ac instanceof SpecialAction) {
                     special = true;

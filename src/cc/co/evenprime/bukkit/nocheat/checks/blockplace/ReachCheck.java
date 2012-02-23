@@ -35,7 +35,7 @@ public class ReachCheck extends BlockPlaceCheck {
             incrementStatistics(player, Id.BP_REACH, distance);
             data.reachdistance = distance;
 
-            cancel = executeActions(player, cc.reachActions.getActions(data.reachVL));
+            cancel = executeActions(player, cc.reachActions, data.reachVL);
         } else {
             data.reachVL *= 0.9D;
         }

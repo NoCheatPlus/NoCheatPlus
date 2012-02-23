@@ -34,7 +34,7 @@ public class DropCheck extends InventoryCheck {
             data.dropVL = data.dropCount - cc.dropLimit;
             incrementStatistics(player, Id.INV_DROP, 1);
 
-            cancel = executeActions(player, cc.dropActions.getActions(data.dropVL));
+            cancel = executeActions(player, cc.dropActions, data.dropVL);
         }
 
         return cancel;

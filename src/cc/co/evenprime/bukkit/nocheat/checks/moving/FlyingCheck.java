@@ -106,7 +106,7 @@ public class FlyingCheck extends MovingCheck {
                 incrementStatistics(player, Id.MOV_FLYING, resultVert);
             }
 
-            boolean cancel = executeActions(player, ccmoving.flyingActions.getActions(data.runflyVL));
+            boolean cancel = executeActions(player, ccmoving.flyingActions, data.runflyVL);
 
             // Was one of the actions a cancel? Then really do it
             if(cancel) {
