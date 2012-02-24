@@ -189,7 +189,7 @@ public class MovingCheckListener implements Listener, EventManager {
     @EventHandler(priority = EventPriority.LOWEST)
     public void move(final PlayerMoveEvent event) {
 
-        if(event.isCancelled() || event.getPlayer().isInsideVehicle() || event.getPlayer().isDead())
+        if(event.isCancelled() || event.getPlayer().isInsideVehicle())
             return;
 
         if(!event.getFrom().getWorld().equals(event.getTo().getWorld()) || event.getFrom().distanceSquared(event.getTo()) > 400) {

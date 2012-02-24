@@ -1,6 +1,9 @@
 package cc.co.evenprime.bukkit.nocheat.checks.fight;
 
 import java.util.Locale;
+import net.minecraft.server.EntityPlayer;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
@@ -20,7 +23,7 @@ public class GodmodeCheck extends FightCheck {
 
         long time = System.currentTimeMillis();
         // Check at most once a second
-        if(data.godmodeLastDamageTime + 1000 < time) {
+        if(data.godmodeLastDamageTime + 1000L < time) {
             data.godmodeLastDamageTime = time;
 
             // How old is the player now?
@@ -49,8 +52,8 @@ public class GodmodeCheck extends FightCheck {
 
             if(data.godmodeBuffer < 0) {
                 data.godmodeBuffer = 0;
-            } else if(data.godmodeBuffer > 40) {
-                data.godmodeBuffer = 40;
+            } else if(data.godmodeBuffer > 30) {
+                data.godmodeBuffer = 30;
             }
 
             // Start age counting from a new time
@@ -72,5 +75,31 @@ public class GodmodeCheck extends FightCheck {
             return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).godmodeVL);
         else
             return super.getParameter(wildcard, player);
+    }
+
+    /**
+     * If a player apparently died, make sure he really dies after some time
+     * if he didn't already.
+     *
+     * @param player
+     */
+    public void death(CraftPlayer player) {
+        if(player.getHealth() <= 0 && player.isDead()) {
+            try {
+                final EntityPlayer entity = player.getHandle();
+
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+                    public void run() {
+                        try {
+                            if(entity.getHealth() <= 0 && !entity.dead) {
+                                entity.deathTicks = 19;
+                                entity.a(true);
+                            }
+                        } catch(Exception e) {}
+                    }
+                }, 30);
+            } catch(Exception e) {}
+        }
     }
 }

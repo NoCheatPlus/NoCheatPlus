@@ -39,18 +39,14 @@ public class InventoryCheckListener implements Listener, EventManager {
     @EventHandler(priority = EventPriority.LOWEST)
     protected void handlePlayerDropItemEvent(final PlayerDropItemEvent event) {
 
-        if(event.isCancelled())
+        if(event.isCancelled() || event.getPlayer().isDead())
             return;
+
+        boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
         final InventoryConfig cc = InventoryCheck.getConfig(player.getConfigurationStore());
         final InventoryData data = InventoryCheck.getData(player.getDataStore());
-
-        if(player.hasPermission(Permissions.INVENTORY) || player.isDead()) {
-            return;
-        }
-
-        boolean cancelled = false;
 
         // If it should be executed, do it
         if(cc.dropCheck && !player.hasPermission(Permissions.INVENTORY_DROP)) {
