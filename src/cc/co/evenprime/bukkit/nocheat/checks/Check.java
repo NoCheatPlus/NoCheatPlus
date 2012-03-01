@@ -125,7 +125,7 @@ public abstract class Check {
         } else if(wildcard == ParameterName.WORLD)
             return player.getPlayer().getWorld().getName();
         else
-            return "Evenprime was lazy and forgot to define " + wildcard + ".";
+            return "the Author was lazy and forgot to define " + wildcard + ".";
 
     }
 }
