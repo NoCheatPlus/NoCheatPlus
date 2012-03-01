@@ -19,6 +19,11 @@ import cc.co.evenprime.bukkit.nocheat.checks.CheckUtil;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
+/**
+ * Central location to listen to events that are 
+ * relevant for the inventory checks
+ * 
+ */
 public class InventoryCheckListener implements Listener, EventManager {
 
     private final DropCheck       dropCheck;
@@ -36,6 +41,10 @@ public class InventoryCheckListener implements Listener, EventManager {
         this.plugin = plugin;
     }
 
+    /**
+     * We listen to DropItem Event for the dropCheck
+     * @param event The PlayerDropItem Event
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     protected void handlePlayerDropItemEvent(final PlayerDropItemEvent event) {
 
@@ -45,8 +54,8 @@ public class InventoryCheckListener implements Listener, EventManager {
         boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final InventoryConfig cc = InventoryCheck.getConfig(player.getConfigurationStore());
-        final InventoryData data = InventoryCheck.getData(player.getDataStore());
+        final InventoryConfig cc = InventoryCheck.getConfig(player);
+        final InventoryData data = InventoryCheck.getData(player);
 
         // If it should be executed, do it
         if(cc.dropCheck && !player.hasPermission(Permissions.INVENTORY_DROP)) {
@@ -54,62 +63,93 @@ public class InventoryCheckListener implements Listener, EventManager {
         }
 
         if(cancelled) {
-            // Cancelling drop events is not save. So don't do it
-            // and kick players instead by default
-            //event.setCancelled(true);
+            // Cancelling drop events is not save (in certain circumstances
+            // items will disappear completely). So don't do it and kick
+            // players instead by default
+
+            // event.setCancelled(true);
         }
     }
 
+    /**
+     * We listen to PlayerInteractEvent for the instantEat and instantBow
+     * checks
+     * @param event The PlayerInteractEvent
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void interact(final PlayerInteractEvent event) {
 
+        // Only interested in right-clicks while holding an item
         if(!event.hasItem() || !(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))
             return;
 
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final InventoryData data = InventoryCheck.getData(player.getDataStore());
+        final InventoryData data = InventoryCheck.getData(player);
 
         if(event.getItem().getType() == Material.BOW) {
+            // It was a bow, the player starts to pull the string
+            // Remember this time
             data.lastBowInteractTime = System.currentTimeMillis();
         } else if(CheckUtil.isFood(event.getItem())) {
-            // Remember food Material, because we don't have that info in the other event
+            // It was food, the player starts to eat some food
+            // Remember this time and the type of food
             data.foodMaterial = event.getItem().getType();
             data.lastEatInteractTime = System.currentTimeMillis();
         } else {
+            // Nothing that we are interested in, reset data
             data.lastBowInteractTime = 0;
             data.lastEatInteractTime = 0;
             data.foodMaterial = null;
         }
     }
 
+    /**
+     * We listen to FoodLevelChange Event because Bukkit doesn't provide a
+     * PlayerFoodEating Event (or whatever it would be called).
+     * 
+     * @param event The FoodLevelChangeEvent
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void foodchanged(final FoodLevelChangeEvent event) {
+        // Only if a player ate food
         if(!event.isCancelled() && event.getEntity() instanceof Player) {
             final NoCheatPlayer player = plugin.getPlayer((Player) event.getEntity());
-            final InventoryConfig cc = InventoryCheck.getConfig(player.getConfigurationStore());
-            final InventoryData data = InventoryCheck.getData(player.getDataStore());
+            final InventoryConfig cc = InventoryCheck.getConfig(player);
+            final InventoryData data = InventoryCheck.getData(player);
 
+            // Only if he should get checked
             if(cc.eatCheck && !player.hasPermission(Permissions.INVENTORY_INSTANTEAT)) {
 
                 boolean cancelled = instantEatCheck.check(player, event, data, cc);
+
+                // The check requested the foodlevelchange to get cancelled
                 event.setCancelled(cancelled);
             }
 
+            // Forget the food material, as the info is no longer needed
             data.foodMaterial = null;
         }
 
     }
 
+    /**
+     * We listen to EntityShootBowEvent for the instantbow check
+     * 
+     * @param event The EntityShootBowEvent
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void bowfired(final EntityShootBowEvent event) {
+        // Only if a player shot the arrow
         if(!event.isCancelled() && event.getEntity() instanceof Player) {
             final NoCheatPlayer player = plugin.getPlayer((Player) event.getEntity());
-            final InventoryConfig cc = InventoryCheck.getConfig(player.getConfigurationStore());
+            final InventoryConfig cc = InventoryCheck.getConfig(player);
 
+            // Only if he should get checked
             if(cc.bowCheck && !player.hasPermission(Permissions.INVENTORY_INSTANTBOW)) {
-                final InventoryData data = InventoryCheck.getData(player.getDataStore());
+                final InventoryData data = InventoryCheck.getData(player);
                 boolean cancelled = instantBowCheck.check(player, event, data, cc);
 
+                // The check requested the bowshooting to get cancelled
                 event.setCancelled(cancelled);
             }
         }

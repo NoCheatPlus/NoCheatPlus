@@ -7,8 +7,8 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.data.DataStore;
 
 /**
- * Check various things related to fighting players/entities
- * 
+ * Abstract base class for Fight checks, provides some convenience
+ * methods for access to data and config that's relevant to this checktype
  */
 public abstract class FightCheck extends Check {
 

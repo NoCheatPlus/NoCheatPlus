@@ -6,6 +6,12 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
+/**
+ * Configurations specific for the "Inventory" checks
+ * Every world gets one of these assigned to it, or if a world doesn't get
+ * it's own, it will use the "global" version
+ * 
+ */
 public class InventoryConfig implements ConfigItem {
 
     public final boolean    dropCheck;
@@ -22,7 +28,7 @@ public class InventoryConfig implements ConfigItem {
     public InventoryConfig(NoCheatConfiguration data) {
 
         dropCheck = data.getBoolean(ConfPaths.INVENTORY_DROP_CHECK);
-        dropTimeFrame = data.getInt(ConfPaths.INVENTORY_DROP_TIMEFRAME);
+        dropTimeFrame = data.getInt(ConfPaths.INVENTORY_DROP_TIMEFRAME) * 1000;
         dropLimit = data.getInt(ConfPaths.INVENTORY_DROP_LIMIT);
         dropActions = data.getActionList(ConfPaths.INVENTORY_DROP_ACTIONS, Permissions.INVENTORY_DROP);
 
