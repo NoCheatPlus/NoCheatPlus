@@ -2,6 +2,8 @@ package cc.co.evenprime.bukkit.nocheat.config;
 
 /**
  * Paths for the configuration options
+ * Making everything final static prevents accidentially modifying any
+ * of these
  * 
  */
 public abstract class ConfPaths {

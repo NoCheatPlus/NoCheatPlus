@@ -17,6 +17,10 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
+/**
+ * The abstract Check class, providing some basic functionality
+ *
+ */
 public abstract class Check {
 
     private final String    name;
@@ -41,13 +45,18 @@ public abstract class Check {
 
         boolean special = false;
 
+        // Get the to be executed actions
         Action[] actions = actionList.getActions(violationLevel);
 
         final long time = System.currentTimeMillis() / 1000L;
+
+        // The configuration will be needed too
         final ConfigurationCacheStore cc = player.getConfigurationStore();
 
         for(Action ac : actions) {
             if(player.getExecutionHistory().executeAction(groupId, ac, time)) {
+                // The executionHistory said it really is time to execute the
+                // action, find out what it is and do what is needed
                 if(ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent)) {
                     executeLogAction((LogAction) ac, this, player, cc);
                 } else if(ac instanceof SpecialAction) {
@@ -79,6 +88,7 @@ public abstract class Check {
         if(!cc.logging.active)
             return;
 
+        // Fire one of our custom "Log" Events
         Bukkit.getServer().getPluginManager().callEvent(new NoCheatLogEvent(cc.logging.prefix, l.getLogMessage(player, check), cc.logging.toConsole && l.toConsole(), cc.logging.toChat && l.toChat(), cc.logging.toFile && l.toFile()));
     }
 

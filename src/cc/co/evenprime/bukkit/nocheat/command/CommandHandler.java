@@ -13,14 +13,19 @@ import org.bukkit.permissions.Permission;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
+/**
+ * Handle all NoCheat related commands in a common place
+ */
 public class CommandHandler {
 
     private final List<Permission> perms;
-    
+
     public CommandHandler(NoCheat plugin) {
         // Make a copy to allow sorting
         perms = new LinkedList<Permission>(plugin.getDescription().getPermissions());
 
+        // Sort NoCheats permission by name and parent-child relation with
+        // a custom sorting method
         Collections.sort(perms, new Comparator<Permission>() {
 
             public int compare(Permission o1, Permission o2) {
@@ -44,10 +49,19 @@ public class CommandHandler {
         });
     }
 
+    /**
+     * Handle a command that is directed at NoCheat
+     * @param plugin
+     * @param sender
+     * @param command
+     * @param label
+     * @param args
+     * @return
+     */
     public boolean handleCommand(NoCheat plugin, CommandSender sender, Command command, String label, String[] args) {
 
         boolean result = false;
-        // Not our command
+        // Not our command, how did it get here?
         if(!command.getName().equalsIgnoreCase("nocheat") || args.length == 0) {
             result = false;
         } else if(args[0].equalsIgnoreCase("permlist") && args.length >= 2) {
@@ -60,7 +74,7 @@ public class CommandHandler {
         }
 
         else if(args[0].equalsIgnoreCase("playerinfo") && args.length >= 2) {
-            // performance command was used
+            // playerinfo command was used
             result = handlePlayerInfoCommand(plugin, sender, args);
         }
 
@@ -117,9 +131,8 @@ public class CommandHandler {
             sender.sendMessage("[NoCheat] Reloading configuration");
             plugin.reloadConfiguration();
             sender.sendMessage("[NoCheat] Configuration reloaded");
-        }
-        else {
-            sender.sendMessage("You lack the "+Permissions.ADMIN_RELOAD+ " permission to use 'reload'");
+        } else {
+            sender.sendMessage("You lack the " + Permissions.ADMIN_RELOAD + " permission to use 'reload'");
         }
 
         return true;

@@ -41,6 +41,9 @@ public class NoFallCheck extends MovingCheck {
             data.fallDistance = player.getPlayer().getFallDistance();
             data.nofallVL += data.fallDistance;
             incrementStatistics(player, Id.MOV_NOFALL, data.fallDistance);
+
+            // Execute whatever actions are associated with this check and the
+            // violation level and find out if we should cancel the event
             final boolean cancel = executeActions(player, cc.nofallActions, data.nofallVL);
             if(cancel) {
                 player.dealFallDamage();
@@ -64,6 +67,8 @@ public class NoFallCheck extends MovingCheck {
             data.nofallVL += difference;
             incrementStatistics(player, Id.MOV_NOFALL, difference);
 
+            // Execute whatever actions are associated with this check and the
+            // violation level and find out if we should cancel the event
             final boolean cancel = executeActions(player, cc.nofallActions, data.nofallVL);
 
             // If "cancelled", the fall damage gets dealt in a way that's
@@ -106,7 +111,7 @@ public class NoFallCheck extends MovingCheck {
         }
 
         // Reduce falldamage violation level
-        data.nofallVL *= 0.99D;
+        data.nofallVL *= 0.95D;
 
         return;
     }
@@ -115,9 +120,9 @@ public class NoFallCheck extends MovingCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).nofallVL);
+            return String.format(Locale.US, "%d", (int) getData(player).nofallVL);
         else if(wildcard == ParameterName.FALLDISTANCE)
-            return String.format(Locale.US, "%.2f", getData(player.getDataStore()).fallDistance);
+            return String.format(Locale.US, "%.2f", getData(player).fallDistance);
         else
             return super.getParameter(wildcard, player);
     }

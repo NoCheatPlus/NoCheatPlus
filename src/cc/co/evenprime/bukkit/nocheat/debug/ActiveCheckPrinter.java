@@ -6,6 +6,10 @@ import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 
+/**
+ * Prints the list of active checks per world on startup, if requested
+ *
+ */
 public class ActiveCheckPrinter {
 
     public static void printActiveChecks(NoCheat plugin, List<EventManager> eventManagers) {

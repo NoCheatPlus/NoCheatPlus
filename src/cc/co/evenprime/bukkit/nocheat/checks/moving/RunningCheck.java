@@ -72,8 +72,8 @@ public class RunningCheck extends MovingCheck {
         // Slowly reduce the level with each event
         data.runflyVL *= 0.95;
 
+        // Did the player move in unexpected ways?
         if(result > 0) {
-
             // Increment violation counter
             data.runflyVL += result;
 
@@ -92,15 +92,24 @@ public class RunningCheck extends MovingCheck {
 
             }
         } else {
+            // Decide if we should create a new setBack point
+            // These are the result of a lot of bug reports, experience and
+            // trial and error
+
             if((toInGround && from.y >= to.y) || CheckUtil.isLiquid(toType)) {
+                // Yes, if the player moved down "into" the ground or into liquid
                 setBack.set(to);
                 setBack.y = Math.ceil(setBack.y);
                 data.jumpPhase = 0;
             } else if(toOnGround && (from.y >= to.y || setBack.y <= Math.floor(to.y))) {
+                // Yes, if the player moved down "onto" the ground and the new
+                // setback point is higher up than the old or at least at the
+                // same height
                 setBack.set(to);
                 setBack.y = Math.floor(setBack.y);
                 data.jumpPhase = 0;
             } else if(fromOnGround || fromInGround || toOnGround || toInGround) {
+                // The player at least touched the ground somehow
                 data.jumpPhase = 0;
             }
         }
@@ -134,7 +143,7 @@ public class RunningCheck extends MovingCheck {
 
         Id statisticsCategory = null;
 
-        // Player on ice?
+        // Player on ice? Give him higher max speed
         Block b = player.getPlayer().getLocation().getBlock();
         if(b.getType() == Material.ICE || b.getRelative(0, -1, 0).getType() == Material.ICE) {
             data.onIce = 20;
@@ -208,6 +217,7 @@ public class RunningCheck extends MovingCheck {
         // How much higher did the player move than expected??
         double distanceAboveLimit = 0.0D;
 
+        // Potion effect "Jump"
         double jumpAmplifier = player.getJumpAmplifier();
         if(jumpAmplifier > data.lastJumpAmplifier) {
             data.lastJumpAmplifier = jumpAmplifier;
@@ -239,9 +249,9 @@ public class RunningCheck extends MovingCheck {
 
         if(wildcard == ParameterName.CHECK)
             // Workaround for something until I find a better way to do it
-            return getData(player.getDataStore()).statisticCategory.toString();
+            return getData(player).statisticCategory.toString();
         else if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).runflyVL);
+            return String.format(Locale.US, "%d", (int) getData(player).runflyVL);
         else
             return super.getParameter(wildcard, player);
     }

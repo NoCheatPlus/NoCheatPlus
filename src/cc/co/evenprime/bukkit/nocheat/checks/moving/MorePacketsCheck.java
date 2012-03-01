@@ -19,6 +19,7 @@ import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
  */
 public class MorePacketsCheck extends MovingCheck {
 
+    // 20 would be for perfect internet connections, 22 is good enough
     private final static int packetsPerTimeframe = 22;
 
     public MorePacketsCheck(NoCheat plugin) {
@@ -55,6 +56,8 @@ public class MorePacketsCheck extends MovingCheck {
 
             data.packets = -data.morePacketsBuffer;
 
+            // Execute whatever actions are associated with this check and the
+            // violation level and find out if we should cancel the event
             final boolean cancel = executeActions(player, cc.morePacketsActions, data.morePacketsVL);
 
             if(cancel)
@@ -100,9 +103,9 @@ public class MorePacketsCheck extends MovingCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).morePacketsVL);
+            return String.format(Locale.US, "%d", (int) getData(player).morePacketsVL);
         else if(wildcard == ParameterName.PACKETS)
-            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).packets);
+            return String.format(Locale.US, "%d", (int) getData(player).packets);
         else
             return super.getParameter(wildcard, player);
     }

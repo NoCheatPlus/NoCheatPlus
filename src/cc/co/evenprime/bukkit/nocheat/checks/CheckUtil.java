@@ -12,7 +12,8 @@ import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
- * Some stuff that's used by different checks
+ * Some stuff that's used by different checks or just too complex to keep
+ * in other places
  * 
  */
 public class CheckUtil {
@@ -85,10 +86,11 @@ public class CheckUtil {
 
     // All fences are solid - fences are treated specially due
     // to being 1.5 blocks high
-    private static final int           FENCE    = 16 | SOLID | NONSOLID;  // 0x00010010
+    private static final int           FENCE    = 16 | SOLID | NONSOLID;  // 0x00010011
 
     private static final int           INGROUND = 128;
     private static final int           ONGROUND = 256;
+
     // Until I can think of a better way to determine if a block is solid or
     // not, this is what I'll do
     private static final int           types[];
@@ -168,6 +170,8 @@ public class CheckUtil {
          * }
          * }
          */
+
+        // We need to know what is considered food for the instanteat check
         foods.add(Material.APPLE);
         foods.add(Material.BREAD);
         foods.add(Material.COOKED_BEEF);
@@ -202,7 +206,7 @@ public class CheckUtil {
 
         final int lowerX = lowerBorder(location.x);
         final int upperX = upperBorder(location.x);
-        final int Y = (int) Math.floor(location.y);
+        final int Y = (int) location.y;
         final int lowerZ = lowerBorder(location.z);
         final int upperZ = upperBorder(location.z);
 

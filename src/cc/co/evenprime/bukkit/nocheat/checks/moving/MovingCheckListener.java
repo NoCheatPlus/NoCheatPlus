@@ -24,10 +24,8 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 import cc.co.evenprime.bukkit.nocheat.data.PreciseLocation;
 
 /**
- * The only place that listens to and modifies player_move events if necessary
- * 
- * Get the event, decide which checks should work on it and in what order,
- * evaluate the check results and decide what to
+ * Central location to listen to events that are 
+ * relevant for the moving checks
  * 
  */
 public class MovingCheckListener implements Listener, EventManager {
@@ -56,7 +54,7 @@ public class MovingCheckListener implements Listener, EventManager {
      * was already on top of that block and should be allowed to stay
      * there
      * 
-     * @param event
+     * @param event The BlockPlaceEvent
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void blockPlace(final BlockPlaceEvent event) {
@@ -66,7 +64,7 @@ public class MovingCheckListener implements Listener, EventManager {
             return;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final MovingConfig config = MovingCheck.getConfig(player.getConfigurationStore());
+        final MovingConfig config = MovingCheck.getConfig(player);
 
         // If the player is allowed to fly anyway, the workaround is not needed
         // It's kind of expensive (looking up block types) therefore it makes
@@ -76,7 +74,7 @@ public class MovingCheckListener implements Listener, EventManager {
         }
 
         // Get the player-specific stored data that applies here
-        final MovingData data = MovingCheck.getData(player.getDataStore());
+        final MovingData data = MovingCheck.getData(player);
 
         final Block block = event.getBlockPlaced();
 
@@ -109,15 +107,15 @@ public class MovingCheckListener implements Listener, EventManager {
      * it was NoCheat or another plugin. If it was NoCheat, the target
      * location should match the "data.teleportTo" value.
      * 
-     * On teleports, reset some movement related data
+     * On teleports, reset some movement related data that gets invalid
      * 
-     * @param event
+     * @param event The PlayerTeleportEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void teleport(final PlayerTeleportEvent event) {
 
         NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final MovingData data = MovingCheck.getData(player.getDataStore());
+        final MovingData data = MovingCheck.getData(player);
 
         // If it was a teleport initialized by NoCheat, do it anyway
         // even if another plugin said "no"
@@ -141,14 +139,15 @@ public class MovingCheckListener implements Listener, EventManager {
 
     /**
      * Just for security, if a player switches between worlds, reset the
-     * runfly and morepackets checks.
+     * runfly and morepackets checks data, because it is definitely invalid
+     * now
      * 
-     * @param event
+     * @param event The PlayerChangedWorldEvent
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void worldChange(final PlayerChangedWorldEvent event) {
         // Maybe this helps with people teleporting through multiverse portals having problems?
-        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()));
         data.teleportTo.reset();
         data.clearRunFlyData();
         data.clearMorePacketsData();
@@ -162,7 +161,7 @@ public class MovingCheckListener implements Listener, EventManager {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void portal(final PlayerPortalEvent event) {
-        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()));
         data.clearMorePacketsData();
         data.clearRunFlyData();
     }
@@ -175,7 +174,7 @@ public class MovingCheckListener implements Listener, EventManager {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void respawn(final PlayerRespawnEvent event) {
-        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()));
         data.clearMorePacketsData();
         data.clearRunFlyData();
     }
@@ -184,22 +183,26 @@ public class MovingCheckListener implements Listener, EventManager {
      * When a player moves, he will be checked for various
      * suspicious behaviour.
      * 
-     * @param event
+     * @param event The PlayerMoveEvent
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void move(final PlayerMoveEvent event) {
 
+        // Don't care for vehicles
         if(event.isCancelled() || event.getPlayer().isInsideVehicle())
             return;
 
+        // Don't care for movements that are very high distance or to another 
+        // world (such that it is very likely the event data was modified by 
+        // another plugin before we got it)
         if(!event.getFrom().getWorld().equals(event.getTo().getWorld()) || event.getFrom().distanceSquared(event.getTo()) > 400) {
             return;
         }
-                        
+
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
 
-        final MovingConfig cc = MovingCheck.getConfig(player.getConfigurationStore());
-        final MovingData data = MovingCheck.getData(player.getDataStore());
+        final MovingConfig cc = MovingCheck.getConfig(player);
+        final MovingData data = MovingCheck.getData(player);
 
         // Advance various counters and values that change per movement
         // tick. They are needed to decide on how fast a player may
@@ -210,9 +213,6 @@ public class MovingCheckListener implements Listener, EventManager {
         data.from.set(event.getFrom());
         final Location to = event.getTo();
         data.to.set(to);
-        
-        
-        
 
         PreciseLocation newTo = null;
 
@@ -240,7 +240,8 @@ public class MovingCheckListener implements Listener, EventManager {
         // Did one of the check(s) decide we need a new "to"-location?
         if(newTo != null) {
             // Compose a new location based on coordinates of "newTo" and
-            // viewing direction of "event.getTo()"
+            // viewing direction of "event.getTo()" to allow the player to
+            // look somewhere else despite getting pulled back by NoCheat
             event.setTo(new Location(player.getPlayer().getWorld(), newTo.x, newTo.y, newTo.z, to.getYaw(), to.getPitch()));
 
             // remember where we send the player to
@@ -279,16 +280,16 @@ public class MovingCheckListener implements Listener, EventManager {
     /**
      * Player got a velocity packet. The server can't keep track
      * of actual velocity values (by design), so we have to try
-     * and do that ourselves.
+     * and do that ourselves. Very rough estimates.
      * 
-     * @param event
+     * @param event The PlayerVelocityEvent
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void velocity(final PlayerVelocityEvent event) {
         if(event.isCancelled())
             return;
 
-        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore());
+        final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()));
 
         final Vector v = event.getVelocity();
 

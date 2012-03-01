@@ -11,6 +11,10 @@ import cc.co.evenprime.bukkit.nocheat.actions.types.DummyAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.LogAction;
 import cc.co.evenprime.bukkit.nocheat.actions.types.SpecialAction;
 
+/**
+ * Helps with creating Actions out of text string definitions
+ *
+ */
 public class ActionFactory {
 
     private static final Map<String, Object> lib = new HashMap<String, Object>();

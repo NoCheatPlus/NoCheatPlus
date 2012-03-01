@@ -3,6 +3,12 @@ package cc.co.evenprime.bukkit.nocheat.debug;
 import org.bukkit.World;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 
+/**
+ * A task running in the background that measures tick time vs. real time
+ * 
+ * @author Evenprime
+ *
+ */
 public class LagMeasureTask implements Runnable {
 
     private int           ingameseconds            = 1;

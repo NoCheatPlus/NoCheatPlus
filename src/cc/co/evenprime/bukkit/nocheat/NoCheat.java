@@ -86,7 +86,7 @@ public class NoCheat extends JavaPlugin implements Listener {
         eventManagers = new ArrayList<EventManager>(8); // Big enough
         // Then set up the event listeners
         eventManagers.add(new MovingCheckListener(this));
-        eventManagers.add(new WorkaroundsListener(this));
+        eventManagers.add(new WorkaroundsListener());
         eventManagers.add(new ChatCheckListener(this));
         eventManagers.add(new BlockBreakCheckListener(this));
         eventManagers.add(new BlockPlaceCheckListener(this));

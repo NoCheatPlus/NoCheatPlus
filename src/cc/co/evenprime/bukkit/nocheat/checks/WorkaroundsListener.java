@@ -8,7 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import cc.co.evenprime.bukkit.nocheat.EventManager;
-import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
 
 /**
@@ -18,12 +17,7 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
  */
 public class WorkaroundsListener implements Listener, EventManager {
 
-    //private final NoCheat plugin;
-
-    public WorkaroundsListener(NoCheat plugin) {
-
-        //this.plugin = plugin;
-    }
+    public WorkaroundsListener() {}
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void playerMove(final PlayerMoveEvent event) {
@@ -39,12 +33,14 @@ public class WorkaroundsListener implements Listener, EventManager {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void toggleSprint(final PlayerToggleSprintEvent event) {
+        // Some plugins cancel "sprinting", which makes no sense at all because
+        // it doesn't stop people from sprinting and rewards them by reducing
+        // their hunger bar as if they were walking instead of sprinting
         if(event.isCancelled() && event.isSprinting()) {
             event.setCancelled(false);
         }
     }
 
-    @Override
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {
         return Collections.emptyList();
     }
