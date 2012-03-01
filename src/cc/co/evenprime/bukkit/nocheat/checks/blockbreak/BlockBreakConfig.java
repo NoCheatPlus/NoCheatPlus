@@ -8,7 +8,8 @@ import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 /**
  * Configurations specific for the "BlockBreak" checks
- * Every world gets one of these assigned to it.
+ * Every world gets one of these assigned to it, or if a world doesn't get
+ * it's own, it will use the "global" version
  * 
  */
 public class BlockBreakConfig implements ConfigItem {
@@ -16,10 +17,12 @@ public class BlockBreakConfig implements ConfigItem {
     public final boolean    reachCheck;
     public final double     reachDistance;
     public final ActionList reachActions;
+
     public final boolean    directionCheck;
     public final ActionList directionActions;
     public final double     directionPrecision;
     public final long       directionPenaltyTime;
+
     public final boolean    noswingCheck;
     public final ActionList noswingActions;
 

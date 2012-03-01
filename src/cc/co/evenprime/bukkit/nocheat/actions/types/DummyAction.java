@@ -4,11 +4,12 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
 
 /**
  * If an action can't be parsed correctly, at least keep it
- * stored in this form
+ * stored in this form to not lose it when loading/storing the config file
  *
  */
 public class DummyAction extends Action {
 
+    // The original string used for this action definition
     private final String def;
 
     public DummyAction(String def) {

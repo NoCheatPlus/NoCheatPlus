@@ -2,7 +2,6 @@ package cc.co.evenprime.bukkit.nocheat.actions;
 
 /**
  * Some wildcards that are used in commands and log messages
- *
  */
 public enum ParameterName {
     PLAYER("player"), LOCATION("location"), WORLD("world"),

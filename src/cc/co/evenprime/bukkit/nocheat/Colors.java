@@ -26,7 +26,7 @@ public class Colors {
     }
     
     /** 
-     * Remove instances of &X with a color
+     * Remove instances of &X
      * 
      * @param text
      * @return

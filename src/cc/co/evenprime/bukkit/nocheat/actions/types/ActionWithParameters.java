@@ -6,6 +6,10 @@ import cc.co.evenprime.bukkit.nocheat.actions.Action;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.checks.Check;
 
+/**
+ * Action with parameters is used to
+ *
+ */
 public abstract class ActionWithParameters extends Action {
 
     private final ArrayList<Object> messageParts;

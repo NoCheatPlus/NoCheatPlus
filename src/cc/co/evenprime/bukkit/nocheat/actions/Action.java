@@ -2,25 +2,28 @@ package cc.co.evenprime.bukkit.nocheat.actions;
 
 /**
  * An action gets executed as the result of a failed check. If it 'really' gets
- * executed depends on how many executions have occured within the last 60
+ * executed depends on how many executions have occurred within the last 60
  * seconds and how much time was between this and the previous execution
  * 
  */
 public abstract class Action {
 
     /**
-     * Delay in violations (only do if there were more than "delay" violations
-     * in last 60 seconds)
+     * Delay in violations. An "ExecutionHistory" will use this info to make
+     * sure that there were at least "delay" attempts to execute this action
+     * before it really gets executed.
      */
     public final int    delay;
 
     /**
-     * Repeat only every "repeat" seconds
+     * Repeat only every "repeat" seconds. An "ExecutionHistory" will use this 
+     * info to make sure that there were at least "repeat" seconds between the
+     * last execution of this action and this execution. 
      */
     public final int    repeat;
 
     /**
-     * The name of the action, to identify it in the config file
+     * The name of the action, to identify it, e.g. in the config file
      */
     public final String name;
 
