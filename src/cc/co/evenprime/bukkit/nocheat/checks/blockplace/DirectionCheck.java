@@ -82,7 +82,7 @@ public class DirectionCheck extends BlockPlaceCheck {
 
         // If the player is still in penalty time, cancel the event anyway
         if(data.directionLastViolationTime + cc.directionPenaltyTime > time) {
-            // A saveguard to avoid people getting stuck in penalty time
+            // A safeguard to avoid people getting stuck in penalty time
             // indefinitely in case the system time of the server gets changed
             if(data.directionLastViolationTime > time) {
                 data.directionLastViolationTime = 0;

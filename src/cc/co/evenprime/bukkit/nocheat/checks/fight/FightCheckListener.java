@@ -19,8 +19,12 @@ import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.config.ConfigurationCacheStore;
-import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
+/**
+ * Central location to listen to events that are 
+ * relevant for the fight checks
+ * 
+ */
 public class FightCheckListener implements Listener, EventManager {
 
     private final List<FightCheck> checks;
@@ -30,7 +34,9 @@ public class FightCheckListener implements Listener, EventManager {
 
     public FightCheckListener(NoCheat plugin) {
 
-        this.checks = new ArrayList<FightCheck>(3);
+        this.checks = new ArrayList<FightCheck>(4);
+
+        // Keep these in a list, because they can be executed in a bundle
         this.checks.add(new SpeedCheck(plugin));
         this.checks.add(new NoswingCheck(plugin));
         this.checks.add(new DirectionCheck(plugin));
@@ -41,9 +47,14 @@ public class FightCheckListener implements Listener, EventManager {
         this.plugin = plugin;
     }
 
+    /**
+     * We listen to EntityDamage events for obvious reasons
+     * @param event The EntityDamage Event
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     public void entityDamage(final EntityDamageEvent event) {
 
+        // Filter some unwanted events right now
         if(event.isCancelled() || !(event instanceof EntityDamageByEntityEvent))
             return;
 
@@ -59,44 +70,55 @@ public class FightCheckListener implements Listener, EventManager {
         }
     }
 
+    /**
+     * We listen to EntityDamage events (again) for obvious reasons
+     * @param event The EntityDamage Event
+     */
     @EventHandler(priority = EventPriority.LOW)
     public void entityDamageForGodmodeCheck(final EntityDamageEvent event) {
 
         if(event.isCancelled())
             return;
 
+        // Filter unwanted events right here
         final Entity entity = event.getEntity();
         if(!(entity instanceof Player) || entity.isDead()) {
             return;
         }
 
         NoCheatPlayer player = plugin.getPlayer((Player) entity);
-        FightConfig cc = FightCheck.getConfig(player.getConfigurationStore());
+        FightConfig cc = FightCheck.getConfig(player);
 
         if(!godmodeCheck.isEnabled(cc) || player.hasPermission(godmodeCheck.permission)) {
             return;
         }
 
-        FightData data = FightCheck.getData(player.getDataStore());
+        FightData data = FightCheck.getData(player);
+
+        // Run the godmode check on the attacked player
         boolean cancelled = godmodeCheck.check(plugin.getPlayer((Player) entity), data, cc);
+
+        // It requested to "cancel" the players invulnerability, so set his
+        // noDamageTicks to 0
         if(cancelled) {
             // Remove the invulnerability from the player
             player.getPlayer().setNoDamageTicks(0);
         }
     }
 
+    /**
+     * A player attacked something with DamageCause ENTITY_ATTACK. That's most
+     * likely what we want to really check.
+     * 
+     * @param event The EntityDamageByEntityEvent
+     */
     private void normalDamage(final EntityDamageByEntityEvent event) {
 
         final Player damager = (Player) event.getDamager();
 
         final NoCheatPlayer player = plugin.getPlayer(damager);
-        final FightConfig cc = FightCheck.getConfig(player.getConfigurationStore());
-
-        if(!cc.damageChecks || player.hasPermission(Permissions.FIGHT)) {
-            return;
-        }
-
-        final FightData data = FightCheck.getData(player.getDataStore());
+        final FightConfig cc = FightCheck.getConfig(player);
+        final FightData data = FightCheck.getData(player);
 
         // For some reason we decided to skip this event anyway
         if(data.skipNext) {
@@ -106,9 +128,10 @@ public class FightCheckListener implements Listener, EventManager {
 
         boolean cancelled = false;
 
-        // Get the attacked entity
+        // Get the attacked entity and remember it
         data.damagee = ((CraftEntity) event.getEntity()).getHandle();
 
+        // Run through the four main checks
         for(FightCheck check : checks) {
             // If it should be executed, do it
             if(!cancelled && check.isEnabled(cc) && !player.hasPermission(check.permission)) {
@@ -116,18 +139,27 @@ public class FightCheckListener implements Listener, EventManager {
             }
         }
 
+        // Forget the attacked entity (to allow garbage collecting etc.
         data.damagee = null;
 
+        // One of the checks requested the event to be cancelled, so do it
         if(cancelled)
             event.setCancelled(cancelled);
     }
 
+    /**
+     * There is an unofficial agreement that if a plugin wants an attack to
+     * not get checked by NoCheat, it either has to use a Damage type different
+     * from ENTITY_ATTACK or fire an event with damage type CUSTOM and damage
+     * 0 directly before the to-be-ignored event.
+     * @param event The EntityDamageByEntityEvent
+     */
     private void customDamage(final EntityDamageByEntityEvent event) {
 
         final Player damager = (Player) event.getDamager();
         final NoCheatPlayer player = plugin.getPlayer(damager);
 
-        final FightData data = FightCheck.getData(player.getDataStore());
+        final FightData data = FightCheck.getData(player);
 
         // Skip the next damage event, because it is with high probability
         // something from the Heroes plugin
@@ -136,8 +168,15 @@ public class FightCheckListener implements Listener, EventManager {
         return;
     }
 
+    /**
+     * We listen to death events to prevent a very specific method of doing
+     * godmode.
+     * 
+     * @param event The EntityDeathEvent
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     protected void death(final EntityDeathEvent event) {
+        // Only interested in dying players
         if(!(event.getEntity() instanceof CraftPlayer)) {
             return;
         }
@@ -145,9 +184,14 @@ public class FightCheckListener implements Listener, EventManager {
         godmodeCheck.death((CraftPlayer) event.getEntity());
     }
 
+    /**
+     * We listen to PlayerAnimationEvent because it is used for arm swinging
+     * @param event The PlayerAnimationEvent
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     protected void armSwing(final PlayerAnimationEvent event) {
-        FightCheck.getData(plugin.getPlayer(event.getPlayer()).getDataStore()).armswung = true;
+        // Set a flag telling us that the arm has been swung
+        FightCheck.getData(plugin.getPlayer(event.getPlayer())).armswung = true;
     }
 
     public List<String> getActiveChecks(ConfigurationCacheStore cc) {

@@ -24,13 +24,32 @@ public abstract class FightCheck extends Check {
 
     public abstract boolean isEnabled(FightConfig cc);
 
-    public static FightData getData(DataStore base) {
+    /**
+     * Get the "FightData" object that belongs to the player. Will ensure
+     * that such a object exists and if not, create one
+     * 
+     * @param player
+     * @return
+     */
+    public static FightData getData(NoCheatPlayer player) {
+        DataStore base = player.getDataStore();
         FightData data = base.get(id);
         if(data == null) {
             data = new FightData();
             base.set(id, data);
         }
         return data;
+    }
+
+    /**
+     * Get the FightConfig object that belongs to the world that the player
+     * currently resides in.
+     * 
+     * @param player
+     * @return
+     */
+    public static FightConfig getConfig(NoCheatPlayer player) {
+        return getConfig(player.getConfigurationStore());
     }
 
     public static FightConfig getConfig(ConfigurationCacheStore cache) {

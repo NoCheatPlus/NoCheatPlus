@@ -6,25 +6,33 @@ import cc.co.evenprime.bukkit.nocheat.config.ConfPaths;
 import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
+/**
+ * Configurations specific for the "Fight" checks
+ * Every world gets one of these assigned to it, or if a world doesn't get
+ * it's own, it will use the "global" version
+ * 
+ */
 public class FightConfig implements ConfigItem {
 
     public final boolean    directionCheck;
     public final double     directionPrecision;
     public final ActionList directionActions;
     public final long       directionPenaltyTime;
+
     public final boolean    noswingCheck;
     public final ActionList noswingActions;
+
     public final boolean    reachCheck;
     public final double     reachLimit;
     public final long       reachPenaltyTime;
     public final ActionList reachActions;
+
     public final int        speedAttackLimit;
     public final ActionList speedActions;
     public final boolean    speedCheck;
+
     public final boolean    godmodeCheck;
     public final ActionList godmodeActions;
-
-    public final boolean    damageChecks;
 
     public FightConfig(NoCheatConfiguration data) {
 
@@ -44,7 +52,5 @@ public class FightConfig implements ConfigItem {
 
         godmodeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
         godmodeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
-
-        damageChecks = directionCheck || noswingCheck || reachCheck || speedCheck;
     }
 }
