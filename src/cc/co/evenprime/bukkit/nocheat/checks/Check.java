@@ -4,12 +4,10 @@ import java.util.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandException;
-import org.bukkit.command.CommandSender;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
 import cc.co.evenprime.bukkit.nocheat.NoCheatLogEvent;
 import cc.co.evenprime.bukkit.nocheat.NoCheatPlayer;
 import cc.co.evenprime.bukkit.nocheat.actions.Action;
-import cc.co.evenprime.bukkit.nocheat.actions.NoCheatCommandSender;
 import cc.co.evenprime.bukkit.nocheat.actions.ParameterName;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ActionList;
 import cc.co.evenprime.bukkit.nocheat.actions.types.ConsolecommandAction;
@@ -21,11 +19,10 @@ import cc.co.evenprime.bukkit.nocheat.data.Statistics.Id;
 
 public abstract class Check {
 
-    private final String               name;
+    private final String    name;
     // used to bundle information of multiple checks
-    private final String               groupId;
-    private static final CommandSender noCheatCommandSender = new NoCheatCommandSender();
-    protected final NoCheat            plugin;
+    private final String    groupId;
+    protected final NoCheat plugin;
 
     public Check(NoCheat plugin, String groupId, String name) {
         this.plugin = plugin;
@@ -89,7 +86,7 @@ public abstract class Check {
         final String command = action.getCommand(player, check);
 
         try {
-            plugin.getServer().dispatchCommand(noCheatCommandSender, command);
+            plugin.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
         } catch(CommandException e) {
             System.out.println("[NoCheat] failed to execute the command '" + command + "': " + e.getMessage() + ", please check if everything is setup correct.");
         } catch(Exception e) {
