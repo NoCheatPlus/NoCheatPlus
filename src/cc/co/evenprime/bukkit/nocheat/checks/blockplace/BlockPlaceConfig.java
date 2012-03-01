@@ -7,6 +7,9 @@ import cc.co.evenprime.bukkit.nocheat.config.NoCheatConfiguration;
 import cc.co.evenprime.bukkit.nocheat.config.Permissions;
 
 /**
+ * Configurations specific for the "BlockPlace" checks
+ * Every world gets one of these assigned to it, or if a world doesn't get
+ * it's own, it will use the "global" version
  * 
  */
 public class BlockPlaceConfig implements ConfigItem {

@@ -4,7 +4,7 @@ import cc.co.evenprime.bukkit.nocheat.DataItem;
 import cc.co.evenprime.bukkit.nocheat.data.SimpleLocation;
 
 /**
- * Playerspecific data for the blockbreak checks
+ * Player specific data for the blockbreak checks
  * 
  */
 public class BlockBreakData implements DataItem {

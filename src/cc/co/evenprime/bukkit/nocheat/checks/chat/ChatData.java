@@ -1,20 +1,24 @@
 package cc.co.evenprime.bukkit.nocheat.checks.chat;
 
-import java.util.LinkedList;
 import cc.co.evenprime.bukkit.nocheat.DataItem;
 
 /**
+ * Player specific data for the chat checks
  * 
  */
 public class ChatData implements DataItem {
 
-    public int                spamVL;
-    public int                colorVL;
+    // Keep track of the violation levels for the two checks
+    public int    spamVL;
+    public int    colorVL;
 
-    public int                messageCount   = 0;
-    public int                commandCount   = 0;
-    public long               spamLastTime   = 0;
-    public String             message        = "";
-    public boolean            botcheckpassed = true;
-    public LinkedList<String> spamBotFailed  = new LinkedList<String>();
+    // Count messages and commands
+    public int    messageCount = 0;
+    public int    commandCount = 0;
+
+    // Remember when the last check time period started
+    public long   spamLastTime = 0;
+
+    // Remember the last chat message or command for logging purposes
+    public String message      = "";
 }

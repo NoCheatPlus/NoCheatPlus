@@ -31,33 +31,39 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
         directionCheck = new DirectionCheck(plugin);
     }
 
+    /**
+     * We listen to BlockPlace events for obvious reasons
+     * @param event the BlockPlace event
+     */
     @EventHandler(priority = EventPriority.LOWEST)
     protected void handleBlockPlaceEvent(BlockPlaceEvent event) {
 
-        if(event.isCancelled())
-            return;
-
-        if(event.getBlock() == null || event.getBlockAgainst() == null)
+        if(event.isCancelled() || event.getBlock() == null || event.getBlockAgainst() == null)
             return;
 
         boolean cancelled = false;
 
         final NoCheatPlayer player = plugin.getPlayer(event.getPlayer());
-        final BlockPlaceConfig cc = BlockPlaceCheck.getConfig(player.getConfigurationStore());
+        final BlockPlaceConfig cc = BlockPlaceCheck.getConfig(player);
+        final BlockPlaceData data = BlockPlaceCheck.getData(player);
 
-        final BlockPlaceData data = BlockPlaceCheck.getData(player.getDataStore());
-
+        // Remember these locations and put them in a simpler "format"
         data.blockPlaced.set(event.getBlock());
         data.blockPlacedAgainst.set(event.getBlockAgainst());
 
         // Now do the actual checks
+
+        // First the reach check
         if(cc.reachCheck && !player.hasPermission(Permissions.BLOCKPLACE_REACH)) {
             cancelled = reachCheck.check(player, data, cc);
         }
+
+        // Second the direction check
         if(!cancelled && cc.directionCheck && !player.hasPermission(Permissions.BLOCKPLACE_DIRECTION)) {
             cancelled = directionCheck.check(player, data, cc);
         }
 
+        // If one of the checks requested to cancel the event, do so
         if(cancelled)
             event.setCancelled(cancelled);
     }

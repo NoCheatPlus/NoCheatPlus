@@ -33,7 +33,7 @@ public class ColorCheck extends ChatCheck {
     public String getParameter(ParameterName wildcard, NoCheatPlayer player) {
 
         if(wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player.getDataStore()).colorVL);
+            return String.format(Locale.US, "%d", (int) getData(player).colorVL);
         else
             return super.getParameter(wildcard, player);
     }
