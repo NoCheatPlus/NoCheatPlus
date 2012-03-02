@@ -35,7 +35,7 @@ public class MovingConfig implements ConfigItem {
     public final boolean    morePacketsCheck;
     public final ActionList morePacketsActions;
 
-    public final double     flyingHeightLimit;
+    public final int        flyingHeightLimit;
 
     public MovingConfig(NoCheatConfiguration data) {
 

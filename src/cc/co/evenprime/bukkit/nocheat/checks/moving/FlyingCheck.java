@@ -42,10 +42,12 @@ public class FlyingCheck extends MovingCheck {
 
         // Before doing anything, do a basic height check to determine if
         // players are flying too high
-        if(to.y - data.vertFreedom > ccmoving.flyingHeightLimit) {
+        int maxheight = ccmoving.flyingHeightLimit + player.getPlayer().getWorld().getMaxHeight();
+
+        if(to.y - data.vertFreedom > maxheight) {
             newToLocation = new PreciseLocation();
             newToLocation.set(setBack);
-            newToLocation.y = ccmoving.flyingHeightLimit - 10;
+            newToLocation.y = maxheight - 10;
             return newToLocation;
         }
 

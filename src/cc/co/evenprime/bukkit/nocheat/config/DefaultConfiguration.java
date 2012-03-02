@@ -49,7 +49,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE, true);
         set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL, 60);
         set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL, 100);
-        set(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT, 250);
+        set(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT, 128);
         set(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS, "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
 
         set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);

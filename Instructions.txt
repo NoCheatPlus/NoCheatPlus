@@ -550,8 +550,9 @@
 
         flyingheightlimit:
           What is the maximum height (in blocks) that a player may reach by 
-          flying. Some servers experience lag when players fly very, very high.
-          This value is how far above the map height a player may fly.
+          flying, relative to the max world height he is in. Some servers
+          experience lag when players fly very, very high. This value is how
+          far above the map height a player may fly.
 
         actions:
           What should happen if a player flies faster/higher than defined here?
