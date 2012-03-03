@@ -131,6 +131,9 @@ public class CheckUtil {
 
         // Obvious
         types[Material.LADDER.getId()] = LADDER;
+        types[Material.WATER_LILY.getId()] = LADDER;
+        types[Material.VINE.getId()] = LADDER;
+
         types[Material.FENCE.getId()] = FENCE;
         types[Material.FENCE_GATE.getId()] = FENCE;
         types[Material.NETHER_FENCE.getId()] = FENCE;
@@ -156,9 +159,6 @@ public class CheckUtil {
         // nonsolid too
         types[Material.STONE_PLATE.getId()] = SOLID | NONSOLID;
         types[Material.WOOD_PLATE.getId()] = SOLID | NONSOLID;
-
-        // Player can stand on and "in" lilipads
-        types[Material.WATER_LILY.getId()] = SOLID | NONSOLID;
 
         /*
          * for(int i = 0; i < 256; i++) {
