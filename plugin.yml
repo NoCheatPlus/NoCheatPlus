@@ -84,6 +84,8 @@ permissions:
                 description: Allow a player to attack faster than usual
               nocheat.checks.fight.godmode:
                 description: Allow a player to not take damage by exploiting a design flaw in Minecraft
+              nocheat.checks.fight.instantheal:
+                description: Allow a player to artificially speed up his health regeneration
           nocheat.checks.inventory:
             description: Allow the player to bypass all inventory checks
             children:

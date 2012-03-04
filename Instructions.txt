@@ -248,6 +248,10 @@
     Don't prevent the player from keeping the temporary invulnerability that he
     gets when taking damage
 
+ - nocheat.checks.fight.instantheal
+    Don't prevent the player from accellerating their health generation by
+    food saturation
+
 
 --------------------------------------------------------------------------------
 ----------------------- Permissions for ADMINISTRATION -------------------------
@@ -880,6 +884,23 @@
         Every time the player fails the check, the VL gets increased by the
         amount of ticks (but at most 15 per failed check), and everytime the
         player didn't avoid taking damage it gets reduced slowly.
+
+ 6) INSTANTHEAL:
+
+     Players may trick Bukkit into regenerating their health faster when they
+     are satiated (full food bar) than normally possible. This will try to
+     identify and correct that behaviour.
+
+      active:
+        Should players be checked for this behavior.
+
+      actions:
+        What should happen if the player fails this check. Default is to not
+        allow the health regeneration ("cancel" the regeneration) and log a
+        message. The Violation LEvel (VL) for this check is the number of
+        seconds that the player tried to skip while regenerating health. It
+        gets reduced whenever the player regenerates health while obeying the
+        normal regeneration times.
 
 
 --------------------------------------------------------------------------------

@@ -37,6 +37,7 @@ public class Permissions {
     public static final String  FIGHT_REACH          = FIGHT + ".reach";
     public static final String  FIGHT_SPEED          = FIGHT + ".speed";
     public static final String  FIGHT_GODMODE        = FIGHT + ".godmode";
+    public static final String  FIGHT_INSTANTHEAL    = FIGHT + ".instantheal";
 
     public final static String  ADMIN_CHATLOG        = ADMIN + ".chatlog";
     public static final String  ADMIN_COMMANDS       = ADMIN + ".commands";

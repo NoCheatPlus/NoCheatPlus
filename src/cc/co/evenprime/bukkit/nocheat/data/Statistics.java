@@ -19,7 +19,7 @@ public class Statistics {
         MOV_RUNNING("moving.running"), MOV_FLYING("moving.flying"),
         MOV_MOREPACKETS("moving.morepackets"), MOV_NOFALL("moving.nofall"),
         MOV_SNEAKING("moving.sneaking"), MOV_SWIMMING("moving.swimming"),
-        FI_GODMODE("fight.godmode");
+        FI_GODMODE("fight.godmode"), FI_INSTANTHEAL("fight.instantheal");
 
         private final String name;
 

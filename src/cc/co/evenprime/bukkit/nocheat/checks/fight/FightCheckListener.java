@@ -14,6 +14,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import cc.co.evenprime.bukkit.nocheat.EventManager;
 import cc.co.evenprime.bukkit.nocheat.NoCheat;
@@ -30,6 +32,7 @@ public class FightCheckListener implements Listener, EventManager {
     private final List<FightCheck> checks;
 
     private final GodmodeCheck     godmodeCheck;
+    private final InstanthealCheck instanthealCheck;
     private final NoCheat          plugin;
 
     public FightCheckListener(NoCheat plugin) {
@@ -43,6 +46,7 @@ public class FightCheckListener implements Listener, EventManager {
         this.checks.add(new ReachCheck(plugin));
 
         this.godmodeCheck = new GodmodeCheck(plugin);
+        this.instanthealCheck = new InstanthealCheck(plugin);
 
         this.plugin = plugin;
     }
@@ -103,6 +107,37 @@ public class FightCheckListener implements Listener, EventManager {
         if(cancelled) {
             // Remove the invulnerability from the player
             player.getPlayer().setNoDamageTicks(0);
+        }
+    }
+
+    /**
+     * We listen to EntityRegainHealth events of type "Satiated"
+     * for instantheal check
+     * 
+     * @param event The EntityRegainHealth Event
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void satiatedRegen(final EntityRegainHealthEvent event) {
+
+        if(!(event.getEntity() instanceof Player) || event.isCancelled() || event.getRegainReason() != RegainReason.SATIATED) {
+            return;
+        }
+
+        boolean cancelled = false;
+
+        NoCheatPlayer player = plugin.getPlayer((Player) event.getEntity());
+        FightConfig config = FightCheck.getConfig(player);
+
+        if(!instanthealCheck.isEnabled(config) || player.hasPermission(instanthealCheck.permission)) {
+            return;
+        }
+
+        FightData data = FightCheck.getData(player);
+
+        cancelled = instanthealCheck.check(player, data, config);
+
+        if(cancelled) {
+            event.setCancelled(true);
         }
     }
 
@@ -209,6 +244,8 @@ public class FightCheckListener implements Listener, EventManager {
             s.add("fight.speed");
         if(f.godmodeCheck)
             s.add("fight.godmode");
+        if(f.instanthealCheck)
+            s.add("fight.instantHeal");
         return s;
     }
 }

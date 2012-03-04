@@ -15,6 +15,7 @@ public class FightData implements DataItem {
     public double  reachVL;
     public int     speedVL;
     public double  godmodeVL;
+    public double  instanthealVL;
 
     // For checks that have penalty time
     public long    directionLastViolationTime;
@@ -23,16 +24,22 @@ public class FightData implements DataItem {
     // godmode check needs to know these
     public long    godmodeLastDamageTime;
     public int     godmodeLastAge;
-    public int     godmodeBuffer = 40;
+    public int     godmodeBuffer     = 40;
+
+    // last time player regenerated health by satiation
+    public long    instanthealLastRegenTime;
+
+    // three seconds buffer to smooth out lag
+    public long    instanthealBuffer = 3000;
 
     // While handling an event, use this to keep the attacked entity
     public Entity  damagee;
 
     // The player swung his arm
-    public boolean armswung      = true;
+    public boolean armswung          = true;
 
     // For some reason the next event should be ignored
-    public boolean skipNext      = false;
+    public boolean skipNext          = false;
 
     // Keep track of time and amount of attacks
     public long    speedTime;

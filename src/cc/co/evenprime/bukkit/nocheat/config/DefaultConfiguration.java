@@ -15,6 +15,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         this.options().header("Main configuration file for NoCheat. Read \"Instructions.txt\"");
 
         /** LOGGING **/
+
         set(ConfPaths.LOGGING_ACTIVE, true);
         set(ConfPaths.LOGGING_SHOWACTIVECHECKS, false);
         set(ConfPaths.LOGGING_DEBUGMESSAGES, false);
@@ -25,6 +26,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.LOGGING_LOGTOINGAMECHAT, true);
 
         /*** INVENTORY ***/
+
         set(ConfPaths.INVENTORY_DROP_CHECK, true);
         set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20);
         set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
@@ -37,6 +39,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, "log:ieat:2:5:if cancel");
 
         /*** MOVING ***/
+
         set(ConfPaths.MOVING_RUNFLY_CHECK, true);
         set(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING, false);
         set(ConfPaths.MOVING_RUNFLY_ACTIONS, "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
@@ -79,6 +82,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bpdirection:0:3:if cancel");
 
         /*** CHAT ***/
+
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
 
@@ -111,6 +115,9 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
         set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:fgod:2:5:if cancel");
 
+        set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, true);
+        set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:fheal:1:1:if cancel");
+
         set(ConfPaths.STRINGS + ".drop", "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");
         set(ConfPaths.STRINGS + ".movelong", "[player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations]");
@@ -128,6 +135,7 @@ public class DefaultConfiguration extends NoCheatConfiguration {
         set(ConfPaths.STRINGS + ".fspeed", "[player] failed [check]: tried to attack more than [limit] times per second. VL [violations]");
         set(ConfPaths.STRINGS + ".fnoswing", "[player] failed [check]: Didn't swing arm. VL [violations]");
         set(ConfPaths.STRINGS + ".fgod", "[player] failed [check]: Avoided taking damage or lagging. VL [violations]");
+        set(ConfPaths.STRINGS + ".fheal", "[player] failed [check]: Tried to regenerate health faster than normal. VL [violations]");
         set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: Fires bow to fast. VL [violations]");
         set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: Eats food [food] too fast. VL [violations]");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");

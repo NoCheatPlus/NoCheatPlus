@@ -34,6 +34,9 @@ public class FightConfig implements ConfigItem {
     public final boolean    godmodeCheck;
     public final ActionList godmodeActions;
 
+    public final boolean    instanthealCheck;
+    public final ActionList instanthealActions;
+
     public FightConfig(NoCheatConfiguration data) {
 
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
@@ -52,5 +55,8 @@ public class FightConfig implements ConfigItem {
 
         godmodeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
         godmodeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
+
+        instanthealCheck = data.getBoolean(ConfPaths.FIGHT_INSTANTHEAL_CHECK);
+        instanthealActions = data.getActionList(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, Permissions.FIGHT_INSTANTHEAL);
     }
 }
