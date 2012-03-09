@@ -1,10 +1,9 @@
 Copyright (c) 2012 Wilfried Pasquazzo (Evenprime)
 <wilfried.pasquazzo@gmail.com>
 
-This software is provided under the MIT License, 
-see file LICENSE.txt for the full licensing terms.
-
-Visit my thread at BukkitDev for new versions,
-support and other useful information:
-
-http://dev.bukkit.org/server-mods/nocheat/
+# Dual-Licensed - you may freely choose between (or use both):
+#
+# 1) GPL v3 (see LICENSE_GPL3.txt)
+# 2) MIT (see LICENSE_MIT.txt)
+#
+#

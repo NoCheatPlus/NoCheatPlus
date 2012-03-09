@@ -61,7 +61,8 @@
 				<includes>
 					<include>plugin.yml</include>
 					<include>README.txt</include>
-					<include>LICENSE.txt</include>
+					<include>LICENSE_GPL3.txt</include>
+					<include>LICENSE_MIT.txt</include>
 					<include>Instructions.txt</include>
 				</includes>
 			</resource>

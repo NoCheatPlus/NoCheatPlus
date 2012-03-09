@@ -1,7 +1,7 @@
 
 ################################################################################
 #                                                                              #
-#           Important files, config.yml or "clean up your stuff"                #
+#           Important files, config.yml or "clean up your stuff"               #
 #                                                                              #
 ################################################################################
 
@@ -934,14 +934,6 @@
   indisputable fact that somebody cheated. It's not possible to be 100% sure
   if somebody is cheating or not, NoCheat will try to be right most of the
   time.
-
-- I appreciate DONATIONS very much. If you have some spare money and want to
-  help me out financially, head over to my BukkitDev page:
-  
-          **** http://dev.bukkit.org/server-mods/nocheat/ ****
-  
-  and use the "donation" button there. Alternatively contact me directly at
-  wilfried.pasquazzo@gmail.com for other means of donations.
   
 Thank you for reading this file. It took hours to write it, so it's nice that
 people actually take a look at it. ;)
