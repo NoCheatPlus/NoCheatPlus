@@ -1,11 +1,10 @@
-
 ################################################################################
 #                                                                              #
 #           Important files, config.yml or "clean up your stuff"               #
 #                                                                              #
 ################################################################################
 
- 1) The config file for NoCheat is called "config.yml" now.
+ 1) The config file for NoCheatPlus is called "config.yml" now.
 
  2) You can have different config files for different worlds. To achieve this, 
     copy the "config.yml" and rename the copy to "worldname_config.yml". Set-
@@ -14,7 +13,7 @@
     won't use. They'll be implicitly taken from the master "config.yml" file.
 
  3) If you have files named "config.txt", "default_actions.txt" or "actions.txt"
-    please delete them. They are no longer used by NoCheat and serve no purpose
+    please delete them. They are no longer used by NoCheatPlus and serve no purpose
     anymore.
 
  4) Never change the amount of white-spaces in front of options in the config 
@@ -27,7 +26,7 @@
 #                                                                              #
 ################################################################################
 
- NoCheat allows to define in detail what should happen when a player fails a
+ NoCheatPlus allows to define in detail what should happen when a player fails a
  check in form of "actions". There are 4 possible things that may be done.
  (read on to learn in detail on how to define/modify actions):
 
@@ -63,8 +62,8 @@
 
  2) The "log" action is a string of the form "log:string:delay:repeat:target".
 
-    log:    is simply used to let NoCheat know it is a log action. Don't remove
-            it from the action, or NoCheat will not know what it is and how to
+    log:    is simply used to let NoCheatPlus know it is a log action. Don't remove
+            it from the action, or NoCheatPlus will not know what it is and how to
             handle it.
 
     string: is the message that will be logged. Because there is so little
@@ -91,8 +90,8 @@
 
  3) The "cmd" action is a string of the form "cmd:string:delay:repeat".
 
-    cmd:   is simply used to let NoCheat know it is a command action. Don't
-           remove it from the action, or NoCheat will not know what it is and 
+    cmd:   is simply used to let NoCheatPlus know it is a command action. Don't
+           remove it from the action, or NoCheatPlus will not know what it is and 
            how to handle it.
 
    string: is the command that will be issued. Because there is so little space
@@ -124,9 +123,9 @@
 ################################################################################
 
 
- NoCheat only supports "SuperPerms", CraftBukkits official permission framework.
+ NoCheatPlus only supports "SuperPerms", CraftBukkits official permission framework.
  You'll need to use a permissions plugin that supports "SuperPerms" to use it 
- with NoCheat. Here are some I know of: 
+ with NoCheatPlus. Here are some I know of: 
 
  - bPermissions
  - PermissionsEx
@@ -146,39 +145,39 @@
  having one of these nodes means he will NOT be checked. Players without the
  permission node will be checked. 
 
- Example: A player has permission "nocheat.checks.moving.morepackets". That 
- means he is allowed to use that hack/cheat because NoCheat won't check/stop it.
+ Example: A player has permission "NoCheatPlus.checks.moving.morepackets". That 
+ means he is allowed to use that hack/cheat because NoCheatPlus won't check/stop it.
 
 
 ------------------------ MOVING Permissions for CHECKS -------------------------
 
- - nocheat.checks.moving.runfly
+ - nocheatplus.checks.moving.runfly
     Allows the player to move freely. It also treats the player as if he has
     the ".flying", ".swimming", ".sneaking" and ".nofall" permission too.
     
- - nocheat.checks.moving.flying
+ - nocheatplus.checks.moving.flying
     Allows the player to fly, independent of if he is in "creative mode" or not.
     He will be limited in speed by the config settings "flyingspeedvertical"
     and "flyingspeedhorizontal". It also treats the player as if he has the
     ".nofall" permission too.
 
- - nocheat.checks.moving.swimming
+ - nocheatplus.checks.moving.swimming
     Allows the player to swim as fast as he is allowed to walk. Normally a
-    player swims slower than he walks and NoCheat prevents faster movement in
+    player swims slower than he walks and NoCheatPlus prevents faster movement in
     water.
 
- - nocheat.checks.moving.sneaking
+ - nocheatplus.checks.moving.sneaking
     Allows the player to sneak faster than he is allowed to walk. Normally a
-    player sneaks a lot slower than he walks and NoCheat prevents faster
+    player sneaks a lot slower than he walks and NoCheatPlus prevents faster
     movement while sneaking.
 
- - nocheat.checks.moving.nofall
-    Allows the player to avoid fall damage by using hacks. Normally NoCheat
+ - nocheatplus.checks.moving.nofall
+    Allows the player to avoid fall damage by using hacks. Normally NoCheatPlus
     will keep track of a players movement and try to rectify the fall-damage
     calculations of Minecraft in case they seem to be wrong because of players
     tricking the server.
 
- - nocheat.checks.moving.morepackets
+ - nocheatplus.checks.moving.morepackets
     Allows players to make a lot more movements than normally possible. Doing
     more movements will result in faster overall movement speed and causes the
     server to spend a lot of additional time for processing these movements.
@@ -186,87 +185,106 @@
 
 -------------------- BLOCKBREAK Permissions for CHECKS -------------------------
 
- - nocheat.checks.blockbreak.reach
+ - nocheatplus.checks.blockbreak.reach
     Allows the player to break blocks that are further away than usual.
 
- - nocheat.checks.blockbreak.direction
+ - nocheatplus.checks.blockbreak.direction
     Don't force players to look at the blocks that they try to destroy.
 
- - nocheat.checks.blockbreak.noswing
+ - nocheatplus.checks.blockbreak.noswing
     Don't force players to swing their arm when breaking blocks.
 
 
 -------------------- BLOCKPLACE Permissions for CHECKS -------------------------
 
- - nocheat.checks.blockplace.reach
+ - nocheatplus.checks.blockplace.reach
     Allows the player to place blocks that are further away than usual.
 
- - nocheat.checks.blockplace.direction
+ - nocheatplus.checks.blockplace.direction
     Don't force players to look at the blocks that they try to place.
 
 
 --------------------- INVENTORY Permissions for CHECKS -------------------------
 
- - nocheat.checks.inventory.drop
+ - nocheatplus.checks.inventory.drop
     Don't limit the number of items that a player may drop within a short time
 
- - nocheat.checks.inventory.instantbow
+ - nocheatplus.checks.inventory.instantbow
     Don't prevent players from shooting their bows instantly without taking the
     usual time to pull the string back
 
- - nocheat.checks.inventory.instanteat
+ - nocheatplus.checks.inventory.instanteat
     Don't prevent players from eating their food instantly without taking the
     usual time to munch on it
 
 
 ----------------------- CHAT Permissions for CHECKS ----------------------------
 
- - nocheat.checks.chat.spam
+ - nocheatplus.checks.chat.spam
     Don't limit the number of messages and commands that a player may send in a
     short timeframe
 
- - nocheat.checks.chat.color
+ - nocheatplus.checks.chat.color
     Don't filter color codes from messages that get sent by players, allowing
     them to use colors in their messages.
 
 
 ---------------------- FIGHT Permissions for CHECKS ----------------------------
 
- - nocheat.checks.fight.direction
+ - nocheatplus.checks.fight.direction
     Don't force players to look at their targets while fighting
 
- - nocheat.checks.fight.noswing
+ - nocheatplus.checks.fight.noswing
     Don't force players to move their arms while fighting
 
- - nocheat.checks.fight.reach
+ - nocheatplus.checks.fight.reach
     Don't limit the distance for fights
 
- - nocheat.checks.fight.speed
+ - nocheatplus.checks.fight.speed
     Don't limit the number of attacks that the player can do per second
 
- - nocheat.checks.fight.godmode
+ - nocheatplus.checks.fight.godmode
     Don't prevent the player from keeping the temporary invulnerability that he
     gets when taking damage
 
- - nocheat.checks.fight.instantheal
+ - nocheatplus.checks.fight.instantheal
     Don't prevent the player from accellerating their health generation by
     food saturation
+
+
+--------------------------------------------------------------------------------
+--------------------------- Permissions for CHECKS -----------------------------
+--------------------------------------------------------------------------------
+ - nocheatplus.zombe.fly
+    Don't prevent the player from using Zombe's fly mod
+ 
+ - nocheatplus.zombe.cheats
+    Don't prevent the player from using all other Zombe's cheats
+ 
+ - nocheatplus.cjb.fly
+    Don't prevent the player from using CJB's fly mod
+ 
+ - nocheatplus.cjb.xray
+    Don't prevent the player from using CJB's Xray
+ 
+ - nocheatplus.cjb.minimap
+    Don't prevent the player from using CJB's minimap
 
 
 --------------------------------------------------------------------------------
 ----------------------- Permissions for ADMINISTRATION -------------------------
 --------------------------------------------------------------------------------
 
- - nocheat.admin.chatlog
+ - nocheatplus.admin.chatlog
     The player will receive log messages that are directed at the "ingame chat"
     as a normal chat message ingame.
 
- - nocheat.admin.commands
-    The player gets access to some of the "/nocheat" commands
+ - nocheatplus.admin.commands
+    The player gets access to some of the "/NoCheatPlus" commands
 
- - nocheat.admin.reload
-    In combination with "nocheat.admin.commands", the player gets access to the
-    "/nocheat reload" command, which will cause NoCheat to reread its config
+ - nocheatplus.admin.reload
+    In combination with "NoCheatPlus.admin.commands", the player gets access to the
+    "/NoCheatPlus reload" command, which will cause NoCheatPlus to reread its config
     files.
 
 
@@ -274,33 +292,33 @@
 ---------------------- Things to know about Permissions ------------------------
 --------------------------------------------------------------------------------
 
- NoCheat defines "parent" nodes for all permissions already for you. That means
+ NoCheatPlus defines "parent" nodes for all permissions already for you. That means
  you can use one of the following:
 
- - nocheat
- - nocheat.admin
- - nocheat.checks
- - nocheat.checks.moving
- - nocheat.checks.blockbreak
- - nocheat.checks.blockplace
- - nocheat.checks.inventory
- - nocheat.checks.chat
- - nocheat.checks.fight
+ - NoCheatPlus
+ - NoCheatPlus.admin
+ - NoCheatPlus.checks
+ - NoCheatPlus.checks.moving
+ - NoCheatPlus.checks.blockbreak
+ - NoCheatPlus.checks.blockplace
+ - NoCheatPlus.checks.inventory
+ - NoCheatPlus.checks.chat
+ - NoCheatPlus.checks.fight
 
  To give a player all the permissions that start with that permission node.
  
  Especially you don't have to and should not use ".*" anywhere when defining
- NoCheat permissions.
+ NoCheatPlus permissions.
  
  
  You can exclude a specific player from getting logged by appending ".silent"
  to the relevant permission node of the specific check. E.g. 
  
- - nocheat.checks.moving.nofall.silent
+ - NoCheatPlus.checks.moving.nofall.silent
  
- will prevent NoCheat from recording log messages for that player for the
+ will prevent NoCheatPlus from recording log messages for that player for the
  "nofall" check, while still executing all other actions as usual. These silent
- permissions won't show up elsewhere, e.g. when using the "nocheat permlist"
+ permissions won't show up elsewhere, e.g. when using the "NoCheatPlus permlist"
  command.
 
 
@@ -318,13 +336,13 @@
 -------------------------------- LOGGING Section -------------------------------
 --------------------------------------------------------------------------------
 
- Everything that in general has to do with controlling NoCheats logging can be
+ Everything that in general has to do with controlling NoCheatPluss logging can be
  found at this part of the config.yml
 
   active:
 
     Should messages get logged at all. If you are not interested in messages, 
-    set this to false and you'll hear and see (almost) nothing of NoCheat.
+    set this to false and you'll hear and see (almost) nothing of NoCheatPlus.
 
   prefix:
 
@@ -334,8 +352,8 @@
 
   filename:
 
-    The name of the logfile that NoCheat will use to log its messages. The
-    default name is "nocheat.log", but you can use a different one if you want
+    The name of the logfile that NoCheatPlus will use to log its messages. The
+    default name is "NoCheatPlus.log", but you can use a different one if you want
     to.
 
   file:
@@ -346,26 +364,26 @@
   console:
 
     Should the server console be used to display messages. Set to false if you
-    don't want NoCheat to show messages related to checks in the console. Error
+    don't want NoCheatPlus to show messages related to checks in the console. Error
     messages may still get displayed there though.
 
   ingamechat:
 
-    Should NoCheat display messages in the ingame chat? Set to false if you
-    don't want NoCheat to show messages ingame. The messages will only be seen
-    by players with the permission node "nocheat.admin.chatlog" or if you don't
+    Should NoCheatPlus display messages in the ingame chat? Set to false if you
+    don't want NoCheatPlus to show messages ingame. The messages will only be seen
+    by players with the permission node "NoCheatPlus.admin.chatlog" or if you don't
     use a permissions plugin, by players who are OP.
 
   showactivechecks:
 
-    Should NoCheat display lists of checks that are enabled for each world. Set
+    Should NoCheatPlus display lists of checks that are enabled for each world. Set
     to true if you are unsure that your (multiworld) setup of the config files
     is done correctly.
 
   debugmessages:
 
     Should some additional messages be displayed in the server console, e.g. 
-    about NoCheat encountering lag. The displayed messages may change from
+    about NoCheatPlus encountering lag. The displayed messages may change from
     version to version. This is deactivated by default.    
 
 
@@ -373,7 +391,7 @@
 -------------------------------- CHECKS Section --------------------------------
 --------------------------------------------------------------------------------
 
- Everything that in has to do with the various checks that NoCheat runs on the
+ Everything that in has to do with the various checks that NoCheatPlus runs on the
  players. Use these to specify what will be done, how it will be done and what
  happens if somebody fails checks.
 
@@ -424,9 +442,9 @@
         What should happen if the player fails this check. Default is to stop
         the attack ("cancel" it) and log messages. The Violation Level (VL) for
         this check the time difference between how long it took the player to
-        fire an arrow and how long NoCheat thinks he should have taken, in
+        fire an arrow and how long NoCheatPlus thinks he should have taken, in
         1/10 seconds. Therefore a VL of 10 would mean that the player shot an
-        arrow 1 second faster than NoCheat expected. The VL gets increased with
+        arrow 1 second faster than NoCheatPlus expected. The VL gets increased with
         every failed check and slowly decreased for every passed check.
 
  3) INSTANTEAT:
@@ -442,9 +460,9 @@
         What should happen if the player fails this check. Default is to stop
         the eating ("cancel" it) and log messages. The Violation Level (VL) for
         this check the time difference between how long it took the player to
-        eat his food and how long NoCheat thinks he should have taken, in
+        eat his food and how long NoCheatPlus thinks he should have taken, in
         1/10 seconds. Therefore a VL of 10 would mean that the player ate his
-        food 1 second faster than NoCheat expected. The VL gets increased with
+        food 1 second faster than NoCheatPlus expected. The VL gets increased with
         every failed check and slowly decreased for every passed check.
 
 
@@ -468,7 +486,7 @@
         How fast should the player be allowed to walk. Default is "100", 
         meaning 100% of normal walking speed. You will not see this option in
         your config.yml file, because normally you shouldn't have to change the
-        walking speed of players at all (NoCheat knows when players sprint, use
+        walking speed of players at all (NoCheatPlus knows when players sprint, use
         Swiftness potions etc and will already adapt the speed based on that
         data).
 
@@ -476,7 +494,7 @@
         How fast should the player be allowed to sprint. Default is "100", 
         meaning 100% of normal sprinting speed. You will not see this option in
         your config.yml file, because normally you shouldn't have to change the
-        sprinting speed of players at all (NoCheat knows when players sprint,
+        sprinting speed of players at all (NoCheatPlus knows when players sprint,
         use Swiftness potions etc and will already adapt the speed based on 
         that data).
 
@@ -484,7 +502,7 @@
         How fast should the player be allowed to sneak. Default is "100", 
         meaning 100% of normal sneaking speed. You will not see this option in
         your config.yml file, because normally you shouldn't have to change the
-        sneaking speed of players at all (NoCheat knows when players sprint,
+        sneaking speed of players at all (NoCheatPlus knows when players sprint,
         use Swiftness potions etc and will already adapt the speed based on 
         that data).
 
@@ -492,7 +510,7 @@
         How fast should the player be allowed to swim. Default is "100", 
         meaning 100% of normal swimming speed. You will not see this option in
         your config.yml file, because normally you shouldn't have to change the
-        swimming speed of players at all (NoCheat knows when players sprint,
+        swimming speed of players at all (NoCheatPlus knows when players sprint,
         use Swiftness potions etc and will already adapt the speed based on 
         that data).
 
@@ -505,7 +523,7 @@
         What should happen when a player sneaks/swims/walks/runs faster than
         normally allowed or is flying. Default is to log messages (depending on
         how severe the cheating is) and teleport the player to the last known
-        legitimate location on ground that NoCheat can remember for that player
+        legitimate location on ground that NoCheatPlus can remember for that player
         ("cancel" the movement)
 
       checknofall:
@@ -562,7 +580,7 @@
           What should happen if a player flies faster/higher than defined here?
           Default is to log messages and to prevent the player from moving
           ("cancel" his last movement). The Violation Level (VL) of this check
-          is the distance that the player went beyond what NoCheat allowed him.
+          is the distance that the player went beyond what NoCheatPlus allowed him.
           The VL increases with every failed check and slowly decreases for
           every passed check.
 
@@ -605,7 +623,7 @@
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from breaking the block ("cancel" breaking)
         and on repeated offenses to log messages about it. The Violation Level
-        (VL) is the distance in Blocks between the reach distance that NoCheat
+        (VL) is the distance in Blocks between the reach distance that NoCheatPlus
         allowed and what the player actually tried to use. The VL increases 
         with every failed attempt to break a block out of reach, and decreases
         with every successful attempt.
@@ -620,7 +638,7 @@
         Should players get checked for this type of hack
 
       precision:
-        How strict should NoCheat be when comparing the players line of view 
+        How strict should NoCheatPlus be when comparing the players line of view 
         with the broken block location. The value represents (roughly) the 
         amount of 1/100 blocks that the player is allowed to look past the to 
         be broken block. 50 (0.5 blocks) seems a good default value.
@@ -673,7 +691,7 @@
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from placing the block ("cancel" placing)
         and on repeated offenses to log messages about it. The Violation Level
-        (VL) is the distance in Blocks between the reach distance that NoCheat
+        (VL) is the distance in Blocks between the reach distance that NoCheatPlus
         allowed and what the player actually tried to use. The VL increases 
         with every failed attempt to place a block out of reach, and decreases
         with every successful attempt.
@@ -687,7 +705,7 @@
         Should players get checked for this type of hack
 
       precision:
-        How strict should NoCheat be when comparing the players line of view 
+        How strict should NoCheatPlus be when comparing the players line of view 
         with the placed block location. The value represents (roughly) the 
         amount of 1/100 blocks that the player is allowed to look past the to 
         be placed block. 75 (0.75 blocks) seems a good default value.
@@ -782,7 +800,7 @@
         Should players get checked for this type of hack
 
       precision:
-        How strict should NoCheat be when comparing the players line of view 
+        How strict should NoCheatPlus be when comparing the players line of view 
         with the his target's location. The value represents (roughly) the 
         amount of 1/100 blocks that the player is allowed to look past the to 
         be attacked entity. 75 (0.75 blocks) seems a good default value.
@@ -844,7 +862,7 @@
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from attacking the target ("cancel" attack)
         and on repeated offenses to log messages about it. The Violation Level
-        (VL) is the distance in Blocks between the reach distance that NoCheat
+        (VL) is the distance in Blocks between the reach distance that NoCheatPlus
         allowed and what the player actually tried to use. The VL increases 
         with every failed attempt to attack enemies out of reach, and decreases
         with every successful attempt.
@@ -927,12 +945,12 @@
 ################################################################################
 
 
-- NoCheat isn't perfect and won't prevent all forms of cheating. It's a best
+- NoCheatPlus isn't perfect and won't prevent all forms of cheating. It's a best
   effort approach. 
 
-- NoCheat may make mistakes. Don't see everything NoCheat says or does as
+- NoCheatPlus may make mistakes. Don't see everything NoCheatPlus says or does as
   indisputable fact that somebody cheated. It's not possible to be 100% sure
-  if somebody is cheating or not, NoCheat will try to be right most of the
+  if somebody is cheating or not, NoCheatPlus will try to be right most of the
   time.
   
 Thank you for reading this file. It took hours to write it, so it's nice that

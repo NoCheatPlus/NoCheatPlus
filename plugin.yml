@@ -1,97 +1,112 @@
-name: NoCheat
+name: NoCheatPlus
 version: ${project.version}
 description: ${project.description}
 
-author: Evenprime
+author: NeatMonster
 website: ${project.url}
 
-main: cc.co.evenprime.bukkit.nocheat.NoCheat
-
+main: me.neatmonster.nocheatplus.NoCheatPlus
 
 commands:
-  nocheat:
-    description: NoCheat command(s)
-    permission: nocheat.admin.commands
+  nocheatplus:
+    description: NoCheatPlus command(s)
+    permission: nocheatplus.admin.commands
     usage: |
-           /<command> permlist player [permission]: list NoCheat permissions of player, optionally only if beginning with [permission]
-           /<command> playerinfo player: show the collected data NoCheat collected about a player
-           /<command> reload: fast reload of NoCheats configuration file(s) - needs additional permissions
+           /<command> permlist player [permission]: list NoCheatPlus' permissions of player, optionally only if beginning with [permission]
+           /<command> playerinfo player: show the collected data NoCheatPlus collected about a player
+           /<command> reload: fast reload of NoCheatPlus' configuration file(s) - needs additional permissions
 
 permissions:
-  nocheat:
+  nocheatplus:
     description: Allow a player to bypass all checks and give him all admin permissions
     children:
-      nocheat.admin:
+      nocheatplus.admin:
         description: Give a player all admin rights
         children:
-          nocheat.admin.chatlog:
-            description: Player can see NoCheats log messages in the ingame chat
-          nocheat.admin.commands:
-            description: allow use of the "nocheat" commands (may be given to players to allow them to check statistics)
-          nocheat.admin.reload:
-            description: allow access to the special "nocheat reload" command (only intended for the actual server administrator)
-      nocheat.checks:
+          nocheatplus.admin.chatlog:
+            description: Player can see NoCheatPlus' log messages in the ingame chat
+          nocheatplus.admin.commands:
+            description: allow use of the "nocheatplus" commands (may be given to players to allow them to check statistics)
+          nocheatplus.admin.reload:
+            description: allow access to the special "nocheatplus reload" command (only intended for the actual server administrator)
+      nocheatplus.checks:
         description: Allow the player to bypass all checks
         children:
-          nocheat.checks.moving: 
+          nocheatplus.checks.moving: 
             description: Allow the player to bypass all moving related checks
             children:
-              nocheat.checks.moving.runfly:
+              nocheatplus.checks.moving.runfly:
                 description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
-              nocheat.checks.moving.flying:
+              nocheatplus.checks.moving.flying:
                 description: Allow a player to fly, but only within given speed limits (ignores swimming and sneaking settings)
-              nocheat.checks.moving.swimming:
+              nocheatplus.checks.moving.swimming:
                 description: Allow a player to move through water without slowdown
-              nocheat.checks.moving.sneaking:
+              nocheatplus.checks.moving.sneaking:
                 description: Allow a player to sneak without slowdown
-              nocheat.checks.moving.nofall:
+              nocheatplus.checks.moving.nofall:
                 description: Allow a player to cheat and not take fall damage at all
-              nocheat.checks.moving.morepackets:
+              nocheatplus.checks.moving.morepackets:
                 description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
-          nocheat.checks.blockbreak:
+          nocheatplus.checks.blockbreak:
             description: Allow the player to bypass all blockbreak checks
             children:
-              nocheat.checks.blockbreak.reach:
+              nocheatplus.checks.blockbreak.reach:
                 description: Allow a player to break blocks at maximum range (about 6-7 blocks, in creative mode unlimited)
-              nocheat.checks.blockbreak.direction:
+              nocheatplus.checks.blockbreak.direction:
                 description: Allow a player to break blocks that are not in front of them
-              nocheat.checks.blockbreak.noswing:
+              nocheatplus.checks.blockbreak.noswing:
                 description: Allow a player to break blocks without swinging their arm
-          nocheat.checks.blockplace:
+          nocheatplus.checks.blockplace:
             description: Allow the player to bypass all blockplace checks
             children:
-              nocheat.checks.blockplace.reach:
+              nocheatplus.checks.blockplace.reach:
                 description: Allow a player to place blocks at maximum range (about 6-7 blocks)
-              nocheat.checks.blockplace.direction:
+              nocheatplus.checks.blockplace.direction:
                 description: Allow a player to place blocks outside their line of view
-          nocheat.checks.chat:
+          nocheatplus.checks.chat:
             description: Allow the player to bypass all chat checks
             children:
-              nocheat.checks.chat.spam:
+              nocheatplus.checks.chat.spam:
                 description: Allow a player to send an infinite amount of chat messages
-              nocheat.checks.chat.color:
+              nocheatplus.checks.chat.color:
                 description: Allow a player to send colored chat messages
-          nocheat.checks.fight:
+          nocheatplus.checks.fight:
             description: Allow the player to bypass all fight checks
             children:
-              nocheat.checks.fight.direction:
+              nocheatplus.checks.fight.direction:
                 description: Allow a player to attack players and monster even if they are not in his field of view
-              nocheat.checks.fight.noswing:
+              nocheatplus.checks.fight.noswing:
                 description: Allow a player to fight without swinging their arm
-              nocheat.checks.fight.reach:
+              nocheatplus.checks.fight.reach:
                 description: Allow a player to fight over bigger distances than usual
-              nocheat.checks.fight.speed:
+              nocheatplus.checks.fight.speed:
                 description: Allow a player to attack faster than usual
-              nocheat.checks.fight.godmode:
+              nocheatplus.checks.fight.godmode:
                 description: Allow a player to not take damage by exploiting a design flaw in Minecraft
-              nocheat.checks.fight.instantheal:
+              nocheatplus.checks.fight.instantheal:
                 description: Allow a player to artificially speed up his health regeneration
-          nocheat.checks.inventory:
+          nocheatplus.checks.inventory:
             description: Allow the player to bypass all inventory checks
             children:
-              nocheat.checks.inventory.drop:
+              nocheatplus.checks.inventory.drop:
                 description: Allow a player to drop more items in a short timeframe than the defined limit
-              nocheat.checks.inventory.instanteat:
+              nocheatplus.checks.inventory.instanteat:
                 description: Allow a player to eat food faster than normally possible
-              nocheat.checks.inventory.instantbow:
+              nocheatplus.checks.inventory.instantbow:
                 description: Allow a player to charge his bow faster than usual
+          nocheatplus.zombe:
+            description: Allow the player to use Zombe's cheats (including fly, Xray, etc.)
+            children:
+              nocheatplus.zombe.fly:
+                description: Allow the player to use Zombe's fly
+              nocheatplus.zombe.cheats:
+                description: Allow the player to use Zombe's cheats (including Xray, etc.)
+          nocheatplus.cjb:
+            description: Allow the player to use CJB's cheats (including fly, Xray, minimap, etc.)
+            children:
+              nocheatplus.cjb.fly:
+                description: Allow the player to use CJB's fly
+              nocheatplus.cjb.xray:
+                description: Allow the player to use CJB's Xray
+              nocheatplus.cjb.minimap:
+                description: Allow the player to use CJB's minimap
