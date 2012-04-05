@@ -13,6 +13,7 @@ import me.neatmonster.nocheatplus.checks.fight.FightCheckListener;
 import me.neatmonster.nocheatplus.checks.inventory.InventoryCheckListener;
 import me.neatmonster.nocheatplus.checks.moving.MovingCheckListener;
 import me.neatmonster.nocheatplus.command.CommandHandler;
+import me.neatmonster.nocheatplus.config.ConfPaths;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.ConfigurationManager;
 import me.neatmonster.nocheatplus.config.NoCheatPlusConfiguration;
@@ -187,22 +188,37 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
+        if (conf.getConfigurationCacheForWorld(player.getWorld().getName()).getConfiguration()
+                .getBoolean(ConfPaths.ALLOW_CLIENT_MODS))
+            return;
         String message = "";
         // Disable Zombe's fly mod
         if (!player.hasPermission(Permissions.ZOMBE_FLY))
             message = message + "§f §f §1 §0 §2 §4";
+        // Disable Zombe's noclip
+        if (!player.hasPermission(Permissions.ZOMBE_NOCLIP))
+            message = message + "§f §f §4 §0 §9 §6";
         // Disable Zombe's cheats
         if (!player.hasPermission(Permissions.ZOMBE_CHEATS))
             message = message + "§f §f §2 §0 §4 §8";
         // Disable CJB's fly mod
         if (!player.hasPermission(Permissions.CJB_FLY))
             message = message + "§3 §9 §2 §0 §0 §1";
-        // Disable CJB's XRay
+        // Disable CJB's xray
         if (!player.hasPermission(Permissions.CJB_XRAY))
             message = message + "§3 §9 §2 §0 §0 §2";
         // Disable CJB's minimap
         if (!player.hasPermission(Permissions.CJB_MINIMAP))
             message = message + "§3 §9 §2 §0 §0 §3";
+        // Disable Rei's Minimap's cave mode
+        if (!player.hasPermission(Permissions.REI_CAVE))
+            message = message + "§0§0§1§e§f";
+        // Disable Rei's Minimap's radar
+        if (!player.hasPermission(Permissions.REI_RADAR))
+            message = message + "§0§0§2§3§4§5§6§7§e§f";
+        // Disable Minecraft AutoMap's cheats
+        if (!player.hasPermission(Permissions.MC_AUTOMAP))
+            message = message + "§0§0§1§2§3§4§5§6§7§8§f§e";
         player.sendMessage(message);
     }
 

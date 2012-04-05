@@ -146,6 +146,8 @@ public abstract class ConfPaths {
     public static final String  FIGHT_INSTANTHEAL_CHECK                   = FIGHT_INSTANTHEAL + "active";
     public final static String  FIGHT_INSTANTHEAL_ACTIONS                 = FIGHT_INSTANTHEAL + "actions";
 
+    public final static String  ALLOW_CLIENT_MODS                         = "allowclientmods";
+
     public final static String  STRINGS                                   = "strings";
 
 }

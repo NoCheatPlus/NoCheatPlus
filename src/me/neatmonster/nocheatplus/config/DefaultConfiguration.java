@@ -125,6 +125,8 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, true);
         set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:fheal:1:1:if cancel");
 
+        set(ConfPaths.ALLOW_CLIENT_MODS, false);
+
         set(ConfPaths.STRINGS + ".drop",
                 "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");

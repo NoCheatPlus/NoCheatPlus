@@ -94,19 +94,33 @@ permissions:
                 description: Allow a player to eat food faster than normally possible
               nocheatplus.checks.inventory.instantbow:
                 description: Allow a player to charge his bow faster than usual
-          nocheatplus.zombe:
-            description: Allow the player to use Zombe's cheats (including fly, Xray, etc.)
+          nocheatplus.mods:
+            description: Allow the player to use all the client mods
             children:
-              nocheatplus.zombe.fly:
-                description: Allow the player to use Zombe's fly
-              nocheatplus.zombe.cheats:
-                description: Allow the player to use Zombe's cheats (including Xray, etc.)
-          nocheatplus.cjb:
-            description: Allow the player to use CJB's cheats (including fly, Xray, minimap, etc.)
-            children:
-              nocheatplus.cjb.fly:
-                description: Allow the player to use CJB's fly
-              nocheatplus.cjb.xray:
-                description: Allow the player to use CJB's Xray
-              nocheatplus.cjb.minimap:
-                description: Allow the player to use CJB's minimap
+              nocheatplus.mods.zombe:
+                description: Allow the player to use all Zombe's cheats
+                children:
+                  nocheatplus.mods.zombe.fly:
+                    description: Allow the player to use Zombe's fly mod
+                  nocheatplus.mods.zombe.noclip:
+                    description: Allow the player to use Zombe's noclip
+                  nocheatplus.mods.zombe.cheats:
+                    description: Allow the player to use all other Zombe's cheats
+              nocheatplus.mods.cjb:
+                description: Allow the player to use all CJB's cheats
+                children:
+                  nocheatplus.mods.cjb.fly:
+                    description: Allow the player to use CJB's fly mod
+                  nocheatplus.mods.cjb.xray:
+                    description: Allow the player to use CJB's xray
+                  nocheatplus.mods.cjb.minimap:
+                    description: Allow the player to use CJB's minimap
+              nocheatplus.mods.rei:
+                description: Allow the player to use all Rei's Minimap's cheats
+                children:
+                  nocheatplus.mods.rei.cave:
+                    description: Allow the player to use Rei's cave mode
+                  nocheatplus.mods.rei.radar:
+                    description: Allow the player to use Rei's radar
+              nocheatplus.mods.mcautomap:
+                description: Allow the player to use all Minecraft AutoMap's cheats

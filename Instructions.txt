@@ -136,6 +136,24 @@
  By default all these permissions are set to "op", which means players with 
  OP-status have all permissions, unless you change it.
 
+
+--------------------------------------------------------------------------------
+----------------------- Permissions for ADMINISTRATION -------------------------
+--------------------------------------------------------------------------------
+
+ - nocheatplus.admin.chatlog
+    The player will receive log messages that are directed at the "ingame chat"
+    as a normal chat message ingame.
+
+ - nocheatplus.admin.commands
+    The player gets access to some of the "/nocheatplus" commands
+
+ - nocheatplus.admin.reload
+    In combination with "nocheatplus.admin.commands", the player gets access to the
+    "/nocheatplus reload" command, which will cause NoCheatPlus to reread its config
+    files.
+
+
 --------------------------------------------------------------------------------
 --------------------------- Permissions for CHECKS -----------------------------
 --------------------------------------------------------------------------------
@@ -145,7 +163,7 @@
  having one of these nodes means he will NOT be checked. Players without the
  permission node will be checked. 
 
- Example: A player has permission "NoCheatPlus.checks.moving.morepackets". That 
+ Example: A player has permission "nocheatplus.checks.moving.morepackets". That 
  means he is allowed to use that hack/cheat because NoCheatPlus won't check/stop it.
 
 
@@ -253,39 +271,35 @@
 
 
 --------------------------------------------------------------------------------
---------------------------- Permissions for CHECKS -----------------------------
+---------------------------- Permissions for MODS ------------------------------
 --------------------------------------------------------------------------------
- - nocheatplus.zombe.fly
+
+ - nocheatplus.mods.zombe.fly
     Don't prevent the player from using Zombe's fly mod
+    
+ - nocheatplus.mods.zombe.xray
+    Don't prevent the player from using Zombe's noclip
  
- - nocheatplus.zombe.cheats
+ - nocheatplus.mods.zombe.cheats
     Don't prevent the player from using all other Zombe's cheats
  
- - nocheatplus.cjb.fly
+ - nocheatplus.mods.cjb.fly
     Don't prevent the player from using CJB's fly mod
  
- - nocheatplus.cjb.xray
-    Don't prevent the player from using CJB's Xray
+ - nocheatplus.mods.cjb.xray
+    Don't prevent the player from using CJB's xray
  
- - nocheatplus.cjb.minimap
+ - nocheatplus.mods.cjb.minimap
     Don't prevent the player from using CJB's minimap
+    
+ - nocheatplus.mods.rei.cave
+    Don't prevent the player from using Rei's Minimap's cave mode
+    
+ - nocheatplus.mods.rei.radar
+    Don't prevent the player from using Rei's Minimap's radar
 
-
---------------------------------------------------------------------------------
------------------------ Permissions for ADMINISTRATION -------------------------
---------------------------------------------------------------------------------
-
- - nocheatplus.admin.chatlog
-    The player will receive log messages that are directed at the "ingame chat"
-    as a normal chat message ingame.
-
- - nocheatplus.admin.commands
-    The player gets access to some of the "/NoCheatPlus" commands
-
- - nocheatplus.admin.reload
-    In combination with "NoCheatPlus.admin.commands", the player gets access to the
-    "/NoCheatPlus reload" command, which will cause NoCheatPlus to reread its config
-    files.
+ - nocheatplus.mods.mcautomap
+    Don't prevent the player from using all Minecraft AutoMap's cheats
 
 
 --------------------------------------------------------------------------------
@@ -295,15 +309,20 @@
  NoCheatPlus defines "parent" nodes for all permissions already for you. That means
  you can use one of the following:
 
- - NoCheatPlus
- - NoCheatPlus.admin
- - NoCheatPlus.checks
- - NoCheatPlus.checks.moving
- - NoCheatPlus.checks.blockbreak
- - NoCheatPlus.checks.blockplace
- - NoCheatPlus.checks.inventory
- - NoCheatPlus.checks.chat
- - NoCheatPlus.checks.fight
+ - nocheatplus
+ - nocheatplus.admin
+ - nocheatplus.checks
+ - nocheatplus.checks.moving
+ - nocheatplus.checks.blockbreak
+ - nocheatplus.checks.blockplace
+ - nocheatplus.checks.inventory
+ - nocheatplus.checks.chat
+ - nocheatplus.checks.fight
+ - nocheatplus.mods
+ - nocheatplus.mods.zombe
+ - nocheatplus.mods.cjb
+ - nocheatplus.mods.rei
+ - nocheatplus.mods.mcautomap
 
  To give a player all the permissions that start with that permission node.
  
@@ -314,11 +333,11 @@
  You can exclude a specific player from getting logged by appending ".silent"
  to the relevant permission node of the specific check. E.g. 
  
- - NoCheatPlus.checks.moving.nofall.silent
+ - nocheatplus.checks.moving.nofall.silent
  
  will prevent NoCheatPlus from recording log messages for that player for the
  "nofall" check, while still executing all other actions as usual. These silent
- permissions won't show up elsewhere, e.g. when using the "NoCheatPlus permlist"
+ permissions won't show up elsewhere, e.g. when using the "nocheatplus permlist"
  command.
 
 
@@ -347,13 +366,13 @@
   prefix:
 
     Will be placed in front of many log messages. To get colors, use "&" 
-    followed by a number (0-9) or a letter (A-F). E.g. "&7NC&f:" would produce
-    the letters NC in red (&7), followed by black text (&f).
+    followed by a number (0-9) or a letter (A-F). E.g. "&7NCP&f:" would produce
+    the letters NCP in red (&7), followed by black text (&f).
 
   filename:
 
     The name of the logfile that NoCheatPlus will use to log its messages. The
-    default name is "NoCheatPlus.log", but you can use a different one if you want
+    default name is "nocheatplus.log", but you can use a different one if you want
     to.
 
   file:
@@ -371,7 +390,7 @@
 
     Should NoCheatPlus display messages in the ingame chat? Set to false if you
     don't want NoCheatPlus to show messages ingame. The messages will only be seen
-    by players with the permission node "NoCheatPlus.admin.chatlog" or if you don't
+    by players with the permission node "nocheatplus.admin.chatlog" or if you don't
     use a permissions plugin, by players who are OP.
 
   showactivechecks:
@@ -604,6 +623,31 @@
         teleport the player back to a location where he was ~1 second before
         ("cancel" his movement). The Violation Level VL is the number of
         packets that the player sent beyond the expected amount       
+       
+ 3) WATERWALK:
+ 
+     The waterwalk check is used to prevent players from walking on water using
+     a client dedicated to griefing (this mode is usually called Jesus mod).
+     Firstly, it'll check if the player's move is valid (not only moving the X
+     and Z axes but also on the Y axis and, of course, if the player is near the
+     surface (most of the griefing client set the player 0.3 blocks under the
+     water surface). Secondly, it'll make sure the player is using the borders
+     of the block to climb outside the water (it prevents players using griefing
+     clients to simply jump multiple times over the water).
+     
+      active:
+        Should players be checked for this kind of cheating. If you are not
+        interested in players that cheat that way, set this to false. It is a
+        good idea to have this active, because player won't be able to cross
+        easily the oceans.
+        
+      actions:
+	    What should happen if a player is considered to be cheating by walking
+        on water. Default is to log messages and to prevent the player from moving
+        ("cancel" his last movement). The Violation Level (VL) of this check is
+        the distance between the player and the surface or how far away he is from
+        the normal position if a player climbing a block. The VL increases with
+        every failed check and slowly decreases for every passed check.
 
 
 ---------------------------- BLOCKBREAK Subsection -----------------------------
