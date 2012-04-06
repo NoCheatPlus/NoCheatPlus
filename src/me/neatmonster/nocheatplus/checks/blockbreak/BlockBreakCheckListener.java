@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
  */
 public class BlockBreakCheckListener implements Listener, EventManager {
 
+    private final FastBreakCheck fastBreakCheck;
     private final NoswingCheck   noswingCheck;
     private final ReachCheck     reachCheck;
     private final DirectionCheck directionCheck;
@@ -31,6 +32,7 @@ public class BlockBreakCheckListener implements Listener, EventManager {
 
     public BlockBreakCheckListener(final NoCheatPlus plugin) {
 
+        fastBreakCheck = new FastBreakCheck(plugin);
         noswingCheck = new NoswingCheck(plugin);
         reachCheck = new ReachCheck(plugin);
         directionCheck = new DirectionCheck(plugin);
@@ -84,16 +86,20 @@ public class BlockBreakCheckListener implements Listener, EventManager {
         // computationally cheap checks first, because it may save us from
         // doing the computationally expensive checks.
 
-        // First NoSwing: Did the arm of the player move before breaking this
+        // First FastPlace: Has the player broken blocks too quickly?
+        if (cc.fastBreakCheck && !player.hasPermission(Permissions.BLOCKBREAK_FASTBREAK))
+            cancelled = fastBreakCheck.check(player, data, cc);
+
+        // Second NoSwing: Did the arm of the player move before breaking this
         // block?
-        if (cc.noswingCheck && !player.hasPermission(Permissions.BLOCKBREAK_NOSWING))
+        if (!cancelled && cc.noswingCheck && !player.hasPermission(Permissions.BLOCKBREAK_NOSWING))
             cancelled = noswingCheck.check(player, data, cc);
 
-        // Second Reach: Is the block really in reach distance
+        // Third Reach: Is the block really in reach distance
         if (!cancelled && cc.reachCheck && !player.hasPermission(Permissions.BLOCKBREAK_REACH))
             cancelled = reachCheck.check(player, data, cc);
 
-        // Third Direction: Did the player look at the block at all
+        // Forth Direction: Did the player look at the block at all
         if (!cancelled && cc.directionCheck && !player.hasPermission(Permissions.BLOCKBREAK_DIRECTION))
             cancelled = directionCheck.check(player, data, cc);
 
@@ -148,6 +154,8 @@ public class BlockBreakCheckListener implements Listener, EventManager {
 
         final BlockBreakConfig bb = BlockBreakCheck.getConfig(cc);
 
+        if (bb.fastBreakCheck)
+            s.add("blockbreak.fastbreak");
         if (bb.directionCheck)
             s.add("blockbreak.direction");
         if (bb.reachCheck)

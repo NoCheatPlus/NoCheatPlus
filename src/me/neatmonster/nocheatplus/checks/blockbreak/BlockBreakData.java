@@ -10,9 +10,13 @@ import me.neatmonster.nocheatplus.data.SimpleLocation;
 public class BlockBreakData implements DataItem {
 
     // Keep track of violation levels for the three checks
+    public double               fastBreakVL                = 0.0D;
     public double               reachVL                    = 0.0D;
     public double               directionVL                = 0.0D;
     public double               noswingVL                  = 0.0D;
+
+    // Used the know when the player has broke his previous block
+    public long                 lastBreakTime              = 0;
 
     // Used for the penalty time feature of the direction check
     public long                 directionLastViolationTime = 0;

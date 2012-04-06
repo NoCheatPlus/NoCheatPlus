@@ -9,9 +9,11 @@ public class Statistics {
 
     public enum Id {
 
+        BB_FASTBREAK("blockbreak.fastbreak"),
         BB_DIRECTION("blockbreak.direction"),
         BB_NOSWING("blockbreak.noswing"),
         BB_REACH("blockbreak.reach"),
+        BP_FASTPLACE("blockplace.fastplace"),
         BP_DIRECTION("blockplace.direction"),
         BP_REACH("blockplace.reach"),
         CHAT_COLOR("chat.color"),

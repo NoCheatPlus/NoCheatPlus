@@ -21,6 +21,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
  */
 public class BlockPlaceCheckListener implements Listener, EventManager {
 
+    private final FastPlaceCheck fastPlaceCheck;
     private final ReachCheck     reachCheck;
     private final DirectionCheck directionCheck;
     private final NoCheatPlus    plugin;
@@ -29,6 +30,7 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
 
         this.plugin = plugin;
 
+        fastPlaceCheck = new FastPlaceCheck(plugin);
         reachCheck = new ReachCheck(plugin);
         directionCheck = new DirectionCheck(plugin);
     }
@@ -39,6 +41,8 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
 
         final BlockPlaceConfig bp = BlockPlaceCheck.getConfig(cc);
 
+        if (bp.fastPlaceCheck)
+            s.add("blockplace.fastplace");
         if (bp.reachCheck)
             s.add("blockplace.reach");
         if (bp.directionCheck)
@@ -72,11 +76,15 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
 
         // Now do the actual checks
 
-        // First the reach check
-        if (cc.reachCheck && !player.hasPermission(Permissions.BLOCKPLACE_REACH))
+        // First the fastplace check
+        if (cc.fastPlaceCheck && !player.hasPermission(Permissions.BLOCKPLACE_FASTPLACE))
+            cancelled = fastPlaceCheck.check(player, data, cc);
+
+        // Second the reach check
+        if (!cancelled && cc.reachCheck && !player.hasPermission(Permissions.BLOCKPLACE_REACH))
             cancelled = reachCheck.check(player, data, cc);
 
-        // Second the direction check
+        // Third the direction check
         if (!cancelled && cc.directionCheck && !player.hasPermission(Permissions.BLOCKPLACE_DIRECTION))
             cancelled = directionCheck.check(player, data, cc);
 

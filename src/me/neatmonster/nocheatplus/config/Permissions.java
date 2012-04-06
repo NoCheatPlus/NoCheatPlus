@@ -18,11 +18,13 @@ public class Permissions {
 
     /** CHECKS **/
     private static final String BLOCKBREAK           = CHECKS + ".blockbreak";
+    public static final String  BLOCKBREAK_FASTBREAK = BLOCKBREAK + ".fastbreak";
     public static final String  BLOCKBREAK_REACH     = BLOCKBREAK + ".reach";
     public static final String  BLOCKBREAK_DIRECTION = BLOCKBREAK + ".direction";
     public static final String  BLOCKBREAK_NOSWING   = BLOCKBREAK + ".noswing";
 
     private static final String BLOCKPLACE           = CHECKS + ".blockplace";
+    public static final String  BLOCKPLACE_FASTPLACE = BLOCKPLACE + ".fastplace";
     public static final String  BLOCKPLACE_REACH     = BLOCKPLACE + ".reach";
     public static final String  BLOCKPLACE_DIRECTION = BLOCKPLACE + ".direction";
 

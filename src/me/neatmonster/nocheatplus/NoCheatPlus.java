@@ -189,7 +189,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         if (conf.getConfigurationCacheForWorld(player.getWorld().getName()).getConfiguration()
-                .getBoolean(ConfPaths.ALLOW_CLIENT_MODS))
+                .getBoolean(ConfPaths.CLIENT_MODS_ALLOW))
             return;
         String message = "";
         // Disable Zombe's fly mod

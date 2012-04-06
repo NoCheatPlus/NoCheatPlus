@@ -69,8 +69,8 @@ public class WaterWalkCheck extends MovingCheck {
             // Was one of the actions a cancel? Then do it
             if (cancel)
                 newToLocation = from;
-        } else if (fromLiquid && fromBukkitLiquid && !toLiquid && (deltaX < 0.27D || deltaX > 0.29D)
-                && (deltaZ < 0.27D || deltaZ > 0.29D)) {
+        } else if (fromLiquid && fromBukkitLiquid && !toLiquid && (deltaX < 0.28D || deltaX > 0.31D)
+                && (deltaZ < 0.28D || deltaZ > 0.31D)) {
             // If the player is trying to jump while being in water
             // Increment violation counter
             data.waterWalkVL += resultXZ;

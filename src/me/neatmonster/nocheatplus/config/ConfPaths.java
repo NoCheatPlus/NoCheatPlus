@@ -8,6 +8,9 @@ package me.neatmonster.nocheatplus.config;
  */
 public abstract class ConfPaths {
 
+    private final static String CLIENT_MODS                               = "clientmods.";
+    public final static String  CLIENT_MODS_ALLOW                         = CLIENT_MODS + "allow";
+
     private final static String LOGGING                                   = "logging.";
     public final static String  LOGGING_ACTIVE                            = LOGGING + "active";
     public final static String  LOGGING_PREFIX                            = LOGGING + "prefix";
@@ -75,6 +78,11 @@ public abstract class ConfPaths {
 
     private final static String BLOCKBREAK                                = CHECKS + "blockbreak.";
 
+    private final static String BLOCKBREAK_FASTBREAK                      = BLOCKBREAK + "fastbreak.";
+    public final static String  BLOCKBREAK_FASTBREAK_CHECK                = BLOCKBREAK_FASTBREAK + "active";
+    public final static String  BLOCKBREAK_FASTBREAK_INTERVAL             = BLOCKBREAK_FASTBREAK + "interval";
+    public final static String  BLOCKBREAK_FASTBREAK_ACTIONS              = BLOCKBREAK_FASTBREAK + "actions";
+
     private final static String BLOCKBREAK_REACH                          = BLOCKBREAK + "reach.";
     public final static String  BLOCKBREAK_REACH_CHECK                    = BLOCKBREAK_REACH + "active";
     public final static String  BLOCKBREAK_REACH_ACTIONS                  = BLOCKBREAK_REACH + "actions";
@@ -90,6 +98,11 @@ public abstract class ConfPaths {
     public static final String  BLOCKBREAK_NOSWING_ACTIONS                = BLOCKBREAK_NOSWING + "actions";
 
     private final static String BLOCKPLACE                                = CHECKS + "blockplace.";
+
+    private final static String BLOCKPLACE_FASTPLACE                      = BLOCKPLACE + "fastplace.";
+    public final static String  BLOCKPLACE_FASTPLACE_CHECK                = BLOCKPLACE_FASTPLACE + "active";
+    public final static String  BLOCKPLACE_FASTPLACE_INTERVAL             = BLOCKPLACE_FASTPLACE + "interval";
+    public final static String  BLOCKPLACE_FASTPLACE_ACTIONS              = BLOCKPLACE_FASTPLACE + "actions";
 
     private final static String BLOCKPLACE_REACH                          = BLOCKPLACE + "reach.";
     public final static String  BLOCKPLACE_REACH_CHECK                    = BLOCKPLACE_REACH + "active";
@@ -145,8 +158,6 @@ public abstract class ConfPaths {
     private final static String FIGHT_INSTANTHEAL                         = FIGHT + "instantheal.";
     public static final String  FIGHT_INSTANTHEAL_CHECK                   = FIGHT_INSTANTHEAL + "active";
     public final static String  FIGHT_INSTANTHEAL_ACTIONS                 = FIGHT_INSTANTHEAL + "actions";
-
-    public final static String  ALLOW_CLIENT_MODS                         = "allowclientmods";
 
     public final static String  STRINGS                                   = "strings";
 

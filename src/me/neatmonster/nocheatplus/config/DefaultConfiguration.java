@@ -14,6 +14,10 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         options().header("Main configuration file for NoCheatPlus. Read \"Instructions.txt\"");
 
+        /** CLIENT MODS **/
+
+        set(ConfPaths.CLIENT_MODS_ALLOW, false);
+
         /** LOGGING **/
 
         set(ConfPaths.LOGGING_ACTIVE, true);
@@ -66,6 +70,11 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         /*** BLOCKBREAK ***/
 
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 145);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS,
+                "cancel vl>1000 log:bbfastbreak:3:5:cif cancel vl>4000 log:waterwalk:3:5:cif cmd:kick cancel");
+
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:bbreach:0:2:if cancel");
 
@@ -78,6 +87,11 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:bbnoswing:3:2:if cancel");
 
         /*** BLOCKPLACE ***/
+
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 145);
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS,
+                "cancel vl>100 log:bpfastplace:3:5:cif cancel vl>2000 log:waterwalk:3:5:cif cmd:kick cancel");
 
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true);
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:bpreach:0:2:if cancel");
@@ -125,8 +139,6 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, true);
         set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:fheal:1:1:if cancel");
 
-        set(ConfPaths.ALLOW_CLIENT_MODS, false);
-
         set(ConfPaths.STRINGS + ".drop",
                 "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");
@@ -138,11 +150,15 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
                 "[player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations]");
         set(ConfPaths.STRINGS + ".waterwalk",
                 "[player] failed [check]: tried to walk on water. Total violation level [violations]");
+        set(ConfPaths.STRINGS + ".bbfastbreak",
+                "[player] failed [check]: tried to break too much blocks. Total violation level [violations]");
         set(ConfPaths.STRINGS + ".bbreach",
                 "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations]");
         set(ConfPaths.STRINGS + ".bbdirection",
                 "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
         set(ConfPaths.STRINGS + ".bbnoswing", "[player] failed [check]: Didn't swing arm. VL [violations]");
+        set(ConfPaths.STRINGS + ".bpfastplace",
+                "[player] failed [check]: tried to place too much blocks. Total violation level [violations]");
         set(ConfPaths.STRINGS + ".bpreach",
                 "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations]");
         set(ConfPaths.STRINGS + ".bpdirection",

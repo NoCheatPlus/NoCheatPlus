@@ -14,6 +14,10 @@ import me.neatmonster.nocheatplus.config.Permissions;
  */
 public class BlockPlaceConfig implements ConfigItem {
 
+    public final boolean    fastPlaceCheck;
+    public final int        fastPlaceInterval;
+    public final ActionList fastPlaceActions;
+
     public final boolean    reachCheck;
     public final double     reachDistance;
     public final ActionList reachActions;
@@ -24,6 +28,10 @@ public class BlockPlaceConfig implements ConfigItem {
     public final double     directionPrecision;
 
     public BlockPlaceConfig(final NoCheatPlusConfiguration data) {
+
+        fastPlaceCheck = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK);
+        fastPlaceInterval = data.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL);
+        fastPlaceActions = data.getActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKPLACE_REACH_CHECK);
         reachDistance = 535D / 100D;

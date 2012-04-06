@@ -50,6 +50,8 @@ permissions:
           nocheatplus.checks.blockbreak:
             description: Allow the player to bypass all blockbreak checks
             children:
+              nocheatplus.checks.blockbreak.fastbreak:
+                description: Allow a player to break blocks very quickly
               nocheatplus.checks.blockbreak.reach:
                 description: Allow a player to break blocks at maximum range (about 6-7 blocks, in creative mode unlimited)
               nocheatplus.checks.blockbreak.direction:
@@ -59,6 +61,8 @@ permissions:
           nocheatplus.checks.blockplace:
             description: Allow the player to bypass all blockplace checks
             children:
+              nocheatplus.checks.blockplace.fastplace:
+                description: Allow a player to place blocks very quickly
               nocheatplus.checks.blockplace.reach:
                 description: Allow a player to place blocks at maximum range (about 6-7 blocks)
               nocheatplus.checks.blockplace.direction:

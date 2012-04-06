@@ -10,8 +10,12 @@ import me.neatmonster.nocheatplus.data.SimpleLocation;
 public class BlockPlaceData implements DataItem {
 
     // Keep track of violation levels for the two checks
+    public double               fastPlaceVL                = 0.0D;
     public double               reachVL                    = 0.0D;
     public double               directionVL                = 0.0D;
+
+    // Used the know when the player has placed his previous block
+    public long                 lastPlaceTime              = 0;
 
     // Used for the penalty time feature of the direction check
     public long                 directionLastViolationTime = 0;
