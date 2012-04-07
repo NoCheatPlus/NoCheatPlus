@@ -199,6 +199,20 @@
     Allows players to make a lot more movements than normally possible. Doing
     more movements will result in faster overall movement speed and causes the
     server to spend a lot of additional time for processing these movements.
+    
+ - nocheatplus.checks.moving.morepacketsvehicle
+   Allows players to make a lot more movements (while being in a vehicule) than
+   normally possible. Doing more movements will result in faster overall movement
+   speed and causes the server to spent a lot of additional time for processing
+   these movements.
+   
+ - nocheatplus.checks.moving.boatonground
+   Allows players to place boats on the ground (and not only on the water).
+   
+ - nocheatplus.checks.moving.respawntrick
+   Allows player to respawn on top if they are blocked by a gravel or a sand
+   block (instead of removing the blocks blocking them). This is usually used
+   by players to go quickly to the surface when they are in their mines).
 
 
 -------------------- BLOCKBREAK Permissions for CHECKS -------------------------
@@ -640,9 +654,29 @@
         more steps per second than normal. Default is to log messages and 
         teleport the player back to a location where he was ~1 second before
         ("cancel" his movement). The Violation Level VL is the number of
-        packets that the player sent beyond the expected amount       
+        packets that the player sent beyond the expected amount.
+        
+ 3) MOREPACKETSVEHICULE:
+
+     The morepacketsvehicule check is complementary to the "morepackets" check.
+     While the "morepacket" check limit the number of player-move packets send
+     per second, this "morepacketsvehicle" limit the number of vehicule-move
+     packets sent per second. A normal value is 20 packets per second.
+
+      active:
+        Should players be checked for this kind of cheating. If you are not 
+        interested in players that cheat that way, set this to false. It is a
+        good idea to have this active, because players that cheat by sending
+        more packets than normally allowed may lag the server (each of those
+        packets has to be processed, after all).
+
+      actions:
+        What should happen if a player is considered to be cheating by taking 
+        more steps per second than normal. Default is to log messages and break
+        the boat the player is using. The Violation Level VL is the number of
+        packets that the player sent beyond the expected amount.
        
- 3) WATERWALK:
+ 4) WATERWALK:
  
      The waterwalk check is used to prevent players from walking on water using
      a client dedicated to griefing (this mode is usually called Jesus mod).

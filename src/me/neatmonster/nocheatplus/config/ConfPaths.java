@@ -72,6 +72,10 @@ public abstract class ConfPaths {
     public final static String  MOVING_MOREPACKETS_CHECK                  = MOVING_MOREPACKETS + "active";
     public final static String  MOVING_MOREPACKETS_ACTIONS                = MOVING_MOREPACKETS + "actions";
 
+    private final static String MOVING_MOREPACKETSVEHICLE                 = MOVING + "morepacketsvehicle.";
+    public final static String  MOVING_MOREPACKETSVEHICLE_CHECK           = MOVING_MOREPACKETSVEHICLE + "active";
+    public final static String  MOVING_MOREPACKETSVEHICLE_ACTIONS         = MOVING_MOREPACKETSVEHICLE + "actions";
+
     private final static String MOVING_WATERWALK                          = MOVING + "waterwalk.";
     public final static String  MOVING_WATERWALK_CHECK                    = MOVING_WATERWALK + "active";
     public final static String  MOVING_WATERWALK_ACTIONS                  = MOVING_WATERWALK + "actions";
@@ -80,7 +84,6 @@ public abstract class ConfPaths {
 
     private final static String BLOCKBREAK_FASTBREAK                      = BLOCKBREAK + "fastbreak.";
     public final static String  BLOCKBREAK_FASTBREAK_CHECK                = BLOCKBREAK_FASTBREAK + "active";
-    public final static String  BLOCKBREAK_FASTBREAK_INTERVAL             = BLOCKBREAK_FASTBREAK + "interval";
     public final static String  BLOCKBREAK_FASTBREAK_ACTIONS              = BLOCKBREAK_FASTBREAK + "actions";
 
     private final static String BLOCKBREAK_REACH                          = BLOCKBREAK + "reach.";

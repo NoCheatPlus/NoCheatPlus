@@ -47,6 +47,12 @@ permissions:
                 description: Allow a player to cheat and not take fall damage at all
               nocheatplus.checks.moving.morepackets:
                 description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
+              nocheatplus.checks.moving.morepacketsvehicle:
+                description: Allow a player to send more vehicule-move-event-packets than normal, causing him to move faster than normal
+              nocheatplus.checks.moving.boatonground:
+                description: Allow a player to place a boat on the ground (not only on the water)
+              nocheatplus.checks.moving.respawntrick:
+                description: Allow a player to respawn on top if blocked by gravel or sand (instead of removing the blocks)
           nocheatplus.checks.blockbreak:
             description: Allow the player to bypass all blockbreak checks
             children:

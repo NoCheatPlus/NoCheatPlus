@@ -12,17 +12,24 @@ import me.neatmonster.nocheatplus.config.Permissions;
 import me.neatmonster.nocheatplus.data.PreciseLocation;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 /**
@@ -32,18 +39,20 @@ import org.bukkit.util.Vector;
  */
 public class MovingCheckListener implements Listener, EventManager {
 
-    private final MorePacketsCheck morePacketsCheck;
-    private final FlyingCheck      flyingCheck;
-    private final RunningCheck     runningCheck;
-    private final WaterWalkCheck   waterWalkCheck;
+    private final MorePacketsCheck        morePacketsCheck;
+    private final MorePacketsVehicleCheck morePacketsVehicleCheck;
+    private final FlyingCheck             flyingCheck;
+    private final RunningCheck            runningCheck;
+    private final WaterWalkCheck          waterWalkCheck;
 
-    private final NoCheatPlus      plugin;
+    private final NoCheatPlus             plugin;
 
     public MovingCheckListener(final NoCheatPlus plugin) {
 
         flyingCheck = new FlyingCheck(plugin);
         runningCheck = new RunningCheck(plugin);
         morePacketsCheck = new MorePacketsCheck(plugin);
+        morePacketsVehicleCheck = new MorePacketsVehicleCheck(plugin);
         waterWalkCheck = new WaterWalkCheck(plugin);
 
         this.plugin = plugin;
@@ -202,6 +211,24 @@ public class MovingCheckListener implements Listener, EventManager {
     }
 
     /**
+     * If a player tries to place a boat on the ground, the event
+     * will be cancelled.
+     * 
+     * @param event
+     *            The PlayerInteractEvent
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onPlayerInteract(final PlayerInteractEvent event) {
+        if (!event.getPlayer().hasPermission(Permissions.MOVING_BOATONGROUND)
+                && event.getAction() == Action.RIGHT_CLICK_BLOCK
+                && event.getPlayer().getItemInHand().getType() == Material.BOAT
+                && event.getClickedBlock().getType() != Material.WATER
+                && event.getClickedBlock().getType() != Material.STATIONARY_WATER)
+            event.setCancelled(true);
+    }
+
+    /**
      * When a player uses a portal, all information related to the
      * moving checks becomes invalid.
      * 
@@ -213,6 +240,22 @@ public class MovingCheckListener implements Listener, EventManager {
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()));
         data.clearMorePacketsData();
         data.clearRunFlyData();
+    }
+
+    /**
+     * This events listener fixes the exploitation of the safe
+     * respawn location (usually exploited with gravel or sand).
+     * 
+     * @param event
+     */
+    @EventHandler
+    public void quit(final PlayerQuitEvent event) {
+        if (!event.getPlayer().hasPermission(Permissions.MOVING_RESPAWNTRICK)
+                && (event.getPlayer().getLocation().getBlock().getType() == Material.GRAVEL || event.getPlayer()
+                        .getLocation().getBlock().getType() == Material.SAND)) {
+            event.getPlayer().getLocation().getBlock().setType(Material.AIR);
+            event.getPlayer().getLocation().add(0, 1, 0).getBlock().setType(Material.AIR);
+        }
     }
 
     /**
@@ -286,6 +329,53 @@ public class MovingCheckListener implements Listener, EventManager {
         } else if (data.vertFreedom > 0.001)
             // Counter has run out, now reduce the vert freedom over time
             data.vertFreedom *= 0.93;
+    }
+
+    /**
+     * When an vehicle moves, it will be checked for various
+     * suspicious behaviour.
+     * 
+     * @param event
+     *            The VehicleMoveEvent
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void vehicleMove(final VehicleMoveEvent event) {
+
+        // Don't care for vehicles without passenger
+        if (event.getVehicle().getPassenger() == null || !(event.getVehicle().getPassenger() instanceof Player))
+            return;
+
+        // Don't care for movements that are very high distance or to another
+        // world (such that it is very likely the event data was modified by
+        // another plugin before we got it)
+        if (!event.getFrom().getWorld().equals(event.getTo().getWorld())
+                || event.getFrom().distanceSquared(event.getTo()) > 400)
+            return;
+
+        final NoCheatPlusPlayer player = plugin.getPlayer((Player) event.getVehicle().getPassenger());
+
+        final MovingConfig cc = MovingCheck.getConfig(player);
+        final MovingData data = MovingCheck.getData(player);
+
+        // Remember locations
+        data.fromVehicle.set(event.getFrom());
+        final Location to = event.getTo();
+        data.toVehicle.set(to);
+
+        if (cc.morePacketsVehicleCheck && !player.hasPermission(Permissions.MOVING_MOREPACKETSVEHICLE)
+                && morePacketsVehicleCheck.check(player, data, cc)) {
+            // Drop the usual items
+            event.getVehicle().getWorld()
+                    .dropItemNaturally(event.getVehicle().getLocation(), new ItemStack(Material.WOOD, 3));
+            event.getVehicle().getWorld()
+                    .dropItemNaturally(event.getVehicle().getLocation(), new ItemStack(Material.STICK, 2));
+            // Remove the passenger
+            if (event.getVehicle().getPassenger() != null)
+                event.getVehicle().setPassenger(null);
+            // Destroy the vehicle
+            event.getVehicle().remove();
+        }
     }
 
     /**

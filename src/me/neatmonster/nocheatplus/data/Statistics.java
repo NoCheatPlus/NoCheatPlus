@@ -28,6 +28,7 @@ public class Statistics {
         MOV_RUNNING("moving.running"),
         MOV_FLYING("moving.flying"),
         MOV_MOREPACKETS("moving.morepackets"),
+        MOV_MOREPACKETSVEHICLE("moving.morepacketsvehicle"),
         MOV_NOFALL("moving.nofall"),
         MOV_SNEAKING("moving.sneaking"),
         MOV_SWIMMING("moving.swimming"),

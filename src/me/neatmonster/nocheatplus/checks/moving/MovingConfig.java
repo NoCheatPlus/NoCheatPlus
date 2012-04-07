@@ -35,6 +35,9 @@ public class MovingConfig implements ConfigItem {
     public final boolean    morePacketsCheck;
     public final ActionList morePacketsActions;
 
+    public final boolean    morePacketsVehicleCheck;
+    public final ActionList morePacketsVehicleActions;
+
     public final boolean    waterWalkCheck;
     public final ActionList waterWalkActions;
 
@@ -72,6 +75,10 @@ public class MovingConfig implements ConfigItem {
 
         morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
         morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
+
+        morePacketsVehicleCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
+        morePacketsVehicleActions = data.getActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
+                Permissions.MOVING_MOREPACKETS);
 
         waterWalkCheck = data.getBoolean(ConfPaths.MOVING_WATERWALK_CHECK);
         waterWalkActions = data.getActionList(ConfPaths.MOVING_WATERWALK_ACTIONS, Permissions.MOVING_WATERWALK);

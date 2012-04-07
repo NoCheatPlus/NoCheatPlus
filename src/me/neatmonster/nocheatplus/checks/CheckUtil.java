@@ -101,17 +101,6 @@ public class CheckUtil {
         // nonsolid too
         types[Material.STONE_PLATE.getId()] = SOLID | NONSOLID;
         types[Material.WOOD_PLATE.getId()] = SOLID | NONSOLID;
-
-        /*
-         * for(int i = 0; i < 256; i++) {
-         * if(Block.byId[i] != null) {
-         * System.out.println(Material.getMaterial(i) +
-         * (isSolid(types[i]) ? " solid " : "") + (isNonSolid(types[i])
-         * ? " nonsolid " : "") + (isLiquid(types[i]) ? " liquid " :
-         * ""));
-         * }
-         * }
-         */
     }
 
     /**

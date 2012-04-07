@@ -211,10 +211,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         if (!player.hasPermission(Permissions.CJB_MINIMAP))
             message = message + "§3 §9 §2 §0 §0 §3";
         // Disable Rei's Minimap's cave mode
-        if (!player.hasPermission(Permissions.REI_CAVE))
+        if (player.hasPermission(Permissions.REI_CAVE))
             message = message + "§0§0§1§e§f";
         // Disable Rei's Minimap's radar
-        if (!player.hasPermission(Permissions.REI_RADAR))
+        if (player.hasPermission(Permissions.REI_RADAR))
             message = message + "§0§0§2§3§4§5§6§7§e§f";
         // Disable Minecraft AutoMap's cheats
         if (!player.hasPermission(Permissions.MC_AUTOMAP))

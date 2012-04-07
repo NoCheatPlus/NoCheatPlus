@@ -11,6 +11,7 @@ import me.neatmonster.nocheatplus.data.PreciseLocation;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 public class WaterWalkCheck extends MovingCheck {
 
@@ -36,13 +37,24 @@ public class WaterWalkCheck extends MovingCheck {
         final boolean toLiquid = CheckUtil.isLiquid(toType);
         final boolean upLiquid = CheckUtil.isLiquid(upType);
 
-        // Make sure the block where the player comes is a stationary liquid block
-        boolean fromBukkitLiquid = false;
         final Block fromBlock = new Location(player.getPlayer().getWorld(), from.x, from.y, from.z).getBlock();
+
+        // Handle the issue with water streams
+        boolean waterStreamsFix = false;
         if (fromBlock.getType() == Material.STATIONARY_WATER || fromBlock.getType() == Material.STATIONARY_LAVA
                 || (fromBlock.getType() == Material.WATER || fromBlock.getType() == Material.LAVA)
                 && fromBlock.getData() == 0x0)
-            fromBukkitLiquid = true;
+            waterStreamsFix = true;
+
+        // Handle the issue with slabs/stairs
+        boolean slabsStairsFix = false;
+        for (final BlockFace blockFace : BlockFace.values()) {
+            final Material material = fromBlock.getRelative(blockFace).getType();
+            if (material == Material.STEP || material == Material.WOOD_STAIRS
+                    || material == Material.COBBLESTONE_STAIRS || material == Material.BRICK_STAIRS
+                    || material == Material.SMOOTH_STAIRS || material == Material.NETHER_BRICK_STAIRS)
+                slabsStairsFix = true;
+        }
 
         // Calculate some distances
         final double deltaX = Math.abs(Math.round(to.x) - to.x);
@@ -57,7 +69,7 @@ public class WaterWalkCheck extends MovingCheck {
         // Slowly reduce the level with each event
         data.waterWalkVL *= 0.95;
 
-        if (fromLiquid && toLiquid && !upLiquid && deltaY == 0D && deltaWithSurface < 0.8D) {
+        if (!slabsStairsFix && fromLiquid && toLiquid && !upLiquid && deltaY == 0D && deltaWithSurface < 0.8D) {
             // If the player is trying to move while being in water
             // Increment violation counter
             data.waterWalkVL += resultY;
@@ -69,7 +81,7 @@ public class WaterWalkCheck extends MovingCheck {
             // Was one of the actions a cancel? Then do it
             if (cancel)
                 newToLocation = from;
-        } else if (fromLiquid && fromBukkitLiquid && !toLiquid && (deltaX < 0.28D || deltaX > 0.31D)
+        } else if (waterStreamsFix && fromLiquid && !toLiquid && (deltaX < 0.28D || deltaX > 0.31D)
                 && (deltaZ < 0.28D || deltaZ > 0.31D)) {
             // If the player is trying to jump while being in water
             // Increment violation counter

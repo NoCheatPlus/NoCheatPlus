@@ -64,6 +64,9 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);
         set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "log:morepackets:3:2:if cancel vl>20 log:morepackets:0:2:if cancel");
 
+        set(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK, true);
+        set(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS, "log:morepackets:0:2:if cancel");
+
         set(ConfPaths.MOVING_WATERWALK_CHECK, true);
         set(ConfPaths.MOVING_WATERWALK_ACTIONS,
                 "log:waterwalk:3:5:f cancel vl>100 log:waterwalk:0:5:if cancel vl>400 log:waterwalk:0:5:cif cancel");
@@ -71,9 +74,8 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         /*** BLOCKBREAK ***/
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 145);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS,
-                "cancel vl>1000 log:bbfastbreak:3:5:cif cancel vl>4000 log:waterwalk:3:5:cif cmd:kick cancel");
+                "vl>200 cancel vl> 1000 log:bbfastbreak:2:5:cif cancel vl>400 log:bbfastbreak:3:5:cif cmd:kick cancel");
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:bbreach:0:2:if cancel");
@@ -91,7 +93,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 145);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS,
-                "cancel vl>100 log:bpfastplace:3:5:cif cancel vl>2000 log:waterwalk:3:5:cif cmd:kick cancel");
+                "cancel vl>100 log:bpfastplace:3:5:cif cancel vl>2000 log:bpfastplace:3:5:cif cmd:kick cancel");
 
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true);
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:bpreach:0:2:if cancel");
