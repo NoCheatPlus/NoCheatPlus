@@ -16,6 +16,7 @@ public class Statistics {
         BP_FASTPLACE("blockplace.fastplace"),
         BP_DIRECTION("blockplace.direction"),
         BP_REACH("blockplace.reach"),
+        BP_PROJECTILE("blockplace.projectile"),
         CHAT_COLOR("chat.color"),
         CHAT_SPAM("chat.spam"),
         FI_DIRECTION("fight.direction"),

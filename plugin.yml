@@ -73,6 +73,10 @@ permissions:
                 description: Allow a player to place blocks at maximum range (about 6-7 blocks)
               nocheatplus.checks.blockplace.direction:
                 description: Allow a player to place blocks outside their line of view
+              nocheatplus.checks.blockplace.projectile:
+                description: Allow a player to throw projectiles very quickly
+              nocheatplus.checks.blockplace.autosign:
+                description: Allow a player to create multiple signs with the same text
           nocheatplus.checks.chat:
             description: Allow the player to bypass all chat checks
             children:

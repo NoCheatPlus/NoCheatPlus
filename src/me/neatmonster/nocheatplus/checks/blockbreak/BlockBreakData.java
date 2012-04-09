@@ -15,8 +15,11 @@ public class BlockBreakData implements DataItem {
     public double               directionVL                = 0.0D;
     public double               noswingVL                  = 0.0D;
 
-    // Used the know when the player has broke his previous block
+    // Used to know when the player has broken his previous block
     public long                 lastBreakTime              = 0;
+
+    // Used to know if the previous event was refused
+    public boolean              previousRefused            = false;
 
     // Used for the penalty time feature of the direction check
     public long                 directionLastViolationTime = 0;

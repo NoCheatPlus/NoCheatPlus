@@ -53,6 +53,9 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.MOVING_RUNFLY_NOFALLAGGRESSIVE, true);
         set(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS, "log:nofall:0:5:cif cancel");
 
+        set(ConfPaths.MOVING_RUNFLY_TRACKER_CHECK, true);
+        set(ConfPaths.MOVING_RUNFLY_TRACKER_MAXTIME, 6000);
+
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS, false);
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE, true);
         set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL, 60);
@@ -74,8 +77,10 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         /*** BLOCKBREAK ***/
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALSURVIVAL, 45);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALCREATIVE, 145);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS,
-                "vl>200 cancel vl> 1000 log:bbfastbreak:2:5:cif cancel vl>400 log:bbfastbreak:3:5:cif cmd:kick cancel");
+                "cancel vl>100 log:bbfastbreak:3:5:cif cancel vl>2000 log:bbfastbreak:3:5:cif cmd:kick cancel");
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:bbreach:0:2:if cancel");
@@ -102,6 +107,11 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.BLOCKPLACE_DIRECTION_PRECISION, 75);
         set(ConfPaths.BLOCKPLACE_DIRECTION_PENALTYTIME, 100);
         set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bpdirection:0:3:if cancel");
+
+        set(ConfPaths.BLOCKPLACE_PROJECTILE_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_PROJECTILE_INTERVAL, 150);
+        set(ConfPaths.BLOCKPLACE_PROJECTILE_ACTIONS,
+                "cancel vl>150 log:bpprojectile:3:5:if cancel vl>1000 log:bpprojectile:3:5:cif cancel vl>4000 log:bpprojectile:3:5:cif cancel cmd:kick");
 
         /*** CHAT ***/
 
@@ -165,6 +175,8 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
                 "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations]");
         set(ConfPaths.STRINGS + ".bpdirection",
                 "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
+        set(ConfPaths.STRINGS + ".bpprojectile",
+                "[player] failed [check]: tried to throw items too quicly. VL [violations]");
         set(ConfPaths.STRINGS + ".color",
                 "[player] failed [check]: Sent colored chat message '[text]'. VL [violations]");
         set(ConfPaths.STRINGS + ".spam", "[player] failed [check]: Last sent message '[text]'. VL [violations]");

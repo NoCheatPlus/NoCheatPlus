@@ -13,9 +13,13 @@ public class BlockPlaceData implements DataItem {
     public double               fastPlaceVL                = 0.0D;
     public double               reachVL                    = 0.0D;
     public double               directionVL                = 0.0D;
+    public double               projectileVL               = 0.0D;
 
-    // Used the know when the player has placed his previous block
+    // Used to know when the player has placed his previous block
     public long                 lastPlaceTime              = 0;
+
+    // Used to know if the previous event was refused
+    public boolean              previousRefused            = false;
 
     // Used for the penalty time feature of the direction check
     public long                 directionLastViolationTime = 0;
@@ -28,4 +32,14 @@ public class BlockPlaceData implements DataItem {
     // For logging, remember the reachDistance that was calculated in the
     // reach check
     public double               reachdistance;
+
+    // Store the two previous signs' text
+    public String[]             lastSignText               = new String[] {"", "", "", ""};
+    public String[]             lastLastSignText           = new String[] {"", "", "", ""};
+
+    // Used to store the last time a projectile was thrown
+    public long                 lastProjectileTime         = 0;
+
+    // Used to know if the previous projectile-thrown-event was refused
+    public boolean              previousProjectileRefused  = false;
 }

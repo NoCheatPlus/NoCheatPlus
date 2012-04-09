@@ -27,6 +27,8 @@ public class Permissions {
     public static final String  BLOCKPLACE_FASTPLACE      = BLOCKPLACE + ".fastplace";
     public static final String  BLOCKPLACE_REACH          = BLOCKPLACE + ".reach";
     public static final String  BLOCKPLACE_DIRECTION      = BLOCKPLACE + ".direction";
+    public static final String  BLOCKPLACE_PROJECTILE     = BLOCKPLACE + ".projectile";
+    public static final String  BLOCKPLACE_AUTOSIGN       = BLOCKPLACE + ".autosign";
 
     private static final String CHAT                      = CHECKS + ".chat";
     public static final String  CHAT_SPAM                 = CHAT + ".spam";

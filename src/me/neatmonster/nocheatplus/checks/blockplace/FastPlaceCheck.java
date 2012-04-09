@@ -19,17 +19,22 @@ public class FastPlaceCheck extends BlockPlaceCheck {
 
         // Has the player placed blocks too quickly
         if (data.lastPlaceTime != 0 && System.currentTimeMillis() - data.lastPlaceTime < cc.fastPlaceInterval) {
-            // He failed, increase vl and statistics
-            data.fastPlaceVL += cc.fastPlaceInterval - System.currentTimeMillis() + data.lastPlaceTime;
-            incrementStatistics(player, Id.BP_FASTPLACE, cc.fastPlaceInterval - System.currentTimeMillis()
-                    + data.lastPlaceTime);
+            if (data.previousRefused) {
+                // He failed, increase vl and statistics
+                data.fastPlaceVL += cc.fastPlaceInterval - System.currentTimeMillis() + data.lastPlaceTime;
+                incrementStatistics(player, Id.BP_FASTPLACE, cc.fastPlaceInterval - System.currentTimeMillis()
+                        + data.lastPlaceTime);
 
-            // Execute whatever actions are associated with this check and the
-            // violation level and find out if we should cancel the event
-            cancel = executeActions(player, cc.fastPlaceActions, data.fastPlaceVL);
-        } else
+                // Execute whatever actions are associated with this check and the
+                // violation level and find out if we should cancel the event
+                cancel = executeActions(player, cc.fastPlaceActions, data.fastPlaceVL);
+            }
+            data.previousRefused = true;
+        } else {
             // Reward with lowering of the violation level
             data.fastPlaceVL *= 0.90D;
+            data.previousRefused = false;
+        }
 
         data.lastPlaceTime = System.currentTimeMillis();
 

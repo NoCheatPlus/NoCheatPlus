@@ -42,6 +42,9 @@ public class MovingData implements DataItem {
     public float                 fallDistance;
     public float                 lastAddedFallDistance;
 
+    // Keep in mind since when the player in falling/jumping
+    public long                  fallingSince             = 0L;
+
     // Keep track of when "morePackets" last time checked and how much packets
     // a player sent and may send before failing the check
     public long                  morePacketsLastTime;

@@ -27,6 +27,10 @@ public class BlockPlaceConfig implements ConfigItem {
     public final long       directionPenaltyTime;
     public final double     directionPrecision;
 
+    public final boolean    projectileCheck;
+    public final int        projectileInterval;
+    public final ActionList projectileActions;
+
     public BlockPlaceConfig(final NoCheatPlusConfiguration data) {
 
         fastPlaceCheck = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK);
@@ -41,5 +45,10 @@ public class BlockPlaceConfig implements ConfigItem {
         directionPenaltyTime = data.getInt(ConfPaths.BLOCKPLACE_DIRECTION_PENALTYTIME);
         directionPrecision = data.getInt(ConfPaths.BLOCKPLACE_DIRECTION_PRECISION) / 100D;
         directionActions = data.getActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
+
+        projectileCheck = data.getBoolean(ConfPaths.BLOCKPLACE_PROJECTILE_CHECK);
+        projectileInterval = data.getInt(ConfPaths.BLOCKPLACE_PROJECTILE_INTERVAL);
+        projectileActions = data.getActionList(ConfPaths.BLOCKPLACE_PROJECTILE_ACTIONS,
+                Permissions.BLOCKPLACE_PROJECTILE);
     }
 }

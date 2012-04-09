@@ -22,6 +22,10 @@ public class MovingConfig implements ConfigItem {
     public final boolean    sneakingCheck;
     public final double     sneakingSpeedLimit;
     public final ActionList actions;
+
+    public final boolean    tracker;
+    public final int        maxtime;
+
     public final boolean    allowFlying;
     public final double     flyingSpeedLimitVertical;
     public final double     flyingSpeedLimitHorizontal;
@@ -61,6 +65,9 @@ public class MovingConfig implements ConfigItem {
 
         sneakingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING);
         actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS, Permissions.MOVING_RUNFLY);
+
+        tracker = data.getBoolean(ConfPaths.MOVING_RUNFLY_TRACKER_CHECK);
+        maxtime = data.getInt(ConfPaths.MOVING_RUNFLY_TRACKER_MAXTIME);
 
         allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);
         flyingSpeedLimitVertical = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL) / 100D;

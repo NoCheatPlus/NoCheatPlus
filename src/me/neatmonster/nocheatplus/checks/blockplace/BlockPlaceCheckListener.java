@@ -9,10 +9,17 @@ import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
  * Central location to listen to Block-related events and dispatching them to
@@ -21,10 +28,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
  */
 public class BlockPlaceCheckListener implements Listener, EventManager {
 
-    private final FastPlaceCheck fastPlaceCheck;
-    private final ReachCheck     reachCheck;
-    private final DirectionCheck directionCheck;
-    private final NoCheatPlus    plugin;
+    private final FastPlaceCheck  fastPlaceCheck;
+    private final ReachCheck      reachCheck;
+    private final DirectionCheck  directionCheck;
+    private final ProjectileCheck projectileCheck;
+    private final NoCheatPlus     plugin;
 
     public BlockPlaceCheckListener(final NoCheatPlus plugin) {
 
@@ -33,6 +41,7 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
         fastPlaceCheck = new FastPlaceCheck(plugin);
         reachCheck = new ReachCheck(plugin);
         directionCheck = new DirectionCheck(plugin);
+        projectileCheck = new ProjectileCheck(plugin);
     }
 
     @Override
@@ -91,5 +100,81 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
         // If one of the checks requested to cancel the event, do so
         if (cancelled)
             event.setCancelled(cancelled);
+    }
+
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void monsterEgg(final PlayerInteractEvent event) {
+
+        // We are only interested by monster eggs
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().getItemInHand() == null
+                || event.getPlayer().getItemInHand().getType() != Material.MONSTER_EGG)
+            return;
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final BlockPlaceConfig cc = BlockPlaceCheck.getConfig(player);
+        final BlockPlaceData data = BlockPlaceCheck.getData(player);
+
+        // Do the actual check
+        if (cc.projectileCheck && !player.hasPermission(Permissions.BLOCKPLACE_PROJECTILE)
+                && projectileCheck.check(player, data, cc))
+            // If the check is positive, cancel the event
+            event.setCancelled(true);
+    }
+
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void otherProjectiles(final ProjectileLaunchEvent event) {
+
+        // We are only interested by enderpears, endersignals, eggs, snowballs and expbottles
+        if (event.getEntityType() != EntityType.ENDER_PEARL && event.getEntityType() != EntityType.ENDER_SIGNAL
+                && event.getEntityType() != EntityType.EGG && event.getEntityType() != EntityType.SNOWBALL
+                && event.getEntityType() != EntityType.THROWN_EXP_BOTTLE)
+            return;
+
+        final NoCheatPlusPlayer player = plugin.getPlayer((Player) event.getEntity().getShooter());
+        final BlockPlaceConfig cc = BlockPlaceCheck.getConfig(player);
+        final BlockPlaceData data = BlockPlaceCheck.getData(player);
+
+        // Do the actual check
+        if (cc.projectileCheck && !player.hasPermission(Permissions.BLOCKPLACE_PROJECTILE)
+                && projectileCheck.check(player, data, cc))
+            // If the check is positive, cancel the event
+            event.setCancelled(true);
+    }
+
+    /**
+     * If the player places three times the same sign,
+     * the sign will be destroyed and looted
+     * 
+     * @param event
+     *            the SignChange event
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void sign(final SignChangeEvent event) {
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final BlockPlaceData data = BlockPlaceCheck.getData(player);
+
+        // Check if the text is the same
+        if (!event.getPlayer().hasPermission(Permissions.BLOCKPLACE_AUTOSIGN)
+                && event.getLine(0).equals(data.lastSignText[0]) && event.getLine(1).equals(data.lastSignText[1])
+                && event.getLine(2).equals(data.lastSignText[2]) && event.getLine(3).equals(data.lastSignText[3])
+                && data.lastSignText[0].equals(data.lastLastSignText[0])
+                && data.lastSignText[1].equals(data.lastLastSignText[1])
+                && data.lastSignText[2].equals(data.lastLastSignText[2])
+                && data.lastSignText[3].equals(data.lastLastSignText[3]))
+            event.getBlock().breakNaturally();
+
+        // Save the text
+        data.lastLastSignText[3] = data.lastSignText[3];
+        data.lastLastSignText[2] = data.lastSignText[2];
+        data.lastLastSignText[1] = data.lastSignText[1];
+        data.lastLastSignText[0] = data.lastSignText[0];
+        data.lastSignText[3] = event.getLine(3);
+        data.lastSignText[2] = event.getLine(2);
+        data.lastSignText[1] = event.getLine(1);
+        data.lastSignText[0] = event.getLine(0);
     }
 }

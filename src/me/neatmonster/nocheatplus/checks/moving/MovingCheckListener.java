@@ -11,6 +11,8 @@ import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 import me.neatmonster.nocheatplus.data.PreciseLocation;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -54,6 +56,52 @@ public class MovingCheckListener implements Listener, EventManager {
         morePacketsCheck = new MorePacketsCheck(plugin);
         morePacketsVehicleCheck = new MorePacketsVehicleCheck(plugin);
         waterWalkCheck = new WaterWalkCheck(plugin);
+
+        // Schedule a new synchronized repeating task repeated 20 times/s.
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+
+            @Override
+            public void run() {
+
+                for (final Player bukkitPlayer : Bukkit.getOnlinePlayers()) {
+
+                    // Get some data about the player/config
+                    final NoCheatPlusPlayer player = plugin.getPlayer(bukkitPlayer);
+                    final MovingConfig cc = MovingCheck.getConfig(player);
+                    final MovingData data = MovingCheck.getData(player);
+
+                    // Do not do the check if it's disabled, if flying is allowed, if the player is
+                    // allowed to fly because of its game mode or if he has the required permission.
+                    if (!cc.tracker || cc.allowFlying || bukkitPlayer.getGameMode() == GameMode.CREATIVE
+                            || bukkitPlayer.getAllowFlight() || bukkitPlayer.hasPermission(Permissions.MOVING_RUNFLY))
+                        return;
+
+                    // If the player is in water or in vines, then do not run the check
+                    if (bukkitPlayer.getLocation().getBlock().getType() == Material.WATER
+                            || bukkitPlayer.getLocation().getBlock().getType() == Material.STATIONARY_WATER
+                            || bukkitPlayer.getLocation().getBlock().getType() == Material.VINE)
+                        return;
+
+                    // If the player isn't falling or jumping
+                    if (Math.abs(bukkitPlayer.getVelocity().getY()) > 0.1D) {
+
+                        // The player is falling/jumping, check if he was previously on the ground
+                        if (data.fallingSince == 0)
+                            data.fallingSince = System.currentTimeMillis();
+
+                        // Check if he has stayed too much time in the air
+                        else if (System.currentTimeMillis() - data.fallingSince > cc.maxtime) {
+                            // He has, so now kick it
+                            bukkitPlayer.kickPlayer("Flying isn't enabled on this server!");
+                            data.fallingSince = 0;
+                        }
+                    } else // The player isn't falling/jumping, check if he was previous on the air
+                    if (data.fallingSince > 0)
+                        // Reset the timer
+                        data.fallingSince = 0;
+                }
+            }
+        }, 1L, 1L);
 
         this.plugin = plugin;
     }
@@ -187,7 +235,8 @@ public class MovingCheckListener implements Listener, EventManager {
             newTo = runningCheck.check(player, data, cc);
 
         /** WATERWALK CHECK SECTION **/
-        if (newTo == null && cc.waterWalkCheck && (!player.isCreative() || !cc.identifyCreativeMode)
+        if (newTo == null && cc.waterWalkCheck && !cc.allowFlying && (!player.isCreative() || !cc.identifyCreativeMode)
+                && (!cc.runflyCheck || !player.hasPermission(Permissions.MOVING_FLYING))
                 && !player.hasPermission(Permissions.MOVING_WATERWALK))
             newTo = waterWalkCheck.check(player, data, cc);
 

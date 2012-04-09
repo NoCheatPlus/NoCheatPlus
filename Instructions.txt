@@ -240,6 +240,15 @@
 
  - nocheatplus.checks.blockplace.direction
     Don't force players to look at the blocks that they try to place.
+ 
+ - nocheatplus.checks.blockplace.projectile
+   Allows the player to throw projectiles very quickly, like expbottles, eggs,
+   monster eggs, eyes of ender, ender pearls. This is usually used by griefers
+   to level up very quickly or to crash the server by spawning too much mobs.
+   
+ - nocheatplus.checks.blockplace.autosign
+   Allows the player to place multiple signs with the same text. This is usually
+   used by griefers to place quickly a lot of signs with their signature.
 
 
 --------------------- INVENTORY Permissions for CHECKS -------------------------
@@ -597,6 +606,20 @@
         fall distance in blocks that the player tried to avoid. It gets
         increased every time that the player fails the check, and decreased 
         over time if the player doesn't fail the check.
+        
+      TRACKER:
+        This is an entire subsection dedicated to a recently introduced check
+        specially designed to prevent players from staying in the air longer
+        than a defined value.
+        
+         active:
+           Should players get checked for this type of movement related hacks at 
+           all. If deactivated, player may stay in the air without being noticed
+           by NoCheat+.
+           
+         maxtime:
+           The maximum interval (in milliseconds) before kicking the player who
+           flies (it takes less than 6000 ms to fall from Y = 256 to Y = 0);
 
       FLYING:
         This is an entire subsection dedicated to the "moving.flying" check.
@@ -837,7 +860,7 @@
      combined with placing a lot of blocks in a certain shape.
 
       active:
-        Should players get checked for this type of hack
+        Should players get checked for this type of hack.
 
       precision:
         How strict should NoCheatPlus be when comparing the players line of view 
@@ -859,6 +882,26 @@
         the distance in Blocks between the line of view of the player and the
         block. It increases with every failure and decreases with every 
         successful block placement.
+        
+ 4) PROJECTILE
+ 
+      Players may throw projectiles (experience bottles, eggs, monster eggs, 
+      eyes of ender, ender pearls) really quickly in order to crash the server.
+      
+       active:
+        Should players get checked for this type of hack.
+        
+       interval:
+        The time (in milliseconds) between each thrown projectile. It takes
+        more than 150 ms if the player is keeping its right button pressed.
+        
+       actions:
+        What should happen if a player fails this check. Default is to prevent
+        the placing of the block ("cancel" it) and after repeated/more severe
+        offenses to log a message and kick the player. The Violation Level (VL)
+        for this check is the interval elapsed subtracted to the interval defined
+        in the configuration's file; It increases with every failure and decreases
+        with every successfully thrown projectile.
 
 
 ------------------------------- CHAT Subsection --------------------------------

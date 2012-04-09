@@ -15,6 +15,8 @@ import me.neatmonster.nocheatplus.config.Permissions;
 public class BlockBreakConfig implements ConfigItem {
 
     public final boolean    fastBreakCheck;
+    public final int        fastBreakIntervalSurvival;
+    public final int        fastBreakIntervalCreative;
     public final ActionList fastBreakActions;
 
     public final boolean    reachCheck;
@@ -32,6 +34,8 @@ public class BlockBreakConfig implements ConfigItem {
     public BlockBreakConfig(final NoCheatPlusConfiguration data) {
 
         fastBreakCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK);
+        fastBreakIntervalSurvival = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALSURVIVAL);
+        fastBreakIntervalCreative = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALCREATIVE);
         fastBreakActions = data.getActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);
         reachCheck = data.getBoolean(ConfPaths.BLOCKBREAK_REACH_CHECK);
         reachDistance = 535D / 100D;

@@ -57,6 +57,10 @@ public abstract class ConfPaths {
     public final static String  MOVING_RUNFLY_NOFALLAGGRESSIVE            = MOVING_RUNFLY + "nofallaggressivemode";
     public final static String  MOVING_RUNFLY_NOFALLACTIONS               = MOVING_RUNFLY + "nofallactions";
 
+    private final static String MOVING_RUNFLY_TRACKER                     = MOVING_RUNFLY + "tracker.";
+    public final static String  MOVING_RUNFLY_TRACKER_CHECK               = MOVING_RUNFLY_TRACKER + "active";
+    public final static String  MOVING_RUNFLY_TRACKER_MAXTIME             = MOVING_RUNFLY_TRACKER + "maxtime";
+
     private final static String MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";
     public final static String  MOVING_RUNFLY_FLYING_ALLOWALWAYS          = MOVING_RUNFLY_FLYING + "allowflyingalways";
     public final static String  MOVING_RUNFLY_FLYING_ALLOWINCREATIVE      = MOVING_RUNFLY_FLYING
@@ -84,6 +88,8 @@ public abstract class ConfPaths {
 
     private final static String BLOCKBREAK_FASTBREAK                      = BLOCKBREAK + "fastbreak.";
     public final static String  BLOCKBREAK_FASTBREAK_CHECK                = BLOCKBREAK_FASTBREAK + "active";
+    public final static String  BLOCKBREAK_FASTBREAK_INTERVALSURVIVAL     = BLOCKBREAK_FASTBREAK + "intervalsurvival";
+    public final static String  BLOCKBREAK_FASTBREAK_INTERVALCREATIVE     = BLOCKBREAK_FASTBREAK + "intervalcreative";
     public final static String  BLOCKBREAK_FASTBREAK_ACTIONS              = BLOCKBREAK_FASTBREAK + "actions";
 
     private final static String BLOCKBREAK_REACH                          = BLOCKBREAK + "reach.";
@@ -116,6 +122,11 @@ public abstract class ConfPaths {
     public final static String  BLOCKPLACE_DIRECTION_PRECISION            = BLOCKPLACE_DIRECTION + "precision";
     public final static String  BLOCKPLACE_DIRECTION_PENALTYTIME          = BLOCKPLACE_DIRECTION + "penaltytime";
     public final static String  BLOCKPLACE_DIRECTION_ACTIONS              = BLOCKPLACE_DIRECTION + "actions";
+
+    private final static String BLOCKPLACE_PROJECTILE                     = BLOCKPLACE + "projectile.";
+    public final static String  BLOCKPLACE_PROJECTILE_CHECK               = BLOCKPLACE_PROJECTILE + "active";
+    public final static String  BLOCKPLACE_PROJECTILE_INTERVAL            = BLOCKPLACE_PROJECTILE + "interval";
+    public final static String  BLOCKPLACE_PROJECTILE_ACTIONS             = BLOCKPLACE_PROJECTILE + "actions";
 
     private final static String CHAT                                      = CHECKS + "chat.";
 
