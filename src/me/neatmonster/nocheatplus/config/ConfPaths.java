@@ -142,6 +142,13 @@ public abstract class ConfPaths {
     public final static String  CHAT_SPAM_COMMANDLIMIT                    = CHAT_SPAM + "commandlimit";
     public final static String  CHAT_SPAM_ACTIONS                         = CHAT_SPAM + "actions";
 
+    private final static String CHAT_SPAMJOINS                            = CHAT + "spamjoins.";
+    public final static String  CHAT_SPAMJOINS_CHECK                      = CHAT_SPAMJOINS + "active";
+    public final static String  CHAT_SPAMJOINS_PLAYERSLIMIT               = CHAT_SPAMJOINS + "playerslimit";
+    public final static String  CHAT_SPAMJOINS_TIMELIMIT                  = CHAT_SPAMJOINS + "timelimit";
+    public final static String  CHAT_SPAMJOINS_COOLDOWN                   = CHAT_SPAMJOINS + "cooldown";
+    public final static String  CHAT_SPAMJOINS_KICKMESSAGE                = CHAT_SPAMJOINS + "kickmessage";
+
     private final static String FIGHT                                     = CHECKS + "fight.";
 
     private final static String FIGHT_DIRECTION                           = FIGHT + "direction.";

@@ -56,6 +56,8 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
             s.add("blockplace.reach");
         if (bp.directionCheck)
             s.add("blockplace.direction");
+        if (bp.projectileCheck)
+            s.add("blockplace.projectileCheck");
 
         return s;
     }
@@ -127,8 +129,10 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
     public void otherProjectiles(final ProjectileLaunchEvent event) {
 
         // We are only interested by enderpears, endersignals, eggs, snowballs and expbottles
-        if (event.getEntityType() != EntityType.ENDER_PEARL && event.getEntityType() != EntityType.ENDER_SIGNAL
-                && event.getEntityType() != EntityType.EGG && event.getEntityType() != EntityType.SNOWBALL
+        // of course thrown by a player
+        if (!(event.getEntity().getShooter() instanceof Player) || event.getEntityType() != EntityType.ENDER_PEARL
+                && event.getEntityType() != EntityType.ENDER_SIGNAL && event.getEntityType() != EntityType.EGG
+                && event.getEntityType() != EntityType.SNOWBALL
                 && event.getEntityType() != EntityType.THROWN_EXP_BOTTLE)
             return;
 

@@ -14,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 /**
  * Central location to listen to events that are
@@ -22,16 +23,18 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
  */
 public class ChatCheckListener implements Listener, EventManager {
 
-    private final SpamCheck   spamCheck;
-    private final ColorCheck  colorCheck;
+    private final SpamCheck      spamCheck;
+    private final SpamJoinsCheck spamJoinsCheck;
+    private final ColorCheck     colorCheck;
 
-    private final NoCheatPlus plugin;
+    private final NoCheatPlus    plugin;
 
     public ChatCheckListener(final NoCheatPlus plugin) {
 
         this.plugin = plugin;
 
         spamCheck = new SpamCheck(plugin);
+        spamJoinsCheck = new SpamJoinsCheck(plugin);
         colorCheck = new ColorCheck(plugin);
     }
 
@@ -95,8 +98,27 @@ public class ChatCheckListener implements Listener, EventManager {
         final ChatConfig c = ChatCheck.getConfig(cc);
         if (c.spamCheck)
             s.add("chat.spam");
+        if (c.spamJoinsCheck)
+            s.add("chat.spamjoins");
         if (c.colorCheck)
             s.add("chat.color");
         return s;
+    }
+
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void join(final PlayerJoinEvent event) {
+
+        // Only check new players (who has joined less than 10 minutes ago)
+        if (System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > 600000L)
+            return;
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final ChatConfig cc = ChatCheck.getConfig(player);
+        final ChatData data = ChatCheck.getData(player);
+
+        if (cc.spamJoinsCheck && spamJoinsCheck.check(player, data, cc))
+            // If the player failed the check, kick it
+            event.getPlayer().kickPlayer(cc.spamJoinsKickMessage);
     }
 }

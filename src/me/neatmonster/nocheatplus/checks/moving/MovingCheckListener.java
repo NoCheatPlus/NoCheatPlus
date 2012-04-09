@@ -71,19 +71,17 @@ public class MovingCheckListener implements Listener, EventManager {
                     final MovingData data = MovingCheck.getData(player);
 
                     // Do not do the check if it's disabled, if flying is allowed, if the player is
-                    // allowed to fly because of its game mode or if he has the required permission.
+                    // allowed to fly because of its game mode, if he has the required permission,
+                    // if he is in water or in vines.
                     if (!cc.tracker || cc.allowFlying || bukkitPlayer.getGameMode() == GameMode.CREATIVE
-                            || bukkitPlayer.getAllowFlight() || bukkitPlayer.hasPermission(Permissions.MOVING_RUNFLY)) {
-                        data.fallingSince = 0;
-                        return;
-                    }
-
-                    // If the player is in water or in vines, then do not run the check
-                    if (bukkitPlayer.getLocation().getBlock().getType() == Material.WATER
+                            || bukkitPlayer.getAllowFlight() || bukkitPlayer.hasPermission(Permissions.MOVING_RUNFLY)
+                            || bukkitPlayer.hasPermission(Permissions.MOVING_FLYING)
+                            || bukkitPlayer.getLocation().getBlock().getType() == Material.WATER
                             || bukkitPlayer.getLocation().getBlock().getType() == Material.STATIONARY_WATER
+                            || bukkitPlayer.getLocation().getBlock().getType() == Material.LADDER
                             || bukkitPlayer.getLocation().getBlock().getType() == Material.VINE) {
                         data.fallingSince = 0;
-                        return;
+                        continue;
                     }
 
                     // If the player isn't falling or jumping
@@ -176,10 +174,14 @@ public class MovingCheckListener implements Listener, EventManager {
                     s.add("moving.sneaking");
                 if (m.nofallCheck)
                     s.add("moving.nofall");
+                if (m.waterWalkCheck)
+                    s.add("moving.waterwalk");
             } else
                 s.add("moving.flying");
         if (m.morePacketsCheck)
             s.add("moving.morepackets");
+        if (m.morePacketsVehicleCheck)
+            s.add("moving.morepacketsvehicle");
 
         return s;
     }

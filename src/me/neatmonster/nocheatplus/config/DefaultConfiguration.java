@@ -125,6 +125,12 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.CHAT_SPAM_COMMANDLIMIT, 12);
         set(ConfPaths.CHAT_SPAM_ACTIONS, "log:spam:0:3:if cancel vl>30 log:spam:0:3:cif cancel cmd:kick");
 
+        set(ConfPaths.CHAT_SPAMJOINS_CHECK, true);
+        set(ConfPaths.CHAT_SPAMJOINS_PLAYERSLIMIT, 3);
+        set(ConfPaths.CHAT_SPAMJOINS_TIMELIMIT, 5000);
+        set(ConfPaths.CHAT_SPAMJOINS_COOLDOWN, 5000);
+        set(ConfPaths.CHAT_SPAMJOINS_KICKMESSAGE, "SpamBot?!");
+
         /*** FIGHT ***/
 
         set(ConfPaths.FIGHT_DIRECTION_CHECK, true);

@@ -10,6 +10,7 @@ public class ChatData implements DataItem {
 
     // Keep track of the violation levels for the two checks
     public int    spamVL;
+    public int    spamJoinsVL;
     public int    colorVL;
 
     // Count messages and commands

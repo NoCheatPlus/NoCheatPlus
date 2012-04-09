@@ -24,6 +24,12 @@ public class ChatConfig implements ConfigItem {
     public final int        spamCommandLimit;
     public final ActionList spamActions;
 
+    public final boolean    spamJoinsCheck;
+    public final int        spamJoinsPlayersLimit;
+    public final int        spamJoinsTimeLimit;
+    public final int        spamJoinsCooldown;
+    public final String     spamJoinsKickMessage;
+
     public final boolean    colorCheck;
     public final ActionList colorActions;
 
@@ -35,6 +41,11 @@ public class ChatConfig implements ConfigItem {
         spamMessageLimit = data.getInt(ConfPaths.CHAT_SPAM_MESSAGELIMIT);
         spamCommandLimit = data.getInt(ConfPaths.CHAT_SPAM_COMMANDLIMIT);
         spamActions = data.getActionList(ConfPaths.CHAT_SPAM_ACTIONS, Permissions.CHAT_SPAM);
+        spamJoinsCheck = data.getBoolean(ConfPaths.CHAT_SPAMJOINS_CHECK);
+        spamJoinsPlayersLimit = data.getInt(ConfPaths.CHAT_SPAMJOINS_PLAYERSLIMIT);
+        spamJoinsTimeLimit = data.getInt(ConfPaths.CHAT_SPAMJOINS_TIMELIMIT);
+        spamJoinsCooldown = data.getInt(ConfPaths.CHAT_SPAMJOINS_COOLDOWN);
+        spamJoinsKickMessage = data.getString(ConfPaths.CHAT_SPAMJOINS_KICKMESSAGE);
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
     }

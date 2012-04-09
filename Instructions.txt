@@ -961,6 +961,26 @@
         number of messages/commands that were sent beyond the specified limits.
         It gets increased for every message/command by 1 and reset to zero when
         the "timeframe" has passed.
+        
+ 3) SPAMJOINS:
+
+     This check limits the number of new players joining every X seconds to
+     prevent the usage of softwares like PWN4G3.
+     
+      active:
+       Should players get checked for that kind of spam.
+       
+      playerslimit:
+       The number of new players allowed to join during the interval defined
+       in the configuration.
+       
+      timelimit:
+       The interval in milliseconds during which the number of new players
+       defined in the configuration are allowed to join.
+       
+      cooldown:
+       The number of milliseconds during which new players won't be allowed
+       to join if too many new players have been detected.
 
 
 ------------------------------ FIGHT Subsection --------------------------------
