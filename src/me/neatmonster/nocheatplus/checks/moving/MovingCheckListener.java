@@ -73,14 +73,18 @@ public class MovingCheckListener implements Listener, EventManager {
                     // Do not do the check if it's disabled, if flying is allowed, if the player is
                     // allowed to fly because of its game mode or if he has the required permission.
                     if (!cc.tracker || cc.allowFlying || bukkitPlayer.getGameMode() == GameMode.CREATIVE
-                            || bukkitPlayer.getAllowFlight() || bukkitPlayer.hasPermission(Permissions.MOVING_RUNFLY))
+                            || bukkitPlayer.getAllowFlight() || bukkitPlayer.hasPermission(Permissions.MOVING_RUNFLY)) {
+                        data.fallingSince = 0;
                         return;
+                    }
 
                     // If the player is in water or in vines, then do not run the check
                     if (bukkitPlayer.getLocation().getBlock().getType() == Material.WATER
                             || bukkitPlayer.getLocation().getBlock().getType() == Material.STATIONARY_WATER
-                            || bukkitPlayer.getLocation().getBlock().getType() == Material.VINE)
+                            || bukkitPlayer.getLocation().getBlock().getType() == Material.VINE) {
+                        data.fallingSince = 0;
                         return;
+                    }
 
                     // If the player isn't falling or jumping
                     if (Math.abs(bukkitPlayer.getVelocity().getY()) > 0.1D) {
@@ -95,8 +99,7 @@ public class MovingCheckListener implements Listener, EventManager {
                             bukkitPlayer.kickPlayer("Flying isn't enabled on this server!");
                             data.fallingSince = 0;
                         }
-                    } else // The player isn't falling/jumping, check if he was previous on the air
-                    if (data.fallingSince > 0)
+                    } else
                         // Reset the timer
                         data.fallingSince = 0;
                 }

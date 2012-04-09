@@ -141,6 +141,10 @@ public class BlockBreakCheckListener implements Listener, EventManager {
             ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void blockInteract(final PlayerInteractEvent event) {
 
+        // Do not care about null blocks
+        if (event.getClickedBlock() == null)
+            return;
+
         final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
         final BlockBreakData data = BlockBreakCheck.getData(player);
         // Remember this location. Only blockbreakevents for this specific
