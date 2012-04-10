@@ -907,6 +907,12 @@
 ------------------------------- CHAT Subsection --------------------------------
 
  Checks that at least technically have to do with chat or commands.
+ 
+  hidenocheatplus:
+    
+    Setting this to true will hide NoCheatPlus for the /plugins (or /pl) command
+    of Bukkit (only if typed by a player). This command might be used by some
+    griefing clients to try to detect and to apply bypasses to NoCheatPlus.
 
  1) COLOR:
 

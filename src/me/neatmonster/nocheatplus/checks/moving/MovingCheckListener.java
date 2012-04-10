@@ -70,16 +70,22 @@ public class MovingCheckListener implements Listener, EventManager {
                     final MovingConfig cc = MovingCheck.getConfig(player);
                     final MovingData data = MovingCheck.getData(player);
 
+                    final PreciseLocation location = new PreciseLocation();
+                    location.x = bukkitPlayer.getLocation().getX();
+                    location.y = bukkitPlayer.getLocation().getY();
+                    location.z = bukkitPlayer.getLocation().getZ();
+                    final int type = CheckUtil.evaluateLocation(bukkitPlayer.getWorld(), location);
+                    final boolean isLiquid = CheckUtil.isLiquid(type);
+
                     // Do not do the check if it's disabled, if flying is allowed, if the player is
                     // allowed to fly because of its game mode, if he has the required permission,
                     // if he is in water or in vines.
                     if (!cc.tracker || cc.allowFlying || bukkitPlayer.getGameMode() == GameMode.CREATIVE
                             || bukkitPlayer.getAllowFlight() || bukkitPlayer.hasPermission(Permissions.MOVING_RUNFLY)
-                            || bukkitPlayer.hasPermission(Permissions.MOVING_FLYING)
-                            || bukkitPlayer.getLocation().getBlock().getType() == Material.WATER
-                            || bukkitPlayer.getLocation().getBlock().getType() == Material.STATIONARY_WATER
+                            || bukkitPlayer.hasPermission(Permissions.MOVING_FLYING) || isLiquid
                             || bukkitPlayer.getLocation().getBlock().getType() == Material.LADDER
-                            || bukkitPlayer.getLocation().getBlock().getType() == Material.VINE) {
+                            || bukkitPlayer.getLocation().getBlock().getType() == Material.VINE
+                            || bukkitPlayer.getLocation().getX() < 0D) {
                         data.fallingSince = 0;
                         continue;
                     }

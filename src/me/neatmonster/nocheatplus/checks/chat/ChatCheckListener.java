@@ -9,12 +9,15 @@ import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Central location to listen to events that are
@@ -86,6 +89,46 @@ public class ChatCheckListener implements Listener, EventManager {
     @EventHandler(
             priority = EventPriority.LOWEST)
     public void commandPreprocess(final PlayerCommandPreprocessEvent event) {
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final ChatConfig cc = ChatCheck.getConfig(player);
+
+        // If the command is /plugins or /pl
+        if ((event.getMessage().equalsIgnoreCase("/plugins")
+                || event.getMessage().toLowerCase().startsWith("/plugins ")
+                || event.getMessage().equalsIgnoreCase("/pl") || event.getMessage().toLowerCase().startsWith("/pl "))
+                && cc.hideNoCheatPlus) {
+            // If the player isn't allowed to use this command
+            if (!event.getPlayer().hasPermission("bukkit.command.plugins"))
+                // Fake the permissions error message
+                event.getPlayer().sendMessage(
+                        ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
+                                + "Please contact the server administrators if you believe that this is in error.");
+            else {
+                // Fake the plugins list
+                final StringBuilder pluginList = new StringBuilder();
+                final Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
+
+                for (final Plugin plugin : plugins) {
+                    // But make sure to hide NoCheatPlus
+                    if (plugin.getName().equals("NoCheatPlus"))
+                        continue;
+                    if (pluginList.length() > 0) {
+                        pluginList.append(ChatColor.WHITE);
+                        pluginList.append(", ");
+                    }
+
+                    pluginList.append(plugin.isEnabled() ? ChatColor.GREEN : ChatColor.RED);
+                    pluginList.append(plugin.getDescription().getName());
+                }
+
+                // Of course decrease the number of plugins
+                event.getPlayer().sendMessage("Plugins (" + (plugins.length - 1) + "): " + pluginList.toString());
+            }
+            // Cancel the event, we have already replied to the player
+            event.setCancelled(true);
+        }
+
         // This type of event is derived from PlayerChatEvent, therefore
         // just treat it like that
         chat(event);

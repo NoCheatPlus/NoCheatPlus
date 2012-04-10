@@ -130,6 +130,8 @@ public abstract class ConfPaths {
 
     private final static String CHAT                                      = CHECKS + "chat.";
 
+    public final static String  CHAT_HIDENOCHEATPLUS                      = CHAT + "hidenocheatplus";
+
     private final static String CHAT_COLOR                                = CHAT + "color.";
     public final static String  CHAT_COLOR_CHECK                          = CHAT_COLOR + "active";
     public final static String  CHAT_COLOR_ACTIONS                        = CHAT_COLOR + "actions";

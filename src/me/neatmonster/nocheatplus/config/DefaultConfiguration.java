@@ -115,6 +115,8 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         /*** CHAT ***/
 
+        set(ConfPaths.CHAT_HIDENOCHEATPLUS, true);
+
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
 

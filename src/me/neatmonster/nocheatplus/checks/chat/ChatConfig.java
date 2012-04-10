@@ -17,6 +17,8 @@ import me.neatmonster.nocheatplus.config.Permissions;
  */
 public class ChatConfig implements ConfigItem {
 
+    public final boolean    hideNoCheatPlus;
+
     public final boolean    spamCheck;
     public final String[]   spamWhitelist;
     public final long       spamTimeframe;
@@ -35,6 +37,7 @@ public class ChatConfig implements ConfigItem {
 
     public ChatConfig(final NoCheatPlusConfiguration data) {
 
+        hideNoCheatPlus = data.getBoolean(ConfPaths.CHAT_HIDENOCHEATPLUS);
         spamCheck = data.getBoolean(ConfPaths.CHAT_SPAM_CHECK);
         spamWhitelist = splitWhitelist(data.getString(ConfPaths.CHAT_SPAM_WHITELIST));
         spamTimeframe = data.getInt(ConfPaths.CHAT_SPAM_TIMEFRAME) * 1000L;
