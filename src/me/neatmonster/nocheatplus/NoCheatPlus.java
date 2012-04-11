@@ -198,8 +198,8 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Disable Zombe's noclip
         if (!player.hasPermission(Permissions.ZOMBE_NOCLIP))
             message = message + "§f §f §4 §0 §9 §6";
-        // Disable Zombe's cheats
-        if (!player.hasPermission(Permissions.ZOMBE_CHEATS))
+        // Disable Zombe's cheat
+        if (!player.hasPermission(Permissions.ZOMBE_CHEAT))
             message = message + "§f §f §2 §0 §4 §8";
         // Disable CJB's fly mod
         if (!player.hasPermission(Permissions.CJB_FLY))
@@ -207,8 +207,8 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Disable CJB's xray
         if (!player.hasPermission(Permissions.CJB_XRAY))
             message = message + "§3 §9 §2 §0 §0 §2";
-        // Disable CJB's minimap
-        if (!player.hasPermission(Permissions.CJB_MINIMAP))
+        // Disable CJB's radar
+        if (!player.hasPermission(Permissions.CJB_RADAR))
             message = message + "§3 §9 §2 §0 §0 §3";
         // Disable Rei's Minimap's cave mode
         if (player.hasPermission(Permissions.REI_CAVE))
@@ -216,9 +216,33 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Disable Rei's Minimap's radar
         if (player.hasPermission(Permissions.REI_RADAR))
             message = message + "§0§0§2§3§4§5§6§7§e§f";
-        // Disable Minecraft AutoMap's cheats
-        if (!player.hasPermission(Permissions.MC_AUTOMAP))
-            message = message + "§0§0§1§2§3§4§5§6§7§8§f§e";
+        // Disable Minecraft AutoMap's ores
+        if (!player.hasPermission(Permissions.MINECRAFTAUTOMAP_ORES))
+            message = message + "§0§0§1§f§e";
+        // Disable Minecraft AutoMap's cave mode
+        if (!player.hasPermission(Permissions.MINECRAFTAUTOMAP_CAVE))
+            message = message + "§0§0§2§f§e";
+        // Disable Minecraft AutoMap's radar
+        if (!player.hasPermission(Permissions.MINECRAFTAUTOMAP_RADAR))
+            message = message + "§0§0§3§4§5§6§7§8§f§e";
+        // Disable Smart Moving's climbing
+        if (!player.hasPermission(Permissions.SMARTMOVING_CLIMBING))
+            message = message + "§0§1§0§1§2§f§f";
+        // Disable Smart Moving's climbing
+        if (!player.hasPermission(Permissions.SMARTMOVING_SWIMMING))
+            message = message + "§0§1§3§4§f§f";
+        // Disable Smart Moving's climbing
+        if (!player.hasPermission(Permissions.SMARTMOVING_CRAWLING))
+            message = message + "§0§1§5§f§f";
+        // Disable Smart Moving's climbing
+        if (!player.hasPermission(Permissions.SMARTMOVING_SLIDING))
+            message = message + "§0§1§6§f§f";
+        // Disable Smart Moving's climbing
+        if (!player.hasPermission(Permissions.SMARTMOVING_JUMPING))
+            message = message + "§0§1§8§9§a§b§f§f";
+        // Disable Smart Moving's climbing
+        if (!player.hasPermission(Permissions.SMARTMOVING_FLYING))
+            message = message + "§0§1§7§f§f";
         player.sendMessage(message);
     }
 

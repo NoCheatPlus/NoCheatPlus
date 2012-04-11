@@ -27,6 +27,7 @@ public class Statistics {
         INV_BOW("inventory.instantbow"),
         INV_EAT("inventory.instanteat"),
         MOV_RUNNING("moving.running"),
+        MOV_TRACKER("moving.tracker"),
         MOV_FLYING("moving.flying"),
         MOV_MOREPACKETS("moving.morepackets"),
         MOV_MOREPACKETSVEHICLE("moving.morepacketsvehicle"),

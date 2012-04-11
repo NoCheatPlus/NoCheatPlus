@@ -201,18 +201,18 @@
     server to spend a lot of additional time for processing these movements.
     
  - nocheatplus.checks.moving.morepacketsvehicle
-   Allows players to make a lot more movements (while being in a vehicule) than
-   normally possible. Doing more movements will result in faster overall movement
-   speed and causes the server to spent a lot of additional time for processing
-   these movements.
+    Allows players to make a lot more movements (while being in a vehicule) than
+    normally possible. Doing more movements will result in faster overall movement
+    speed and causes the server to spent a lot of additional time for processing
+    these movements.
    
  - nocheatplus.checks.moving.boatonground
-   Allows players to place boats on the ground (and not only on the water).
+    Allows players to place boats on the ground (and not only on the water).
    
  - nocheatplus.checks.moving.respawntrick
-   Allows player to respawn on top if they are blocked by a gravel or a sand
-   block (instead of removing the blocks blocking them). This is usually used
-   by players to go quickly to the surface when they are in their mines).
+    Allows player to respawn on top if they are blocked by a gravel or a sand
+    block (instead of removing the blocks blocking them). This is usually used
+    by players to go quickly to the surface when they are in their mines).
 
 
 -------------------- BLOCKBREAK Permissions for CHECKS -------------------------
@@ -309,8 +309,8 @@
  - nocheatplus.mods.zombe.xray
     Don't prevent the player from using Zombe's noclip
  
- - nocheatplus.mods.zombe.cheats
-    Don't prevent the player from using all other Zombe's cheats
+ - nocheatplus.mods.zombe.cheat
+    Don't prevent the player from using Zombe's cheat
  
  - nocheatplus.mods.cjb.fly
     Don't prevent the player from using CJB's fly mod
@@ -318,8 +318,8 @@
  - nocheatplus.mods.cjb.xray
     Don't prevent the player from using CJB's xray
  
- - nocheatplus.mods.cjb.minimap
-    Don't prevent the player from using CJB's minimap
+ - nocheatplus.mods.cjb.radar
+    Don't prevent the player from using CJB's radar
     
  - nocheatplus.mods.rei.cave
     Don't prevent the player from using Rei's Minimap's cave mode
@@ -327,8 +327,32 @@
  - nocheatplus.mods.rei.radar
     Don't prevent the player from using Rei's Minimap's radar
 
- - nocheatplus.mods.mcautomap
-    Don't prevent the player from using all Minecraft AutoMap's cheats
+ - nocheatplus.mods.minecraftautomap.ores
+    Don't prevent the player from using Minecraft AutoMap's ores detector
+
+ - nocheatplus.mods.minecraftautomap.cave
+    Don't prevent the player from using Minecraft AutoMap's cave mode
+
+ - nocheatplus.mods.minecraftautomap.radar
+    Don't prevent the player from using Minecraft AutoMap's radar
+
+ - nocheatplus.mods.smartmoving.climbing
+    Don't prevent the player from using Smart Moving's climb
+
+ - nocheatplus.mods.smartmoving.swimming
+    Don't prevent the player from using Smart Moving's swim
+
+ - nocheatplus.mods.smartmoving.crawling
+    Don't prevent the player from using Smart Moving's crawl
+
+ - nocheatplus.mods.smartmoving.sliding
+    Don't prevent the player from using Smart Moving's slide
+
+ - nocheatplus.mods.smartmoving.jumping
+    Don't prevent the player from using Smart Moving's jump
+
+ - nocheatplus.mods.smartmoving.flying
+    Don't prevent the player from using Smart Moving's fly
 
 
 --------------------------------------------------------------------------------
@@ -351,7 +375,8 @@
  - nocheatplus.mods.zombe
  - nocheatplus.mods.cjb
  - nocheatplus.mods.rei
- - nocheatplus.mods.mcautomap
+ - nocheatplus.mods.minecraftautomap
+ - nocheatplus.mods.smartmoving
 
  To give a player all the permissions that start with that permission node.
  
@@ -390,7 +415,7 @@
   allow:
   
     Allow all your players to use all the client mods (Zombe, CJB, Rei's Minimap,
-    Minecraft AutoMap).
+    Minecraft AutoMap and Smart Moving).
 
 --------------------------------------------------------------------------------
 -------------------------------- LOGGING Section -------------------------------
@@ -617,9 +642,10 @@
            all. If deactivated, player may stay in the air without being noticed
            by NoCheat+.
            
-         maxtime:
-           The maximum interval (in milliseconds) before kicking the player who
-           flies (it takes less than 6000 ms to fall from Y = 256 to Y = 0);
+         actions:
+           What should happen if a player tries to stay too much time in the air.
+           Default is to kick the player. The Violation Level is the time the
+           player has spent in the air minus the maximum time allowed (6 seconds).
 
       FLYING:
         This is an entire subsection dedicated to the "moving.flying" check.

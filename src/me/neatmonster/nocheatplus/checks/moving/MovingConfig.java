@@ -24,7 +24,7 @@ public class MovingConfig implements ConfigItem {
     public final ActionList actions;
 
     public final boolean    tracker;
-    public final int        maxtime;
+    public final ActionList trackerActions;
 
     public final boolean    allowFlying;
     public final double     flyingSpeedLimitVertical;
@@ -67,7 +67,7 @@ public class MovingConfig implements ConfigItem {
         actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS, Permissions.MOVING_RUNFLY);
 
         tracker = data.getBoolean(ConfPaths.MOVING_RUNFLY_TRACKER_CHECK);
-        maxtime = data.getInt(ConfPaths.MOVING_RUNFLY_TRACKER_MAXTIME);
+        trackerActions = data.getActionList(ConfPaths.MOVING_RUNFLY_TRACKER_ACTIONS, Permissions.MOVING_FLYING);
 
         allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);
         flyingSpeedLimitVertical = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL) / 100D;

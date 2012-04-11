@@ -10,7 +10,6 @@ import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 
 import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -130,11 +129,22 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
 
         // We are only interested by enderpears, endersignals, eggs, snowballs and expbottles
         // of course thrown by a player
-        if (!(event.getEntity().getShooter() instanceof Player) || event.getEntityType() != EntityType.ENDER_PEARL
-                && event.getEntityType() != EntityType.ENDER_SIGNAL && event.getEntityType() != EntityType.EGG
-                && event.getEntityType() != EntityType.SNOWBALL
-                && event.getEntityType() != EntityType.THROWN_EXP_BOTTLE)
+        if (!(event.getEntity().getShooter() instanceof Player))
             return;
+        switch (event.getEntityType()) {
+        case ENDER_PEARL:
+            break;
+        case ENDER_SIGNAL:
+            break;
+        case EGG:
+            break;
+        case SNOWBALL:
+            break;
+        case THROWN_EXP_BOTTLE:
+            break;
+        default:
+            return;
+        }
 
         final NoCheatPlusPlayer player = plugin.getPlayer((Player) event.getEntity().getShooter());
         final BlockPlaceConfig cc = BlockPlaceCheck.getConfig(player);

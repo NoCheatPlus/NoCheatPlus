@@ -54,7 +54,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS, "log:nofall:0:5:cif cancel");
 
         set(ConfPaths.MOVING_RUNFLY_TRACKER_CHECK, true);
-        set(ConfPaths.MOVING_RUNFLY_TRACKER_MAXTIME, 6000);
+        set(ConfPaths.MOVING_RUNFLY_TRACKER_ACTIONS, "cmd:kick");
 
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS, false);
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE, true);

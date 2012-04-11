@@ -12,7 +12,6 @@ import me.neatmonster.nocheatplus.config.Permissions;
 import me.neatmonster.nocheatplus.data.PreciseLocation;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -45,6 +44,7 @@ public class MovingCheckListener implements Listener, EventManager {
     private final MorePacketsVehicleCheck morePacketsVehicleCheck;
     private final FlyingCheck             flyingCheck;
     private final RunningCheck            runningCheck;
+    private final TrackerCheck            trackerCheck;
     private final WaterWalkCheck          waterWalkCheck;
 
     private final NoCheatPlus             plugin;
@@ -53,6 +53,7 @@ public class MovingCheckListener implements Listener, EventManager {
 
         flyingCheck = new FlyingCheck(plugin);
         runningCheck = new RunningCheck(plugin);
+        trackerCheck = new TrackerCheck(plugin);
         morePacketsCheck = new MorePacketsCheck(plugin);
         morePacketsVehicleCheck = new MorePacketsVehicleCheck(plugin);
         waterWalkCheck = new WaterWalkCheck(plugin);
@@ -63,6 +64,7 @@ public class MovingCheckListener implements Listener, EventManager {
             @Override
             public void run() {
 
+                // Loop through all players
                 for (final Player bukkitPlayer : Bukkit.getOnlinePlayers()) {
 
                     // Get some data about the player/config
@@ -70,42 +72,8 @@ public class MovingCheckListener implements Listener, EventManager {
                     final MovingConfig cc = MovingCheck.getConfig(player);
                     final MovingData data = MovingCheck.getData(player);
 
-                    final PreciseLocation location = new PreciseLocation();
-                    location.x = bukkitPlayer.getLocation().getX();
-                    location.y = bukkitPlayer.getLocation().getY();
-                    location.z = bukkitPlayer.getLocation().getZ();
-                    final int type = CheckUtil.evaluateLocation(bukkitPlayer.getWorld(), location);
-                    final boolean isLiquid = CheckUtil.isLiquid(type);
-
-                    // Do not do the check if it's disabled, if flying is allowed, if the player is
-                    // allowed to fly because of its game mode, if he has the required permission,
-                    // if he is in water or in vines.
-                    if (!cc.tracker || cc.allowFlying || bukkitPlayer.getGameMode() == GameMode.CREATIVE
-                            || bukkitPlayer.getAllowFlight() || bukkitPlayer.hasPermission(Permissions.MOVING_RUNFLY)
-                            || bukkitPlayer.hasPermission(Permissions.MOVING_FLYING) || isLiquid
-                            || bukkitPlayer.getLocation().getBlock().getType() == Material.LADDER
-                            || bukkitPlayer.getLocation().getBlock().getType() == Material.VINE
-                            || bukkitPlayer.getLocation().getX() < 0D) {
-                        data.fallingSince = 0;
-                        continue;
-                    }
-
-                    // If the player isn't falling or jumping
-                    if (Math.abs(bukkitPlayer.getVelocity().getY()) > 0.1D) {
-
-                        // The player is falling/jumping, check if he was previously on the ground
-                        if (data.fallingSince == 0)
-                            data.fallingSince = System.currentTimeMillis();
-
-                        // Check if he has stayed too much time in the air
-                        else if (System.currentTimeMillis() - data.fallingSince > cc.maxtime) {
-                            // He has, so now kick it
-                            bukkitPlayer.kickPlayer("Flying isn't enabled on this server!");
-                            data.fallingSince = 0;
-                        }
-                    } else
-                        // Reset the timer
-                        data.fallingSince = 0;
+                    // Execute the check
+                    trackerCheck.check(player, data, cc);
                 }
             }
         }, 1L, 1L);

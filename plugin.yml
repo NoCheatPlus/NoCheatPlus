@@ -118,8 +118,8 @@ permissions:
                     description: Allow the player to use Zombe's fly mod
                   nocheatplus.mods.zombe.noclip:
                     description: Allow the player to use Zombe's noclip
-                  nocheatplus.mods.zombe.cheats:
-                    description: Allow the player to use all other Zombe's cheats
+                  nocheatplus.mods.zombe.cheat:
+                    description: Allow the player to use Zombe's cheat
               nocheatplus.mods.cjb:
                 description: Allow the player to use all CJB's cheats
                 children:
@@ -127,8 +127,8 @@ permissions:
                     description: Allow the player to use CJB's fly mod
                   nocheatplus.mods.cjb.xray:
                     description: Allow the player to use CJB's xray
-                  nocheatplus.mods.cjb.minimap:
-                    description: Allow the player to use CJB's minimap
+                  nocheatplus.mods.cjb.radar:
+                    description: Allow the player to use CJB's radar
               nocheatplus.mods.rei:
                 description: Allow the player to use all Rei's Minimap's cheats
                 children:
@@ -136,5 +136,27 @@ permissions:
                     description: Allow the player to use Rei's cave mode
                   nocheatplus.mods.rei.radar:
                     description: Allow the player to use Rei's radar
-              nocheatplus.mods.mcautomap:
+              nocheatplus.mods.minecraftautomap:
                 description: Allow the player to use all Minecraft AutoMap's cheats
+                children:
+                  nocheatplus.mods.minecraftautomap.ores:
+                    description: Allow the player to use Minecraft AutoMap's ores detector
+                  nocheatplus.mods.minecraftautomap.cave:
+                    description: Allow the player to use Minecraft AutoMap's cave mode
+                  nocheatplus.mods.minecraftautomap.radar:
+                    description: Allow the player to use Minecraft AutoMap's radar
+              nocheatplus.mods.smartmoving:
+                description: Allow the player to use all Smart Moving's moves
+                children:
+                  nocheatplus.mods.smartmoving.climbing:
+                    description: Allow the player to use Smart Moving's climb
+                  nocheatplus.mods.smartmoving.swimming:
+                    description: Allow the player to use Smart Moving's swim
+                  nocheatplus.mods.smartmoving.crawling:
+                    description: Allow the player to use Smart Moving's crawl
+                  nocheatplus.mods.smartmoving.sliding:
+                    description: Allow the player to use Smart Moving's slide
+                  nocheatplus.mods.smartmoving.jumping:
+                    description: Allow the player to use Smart Moving's jump
+                  nocheatplus.mods.smartmoving.flying:
+                    description: Allow the player to use Smart Moving's fly

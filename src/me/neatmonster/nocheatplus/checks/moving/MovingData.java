@@ -11,6 +11,7 @@ public class MovingData implements DataItem {
 
     // Keep track of the violation levels of the checks
     public double                runflyVL;
+    public double                trackerVL;
     public double                nofallVL;
     public double                morePacketsVL;
     public double                morePacketsVehicleVL;

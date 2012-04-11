@@ -63,18 +63,29 @@ public class Permissions {
     private static final String CJB                       = MODS + ".cjb";
     public static final String  CJB_FLY                   = CJB + ".fly";
     public static final String  CJB_XRAY                  = CJB + ".xray";
-    public static final String  CJB_MINIMAP               = CJB + ".minimap";
+    public static final String  CJB_RADAR                 = CJB + ".radar";
 
-    public static final String  MC_AUTOMAP                = MODS + ".mcautomap";
+    private static final String MINECRAFTAUTOMAP          = MODS + ".minecraftautomap";
+    public static final String  MINECRAFTAUTOMAP_ORES     = MINECRAFTAUTOMAP + ".ores";
+    public static final String  MINECRAFTAUTOMAP_CAVE     = MINECRAFTAUTOMAP + ".cave";
+    public static final String  MINECRAFTAUTOMAP_RADAR    = MINECRAFTAUTOMAP + ".radar";
 
     private static final String REI                       = MODS + ".rei";
     public static final String  REI_CAVE                  = REI + ".cave";
     public static final String  REI_RADAR                 = REI + ".radar";
 
+    private static final String SMARTMOVING               = MODS + ".smartmoving";
+    public static final String  SMARTMOVING_CLIMBING      = SMARTMOVING + ".climbing";
+    public static final String  SMARTMOVING_SWIMMING      = SMARTMOVING + ".swimming";
+    public static final String  SMARTMOVING_CRAWLING      = SMARTMOVING + ".crawling";
+    public static final String  SMARTMOVING_SLIDING       = SMARTMOVING + ".sliding";
+    public static final String  SMARTMOVING_JUMPING       = SMARTMOVING + ".jumping";
+    public static final String  SMARTMOVING_FLYING        = SMARTMOVING + ".flying";
+
     private static final String ZOMBE                     = MODS + ".zombe";
     public static final String  ZOMBE_FLY                 = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP              = ZOMBE + ".noclip";
-    public static final String  ZOMBE_CHEATS              = ZOMBE + ".cheats";
+    public static final String  ZOMBE_CHEAT               = ZOMBE + ".cheat";
 
     private Permissions() {}
 }

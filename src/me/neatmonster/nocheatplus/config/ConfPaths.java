@@ -59,7 +59,7 @@ public abstract class ConfPaths {
 
     private final static String MOVING_RUNFLY_TRACKER                     = MOVING_RUNFLY + "tracker.";
     public final static String  MOVING_RUNFLY_TRACKER_CHECK               = MOVING_RUNFLY_TRACKER + "active";
-    public final static String  MOVING_RUNFLY_TRACKER_MAXTIME             = MOVING_RUNFLY_TRACKER + "maxtime";
+    public final static String  MOVING_RUNFLY_TRACKER_ACTIONS             = MOVING_RUNFLY_TRACKER + "actions";
 
     private final static String MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";
     public final static String  MOVING_RUNFLY_FLYING_ALLOWALWAYS          = MOVING_RUNFLY_FLYING + "allowflyingalways";
