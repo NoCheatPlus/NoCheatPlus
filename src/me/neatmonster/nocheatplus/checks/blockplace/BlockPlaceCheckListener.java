@@ -171,6 +171,11 @@ public class BlockPlaceCheckListener implements Listener, EventManager {
         final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
         final BlockPlaceData data = BlockPlaceCheck.getData(player);
 
+        // Check if the sign's content is empty
+        if (event.getLine(0).length() + event.getLine(1).length() + event.getLine(2).length()
+                + event.getLine(3).length() == 0)
+            return;
+
         // Check if the text is the same
         if (!event.getPlayer().hasPermission(Permissions.BLOCKPLACE_AUTOSIGN)
                 && event.getLine(0).equals(data.lastSignText[0]) && event.getLine(1).equals(data.lastSignText[1])

@@ -153,8 +153,8 @@ public class ChatCheckListener implements Listener, EventManager {
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void login(final PlayerLoginEvent event) {
 
-        // Only check new players (who has joined less than 10 minutes ago)
-        if (System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > 600000L)
+        // Only check players who haven't played before
+        if (event.getPlayer().hasPlayedBefore())
             return;
 
         final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
@@ -165,24 +165,4 @@ public class ChatCheckListener implements Listener, EventManager {
             // If the player failed the check, disallow the login
             event.disallow(Result.KICK_OTHER, cc.spamJoinsKickMessage);
     }
-
-    /*@EventHandler(
-            priority = EventPriority.MONITOR)
-    public void join(final PlayerJoinEvent event) {
-
-        // Only check new players (who has joined less than 10 minutes ago)
-        if (System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > 600000L)
-            return;
-
-        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
-        final ChatData data = ChatCheck.getData(player);
-
-        // Get the question (and it's answer)
-        String[] question = data.getQuestion();
-        if (question == null)
-            return;
-
-        player.getPlayer().sendMessage(ChatColor.YELLOW + "Please answer the following question:");
-        player.getPlayer().sendMessage(ChatColor.YELLOW + "\"" + ChatColor.RED + question[0] + ChatColor.YELLOW + "\"");
-    }*/
 }

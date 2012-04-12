@@ -4,7 +4,7 @@
 
 	<!-- Informations -->
 	<name>NoCheatPlus</name>
-	<version>3.5.5_2</version>
+	<version>3.5.5_3</version>
 	<description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
 	<url>http://dev.bukkit.org/server-mods/nocheatplus</url>
 
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.2.5-R1.0</version>
+			<version>1.2.5-R1.1</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
