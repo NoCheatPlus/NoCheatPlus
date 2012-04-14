@@ -3,6 +3,7 @@ version: ${project.version}
 description: ${project.description}
 
 author: NeatMonster
+authors: [Eventprime, Juliui]
 website: ${project.url}
 
 main: me.neatmonster.nocheatplus.NoCheatPlus
@@ -10,7 +11,7 @@ main: me.neatmonster.nocheatplus.NoCheatPlus
 commands:
   nocheatplus:
     description: NoCheatPlus command(s)
-    permission: nocheatplus.admin.commands
+    # permission: nocheatplus.admin.commands
     usage: |
            /<command> permlist player [permission]: list NoCheatPlus' permissions of player, optionally only if beginning with [permission]
            /<command> playerinfo player: show the collected data NoCheatPlus collected about a player

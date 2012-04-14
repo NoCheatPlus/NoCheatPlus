@@ -98,7 +98,7 @@ public class ChatCheckListener implements Listener, EventManager {
         if ((event.getMessage().equalsIgnoreCase("/plugins")
                 || event.getMessage().toLowerCase().startsWith("/plugins ")
                 || event.getMessage().equalsIgnoreCase("/pl") || event.getMessage().toLowerCase().startsWith("/pl "))
-                && cc.hideNoCheatPlus) {
+                && Bukkit.getPluginManager().getPlugin("PluginList") == null && cc.hideNoCheatPlus) {
             // If the player isn't allowed to use this command
             if (!event.getPlayer().hasPermission("bukkit.command.plugins"))
                 // Fake the permissions error message
@@ -153,8 +153,8 @@ public class ChatCheckListener implements Listener, EventManager {
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void login(final PlayerLoginEvent event) {
 
-        // Only check players who haven't played before
-        if (event.getPlayer().hasPlayedBefore())
+        // Only check new players (who has joined less than 10 minutes ago)
+        if (System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > 600000D)
             return;
 
         final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());

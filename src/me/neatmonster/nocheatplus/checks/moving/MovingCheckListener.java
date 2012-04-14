@@ -23,6 +23,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -135,6 +136,26 @@ public class MovingCheckListener implements Listener, EventManager {
         }
     }
 
+    /**
+     * If a player tries to place a boat on the ground, the event
+     * will be cancelled.
+     * 
+     * @param event
+     *            The PlayerInteractEvent
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void boat(final PlayerInteractEvent event) {
+        if (!event.getPlayer().hasPermission(Permissions.MOVING_BOATONGROUND)
+                && event.getAction() == Action.RIGHT_CLICK_BLOCK
+                && event.getPlayer().getItemInHand().getType() == Material.BOAT
+                && event.getClickedBlock().getType() != Material.WATER
+                && event.getClickedBlock().getType() != Material.STATIONARY_WATER
+                && event.getClickedBlock().getRelative(event.getBlockFace()).getType() != Material.WATER
+                && event.getClickedBlock().getRelative(event.getBlockFace()).getType() != Material.STATIONARY_WATER)
+            event.setCancelled(true);
+    }
+
     @Override
     public List<String> getActiveChecks(final ConfigurationCacheStore cc) {
         final LinkedList<String> s = new LinkedList<String>();
@@ -158,6 +179,27 @@ public class MovingCheckListener implements Listener, EventManager {
             s.add("moving.morepacketsvehicle");
 
         return s;
+    }
+
+    /**
+     * This event handler is used to prevent the player from quickly
+     * disconnecting/reconnecting in order to cancel his fall damages.
+     * 
+     * @param event
+     *            The PlayerJoinEvent
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void join(final PlayerJoinEvent event) {
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final MovingData data = MovingCheck.getData(player);
+
+        // If the player has joined in the air and a safe location is defined...
+        if (player.getPlayer().getLocation().add(0, -1, 0).getBlock().getType() == Material.AIR
+                && data.lastSafeLocations[0] != null)
+            // ...then teleport him to this location
+            event.getPlayer().teleport(data.lastSafeLocations[0]);
     }
 
     /**
@@ -196,6 +238,12 @@ public class MovingCheckListener implements Listener, EventManager {
         data.from.set(event.getFrom());
         final Location to = event.getTo();
         data.to.set(to);
+
+        // Remember safe locations
+        if (Math.abs(event.getPlayer().getVelocity().getY()) < 0.0785D) {
+            data.lastSafeLocations[0] = data.lastSafeLocations[1];
+            data.lastSafeLocations[1] = event.getFrom();
+        }
 
         PreciseLocation newTo = null;
 
@@ -239,24 +287,6 @@ public class MovingCheckListener implements Listener, EventManager {
     }
 
     /**
-     * If a player tries to place a boat on the ground, the event
-     * will be cancelled.
-     * 
-     * @param event
-     *            The PlayerInteractEvent
-     */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onPlayerInteract(final PlayerInteractEvent event) {
-        if (!event.getPlayer().hasPermission(Permissions.MOVING_BOATONGROUND)
-                && event.getAction() == Action.RIGHT_CLICK_BLOCK
-                && event.getPlayer().getItemInHand().getType() == Material.BOAT
-                && event.getClickedBlock().getType() != Material.WATER
-                && event.getClickedBlock().getType() != Material.STATIONARY_WATER)
-            event.setCancelled(true);
-    }
-
-    /**
      * When a player uses a portal, all information related to the
      * moving checks becomes invalid.
      * 
@@ -278,6 +308,13 @@ public class MovingCheckListener implements Listener, EventManager {
      */
     @EventHandler
     public void quit(final PlayerQuitEvent event) {
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final MovingData data = MovingCheck.getData(player);
+
+        // Reset the variable
+        data.fallingSince = 0L;
+
         if (!event.getPlayer().hasPermission(Permissions.MOVING_RESPAWNTRICK)
                 && (event.getPlayer().getLocation().getBlock().getType() == Material.GRAVEL || event.getPlayer()
                         .getLocation().getBlock().getType() == Material.SAND)) {
@@ -419,6 +456,9 @@ public class MovingCheckListener implements Listener, EventManager {
     public void velocity(final PlayerVelocityEvent event) {
 
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()));
+
+        // Reset the tracker's data
+        data.fallingSince = 0L;
 
         final Vector v = event.getVelocity();
 

@@ -63,6 +63,12 @@ public class CommandHandler {
     public boolean handleCommand(final NoCheatPlus plugin, final CommandSender sender, final Command command,
             final String label, final String[] args) {
 
+        // Hide NoCheatPlus's commands if the player doesn't have the required permission
+        if (sender instanceof Player && !sender.hasPermission("nocheatplus.admin.commands")) {
+            sender.sendMessage("Unknown command. Type \"help\" for help.");
+            return true;
+        }
+
         boolean result = false;
         // Not our command, how did it get here?
         if (!command.getName().equalsIgnoreCase("nocheatplus") || args.length == 0)
