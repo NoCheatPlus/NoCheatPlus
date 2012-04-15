@@ -46,6 +46,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         set(ConfPaths.MOVING_RUNFLY_CHECK, true);
         set(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING, false);
+        set(ConfPaths.MOVING_RUNFLY_MAXCOOLDOWN, 10000);
         set(ConfPaths.MOVING_RUNFLY_ACTIONS,
                 "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
 

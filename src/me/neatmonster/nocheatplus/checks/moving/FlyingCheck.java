@@ -106,7 +106,7 @@ public class FlyingCheck extends MovingCheck {
         result = resultHoriz + resultVert;
 
         // The player went to far, either horizontal or vertical
-        if (result > 0) {
+        if (result > 0 && !data.velocityChanged) {
 
             // Increment violation counter and statistics
             data.runflyVL += result;

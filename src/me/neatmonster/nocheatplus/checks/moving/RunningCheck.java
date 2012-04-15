@@ -77,7 +77,7 @@ public class RunningCheck extends MovingCheck {
         data.runflyVL *= 0.95;
 
         // Did the player move in unexpected ways?
-        if (result > 0) {
+        if (result > 0 && !data.velocityChanged) {
             // Increment violation counter
             data.runflyVL += result;
 

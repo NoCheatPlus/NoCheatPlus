@@ -51,6 +51,7 @@ public abstract class ConfPaths {
     public final static String  MOVING_RUNFLY_SPRINTSPEED                 = MOVING_RUNFLY + "sprintspeed";
 
     public final static String  MOVING_RUNFLY_ALLOWFASTSNEAKING           = MOVING_RUNFLY + "allowfastsneaking";
+    public final static String  MOVING_RUNFLY_MAXCOOLDOWN                 = MOVING_RUNFLY + "maxcooldown";
     public final static String  MOVING_RUNFLY_ACTIONS                     = MOVING_RUNFLY + "actions";
 
     public final static String  MOVING_RUNFLY_CHECKNOFALL                 = MOVING_RUNFLY + "checknofall";

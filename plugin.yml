@@ -3,7 +3,7 @@ version: ${project.version}
 description: ${project.description}
 
 author: NeatMonster
-authors: [Eventprime, Juliui]
+authors: [Evenprime, Juliui, craftingmania]
 website: ${project.url}
 
 main: me.neatmonster.nocheatplus.NoCheatPlus

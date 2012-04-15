@@ -21,9 +21,10 @@ public class MovingConfig implements ConfigItem {
     public final double     swimmingSpeedLimit;
     public final boolean    sneakingCheck;
     public final double     sneakingSpeedLimit;
+    public final int        maxCooldown;
     public final ActionList actions;
 
-    public final boolean    tracker;
+    public final boolean    trackerCheck;
     public final ActionList trackerActions;
 
     public final boolean    allowFlying;
@@ -64,9 +65,10 @@ public class MovingConfig implements ConfigItem {
         jumpheight = 135 / 100D;
 
         sneakingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING);
+        maxCooldown = data.getInt(ConfPaths.MOVING_RUNFLY_MAXCOOLDOWN);
         actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS, Permissions.MOVING_RUNFLY);
 
-        tracker = data.getBoolean(ConfPaths.MOVING_RUNFLY_TRACKER_CHECK);
+        trackerCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_TRACKER_CHECK);
         trackerActions = data.getActionList(ConfPaths.MOVING_RUNFLY_TRACKER_ACTIONS, Permissions.MOVING_FLYING);
 
         allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);

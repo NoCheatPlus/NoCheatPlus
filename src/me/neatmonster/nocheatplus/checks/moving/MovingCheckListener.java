@@ -169,6 +169,8 @@ public class MovingCheckListener implements Listener, EventManager {
                     s.add("moving.sneaking");
                 if (m.nofallCheck)
                     s.add("moving.nofall");
+                if (m.trackerCheck)
+                    s.add("moving.tracker");
                 if (m.waterWalkCheck)
                     s.add("moving.waterwalk");
             } else
@@ -243,6 +245,16 @@ public class MovingCheckListener implements Listener, EventManager {
         if (Math.abs(event.getPlayer().getVelocity().getY()) < 0.0785D) {
             data.lastSafeLocations[0] = data.lastSafeLocations[1];
             data.lastSafeLocations[1] = event.getFrom();
+        }
+
+        // Check if the player is on/in the ground
+        final int toType = CheckUtil.evaluateLocation(event.getPlayer().getWorld(), data.to);
+        if (data.velocityChanged
+                && (System.currentTimeMillis() - data.velocityChangedSince > 500L
+                        && (CheckUtil.isOnGround(toType) || CheckUtil.isInGround(toType)) || cc.maxCooldown != -1
+                        && System.currentTimeMillis() - data.velocityChangedSince > cc.maxCooldown)) {
+            data.velocityChanged = false;
+            data.velocityChangedSince = 0L;
         }
 
         PreciseLocation newTo = null;
@@ -457,8 +469,9 @@ public class MovingCheckListener implements Listener, EventManager {
 
         final MovingData data = MovingCheck.getData(plugin.getPlayer(event.getPlayer()));
 
-        // Reset the tracker's data
-        data.fallingSince = 0L;
+        // Remeber that a plugin changed the player's velocity
+        data.velocityChanged = true;
+        data.velocityChangedSince = System.currentTimeMillis();
 
         final Vector v = event.getVelocity();
 

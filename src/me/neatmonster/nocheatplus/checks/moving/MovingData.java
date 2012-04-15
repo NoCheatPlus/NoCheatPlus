@@ -48,6 +48,12 @@ public class MovingData implements DataItem {
     // Keep in mind since when the player in falling/jumping
     public long                  fallingSince              = 0L;
 
+    // Is the player flying because of a plugin has modified his velocity
+    public boolean               velocityChanged           = false;
+
+    // If yes, since when?
+    public long                  velocityChangedSince      = 0L;
+
     // Remember if the player has already been on the ground
     public boolean               hasAlreadyBeenOnTheGround = false;
 

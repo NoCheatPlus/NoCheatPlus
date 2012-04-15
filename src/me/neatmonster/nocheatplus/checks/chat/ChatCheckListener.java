@@ -98,7 +98,10 @@ public class ChatCheckListener implements Listener, EventManager {
         if ((event.getMessage().equalsIgnoreCase("/plugins")
                 || event.getMessage().toLowerCase().startsWith("/plugins ")
                 || event.getMessage().equalsIgnoreCase("/pl") || event.getMessage().toLowerCase().startsWith("/pl "))
-                && Bukkit.getPluginManager().getPlugin("PluginList") == null && cc.hideNoCheatPlus) {
+                // Exception for 'PluginList'...
+                && Bukkit.getPluginManager().getPlugin("PluginList") == null
+                // ...and CommandHelper
+                && Bukkit.getPluginManager().getPlugin("CommandHelper") == null && cc.hideNoCheatPlus) {
             // If the player isn't allowed to use this command
             if (!event.getPlayer().hasPermission("bukkit.command.plugins"))
                 // Fake the permissions error message
@@ -111,7 +114,7 @@ public class ChatCheckListener implements Listener, EventManager {
                 final Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
 
                 for (final Plugin plugin : plugins) {
-                    // But make sure to hide NoCheatPlus
+                    // But make sure to hide NoCheatPlus from the plugins list
                     if (plugin.getName().equals("NoCheatPlus"))
                         continue;
                     if (pluginList.length() > 0) {
@@ -126,6 +129,7 @@ public class ChatCheckListener implements Listener, EventManager {
                 // Of course decrease the number of plugins
                 event.getPlayer().sendMessage("Plugins (" + (plugins.length - 1) + "): " + pluginList.toString());
             }
+
             // Cancel the event, we have already replied to the player
             event.setCancelled(true);
         }

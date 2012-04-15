@@ -598,6 +598,12 @@
         swimming speed of players at all (NoCheatPlus knows when players sprint,
         use Swiftness potions etc and will already adapt the speed based on 
         that data).
+        
+      maxcooldown:
+        How much time the player can spend in the air if his velocity has been
+        modified by an external plugin (PreciousStones for example). The default
+        delay is 10 seconds because it sounds like a player won't spend more
+        than 10 seconds in the air.
 
       allowfastsneaking:
         Should sneaking players be allowed to move as fast as normal players.

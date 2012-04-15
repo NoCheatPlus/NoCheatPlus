@@ -35,7 +35,7 @@ public class TrackerCheck extends MovingCheck {
         // Do not do the check if it's disabled, if flying is allowed, if the player is
         // allowed to fly because of its game mode, if he has the required permission,
         // if he is in water, on a ladder or in vines.
-        if (!cc.tracker || cc.allowFlying || player.getPlayer().getGameMode() == GameMode.CREATIVE
+        if (!cc.trackerCheck || cc.allowFlying || player.getPlayer().getGameMode() == GameMode.CREATIVE
                 || player.getPlayer().getAllowFlight() || player.getPlayer().hasPermission(Permissions.MOVING_RUNFLY)
                 || player.getPlayer().hasPermission(Permissions.MOVING_FLYING) || isLiquid
                 || player.getPlayer().getLocation().getBlock().getType() == Material.LADDER
@@ -46,7 +46,7 @@ public class TrackerCheck extends MovingCheck {
         }
 
         // If the player isn't static or jumping
-        if (Math.abs(player.getPlayer().getVelocity().getY()) > 0.1D) {
+        if (Math.abs(player.getPlayer().getVelocity().getY()) > 0.1D && !data.velocityChanged) {
 
             // Only do something if the player has already been on the ground
             if (!data.hasAlreadyBeenOnTheGround)

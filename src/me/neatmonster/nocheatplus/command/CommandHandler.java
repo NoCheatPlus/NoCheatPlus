@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import me.neatmonster.nocheatplus.NoCheatPlus;
+import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
+import me.neatmonster.nocheatplus.checks.chat.ChatCheck;
+import me.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import me.neatmonster.nocheatplus.config.Permissions;
 
 import org.bukkit.command.Command;
@@ -63,10 +66,15 @@ public class CommandHandler {
     public boolean handleCommand(final NoCheatPlus plugin, final CommandSender sender, final Command command,
             final String label, final String[] args) {
 
-        // Hide NoCheatPlus's commands if the player doesn't have the required permission
-        if (sender instanceof Player && !sender.hasPermission("nocheatplus.admin.commands")) {
-            sender.sendMessage("Unknown command. Type \"help\" for help.");
-            return true;
+        if (sender instanceof Player) {
+            final NoCheatPlusPlayer player = plugin.getPlayer((Player) sender);
+            final ChatConfig cc = ChatCheck.getConfig(player);
+
+            // Hide NoCheatPlus's commands if the player doesn't have the required permission
+            if (!sender.hasPermission("nocheatplus.admin.commands") && cc.hideNoCheatPlus) {
+                sender.sendMessage("Unknown command. Type \"help\" for help.");
+                return true;
+            }
         }
 
         boolean result = false;
