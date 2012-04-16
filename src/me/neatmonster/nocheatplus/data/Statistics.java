@@ -18,7 +18,6 @@ public class Statistics {
         BP_REACH("blockplace.reach"),
         BP_PROJECTILE("blockplace.projectile"),
         CHAT_COLOR("chat.color"),
-        CHAT_SPAM("chat.spam"),
         FI_DIRECTION("fight.direction"),
         FI_NOSWING("fight.noswing"),
         FI_REACH("fight.reach"),

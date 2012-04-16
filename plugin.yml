@@ -3,7 +3,7 @@ version: ${project.version}
 description: ${project.description}
 
 author: NeatMonster
-authors: [Evenprime, Juliui, craftingmania]
+authors: [Evenprime, Juliui]
 website: ${project.url}
 
 main: me.neatmonster.nocheatplus.NoCheatPlus
@@ -11,6 +11,7 @@ main: me.neatmonster.nocheatplus.NoCheatPlus
 commands:
   nocheatplus:
     description: NoCheatPlus command(s)
+    aliases: [ncp]
     # permission: nocheatplus.admin.commands
     usage: |
            /<command> permlist player [permission]: list NoCheatPlus' permissions of player, optionally only if beginning with [permission]
@@ -81,8 +82,10 @@ permissions:
           nocheatplus.checks.chat:
             description: Allow the player to bypass all chat checks
             children:
-              nocheatplus.checks.chat.spam:
-                description: Allow a player to send an infinite amount of chat messages
+              nocheatplus.checks.chat.nopwnage:
+                description: Allow a player to bypass the nopwnage check
+              nocheatplus.checks.chat.arrivalslimit:
+                description: Allow a player to bypass the arrivals limit
               nocheatplus.checks.chat.color:
                 description: Allow a player to send colored chat messages
           nocheatplus.checks.fight:

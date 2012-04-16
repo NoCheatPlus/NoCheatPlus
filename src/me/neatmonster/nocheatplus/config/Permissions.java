@@ -31,7 +31,8 @@ public class Permissions {
     public static final String  BLOCKPLACE_AUTOSIGN       = BLOCKPLACE + ".autosign";
 
     private static final String CHAT                      = CHECKS + ".chat";
-    public static final String  CHAT_SPAM                 = CHAT + ".spam";
+    public static final String  CHAT_NOPWNAGE             = CHAT + ".nopwnage";
+    public static final String  CHAT_ARRIVALSLIMIT        = CHAT + ".arrivalslimit";
     public static final String  CHAT_COLOR                = CHAT + ".color";
 
     private static final String FIGHT                     = CHECKS + ".fight";

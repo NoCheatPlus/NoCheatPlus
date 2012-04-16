@@ -116,23 +116,62 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         /*** CHAT ***/
 
-        set(ConfPaths.CHAT_HIDENOCHEATPLUS, true);
+        set(ConfPaths.CHAT_HIDECOMMANDS, false);
+
+        set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_WARNPLAYERS, false);
+        set(ConfPaths.CHAT_NOPWNAGE_WARNOTHERS, false);
+        set(ConfPaths.CHAT_NOPWNAGE_WARNLEVEL, 400);
+        set(ConfPaths.CHAT_NOPWNAGE_WARNTIMEOUT, 30000);
+        set(ConfPaths.CHAT_NOPWNAGE_BANLEVEL, 800);
+        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "log:nopwnage:2:5:cf cmd:kick cmd:ban cmd:ban-ip");
+
+        set(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHTBONUS, 200);
+        set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHTMALUS, 200);
+        set(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT, 30000);
+
+        set(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT, 150);
+        set(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT, 5000);
+
+        set(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT, 200);
+        set(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT, 500);
+
+        set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_FIRST_WEIGHT, 200);
+        set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000);
+
+        set(ConfPaths.CHAT_NOPWNAGE_GLOBAL_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_GLOBAL_WEIGHT, 100);
+        set(ConfPaths.CHAT_NOPWNAGE_GLOBAL_TIMEOUT, 5000);
+
+        set(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT, 200);
+        set(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT, 2000);
+
+        set(ConfPaths.CHAT_NOPWNAGE_RELOG_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_RELOG_TIME, 1500);
+        set(ConfPaths.CHAT_NOPWNAGE_RELOG_WARNINGS, 1);
+        set(ConfPaths.CHAT_NOPWNAGE_RELOG_TIMEOUT, 60000);
+
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 20);
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH, 4);
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS,
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+
+        set(ConfPaths.CHAT_ARRIVALSLIMIT_CHECK, false);
+        set(ConfPaths.CHAT_ARRIVALSLIMIT_PLAYERSLIMIT, 3);
+        set(ConfPaths.CHAT_ARRIVALSLIMIT_TIMEFRAME, 5000);
+        set(ConfPaths.CHAT_ARRIVALSLIMIT_COOLDOWNDELAY, 5000);
+        set(ConfPaths.CHAT_ARRIVALSLIMIT_NEWTIME, 600000);
+        set(ConfPaths.CHAT_ARRIVALSLIMIT_KICKMESSAGE, "Please try again later!");
+        set(ConfPaths.CHAT_ARRIVALSLIMIT_ACTIONS, "cancel");
 
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
-
-        set(ConfPaths.CHAT_SPAM_CHECK, true);
-        set(ConfPaths.CHAT_SPAM_WHITELIST, "");
-        set(ConfPaths.CHAT_SPAM_TIMEFRAME, 3);
-        set(ConfPaths.CHAT_SPAM_MESSAGELIMIT, 3);
-        set(ConfPaths.CHAT_SPAM_COMMANDLIMIT, 12);
-        set(ConfPaths.CHAT_SPAM_ACTIONS, "log:spam:0:3:if cancel vl>30 log:spam:0:3:cif cancel cmd:kick");
-
-        set(ConfPaths.CHAT_SPAMJOINS_CHECK, true);
-        set(ConfPaths.CHAT_SPAMJOINS_PLAYERSLIMIT, 3);
-        set(ConfPaths.CHAT_SPAMJOINS_TIMELIMIT, 5000);
-        set(ConfPaths.CHAT_SPAMJOINS_COOLDOWN, 5000);
-        set(ConfPaths.CHAT_SPAMJOINS_KICKMESSAGE, "SpamBot?!");
 
         /*** FIGHT ***/
 
@@ -186,9 +225,9 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
                 "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
         set(ConfPaths.STRINGS + ".bpprojectile",
                 "[player] failed [check]: tried to throw items too quicly. VL [violations]");
+        set(ConfPaths.STRINGS + ".nopwnage", "Commands run for [player] ([ip]): [reason]!");
         set(ConfPaths.STRINGS + ".color",
                 "[player] failed [check]: Sent colored chat message '[text]'. VL [violations]");
-        set(ConfPaths.STRINGS + ".spam", "[player] failed [check]: Last sent message '[text]'. VL [violations]");
         set(ConfPaths.STRINGS + ".fdirection",
                 "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
         set(ConfPaths.STRINGS + ".freach",
@@ -202,6 +241,8 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: Fires bow to fast. VL [violations]");
         set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: Eats food [food] too fast. VL [violations]");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
+        set(ConfPaths.STRINGS + ".ban", "ban [player]");
+        set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
 
         // Update internal factory based on all the new entries to the "actions" section
         regenerateActionLists();

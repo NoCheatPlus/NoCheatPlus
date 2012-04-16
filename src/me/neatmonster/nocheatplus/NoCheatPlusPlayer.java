@@ -34,4 +34,6 @@ public interface NoCheatPlusPlayer {
 
     public boolean isSprinting();
 
+    public void sendMessage(String message);
+
 }

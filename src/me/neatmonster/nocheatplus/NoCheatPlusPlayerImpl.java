@@ -118,6 +118,11 @@ public class NoCheatPlusPlayerImpl implements NoCheatPlusPlayer {
         config = plugin.getConfig(player);
     }
 
+    @Override
+    public void sendMessage(final String message) {
+        player.sendMessage(message);
+    }
+
     public void setLastUsedTime(final long currentTimeInMilliseconds) {
         lastUsedTime = currentTimeInMilliseconds;
     }

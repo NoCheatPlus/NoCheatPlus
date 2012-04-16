@@ -20,7 +20,9 @@ public enum ParameterName {
     BLOCK_TYPE("blocktype"),
     LIMIT("limit"),
     FOOD("food"),
-    SERVERS("servers");
+    SERVERS("servers"),
+    REASON("reason"),
+    IP("ip");
 
     public static final ParameterName get(final String s) {
         for (final ParameterName c : ParameterName.values())

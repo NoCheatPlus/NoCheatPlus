@@ -102,5 +102,6 @@ public class MovingData implements DataItem {
         fallDistance = 0;
         lastAddedFallDistance = 0;
         bunnyhopdelay = 0;
+        fallingSince = 0;
     }
 }

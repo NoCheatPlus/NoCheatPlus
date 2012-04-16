@@ -1,5 +1,6 @@
 package me.neatmonster.nocheatplus.checks.chat;
 
+import java.lang.management.ManagementFactory;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,16 +10,14 @@ import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Central location to listen to events that are
@@ -27,19 +26,20 @@ import org.bukkit.plugin.Plugin;
  */
 public class ChatCheckListener implements Listener, EventManager {
 
-    private final SpamCheck      spamCheck;
-    private final SpamJoinsCheck spamJoinsCheck;
-    private final ColorCheck     colorCheck;
+    private final NoPwnageCheck      noPwnageCheck;
+    private final ArrivalsLimitCheck arrivalsLimitCheck;
+    private final ColorCheck         colorCheck;
 
-    private final NoCheatPlus    plugin;
+    private final NoCheatPlus        plugin;
 
     public ChatCheckListener(final NoCheatPlus plugin) {
 
         this.plugin = plugin;
 
-        spamCheck = new SpamCheck(plugin);
-        spamJoinsCheck = new SpamJoinsCheck(plugin);
+        noPwnageCheck = new NoPwnageCheck(plugin);
+        arrivalsLimitCheck = new ArrivalsLimitCheck(plugin);
         colorCheck = new ColorCheck(plugin);
+
     }
 
     /**
@@ -61,11 +61,17 @@ public class ChatCheckListener implements Listener, EventManager {
         // Remember the original message
         data.message = event.getMessage();
 
+        // Remember if it is a command or not
+        if (event instanceof PlayerCommandPreprocessEvent)
+            data.isCommand = true;
+        else
+            data.isCommand = false;
+
         // Now do the actual checks
 
-        // First the spam check
-        if (cc.spamCheck && !player.hasPermission(Permissions.CHAT_SPAM))
-            cancelled = spamCheck.check(player, data, cc);
+        // First the nopwnage check
+        if (cc.noPwnageCheck && !player.hasPermission(Permissions.CHAT_NOPWNAGE))
+            cancelled = noPwnageCheck.check(player, data, cc);
 
         // Second the color check
         if (!cancelled && cc.colorCheck && !player.hasPermission(Permissions.CHAT_COLOR))
@@ -90,50 +96,6 @@ public class ChatCheckListener implements Listener, EventManager {
     @EventHandler(
             priority = EventPriority.LOWEST)
     public void commandPreprocess(final PlayerCommandPreprocessEvent event) {
-
-        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
-        final ChatConfig cc = ChatCheck.getConfig(player);
-
-        // If the command is /plugins or /pl
-        if ((event.getMessage().equalsIgnoreCase("/plugins")
-                || event.getMessage().toLowerCase().startsWith("/plugins ")
-                || event.getMessage().equalsIgnoreCase("/pl") || event.getMessage().toLowerCase().startsWith("/pl "))
-                // Exception for 'PluginList'...
-                && Bukkit.getPluginManager().getPlugin("PluginList") == null
-                // ...and CommandHelper
-                && Bukkit.getPluginManager().getPlugin("CommandHelper") == null && cc.hideNoCheatPlus) {
-            // If the player isn't allowed to use this command
-            if (!event.getPlayer().hasPermission("bukkit.command.plugins"))
-                // Fake the permissions error message
-                event.getPlayer().sendMessage(
-                        ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
-                                + "Please contact the server administrators if you believe that this is in error.");
-            else {
-                // Fake the plugins list
-                final StringBuilder pluginList = new StringBuilder();
-                final Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
-
-                for (final Plugin plugin : plugins) {
-                    // But make sure to hide NoCheatPlus from the plugins list
-                    if (plugin.getName().equals("NoCheatPlus"))
-                        continue;
-                    if (pluginList.length() > 0) {
-                        pluginList.append(ChatColor.WHITE);
-                        pluginList.append(", ");
-                    }
-
-                    pluginList.append(plugin.isEnabled() ? ChatColor.GREEN : ChatColor.RED);
-                    pluginList.append(plugin.getDescription().getName());
-                }
-
-                // Of course decrease the number of plugins
-                event.getPlayer().sendMessage("Plugins (" + (plugins.length - 1) + "): " + pluginList.toString());
-            }
-
-            // Cancel the event, we have already replied to the player
-            event.setCancelled(true);
-        }
-
         // This type of event is derived from PlayerChatEvent, therefore
         // just treat it like that
         chat(event);
@@ -144,29 +106,46 @@ public class ChatCheckListener implements Listener, EventManager {
         final LinkedList<String> s = new LinkedList<String>();
 
         final ChatConfig c = ChatCheck.getConfig(cc);
-        if (c.spamCheck)
-            s.add("chat.spam");
-        if (c.spamJoinsCheck)
-            s.add("chat.spamjoins");
+        if (c.noPwnageCheck)
+            s.add("chat.nopwnage");
+        if (c.arrivalsLimitCheck)
+            s.add("chat.arrivalscheck");
         if (c.colorCheck)
             s.add("chat.color");
         return s;
     }
 
     @EventHandler(
+            priority = EventPriority.LOWEST)
+    public void join(final PlayerJoinEvent event) {
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final ChatConfig cc = ChatCheck.getConfig(player);
+        final ChatData data = ChatCheck.getData(player);
+
+        // Check if the join is valid
+        if (cc.noPwnageCheck && !player.hasPermission(Permissions.CHAT_NOPWNAGE))
+            noPwnageCheck.handleJoin(player, data, cc);
+    }
+
+    @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void login(final PlayerLoginEvent event) {
 
-        // Only check new players (who has joined less than 10 minutes ago)
-        if (System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > 600000D)
+        // Do not check the players if the server has just restarted
+        if (System.currentTimeMillis() - ManagementFactory.getRuntimeMXBean().getStartTime() < 120000L)
             return;
 
         final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
         final ChatConfig cc = ChatCheck.getConfig(player);
         final ChatData data = ChatCheck.getData(player);
 
-        if (cc.spamJoinsCheck && spamJoinsCheck.check(player, data, cc))
+        // Only check new players, not the regular players
+        if (System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > cc.arrivalsLimitNewTime)
+            return;
+
+        if (cc.arrivalsLimitCheck && arrivalsLimitCheck.check(player, data, cc))
             // If the player failed the check, disallow the login
-            event.disallow(Result.KICK_OTHER, cc.spamJoinsKickMessage);
+            event.disallow(Result.KICK_OTHER, cc.arrivalsLimitKickMessage);
     }
 }

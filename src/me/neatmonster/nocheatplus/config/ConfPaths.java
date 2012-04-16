@@ -131,26 +131,72 @@ public abstract class ConfPaths {
 
     private final static String CHAT                                      = CHECKS + "chat.";
 
-    public final static String  CHAT_HIDENOCHEATPLUS                      = CHAT + "hidenocheatplus";
+    public final static String  CHAT_HIDECOMMANDS                         = CHAT + "hidecommands";
+
+    private final static String CHAT_NOPWNAGE                             = CHAT + "nopwnage.";
+    public final static String  CHAT_NOPWNAGE_CHECK                       = CHAT_NOPWNAGE + "active";
+    public final static String  CHAT_NOPWNAGE_WARNPLAYERS                 = CHAT_NOPWNAGE + "warnplayers";
+    public final static String  CHAT_NOPWNAGE_WARNOTHERS                  = CHAT_NOPWNAGE + "warnothers";
+    public final static String  CHAT_NOPWNAGE_WARNLEVEL                   = CHAT_NOPWNAGE + "warnlevel";
+    public final static String  CHAT_NOPWNAGE_WARNTIMEOUT                 = CHAT_NOPWNAGE + "warntimeout";
+    public final static String  CHAT_NOPWNAGE_BANLEVEL                    = CHAT_NOPWNAGE + "banlevel";
+    public final static String  CHAT_NOPWNAGE_ACTIONS                     = CHAT_NOPWNAGE + "actions";
+
+    private final static String CHAT_NOPWNAGE_MOVE                        = CHAT_NOPWNAGE + "move.";
+    public final static String  CHAT_NOPWNAGE_MOVE_CHECK                  = CHAT_NOPWNAGE_MOVE + "active";
+    public final static String  CHAT_NOPWNAGE_MOVE_WEIGHTBONUS            = CHAT_NOPWNAGE_MOVE + "weightbonus";
+    public final static String  CHAT_NOPWNAGE_MOVE_WEIGHTMALUS            = CHAT_NOPWNAGE_MOVE + "weightmalus";
+    public final static String  CHAT_NOPWNAGE_MOVE_TIMEOUT                = CHAT_NOPWNAGE_MOVE + "timeout";
+
+    private final static String CHAT_NOPWNAGE_REPEAT                      = CHAT_NOPWNAGE + "repeat.";
+    public final static String  CHAT_NOPWNAGE_REPEAT_CHECK                = CHAT_NOPWNAGE_REPEAT + "active";
+    public final static String  CHAT_NOPWNAGE_REPEAT_WEIGHT               = CHAT_NOPWNAGE_REPEAT + "weight";
+    public final static String  CHAT_NOPWNAGE_REPEAT_TIMEOUT              = CHAT_NOPWNAGE_REPEAT + "timeout";
+
+    private final static String CHAT_NOPWNAGE_SPEED                       = CHAT_NOPWNAGE + "speed.";
+    public final static String  CHAT_NOPWNAGE_SPEED_CHECK                 = CHAT_NOPWNAGE_SPEED + "active";
+    public final static String  CHAT_NOPWNAGE_SPEED_WEIGHT                = CHAT_NOPWNAGE_SPEED + "weight";
+    public final static String  CHAT_NOPWNAGE_SPEED_TIMEOUT               = CHAT_NOPWNAGE_SPEED + "timeout";
+
+    private final static String CHAT_NOPWNAGE_FIRST                       = CHAT_NOPWNAGE + "first.";
+    public final static String  CHAT_NOPWNAGE_FIRST_CHECK                 = CHAT_NOPWNAGE_FIRST + "active";
+    public final static String  CHAT_NOPWNAGE_FIRST_WEIGHT                = CHAT_NOPWNAGE_FIRST + "weight";
+    public final static String  CHAT_NOPWNAGE_FIRST_TIMEOUT               = CHAT_NOPWNAGE_FIRST + "timeout";
+
+    private final static String CHAT_NOPWNAGE_GLOBAL                      = CHAT_NOPWNAGE + "global.";
+    public final static String  CHAT_NOPWNAGE_GLOBAL_CHECK                = CHAT_NOPWNAGE_GLOBAL + "active";
+    public final static String  CHAT_NOPWNAGE_GLOBAL_WEIGHT               = CHAT_NOPWNAGE_GLOBAL + "weight";
+    public final static String  CHAT_NOPWNAGE_GLOBAL_TIMEOUT              = CHAT_NOPWNAGE_GLOBAL + "timeout";
+
+    private final static String CHAT_NOPWNAGE_BANNED                      = CHAT_NOPWNAGE + "banned.";
+    public final static String  CHAT_NOPWNAGE_BANNED_CHECK                = CHAT_NOPWNAGE_BANNED + "active";
+    public final static String  CHAT_NOPWNAGE_BANNED_WEIGHT               = CHAT_NOPWNAGE_BANNED + "weight";
+    public final static String  CHAT_NOPWNAGE_BANNED_TIMEOUT              = CHAT_NOPWNAGE_BANNED + "timeout";
+
+    private final static String CHAT_NOPWNAGE_RELOG                       = CHAT_NOPWNAGE + "relog.";
+    public final static String  CHAT_NOPWNAGE_RELOG_CHECK                 = CHAT_NOPWNAGE_RELOG + "active";
+    public final static String  CHAT_NOPWNAGE_RELOG_TIME                  = CHAT_NOPWNAGE_RELOG + "time";
+    public final static String  CHAT_NOPWNAGE_RELOG_WARNINGS              = CHAT_NOPWNAGE_RELOG + "warnings";
+    public final static String  CHAT_NOPWNAGE_RELOG_TIMEOUT               = CHAT_NOPWNAGE_RELOG + "timeout";
+
+    private final static String CHAT_NOPWNAGE_CAPTCHA                     = CHAT_NOPWNAGE + "captcha.";
+    public final static String  CHAT_NOPWNAGE_CAPTCHA_CHECK               = CHAT_NOPWNAGE_CAPTCHA + "active";
+    public final static String  CHAT_NOPWNAGE_CAPTCHA_TRIES               = CHAT_NOPWNAGE_CAPTCHA + "tries";
+    public final static String  CHAT_NOPWNAGE_CAPTCHA_LENGTH              = CHAT_NOPWNAGE_CAPTCHA + "length";
+    public final static String  CHAT_NOPWNAGE_CAPTCHA_CHARACTERS          = CHAT_NOPWNAGE_CAPTCHA + "characters";
+
+    private final static String CHAT_ARRIVALSLIMIT                        = CHAT + "arrivalslimit.";
+    public final static String  CHAT_ARRIVALSLIMIT_CHECK                  = CHAT_ARRIVALSLIMIT + "active";
+    public final static String  CHAT_ARRIVALSLIMIT_PLAYERSLIMIT           = CHAT_ARRIVALSLIMIT + "playerslimit";
+    public final static String  CHAT_ARRIVALSLIMIT_TIMEFRAME              = CHAT_ARRIVALSLIMIT + "timeframe";
+    public final static String  CHAT_ARRIVALSLIMIT_COOLDOWNDELAY          = CHAT_ARRIVALSLIMIT + "cooldowndelay";
+    public final static String  CHAT_ARRIVALSLIMIT_KICKMESSAGE            = CHAT_ARRIVALSLIMIT + "kickmessage";
+    public final static String  CHAT_ARRIVALSLIMIT_NEWTIME                = CHAT_ARRIVALSLIMIT + "newtime";
+    public final static String  CHAT_ARRIVALSLIMIT_ACTIONS                = CHAT_ARRIVALSLIMIT + "actions";
 
     private final static String CHAT_COLOR                                = CHAT + "color.";
     public final static String  CHAT_COLOR_CHECK                          = CHAT_COLOR + "active";
     public final static String  CHAT_COLOR_ACTIONS                        = CHAT_COLOR + "actions";
-
-    private final static String CHAT_SPAM                                 = CHAT + "spam.";
-    public final static String  CHAT_SPAM_CHECK                           = CHAT_SPAM + "active";
-    public final static String  CHAT_SPAM_WHITELIST                       = CHAT_SPAM + "whitelist";
-    public final static String  CHAT_SPAM_TIMEFRAME                       = CHAT_SPAM + "timeframe";
-    public final static String  CHAT_SPAM_MESSAGELIMIT                    = CHAT_SPAM + "messagelimit";
-    public final static String  CHAT_SPAM_COMMANDLIMIT                    = CHAT_SPAM + "commandlimit";
-    public final static String  CHAT_SPAM_ACTIONS                         = CHAT_SPAM + "actions";
-
-    private final static String CHAT_SPAMJOINS                            = CHAT + "spamjoins.";
-    public final static String  CHAT_SPAMJOINS_CHECK                      = CHAT_SPAMJOINS + "active";
-    public final static String  CHAT_SPAMJOINS_PLAYERSLIMIT               = CHAT_SPAMJOINS + "playerslimit";
-    public final static String  CHAT_SPAMJOINS_TIMELIMIT                  = CHAT_SPAMJOINS + "timelimit";
-    public final static String  CHAT_SPAMJOINS_COOLDOWN                   = CHAT_SPAMJOINS + "cooldown";
-    public final static String  CHAT_SPAMJOINS_KICKMESSAGE                = CHAT_SPAMJOINS + "kickmessage";
 
     private final static String FIGHT                                     = CHECKS + "fight.";
 

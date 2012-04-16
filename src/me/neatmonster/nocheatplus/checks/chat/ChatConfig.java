@@ -1,8 +1,5 @@
 package me.neatmonster.nocheatplus.checks.chat;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import me.neatmonster.nocheatplus.ConfigItem;
 import me.neatmonster.nocheatplus.actions.types.ActionList;
 import me.neatmonster.nocheatplus.config.ConfPaths;
@@ -17,59 +14,118 @@ import me.neatmonster.nocheatplus.config.Permissions;
  */
 public class ChatConfig implements ConfigItem {
 
-    public final boolean    hideNoCheatPlus;
+    public final boolean    hideCommands;
 
-    public final boolean    spamCheck;
-    public final String[]   spamWhitelist;
-    public final long       spamTimeframe;
-    public final int        spamMessageLimit;
-    public final int        spamCommandLimit;
-    public final ActionList spamActions;
+    public final boolean    noPwnageCheck;
+    public final boolean    noPwnageWarnPlayers;
+    public final boolean    noPwnageWarnOthers;
+    public final int        noPwnageWarnLevel;
+    public final long       noPwnageWarnTimeout;
+    public final int        noPwnageBanLevel;
+    public final ActionList noPwnageActions;
 
-    public final boolean    spamJoinsCheck;
-    public final int        spamJoinsPlayersLimit;
-    public final int        spamJoinsTimeLimit;
-    public final int        spamJoinsCooldown;
-    public final String     spamJoinsKickMessage;
+    public final boolean    noPwnageMoveCheck;
+    public final int        noPwnageMoveWeightBonus;
+    public final int        noPwnageMoveWeightMalus;
+    public final long       noPwnageMoveTimeout;
+
+    public final boolean    noPwnageSpeedCheck;
+    public final int        noPwnageSpeedWeight;
+    public final long       noPwnageSpeedTimeout;
+
+    public final boolean    noPwnageFirstCheck;
+    public final int        noPwnageFirstWeight;
+    public final long       noPwnageFirstTimeout;
+
+    public final boolean    noPwnageRepeatCheck;
+    public final int        noPwnageRepeatWeight;
+    public final long       noPwnageRepeatTimeout;
+
+    public final boolean    noPwnageGlobalCheck;
+    public final int        noPwnageGlobalWeight;
+    public final long       noPwnageGlobalTimeout;
+
+    public final boolean    noPwnageBannedCheck;
+    public final int        noPwnageBannedWeight;
+    public final long       noPwnageBannedTimeout;
+
+    public final boolean    noPwnageRelogCheck;
+    public final long       noPwnageRelogTime;
+    public final int        noPwnageRelogWarnings;
+    public final long       noPwnageRelogTimeout;
+
+    public final boolean    noPwnageCaptchaCheck;
+    public final int        noPwnageCaptchaLength;
+    public final String     noPwnageCaptchaCharacters;
+    public final int        noPwnageCaptchaTries;
+
+    public final boolean    arrivalsLimitCheck;
+    public final int        arrivalsLimitPlayersLimit;
+    public final long       arrivalsLimitTimeframe;
+    public final long       arrivalsLimitCooldownDelay;
+    public final long       arrivalsLimitNewTime;
+    public final String     arrivalsLimitKickMessage;
+    public final ActionList arrivalsLimitActions;
 
     public final boolean    colorCheck;
     public final ActionList colorActions;
 
     public ChatConfig(final NoCheatPlusConfiguration data) {
 
-        hideNoCheatPlus = data.getBoolean(ConfPaths.CHAT_HIDENOCHEATPLUS);
-        spamCheck = data.getBoolean(ConfPaths.CHAT_SPAM_CHECK);
-        spamWhitelist = splitWhitelist(data.getString(ConfPaths.CHAT_SPAM_WHITELIST));
-        spamTimeframe = data.getInt(ConfPaths.CHAT_SPAM_TIMEFRAME) * 1000L;
-        spamMessageLimit = data.getInt(ConfPaths.CHAT_SPAM_MESSAGELIMIT);
-        spamCommandLimit = data.getInt(ConfPaths.CHAT_SPAM_COMMANDLIMIT);
-        spamActions = data.getActionList(ConfPaths.CHAT_SPAM_ACTIONS, Permissions.CHAT_SPAM);
-        spamJoinsCheck = data.getBoolean(ConfPaths.CHAT_SPAMJOINS_CHECK);
-        spamJoinsPlayersLimit = data.getInt(ConfPaths.CHAT_SPAMJOINS_PLAYERSLIMIT);
-        spamJoinsTimeLimit = data.getInt(ConfPaths.CHAT_SPAMJOINS_TIMELIMIT);
-        spamJoinsCooldown = data.getInt(ConfPaths.CHAT_SPAMJOINS_COOLDOWN);
-        spamJoinsKickMessage = data.getString(ConfPaths.CHAT_SPAMJOINS_KICKMESSAGE);
+        hideCommands = data.getBoolean(ConfPaths.CHAT_HIDECOMMANDS);
+
+        noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
+        noPwnageWarnPlayers = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARNPLAYERS);
+        noPwnageWarnOthers = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARNOTHERS);
+        noPwnageWarnLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_WARNLEVEL);
+        noPwnageWarnTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_WARNTIMEOUT);
+        noPwnageBanLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_BANLEVEL);
+        noPwnageActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
+
+        noPwnageMoveCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK);
+        noPwnageMoveWeightBonus = data.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHTBONUS);
+        noPwnageMoveWeightMalus = data.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHTMALUS);
+        noPwnageMoveTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT);
+
+        noPwnageSpeedCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK);
+        noPwnageSpeedWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT);
+        noPwnageSpeedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT);
+
+        noPwnageFirstCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK);
+        noPwnageFirstWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_FIRST_WEIGHT);
+        noPwnageFirstTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT);
+
+        noPwnageRepeatCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK);
+        noPwnageRepeatWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT);
+        noPwnageRepeatTimeout = data.getInt(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT);
+
+        noPwnageGlobalCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_GLOBAL_CHECK);
+        noPwnageGlobalWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_GLOBAL_WEIGHT);
+        noPwnageGlobalTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_GLOBAL_TIMEOUT);
+
+        noPwnageBannedCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
+        noPwnageBannedWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT);
+        noPwnageBannedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);
+
+        noPwnageRelogCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_RELOG_CHECK);
+        noPwnageRelogTime = data.getLong(ConfPaths.CHAT_NOPWNAGE_RELOG_TIME);
+        noPwnageRelogWarnings = data.getInt(ConfPaths.CHAT_NOPWNAGE_RELOG_WARNINGS);
+        noPwnageRelogTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_RELOG_TIMEOUT);
+
+        noPwnageCaptchaCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK);
+        noPwnageCaptchaLength = data.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH);
+        noPwnageCaptchaCharacters = data.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS);
+        noPwnageCaptchaTries = data.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES);
+
+        arrivalsLimitCheck = data.getBoolean(ConfPaths.CHAT_ARRIVALSLIMIT_CHECK);
+        arrivalsLimitPlayersLimit = data.getInt(ConfPaths.CHAT_ARRIVALSLIMIT_PLAYERSLIMIT);
+        arrivalsLimitTimeframe = data.getLong(ConfPaths.CHAT_ARRIVALSLIMIT_TIMEFRAME);
+        arrivalsLimitCooldownDelay = data.getLong(ConfPaths.CHAT_ARRIVALSLIMIT_COOLDOWNDELAY);
+        arrivalsLimitNewTime = data.getLong(ConfPaths.CHAT_ARRIVALSLIMIT_NEWTIME);
+        arrivalsLimitKickMessage = data.getString(ConfPaths.CHAT_ARRIVALSLIMIT_KICKMESSAGE);
+        arrivalsLimitActions = data.getActionList(ConfPaths.CHAT_ARRIVALSLIMIT_ACTIONS, Permissions.CHAT_ARRIVALSLIMIT);
+
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
-    }
-
-    /**
-     * Convenience method to split a string into an array on every occurance of
-     * the "," character, removing all whitespaces before and after it too.
-     * 
-     * @param string
-     *            The string containing text seperated by ","
-     * @return An array of the seperate texts
-     */
-    private String[] splitWhitelist(String string) {
-
-        final List<String> strings = new LinkedList<String>();
-        string = string.trim();
-
-        for (final String s : string.split(","))
-            if (s != null && s.trim().length() > 0)
-                strings.add(s.trim());
-
-        return strings.toArray(new String[strings.size()]);
     }
 }

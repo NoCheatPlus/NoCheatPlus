@@ -267,9 +267,13 @@
 
 ----------------------- CHAT Permissions for CHECKS ----------------------------
 
- - nocheatplus.checks.chat.spam
+ - nocheatplus.checks.chat.nopwnage
     Don't limit the number of messages and commands that a player may send in a
-    short timeframe
+    short timeframe, the delay allowed to join the server again, etc. in short
+    everything watched by the NoPwnage check.
+    
+ - nocheatplus.checks.chat.arrivalslimit
+    Don't limit the number of new players allowed to join in a short timeframe.
 
  - nocheatplus.checks.chat.color
     Don't filter color codes from messages that get sent by players, allowing
@@ -940,13 +944,155 @@
 
  Checks that at least technically have to do with chat or commands.
  
-  hidenocheatplus:
-    
-    Setting this to true will hide NoCheatPlus for the /plugins (or /pl) command
-    of Bukkit (only if typed by a player). This command might be used by some
-    griefing clients to try to detect and to apply bypasses to NoCheatPlus.
+   hideCommands:
+    Enable this if you don't want NoCheat+'s commands to reply to the player if
+    he doesn't have the permissions to use them.
+ 
+ 1) NOPWNAGE:
+	
+      The instructions for this check comes directly from NoPwnage's instructions
+      file. You can find the project at http://dev.bukkit.org/server-mods/nopwnage/.
 
- 1) COLOR:
+  warnPlayers:
+    Should a player that reaches the "warnLevel" get a text message telling
+    him that he is under suspicion of being a bot.
+
+  warnOthers:
+    Should all players get warned when a player gets banned for spambot-like 
+    activity?
+
+  warnLevel:
+    How much suspicion must a message earn to issue a warning for the player
+
+  warnTimeout:
+    After what time (in ms) should a player be considered "unwarned" again.
+
+  banLevel:
+    How much suspicion must a message earn to execute the "commands" (usually
+    ban the player). If warnings for players are enabled and the player hasn't
+    been warned yet, he'll get warned instead.
+
+  move.enabled:
+  move.weightbonus:
+  move.weightmalus:
+  move.timeout:
+    NoPwnage will check if a player moved within the "timeout" timeframe. If
+    he did move, the suspicion will be reduced by the "weightbonus" value. If 
+    he did not move, the suspicion will be increased by "weightmalus" value.
+    Only used if "enabled".
+
+  messageRepeat.enabled:
+  messageRepeat.weight:
+  messageRepeat.timeout:
+    NoPwnage will check if a player repeats his messages within the "timeout" 
+    timeframe. Even if the message is a bit different, it will be counted as
+    being a repetition. The suspicion is increased by "weight" and for each
+    additional repetition by "weight/2". This means that multiple repetitions
+    will increase suspicion, but not as much as the first repetition.
+    Only used if "enabled".
+
+  messageSpeed.enabled:
+  messageSpeed.weight:
+  messageSpeed.timeout:
+    NoPwnage will check if a player sends messages too fast. If a message is
+    sent within "timout" ms after the previous message, increase suspicion by
+    "weight". For each additional message that is sent within "timeout",
+    the suspicion is increased by "weight/2". This means that multiple 
+    too fast sent messages in a row will increase suspicion, but not as much as
+    the first.
+    Only used if "enabled".
+
+  messageFirst.enabled:
+  messageFirst.weight:
+  messageFirst.timeout:
+    NoPwnage will check if a player sends his first message within "timeout"
+    ms after his login. If he does, increase supspicion by "weight".
+    Only used if "enabled".
+
+  globalMessageRepeat.enabled:
+  globalMessageRepeat.weight:
+  globalMessageRepeat.timeout:
+    NoPwnage will check if a player repeats a message that has been sent by
+    another player just before, within "timeout". If he does, suspicion will
+    be increased by "weight" and for each additional repetition by "weight/2",
+    independent of by which player. This means that multiple repetitions will
+    increase suspicion, but not as much as the first repetition.
+    Only used if "enabled".
+
+  bannedMessageRepeat.enabled:
+  bannedMessageRepeat.weight:
+  bannedMessageRepeat.timeout:
+    NoPwnage will remember the last message that caused someone to get banned.
+    If a player repeats that message within "timeout" ms, the suspicion will
+    be increased by "weight".
+    Only used if "enabled".
+
+  relog.enabled:
+  relog.time:
+  relog.warnings:
+  relog.timeout:
+    NoPwnage will remember the time when a player leaves the server. If he
+    returns within "time" ms, he will get warned. If he has been warned
+    "warnings" times already, the "commands" will be executed for him. Warnings
+    get removed if the time of the last warning was more than "timeout" ms ago.
+
+  actions:
+    NoPwnage allows you to decide what should happen when a player reaches
+    "banLevel" or relogged too fast. The default is to kick him and ban IP and
+    name. You'll also get a log message to console stating how exactly he
+    reached the "banLevel" (how much suspicion was added by each check).
+    
+    Commands have to be seperated by ";" and the "[player]" and "[ip]"
+    wildcards will be replaced by the actual data during execution.
+    
+  captcha.enabled:
+    Should players that get to "banlevel" be presented with a captcha first
+    instead of running the commands immediatly?
+
+  captcha.question:
+    How should the question be worded. Use & to create colors. The text
+    [captcha] will be replaced with the actual captcha.
+ 
+  tries:
+    How many attempts will a player have to give the correct answer. A failed
+    attempt will display the question again. Be generous here, as players may
+    not be fast enough to read the question the first few times or be otherwise
+    distracted.
+
+  length:
+    How many characters should the captcha have.
+
+  characters:
+    The characters for the captcha are randomly drawn from this string
+ 
+ 2) ARRIVALSLIMIT:
+
+     This check limits the number of new players joining every X seconds to
+     prevent the usage of softwares like PWN4G3.
+     
+      active:
+       Should players get checked for that kind of spam.
+       
+      playerslimit:
+       The number of new players allowed to join during the interval defined
+       in the configuration.
+       
+      timeframe:
+       The interval in milliseconds during which the number of new players
+       defined in the configuration are allowed to join.
+       
+      cooldown:
+       The number of milliseconds during which new players won't be allowed
+       to join if too many new players have been detected.
+       
+      newtime:
+       The time elsaped since the player's first join to be considered as
+       an old/regular player.
+       
+      actions:
+       What should happen if the access is denied to the player.
+
+ 3) COLOR:
 
      Players may use color-codes to send colored messages. This may be used
      to fool other players into believing they are admins or similar.
@@ -962,63 +1108,6 @@
         the number of messages that contained color codes. It increases with
         each color-code message by 1 and decreases slowly with colorless
         messages.
-
- 2) SPAM:
-
-     Players may send a ton of messages/commands in a short time to cause
-     lag or even crash a server.
-
-      active:
-        Should player messages get checked for sending of too many messages.
-
-      whitelist:
-        A " " (whitespace) separated list of words. Messages that start with
-        these sequences will not be counted. This is ideal to exempt commands
-        from getting filtered, by e.g. adding "/help" to the list.
-
-      timeframe:
-        For how many seconds should messages and commands be counted, before 
-        the counters get reset and counting starts at zero again.
-
-      messagelimit:
-        How many "normal" chat messages may be sent within the timeframe. All
-        messages that don't start with "/" are considered "normal".
-
-      commandlimit:
-        How many commands may be issued within the timeframe. Some mods (e.g.
-        TooManyItems) send a command on every mouse-click, which may cause
-        problems if this is set too low. So choose wisely. Every message that
-        starts with "/" is considered a command, even if the command doesn't
-        exist.
-
-      actions:
-        What should happen if players send more messages/commands than declared
-        by the above limits? Default is to prevent the message/command from 
-        being processed ("cancel" them) and for severe cases where players send
-        a lot of messages/commands, kick them. The Violation Level (VL) is the
-        number of messages/commands that were sent beyond the specified limits.
-        It gets increased for every message/command by 1 and reset to zero when
-        the "timeframe" has passed.
-        
- 3) SPAMJOINS:
-
-     This check limits the number of new players joining every X seconds to
-     prevent the usage of softwares like PWN4G3.
-     
-      active:
-       Should players get checked for that kind of spam.
-       
-      playerslimit:
-       The number of new players allowed to join during the interval defined
-       in the configuration.
-       
-      timelimit:
-       The interval in milliseconds during which the number of new players
-       defined in the configuration are allowed to join.
-       
-      cooldown:
-       The number of milliseconds during which new players won't be allowed
-       to join if too many new players have been detected.
 
 
 ------------------------------ FIGHT Subsection --------------------------------
