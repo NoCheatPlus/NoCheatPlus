@@ -16,6 +16,7 @@ public class FightData implements DataItem {
     public int     speedVL;
     public double  godmodeVL;
     public double  instanthealVL;
+    public double  knockbackVL;
 
     // For checks that have penalty time
     public long    directionLastViolationTime;
@@ -44,5 +45,8 @@ public class FightData implements DataItem {
     // Keep track of time and amount of attacks
     public long    speedTime;
     public int     speedAttackCount;
+
+    // Remember when the player has toggled his sprint mode
+    public long    sprint            = 0L;
 
 }

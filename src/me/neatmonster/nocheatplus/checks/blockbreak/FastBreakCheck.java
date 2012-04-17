@@ -9,6 +9,10 @@ import me.neatmonster.nocheatplus.data.Statistics.Id;
 
 import org.bukkit.GameMode;
 
+/**
+ * A check used to verify if the player isn't placing his blocks too quickly
+ * 
+ */
 public class FastBreakCheck extends BlockBreakCheck {
 
     public FastBreakCheck(final NoCheatPlus plugin) {

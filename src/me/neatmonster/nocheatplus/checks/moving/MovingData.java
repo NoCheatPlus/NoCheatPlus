@@ -45,9 +45,6 @@ public class MovingData implements DataItem {
     public float                 fallDistance;
     public float                 lastAddedFallDistance;
 
-    // Keep in mind since when the player in falling/jumping
-    public long                  fallingSince              = 0L;
-
     // Is the player flying because of a plugin has modified his velocity
     public boolean               velocityChanged           = false;
 
@@ -90,6 +87,9 @@ public class MovingData implements DataItem {
     public boolean               fromOnOrInGround;
     public boolean               toOnOrInGround;
 
+    // Store if the player had blocks above his head when he moved previously
+    public boolean[]             hadBlocksAbove            = new boolean[5];
+
     public Id                    statisticCategory         = Id.MOV_RUNNING;
 
     public void clearMorePacketsData() {
@@ -102,6 +102,11 @@ public class MovingData implements DataItem {
         fallDistance = 0;
         lastAddedFallDistance = 0;
         bunnyhopdelay = 0;
-        fallingSince = 0;
+    }
+
+    public void rotateWaterWalkData(final boolean aboveSolid) {
+        for (int i = 0; i < hadBlocksAbove.length - 1; i++)
+            hadBlocksAbove[i] = hadBlocksAbove[i + 1];
+        hadBlocksAbove[hadBlocksAbove.length - 1] = aboveSolid;
     }
 }

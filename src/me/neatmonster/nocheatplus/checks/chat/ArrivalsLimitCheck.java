@@ -5,6 +5,10 @@ import java.util.Arrays;
 import me.neatmonster.nocheatplus.NoCheatPlus;
 import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 
+/**
+ * A check used to limit the number of new players allowed to join in a specified time frame
+ * 
+ */
 public class ArrivalsLimitCheck extends ChatCheck {
 
     // Used to know if the cooldown is enabled and since when

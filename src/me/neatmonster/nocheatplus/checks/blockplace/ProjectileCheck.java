@@ -7,6 +7,10 @@ import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.actions.ParameterName;
 import me.neatmonster.nocheatplus.data.Statistics.Id;
 
+/**
+ * A check used to verify if the player isn't throwing projectiles too quickly
+ * 
+ */
 public class ProjectileCheck extends BlockPlaceCheck {
 
     public ProjectileCheck(final NoCheatPlus plugin) {

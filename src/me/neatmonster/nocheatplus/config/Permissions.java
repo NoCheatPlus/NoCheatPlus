@@ -42,6 +42,7 @@ public class Permissions {
     public static final String  FIGHT_SPEED               = FIGHT + ".speed";
     public static final String  FIGHT_GODMODE             = FIGHT + ".godmode";
     public static final String  FIGHT_INSTANTHEAL         = FIGHT + ".instantheal";
+    public static final String  FIGHT_KNOCKBACK           = FIGHT + ".knockback";
 
     private static final String INVENTORY                 = CHECKS + ".inventory";
     public static final String  INVENTORY_DROP            = INVENTORY + ".drop";

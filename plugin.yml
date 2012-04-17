@@ -103,6 +103,8 @@ permissions:
                 description: Allow a player to not take damage by exploiting a design flaw in Minecraft
               nocheatplus.checks.fight.instantheal:
                 description: Allow a player to artificially speed up his health regeneration
+              nocheatplus.checks.fight.knockback:
+                description: Allow a player to do knockbacks when it's not technically possible
           nocheatplus.checks.inventory:
             description: Allow the player to bypass all inventory checks
             children:

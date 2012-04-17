@@ -7,6 +7,7 @@ import net.minecraft.server.Block;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -170,8 +171,8 @@ public class CheckUtil {
 
         if (!isInGround(result))
             // Original location: X, Z (allow standing in walls this time)
-            if (isSolid(types[world.getBlockTypeIdAt(Location.locToBlock(location.x), Location.locToBlock(location.y),
-                    Location.locToBlock(location.z))]))
+            if (isSolid(getType(world, Location.locToBlock(location.x), Location.locToBlock(location.y),
+                    Location.locToBlock(location.z))))
                 result |= INGROUND;
 
         return result;
@@ -192,16 +193,16 @@ public class CheckUtil {
 
         // First we need to know about the block itself, the block
         // below it and the block above it
-        final int top = types[world.getBlockTypeIdAt(x, y + 1, z)];
-        final int base = types[world.getBlockTypeIdAt(x, y, z)];
-        final int below = types[world.getBlockTypeIdAt(x, y - 1, z)];
+        final int top = getType(world, x, y + 1, z);
+        final int base = getType(world, x, y, z);
+        final int below = getType(world, x, y - 1, z);
 
         int type = 0;
         // Special case: Standing on a fence
         // Behave as if there is a block on top of the fence
         if (below == FENCE && base != FENCE && isNonSolid(top))
             type = INGROUND;
-        else if (below != FENCE && isNonSolid(base) && types[world.getBlockTypeIdAt(x, y - 2, z)] == FENCE)
+        else if (below != FENCE && isNonSolid(base) && getType(world, x, y - 2, z) == FENCE)
             type = ONGROUND;
         else if (isNonSolid(top))
             // Simplest (and most likely) case:
@@ -222,6 +223,28 @@ public class CheckUtil {
 
     public static int getType(final int typeId) {
         return types[typeId];
+    }
+
+    private static int getType(final World world, final int x, final int y, final int z) {
+        return types[world.getBlockAt(x, y, z).getType() == Material.VINE && !isClimbable(world, x, y, z) ? 0 : world
+                .getBlockTypeIdAt(x, y, z)];
+    }
+
+    public static boolean isClimbable(final World world, final int x, final int y, final int z) {
+        BlockFace attachedFace = null;
+        if (world.getBlockAt(x, y, z).getData() == 0x1)
+            attachedFace = BlockFace.WEST;
+        else if (world.getBlockAt(x, y, z).getData() == 0x2)
+            attachedFace = BlockFace.NORTH;
+        else if (world.getBlockAt(x, y, z).getData() == 0x4)
+            attachedFace = BlockFace.EAST;
+        else if (world.getBlockAt(x, y, z).getData() == 0x8)
+            attachedFace = BlockFace.SOUTH;
+        if (attachedFace == null)
+            return true;
+        return isSolid(getType(world, world.getBlockAt(x, y, z).getRelative(attachedFace).getX(),
+                world.getBlockAt(x, y, z).getRelative(attachedFace).getY(),
+                world.getBlockAt(x, y, z).getRelative(attachedFace).getZ()));
     }
 
     public static boolean isFood(final ItemStack item) {
@@ -308,5 +331,4 @@ public class CheckUtil {
         else
             return (int) floor;
     }
-
 }

@@ -8,6 +8,7 @@ import me.neatmonster.nocheatplus.EventManager;
 import me.neatmonster.nocheatplus.NoCheatPlus;
 import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
+import me.neatmonster.nocheatplus.config.Permissions;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -23,6 +24,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 
 /**
  * Central location to listen to events that are
@@ -31,7 +33,7 @@ import org.bukkit.event.player.PlayerAnimationEvent;
  */
 public class FightCheckListener implements Listener, EventManager {
 
-    private final List<FightCheck> checks = new ArrayList<FightCheck>(4);
+    private final List<FightCheck> checks = new ArrayList<FightCheck>(5);
 
     private final GodmodeCheck     godmodeCheck;
     private final InstanthealCheck instanthealCheck;
@@ -44,6 +46,7 @@ public class FightCheckListener implements Listener, EventManager {
         checks.add(new NoswingCheck(plugin));
         checks.add(new DirectionCheck(plugin));
         checks.add(new ReachCheck(plugin));
+        checks.add(new KnockbackCheck(plugin));
 
         godmodeCheck = new GodmodeCheck(plugin);
         instanthealCheck = new InstanthealCheck(plugin);
@@ -177,6 +180,8 @@ public class FightCheckListener implements Listener, EventManager {
             s.add("fight.godmode");
         if (f.instanthealCheck)
             s.add("fight.instantHeal");
+        if (f.knockbackCheck)
+            s.add("fight.knockback");
         return s;
     }
 
@@ -248,5 +253,27 @@ public class FightCheckListener implements Listener, EventManager {
 
         if (cancelled)
             event.setCancelled(true);
+    }
+
+    /**
+     * We listen to the PlayerToggleSprint event for the
+     * knockback check
+     * 
+     * @param event
+     *            The PlayerToggleSprintEvent
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void sprint(final PlayerToggleSprintEvent event) {
+
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final FightConfig cc = FightCheck.getConfig(player);
+
+        if (!cc.knockbackCheck || player.hasPermission(Permissions.FIGHT_KNOCKBACK))
+            return;
+
+        // Store when the player has started sprinting
+        final FightData data = FightCheck.getData(player);
+        data.sprint = System.currentTimeMillis();
     }
 }

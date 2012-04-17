@@ -7,9 +7,11 @@ import java.util.List;
 import me.neatmonster.nocheatplus.EventManager;
 import me.neatmonster.nocheatplus.NoCheatPlus;
 import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
+import me.neatmonster.nocheatplus.config.ConfPaths;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -96,6 +98,19 @@ public class ChatCheckListener implements Listener, EventManager {
     @EventHandler(
             priority = EventPriority.LOWEST)
     public void commandPreprocess(final PlayerCommandPreprocessEvent event) {
+
+        // If OP by console only is enabled, prevent the op/deop commands
+        // to be used by a player who is OP or has the required permissions
+        if (plugin.getConfig(event.getPlayer()).getConfiguration().getBoolean(ConfPaths.MISCELLANEOUS_OPBYCONSOLEONLY)
+                && (event.getMessage().startsWith("/op")
+                        && (event.getPlayer().isOp() || event.getPlayer().hasPermission("bukkit.command.op.give")) || event
+                        .getMessage().startsWith("/deop")
+                        && (event.getPlayer().isOp() || event.getPlayer().hasPermission("bukkit.command.op.take")))) {
+            event.getPlayer().sendMessage(ChatColor.RED + "This command can be executed from the console!");
+            event.setCancelled(true);
+            return;
+        }
+
         // This type of event is derived from PlayerChatEvent, therefore
         // just treat it like that
         chat(event);
@@ -115,6 +130,12 @@ public class ChatCheckListener implements Listener, EventManager {
         return s;
     }
 
+    /**
+     * We listen to PlayerJoin events for the nopwnage check
+     * 
+     * @param event
+     *            The PlayerJoin Event
+     */
     @EventHandler(
             priority = EventPriority.LOWEST)
     public void join(final PlayerJoinEvent event) {
@@ -128,6 +149,12 @@ public class ChatCheckListener implements Listener, EventManager {
             noPwnageCheck.handleJoin(player, data, cc);
     }
 
+    /**
+     * We listen to PlayerLogin events for the arrivalslimit check
+     * 
+     * @param event
+     *            The PlayerLogin Event
+     */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void login(final PlayerLoginEvent event) {

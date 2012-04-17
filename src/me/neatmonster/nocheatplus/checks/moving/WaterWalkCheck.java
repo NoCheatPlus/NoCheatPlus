@@ -13,6 +13,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+/**
+ * This check is used to verify that players aren't walking on water
+ * 
+ */
 public class WaterWalkCheck extends MovingCheck {
 
     public WaterWalkCheck(final NoCheatPlus plugin) {
@@ -28,6 +32,15 @@ public class WaterWalkCheck extends MovingCheck {
         up.y = to.y + 1;
         up.z = to.z;
 
+        final PreciseLocation toAbove = new PreciseLocation();
+        toAbove.x = to.x;
+        toAbove.y = to.y + 2;
+        toAbove.z = to.z;
+        final PreciseLocation fromAbove = new PreciseLocation();
+        fromAbove.x = from.x;
+        fromAbove.y = from.y + 2;
+        fromAbove.z = from.z;
+
         // To know if a player "is in water" is useful
         final int fromType = CheckUtil.evaluateLocation(player.getPlayer().getWorld(), from);
         final int toType = CheckUtil.evaluateLocation(player.getPlayer().getWorld(), to);
@@ -36,6 +49,17 @@ public class WaterWalkCheck extends MovingCheck {
         final boolean fromLiquid = CheckUtil.isLiquid(fromType);
         final boolean toLiquid = CheckUtil.isLiquid(toType);
         final boolean upLiquid = CheckUtil.isLiquid(upType);
+
+        final boolean toAboveSolid = CheckUtil.isSolid(CheckUtil.getType(new Location(player.getPlayer().getWorld(),
+                toAbove.x, toAbove.y, toAbove.z).getBlock().getTypeId()));
+        final boolean fromAboveSolid = CheckUtil.isSolid(CheckUtil.getType(new Location(player.getPlayer().getWorld(),
+                fromAbove.x, fromAbove.y, fromAbove.z).getBlock().getTypeId()));
+        boolean aboveSolid = toAboveSolid || fromAboveSolid;
+        final boolean save = aboveSolid;
+        for (final boolean hadBlocksAbove : data.hadBlocksAbove)
+            if (hadBlocksAbove)
+                aboveSolid = true;
+        data.rotateWaterWalkData(save);
 
         final Block fromBlock = new Location(player.getPlayer().getWorld(), from.x, from.y, from.z).getBlock();
 
@@ -69,7 +93,8 @@ public class WaterWalkCheck extends MovingCheck {
         // Slowly reduce the level with each event
         data.waterWalkVL *= 0.95;
 
-        if (!slabsStairsFix && fromLiquid && toLiquid && !upLiquid && deltaY == 0D && deltaWithSurface < 0.8D) {
+        if (!slabsStairsFix && fromLiquid && toLiquid && !upLiquid && !aboveSolid && deltaY == 0D
+                && deltaWithSurface < 0.8D) {
             // If the player is trying to move while being in water
             // Increment violation counter
             data.waterWalkVL += resultY;
@@ -81,7 +106,7 @@ public class WaterWalkCheck extends MovingCheck {
             // Was one of the actions a cancel? Then do it
             if (cancel)
                 newToLocation = from;
-        } else if (waterStreamsFix && fromLiquid && !toLiquid && (deltaX < 0.28D || deltaX > 0.31D)
+        } else if (waterStreamsFix && fromLiquid && !toLiquid && !aboveSolid && (deltaX < 0.28D || deltaX > 0.31D)
                 && (deltaZ < 0.28D || deltaZ > 0.31D)) {
             // If the player is trying to jump while being in water
             // Increment violation counter

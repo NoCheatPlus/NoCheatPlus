@@ -11,7 +11,6 @@ import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 import me.neatmonster.nocheatplus.data.PreciseLocation;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -45,7 +44,6 @@ public class MovingCheckListener implements Listener, EventManager {
     private final MorePacketsVehicleCheck morePacketsVehicleCheck;
     private final FlyingCheck             flyingCheck;
     private final RunningCheck            runningCheck;
-    private final TrackerCheck            trackerCheck;
     private final WaterWalkCheck          waterWalkCheck;
 
     private final NoCheatPlus             plugin;
@@ -54,30 +52,9 @@ public class MovingCheckListener implements Listener, EventManager {
 
         flyingCheck = new FlyingCheck(plugin);
         runningCheck = new RunningCheck(plugin);
-        trackerCheck = new TrackerCheck(plugin);
         morePacketsCheck = new MorePacketsCheck(plugin);
         morePacketsVehicleCheck = new MorePacketsVehicleCheck(plugin);
         waterWalkCheck = new WaterWalkCheck(plugin);
-
-        // Schedule a new synchronized repeating task repeated 20 times/s.
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-
-            @Override
-            public void run() {
-
-                // Loop through all players
-                for (final Player bukkitPlayer : Bukkit.getOnlinePlayers()) {
-
-                    // Get some data about the player/config
-                    final NoCheatPlusPlayer player = plugin.getPlayer(bukkitPlayer);
-                    final MovingConfig cc = MovingCheck.getConfig(player);
-                    final MovingData data = MovingCheck.getData(player);
-
-                    // Execute the check
-                    trackerCheck.check(player, data, cc);
-                }
-            }
-        }, 1L, 1L);
 
         this.plugin = plugin;
     }
@@ -169,8 +146,6 @@ public class MovingCheckListener implements Listener, EventManager {
                     s.add("moving.sneaking");
                 if (m.nofallCheck)
                     s.add("moving.nofall");
-                if (m.trackerCheck)
-                    s.add("moving.tracker");
                 if (m.waterWalkCheck)
                     s.add("moving.waterwalk");
             } else
@@ -321,12 +296,8 @@ public class MovingCheckListener implements Listener, EventManager {
     @EventHandler
     public void quit(final PlayerQuitEvent event) {
 
-        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
-        final MovingData data = MovingCheck.getData(player);
-
-        // Reset the variable
-        data.fallingSince = 0L;
-
+        // If the player has buried himself, remove the blocks to prevent
+        // him from respawning at the surface
         if (!event.getPlayer().hasPermission(Permissions.MOVING_RESPAWNTRICK)
                 && (event.getPlayer().getLocation().getBlock().getType() == Material.GRAVEL || event.getPlayer()
                         .getLocation().getBlock().getType() == Material.SAND)) {

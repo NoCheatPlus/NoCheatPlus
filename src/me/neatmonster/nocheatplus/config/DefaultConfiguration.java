@@ -14,11 +14,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         options().header("Main configuration file for NoCheatPlus. Read \"Instructions.txt\"");
 
-        /** CLIENT MODS **/
-
-        set(ConfPaths.CLIENT_MODS_ALLOW, false);
-
-        /** LOGGING **/
+        /*** LOGGING ***/
 
         set(ConfPaths.LOGGING_ACTIVE, true);
         set(ConfPaths.LOGGING_SHOWACTIVECHECKS, false);
@@ -28,6 +24,11 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.LOGGING_LOGTOFILE, true);
         set(ConfPaths.LOGGING_LOGTOCONSOLE, true);
         set(ConfPaths.LOGGING_LOGTOINGAMECHAT, true);
+
+        /*** MISCELLANEOUS ***/
+
+        set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
+        set(ConfPaths.MISCELLANEOUS_OPBYCONSOLEONLY, true);
 
         /*** INVENTORY ***/
 
@@ -53,9 +54,6 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.MOVING_RUNFLY_CHECKNOFALL, true);
         set(ConfPaths.MOVING_RUNFLY_NOFALLAGGRESSIVE, true);
         set(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS, "log:nofall:0:5:cif cancel");
-
-        set(ConfPaths.MOVING_RUNFLY_TRACKER_CHECK, true);
-        set(ConfPaths.MOVING_RUNFLY_TRACKER_ACTIONS, "cmd:kick");
 
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS, false);
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE, true);
@@ -199,6 +197,10 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, true);
         set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:fheal:1:1:if cancel");
 
+        set(ConfPaths.FIGHT_KNOCKBACK_CHECK, true);
+        set(ConfPaths.FIGHT_KNOCKBACK_INTERVAL, 50);
+        set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:fknock:0:5:cif cancel");
+
         set(ConfPaths.STRINGS + ".drop",
                 "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");
@@ -238,6 +240,8 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.STRINGS + ".fgod", "[player] failed [check]: Avoided taking damage or lagging. VL [violations]");
         set(ConfPaths.STRINGS + ".fheal",
                 "[player] failed [check]: Tried to regenerate health faster than normal. VL [violations]");
+        set(ConfPaths.STRINGS + ".fknock",
+                "[player] failed [check]: Tried to do a knockback but wasn't really sprinting. VL [violations]");
         set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: Fires bow to fast. VL [violations]");
         set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: Eats food [food] too fast. VL [violations]");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");

@@ -13,6 +13,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+/**
+ * A check used to verify if players aren't spam bots
+ * 
+ */
 public class NoPwnageCheck extends ChatCheck {
     private String       lastBanCausingMessage;
     private long         lastBanCausingMessageTime;
@@ -163,6 +167,14 @@ public class NoPwnageCheck extends ChatCheck {
         return cancel;
     }
 
+    /**
+     * This function is used to generate a captcha
+     * 
+     * @param cc
+     *            The ChatConfig
+     * @return
+     *         The captcha generated
+     */
     private String generateCaptcha(final ChatConfig cc) {
 
         final StringBuilder b = new StringBuilder();
@@ -213,6 +225,18 @@ public class NoPwnageCheck extends ChatCheck {
         data.commandsHaveBeenRun = false;
     }
 
+    /**
+     * This function return the minimum between the 3 Integers
+     * 
+     * @param a
+     *            The first Integer
+     * @param b
+     *            The second Integer
+     * @param c
+     *            The third Integer
+     * @return
+     *         The minimum
+     */
     private int minimum(final int a, final int b, final int c) {
         int mi;
 
@@ -224,6 +248,18 @@ public class NoPwnageCheck extends ChatCheck {
         return mi;
     }
 
+    /**
+     * This function executes the commands defined in the configuration
+     * 
+     * @param player
+     *            The Player
+     * @param reason
+     *            The reason
+     * @param data
+     *            The ChatData
+     * @param cc
+     *            The ChatConfig
+     */
     private void runCommands(final NoCheatPlusPlayer player, final String reason, final ChatData data,
             final ChatConfig cc) {
         data.reason = reason;
@@ -235,6 +271,16 @@ public class NoPwnageCheck extends ChatCheck {
         }
     }
 
+    /**
+     * This function is used to know if two messages are similar
+     * 
+     * @param message1
+     *            The first message
+     * @param message2
+     *            The second message
+     * @return
+     *         true if the messages are similar, false otherwise
+     */
     private boolean similar(final String message1, final String message2) {
         return message1 != null && message2 != null
                 && stringDifference(message1, message2) < 1 + message1.length() / 10;
@@ -283,6 +329,12 @@ public class NoPwnageCheck extends ChatCheck {
         return d[n][m];
     }
 
+    /**
+     * This function is used to warn the other player
+     * 
+     * @param player
+     *            The Player
+     */
     private void warnOthers(final NoCheatPlusPlayer player) {
         plugin.getServer().broadcastMessage(
                 ChatColor.YELLOW + player.getName() + ChatColor.DARK_RED + " has set off the autoban!");
@@ -290,6 +342,12 @@ public class NoPwnageCheck extends ChatCheck {
                 ChatColor.DARK_RED + " Please do not say anything similar to what the user said!");
     }
 
+    /**
+     * This function is used to warn the player
+     * 
+     * @param player
+     *            The Player
+     */
     private void warnPlayer(final NoCheatPlusPlayer player) {
         player.sendMessage(player.getConfigurationStore().getConfiguration().getString(ConfPaths.LOGGING_PREFIX)
                 + ChatColor.DARK_RED + "Our system has detected unusual bot activities coming from you.");

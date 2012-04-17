@@ -37,6 +37,10 @@ public class FightConfig implements ConfigItem {
     public final boolean    instanthealCheck;
     public final ActionList instanthealActions;
 
+    public final boolean    knockbackCheck;
+    public final long       knockbackInterval;
+    public final ActionList knockbackActions;
+
     public FightConfig(final NoCheatPlusConfiguration data) {
 
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
@@ -58,5 +62,9 @@ public class FightConfig implements ConfigItem {
 
         instanthealCheck = data.getBoolean(ConfPaths.FIGHT_INSTANTHEAL_CHECK);
         instanthealActions = data.getActionList(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, Permissions.FIGHT_INSTANTHEAL);
+
+        knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
+        knockbackInterval = data.getLong(ConfPaths.FIGHT_KNOCKBACK_INTERVAL);
+        knockbackActions = data.getActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
     }
 }

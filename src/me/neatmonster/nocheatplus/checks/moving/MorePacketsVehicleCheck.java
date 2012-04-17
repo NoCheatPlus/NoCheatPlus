@@ -7,6 +7,15 @@ import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.actions.ParameterName;
 import me.neatmonster.nocheatplus.data.Statistics.Id;
 
+/**
+ * The morePacketsVehiculeCheck will try to identify players that send more than
+ * the usual amount of vehicule-move-packets to the server to be able to move
+ * faster than normal, without getting caught by the other checks (flying/running).
+ * 
+ * It monitors the number of packets sent to the server within 1 second and
+ * compares it to the "legal" number of packets for that timeframe (22).
+ * 
+ */
 public class MorePacketsVehicleCheck extends MovingCheck {
 
     // 20 would be for perfect internet connections, 22 is good enough

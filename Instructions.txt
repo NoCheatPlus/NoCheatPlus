@@ -301,6 +301,10 @@
  - nocheatplus.checks.fight.instantheal
     Don't prevent the player from accellerating their health generation by
     food saturation
+    
+ - nocheatplus.checks.fight.knockback
+    Don't prevent the player from doing knockbacks when it's not technically
+    possible
 
 
 --------------------------------------------------------------------------------
@@ -410,18 +414,6 @@
 
 
 --------------------------------------------------------------------------------
------------------------------ CLIENT MODS Section ------------------------------
---------------------------------------------------------------------------------
-
- Everything that in has to do with the client mods can be found at this part of
- the config.yml.
- 
-  allow:
-  
-    Allow all your players to use all the client mods (Zombe, CJB, Rei's Minimap,
-    Minecraft AutoMap and Smart Moving).
-
---------------------------------------------------------------------------------
 -------------------------------- LOGGING Section -------------------------------
 --------------------------------------------------------------------------------
 
@@ -474,6 +466,22 @@
     Should some additional messages be displayed in the server console, e.g. 
     about NoCheatPlus encountering lag. The displayed messages may change from
     version to version. This is deactivated by default.    
+
+
+--------------------------------------------------------------------------------
+---------------------------- MISCELLANEOUS Section -----------------------------
+--------------------------------------------------------------------------------
+
+ Everything that in has nothing to do with the other categories
+ 
+  allowclientmods:
+  
+    Allow all your players to use all the client mods (Zombe, CJB, Rei's Minimap,
+    Minecraft AutoMap and Smart Moving).
+    
+  opbyconsoleonly:
+  
+    Only allow the commands /op and /deop to be executed by the console.
 
 
 --------------------------------------------------------------------------------
@@ -641,21 +649,6 @@
         fall distance in blocks that the player tried to avoid. It gets
         increased every time that the player fails the check, and decreased 
         over time if the player doesn't fail the check.
-        
-      TRACKER:
-        This is an entire subsection dedicated to a recently introduced check
-        specially designed to prevent players from staying in the air longer
-        than a defined value.
-        
-         active:
-           Should players get checked for this type of movement related hacks at 
-           all. If deactivated, player may stay in the air without being noticed
-           by NoCheat+.
-           
-         actions:
-           What should happen if a player tries to stay too much time in the air.
-           Default is to kick the player. The Violation Level is the time the
-           player has spent in the air minus the maximum time allowed (6 seconds).
 
       FLYING:
         This is an entire subsection dedicated to the "moving.flying" check.
@@ -1240,10 +1233,30 @@
       actions:
         What should happen if the player fails this check. Default is to not
         allow the health regeneration ("cancel" the regeneration) and log a
-        message. The Violation LEvel (VL) for this check is the number of
+        message. The Violation Level (VL) for this check is the number of
         seconds that the player tried to skip while regenerating health. It
         gets reduced whenever the player regenerates health while obeying the
         normal regeneration times.
+       
+       
+ 7) KNOCKBACK:
+
+     Players may send sprint packets to the server just before attacking an
+     entity in order to do a knockback on this entity. This check will try to
+     identify players doing this.
+
+      active:
+        Should players be checked for this behavior.
+        
+      interval:
+        The minimal interval in milliseconds to enable sprinting before
+        attacking an entity (50 milliseconds is a good default value).
+
+      actions:
+        What should happen if the player fails this check. Default is to not
+        allow the player to attack the entity ("cancel" the attack) and log a
+        message. The Violation Level (VL) for this check is difference between
+        the interval defined in the configuration file and the real interval.
 
 
 --------------------------------------------------------------------------------

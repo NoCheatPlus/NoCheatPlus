@@ -7,6 +7,10 @@ import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.actions.ParameterName;
 import me.neatmonster.nocheatplus.data.Statistics.Id;
 
+/**
+ * A check used to verify if the player isn't breaking his blocks too quickly
+ * 
+ */
 public class FastPlaceCheck extends BlockPlaceCheck {
 
     public FastPlaceCheck(final NoCheatPlus plugin) {
