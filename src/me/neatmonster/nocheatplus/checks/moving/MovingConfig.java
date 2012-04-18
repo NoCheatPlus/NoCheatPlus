@@ -43,6 +43,8 @@ public class MovingConfig implements ConfigItem {
     public final boolean    waterWalkCheck;
     public final ActionList waterWalkActions;
 
+    public final boolean    unpushableCheck;
+
     public final int        flyingHeightLimit;
 
     public MovingConfig(final NoCheatPlusConfiguration data) {
@@ -85,5 +87,7 @@ public class MovingConfig implements ConfigItem {
 
         waterWalkCheck = data.getBoolean(ConfPaths.MOVING_WATERWALK_CHECK);
         waterWalkActions = data.getActionList(ConfPaths.MOVING_WATERWALK_ACTIONS, Permissions.MOVING_WATERWALK);
+
+        unpushableCheck = data.getBoolean(ConfPaths.MOVING_UNPUSHABLE_CHECK);
     }
 }

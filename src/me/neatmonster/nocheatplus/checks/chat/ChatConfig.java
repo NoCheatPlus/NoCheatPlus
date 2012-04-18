@@ -14,7 +14,8 @@ import me.neatmonster.nocheatplus.config.Permissions;
  */
 public class ChatConfig implements ConfigItem {
 
-    public final boolean    hideCommands;
+    public final boolean    opByConsoleOnly;
+    public final boolean    protectPlugins;
 
     public final boolean    noPwnageCheck;
     public final boolean    noPwnageWarnPlayers;
@@ -72,7 +73,8 @@ public class ChatConfig implements ConfigItem {
 
     public ChatConfig(final NoCheatPlusConfiguration data) {
 
-        hideCommands = data.getBoolean(ConfPaths.CHAT_HIDECOMMANDS);
+        opByConsoleOnly = data.getBoolean(ConfPaths.MISCELLANEOUS_OPBYCONSOLEONLY);
+        protectPlugins = data.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
 
         noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
         noPwnageWarnPlayers = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARNPLAYERS);

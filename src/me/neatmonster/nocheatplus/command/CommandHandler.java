@@ -71,7 +71,7 @@ public class CommandHandler {
             final ChatConfig cc = ChatCheck.getConfig(player);
 
             // Hide NoCheatPlus's commands if the player doesn't have the required permission
-            if (cc.hideCommands && !sender.hasPermission("nocheatplus.admin.commands")) {
+            if (cc.protectPlugins && !sender.hasPermission("nocheatplus.admin.commands")) {
                 sender.sendMessage("Unknown command. Type \"help\" for help.");
                 return true;
             }

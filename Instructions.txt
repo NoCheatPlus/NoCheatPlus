@@ -152,6 +152,10 @@
     In combination with "nocheatplus.admin.commands", the player gets access to the
     "/nocheatplus reload" command, which will cause NoCheatPlus to reread its config
     files.
+    
+ - nocheatplus.admin.plugins
+    Give this permissions to the players you want to be able to see the plugins your
+    server is using.
 
 
 --------------------------------------------------------------------------------
@@ -205,6 +209,13 @@
     normally possible. Doing more movements will result in faster overall movement
     speed and causes the server to spent a lot of additional time for processing
     these movements.
+    
+ - nocheatplus.checks.moving.waterwalk
+    Allows players to walk on water (by using a griefing client). This functionality
+    is also called Jesus mode.
+    
+ - nocheatplus.checks.moving.unpushable
+    Allows players to be unpushable (they can't be pushed by an other player).
    
  - nocheatplus.checks.moving.boatonground
     Allows players to place boats on the ground (and not only on the water).
@@ -482,6 +493,12 @@
   opbyconsoleonly:
   
     Only allow the commands /op and /deop to be executed by the console.
+    
+  protectplugins:
+    
+    Don't not allow your players to access the /plugins, /pl, /? commands by
+    default. Of course, the players having the explicit permisssion to use them
+    won't be blocked.
 
 
 --------------------------------------------------------------------------------
@@ -742,7 +759,7 @@
       active:
         Should players be checked for this kind of cheating. If you are not
         interested in players that cheat that way, set this to false. It is a
-        good idea to have this active, because player won't be able to cross
+        good idea to have this active, because players won't be able to cross
         easily the oceans.
         
       actions:
@@ -752,6 +769,17 @@
         the distance between the player and the surface or how far away he is from
         the normal position if a player climbing a block. The VL increases with
         every failed check and slowly decreases for every passed check.
+        
+ 5) UNPUSHABLE:
+ 
+     This check is designed to prevent players from being unpushable. It'll handle
+     "pushs" server-side instead of letting the client calculates them for the server.
+     
+      active:
+        Should players be checked for this kind of cheating. If you are not
+        interested in players that cheat that way, set this to false. It is a
+        good idea to have this active, because players won't be able to stay on
+        a block and to do not fall when pushed by other players.
 
 
 ---------------------------- BLOCKBREAK Subsection -----------------------------
@@ -946,117 +974,117 @@
       The instructions for this check comes directly from NoPwnage's instructions
       file. You can find the project at http://dev.bukkit.org/server-mods/nopwnage/.
 
-  warnPlayers:
-    Should a player that reaches the "warnLevel" get a text message telling
-    him that he is under suspicion of being a bot.
+       warnPlayers:
+        Should a player that reaches the "warnLevel" get a text message telling
+        him that he is under suspicion of being a bot.
 
-  warnOthers:
-    Should all players get warned when a player gets banned for spambot-like 
-    activity?
+       warnOthers:
+        Should all players get warned when a player gets banned for spambot-like 
+        activity?
 
-  warnLevel:
-    How much suspicion must a message earn to issue a warning for the player
+       warnLevel:
+        How much suspicion must a message earn to issue a warning for the player
 
-  warnTimeout:
-    After what time (in ms) should a player be considered "unwarned" again.
+       warnTimeout:
+        After what time (in ms) should a player be considered "unwarned" again.
 
-  banLevel:
-    How much suspicion must a message earn to execute the "commands" (usually
-    ban the player). If warnings for players are enabled and the player hasn't
-    been warned yet, he'll get warned instead.
+       banLevel:
+        How much suspicion must a message earn to execute the "commands" (usually
+        ban the player). If warnings for players are enabled and the player hasn't
+        been warned yet, he'll get warned instead.
 
-  move.enabled:
-  move.weightbonus:
-  move.weightmalus:
-  move.timeout:
-    NoPwnage will check if a player moved within the "timeout" timeframe. If
-    he did move, the suspicion will be reduced by the "weightbonus" value. If 
-    he did not move, the suspicion will be increased by "weightmalus" value.
-    Only used if "enabled".
+       move.enabled:
+       move.weightbonus:
+       move.weightmalus:
+       move.timeout:
+        NoPwnage will check if a player moved within the "timeout" timeframe. If
+        he did move, the suspicion will be reduced by the "weightbonus" value. If 
+        he did not move, the suspicion will be increased by "weightmalus" value.
+        Only used if "enabled".
 
-  messageRepeat.enabled:
-  messageRepeat.weight:
-  messageRepeat.timeout:
-    NoPwnage will check if a player repeats his messages within the "timeout" 
-    timeframe. Even if the message is a bit different, it will be counted as
-    being a repetition. The suspicion is increased by "weight" and for each
-    additional repetition by "weight/2". This means that multiple repetitions
-    will increase suspicion, but not as much as the first repetition.
-    Only used if "enabled".
+       messageRepeat.enabled:
+       messageRepeat.weight:
+       messageRepeat.timeout:
+        NoPwnage will check if a player repeats his messages within the "timeout" 
+        timeframe. Even if the message is a bit different, it will be counted as
+        being a repetition. The suspicion is increased by "weight" and for each
+        additional repetition by "weight/2". This means that multiple repetitions
+        will increase suspicion, but not as much as the first repetition.
+        Only used if "enabled".
 
-  messageSpeed.enabled:
-  messageSpeed.weight:
-  messageSpeed.timeout:
-    NoPwnage will check if a player sends messages too fast. If a message is
-    sent within "timout" ms after the previous message, increase suspicion by
-    "weight". For each additional message that is sent within "timeout",
-    the suspicion is increased by "weight/2". This means that multiple 
-    too fast sent messages in a row will increase suspicion, but not as much as
-    the first.
-    Only used if "enabled".
+       messageSpeed.enabled:
+       messageSpeed.weight:
+       messageSpeed.timeout:
+        NoPwnage will check if a player sends messages too fast. If a message is
+        sent within "timout" ms after the previous message, increase suspicion by
+        "weight". For each additional message that is sent within "timeout",
+        the suspicion is increased by "weight/2". This means that multiple 
+        too fast sent messages in a row will increase suspicion, but not as much as
+        the first.
+        Only used if "enabled".
 
-  messageFirst.enabled:
-  messageFirst.weight:
-  messageFirst.timeout:
-    NoPwnage will check if a player sends his first message within "timeout"
-    ms after his login. If he does, increase supspicion by "weight".
-    Only used if "enabled".
+       messageFirst.enabled:
+       messageFirst.weight:
+       messageFirst.timeout:
+        NoPwnage will check if a player sends his first message within "timeout"
+        ms after his login. If he does, increase supspicion by "weight".
+        Only used if "enabled".
 
-  globalMessageRepeat.enabled:
-  globalMessageRepeat.weight:
-  globalMessageRepeat.timeout:
-    NoPwnage will check if a player repeats a message that has been sent by
-    another player just before, within "timeout". If he does, suspicion will
-    be increased by "weight" and for each additional repetition by "weight/2",
-    independent of by which player. This means that multiple repetitions will
-    increase suspicion, but not as much as the first repetition.
-    Only used if "enabled".
+       globalMessageRepeat.enabled:
+       globalMessageRepeat.weight:
+       globalMessageRepeat.timeout:
+        NoPwnage will check if a player repeats a message that has been sent by
+        another player just before, within "timeout". If he does, suspicion will
+        be increased by "weight" and for each additional repetition by "weight/2",
+        independent of by which player. This means that multiple repetitions will
+        increase suspicion, but not as much as the first repetition.
+        Only used if "enabled".
 
-  bannedMessageRepeat.enabled:
-  bannedMessageRepeat.weight:
-  bannedMessageRepeat.timeout:
-    NoPwnage will remember the last message that caused someone to get banned.
-    If a player repeats that message within "timeout" ms, the suspicion will
-    be increased by "weight".
-    Only used if "enabled".
+       bannedMessageRepeat.enabled:
+       bannedMessageRepeat.weight:
+       bannedMessageRepeat.timeout:
+        NoPwnage will remember the last message that caused someone to get banned.
+        If a player repeats that message within "timeout" ms, the suspicion will
+        be increased by "weight".
+        Only used if "enabled".
 
-  relog.enabled:
-  relog.time:
-  relog.warnings:
-  relog.timeout:
-    NoPwnage will remember the time when a player leaves the server. If he
-    returns within "time" ms, he will get warned. If he has been warned
-    "warnings" times already, the "commands" will be executed for him. Warnings
-    get removed if the time of the last warning was more than "timeout" ms ago.
+       relog.enabled:
+       relog.time:
+       relog.warnings:
+       relog.timeout:
+        NoPwnage will remember the time when a player leaves the server. If he
+        returns within "time" ms, he will get warned. If he has been warned
+        "warnings" times already, the "commands" will be executed for him. Warnings
+        get removed if the time of the last warning was more than "timeout" ms ago.
 
-  actions:
-    NoPwnage allows you to decide what should happen when a player reaches
-    "banLevel" or relogged too fast. The default is to kick him and ban IP and
-    name. You'll also get a log message to console stating how exactly he
-    reached the "banLevel" (how much suspicion was added by each check).
+       actions:
+        NoPwnage allows you to decide what should happen when a player reaches
+        "banLevel" or relogged too fast. The default is to kick him and ban IP and
+        name. You'll also get a log message to console stating how exactly he
+        reached the "banLevel" (how much suspicion was added by each check).
     
-    Commands have to be seperated by ";" and the "[player]" and "[ip]"
-    wildcards will be replaced by the actual data during execution.
+        Commands have to be seperated by ";" and the "[player]" and "[ip]"
+        wildcards will be replaced by the actual data during execution.
     
-  captcha.enabled:
-    Should players that get to "banlevel" be presented with a captcha first
-    instead of running the commands immediatly?
+       captcha.enabled:
+        Should players that get to "banlevel" be presented with a captcha first
+        instead of running the commands immediatly?
 
-  captcha.question:
-    How should the question be worded. Use & to create colors. The text
-    [captcha] will be replaced with the actual captcha.
+       captcha.question:
+        How should the question be worded. Use & to create colors. The text
+        [captcha] will be replaced with the actual captcha.
  
-  tries:
-    How many attempts will a player have to give the correct answer. A failed
-    attempt will display the question again. Be generous here, as players may
-    not be fast enough to read the question the first few times or be otherwise
-    distracted.
+       tries:
+        How many attempts will a player have to give the correct answer. A failed
+        attempt will display the question again. Be generous here, as players may
+        not be fast enough to read the question the first few times or be otherwise
+        distracted.
 
-  length:
-    How many characters should the captcha have.
+       length:
+        How many characters should the captcha have.
 
-  characters:
-    The characters for the captcha are randomly drawn from this string
+       characters:
+         The characters for the captcha are randomly drawn from this string
  
  2) ARRIVALSLIMIT:
 

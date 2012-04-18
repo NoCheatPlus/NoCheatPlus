@@ -21,6 +21,7 @@ public abstract class ConfPaths {
     private static final String MISCELLANEOUS                             = "miscellaneous.";
     public static final String  MISCELLANEOUS_ALLOWCLIENTMODS             = MISCELLANEOUS + "allowclientmods";
     public static final String  MISCELLANEOUS_OPBYCONSOLEONLY             = MISCELLANEOUS + "opbyconsoleonly";
+    public static final String  MISCELLANEOUS_PROTECTPLUGINS              = MISCELLANEOUS + "protectplugins";
 
     private static final String CHECKS                                    = "checks.";
 
@@ -82,6 +83,9 @@ public abstract class ConfPaths {
     public static final String  MOVING_WATERWALK_CHECK                    = MOVING_WATERWALK + "active";
     public static final String  MOVING_WATERWALK_ACTIONS                  = MOVING_WATERWALK + "actions";
 
+    private static final String MOVING_UNPUSHABLE                         = MOVING + "unpushable.";
+    public static final String  MOVING_UNPUSHABLE_CHECK                   = MOVING_UNPUSHABLE + "active";
+
     private static final String BLOCKBREAK                                = CHECKS + "blockbreak.";
 
     private static final String BLOCKBREAK_FASTBREAK                      = BLOCKBREAK + "fastbreak.";
@@ -127,8 +131,6 @@ public abstract class ConfPaths {
     public static final String  BLOCKPLACE_PROJECTILE_ACTIONS             = BLOCKPLACE_PROJECTILE + "actions";
 
     private static final String CHAT                                      = CHECKS + "chat.";
-
-    public static final String  CHAT_HIDECOMMANDS                         = CHAT + "hidecommands";
 
     private static final String CHAT_NOPWNAGE                             = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                       = CHAT_NOPWNAGE + "active";

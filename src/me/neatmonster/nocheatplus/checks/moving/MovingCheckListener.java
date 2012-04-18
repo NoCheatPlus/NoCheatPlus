@@ -10,10 +10,13 @@ import me.neatmonster.nocheatplus.checks.CheckUtil;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 import me.neatmonster.nocheatplus.data.PreciseLocation;
+import net.minecraft.server.Entity;
+import net.minecraft.server.EntityLiving;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -131,6 +134,43 @@ public class MovingCheckListener implements Listener, EventManager {
                 && event.getClickedBlock().getRelative(event.getBlockFace()).getType() != Material.WATER
                 && event.getClickedBlock().getRelative(event.getBlockFace()).getType() != Material.STATIONARY_WATER)
             event.setCancelled(true);
+    }
+
+    private PreciseLocation collide(final PreciseLocation to, final Player collider, final Player collided) {
+        // Calculate some distances
+        double moveX = collider.getLocation().getX() - collided.getLocation().getX();
+        double moveZ = collider.getLocation().getZ() - collided.getLocation().getZ();
+        double move = Math.max(Math.abs(moveX), Math.abs(moveZ));
+
+        // If the two players are close enough
+        if (move >= 0.009999999776482582D) {
+
+            // Calculate the move
+            move = Math.sqrt(move);
+            moveX /= move;
+            moveZ /= move;
+
+            double moveInv = 1D / move;
+            if (moveInv > 1D)
+                moveInv = 1D;
+
+            // More magic numbers...
+            moveX *= moveInv * 0.05000000074505806D;
+            moveZ *= moveInv * 0.05000000074505806D;
+
+            // Teleport the collided player to his new location
+            // if he hasn't the required permission
+            if (!collided.hasPermission(Permissions.MOVING_UNPUSHABLE))
+                collided.teleport(collided.getLocation().add(-moveX, 0, -moveZ));
+
+            // Same for the collider, check his permissions
+            to.x = to.x + moveX;
+            to.z = to.z + moveZ;
+
+            if (!collider.hasPermission(Permissions.MOVING_UNPUSHABLE))
+                return to;
+        }
+        return null;
     }
 
     @Override
@@ -259,6 +299,27 @@ public class MovingCheckListener implements Listener, EventManager {
             data.clearMorePacketsData();
         else if (newTo == null)
             newTo = morePacketsCheck.check(player, data, cc);
+
+        /** UNPUSHABLE CHECK SECTION **/
+        if (newTo == null && cc.unpushableCheck) {
+            final EntityLiving entity = ((CraftPlayer) event.getPlayer()).getHandle();
+
+            // List of the entities the player is colliding with
+            final List<?> collisions = entity.world.getEntities(entity,
+                    entity.boundingBox.grow(0.20000000298023224D, 0.0D, 0.20000000298023224D));
+
+            for (int i = 0; i < collisions.size(); i++) {
+                final Entity collidedEntity = (Entity) collisions.get(i);
+
+                // Check if the entity is a player
+                if (collidedEntity.getBukkitEntity() instanceof Player) {
+                    final Player collidedPlayer = (Player) collidedEntity.getBukkitEntity();
+
+                    // Collide the two players
+                    newTo = collide(data.to, event.getPlayer(), collidedPlayer);
+                }
+            }
+        }
 
         // Did one of the check(s) decide we need a new "to"-location?
         if (newTo != null) {

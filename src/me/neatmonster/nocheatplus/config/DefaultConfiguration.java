@@ -29,6 +29,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
         set(ConfPaths.MISCELLANEOUS_OPBYCONSOLEONLY, true);
+        set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
 
         /*** INVENTORY ***/
 
@@ -73,6 +74,8 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.MOVING_WATERWALK_ACTIONS,
                 "log:waterwalk:3:5:f cancel vl>100 log:waterwalk:0:5:if cancel vl>400 log:waterwalk:0:5:cif cancel");
 
+        set(ConfPaths.MOVING_UNPUSHABLE_CHECK, true);
+
         /*** BLOCKBREAK ***/
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
@@ -95,7 +98,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         /*** BLOCKPLACE ***/
 
         set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
-        set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 145);
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 95);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS,
                 "cancel vl>100 log:bpfastplace:3:5:cif cancel vl>2000 log:bpfastplace:3:5:cif cmd:kick cancel");
 
@@ -113,8 +116,6 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
                 "cancel vl>150 log:bpprojectile:3:5:if cancel vl>1000 log:bpprojectile:3:5:cif cancel vl>4000 log:bpprojectile:3:5:cif cancel cmd:kick");
 
         /*** CHAT ***/
-
-        set(ConfPaths.CHAT_HIDECOMMANDS, false);
 
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_WARNPLAYERS, false);

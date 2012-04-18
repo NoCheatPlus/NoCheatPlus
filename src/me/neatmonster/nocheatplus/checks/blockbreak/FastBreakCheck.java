@@ -33,15 +33,17 @@ public class FastBreakCheck extends BlockBreakCheck {
 
         // Has the player broken the blocks too quickly
         if (data.lastBreakTime != 0 && elapsedTime < breakTime) {
-            if (data.previousRefused) {
-                // He failed, increase vl and statistics
-                data.fastBreakVL += breakTime - elapsedTime;
-                incrementStatistics(player, Id.BB_FASTBREAK, breakTime - elapsedTime);
-                // Execute whatever actions are associated with this check and the
-                // violation level and find out if we should cancel the event
-                cancel = executeActions(player, cc.fastBreakActions, data.fastBreakVL);
+            if (!plugin.skipCheck()) {
+                if (data.previousRefused) {
+                    // He failed, increase vl and statistics
+                    data.fastBreakVL += breakTime - elapsedTime;
+                    incrementStatistics(player, Id.BB_FASTBREAK, breakTime - elapsedTime);
+                    // Execute whatever actions are associated with this check and the
+                    // violation level and find out if we should cancel the event
+                    cancel = executeActions(player, cc.fastBreakActions, data.fastBreakVL);
+                }
+                data.previousRefused = true;
             }
-            data.previousRefused = true;
         } else {
             // Reward with lowering of the violation level
             data.fastBreakVL *= 0.90D;

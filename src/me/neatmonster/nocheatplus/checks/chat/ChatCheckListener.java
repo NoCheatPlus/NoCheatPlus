@@ -7,7 +7,6 @@ import java.util.List;
 import me.neatmonster.nocheatplus.EventManager;
 import me.neatmonster.nocheatplus.NoCheatPlus;
 import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
-import me.neatmonster.nocheatplus.config.ConfPaths;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 
@@ -99,14 +98,29 @@ public class ChatCheckListener implements Listener, EventManager {
             priority = EventPriority.LOWEST)
     public void commandPreprocess(final PlayerCommandPreprocessEvent event) {
 
+        final NoCheatPlusPlayer player = plugin.getPlayer(event.getPlayer());
+        final ChatConfig cc = ChatCheck.getConfig(player);
+
+        final String command = event.getMessage().split(" ")[0].substring(1).toLowerCase();
+
+        // Protect the /plugins, /pl, /? commands to prevent players for seeing which plugins are installed
+        if (cc.protectPlugins && (command.equals("plugins") || command.equals("pl") || command.equals("?"))
+                && !event.getPlayer().hasPermission(Permissions.ADMIN_PLUGINS)) {
+            event.getPlayer().sendMessage(
+                    ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
+                            + "Please contact the server administrators if you believe that this is in error.");
+            event.setCancelled(true);
+            return;
+        }
+
         // If OP by console only is enabled, prevent the op/deop commands
         // to be used by a player who is OP or has the required permissions
-        if (plugin.getConfig(event.getPlayer()).getConfiguration().getBoolean(ConfPaths.MISCELLANEOUS_OPBYCONSOLEONLY)
-                && (event.getMessage().startsWith("/op")
-                        && (event.getPlayer().isOp() || event.getPlayer().hasPermission("bukkit.command.op.give")) || event
-                        .getMessage().startsWith("/deop")
+        if (cc.opByConsoleOnly
+                && (command.equals("op")
+                        && (event.getPlayer().isOp() || event.getPlayer().hasPermission("bukkit.command.op.give")) || command
+                        .equals("deop")
                         && (event.getPlayer().isOp() || event.getPlayer().hasPermission("bukkit.command.op.take")))) {
-            event.getPlayer().sendMessage(ChatColor.RED + "This command can be executed from the console!");
+            event.getPlayer().sendMessage(ChatColor.RED + "This command can only be executed from the console!");
             event.setCancelled(true);
             return;
         }

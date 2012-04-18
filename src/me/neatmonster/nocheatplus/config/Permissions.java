@@ -15,6 +15,7 @@ public class Permissions {
     public static final String  ADMIN_CHATLOG             = ADMIN + ".chatlog";
     public static final String  ADMIN_COMMANDS            = ADMIN + ".commands";
     public static final String  ADMIN_RELOAD              = ADMIN + ".reload";
+    public static final String  ADMIN_PLUGINS             = ADMIN + ".plugins";
 
     /** CHECKS **/
     private static final String BLOCKBREAK                = CHECKS + ".blockbreak";
@@ -57,9 +58,10 @@ public class Permissions {
     public static final String  MOVING_NOFALL             = MOVING + ".nofall";
     public static final String  MOVING_MOREPACKETS        = MOVING + ".morepackets";
     public static final String  MOVING_MOREPACKETSVEHICLE = MOVING + ".morepacketsvehicle";
-    public static final String  MOVING_BOATONGROUND       = MOVING + ".boatonground";
     public static final String  MOVING_WATERWALK          = MOVING + ".waterwalk";
+    public static final String  MOVING_UNPUSHABLE         = MOVING + ".unpushable";
     public static final String  MOVING_RESPAWNTRICK       = MOVING + ".respawntrick";
+    public static final String  MOVING_BOATONGROUND       = MOVING + ".boatonground";
 
     /** MODS **/
     private static final String CJB                       = MODS + ".cjb";
