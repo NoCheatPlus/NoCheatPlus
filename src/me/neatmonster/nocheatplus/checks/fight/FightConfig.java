@@ -41,18 +41,26 @@ public class FightConfig implements ConfigItem {
     public final long       knockbackInterval;
     public final ActionList knockbackActions;
 
+    public final boolean    criticalCheck;
+    public final double     criticalFallDistance;
+    public final double     criticalVelocity;
+    public final ActionList criticalActions;
+
     public FightConfig(final NoCheatPlusConfiguration data) {
 
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
         directionPrecision = data.getInt(ConfPaths.FIGHT_DIRECTION_PRECISION) / 100D;
         directionPenaltyTime = data.getInt(ConfPaths.FIGHT_DIRECTION_PENALTYTIME);
         directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
+
         noswingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
         noswingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
+
         reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
         reachLimit = data.getInt(ConfPaths.FIGHT_REACH_LIMIT) / 100D;
         reachPenaltyTime = data.getInt(ConfPaths.FIGHT_REACH_PENALTYTIME);
         reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
+
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
         speedAttackLimit = data.getInt(ConfPaths.FIGHT_SPEED_ATTACKLIMIT);
@@ -66,5 +74,10 @@ public class FightConfig implements ConfigItem {
         knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
         knockbackInterval = data.getLong(ConfPaths.FIGHT_KNOCKBACK_INTERVAL);
         knockbackActions = data.getActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
+
+        criticalCheck = data.getBoolean(ConfPaths.FIGHT_CRITICAL_CHECK);
+        criticalFallDistance = data.getDouble(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE);
+        criticalVelocity = data.getDouble(ConfPaths.FIGHT_CRITICAL_VELOCITY);
+        criticalActions = data.getActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
     }
 }

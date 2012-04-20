@@ -5,6 +5,7 @@ import java.util.Locale;
 import me.neatmonster.nocheatplus.NoCheatPlus;
 import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
 import me.neatmonster.nocheatplus.actions.ParameterName;
+import me.neatmonster.nocheatplus.checks.CheckUtil;
 import me.neatmonster.nocheatplus.data.Statistics.Id;
 
 /**
@@ -27,6 +28,14 @@ public class NoFallCheck extends MovingCheck {
         // If the player is serverside in creative mode, we have to stop here to
         // avoid hurting him when he switches back to "normal" mode
         if (player.isCreative()) {
+            data.fallDistance = 0F;
+            data.lastAddedFallDistance = 0F;
+            return;
+        }
+
+        // If the player is in unclimbable vines, do not do the check
+        if (CheckUtil.isVine(CheckUtil.evaluateLocation(player.getPlayer().getWorld(), data.from))
+                || CheckUtil.isVine(CheckUtil.evaluateLocation(player.getPlayer().getWorld(), data.to))) {
             data.fallDistance = 0F;
             data.lastAddedFallDistance = 0F;
             return;

@@ -18,9 +18,9 @@ import org.bukkit.util.Vector;
  */
 public class CheckUtil {
 
-    private final static double magic    = 0.45D;
+    private static final double magic    = 0.45D;
 
-    private final static double magic2   = 0.55D;
+    private static final double magic2   = 0.55D;
 
     private static final int    NONSOLID = 1;                    // 0x00000001
     private static final int    SOLID    = 2;                    // 0x00000010
@@ -32,7 +32,14 @@ public class CheckUtil {
 
     // All fences are solid - fences are treated specially due
     // to being 1.5 blocks high
-    private static final int    FENCE    = 16 | SOLID | NONSOLID;  // 0x00010011
+    private static final int    FENCE    = 16 | NONSOLID | SOLID;  // 0x00010011
+
+    // Webs slow players down so they must also be treated specially
+    private static final int    WEB      = 32 | NONSOLID | SOLID;
+
+    // We also treat unclimbable vines specially because players
+    // can't climb them but they slow players down
+    private static final int    VINE     = 64 | NONSOLID;
 
     private static final int    INGROUND = 128;
 
@@ -68,18 +75,17 @@ public class CheckUtil {
         // du'h
         types[Material.AIR.getId()] = NONSOLID;
 
-        // Webs slow down a players fall extremely, so it makes
-        // sense to treat them as optionally solid
-        types[Material.WEB.getId()] = SOLID | NONSOLID;
-
         // Obvious
         types[Material.LADDER.getId()] = LADDER;
         types[Material.WATER_LILY.getId()] = LADDER;
+        // The type VINE is only for unclimbable vines
         types[Material.VINE.getId()] = LADDER;
 
         types[Material.FENCE.getId()] = FENCE;
         types[Material.FENCE_GATE.getId()] = FENCE;
         types[Material.NETHER_FENCE.getId()] = FENCE;
+
+        types[Material.WEB.getId()] = WEB;
 
         // These are sometimes solid, sometimes not
         types[Material.IRON_FENCE.getId()] = SOLID | NONSOLID;
@@ -214,9 +220,15 @@ public class CheckUtil {
             else if (isSolid(base))
                 type = INGROUND;
 
-        // (In every case, check for water)
+        // (In every case, check for water...)
         if (isLiquid(base) || isLiquid(top))
             type |= LIQUID | INGROUND;
+        // (...and for web...)
+        if (isWeb(base) || isWeb(top))
+            type |= WEB;
+        // (...and for vine)
+        if (isVine(base))
+            type |= VINE;
 
         return type;
     }
@@ -226,8 +238,9 @@ public class CheckUtil {
     }
 
     private static int getType(final World world, final int x, final int y, final int z) {
-        return types[world.getBlockAt(x, y, z).getType() == Material.VINE && !isClimbable(world, x, y, z) ? 0 : world
-                .getBlockTypeIdAt(x, y, z)];
+        if (world.getBlockAt(x, y, z).getType() == Material.VINE && !isClimbable(world, x, y, z))
+            return VINE;
+        return types[world.getBlockTypeIdAt(x, y, z)];
     }
 
     public static boolean isClimbable(final World world, final int x, final int y, final int z) {
@@ -242,9 +255,7 @@ public class CheckUtil {
             attachedFace = BlockFace.SOUTH;
         if (attachedFace == null)
             return true;
-        return isSolid(getType(world, world.getBlockAt(x, y, z).getRelative(attachedFace).getX(),
-                world.getBlockAt(x, y, z).getRelative(attachedFace).getY(),
-                world.getBlockAt(x, y, z).getRelative(attachedFace).getZ()));
+        return isSolid(getType(world.getBlockAt(x, y, z).getRelative(attachedFace).getTypeId()));
     }
 
     public static boolean isFood(final ItemStack item) {
@@ -275,6 +286,14 @@ public class CheckUtil {
 
     public static boolean isSolid(final int value) {
         return (value & SOLID) == SOLID;
+    }
+
+    public static boolean isVine(final int value) {
+        return (value & VINE) == VINE;
+    }
+
+    public static boolean isWeb(final int value) {
+        return (value & WEB) == WEB;
     }
 
     /**

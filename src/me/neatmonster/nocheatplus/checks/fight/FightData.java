@@ -3,6 +3,8 @@ package me.neatmonster.nocheatplus.checks.fight;
 import me.neatmonster.nocheatplus.DataItem;
 import net.minecraft.server.Entity;
 
+import org.bukkit.entity.Player;
+
 /**
  * Player specific data for the fight checks
  * 
@@ -17,6 +19,7 @@ public class FightData implements DataItem {
     public double  godmodeVL;
     public double  instanthealVL;
     public double  knockbackVL;
+    public double  criticalVL;
 
     // For checks that have penalty time
     public long    directionLastViolationTime;
@@ -35,6 +38,9 @@ public class FightData implements DataItem {
 
     // While handling an event, use this to keep the attacked entity
     public Entity  damagee;
+
+    // Remember the player who attacked the entity
+    public Player  damager;
 
     // The player swung his arm
     public boolean armswung          = true;

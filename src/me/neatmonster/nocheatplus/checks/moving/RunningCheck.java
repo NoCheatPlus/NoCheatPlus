@@ -11,6 +11,7 @@ import me.neatmonster.nocheatplus.data.PreciseLocation;
 import me.neatmonster.nocheatplus.data.Statistics.Id;
 
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 
 /**
@@ -148,7 +149,14 @@ public class RunningCheck extends MovingCheck {
         else if (data.onIce > 0)
             data.onIce--;
 
-        if (cc.sneakingCheck && player.getPlayer().isSneaking() && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
+        if (cc.blockingCheck && player.getPlayer().isBlocking() && !player.hasPermission(Permissions.MOVING_BLOCKING)) {
+            limit = cc.blockingSpeedLimit;
+            statisticsCategory = Id.MOV_BLOCKING;
+            if (cc.sneakingCheck && player.getPlayer().isSneaking()
+                    && !player.hasPermission(Permissions.MOVING_SNEAKING))
+                limit = Math.min(cc.sneakingSpeedLimit, cc.blockingSpeedLimit);
+        } else if (cc.sneakingCheck && player.getPlayer().isSneaking()
+                && !player.hasPermission(Permissions.MOVING_SNEAKING)) {
             limit = cc.sneakingSpeedLimit;
             statisticsCategory = Id.MOV_SNEAKING;
         } else if (isSwimming && !player.hasPermission(Permissions.MOVING_SWIMMING)) {
@@ -163,7 +171,16 @@ public class RunningCheck extends MovingCheck {
         }
 
         if (data.onIce > 0)
-            limit *= 2.5;
+            limit *= 2.5D;
+
+        // If the player is in web, we need a fixed limit
+        final World world = player.getPlayer().getWorld();
+        if (CheckUtil.isWeb(CheckUtil.evaluateLocation(world, data.from))
+                && CheckUtil.isWeb(CheckUtil.evaluateLocation(world, data.to))
+                && !player.hasPermission(Permissions.MOVING_COBWEB)) {
+            limit = cc.cobWebHoriSpeedLimit;
+            statisticsCategory = Id.MOV_COBWEB;
+        }
 
         // Taken directly from Minecraft code, should work
         limit *= player.getSpeedAmplifier();
@@ -219,7 +236,15 @@ public class RunningCheck extends MovingCheck {
         if (data.jumpPhase > jumpingLimit + data.lastJumpAmplifier)
             limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
 
-        distanceAboveLimit = data.to.y - data.runflySetBackPoint.y - limit;
+        // Check if the player is in web and check his move
+        final World world = player.getPlayer().getWorld();
+        if (CheckUtil.isWeb(CheckUtil.evaluateLocation(world, data.from))
+                && CheckUtil.isWeb(CheckUtil.evaluateLocation(world, data.to))
+                && Math.abs(data.to.y - data.from.y) > cc.cobWebVertSpeedLimit)
+            distanceAboveLimit = Math.abs(data.to.y - data.from.y - cc.cobWebVertSpeedLimit);
+
+        else
+            distanceAboveLimit = data.to.y - data.runflySetBackPoint.y - limit;
 
         if (distanceAboveLimit > 0)
             data.statisticCategory = Id.MOV_FLYING;

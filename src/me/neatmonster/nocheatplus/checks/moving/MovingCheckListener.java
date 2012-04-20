@@ -136,14 +136,14 @@ public class MovingCheckListener implements Listener, EventManager {
             event.setCancelled(true);
     }
 
-    private PreciseLocation collide(final PreciseLocation to, final Player collider, final Player collided) {
+    private Location collide(final Player collider, final Player collided, final PreciseLocation to) {
         // Calculate some distances
         double moveX = collider.getLocation().getX() - collided.getLocation().getX();
         double moveZ = collider.getLocation().getZ() - collided.getLocation().getZ();
         double move = Math.max(Math.abs(moveX), Math.abs(moveZ));
 
         // If the two players are close enough
-        if (move >= 0.009999999776482582D) {
+        if (move >= 0.0099999997764825821D) {
 
             // Calculate the move
             move = Math.sqrt(move);
@@ -161,14 +161,16 @@ public class MovingCheckListener implements Listener, EventManager {
             // Teleport the collided player to his new location
             // if he hasn't the required permission
             if (!collided.hasPermission(Permissions.MOVING_UNPUSHABLE))
-                collided.teleport(collided.getLocation().add(-moveX, 0, -moveZ));
+                ((CraftPlayer) collided).getHandle().move(-moveX, 0, -moveZ);
 
             // Same for the collider, check his permissions
-            to.x = to.x + moveX;
-            to.z = to.z + moveZ;
-
-            if (!collider.hasPermission(Permissions.MOVING_UNPUSHABLE))
-                return to;
+            if (!collider.hasPermission(Permissions.MOVING_UNPUSHABLE)) {
+                final Entity entity = ((CraftPlayer) collider).getHandle();
+                entity.setPosition(to.x, to.y, to.z);
+                entity.move(moveX, 0, moveZ);
+                return new Location(collider.getWorld(), entity.locX, entity.locY, entity.locZ, entity.yaw,
+                        entity.pitch);
+            }
         }
         return null;
     }
@@ -184,6 +186,8 @@ public class MovingCheckListener implements Listener, EventManager {
                 s.add("moving.runfly");
                 if (m.sneakingCheck)
                     s.add("moving.sneaking");
+                if (m.blockingCheck)
+                    s.add("moving.blocking");
                 if (m.nofallCheck)
                     s.add("moving.nofall");
                 if (m.waterWalkCheck)
@@ -313,10 +317,10 @@ public class MovingCheckListener implements Listener, EventManager {
 
                 // Check if the entity is a player
                 if (collidedEntity.getBukkitEntity() instanceof Player) {
-                    final Player collidedPlayer = (Player) collidedEntity.getBukkitEntity();
-
-                    // Collide the two players
-                    newTo = collide(data.to, event.getPlayer(), collidedPlayer);
+                    final Location toLoc = collide(event.getPlayer(), (Player) collidedEntity.getBukkitEntity(),
+                            data.to);
+                    if (toLoc != null)
+                        event.setTo(toLoc);
                 }
             }
         }

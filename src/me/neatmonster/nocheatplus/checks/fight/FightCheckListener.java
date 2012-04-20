@@ -7,6 +7,8 @@ import java.util.List;
 import me.neatmonster.nocheatplus.EventManager;
 import me.neatmonster.nocheatplus.NoCheatPlus;
 import me.neatmonster.nocheatplus.NoCheatPlusPlayer;
+import me.neatmonster.nocheatplus.checks.moving.MovingCheck;
+import me.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import me.neatmonster.nocheatplus.config.ConfigurationCacheStore;
 import me.neatmonster.nocheatplus.config.Permissions;
 
@@ -47,6 +49,7 @@ public class FightCheckListener implements Listener, EventManager {
         checks.add(new DirectionCheck(plugin));
         checks.add(new ReachCheck(plugin));
         checks.add(new KnockbackCheck(plugin));
+        checks.add(new CriticalCheck(plugin));
 
         godmodeCheck = new GodmodeCheck(plugin);
         instanthealCheck = new InstanthealCheck(plugin);
@@ -182,6 +185,8 @@ public class FightCheckListener implements Listener, EventManager {
             s.add("fight.instantHeal");
         if (f.knockbackCheck)
             s.add("fight.knockback");
+        if (f.criticalCheck)
+            s.add("fight.critical");
         return s;
     }
 
@@ -211,14 +216,24 @@ public class FightCheckListener implements Listener, EventManager {
         // Get the attacked entity and remember it
         data.damagee = ((CraftEntity) event.getEntity()).getHandle();
 
+        // Remember the attacker
+        data.damager = damager;
+
         // Run through the four main checks
         for (final FightCheck check : checks)
             // If it should be executed, do it
             if (!cancelled && check.isEnabled(cc) && !player.hasPermission(check.permission))
                 cancelled = check.check(player, data, cc);
 
-        // Forget the attacked entity (to allow garbage collecting etc.
+        final MovingConfig movingCc = MovingCheck.getConfig(player);
+        if (!cancelled && movingCc.blockingCheck && player.getPlayer().isBlocking())
+            cancelled = true;
+
+        // Forget the attacked entity (to allow garbage collecting, etc.)
         data.damagee = null;
+
+        // Forget the attacker (to allow garbage collecting, etc.)
+        data.damager = null;
 
         // One of the checks requested the event to be cancelled, so do it
         if (cancelled)

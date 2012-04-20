@@ -23,6 +23,7 @@ public class Statistics {
         FI_REACH("fight.reach"),
         FI_SPEED("fight.speed"),
         FI_KNOCKBACK("fight.knockback"),
+        FI_CRITICAL("fight.critical"),
         INV_DROP("inventory.drop"),
         INV_BOW("inventory.instantbow"),
         INV_EAT("inventory.instanteat"),
@@ -32,7 +33,9 @@ public class Statistics {
         MOV_MOREPACKETSVEHICLE("moving.morepacketsvehicle"),
         MOV_NOFALL("moving.nofall"),
         MOV_SNEAKING("moving.sneaking"),
+        MOV_BLOCKING("moving.blocking"),
         MOV_SWIMMING("moving.swimming"),
+        MOV_COBWEB("moving.cobweb"),
         FI_GODMODE("fight.godmode"),
         FI_INSTANTHEAL("fight.instantheal");
 

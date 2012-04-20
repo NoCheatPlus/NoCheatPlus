@@ -48,6 +48,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
 
         set(ConfPaths.MOVING_RUNFLY_CHECK, true);
         set(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING, false);
+        set(ConfPaths.MOVING_RUNFLY_ALLOWFASTBLOCKING, false);
         set(ConfPaths.MOVING_RUNFLY_MAXCOOLDOWN, 10000);
         set(ConfPaths.MOVING_RUNFLY_ACTIONS,
                 "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
@@ -74,7 +75,7 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.MOVING_WATERWALK_ACTIONS,
                 "log:waterwalk:3:5:f cancel vl>100 log:waterwalk:0:5:if cancel vl>400 log:waterwalk:0:5:cif cancel");
 
-        set(ConfPaths.MOVING_UNPUSHABLE_CHECK, true);
+        set(ConfPaths.MOVING_UNPUSHABLE_CHECK, false);
 
         /*** BLOCKBREAK ***/
 
@@ -202,6 +203,11 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.FIGHT_KNOCKBACK_INTERVAL, 50);
         set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:fknock:0:5:cif cancel");
 
+        set(ConfPaths.FIGHT_CRITICAL_CHECK, true);
+        set(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE, 0.01D);
+        set(ConfPaths.FIGHT_CRITICAL_VELOCITY, 0.1D);
+        set(ConfPaths.FIGHT_CRITICAL_ACTIONS, "cancel vl>50 log:fcritical:0:5:cif cancel");
+
         set(ConfPaths.STRINGS + ".drop",
                 "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");
@@ -242,7 +248,9 @@ public class DefaultConfiguration extends NoCheatPlusConfiguration {
         set(ConfPaths.STRINGS + ".fheal",
                 "[player] failed [check]: Tried to regenerate health faster than normal. VL [violations]");
         set(ConfPaths.STRINGS + ".fknock",
-                "[player] failed [check]: Tried to do a knockback but wasn't really sprinting. VL [violations]");
+                "[player] failed [check]: Tried to do a knockback but wasn't technically sprinting. VL [violations]");
+        set(ConfPaths.STRINGS + ".fcritical",
+                "[player] failed [check]: Tried to do a critical hit but wasn't technically jumping. VL [violations]");
         set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: Fires bow to fast. VL [violations]");
         set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: Eats food [food] too fast. VL [violations]");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");

@@ -1,6 +1,5 @@
 package me.neatmonster.nocheatplus.checks.chat;
 
-import java.util.Locale;
 import java.util.Random;
 
 import me.neatmonster.nocheatplus.NoCheatPlus;
@@ -189,9 +188,9 @@ public class NoPwnageCheck extends ChatCheck {
     public String getParameter(final ParameterName wildcard, final NoCheatPlusPlayer player) {
 
         if (wildcard == ParameterName.REASON)
-            return String.format(Locale.US, "%d", getData(player).reason);
+            return getData(player).reason;
         else if (wildcard == ParameterName.IP)
-            return String.format(Locale.US, "%d", getData(player).ip);
+            return getData(player).ip;
         else
             return super.getParameter(wildcard, player);
     }

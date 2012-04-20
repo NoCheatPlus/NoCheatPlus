@@ -46,13 +46,16 @@ public abstract class ConfPaths {
     private static final String MOVING_RUNFLY                             = MOVING + "runfly.";
     public static final String  MOVING_RUNFLY_CHECK                       = MOVING_RUNFLY + "active";
 
-    // These four are not automatically shown in the config
+    // These sixth are not automatically shown in the config
     public static final String  MOVING_RUNFLY_WALKSPEED                   = MOVING_RUNFLY + "walkspeed";
     public static final String  MOVING_RUNFLY_SNEAKSPEED                  = MOVING_RUNFLY + "sneakspeed";
+    public static final String  MOVING_RUNFLY_BLOCKSPEED                  = MOVING_RUNFLY + "blockspeed";
     public static final String  MOVING_RUNFLY_SWIMSPEED                   = MOVING_RUNFLY + "swimspeed";
     public static final String  MOVING_RUNFLY_SPRINTSPEED                 = MOVING_RUNFLY + "sprintspeed";
+    public static final String  MOVING_RUNFLY_COBWEBSPEED                 = MOVING_RUNFLY + "cobwebspeed";
 
     public static final String  MOVING_RUNFLY_ALLOWFASTSNEAKING           = MOVING_RUNFLY + "allowfastsneaking";
+    public static final String  MOVING_RUNFLY_ALLOWFASTBLOCKING           = MOVING_RUNFLY + "allowfastblocking";
     public static final String  MOVING_RUNFLY_MAXCOOLDOWN                 = MOVING_RUNFLY + "maxcooldown";
     public static final String  MOVING_RUNFLY_ACTIONS                     = MOVING_RUNFLY + "actions";
 
@@ -232,6 +235,12 @@ public abstract class ConfPaths {
     public static final String  FIGHT_KNOCKBACK_CHECK                     = FIGHT_KNOCKBACK + "active";
     public static final String  FIGHT_KNOCKBACK_INTERVAL                  = FIGHT_KNOCKBACK + "interval";
     public static final String  FIGHT_KNOCKBACK_ACTIONS                   = FIGHT_KNOCKBACK + "actions";
+
+    private static final String FIGHT_CRITICAL                            = FIGHT + "critical.";
+    public static final String  FIGHT_CRITICAL_CHECK                      = FIGHT_CRITICAL + "active";
+    public static final String  FIGHT_CRITICAL_FALLDISTANCE               = FIGHT_CRITICAL + "falldistance";
+    public static final String  FIGHT_CRITICAL_VELOCITY                   = FIGHT_CRITICAL + "velocity";
+    public static final String  FIGHT_CRITICAL_ACTIONS                    = FIGHT_CRITICAL + "actions";
 
     public static final String  STRINGS                                   = "strings";
 

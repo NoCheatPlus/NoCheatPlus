@@ -47,6 +47,10 @@ permissions:
                 description: Allow a player to move through water without slowdown
               nocheatplus.checks.moving.sneaking:
                 description: Allow a player to sneak without slowdown
+              nocheatplus.checks.moving.blocking:
+                description: Allow a player to block without slowdown
+              nocheatplus.checks.moving.cobweb:
+                description: Allow a player to move without slowdown while being into cobweb
               nocheatplus.checks.moving.nofall:
                 description: Allow a player to cheat and not take fall damage at all
               nocheatplus.checks.moving.morepackets:
@@ -111,6 +115,8 @@ permissions:
                 description: Allow a player to artificially speed up his health regeneration
               nocheatplus.checks.fight.knockback:
                 description: Allow a player to do knockbacks when it's not technically possible
+              nocheatplus.checks.fight.critical:
+                description: Allow a player to do criticals when it's not technically possible
           nocheatplus.checks.inventory:
             description: Allow the player to bypass all inventory checks
             children:
