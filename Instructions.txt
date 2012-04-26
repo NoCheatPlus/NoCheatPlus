@@ -13,7 +13,8 @@
     won't use. They'll be implicitly taken from the master "config.yml" file.
 
  3) If you have files named "config.txt", "default_actions.txt" or "actions.txt"
-    please delete them. They are no longer used by NoCheatPlus and serve no purpose anymore.
+    please delete them. They are no longer used by NoCheatPlus and serve no
+    purpose anymore.
 
  4) Never change the amount of white-spaces in front of options in the config
     file "config.yml". It will break the configuration.
@@ -30,7 +31,8 @@
  (read on to learn in detail on how to define/modify actions)
 
   cancel: The effects of the action "cancel" depend on the check that it is used
-          for. Usually it means to prevent something from happening, e.g. stop an attack or prevent sending of a chat message.
+          for. Usually it means to prevent something from happening, e.g. stop
+          an attack or prevent sending of a chat message.
 
   log:    Create and show/log a message. Log messages can be customized in how
           often, when and where they are registered/shown.
@@ -60,10 +62,12 @@
  2) The "log" action is a string of the form "log:string:delay:repeat:target".
 
     log:    is simply used to let NoCheatPlus know it is a log action. Don't
-            remove it from the action, or NoCheatPlus will not know what it is and how to handle it.
+            remove it from the action, or NoCheatPlus will not know what it is
+            and how to handle it.
 
     string: is the message that will be logged. Because there is so little space
-            here, you only give a name here and define the actual log message in the "strings" section of the config file.
+            here, you only give a name here and define the actual log message in
+            the "strings" section of the config file.
 
     delay:  a number declaring how many times that action initially has to be
             executed before it really leads to logging a message. Use this for
@@ -86,7 +90,8 @@
  3) The "cmd" action is a string of the form "cmd:string:delay:repeat".
 
     cmd:    is simply used to let NoCheatPlus know it is a command action. Don't
-            remove it from the action, or NoCheatPlus will not know what it is and how to handle it.
+            remove it from the action, or NoCheatPlus will not know what it is
+            and how to handle it.
 
     string: is the command that will be issued. Because there is so little space
             here, you only give a name here and define the actual command in the
@@ -106,7 +111,8 @@
  4) The "vl>" isn't really an action. It limits all actions that are written
     afterwards to be only executed if the players violation level has reached
     at least the given value. This allows to define layers of actions and handle
-    repeated or severe failing of checks different. For example the spam check will only kick players if they reach a certain violation level (vl).
+    repeated or severe failing of checks different. For example the spam check
+    will only kick players if they reach a certain violation level (vl).
 
 
 ################################################################################
@@ -116,9 +122,9 @@
 ################################################################################
 
 
- NoCheatPlus only supports "SuperPerms", CraftBukkits official permission framework.
- You'll need to use a permissions plugin that supports "SuperPerms" to use it
- with NoCheatPlus. Here are some I know of:
+ NoCheatPlus only supports "SuperPerms", CraftBukkits official permission
+ framework. You'll need to use a permissions plugin that supports "SuperPerms"
+ to use it with NoCheatPlus. Here are some I know of:
 
    - bPermissions;
    - PermissionsEx;
@@ -142,10 +148,13 @@
     The player gets access to some of the "/nocheatplus" commands.
 
  - nocheatplus.admin.reload
-    In combination with "nocheatplus.admin.commands", the player gets access to the "/nocheatplus reload" command, which will cause NoCheatPlus to reread its config files.
+    In combination with "nocheatplus.admin.commands", the player gets access to
+    the "/nocheatplus reload" command, which will cause NoCheatPlus to reread
+    its config files.
 
  - nocheatplus.admin.plugins
-    Give this permissions to the players you want to be able to see the plugins your server is using.
+    Give this permissions to the players you want to be able to see the plugins
+    your server is using.
 
 
 --------------------------------------------------------------------------------
@@ -176,7 +185,8 @@
 
  - nocheatplus.checks.moving.swimming
     Allows the player to swim as fast as he is allowed to walk. Normally a
-    player swims slower than he walks and NoCheatPlus prevents faster movement in water.
+    player swims slower than he walks and NoCheatPlus prevents faster movement
+    in water.
 
  - nocheatplus.checks.moving.sneaking
     Allows the player to sneak faster than he is allowed to walk. Normally a
@@ -208,13 +218,13 @@
 
  - nocheatplus.checks.moving.morepacketsvehicle
     Allows players to make a lot more movements (while being in a vehicule) than
-    normally possible. Doing more movements will result in faster overall movement speed and causes the server to spent a lot of additional time for processing these movements.
+    normally possible. Doing more movements will result in faster overall
+    movement speed and causes the server to spent a lot of additional time for
+    processing these movements.
 
  - nocheatplus.checks.moving.waterwalk
-    Allows players to walk on water (by using a griefing client). This functionality is also called Jesus mode.
-
- - nocheatplus.checks.moving.unpushable
-    Allows players to be unpushable (they can't be pushed by an other player).
+    Allows players to walk on water (by using a griefing client). This
+    functionality is also called Jesus mode.
 
  - nocheatplus.checks.moving.boatonground
     Allows players to place boats on the ground (and not only on the water).
@@ -257,7 +267,9 @@
     to level up very quickly or to crash the server by spawning too much mobs.
 
  - nocheatplus.checks.blockplace.autosign
-    Allows the player to place multiple signs with the same text. This is usually used by griefers to place quickly a lot of signs with their signature.
+    Allows the player to place multiple signs with the same text. This is
+    usually used by griefers to place quickly a lot of signs with their
+    signature.
 
 
 --------------------- INVENTORY Permissions for CHECKS -------------------------
@@ -382,7 +394,8 @@
 ---------------------- Things to know about Permissions ------------------------
 --------------------------------------------------------------------------------
 
- NoCheatPlus defines "parent" nodes for all permissions already for you. That means you can use one of the following:
+ NoCheatPlus defines "parent" nodes for all permissions already for you. That
+ means you can use one of the following:
 
    - nocheatplus
    - nocheatplus.admin
@@ -431,7 +444,8 @@
 -------------------------------- LOGGING Section -------------------------------
 --------------------------------------------------------------------------------
 
- Everything that in general has to do with controlling NoCheatPluss logging can be found at this part of the config.yml.
+ Everything that in general has to do with controlling NoCheatPluss logging can
+ be found at this part of the config.yml.
 
   active:
 
@@ -447,7 +461,8 @@
   filename:
 
     The name of the logfile that NoCheatPlus will use to log its messages. The
-    default name is "nocheatplus.log", but you can use a different one if you want to.
+    default name is "nocheatplus.log", but you can use a different one if you
+    want to.
 
   file:
 
@@ -457,16 +472,21 @@
   console:
 
     Should the server console be used to display messages. Set to false if you
-    don't want NoCheatPlus to show messages related to checks in the console. Error messages may still get displayed there though.
+    don't want NoCheatPlus to show messages related to checks in the console.
+    Error messages may still get displayed there though.
 
   ingamechat:
 
     Should NoCheatPlus display messages in the ingame chat? Set to false if you
-    don't want NoCheatPlus to show messages ingame. The messages will only be seen by players with the permission node "nocheatplus.admin.chatlog" or if you don't use a permissions plugin, by players who are OP.
+    don't want NoCheatPlus to show messages ingame. The messages will only be
+    seen by players with the permission node "nocheatplus.admin.chatlog" or if
+    you don't use a permissions plugin, by players who are OP.
 
   showactivechecks:
 
-    Should NoCheatPlus display lists of checks that are enabled for each world. Set to true if you are unsure that your (multiworld) setup of the config files is done correctly.
+    Should NoCheatPlus display lists of checks that are enabled for each world.
+    Set to true if you are unsure that your (multiworld) setup of the config
+    files is done correctly.
 
   debugmessages:
 
@@ -483,7 +503,8 @@
 
   allowclientmods:
 
-    Allow all your players to use all the client mods (Zombe, CJB, Rei's Minimap, Minecraft AutoMap and Smart Moving).
+    Allow all your players to use all the client mods (Zombe, CJB, Rei's
+    Minimap, Minecraft AutoMap and Smart Moving).
 
   opbyconsoleonly:
 
@@ -500,7 +521,9 @@
 -------------------------------- CHECKS Section --------------------------------
 --------------------------------------------------------------------------------
 
- Everything that in has to do with the various checks that NoCheatPlus runs on the players. Use these to specify what will be done, how it will be done and what happens if somebody fails checks.
+ Everything that in has to do with the various checks that NoCheatPlus runs on
+ the players. Use these to specify what will be done, how it will be done and
+ what happens if somebody fails checks.
 
 
 ----------------------------- INVENTORY Subsection -----------------------------
@@ -551,7 +574,8 @@
         this check the time difference between how long it took the player to
         fire an arrow and how long NoCheatPlus thinks he should have taken, in
         1/10 seconds. Therefore a VL of 10 would mean that the player shot an
-        arrow 1 second faster than NoCheatPlus expected. The VL gets increased with every failed check and slowly decreased for every passed check.
+        arrow 1 second faster than NoCheatPlus expected. The VL gets increased
+        with every failed check and slowly decreased for every passed check.
 
  3) INSTANTEAT:
 
@@ -568,7 +592,8 @@
         this check the time difference between how long it took the player to
         eat his food and how long NoCheatPlus thinks he should have taken, in
         1/10 seconds. Therefore a VL of 10 would mean that the player ate his
-        food 1 second faster than NoCheatPlus expected. The VL gets increased with every failed check and slowly decreased for every passed check.
+        food 1 second faster than NoCheatPlus expected. The VL gets increased
+        with every failed check and slowly decreased for every passed check.
 
 
 ------------------------------ MOVING Subsection -------------------------------
@@ -591,7 +616,8 @@
         How fast should the player be allowed to walk. Default is "100",
         meaning 100% of normal walking speed. You will not see this option in
         your config.yml file, because normally you shouldn't have to change the
-        walking speed of players at all (NoCheatPlus knows when players sprint, use Swiftness potions etc and will already adapt the speed based on that
+        walking speed of players at all (NoCheatPlus knows when players sprint,
+        use Swiftness potions etc and will already adapt the speed based on that
         data).
 
       sneakspeed:
@@ -604,7 +630,11 @@
 
       blockspeed:
         How fast should the player be allowed to move while blocking. Default is
-        "100" meaning 100% of normal blocking speed. You will not see this option in your config.yml file, because normally you shouldn't have to change the blocking speed of player at all (NoCheatPlus knows when players block, use Swiftness potions etc and will already adapt the speed based on that data).
+        "100" meaning 100% of normal blocking speed. You will not see this
+        option in your config.yml file, because normally you shouldn't have to
+        change the blocking speed of player at all (NoCheatPlus knows when
+        players block, use Swiftness potions etc and will already adapt the
+        speed based on that data).
 
       swimspeed:
         How fast should the player be allowed to swim. Default is "100",
@@ -618,11 +648,18 @@
         How fast should the player be allowed to sprint. Default is "100",
         meaning 100% of normal sprinting speed. You will not see this option in
         your config.yml file, because normally you shouldn't have to change the
-        sprinting speed of players at all (NoCheatPlus knows when players sprint, use Swiftness potions etc and will already adapt the speed based on that data).
+        sprinting speed of players at all (NoCheatPlus knows when players
+        sprint, use Swiftness potions etc and will already adapt the speed based
+        on that data).
 
       cobwebspeed:
         How fast should the player be allowed to move while being into cobweb.
-        Default is "100" meaning 100% of normal speed while being into cobweb. You will not see this option in your config.yml file, because normally you shouldn't have to change the speed while being into cobweb of players at all (NoCheatPlus knows when players are in cobweb, use Swiftness potions etc and will already adapt the speed based on that data).
+        Default is "100" meaning 100% of normal speed while being into cobweb.
+        You will not see this option in your config.yml file, because normally
+        you shouldn't have to change the speed while being into cobweb of
+        players at all (NoCheatPlus knows when players are in cobweb, use
+        Swiftness potions etc and will already adapt the speed based on that
+        data).
 
       maxcooldown:
         How much time the player can spend in the air if his velocity has been
@@ -643,7 +680,8 @@
         What should happen when a player sneaks/swims/walks/runs faster than
         normally allowed or is flying. Default is to log messages (depending on
         how severe the cheating is) and teleport the player to the last known
-        legitimate location on ground that NoCheatPlus can remember for that player ("cancel" the movement).
+        legitimate location on ground that NoCheatPlus can remember for that
+        player ("cancel" the movement).
 
       checknofall:
         Should players be checked for a common type of "nofall" hack, that
@@ -699,7 +737,8 @@
           What should happen if a player flies faster/higher than defined here?
           Default is to log messages and to prevent the player from moving
           ("cancel" his last movement). The Violation Level (VL) of this check
-          is the distance that the player went beyond what NoCheatPlus allowed him. The VL increases with every failed check and slowly decreases for
+          is the distance that the player went beyond what NoCheatPlus allowed
+          him. The VL increases with every failed check and slowly decreases for
           every passed check.
 
  2) MOREPACKETS:
@@ -762,17 +801,12 @@
 
       actions:
 	      What should happen if a player is considered to be cheating by walking
-        on water. Default is to log messages and to prevent the player from moving ("cancel" his last movement). The Violation Level (VL) of this check is the distance between the player and the surface or how far away he is from the normal position if a player climbing a block. The VL increases with every failed check and slowly decreases for every passed check.
-
- 5) UNPUSHABLE:
-
-     This check is designed to prevent players from being unpushable. It'll handle "pushs" server-side instead of letting the client calculates them for the server.
-
-      active:
-        Should players be checked for this kind of cheating. If you are not
-        interested in players that cheat that way, set this to false. It is a
-        good idea to have this active, because players won't be able to stay on
-        a block and to do not fall when pushed by other players.
+        on water. Default is to log messages and to prevent the player from
+        moving ("cancel" his last movement). The Violation Level (VL) of this
+        check is the distance between the player and the surface or how far away
+        he is from the normal position if a player climbing a block. The VL
+        increases with every failed check and slowly decreases for every passed
+        check.
 
 
 ---------------------------- BLOCKBREAK Subsection -----------------------------
@@ -781,7 +815,10 @@
 
  1) FASTBREAK:
 
-     This check will prevent players from breaking blocks too quickly by checking the interval of time elapsed since they've broken their last block. This should prevent players from using the features called "Smasher", "Click Nuker" and "Creative Nuker" of their griefing client.
+     This check will prevent players from breaking blocks too quickly by
+     checking the interval of time elapsed since they've broken their last
+     block. This should prevent players from using the features called
+     "Smasher", "Click Nuker" and "Creative Nuker" of their griefing client.
 
       active:
         Should players be checked for this behaviour.
@@ -809,7 +846,10 @@
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from breaking the block ("cancel" breaking)
         and on repeated offenses to log messages about it. The Violation Level
-        (VL) is the distance in Blocks between the reach distance that NoCheatPlus allowed and what the player actually tried to use. The VL increases with every failed attempt to break a block out of reach, and decreases with every successful attempt.
+        (VL) is the distance in Blocks between the reach distance that NoCheatPlus
+        allowed and what the player actually tried to use. The VL increases with
+        every failed attempt to break a block out of reach, and decreases with
+        every successful attempt.
 
  3) DIRECTION:
 
@@ -821,7 +861,8 @@
         Should players get checked for this type of hack.
 
       precision:
-        How strict should NoCheatPlus be when comparing the players line of view with the broken block location. The value represents (roughly) the
+        How strict should NoCheatPlus be when comparing the players line of view
+        with the broken block location. The value represents (roughly) the
         amount of 1/100 blocks that the player is allowed to look past the to
         be broken block. 50 (0.5 blocks) seems a good default value.
 
@@ -892,7 +933,10 @@
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from placing the block ("cancel" placing)
         and on repeated offenses to log messages about it. The Violation Level
-        (VL) is the distance in Blocks between the reach distance that NoCheatPlus allowed and what the player actually tried to use. The VL increases with every failed attempt to place a block out of reach, and decreases with every successful attempt.
+        (VL) is the distance in Blocks between the reach distance that
+        NoCheatPlus allowed and what the player actually tried to use. The VL
+        increases with every failed attempt to place a block out of reach, and
+        decreases with every successful attempt.
 
  3) DIRECTION:
 
@@ -903,7 +947,8 @@
         Should players get checked for this type of hack.
 
       precision:
-        How strict should NoCheatPlus be when comparing the players line of view with the placed block location. The value represents (roughly) the
+        How strict should NoCheatPlus be when comparing the players line of view
+        with the placed block location. The value represents (roughly) the
         amount of 1/100 blocks that the player is allowed to look past the to
         be placed block. 75 (0.75 blocks) seems a good default value.
 
@@ -938,7 +983,18 @@
         What should happen if a player fails this check. Default is to prevent
         the placing of the block ("cancel" it) and after repeated/more severe
         offenses to log a message and kick the player. The Violation Level (VL)
-        for this check is the interval elapsed subtracted to the interval defined in the configuration's file; It increases with every failure and decreases with every successfully thrown projectile.
+        for this check is the interval elapsed subtracted to the interval
+        defined in the configuration's file; It increases with every failure and
+        decreases with every successfully thrown projectile.
+        
+ 5) FASTSIGN
+ 
+     Players using custom clients are able to spam the server with signs
+     containing the text they have chosen.
+     
+      exclusions:
+        If the first line of the sign is included into this list, the sign won't
+        be checked.
 
 
 ------------------------------- CHAT Subsection --------------------------------
@@ -952,45 +1008,59 @@
  1) NOPWNAGE:
 	
      The instructions for this check comes directly from NoPwnage's instructions
-     file. You can find the project at http://dev.bukkit.org/server-mods/nopwnage/.
+     file. You can find the project at http://dev.bukkit.org/server-mods/
+     nopwnage/.
 
       warnPlayers:
         Should a player that reaches the "warnLevel" get a text message telling
         him that he is under suspicion of being a bot.
 
       warnOthers:
-        Should all players get warned when a player gets banned for spambot-like activity?
+        Should all players get warned when a player gets banned for spambot-like
+        activity?
 
       warnLevel:
-        How much suspicion must a message earn to issue a warning for the player?
+        How much suspicion must a message earn to issue a warning for the
+        player?
 
       warnTimeout:
         After what time (in ms) should a player be considered "unwarned" again.
 
       banLevel:
-        How much suspicion must a message earn to execute the "commands" (usually ban the player). If warnings for players are enabled and the player hasn't been warned yet, he'll get warned instead.
+        How much suspicion must a message earn to execute the "commands"
+        (usually ban the player). If warnings for players are enabled and the
+        player hasn't been warned yet, he'll get warned instead.
 
       move.enabled:
       move.weightbonus:
       move.weightmalus:
       move.timeout:
         NoPwnage will check if a player moved within the "timeout" timeframe. If
-        he did move, the suspicion will be reduced by the "weightbonus" value. If he did not move, the suspicion will be increased by "weightmalus" value.
+        he did move, the suspicion will be reduced by the "weightbonus" value.
+        If he did not move, the suspicion will be increased by "weightmalus"
+        value.
         Only used if "enabled".
 
       messageRepeat.enabled:
       messageRepeat.weight:
       messageRepeat.timeout:
-        NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight" and for each additional repetition by "weight/2". This means that multiple repetitions will increase suspicion, but not as much as the first repetition.
+        NoPwnage will check if a player repeats his messages within the
+        "timeout" timeframe. Even if the message is a bit different, it will be
+        counted as being a repetition. The suspicion is increased by "weight"
+        and for each additional repetition by "weight/2". This means that
+        multiple repetitions will increase suspicion, but not as much as the
+        first repetition.
         Only used if "enabled".
 
       messageSpeed.enabled:
       messageSpeed.weight:
       messageSpeed.timeout:
         NoPwnage will check if a player sends messages too fast. If a message is
-        sent within "timout" ms after the previous message, increase suspicion by "weight". For each additional message that is sent within "timeout",
+        sent within "timout" ms after the previous message, increase suspicion
+        by "weight". For each additional message that is sent within "timeout",
         the suspicion is increased by "weight/2". This means that multiple
-        too fast sent messages in a row will increase suspicion, but not as much as the first.
+        too fast sent messages in a row will increase suspicion, but not as much
+        as the first.
         Only used if "enabled".
 
       messageFirst.enabled:
@@ -1005,13 +1075,18 @@
       globalMessageRepeat.timeout:
         NoPwnage will check if a player repeats a message that has been sent by
         another player just before, within "timeout". If he does, suspicion will
-        be increased by "weight" and for each additional repetition by "weight/2", independent of by which player. This means that multiple repetitions will increase suspicion, but not as much as the first repetition.
+        be increased by "weight" and for each additional repetition by
+        "weight/2", independent of by which player. This means that multiple
+        repetitions will increase suspicion, but not as much as the first
+        repetition.
         Only used if "enabled".
 
       bannedMessageRepeat.enabled:
       bannedMessageRepeat.weight:
       bannedMessageRepeat.timeout:
-        NoPwnage will remember the last message that caused someone to get banned. If a player repeats that message within "timeout" ms, the suspicion will be increased by "weight".
+        NoPwnage will remember the last message that caused someone to get
+        banned. If a player repeats that message within "timeout" ms, the
+        suspicion will be increased by "weight".
         Only used if "enabled".
 
       relog.enabled:
@@ -1020,13 +1095,18 @@
       relog.timeout:
         NoPwnage will remember the time when a player leaves the server. If he
         returns within "time" ms, he will get warned. If he has been warned
-        "warnings" times already, the "commands" will be executed for him. Warnings get removed if the time of the last warning was more than "timeout" ms ago.
+        "warnings" times already, the "commands" will be executed for him.
+        Warnings get removed if the time of the last warning was more than
+        "timeout" ms ago.
 
       actions:
         NoPwnage allows you to decide what should happen when a player reaches
-        "banLevel" or relogged too fast. The default is to kick him and ban IP and name. You'll also get a log message to console stating how exactly he reached the "banLevel" (how much suspicion was added by each check).
+        "banLevel" or relogged too fast. The default is to kick him and ban IP
+        and name. You'll also get a log message to console stating how exactly
+        he reached the "banLevel" (how much suspicion was added by each check).
 
-        "[player]" and "[ip]" wildcards will be replaced by the actual data during execution.
+        "[player]" and "[ip]" wildcards will be replaced by the actual data
+        during execution.
 
       captcha.enabled:
         Should players that get to "banlevel" be presented with a captcha first
@@ -1037,7 +1117,10 @@
         [captcha] will be replaced with the actual captcha.
 
       tries:
-        How many attempts will a player have to give the correct answer. A failed attempt will display the question again. Be generous here, as players may not be fast enough to read the question the first few times or be otherwise distracted.
+        How many attempts will a player have to give the correct answer. A
+        failed attempt will display the question again. Be generous here, as
+        players may not be fast enough to read the question the first few times
+        or be otherwise distracted.
 
       length:
         How many characters should the captcha have.
@@ -1105,7 +1188,8 @@
         Should players get checked for this type of hack.
 
       precision:
-        How strict should NoCheatPlus be when comparing the players line of view with the his target's location. The value represents (roughly) the
+        How strict should NoCheatPlus be when comparing the players line of view
+        with the his target's location. The value represents (roughly) the
         amount of 1/100 blocks that the player is allowed to look past the to
         be attacked entity. 75 (0.75 blocks) seems a good default value.
 
@@ -1166,7 +1250,10 @@
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from attacking the target ("cancel" attack)
         and on repeated offenses to log messages about it. The Violation Level
-        (VL) is the distance in Blocks between the reach distance that NoCheatPlus allowed and what the player actually tried to use. The VL increases with every failed attempt to attack enemies out of reach, and decreases with every successful attempt.
+        (VL) is the distance in Blocks between the reach distance that
+        NoCheatPlus allowed and what the player actually tried to use. The VL
+        increases with every failed attempt to attack enemies out of reach, and
+        decreases with every successful attempt.
 
  4) SPEED:
 
@@ -1293,7 +1380,9 @@
     best effort approach.
 
   - NoCheatPlus may make mistakes. Don't see everything NoCheatPlus says or does
-    as indisputable fact that somebody cheated. It's not possible to be 100% sure if somebody is cheating or not, NoCheatPlus will try to be right most of the time.
+    as indisputable fact that somebody cheated. It's not possible to be 100% sure
+    if somebody is cheating or not, NoCheatPlus will try to be right most of the
+    time.
 
 Thank you for reading this file. It took hours to write it, so it's nice that
 people actually take a look at it. ;)

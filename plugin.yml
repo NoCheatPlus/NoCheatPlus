@@ -6,7 +6,7 @@ author: NeatMonster
 authors: [Evenprime, Juliui]
 website: ${project.url}
 
-main: me.neatmonster.nocheatplus.NoCheatPlus
+main: ${project.groupId}.${project.artifactId}
 
 commands:
   nocheatplus:
@@ -59,8 +59,6 @@ permissions:
                 description: Allow a player to send more vehicule-move-event-packets than normal, causing him to move faster than normal
               nocheatplus.checks.moving.waterwalk:
                 description: Allow a player to walk on the water
-              nocheatplus.checks.moving.unpushable:
-                description: Allow a player to be unpushable by the other players
               nocheatplus.checks.moving.boatonground:
                 description: Allow a player to place a boat on the ground (not only on the water)
               nocheatplus.checks.moving.respawntrick:
