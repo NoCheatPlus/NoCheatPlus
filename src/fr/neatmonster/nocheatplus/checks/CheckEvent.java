@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -26,19 +25,19 @@ public abstract class CheckEvent extends Event implements Cancellable {
     }
 
     /** The check which has triggered this event. */
-    private final Check check;
+    private final Check     check;
 
     /** The player who has triggered this event. */
-    private NCPPlayer   player;
+    private final NCPPlayer player;
 
     /** The actions which are going to be executed if the event isn't cancelled. */
-    private ActionList  actions;
+    private ActionList      actions;
 
     /** The violation level of the player for the specified check. */
-    private double      vL;
+    private double          vL;
 
     /** The boolean used to know if the event is cancelled. */
-    private boolean     cancel = false;
+    private boolean         cancel = false;
 
     /**
      * Instantiates a new check event.
@@ -91,8 +90,8 @@ public abstract class CheckEvent extends Event implements Cancellable {
      * 
      * @return the player
      */
-    public Player getPlayer() {
-        return player.getBukkitPlayer();
+    public NCPPlayer getPlayer() {
+        return player;
     }
 
     /**
@@ -130,16 +129,6 @@ public abstract class CheckEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(final boolean cancel) {
         this.cancel = cancel;
-    }
-
-    /**
-     * Sets the player who has triggered the event.
-     * 
-     * @param player
-     *            the new player
-     */
-    public void setPlayer(final Player player) {
-        this.player = NCPPlayer.getPlayer(player);
     }
 
     /**
