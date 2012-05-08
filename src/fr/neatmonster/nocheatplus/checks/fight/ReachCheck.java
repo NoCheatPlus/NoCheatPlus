@@ -1,12 +1,14 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import java.util.Locale;
-
 import net.minecraft.server.Entity;
 import net.minecraft.server.EntityComplex;
 import net.minecraft.server.EntityComplexPart;
+
+import org.bukkit.Bukkit;
+
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckUtils;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Permissions;
@@ -18,6 +20,13 @@ import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
  * 
  */
 public class ReachCheck extends FightCheck {
+
+    public class ReachCheckEvent extends FightEvent {
+
+        public ReachCheckEvent(final ReachCheck check, final NCPPlayer player, final ActionList actions, final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public ReachCheck() {
         super("reach", Permissions.FIGHT_REACH);
@@ -83,10 +92,19 @@ public class ReachCheck extends FightCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final ReachCheckEvent event = new ReachCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).reachVL);
+            return String.valueOf(Math.round(getData(player).reachVL));
         else
             return super.getParameter(wildcard, player);
     }

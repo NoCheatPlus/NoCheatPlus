@@ -15,11 +15,11 @@ public class MovingConfig extends CheckConfig {
 
     public final boolean    runflyCheck;
     public final double     jumpheight;
-    public final int        maxCooldown;
     public final boolean    identifyCreativeMode;
     public final double     walkingSpeedLimit;
     public final double     sprintingSpeedLimit;
     public final double     swimmingSpeedLimit;
+    public final double     verticalSwimmingSpeedLimit;
     public final boolean    sneakingCheck;
     public final double     sneakingSpeedLimit;
     public final boolean    blockingCheck;
@@ -35,7 +35,7 @@ public class MovingConfig extends CheckConfig {
     public final ActionList flyingActions;
 
     public final boolean    nofallCheck;
-    public final boolean    nofallaggressive;
+    public final boolean    nofallAggressive;
     public final float      nofallMultiplier;
     public final ActionList nofallActions;
 
@@ -59,12 +59,14 @@ public class MovingConfig extends CheckConfig {
         final int walkspeed = data.getInt(ConfPaths.MOVING_RUNFLY_WALKSPEED, 100);
         final int sprintspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SPRINTSPEED, 100);
         final int swimspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SWIMSPEED, 100);
+        final int vertSwimSpeed = data.getInt(ConfPaths.MOVING_RUNFLY_VERTICALSWIMSPEED, 100);
         final int sneakspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SNEAKSPEED, 100);
         final int blockspeed = data.getInt(ConfPaths.MOVING_RUNFLY_BLOCKSPEED, 100);
         final int cobWebSpeed = data.getInt(ConfPaths.MOVING_RUNFLY_COBWEBSPEED, 100);
         walkingSpeedLimit = 0.22 * walkspeed / 100D;
         sprintingSpeedLimit = 0.35 * sprintspeed / 100D;
         swimmingSpeedLimit = 0.18 * swimspeed / 100D;
+        verticalSwimmingSpeedLimit = 0.43 * vertSwimSpeed / 100D;
         sneakingSpeedLimit = 0.14 * sneakspeed / 100D;
         blockingSpeedLimit = 0.16 * blockspeed / 100D;
         cobWebHoriSpeedLimit = 0.08 * cobWebSpeed / 100D;
@@ -73,7 +75,6 @@ public class MovingConfig extends CheckConfig {
 
         sneakingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING);
         blockingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTBLOCKING);
-        maxCooldown = data.getInt(ConfPaths.MOVING_RUNFLY_MAXCOOLDOWN);
         actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS, Permissions.MOVING_RUNFLY);
 
         allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);
@@ -82,10 +83,10 @@ public class MovingConfig extends CheckConfig {
         flyingHeightLimit = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT);
         flyingActions = data.getActionList(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS, Permissions.MOVING_FLYING);
 
-        nofallCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECKNOFALL);
+        nofallCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALL_CHECK);
         nofallMultiplier = 200 / 100F;
-        nofallaggressive = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALLAGGRESSIVE);
-        nofallActions = data.getActionList(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS, Permissions.MOVING_NOFALL);
+        nofallAggressive = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALL_AGGRESSIVE);
+        nofallActions = data.getActionList(ConfPaths.MOVING_RUNFLY_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
 
         morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
         morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);

@@ -152,9 +152,9 @@ public class BlockPlaceListener extends CheckListener {
             return;
 
         // Check if the text is the same
-        if (!event.getPlayer().hasPermission(Permissions.BLOCKPLACE_AUTOSIGN)
-                && event.getLine(0).equals(data.lastSignText[0]) && event.getLine(1).equals(data.lastSignText[1])
-                && event.getLine(2).equals(data.lastSignText[2]) && event.getLine(3).equals(data.lastSignText[3])
+        if (!player.hasPermission(Permissions.BLOCKPLACE_AUTOSIGN) && event.getLine(0).equals(data.lastSignText[0])
+                && event.getLine(1).equals(data.lastSignText[1]) && event.getLine(2).equals(data.lastSignText[2])
+                && event.getLine(3).equals(data.lastSignText[3])
                 && data.lastSignText[0].equals(data.lastLastSignText[0])
                 && data.lastSignText[1].equals(data.lastLastSignText[1])
                 && data.lastSignText[2].equals(data.lastLastSignText[2])

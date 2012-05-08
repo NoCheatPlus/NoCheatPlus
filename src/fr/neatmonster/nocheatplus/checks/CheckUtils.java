@@ -269,7 +269,7 @@ public class CheckUtils {
         return (fromType & INGROUND) == INGROUND;
     }
 
-    private static boolean isLadder(final int value) {
+    public static boolean isLadder(final int value) {
         return (value & LADDER) == LADDER;
     }
 

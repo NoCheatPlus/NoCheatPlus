@@ -92,6 +92,4 @@ public class Permissions {
     public static final String  ZOMBE_FLY                 = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP              = ZOMBE + ".noclip";
     public static final String  ZOMBE_CHEAT               = ZOMBE + ".cheat";
-
-    private Permissions() {}
 }

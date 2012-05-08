@@ -13,7 +13,6 @@ public class MovingData extends CheckData {
 
     // Keep track of the violation levels of the checks
     public double                runflyVL;
-    public double                trackerVL;
     public double                nofallVL;
     public double                morePacketsVL;
     public double                morePacketsVehicleVL;
@@ -44,12 +43,6 @@ public class MovingData extends CheckData {
     // Keep track of estimated fall distance to compare to real fall distance
     public float                 fallDistance;
     public float                 lastAddedFallDistance;
-
-    // Is the player flying because of a plugin has modified his velocity
-    public boolean               velocityChanged           = false;
-
-    // If yes, since when?
-    public long                  velocityChangedSince      = 0L;
 
     // Remember if the player has already been on the ground
     public boolean               hasAlreadyBeenOnTheGround = false;

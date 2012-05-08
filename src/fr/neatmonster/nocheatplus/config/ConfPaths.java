@@ -15,7 +15,6 @@ public abstract class ConfPaths {
     public static final String  LOGGING_LOGTOFILE                         = LOGGING + "file";
     public static final String  LOGGING_LOGTOCONSOLE                      = LOGGING + "console";
     public static final String  LOGGING_LOGTOINGAMECHAT                   = LOGGING + "ingamechat";
-    public static final String  LOGGING_SHOWACTIVECHECKS                  = LOGGING + "showactivechecks";
     public static final String  LOGGING_DEBUGMESSAGES                     = LOGGING + "debugmessages";
 
     private static final String MISCELLANEOUS                             = "miscellaneous.";
@@ -46,22 +45,23 @@ public abstract class ConfPaths {
     private static final String MOVING_RUNFLY                             = MOVING + "runfly.";
     public static final String  MOVING_RUNFLY_CHECK                       = MOVING_RUNFLY + "active";
 
-    // These sixth are not automatically shown in the config
+    // These seventh aren't automatically shown in the config
     public static final String  MOVING_RUNFLY_WALKSPEED                   = MOVING_RUNFLY + "walkspeed";
     public static final String  MOVING_RUNFLY_SNEAKSPEED                  = MOVING_RUNFLY + "sneakspeed";
     public static final String  MOVING_RUNFLY_BLOCKSPEED                  = MOVING_RUNFLY + "blockspeed";
     public static final String  MOVING_RUNFLY_SWIMSPEED                   = MOVING_RUNFLY + "swimspeed";
+    public static final String  MOVING_RUNFLY_VERTICALSWIMSPEED           = MOVING_RUNFLY + "vertswimspeed";
     public static final String  MOVING_RUNFLY_SPRINTSPEED                 = MOVING_RUNFLY + "sprintspeed";
     public static final String  MOVING_RUNFLY_COBWEBSPEED                 = MOVING_RUNFLY + "cobwebspeed";
 
     public static final String  MOVING_RUNFLY_ALLOWFASTSNEAKING           = MOVING_RUNFLY + "allowfastsneaking";
     public static final String  MOVING_RUNFLY_ALLOWFASTBLOCKING           = MOVING_RUNFLY + "allowfastblocking";
-    public static final String  MOVING_RUNFLY_MAXCOOLDOWN                 = MOVING_RUNFLY + "maxcooldown";
     public static final String  MOVING_RUNFLY_ACTIONS                     = MOVING_RUNFLY + "actions";
 
-    public static final String  MOVING_RUNFLY_CHECKNOFALL                 = MOVING_RUNFLY + "checknofall";
-    public static final String  MOVING_RUNFLY_NOFALLAGGRESSIVE            = MOVING_RUNFLY + "nofallaggressivemode";
-    public static final String  MOVING_RUNFLY_NOFALLACTIONS               = MOVING_RUNFLY + "nofallactions";
+    private static final String MOVING_RUNFLY_NOFALL                      = MOVING_RUNFLY + "nofall.";
+    public static final String  MOVING_RUNFLY_NOFALL_CHECK                = MOVING_RUNFLY_NOFALL + "active";
+    public static final String  MOVING_RUNFLY_NOFALL_AGGRESSIVE           = MOVING_RUNFLY_NOFALL + "aggressivemode";
+    public static final String  MOVING_RUNFLY_NOFALL_ACTIONS              = MOVING_RUNFLY_NOFALL + "actions";
 
     private static final String MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";
     public static final String  MOVING_RUNFLY_FLYING_ALLOWALWAYS          = MOVING_RUNFLY_FLYING + "allowflyingalways";
@@ -131,6 +131,7 @@ public abstract class ConfPaths {
     public static final String  BLOCKPLACE_PROJECTILE_ACTIONS             = BLOCKPLACE_PROJECTILE + "actions";
 
     private static final String BLOCKPLACE_FASTSIGN                       = BLOCKPLACE + "fastsign.";
+    public static final String  BLOCKPLACE_FASTSIGN_CHECK                 = BLOCKPLACE_FASTSIGN + "active";
     public static final String  BLOCKPLACE_FASTSIGN_EXCLUSIONS            = BLOCKPLACE_FASTSIGN + "exclusions";
 
     private static final String CHAT                                      = CHECKS + "chat.";
@@ -142,7 +143,8 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_WARNLEVEL                   = CHAT_NOPWNAGE + "warnlevel";
     public static final String  CHAT_NOPWNAGE_WARNTIMEOUT                 = CHAT_NOPWNAGE + "warntimeout";
     public static final String  CHAT_NOPWNAGE_BANLEVEL                    = CHAT_NOPWNAGE + "banlevel";
-    public static final String  CHAT_NOPWNAGE_ACTIONS                     = CHAT_NOPWNAGE + "actions";
+    public static final String  CHAT_NOPWNAGE_KICKMESSAGE                 = CHAT_NOPWNAGE + "kickmessage";
+    public static final String  CHAT_NOPWNAGE_ACTIONS                     = CHAT_NOPWNAGE + "otheractions";
 
     private static final String CHAT_NOPWNAGE_MOVE                        = CHAT_NOPWNAGE + "move.";
     public static final String  CHAT_NOPWNAGE_MOVE_CHECK                  = CHAT_NOPWNAGE_MOVE + "active";

@@ -3,10 +3,13 @@ package fr.neatmonster.nocheatplus.checks;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandException;
+import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -19,11 +22,12 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
+import fr.neatmonster.nocheatplus.players.informations.Permissions;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
-import fr.neatmonster.nocheatplus.utilities.LogEvent;
 
 public abstract class Check {
-    private static final Map<String, Check> checks = new HashMap<String, Check>();
+    private static final Map<String, Check> checks     = new HashMap<String, Check>();
+    private static Logger                   fileLogger = null;
 
     public static CheckConfig newConfig(final String group, final String worldName) {
         if (checks.containsKey(group))
@@ -37,8 +41,42 @@ public abstract class Check {
         return null;
     }
 
+    /**
+     * Remove instances of &X
+     * 
+     * @param text
+     * @return
+     */
+    public static String removeColors(String text) {
+
+        for (final ChatColor c : ChatColor.values())
+            text = text.replace("&" + c.getChar(), "");
+
+        return text;
+    }
+
+    /**
+     * Replace instances of &X with a color
+     * 
+     * @param text
+     * @return
+     */
+    public static String replaceColors(String text) {
+
+        for (final ChatColor c : ChatColor.values())
+            text = text.replace("&" + c.getChar(), c.toString());
+
+        return text;
+    }
+
+    public static void setFileLogger(final Logger logger) {
+        fileLogger = logger;
+    }
+
     private final String                       name;
+
     private final Class<? extends CheckConfig> configClass;
+
     private final Class<? extends CheckData>   dataClass;
 
     public Check(final String name, final Class<? extends CheckConfig> configClass,
@@ -102,18 +140,27 @@ public abstract class Check {
         if (!configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE))
             return;
 
-        // Fire one of our custom "Log" Events
-        Bukkit.getServer()
-                .getPluginManager()
-                .callEvent(
-                        new LogEvent(configurationFile.getString(ConfPaths.LOGGING_PREFIX), l.getLogMessage(player,
-                                check), configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE) && l.toConsole(),
-                                configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOINGAMECHAT) && l.toChat(),
-                                configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOFILE) && l.toFile()));
+        final String prefix = configurationFile.getString(ConfPaths.LOGGING_PREFIX);
+        final String message = l.getLogMessage(player, check);
+        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE) && l.toConsole())
+            // Console logs are not colored
+            System.out.println(removeColors(prefix + message));
+        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOINGAMECHAT) && l.toChat())
+            for (final Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers())
+                if (NCPPlayer.hasPermission(bukkitPlayer, Permissions.ADMIN_CHATLOG))
+                    // Chat logs are potentially colored
+                    bukkitPlayer.sendMessage(replaceColors(prefix + message));
+        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOFILE) && l.toFile())
+            // File logs are not colored
+            fileLogger.info(removeColors(message));
     }
 
     public String getGroup() {
         return name.contains(".") ? name.split("\\.")[0] : name;
+    }
+
+    public String getName() {
+        return name.contains(".") ? name.split("\\.")[name.split("\\.").length - 1] : name;
     }
 
     /**

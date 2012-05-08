@@ -3,6 +3,8 @@ package fr.neatmonster.nocheatplus.checks.moving;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Boat;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -114,7 +116,7 @@ public class MovingListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void boat(final PlayerInteractEvent event) {
-        if (!event.getPlayer().hasPermission(Permissions.MOVING_BOATONGROUND)
+        if (!NCPPlayer.hasPermission(event.getPlayer(), Permissions.MOVING_BOATONGROUND)
                 && event.getAction() == Action.RIGHT_CLICK_BLOCK
                 && event.getPlayer().getItemInHand().getType() == Material.BOAT
                 && event.getClickedBlock().getType() != Material.WATER
@@ -187,16 +189,6 @@ public class MovingListener extends CheckListener {
             data.lastSafeLocations[1] = event.getFrom();
         }
 
-        // Check if the player is on/in the ground
-        final int toType = CheckUtils.evaluateLocation(event.getPlayer().getWorld(), data.to);
-        if (data.velocityChanged
-                && (System.currentTimeMillis() - data.velocityChangedSince > 500L
-                        && (CheckUtils.isOnGround(toType) || CheckUtils.isInGround(toType)) || cc.maxCooldown != -1
-                        && System.currentTimeMillis() - data.velocityChangedSince > cc.maxCooldown)) {
-            data.velocityChanged = false;
-            data.velocityChangedSince = 0L;
-        }
-
         PreciseLocation newTo = null;
 
         /** RUNFLY CHECK SECTION **/
@@ -262,7 +254,7 @@ public class MovingListener extends CheckListener {
 
         // If the player has buried himself, remove the blocks to prevent
         // him from respawning at the surface
-        if (!event.getPlayer().hasPermission(Permissions.MOVING_RESPAWNTRICK)
+        if (!NCPPlayer.hasPermission(event.getPlayer(), Permissions.MOVING_RESPAWNTRICK)
                 && (event.getPlayer().getLocation().getBlock().getType() == Material.GRAVEL || event.getPlayer()
                         .getLocation().getBlock().getType() == Material.SAND)) {
             event.getPlayer().getLocation().getBlock().setType(Material.AIR);
@@ -354,7 +346,7 @@ public class MovingListener extends CheckListener {
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void vehicleMove(final VehicleMoveEvent event) {
 
-        // Don't care for vehicles without passenger
+        // Don't care for vehicles without a player as passenger
         if (event.getVehicle().getPassenger() == null || !(event.getVehicle().getPassenger() instanceof Player))
             return;
 
@@ -377,11 +369,16 @@ public class MovingListener extends CheckListener {
 
         if (cc.morePacketsVehicleCheck && !player.hasPermission(Permissions.MOVING_MOREPACKETSVEHICLE)
                 && morePacketsVehicleCheck.check(player)) {
-            // Drop the usual items
-            event.getVehicle().getWorld()
-                    .dropItemNaturally(event.getVehicle().getLocation(), new ItemStack(Material.WOOD, 3));
-            event.getVehicle().getWorld()
-                    .dropItemNaturally(event.getVehicle().getLocation(), new ItemStack(Material.STICK, 2));
+            // Drop the usual items (depending on the vehicle)
+            if (event.getVehicle() instanceof Minecart)
+                event.getVehicle().getWorld()
+                        .dropItemNaturally(event.getVehicle().getLocation(), new ItemStack(Material.MINECART, 1));
+            else if (event.getVehicle() instanceof Boat) {
+                event.getVehicle().getWorld()
+                        .dropItemNaturally(event.getVehicle().getLocation(), new ItemStack(Material.WOOD, 3));
+                event.getVehicle().getWorld()
+                        .dropItemNaturally(event.getVehicle().getLocation(), new ItemStack(Material.STICK, 2));
+            }
             // Remove the passenger
             if (event.getVehicle().getPassenger() != null)
                 event.getVehicle().setPassenger(null);
@@ -403,10 +400,6 @@ public class MovingListener extends CheckListener {
     public void velocity(final PlayerVelocityEvent event) {
 
         final MovingData data = (MovingData) getData(NCPPlayer.getPlayer(event.getPlayer()));
-
-        // Remeber that a plugin changed the player's velocity
-        data.velocityChanged = true;
-        data.velocityChangedSince = System.currentTimeMillis();
 
         final Vector v = event.getVelocity();
 

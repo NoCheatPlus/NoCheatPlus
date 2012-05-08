@@ -5,12 +5,13 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerChatEvent;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
-import fr.neatmonster.nocheatplus.utilities.Colors;
 import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
 
 /**
@@ -18,10 +19,19 @@ import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
  * 
  */
 public class NoPwnageCheck extends ChatCheck {
+    public class NoPwnageCheckEvent extends ChatEvent {
+
+        public NoPwnageCheckEvent(final NoPwnageCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
+
     private String       lastBanCausingMessage;
     private long         lastBanCausingMessageTime;
     private String       lastGlobalMessage;
     private long         lastGlobalMessageTime;
+
     private int          globalRepeated;
 
     private final Random random = new Random();
@@ -40,16 +50,15 @@ public class NoPwnageCheck extends ChatCheck {
     public boolean check(final NCPPlayer player, final Object... args) {
         final ChatConfig cc = getConfig(player);
         final ChatData data = getData(player);
+        final PlayerChatEvent event = (PlayerChatEvent) args[0];
 
         boolean cancel = false;
 
-        if (data.commandsHaveBeenRun || !player.getBukkitPlayer().isOnline())
-            return false;
-
-        // Player is supposed to fill out a captcha
-        if (cc.noPwnageCaptchaCheck && data.captchaDone)
+        // If the player has filled out the captcha, return
+        if (data.commandsHaveBeenRun || !player.getBukkitPlayer().isOnline() || cc.noPwnageCaptchaCheck
+                && data.captchaDone)
             // His reply was valid, he isn't a spambot
-            return false;
+            return cancel;
 
         if (cc.noPwnageCaptchaCheck && data.captchaStarted) {
             // Correct answer?
@@ -62,14 +71,17 @@ public class NoPwnageCheck extends ChatCheck {
 
                 // He failed too much times
                 if (data.captchaTries > cc.noPwnageCaptchaTries)
-                    if (player.getBukkitPlayer().isOnline())
+                    if (player.getBukkitPlayer().isOnline()) {
                         // Execute the commands, it's a spambot
-                        runCommands(player, "failed captcha", data, cc);
+                        data.reason = "failed captcha";
+                        cancel = executeActions(player, cc.noPwnageActions, 0);
+                    }
 
                 // Increment the number of times he replied
                 data.captchaTries++;
             }
-            return true;
+            event.setCancelled(true);
+            return cancel;
         }
 
         // Do some pre-testing for the next check
@@ -148,7 +160,7 @@ public class NoPwnageCheck extends ChatCheck {
                 data.captchaAnswer = captcha;
                 data.captchaQuestion = ChatColor.RED + "Please type '" + ChatColor.GOLD + captcha + ChatColor.RED
                         + "' to continue sending messages/commands.";
-                cancel = true;
+                event.setCancelled(true);
                 player.sendMessage(data.captchaQuestion);
             } else if (player.getBukkitPlayer().isOnline()) {
                 // Execute the commands, it's a spambot
@@ -157,8 +169,9 @@ public class NoPwnageCheck extends ChatCheck {
                 data.lastWarningTime = now;
                 if (cc.noPwnageWarnOthers)
                     warnOthers(player);
-                runCommands(player, "spambotlike behaviour", data, cc);
-                return true;
+                data.reason = "spambotlike behaviour";
+                event.setCancelled(true);
+                return executeActions(player, cc.noPwnageActions, 0);
             }
 
         // Remember his message and some other data
@@ -169,6 +182,18 @@ public class NoPwnageCheck extends ChatCheck {
         lastGlobalMessageTime = now;
 
         return cancel;
+    }
+
+    @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        getData(player).ip = player.getBukkitPlayer().getAddress().toString().substring(1).split(":")[0];
+        getData(player).commandsHaveBeenRun = true;
+
+        final NoPwnageCheckEvent event = new NoPwnageCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
     }
 
     /**
@@ -200,24 +225,26 @@ public class NoPwnageCheck extends ChatCheck {
             return super.getParameter(wildcard, player);
     }
 
-    public void handleJoin(final NCPPlayer player, final ChatData data, final ChatConfig cc) {
+    public boolean handleJoin(final NCPPlayer player, final ChatData data, final ChatConfig cc) {
+        boolean cancel = false;
         final long now = System.currentTimeMillis();
 
-        // Relog check (cf. documentation)
+        // Re-login check (cf. documentation)
         if (cc.noPwnageRelogCheck && now - data.leaveTime <= cc.noPwnageRelogTime) {
             if (now - data.lastRelogWarningTime >= cc.noPwnageRelogTimeout)
                 data.relogWarnings = 0;
 
             if (data.relogWarnings < cc.noPwnageRelogWarnings) {
-                player.sendMessage(Colors.replaceColors(ConfigManager.getConfigFile().getString(
-                        ConfPaths.LOGGING_PREFIX))
+                player.sendMessage(replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_PREFIX))
                         + ChatColor.DARK_RED
                         + "You relogged really fast! If you keep doing that, you're going to be banned.");
                 data.lastRelogWarningTime = now;
                 data.relogWarnings++;
-            } else if (now - data.lastRelogWarningTime < cc.noPwnageRelogTimeout)
+            } else if (now - data.lastRelogWarningTime < cc.noPwnageRelogTimeout) {
                 // Run the commands, it's a spambot
-                runCommands(player, "relogged too fast", data, cc);
+                data.reason = "relogged too fast";
+                cancel = executeActions(player, cc.noPwnageActions, 0);
+            }
         }
 
         // Remember his location
@@ -227,6 +254,8 @@ public class NoPwnageCheck extends ChatCheck {
         data.joinTime = now;
 
         data.commandsHaveBeenRun = false;
+
+        return cancel;
     }
 
     /**
@@ -250,28 +279,6 @@ public class NoPwnageCheck extends ChatCheck {
         if (c < mi)
             mi = c;
         return mi;
-    }
-
-    /**
-     * This function executes the commands defined in the configuration
-     * 
-     * @param player
-     *            The Player
-     * @param reason
-     *            The reason
-     * @param data
-     *            The ChatData
-     * @param cc
-     *            The ChatConfig
-     */
-    private void runCommands(final NCPPlayer player, final String reason, final ChatData data, final ChatConfig cc) {
-        data.reason = reason;
-        data.ip = player.getBukkitPlayer().getAddress().toString().substring(1).split(":")[0];
-
-        if (player.getBukkitPlayer().isOnline()) {
-            data.commandsHaveBeenRun = true;
-            executeActions(player, cc.noPwnageActions, 0);
-        }
     }
 
     /**
@@ -352,7 +359,7 @@ public class NoPwnageCheck extends ChatCheck {
      *            The Player
      */
     private void warnPlayer(final NCPPlayer player) {
-        player.sendMessage(Colors.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_PREFIX))
+        player.sendMessage(replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_PREFIX))
                 + ChatColor.DARK_RED
                 + "Our system has detected unusual bot activities coming from you. Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
     }

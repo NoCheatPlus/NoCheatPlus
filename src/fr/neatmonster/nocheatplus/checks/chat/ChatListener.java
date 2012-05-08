@@ -7,7 +7,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
@@ -64,7 +63,11 @@ public class ChatListener extends CheckListener {
 
         // First the nopwnage check
         if (cc.noPwnageCheck && !player.hasPermission(Permissions.CHAT_NOPWNAGE))
-            cancelled = noPwnageCheck.check(player);
+            if (noPwnageCheck.check(player, event)) {
+                player.getBukkitPlayer().kickPlayer(cc.noPwnageKickMessage);
+                return;
+            } else
+                cancelled = event.isCancelled();
 
         // Second the color check
         if (!cancelled && cc.colorCheck && !player.hasPermission(Permissions.CHAT_COLOR))
@@ -97,7 +100,7 @@ public class ChatListener extends CheckListener {
 
         // Protect the /plugins, /pl, /? commands to prevent players for seeing which plugins are installed
         if (cc.protectPlugins && (command.equals("plugins") || command.equals("pl") || command.equals("?"))
-                && !event.getPlayer().hasPermission(Permissions.ADMIN_PLUGINS)) {
+                && !player.hasPermission(Permissions.ADMIN_PLUGINS)) {
             event.getPlayer().sendMessage(
                     ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
                             + "Please contact the server administrators if you believe that this is in error.");
@@ -109,9 +112,8 @@ public class ChatListener extends CheckListener {
         // to be used by a player who is OP or has the required permissions
         if (cc.opByConsoleOnly
                 && (command.equals("op")
-                        && (event.getPlayer().isOp() || event.getPlayer().hasPermission("bukkit.command.op.give")) || command
-                        .equals("deop")
-                        && (event.getPlayer().isOp() || event.getPlayer().hasPermission("bukkit.command.op.take")))) {
+                        && (event.getPlayer().isOp() || player.hasPermission("bukkit.command.op.give")) || command
+                        .equals("deop") && (event.getPlayer().isOp() || player.hasPermission("bukkit.command.op.take")))) {
             event.getPlayer().sendMessage(ChatColor.RED + "This command can only be executed from the console!");
             event.setCancelled(true);
             return;
@@ -123,44 +125,30 @@ public class ChatListener extends CheckListener {
     }
 
     /**
-     * We listen to PlayerJoin events for the nopwnage check
-     * 
-     * @param event
-     *            The PlayerJoin Event
-     */
-    @EventHandler(
-            priority = EventPriority.LOWEST)
-    public void join(final PlayerJoinEvent event) {
-
-        final NCPPlayer player = NCPPlayer.getPlayer(event.getPlayer());
-        final ChatConfig cc = (ChatConfig) getConfig(player);
-        final ChatData data = (ChatData) getData(player);
-
-        // Check if the join is valid
-        if (cc.noPwnageCheck && !player.hasPermission(Permissions.CHAT_NOPWNAGE))
-            noPwnageCheck.handleJoin(player, data, cc);
-    }
-
-    /**
      * We listen to PlayerLogin events for the arrivalslimit check
      * 
      * @param event
      *            The PlayerLogin Event
      */
     @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+            priority = EventPriority.LOWEST)
     public void login(final PlayerLoginEvent event) {
-
-        // Do not check the players if the server has just restarted
-        if (System.currentTimeMillis() - ManagementFactory.getRuntimeMXBean().getStartTime() < 120000L)
-            return;
-
         final NCPPlayer player = NCPPlayer.getPlayer(event.getPlayer());
         final ChatConfig cc = (ChatConfig) getConfig(player);
         final ChatData data = (ChatData) getData(player);
 
-        // Only check new players, not the regular players
-        if (System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > cc.arrivalsLimitNewTime)
+        /*** NOPWNAGE CHECK ***/
+        // Check if the join is legit
+        if (cc.noPwnageCheck && !player.hasPermission(Permissions.CHAT_NOPWNAGE))
+            if (noPwnageCheck.handleJoin(player, data, cc))
+                event.disallow(Result.KICK_OTHER, cc.noPwnageKickMessage);
+
+        /*** ARRIVALSLIMIT CHECK ***/
+        // Do not check the players if the event is already cancelled,
+        // if the server has just restarted or if it is a regular player
+        if (event.getResult() == Result.KICK_OTHER
+                || System.currentTimeMillis() - ManagementFactory.getRuntimeMXBean().getStartTime() < 120000L
+                || System.currentTimeMillis() - event.getPlayer().getFirstPlayed() > cc.arrivalsLimitNewTime)
             return;
 
         if (cc.arrivalsLimitCheck && arrivalsLimitCheck.check(player, data, cc))

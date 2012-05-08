@@ -1,10 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import java.util.Locale;
-
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckUtils;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
@@ -16,6 +16,13 @@ import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
  * 
  */
 public class ReachCheck extends BlockPlaceCheck {
+
+    public class ReachCheckEvent extends BlockPlaceEvent {
+
+        public ReachCheckEvent(final ReachCheck check, final NCPPlayer player, final ActionList actions, final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public ReachCheck() {
         super("reach");
@@ -58,12 +65,21 @@ public class ReachCheck extends BlockPlaceCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final ReachCheckEvent event = new ReachCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).reachVL);
+            return String.valueOf(Math.round(getData(player).reachVL));
         else if (wildcard == ParameterName.REACHDISTANCE)
-            return String.format(Locale.US, "%.2f", getData(player).reachdistance);
+            return String.valueOf(Math.round(getData(player).reachdistance));
         else
             return super.getParameter(wildcard, player);
     }

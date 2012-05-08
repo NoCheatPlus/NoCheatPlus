@@ -2,7 +2,10 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
 
+import org.bukkit.Bukkit;
+
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckUtils;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
@@ -13,6 +16,14 @@ import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
  * 
  */
 public class NoFallCheck extends MovingCheck {
+
+    public class NoFallCheckEvent extends MovingEvent {
+
+        public NoFallCheckEvent(final NoFallCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public NoFallCheck() {
         super("nofall");
@@ -34,8 +45,10 @@ public class NoFallCheck extends MovingCheck {
             return;
         }
 
-        // If the player is in unclimbable vines, do not do the check
-        if (CheckUtils.isVine(CheckUtils.evaluateLocation(player.getWorld(), data.from))
+        // If the player is in ladder or unclimbable vines, do not do the check
+        if (CheckUtils.isLadder(CheckUtils.evaluateLocation(player.getWorld(), data.from))
+                || CheckUtils.isLadder(CheckUtils.evaluateLocation(player.getWorld(), data.to))
+                || CheckUtils.isVine(CheckUtils.evaluateLocation(player.getWorld(), data.from))
                 || CheckUtils.isVine(CheckUtils.evaluateLocation(player.getWorld(), data.to))) {
             data.fallDistance = 0F;
             data.lastAddedFallDistance = 0F;
@@ -47,7 +60,7 @@ public class NoFallCheck extends MovingCheck {
             // Start with zero fall distance
             data.fallDistance = 0F;
 
-        if (cc.nofallaggressive && data.fromOnOrInGround && data.toOnOrInGround && data.from.y <= data.to.y
+        if (cc.nofallAggressive && data.fromOnOrInGround && data.toOnOrInGround && data.from.y <= data.to.y
                 && player.getBukkitPlayer().getFallDistance() > 3.0F) {
             data.fallDistance = player.getBukkitPlayer().getFallDistance();
             data.nofallVL += data.fallDistance;
@@ -125,10 +138,19 @@ public class NoFallCheck extends MovingCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final NoFallCheckEvent event = new NoFallCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).nofallVL);
+            return String.valueOf(Math.round(getData(player).nofallVL));
         else if (wildcard == ParameterName.FALLDISTANCE)
             return String.format(Locale.US, "%.2f", getData(player).fallDistance);
         else

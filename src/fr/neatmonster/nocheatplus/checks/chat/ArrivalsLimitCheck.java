@@ -2,6 +2,9 @@ package fr.neatmonster.nocheatplus.checks.chat;
 
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
+
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 
 /**
@@ -10,12 +13,22 @@ import fr.neatmonster.nocheatplus.players.NCPPlayer;
  */
 public class ArrivalsLimitCheck extends ChatCheck {
 
+    public class ArrivalsLimitCheckEvent extends ChatEvent {
+
+        public ArrivalsLimitCheckEvent(final ArrivalsLimitCheck check, final NCPPlayer player,
+                final ActionList actions, final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
+
     // Used to know if the cooldown is enabled and since when
     private boolean  cooldown          = false;
+
     private long     cooldownStartTime = 0L;
 
     // Used to remember the latest joins;
     private long[]   joinsTimes        = null;
+
     private String[] joinsPlayers      = null;
 
     public ArrivalsLimitCheck() {
@@ -41,13 +54,12 @@ public class ArrivalsLimitCheck extends ChatCheck {
             cooldownStartTime = 0L;
         }
 
-        // If the new players cooldown is active
+        // If the new players cooldown is active...
         else if (cooldown)
             // Kick the player who joined
             cancel = executeActions(player, cc.arrivalsLimitActions, 0);
-
-        // If more than limit new players have joined in less than limit time
         else if (System.currentTimeMillis() - joinsTimes[0] < cc.arrivalsLimitTimeframe) {
+            // ...if more than limit new players have joined in less than limit time
             // Enable the new players cooldown
             cooldown = true;
             cooldownStartTime = System.currentTimeMillis();
@@ -66,5 +78,14 @@ public class ArrivalsLimitCheck extends ChatCheck {
         }
 
         return cancel;
+    }
+
+    @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final ArrivalsLimitCheckEvent event = new ArrivalsLimitCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
     }
 }

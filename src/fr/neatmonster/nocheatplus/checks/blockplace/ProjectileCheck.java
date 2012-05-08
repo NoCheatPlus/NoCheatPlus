@@ -1,8 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import java.util.Locale;
+import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
 
@@ -11,6 +12,14 @@ import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
  * 
  */
 public class ProjectileCheck extends BlockPlaceCheck {
+
+    public class ProjectileCheckEvent extends BlockPlaceEvent {
+
+        public ProjectileCheckEvent(final ProjectileCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public ProjectileCheck() {
         super("projectile");
@@ -50,10 +59,19 @@ public class ProjectileCheck extends BlockPlaceCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final ProjectileCheckEvent event = new ProjectileCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).projectileVL);
+            return String.valueOf(Math.round(getData(player).projectileVL));
         else
             return super.getParameter(wildcard, player);
     }

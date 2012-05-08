@@ -1,11 +1,11 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
-import java.util.Locale;
-
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
 
@@ -15,12 +15,20 @@ import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
  */
 public class FastBreakCheck extends BlockBreakCheck {
 
+    public class FastBreakCheckEvent extends BlockBreakEvent {
+
+        public FastBreakCheckEvent(final FastBreakCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
+
     public FastBreakCheck() {
         super("fastbreak");
     }
 
     @Override
-    public boolean check(final fr.neatmonster.nocheatplus.players.NCPPlayer player, final Object... args) {
+    public boolean check(final NCPPlayer player, final Object... args) {
         final BlockBreakConfig cc = getConfig(player);
         final BlockBreakData data = getData(player);
 
@@ -59,10 +67,19 @@ public class FastBreakCheck extends BlockBreakCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final FastBreakCheckEvent event = new FastBreakCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).fastBreakVL);
+            return String.valueOf(Math.round(getData(player).fastBreakVL));
         else
             return super.getParameter(wildcard, player);
     }

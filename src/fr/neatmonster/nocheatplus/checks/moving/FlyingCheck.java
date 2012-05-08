@@ -1,8 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import java.util.Locale;
+import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
 import fr.neatmonster.nocheatplus.utilities.locations.PreciseLocation;
@@ -14,6 +15,14 @@ import fr.neatmonster.nocheatplus.utilities.locations.PreciseLocation;
  * 
  */
 public class FlyingCheck extends MovingCheck {
+
+    public class FlyingCheckEvent extends MovingEvent {
+
+        public FlyingCheckEvent(final FlyingCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     // Determined by trial and error, the flying movement speed of the creative
     // mode
@@ -107,7 +116,7 @@ public class FlyingCheck extends MovingCheck {
         result = resultHoriz + resultVert;
 
         // The player went to far, either horizontal or vertical
-        if (result > 0 && !data.velocityChanged) {
+        if (result > 0) {
 
             // Increment violation counter and statistics
             data.runflyVL += result;
@@ -137,10 +146,19 @@ public class FlyingCheck extends MovingCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final FlyingCheckEvent event = new FlyingCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).runflyVL);
+            return String.valueOf(Math.round(getData(player).runflyVL));
         else
             return super.getParameter(wildcard, player);
     }

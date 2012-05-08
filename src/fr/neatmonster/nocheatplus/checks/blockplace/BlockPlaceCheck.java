@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import java.util.Locale;
-
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
@@ -32,7 +30,8 @@ public abstract class BlockPlaceCheck extends Check {
         if (wildcard == ParameterName.PLACE_LOCATION) {
             final SimpleLocation l = getData(player).blockPlaced;
             if (l.isSet())
-                return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
+                return String.valueOf(Math.round(l.x)) + " " + String.valueOf(Math.round(l.y)) + " "
+                        + String.valueOf(Math.round(l.z));
             else
                 return "null";
         }
@@ -40,7 +39,8 @@ public abstract class BlockPlaceCheck extends Check {
         else if (wildcard == ParameterName.PLACE_AGAINST) {
             final SimpleLocation l = getData(player).blockPlacedAgainst;
             if (l.isSet())
-                return String.format(Locale.US, "%d %d %d", l.x, l.y, l.z);
+                return String.valueOf(Math.round(l.x)) + " " + String.valueOf(Math.round(l.y)) + " "
+                        + String.valueOf(Math.round(l.z));
             else
                 return "null";
         }

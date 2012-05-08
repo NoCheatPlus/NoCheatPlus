@@ -1,12 +1,12 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import java.util.Locale;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckUtils;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Permissions;
@@ -22,6 +22,14 @@ import fr.neatmonster.nocheatplus.utilities.locations.PreciseLocation;
  */
 public class RunningCheck extends MovingCheck {
 
+    public class RunningCheckEvent extends MovingEvent {
+
+        public RunningCheckEvent(final RunningCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
+
     private final static double maxBonus     = 1D;
 
     // How many move events can a player have in air before he is expected to
@@ -31,7 +39,6 @@ public class RunningCheck extends MovingCheck {
     private final NoFallCheck   noFallCheck;
 
     public RunningCheck() {
-
         super("running");
 
         noFallCheck = new NoFallCheck();
@@ -69,7 +76,10 @@ public class RunningCheck extends MovingCheck {
                 0.0D,
                 checkHorizontal(player, data, CheckUtils.isLiquid(fromType) && CheckUtils.isLiquid(toType),
                         horizontalDistance, cc));
-        final double resultVert = Math.max(0.0D, checkVertical(player, data, fromOnGround, toOnGround, cc));
+        final double resultVert = Math.max(
+                0.0D,
+                checkVertical(player, data, fromOnGround, toOnGround,
+                        CheckUtils.isLiquid(fromType) && CheckUtils.isLiquid(toType), cc));
 
         final double result = (resultHoriz + resultVert) * 100;
 
@@ -79,7 +89,7 @@ public class RunningCheck extends MovingCheck {
         data.runflyVL *= 0.95;
 
         // Did the player move in unexpected ways?
-        if (result > 0 && !data.velocityChanged) {
+        if (result > 0) {
             // Increment violation counter
             data.runflyVL += result;
 
@@ -221,7 +231,7 @@ public class RunningCheck extends MovingCheck {
      * 
      */
     private double checkVertical(final NCPPlayer player, final MovingData data, final boolean fromOnGround,
-            final boolean toOnGround, final MovingConfig cc) {
+            final boolean toOnGround, final boolean isSwimming, final MovingConfig cc) {
 
         // How much higher did the player move than expected??
         double distanceAboveLimit = 0.0D;
@@ -238,17 +248,20 @@ public class RunningCheck extends MovingCheck {
         if (data.jumpPhase > jumpingLimit + data.lastJumpAmplifier)
             limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
 
-        // Check if the player is in web and check his move
-        final World world = player.getWorld();
-        if (CheckUtils.isWeb(CheckUtils.evaluateLocation(world, data.from))
-                && CheckUtils.isWeb(CheckUtils.evaluateLocation(world, data.to))
-                && Math.abs(data.to.y - data.from.y) > cc.cobWebVertSpeedLimit)
-            distanceAboveLimit = Math.abs(data.to.y - data.from.y - cc.cobWebVertSpeedLimit);
+        // Handle the calculation differently if the player is in water
+        if (isSwimming && data.to.y - data.from.y > 0D)
+            distanceAboveLimit = data.to.y - data.from.y - cc.verticalSwimmingSpeedLimit;
 
-        else
+        // Handle the calculation differently if the player is in cobweb
+        final World world = player.getWorld();
+        if (distanceAboveLimit <= 0D && CheckUtils.isWeb(CheckUtils.evaluateLocation(world, data.from))
+                && CheckUtils.isWeb(CheckUtils.evaluateLocation(world, data.to)))
+            distanceAboveLimit = Math.abs(data.to.y - data.from.y) - cc.cobWebVertSpeedLimit;
+
+        if (distanceAboveLimit <= 0D)
             distanceAboveLimit = data.to.y - data.runflySetBackPoint.y - limit;
 
-        if (distanceAboveLimit > 0)
+        if (distanceAboveLimit > 0D)
             data.statisticCategory = Id.MOV_FLYING;
 
         if (toOnGround || fromOnGround)
@@ -258,13 +271,22 @@ public class RunningCheck extends MovingCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final RunningCheckEvent event = new RunningCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.CHECK)
             // Workaround for something until I find a better way to do it
             return getData(player).statisticCategory.toString();
         else if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).runflyVL);
+            return String.valueOf(Math.round(getData(player).runflyVL));
         else
             return super.getParameter(wildcard, player);
     }

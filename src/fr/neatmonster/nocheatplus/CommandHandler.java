@@ -73,7 +73,7 @@ public class CommandHandler implements CommandExecutor {
 
         for (final Permission permission : perms)
             if (permission.getName().startsWith(prefix))
-                sender.sendMessage(permission.getName() + ": " + player.hasPermission(permission));
+                sender.sendMessage(permission.getName() + ": " + NCPPlayer.hasPermission(player, permission.getName()));
         return true;
     }
 
@@ -97,7 +97,7 @@ public class CommandHandler implements CommandExecutor {
     private boolean handleReloadCommand(final CommandSender sender) {
 
         // Players need a special permission for this
-        if (!(sender instanceof Player) || sender.hasPermission(Permissions.ADMIN_RELOAD)) {
+        if (!(sender instanceof Player) || NCPPlayer.hasPermission(sender, Permissions.ADMIN_RELOAD)) {
             sender.sendMessage("[NoCheatPlus] Reloading configuration");
             ConfigManager.cleanup();
             ConfigManager.init();
@@ -121,7 +121,7 @@ public class CommandHandler implements CommandExecutor {
                     ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
 
             // Hide NoCheatPlus's commands if the player doesn't have the required permission
-            if (protectPlugins && !sender.hasPermission("nocheatplus.admin.commands")) {
+            if (protectPlugins && !NCPPlayer.hasPermission(sender, "nocheatplus.admin.commands")) {
                 sender.sendMessage("Unknown command. Type \"help\" for help.");
                 return true;
             }

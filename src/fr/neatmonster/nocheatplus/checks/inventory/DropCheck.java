@@ -1,8 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
-import java.util.Locale;
+import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
 
@@ -12,6 +13,13 @@ import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
  * 
  */
 public class DropCheck extends InventoryCheck {
+
+    public class DropCheckEvent extends InventoryEvent {
+
+        public DropCheckEvent(final DropCheck check, final NCPPlayer player, final ActionList actions, final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public DropCheck() {
         super("drop");
@@ -53,10 +61,19 @@ public class DropCheck extends InventoryCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final DropCheckEvent event = new DropCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", getData(player).dropVL);
+            return String.valueOf(Math.round(getData(player).dropVL));
         else
             return super.getParameter(wildcard, player);
     }

@@ -19,7 +19,6 @@ public class DefaultConfig extends ConfigFile {
         /*** LOGGING ***/
 
         set(ConfPaths.LOGGING_ACTIVE, true);
-        set(ConfPaths.LOGGING_SHOWACTIVECHECKS, false);
         set(ConfPaths.LOGGING_DEBUGMESSAGES, false);
         set(ConfPaths.LOGGING_PREFIX, "&4NCP&f: ");
         set(ConfPaths.LOGGING_FILENAME, "nocheatplus.log");
@@ -51,18 +50,17 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_RUNFLY_CHECK, true);
         set(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING, false);
         set(ConfPaths.MOVING_RUNFLY_ALLOWFASTBLOCKING, false);
-        set(ConfPaths.MOVING_RUNFLY_MAXCOOLDOWN, 10000);
         set(ConfPaths.MOVING_RUNFLY_ACTIONS,
                 "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
 
-        set(ConfPaths.MOVING_RUNFLY_CHECKNOFALL, true);
-        set(ConfPaths.MOVING_RUNFLY_NOFALLAGGRESSIVE, true);
-        set(ConfPaths.MOVING_RUNFLY_NOFALLACTIONS, "log:nofall:0:5:cif cancel");
+        set(ConfPaths.MOVING_RUNFLY_NOFALL_CHECK, true);
+        set(ConfPaths.MOVING_RUNFLY_NOFALL_AGGRESSIVE, true);
+        set(ConfPaths.MOVING_RUNFLY_NOFALL_ACTIONS, "log:nofall:0:5:cif cancel");
 
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS, false);
         set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE, true);
-        set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL, 60);
         set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL, 100);
+        set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL, 60);
         set(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT, 128);
         set(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS,
                 "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
@@ -83,7 +81,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALSURVIVAL, 45);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALCREATIVE, 145);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS,
-                "cancel vl>100 log:bbfastbreak:3:5:cif cancel vl>2000 log:bbfastbreak:3:5:cif cmd:kick cancel");
+                "cancel vl>100 log:bbfastbreak:3:5:cif cancel vl>1000 log:bbfastbreak:3:5:cif cmd:kick cancel");
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:bbreach:0:2:if cancel");
@@ -101,7 +99,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 95);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS,
-                "cancel vl>100 log:bpfastplace:3:5:cif cancel vl>2000 log:bpfastplace:3:5:cif cmd:kick cancel");
+                "cancel vl>100 log:bpfastplace:3:5:cif cancel vl>1000 log:bpfastplace:3:5:cif cmd:kick cancel");
 
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true);
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:bpreach:0:2:if cancel");
@@ -116,10 +114,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_PROJECTILE_ACTIONS,
                 "cancel vl>150 log:bpprojectile:3:5:if cancel vl>1000 log:bpprojectile:3:5:cif cancel vl>4000 log:bpprojectile:3:5:cif cancel cmd:kick");
 
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
         set(ConfPaths.BLOCKPLACE_FASTSIGN_EXCLUSIONS,
                 Arrays.asList(new String[] {"[public]", "[private]", "[protection]", "[mail]", "[free]", "[kit]",
                         "[disposal]", "[heal]", "[time]", "[weather]", "[warp]", "[spawnmob]", "[enchant]", "[trade]",
-                        "[buy]", "[sell]", "[balance]"}));
+                        "[buy]", "[sell]", "[balance]", "[gate]", "[bridge]", "[door]"}));
 
         /*** CHAT ***/
 
@@ -129,7 +128,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_WARNLEVEL, 400);
         set(ConfPaths.CHAT_NOPWNAGE_WARNTIMEOUT, 30000);
         set(ConfPaths.CHAT_NOPWNAGE_BANLEVEL, 800);
-        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "log:nopwnage:2:5:cf cmd:kick cmd:ban cmd:ban-ip");
+        set(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE, "Kicked by the NoPwnage check of NoCheat+!");
+        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:ban cmd:ban-ip");
 
         set(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHTBONUS, 200);
@@ -214,50 +214,50 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_CRITICAL_ACTIONS, "cancel vl>50 log:fcritical:0:5:cif cancel");
 
         set(ConfPaths.STRINGS + ".drop",
-                "[player] failed [check]: Tried to drop more items than allowed. VL [violations]");
-        set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations]");
+                "[player] failed [check]: tried to drop more items than allowed. VL [violations].");
+        set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations].");
         set(ConfPaths.STRINGS + ".movelong",
-                "[player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations]");
+                "[player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
         set(ConfPaths.STRINGS + ".nofall",
-                "[player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations]");
+                "[player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations].");
         set(ConfPaths.STRINGS + ".morepackets",
-                "[player] failed [check]: Sent [packets] more packets than expected. Total violation level [violations]");
+                "[player] failed [check]: sent [packets] more packets than expected. Total violation level [violations].");
         set(ConfPaths.STRINGS + ".waterwalk",
-                "[player] failed [check]: tried to walk on water. Total violation level [violations]");
+                "[player] failed [check]: tried to walk on water. Total violation level [violations].");
         set(ConfPaths.STRINGS + ".bbfastbreak",
-                "[player] failed [check]: tried to break too much blocks. Total violation level [violations]");
+                "[player] failed [check]: tried to break too much blocks. Total violation level [violations].");
         set(ConfPaths.STRINGS + ".bbreach",
-                "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations]");
+                "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations].");
         set(ConfPaths.STRINGS + ".bbdirection",
-                "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
-        set(ConfPaths.STRINGS + ".bbnoswing", "[player] failed [check]: Didn't swing arm. VL [violations]");
+                "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations].");
+        set(ConfPaths.STRINGS + ".bbnoswing", "[player] failed [check]: Didn't swing arm. VL [violations].");
         set(ConfPaths.STRINGS + ".bpfastplace",
-                "[player] failed [check]: tried to place too much blocks. Total violation level [violations]");
+                "[player] failed [check]: tried to place too much blocks. Total violation level [violations].");
         set(ConfPaths.STRINGS + ".bpreach",
-                "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations]");
+                "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations].");
         set(ConfPaths.STRINGS + ".bpdirection",
-                "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
+                "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations].");
         set(ConfPaths.STRINGS + ".bpprojectile",
-                "[player] failed [check]: tried to throw items too quicly. VL [violations]");
-        set(ConfPaths.STRINGS + ".nopwnage", "Commands run for [player] ([ip]): [reason]!");
+                "[player] failed [check]: tried to throw items too quicly. VL [violations].");
+        set(ConfPaths.STRINGS + ".nopwnage", "[player] ([ip]) failed chat.nopwnage: [reason].");
         set(ConfPaths.STRINGS + ".color",
-                "[player] failed [check]: Sent colored chat message '[text]'. VL [violations]");
+                "[player] failed [check]: sent colored chat message '[text]'. VL [violations].");
         set(ConfPaths.STRINGS + ".fdirection",
-                "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations]");
+                "[player] failed [check]: tried to interact with a block out of line of sight. VL [violations].");
         set(ConfPaths.STRINGS + ".freach",
-                "[player] failed [check]: tried to attack entity out of reach. VL [violations]");
+                "[player] failed [check]: tried to attack entity out of reach. VL [violations].");
         set(ConfPaths.STRINGS + ".fspeed",
-                "[player] failed [check]: tried to attack more than [limit] times per second. VL [violations]");
-        set(ConfPaths.STRINGS + ".fnoswing", "[player] failed [check]: Didn't swing arm. VL [violations]");
-        set(ConfPaths.STRINGS + ".fgod", "[player] failed [check]: Avoided taking damage or lagging. VL [violations]");
+                "[player] failed [check]: tried to attack more than [limit] times per second. VL [violations].");
+        set(ConfPaths.STRINGS + ".fnoswing", "[player] failed [check]: Didn't swing arm. VL [violations].");
+        set(ConfPaths.STRINGS + ".fgod", "[player] failed [check]: Avoided taking damage or lagging. VL [violations].");
         set(ConfPaths.STRINGS + ".fheal",
-                "[player] failed [check]: Tried to regenerate health faster than normal. VL [violations]");
+                "[player] failed [check]: tried to regenerate health faster than normal. VL [violations].");
         set(ConfPaths.STRINGS + ".fknock",
-                "[player] failed [check]: Tried to do a knockback but wasn't technically sprinting. VL [violations]");
+                "[player] failed [check]: tried to do a knockback but wasn't technically sprinting. VL [violations].");
         set(ConfPaths.STRINGS + ".fcritical",
-                "[player] failed [check]: Tried to do a critical hit but wasn't technically jumping. VL [violations]");
-        set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: Fires bow to fast. VL [violations]");
-        set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: Eats food [food] too fast. VL [violations]");
+                "[player] failed [check]: tried to do a critical hit but wasn't technically jumping. VL [violations].");
+        set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: fires bow to fast. VL [violations].");
+        set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: eats food [food] too fast. VL [violations].");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".ban", "ban [player]");
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");

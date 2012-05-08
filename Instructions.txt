@@ -418,7 +418,6 @@
  Especially you don't have to and should not use ".*" anywhere when defining
  NoCheatPlus permissions.
 
-
  You can exclude a specific player from getting logged by appending ".silent"
  to the relevant permission node of the specific check. E.g.
 
@@ -482,12 +481,6 @@
     seen by players with the permission node "nocheatplus.admin.chatlog" or if
     you don't use a permissions plugin, by players who are OP.
 
-  showactivechecks:
-
-    Should NoCheatPlus display lists of checks that are enabled for each world.
-    Set to true if you are unsure that your (multiworld) setup of the config
-    files is done correctly.
-
   debugmessages:
 
     Should some additional messages be displayed in the server console, e.g.
@@ -524,289 +517,6 @@
  Everything that in has to do with the various checks that NoCheatPlus runs on
  the players. Use these to specify what will be done, how it will be done and
  what happens if somebody fails checks.
-
-
------------------------------ INVENTORY Subsection -----------------------------
-
- Checks that at least technically have to do with the inventory or usage of
- items can be found here.
-
- 1) DROP:
-
-     The "inventory.drop" check. It limits how many separate items a player can
-     drop onto the ground within a specific time. Dropping a lot of separate
-     items at once can cause lag on the server, therefore this check exists.
-
-      active:
-        Should the check be enabled. Set to false if you are not interested in
-        this at all.
-
-      time:
-        Over how many seconds should dropped items be counted, before the
-        counter gets reset and starts at zero again.
-
-      limit:
-        How many items may be dropped in the timeframe that is specified by
-        the "time" setting. Please consider that dying causes a player to drop
-        up to 36 separate items (stacks). Therefore this value shouldn't be
-        set below ~50.
-
-      actions:
-        What should happen when a player goes beyond the set limit. Default
-        settings log a message and kick the player from the server. The VL of
-        the drop check symbolizes how many items a player dropped beyond the
-        set limit. If the limit is 100 and he tried to drop 130, he will have a
-        Violation Level of 130 - 100 = 30.
-
- 2) INSTANTBOW:
-
-     Players may attack extremely fast and with a fully charged bow without
-     waiting for it to be fully pulled back. This is a significant advantage in
-     PvP and PvE combat.
-
-      active:
-        Should players be checked for this behavior. Set to false if you don't
-        care about players using bows faster than normally possible.
-
-      actions:
-        What should happen if the player fails this check. Default is to stop
-        the attack ("cancel" it) and log messages. The Violation Level (VL) for
-        this check the time difference between how long it took the player to
-        fire an arrow and how long NoCheatPlus thinks he should have taken, in
-        1/10 seconds. Therefore a VL of 10 would mean that the player shot an
-        arrow 1 second faster than NoCheatPlus expected. The VL gets increased
-        with every failed check and slowly decreased for every passed check.
-
- 3) INSTANTEAT:
-
-     Players may eat various kinds of food instantly instead of waiting the
-     usual time munching on the item.
-
-      active:
-        Should players be checked for this behavior. Set to false if you don't
-        care about players eating their food faster than normally possible.
-
-      actions:
-        What should happen if the player fails this check. Default is to stop
-        the eating ("cancel" it) and log messages. The Violation Level (VL) for
-        this check the time difference between how long it took the player to
-        eat his food and how long NoCheatPlus thinks he should have taken, in
-        1/10 seconds. Therefore a VL of 10 would mean that the player ate his
-        food 1 second faster than NoCheatPlus expected. The VL gets increased
-        with every failed check and slowly decreased for every passed check.
-
-
------------------------------- MOVING Subsection -------------------------------
-
- Checks that at least technically have to do with the player moving around or
- impacting the world with his movement can be found here.
-
- 1) RUNFLY:
-
-     Players may move in illegal ways (flying, running too fast) or try to
-     trick the server into thinking that they are not falling/flying by
-     cleverly manipulating the data that they send to the server.
-
-      active:
-        Should players get checked for this type of movement related hacks at
-        all. If deactivated, player may freely move around on the server, fly
-        or run really fast.
-
-      walkspeed:
-        How fast should the player be allowed to walk. Default is "100",
-        meaning 100% of normal walking speed. You will not see this option in
-        your config.yml file, because normally you shouldn't have to change the
-        walking speed of players at all (NoCheatPlus knows when players sprint,
-        use Swiftness potions etc and will already adapt the speed based on that
-        data).
-
-      sneakspeed:
-        How fast should the player be allowed to sneak. Default is "100",
-        meaning 100% of normal sneaking speed. You will not see this option in
-        your config.yml file, because normally you shouldn't have to change the
-        sneaking speed of players at all (NoCheatPlus knows when players sprint,
-        use Swiftness potions etc and will already adapt the speed based on
-        that data).
-
-      blockspeed:
-        How fast should the player be allowed to move while blocking. Default is
-        "100" meaning 100% of normal blocking speed. You will not see this
-        option in your config.yml file, because normally you shouldn't have to
-        change the blocking speed of player at all (NoCheatPlus knows when
-        players block, use Swiftness potions etc and will already adapt the
-        speed based on that data).
-
-      swimspeed:
-        How fast should the player be allowed to swim. Default is "100",
-        meaning 100% of normal swimming speed. You will not see this option in
-        your config.yml file, because normally you shouldn't have to change the
-        swimming speed of players at all (NoCheatPlus knows when players sprint,
-        use Swiftness potions etc and will already adapt the speed based on
-        that data).
-
-      sprintspeed:
-        How fast should the player be allowed to sprint. Default is "100",
-        meaning 100% of normal sprinting speed. You will not see this option in
-        your config.yml file, because normally you shouldn't have to change the
-        sprinting speed of players at all (NoCheatPlus knows when players
-        sprint, use Swiftness potions etc and will already adapt the speed based
-        on that data).
-
-      cobwebspeed:
-        How fast should the player be allowed to move while being into cobweb.
-        Default is "100" meaning 100% of normal speed while being into cobweb.
-        You will not see this option in your config.yml file, because normally
-        you shouldn't have to change the speed while being into cobweb of
-        players at all (NoCheatPlus knows when players are in cobweb, use
-        Swiftness potions etc and will already adapt the speed based on that
-        data).
-
-      maxcooldown:
-        How much time the player can spend in the air if his velocity has been
-        modified by an external plugin (PreciousStones for example). The default
-        delay is 10 seconds because it sounds like a player won't spend more
-        than 10 seconds in the air.
-
-      allowfastsneaking:
-        Should sneaking players be allowed to move as fast as normal players.
-        Set this to true, if you use plugins that enable players to do that
-        (e.g. the "Heroes" plugin or other RPG plugins tend to do that)
-
-      allowfastblock:
-        Should players blocking be allowed to move as fast as normal players.
-        Set this to true if you use plugins that enable players to do that.
-
-      actions:
-        What should happen when a player sneaks/swims/walks/runs faster than
-        normally allowed or is flying. Default is to log messages (depending on
-        how severe the cheating is) and teleport the player to the last known
-        legitimate location on ground that NoCheatPlus can remember for that
-        player ("cancel" the movement).
-
-      checknofall:
-        Should players be checked for a common type of "nofall" hack, that
-        allows them to avoid taking damage when falling. If you don't care
-        about fall damage, you can deactivate this. It gets deactivated if a
-        player is allowed to fly (see some lines below), because it doesn't
-        make sense to allow flying and then hurt players when they land.
-
-      nofallaggressivemode:
-        Enable an improved version of nofall check, that will catch additional
-        types of "nofall" hacks and deal damage to players directly. This is
-        usually safe to activate. It will only work if the "checknofall" is
-        also set to "true".
-
-      nofallactions:
-        What should happen if a player is considered to be using a "nofall"
-        hack. Default reaction is to log a message and encourage Bukkit to deal
-        fall damage anyway ("cancel" the hack). The Violation Level is the
-        fall distance in blocks that the player tried to avoid. It gets
-        increased every time that the player fails the check, and decreased
-        over time if the player doesn't fail the check.
-
-      FLYING:
-        This is an entire subsection dedicated to the "moving.flying" check.
-        It will be used instead of the "runfly" check whenever a player has
-        the right to fly.
-
-        allowflyingalways:
-          Should all players be allowed to fly always.
-
-        allowflyingincreative:
-          Should players that are set to "creative mode" be allowed to fly. If
-          they are already allowed because of "allowflyingalways" to fly, this
-          setting gets ignored.
-
-        flyingspeedlimithorizontal:
-          How many 1/100 blocks may a player fly horizontal within one "step".
-          The official "creative mode" flying reaches speeds of about 0.6
-          blocks which means a value of 60 here.
-
-        flyingspeedlimitvertical:
-          How many 1/100 blocks may a player fly vertically up within one
-          "step". A value of 100 which means 1 block seems reasonable for most
-          cases.
-
-        flyingheightlimit:
-          What is the maximum height (in blocks) that a player may reach by
-          flying, relative to the max world height he is in. Some servers
-          experience lag when players fly very, very high. This value is how
-          far above the map height a player may fly.
-
-        actions:
-          What should happen if a player flies faster/higher than defined here?
-          Default is to log messages and to prevent the player from moving
-          ("cancel" his last movement). The Violation Level (VL) of this check
-          is the distance that the player went beyond what NoCheatPlus allowed
-          him. The VL increases with every failed check and slowly decreases for
-          every passed check.
-
- 2) MOREPACKETS:
-
-     The morepackets check is complementary to the "runfly" check. While the
-     "runfly" check(s) limit the distance a player can move per step, this
-     "morepackets" check limits the number of "steps" a player may take per
-     second. A normal value is 20 steps per second.
-
-      active:
-        Should players be checked for this kind of cheating. If you are not
-        interested in players that cheat that way, set this to false. It is a
-        good idea to have this active, because players that cheat by sending
-        more packets than normally allowed may lag the server (each of those
-        packets has to be processed, after all).
-
-      actions:
-        What should happen if a player is considered to be cheating by taking
-        more steps per second than normal. Default is to log messages and
-        teleport the player back to a location where he was ~1 second before
-        ("cancel" his movement). The Violation Level VL is the number of
-        packets that the player sent beyond the expected amount.
-
- 3) MOREPACKETSVEHICULE:
-
-     The morepacketsvehicule check is complementary to the "morepackets" check.
-     While the "morepacket" check limit the number of player-move packets send
-     per second, this "morepacketsvehicle" limit the number of vehicule-move
-     packets sent per second. A normal value is 20 packets per second.
-
-      active:
-        Should players be checked for this kind of cheating. If you are not
-        interested in players that cheat that way, set this to false. It is a
-        good idea to have this active, because players that cheat by sending
-        more packets than normally allowed may lag the server (each of those
-        packets has to be processed, after all).
-
-      actions:
-        What should happen if a player is considered to be cheating by taking
-        more steps per second than normal. Default is to log messages and break
-        the boat the player is using. The Violation Level VL is the number of
-        packets that the player sent beyond the expected amount.
-
- 4) WATERWALK:
-
-     The waterwalk check is used to prevent players from walking on water using
-     a client dedicated to griefing (this mode is usually called Jesus mod).
-     Firstly, it'll check if the player's move is valid (not only moving the X
-     and Z axes but also on the Y axis and, of course, if the player is near the
-     surface (most of the griefing client set the player 0.3 blocks under the
-     water surface). Secondly, it'll make sure the player is using the borders
-     of the block to climb outside the water (it prevents players using griefing
-     clients to simply jump multiple times over the water).
-
-      active:
-        Should players be checked for this kind of cheating. If you are not
-        interested in players that cheat that way, set this to false. It is a
-        good idea to have this active, because players won't be able to cross
-        easily the oceans.
-
-      actions:
-	      What should happen if a player is considered to be cheating by walking
-        on water. Default is to log messages and to prevent the player from
-        moving ("cancel" his last movement). The Violation Level (VL) of this
-        check is the distance between the player and the surface or how far away
-        he is from the normal position if a player climbing a block. The VL
-        increases with every failed check and slowly decreases for every passed
-        check.
 
 
 ---------------------------- BLOCKBREAK Subsection -----------------------------
@@ -1098,6 +808,10 @@
         "warnings" times already, the "commands" will be executed for him.
         Warnings get removed if the time of the last warning was more than
         "timeout" ms ago.
+        
+      kickmessage:
+        The message that will be displayed to the player is he is kicked by the
+        NoPwnage check.
 
       actions:
         NoPwnage allows you to decide what should happen when a player reaches
@@ -1107,6 +821,10 @@
 
         "[player]" and "[ip]" wildcards will be replaced by the actual data
         during execution.
+        
+        IMPORTANT: Please notice that cancelling the check will not cancel the
+        actual message but kick the player (and the kick message defined in the
+        configuration will displayed on the player's screen).
 
       captcha.enabled:
         Should players that get to "banlevel" be presented with a captcha first
@@ -1350,6 +1068,296 @@
         allow the player to attack the entity ("cancel" the attack) and log
         the event. The Violation Level (VL) for this check is the difference
         between the real values and the values defined in the configuration.
+
+
+----------------------------- INVENTORY Subsection -----------------------------
+
+ Checks that at least technically have to do with the inventory or usage of
+ items can be found here.
+
+ 1) DROP:
+
+     The "inventory.drop" check. It limits how many separate items a player can
+     drop onto the ground within a specific time. Dropping a lot of separate
+     items at once can cause lag on the server, therefore this check exists.
+
+      active:
+        Should the check be enabled. Set to false if you are not interested in
+        this at all.
+
+      time:
+        Over how many seconds should dropped items be counted, before the
+        counter gets reset and starts at zero again.
+
+      limit:
+        How many items may be dropped in the timeframe that is specified by
+        the "time" setting. Please consider that dying causes a player to drop
+        up to 36 separate items (stacks). Therefore this value shouldn't be
+        set below ~50.
+
+      actions:
+        What should happen when a player goes beyond the set limit. Default
+        settings log a message and kick the player from the server. The VL of
+        the drop check symbolizes how many items a player dropped beyond the
+        set limit. If the limit is 100 and he tried to drop 130, he will have a
+        Violation Level of 130 - 100 = 30.
+
+ 2) INSTANTBOW:
+
+     Players may attack extremely fast and with a fully charged bow without
+     waiting for it to be fully pulled back. This is a significant advantage in
+     PvP and PvE combat.
+
+      active:
+        Should players be checked for this behavior. Set to false if you don't
+        care about players using bows faster than normally possible.
+
+      actions:
+        What should happen if the player fails this check. Default is to stop
+        the attack ("cancel" it) and log messages. The Violation Level (VL) for
+        this check the time difference between how long it took the player to
+        fire an arrow and how long NoCheatPlus thinks he should have taken, in
+        1/10 seconds. Therefore a VL of 10 would mean that the player shot an
+        arrow 1 second faster than NoCheatPlus expected. The VL gets increased
+        with every failed check and slowly decreased for every passed check.
+
+ 3) INSTANTEAT:
+
+     Players may eat various kinds of food instantly instead of waiting the
+     usual time munching on the item.
+
+      active:
+        Should players be checked for this behavior. Set to false if you don't
+        care about players eating their food faster than normally possible.
+
+      actions:
+        What should happen if the player fails this check. Default is to stop
+        the eating ("cancel" it) and log messages. The Violation Level (VL) for
+        this check the time difference between how long it took the player to
+        eat his food and how long NoCheatPlus thinks he should have taken, in
+        1/10 seconds. Therefore a VL of 10 would mean that the player ate his
+        food 1 second faster than NoCheatPlus expected. The VL gets increased
+        with every failed check and slowly decreased for every passed check.
+
+
+------------------------------ MOVING Subsection -------------------------------
+
+ Checks that at least technically have to do with the player moving around or
+ impacting the world with his movement can be found here.
+
+ 1) RUNFLY:
+
+     Players may move in illegal ways (flying, running too fast) or try to
+     trick the server into thinking that they are not falling/flying by
+     cleverly manipulating the data that they send to the server.
+
+      active:
+        Should players get checked for this type of movement related hacks at
+        all. If deactivated, player may freely move around on the server, fly
+        or run really fast.
+
+      walkspeed:
+        How fast should the player be allowed to walk. Default is "100",
+        meaning 100% of normal walking speed. You will not see this option in
+        your config.yml file, because normally you shouldn't have to change the
+        walking speed of players at all (NoCheatPlus knows when players sprint,
+        use Swiftness potions etc and will already adapt the speed based on that
+        data).
+
+      sneakspeed:
+        How fast should the player be allowed to sneak. Default is "100",
+        meaning 100% of normal sneaking speed. You will not see this option in
+        your config.yml file, because normally you shouldn't have to change the
+        sneaking speed of players at all (NoCheatPlus knows when players sprint,
+        use Swiftness potions etc and will already adapt the speed based on
+        that data).
+
+      blockspeed:
+        How fast should the player be allowed to move while blocking. Default is
+        "100" meaning 100% of normal blocking speed. You will not see this
+        option in your config.yml file, because normally you shouldn't have to
+        change the blocking speed of player at all (NoCheatPlus knows when
+        players block, use Swiftness potions etc and will already adapt the
+        speed based on that data).
+
+      swimspeed:
+        How fast should the player be allowed to swim. Default is "100",
+        meaning 100% of normal swimming speed. You will not see this option in
+        your config.yml file, because normally you shouldn't have to change the
+        swimming speed of players at all (NoCheatPlus knows when players sprint,
+        use Swiftness potions etc and will already adapt the speed based on
+        that data).
+        
+      verticalswimspped:
+        How fast should the player be allowed to swim (but on the vertical
+        axis). Default is "100", meaning 100% of normal swimming speed. You will
+        not see this option in our config.yml file, because normally you
+        shouldn't have to change the swimming speed of players at all
+        (NoCheatPlus knows when players sprint, use Swiftness potions etc and
+        will already adapt the speed based on that data).
+
+      sprintspeed:
+        How fast should the player be allowed to sprint. Default is "100",
+        meaning 100% of normal sprinting speed. You will not see this option in
+        your config.yml file, because normally you shouldn't have to change the
+        sprinting speed of players at all (NoCheatPlus knows when players
+        sprint, use Swiftness potions etc and will already adapt the speed based
+        on that data).
+
+      cobwebspeed:
+        How fast should the player be allowed to move while being into cobweb.
+        Default is "100" meaning 100% of normal speed while being into cobweb.
+        You will not see this option in your config.yml file, because normally
+        you shouldn't have to change the speed while being into cobweb of
+        players at all (NoCheatPlus knows when players are in cobweb, use
+        Swiftness potions etc and will already adapt the speed based on that
+        data).
+
+      allowfastsneaking:
+        Should sneaking players be allowed to move as fast as normal players.
+        Set this to true, if you use plugins that enable players to do that
+        (e.g. the "Heroes" plugin or other RPG plugins tend to do that)
+
+      allowfastblock:
+        Should players blocking be allowed to move as fast as normal players.
+        Set this to true if you use plugins that enable players to do that.
+
+      actions:
+        What should happen when a player sneaks/swims/walks/runs faster than
+        normally allowed or is flying. Default is to log messages (depending on
+        how severe the cheating is) and teleport the player to the last known
+        legitimate location on ground that NoCheatPlus can remember for that
+        player ("cancel" the movement).
+      
+      NOFALL:
+        This is an entire subsection dedicated to the "moving.nofall" check.
+        It will be used to check if the player has tried to avoid fall
+        damages.
+        
+        active:
+          Should players be checked for a common type of "nofall" hack, that
+          allows them to avoid taking damage when falling. If you don't care
+          about fall damage, you can deactivate this. It gets deactivated if a
+          player is allowed to fly (see some lines below), because it doesn't
+          make sense to allow flying and then hurt players when they land.
+
+        aggressivemode:
+          Enable an improved version of nofall check, that will catch additional
+          types of "nofall" hacks and deal damage to players directly. This is
+          usually safe to activate. It will only work if the "checknofall" is
+          also set to "true".
+
+        actions:
+          What should happen if a player is considered to be using a "nofall"
+          hack. Default reaction is to log a message and encourage Bukkit to
+          deal fall damage anyway ("cancel" the hack). The Violation Level is
+          the fall distance in blocks that the player tried to avoid. It gets
+          increased every time that the player fails the check, and decreased
+          over time if the player doesn't fail the check.
+
+      FLYING:
+        This is an entire subsection dedicated to the "moving.flying" check.
+        It will be used instead of the "runfly" check whenever a player has
+        the right to fly.
+
+        allowflyingalways:
+          Should all players be allowed to fly always.
+
+        allowflyingincreative:
+          Should players that are set to "creative mode" be allowed to fly. If
+          they are already allowed because of "allowflyingalways" to fly, this
+          setting gets ignored.
+
+        flyingspeedlimithorizontal:
+          How many 1/100 blocks may a player fly horizontal within one "step".
+          The official "creative mode" flying reaches speeds of about 0.6
+          blocks which means a value of 60 here.
+
+        flyingspeedlimitvertical:
+          How many 1/100 blocks may a player fly vertically up within one
+          "step". A value of 100 which means 1 block seems reasonable for most
+          cases.
+
+        flyingheightlimit:
+          What is the maximum height (in blocks) that a player may reach by
+          flying, relative to the max world height he is in. Some servers
+          experience lag when players fly very, very high. This value is how
+          far above the map height a player may fly.
+
+        actions:
+          What should happen if a player flies faster/higher than defined here?
+          Default is to log messages and to prevent the player from moving
+          ("cancel" his last movement). The Violation Level (VL) of this check
+          is the distance that the player went beyond what NoCheatPlus allowed
+          him. The VL increases with every failed check and slowly decreases for
+          every passed check.
+
+ 2) MOREPACKETS:
+
+     The morepackets check is complementary to the "runfly" check. While the
+     "runfly" check(s) limit the distance a player can move per step, this
+     "morepackets" check limits the number of "steps" a player may take per
+     second. A normal value is 20 steps per second.
+
+      active:
+        Should players be checked for this kind of cheating. If you are not
+        interested in players that cheat that way, set this to false. It is a
+        good idea to have this active, because players that cheat by sending
+        more packets than normally allowed may lag the server (each of those
+        packets has to be processed, after all).
+
+      actions:
+        What should happen if a player is considered to be cheating by taking
+        more steps per second than normal. Default is to log messages and
+        teleport the player back to a location where he was ~1 second before
+        ("cancel" his movement). The Violation Level VL is the number of
+        packets that the player sent beyond the expected amount.
+
+ 3) MOREPACKETSVEHICULE:
+
+     The morepacketsvehicule check is complementary to the "morepackets" check.
+     While the "morepacket" check limit the number of player-move packets send
+     per second, this "morepacketsvehicle" limit the number of vehicule-move
+     packets sent per second. A normal value is 20 packets per second.
+
+      active:
+        Should players be checked for this kind of cheating. If you are not
+        interested in players that cheat that way, set this to false. It is a
+        good idea to have this active, because players that cheat by sending
+        more packets than normally allowed may lag the server (each of those
+        packets has to be processed, after all).
+
+      actions:
+        What should happen if a player is considered to be cheating by taking
+        more steps per second than normal. Default is to log messages and break
+        the boat the player is using. The Violation Level VL is the number of
+        packets that the player sent beyond the expected amount.
+
+ 4) WATERWALK:
+
+     The waterwalk check is used to prevent players from walking on water using
+     a client dedicated to griefing (this mode is usually called Jesus mod).
+     Firstly, it'll check if the player's move is valid (not only moving the X
+     and Z axes but also on the Y axis and, of course, if the player is near the
+     surface (most of the griefing client set the player 0.3 blocks under the
+     water surface). Secondly, it'll make sure the player is using the borders
+     of the block to climb outside the water (it prevents players using griefing
+     clients to simply jump multiple times over the water).
+
+      active:
+        Should players be checked for this kind of cheating. If you are not
+        interested in players that cheat that way, set this to false. It is a
+        good idea to have this active, because players won't be able to cross
+        easily the oceans.
+
+      actions:
+	      What should happen if a player is considered to be cheating by walking
+        on water. Default is to log messages and to prevent the player from
+        moving ("cancel" his last movement). The Violation Level (VL) of this
+        check is the distance between the player and the surface or how far away
+        he is from the normal position if a player climbing a block. The VL
+        increases with every failed check and slowly decreases for every passed
+        check.
 
 
 --------------------------------------------------------------------------------

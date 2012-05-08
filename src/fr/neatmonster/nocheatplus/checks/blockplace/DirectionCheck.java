@@ -1,10 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import java.util.Locale;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckUtils;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
@@ -16,6 +16,14 @@ import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
  * 
  */
 public class DirectionCheck extends BlockPlaceCheck {
+
+    public class DirectionCheckEvent extends BlockPlaceEvent {
+
+        public DirectionCheckEvent(final DirectionCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public DirectionCheck() {
         super("direction");
@@ -97,10 +105,19 @@ public class DirectionCheck extends BlockPlaceCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final DirectionCheckEvent event = new DirectionCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).directionVL);
+            return String.valueOf(Math.round(getData(player).directionVL));
         else
             return super.getParameter(wildcard, player);
     }

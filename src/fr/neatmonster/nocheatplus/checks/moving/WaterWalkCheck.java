@@ -1,13 +1,13 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import java.util.Locale;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckUtils;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.utilities.locations.PreciseLocation;
@@ -17,6 +17,14 @@ import fr.neatmonster.nocheatplus.utilities.locations.PreciseLocation;
  * 
  */
 public class WaterWalkCheck extends MovingCheck {
+
+    public class WaterWalkCheckEvent extends MovingEvent {
+
+        public WaterWalkCheckEvent(final WaterWalkCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public WaterWalkCheck() {
         super("waterwalk");
@@ -72,14 +80,15 @@ public class WaterWalkCheck extends MovingCheck {
                 && fromBlock.getData() == 0x0)
             waterStreamsFix = true;
 
-        // Handle the issue with slabs/stairs
-        boolean slabsStairsFix = false;
+        // Handle the issue with slabs/stairs/soul sand
+        boolean othersFix = false;
         for (final BlockFace blockFace : BlockFace.values()) {
             final Material material = fromBlock.getRelative(blockFace).getType();
             if (material == Material.STEP || material == Material.WOOD_STAIRS
                     || material == Material.COBBLESTONE_STAIRS || material == Material.BRICK_STAIRS
-                    || material == Material.SMOOTH_STAIRS || material == Material.NETHER_BRICK_STAIRS)
-                slabsStairsFix = true;
+                    || material == Material.SMOOTH_STAIRS || material == Material.NETHER_BRICK_STAIRS
+                    || material == Material.SOUL_SAND)
+                othersFix = true;
         }
 
         // Calculate some distances
@@ -95,8 +104,7 @@ public class WaterWalkCheck extends MovingCheck {
         // Slowly reduce the level with each event
         data.waterWalkVL *= 0.95;
 
-        if (!slabsStairsFix && fromLiquid && toLiquid && !upLiquid && !aboveSolid && deltaY == 0D
-                && deltaWithSurface < 0.8D) {
+        if (!othersFix && fromLiquid && toLiquid && !upLiquid && !aboveSolid && deltaY == 0D && deltaWithSurface < 0.8D) {
             // If the player is trying to move while being in water
             // Increment violation counter
             data.waterWalkVL += resultY;
@@ -127,10 +135,19 @@ public class WaterWalkCheck extends MovingCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final WaterWalkCheckEvent event = new WaterWalkCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).waterWalkVL);
+            return String.valueOf(Math.round(getData(player).waterWalkVL));
         else
             return super.getParameter(wildcard, player);
     }

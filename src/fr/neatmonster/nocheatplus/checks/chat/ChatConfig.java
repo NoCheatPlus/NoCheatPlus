@@ -23,6 +23,7 @@ public class ChatConfig extends CheckConfig {
     public final int        noPwnageWarnLevel;
     public final long       noPwnageWarnTimeout;
     public final int        noPwnageBanLevel;
+    public final String     noPwnageKickMessage;
     public final ActionList noPwnageActions;
 
     public final boolean    noPwnageMoveCheck;
@@ -82,6 +83,7 @@ public class ChatConfig extends CheckConfig {
         noPwnageWarnLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_WARNLEVEL);
         noPwnageWarnTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_WARNTIMEOUT);
         noPwnageBanLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_BANLEVEL);
+        noPwnageKickMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE);
         noPwnageActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
 
         noPwnageMoveCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK);

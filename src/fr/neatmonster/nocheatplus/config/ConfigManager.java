@@ -3,18 +3,57 @@ package fr.neatmonster.nocheatplus.config;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
-import fr.neatmonster.nocheatplus.utilities.LogFileFormatter;
+import fr.neatmonster.nocheatplus.checks.Check;
 
 public class ConfigManager {
+    private static class LogFileFormatter extends Formatter {
+
+        public static LogFileFormatter newInstance() {
+            return new LogFileFormatter();
+        }
+
+        private final SimpleDateFormat date;
+
+        private LogFileFormatter() {
+            date = new SimpleDateFormat("yy.MM.dd HH:mm:ss");
+        }
+
+        @Override
+        public String format(final LogRecord record) {
+            final StringBuilder builder = new StringBuilder();
+            final Throwable ex = record.getThrown();
+
+            builder.append(date.format(record.getMillis()));
+            builder.append(" [");
+            builder.append(record.getLevel().getLocalizedName().toUpperCase());
+            builder.append("] ");
+            builder.append(record.getMessage());
+            builder.append('\n');
+
+            if (ex != null) {
+                final StringWriter writer = new StringWriter();
+                ex.printStackTrace(new PrintWriter(writer));
+                builder.append(writer);
+            }
+
+            return builder.toString();
+        }
+    }
+
     private static final Map<String, ConfigFile> worldsMap = new HashMap<String, ConfigFile>();
 
     private static FileHandler                   fileHandler;
@@ -95,14 +134,14 @@ public class ConfigManager {
             }
             fileHandler = new FileHandler(logFile.getCanonicalPath(), true);
             fileHandler.setLevel(Level.ALL);
-            fileHandler.setFormatter(new LogFileFormatter());
+            fileHandler.setFormatter(LogFileFormatter.newInstance());
 
             logger.addHandler(fileHandler);
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
-        NoCheatPlus.instance.setFileLogger(logger);
+        Check.setFileLogger(logger);
 
         // Try to find world-specific config files
         final HashMap<String, File> worldFiles = new HashMap<String, File>();

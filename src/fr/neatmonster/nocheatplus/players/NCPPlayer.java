@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -46,6 +47,16 @@ public class NCPPlayer {
         if (player.getBukkitPlayer() != bukkitPlayer)
             players.put(bukkitPlayer.getName(), player = new NCPPlayer(bukkitPlayer));
         return player;
+    }
+
+    public static boolean hasPermission(final CommandSender sender, final String permission) {
+        String subPermission = "";
+        for (final String partOfPermission : permission.split("\\.")) {
+            subPermission += (subPermission == "" ? "" : ".") + partOfPermission;
+            if (sender.hasPermission(permission) || sender.hasPermission(permission + ".*"))
+                return true;
+        }
+        return false;
     }
 
     private final String                     name;
@@ -147,7 +158,13 @@ public class NCPPlayer {
     }
 
     public boolean hasPermission(final String permission) {
-        return bukkitPlayer.hasPermission(permission);
+        String subPermission = "";
+        for (final String partOfPermission : permission.split("\\.")) {
+            subPermission += (subPermission == "" ? "" : ".") + partOfPermission;
+            if (bukkitPlayer.hasPermission(permission) || bukkitPlayer.hasPermission(permission + ".*"))
+                return true;
+        }
+        return false;
     }
 
     public void refresh() {

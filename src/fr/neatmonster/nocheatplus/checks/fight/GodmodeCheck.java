@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import java.util.Locale;
-
 import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.Bukkit;
@@ -9,6 +7,7 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Permissions;
 import fr.neatmonster.nocheatplus.players.informations.Statistics;
@@ -19,6 +18,14 @@ import fr.neatmonster.nocheatplus.players.informations.Statistics;
  * 
  */
 public class GodmodeCheck extends FightCheck {
+
+    public class GodmodeCheckEvent extends FightEvent {
+
+        public GodmodeCheckEvent(final GodmodeCheck check, final NCPPlayer player, final ActionList actions,
+                final double vL) {
+            super(check, player, actions, vL);
+        }
+    }
 
     public GodmodeCheck() {
         super("godmode", Permissions.FIGHT_GODMODE);
@@ -113,10 +120,19 @@ public class GodmodeCheck extends FightCheck {
     }
 
     @Override
+    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
+        final GodmodeCheckEvent event = new GodmodeCheckEvent(this, player, actionList, violationLevel);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled())
+            return super.executeActions(player, event.getActions(), event.getVL());
+        return false;
+    }
+
+    @Override
     public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
 
         if (wildcard == ParameterName.VIOLATIONS)
-            return String.format(Locale.US, "%d", (int) getData(player).godmodeVL);
+            return String.valueOf(Math.round((int) getData(player).godmodeVL));
         else
             return super.getParameter(wildcard, player);
     }
