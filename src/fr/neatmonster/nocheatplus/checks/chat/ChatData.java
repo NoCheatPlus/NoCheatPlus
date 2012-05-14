@@ -40,7 +40,6 @@ public class ChatData extends CheckData {
     // Remember some data about captcha
     public String               captchaAnswer       = "";
     public String               captchaQuestion     = "";
-    public boolean              captchaDone         = false;
     public boolean              captchaStarted      = false;
     public int                  captchaTries;
 
@@ -50,6 +49,14 @@ public class ChatData extends CheckData {
     // Remember reason and player's IP
     public String               reason              = "";
     public String               ip                  = "";
+
+    public void clear() {
+        location.reset();
+        lastMessage = captchaAnswer = captchaQuestion = "";
+        lastMessageTime = joinTime = leaveTime = lastWarningTime = lastRelogWarningTime = lastMovedTime = 0L;
+        messageRepeated = relogWarnings = speedRepeated = captchaTries = 0;
+        captchaStarted = false;
+    }
 
     public boolean compareLocation(final SimpleLocation l) {
         return location != null && location.x == l.x && location.y == l.y && location.z == l.z;

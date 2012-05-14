@@ -32,49 +32,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MISCELLANEOUS_OPBYCONSOLEONLY, true);
         set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
 
-        /*** INVENTORY ***/
-
-        set(ConfPaths.INVENTORY_DROP_CHECK, true);
-        set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20);
-        set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
-        set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:kick");
-
-        set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);
-        set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "log:ibow:2:5:if cancel");
-
-        set(ConfPaths.INVENTORY_INSTANTEAT_CHECK, true);
-        set(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, "log:ieat:2:5:if cancel");
-
-        /*** MOVING ***/
-
-        set(ConfPaths.MOVING_RUNFLY_CHECK, true);
-        set(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING, false);
-        set(ConfPaths.MOVING_RUNFLY_ALLOWFASTBLOCKING, false);
-        set(ConfPaths.MOVING_RUNFLY_ACTIONS,
-                "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
-
-        set(ConfPaths.MOVING_RUNFLY_NOFALL_CHECK, true);
-        set(ConfPaths.MOVING_RUNFLY_NOFALL_AGGRESSIVE, true);
-        set(ConfPaths.MOVING_RUNFLY_NOFALL_ACTIONS, "log:nofall:0:5:cif cancel");
-
-        set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS, false);
-        set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE, true);
-        set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL, 100);
-        set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL, 60);
-        set(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT, 128);
-        set(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS,
-                "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
-
-        set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);
-        set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "log:morepackets:3:2:if cancel vl>20 log:morepackets:0:2:if cancel");
-
-        set(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK, true);
-        set(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS, "log:morepackets:0:2:if cancel");
-
-        set(ConfPaths.MOVING_WATERWALK_CHECK, true);
-        set(ConfPaths.MOVING_WATERWALK_ACTIONS,
-                "log:waterwalk:3:5:f cancel vl>100 log:waterwalk:0:5:if cancel vl>400 log:waterwalk:0:5:cif cancel");
-
         /*** BLOCKBREAK ***/
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
@@ -128,7 +85,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_WARNLEVEL, 400);
         set(ConfPaths.CHAT_NOPWNAGE_WARNTIMEOUT, 30000);
         set(ConfPaths.CHAT_NOPWNAGE_BANLEVEL, 800);
-        set(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE, "Kicked by the NoPwnage check of NoCheat+!");
         set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:ban cmd:ban-ip");
 
         set(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK, true);
@@ -166,6 +122,16 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH, 4);
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS,
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+
+        set(ConfPaths.CHAT_NOPWNAGE_MESSAGES_KICK, "You're not allowed to spam this server!");
+        set(ConfPaths.CHAT_NOPWNAGE_MESSAGES_CAPTCHAQUESTION,
+                "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
+        set(ConfPaths.CHAT_NOPWNAGE_MESSAGES_CAPTCHASUCCESS, "&aOK, it sounds like you're not a spambot.");
+        set(ConfPaths.CHAT_NOPWNAGE_MESSAGES_WARNPLAYER,
+                "&cOur system has detected unusual bot activities coming from you. Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
+        set(ConfPaths.CHAT_NOPWNAGE_MESSAGES_WARNOTHERS, "&cPlease do not say anything similar to what [player] said!");
+        set(ConfPaths.CHAT_NOPWNAGE_MESSAGES_WARNRELOG,
+                "&cYou relogged really fast! If you keep doing that, you're going to be banned.");
 
         set(ConfPaths.CHAT_ARRIVALSLIMIT_CHECK, false);
         set(ConfPaths.CHAT_ARRIVALSLIMIT_PLAYERSLIMIT, 3);
@@ -213,11 +179,66 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_CRITICAL_VELOCITY, 0.1D);
         set(ConfPaths.FIGHT_CRITICAL_ACTIONS, "cancel vl>50 log:fcritical:0:5:cif cancel");
 
+        set(ConfPaths.FIGHT_ANGLE_CHECK, true);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD, 50D);
+        set(ConfPaths.FIGHT_ANGLE_ACTIONS, "cancel vl>100 log:fangle:3:5:f cancel vl>250 log:fangle:0:5:cif cancel");
+
+        /*** INVENTORY ***/
+
+        set(ConfPaths.INVENTORY_DROP_CHECK, true);
+        set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20);
+        set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
+        set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:kick");
+
+        set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);
+        set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "log:ibow:2:5:if cancel");
+
+        set(ConfPaths.INVENTORY_INSTANTEAT_CHECK, true);
+        set(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, "log:ieat:2:5:if cancel");
+
+        /*** MOVING ***/
+
+        set(ConfPaths.MOVING_RUNFLY_CHECK, true);
+        set(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING, false);
+        set(ConfPaths.MOVING_RUNFLY_ALLOWFASTBLOCKING, false);
+        set(ConfPaths.MOVING_RUNFLY_ACTIONS,
+                "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
+
+        set(ConfPaths.MOVING_RUNFLY_NOFALL_CHECK, true);
+        set(ConfPaths.MOVING_RUNFLY_NOFALL_AGGRESSIVE, true);
+        set(ConfPaths.MOVING_RUNFLY_NOFALL_ACTIONS, "log:nofall:0:5:cif cancel");
+
+        set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS, false);
+        set(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE, true);
+        set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL, 100);
+        set(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL, 60);
+        set(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT, 128);
+        set(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS,
+                "log:moveshort:3:5:f cancel vl>100 log:moveshort:0:5:if cancel vl>400 log:movelong:0:5:cif cancel");
+
+        set(ConfPaths.MOVING_RUNFLY_BEDFLYING_CHECK, true);
+        set(ConfPaths.MOVING_RUNFLY_BEDFLYING_ACTIONS,
+                "log:bedfly:3:5:f cancel vl>1 log:bedfly:0:5:if cancel vl>4 log:bedfly:0:5:cif cancel");
+
+        set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);
+        set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "log:morepackets:3:2:if cancel vl>20 log:morepackets:0:2:if cancel");
+
+        set(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK, true);
+        set(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS, "log:morepackets:0:2:if cancel");
+
+        set(ConfPaths.MOVING_WATERWALK_CHECK, true);
+        set(ConfPaths.MOVING_WATERWALK_ACTIONS,
+                "log:waterwalk:3:5:f vl>100 log:waterwalk:0:5:if cancel vl>400 log:waterwalk:0:5:cif cancel");
+
+        /*** STRINGS ***/
+
         set(ConfPaths.STRINGS + ".drop",
                 "[player] failed [check]: tried to drop more items than allowed. VL [violations].");
         set(ConfPaths.STRINGS + ".moveshort", "[player] failed [check]. VL [violations].");
         set(ConfPaths.STRINGS + ".movelong",
                 "[player] in [world] at [location] moving to [locationto] over distance [movedistance] failed check [check]. Total violation level so far [violations].");
+        set(ConfPaths.STRINGS + ".bedfly",
+                "[player] failed [check]: tried to fly by sending bed leaving packets. VL [violations].");
         set(ConfPaths.STRINGS + ".nofall",
                 "[player] failed [check]: tried to avoid fall damage for ~[falldistance] blocks. VL [violations].");
         set(ConfPaths.STRINGS + ".morepackets",
@@ -225,7 +246,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".waterwalk",
                 "[player] failed [check]: tried to walk on water. Total violation level [violations].");
         set(ConfPaths.STRINGS + ".bbfastbreak",
-                "[player] failed [check]: tried to break too much blocks. Total violation level [violations].");
+                "[player] failed [check]: tried to break too much [blocktype]. Total violation level [violations].");
         set(ConfPaths.STRINGS + ".bbreach",
                 "[player] failed [check]: tried to interact with a block over distance [reachdistance]. VL [violations].");
         set(ConfPaths.STRINGS + ".bbdirection",
@@ -256,6 +277,8 @@ public class DefaultConfig extends ConfigFile {
                 "[player] failed [check]: tried to do a knockback but wasn't technically sprinting. VL [violations].");
         set(ConfPaths.STRINGS + ".fcritical",
                 "[player] failed [check]: tried to do a critical hit but wasn't technically jumping. VL [violations].");
+        set(ConfPaths.STRINGS + ".fangle",
+                "[player] failed [check]: tried to fight multiple entities at the same time. VL [violations].");
         set(ConfPaths.STRINGS + ".ibow", "[player] failed [check]: fires bow to fast. VL [violations].");
         set(ConfPaths.STRINGS + ".ieat", "[player] failed [check]: eats food [food] too fast. VL [violations].");
         set(ConfPaths.STRINGS + ".kick", "kick [player]");

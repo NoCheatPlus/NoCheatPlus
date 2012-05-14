@@ -20,7 +20,6 @@ public enum ParameterName {
     BLOCK_TYPE("blocktype"),
     LIMIT("limit"),
     FOOD("food"),
-    SERVERS("servers"),
     REASON("reason"),
     IP("ip");
 

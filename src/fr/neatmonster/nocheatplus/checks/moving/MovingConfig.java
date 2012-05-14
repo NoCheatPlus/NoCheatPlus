@@ -34,6 +34,9 @@ public class MovingConfig extends CheckConfig {
     public final double     flyingSpeedLimitHorizontal;
     public final ActionList flyingActions;
 
+    public final boolean    bedFlyCheck;
+    public final ActionList bedFlyActions;
+
     public final boolean    nofallCheck;
     public final boolean    nofallAggressive;
     public final float      nofallMultiplier;
@@ -82,6 +85,9 @@ public class MovingConfig extends CheckConfig {
         flyingSpeedLimitHorizontal = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL) / 100D;
         flyingHeightLimit = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT);
         flyingActions = data.getActionList(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS, Permissions.MOVING_FLYING);
+
+        bedFlyCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_BEDFLYING_CHECK);
+        bedFlyActions = data.getActionList(ConfPaths.MOVING_RUNFLY_BEDFLYING_ACTIONS, Permissions.MOVING_BEDFLYING);
 
         nofallCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALL_CHECK);
         nofallMultiplier = 200 / 100F;

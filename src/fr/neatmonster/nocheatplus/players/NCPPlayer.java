@@ -59,6 +59,11 @@ public class NCPPlayer {
         return false;
     }
 
+    public static void reloadConfig() {
+        for (final String playerName : players.keySet())
+            players.get(playerName).configMap.clear();
+    }
+
     private final String                     name;
 
     private Player                           bukkitPlayer;

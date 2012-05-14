@@ -171,70 +171,6 @@
  stop it.
 
 
------------------------- MOVING Permissions for CHECKS -------------------------
-
- - nocheatplus.checks.moving.runfly
-    Allows the player to move freely. It also treats the player as if he has the
-    ".flying", ".swimming", ".sneaking" and ".nofall" permission too.
-
- - nocheatplus.checks.moving.flying
-    Allows the player to fly, independent of if he is in "creative mode" or not.
-    He will be limited in speed by the config settings "flyingspeedvertical" and
-    "flyingspeedhorizontal". It also treats the player as if he has the
-    ".nofall" permission too.
-
- - nocheatplus.checks.moving.swimming
-    Allows the player to swim as fast as he is allowed to walk. Normally a
-    player swims slower than he walks and NoCheatPlus prevents faster movement
-    in water.
-
- - nocheatplus.checks.moving.sneaking
-    Allows the player to sneak faster than he is allowed to walk. Normally a
-    player sneaks a lot slower than he walks and NoCheatPlus prevents faster
-    movement while sneaking.
-
- - nocheatplus.checks.moving.blocking
-    Allows the player to move faster than he is allowed while blocking. Normally
-    a player move a lot slower while blocking than when he walks and NoCheatPlus
-    prevent faster movement while blocking. Please note this will also allow the
-    player to attack an entity while blocking (which is not possible with an un-
-    modified client).
-
- - nocheatplus.checks.moving.cobweb
-    Allows the player to move fast than he is allowed while being into cobweb.
-    Normally a player more a lot slower than when he wallks and NoCheatPlus will
-    try to prevent that kind of behavior.
-
- - nocheatplus.checks.moving.nofall
-    Allows the player to avoid fall damage by using hacks. Normally NoCheatPlus
-    will keep track of a players movement and try to rectify the fall-damage
-    calculations of Minecraft in case they seem to be wrong because of players
-    tricking the server.
-
- - nocheatplus.checks.moving.morepackets
-    Allows players to make a lot more movements than normally possible. Doing
-    more movements will result in faster overall movement speed and causes the
-    server to spend a lot of additional time for processing these movements.
-
- - nocheatplus.checks.moving.morepacketsvehicle
-    Allows players to make a lot more movements (while being in a vehicule) than
-    normally possible. Doing more movements will result in faster overall
-    movement speed and causes the server to spent a lot of additional time for
-    processing these movements.
-
- - nocheatplus.checks.moving.waterwalk
-    Allows players to walk on water (by using a griefing client). This
-    functionality is also called Jesus mode.
-
- - nocheatplus.checks.moving.boatonground
-    Allows players to place boats on the ground (and not only on the water).
-
- - nocheatplus.checks.moving.respawntrick
-    Allows player to respawn on top if they are blocked by a gravel or a sand
-    block (instead of removing the blocks blocking them). This is usually used
-    by players to go quickly to the surface when they are in their mines).
-
-
 -------------------- BLOCKBREAK Permissions for CHECKS -------------------------
 
  - nocheatplus.checks.blockbreak.fastbreak
@@ -270,20 +206,6 @@
     Allows the player to place multiple signs with the same text. This is
     usually used by griefers to place quickly a lot of signs with their
     signature.
-
-
---------------------- INVENTORY Permissions for CHECKS -------------------------
-
- - nocheatplus.checks.inventory.drop
-    Don't limit the number of items that a player may drop within a short time.
-
- - nocheatplus.checks.inventory.instantbow
-    Don't prevent players from shooting their bows instantly without taking the
-    usual time to pull the string back.
-
- - nocheatplus.checks.inventory.instanteat
-    Don't prevent players from eating their food instantly without taking the
-    usual time to munch on it.
 
 
 ----------------------- CHAT Permissions for CHECKS ----------------------------
@@ -333,19 +255,93 @@
     possible (if he hasn't really jumped/fallen [if he has just sent a packet
     before attacking the entity]).
 
+ - nocheatplus.checks.fight.angle
+    Don't prevent the player from attacking multiple entities at the time (this
+    check is mostly triggered when a player is using a forcefield).
+
+
+--------------------- INVENTORY Permissions for CHECKS -------------------------
+
+ - nocheatplus.checks.inventory.drop
+    Don't limit the number of items that a player may drop within a short time.
+
+ - nocheatplus.checks.inventory.instantbow
+    Don't prevent players from shooting their bows instantly without taking the
+    usual time to pull the string back.
+
+ - nocheatplus.checks.inventory.instanteat
+    Don't prevent players from eating their food instantly without taking the
+    usual time to munch on it.
+
+
+------------------------ MOVING Permissions for CHECKS -------------------------
+
+ - nocheatplus.checks.moving.runfly
+    Allows the player to move freely. It also treats the player as if he has the
+    ".flying", ".swimming", ".sneaking" and ".nofall" permission too.
+
+ - nocheatplus.checks.moving.flying
+    Allows the player to fly, independent of if he is in "creative mode" or not.
+    He will be limited in speed by the config settings "flyingspeedvertical" and
+    "flyingspeedhorizontal". It also treats the player as if he has the
+    ".nofall" permission too.
+
+ - nocheatplus.checks.moving.nofall
+    Allows the player to avoid fall damage by using hacks. Normally NoCheatPlus
+    will keep track of a players movement and try to rectify the fall-damage
+    calculations of Minecraft in case they seem to be wrong because of players
+    tricking the server.
+
+ - nocheatplus.checks.moving.swimming
+    Allows the player to swim as fast as he is allowed to walk. Normally a
+    player swims slower than he walks and NoCheatPlus prevents faster movement
+    in water.
+
+ - nocheatplus.checks.moving.sneaking
+    Allows the player to sneak faster than he is allowed to walk. Normally a
+    player sneaks a lot slower than he walks and NoCheatPlus prevents faster
+    movement while sneaking.
+
+ - nocheatplus.checks.moving.blocking
+    Allows the player to move faster than he is allowed while blocking. Normally
+    a player move a lot slower while blocking than when he walks and NoCheatPlus
+    prevent faster movement while blocking. Please note this will also allow the
+    player to attack an entity while blocking (which is not possible with an un-
+    modified client).
+
+ - nocheatplus.checks.moving.cobweb
+    Allows the player to move fast than he is allowed while being into cobweb.
+    Normally a player more a lot slower than when he wallks and NoCheatPlus will
+    try to prevent that kind of behavior.
+
+ - nocheatplus.checks.moving.morepackets
+    Allows players to make a lot more movements than normally possible. Doing
+    more movements will result in faster overall movement speed and causes the
+    server to spend a lot of additional time for processing these movements.
+
+ - nocheatplus.checks.moving.morepacketsvehicle
+    Allows players to make a lot more movements (while being in a vehicule) than
+    normally possible. Doing more movements will result in faster overall
+    movement speed and causes the server to spent a lot of additional time for
+    processing these movements.
+
+ - nocheatplus.checks.moving.waterwalk
+    Allows players to walk on water (by using a griefing client). This
+    functionality is also called Jesus mode.
+
+ - nocheatplus.checks.moving.respawntrick
+    Allows player to respawn on top if they are blocked by a gravel or a sand
+    block (instead of removing the blocks blocking them). This is usually used
+    by players to go quickly to the surface when they are in their mines).
+
+ - nocheatplus.checks.moving.boatonground
+    Allows players to place boats on the ground (and not only on the water).
+
 
 --------------------------------------------------------------------------------
 ---------------------------- Permissions for MODS ------------------------------
 --------------------------------------------------------------------------------
 
- - nocheatplus.mods.zombe.fly
-    Don't prevent the player from using Zombe's fly mod.
-
- - nocheatplus.mods.zombe.xray
-    Don't prevent the player from using Zombe's noclip.
-
- - nocheatplus.mods.zombe.cheat
-    Don't prevent the player from using Zombe's cheat.
 
  - nocheatplus.mods.cjb.fly
     Don't prevent the player from using CJB's fly mod.
@@ -356,12 +352,6 @@
  - nocheatplus.mods.cjb.radar
     Don't prevent the player from using CJB's radar.
 
- - nocheatplus.mods.rei.cave
-    Don't prevent the player from using Rei's Minimap's cave mode.
-
- - nocheatplus.mods.rei.radar
-    Don't prevent the player from using Rei's Minimap's radar.
-
  - nocheatplus.mods.minecraftautomap.ores
     Don't prevent the player from using Minecraft AutoMap's ores detector.
 
@@ -370,6 +360,12 @@
 
  - nocheatplus.mods.minecraftautomap.radar
     Don't prevent the player from using Minecraft AutoMap's radar.
+
+ - nocheatplus.mods.rei.cave
+    Don't prevent the player from using Rei's Minimap's cave mode.
+
+ - nocheatplus.mods.rei.radar
+    Don't prevent the player from using Rei's Minimap's radar.
 
  - nocheatplus.mods.smartmoving.climbing
     Don't prevent the player from using Smart Moving's climb.
@@ -389,6 +385,15 @@
  - nocheatplus.mods.smartmoving.flying
     Don't prevent the player from using Smart Moving's fly.
 
+ - nocheatplus.mods.zombe.fly
+    Don't prevent the player from using Zombe's fly mod.
+
+ - nocheatplus.mods.zombe.xray
+    Don't prevent the player from using Zombe's noclip.
+
+ - nocheatplus.mods.zombe.cheat
+    Don't prevent the player from using Zombe's cheat.
+
 
 --------------------------------------------------------------------------------
 ---------------------- Things to know about Permissions ------------------------
@@ -400,18 +405,18 @@
    - nocheatplus
    - nocheatplus.admin
    - nocheatplus.checks
-   - nocheatplus.checks.moving
    - nocheatplus.checks.blockbreak
    - nocheatplus.checks.blockplace
-   - nocheatplus.checks.inventory
    - nocheatplus.checks.chat
+   - nocheatplus.checks.inventory
+   - nocheatplus.checks.moving
    - nocheatplus.checks.fight
    - nocheatplus.mods
-   - nocheatplus.mods.zombe
    - nocheatplus.mods.cjb
-   - nocheatplus.mods.rei
    - nocheatplus.mods.minecraftautomap
+   - nocheatplus.mods.rei
    - nocheatplus.mods.smartmoving
+   - nocheatplus.mods.zombe
 
  To give a player all the permissions that start with that permission node.
 
@@ -533,6 +538,14 @@
       active:
         Should players be checked for this behaviour.
 
+      intervalsurvival:
+        The regular interval between each block breaks if the player is in
+        survival mode.
+
+      intervalcreative:
+        The regular interval between each block breaks if the player is in
+        creative mode.
+
       actions:
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from breaking the block ("cancel" breaking)
@@ -621,6 +634,10 @@
       active:
         Should players be checked for this behaviour.
 
+      interval:
+        The regular interval between two block places (doesn't depend on the
+        player's gamemode).
+
       actions:
         What should happen if the player is considered to cheat this way. The
         default is to prevent him from placing the block ("cancel" placing)
@@ -696,12 +713,15 @@
         for this check is the interval elapsed subtracted to the interval
         defined in the configuration's file; It increases with every failure and
         decreases with every successfully thrown projectile.
-        
+
  5) FASTSIGN
- 
+
      Players using custom clients are able to spam the server with signs
      containing the text they have chosen.
-     
+
+      active:
+        Should players get checked for this type of hack.
+
       exclusions:
         If the first line of the sign is included into this list, the sign won't
         be checked.
@@ -711,37 +731,49 @@
 
  Checks that at least technically have to do with chat or commands.
 
-   hideCommands:
-    Enable this if you don't want NoCheat+'s commands to reply to the player if
-    he doesn't have the permissions to use them.
-
  1) NOPWNAGE:
-	
+
      The instructions for this check comes directly from NoPwnage's instructions
      file. You can find the project at http://dev.bukkit.org/server-mods/
      nopwnage/.
 
-      warnPlayers:
+      active:
+        Should messages be check to see if players are spamming the server?
+
+      warnplayers:
         Should a player that reaches the "warnLevel" get a text message telling
         him that he is under suspicion of being a bot.
 
-      warnOthers:
+      warnothers:
         Should all players get warned when a player gets banned for spambot-like
         activity?
 
-      warnLevel:
+      warnlevel:
         How much suspicion must a message earn to issue a warning for the
         player?
 
-      warnTimeout:
+      warntimeout:
         After what time (in ms) should a player be considered "unwarned" again.
 
-      banLevel:
+      banlevel:
         How much suspicion must a message earn to execute the "commands"
         (usually ban the player). If warnings for players are enabled and the
         player hasn't been warned yet, he'll get warned instead.
 
-      move.enabled:
+      otheractions:
+        NoPwnage allows you to decide what should happen when a player reaches
+        "banLevel" or relogged too fast. The default is to kick him and ban IP
+        and name. You'll also get a log message to console stating how exactly
+        he reached the "banLevel" (how much suspicion was added by each check).
+
+        "[player]" and "[ip]" wildcards will be replaced by the actual data
+        during execution.
+
+        IMPORTANT: Please notice that cancelling the check will not cancel the
+        actual message but kick the player (and the kick message defined in the
+        configuration will displayed on the player's screen).
+
+      move.active:
       move.weightbonus:
       move.weightmalus:
       move.timeout:
@@ -749,57 +781,57 @@
         he did move, the suspicion will be reduced by the "weightbonus" value.
         If he did not move, the suspicion will be increased by "weightmalus"
         value.
-        Only used if "enabled".
+        Only used if "actived".
 
-      messageRepeat.enabled:
-      messageRepeat.weight:
-      messageRepeat.timeout:
+      repeat.active:
+      repeat.weight:
+      repeat.timeout:
         NoPwnage will check if a player repeats his messages within the
         "timeout" timeframe. Even if the message is a bit different, it will be
         counted as being a repetition. The suspicion is increased by "weight"
         and for each additional repetition by "weight/2". This means that
         multiple repetitions will increase suspicion, but not as much as the
         first repetition.
-        Only used if "enabled".
+        Only used if "actived".
 
-      messageSpeed.enabled:
-      messageSpeed.weight:
-      messageSpeed.timeout:
+      speed.active:
+      speed.weight:
+      speed.timeout:
         NoPwnage will check if a player sends messages too fast. If a message is
         sent within "timout" ms after the previous message, increase suspicion
         by "weight". For each additional message that is sent within "timeout",
         the suspicion is increased by "weight/2". This means that multiple
         too fast sent messages in a row will increase suspicion, but not as much
         as the first.
-        Only used if "enabled".
+        Only used if "actived".
 
-      messageFirst.enabled:
-      messageFirst.weight:
-      messageFirst.timeout:
+      first.active:
+      first.weight:
+      first.timeout:
         NoPwnage will check if a player sends his first message within "timeout"
         ms after his login. If he does, increase supspicion by "weight".
-        Only used if "enabled".
+        Only used if "actived".
 
-      globalMessageRepeat.enabled:
-      globalMessageRepeat.weight:
-      globalMessageRepeat.timeout:
+      global.active:
+      global.weight:
+      global.timeout:
         NoPwnage will check if a player repeats a message that has been sent by
         another player just before, within "timeout". If he does, suspicion will
         be increased by "weight" and for each additional repetition by
         "weight/2", independent of by which player. This means that multiple
         repetitions will increase suspicion, but not as much as the first
         repetition.
-        Only used if "enabled".
+        Only used if "actived".
 
-      bannedMessageRepeat.enabled:
-      bannedMessageRepeat.weight:
-      bannedMessageRepeat.timeout:
+      banned.active:
+      banned.weight:
+      banned.timeout:
         NoPwnage will remember the last message that caused someone to get
         banned. If a player repeats that message within "timeout" ms, the
         suspicion will be increased by "weight".
-        Only used if "enabled".
+        Only used if "actived".
 
-      relog.enabled:
+      relog.active:
       relog.time:
       relog.warnings:
       relog.timeout:
@@ -808,43 +840,33 @@
         "warnings" times already, the "commands" will be executed for him.
         Warnings get removed if the time of the last warning was more than
         "timeout" ms ago.
-        
-      kickmessage:
-        The message that will be displayed to the player is he is kicked by the
-        NoPwnage check.
+        Only used if "actived".
 
-      actions:
-        NoPwnage allows you to decide what should happen when a player reaches
-        "banLevel" or relogged too fast. The default is to kick him and ban IP
-        and name. You'll also get a log message to console stating how exactly
-        he reached the "banLevel" (how much suspicion was added by each check).
-
-        "[player]" and "[ip]" wildcards will be replaced by the actual data
-        during execution.
-        
-        IMPORTANT: Please notice that cancelling the check will not cancel the
-        actual message but kick the player (and the kick message defined in the
-        configuration will displayed on the player's screen).
-
-      captcha.enabled:
+      captcha.active:
         Should players that get to "banlevel" be presented with a captcha first
         instead of running the commands immediatly?
 
-      captcha.question:
-        How should the question be worded. Use & to create colors. The text
-        [captcha] will be replaced with the actual captcha.
-
-      tries:
+      captcha.tries:
         How many attempts will a player have to give the correct answer. A
         failed attempt will display the question again. Be generous here, as
         players may not be fast enough to read the question the first few times
         or be otherwise distracted.
 
-      length:
+      captcha.length:
         How many characters should the captcha have.
 
-      characters:
+      captcha.characters:
         The characters for the captcha are randomly drawn from this string
+
+      messages.kick
+      messages.captchaquestion
+      messages.captchasuccess
+      messages.warnplayer
+      messages.warnothers
+      messages.warnrelog
+        You can customize here all the message which are going to be displayed
+        by the NoPwnage check (the kick message displayed when a spambot is
+        kicked, the message asking for a captcha, the warning messages, etc.).
 
  2) ARRIVALSLIMIT:
 
@@ -862,9 +884,13 @@
         The interval in milliseconds during which the number of new players
         defined in the configuration are allowed to join.
 
-      cooldown:
+      cooldowndelay:
         The number of milliseconds during which new players won't be allowed
         to join if too many new players have been detected.
+
+      kickmessage:
+        The message that will be displayed when a player is kicked by this
+        check.
 
       newtime:
         The time elsaped since the player's first join to be considered as
@@ -1069,6 +1095,28 @@
         the event. The Violation Level (VL) for this check is the difference
         between the real values and the values defined in the configuration.
 
+ 9) ANGLE
+
+     Players may be able to attack accurately multiple entities at the same time
+     using a forcefield. This check will try to stop that kind of cheat by check
+     for the time, the angle delta and the location of the player between each
+     hit. This check has been introduced recently so it's still experimental.
+
+      active:
+        Should players be checked for this behavior.
+
+      threshold:
+        This is the minimum value (percentage) to trigger a violation. This
+        percentage is calculated by doing a weighted average of the percentage
+        of the time, angle and location checks. I recommand to use a value close
+        to 50.
+
+      actions:
+        What should happen if the player fails this check. Default is to not
+        allow the player to attack the entity ("cancel" the attack) and log
+        the event. The Violation Level (VL) for this check is the difference
+        between the real values and the values defined in the configuration.
+
 
 ----------------------------- INVENTORY Subsection -----------------------------
 
@@ -1187,7 +1235,7 @@
         swimming speed of players at all (NoCheatPlus knows when players sprint,
         use Swiftness potions etc and will already adapt the speed based on
         that data).
-        
+
       verticalswimspped:
         How fast should the player be allowed to swim (but on the vertical
         axis). Default is "100", meaning 100% of normal swimming speed. You will
@@ -1228,12 +1276,12 @@
         how severe the cheating is) and teleport the player to the last known
         legitimate location on ground that NoCheatPlus can remember for that
         player ("cancel" the movement).
-      
+
       NOFALL:
         This is an entire subsection dedicated to the "moving.nofall" check.
         It will be used to check if the player has tried to avoid fall
         damages.
-        
+
         active:
           Should players be checked for a common type of "nofall" hack, that
           allows them to avoid taking damage when falling. If you don't care
@@ -1292,6 +1340,24 @@
           him. The VL increases with every failed check and slowly decreases for
           every passed check.
 
+      BEDFLYING:
+        This is an entire subsection dedicated to the "moving.bedflying" check.
+        It will be used instead as a complements of the running check to make
+        sure that the player isn't try to fly by sending bed leaving packets.
+        This technique can also be used to avoid fall damages.
+
+        active:
+          Should players get checked for this type of movement related hacks at
+          all. If deactivated, player may be able to fly (but really slowly).
+
+        actions:
+          What should happen if a player flies but isn't allowed to do so?
+          Default is to log messages and to prevent the player from moving
+          ("cancel" his last movement). The Violation Level (VL) of this check
+          is the distance that the player went beyond what NoCheatPlus allowed
+          him. The VL increases with every failed check and slowly decreases for
+          every passed check.
+
  2) MOREPACKETS:
 
      The morepackets check is complementary to the "runfly" check. While the
@@ -1340,9 +1406,8 @@
      Firstly, it'll check if the player's move is valid (not only moving the X
      and Z axes but also on the Y axis and, of course, if the player is near the
      surface (most of the griefing client set the player 0.3 blocks under the
-     water surface). Secondly, it'll make sure the player is using the borders
-     of the block to climb outside the water (it prevents players using griefing
-     clients to simply jump multiple times over the water).
+     water surface). Secondly, it'll make sure the player is jumping on the
+     surface of the water by checking his velocity.
 
       active:
         Should players be checked for this kind of cheating. If you are not
@@ -1351,13 +1416,12 @@
         easily the oceans.
 
       actions:
-	      What should happen if a player is considered to be cheating by walking
+        What should happen if a player is considered to be cheating by walking
         on water. Default is to log messages and to prevent the player from
         moving ("cancel" his last movement). The Violation Level (VL) of this
         check is the distance between the player and the surface or how far away
-        he is from the normal position if a player climbing a block. The VL
-        increases with every failed check and slowly decreases for every passed
-        check.
+        is his velocity from a regular value. The VL increases with every failed
+        check and slowly decreases for every passed check.
 
 
 --------------------------------------------------------------------------------

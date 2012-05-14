@@ -10,6 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -39,6 +41,7 @@ public class MovingListener extends CheckListener {
     private final MorePacketsCheck        morePacketsCheck;
     private final MorePacketsVehicleCheck morePacketsVehicleCheck;
     private final FlyingCheck             flyingCheck;
+    private final BedFlyingCheck          bedFlyingCheck;
     private final RunningCheck            runningCheck;
     private final WaterWalkCheck          waterWalkCheck;
 
@@ -46,10 +49,54 @@ public class MovingListener extends CheckListener {
         super("moving");
 
         flyingCheck = new FlyingCheck();
+        bedFlyingCheck = new BedFlyingCheck();
         runningCheck = new RunningCheck();
         morePacketsCheck = new MorePacketsCheck();
         morePacketsVehicleCheck = new MorePacketsVehicleCheck();
         waterWalkCheck = new WaterWalkCheck();
+    }
+
+    /**
+     * We listen to this event to prevent player from flying by sending
+     * bed leaving packets.
+     * 
+     * @param event
+     * 
+     */
+    @EventHandler(
+            priority = EventPriority.MONITOR)
+    public void bedEntering(final PlayerBedEnterEvent event) {
+        final NCPPlayer player = NCPPlayer.getPlayer(event.getPlayer());
+        final MovingConfig cc = (MovingConfig) getConfig(player);
+
+        if (cc.bedFlyCheck && !player.hasPermission(Permissions.MOVING_BEDFLYING)) {
+            final MovingData data = (MovingData) getData(player);
+            data.wasSleeping = true;
+        }
+    }
+
+    /**
+     * We listen to this event to prevent player from flying by sending
+     * bed leaving packets.
+     * 
+     * @param event
+     * 
+     */
+    @EventHandler(
+            priority = EventPriority.MONITOR)
+    public void bedLeaving(final PlayerBedLeaveEvent event) {
+        final NCPPlayer player = NCPPlayer.getPlayer(event.getPlayer());
+        final MovingConfig cc = (MovingConfig) getConfig(player);
+
+        if (cc.bedFlyCheck && !player.hasPermission(Permissions.MOVING_BEDFLYING)) {
+            final MovingData data = (MovingData) getData(player);
+
+            if (bedFlyingCheck.check(player))
+                // To cancel the event, simply teleport him to his last safe location
+                event.getPlayer().teleport(data.lastSafeLocations[1]);
+
+            data.wasSleeping = false;
+        }
     }
 
     /**

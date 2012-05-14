@@ -45,6 +45,7 @@ public class Permissions {
     public static final String  FIGHT_INSTANTHEAL         = FIGHT + ".instantheal";
     public static final String  FIGHT_KNOCKBACK           = FIGHT + ".knockback";
     public static final String  FIGHT_CRITICAL            = FIGHT + ".critical";
+    public static final String  FIGHT_ANGLE               = FIGHT + ".angle";
 
     private static final String INVENTORY                 = CHECKS + ".inventory";
     public static final String  INVENTORY_DROP            = INVENTORY + ".drop";
@@ -53,12 +54,13 @@ public class Permissions {
 
     private static final String MOVING                    = CHECKS + ".moving";
     public static final String  MOVING_RUNFLY             = MOVING + ".runfly";
+    public static final String  MOVING_FLYING             = MOVING + ".flying";
+    public static final String  MOVING_BEDFLYING          = MOVING + ".bedflying";
+    public static final String  MOVING_NOFALL             = MOVING + ".nofall";
     public static final String  MOVING_SWIMMING           = MOVING + ".swimming";
     public static final String  MOVING_SNEAKING           = MOVING + ".sneaking";
     public static final String  MOVING_BLOCKING           = MOVING + ".blocking";
-    public static final String  MOVING_FLYING             = MOVING + ".flying";
     public static final String  MOVING_COBWEB             = MOVING + ".cobweb";
-    public static final String  MOVING_NOFALL             = MOVING + ".nofall";
     public static final String  MOVING_MOREPACKETS        = MOVING + ".morepackets";
     public static final String  MOVING_MOREPACKETSVEHICLE = MOVING + ".morepacketsvehicle";
     public static final String  MOVING_WATERWALK          = MOVING + ".waterwalk";

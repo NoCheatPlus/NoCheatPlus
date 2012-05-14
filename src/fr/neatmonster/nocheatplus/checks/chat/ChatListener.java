@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
+import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Permissions;
@@ -64,7 +65,7 @@ public class ChatListener extends CheckListener {
         // First the nopwnage check
         if (cc.noPwnageCheck && !player.hasPermission(Permissions.CHAT_NOPWNAGE))
             if (noPwnageCheck.check(player, event)) {
-                player.getBukkitPlayer().kickPlayer(cc.noPwnageKickMessage);
+                player.getBukkitPlayer().kickPlayer(Check.removeColors(cc.noPwnageMessagesKick));
                 return;
             } else
                 cancelled = event.isCancelled();
@@ -141,7 +142,7 @@ public class ChatListener extends CheckListener {
         // Check if the join is legit
         if (cc.noPwnageCheck && !player.hasPermission(Permissions.CHAT_NOPWNAGE))
             if (noPwnageCheck.handleJoin(player, data, cc))
-                event.disallow(Result.KICK_OTHER, cc.noPwnageKickMessage);
+                event.disallow(Result.KICK_OTHER, Check.removeColors(cc.noPwnageMessagesKick));
 
         /*** ARRIVALSLIMIT CHECK ***/
         // Do not check the players if the event is already cancelled,

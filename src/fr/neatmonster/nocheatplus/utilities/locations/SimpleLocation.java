@@ -61,4 +61,8 @@ public final class SimpleLocation {
         z = location.getBlockZ();
     }
 
+    @Override
+    public String toString() {
+        return "SimpleLocation {x=" + x + ", y=" + y + ", z=" + z + "}";
+    }
 }

@@ -46,6 +46,7 @@ public class FightListener extends CheckListener {
         checks.add(new ReachCheck());
         checks.add(new KnockbackCheck());
         checks.add(new CriticalCheck());
+        checks.add(new AngleCheck());
 
         godmodeCheck = new GodmodeCheck();
         instanthealCheck = new InstanthealCheck();

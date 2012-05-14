@@ -46,6 +46,10 @@ public class FightConfig extends CheckConfig {
     public final double     criticalVelocity;
     public final ActionList criticalActions;
 
+    public final boolean    angleCheck;
+    public final double     angleThreshold;
+    public final ActionList angleActions;
+
     public FightConfig(final ConfigFile data) {
 
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
@@ -79,5 +83,9 @@ public class FightConfig extends CheckConfig {
         criticalFallDistance = data.getDouble(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE);
         criticalVelocity = data.getDouble(ConfPaths.FIGHT_CRITICAL_VELOCITY);
         criticalActions = data.getActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
+
+        angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
+        angleThreshold = data.getDouble(ConfPaths.FIGHT_ANGLE_THRESHOLD);
+        angleActions = data.getActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);
     }
 }

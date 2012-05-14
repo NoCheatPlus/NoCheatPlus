@@ -24,68 +24,6 @@ public abstract class ConfPaths {
 
     private static final String CHECKS                                    = "checks.";
 
-    private static final String INVENTORY                                 = CHECKS + "inventory.";
-
-    private static final String INVENTORY_DROP                            = INVENTORY + "drop.";
-    public static final String  INVENTORY_DROP_CHECK                      = INVENTORY_DROP + "active";
-    public static final String  INVENTORY_DROP_TIMEFRAME                  = INVENTORY_DROP + "time";
-    public static final String  INVENTORY_DROP_LIMIT                      = INVENTORY_DROP + "limit";
-    public static final String  INVENTORY_DROP_ACTIONS                    = INVENTORY_DROP + "actions";
-
-    private static final String INVENTORY_INSTANTBOW                      = INVENTORY + "instantbow.";
-    public static final String  INVENTORY_INSTANTBOW_CHECK                = INVENTORY_INSTANTBOW + "active";
-    public static final String  INVENTORY_INSTANTBOW_ACTIONS              = INVENTORY_INSTANTBOW + "actions";
-
-    private static final String INVENTORY_INSTANTEAT                      = INVENTORY + "instanteat.";
-    public static final String  INVENTORY_INSTANTEAT_CHECK                = INVENTORY_INSTANTEAT + "active";
-    public static final String  INVENTORY_INSTANTEAT_ACTIONS              = INVENTORY_INSTANTEAT + "actions";
-
-    private static final String MOVING                                    = CHECKS + "moving.";
-
-    private static final String MOVING_RUNFLY                             = MOVING + "runfly.";
-    public static final String  MOVING_RUNFLY_CHECK                       = MOVING_RUNFLY + "active";
-
-    // These seventh aren't automatically shown in the config
-    public static final String  MOVING_RUNFLY_WALKSPEED                   = MOVING_RUNFLY + "walkspeed";
-    public static final String  MOVING_RUNFLY_SNEAKSPEED                  = MOVING_RUNFLY + "sneakspeed";
-    public static final String  MOVING_RUNFLY_BLOCKSPEED                  = MOVING_RUNFLY + "blockspeed";
-    public static final String  MOVING_RUNFLY_SWIMSPEED                   = MOVING_RUNFLY + "swimspeed";
-    public static final String  MOVING_RUNFLY_VERTICALSWIMSPEED           = MOVING_RUNFLY + "vertswimspeed";
-    public static final String  MOVING_RUNFLY_SPRINTSPEED                 = MOVING_RUNFLY + "sprintspeed";
-    public static final String  MOVING_RUNFLY_COBWEBSPEED                 = MOVING_RUNFLY + "cobwebspeed";
-
-    public static final String  MOVING_RUNFLY_ALLOWFASTSNEAKING           = MOVING_RUNFLY + "allowfastsneaking";
-    public static final String  MOVING_RUNFLY_ALLOWFASTBLOCKING           = MOVING_RUNFLY + "allowfastblocking";
-    public static final String  MOVING_RUNFLY_ACTIONS                     = MOVING_RUNFLY + "actions";
-
-    private static final String MOVING_RUNFLY_NOFALL                      = MOVING_RUNFLY + "nofall.";
-    public static final String  MOVING_RUNFLY_NOFALL_CHECK                = MOVING_RUNFLY_NOFALL + "active";
-    public static final String  MOVING_RUNFLY_NOFALL_AGGRESSIVE           = MOVING_RUNFLY_NOFALL + "aggressivemode";
-    public static final String  MOVING_RUNFLY_NOFALL_ACTIONS              = MOVING_RUNFLY_NOFALL + "actions";
-
-    private static final String MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";
-    public static final String  MOVING_RUNFLY_FLYING_ALLOWALWAYS          = MOVING_RUNFLY_FLYING + "allowflyingalways";
-    public static final String  MOVING_RUNFLY_FLYING_ALLOWINCREATIVE      = MOVING_RUNFLY_FLYING
-                                                                                  + "allowflyingincreative";
-    public static final String  MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL   = MOVING_RUNFLY_FLYING
-                                                                                  + "flyingspeedlimitvertical";
-    public static final String  MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL = MOVING_RUNFLY_FLYING
-                                                                                  + "flyingspeedlimithorizontal";
-    public static final String  MOVING_RUNFLY_FLYING_HEIGHTLIMIT          = MOVING_RUNFLY_FLYING + "flyingheightlimit";
-    public static final String  MOVING_RUNFLY_FLYING_ACTIONS              = MOVING_RUNFLY_FLYING + "actions";
-
-    private static final String MOVING_MOREPACKETS                        = MOVING + "morepackets.";
-    public static final String  MOVING_MOREPACKETS_CHECK                  = MOVING_MOREPACKETS + "active";
-    public static final String  MOVING_MOREPACKETS_ACTIONS                = MOVING_MOREPACKETS + "actions";
-
-    private static final String MOVING_MOREPACKETSVEHICLE                 = MOVING + "morepacketsvehicle.";
-    public static final String  MOVING_MOREPACKETSVEHICLE_CHECK           = MOVING_MOREPACKETSVEHICLE + "active";
-    public static final String  MOVING_MOREPACKETSVEHICLE_ACTIONS         = MOVING_MOREPACKETSVEHICLE + "actions";
-
-    private static final String MOVING_WATERWALK                          = MOVING + "waterwalk.";
-    public static final String  MOVING_WATERWALK_CHECK                    = MOVING_WATERWALK + "active";
-    public static final String  MOVING_WATERWALK_ACTIONS                  = MOVING_WATERWALK + "actions";
-
     private static final String BLOCKBREAK                                = CHECKS + "blockbreak.";
 
     private static final String BLOCKBREAK_FASTBREAK                      = BLOCKBREAK + "fastbreak.";
@@ -143,7 +81,6 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_WARNLEVEL                   = CHAT_NOPWNAGE + "warnlevel";
     public static final String  CHAT_NOPWNAGE_WARNTIMEOUT                 = CHAT_NOPWNAGE + "warntimeout";
     public static final String  CHAT_NOPWNAGE_BANLEVEL                    = CHAT_NOPWNAGE + "banlevel";
-    public static final String  CHAT_NOPWNAGE_KICKMESSAGE                 = CHAT_NOPWNAGE + "kickmessage";
     public static final String  CHAT_NOPWNAGE_ACTIONS                     = CHAT_NOPWNAGE + "otheractions";
 
     private static final String CHAT_NOPWNAGE_MOVE                        = CHAT_NOPWNAGE + "move.";
@@ -188,6 +125,14 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_CAPTCHA_TRIES               = CHAT_NOPWNAGE_CAPTCHA + "tries";
     public static final String  CHAT_NOPWNAGE_CAPTCHA_LENGTH              = CHAT_NOPWNAGE_CAPTCHA + "length";
     public static final String  CHAT_NOPWNAGE_CAPTCHA_CHARACTERS          = CHAT_NOPWNAGE_CAPTCHA + "characters";
+
+    private static final String CHAT_NOPWNAGE_MESSAGES                    = CHAT_NOPWNAGE + "messages.";
+    public static final String  CHAT_NOPWNAGE_MESSAGES_KICK               = CHAT_NOPWNAGE_MESSAGES + "kick";
+    public static final String  CHAT_NOPWNAGE_MESSAGES_CAPTCHAQUESTION    = CHAT_NOPWNAGE_MESSAGES + "captchaquestion";
+    public static final String  CHAT_NOPWNAGE_MESSAGES_CAPTCHASUCCESS     = CHAT_NOPWNAGE_MESSAGES + "captchasuccess";
+    public static final String  CHAT_NOPWNAGE_MESSAGES_WARNPLAYER         = CHAT_NOPWNAGE_MESSAGES + "warnplayer";
+    public static final String  CHAT_NOPWNAGE_MESSAGES_WARNOTHERS         = CHAT_NOPWNAGE_MESSAGES + "warnothers";
+    public static final String  CHAT_NOPWNAGE_MESSAGES_WARNRELOG          = CHAT_NOPWNAGE_MESSAGES + "warnrelog";
 
     private static final String CHAT_ARRIVALSLIMIT                        = CHAT + "arrivalslimit.";
     public static final String  CHAT_ARRIVALSLIMIT_CHECK                  = CHAT_ARRIVALSLIMIT + "active";
@@ -244,6 +189,76 @@ public abstract class ConfPaths {
     public static final String  FIGHT_CRITICAL_VELOCITY                   = FIGHT_CRITICAL + "velocity";
     public static final String  FIGHT_CRITICAL_ACTIONS                    = FIGHT_CRITICAL + "actions";
 
-    public static final String  STRINGS                                   = "strings";
+    private static final String FIGHT_ANGLE                               = FIGHT + "angle.";
+    public static final String  FIGHT_ANGLE_CHECK                         = FIGHT_ANGLE + "active";
+    public static final String  FIGHT_ANGLE_THRESHOLD                     = FIGHT_ANGLE + "threshold";
+    public static final String  FIGHT_ANGLE_ACTIONS                       = FIGHT_ANGLE + "actions";
 
+    private static final String INVENTORY                                 = CHECKS + "inventory.";
+
+    private static final String INVENTORY_DROP                            = INVENTORY + "drop.";
+    public static final String  INVENTORY_DROP_CHECK                      = INVENTORY_DROP + "active";
+    public static final String  INVENTORY_DROP_TIMEFRAME                  = INVENTORY_DROP + "time";
+    public static final String  INVENTORY_DROP_LIMIT                      = INVENTORY_DROP + "limit";
+    public static final String  INVENTORY_DROP_ACTIONS                    = INVENTORY_DROP + "actions";
+
+    private static final String INVENTORY_INSTANTBOW                      = INVENTORY + "instantbow.";
+    public static final String  INVENTORY_INSTANTBOW_CHECK                = INVENTORY_INSTANTBOW + "active";
+    public static final String  INVENTORY_INSTANTBOW_ACTIONS              = INVENTORY_INSTANTBOW + "actions";
+
+    private static final String INVENTORY_INSTANTEAT                      = INVENTORY + "instanteat.";
+    public static final String  INVENTORY_INSTANTEAT_CHECK                = INVENTORY_INSTANTEAT + "active";
+    public static final String  INVENTORY_INSTANTEAT_ACTIONS              = INVENTORY_INSTANTEAT + "actions";
+
+    private static final String MOVING                                    = CHECKS + "moving.";
+
+    private static final String MOVING_RUNFLY                             = MOVING + "runfly.";
+    public static final String  MOVING_RUNFLY_CHECK                       = MOVING_RUNFLY + "active";
+
+    // These seventh aren't automatically shown in the config
+    public static final String  MOVING_RUNFLY_WALKSPEED                   = MOVING_RUNFLY + "walkspeed";
+    public static final String  MOVING_RUNFLY_SNEAKSPEED                  = MOVING_RUNFLY + "sneakspeed";
+    public static final String  MOVING_RUNFLY_BLOCKSPEED                  = MOVING_RUNFLY + "blockspeed";
+    public static final String  MOVING_RUNFLY_SWIMSPEED                   = MOVING_RUNFLY + "swimspeed";
+    public static final String  MOVING_RUNFLY_VERTICALSWIMSPEED           = MOVING_RUNFLY + "vertswimspeed";
+    public static final String  MOVING_RUNFLY_SPRINTSPEED                 = MOVING_RUNFLY + "sprintspeed";
+    public static final String  MOVING_RUNFLY_COBWEBSPEED                 = MOVING_RUNFLY + "cobwebspeed";
+
+    public static final String  MOVING_RUNFLY_ALLOWFASTSNEAKING           = MOVING_RUNFLY + "allowfastsneaking";
+    public static final String  MOVING_RUNFLY_ALLOWFASTBLOCKING           = MOVING_RUNFLY + "allowfastblocking";
+    public static final String  MOVING_RUNFLY_ACTIONS                     = MOVING_RUNFLY + "actions";
+
+    private static final String MOVING_RUNFLY_NOFALL                      = MOVING_RUNFLY + "nofall.";
+    public static final String  MOVING_RUNFLY_NOFALL_CHECK                = MOVING_RUNFLY_NOFALL + "active";
+    public static final String  MOVING_RUNFLY_NOFALL_AGGRESSIVE           = MOVING_RUNFLY_NOFALL + "aggressivemode";
+    public static final String  MOVING_RUNFLY_NOFALL_ACTIONS              = MOVING_RUNFLY_NOFALL + "actions";
+
+    private static final String MOVING_RUNFLY_FLYING                      = MOVING_RUNFLY + "flying.";
+    public static final String  MOVING_RUNFLY_FLYING_ALLOWALWAYS          = MOVING_RUNFLY_FLYING + "allowflyingalways";
+    public static final String  MOVING_RUNFLY_FLYING_ALLOWINCREATIVE      = MOVING_RUNFLY_FLYING
+                                                                                  + "allowflyingincreative";
+    public static final String  MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL   = MOVING_RUNFLY_FLYING
+                                                                                  + "flyingspeedlimitvertical";
+    public static final String  MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL = MOVING_RUNFLY_FLYING
+                                                                                  + "flyingspeedlimithorizontal";
+    public static final String  MOVING_RUNFLY_FLYING_HEIGHTLIMIT          = MOVING_RUNFLY_FLYING + "flyingheightlimit";
+    public static final String  MOVING_RUNFLY_FLYING_ACTIONS              = MOVING_RUNFLY_FLYING + "actions";
+
+    private static final String MOVING_RUNFLY_BEDFLYING                   = MOVING_RUNFLY + "bedflying.";
+    public static final String  MOVING_RUNFLY_BEDFLYING_CHECK             = MOVING_RUNFLY_BEDFLYING + "active";
+    public static final String  MOVING_RUNFLY_BEDFLYING_ACTIONS           = MOVING_RUNFLY_BEDFLYING + "actions";
+
+    private static final String MOVING_MOREPACKETS                        = MOVING + "morepackets.";
+    public static final String  MOVING_MOREPACKETS_CHECK                  = MOVING_MOREPACKETS + "active";
+    public static final String  MOVING_MOREPACKETS_ACTIONS                = MOVING_MOREPACKETS + "actions";
+
+    private static final String MOVING_MOREPACKETSVEHICLE                 = MOVING + "morepacketsvehicle.";
+    public static final String  MOVING_MOREPACKETSVEHICLE_CHECK           = MOVING_MOREPACKETSVEHICLE + "active";
+    public static final String  MOVING_MOREPACKETSVEHICLE_ACTIONS         = MOVING_MOREPACKETSVEHICLE + "actions";
+
+    private static final String MOVING_WATERWALK                          = MOVING + "waterwalk.";
+    public static final String  MOVING_WATERWALK_CHECK                    = MOVING_WATERWALK + "active";
+    public static final String  MOVING_WATERWALK_ACTIONS                  = MOVING_WATERWALK + "actions";
+
+    public static final String  STRINGS                                   = "strings";
 }

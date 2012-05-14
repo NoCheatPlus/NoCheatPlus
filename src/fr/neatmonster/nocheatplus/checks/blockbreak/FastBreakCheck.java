@@ -2,12 +2,14 @@ package fr.neatmonster.nocheatplus.checks.blockbreak;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.players.NCPPlayer;
 import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
+import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
 
 /**
  * A check used to verify if the player isn't placing his blocks too quickly
@@ -80,7 +82,14 @@ public class FastBreakCheck extends BlockBreakCheck {
 
         if (wildcard == ParameterName.VIOLATIONS)
             return String.valueOf(Math.round(getData(player).fastBreakVL));
-        else
+        else if (wildcard == ParameterName.BLOCK_TYPE) {
+            final SimpleLocation location = getData(player).lastDamagedBlock;
+            if (location.isSet())
+                return new Location(player.getWorld(), location.x, location.y, location.z).getBlock().getType().name()
+                        .toLowerCase().replace("_", " ");
+            else
+                return "UNKNOWN";
+        } else
             return super.getParameter(wildcard, player);
     }
 }

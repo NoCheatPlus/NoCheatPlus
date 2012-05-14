@@ -23,7 +23,6 @@ public class ChatConfig extends CheckConfig {
     public final int        noPwnageWarnLevel;
     public final long       noPwnageWarnTimeout;
     public final int        noPwnageBanLevel;
-    public final String     noPwnageKickMessage;
     public final ActionList noPwnageActions;
 
     public final boolean    noPwnageMoveCheck;
@@ -61,6 +60,13 @@ public class ChatConfig extends CheckConfig {
     public final String     noPwnageCaptchaCharacters;
     public final int        noPwnageCaptchaTries;
 
+    public final String     noPwnageMessagesKick;
+    public final String     noPwnageMessagesCaptchaQuestion;
+    public final String     noPwnageMessagesCaptchaSuccess;
+    public final String     noPwnageMessagesWarnPlayer;
+    public final String     noPwnageMessagesWarnOthers;
+    public final String     noPwnageMessagesWarnRelog;
+
     public final boolean    arrivalsLimitCheck;
     public final int        arrivalsLimitPlayersLimit;
     public final long       arrivalsLimitTimeframe;
@@ -83,7 +89,6 @@ public class ChatConfig extends CheckConfig {
         noPwnageWarnLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_WARNLEVEL);
         noPwnageWarnTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_WARNTIMEOUT);
         noPwnageBanLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_BANLEVEL);
-        noPwnageKickMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE);
         noPwnageActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
 
         noPwnageMoveCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK);
@@ -120,6 +125,13 @@ public class ChatConfig extends CheckConfig {
         noPwnageCaptchaLength = data.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH);
         noPwnageCaptchaCharacters = data.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS);
         noPwnageCaptchaTries = data.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES);
+
+        noPwnageMessagesKick = data.getString(ConfPaths.CHAT_NOPWNAGE_MESSAGES_KICK);
+        noPwnageMessagesCaptchaQuestion = data.getString(ConfPaths.CHAT_NOPWNAGE_MESSAGES_CAPTCHAQUESTION);
+        noPwnageMessagesCaptchaSuccess = data.getString(ConfPaths.CHAT_NOPWNAGE_MESSAGES_CAPTCHASUCCESS);
+        noPwnageMessagesWarnPlayer = data.getString(ConfPaths.CHAT_NOPWNAGE_MESSAGES_WARNPLAYER);
+        noPwnageMessagesWarnOthers = data.getString(ConfPaths.CHAT_NOPWNAGE_MESSAGES_WARNOTHERS);
+        noPwnageMessagesWarnRelog = data.getString(ConfPaths.CHAT_NOPWNAGE_MESSAGES_WARNRELOG);
 
         arrivalsLimitCheck = data.getBoolean(ConfPaths.CHAT_ARRIVALSLIMIT_CHECK);
         arrivalsLimitPlayersLimit = data.getInt(ConfPaths.CHAT_ARRIVALSLIMIT_PLAYERSLIMIT);

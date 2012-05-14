@@ -42,4 +42,9 @@ public final class PreciseLocation {
         y = location.y;
         z = location.z;
     }
+
+    @Override
+    public String toString() {
+        return "PreciseLocation {x=" + x + ", y=" + y + ", z=" + z + "}";
+    }
 }

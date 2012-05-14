@@ -36,33 +36,6 @@ permissions:
       nocheatplus.checks:
         description: Allow the player to bypass all checks
         children:
-          nocheatplus.checks.moving: 
-            description: Allow the player to bypass all moving related checks
-            children:
-              nocheatplus.checks.moving.runfly:
-                description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
-              nocheatplus.checks.moving.flying:
-                description: Allow a player to fly, but only within given speed limits (ignores swimming and sneaking settings)
-              nocheatplus.checks.moving.swimming:
-                description: Allow a player to move through water without slowdown
-              nocheatplus.checks.moving.sneaking:
-                description: Allow a player to sneak without slowdown
-              nocheatplus.checks.moving.blocking:
-                description: Allow a player to block without slowdown
-              nocheatplus.checks.moving.cobweb:
-                description: Allow a player to move without slowdown while being into cobweb
-              nocheatplus.checks.moving.nofall:
-                description: Allow a player to cheat and not take fall damage at all
-              nocheatplus.checks.moving.morepackets:
-                description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
-              nocheatplus.checks.moving.morepacketsvehicle:
-                description: Allow a player to send more vehicule-move-event-packets than normal, causing him to move faster than normal
-              nocheatplus.checks.moving.waterwalk:
-                description: Allow a player to walk on the water
-              nocheatplus.checks.moving.boatonground:
-                description: Allow a player to place a boat on the ground (not only on the water)
-              nocheatplus.checks.moving.respawntrick:
-                description: Allow a player to respawn on top if blocked by gravel or sand (instead of removing the blocks)
           nocheatplus.checks.blockbreak:
             description: Allow the player to bypass all blockbreak checks
             children:
@@ -115,6 +88,8 @@ permissions:
                 description: Allow a player to do knockbacks when it's not technically possible
               nocheatplus.checks.fight.critical:
                 description: Allow a player to do criticals when it's not technically possible
+              nocheatplus.checks.fight.angle:
+                description: Allow a player to attack multiple entities at the same time (using a forcefield)
           nocheatplus.checks.inventory:
             description: Allow the player to bypass all inventory checks
             children:
@@ -124,18 +99,38 @@ permissions:
                 description: Allow a player to eat food faster than normally possible
               nocheatplus.checks.inventory.instantbow:
                 description: Allow a player to charge his bow faster than usual
+          nocheatplus.checks.moving:
+            description: Allow the player to bypass all moving related checks
+            children:
+              nocheatplus.checks.moving.runfly:
+                description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
+              nocheatplus.checks.moving.flying:
+                description: Allow a player to fly, but only within given speed limits (ignores swimming and sneaking settings)
+              nocheatplus.checks.moving.bedflying:
+                description: Allow a player to fly by sending fake bed leaving packets (and only cancelling his fall damages)
+              nocheatplus.checks.moving.nofall:
+                description: Allow a player to cheat and not take fall damage at all
+              nocheatplus.checks.moving.swimming:
+                description: Allow a player to move through water without slowdown
+              nocheatplus.checks.moving.sneaking:
+                description: Allow a player to sneak without slowdown
+              nocheatplus.checks.moving.blocking:
+                description: Allow a player to block without slowdown
+              nocheatplus.checks.moving.cobweb:
+                description: Allow a player to move without slowdown while being into cobweb
+              nocheatplus.checks.moving.morepackets:
+                description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
+              nocheatplus.checks.moving.morepacketsvehicle:
+                description: Allow a player to send more vehicule-move-event-packets than normal, causing him to move faster than normal
+              nocheatplus.checks.moving.waterwalk:
+                description: Allow a player to walk on the water
+              nocheatplus.checks.moving.respawntrick:
+                description: Allow a player to respawn on top if blocked by gravel or sand (instead of removing the blocks)
+              nocheatplus.checks.moving.boatonground:
+                description: Allow a player to place a boat on the ground (not only on the water)
           nocheatplus.mods:
             description: Allow the player to use all the client mods
             children:
-              nocheatplus.mods.zombe:
-                description: Allow the player to use all Zombe's cheats
-                children:
-                  nocheatplus.mods.zombe.fly:
-                    description: Allow the player to use Zombe's fly mod
-                  nocheatplus.mods.zombe.noclip:
-                    description: Allow the player to use Zombe's noclip
-                  nocheatplus.mods.zombe.cheat:
-                    description: Allow the player to use Zombe's cheat
               nocheatplus.mods.cjb:
                 description: Allow the player to use all CJB's cheats
                 children:
@@ -145,13 +140,6 @@ permissions:
                     description: Allow the player to use CJB's xray
                   nocheatplus.mods.cjb.radar:
                     description: Allow the player to use CJB's radar
-              nocheatplus.mods.rei:
-                description: Allow the player to use all Rei's Minimap's cheats
-                children:
-                  nocheatplus.mods.rei.cave:
-                    description: Allow the player to use Rei's cave mode
-                  nocheatplus.mods.rei.radar:
-                    description: Allow the player to use Rei's radar
               nocheatplus.mods.minecraftautomap:
                 description: Allow the player to use all Minecraft AutoMap's cheats
                 children:
@@ -161,6 +149,13 @@ permissions:
                     description: Allow the player to use Minecraft AutoMap's cave mode
                   nocheatplus.mods.minecraftautomap.radar:
                     description: Allow the player to use Minecraft AutoMap's radar
+              nocheatplus.mods.rei:
+                description: Allow the player to use all Rei's Minimap's cheats
+                children:
+                  nocheatplus.mods.rei.cave:
+                    description: Allow the player to use Rei's cave mode
+                  nocheatplus.mods.rei.radar:
+                    description: Allow the player to use Rei's radar
               nocheatplus.mods.smartmoving:
                 description: Allow the player to use all Smart Moving's moves
                 children:
@@ -176,3 +171,12 @@ permissions:
                     description: Allow the player to use Smart Moving's jump
                   nocheatplus.mods.smartmoving.flying:
                     description: Allow the player to use Smart Moving's fly
+              nocheatplus.mods.zombe:
+                description: Allow the player to use all Zombe's cheats
+                children:
+                  nocheatplus.mods.zombe.fly:
+                    description: Allow the player to use Zombe's fly mod
+                  nocheatplus.mods.zombe.noclip:
+                    description: Allow the player to use Zombe's noclip
+                  nocheatplus.mods.zombe.cheat:
+                    description: Allow the player to use Zombe's cheat

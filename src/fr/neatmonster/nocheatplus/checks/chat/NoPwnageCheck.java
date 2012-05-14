@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.chat;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 
@@ -55,16 +54,15 @@ public class NoPwnageCheck extends ChatCheck {
         boolean cancel = false;
 
         // If the player has filled out the captcha, return
-        if (data.commandsHaveBeenRun || !player.getBukkitPlayer().isOnline() || cc.noPwnageCaptchaCheck
-                && data.captchaDone)
-            // His reply was valid, he isn't a spambot
+        if (data.commandsHaveBeenRun || !player.getBukkitPlayer().isOnline())
             return cancel;
 
         if (cc.noPwnageCaptchaCheck && data.captchaStarted) {
             // Correct answer?
             if (data.message.equals(data.captchaAnswer)) {
-                data.captchaDone = true;
-                player.sendMessage(ChatColor.GREEN + "OK, it sounds like you're not a spambot.");
+                // His reply was valid, he isn't a spambot
+                data.clear();
+                player.sendMessage(replaceColors(cc.noPwnageMessagesCaptchaSuccess));
             } else {
                 // Display the question again
                 player.sendMessage(data.captchaQuestion);
@@ -158,8 +156,7 @@ public class NoPwnageCheck extends ChatCheck {
                 data.captchaStarted = true;
                 final String captcha = generateCaptcha(cc);
                 data.captchaAnswer = captcha;
-                data.captchaQuestion = ChatColor.RED + "Please type '" + ChatColor.GOLD + captcha + ChatColor.RED
-                        + "' to continue sending messages/commands.";
+                data.captchaQuestion = replaceColors(cc.noPwnageMessagesCaptchaQuestion).replace("[captcha]", captcha);
                 event.setCancelled(true);
                 player.sendMessage(data.captchaQuestion);
             } else if (player.getBukkitPlayer().isOnline()) {
@@ -235,9 +232,8 @@ public class NoPwnageCheck extends ChatCheck {
                 data.relogWarnings = 0;
 
             if (data.relogWarnings < cc.noPwnageRelogWarnings) {
-                player.sendMessage(replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_PREFIX))
-                        + ChatColor.DARK_RED
-                        + "You relogged really fast! If you keep doing that, you're going to be banned.");
+                player.sendMessage(replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_PREFIX)
+                        + cc.noPwnageMessagesWarnRelog));
                 data.lastRelogWarningTime = now;
                 data.relogWarnings++;
             } else if (now - data.lastRelogWarningTime < cc.noPwnageRelogTimeout) {
@@ -347,9 +343,7 @@ public class NoPwnageCheck extends ChatCheck {
      */
     private void warnOthers(final NCPPlayer player) {
         Bukkit.getServer().broadcastMessage(
-                ChatColor.YELLOW + player.getName() + ChatColor.DARK_RED + " has set off the autoban!");
-        Bukkit.getServer().broadcastMessage(
-                ChatColor.DARK_RED + " Please do not say anything similar to what the user said!");
+                replaceColors(getConfig(player).noPwnageMessagesWarnOthers).replace("[player]", player.getName()));
     }
 
     /**
@@ -359,8 +353,7 @@ public class NoPwnageCheck extends ChatCheck {
      *            The Player
      */
     private void warnPlayer(final NCPPlayer player) {
-        player.sendMessage(replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_PREFIX))
-                + ChatColor.DARK_RED
-                + "Our system has detected unusual bot activities coming from you. Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
+        player.sendMessage(replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_PREFIX)
+                + getConfig(player).noPwnageMessagesWarnPlayer));
     }
 }

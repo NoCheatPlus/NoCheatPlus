@@ -1,9 +1,14 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import net.minecraft.server.AxisAlignedBB;
+import net.minecraft.server.EntityPlayer;
+
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
@@ -249,13 +254,25 @@ public class RunningCheck extends MovingCheck {
             limit -= (data.jumpPhase - jumpingLimit) * 0.15D;
 
         // Handle the calculation differently if the player is in water
-        if (isSwimming && data.to.y - data.from.y > 0D)
-            distanceAboveLimit = data.to.y - data.from.y - cc.verticalSwimmingSpeedLimit;
+        if (isSwimming && data.to.y - data.from.y > 0D) {
+            // We need to make sure the player isn't a special block
+            // We get the bounding box of the player
+            final EntityPlayer entity = ((CraftPlayer) player.getBukkitPlayer()).getHandle();
+            final AxisAlignedBB aabb = entity.boundingBox.clone();
+            // Grow it of the minimum value (to collide with blocks)
+            aabb.grow(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+            final double xValue = (aabb.d - aabb.a) / 2D;
+            final double zValue = (aabb.f - aabb.c) / 2D;
+            if (!isSpecial(player.getWorld(), data.to.x - xValue, data.to.y, data.to.z - zValue)
+                    && !isSpecial(player.getWorld(), data.to.x + xValue, data.to.y, data.to.z - zValue)
+                    && !isSpecial(player.getWorld(), data.to.x - xValue, data.to.y, data.to.z + zValue)
+                    && !isSpecial(player.getWorld(), data.to.x + xValue, data.to.y, data.to.z + zValue))
+                distanceAboveLimit = data.to.y - data.from.y - cc.verticalSwimmingSpeedLimit;
+        }
 
         // Handle the calculation differently if the player is in cobweb
-        final World world = player.getWorld();
-        if (distanceAboveLimit <= 0D && CheckUtils.isWeb(CheckUtils.evaluateLocation(world, data.from))
-                && CheckUtils.isWeb(CheckUtils.evaluateLocation(world, data.to)))
+        if (distanceAboveLimit <= 0D
+                && new Location(player.getWorld(), data.to.x, data.to.y, data.to.z).getBlock().getType() == Material.WEB)
             distanceAboveLimit = Math.abs(data.to.y - data.from.y) - cc.cobWebVertSpeedLimit;
 
         if (distanceAboveLimit <= 0D)
@@ -266,6 +283,8 @@ public class RunningCheck extends MovingCheck {
 
         if (toOnGround || fromOnGround)
             data.lastJumpAmplifier = 0;
+
+        // Bukkit.broadcastMessage("d = " + distanceAboveLimit);
 
         return distanceAboveLimit;
     }
@@ -289,5 +308,27 @@ public class RunningCheck extends MovingCheck {
             return String.valueOf(Math.round(getData(player).runflyVL));
         else
             return super.getParameter(wildcard, player);
+    }
+
+    /**
+     * Checks if a block special (checks if the block is stairs/fence or not)
+     * 
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * @param above
+     * @return is the block special?
+     */
+    private boolean isSpecial(final World world, final double x, final double y, final double z) {
+        Material material = new Location(world, x, y, z).getBlock().getType();
+        if (material == Material.BRICK_STAIRS || material == Material.COBBLESTONE_STAIRS
+                || material == Material.NETHER_BRICK_STAIRS || material == Material.SMOOTH_STAIRS
+                || material == Material.STEP || material == Material.WOOD_STAIRS)
+            return true;
+        material = new Location(world, x, y - 1, z).getBlock().getType();
+        if (material == Material.FENCE || material == Material.IRON_FENCE || material == Material.NETHER_FENCE)
+            return true;
+        return false;
     }
 }
