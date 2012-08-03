@@ -1,6 +1,17 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
+
+import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
  * MM'""""'YMM dP                  dP   M""MMMMMMMM oo            dP                                       
@@ -15,5 +26,106 @@ import org.bukkit.event.Listener;
  * Central location to listen to events that are relevant for the chat checks.
  */
 public class ChatListener implements Listener {
+    private final Arrivals arrivals = new Arrivals();
+    private final Color    color    = new Color();
+    private final NoPwnage noPwnage = new NoPwnage();
 
+    /**
+     * We listen to PlayerChat events for obvious reasons.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onPlayerChat(final PlayerChatEvent event) {
+        /*
+         *  ____  _                          ____ _           _   
+         * |  _ \| | __ _ _   _  ___ _ __   / ___| |__   __ _| |_ 
+         * | |_) | |/ _` | | | |/ _ \ '__| | |   | '_ \ / _` | __|
+         * |  __/| | (_| | |_| |  __/ |    | |___| | | | (_| | |_ 
+         * |_|   |_|\__,_|\__, |\___|_|     \____|_| |_|\__,_|\__|
+         *                |___/                                   
+         */
+        final Player player = event.getPlayer();
+
+        // First the color check.
+        if (color.isEnabled(player))
+            event.setMessage(color.check(player, event.getMessage()));
+
+        // Then the no pwnage check.
+        if (noPwnage.isEnabled(player) && noPwnage.check(player))
+            player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
+    }
+
+    /**
+     * We listen to PlayerCommandPreprocess events because commands can be used for spamming too.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            priority = EventPriority.LOWEST)
+    public void onPlayerCommandPreprocess(final PlayerCommandPreprocessEvent event) {
+        /*
+         *  ____  _                          ____                                          _ 
+         * |  _ \| | __ _ _   _  ___ _ __   / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |
+         * | |_) | |/ _` | | | |/ _ \ '__| | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` |
+         * |  __/| | (_| | |_| |  __/ |    | |__| (_) | | | | | | | | | | | (_| | | | | (_| |
+         * |_|   |_|\__,_|\__, |\___|_|     \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|
+         *                |___/                                                              
+         *  ____                                             
+         * |  _ \ _ __ ___ _ __  _ __ ___   ___ ___  ___ ___ 
+         * | |_) | '__/ _ \ '_ \| '__/ _ \ / __/ _ \/ __/ __|
+         * |  __/| | |  __/ |_) | | | (_) | (_|  __/\__ \__ \
+         * |_|   |_|  \___| .__/|_|  \___/ \___\___||___/___/
+         *                |_|                                
+         */
+        final Player player = event.getPlayer();
+        final String command = event.getMessage().split(" ")[0].substring(1).toLowerCase();
+
+        // Protect some commands to prevent players for seeing which plugins are installed.
+        if (ChatConfig.getConfig(player).protectPlugins
+                && (command.equals("plugins") || command.equals("pl") || command.equals("?"))
+                && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
+            event.getPlayer().sendMessage(
+                    ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
+                            + "Please contact the server administrators if you believe that this is in error.");
+            event.setCancelled(true);
+            return;
+        }
+
+        // This type of event is derived from PlayerChatEvent, therefore just treat it like that.
+        onPlayerChat(event);
+    }
+
+    /**
+     * We listen to this type of events to prevent spambots from login to the server.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            priority = EventPriority.LOWEST)
+    public void onPlayerLogin(final PlayerLoginEvent event) {
+        /*
+         *  ____  _                             _       _       
+         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
+         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
+         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
+         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
+         *                |___/                                 
+         */
+        final Player player = event.getPlayer();
+        final ChatConfig cc = ChatConfig.getConfig(player);
+
+        // First the arrivals check, if enabled of course.
+        if (arrivals.isEnabled(player) && arrivals.check(player))
+            // The player failed the check, disallow the login.
+            event.disallow(Result.KICK_OTHER, cc.arrivalsMessage);
+
+        // Then the no pwnage check, if the login isn't already disallowed.
+        if (event.getResult() != Result.KICK_OTHER && noPwnage.isEnabled(player) && noPwnage.check(player))
+            event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);
+    }
 }

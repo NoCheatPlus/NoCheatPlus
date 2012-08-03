@@ -111,6 +111,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_LEVEL, 800);
+        set(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE, "You're not allowed to spam this server!");
 
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT, 5000L);
@@ -144,6 +145,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE,
                 "&cYou relogged really fast! If you keep doing that, you're going to be banned.");
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER, 1);
+        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE, "Please try again later!");
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_TIMEOUT, 60000L);
 
         set(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK, true);

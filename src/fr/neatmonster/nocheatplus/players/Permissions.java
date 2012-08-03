@@ -24,6 +24,7 @@ public class Permissions {
      */
     private static final String ADMINISTRATION            = NOCHEATPLUS + ".admin";
     public static final String  ADMINISTRATION_NOTIFY     = ADMINISTRATION + ".notify";
+    public static final String  ADMINISTRATION_PLUGINS    = ADMINISTRATION + ".plugins";
     public static final String  ADMINISTRATION_RELOAD     = ADMINISTRATION + ".reload";
 
     /*

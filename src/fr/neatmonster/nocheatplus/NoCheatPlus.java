@@ -35,6 +35,8 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
 public class NoCheatPlus extends JavaPlugin implements Listener {
+    public static long     time = System.currentTimeMillis();
+
     private List<Listener> listeners;
 
     /* (non-Javadoc)

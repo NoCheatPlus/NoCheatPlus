@@ -121,6 +121,7 @@ public abstract class ConfPaths {
     private static final String CHAT_NOPWNAGE                         = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                   = CHAT_NOPWNAGE + "active";
     public static final String  CHAT_NOPWNAGE_LEVEL                   = CHAT_NOPWNAGE + "level";
+    public static final String  CHAT_NOPWNAGE_KICKMESSAGE             = CHAT_NOPWNAGE + "kickmessage";
 
     private static final String CHAT_NOPWNAGE_BANNED                  = CHAT_NOPWNAGE + "banned.";
     public static final String  CHAT_NOPWNAGE_BANNED_CHECK            = CHAT_NOPWNAGE_BANNED + "active";
@@ -153,6 +154,7 @@ public abstract class ConfPaths {
 
     private static final String CHAT_NOPWNAGE_RELOGIN                 = CHAT_NOPWNAGE + "relogin.";
     public static final String  CHAT_NOPWNAGE_RELOGIN_CHECK           = CHAT_NOPWNAGE_RELOGIN + "active";
+    public static final String  CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE     = CHAT_NOPWNAGE_RELOGIN + "kickmessage";
     public static final String  CHAT_NOPWNAGE_RELOGIN_TIMEOUT         = CHAT_NOPWNAGE_RELOGIN + "timeout";
 
     private static final String CHAT_NOPWNAGE_RELOGIN_WARNING         = CHAT_NOPWNAGE_RELOGIN + "warning.";

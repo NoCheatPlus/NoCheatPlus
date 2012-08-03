@@ -5,6 +5,7 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -126,7 +127,7 @@ public class NoPwnage extends Check {
 
         if (!data.noPwnageHasFilledCaptcha) {
             final String message = event.getMessage();
-            final boolean isCommand = message.startsWith("/");
+            final boolean isCommand = event instanceof PlayerCommandPreprocessEvent;
             final long now = System.currentTimeMillis();
 
             if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {

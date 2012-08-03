@@ -62,6 +62,7 @@ public class ChatConfig {
 
     public final boolean    noPwnageCheck;
     public final int        noPwnageLevel;
+    public final String     noPwnageKickMessage;
 
     public final boolean    noPwnageBannedCheck;
     public final long       noPwnageBannedTimeout;
@@ -88,6 +89,7 @@ public class ChatConfig {
     public final int        noPwnageMoveWeightMalus;
 
     public final boolean    noPwnageReloginCheck;
+    public final String     noPwnageReloginKickMessage;
     public final long       noPwnageReloginTimeout;
     public final String     noPwnageReloginWarningMessage;
     public final int        noPwnageReloginWarningNumber;
@@ -110,6 +112,8 @@ public class ChatConfig {
 
     public final ActionList noPwnageActions;
 
+    public final boolean    protectPlugins;
+
     /**
      * Instantiates a new chat configuration.
      * 
@@ -128,6 +132,7 @@ public class ChatConfig {
 
         noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
         noPwnageLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
+        noPwnageKickMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE);
 
         noPwnageBannedCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
         noPwnageBannedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);
@@ -154,6 +159,7 @@ public class ChatConfig {
         noPwnageMoveWeightMalus = data.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT_MALUS);
 
         noPwnageReloginCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_RELOGIN_CHECK);
+        noPwnageReloginKickMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE);
         noPwnageReloginTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_RELOGIN_TIMEOUT);
         noPwnageReloginWarningMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE);
         noPwnageReloginWarningNumber = data.getInt(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER);
@@ -175,5 +181,7 @@ public class ChatConfig {
         noPwnageWarnPlayerMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE);
 
         noPwnageActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
+
+        protectPlugins = data.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
     }
 }
