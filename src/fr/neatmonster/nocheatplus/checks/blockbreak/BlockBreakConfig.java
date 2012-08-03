@@ -1,50 +1,97 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bukkit.entity.Player;
+
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.checks.CheckConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.players.informations.Permissions;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.players.Permissions;
 
-/**
- * Configurations specific for the "BlockBreak" checks
- * Every world gets one of these assigned to it, or if a world doesn't get
- * it's own, it will use the "global" version
+/*
+ * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
+ * ##  mmmm. `M 88                   88       ##  mmmm. `M                            88       
+ * #'        .M 88 .d8888b. .d8888b. 88  .dP  #'        .M 88d888b. .d8888b. .d8888b. 88  .dP  
+ * M#  MMMb.'YM 88 88'  `88 88'  `"" 88888"   M#  MMMb.'YM 88'  `88 88ooood8 88'  `88 88888"   
+ * M#  MMMM'  M 88 88.  .88 88.  ... 88  `8b. M#  MMMM'  M 88       88.  ... 88.  .88 88  `8b. 
+ * M#       .;M dP `88888P' `88888P' dP   `YP M#       .;M dP       `88888P' `88888P8 dP   `YP 
+ * M#########M                                M#########M                                      
  * 
+ * MM'""""'YMM                   .8888b oo          
+ * M' .mmm. `M                   88   "             
+ * M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. 
+ * M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 
+ * M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 
+ * MM.     .dM `88888P' dP    dP dP     dP `8888P88 
+ * MMMMMMMMMMM                                  .88 
+ *                                          d8888P  
  */
-public class BlockBreakConfig extends CheckConfig {
+/**
+ * Configurations specific for the block break checks. Every world gets one of these assigned to it, or if a world
+ * doesn't get it's own, it will use the "global" version.
+ */
+public class BlockBreakConfig {
 
-    public final boolean    fastBreakCheck;
-    public final int        fastBreakIntervalSurvival;
-    public final int        fastBreakIntervalCreative;
-    public final ActionList fastBreakActions;
+    /** The map containing the configurations per world. */
+    private static Map<String, BlockBreakConfig> worldsMap = new HashMap<String, BlockBreakConfig>();
 
-    public final boolean    reachCheck;
-    public final double     reachDistance;
-    public final ActionList reachActions;
+    /**
+     * Clear all the configurations.
+     */
+    public static void clear() {
+        worldsMap.clear();
+    }
+
+    /**
+     * Gets the configuration for a specified player.
+     * 
+     * @param player
+     *            the player
+     * @return the configuration
+     */
+    public static BlockBreakConfig getConfig(final Player player) {
+        if (!worldsMap.containsKey(player.getWorld().getName()))
+            worldsMap.put(player.getWorld().getName(),
+                    new BlockBreakConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
+        return worldsMap.get(player.getWorld().getName());
+    }
 
     public final boolean    directionCheck;
     public final ActionList directionActions;
-    public final double     directionPrecision;
-    public final long       directionPenaltyTime;
 
-    public final boolean    noswingCheck;
-    public final ActionList noswingActions;
+    public final boolean    fastBreakCheck;
+    public final boolean    fastBreakExperimental;
+    public final int        fastBreakInterval;
+    public final ActionList fastBreakActions;
 
+    public final boolean    noSwingCheck;
+    public final ActionList noSwingActions;
+
+    public final boolean    reachCheck;
+    public final ActionList reachActions;
+
+    /**
+     * Instantiates a new block break configuration.
+     * 
+     * @param data
+     *            the data
+     */
     public BlockBreakConfig(final ConfigFile data) {
+        directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
+        directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
 
         fastBreakCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK);
-        fastBreakIntervalSurvival = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALSURVIVAL);
-        fastBreakIntervalCreative = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVALCREATIVE);
+        fastBreakExperimental = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_EXPERIMENTAL);
+        fastBreakInterval = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL);
         fastBreakActions = data.getActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);
+
+        noSwingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
+        noSwingActions = data.getActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, Permissions.BLOCKBREAK_NOSWING);
+
         reachCheck = data.getBoolean(ConfPaths.BLOCKBREAK_REACH_CHECK);
-        reachDistance = 535D / 100D;
         reachActions = data.getActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
-        directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
-        directionPrecision = data.getInt(ConfPaths.BLOCKBREAK_DIRECTION_PRECISION) / 100D;
-        directionPenaltyTime = data.getInt(ConfPaths.BLOCKBREAK_DIRECTION_PENALTYTIME);
-        directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
-        noswingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
-        noswingActions = data.getActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, Permissions.BLOCKBREAK_NOSWING);
     }
 }

@@ -1,70 +1,67 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
-import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Player specific data for the chat checks
- * 
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
+/*
+ * MM'""""'YMM dP                  dP   M""""""'YMM            dP            
+ * M' .mmm. `M 88                  88   M  mmmm. `M            88            
+ *  * M  MMMMMooM 88d888b. .d8888b. d8888P M  MMMMM  M .d8888b. d8888P .d8888b. 
+ * M  MMMMMMMM 88'  `88 88'  `88   88   M  MMMMM  M 88'  `88   88   88'  `88 
+ * M. `MMM' .M 88    88 88.  .88   88   M  MMMM' .M 88.  .88   88   88.  .88 
+ * MM.     .dM dP    dP `88888P8   dP   M       .MM `88888P8   dP   `88888P8 
+ * MMMMMMMMMMM                          MMMMMMMMMMM                          
  */
-public class ChatData extends CheckData {
+/**
+ * Player specific data for the chat checks.
+ */
+public class ChatData {
 
-    // Keep track of the violation levels for the check
-    public int                  colorVL;
+    /** The map containing the data per players. */
+    private static Map<String, ChatData> playersMap = new HashMap<String, ChatData>();
 
-    // Remember the player's location
-    public final SimpleLocation location            = new SimpleLocation();
-
-    // Remember the last chat message or command for logging purposes
-    public String               message             = "";
-    public String               lastMessage         = "";
-    public long                 lastMessageTime;
-
-    // Remember if the message is a command or not
-    public boolean              isCommand           = false;
-
-    // Remember some other time informations about the player
-    public long                 joinTime;
-    public long                 leaveTime;
-    public long                 lastWarningTime;
-    public long                 lastRelogWarningTime;
-    public long                 lastMovedTime;
-
-    // Remember how many time the player has repeated the same message
-    public int                  messageRepeated;
-
-    // Remember some warning levels
-    public int                  relogWarnings;
-    public int                  speedRepeated;
-
-    // Remember some data about captcha
-    public String               captchaAnswer       = "";
-    public String               captchaQuestion     = "";
-    public boolean              captchaStarted      = false;
-    public int                  captchaTries;
-
-    // Remember if commands have been run by the player
-    public boolean              commandsHaveBeenRun = false;
-
-    // Remember reason and player's IP
-    public String               reason              = "";
-    public String               ip                  = "";
-
-    public void clear() {
-        location.reset();
-        lastMessage = captchaAnswer = captchaQuestion = "";
-        lastMessageTime = joinTime = leaveTime = lastWarningTime = lastRelogWarningTime = lastMovedTime = 0L;
-        messageRepeated = relogWarnings = speedRepeated = captchaTries = 0;
-        captchaStarted = false;
+    /**
+     * Gets the data of a specified player.
+     * 
+     * @param player
+     *            the player
+     * @return the data
+     */
+    public static ChatData getData(final Player player) {
+        if (!playersMap.containsKey(player.getName()))
+            playersMap.put(player.getName(), new ChatData());
+        return playersMap.get(player.getName());
     }
 
-    public boolean compareLocation(final SimpleLocation l) {
-        return location != null && location.x == l.x && location.y == l.y && location.z == l.z;
-    }
+    // Violation levels.
+    public double   colorVL;
+    public double   noPwnageVL;
 
-    public void setLocation(final SimpleLocation l) {
-        location.x = l.x;
-        location.y = l.y;
-        location.z = l.z;
+    // Data of the no pwnage check.
+    public int      noPwnageCaptchTries;
+    public String   noPwnageGeneratedCaptcha;
+    public boolean  noPwnageHasFilledCaptcha;
+    public boolean  noPwnageHasStartedCaptcha;
+    public long     noPwnageJoinTime;
+    public Location noPwnageLastLocation;
+    public String   noPwnageLastMessage;
+    public long     noPwnageLastMessageTime;
+    public long     noPwnageLastMovedTime;
+    public long     noPwnageLastWarningTime;
+    public long     noPwnageLeaveTime;
+    public int      noPwnageReloginWarnings;
+    public long     noPwnageReloginWarningTime;
+
+    /**
+     * Clear the data of the no pwnage check.
+     */
+    public void clearNoPwnageData() {
+        noPwnageCaptchTries = noPwnageReloginWarnings = 0;
+        noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
+        noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
+        noPwnageLastLocation = null;
     }
 }

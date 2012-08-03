@@ -19,19 +19,47 @@ import java.util.logging.Logger;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.Check;
 
+/*
+ * MM'""""'YMM                   .8888b oo          M"""""`'"""`YM                                                       
+ * M' .mmm. `M                   88   "             M  mm.  mm.  M                                                       
+ * M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. M  MMM  MMM  M .d8888b. 88d888b. .d8888b. .d8888b. .d8888b. 88d888b. 
+ * M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 M  MMM  MMM  M 88'  `88 88'  `88 88'  `88 88'  `88 88ooood8 88'  `88 
+ * M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 M  MMM  MMM  M 88.  .88 88    88 88.  .88 88.  .88 88.  ... 88       
+ * MM.     .dM `88888P' dP    dP dP     dP `8888P88 M  MMM  MMM  M `88888P8 dP    dP `88888P8 `8888P88 `88888P' dP       
+ * MMMMMMMMMMM                                  .88 MMMMMMMMMMMMMM                                 .88                   
+ *                                          d8888P                                             d8888P                    
+ */
+/**
+ * Central location for everything that's described in the configuration file(s).
+ */
 public class ConfigManager {
+
+    /**
+     * The formatter that is used to format the log file.
+     */
     private static class LogFileFormatter extends Formatter {
 
+        /**
+         * Create a new instance of the log file formatter.
+         * 
+         * @return the log file formatter
+         */
         public static LogFileFormatter newInstance() {
             return new LogFileFormatter();
         }
 
         private final SimpleDateFormat date;
 
+        /**
+         * Instantiates a new log file formatter.
+         */
         private LogFileFormatter() {
             date = new SimpleDateFormat("yy.MM.dd HH:mm:ss");
         }
 
+        /* (non-Javadoc)
+         * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
+         */
         @Override
         public String format(final LogRecord record) {
             final StringBuilder builder = new StringBuilder();
@@ -54,10 +82,15 @@ public class ConfigManager {
         }
     }
 
-    private static final Map<String, ConfigFile> worldsMap = new HashMap<String, ConfigFile>();
+    /** The map containing the configuration files per world. */
+    private static final Map<String, ConfigFile> worldsMap   = new HashMap<String, ConfigFile>();
 
-    private static FileHandler                   fileHandler;
+    /** The file handler. */
+    private static FileHandler                   fileHandler = null;
 
+    /**
+     * Cleanup.
+     */
     public static void cleanup() {
         fileHandler.flush();
         fileHandler.close();
@@ -66,55 +99,64 @@ public class ConfigManager {
         fileHandler = null;
     }
 
-    public static ConfigFile getConfFile(final String worldName) {
-        if (worldsMap.containsKey(worldName))
-            return worldsMap.get(worldName);
-        return worldsMap.get(null);
-    }
-
+    /**
+     * Gets the configuration file.
+     * 
+     * @return the configuration file
+     */
     public static ConfigFile getConfigFile() {
         return worldsMap.get(null);
     }
 
+    /**
+     * Gets the configuration file.
+     * 
+     * @param worldName
+     *            the world name
+     * @return the configuration file
+     */
     public static ConfigFile getConfigFile(final String worldName) {
         if (worldsMap.containsKey(worldName))
             return worldsMap.get(worldName);
         return getConfigFile();
     }
 
-    public static void init() {
-        // First try to obtain and parse the global config file
-        final File rootFolder = NoCheatPlus.instance.getDataFolder();
-        final ConfigFile root = new ConfigFile();
-        root.setDefaults(new DefaultConfig());
-        root.options().copyDefaults(true);
-        root.options().copyHeader(true);
+    /**
+     * Initializes the configuration manager.
+     * 
+     * @param plugin
+     *            the instance of NoCheatPlus
+     */
+    public static void init(final NoCheatPlus plugin) {
+        // First try to obtain and parse the global configuration file.
+        final File folder = plugin.getDataFolder();
+        final File globalFile = new File(folder, "config.yml");
 
-        final File globalConfigFile = new File(rootFolder, "config.yml");
+        final ConfigFile global = new ConfigFile();
+        global.setDefaults(new DefaultConfig());
+        global.options().copyDefaults(true);
+        global.options().copyHeader(true);
 
-        if (globalConfigFile.exists())
+        if (globalFile.exists())
             try {
-                root.load(globalConfigFile);
+                global.load(globalFile);
             } catch (final Exception e) {
                 e.printStackTrace();
             }
 
         try {
-            root.save(globalConfigFile);
+            global.save(globalFile);
         } catch (final Exception e) {
             e.printStackTrace();
         }
 
-        root.regenerateActionLists();
+        global.regenerateActionLists();
 
-        // Create a corresponding ConfigurationByPlayer and
-        // put the global configuration in the worlds map
-        worldsMap.put(null, root);
+        // Put the global configuration file on the configurations map.
+        worldsMap.put(null, global);
 
-        // Setup the file logger used by the plugin
         final Logger logger = Logger.getAnonymousLogger();
         logger.setLevel(Level.INFO);
-        // Ignore parent's settings
         logger.setUseParentHandlers(false);
         for (final Handler h : logger.getHandlers())
             logger.removeHandler(h);
@@ -125,7 +167,7 @@ public class ConfigManager {
             fileHandler = null;
         }
 
-        final File logFile = new File(rootFolder, root.getString(ConfPaths.LOGGING_FILENAME));
+        final File logFile = new File(folder, "nocheatplus.log");
         try {
             try {
                 logFile.getParentFile().mkdirs();
@@ -143,15 +185,14 @@ public class ConfigManager {
 
         Check.setFileLogger(logger);
 
-        // Try to find world-specific config files
+        // Try to find world-specific configuration files.
         final HashMap<String, File> worldFiles = new HashMap<String, File>();
 
-        if (rootFolder.isDirectory())
-            for (final File file : rootFolder.listFiles())
+        if (folder.isDirectory())
+            for (final File file : folder.listFiles())
                 if (file.isFile()) {
                     final String filename = file.getName();
                     if (filename.matches(".+_config.yml$")) {
-                        // Get the first part = world name
                         final String worldname = filename.substring(0, filename.length() - 10);
                         worldFiles.put(worldname, file);
                     }
@@ -160,15 +201,17 @@ public class ConfigManager {
         for (final Entry<String, File> worldEntry : worldFiles.entrySet()) {
             final File worldConfigFile = worldEntry.getValue();
             final ConfigFile world = new ConfigFile();
-            world.setDefaults(root);
+            world.setDefaults(global);
 
             try {
                 world.load(worldConfigFile);
                 worldsMap.put(worldEntry.getKey(), world);
-                // write the config file back to disk immediately
+
+                // Write the configuration file back to disk immediately.
                 world.save(worldConfigFile);
             } catch (final Exception e) {
-                System.out.println("NoCheatPlus: Couldn't load world-specific config for " + worldEntry.getKey());
+                System.out.println("[NoCheatPlus] Couldn't load world-specific configuration for "
+                        + worldEntry.getKey() + "!");
                 e.printStackTrace();
             }
 
@@ -176,11 +219,16 @@ public class ConfigManager {
         }
     }
 
-    public static void writeInstructions() {
+    /**
+     * Write instructions.
+     * 
+     * @param plugin
+     *            the instance of NoCheatPlus
+     */
+    public static void writeInstructions(final NoCheatPlus plugin) {
         try {
-            final InputStream is = NoCheatPlus.instance.getResource("Instructions.txt");
-            final FileOutputStream fos = new FileOutputStream(new File(NoCheatPlus.instance.getDataFolder(),
-                    "Intructions.txt"));
+            final InputStream is = plugin.getResource("Instructions.txt");
+            final FileOutputStream fos = new FileOutputStream(new File(plugin.getDataFolder(), "Intructions.txt"));
             final byte[] buffer = new byte[64 * 1024];
             int length = 0;
             while ((length = is.read(buffer)) != -1)

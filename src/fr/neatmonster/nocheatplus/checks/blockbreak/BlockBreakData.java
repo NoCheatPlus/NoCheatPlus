@@ -1,40 +1,62 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
-import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Player specific data for the blockbreak checks
+import org.bukkit.entity.Player;
+
+/*
+ * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
+ * ##  mmmm. `M 88                   88       ##  mmmm. `M                            88       
+ * #'        .M 88 .d8888b. .d8888b. 88  .dP  #'        .M 88d888b. .d8888b. .d8888b. 88  .dP  
+ * M#  MMMb.'YM 88 88'  `88 88'  `"" 88888"   M#  MMMb.'YM 88'  `88 88ooood8 88'  `88 88888"   
+ * M#  MMMM'  M 88 88.  .88 88.  ... 88  `8b. M#  MMMM'  M 88       88.  ... 88.  .88 88  `8b. 
+ * M#       .;M dP `88888P' `88888P' dP   `YP M#       .;M dP       `88888P' `88888P8 dP   `YP 
+ * M#########M                                M#########M                                      
  * 
+ * M""""""'YMM            dP            
+ * M  mmmm. `M            88            
+ * M  MMMMM  M .d8888b. d8888P .d8888b. 
+ * M  MMMMM  M 88'  `88   88   88'  `88 
+ * M  MMMM' .M 88.  .88   88   88.  .88 
+ * M       .MM `88888P8   dP   `88888P8 
+ * MMMMMMMMMMM                          
  */
-public class BlockBreakData extends CheckData {
+/**
+ * Player specific data for the block break checks.
+ */
+public class BlockBreakData {
 
-    // Keep track of violation levels for the three checks
-    public double               fastBreakVL                = 0.0D;
-    public double               reachVL                    = 0.0D;
-    public double               directionVL                = 0.0D;
-    public double               noswingVL                  = 0.0D;
+    /** The map containing the data per players. */
+    private static Map<String, BlockBreakData> playersMap = new HashMap<String, BlockBreakData>();
 
-    // Used to know when the player has broken his previous block
-    public long                 lastBreakTime              = 0;
+    /**
+     * Gets the data of a specified player.
+     * 
+     * @param player
+     *            the player
+     * @return the data
+     */
+    public static BlockBreakData getData(final Player player) {
+        if (!playersMap.containsKey(player.getName()))
+            playersMap.put(player.getName(), new BlockBreakData());
+        return playersMap.get(player.getName());
+    }
 
-    // Used to know if the previous event was refused
-    public boolean              previousRefused            = false;
+    // Violation levels.
+    public double  directionVL;
+    public double  fastBreakVL;
+    public double  noSwingVL;
+    public double  reachVL;
 
-    // Used for the penalty time feature of the direction check
-    public long                 directionLastViolationTime = 0;
+    // Data of the fast break check.
+    public int     fastBreakBuffer     = 3;
+    public long    fastBreakBreakTime  = System.currentTimeMillis() - 1000L;
+    public long    fastBreakDamageTime = System.currentTimeMillis();
 
-    // Have a nicer/simpler way to work with block locations instead of
-    // Bukkits own "Location" class
-    public final SimpleLocation instaBrokenBlockLocation   = new SimpleLocation();
-    public final SimpleLocation brokenBlockLocation        = new SimpleLocation();
-    public final SimpleLocation lastDamagedBlock           = new SimpleLocation();
+    // Data of the no swing check.
+    public boolean noSwingArmSwung;
 
-    // indicate if the player swung his arm since he got checked last time
-    public boolean              armswung                   = true;
-
-    // For logging, remember the reachDistance that was calculated in the
-    // reach check
-    public double               reachDistance;
-
+    // Data of the reach check.
+    public double  reachDistance;
 }

@@ -1,97 +1,106 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
-import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
-import fr.neatmonster.nocheatplus.utilities.locations.PreciseLocation;
-
-/**
- * Player specific data for the moving check group
+/*
+ * M"""""`'"""`YM                   oo                   M""""""'YMM            dP            
+ * M  mm.  mm.  M                                        M  mmmm. `M            88            
+ * M  MMM  MMM  M .d8888b. dP   .dP dP 88d888b. .d8888b. M  MMMMM  M .d8888b. d8888P .d8888b. 
+ * M  MMM  MMM  M 88'  `88 88   d8' 88 88'  `88 88'  `88 M  MMMMM  M 88'  `88   88   88'  `88 
+ * M  MMM  MMM  M 88.  .88 88 .88'  88 88    88 88.  .88 M  MMMM' .M 88.  .88   88   88.  .88 
+ * M  MMM  MMM  M `88888P' 8888P'   dP dP    dP `8888P88 M       .MM `88888P8   dP   `88888P8 
+ * MMMMMMMMMMMMMM                                    .88 MMMMMMMMMMM                          
+ *                                               d8888P                                       
  */
-public class MovingData extends CheckData {
+/**
+ * Player specific data for the moving checks.
+ */
+public class MovingData {
 
-    // Keep track of the violation levels of the checks
-    public double                runflyVL;
-    public double                nofallVL;
-    public double                morePacketsVL;
-    public double                morePacketsVehicleVL;
-    public double                waterWalkVL;
-    public double                bedFlyVL;
+    /** The map containing the data per players. */
+    private static Map<String, MovingData> playersMap = new HashMap<String, MovingData>();
 
-    // Count how long a player is in the air
-    public int                   jumpPhase;
-
-    // Remember how big the players last JumpAmplifier (potion effect) was
-    public double                lastJumpAmplifier;
-
-    // Remember for a short time that the player was on ice and therefore
-    // should be allowed to move a bit faster
-    public int                   onIce;
-
-    // Where should a player be teleported back to when failing the check
-    public final PreciseLocation runflySetBackPoint       = new PreciseLocation();
-
-    // Some values for estimating movement freedom
-    public double                vertFreedom;
-    public double                vertVelocity;
-    public int                   vertVelocityCounter;
-    public double                horizFreedom;
-    public int                   horizVelocityCounter;
-    public double                horizontalBuffer;
-    public int                   bunnyhopdelay;
-
-    // Keep track of estimated fall distance to compare to real fall distance
-    public float                 fallDistance;
-    public float                 lastAddedFallDistance;
-
-    // Keep in mind the player's last safe position
-    public Location[]            lastSafeLocations        = new Location[] {null, null};
-
-    // Keep track of when "morePackets" last time checked and how much packets
-    // a player sent and may send before failing the check
-    public long                  morePacketsLastTime;
-    public int                   packets;
-    public int                   morePacketsBuffer        = 50;
-
-    // Where to teleport the player that fails the "morepackets" check
-    public final PreciseLocation morePacketsSetbackPoint  = new PreciseLocation();
-
-    // Keep track of when "morePacketsVehicle" last time checked an how much
-    // packets a vehicle sent and may send before failing the check
-    public long                  morePacketsVehicleLastTime;
-    public int                   packetsVehicle;
-    public int                   morePacketsVehicleBuffer = 50;
-
-    // When NoCheatPlus does teleport the player, remember the target location to
-    // be able to distinguish "our" teleports from teleports of others
-    public final PreciseLocation teleportTo               = new PreciseLocation();
-
-    // For logging and convenience, make copies of the events locations
-    public final PreciseLocation from                     = new PreciseLocation();
-    public final PreciseLocation fromVehicle              = new PreciseLocation();
-    public final PreciseLocation to                       = new PreciseLocation();
-    public final PreciseLocation toVehicle                = new PreciseLocation();
-
-    // For convenience, remember if the locations are considered "on ground"
-    // by NoCheatPlus
-    public boolean               fromOnOrInGround;
-    public boolean               toOnOrInGround;
-
-    // Remember if the player was previously sleeping
-    public boolean               wasSleeping              = false;
-
-    public Id                    statisticCategory        = Id.MOV_RUNNING;
-
-    public void clearMorePacketsData() {
-        morePacketsSetbackPoint.reset();
+    /**
+     * Gets the data of a specified player.
+     * 
+     * @param player
+     *            the player
+     * @return the data
+     */
+    public static MovingData getData(final Player player) {
+        if (!playersMap.containsKey(player.getName()))
+            playersMap.put(player.getName(), new MovingData());
+        return playersMap.get(player.getName());
     }
 
-    public void clearRunFlyData() {
-        runflySetBackPoint.reset();
-        jumpPhase = 0;
-        fallDistance = 0;
-        lastAddedFallDistance = 0;
-        bunnyhopdelay = 0;
+    // Violation levels.
+    public double     creativeFlyVL            = 0D;
+    public double     morePacketsVL            = 0D;
+    public double     morePacketsVehicleVL     = 0D;
+    public double     noFallVL                 = 0D;
+    public double     survivalFlyVL            = 0D;
+
+    // Data shared between the fly checks.
+    public int        bunnyhopDelay;
+    public double     horizontalBuffer;
+    public double     horizontalFreedom;
+    public double     horizontalVelocityCounter;
+    public double     jumpAmplifier;
+    public double     verticalFreedom;
+    public double     verticalVelocity;
+    public int        verticalVelocityCounter;
+
+    public Location[] lastSafeLocations        = new Location[] {null, null};
+
+    // Data of the more packets check.
+    public int        morePacketsBuffer        = 50;
+    public long       morePacketsLastTime;
+    public int        morePacketsPackets;
+    public Location   morePacketsSetback;
+
+    // Data of the more packets vehicle check.
+    public int        morePacketsVehicleBuffer = 50;
+    public long       morePacketsVehicleLastTime;
+    public int        morePacketsVehiclePackets;
+    public Location   morePacketsVehicleSetback;
+
+    // Data of the no fall check.
+    public float      noFallDistance;
+    public float      noFallLastAddedDistance;
+
+    // Data of the survival fly check.
+    public int        survivalFlyJumpPhase;
+    public int        survivalFlyOnIce;
+    public long       survivalInLavaSince;
+    public long       survivalInWaterSince;
+    public long       survivalOnLadderSince;
+
+    // Locations shared between all checks.
+    public Location   from;
+    public Location   to;
+    public Location   setBack;
+    public Location   teleported;
+
+    /**
+     * Clear the data of the fly checks.
+     */
+    public void clearFlyData() {
+        bunnyhopDelay = 0;
+        setBack = null;
+        noFallDistance = 0F;
+        noFallLastAddedDistance = 0F;
+        survivalFlyJumpPhase = 0;
+    }
+
+    /**
+     * Clear the data of the more packets checks.
+     */
+    public void clearMorePacketsData() {
+        morePacketsSetback = null;
+        morePacketsVehicleSetback = null;
     }
 }

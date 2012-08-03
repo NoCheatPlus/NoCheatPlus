@@ -6,70 +6,102 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 
+/*
+ * M""MMMMMMMM                   M"""""`'"""`YM                                                       
+ * M  MMMMMMMM                   M  mm.  mm.  M                                                       
+ * M  MMMMMMMM .d8888b. .d8888b. M  MMM  MMM  M .d8888b. .d8888b. .d8888b. dP    dP 88d888b. .d8888b. 
+ * M  MMMMMMMM 88'  `88 88'  `88 M  MMM  MMM  M 88ooood8 88'  `88 Y8ooooo. 88    88 88'  `88 88ooood8 
+ * M  MMMMMMMM 88.  .88 88.  .88 M  MMM  MMM  M 88.  ... 88.  .88       88 88.  .88 88       88.  ... 
+ * M         M `88888P8 `8888P88 M  MMM  MMM  M `88888P' `88888P8 `88888P' `88888P' dP       `88888P' 
+ * MMMMMMMMMMM               .88 MMMMMMMMMMMMMM                                                       
+ *                       d8888P                                                                       
+ *                       
+ * M""""""""M                   dP       
+ * Mmmm  mmmM                   88       
+ * MMMM  MMMM .d8888b. .d8888b. 88  .dP  
+ * MMMM  MMMM 88'  `88 Y8ooooo. 88888"   
+ * MMMM  MMMM 88.  .88       88 88  `8b. 
+ * MMMM  MMMM `88888P8 `88888P' dP   `YP 
+ * MMMMMMMMMM                            
+ */
 /**
- * A task running in the background that measures tick time vs. real time
- * 
+ * A task running in the background that measures tick time vs. real time.
  */
 public class LagMeasureTask implements Runnable {
+    private static LagMeasureTask instance = new LagMeasureTask();
 
-    // private int ingameseconds = 1;
-    private long    lastIngamesecondTime     = System.currentTimeMillis();
-    private long    lastIngamesecondDuration = 2000L;
-    private boolean skipCheck                = false;
-    private int     lagMeasureTaskId         = -1;
-
-    public void cancel() {
-        if (lagMeasureTaskId != -1) {
+    /**
+     * Cancel the task.
+     */
+    public static void cancel() {
+        if (instance.lagMeasureTaskId != -1) {
             try {
-                Bukkit.getServer().getScheduler().cancelTask(lagMeasureTaskId);
+                Bukkit.getServer().getScheduler().cancelTask(instance.lagMeasureTaskId);
             } catch (final Exception e) {
-                System.out.println("NoCheatPlus: Couldn't cancel LagMeasureTask: " + e.getMessage());
+                System.out.println("[NoCheatPlus] Couldn't cancel LagMeasureTask: " + e.getMessage() + ".");
             }
-            lagMeasureTaskId = -1;
+            instance.lagMeasureTaskId = -1;
         }
     }
 
+    /**
+     * Returns if checking must be skipped (lag).
+     * 
+     * @return true, if successful
+     */
+    public static boolean skipCheck() {
+        return instance.skipCheck;
+    }
+
+    /**
+     * Start the task.
+     * 
+     * @param plugin
+     *            the instance of NoCheatPlus
+     */
+    public static void start(final NoCheatPlus plugin) {
+        instance.lagMeasureTaskId = Bukkit.getServer().getScheduler()
+                .scheduleSyncRepeatingTask(plugin, instance, 20, 20);
+    }
+
+    /** The last in game second time. */
+    private long    lastInGameSecondTime     = System.currentTimeMillis();
+
+    /** The last in game second duration. */
+    private long    lastInGameSecondDuration = 2000L;
+
+    /** The skip check. */
+    private boolean skipCheck                = false;
+
+    /** The lag measure task id. */
+    private int     lagMeasureTaskId         = -1;
+
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
     @Override
     public void run() {
-
         try {
             final boolean oldStatus = skipCheck;
-            // If the previous second took to long, skip checks during
-            // this second
-            skipCheck = lastIngamesecondDuration > 2000;
+            // If the previous second took to long, skip checks during this second.
+            skipCheck = lastInGameSecondDuration > 2000;
 
             if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUGMESSAGES))
                 if (oldStatus != skipCheck && skipCheck)
-                    System.out.println("[NoCheatPlus] detected server lag, some checks will not work.");
+                    System.out.println("[NoCheatPlus] Detected server lag, some checks will not work.");
                 else if (oldStatus != skipCheck && !skipCheck)
-                    System.out.println("[NoCheatPlus] server lag seems to have stopped, reenabling checks.");
+                    System.out.println("[NoCheatPlus] Server lag seems to have stopped, reenabling checks.");
 
             final long time = System.currentTimeMillis();
-            lastIngamesecondDuration = time - lastIngamesecondTime;
-            if (lastIngamesecondDuration < 1000)
-                lastIngamesecondDuration = 1000;
-            else if (lastIngamesecondDuration > 3600000)
-                lastIngamesecondDuration = 3600000; // top limit of 1
-                                                    // hour per "second"
-            lastIngamesecondTime = time;
-            // ingameseconds++;
-
-            // Check if some data is outdated now and let it be removed
-            // if (ingameseconds % 62 == 0)
-            // NoCheatPlus.cleanDataMap();
+            lastInGameSecondDuration = time - lastInGameSecondTime;
+            if (lastInGameSecondDuration < 1000)
+                lastInGameSecondDuration = 1000;
+            else if (lastInGameSecondDuration > 3600000)
+                // Top limit of 1 hour per "second".
+                lastInGameSecondDuration = 3600000;
+            lastInGameSecondTime = time;
         } catch (final Exception e) {
-            // Just prevent this thread from dying for whatever reason
+            // Just prevent this thread from dying for whatever reason.
         }
-
-    }
-
-    public boolean skipCheck() {
-        return skipCheck;
-    }
-
-    public void start() {
-        // start measuring with a delay of 10 seconds
-        lagMeasureTaskId = Bukkit.getServer().getScheduler()
-                .scheduleSyncRepeatingTask(NoCheatPlus.instance, this, 20, 20);
     }
 }

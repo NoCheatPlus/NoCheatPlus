@@ -1,18 +1,23 @@
 package fr.neatmonster.nocheatplus.checks;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.players.NCPPlayer;
-
-/**
- * The event created when actions are executed.
+/*
+ * MM'""""'YMM dP                         dP       MM""""""""`M                              dP   
+ * M' .mmm. `M 88                         88       MM  mmmmmmmM                              88   
+ * M  MMMMMooM 88d888b. .d8888b. .d8888b. 88  .dP  M`      MMMM dP   .dP .d8888b. 88d888b. d8888P 
+ * M  MMMMMMMM 88'  `88 88ooood8 88'  `"" 88888"   MM  MMMMMMMM 88   d8' 88ooood8 88'  `88   88   
+ * M. `MMM' .M 88    88 88.  ... 88.  ... 88  `8b. MM  MMMMMMMM 88 .88'  88.  ... 88    88   88   
+ * MM.     .dM dP    dP `88888P' `88888P' dP   `YP MM        .M 8888P'   `88888P' dP    dP   dP   
+ * MMMMMMMMMMM                                     MMMMMMMMMMMM                                   
  */
-public abstract class CheckEvent extends Event implements Cancellable {
-
-    /** The Constant handlers. */
+/**
+ * An event that is triggered by NoCheatPlus' API.
+ */
+public class CheckEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     /**
@@ -24,60 +29,23 @@ public abstract class CheckEvent extends Event implements Cancellable {
         return handlers;
     }
 
-    /** The check which has triggered this event. */
-    private final Check     check;
+    /** The player who has triggered the check. */
+    private final Player player;
 
-    /** The player who has triggered this event. */
-    private final NCPPlayer player;
-
-    /** The actions which are going to be executed if the event isn't cancelled. */
-    private ActionList      actions;
-
-    /** The violation level of the player for the specified check. */
-    private double          vL;
-
-    /** The boolean used to know if the event is cancelled. */
-    private boolean         cancel = false;
+    /** Is the event cancelled? */
+    private boolean      cancel = false;
 
     /**
      * Instantiates a new check event.
      * 
-     * @param check
-     *            the check
      * @param player
      *            the player
-     * @param actions
-     *            the actions
-     * @param vL
-     *            the vL
      */
-    public CheckEvent(final Check check, final NCPPlayer player, final ActionList actions, final double vL) {
-        this.check = check;
+    public CheckEvent(final Player player) {
         this.player = player;
-        this.actions = actions;
-        this.vL = vL;
     }
 
-    /**
-     * Gets the actions which are going to be executed if the event isn't cancelled.
-     * 
-     * @return the actions
-     */
-    public ActionList getActions() {
-        return actions;
-    }
-
-    /**
-     * Gets the check which has triggered this event.
-     * 
-     * @return the check
-     */
-    public Check getCheck() {
-        return check;
-    }
-
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.bukkit.event.Event#getHandlers()
      */
     @Override
@@ -90,21 +58,11 @@ public abstract class CheckEvent extends Event implements Cancellable {
      * 
      * @return the player
      */
-    public NCPPlayer getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
-    /**
-     * Gets the violation level of the player for the specified check.
-     * 
-     * @return the vL
-     */
-    public double getVL() {
-        return vL;
-    }
-
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.bukkit.event.Cancellable#isCancelled()
      */
     @Override
@@ -112,32 +70,11 @@ public abstract class CheckEvent extends Event implements Cancellable {
         return cancel;
     }
 
-    /**
-     * Sets the actions which are going to be executed if the event isn't cancelled.
-     * 
-     * @param actions
-     *            the new actions
-     */
-    public void setActions(final ActionList actions) {
-        this.actions = actions;
-    }
-
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.bukkit.event.Cancellable#setCancelled(boolean)
      */
     @Override
     public void setCancelled(final boolean cancel) {
         this.cancel = cancel;
-    }
-
-    /**
-     * Sets the violation level of the player for the specified check.
-     * 
-     * @param vL
-     *            the new vL
-     */
-    public void setVL(final double vL) {
-        this.vL = vL;
     }
 }

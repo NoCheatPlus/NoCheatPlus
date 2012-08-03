@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.checks;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -10,210 +9,226 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.actions.types.ConsolecommandAction;
+import fr.neatmonster.nocheatplus.actions.types.CancelAction;
+import fr.neatmonster.nocheatplus.actions.types.CommandAction;
 import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
-import fr.neatmonster.nocheatplus.actions.types.SpecialAction;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.players.NCPPlayer;
-import fr.neatmonster.nocheatplus.players.informations.Permissions;
-import fr.neatmonster.nocheatplus.players.informations.Statistics.Id;
+import fr.neatmonster.nocheatplus.players.ExecutionHistory;
+import fr.neatmonster.nocheatplus.players.Permissions;
 
-public abstract class Check {
-    private static final Map<String, Check> checks     = new HashMap<String, Check>();
-    private static Logger                   fileLogger = null;
+/*
+ * MM'""""'YMM dP                         dP       
+ * M' .mmm. `M 88                         88       
+ * M  MMMMMooM 88d888b. .d8888b. .d8888b. 88  .dP  
+ * M  MMMMMMMM 88'  `88 88ooood8 88'  `"" 88888"   
+ * M. `MMM' .M 88    88 88.  ... 88.  ... 88  `8b. 
+ * MM.     .dM dP    dP `88888P' `88888P' dP   `YP 
+ * MMMMMMMMMMM                                     
+ */
+/**
+ * The Class Check.
+ */
+public abstract class Check implements Listener {
+    protected static Map<String, ExecutionHistory> histories  = new HashMap<String, ExecutionHistory>();
 
-    public static CheckConfig newConfig(final String group, final String worldName) {
-        if (checks.containsKey(group))
-            return checks.get(group).newConfig(worldName);
-        return null;
-    }
+    private static Logger                          fileLogger = null;
 
-    public static CheckData newData(final String group) {
-        if (checks.containsKey(group))
-            return checks.get(group).newData();
-        return null;
+    /**
+     * Gets the player's history.
+     * 
+     * @param player
+     *            the player
+     * @return the history
+     */
+    protected static ExecutionHistory getHistory(final Player player) {
+        if (!histories.containsKey(player.getName()))
+            histories.put(player.getName(), new ExecutionHistory());
+        return histories.get(player.getName());
     }
 
     /**
-     * Remove instances of &X
+     * Checks if a player is close enough to a target, based on his eye location.
+     * 
+     * @param player
+     *            the player
+     * @param targetX
+     *            the target x
+     * @param targetY
+     *            the target y
+     * @param targetZ
+     *            the target z
+     * @param limit
+     *            the limit
+     * @return the result
+     */
+    public static final double reachCheck(final Player player, final double targetX, final double targetY,
+            final double targetZ, final double limit) {
+        final Location eyes = player.getPlayer().getEyeLocation();
+
+        final double distance = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2)
+                + Math.pow(eyes.getZ() - targetZ, 2));
+
+        return Math.max(distance - limit, 0.0D);
+    }
+
+    /**
+     * Removes the colors of a message.
      * 
      * @param text
-     * @return
+     *            the text
+     * @return the string
      */
     public static String removeColors(String text) {
-
         for (final ChatColor c : ChatColor.values())
             text = text.replace("&" + c.getChar(), "");
-
         return text;
     }
 
     /**
-     * Replace instances of &X with a color
+     * Replace colors of a message.
      * 
      * @param text
-     * @return
+     *            the text
+     * @return the string
      */
     public static String replaceColors(String text) {
-
         for (final ChatColor c : ChatColor.values())
             text = text.replace("&" + c.getChar(), c.toString());
-
         return text;
     }
 
+    /**
+     * Sets the file logger.
+     * 
+     * @param logger
+     *            the new file logger
+     */
     public static void setFileLogger(final Logger logger) {
         fileLogger = logger;
     }
 
-    private final String                       name;
-
-    private final Class<? extends CheckConfig> configClass;
-
-    private final Class<? extends CheckData>   dataClass;
-
-    public Check(final String name, final Class<? extends CheckConfig> configClass,
-            final Class<? extends CheckData> dataClass) {
-        this.name = name;
-        this.configClass = configClass;
-        this.dataClass = dataClass;
-
-        checks.put(getGroup(), this);
-    }
-
     /**
-     * Execute some actions for the specified player
+     * Execute some actions for the specified player.
      * 
      * @param player
-     * @param actions
-     * @return
+     *            the player
+     * @param actionList
+     *            the action list
+     * @param violationLevel
+     *            the violation level
+     * @return true, if successful
      */
-    protected boolean executeActions(final NCPPlayer player, final ActionList actionList, final double violationLevel) {
-
+    protected boolean executeActions(final Player player, final ActionList actionList, final double violationLevel) {
         boolean special = false;
 
-        // Get the to be executed actions
+        // Get the to be executed actions.
         final Action[] actions = actionList.getActions(violationLevel);
 
         final long time = System.currentTimeMillis() / 1000L;
 
         for (final Action ac : actions)
-            if (player.getExecutionHistory().executeAction(getGroup(), ac, time))
-                // The executionHistory said it really is time to execute the
-                // action, find out what it is and do what is needed
+            if (getHistory(player).executeAction(getClass().getName(), ac, time))
+                // The execution history said it really is time to execute the action, find out what it is and do what
+                // is
+                // needed.
                 if (ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent))
                     executeLogAction((LogAction) ac, this, player);
-                else if (ac instanceof SpecialAction)
+                else if (ac instanceof CancelAction)
                     special = true;
-                else if (ac instanceof ConsolecommandAction)
-                    executeConsoleCommand((ConsolecommandAction) ac, this, player);
+                else if (ac instanceof CommandAction)
+                    executeConsoleCommand((CommandAction) ac, this, player);
                 else if (ac instanceof DummyAction) {
-                    // nothing - it's a "DummyAction" after all
+                    // Do nothing, it's a dummy action after all.
                 }
 
         return special;
     }
 
-    private void executeConsoleCommand(final ConsolecommandAction action, final Check check, final NCPPlayer player) {
+    /**
+     * Execute a console command.
+     * 
+     * @param action
+     *            the action
+     * @param check
+     *            the check
+     * @param player
+     *            the player
+     */
+    private void executeConsoleCommand(final CommandAction action, final Check check, final Player player) {
         final String command = action.getCommand(player, check);
 
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
         } catch (final CommandException e) {
-            System.out.println("[NoCheatPlus] failed to execute the command '" + command + "': " + e.getMessage()
+            System.out.println("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
                     + ", please check if everything is setup correct.");
         } catch (final Exception e) {
             // I don't care in this case, your problem if your command fails.
         }
     }
 
-    private void executeLogAction(final LogAction l, final Check check, final NCPPlayer player) {
-
+    /**
+     * Execute a log action.
+     * 
+     * @param logAction
+     *            the log action
+     * @param check
+     *            the check
+     * @param player
+     *            the player
+     */
+    private void executeLogAction(final LogAction logAction, final Check check, final Player player) {
         final ConfigFile configurationFile = ConfigManager.getConfigFile();
         if (!configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE))
             return;
 
-        final String prefix = configurationFile.getString(ConfPaths.LOGGING_PREFIX);
-        final String message = l.getLogMessage(player, check);
-        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE) && l.toConsole())
-            // Console logs are not colored
-            System.out.println(removeColors(prefix + message));
-        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOINGAMECHAT) && l.toChat())
-            for (final Player bukkitPlayer : Bukkit.getServer().getOnlinePlayers())
-                if (NCPPlayer.hasPermission(bukkitPlayer, Permissions.ADMIN_CHATLOG))
-                    // Chat logs are potentially colored
-                    bukkitPlayer.sendMessage(replaceColors(prefix + message));
-        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOFILE) && l.toFile())
-            // File logs are not colored
+        final String message = logAction.getLogMessage(player, check);
+        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE) && logAction.toConsole())
+            // Console logs are not colored.
+            System.out.println("[NoCheatPlus] " + removeColors(message));
+        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOINGAMECHAT) && logAction.toChat())
+            for (final Player otherPlayer : Bukkit.getServer().getOnlinePlayers())
+                if (otherPlayer.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
+                    // Chat logs are potentially colored.
+                    otherPlayer.sendMessage(replaceColors(ChatColor.RED + "NCP: " + ChatColor.WHITE + message));
+        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOFILE) && logAction.toFile())
+            // File logs are not colored.
             fileLogger.info(removeColors(message));
     }
 
-    public String getGroup() {
-        return name.contains(".") ? name.split("\\.")[0] : name;
-    }
-
-    public String getName() {
-        return name.contains(".") ? name.split("\\.")[name.split("\\.").length - 1] : name;
-    }
-
     /**
-     * Replace a parameter for commands or log actions with an actual
-     * value. Individual checks should override this to get their own
-     * parameters handled too.
+     * Replace a parameter for commands or log actions with an actual value. Individual checks should override this to
+     * get their own parameters handled too.
      * 
      * @param wildcard
+     *            the wildcard
      * @param player
-     * @return
+     *            the player
+     * @return the parameter
      */
-    public String getParameter(final ParameterName wildcard, final NCPPlayer player) {
-
-        if (wildcard == ParameterName.PLAYER)
+    public String getParameter(final ParameterName wildcard, final Player player) {
+        if (wildcard == ParameterName.CHECK)
+            return getClass().getSimpleName();
+        else if (wildcard == ParameterName.PLAYER)
             return player.getName();
-        else if (wildcard == ParameterName.CHECK)
-            return name;
-        else if (wildcard == ParameterName.LOCATION) {
-            final Location l = player.getLocation();
-            return String.format(Locale.US, "%.2f,%.2f,%.2f", l.getX(), l.getY(), l.getZ());
-        } else if (wildcard == ParameterName.WORLD)
-            return player.getWorld().getName();
         else
-            return "the Author was lazy and forgot to define " + wildcard + ".";
-
+            return "The author was lazy and forgot to define " + wildcard + ".";
     }
 
     /**
-     * Collect information about the players violations
+     * Returns if the check is enabled or not for the specified player.
      * 
      * @param player
-     * @param id
-     * @param vl
+     *            the player
+     * @return true, if enabled
      */
-    protected void incrementStatistics(final NCPPlayer player, final Id id, final double vl) {
-        player.getStatistics().increment(id, vl);
-    }
-
-    public CheckConfig newConfig(final String worldName) {
-        try {
-            return configClass.getConstructor(ConfigFile.class).newInstance(ConfigManager.getConfFile(worldName));
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public CheckData newData() {
-        try {
-            return dataClass.getConstructor().newInstance();
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+    protected abstract boolean isEnabled(final Player player);
 }

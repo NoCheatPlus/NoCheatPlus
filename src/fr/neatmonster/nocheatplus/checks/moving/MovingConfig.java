@@ -1,46 +1,60 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bukkit.entity.Player;
+
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.checks.CheckConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.players.informations.Permissions;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.players.Permissions;
 
-/**
- * Configurations specific for the Move Checks. Every world gets one of these
- * assigned to it.
- * 
+/*
+ * M"""""`'"""`YM                   oo                   MM'""""'YMM                   .8888b oo          
+ * M  mm.  mm.  M                                        M' .mmm. `M                   88   "             
+ * M  MMM  MMM  M .d8888b. dP   .dP dP 88d888b. .d8888b. M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. 
+ * M  MMM  MMM  M 88'  `88 88   d8' 88 88'  `88 88'  `88 M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 
+ * M  MMM  MMM  M 88.  .88 88 .88'  88 88    88 88.  .88 M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 
+ * M  MMM  MMM  M `88888P' 8888P'   dP dP    dP `8888P88 MM.     .dM `88888P' dP    dP dP     dP `8888P88 
+ * MMMMMMMMMMMMMM                                    .88 MMMMMMMMMMM                                  .88 
+ *                                               d8888P                                           d8888P  
  */
-public class MovingConfig extends CheckConfig {
+/**
+ * Configurations specific for the moving checks. Every world gets one of these assigned to it.
+ */
+public class MovingConfig {
 
-    public final boolean    runflyCheck;
-    public final double     jumpheight;
-    public final boolean    identifyCreativeMode;
-    public final double     walkingSpeedLimit;
-    public final double     sprintingSpeedLimit;
-    public final double     swimmingSpeedLimit;
-    public final double     verticalSwimmingSpeedLimit;
-    public final boolean    sneakingCheck;
-    public final double     sneakingSpeedLimit;
-    public final boolean    blockingCheck;
-    public final double     blockingSpeedLimit;
-    public final double     cobWebHoriSpeedLimit;
-    public final double     cobWebVertSpeedLimit;
+    /** The map containing the configurations per world. */
+    private static Map<String, MovingConfig> worldsMap = new HashMap<String, MovingConfig>();
 
-    public final ActionList actions;
+    /**
+     * Clear all the configurations.
+     */
+    public static void clear() {
+        worldsMap.clear();
+    }
 
-    public final boolean    allowFlying;
-    public final double     flyingSpeedLimitVertical;
-    public final double     flyingSpeedLimitHorizontal;
-    public final ActionList flyingActions;
+    /**
+     * Gets the configuration for a specified player.
+     * 
+     * @param player
+     *            the player
+     * @return the configuration
+     */
+    public static MovingConfig getConfig(final Player player) {
+        if (!worldsMap.containsKey(player.getWorld().getName()))
+            worldsMap.put(player.getWorld().getName(),
+                    new MovingConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
+        return worldsMap.get(player.getWorld().getName());
+    }
 
-    public final boolean    bedFlyCheck;
-    public final ActionList bedFlyActions;
-
-    public final boolean    nofallCheck;
-    public final boolean    nofallAggressive;
-    public final float      nofallMultiplier;
-    public final ActionList nofallActions;
+    public final boolean    creativeFlyCheck;
+    public final int        creativeFlyHorizontalSpeed;
+    public final int        creativeFlyMaxHeight;
+    public final int        creativeFlyVerticalSpeed;
+    public final ActionList creativeFlyActions;
 
     public final boolean    morePacketsCheck;
     public final ActionList morePacketsActions;
@@ -48,51 +62,36 @@ public class MovingConfig extends CheckConfig {
     public final boolean    morePacketsVehicleCheck;
     public final ActionList morePacketsVehicleActions;
 
-    public final boolean    waterWalkCheck;
-    public final ActionList waterWalkActions;
+    public final boolean    noFallCheck;
+    public final boolean    noFallAggressive;
+    public final ActionList noFallActions;
 
-    public final int        flyingHeightLimit;
+    public final boolean    survivalFlyCheck;
+    public final boolean    survivalFlyAllowFastBlocking;
+    public final boolean    survivalFlyAllowFastSneaking;
+    public final int        survivalFlyBlockingSpeed;
+    public final int        survivalFlyCobWebSpeed;
+    public final int        survivalFlyLadderSpeed;
+    public final int        survivalFlyLavaSpeed;
+    public final int        survivalFlyMoveSpeed;
+    public final int        survivalFlySneakingSpeed;
+    public final int        survivalFlySoulSandSpeed;
+    public final int        survivalFlySprintingSpeed;
+    public final int        survivalFlyWaterSpeed;
+    public final ActionList survivalFlyActions;
 
+    /**
+     * Instantiates a new moving configuration.
+     * 
+     * @param data
+     *            the data
+     */
     public MovingConfig(final ConfigFile data) {
-
-        identifyCreativeMode = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWINCREATIVE);
-
-        runflyCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_CHECK);
-
-        final int walkspeed = data.getInt(ConfPaths.MOVING_RUNFLY_WALKSPEED, 100);
-        final int sprintspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SPRINTSPEED, 100);
-        final int swimspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SWIMSPEED, 100);
-        final int vertSwimSpeed = data.getInt(ConfPaths.MOVING_RUNFLY_VERTICALSWIMSPEED, 100);
-        final int sneakspeed = data.getInt(ConfPaths.MOVING_RUNFLY_SNEAKSPEED, 100);
-        final int blockspeed = data.getInt(ConfPaths.MOVING_RUNFLY_BLOCKSPEED, 100);
-        final int cobWebSpeed = data.getInt(ConfPaths.MOVING_RUNFLY_COBWEBSPEED, 100);
-        walkingSpeedLimit = 0.22 * walkspeed / 100D;
-        sprintingSpeedLimit = 0.35 * sprintspeed / 100D;
-        swimmingSpeedLimit = 0.18 * swimspeed / 100D;
-        verticalSwimmingSpeedLimit = 0.43 * vertSwimSpeed / 100D;
-        sneakingSpeedLimit = 0.14 * sneakspeed / 100D;
-        blockingSpeedLimit = 0.16 * blockspeed / 100D;
-        cobWebHoriSpeedLimit = 0.08 * cobWebSpeed / 100D;
-        cobWebVertSpeedLimit = 0.07 * cobWebSpeed / 100D;
-        jumpheight = 135 / 100D;
-
-        sneakingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTSNEAKING);
-        blockingCheck = !data.getBoolean(ConfPaths.MOVING_RUNFLY_ALLOWFASTBLOCKING);
-        actions = data.getActionList(ConfPaths.MOVING_RUNFLY_ACTIONS, Permissions.MOVING_RUNFLY);
-
-        allowFlying = data.getBoolean(ConfPaths.MOVING_RUNFLY_FLYING_ALLOWALWAYS);
-        flyingSpeedLimitVertical = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITVERTICAL) / 100D;
-        flyingSpeedLimitHorizontal = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_SPEEDLIMITHORIZONTAL) / 100D;
-        flyingHeightLimit = data.getInt(ConfPaths.MOVING_RUNFLY_FLYING_HEIGHTLIMIT);
-        flyingActions = data.getActionList(ConfPaths.MOVING_RUNFLY_FLYING_ACTIONS, Permissions.MOVING_FLYING);
-
-        bedFlyCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_BEDFLYING_CHECK);
-        bedFlyActions = data.getActionList(ConfPaths.MOVING_RUNFLY_BEDFLYING_ACTIONS, Permissions.MOVING_BEDFLYING);
-
-        nofallCheck = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALL_CHECK);
-        nofallMultiplier = 200 / 100F;
-        nofallAggressive = data.getBoolean(ConfPaths.MOVING_RUNFLY_NOFALL_AGGRESSIVE);
-        nofallActions = data.getActionList(ConfPaths.MOVING_RUNFLY_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
+        creativeFlyCheck = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
+        creativeFlyHorizontalSpeed = data.getInt(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED);
+        creativeFlyMaxHeight = data.getInt(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT);
+        creativeFlyVerticalSpeed = data.getInt(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED);
+        creativeFlyActions = data.getActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
         morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
         morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
@@ -101,7 +100,23 @@ public class MovingConfig extends CheckConfig {
         morePacketsVehicleActions = data.getActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
                 Permissions.MOVING_MOREPACKETS);
 
-        waterWalkCheck = data.getBoolean(ConfPaths.MOVING_WATERWALK_CHECK);
-        waterWalkActions = data.getActionList(ConfPaths.MOVING_WATERWALK_ACTIONS, Permissions.MOVING_WATERWALK);
+        noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
+        noFallAggressive = data.getBoolean(ConfPaths.MOVING_NOFALL_AGGRESSIVE);
+        noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
+
+        survivalFlyCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
+        survivalFlyAllowFastBlocking = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_ALLOWFASTBLOCKING);
+        survivalFlyAllowFastSneaking = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_ALLOWFASTSNEAKING);
+        // Default values are specified here because this settings aren't showed by default into the configuration file.
+        survivalFlyBlockingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
+        survivalFlyCobWebSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_COBWEBSPEED, 100);
+        survivalFlyLadderSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_LADDERSPEED, 100);
+        survivalFlyLavaSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_LAVASPEED, 100);
+        survivalFlyMoveSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_MOVESPEED, 100);
+        survivalFlySneakingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
+        survivalFlySoulSandSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SOULSANDSPEED, 100);
+        survivalFlySprintingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
+        survivalFlyWaterSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WATERSPEED, 100);
+        survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
     }
 }

@@ -29,3 +29,4 @@
 *.ipr
 *.iws
 .idea/
+/auth.properties

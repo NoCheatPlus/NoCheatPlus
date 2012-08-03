@@ -1,45 +1,62 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
-import fr.neatmonster.nocheatplus.utilities.locations.SimpleLocation;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Player specific data for the blockbreak checks
+import org.bukkit.entity.Player;
+
+/*
+ * M#"""""""'M  dP                   dP       MM"""""""`YM dP                            
+ * ##  mmmm. `M 88                   88       MM  mmmmm  M 88                            
+ * #'        .M 88 .d8888b. .d8888b. 88  .dP  M'        .M 88 .d8888b. .d8888b. .d8888b. 
+ * M#  MMMb.'YM 88 88'  `88 88'  `"" 88888"   MM  MMMMMMMM 88 88'  `88 88'  `"" 88ooood8 
+ * M#  MMMM'  M 88 88.  .88 88.  ... 88  `8b. MM  MMMMMMMM 88 88.  .88 88.  ... 88.  ... 
+ * M#       .;M dP `88888P' `88888P' dP   `YP MM  MMMMMMMM dP `88888P8 `88888P' `88888P' 
+ * M#########M                                MMMMMMMMMMMM                               
  * 
+ * M""""""'YMM            dP            
+ * M  mmmm. `M            88            
+ * M  MMMMM  M .d8888b. d8888P .d8888b. 
+ * M  MMMMM  M 88'  `88   88   88'  `88 
+ * M  MMMM' .M 88.  .88   88   88.  .88 
+ * M       .MM `88888P8   dP   `88888P8 
+ * MMMMMMMMMMM                          
  */
-public class BlockPlaceData extends CheckData {
+/**
+ * Player specific data for the block place checks.
+ */
+public class BlockPlaceData {
 
-    // Keep track of violation levels for the two checks
-    public double               fastPlaceVL                = 0.0D;
-    public double               reachVL                    = 0.0D;
-    public double               directionVL                = 0.0D;
-    public double               projectileVL               = 0.0D;
+    /** The map containing the data per players. */
+    private static Map<String, BlockPlaceData> playersMap = new HashMap<String, BlockPlaceData>();
 
-    // Used to know when the player has placed his previous block
-    public long                 lastPlaceTime              = 0;
+    /**
+     * Gets the data of a specified player.
+     * 
+     * @param player
+     *            the player
+     * @return the data
+     */
+    public static BlockPlaceData getData(final Player player) {
+        if (!playersMap.containsKey(player.getName()))
+            playersMap.put(player.getName(), new BlockPlaceData());
+        return playersMap.get(player.getName());
+    }
 
-    // Used to know if the previous event was refused
-    public boolean              previousRefused            = false;
+    // Violation levels.
+    public double  directionVL;
+    public double  fastPlaceVL;
+    public double  reachVL;
+    public double  speedVL;
 
-    // Used for the penalty time feature of the direction check
-    public long                 directionLastViolationTime = 0;
+    // Data of the fast place check.
+    public long    fastPlaceLastTime;
+    public boolean fastPlaceLastRefused;
 
-    // Have a nicer/simpler way to work with block locations instead of
-    // Bukkits own "Location" class
-    public final SimpleLocation blockPlacedAgainst         = new SimpleLocation();
-    public final SimpleLocation blockPlaced                = new SimpleLocation();
+    // Data of the reach check.
+    public double  reachDistance;
 
-    // For logging, remember the reachDistance that was calculated in the
-    // reach check
-    public double               reachdistance;
-
-    // Store the two previous signs' text
-    public String[]             lastSignText               = new String[] {"", "", "", ""};
-    public String[]             lastLastSignText           = new String[] {"", "", "", ""};
-
-    // Used to store the last time a projectile was thrown
-    public long                 lastProjectileTime         = 0;
-
-    // Used to know if the previous projectile-thrown-event was refused
-    public boolean              previousProjectileRefused  = false;
+    // Data of the speed check;
+    public boolean speedLastRefused;
+    public long    speedLastTime;
 }

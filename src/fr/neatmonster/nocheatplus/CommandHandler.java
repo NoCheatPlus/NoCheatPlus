@@ -1,147 +1,103 @@
 package fr.neatmonster.nocheatplus;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 
+import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
+import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.players.NCPPlayer;
-import fr.neatmonster.nocheatplus.players.informations.Permissions;
+import fr.neatmonster.nocheatplus.players.Permissions;
 
+/*
+ * MM'""""'YMM                                                        dP 
+ * M' .mmm. `M                                                        88 
+ * M  MMMMMooM .d8888b. 88d8b.d8b. 88d8b.d8b. .d8888b. 88d888b. .d888b88 
+ * M  MMMMMMMM 88'  `88 88'`88'`88 88'`88'`88 88'  `88 88'  `88 88'  `88 
+ * M. `MMM' .M 88.  .88 88  88  88 88  88  88 88.  .88 88    88 88.  .88 
+ * MM.     .dM `88888P' dP  dP  dP dP  dP  dP `88888P8 dP    dP `88888P8 
+ * MMMMMMMMMMM                                                           
+ * 
+ * M""MMMMM""MM                         dP dP                   
+ * M  MMMMM  MM                         88 88                   
+ * M         `M .d8888b. 88d888b. .d888b88 88 .d8888b. 88d888b. 
+ * M  MMMMM  MM 88'  `88 88'  `88 88'  `88 88 88ooood8 88'  `88 
+ * M  MMMMM  MM 88.  .88 88    88 88.  .88 88 88.  ... 88       
+ * M  MMMMM  MM `88888P8 dP    dP `88888P8 dP `88888P' dP       
+ * MMMMMMMMMMMM                                                 
+ */
 /**
- * Handle all NoCheatPlus related commands in a common place
+ * This the class handling all the commands.
  */
 public class CommandHandler implements CommandExecutor {
+    private final NoCheatPlus plugin;
 
-    private final List<Permission> perms;
-
-    public CommandHandler() {
-        // Make a copy to allow sorting
-        perms = new LinkedList<Permission>(NoCheatPlus.instance.getDescription().getPermissions());
-
-        // Sort NoCheats permission by name and parent-child relation with
-        // a custom sorting method
-        Collections.sort(perms, new Comparator<Permission>() {
-
-            @Override
-            public int compare(final Permission o1, final Permission o2) {
-
-                final String name1 = o1.getName();
-                final String name2 = o2.getName();
-
-                if (name1.equals(name2))
-                    return 0;
-
-                if (name1.startsWith(name2))
-                    return 1;
-
-                if (name2.startsWith(name1))
-                    return -1;
-
-                return name1.compareTo(name2);
-            }
-        });
-    }
-
-    private boolean handlePermlistCommand(final CommandSender sender, final String[] args) {
-
-        // Get the player by name
-        final Player player = Bukkit.getServer().getPlayerExact(args[1]);
-        if (player == null) {
-            sender.sendMessage("Unknown player: " + args[1]);
-            return true;
-        }
-
-        // Should permissions be filtered by prefix?
-        String prefix = "";
-        if (args.length == 3)
-            prefix = args[2];
-
-        sender.sendMessage("Player " + player.getName() + " has the permission(s):");
-
-        for (final Permission permission : perms)
-            if (permission.getName().startsWith(prefix))
-                sender.sendMessage(permission.getName() + ": " + NCPPlayer.hasPermission(player, permission.getName()));
-        return true;
-    }
-
-    private boolean handlePlayerInfoCommand(final CommandSender sender, final String[] args) {
-
-        final Player player = Bukkit.getPlayer(args[1]);
-        final Map<String, Object> map = player == null ? new HashMap<String, Object>() : NCPPlayer.getPlayer(player)
-                .collectData();
-        String filter = "";
-
-        if (args.length > 2)
-            filter = args[2];
-
-        sender.sendMessage("PlayerInfo for " + args[1]);
-        for (final Entry<String, Object> entry : map.entrySet())
-            if (entry.getKey().contains(filter))
-                sender.sendMessage(entry.getKey() + ": " + entry.getValue());
-        return true;
-    }
-
-    private boolean handleReloadCommand(final CommandSender sender) {
-
-        // Players need a special permission for this
-        if (!(sender instanceof Player) || NCPPlayer.hasPermission(sender, Permissions.ADMIN_RELOAD)) {
-            sender.sendMessage("[NoCheatPlus] Reloading configuration");
-            ConfigManager.cleanup();
-            ConfigManager.init();
-            NCPPlayer.reloadConfig();
-            sender.sendMessage("[NoCheatPlus] Configuration reloaded");
-        } else
-            sender.sendMessage("You lack the " + Permissions.ADMIN_RELOAD + " permission to use 'reload'");
-
-        return true;
+    /**
+     * Instantiates a new command handler.
+     * 
+     * @param plugin
+     *            the instance of NoCheatPlus
+     */
+    public CommandHandler(final NoCheatPlus plugin) {
+        this.plugin = plugin;
     }
 
     /**
-     * Handle a command that is directed at NoCheatPlus
+     * Handle the '/nocheatplus reload' command.
+     * 
+     * @param sender
+     *            the sender
+     * @return true, if successful
+     */
+    private boolean handleReloadCommand(final CommandSender sender) {
+        // Players need a special permission for this.
+        if (!(sender instanceof Player) || sender.hasPermission(Permissions.ADMINISTRATION_RELOAD)) {
+            sender.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Reloading configuration...");
+
+            // Do the actual reload.
+            ConfigManager.cleanup();
+            ConfigManager.init(plugin);
+            BlockBreakConfig.clear();
+            BlockPlaceConfig.clear();
+            MovingConfig.clear();
+
+            sender.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Configuration reloaded!");
+        } else
+            sender.sendMessage(ChatColor.RED + "You lack the " + Permissions.ADMINISTRATION_RELOAD
+                    + " permission to use 'reload'!");
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command,
+     * java.lang.String, java.lang.String[])
      */
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String commandLabel,
             final String[] args) {
-
         if (sender instanceof Player) {
-            final String worldName = ((Player) sender).getWorld().getName();
-            final boolean protectPlugins = ConfigManager.getConfigFile(worldName).getBoolean(
-                    ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
+            final boolean protectPlugins = ConfigManager.getConfigFile(((Player) sender).getWorld().getName())
+                    .getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
 
-            // Hide NoCheatPlus's commands if the player doesn't have the required permission
-            if (protectPlugins && !NCPPlayer.hasPermission(sender, Permissions.ADMIN_COMMANDS)) {
+            // Hide NoCheatPlus's commands if the player doesn't have the required permission.
+            if (protectPlugins && !sender.hasPermission(Permissions.ADMINISTRATION_RELOAD)) {
                 sender.sendMessage("Unknown command. Type \"help\" for help.");
                 return true;
             }
         }
 
         boolean result = false;
+
         // Not our command, how did it get here?
         if (!command.getName().equalsIgnoreCase("nocheatplus") || args.length == 0)
             result = false;
-        else if (args[0].equalsIgnoreCase("permlist") && args.length >= 2)
-            // permlist command was used
-            result = handlePermlistCommand(sender, args);
         else if (args[0].equalsIgnoreCase("reload"))
-            // reload command was used
+            // Reload command was used.
             result = handleReloadCommand(sender);
-        else if (args[0].equalsIgnoreCase("playerinfo") && args.length >= 2)
-            // playerinfo command was used
-            result = handlePlayerInfoCommand(sender, args);
-
         return result;
     }
 }

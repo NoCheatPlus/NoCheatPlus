@@ -1,109 +1,132 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import fr.neatmonster.nocheatplus.checks.CheckListener;
-import fr.neatmonster.nocheatplus.players.NCPPlayer;
-import fr.neatmonster.nocheatplus.players.informations.Permissions;
-
-/**
- * Central location to listen to Block-related events and dispatching them to
- * checks
+/*
+ * M#"""""""'M  dP                   dP       MM"""""""`YM dP                            
+ * ##  mmmm. `M 88                   88       MM  mmmmm  M 88                            
+ * #'        .M 88 .d8888b. .d8888b. 88  .dP  M'        .M 88 .d8888b. .d8888b. .d8888b. 
+ * M#  MMMb.'YM 88 88'  `88 88'  `"" 88888"   MM  MMMMMMMM 88 88'  `88 88'  `"" 88ooood8 
+ * M#  MMMM'  M 88 88.  .88 88.  ... 88  `8b. MM  MMMMMMMM 88 88.  .88 88.  ... 88.  ... 
+ * M#       .;M dP `88888P' `88888P' dP   `YP MM  MMMMMMMM dP `88888P8 `88888P' `88888P' 
+ * M#########M                                MMMMMMMMMMMM                               
  * 
+ * M""MMMMMMMM oo            dP                                       
+ * M  MMMMMMMM               88                                       
+ * M  MMMMMMMM dP .d8888b. d8888P .d8888b. 88d888b. .d8888b. 88d888b. 
+ * M  MMMMMMMM 88 Y8ooooo.   88   88ooood8 88'  `88 88ooood8 88'  `88 
+ * M  MMMMMMMM 88       88   88   88.  ... 88    88 88.  ... 88       
+ * M         M dP `88888P'   dP   `88888P' dP    dP `88888P' dP       
+ * MMMMMMMMMMM                                                        
  */
-public class BlockPlaceListener extends CheckListener {
-
-    private final FastPlaceCheck  fastPlaceCheck;
-    private final ReachCheck      reachCheck;
-    private final DirectionCheck  directionCheck;
-    private final ProjectileCheck projectileCheck;
-
-    public BlockPlaceListener() {
-        super("blockplace");
-
-        fastPlaceCheck = new FastPlaceCheck();
-        reachCheck = new ReachCheck();
-        directionCheck = new DirectionCheck();
-        projectileCheck = new ProjectileCheck();
-    }
+/**
+ * Central location to listen to events that are relevant for the block place checks.
+ * 
+ * @see BlockPlaceEvent
+ */
+public class BlockPlaceListener implements Listener {
+    private final Direction direction = new Direction();
+    private final FastPlace fastPlace = new FastPlace();
+    private final Reach     reach     = new Reach();
+    private final Speed     speed     = new Speed();
 
     /**
-     * We listen to BlockPlace events for obvious reasons
+     * We listen to BlockPlace events for obvious reasons.
      * 
      * @param event
-     *            the BlockPlace event
+     *            the event
      */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
-    protected void handleBlockPlaceEvent(final BlockPlaceEvent event) {
-
+    protected void onBlockPlace(final BlockPlaceEvent event) {
+        /*
+         *  ____  _            _      ____  _                
+         * | __ )| | ___   ___| | __ |  _ \| | __ _  ___ ___ 
+         * |  _ \| |/ _ \ / __| |/ / | |_) | |/ _` |/ __/ _ \
+         * | |_) | | (_) | (__|   <  |  __/| | (_| | (_|  __/
+         * |____/|_|\___/ \___|_|\_\ |_|   |_|\__,_|\___\___|
+         */
+        // We don't care about null blocks.
         if (event.getBlock() == null || event.getBlockAgainst() == null)
             return;
 
-        final NCPPlayer player = NCPPlayer.getPlayer(event.getPlayer());
-        final BlockPlaceConfig cc = (BlockPlaceConfig) getConfig(player);
-        final BlockPlaceData data = (BlockPlaceData) getData(player);
+        final Player player = event.getPlayer();
+        final Block block = event.getBlock();
 
         boolean cancelled = false;
 
-        // Remember these locations and put them in a simpler "format"
-        data.blockPlaced.set(event.getBlock());
-        data.blockPlacedAgainst.set(event.getBlockAgainst());
+        // First, the fast place check.
+        if (fastPlace.isEnabled(player))
+            cancelled = fastPlace.check(player, block);
 
-        // Now do the actual checks
+        // Second, the reach check.
+        if (!cancelled && reach.isEnabled(player))
+            cancelled = reach.check(player, block.getLocation());
 
-        // First the fastplace check
-        if (cc.fastPlaceCheck && !player.hasPermission(Permissions.BLOCKPLACE_FASTPLACE))
-            cancelled = fastPlaceCheck.check(player);
+        // Third, the direction check.
+        if (!cancelled && direction.isEnabled(player))
+            cancelled = direction.check(player, block.getLocation());
 
-        // Second the reach check
-        if (!cancelled && cc.reachCheck && !player.hasPermission(Permissions.BLOCKPLACE_REACH))
-            cancelled = reachCheck.check(player);
-
-        // Third the direction check
-        if (!cancelled && cc.directionCheck && !player.hasPermission(Permissions.BLOCKPLACE_DIRECTION))
-            cancelled = directionCheck.check(player);
-
-        // If one of the checks requested to cancel the event, do so
+        // If one of the checks requested to cancel the event, do so.
         if (cancelled)
             event.setCancelled(cancelled);
     }
 
+    /**
+     * We listener to PlayerInteract events to prevent players from spamming the server with monster eggs.
+     */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void monsterEgg(final PlayerInteractEvent event) {
-
-        // We are only interested by monster eggs
+    public void onPlayerInteract(final PlayerInteractEvent event) {
+        /*
+         *  ____  _                         ___       _                      _   
+         * |  _ \| | __ _ _   _  ___ _ __  |_ _|_ __ | |_ ___ _ __ __ _  ___| |_ 
+         * | |_) | |/ _` | | | |/ _ \ '__|  | || '_ \| __/ _ \ '__/ _` |/ __| __|
+         * |  __/| | (_| | |_| |  __/ |     | || | | | ||  __/ | | (_| | (__| |_ 
+         * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
+         *                |___/                                                  
+         */
+        // We are only interested by monster eggs.
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().getItemInHand() == null
                 || event.getPlayer().getItemInHand().getType() != Material.MONSTER_EGG)
             return;
 
-        final NCPPlayer player = NCPPlayer.getPlayer(event.getPlayer());
-        final BlockPlaceConfig cc = (BlockPlaceConfig) getConfig(player);
+        final Player player = event.getPlayer();
 
-        // Do the actual check
-        if (cc.projectileCheck && !player.hasPermission(Permissions.BLOCKPLACE_PROJECTILE)
-                && projectileCheck.check(player))
-            // If the check is positive, cancel the event
+        // Do the actual check...
+        if (speed.isEnabled(player) && speed.check(player))
+            // If the check was positive, cancel the event.
             event.setCancelled(true);
     }
 
+    /**
+     * We listen to ProjectileLaunch events to prevent players from launching projectiles too quickly.
+     */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void otherProjectiles(final ProjectileLaunchEvent event) {
-
-        // We are only interested by enderpears, endersignals, eggs, snowballs and expbottles
-        // of course thrown by a player
+    public void onProjectileLaunch(final ProjectileLaunchEvent event) {
+        /*
+         *  ____            _           _   _ _        _                           _     
+         * |  _ \ _ __ ___ (_) ___  ___| |_(_) | ___  | |    __ _ _   _ _ __   ___| |__  
+         * | |_) | '__/ _ \| |/ _ \/ __| __| | |/ _ \ | |   / _` | | | | '_ \ / __| '_ \ 
+         * |  __/| | | (_) | |  __/ (__| |_| | |  __/ | |__| (_| | |_| | | | | (__| | | |
+         * |_|   |_|  \___// |\___|\___|\__|_|_|\___| |_____\__,_|\__,_|_| |_|\___|_| |_|
+         *               |__/                                                            
+         */
+        // The shooter needs to be a player.
         if (!(event.getEntity().getShooter() instanceof Player))
             return;
+
+        // And the projectile must be one the following:
         switch (event.getEntityType()) {
         case ENDER_PEARL:
             break;
@@ -119,56 +142,11 @@ public class BlockPlaceListener extends CheckListener {
             return;
         }
 
-        final NCPPlayer player = NCPPlayer.getPlayer((Player) event.getEntity().getShooter());
-        final BlockPlaceConfig cc = (BlockPlaceConfig) getConfig(player);
+        final Player player = (Player) event.getEntity().getShooter();
 
-        // Do the actual check
-        if (cc.projectileCheck && !player.hasPermission(Permissions.BLOCKPLACE_PROJECTILE)
-                && projectileCheck.check(player))
-            // If the check is positive, cancel the event
+        // Do the actual check...
+        if (speed.isEnabled(player) && speed.check(player))
+            // If the check was positive, cancel the event.
             event.setCancelled(true);
-    }
-
-    /**
-     * If the player places three times the same sign,
-     * the sign will be destroyed and looted
-     * 
-     * @param event
-     *            the SignChange event
-     */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void sign(final SignChangeEvent event) {
-
-        final NCPPlayer player = NCPPlayer.getPlayer(event.getPlayer());
-        final BlockPlaceConfig cc = (BlockPlaceConfig) getConfig(player);
-        final BlockPlaceData data = (BlockPlaceData) getData(player);
-
-        // Check if the sign's content is empty
-        // if is the first line is whitelisted
-        if (event.getLine(0).length() + event.getLine(1).length() + event.getLine(2).length()
-                + event.getLine(3).length() == 0
-                || cc.fastSignExclusions.contains(event.getLine(0).toLowerCase()))
-            return;
-
-        // Check if the text is the same
-        if (!player.hasPermission(Permissions.BLOCKPLACE_AUTOSIGN) && event.getLine(0).equals(data.lastSignText[0])
-                && event.getLine(1).equals(data.lastSignText[1]) && event.getLine(2).equals(data.lastSignText[2])
-                && event.getLine(3).equals(data.lastSignText[3])
-                && data.lastSignText[0].equals(data.lastLastSignText[0])
-                && data.lastSignText[1].equals(data.lastLastSignText[1])
-                && data.lastSignText[2].equals(data.lastLastSignText[2])
-                && data.lastSignText[3].equals(data.lastLastSignText[3]))
-            event.getBlock().breakNaturally();
-
-        // Save the text
-        data.lastLastSignText[3] = data.lastSignText[3];
-        data.lastLastSignText[2] = data.lastSignText[2];
-        data.lastLastSignText[1] = data.lastSignText[1];
-        data.lastLastSignText[0] = data.lastSignText[0];
-        data.lastSignText[3] = event.getLine(3);
-        data.lastSignText[2] = event.getLine(2);
-        data.lastSignText[1] = event.getLine(1);
-        data.lastSignText[0] = event.getLine(0);
     }
 }

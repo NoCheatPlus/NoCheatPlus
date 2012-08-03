@@ -6,29 +6,49 @@ import java.util.List;
 import java.util.Map;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.actions.types.ConsolecommandAction;
+import fr.neatmonster.nocheatplus.actions.types.CancelAction;
+import fr.neatmonster.nocheatplus.actions.types.CommandAction;
 import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
-import fr.neatmonster.nocheatplus.actions.types.SpecialAction;
 
+/*
+ * MMP"""""""MM            dP   oo                   MM""""""""`M                     dP                              
+ * M' .mmmm  MM            88                        MM  mmmmmmmM                     88                              
+ * M         `M .d8888b. d8888P dP .d8888b. 88d888b. M'      MMMM .d8888b. .d8888b. d8888P .d8888b. 88d888b. dP    dP 
+ * M  MMMMM  MM 88'  `""   88   88 88'  `88 88'  `88 MM  MMMMMMMM 88'  `88 88'  `""   88   88'  `88 88'  `88 88    88 
+ * M  MMMMM  MM 88.  ...   88   88 88.  .88 88    88 MM  MMMMMMMM 88.  .88 88.  ...   88   88.  .88 88       88.  .88 
+ * M  MMMMM  MM `88888P'   dP   dP `88888P' dP    dP MM  MMMMMMMM `88888P8 `88888P'   dP   `88888P' dP       `8888P88 
+ * MMMMMMMMMMMM                                      MMMMMMMMMMMM                                                 .88 
+ *                                                                                                            d8888P  
+ */
 /**
- * Helps with creating Actions out of text string definitions
- * 
+ * Helps with creating Actions out of text string definitions.
  */
 public class ActionFactory {
-
     private static final Map<String, Object> lib = new HashMap<String, Object>();
 
+    /**
+     * Instantiates a new action factory.
+     * 
+     * @param library
+     *            the library
+     */
     public ActionFactory(final Map<String, Object> library) {
         lib.putAll(library);
     }
 
+    /**
+     * Creates a new Action object.
+     * 
+     * @param actionDefinition
+     *            the action definition
+     * @return the action
+     */
     public Action createAction(String actionDefinition) {
-
         actionDefinition = actionDefinition.toLowerCase();
 
         if (actionDefinition.equals("cancel"))
-            return new SpecialAction();
+            return new CancelAction();
 
         if (actionDefinition.startsWith("log:"))
             return parseLogAction(actionDefinition.split(":", 2)[1]);
@@ -39,6 +59,15 @@ public class ActionFactory {
         throw new IllegalArgumentException("NoCheatPlus doesn't understand action '" + actionDefinition + "' at all");
     }
 
+    /**
+     * Creates a new Action object.
+     * 
+     * @param definition
+     *            the definition
+     * @param permission
+     *            the permission
+     * @return the action list
+     */
     public ActionList createActionList(final String definition, final String permission) {
         final ActionList list = new ActionList(permission);
 
@@ -66,13 +95,20 @@ public class ActionFactory {
                 }
                 list.setActions(vl, createActions(def.split("\\s+")));
             } catch (final Exception e) {
-                System.out.println("NoCheatPlus couldn't parse action definition 'vl:" + s + "'");
+                System.out.println("[NoCheatPlus] Couldn't parse action definition 'vl:" + s + "'.");
             }
         }
 
         return list;
     }
 
+    /**
+     * Creates a new Action object.
+     * 
+     * @param definitions
+     *            the definitions
+     * @return the action[]
+     */
     public Action[] createActions(final String... definitions) {
         final List<Action> actions = new ArrayList<Action>();
 
@@ -82,7 +118,7 @@ public class ActionFactory {
             try {
                 actions.add(createAction(def));
             } catch (final IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                System.out.println("[NoCheatPlus] " + e.getMessage());
                 actions.add(new DummyAction(def));
             }
         }
@@ -90,6 +126,13 @@ public class ActionFactory {
         return actions.toArray(new Action[actions.size()]);
     }
 
+    /**
+     * Parses the cmd action.
+     * 
+     * @param definition
+     *            the definition
+     * @return the action
+     */
     private Action parseCmdAction(final String definition) {
         final String[] parts = definition.split(":");
         final String name = parts[0];
@@ -106,15 +149,22 @@ public class ActionFactory {
                 delay = Integer.parseInt(parts[1]);
                 repeat = Integer.parseInt(parts[2]);
             } catch (final Exception e) {
-                System.out.println("NoCheatPlus couldn't parse details of command '" + definition
+                System.out.println("[NoCheatPlus] Couldn't parse details of command '" + definition
                         + "', will use default values instead.");
                 delay = 0;
                 repeat = 1;
             }
 
-        return new ConsolecommandAction(name, delay, repeat, command.toString());
+        return new CommandAction(name, delay, repeat, command.toString());
     }
 
+    /**
+     * Parses the log action.
+     * 
+     * @param definition
+     *            the definition
+     * @return the action
+     */
     private Action parseLogAction(final String definition) {
         final String[] parts = definition.split(":");
         final String name = parts[0];
@@ -136,7 +186,7 @@ public class ActionFactory {
             toChat = parts[3].contains("i");
             toFile = parts[3].contains("f");
         } catch (final Exception e) {
-            System.out.println("NoCheatPlus couldn't parse details of log action '" + definition
+            System.out.println("[NoCheatPlus] Couldn't parse details of log action '" + definition
                     + "', will use default values instead.");
             e.printStackTrace();
             delay = 0;
