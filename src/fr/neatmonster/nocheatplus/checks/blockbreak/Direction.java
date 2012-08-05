@@ -58,7 +58,7 @@ public class Direction extends Check {
 
         boolean cancel = false;
 
-        if (!CheckUtils.intersects(player, location, OFFSET)) {
+        if (!CheckUtils.intersects(player, location, location.add(1D, 1D, 1D), OFFSET)) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the block...
             final Vector direction = player.getEyeLocation().getDirection();
             final Vector blockEyes = location.add(0.5D, 0.5D, 0.5D).subtract(player.getEyeLocation()).toVector();
@@ -73,8 +73,7 @@ public class Direction extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (!e.isCancelled() && executeActions(player, cc.directionActions, data.directionVL))
-                cancel = true;
+            cancel = !e.isCancelled() && executeActions(player, cc.directionActions, data.directionVL);
         } else
             // Player did likely nothing wrong, reduce violation counter to reward him.
             data.directionVL *= 0.9D;

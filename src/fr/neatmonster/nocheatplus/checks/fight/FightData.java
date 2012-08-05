@@ -41,7 +41,11 @@ public class FightData {
     // Violation levels.
     public double                  angleVL;
     public double                  criticalVL;
+    public double                  directionVL;
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
+
+    // Data of the direction check.
+    public long                    directionLastViolationTime;
 }

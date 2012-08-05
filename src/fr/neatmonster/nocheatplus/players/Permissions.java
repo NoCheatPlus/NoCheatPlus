@@ -115,6 +115,7 @@ public class Permissions {
     private static final String FIGHT                     = CHECKS + ".fight";
     public static final String  FIGHT_ANGLE               = FIGHT + ".angle";
     public static final String  FIGHT_CRITICAL            = FIGHT + ".critical";
+    public static final String  FIGHT_DIRECTION           = FIGHT + ".direction";
 
     /*
      *     e   e                         ,e,                  

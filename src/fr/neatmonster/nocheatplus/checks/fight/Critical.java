@@ -25,13 +25,29 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class Critical extends Check {
 
+    /**
+     * The event triggered by this check.
+     */
     public class CriticalEvent extends CheckEvent {
 
+        /**
+         * Instantiates a new critical event.
+         * 
+         * @param player
+         *            the player
+         */
         public CriticalEvent(final Player player) {
             super(player);
         }
     }
 
+    /**
+     * Checks a player.
+     * 
+     * @param player
+     *            the player
+     * @return true, if successful
+     */
     public boolean check(final Player player) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
@@ -73,6 +89,9 @@ public class Critical extends Check {
         return cancel;
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
+     */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
         if (wildcard == ParameterName.VIOLATIONS)
@@ -81,6 +100,9 @@ public class Critical extends Check {
             return super.getParameter(wildcard, player);
     }
 
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
+     */
     @Override
     protected boolean isEnabled(final Player player) {
         return !player.hasPermission(Permissions.FIGHT_CRITICAL) && FightConfig.getConfig(player).criticalCheck;

@@ -208,6 +208,11 @@ public abstract class ConfPaths {
     public static final String  FIGHT_CRITICAL_VELOCITY               = FIGHT_CRITICAL + "velocity";
     public static final String  FIGHT_CRITICAL_ACTIONS                = FIGHT_CRITICAL + "actions";
 
+    private static final String FIGHT_DIRECTION                       = FIGHT + "direction.";
+    public static final String  FIGHT_DIRECTION_CHECK                 = FIGHT_DIRECTION + "active";
+    public static final String  FIGHT_DIRECTION_PENALTY               = FIGHT_DIRECTION + "penalty";
+    public static final String  FIGHT_DIRECTION_ACTIONS               = FIGHT_DIRECTION + "actions";
+
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 

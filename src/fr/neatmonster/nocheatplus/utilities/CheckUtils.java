@@ -41,19 +41,22 @@ public class CheckUtils {
      * 
      * @param player
      *            the player
-     * @param location
-     *            the location
+     * @param minimum
+     *            the minimum location
+     * @param maximum
+     *            the maximum location
      * @param offset
      *            the offset
      * @return true, if successful
      */
-    public static boolean intersects(final Player player, final Location location, final double offset) {
-        final double x1 = location.getX() - offset;
-        final double y1 = location.getY() - offset;
-        final double z1 = location.getZ() - offset;
-        final double xH = location.getX() + 1D + offset;
-        final double yH = location.getY() + 1D + offset;
-        final double zH = location.getZ() + 1D + offset;
+    public static boolean intersects(final Player player, final Location minimum, final Location maximum,
+            final double offset) {
+        final double x1 = minimum.getX() - offset;
+        final double y1 = minimum.getY() - offset;
+        final double z1 = minimum.getZ() - offset;
+        final double xH = maximum.getX() + offset;
+        final double yH = maximum.getY() + offset;
+        final double zH = maximum.getZ() + offset;
         final double x0 = player.getEyeLocation().getX();
         final double y0 = player.getEyeLocation().getY();
         final double z0 = player.getEyeLocation().getZ();

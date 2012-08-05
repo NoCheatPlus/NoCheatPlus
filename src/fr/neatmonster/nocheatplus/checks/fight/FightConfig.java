@@ -60,6 +60,10 @@ public class FightConfig {
     public final double     criticalVelocity;
     public final ActionList criticalActions;
 
+    public final boolean    directionCheck;
+    public final long       directionPenalty;
+    public final ActionList directionActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -75,5 +79,9 @@ public class FightConfig {
         criticalFallDistance = data.getDouble(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE);
         criticalVelocity = data.getDouble(ConfPaths.FIGHT_CRITICAL_VELOCITY);
         criticalActions = data.getActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
+
+        directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
+        directionPenalty = data.getLong(ConfPaths.FIGHT_DIRECTION_PENALTY);
+        directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
     }
 }
