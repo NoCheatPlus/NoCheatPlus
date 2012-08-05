@@ -119,6 +119,7 @@ public class Permissions {
     public static final String  FIGHT_GODMODE             = FIGHT + ".godmode";
     public static final String  FIGHT_INSTANTHEAL         = FIGHT + ".instantheal";
     public static final String  FIGHT_KNOCKBACK           = FIGHT + ".knockback";
+    public static final String  FIGHT_NOSWING             = FIGHT + ".noswing";
 
     /*
      *     e   e                         ,e,                  

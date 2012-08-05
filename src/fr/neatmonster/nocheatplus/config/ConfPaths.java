@@ -226,6 +226,10 @@ public abstract class ConfPaths {
     public static final String  FIGHT_KNOCKBACK_INTERVAL              = FIGHT_KNOCKBACK + "interval";
     public static final String  FIGHT_KNOCKBACK_ACTIONS               = FIGHT_KNOCKBACK + "actions";
 
+    private static final String FIGHT_NOSWING                         = FIGHT + "noswing.";
+    public static final String  FIGHT_NOSWING_CHECK                   = FIGHT_NOSWING + "active";
+    public static final String  FIGHT_NOSWING_ACTIONS                 = FIGHT_NOSWING + "actions";
+
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 

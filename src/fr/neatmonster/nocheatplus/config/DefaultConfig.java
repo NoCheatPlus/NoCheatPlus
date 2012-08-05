@@ -65,7 +65,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastbreak:3:5:cif cancel");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:bbnoswing:3:2:if cancel");
+        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
@@ -201,6 +201,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_KNOCKBACK_INTERVAL, 50L);
         set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:knockback:0:5:cif cancel");
 
+        set(ConfPaths.FIGHT_NOSWING_CHECK, true);
+        set(ConfPaths.FIGHT_NOSWING_ACTIONS, "log:noswing:0:5:cif cancel");
+
         /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
@@ -258,7 +261,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".angle", start + "tried to hit multiple entities at the same time" + end);
         set(ConfPaths.STRINGS + ".ban", "ban [player]");
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
-        set(ConfPaths.STRINGS + ".bbnoswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of his line of sight" + end);
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
@@ -277,6 +279,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like a spambot (IP: [ip])" + end);
+        set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
 
         // Update internal factory based on all the new entries to the "actions" section.
         regenerateActionLists();

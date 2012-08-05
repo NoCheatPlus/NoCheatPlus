@@ -74,6 +74,9 @@ public class FightConfig {
     public final long       knockbackInterval;
     public final ActionList knockbackActions;
 
+    public final boolean    noSwingCheck;
+    public final ActionList noSwingActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -103,5 +106,8 @@ public class FightConfig {
         knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
         knockbackInterval = data.getLong(ConfPaths.FIGHT_KNOCKBACK_INTERVAL);
         knockbackActions = data.getActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
+
+        noSwingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
+        noSwingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
     }
 }
