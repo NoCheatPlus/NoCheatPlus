@@ -213,6 +213,10 @@ public abstract class ConfPaths {
     public static final String  FIGHT_DIRECTION_PENALTY               = FIGHT_DIRECTION + "penalty";
     public static final String  FIGHT_DIRECTION_ACTIONS               = FIGHT_DIRECTION + "actions";
 
+    private static final String FIGHT_GODMODE                         = FIGHT + "godmode.";
+    public static final String  FIGHT_GODMODE_CHECK                   = FIGHT_GODMODE + "active";
+    public static final String  FIGHT_GODMODE_ACTIONS                 = FIGHT_GODMODE + "actions";
+
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 

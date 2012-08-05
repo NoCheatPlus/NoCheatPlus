@@ -64,6 +64,9 @@ public class FightConfig {
     public final long       directionPenalty;
     public final ActionList directionActions;
 
+    public final boolean    godModeCheck;
+    public final ActionList godModeActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -83,5 +86,8 @@ public class FightConfig {
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
         directionPenalty = data.getLong(ConfPaths.FIGHT_DIRECTION_PENALTY);
         directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
+
+        godModeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
+        godModeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
     }
 }

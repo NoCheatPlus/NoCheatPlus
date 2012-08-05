@@ -42,10 +42,17 @@ public class FightData {
     public double                  angleVL;
     public double                  criticalVL;
     public double                  directionVL;
+    public double                  godModeVL;
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
 
     // Data of the direction check.
     public long                    directionLastViolationTime;
+
+    // Data of the god mode check.
+    public int                     godModeBuffer;
+    public int                     godModeLastAge;
+    public long                    godModeLastTime;
+
 }

@@ -191,6 +191,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_DIRECTION_ACTIONS,
                 "cancel vl>5 log:fdirection:3:5:f cancel vl>20 log:fdirection:0:5:if cancel vl>50 log:fdirection:0:5:cif cancel");
 
+        set(ConfPaths.FIGHT_GODMODE_CHECK, true);
+        set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel");
+
         /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
@@ -260,6 +263,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);
         set(ConfPaths.STRINGS + ".flylong", start
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
