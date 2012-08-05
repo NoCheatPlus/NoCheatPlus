@@ -213,6 +213,26 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
 
         /*
+         * 888                                     d8                              
+         * 888 888 8e  Y8b Y888P  ,e e,  888 8e   d88    e88 88e  888,8, Y8b Y888P 
+         * 888 888 88b  Y8b Y8P  d88 88b 888 88b d88888 d888 888b 888 "   Y8b Y8P  
+         * 888 888 888   Y8b "   888   , 888 888  888   Y888 888P 888      Y8b Y   
+         * 888 888 888    Y8P     "YeeP" 888 888  888    "88 88"  888       888    
+         *                                                                  888    
+         *                                                                  888    
+         */
+        set(ConfPaths.INVENTORY_DROP_CHECK, true);
+        set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
+        set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20L);
+        set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:kick");
+
+        set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);
+        set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "log:instantbow:2:5:if cancel");
+
+        set(ConfPaths.INVENTORY_INSTANTEAT_CHECK, true);
+        set(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, "log:instanteat:2:5:if cancel");
+
+        /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
          *   e Y8b Y8b   d888 888b  Y8b Y8P  888 888 88b d888 888 
@@ -274,6 +294,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".breach", start
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
+        set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too much blocks" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too much blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
@@ -283,6 +304,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [attackslimit] times per second" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
+        set(ConfPaths.STRINGS + ".instantbow", start + "fires bow to fast" + end);
+        set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);

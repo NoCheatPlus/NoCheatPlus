@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
+import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -67,6 +68,7 @@ public class CommandHandler implements CommandExecutor {
             BlockPlaceConfig.clear();
             ChatConfig.clear();
             FightConfig.clear();
+            InventoryConfig.clear();
             MovingConfig.clear();
 
             sender.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Configuration reloaded!");

@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
@@ -38,7 +38,7 @@ public class ChatListener implements Listener {
      */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onPlayerChat(final PlayerChatEvent event) {
+    public void onPlayerChat(final AsyncPlayerChatEvent event) {
         /*
          *  ____  _                          ____ _           _   
          * |  _ \| | __ _ _   _  ___ _ __   / ___| |__   __ _| |_ 

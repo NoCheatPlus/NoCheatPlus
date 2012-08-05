@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerEvent;
 
@@ -128,8 +128,8 @@ public class NoPwnage extends Check {
 
         if (!data.noPwnageHasFilledCaptcha) {
             String message = "";
-            if (event instanceof PlayerChatEvent)
-                message = ((PlayerChatEvent) event).getMessage();
+            if (event instanceof AsyncPlayerChatEvent)
+                message = ((AsyncPlayerChatEvent) event).getMessage();
             else if (event instanceof PlayerCommandPreprocessEvent)
                 message = ((PlayerCommandPreprocessEvent) event).getMessage();
             final boolean isCommand = event instanceof PlayerCommandPreprocessEvent;
@@ -164,8 +164,8 @@ public class NoPwnage extends Check {
                 }
 
                 // Cancel the event and return.
-                if (event instanceof PlayerChatEvent)
-                    ((PlayerChatEvent) event).setCancelled(true);
+                if (event instanceof AsyncPlayerChatEvent)
+                    ((AsyncPlayerChatEvent) event).setCancelled(true);
                 else if (event instanceof PlayerCommandPreprocessEvent)
                     ((PlayerCommandPreprocessEvent) event).setCancelled(true);
                 return cancel;
@@ -234,8 +234,8 @@ public class NoPwnage extends Check {
                     player.sendMessage(replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
                             data.noPwnageGeneratedCaptcha)));
                     data.noPwnageHasStartedCaptcha = true;
-                    if (event instanceof PlayerChatEvent)
-                        ((PlayerChatEvent) event).setCancelled(true);
+                    if (event instanceof AsyncPlayerChatEvent)
+                        ((AsyncPlayerChatEvent) event).setCancelled(true);
                     else if (event instanceof PlayerCommandPreprocessEvent)
                         ((PlayerCommandPreprocessEvent) event).setCancelled(true);
                 } else {
@@ -244,8 +244,8 @@ public class NoPwnage extends Check {
                     if (cc.noPwnageWarnOthersCheck)
                         Bukkit.broadcastMessage(replaceColors(cc.noPwnageWarnOthersMessage.replace("[player]",
                                 player.getName())));
-                    if (event instanceof PlayerChatEvent)
-                        ((PlayerChatEvent) event).setCancelled(true);
+                    if (event instanceof AsyncPlayerChatEvent)
+                        ((AsyncPlayerChatEvent) event).setCancelled(true);
                     else if (event instanceof PlayerCommandPreprocessEvent)
                         ((PlayerCommandPreprocessEvent) event).setCancelled(true);
 

@@ -24,13 +24,14 @@ public enum ParameterName {
     ATTACKS_LIMIT("attackslimit"),
     CHECK("check"),
     DISTANCE("distance"),
-    FALLDISTANCE("falldistance"),
+    FALL_DISTANCE("falldistance"),
+    FOOD("food"),
     IP("ip"),
     LOCATION_FROM("locationfrom"),
     LOCATION_TO("locationto"),
     PACKETS("packets"),
     PLAYER("player"),
-    REACHDISTANCE("reachdistance"),
+    REACH_DISTANCE("reachdistance"),
     VIOLATIONS("violations"),
     WORLD("world");
     /**

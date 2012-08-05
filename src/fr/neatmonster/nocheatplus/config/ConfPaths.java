@@ -241,6 +241,31 @@ public abstract class ConfPaths {
     public static final String  FIGHT_SPEED_ACTIONS                   = FIGHT_SPEED + "actions";
 
     /*
+     * 888                                     d8                              
+     * 888 888 8e  Y8b Y888P  ,e e,  888 8e   d88    e88 88e  888,8, Y8b Y888P 
+     * 888 888 88b  Y8b Y8P  d88 88b 888 88b d88888 d888 888b 888 "   Y8b Y8P  
+     * 888 888 888   Y8b "   888   , 888 888  888   Y888 888P 888      Y8b Y   
+     * 888 888 888    Y8P     "YeeP" 888 888  888    "88 88"  888       888    
+     *                                                                  888    
+     *                                                                  888    
+     */
+    private static final String INVENTORY                             = CHECKS + "inventory.";
+
+    private static final String INVENTORY_DROP                        = INVENTORY + "drop.";
+    public static final String  INVENTORY_DROP_CHECK                  = INVENTORY_DROP + "active";
+    public static final String  INVENTORY_DROP_LIMIT                  = INVENTORY_DROP + "limit";
+    public static final String  INVENTORY_DROP_TIMEFRAME              = INVENTORY_DROP + "timeframe";
+    public static final String  INVENTORY_DROP_ACTIONS                = INVENTORY_DROP + "actions";
+
+    private static final String INVENTORY_INSTANTBOW                  = INVENTORY + "instantbow.";
+    public static final String  INVENTORY_INSTANTBOW_CHECK            = INVENTORY_INSTANTBOW + "active";
+    public static final String  INVENTORY_INSTANTBOW_ACTIONS          = INVENTORY_INSTANTBOW + "actions";
+
+    private static final String INVENTORY_INSTANTEAT                  = INVENTORY + "instanteat.";
+    public static final String  INVENTORY_INSTANTEAT_CHECK            = INVENTORY_INSTANTEAT + "active";
+    public static final String  INVENTORY_INSTANTEAT_ACTIONS          = INVENTORY_INSTANTEAT + "actions";
+
+    /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
      *   e Y8b Y8b   d888 888b  Y8b Y8P  888 888 88b d888 888 

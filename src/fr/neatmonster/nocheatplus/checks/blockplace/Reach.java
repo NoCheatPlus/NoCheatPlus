@@ -89,7 +89,7 @@ public class Reach extends Check {
     public String getParameter(final ParameterName wildcard, final Player player) {
         if (wildcard == ParameterName.VIOLATIONS)
             return String.valueOf(Math.round(BlockPlaceData.getData(player).reachVL));
-        else if (wildcard == ParameterName.REACHDISTANCE)
+        else if (wildcard == ParameterName.REACH_DISTANCE)
             return String.valueOf(Math.round(BlockPlaceData.getData(player).reachDistance));
         else
             return super.getParameter(wildcard, player);

@@ -151,7 +151,7 @@ public class NoFall extends Check {
     public String getParameter(final ParameterName wildcard, final Player player) {
         if (wildcard == ParameterName.VIOLATIONS)
             return String.valueOf(Math.round(MovingData.getData(player).noFallVL));
-        else if (wildcard == ParameterName.FALLDISTANCE)
+        else if (wildcard == ParameterName.FALL_DISTANCE)
             return String.format(Locale.US, "%.2f", MovingData.getData(player).noFallDistance);
         else
             return super.getParameter(wildcard, player);
