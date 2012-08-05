@@ -62,7 +62,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_EXPERIMENTAL, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 100);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:bbfastbreak:3:5:cif cancel");
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastbreak:3:5:cif cancel");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
         set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:bbnoswing:3:2:if cancel");
@@ -83,7 +83,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_EXPERIMENTAL, true);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 95L);
-        set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, "cancel vl>100 log:bpfastplace:3:5:cif cancel");
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, "cancel vl>100 log:fastplace:3:5:cif cancel");
 
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true);
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
@@ -169,6 +169,19 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:ban cmd:ban-ip");
 
         /*
+         * 888'Y88 ,e,          888       d8   
+         * 888 ,'Y  "   e88 888 888 ee   d88   
+         * 888C8   888 d888 888 888 88b d88888 
+         * 888 "   888 Y888 888 888 888  888   
+         * 888     888  "88 888 888 888  888   
+         *               ,  88P                
+         *              "8",P"                 
+         */
+        set(ConfPaths.FIGHT_ANGLE_CHECK, true);
+        set(ConfPaths.FIGHT_ANGLE_THRESHOLD, 50);
+        set(ConfPaths.FIGHT_ANGLE_ACTIONS, "cancel vl>100 log:angle:3:5:f cancel vl>250 log:angle:0:5:cif cancel");
+
+        /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
          *   e Y8b Y8b   d888 888b  Y8b Y8P  888 888 88b d888 888 
@@ -222,14 +235,16 @@ public class DefaultConfig extends ConfigFile {
          */
         final String start = "[player] failed [check]: ";
         final String end = ". VL [violations].";
+        set(ConfPaths.STRINGS + ".angle", start + "tried to hit multiple entities at the same time" + end);
         set(ConfPaths.STRINGS + ".ban", "ban [player]");
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
-        set(ConfPaths.STRINGS + ".bbfastbreak", start + "tried to break too much blocks" + end);
         set(ConfPaths.STRINGS + ".bbnoswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of his line of sight" + end);
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too much blocks" + end);
+        set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too much blocks" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);
         set(ConfPaths.STRINGS + ".flylong", start
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);

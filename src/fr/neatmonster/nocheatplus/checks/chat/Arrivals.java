@@ -48,7 +48,7 @@ public class Arrivals extends Check {
     private final Map<Long, String> joins = new HashMap<Long, String>();
 
     /**
-     * Checks player.
+     * Checks a player.
      * 
      * @param player
      *            the player

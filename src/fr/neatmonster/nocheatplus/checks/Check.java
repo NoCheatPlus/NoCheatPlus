@@ -6,10 +6,8 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -36,7 +34,7 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 /**
  * The Class Check.
  */
-public abstract class Check implements Listener {
+public abstract class Check {
     protected static Map<String, ExecutionHistory> histories  = new HashMap<String, ExecutionHistory>();
 
     private static Logger                          fileLogger = null;
@@ -52,31 +50,6 @@ public abstract class Check implements Listener {
         if (!histories.containsKey(player.getName()))
             histories.put(player.getName(), new ExecutionHistory());
         return histories.get(player.getName());
-    }
-
-    /**
-     * Checks if a player is close enough to a target, based on his eye location.
-     * 
-     * @param player
-     *            the player
-     * @param targetX
-     *            the target x
-     * @param targetY
-     *            the target y
-     * @param targetZ
-     *            the target z
-     * @param limit
-     *            the limit
-     * @return the result
-     */
-    public static final double reachCheck(final Player player, final double targetX, final double targetY,
-            final double targetZ, final double limit) {
-        final Location eyes = player.getPlayer().getEyeLocation();
-
-        final double distance = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2)
-                + Math.pow(eyes.getZ() - targetZ, 2));
-
-        return Math.max(distance - limit, 0.0D);
     }
 
     /**

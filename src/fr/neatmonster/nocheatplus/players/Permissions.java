@@ -104,6 +104,18 @@ public class Permissions {
     public static final String  CHAT_NOPWNAGE             = CHAT + ".nopwnage";
 
     /*
+     * 888'Y88 ,e,          888       d8   
+     * 888 ,'Y  "   e88 888 888 ee   d88   
+     * 888C8   888 d888 888 888 88b d88888 
+     * 888 "   888 Y888 888 888 888  888   
+     * 888     888  "88 888 888 888  888   
+     *               ,  88P                
+     *              "8",P"                 
+     */
+    private static final String FIGHT                     = CHECKS + ".fight";
+    public static final String  FIGHT_ANGLE               = FIGHT + ".angle";
+
+    /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
      *   e Y8b Y8b   d888 888b  Y8b Y8P  888 888 88b d888 888 
