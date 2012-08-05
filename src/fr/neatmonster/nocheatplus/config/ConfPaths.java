@@ -230,6 +230,11 @@ public abstract class ConfPaths {
     public static final String  FIGHT_NOSWING_CHECK                   = FIGHT_NOSWING + "active";
     public static final String  FIGHT_NOSWING_ACTIONS                 = FIGHT_NOSWING + "actions";
 
+    private static final String FIGHT_REACH                           = FIGHT + "reach.";
+    public static final String  FIGHT_REACH_CHECK                     = FIGHT_REACH + "active";
+    public static final String  FIGHT_REACH_PENALTY                   = FIGHT_REACH + "penalty";
+    public static final String  FIGHT_REACH_ACTIONS                   = FIGHT_REACH + "actions";
+
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 

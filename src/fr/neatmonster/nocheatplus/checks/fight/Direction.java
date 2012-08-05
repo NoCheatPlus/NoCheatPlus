@@ -65,7 +65,6 @@ public class Direction extends Check {
         final Location maximum = new Location(player.getWorld(), damaged.boundingBox.d, damaged.boundingBox.e,
                 damaged.boundingBox.f);
         if (!CheckUtils.intersects(player, minimum, maximum, OFFSET)) {
-
             // Player failed the check. Let's try to guess how far he was from looking directly to the entity...
             final Vector direction = player.getEyeLocation().getDirection();
             final Vector blockEyes = minimum.add(maximum).multiply(0.5D).subtract(player.getEyeLocation()).toVector();

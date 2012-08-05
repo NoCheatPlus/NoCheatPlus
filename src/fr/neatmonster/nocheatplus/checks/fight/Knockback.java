@@ -55,7 +55,6 @@ public class Knockback extends Check {
         // How long ago has the player started sprinting?
         if (data.knockbackSprintTime > 0L
                 && System.currentTimeMillis() - data.knockbackSprintTime < cc.knockbackInterval) {
-
             // Player failed the check, but this is influenced by lag, so don't do it if there was lag.
             if (!LagMeasureTask.skipCheck())
                 // Increment the violation level

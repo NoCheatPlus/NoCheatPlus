@@ -46,6 +46,7 @@ public class FightData {
     public double                  instantHealVL;
     public double                  knockbackVL;
     public double                  noSwingVL;
+    public double                  reachVL;
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
@@ -67,5 +68,8 @@ public class FightData {
 
     // Data of the no swing check.
     public boolean                 noSwingArmSwung;
+
+    // Data of the reach check.
+    public long                    reachLastViolationTime;
 
 }

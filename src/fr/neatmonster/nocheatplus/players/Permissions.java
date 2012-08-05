@@ -120,6 +120,7 @@ public class Permissions {
     public static final String  FIGHT_INSTANTHEAL         = FIGHT + ".instantheal";
     public static final String  FIGHT_KNOCKBACK           = FIGHT + ".knockback";
     public static final String  FIGHT_NOSWING             = FIGHT + ".noswing";
+    public static final String  FIGHT_REACH               = FIGHT + ".reach";
 
     /*
      *     e   e                         ,e,                  

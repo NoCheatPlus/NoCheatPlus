@@ -54,12 +54,10 @@ public class NoSwing extends Check {
 
         // Did he swing his arm before?
         if (data.noSwingArmSwung) {
-
             // Yes, reward him with reduction of his violation level.
             data.noSwingArmSwung = false;
             data.noSwingVL *= 0.9D;
         } else {
-
             // No, increase his violation level.
             data.noSwingVL += 1D;
 

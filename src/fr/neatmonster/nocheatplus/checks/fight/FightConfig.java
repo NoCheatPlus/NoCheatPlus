@@ -77,6 +77,10 @@ public class FightConfig {
     public final boolean    noSwingCheck;
     public final ActionList noSwingActions;
 
+    public final boolean    reachCheck;
+    public final long       reachPenalty;
+    public final ActionList reachActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -109,5 +113,9 @@ public class FightConfig {
 
         noSwingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
         noSwingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
+
+        reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
+        reachPenalty = data.getLong(ConfPaths.FIGHT_REACH_PENALTY);
+        reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
     }
 }

@@ -119,7 +119,6 @@ public class Angle extends Check {
 
         // Is the violation is superior to the threshold defined in the configuration?
         if (violation > cc.angleThreshold) {
-
             // Has the server lagged?
             if (!LagMeasureTask.skipCheck())
                 // If it hasn't, increment the violation level.

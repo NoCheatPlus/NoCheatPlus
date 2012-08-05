@@ -41,7 +41,7 @@ public class Reach extends Check {
     }
 
     /** The maximum distance allowed to interact with a block. */
-    public final double DISTANCE = 5D;
+    public final double DISTANCE = 5D; // TODO: Test with creative mode.
 
     /**
      * Checks a player.
@@ -57,6 +57,7 @@ public class Reach extends Check {
         final BlockBreakData data = BlockBreakData.getData(player);
 
         boolean cancel = false;
+
         // Distance is calculated from eye location to center of targeted block. If the player is further away from his
         // target than allowed, the difference will be assigned to "distance".
         final double distance = Math.max(CheckUtils.distance(player, location) - DISTANCE, 0D);
