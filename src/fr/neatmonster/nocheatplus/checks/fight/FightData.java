@@ -40,6 +40,7 @@ public class FightData {
 
     // Violation levels.
     public double                  angleVL;
+    public double                  criticalVL;
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();

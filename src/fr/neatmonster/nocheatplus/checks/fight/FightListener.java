@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import org.bukkit.event.Listener;
+
 /*
  * MM""""""""`M oo          dP         dP   M""MMMMMMMM oo            dP                                       
  * MM  mmmmmmmM             88         88   M  MMMMMMMM               88                                       
@@ -13,6 +15,6 @@ package fr.neatmonster.nocheatplus.checks.fight;
 /**
  * Central location to listen to events that are relevant for the fight checks.
  */
-public class FightListener {
+public class FightListener implements Listener {
 
 }

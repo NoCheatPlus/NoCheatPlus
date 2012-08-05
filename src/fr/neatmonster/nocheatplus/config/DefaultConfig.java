@@ -181,6 +181,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_ANGLE_THRESHOLD, 50);
         set(ConfPaths.FIGHT_ANGLE_ACTIONS, "cancel vl>100 log:angle:3:5:f cancel vl>250 log:angle:0:5:cif cancel");
 
+        set(ConfPaths.FIGHT_CRITICAL_CHECK, true);
+        set(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE, 0.01D);
+        set(ConfPaths.FIGHT_CRITICAL_VELOCITY, 0.1D);
+        set(ConfPaths.FIGHT_CRITICAL_ACTIONS, "cancel vl>50 log:critical:0:5:cif cancel");
+
         /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
@@ -243,6 +248,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too much blocks" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too much blocks" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);

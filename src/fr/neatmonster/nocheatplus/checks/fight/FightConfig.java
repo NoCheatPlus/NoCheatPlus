@@ -55,6 +55,11 @@ public class FightConfig {
     public final int        angleThreshold;
     public final ActionList angleActions;
 
+    public final boolean    criticalCheck;
+    public final double     criticalFallDistance;
+    public final double     criticalVelocity;
+    public final ActionList criticalActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -65,5 +70,10 @@ public class FightConfig {
         angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
         angleThreshold = data.getInt(ConfPaths.FIGHT_ANGLE_THRESHOLD);
         angleActions = data.getActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);
+
+        criticalCheck = data.getBoolean(ConfPaths.FIGHT_CRITICAL_CHECK);
+        criticalFallDistance = data.getDouble(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE);
+        criticalVelocity = data.getDouble(ConfPaths.FIGHT_CRITICAL_VELOCITY);
+        criticalActions = data.getActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
     }
 }

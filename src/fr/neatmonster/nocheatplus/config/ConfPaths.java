@@ -202,6 +202,12 @@ public abstract class ConfPaths {
     public static final String  FIGHT_ANGLE_THRESHOLD                 = FIGHT_ANGLE + "threshold";
     public static final String  FIGHT_ANGLE_ACTIONS                   = FIGHT_ANGLE + "actions";
 
+    private static final String FIGHT_CRITICAL                        = FIGHT + "critical.";
+    public static final String  FIGHT_CRITICAL_CHECK                  = FIGHT_CRITICAL + "active";
+    public static final String  FIGHT_CRITICAL_FALLDISTANCE           = FIGHT_CRITICAL + "falldistance";
+    public static final String  FIGHT_CRITICAL_VELOCITY               = FIGHT_CRITICAL + "velocity";
+    public static final String  FIGHT_CRITICAL_ACTIONS                = FIGHT_CRITICAL + "actions";
+
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
