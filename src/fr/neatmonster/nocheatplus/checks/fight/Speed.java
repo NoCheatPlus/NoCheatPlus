@@ -88,7 +88,7 @@ public class Speed extends Check {
     public String getParameter(final ParameterName wildcard, final Player player) {
         if (wildcard == ParameterName.VIOLATIONS)
             return String.valueOf(Math.round(FightData.getData(player).speedVL));
-        else if (wildcard == ParameterName.ATTACKS_LIMIT)
+        else if (wildcard == ParameterName.LIMIT)
             return String.valueOf(Math.round(FightConfig.getConfig(player).speedLimit));
         else
             return super.getParameter(wildcard, player);

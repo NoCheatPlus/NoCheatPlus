@@ -88,6 +88,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true);
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
 
+        set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
+
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, true);
         set(ConfPaths.BLOCKPLACE_SPEED_INTERVAL, 45L);
         set(ConfPaths.BLOCKPLACE_SPEED_ACTIONS,
@@ -302,7 +305,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".flylong", start
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
-        set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [attackslimit] times per second" + end);
+        set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [limit] times per second" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow to fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);

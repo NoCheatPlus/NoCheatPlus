@@ -87,7 +87,8 @@ public class Permissions {
      */
     private static final String BLOCKPLACE                = CHECKS + ".blockplace";
     public static final String  BLOCKPLACE_DIRECTION      = BLOCKPLACE + ".direction";
-    public static final String  BLOCKPLACE_FASTPLACE      = BLOCKPLACE + "fastplace";
+    public static final String  BLOCKPLACE_FASTPLACE      = BLOCKPLACE + ".fastplace";
+    public static final String  BLOCKPLACE_NOSWING        = BLOCKPLACE + ".noswing";
     public static final String  BLOCKPLACE_REACH          = BLOCKPLACE + ".reach";
     public static final String  BLOCKPLACE_SPEED          = BLOCKPLACE + ".speed";
 

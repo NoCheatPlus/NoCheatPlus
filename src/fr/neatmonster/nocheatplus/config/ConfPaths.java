@@ -89,6 +89,10 @@ public abstract class ConfPaths {
     public static final String  BLOCKPLACE_FASTPLACE_INTERVAL         = BLOCKPLACE_FASTPLACE + "interval";
     public static final String  BLOCKPLACE_FASTPLACE_ACTIONS          = BLOCKPLACE_FASTPLACE + "actions";
 
+    private static final String BLOCKPLACE_NOSWING                    = BLOCKPLACE + "noswing.";
+    public static final String  BLOCKPLACE_NOSWING_CHECK              = BLOCKPLACE_NOSWING + "active";
+    public static final String  BLOCKPLACE_NOSWING_ACTIONS            = BLOCKPLACE_NOSWING + "actions";
+
     private static final String BLOCKPLACE_REACH                      = BLOCKPLACE + "reach.";
     public static final String  BLOCKPLACE_REACH_CHECK                = BLOCKPLACE_REACH + "active";
     public static final String  BLOCKPLACE_REACH_ACTIONS              = BLOCKPLACE_REACH + "actions";

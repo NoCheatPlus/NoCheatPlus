@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.moving;
 import java.util.Locale;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -75,8 +74,6 @@ public class NoFall extends Check {
         if (cc.noFallAggressive && (from.isInLiquid() || from.isOnGround() || from.isOnLadder())
                 && (to.isInLiquid() || to.isOnGround() || to.isOnLadder()) && from.getY() <= to.getY()
                 && player.getFallDistance() > 3F) {
-            // Bukkit.broadcastMessage(ChatColor.RED + "Problem with the no fall check!"); // TODO
-
             data.noFallDistance = player.getFallDistance();
 
             // Increment violation level.
@@ -105,8 +102,6 @@ public class NoFall extends Check {
         // We want to know if the fallDistance recorded by the game is smaller than the fall distance recorded by the
         // plugin.
         if (difference > 1F && (to.isInWater() || to.isOnGround() || to.isOnLadder()) && data.noFallDistance > 2F) {
-            Bukkit.broadcastMessage(ChatColor.RED + "Problem with the no fall check!"); // TODO
-
             // Increment violation level.
             data.noFallVL += difference;
 

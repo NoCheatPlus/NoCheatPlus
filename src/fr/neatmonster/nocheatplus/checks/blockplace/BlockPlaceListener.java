@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 /*
@@ -36,6 +37,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class BlockPlaceListener implements Listener {
     private final Direction direction = new Direction();
     private final FastPlace fastPlace = new FastPlace();
+    private final NoSwing   noSwing   = new NoSwing();
     private final Reach     reach     = new Reach();
     private final Speed     speed     = new Speed();
 
@@ -65,20 +67,47 @@ public class BlockPlaceListener implements Listener {
         boolean cancelled = false;
 
         // First, the fast place check.
-        if (fastPlace.isEnabled(player))
-            cancelled = fastPlace.check(player, block);
+        if (fastPlace.isEnabled(player) && fastPlace.check(player, block))
+            cancelled = true;
 
-        // Second, the reach check.
-        if (!cancelled && reach.isEnabled(player))
-            cancelled = reach.check(player, block.getLocation());
+        // Second, the no swing check.
+        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
+            cancelled = true;
 
-        // Third, the direction check.
-        if (!cancelled && direction.isEnabled(player))
-            cancelled = direction.check(player, block.getLocation(), event.getBlockAgainst().getLocation());
+        // Third, the reach check.
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation()))
+            cancelled = true;
+
+        // Fourth, the direction check.
+        if (!cancelled && direction.isEnabled(player)
+                && direction.check(player, block.getLocation(), event.getBlockAgainst().getLocation()))
+            cancelled = true;
 
         // If one of the checks requested to cancel the event, do so.
         if (cancelled)
             event.setCancelled(cancelled);
+    }
+
+    /**
+     * We listen to PlayerAnimation events because it is (currently) equivalent to "player swings arm" and we want to
+     * check if he did that between block breaks.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            priority = EventPriority.MONITOR)
+    public void onPlayerAnimation(final PlayerAnimationEvent event) {
+        /*
+         *  ____  _                            _          _                 _   _             
+         * |  _ \| | __ _ _   _  ___ _ __     / \   _ __ (_)_ __ ___   __ _| |_(_) ___  _ __  
+         * | |_) | |/ _` | | | |/ _ \ '__|   / _ \ | '_ \| | '_ ` _ \ / _` | __| |/ _ \| '_ \ 
+         * |  __/| | (_| | |_| |  __/ |     / ___ \| | | | | | | | | | (_| | |_| | (_) | | | |
+         * |_|   |_|\__,_|\__, |\___|_|    /_/   \_\_| |_|_|_| |_| |_|\__,_|\__|_|\___/|_| |_|
+         *                |___/                                                               
+         */
+        // Just set a flag to true when the arm was swung.
+        BlockPlaceData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
 
     /**

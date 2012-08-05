@@ -281,9 +281,6 @@ public class SurvivalFly extends Check {
 
         // Did the player move in unexpected ways?
         if (result > 0D) {
-            // Bukkit.broadcastMessage(ChatColor.RED + player.getName() + ": problem with the survival fly check!"); //
-            // TODO
-
             // Increment violation counter.
             data.survivalFlyVL += result;
 

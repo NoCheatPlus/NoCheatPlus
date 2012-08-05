@@ -67,6 +67,9 @@ public class BlockPlaceConfig {
     public final long       fastPlaceInterval;
     public final ActionList fastPlaceActions;
 
+    public final boolean    noSwingCheck;
+    public final ActionList noSwingActions;
+
     public final boolean    reachCheck;
     public final ActionList reachActions;
 
@@ -88,6 +91,9 @@ public class BlockPlaceConfig {
         fastPlaceExperimental = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_EXPERIMENTAL);
         fastPlaceInterval = data.getLong(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL);
         fastPlaceActions = data.getActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
+
+        noSwingCheck = data.getBoolean(ConfPaths.BLOCKPLACE_NOSWING_CHECK);
+        noSwingActions = data.getActionList(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, Permissions.BLOCKPLACE_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKPLACE_REACH_CHECK);
         reachActions = data.getActionList(ConfPaths.BLOCKPLACE_REACH_ACTIONS, Permissions.BLOCKPLACE_REACH);

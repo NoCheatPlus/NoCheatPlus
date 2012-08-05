@@ -46,12 +46,16 @@ public class BlockPlaceData {
     // Violation levels.
     public double  directionVL;
     public double  fastPlaceVL;
+    public double  noSwingVL;
     public double  reachVL;
     public double  speedVL;
 
     // Data of the fast place check.
     public long    fastPlaceLastTime;
     public boolean fastPlaceLastRefused;
+
+    // Data of the no swing check.
+    public boolean noSwingArmSwung;
 
     // Data of the reach check.
     public double  reachDistance;
