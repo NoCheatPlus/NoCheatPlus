@@ -81,6 +81,10 @@ public class FightConfig {
     public final long       reachPenalty;
     public final ActionList reachActions;
 
+    public final boolean    speedCheck;
+    public final int        speedLimit;
+    public final ActionList speedActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -117,5 +121,9 @@ public class FightConfig {
         reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
         reachPenalty = data.getLong(ConfPaths.FIGHT_REACH_PENALTY);
         reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
+
+        speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
+        speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
+        speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
     }
 }

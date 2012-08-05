@@ -21,6 +21,7 @@ package fr.neatmonster.nocheatplus.actions;
  * Some wildcards that are used in commands and log messages.
  */
 public enum ParameterName {
+    ATTACKS_LIMIT("attackslimit"),
     CHECK("check"),
     DISTANCE("distance"),
     FALLDISTANCE("falldistance"),

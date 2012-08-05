@@ -208,6 +208,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_REACH_PENALTY, 500);
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
 
+        set(ConfPaths.FIGHT_SPEED_CHECK, true);
+        set(ConfPaths.FIGHT_SPEED_LIMIT, 15);
+        set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
+
         /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
@@ -277,6 +281,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".flylong", start
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
+        set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [attackslimit] times per second" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");

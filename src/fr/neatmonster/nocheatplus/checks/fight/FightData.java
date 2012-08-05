@@ -47,6 +47,9 @@ public class FightData {
     public double                  knockbackVL;
     public double                  noSwingVL;
     public double                  reachVL;
+    public double                  speedVL;
+
+    public boolean                 skipNext;
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
@@ -71,5 +74,9 @@ public class FightData {
 
     // Data of the reach check.
     public long                    reachLastViolationTime;
+
+    // Data of the speed check.
+    public int                     speedAttacks;
+    public long                    speedTime;
 
 }
