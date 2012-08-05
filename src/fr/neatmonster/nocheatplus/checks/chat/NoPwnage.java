@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerEvent;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -118,7 +119,7 @@ public class NoPwnage extends Check {
      *            the event
      * @return true, if successful
      */
-    public boolean check(final Player player, final PlayerChatEvent event) {
+    public boolean check(final Player player, final PlayerEvent event) {
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
         data.noPwnageVL = 0D;
@@ -126,7 +127,11 @@ public class NoPwnage extends Check {
         boolean cancel = false;
 
         if (!data.noPwnageHasFilledCaptcha) {
-            final String message = event.getMessage();
+            String message = "";
+            if (event instanceof PlayerChatEvent)
+                message = ((PlayerChatEvent) event).getMessage();
+            else if (event instanceof PlayerCommandPreprocessEvent)
+                message = ((PlayerCommandPreprocessEvent) event).getMessage();
             final boolean isCommand = event instanceof PlayerCommandPreprocessEvent;
             final long now = System.currentTimeMillis();
 
@@ -159,7 +164,10 @@ public class NoPwnage extends Check {
                 }
 
                 // Cancel the event and return.
-                event.setCancelled(true);
+                if (event instanceof PlayerChatEvent)
+                    ((PlayerChatEvent) event).setCancelled(true);
+                else if (event instanceof PlayerCommandPreprocessEvent)
+                    ((PlayerCommandPreprocessEvent) event).setCancelled(true);
                 return cancel;
             }
 
@@ -226,14 +234,20 @@ public class NoPwnage extends Check {
                     player.sendMessage(replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
                             data.noPwnageGeneratedCaptcha)));
                     data.noPwnageHasStartedCaptcha = true;
-                    event.setCancelled(true);
+                    if (event instanceof PlayerChatEvent)
+                        ((PlayerChatEvent) event).setCancelled(true);
+                    else if (event instanceof PlayerCommandPreprocessEvent)
+                        ((PlayerCommandPreprocessEvent) event).setCancelled(true);
                 } else {
                     lastBanCausingMessage = message;
                     data.noPwnageLastWarningTime = lastBanCausingMessageTime = now;
                     if (cc.noPwnageWarnOthersCheck)
                         Bukkit.broadcastMessage(replaceColors(cc.noPwnageWarnOthersMessage.replace("[player]",
                                 player.getName())));
-                    event.setCancelled(true);
+                    if (event instanceof PlayerChatEvent)
+                        ((PlayerChatEvent) event).setCancelled(true);
+                    else if (event instanceof PlayerCommandPreprocessEvent)
+                        ((PlayerCommandPreprocessEvent) event).setCancelled(true);
 
                     // Dispatch a no pwnage event (API).
                     final NoPwnageEvent e = new NoPwnageEvent(player);

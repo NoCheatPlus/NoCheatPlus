@@ -95,8 +95,13 @@ public class ChatListener implements Listener {
             return;
         }
 
-        // This type of event is derived from PlayerChatEvent, therefore just treat it like that.
-        onPlayerChat(event);
+        // First the color check.
+        if (color.isEnabled(player))
+            event.setMessage(color.check(player, event.getMessage()));
+
+        // Then the no pwnage check.
+        if (noPwnage.isEnabled(player) && noPwnage.check(player))
+            player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
     /**

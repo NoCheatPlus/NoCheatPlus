@@ -70,6 +70,10 @@ public class FightConfig {
     public final boolean    instantHealCheck;
     public final ActionList instantHealActions;
 
+    public final boolean    knockbackCheck;
+    public final long       knockbackInterval;
+    public final ActionList knockbackActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -95,5 +99,9 @@ public class FightConfig {
 
         instantHealCheck = data.getBoolean(ConfPaths.FIGHT_INSTANTHEAL_CHECK);
         instantHealActions = data.getActionList(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, Permissions.FIGHT_INSTANTHEAL);
+
+        knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
+        knockbackInterval = data.getLong(ConfPaths.FIGHT_KNOCKBACK_INTERVAL);
+        knockbackActions = data.getActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
     }
 }

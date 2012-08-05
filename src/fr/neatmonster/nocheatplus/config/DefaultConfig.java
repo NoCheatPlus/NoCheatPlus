@@ -197,6 +197,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, true);
         set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:instantheal:1:1:if cancel");
 
+        set(ConfPaths.FIGHT_KNOCKBACK_CHECK, true);
+        set(ConfPaths.FIGHT_KNOCKBACK_INTERVAL, 50L);
+        set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:knockback:0:5:cif cancel");
+
         /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
@@ -269,6 +273,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
+        set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like a spambot (IP: [ip])" + end);

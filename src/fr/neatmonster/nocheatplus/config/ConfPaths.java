@@ -221,6 +221,11 @@ public abstract class ConfPaths {
     public static final String  FIGHT_INSTANTHEAL_CHECK               = FIGHT_INSTANTHEAL + "active";
     public static final String  FIGHT_INSTANTHEAL_ACTIONS             = FIGHT_INSTANTHEAL + "actions";
 
+    private static final String FIGHT_KNOCKBACK                       = FIGHT + "knockback.";
+    public static final String  FIGHT_KNOCKBACK_CHECK                 = FIGHT_KNOCKBACK + "active";
+    public static final String  FIGHT_KNOCKBACK_INTERVAL              = FIGHT_KNOCKBACK + "interval";
+    public static final String  FIGHT_KNOCKBACK_ACTIONS               = FIGHT_KNOCKBACK + "actions";
+
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
