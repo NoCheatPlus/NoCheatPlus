@@ -63,7 +63,7 @@ public class FightData {
     public long                    godModeLastTime;
 
     // Data of the instant heal check.
-    public int                     instantHealBuffer;
+    public long                    instantHealBuffer;
     public long                    instantHealLastTime;
 
     // Data of the knockback check.

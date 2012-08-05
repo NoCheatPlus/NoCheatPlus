@@ -75,7 +75,7 @@ public class NoFall extends Check {
         if (cc.noFallAggressive && (from.isInLiquid() || from.isOnGround() || from.isOnLadder())
                 && (to.isInLiquid() || to.isOnGround() || to.isOnLadder()) && from.getY() <= to.getY()
                 && player.getFallDistance() > 3F) {
-            Bukkit.broadcastMessage(ChatColor.RED + "Problem with the no fall check!"); // TODO
+            // Bukkit.broadcastMessage(ChatColor.RED + "Problem with the no fall check!"); // TODO
 
             data.noFallDistance = player.getFallDistance();
 

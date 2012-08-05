@@ -10,6 +10,57 @@ import org.bukkit.util.Vector;
 public class CheckUtils {
 
     /**
+     * Check if a player looks at a target of a specific size, with a specific precision value (roughly).
+     * 
+     * @param player
+     *            the player
+     * @param targetX
+     *            the target x
+     * @param targetY
+     *            the target y
+     * @param targetZ
+     *            the target z
+     * @param targetWidth
+     *            the target width
+     * @param targetHeight
+     *            the target height
+     * @param precision
+     *            the precision
+     * @return the double
+     */
+    public static double directionCheck(final Player player, final double targetX, final double targetY,
+            final double targetZ, final double targetWidth, final double targetHeight, final double precision) {
+
+        // Get the eye location of the player.
+        final Location eyes = player.getEyeLocation();
+
+        final double factor = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2)
+                + Math.pow(eyes.getZ() - targetZ, 2));
+
+        // Get the view direction of the player.
+        final Vector direction = eyes.getDirection();
+
+        final double x = targetX - eyes.getX();
+        final double y = targetY - eyes.getY();
+        final double z = targetZ - eyes.getZ();
+
+        final double xPrediction = factor * direction.getX();
+        final double yPrediction = factor * direction.getY();
+        final double zPrediction = factor * direction.getZ();
+
+        double off = 0.0D;
+
+        off += Math.max(Math.abs(x - xPrediction) - (targetWidth / 2 + precision), 0.0D);
+        off += Math.max(Math.abs(z - zPrediction) - (targetWidth / 2 + precision), 0.0D);
+        off += Math.max(Math.abs(y - yPrediction) - (targetHeight / 2 + precision), 0.0D);
+
+        if (off > 1)
+            off = Math.sqrt(off);
+
+        return off;
+    }
+
+    /**
      * Calculates the distance between the player and the intersection of the player's line of sight with the targeted
      * block.
      * 
@@ -34,98 +85,6 @@ public class CheckUtils {
             return max;
         else
             return min;
-    }
-
-    /**
-     * Check if the location is in the line of sight of the player.
-     * 
-     * @param player
-     *            the player
-     * @param minimum
-     *            the minimum location
-     * @param maximum
-     *            the maximum location
-     * @param offset
-     *            the offset
-     * @return true, if successful
-     */
-    public static boolean intersects(final Player player, final Location minimum, final Location maximum,
-            final double offset) {
-        final double x1 = minimum.getX() - offset;
-        final double y1 = minimum.getY() - offset;
-        final double z1 = minimum.getZ() - offset;
-        final double xH = maximum.getX() + offset;
-        final double yH = maximum.getY() + offset;
-        final double zH = maximum.getZ() + offset;
-        final double x0 = player.getEyeLocation().getX();
-        final double y0 = player.getEyeLocation().getY();
-        final double z0 = player.getEyeLocation().getZ();
-        final double xD = player.getEyeLocation().getDirection().getX();
-        final double yD = player.getEyeLocation().getDirection().getY();
-        final double zD = player.getEyeLocation().getDirection().getZ();
-        double tNear = Double.NEGATIVE_INFINITY;
-        double tFar = Double.POSITIVE_INFINITY;
-        if (xD == 0D) {
-            if (x0 < x1 || x0 > xH)
-                return false;
-        } else {
-            double t1 = (x1 - x0) / xD;
-            double t2 = (xH - x0) / xD;
-            if (t1 > t2) {
-                final double tTemp = t1;
-                t1 = t2;
-                t2 = tTemp;
-            }
-            if (t1 > tNear)
-                tNear = t1;
-            if (t2 < tFar)
-                tFar = t2;
-            if (tNear > tFar)
-                return false;
-            if (tFar < 0D)
-                return false;
-        }
-        if (yD == 0D) {
-            if (y0 < y1 || y0 > yH)
-                return false;
-        } else {
-            double t1 = (y1 - y0) / yD;
-            double t2 = (yH - y0) / yD;
-            if (t1 > t2) {
-                final double tTemp = t1;
-                t1 = t2;
-                t2 = tTemp;
-            }
-            if (t1 > tNear)
-                tNear = t1;
-            if (t2 < tFar)
-                tFar = t2;
-            if (tNear > tFar)
-                return false;
-            if (tFar < 0D)
-                return false;
-        }
-        if (zD == 0D) {
-            if (z0 < z1 || z0 > zH)
-                return false;
-        } else {
-            double t1 = (z1 - z0) / zD;
-            double t2 = (zH - z0) / zD;
-            if (t1 > t2) {
-                final double tTemp = t1;
-                t1 = t2;
-                t2 = tTemp;
-            }
-            if (t1 > tNear)
-                tNear = t1;
-            if (t2 < tFar)
-                tFar = t2;
-            if (tNear > tFar)
-                return false;
-            if (tFar < 0D)
-                return false;
-        }
-        return true;
     }
 
     /**

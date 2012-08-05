@@ -70,20 +70,20 @@ public class BlockBreakListener implements Listener {
         // it may save us from doing the computationally expensive checks.
 
         // Has the player broken blocks too quickly?
-        if (fastBreak.isEnabled(player))
-            cancelled = fastBreak.check(player, block);
+        if (fastBreak.isEnabled(player) && fastBreak.check(player, block))
+            cancelled = true;
 
         // Did the arm of the player move before breaking this block?
-        if (!cancelled && noSwing.isEnabled(player))
-            cancelled = noSwing.check(player);
+        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
+            cancelled = true;
 
         // Is the block really in reach distance?
-        if (!cancelled && reach.isEnabled(player))
-            cancelled = reach.check(player, block.getLocation());
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation()))
+            cancelled = true;
 
         // Did the player look at the block at all?
-        if (!cancelled && direction.isEnabled(player))
-            cancelled = direction.check(player, block.getLocation());
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, block.getLocation()))
+            cancelled = true;
 
         // At least one check failed and demanded to cancel the event.
         if (cancelled)

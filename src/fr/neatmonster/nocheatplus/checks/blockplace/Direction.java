@@ -41,8 +41,6 @@ public class Direction extends Check {
         }
     }
 
-    private final double OFFSET = 0.5D;
-
     /**
      * Checks a player.
      * 
@@ -52,16 +50,44 @@ public class Direction extends Check {
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location location) {
+    public boolean check(final Player player, final Location placed, final Location against) {
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         final BlockPlaceData data = BlockPlaceData.getData(player);
 
         boolean cancel = false;
 
-        if (!CheckUtils.intersects(player, location, location.add(1D, 1D, 1D), OFFSET)) {
+        // How far "off" is the player with his aim. We calculate from the players eye location and view direction to
+        // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
+        double off = CheckUtils.directionCheck(player, against.getX() + 0.5D, against.getY() + 0.5D,
+                against.getZ() + 0.5D, 1D, 1D, 75);
+
+        // Now check if the player is looking at the block from the correct side.
+        double off2 = 0.0D;
+
+        // Find out against which face the player tried to build, and if he
+        // stood on the correct side of it
+        final Location eyes = player.getEyeLocation();
+        if (placed.getX() > against.getX())
+            off2 = against.getX() + 0.5D - eyes.getX();
+        else if (placed.getX() < against.getX())
+            off2 = -(against.getX() + 0.5D - eyes.getX());
+        else if (placed.getY() > against.getY())
+            off2 = against.getY() + 0.5D - eyes.getY();
+        else if (placed.getY() < against.getY())
+            off2 = -(against.getY() + 0.5D - eyes.getY());
+        else if (placed.getZ() > against.getZ())
+            off2 = against.getZ() + 0.5D - eyes.getZ();
+        else if (placed.getZ() < against.getZ())
+            off2 = -(against.getZ() + 0.5D - eyes.getZ());
+
+        // If he wasn't on the correct side, add that to the "off" value
+        if (off2 > 0.0D)
+            off += off2;
+
+        if (off > 0.1D) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the block...
             final Vector direction = player.getEyeLocation().getDirection();
-            final Vector blockEyes = location.add(0.5D, 0.5D, 0.5D).subtract(player.getEyeLocation()).toVector();
+            final Vector blockEyes = placed.add(0.5D, 0.5D, 0.5D).subtract(player.getEyeLocation()).toVector();
             final double distance = blockEyes.crossProduct(direction).length() / direction.length();
 
             // Add the overall violation level of the check.

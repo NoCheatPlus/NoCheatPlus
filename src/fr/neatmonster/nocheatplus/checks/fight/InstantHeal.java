@@ -65,7 +65,7 @@ public class InstantHeal extends Check {
             data.instantHealVL -= data.instantHealBuffer / 1000D;
 
             // Reset the buffer.
-            data.instantHealBuffer = 0;
+            data.instantHealBuffer = 0L;
 
             // Dispatch an instant heal event (API).
             final InstantHealEvent e = new InstantHealEvent(player);
@@ -79,8 +79,8 @@ public class InstantHeal extends Check {
             data.instantHealVL *= 0.9D;
 
         // Buffer can't be bigger than 2 seconds.
-        if (data.instantHealBuffer > 2000)
-            data.instantHealBuffer = 2000;
+        if (data.instantHealBuffer > 2000L)
+            data.instantHealBuffer = 2000L;
 
         if (!cancel)
             // New reference time.

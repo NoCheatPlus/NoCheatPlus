@@ -41,8 +41,6 @@ public class Direction extends Check {
         }
     }
 
-    private final double OFFSET = 0.5D;
-
     /**
      * Checks a player.
      * 
@@ -58,7 +56,12 @@ public class Direction extends Check {
 
         boolean cancel = false;
 
-        if (!CheckUtils.intersects(player, location, location.add(1D, 1D, 1D), OFFSET)) {
+        // How far "off" is the player with his aim. We calculate from the players eye location and view direction to
+        // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
+        final double off = CheckUtils.directionCheck(player, location.getX() + 0.5D, location.getY() + 0.5D,
+                location.getZ() + 0.5D, 1D, 1D, 50);
+
+        if (off > 0.1D) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the block...
             final Vector direction = player.getEyeLocation().getDirection();
             final Vector blockEyes = location.add(0.5D, 0.5D, 0.5D).subtract(player.getEyeLocation()).toVector();

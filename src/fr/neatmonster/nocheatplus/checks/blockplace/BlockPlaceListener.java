@@ -60,7 +60,7 @@ public class BlockPlaceListener implements Listener {
             return;
 
         final Player player = event.getPlayer();
-        final Block block = event.getBlock();
+        final Block block = event.getBlockPlaced();
 
         boolean cancelled = false;
 
@@ -74,7 +74,7 @@ public class BlockPlaceListener implements Listener {
 
         // Third, the direction check.
         if (!cancelled && direction.isEnabled(player))
-            cancelled = direction.check(player, block.getLocation());
+            cancelled = direction.check(player, block.getLocation(), event.getBlockAgainst().getLocation());
 
         // If one of the checks requested to cancel the event, do so.
         if (cancelled)

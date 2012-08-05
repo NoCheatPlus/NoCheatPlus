@@ -6,7 +6,6 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -282,7 +281,8 @@ public class SurvivalFly extends Check {
 
         // Did the player move in unexpected ways?
         if (result > 0D) {
-            Bukkit.broadcastMessage(ChatColor.RED + player.getName() + ": problem with the survival fly check!"); // TODO
+            // Bukkit.broadcastMessage(ChatColor.RED + player.getName() + ": problem with the survival fly check!"); //
+            // TODO
 
             // Increment violation counter.
             data.survivalFlyVL += result;

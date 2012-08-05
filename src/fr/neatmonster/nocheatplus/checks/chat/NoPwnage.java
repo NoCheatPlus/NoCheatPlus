@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerEvent;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckEvent;
 import fr.neatmonster.nocheatplus.players.Permissions;
@@ -266,6 +267,18 @@ public class NoPwnage extends Check {
         }
 
         return cancel;
+    }
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.Check#executeActions(org.bukkit.entity.Player, fr.neatmonster.nocheatplus.actions.types.ActionList, double)
+     */
+    @Override
+    protected boolean executeActions(final Player player, final ActionList actionList, final double violationLevel) {
+        if (super.executeActions(player, actionList, violationLevel)) {
+            ChatData.getData(player).clearNoPwnageData();
+            return true;
+        }
+        return false;
     }
 
     /* (non-Javadoc)
