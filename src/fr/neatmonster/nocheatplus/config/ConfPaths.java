@@ -217,6 +217,10 @@ public abstract class ConfPaths {
     public static final String  FIGHT_GODMODE_CHECK                   = FIGHT_GODMODE + "active";
     public static final String  FIGHT_GODMODE_ACTIONS                 = FIGHT_GODMODE + "actions";
 
+    private static final String FIGHT_INSTANTHEAL                     = FIGHT + "instantheal.";
+    public static final String  FIGHT_INSTANTHEAL_CHECK               = FIGHT_INSTANTHEAL + "active";
+    public static final String  FIGHT_INSTANTHEAL_ACTIONS             = FIGHT_INSTANTHEAL + "actions";
+
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 

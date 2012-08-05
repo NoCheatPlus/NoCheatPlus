@@ -67,6 +67,9 @@ public class FightConfig {
     public final boolean    godModeCheck;
     public final ActionList godModeActions;
 
+    public final boolean    instantHealCheck;
+    public final ActionList instantHealActions;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -89,5 +92,8 @@ public class FightConfig {
 
         godModeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
         godModeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
+
+        instantHealCheck = data.getBoolean(ConfPaths.FIGHT_INSTANTHEAL_CHECK);
+        instantHealActions = data.getActionList(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, Permissions.FIGHT_INSTANTHEAL);
     }
 }

@@ -194,6 +194,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
         set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel");
 
+        set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, true);
+        set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:instantheal:1:1:if cancel");
+
         /*
          *     e   e                         ,e,                  
          *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
@@ -264,6 +267,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".flylong", start
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
+        set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);

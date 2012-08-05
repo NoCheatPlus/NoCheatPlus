@@ -43,6 +43,7 @@ public class FightData {
     public double                  criticalVL;
     public double                  directionVL;
     public double                  godModeVL;
+    public double                  instantHealVL;
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
@@ -54,5 +55,9 @@ public class FightData {
     public int                     godModeBuffer;
     public int                     godModeLastAge;
     public long                    godModeLastTime;
+
+    // Data of the instant heal check.
+    public int                     instantHealBuffer;
+    public long                    instantHealLastTime;
 
 }

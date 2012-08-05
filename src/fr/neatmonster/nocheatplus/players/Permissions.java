@@ -117,6 +117,7 @@ public class Permissions {
     public static final String  FIGHT_CRITICAL            = FIGHT + ".critical";
     public static final String  FIGHT_DIRECTION           = FIGHT + ".direction";
     public static final String  FIGHT_GODMODE             = FIGHT + ".godmode";
+    public static final String  FIGHT_INSTANTHEAL         = FIGHT + "instantheal";
 
     /*
      *     e   e                         ,e,                  
