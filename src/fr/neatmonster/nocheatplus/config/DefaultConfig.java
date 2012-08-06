@@ -62,13 +62,33 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_EXPERIMENTAL, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 100);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastbreak:3:5:cif cancel");
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastinteract:3:5:cif cancel");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
         set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
+
+        /*
+         * 888 88b, 888                    888    888           d8                                     d8   
+         * 888 88P' 888  e88 88e   e88'888 888 ee 888 888 8e   d88    ,e e,  888,8,  ,"Y88b  e88'888  d88   
+         * 888 8K   888 d888 888b d888  '8 888 P  888 888 88b d88888 d88 88b 888 "  "8" 888 d888  '8 d88888 
+         * 888 88b, 888 Y888 888P Y888   , 888 b  888 888 888  888   888   , 888    ,ee 888 Y888   ,  888   
+         * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 888 888  888    "YeeP" 888    "88 888  "88,e8'  888   
+         */
+        set(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK, true);
+        set(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel");
+
+        set(ConfPaths.BLOCKINTERACT_FASTINTERACT_CHECK, true);
+        set(ConfPaths.BLOCKINTERACT_FASTINTERACT_INTERVAL, 95L);
+        set(ConfPaths.BLOCKINTERACT_FASTINTERACT_ACTIONS, "cancel vl>100 log:fastplace:3:5:cif cancel");
+
+        set(ConfPaths.BLOCKINTERACT_NOSWING_CHECK, true);
+        set(ConfPaths.BLOCKINTERACT_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
+
+        set(ConfPaths.BLOCKINTERACT_REACH_CHECK, true);
+        set(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
 
         /*
          * 888 88b, 888                    888    888 88e  888                          
@@ -299,6 +319,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too much blocks" + end);
+        set(ConfPaths.STRINGS + ".fastinteract", start + "tried to interact with too much blocks" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too much blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);

@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.checks.Workarounds;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
 import fr.neatmonster.nocheatplus.checks.chat.ChatListener;
 import fr.neatmonster.nocheatplus.checks.fight.FightListener;
@@ -72,6 +73,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // List the events listeners.
         listeners = new ArrayList<Listener>();
         listeners.add(new BlockBreakListener());
+        listeners.add(new BlockInteractListener());
         listeners.add(new BlockPlaceListener());
         listeners.add(new ChatListener());
         listeners.add(new FightListener());

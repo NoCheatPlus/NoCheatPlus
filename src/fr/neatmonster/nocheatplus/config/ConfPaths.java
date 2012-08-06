@@ -71,6 +71,32 @@ public abstract class ConfPaths {
     public static final String  BLOCKBREAK_REACH_ACTIONS              = BLOCKBREAK_REACH + "actions";
 
     /*
+     * 888 88b, 888                    888    888           d8                                     d8   
+     * 888 88P' 888  e88 88e   e88'888 888 ee 888 888 8e   d88    ,e e,  888,8,  ,"Y88b  e88'888  d88   
+     * 888 8K   888 d888 888b d888  '8 888 P  888 888 88b d88888 d88 88b 888 "  "8" 888 d888  '8 d88888 
+     * 888 88b, 888 Y888 888P Y888   , 888 b  888 888 888  888   888   , 888    ,ee 888 Y888   ,  888   
+     * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 888 888  888    "YeeP" 888    "88 888  "88,e8'  888   
+     */
+    private static final String BLOCKINTERACT                         = CHECKS + "blockinteract.";
+
+    private static final String BLOCKINTERACT_DIRECTION               = BLOCKINTERACT + "direction.";
+    public static final String  BLOCKINTERACT_DIRECTION_CHECK         = BLOCKINTERACT_DIRECTION + "active";
+    public static final String  BLOCKINTERACT_DIRECTION_ACTIONS       = BLOCKINTERACT_DIRECTION + "actions";
+
+    private static final String BLOCKINTERACT_FASTINTERACT            = BLOCKINTERACT + "fastinteract.";
+    public static final String  BLOCKINTERACT_FASTINTERACT_CHECK      = BLOCKINTERACT_FASTINTERACT + "active";
+    public static final String  BLOCKINTERACT_FASTINTERACT_INTERVAL   = BLOCKINTERACT_FASTINTERACT + "interval";
+    public static final String  BLOCKINTERACT_FASTINTERACT_ACTIONS    = BLOCKINTERACT_FASTINTERACT + "actions";
+
+    private static final String BLOCKINTERACT_NOSWING                 = BLOCKINTERACT + "noswing.";
+    public static final String  BLOCKINTERACT_NOSWING_CHECK           = BLOCKINTERACT_NOSWING + "active";
+    public static final String  BLOCKINTERACT_NOSWING_ACTIONS         = BLOCKINTERACT_NOSWING + "actions";
+
+    private static final String BLOCKINTERACT_REACH                   = BLOCKINTERACT + "reach.";
+    public static final String  BLOCKINTERACT_REACH_CHECK             = BLOCKINTERACT_REACH + "active";
+    public static final String  BLOCKINTERACT_REACH_ACTIONS           = BLOCKINTERACT_REACH + "actions";
+
+    /*
      * 888 88b, 888                    888    888 88e  888                          
      * 888 88P' 888  e88 88e   e88'888 888 ee 888 888D 888  ,"Y88b  e88'888  ,e e,  
      * 888 8K   888 d888 888b d888  '8 888 P  888 88"  888 "8" 888 d888  '8 d88 88b 

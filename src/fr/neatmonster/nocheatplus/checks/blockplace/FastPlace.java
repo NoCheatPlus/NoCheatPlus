@@ -70,12 +70,12 @@ public class FastPlace extends Check {
                     // we should cancel the event.
                     cancel = !e.isCancelled() && executeActions(player, cc.fastPlaceActions, data.fastPlaceVL);
                 }
+
                 data.fastPlaceLastRefused = true;
             }
         } else {
             // Reward him by lowering his violation level.
             data.fastPlaceVL *= 0.9D;
-
             data.fastPlaceLastRefused = false;
         }
 

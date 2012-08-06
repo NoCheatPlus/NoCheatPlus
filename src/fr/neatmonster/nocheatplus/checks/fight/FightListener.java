@@ -115,6 +115,14 @@ public class FightListener implements Listener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityDamage(final EntityDamageEvent event) {
+        /*
+         *  _____       _   _ _           ____                                   
+         * | ____|_ __ | |_(_) |_ _   _  |  _ \  __ _ _ __ ___   __ _  __ _  ___ 
+         * |  _| | '_ \| __| | __| | | | | | | |/ _` | '_ ` _ \ / _` |/ _` |/ _ \
+         * | |___| | | | |_| | |_| |_| | | |_| | (_| | | | | | | (_| | (_| |  __/
+         * |_____|_| |_|\__|_|\__|\__, | |____/ \__,_|_| |_| |_|\__,_|\__, |\___|
+         *                        |___/                               |___/      
+         */
         // Filter some unwanted events right now.
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
@@ -135,6 +143,14 @@ public class FightListener implements Listener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOW)
     public void onEntityDamage_(final EntityDamageEvent event) {
+        /*
+         *  _____       _   _ _           ____                                   
+         * | ____|_ __ | |_(_) |_ _   _  |  _ \  __ _ _ __ ___   __ _  __ _  ___ 
+         * |  _| | '_ \| __| | __| | | | | | | |/ _` | '_ ` _ \ / _` |/ _` |/ _ \
+         * | |___| | | | |_| | |_| |_| | | |_| | (_| | | | | | | (_| | (_| |  __/
+         * |_____|_| |_|\__|_|\__|\__, | |____/ \__,_|_| |_| |_|\__,_|\__, |\___|
+         *                        |___/                               |___/      
+         */
         // Filter unwanted events right here.
         if (event.getEntity() instanceof Player && !event.getEntity().isDead()) {
             final Player player = (Player) event.getEntity();
@@ -153,6 +169,14 @@ public class FightListener implements Listener {
     @EventHandler(
             priority = EventPriority.MONITOR)
     protected void onEntityDeathEvent(final EntityDeathEvent event) {
+        /*
+         *  _____       _   _ _           ____             _   _     
+         * | ____|_ __ | |_(_) |_ _   _  |  _ \  ___  __ _| |_| |__  
+         * |  _| | '_ \| __| | __| | | | | | | |/ _ \/ _` | __| '_ \ 
+         * | |___| | | | |_| | |_| |_| | | |_| |  __/ (_| | |_| | | |
+         * |_____|_| |_|\__|_|\__|\__, | |____/ \___|\__,_|\__|_| |_|
+         *                        |___/                              
+         */
         // Only interested in dying players.
         if (event.getEntity() instanceof Player)
             godMode.death((Player) event.getEntity());
@@ -167,6 +191,14 @@ public class FightListener implements Listener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityRegainHealth(final EntityRegainHealthEvent event) {
+        /*
+         *  _____       _   _ _           ____                  _         _   _            _ _   _     
+         * | ____|_ __ | |_(_) |_ _   _  |  _ \ ___  __ _  __ _(_)_ __   | | | | ___  __ _| | |_| |__  
+         * |  _| | '_ \| __| | __| | | | | |_) / _ \/ _` |/ _` | | '_ \  | |_| |/ _ \/ _` | | __| '_ \ 
+         * | |___| | | | |_| | |_| |_| | |  _ <  __/ (_| | (_| | | | | | |  _  |  __/ (_| | | |_| | | |
+         * |_____|_| |_|\__|_|\__|\__, | |_| \_\___|\__, |\__,_|_|_| |_| |_| |_|\___|\__,_|_|\__|_| |_|
+         *                        |___/             |___/                                              
+         */
         if (event.getEntity() instanceof Player && event.getRegainReason() == RegainReason.SATIATED) {
             final Player player = (Player) event.getEntity();
             if (instantHeal.isEnabled(player) && instantHeal.check(player))
@@ -183,6 +215,14 @@ public class FightListener implements Listener {
     @EventHandler(
             priority = EventPriority.MONITOR)
     protected void onPlayerAnimation(final PlayerAnimationEvent event) {
+        /*
+         *  ____  _                            _          _                 _   _             
+         * |  _ \| | __ _ _   _  ___ _ __     / \   _ __ (_)_ __ ___   __ _| |_(_) ___  _ __  
+         * | |_) | |/ _` | | | |/ _ \ '__|   / _ \ | '_ \| | '_ ` _ \ / _` | __| |/ _ \| '_ \ 
+         * |  __/| | (_| | |_| |  __/ |     / ___ \| | | | | | | | | | (_| | |_| | (_) | | | |
+         * |_|   |_|\__,_|\__, |\___|_|    /_/   \_\_| |_|_|_| |_| |_|\__,_|\__|_|\___/|_| |_|
+         *                |___/                                                               
+         */
         // Set a flag telling us that the arm has been swung.
         FightData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
@@ -196,6 +236,14 @@ public class FightListener implements Listener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerToggleSprint(final PlayerToggleSprintEvent event) {
+        /*
+         *  ____  _                         _____                 _        ____             _       _   
+         * |  _ \| | __ _ _   _  ___ _ __  |_   _|__   __ _  __ _| | ___  / ___| _ __  _ __(_)_ __ | |_ 
+         * | |_) | |/ _` | | | |/ _ \ '__|   | |/ _ \ / _` |/ _` | |/ _ \ \___ \| '_ \| '__| | '_ \| __|
+         * |  __/| | (_| | |_| |  __/ |      | | (_) | (_| | (_| | |  __/  ___) | |_) | |  | | | | | |_ 
+         * |_|   |_|\__,_|\__, |\___|_|      |_|\___/ \__, |\__, |_|\___| |____/| .__/|_|  |_|_| |_|\__|
+         *                |___/                       |___/ |___/               |_|                     
+         */
         FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
     }
 }

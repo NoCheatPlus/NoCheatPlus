@@ -46,6 +46,14 @@ public class InventoryListener implements Listener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityShootBow(final EntityShootBowEvent event) {
+        /*
+         *  _____       _   _ _           ____  _                 _     ____                
+         * | ____|_ __ | |_(_) |_ _   _  / ___|| |__   ___   ___ | |_  | __ )  _____      __
+         * |  _| | '_ \| __| | __| | | | \___ \| '_ \ / _ \ / _ \| __| |  _ \ / _ \ \ /\ / /
+         * | |___| | | | |_| | |_| |_| |  ___) | | | | (_) | (_) | |_  | |_) | (_) \ V  V / 
+         * |_____|_| |_|\__|_|\__|\__, | |____/|_| |_|\___/ \___/ \__| |____/ \___/ \_/\_/  
+         *                        |___/                                                     
+         */
         // Only if a player shot the arrow.
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
@@ -65,6 +73,14 @@ public class InventoryListener implements Listener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onFoodLevelChange(final FoodLevelChangeEvent event) {
+        /*
+         *  _____               _   _                   _    ____ _                            
+         * |  ___|__   ___   __| | | |    _____   _____| |  / ___| |__   __ _ _ __   __ _  ___ 
+         * | |_ / _ \ / _ \ / _` | | |   / _ \ \ / / _ \ | | |   | '_ \ / _` | '_ \ / _` |/ _ \
+         * |  _| (_) | (_) | (_| | | |__|  __/\ V /  __/ | | |___| | | | (_| | | | | (_| |  __/
+         * |_|  \___/ \___/ \__,_| |_____\___| \_/ \___|_|  \____|_| |_|\__,_|_| |_|\__, |\___|
+         *                                                                          |___/      
+         */
         // Only if a player ate food.
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
@@ -84,6 +100,14 @@ public class InventoryListener implements Listener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     protected void onPlayerDropItem(final PlayerDropItemEvent event) {
+        /*
+         *  ____  _                         ____                  
+         * |  _ \| | __ _ _   _  ___ _ __  |  _ \ _ __ ___  _ __  
+         * | |_) | |/ _` | | | |/ _ \ '__| | | | | '__/ _ \| '_ \ 
+         * |  __/| | (_| | |_| |  __/ |    | |_| | | | (_) | |_) |
+         * |_|   |_|\__,_|\__, |\___|_|    |____/|_|  \___/| .__/ 
+         *                |___/                            |_|    
+         */
         // If the player died, all his items are dropped so ignore him.
         if (event.getPlayer().isDead())
             return;
@@ -103,6 +127,14 @@ public class InventoryListener implements Listener {
     @EventHandler(
             priority = EventPriority.LOWEST)
     public void onPlayerInteractEvent(final PlayerInteractEvent event) {
+        /*
+         *  ____  _                         ___       _                      _   
+         * |  _ \| | __ _ _   _  ___ _ __  |_ _|_ __ | |_ ___ _ __ __ _  ___| |_ 
+         * | |_) | |/ _` | | | |/ _ \ '__|  | || '_ \| __/ _ \ '__/ _` |/ __| __|
+         * |  __/| | (_| | |_| |  __/ |     | || | | | ||  __/ | | (_| | (__| |_ 
+         * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
+         *                |___/                                                  
+         */
         // Only interested in right-clicks while holding an item.
         if (!event.hasItem()
                 || !(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))

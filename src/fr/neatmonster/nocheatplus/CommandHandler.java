@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
@@ -65,6 +66,7 @@ public class CommandHandler implements CommandExecutor {
             ConfigManager.cleanup();
             ConfigManager.init(plugin);
             BlockBreakConfig.clear();
+            BlockInteractConfig.clear();
             BlockPlaceConfig.clear();
             ChatConfig.clear();
             FightConfig.clear();
