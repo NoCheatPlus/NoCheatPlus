@@ -66,8 +66,7 @@ public class NoFall extends Check {
         }
 
         // This check is pretty much always a step behind for technical reasons.
-        if (from.isInLiquid() || to.isInLiquid() || from.isOnGround() || to.isOnGround() || from.isOnLadder()
-                || to.isOnLadder())
+        if (from.isInLiquid() || from.isOnGround() || from.isOnLadder())
             // Start with zero fall distance.
             data.noFallDistance = 0F;
 

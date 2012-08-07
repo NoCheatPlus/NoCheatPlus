@@ -1,5 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
+import java.util.Arrays;
+
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,10 +35,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
  * @see BlockInteractEvent
  */
 public class BlockInteractListener implements Listener {
-    private final Direction    direction    = new Direction();
-    private final FastInteract fastInteract = new FastInteract();
-    private final NoSwing      noSwing      = new NoSwing();
-    private final Reach        reach        = new Reach();
+    private final Direction  direction = new Direction();
+    private final NoSwing    noSwing   = new NoSwing();
+    private final Reach      reach     = new Reach();
+
+    private final Material[] materials = new Material[] {Material.BED_BLOCK, Material.BURNING_FURNACE,
+            Material.BREWING_STAND, Material.CAKE_BLOCK, Material.CAULDRON, Material.CHEST, Material.DIODE_BLOCK_OFF,
+            Material.DIODE_BLOCK_ON, Material.DISPENSER, Material.DRAGON_EGG, Material.ENCHANTMENT_TABLE,
+            Material.ENDER_CHEST, Material.FENCE_GATE, Material.FURNACE, Material.IRON_DOOR_BLOCK, Material.LEVER,
+            Material.NOTE_BLOCK, Material.STONE_BUTTON, Material.TRAP_DOOR, Material.WOODEN_DOOR, Material.WORKBENCH};
 
     /**
      * We listen to PlayerAnimation events because it is (currently) equivalent to "player swings arm" and we want to
@@ -60,7 +68,7 @@ public class BlockInteractListener implements Listener {
     }
 
     /**
-     * We listen to PlayerInteractEvent events for obvious reasons
+     * We listen to PlayerInteractEvent events for obvious reasons.
      * 
      * @param event
      *            the event
@@ -86,19 +94,19 @@ public class BlockInteractListener implements Listener {
 
         boolean cancelled = false;
 
-        // Do the actual checks, first the fast interact check.
-        if (fastInteract.isEnabled(player) && fastInteract.check(player))
-            cancelled = true;
+        // First the no swing check.
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK
+                || Arrays.asList(materials).contains(event.getClickedBlock().getType())) {
+            if (noSwing.isEnabled(player) && noSwing.check(player))
+                cancelled = true;
+        } else
+            BlockInteractData.getData(player).noSwingArmSwung = false;
 
-        // Second the no swing check.
-        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
-            cancelled = true;
-
-        // Third the reach check
+        // Second the reach check.
         if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation()))
             cancelled = true;
 
-        // Fourth the direction check
+        // Third the direction check
         if (!cancelled && direction.isEnabled(player) && direction.check(player, block.getLocation()))
             cancelled = true;
 

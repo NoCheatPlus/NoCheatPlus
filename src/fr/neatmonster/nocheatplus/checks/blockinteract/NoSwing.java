@@ -52,24 +52,28 @@ public class NoSwing extends Check {
 
         boolean cancel = false;
 
-        // Did he swing his arm before?
-        if (data.noSwingArmSwung) {
-            // "Consume" the flag.
-            data.noSwingArmSwung = false;
-            // Reward with lowering of the violation level.
-            data.noSwingVL *= 0.9D;
-        } else {
-            // He failed, increase violation level.
-            data.noSwingVL += 1D;
+        if (System.currentTimeMillis() - data.noSwingLastTime > 3L)
+            // Did he swing his arm before?
+            if (data.noSwingArmSwung) {
+                // "Consume" the flag.
+                data.noSwingArmSwung = false;
+                // Reward with lowering of the violation level.
+                data.noSwingVL *= 0.9D;
+            } else {
+                // He failed, increase violation level.
+                data.noSwingVL += 1D;
 
-            // Dispatch a no swing event (API).
-            final NoSwingEvent e = new NoSwingEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
+                // Dispatch a no swing event (API).
+                final NoSwingEvent e = new NoSwingEvent(player);
+                Bukkit.getPluginManager().callEvent(e);
 
-            // Execute whatever actions are associated with this check and the violation level and find out if we should
-            // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.noSwingActions, data.noSwingVL);
-        }
+                // Execute whatever actions are associated with this check and the violation level and find out if we
+                // should
+                // cancel the event.
+                cancel = !e.isCancelled() && executeActions(player, cc.noSwingActions, data.noSwingVL);
+            }
+
+        data.noSwingLastTime = System.currentTimeMillis();
 
         return cancel;
 

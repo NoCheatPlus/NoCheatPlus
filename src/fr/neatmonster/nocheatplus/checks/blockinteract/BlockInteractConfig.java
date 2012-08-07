@@ -62,10 +62,6 @@ public class BlockInteractConfig {
     public final boolean    directionCheck;
     public final ActionList directionActions;
 
-    public final boolean    fastInteractCheck;
-    public final long       fastInteractInterval;
-    public final ActionList fastInteractActions;
-
     public final boolean    noSwingCheck;
     public final ActionList noSwingActions;
 
@@ -82,11 +78,6 @@ public class BlockInteractConfig {
         directionCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK);
         directionActions = data.getActionList(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS,
                 Permissions.BLOCKINTERACT_DIRECTION);
-
-        fastInteractCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_FASTINTERACT_CHECK);
-        fastInteractInterval = data.getLong(ConfPaths.BLOCKINTERACT_FASTINTERACT_INTERVAL);
-        fastInteractActions = data.getActionList(ConfPaths.BLOCKINTERACT_FASTINTERACT_ACTIONS,
-                Permissions.BLOCKINTERACT_FASTINTERACT);
 
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_NOSWING_CHECK);
         noSwingActions = data.getActionList(ConfPaths.BLOCKINTERACT_NOSWING_ACTIONS, Permissions.BLOCKINTERACT_NOSWING);

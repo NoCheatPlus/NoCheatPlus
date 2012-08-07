@@ -95,7 +95,7 @@ public class FastBreak extends Check {
                 data.fastBreakBuffer--;
         } else {
             // If the buffer isn't full.
-            if (data.fastBreakBuffer < 3)
+            if (data.fastBreakBuffer < data.fastBreakBuffer)
                 // Add one to the buffer.
                 data.fastBreakBuffer++;
 

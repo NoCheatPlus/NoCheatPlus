@@ -58,6 +58,7 @@ public abstract class ConfPaths {
 
     private static final String BLOCKBREAK_FASTBREAK                  = BLOCKBREAK + "fastbreak.";
     public static final String  BLOCKBREAK_FASTBREAK_CHECK            = BLOCKBREAK_FASTBREAK + "active";
+    public static final String  BLOCKBREAK_FASTBREAK_BUFFER           = BLOCKBREAK_FASTBREAK + "buffer";
     public static final String  BLOCKBREAK_FASTBREAK_EXPERIMENTAL     = BLOCKBREAK_FASTBREAK + "experimental";
     public static final String  BLOCKBREAK_FASTBREAK_INTERVAL         = BLOCKBREAK_FASTBREAK + "interval";
     public static final String  BLOCKBREAK_FASTBREAK_ACTIONS          = BLOCKBREAK_FASTBREAK + "actions";
@@ -82,11 +83,6 @@ public abstract class ConfPaths {
     private static final String BLOCKINTERACT_DIRECTION               = BLOCKINTERACT + "direction.";
     public static final String  BLOCKINTERACT_DIRECTION_CHECK         = BLOCKINTERACT_DIRECTION + "active";
     public static final String  BLOCKINTERACT_DIRECTION_ACTIONS       = BLOCKINTERACT_DIRECTION + "actions";
-
-    private static final String BLOCKINTERACT_FASTINTERACT            = BLOCKINTERACT + "fastinteract.";
-    public static final String  BLOCKINTERACT_FASTINTERACT_CHECK      = BLOCKINTERACT_FASTINTERACT + "active";
-    public static final String  BLOCKINTERACT_FASTINTERACT_INTERVAL   = BLOCKINTERACT_FASTINTERACT + "interval";
-    public static final String  BLOCKINTERACT_FASTINTERACT_ACTIONS    = BLOCKINTERACT_FASTINTERACT + "actions";
 
     private static final String BLOCKINTERACT_NOSWING                 = BLOCKINTERACT + "noswing.";
     public static final String  BLOCKINTERACT_NOSWING_CHECK           = BLOCKINTERACT_NOSWING + "active";

@@ -50,7 +50,7 @@ public class BlockBreakData {
     public double  reachVL;
 
     // Data of the fast break check.
-    public int     fastBreakBuffer     = 3;
+    public int     fastBreakBuffer     = 5;
     public long    fastBreakBreakTime  = System.currentTimeMillis() - 1000L;
     public long    fastBreakDamageTime = System.currentTimeMillis();
 

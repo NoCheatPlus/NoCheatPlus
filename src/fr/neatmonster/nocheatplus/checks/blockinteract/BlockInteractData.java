@@ -45,16 +45,12 @@ public class BlockInteractData {
 
     // Violation levels.
     public double  directionVL;
-    public double  fastInteractVL;
     public double  noSwingVL;
     public double  reachVL;
 
-    // Data of the fast interact check.
-    public boolean fastInteractLastRefused;
-    public double  fastInteractLastTime;
-
     // Data of the no swing check.
     public boolean noSwingArmSwung;
+    public long    noSwingLastTime;
 
     // Data of the reach check.
     public double  reachDistance;

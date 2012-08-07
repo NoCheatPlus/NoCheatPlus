@@ -56,6 +56,9 @@ public class MovingData {
 
     public Location[] lastSafeLocations        = new Location[] {null, null};
 
+    // Data of the creative check.
+    public boolean    creativeFlyPreviousRefused;
+
     // Data of the more packets check.
     public int        morePacketsBuffer        = 50;
     public long       morePacketsLastTime;
@@ -75,9 +78,9 @@ public class MovingData {
     // Data of the survival fly check.
     public int        survivalFlyJumpPhase;
     public int        survivalFlyOnIce;
-    public long       survivalInLavaSince;
-    public long       survivalInWaterSince;
-    public long       survivalOnLadderSince;
+    public long       survivalFlyInLavaSince;
+    public long       survivalFlyInWaterSince;
+    public long       survivalFlyOnLadderSince;
 
     // Locations shared between all checks.
     public Location   from;

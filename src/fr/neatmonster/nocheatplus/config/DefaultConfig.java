@@ -60,6 +60,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER, 5);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_EXPERIMENTAL, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastinteract:3:5:cif cancel");
@@ -79,10 +80,6 @@ public class DefaultConfig extends ConfigFile {
          */
         set(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel");
-
-        set(ConfPaths.BLOCKINTERACT_FASTINTERACT_CHECK, true);
-        set(ConfPaths.BLOCKINTERACT_FASTINTERACT_INTERVAL, 95L);
-        set(ConfPaths.BLOCKINTERACT_FASTINTERACT_ACTIONS, "cancel vl>100 log:fastplace:3:5:cif cancel");
 
         set(ConfPaths.BLOCKINTERACT_NOSWING_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
@@ -319,7 +316,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too much blocks" + end);
-        set(ConfPaths.STRINGS + ".fastinteract", start + "tried to interact with too much blocks" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too much blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);

@@ -63,6 +63,7 @@ public class BlockBreakConfig {
     public final ActionList directionActions;
 
     public final boolean    fastBreakCheck;
+    public final int        fastBreakBuffer;
     public final boolean    fastBreakExperimental;
     public final int        fastBreakInterval;
     public final ActionList fastBreakActions;
@@ -84,6 +85,7 @@ public class BlockBreakConfig {
         directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
 
         fastBreakCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK);
+        fastBreakBuffer = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER);
         fastBreakExperimental = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_EXPERIMENTAL);
         fastBreakInterval = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL);
         fastBreakActions = data.getActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);

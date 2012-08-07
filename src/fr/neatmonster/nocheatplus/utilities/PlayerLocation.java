@@ -268,7 +268,10 @@ public class PlayerLocation {
      */
     public boolean isOnIce() {
         if (!onIce.isSet())
-            onIce.set(world.getTypeId(x, y - 1, z) == Block.ICE.id);
+            if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
+                onIce.set(world.getTypeId(x, (int) Math.floor(boundingBox.b - 0.1D), z) == Block.ICE.id);
+            else
+                onIce.set(world.getTypeId(x, y - 1, z) == Block.ICE.id);
         return onIce.get();
     }
 

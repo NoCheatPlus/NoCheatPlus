@@ -69,7 +69,8 @@ public class CreativeFly extends Check {
         final MovingData data = MovingData.getData(player);
 
         // If we have no setback, define one now.
-        data.setBack = data.setBack == null ? from.getLocation() : data.setBack;
+        if (data.setBack == null)
+            data.setBack = from.getLocation();
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final int maximumHeight = cc.creativeFlyMaxHeight + player.getWorld().getMaxHeight();
@@ -135,21 +136,27 @@ public class CreativeFly extends Check {
 
         // The player went to far, either horizontal or vertical.
         if (result > 0D) {
-            // Increment violation level.
-            data.creativeFlyVL += result;
+            if (data.creativeFlyPreviousRefused) {
+                // Increment violation level.
+                data.creativeFlyVL += result;
 
-            // Dispatch a creative fly event (API).
-            final CreativeFlyEvent e = new CreativeFlyEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
+                // Dispatch a creative fly event (API).
+                final CreativeFlyEvent e = new CreativeFlyEvent(player);
+                Bukkit.getPluginManager().callEvent(e);
 
-            // Execute whatever actions are associated with this check and the violation level and find out if we should
-            // cancel the event.
-            if (!e.isCancelled() && executeActions(player, cc.creativeFlyActions, data.creativeFlyVL))
-                // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
-                // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
-                return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
-                        to.getYaw(), to.getPitch());
-        }
+                // Execute whatever actions are associated with this check and the violation level and find out if we
+                // should
+                // cancel the event.
+                if (!e.isCancelled() && executeActions(player, cc.creativeFlyActions, data.creativeFlyVL))
+                    // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
+                    // to
+                    // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
+                    return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(),
+                            data.setBack.getZ(), to.getYaw(), to.getPitch());
+            } else
+                data.creativeFlyPreviousRefused = true;
+        } else
+            data.creativeFlyPreviousRefused = false;
 
         // Slowly reduce the violation level with each event.
         data.creativeFlyVL *= 0.97D;
