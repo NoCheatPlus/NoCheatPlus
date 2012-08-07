@@ -1,13 +1,11 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -30,27 +28,18 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 public class MorePackets extends Check {
 
     /**
-     * The event triggered by this check.
-     */
-    public class MorePacketsEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new more packets event.
-         * 
-         * @param player
-         *            the player
-         */
-        public MorePacketsEvent(final Player player) {
-            super(player);
-        }
-    }
-
-    /**
      * The usual number of packets per timeframe.
      * 
      * 20 would be for perfect internet connections, 22 is good enough.
      */
     private final static int packetsPerTimeframe = 22;
+
+    /**
+     * Instantiates a new more packets check.
+     */
+    public MorePackets() {
+        super(CheckType.MOVING_MOREPACKETS);
+    }
 
     /**
      * Checks a player.
@@ -69,7 +58,7 @@ public class MorePackets extends Check {
      * @return the location
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
+        MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 
         Location newTo = null;
@@ -89,13 +78,9 @@ public class MorePackets extends Check {
             // Increment violation level.
             data.morePacketsVL = -data.morePacketsBuffer;
 
-            // Dispatch a more packets event (API).
-            final MorePacketsEvent e = new MorePacketsEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (!e.isCancelled() && executeActions(player, cc.morePacketsActions, data.morePacketsVL))
+            if (executeActions(player))
                 newTo = data.teleported = data.morePacketsSetback;
         }
 
@@ -138,19 +123,9 @@ public class MorePackets extends Check {
      */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(MovingData.getData(player).morePacketsVL));
-        else if (wildcard == ParameterName.PACKETS)
+        if (wildcard == ParameterName.PACKETS)
             return String.valueOf(MovingData.getData(player).morePacketsPackets);
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.MOVING_MOREPACKETS) && MovingConfig.getConfig(player).morePacketsCheck;
     }
 }

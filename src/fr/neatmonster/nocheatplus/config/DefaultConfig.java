@@ -63,7 +63,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER, 5);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_EXPERIMENTAL, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 100);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastinteract:3:5:cif cancel");
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastbreak:3:5:cif cancel");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
         set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
@@ -280,8 +280,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_NOFALL_ACTIONS, "log:nofall:0:5:cif cancel");
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
-        set(ConfPaths.MOVING_SURVIVALFLY_ALLOWFASTBLOCKING, false);
-        set(ConfPaths.MOVING_SURVIVALFLY_ALLOWFASTSNEAKING, false);
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
         // set(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_COBWEBSPEED, 100);
@@ -313,6 +311,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too much blocks" + end);

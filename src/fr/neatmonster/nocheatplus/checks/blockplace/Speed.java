@@ -1,12 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * MP""""""`MM                                  dP 
@@ -24,19 +21,10 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 public class Speed extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new speed check.
      */
-    public class SpeedEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new speed event.
-         * 
-         * @param player
-         *            the player
-         */
-        public SpeedEvent(final Player player) {
-            super(player);
-        }
+    public Speed() {
+        super(CheckType.BLOCKPLACE_SPEED);
     }
 
     /**
@@ -58,13 +46,9 @@ public class Speed extends Check {
                 // He failed, increase this violation level.
                 data.speedVL += cc.speedInterval - System.currentTimeMillis() + data.speedLastTime;
 
-                // Dispatch a speed event (API).
-                final SpeedEvent e = new SpeedEvent(player);
-                Bukkit.getPluginManager().callEvent(e);
-
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should cancel the event.
-                cancel = !e.isCancelled() && executeActions(player, cc.speedActions, data.speedVL);
+                cancel = executeActions(player);
             }
 
             data.speedLastRefused = true;
@@ -78,24 +62,5 @@ public class Speed extends Check {
         data.speedLastTime = System.currentTimeMillis();
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(BlockPlaceData.getData(player).speedVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.BLOCKPLACE_SPEED) && BlockPlaceConfig.getConfig(player).speedCheck;
     }
 }

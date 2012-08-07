@@ -76,10 +76,11 @@ public class MovingData {
     public float      noFallLastAddedDistance;
 
     // Data of the survival fly check.
-    public int        survivalFlyJumpPhase;
-    public int        survivalFlyOnIce;
     public long       survivalFlyInLavaSince;
     public long       survivalFlyInWaterSince;
+    public int        survivalFlyJumpPhase;
+    public double[]   survivalFlyLastDistances = new double[] {0D, 0D};
+    public int        survivalFlyOnIce;
     public long       survivalFlyOnLadderSince;
 
     // Locations shared between all checks.

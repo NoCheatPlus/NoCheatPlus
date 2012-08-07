@@ -9,10 +9,8 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerEvent;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
-import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -30,22 +28,6 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  */
 public class NoPwnage extends Check {
 
-    /**
-     * The event triggered by this check.
-     */
-    public class NoPwnageEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new no pwnage event.
-         * 
-         * @param player
-         *            the player
-         */
-        public NoPwnageEvent(final Player player) {
-            super(player);
-        }
-    }
-
     /** The last message which caused ban said. */
     private String       lastBanCausingMessage;
 
@@ -58,12 +40,15 @@ public class NoPwnage extends Check {
     /** The time it was when the last message was said. */
     private long         lastGlobalMessageTime;
 
+    /** The random number generator. */
     private final Random random = new Random();
 
     /**
      * Instantiates a new no pwnage check.
      */
     public NoPwnage() {
+        super(CheckType.CHAT_NOPWNAGE);
+
         for (final Player player : Bukkit.getOnlinePlayers())
             ChatData.getData(player).noPwnageLastLocation = player.getLocation();
     }
@@ -93,15 +78,9 @@ public class NoPwnage extends Check {
                 player.sendMessage(replaceColors(cc.noPwnageReloginWarningMessage));
                 data.noPwnageReloginWarningTime = now;
                 data.noPwnageReloginWarnings++;
-            } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout) {
-                // Dispatch a no pwnage event (API).
-                final NoPwnageEvent e = new NoPwnageEvent(player);
-                Bukkit.getPluginManager().callEvent(e);
-
+            } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
                 // Find out if we need to ban the player or not.
-                if (!e.isCancelled())
-                    cancel = executeActions(player, cc.noPwnageActions, data.noPwnageVL);
-            }
+                cancel = executeActions_(player);
         }
 
         // Store his location and some other data.
@@ -145,16 +124,9 @@ public class NoPwnage extends Check {
                     player.sendMessage(replaceColors(cc.noPwnageCaptchaSuccess));
                 } else {
                     // Does he failed too much times?
-                    if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
-
-                        // Dispatch a no pwnage event (API).
-                        final NoPwnageEvent e = new NoPwnageEvent(player);
-                        Bukkit.getPluginManager().callEvent(e);
-
+                    if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
                         // Find out if we need to ban the player or not.
-                        if (!e.isCancelled())
-                            cancel = executeActions(player, cc.noPwnageActions, data.noPwnageVL);
-                    }
+                        cancel = executeActions_(player);
 
                     // Increment his tries number counter.
                     data.noPwnageCaptchTries++;
@@ -250,13 +222,8 @@ public class NoPwnage extends Check {
                     else if (event instanceof PlayerCommandPreprocessEvent)
                         ((PlayerCommandPreprocessEvent) event).setCancelled(true);
 
-                    // Dispatch a no pwnage event (API).
-                    final NoPwnageEvent e = new NoPwnageEvent(player);
-                    Bukkit.getPluginManager().callEvent(e);
-
                     // Find out if we need to ban the player or not.
-                    if (!e.isCancelled())
-                        cancel = executeActions(player, cc.noPwnageActions, data.noPwnageVL);
+                    cancel = executeActions_(player);
                 }
 
             // Store the message and some other data.
@@ -269,12 +236,15 @@ public class NoPwnage extends Check {
         return cancel;
     }
 
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#executeActions(org.bukkit.entity.Player, fr.neatmonster.nocheatplus.actions.types.ActionList, double)
+    /**
+     * Execute actions.
+     * 
+     * @param player
+     *            the player
+     * @return true, if successful
      */
-    @Override
-    protected boolean executeActions(final Player player, final ActionList actionList, final double violationLevel) {
-        if (super.executeActions(player, actionList, violationLevel)) {
+    private boolean executeActions_(final Player player) {
+        if (super.executeActions(player)) {
             ChatData.getData(player).clearNoPwnageData();
             return true;
         }
@@ -286,19 +256,9 @@ public class NoPwnage extends Check {
      */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(ChatData.getData(player).noPwnageVL));
-        else if (wildcard == ParameterName.IP)
+        if (wildcard == ParameterName.IP)
             return player.getAddress().toString().substring(1).split(":")[0];
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.CHAT_NOPWNAGE) && ChatConfig.getConfig(player).noPwnageCheck;
     }
 }

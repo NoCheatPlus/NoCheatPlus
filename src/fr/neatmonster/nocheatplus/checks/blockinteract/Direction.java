@@ -1,14 +1,11 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -26,19 +23,10 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 public class Direction extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new direction check.
      */
-    public class DirectionEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new direction event.
-         * 
-         * @param player
-         *            the player
-         */
-        public DirectionEvent(final Player player) {
-            super(player);
-        }
+    public Direction() {
+        super(CheckType.BLOCKINTERACT_DIRECTION);
     }
 
     /**
@@ -51,7 +39,7 @@ public class Direction extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location location) {
-        final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
+        BlockInteractConfig.getConfig(player);
         final BlockInteractData data = BlockInteractData.getData(player);
 
         boolean cancel = false;
@@ -70,37 +58,13 @@ public class Direction extends Check {
             // Add the overall violation level of the check.
             data.directionVL += distance;
 
-            // Dispatch a direction event (API).
-            final DirectionEvent e = new DirectionEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.directionActions, data.directionVL);
+            cancel = executeActions(player);
         } else
             // Player did likely nothing wrong, reduce violation counter to reward him.
             data.directionVL *= 0.9D;
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(BlockInteractData.getData(player).directionVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.BLOCKINTERACT_DIRECTION)
-                && BlockInteractConfig.getConfig(player).directionCheck;
     }
 }

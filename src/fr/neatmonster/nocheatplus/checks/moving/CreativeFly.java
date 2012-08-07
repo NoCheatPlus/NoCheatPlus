@@ -5,15 +5,13 @@ import java.util.Locale;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -31,27 +29,19 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  * aren't allowed to fly, and therefore have tighter rules to obey.
  */
 public class CreativeFly extends Check {
-    /**
-     * The event triggered by this check.
-     */
-    public class CreativeFlyEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new creative fly event.
-         * 
-         * @param player
-         *            the player
-         */
-        public CreativeFlyEvent(final Player player) {
-            super(player);
-        }
-    }
 
     /** The horizontal speed in creative mode. */
     private static final double HORIZONTAL_SPEED = 0.6D;
 
     /** The vertical speed in creative mode. */
     private static final double VERTICAL_SPEED   = 1D;
+
+    /**
+     * Instantiates a new creative fly check.
+     */
+    public CreativeFly() {
+        super(CheckType.MOVING_CREATIVEFLY);
+    }
 
     /**
      * Checks a player.
@@ -140,17 +130,12 @@ public class CreativeFly extends Check {
                 // Increment violation level.
                 data.creativeFlyVL += result;
 
-                // Dispatch a creative fly event (API).
-                final CreativeFlyEvent e = new CreativeFlyEvent(player);
-                Bukkit.getPluginManager().callEvent(e);
-
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should
                 // cancel the event.
-                if (!e.isCancelled() && executeActions(player, cc.creativeFlyActions, data.creativeFlyVL))
+                if (executeActions(player))
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
-                    // to
-                    // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
+                    // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                     return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(),
                             data.setBack.getZ(), to.getYaw(), to.getPitch());
             } else
@@ -173,9 +158,7 @@ public class CreativeFly extends Check {
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
         final MovingData data = MovingData.getData(player);
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(data.creativeFlyVL));
-        else if (wildcard == ParameterName.LOCATION_FROM)
+        if (wildcard == ParameterName.LOCATION_FROM)
             return String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ());
         else if (wildcard == ParameterName.LOCATION_TO)
             return String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ());
@@ -183,13 +166,5 @@ public class CreativeFly extends Check {
             return String.format(Locale.US, "%.2f", data.to.subtract(data.from).lengthSquared());
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.MOVING_CREATIVEFLY) && MovingConfig.getConfig(player).creativeFlyCheck;
     }
 }

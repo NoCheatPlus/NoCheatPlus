@@ -1,12 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
 /*
@@ -25,19 +23,10 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class Speed extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new speed check.
      */
-    public class SpeedEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new speed event.
-         * 
-         * @param player
-         *            the player
-         */
-        public SpeedEvent(final Player player) {
-            super(player);
-        }
+    public Speed() {
+        super(CheckType.FIGHT_SPEED);
     }
 
     /**
@@ -69,13 +58,9 @@ public class Speed extends Check {
             if (!LagMeasureTask.skipCheck())
                 data.speedVL += 1;
 
-            // Dispatch a speed event (API).
-            final SpeedEvent e = new SpeedEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.speedActions, data.speedVL);
+            cancel = executeActions(player);
         }
 
         return cancel;
@@ -86,19 +71,9 @@ public class Speed extends Check {
      */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(FightData.getData(player).speedVL));
-        else if (wildcard == ParameterName.LIMIT)
+        if (wildcard == ParameterName.LIMIT)
             return String.valueOf(Math.round(FightConfig.getConfig(player).speedLimit));
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.FIGHT_SPEED) && FightConfig.getConfig(player).speedCheck;
     }
 }

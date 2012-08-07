@@ -1,12 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * M""M                     dP                       dP   M""MMMMM""MM                   dP 
@@ -23,19 +20,10 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 public class InstantHeal extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new instant heal check.
      */
-    public class InstantHealEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new instant heal event.
-         * 
-         * @param player
-         *            the player
-         */
-        public InstantHealEvent(final Player player) {
-            super(player);
-        }
+    public InstantHeal() {
+        super(CheckType.FIGHT_INSTANTHEAL);
     }
 
     /**
@@ -46,7 +34,7 @@ public class InstantHeal extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
-        final FightConfig cc = FightConfig.getConfig(player);
+        FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
@@ -67,13 +55,9 @@ public class InstantHeal extends Check {
             // Reset the buffer.
             data.instantHealBuffer = 0L;
 
-            // Dispatch an instant heal event (API).
-            final InstantHealEvent e = new InstantHealEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.instantHealActions, data.instantHealVL);
+            cancel = executeActions(player);
         } else
             // Decrease the violation level.
             data.instantHealVL *= 0.9D;
@@ -87,24 +71,5 @@ public class InstantHeal extends Check {
             data.instantHealLastTime = System.currentTimeMillis();
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(FightData.getData(player).instantHealVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.FIGHT_INSTANTHEAL) && FightConfig.getConfig(player).instantHealCheck;
     }
 }

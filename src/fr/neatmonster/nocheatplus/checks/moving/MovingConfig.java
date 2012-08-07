@@ -67,8 +67,6 @@ public class MovingConfig {
     public final ActionList noFallActions;
 
     public final boolean    survivalFlyCheck;
-    public final boolean    survivalFlyAllowFastBlocking;
-    public final boolean    survivalFlyAllowFastSneaking;
     public final int        survivalFlyBlockingSpeed;
     public final int        survivalFlyCobWebSpeed;
     public final int        survivalFlyLadderSpeed;
@@ -105,8 +103,6 @@ public class MovingConfig {
         noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
 
         survivalFlyCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
-        survivalFlyAllowFastBlocking = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_ALLOWFASTBLOCKING);
-        survivalFlyAllowFastSneaking = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_ALLOWFASTSNEAKING);
         // Default values are specified here because this settings aren't showed by default into the configuration file.
         survivalFlyBlockingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
         survivalFlyCobWebSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_COBWEBSPEED, 100);

@@ -1,12 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * M""M                     dP                       dP   MM""""""""`M            dP   
@@ -23,19 +21,10 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 public class InstantEat extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new instant eat check.
      */
-    public class InstantEatEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new instant eat event.
-         * 
-         * @param player
-         *            the player
-         */
-        public InstantEatEvent(final Player player) {
-            super(player);
-        }
+    public InstantEat() {
+        super(CheckType.INVENTORY_INSTANTEAT);
     }
 
     /**
@@ -48,7 +37,7 @@ public class InstantEat extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final int level) {
-        final InventoryConfig cc = InventoryConfig.getConfig(player);
+        InventoryConfig.getConfig(player);
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;
@@ -70,13 +59,9 @@ public class InstantEat extends Check {
             // Player was too fast, increase his violation level.
             data.instantEatVL += (expectedTimeWhenEatingFinished - System.currentTimeMillis()) / 100D;
 
-            // Dispatch an instant eat event (API).
-            final InstantEatEvent e = new InstantEatEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.instantEatActions, data.instantEatVL);
+            cancel = executeActions(player);
         }
 
         return cancel;
@@ -87,20 +72,9 @@ public class InstantEat extends Check {
      */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(InventoryData.getData(player).instantEatVL));
-        else if (wildcard == ParameterName.FOOD)
+        if (wildcard == ParameterName.FOOD)
             return InventoryData.getData(player).instantEatFood.toString();
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.INVENTORY_INSTANTEAT)
-                && InventoryConfig.getConfig(player).instantEatCheck;
     }
 }

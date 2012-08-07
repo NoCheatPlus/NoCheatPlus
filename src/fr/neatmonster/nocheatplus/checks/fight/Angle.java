@@ -2,14 +2,11 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import java.util.TreeMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
 /*
@@ -30,19 +27,10 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class Angle extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new angle check.
      */
-    public class AngleEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new angle event.
-         * 
-         * @param player
-         *            the player
-         */
-        public AngleEvent(final Player player) {
-            super(player);
-        }
+    public Angle() {
+        super(CheckType.FIGHT_ANGLE);
     }
 
     /**
@@ -128,36 +116,13 @@ public class Angle extends Check {
                 // If it hasn't, increment the violation level.
                 data.angleVL += violation;
 
-            // Dispatch a angle event (API).
-            final AngleEvent e = new AngleEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.angleActions, data.angleVL);
+            cancel = executeActions(player);
         } else
             // Reward the player by lowering his violation level.
             data.angleVL *= 0.98D;
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(FightData.getData(player).angleVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.FIGHT_ANGLE) && FightConfig.getConfig(player).angleCheck;
     }
 }

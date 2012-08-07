@@ -5,14 +5,13 @@ import java.util.Locale;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
@@ -32,22 +31,6 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  * normal ground, while sprinting, sneaking, swimming, etc.
  */
 public class SurvivalFly extends Check {
-
-    /**
-     * The event triggered by this check.
-     */
-    public class SurvivalFlyEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new survival fly event.
-         * 
-         * @param player
-         *            the player
-         */
-        public SurvivalFlyEvent(final Player player) {
-            super(player);
-        }
-    }
 
     /** The common margin of error for some speeds. */
     private static final double MARGIN                  = 0.001D;
@@ -116,6 +99,13 @@ public class SurvivalFly extends Check {
     private final NoFall        noFall                  = new NoFall();
 
     /**
+     * Instantiates a new survival fly check.
+     */
+    public SurvivalFly() {
+        super(CheckType.MOVING_SURVIVALFLY);
+    }
+
+    /**
      * Checks a player.
      * 
      * @param player
@@ -157,9 +147,9 @@ public class SurvivalFly extends Check {
         else if (from.isOnSoulSand() && to.isOnSoulSand() && sprinting) {
             hAllowedDistance = cc.survivalFlySoulSandSpeed / 100D * SOULSAND_SPRINTING_MOVE;
             useBuffer = false;
-        } else if (player.isSneaking())
+        } else if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
             hAllowedDistance = cc.survivalFlySneakingSpeed / 100D * SNEAKING_MOVE;
-        else if (player.isBlocking())
+        else if (player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
             hAllowedDistance = cc.survivalFlyBlockingSpeed / 100D * BLOCKING_MOVE;
         else if (from.isInWater() && to.isInWater())
             hAllowedDistance = cc.survivalFlyWaterSpeed / 100D * WATER_MOVE;
@@ -262,8 +252,17 @@ public class SurvivalFly extends Check {
                 vDistanceAboveLimit = cc.survivalFlyLadderSpeed / 100D * -LADDER_DESCEND - vDistance;
         } else {
             vDistance = to.getY() - data.setBack.getY();
-            if (vDistance <= 0D)
+
+            if (data.survivalFlyLastDistances[0] < data.survivalFlyLastDistances[1]
+                    && vDistance > data.survivalFlyLastDistances[0] && data.survivalFlyJumpPhase >= 7
+                    && data.survivalFlyJumpPhase <= 8) {
                 data.survivalFlyJumpPhase = 0;
+                data.noFallDistance = 0f;
+            } else if (vDistance <= 0D)
+                data.survivalFlyJumpPhase = 0;
+
+            data.survivalFlyLastDistances[1] = data.survivalFlyLastDistances[0];
+            data.survivalFlyLastDistances[0] = vDistance;
 
             double vAllowedDistance = (data.verticalFreedom + 1.35D) * data.jumpAmplifier;
             if (data.survivalFlyJumpPhase > JUMP_PHASE + data.jumpAmplifier)
@@ -273,10 +272,9 @@ public class SurvivalFly extends Check {
         }
 
         // Handle slabs placed into a liquid.
-        if (from.isInLiquid()
-                && to.isInLiquid()
-                && (to.isOnGround() && to.getY() - from.getY() == 0.5D || !from.isOnGround() && to.isOnGround() || from
-                        .isOnGround() && !to.isOnGround()))
+        if ((to.isOnGround() && to.getY() - from.getY() == 0.5D || !from.isOnGround() && to.isOnGround() || from
+                .isOnGround() && !to.isOnGround())
+                && from.isInLiquid() && to.isInLiquid())
             vDistanceAboveLimit = 0D;
 
         if (from.isOnGround() || to.isOnGround())
@@ -294,13 +292,9 @@ public class SurvivalFly extends Check {
             // Increment violation counter.
             data.survivalFlyVL += result;
 
-            // Dispatch a survival fly event (API).
-            final SurvivalFlyEvent e = new SurvivalFlyEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // If the other plugins haven't decided to cancel the execution of the actions, then do it. If one of the
             // actions was a cancel, cancel it.
-            if (!e.isCancelled() && executeActions(player, cc.survivalFlyActions, data.survivalFlyVL))
+            if (executeActions(player))
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
@@ -348,9 +342,7 @@ public class SurvivalFly extends Check {
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
         final MovingData data = MovingData.getData(player);
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(data.survivalFlyVL));
-        else if (wildcard == ParameterName.LOCATION_FROM)
+        if (wildcard == ParameterName.LOCATION_FROM)
             return String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ());
         else if (wildcard == ParameterName.LOCATION_TO)
             return String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ());
@@ -358,13 +350,5 @@ public class SurvivalFly extends Check {
             return String.format(Locale.US, "%.2f", data.to.subtract(data.from).lengthSquared());
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.MOVING_SURVIVALFLY) && MovingConfig.getConfig(player).survivalFlyCheck;
     }
 }

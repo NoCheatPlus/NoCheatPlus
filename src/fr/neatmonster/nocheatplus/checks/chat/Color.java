@@ -1,12 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * MM'""""'YMM          dP                   
@@ -23,19 +20,10 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 public class Color extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new color check.
      */
-    public class ColorEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new color event.
-         * 
-         * @param player
-         *            the player
-         */
-        public ColorEvent(final Player player) {
-            super(player);
-        }
+    public Color() {
+        super(CheckType.CHAT_COLOR);
     }
 
     /**
@@ -48,7 +36,7 @@ public class Color extends Check {
      * @return the string
      */
     public String check(final Player player, final String message) {
-        final ChatConfig cc = ChatConfig.getConfig(player);
+        ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
 
         // If the message contains colors...
@@ -56,35 +44,12 @@ public class Color extends Check {
             // Increment the violation level of the player.
             data.colorVL++;
 
-            // Dispatch a color event (API).
-            final ColorEvent e = new ColorEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Find out if we need to remove the colors or not.
-            if (!e.isCancelled() && executeActions(player, cc.colorActions, data.colorVL))
+            if (executeActions(player))
                 // Remove color codes.
                 message.replaceAll("\302\247.", "").replaceAll("\247.", "");
         }
 
         return message;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(ChatData.getData(player).colorVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.CHAT_COLOR) && ChatConfig.getConfig(player).colorCheck;
     }
 }

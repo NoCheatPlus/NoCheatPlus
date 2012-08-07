@@ -111,7 +111,7 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(player);
 
         final int blockY = event.getBlock().getY();
-        if (isLiquid(event.getBlockAgainst().getType()))
+        if (isLiquid(event.getBlockAgainst().getType()) && event.getBlock().getType() != Material.WATER_LILY)
             // The block was placed against a liquid block, cancel its placement.
             event.setCancelled(true);
         else if ((creativeFly.isEnabled(player) || survivalFly.isEnabled(player)) && event.getBlock() != null

@@ -1,13 +1,11 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * M"""""`'"""`YM                            MM"""""""`YM                   dP                  dP            
@@ -32,27 +30,18 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 public class MorePacketsVehicle extends Check {
 
     /**
-     * The event triggered by this check.
-     */
-    public class MorePacketsVehicleEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new more packets vehicle event.
-         * 
-         * @param player
-         *            the player
-         */
-        public MorePacketsVehicleEvent(final Player player) {
-            super(player);
-        }
-    }
-
-    /**
      * The usual number of packets per timeframe.
      * 
      * 20 would be for perfect internet connections, 22 is good enough.
      */
     private final static int packetsPerTimeframe = 22;
+
+    /**
+     * Instantiates a new more packet vehicle check.
+     */
+    public MorePacketsVehicle() {
+        super(CheckType.MOVING_MOREPACKETSVEHICLE);
+    }
 
     /**
      * Checks a player.
@@ -68,7 +57,7 @@ public class MorePacketsVehicle extends Check {
      * @return the location
      */
     public Location check(final Player player, final Location from, final Location to) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
+        MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 
         Location newTo = null;
@@ -88,13 +77,9 @@ public class MorePacketsVehicle extends Check {
             // Increment violation level.
             data.morePacketsVehicleVL = -data.morePacketsVehicleBuffer;
 
-            // Dispatch a more packets vehicle event (API).
-            final MorePacketsVehicleEvent e = new MorePacketsVehicleEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (!e.isCancelled() && executeActions(player, cc.morePacketsVehicleActions, data.morePacketsVehicleVL))
+            if (executeActions(player))
                 newTo = data.morePacketsVehicleSetback;
         }
 
@@ -137,20 +122,9 @@ public class MorePacketsVehicle extends Check {
      */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(MovingData.getData(player).morePacketsVehicleVL));
-        else if (wildcard == ParameterName.PACKETS)
+        if (wildcard == ParameterName.PACKETS)
             return String.valueOf(MovingData.getData(player).morePacketsVehiclePackets);
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.MOVING_MOREPACKETSVEHICLE)
-                && MovingConfig.getConfig(player).morePacketsVehicleCheck;
     }
 }

@@ -7,10 +7,8 @@ import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * MM'"""""`MM                dP M"""""`'"""`YM                dP          
@@ -27,19 +25,10 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 public class GodMode extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new god mode check.
      */
-    public class GodModeEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new god mode event.
-         * 
-         * @param player
-         *            the player
-         */
-        public GodModeEvent(final Player player) {
-            super(player);
-        }
+    public GodMode() {
+        super(CheckType.FIGHT_GODMODE);
     }
 
     /**
@@ -50,7 +39,7 @@ public class GodMode extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
-        final FightConfig cc = FightConfig.getConfig(player);
+        FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
@@ -73,13 +62,9 @@ public class GodMode extends Check {
                     // No, that means we can increase his violation level.
                     data.godModeVL -= data.godModeBuffer;
 
-                    // Dispatch a god mode event (API).
-                    final GodModeEvent e = new GodModeEvent(player);
-                    Bukkit.getPluginManager().callEvent(e);
-
                     // Execute whatever actions are associated with this check and the violation level and find out if
                     // we should cancel the event.
-                    cancel = !e.isCancelled() && executeActions(player, cc.godModeActions, data.godModeVL);
+                    cancel = executeActions(player);
                 }
             } else {
                 // Give some new points, once a second.
@@ -133,24 +118,5 @@ public class GodMode extends Check {
                     }
                 }, 30);
             } catch (final Exception e) {}
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(FightData.getData(player).godModeVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.FIGHT_GODMODE) && FightConfig.getConfig(player).godModeCheck;
     }
 }

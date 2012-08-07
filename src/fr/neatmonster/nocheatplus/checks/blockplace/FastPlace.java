@@ -1,13 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
 /*
@@ -25,19 +22,10 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class FastPlace extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new fast place check.
      */
-    public class FastPlaceEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new fast place event.
-         * 
-         * @param player
-         *            the player
-         */
-        public FastPlaceEvent(final Player player) {
-            super(player);
-        }
+    public FastPlace() {
+        super(CheckType.BLOCKPLACE_FASTPLACE);
     }
 
     /**
@@ -62,13 +50,9 @@ public class FastPlace extends Check {
                     // He failed, increase his violation level.
                     data.fastPlaceVL += cc.fastPlaceInterval - System.currentTimeMillis() + data.fastPlaceLastTime;
 
-                    // Distance a fast place event (API).
-                    final FastPlaceEvent e = new FastPlaceEvent(player);
-                    Bukkit.getPluginManager().callEvent(e);
-
                     // Execute whatever actions are associated with this check and the violation level and find out if
                     // we should cancel the event.
-                    cancel = !e.isCancelled() && executeActions(player, cc.fastPlaceActions, data.fastPlaceVL);
+                    cancel = executeActions(player);
                 }
 
                 data.fastPlaceLastRefused = true;
@@ -82,25 +66,5 @@ public class FastPlace extends Check {
         data.fastPlaceLastTime = System.currentTimeMillis();
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(BlockPlaceData.getData(player).fastPlaceVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.BLOCKPLACE_FASTPLACE)
-                && BlockPlaceConfig.getConfig(player).fastPlaceCheck;
     }
 }

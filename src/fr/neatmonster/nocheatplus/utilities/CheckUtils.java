@@ -61,30 +61,18 @@ public class CheckUtils {
     }
 
     /**
-     * Calculates the distance between the player and the intersection of the player's line of sight with the targeted
-     * block.
+     * Calculate the distance between two location, because for Bukkit distance is the distance squared and
+     * distanceSquared is the distance non-squared.
      * 
-     * @param player
-     *            the player
-     * @param location
-     *            the location
+     * @param location1
+     *            the location1
+     * @param location2
+     *            the location2
      * @return the double
      */
-    public static double distance(final Player player, final Location location) {
-        final Location eyes = player.getEyeLocation();
-        final Vector directionUnit = eyes.getDirection().normalize();
-        final double xMin = (location.getX() - eyes.getX()) / directionUnit.getX();
-        final double xMax = (location.getX() + 1D - eyes.getX()) / directionUnit.getX();
-        final double yMin = (location.getY() - eyes.getY()) / directionUnit.getY();
-        final double yMax = (location.getY() + 1D - eyes.getY()) * directionUnit.getY();
-        final double zMin = (location.getZ() - eyes.getZ()) / directionUnit.getZ();
-        final double zMax = (location.getZ() + 1D - eyes.getZ()) / directionUnit.getZ();
-        final double min = Math.max(Math.max(Math.min(xMin, xMax), Math.min(yMin, yMax)), Math.min(zMin, zMax));
-        final double max = Math.min(Math.min(Math.max(xMin, xMax), Math.max(yMin, yMax)), Math.max(zMin, zMax));
-        if (max < 0D || min > max)
-            return max;
-        else
-            return min;
+    public static double distance(final Location location1, final Location location2) {
+        return Math.sqrt(Math.pow(location2.getX() - location1.getX(), 2)
+                + Math.pow(location2.getY() - location1.getY(), 2) + Math.pow(location2.getZ() - location1.getZ(), 2));
     }
 
     /**

@@ -5,14 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * MMP"""""""MM                   oo                   dP          
@@ -28,24 +25,15 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  */
 public class Arrivals extends Check {
 
-    /**
-     * The event triggered by this check.
-     */
-    public class ArrivalsEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new arrivals event.
-         * 
-         * @param player
-         *            the player
-         */
-        public ArrivalsEvent(final Player player) {
-            super(player);
-        }
-    }
-
     /** The map containing the time and the name of the player, every time that one of them joins. */
     private final Map<Long, String> joins = new HashMap<Long, String>();
+
+    /**
+     * Instantiates a new arrivals check.
+     */
+    public Arrivals() {
+        super(CheckType.CHAT_ARRIVALS);
+    }
 
     /**
      * Checks a player.
@@ -76,34 +64,10 @@ public class Arrivals extends Check {
         // Add the new data.
         joins.put(System.currentTimeMillis(), player.getName());
 
-        if (joins.size() > cc.arrivalsJoinsLimit) {
-            // Dispatch an arrivals event (API).
-            final ArrivalsEvent e = new ArrivalsEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
+        if (joins.size() > cc.arrivalsJoinsLimit)
             // Find out if we should cancel the event or not.
-            cancel = !e.isCancelled() && executeActions(player, cc.arrivalsActions, 0);
-        }
+            cancel = executeActions(player);
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return "0";
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.CHAT_ARRIVALS) && ChatConfig.getConfig(player).arrivalsCheck;
     }
 }

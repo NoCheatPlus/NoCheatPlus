@@ -1,13 +1,12 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
-import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -24,24 +23,18 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  */
 public class Reach extends Check {
 
+    /** The maximum distance allowed to interact with a block in creative mode. */
+    public final double CREATIVE_DISTANCE = 5.6D;
+
+    /** The maximum distance allowed to interact with a block in survival mode. */
+    public final double SURVIVAL_DISTANCE = 5.1D;
+
     /**
-     * The event triggered by this check.
+     * Instantiates a new reach check.
      */
-    public class ReachEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new reach event.
-         * 
-         * @param player
-         *            the player
-         */
-        public ReachEvent(final Player player) {
-            super(player);
-        }
+    public Reach() {
+        super(CheckType.BLOCKINTERACT_REACH);
     }
-
-    /** The maximum distance allowed to interact with a block. */
-    public final double DISTANCE = 5D; // TODO: Test with creative mode.
 
     /**
      * Checks a player.
@@ -53,29 +46,28 @@ public class Reach extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location location) {
-        final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
+        BlockInteractConfig.getConfig(player);
         final BlockInteractData data = BlockInteractData.getData(player);
 
         boolean cancel = false;
 
+        final double distanceLimit = player.getGameMode() == GameMode.SURVIVAL ? SURVIVAL_DISTANCE : CREATIVE_DISTANCE;
+
         // Distance is calculated from eye location to center of targeted block. If the player is further away from his
         // target than allowed, the difference will be assigned to "distance".
-        final double distance = Math.max(CheckUtils.distance(player, location) - DISTANCE, 0D);
+        final double distance = CheckUtils.distance(player.getEyeLocation(), location.add(0.5D, 0.5D, 0.5D))
+                - distanceLimit;
 
         if (distance > 0) {
             // He failed, increment violation level.
             data.reachVL += distance;
 
-            // Dispatch a reach event (API).
-            final ReachEvent e = new ReachEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Remember how much further than allowed he tried to reach for logging, if necessary.
-            data.reachDistance = distance + DISTANCE;
+            data.reachDistance = distance;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.reachActions, data.reachVL);
+            cancel = executeActions(player);
         } else
             // Player passed the check, reward him.
             data.reachVL *= 0.9D;
@@ -88,20 +80,9 @@ public class Reach extends Check {
      */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(BlockInteractData.getData(player).reachVL));
-        else if (wildcard == ParameterName.REACH_DISTANCE)
+        if (wildcard == ParameterName.REACH_DISTANCE)
             return String.valueOf(Math.round(BlockInteractData.getData(player).reachDistance));
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.BLOCKINTERACT_REACH)
-                && BlockInteractConfig.getConfig(player).reachCheck;
     }
 }

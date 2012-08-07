@@ -49,7 +49,7 @@ public class BlockPlaceListener implements Listener {
      */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
-    protected void onBlockPlace(final BlockPlaceEvent event) {
+    public void onBlockPlace(final BlockPlaceEvent event) {
         /*
          *  ____  _            _      ____  _                
          * | __ )| | ___   ___| | __ |  _ \| | __ _  ___ ___ 
@@ -70,8 +70,9 @@ public class BlockPlaceListener implements Listener {
         if (fastPlace.isEnabled(player) && fastPlace.check(player, block))
             cancelled = true;
 
-        // Second, the no swing check.
-        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
+        // Second, the no swing check (player doesn't swing his arm when placing a lily pad).
+        if (!cancelled && event.getBlockPlaced().getType() != Material.WATER_LILY && noSwing.isEnabled(player)
+                && noSwing.check(player))
             cancelled = true;
 
         // Third, the reach check.

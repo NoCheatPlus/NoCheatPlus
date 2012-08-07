@@ -1,15 +1,12 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * MM""""""""`M                     dP   M#"""""""'M                             dP       
@@ -25,30 +22,21 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  */
 public class FastBreak extends Check {
 
-    /**
-     * The event triggered by this check.
-     */
-    public class FastBreakEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new fast break event.
-         * 
-         * @param player
-         *            the player
-         */
-        public FastBreakEvent(final Player player) {
-            super(player);
-        }
-    }
-
     /** The minimum time that needs to be elapsed between two block breaks for a player in creative mode. */
-    private static final long CREATIVE  = 145L;
+    private static final long CREATIVE  = 95L;
 
     /** The minimum time that needs to be elapsed between two block breaks for a player in survival mode. */
     private static final long SURVIVAL  = 45L;
 
     /** The multiplicative constant used when incrementing the limit. */
     private static final int  TOLERANCE = 10;
+
+    /**
+     * Instantiates a new fast break check.
+     */
+    public FastBreak() {
+        super(CheckType.BLOCKBREAK_FASTBREAK);
+    }
 
     /**
      * Checks a player.
@@ -84,18 +72,14 @@ public class FastBreak extends Check {
                 // Increment the violation level (but using the original limit).
                 data.fastBreakVL += Math.max(timeLimit - elapsedTime, 0D);
 
-                // Dispatch a new fast break event (API).
-                final FastBreakEvent e = new FastBreakEvent(player);
-                Bukkit.getPluginManager().callEvent(e);
-
                 // Cancel the event if needed.
-                cancel = !e.isCancelled() && executeActions(player, cc.fastBreakActions, data.fastBreakVL);
+                cancel = executeActions(player);
             } else
                 // Remove one from the buffer.
                 data.fastBreakBuffer--;
         } else {
             // If the buffer isn't full.
-            if (data.fastBreakBuffer < data.fastBreakBuffer)
+            if (data.fastBreakBuffer < cc.fastBreakBuffer)
                 // Add one to the buffer.
                 data.fastBreakBuffer++;
 
@@ -107,25 +91,5 @@ public class FastBreak extends Check {
         data.fastBreakBreakTime = System.currentTimeMillis();
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(BlockBreakData.getData(player).fastBreakVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.BLOCKBREAK_FASTBREAK)
-                && BlockBreakConfig.getConfig(player).fastBreakCheck;
     }
 }

@@ -19,6 +19,7 @@ import fr.neatmonster.nocheatplus.actions.types.LogAction;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
@@ -88,41 +89,65 @@ public abstract class Check {
         fileLogger = logger;
     }
 
+    /** The type. */
+    private final CheckType type;
+
+    /**
+     * Instantiates a new check.
+     * 
+     * @param type
+     *            the type
+     */
+    public Check(final CheckType type) {
+        this.type = type;
+    }
+
     /**
      * Execute some actions for the specified player.
      * 
      * @param player
      *            the player
-     * @param actionList
-     *            the action list
-     * @param violationLevel
-     *            the violation level
      * @return true, if successful
      */
-    protected boolean executeActions(final Player player, final ActionList actionList, final double violationLevel) {
-        boolean special = false;
+    protected boolean executeActions(final Player player) {
+        try {
+            boolean special = false;
 
-        // Get the to be executed actions.
-        final Action[] actions = actionList.getActions(violationLevel);
+            final Object config = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null, player);
+            final Object data = type.getData().getDeclaredMethod("getData", Player.class).invoke(null, player);
+            final ActionList actionList = (ActionList) type.getConfig().getDeclaredField(type.getName() + "Actions")
+                    .get(config);
+            final double violationLevel = type.getData().getDeclaredField(type.getName() + "VL").getDouble(data);
 
-        final long time = System.currentTimeMillis() / 1000L;
+            // Dispatch the VL processing to the hook manager.
+            if (NCPHookManager.shouldCancelVLProcessing(type, player))
+                // One of the hooks has decided to cancel the VL processing, return false.
+                return false;
 
-        for (final Action ac : actions)
-            if (getHistory(player).executeAction(getClass().getName(), ac, time))
-                // The execution history said it really is time to execute the action, find out what it is and do what
-                // is
-                // needed.
-                if (ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent))
-                    executeLogAction((LogAction) ac, this, player);
-                else if (ac instanceof CancelAction)
-                    special = true;
-                else if (ac instanceof CommandAction)
-                    executeConsoleCommand((CommandAction) ac, this, player);
-                else if (ac instanceof DummyAction) {
-                    // Do nothing, it's a dummy action after all.
-                }
+            // Get the to be executed actions.
+            final Action[] actions = actionList.getActions(violationLevel);
 
-        return special;
+            final long time = System.currentTimeMillis() / 1000L;
+
+            for (final Action ac : actions)
+                if (getHistory(player).executeAction(getClass().getName(), ac, time))
+                    // The execution history said it really is time to execute the action, find out what it is and do
+                    // what is needed.
+                    if (ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent))
+                        executeLogAction((LogAction) ac, this, player);
+                    else if (ac instanceof CancelAction)
+                        special = true;
+                    else if (ac instanceof CommandAction)
+                        executeConsoleCommand((CommandAction) ac, this, player);
+                    else if (ac instanceof DummyAction) {
+                        // Do nothing, it's a dummy action after all.
+                    }
+
+            return special;
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -192,16 +217,34 @@ public abstract class Check {
             return getClass().getSimpleName();
         else if (wildcard == ParameterName.PLAYER)
             return player.getName();
-        else
+        else if (wildcard == ParameterName.VIOLATIONS) {
+            try {
+                final Object data = type.getData().getDeclaredMethod("getData", Player.class).invoke(null, player);
+                return "" + Math.round(type.getData().getDeclaredField(type.getName() + "VL").getDouble(data));
+            } catch (final Exception e) {
+                Bukkit.broadcastMessage("getParameter " + type.getName());
+                e.printStackTrace();
+            }
+            return "";
+        } else
             return "The author was lazy and forgot to define " + wildcard + ".";
     }
 
     /**
-     * Returns if the check is enabled or not for the specified player.
+     * Checks if this check is enabled for the specified player.
      * 
      * @param player
      *            the player
-     * @return true, if enabled
+     * @return true, if is enabled
      */
-    protected abstract boolean isEnabled(final Player player);
+    public boolean isEnabled(final Player player) {
+        try {
+            final Object config = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null, player);
+            return !player.hasPermission(type.getPermission())
+                    && type.getConfig().getDeclaredField(type.getName() + "Check").getBoolean(config);
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

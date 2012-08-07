@@ -2,14 +2,11 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import net.minecraft.server.Entity;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
@@ -27,24 +24,18 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
  */
 public class Reach extends Check {
 
+    /** The maximum distance allowed to interact with an entity in creative mode. */
+    public final double CREATIVE_DISTANCE = 6D;
+
+    /** The maximum distance allowed to interact with an entity in survival mode. */
+    public final double SURVIVAL_DISTANCE = 3.6D;
+
     /**
-     * The event triggered by this check.
+     * Instantiates a new reach check.
      */
-    public class ReachEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new reach event.
-         * 
-         * @param player
-         *            the player
-         */
-        public ReachEvent(final Player player) {
-            super(player);
-        }
+    public Reach() {
+        super(CheckType.FIGHT_REACH);
     }
-
-    /** The maximum distance allowed to interact with an entity. */
-    public final double DISTANCE = 4D; // TODO: Needs testing.
 
     /**
      * Checks a player.
@@ -61,28 +52,22 @@ public class Reach extends Check {
 
         boolean cancel = false;
 
-        final Location minimum = new Location(player.getWorld(), damaged.boundingBox.a, damaged.boundingBox.b,
-                damaged.boundingBox.c);
-        final Location maximum = new Location(player.getWorld(), damaged.boundingBox.d, damaged.boundingBox.e,
-                damaged.boundingBox.f);
-        final Location location = minimum.add(maximum).multiply(0.5D);
+        final double distanceLimit = player.getGameMode() == GameMode.SURVIVAL ? SURVIVAL_DISTANCE : CREATIVE_DISTANCE;
 
         // Distance is calculated from eye location to center of targeted. If the player is further away from his target
         // than allowed, the difference will be assigned to "distance".
-        final double distance = Math.max(CheckUtils.distance(player, location) - DISTANCE, 0D);
+        final double distance = CheckUtils.distance(player.getEyeLocation(), damaged.getBukkitEntity().getLocation()
+                .add(0D, damaged.getHeadHeight(), 0D))
+                - distanceLimit;
 
         if (distance > 0) {
             // He failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
             if (!LagMeasureTask.skipCheck())
                 data.reachVL += distance;
 
-            // Dispatch a reach event (API).
-            final ReachEvent e = new ReachEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.reachActions, data.reachVL);
+            cancel = executeActions(player);
 
             if (cancel)
                 // If we should cancel, remember the current time too.
@@ -103,24 +88,5 @@ public class Reach extends Check {
         }
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(FightData.getData(player).reachVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.FIGHT_REACH) && FightConfig.getConfig(player).reachCheck;
     }
 }

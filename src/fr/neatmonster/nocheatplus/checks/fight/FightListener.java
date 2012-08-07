@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
-import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
  * MM""""""""`M oo          dP         dP   M""MMMMMMMM oo            dP                                       
@@ -98,7 +98,7 @@ public class FightListener implements Listener {
         if (!cancelled && speed.isEnabled(player) && speed.check(player))
             cancelled = true;
 
-        if (!cancelled && !MovingConfig.getConfig(player).survivalFlyAllowFastBlocking && player.isBlocking())
+        if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
             cancelled = true;
 
         // One of the checks requested the event to be cancelled, so do it.

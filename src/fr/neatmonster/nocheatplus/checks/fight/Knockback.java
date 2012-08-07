@@ -1,13 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
 /*
@@ -25,19 +22,10 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class Knockback extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new knockback check.
      */
-    public class KnockbackEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new knockback event.
-         * 
-         * @param player
-         *            the player
-         */
-        public KnockbackEvent(final Player player) {
-            super(player);
-        }
+    public Knockback() {
+        super(CheckType.FIGHT_KNOCKBACK);
     }
 
     /**
@@ -66,34 +54,11 @@ public class Knockback extends Check {
                 // Increment the violation level
                 data.knockbackVL += cc.knockbackInterval - System.currentTimeMillis() + data.knockbackSprintTime;
 
-            // Dispatch a knockback event (API).
-            final KnockbackEvent e = new KnockbackEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = !e.isCancelled() && executeActions(player, cc.knockbackActions, data.knockbackVL);
+            cancel = executeActions(player);
         }
 
         return cancel;
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(FightData.getData(player).knockbackVL));
-        else
-            return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.FIGHT_KNOCKBACK) && FightConfig.getConfig(player).knockbackCheck;
     }
 }

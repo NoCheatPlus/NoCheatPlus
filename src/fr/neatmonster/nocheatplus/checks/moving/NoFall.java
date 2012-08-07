@@ -2,15 +2,13 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
 
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
-import fr.neatmonster.nocheatplus.checks.CheckEvent;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -28,19 +26,10 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 public class NoFall extends Check {
 
     /**
-     * The event triggered by this check.
+     * Instantiates a new no fall check.
      */
-    public class NoFallEvent extends CheckEvent {
-
-        /**
-         * Instantiates a new no fall event.
-         * 
-         * @param player
-         *            the player
-         */
-        public NoFallEvent(final Player player) {
-            super(player);
-        }
+    public NoFall() {
+        super(CheckType.MOVING_NOFALL);
     }
 
     /**
@@ -78,13 +67,9 @@ public class NoFall extends Check {
             // Increment violation level.
             data.noFallVL += player.getFallDistance();
 
-            // Dispatch a no fall event (API).
-            final NoFallEvent e = new NoFallEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (!e.isCancelled() && executeActions(player, cc.noFallActions, data.noFallVL))
+            if (executeActions(player))
                 // Deal fall damages to the player.
                 ((CraftPlayer) player).getHandle().b(0D, true);
             data.noFallDistance = 0F;
@@ -104,13 +89,9 @@ public class NoFall extends Check {
             // Increment violation level.
             data.noFallVL += difference;
 
-            // Dispatch a no fall event (API).
-            final NoFallEvent e = new NoFallEvent(player);
-            Bukkit.getPluginManager().callEvent(e);
-
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event. If "cancelled", the fall damage gets dealt in a way that's visible to other plugins.
-            if (!e.isCancelled() && executeActions(player, cc.noFallActions, data.noFallVL))
+            if (executeActions(player))
                 // Increase the fall distance a bit. :)
                 player.setFallDistance(data.noFallDistance + difference);
             data.noFallDistance = 0F;
@@ -123,7 +104,7 @@ public class NoFall extends Check {
         // feeling.
         if (from.getY() > to.getY()) {
             final float deltaY = (float) (from.getY() - to.getY());
-            data.noFallDistance += deltaY;
+            data.noFallDistance += deltaY * 0.75F; // Magic number. :)
 
             if (deltaY > 1F) {
                 data.noFallLastAddedDistance = deltaY;
@@ -132,6 +113,9 @@ public class NoFall extends Check {
                 data.noFallLastAddedDistance = 0F;
         } else
             data.noFallLastAddedDistance = 0F;
+
+        if (to.isOnGround())
+            data.noFallDistance = 0F;
 
         // Reduce violation level.
         data.noFallVL *= 0.95D;
@@ -143,19 +127,9 @@ public class NoFall extends Check {
      */
     @Override
     public String getParameter(final ParameterName wildcard, final Player player) {
-        if (wildcard == ParameterName.VIOLATIONS)
-            return String.valueOf(Math.round(MovingData.getData(player).noFallVL));
-        else if (wildcard == ParameterName.FALL_DISTANCE)
+        if (wildcard == ParameterName.FALL_DISTANCE)
             return String.format(Locale.US, "%.2f", MovingData.getData(player).noFallDistance);
         else
             return super.getParameter(wildcard, player);
-    }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#isEnabled(org.bukkit.entity.Player)
-     */
-    @Override
-    protected boolean isEnabled(final Player player) {
-        return !player.hasPermission(Permissions.MOVING_NOFALL) && MovingConfig.getConfig(player).noFallCheck;
     }
 }
