@@ -13,6 +13,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -125,6 +127,49 @@ public class MovingListener implements Listener {
             data.setBack.setY(blockY + 1D);
             data.survivalFlyJumpPhase = 0;
         }
+    }
+
+    /**
+     * We listen to this event to prevent player from flying by sending bed leaving packets.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            priority = EventPriority.MONITOR)
+    public void onPlayerBedEnter(final PlayerBedEnterEvent event) {
+        /*
+         *  ____  _                         ____           _   _____       _            
+         * |  _ \| | __ _ _   _  ___ _ __  | __ )  ___  __| | | ____|_ __ | |_ ___ _ __ 
+         * | |_) | |/ _` | | | |/ _ \ '__| |  _ \ / _ \/ _` | |  _| | '_ \| __/ _ \ '__|
+         * |  __/| | (_| | |_| |  __/ |    | |_) |  __/ (_| | | |___| | | | ||  __/ |   
+         * |_|   |_|\__,_|\__, |\___|_|    |____/ \___|\__,_| |_____|_| |_|\__\___|_|   
+         *                |___/                                                         
+         */
+        MovingData.getData(event.getPlayer()).survivalFlyWasInBed = true;
+    }
+
+    /**
+     * We listen to this event to prevent player from flying by sending bed leaving packets.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            priority = EventPriority.MONITOR)
+    public void onPlayerBedLeave(final PlayerBedLeaveEvent event) {
+        /*
+         *  ____  _                         ____           _   _                         
+         * |  _ \| | __ _ _   _  ___ _ __  | __ )  ___  __| | | |    ___  __ ___   _____ 
+         * | |_) | |/ _` | | | |/ _ \ '__| |  _ \ / _ \/ _` | | |   / _ \/ _` \ \ / / _ \
+         * |  __/| | (_| | |_| |  __/ |    | |_) |  __/ (_| | | |__|  __/ (_| |\ V /  __/
+         * |_|   |_|\__,_|\__, |\___|_|    |____/ \___|\__,_| |_____\___|\__,_| \_/ \___|
+         *                |___/                                                          
+         */
+        final Player player = event.getPlayer();
+        if (survivalFly.isEnabled(player) && survivalFly.check(player))
+            // To cancel the event, we simply teleport the player to his last safe location.
+            player.teleport(MovingData.getData(player).lastSafeLocations[1]);
     }
 
     /**

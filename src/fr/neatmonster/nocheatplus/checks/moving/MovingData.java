@@ -82,6 +82,7 @@ public class MovingData {
     public double[]   survivalFlyLastDistances = new double[] {0D, 0D};
     public int        survivalFlyOnIce;
     public long       survivalFlyOnLadderSince;
+    public boolean    survivalFlyWasInBed;
 
     // Locations shared between all checks.
     public Location   from;

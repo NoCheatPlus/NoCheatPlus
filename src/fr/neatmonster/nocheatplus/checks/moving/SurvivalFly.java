@@ -110,6 +110,30 @@ public class SurvivalFly extends Check {
      * 
      * @param player
      *            the player
+     * @return true, if successful
+     */
+    public boolean check(final Player player) {
+        final MovingData data = MovingData.getData(player);
+
+        // Check if the player has entered the bed he is trying to leave.
+        if (!data.survivalFlyWasInBed) {
+            // He hasn't, increment his violation level.
+            data.survivalFlyVL += 100D;
+
+            // And return if we need to do something or not.
+            return executeActions(player);
+        } else
+            // He has, everything is alright.
+            data.survivalFlyWasInBed = false;
+
+        return false;
+    }
+
+    /**
+     * Checks a player.
+     * 
+     * @param player
+     *            the player
      * @param from
      *            the from
      * @param to
