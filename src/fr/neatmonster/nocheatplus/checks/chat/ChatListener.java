@@ -23,9 +23,7 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * MMMMMMMMMMM                          MMMMMMMMMMM                                                        
  */
 
-
 // TODO: SYNC
-
 
 /**
  * Central location to listen to events that are relevant for the chat checks.

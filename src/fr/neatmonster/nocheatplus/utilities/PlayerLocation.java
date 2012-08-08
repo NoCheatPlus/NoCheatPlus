@@ -352,6 +352,11 @@ public class PlayerLocation {
         return onSoulSand.get();
     }
 
+    /**
+     * Checks if the player is on stairs.
+     * 
+     * @return true, if the player is on stairs
+     */
     public boolean isOnStairs() {
         if (!onStairs.isSet()) {
             AxisAlignedBB boundingBoxGround = boundingBox.clone();
