@@ -55,12 +55,6 @@ public class ChatConfig {
 		}
     }
 
-    public final boolean    arrivalsCheck;
-    public final int        arrivalsJoinsLimit;
-    public final String     arrivalsMessage;
-    public final long       arrivalsTimeLimit;
-    public final ActionList arrivalsActions;
-
     public final boolean    colorCheck;
     public final ActionList colorActions;
 
@@ -116,6 +110,8 @@ public class ChatConfig {
 
     public final ActionList noPwnageActions;
 
+    public final boolean    opInConsoleOnly;
+
     public final boolean    protectPlugins;
 
     /**
@@ -125,12 +121,6 @@ public class ChatConfig {
      *            the data
      */
     public ChatConfig(final ConfigFile data) {
-        arrivalsCheck = data.getBoolean(ConfPaths.CHAT_ARRIVALS_CHECK);
-        arrivalsJoinsLimit = data.getInt(ConfPaths.CHAT_ARRIVALS_JOINSLIMIT);
-        arrivalsMessage = data.getString(ConfPaths.CHAT_ARRIVALS_MESSAGE);
-        arrivalsTimeLimit = data.getLong(ConfPaths.CHAT_ARRIVALS_TIMELIMIT);
-        arrivalsActions = data.getActionList(ConfPaths.CHAT_ARRIVALS_ACTIONS, Permissions.CHAT_ARRIVALS);
-
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
 
@@ -185,6 +175,8 @@ public class ChatConfig {
         noPwnageWarnPlayerMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE);
 
         noPwnageActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
+
+        opInConsoleOnly = data.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
 
         protectPlugins = data.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
     }
