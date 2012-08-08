@@ -50,7 +50,6 @@ public enum CheckType {
     BLOCKPLACE_SPEED(BLOCKPLACE, "speed", Permissions.BLOCKPLACE_SPEED),
 
     CHAT(ChatConfig.class, ChatData.class),
-    CHAT_ARRIVALS(CHAT, "arrivals", Permissions.CHAT_ARRIVALS),
     CHAT_COLOR(CHAT, "color", Permissions.CHAT_COLOR),
     CHAT_NOPWNAGE(CHAT, "noPwnage", Permissions.CHAT_NOPWNAGE),
 

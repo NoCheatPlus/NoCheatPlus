@@ -23,15 +23,12 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * MMMMMMMMMMM                          MMMMMMMMMMM                                                        
  */
 
-
 // TODO: SYNC
-
 
 /**
  * Central location to listen to events that are relevant for the chat checks.
  */
 public class ChatListener implements Listener {
-    private final Arrivals arrivals = new Arrivals();
     private final Color    color    = new Color();
     private final NoPwnage noPwnage = new NoPwnage();
 
@@ -100,6 +97,14 @@ public class ChatListener implements Listener {
             return;
         }
 
+        // Prevent /op and /deop commands from being used in chat.
+        if (ChatConfig.getConfig(player).opInConsoleOnly && (command.equals("op") || command.equals("deop"))) {
+            event.getPlayer().sendMessage(
+                    ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
+            event.setCancelled(true);
+            return;
+        }
+
         // First the color check.
         if (color.isEnabled(player))
             event.setMessage(color.check(player, event.getMessage()));
@@ -128,11 +133,6 @@ public class ChatListener implements Listener {
          */
         final Player player = event.getPlayer();
         final ChatConfig cc = ChatConfig.getConfig(player); // Non critical use (concurrency).
-
-        // First the arrivals check, if enabled of course.
-        if (arrivals.isEnabled(player) && arrivals.check(player))
-            // The player failed the check, disallow the login.
-            event.disallow(Result.KICK_OTHER, cc.arrivalsMessage);
 
         // Then the no pwnage check, if the login isn't already disallowed.
         if (event.getResult() != Result.KICK_OTHER && noPwnage.check(player))

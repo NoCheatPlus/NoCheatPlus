@@ -47,6 +47,7 @@ public class DefaultConfig extends ConfigFile {
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
+        set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
 
         /*
@@ -117,12 +118,6 @@ public class DefaultConfig extends ConfigFile {
          *  Y888  ,d 888 888 ,ee 888  888   
          *   "88,d88 888 888 "88 888  888   
          */
-        set(ConfPaths.CHAT_ARRIVALS_CHECK, false);
-        set(ConfPaths.CHAT_ARRIVALS_JOINSLIMIT, 3);
-        set(ConfPaths.CHAT_ARRIVALS_MESSAGE, "Please try again later!");
-        set(ConfPaths.CHAT_ARRIVALS_TIMELIMIT, 5000L);
-        set(ConfPaths.CHAT_ARRIVALS_ACTIONS, "cancel");
-
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
 
@@ -162,7 +157,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE,
                 "&cYou relogged really fast! If you keep doing that, you're going to be banned.");
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER, 1);
-        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE, "Please try again later!");
+        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE, "You've relogged too fast, joining cancelled!");
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_TIMEOUT, 60000L);
 
         set(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK, true);
