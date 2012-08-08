@@ -192,6 +192,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     
     @EventHandler(priority=EventPriority.LOWEST)
     final void onExecuteActions(final ExecuteActionsEvent event){
-    	
+    	event.executeActions();
     }
 }
