@@ -132,10 +132,10 @@ public class ChatListener implements Listener {
          *                |___/                                 
          */
         final Player player = event.getPlayer();
-        final ChatConfig cc = ChatConfig.getConfig(player); // Non critical use (concurrency).
+        final ChatConfig cc = ChatConfig.getConfig(player);
 
-        // Then the no pwnage check, if the login isn't already disallowed.
-        if (event.getResult() != Result.KICK_OTHER && noPwnage.check(player))
+        // Execute the no pwnage check.
+        if (noPwnage.isEnabled(player) && noPwnage.check(player))
             event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);
     }
 }

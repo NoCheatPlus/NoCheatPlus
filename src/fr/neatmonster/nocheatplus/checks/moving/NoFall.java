@@ -104,7 +104,7 @@ public class NoFall extends Check {
         // feeling.
         if (from.getY() > to.getY()) {
             final float deltaY = (float) (from.getY() - to.getY());
-            data.noFallDistance += deltaY * 0.75F; // Magic number. :)
+            data.noFallDistance += deltaY * 0.75D; // Magic number. :)
 
             if (deltaY > 1F) {
                 data.noFallLastAddedDistance = deltaY;
@@ -114,7 +114,7 @@ public class NoFall extends Check {
         } else
             data.noFallLastAddedDistance = 0F;
 
-        if (to.isOnGround())
+        if (to.isOnGround() || from.isOnStairs())
             data.noFallDistance = 0F;
 
         // Reduce violation level.
