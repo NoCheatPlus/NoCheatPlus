@@ -22,6 +22,11 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * MM.     .dM dP    dP `88888P8   dP   M         M dP `88888P'   dP   `88888P' dP    dP `88888P' dP       
  * MMMMMMMMMMM                          MMMMMMMMMMM                                                        
  */
+
+
+// TODO: SYNC
+
+
 /**
  * Central location to listen to events that are relevant for the chat checks.
  */
