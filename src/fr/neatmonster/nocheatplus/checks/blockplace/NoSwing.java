@@ -35,7 +35,6 @@ public class NoSwing extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
-        BlockPlaceConfig.getConfig(player);
         final BlockPlaceData data = BlockPlaceData.getData(player);
 
         boolean cancel = false;

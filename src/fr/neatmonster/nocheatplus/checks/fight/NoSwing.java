@@ -35,7 +35,6 @@ public class NoSwing extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
-        FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;

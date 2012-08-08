@@ -36,7 +36,6 @@ public class Color extends Check {
      * @return the string
      */
     public String check(final Player player, final String message) {
-        ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
 
         // If the message contains colors...

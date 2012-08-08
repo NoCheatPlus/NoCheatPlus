@@ -62,9 +62,6 @@ public class BlockInteractConfig {
     public final boolean    directionCheck;
     public final ActionList directionActions;
 
-    public final boolean    noSwingCheck;
-    public final ActionList noSwingActions;
-
     public final boolean    reachCheck;
     public final ActionList reachActions;
 
@@ -78,9 +75,6 @@ public class BlockInteractConfig {
         directionCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK);
         directionActions = data.getActionList(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS,
                 Permissions.BLOCKINTERACT_DIRECTION);
-
-        noSwingCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_NOSWING_CHECK);
-        noSwingActions = data.getActionList(ConfPaths.BLOCKINTERACT_NOSWING_ACTIONS, Permissions.BLOCKINTERACT_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_REACH_CHECK);
         reachActions = data.getActionList(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, Permissions.BLOCKINTERACT_REACH);

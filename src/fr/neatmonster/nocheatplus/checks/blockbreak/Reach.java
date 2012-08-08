@@ -46,7 +46,6 @@ public class Reach extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location location) {
-        BlockBreakConfig.getConfig(player);
         final BlockBreakData data = BlockBreakData.getData(player);
 
         boolean cancel = false;

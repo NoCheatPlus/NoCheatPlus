@@ -42,7 +42,7 @@ public class SurvivalFly extends Check {
     private static final double COBWEB_ASCEND           = 0.02D + MARGIN;
 
     /** The vertical speed limit when descending into web. */
-    private static final double COBWEB_DESCEND          = 0.062D + MARGIN;
+    private static final double COBWEB_DESCEND          = 0.09D + MARGIN;
 
     /** The horizontal speed limit when moving into web. */
     private static final double COBWEB_MOVE             = 0.11D;

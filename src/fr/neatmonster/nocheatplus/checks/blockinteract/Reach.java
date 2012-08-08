@@ -46,7 +46,6 @@ public class Reach extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location location) {
-        BlockInteractConfig.getConfig(player);
         final BlockInteractData data = BlockInteractData.getData(player);
 
         boolean cancel = false;

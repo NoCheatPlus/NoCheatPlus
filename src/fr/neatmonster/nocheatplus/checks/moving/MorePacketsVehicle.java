@@ -57,7 +57,6 @@ public class MorePacketsVehicle extends Check {
      * @return the location
      */
     public Location check(final Player player, final Location from, final Location to) {
-        MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 
         Location newTo = null;

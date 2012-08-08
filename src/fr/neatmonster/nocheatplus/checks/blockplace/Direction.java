@@ -39,7 +39,6 @@ public class Direction extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location placed, final Location against) {
-        BlockPlaceConfig.getConfig(player);
         final BlockPlaceData data = BlockPlaceData.getData(player);
 
         boolean cancel = false;

@@ -44,14 +44,9 @@ public class BlockInteractData {
     }
 
     // Violation levels.
-    public double  directionVL;
-    public double  noSwingVL;
-    public double  reachVL;
-
-    // Data of the no swing check.
-    public boolean noSwingArmSwung;
-    public long    noSwingLastTime;
+    public double directionVL;
+    public double reachVL;
 
     // Data of the reach check.
-    public double  reachDistance;
+    public double reachDistance;
 }

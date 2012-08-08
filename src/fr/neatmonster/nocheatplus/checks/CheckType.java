@@ -40,7 +40,6 @@ public enum CheckType {
 
     BLOCKINTERACT(BlockInteractConfig.class, BlockInteractData.class),
     BLOCKINTERACT_DIRECTION(BLOCKINTERACT, "direction", Permissions.BLOCKINTERACT_DIRECTION),
-    BLOCKINTERACT_NOSWING(BLOCKINTERACT, "noSwing", Permissions.BLOCKINTERACT_NOSWING),
     BLOCKINTERACT_REACH(BLOCKINTERACT, "reach", Permissions.BLOCKINTERACT_REACH),
 
     BLOCKPLACE(BlockPlaceConfig.class, BlockPlaceData.class),

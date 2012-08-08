@@ -81,9 +81,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel");
 
-        set(ConfPaths.BLOCKINTERACT_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKINTERACT_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
-
         set(ConfPaths.BLOCKINTERACT_REACH_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
 

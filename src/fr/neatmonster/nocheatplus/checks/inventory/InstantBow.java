@@ -36,7 +36,6 @@ public class InstantBow extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final float force) {
-        InventoryConfig.getConfig(player);
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;
