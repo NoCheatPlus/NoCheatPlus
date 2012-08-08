@@ -1,10 +1,13 @@
 package fr.neatmonster.nocheatplus;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
@@ -38,6 +41,34 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * This the class handling all the commands.
  */
 public class CommandHandler implements CommandExecutor {
+
+    /**
+     * The event triggered when NoCheatPlus configuration is reloaded.
+     */
+    public static class NCPReloadEvent extends Event {
+
+        /** The handlers list. */
+        private static final HandlerList handlers = new HandlerList();
+
+        /**
+         * Gets the handler list.
+         * 
+         * @return the handler list
+         */
+        public static HandlerList getHandlerList() {
+            return handlers;
+        }
+
+        /* (non-Javadoc)
+         * @see org.bukkit.event.Event#getHandlers()
+         */
+        @Override
+        public HandlerList getHandlers() {
+            return handlers;
+        }
+    }
+
+    /** The plugin. */
     private final NoCheatPlus plugin;
 
     /**
@@ -72,6 +103,9 @@ public class CommandHandler implements CommandExecutor {
             FightConfig.clear();
             InventoryConfig.clear();
             MovingConfig.clear();
+
+            // Say to the other plugins that we've reloaded the configuration.
+            Bukkit.getPluginManager().callEvent(new NCPReloadEvent());
 
             sender.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Configuration reloaded!");
         } else

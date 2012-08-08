@@ -44,7 +44,7 @@ public class InstantHeal extends Check {
             return false;
         }
 
-        final long delta = System.currentTimeMillis() - (data.instantHealLastTime + 3500L);
+        final long delta = System.currentTimeMillis() - (data.instantHealLastTime + 3000L);
         data.instantHealBuffer += delta;
 
         if (data.instantHealBuffer < 0) {

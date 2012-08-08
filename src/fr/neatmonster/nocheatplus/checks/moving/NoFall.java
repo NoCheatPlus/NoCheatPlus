@@ -54,6 +54,16 @@ public class NoFall extends Check {
             return;
         }
 
+        // if (player.getName().equals("NeatMonster")) {
+        // player.sendMessage("---");
+        // player.sendMessage("bukkit = " + player.getFallDistance());
+        // player.sendMessage("ncp = " + data.noFallDistance);
+        // player.sendMessage("fromIsOnGround = " + from.isOnGround());
+        // player.sendMessage("fromIsOnStairs = " + from.isOnStairs());
+        // player.sendMessage("toIsOnGround = " + to.isOnGround());
+        // player.sendMessage("toIsOnStairs = " + to.isOnStairs());
+        // }
+
         // This check is pretty much always a step behind for technical reasons.
         if (from.isInLiquid() || from.isOnGround() || from.isOnLadder())
             // Start with zero fall distance.
@@ -104,7 +114,7 @@ public class NoFall extends Check {
         // feeling.
         if (from.getY() > to.getY()) {
             final float deltaY = (float) (from.getY() - to.getY());
-            data.noFallDistance += deltaY * 0.75F; // Magic number. :)
+            data.noFallDistance += deltaY * 0.75D; // Magic number. :)
 
             if (deltaY > 1F) {
                 data.noFallLastAddedDistance = deltaY;
@@ -114,7 +124,7 @@ public class NoFall extends Check {
         } else
             data.noFallLastAddedDistance = 0F;
 
-        if (to.isOnGround())
+        if (to.isOnGround() || from.isOnStairs())
             data.noFallDistance = 0F;
 
         // Reduce violation level.

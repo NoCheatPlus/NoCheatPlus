@@ -39,6 +39,7 @@ public abstract class ConfPaths {
      */
     private static final String MISCELLANEOUS                         = "miscellaneous.";
     public static final String  MISCELLANEOUS_ALLOWCLIENTMODS         = MISCELLANEOUS + "allowclientmods";
+    public static final String  MISCELLANEOUS_OPINCONSOLEONLY         = MISCELLANEOUS + "opinconsoleonly";
     public static final String  MISCELLANEOUS_PROTECTPLUGINS          = MISCELLANEOUS + "protectplugins";
 
     private static final String CHECKS                                = "checks.";
@@ -128,13 +129,6 @@ public abstract class ConfPaths {
      *   "88,d88 888 888 "88 888  888   
      */
     private static final String CHAT                                  = CHECKS + "chat.";
-
-    private static final String CHAT_ARRIVALS                         = CHAT + "arrivals.";
-    public static final String  CHAT_ARRIVALS_CHECK                   = CHAT_ARRIVALS + "active";
-    public static final String  CHAT_ARRIVALS_JOINSLIMIT              = CHAT_ARRIVALS + "joinslimit";
-    public static final String  CHAT_ARRIVALS_MESSAGE                 = CHAT_ARRIVALS + "message";
-    public static final String  CHAT_ARRIVALS_TIMELIMIT               = CHAT_ARRIVALS + "timelimit";
-    public static final String  CHAT_ARRIVALS_ACTIONS                 = CHAT_ARRIVALS + "actions";
 
     private static final String CHAT_COLOR                            = CHAT + "color.";
     public static final String  CHAT_COLOR_CHECK                      = CHAT_COLOR + "active";

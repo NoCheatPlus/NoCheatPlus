@@ -37,7 +37,6 @@ public class ChatData {
     }
 
     // Violation levels.
-    public double   arrivalsVL;
     public double   colorVL;
     public double   noPwnageVL;
 

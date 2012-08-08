@@ -84,7 +84,7 @@ public class SurvivalFly extends Check {
     private static final double SOULSAND_SPRINTING_MOVE = 0.18D;
 
     /** The horizontal speed limit when sprinting. */
-    private static final double SPRINTING_MOVE          = 0.37D;
+    private static final double SPRINTING_MOVE          = 0.35D;
 
     /** The vertical speed limit when ascending into water. */
     private static final double WATER_ASCEND            = 0.13D + MARGIN;
@@ -94,9 +94,6 @@ public class SurvivalFly extends Check {
 
     /** The horizontal speed limit when moving into water. */
     private static final double WATER_MOVE              = 0.18D;
-
-    /** The no fall check. */
-    private final NoFall        noFall                  = new NoFall();
 
     /**
      * Instantiates a new survival fly check.
@@ -177,7 +174,7 @@ public class SurvivalFly extends Check {
             hAllowedDistance = cc.survivalFlyBlockingSpeed / 100D * BLOCKING_MOVE;
         else if (from.isInWater() && to.isInWater())
             hAllowedDistance = cc.survivalFlyWaterSpeed / 100D * WATER_MOVE;
-        else if (player.isSprinting() && player.getFoodLevel() > 5)
+        else if (sprinting)
             hAllowedDistance = cc.survivalFlySprintingSpeed / 100D * SPRINTING_MOVE;
 
         if (data.survivalFlyOnIce > 0)
@@ -220,6 +217,16 @@ public class SurvivalFly extends Check {
         }
 
         hDistanceAboveLimit = Math.max(0D, hDistanceAboveLimit);
+
+        if (hDistanceAboveLimit == 0D && sprinting && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+            final double dX = to.getX() - from.getX();
+            final double dZ = to.getZ() - from.getZ();
+            final float yaw = from.getYaw();
+            // Prevent players from sprinting if they're moving backwards.
+            if (dX < 0D && dZ > 0D && yaw > 180F && yaw < 270F || dX < 0D && dZ < 0D && yaw > 270F && yaw < 360F
+                    || dX > 0D && dZ < 0D && yaw > 0F && yaw < 90F || dX > 0D && dZ > 0D && yaw > 90F && yaw < 180F)
+                hDistanceAboveLimit = hDistance;
+        }
 
         // Potion effect "Jump".
         double jumpAmplifier = 1D;
@@ -288,7 +295,8 @@ public class SurvivalFly extends Check {
             data.survivalFlyLastDistances[1] = data.survivalFlyLastDistances[0];
             data.survivalFlyLastDistances[0] = vDistance;
 
-            double vAllowedDistance = (data.verticalFreedom + 1.35D) * data.jumpAmplifier;
+            double vAllowedDistance = (data.verticalFreedom + (!from.isOnGround() && to.isOnGround() ? 1.5D : 1.35D))
+                    * data.jumpAmplifier;
             if (data.survivalFlyJumpPhase > JUMP_PHASE + data.jumpAmplifier)
                 vAllowedDistance -= (data.survivalFlyJumpPhase - JUMP_PHASE) * JUMP_STEP;
 
@@ -351,10 +359,6 @@ public class SurvivalFly extends Check {
                 // The player at least touched the ground somehow.
                 data.survivalFlyJumpPhase = 0;
         }
-
-        if (noFall.isEnabled(player))
-            // Execute the NoFall check.
-            noFall.check(player, from, to);
 
         return null;
     }
