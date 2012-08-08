@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import fr.neatmonster.nocheatplus.checks.ExecuteActionsEvent;
 import fr.neatmonster.nocheatplus.checks.Workarounds;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
@@ -187,5 +188,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             message = message + "§0§1§7§f§f";
 
         player.sendMessage(message);
+    }
+    
+    @EventHandler(priority=EventPriority.LOWEST)
+    final void onExecuteActions(final ExecuteActionsEvent event){
+    	
     }
 }

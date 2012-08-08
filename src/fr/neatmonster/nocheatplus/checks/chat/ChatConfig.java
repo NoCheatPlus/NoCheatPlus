@@ -34,7 +34,9 @@ public class ChatConfig {
      * Clear all the configurations.
      */
     public static void clear() {
-        worldsMap.clear();
+    	synchronized (worldsMap) {
+    		worldsMap.clear();
+    	}
     }
 
     /**
@@ -45,10 +47,12 @@ public class ChatConfig {
      * @return the configuration
      */
     public static ChatConfig getConfig(final Player player) {
-        if (!worldsMap.containsKey(player.getWorld().getName()))
-            worldsMap.put(player.getWorld().getName(),
-                    new ChatConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
-        return worldsMap.get(player.getWorld().getName());
+    	synchronized (worldsMap) {
+    		if (!worldsMap.containsKey(player.getWorld().getName()))
+                worldsMap.put(player.getWorld().getName(),
+                        new ChatConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
+            return worldsMap.get(player.getWorld().getName());
+		}
     }
 
     public final boolean    arrivalsCheck;

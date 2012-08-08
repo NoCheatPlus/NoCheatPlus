@@ -59,7 +59,7 @@ public class ChatListener implements Listener {
             event.setMessage(color.check(player, event.getMessage()));
 
         // Then the no pwnage check.
-        if (noPwnage.isEnabled(player) && noPwnage.check(player))
+        if (noPwnage.check(player, event, false))
             player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
@@ -105,7 +105,7 @@ public class ChatListener implements Listener {
             event.setMessage(color.check(player, event.getMessage()));
 
         // Then the no pwnage check.
-        if (noPwnage.isEnabled(player) && noPwnage.check(player))
+        if (noPwnage.check(player, event, true))
             player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
@@ -127,7 +127,7 @@ public class ChatListener implements Listener {
          *                |___/                                 
          */
         final Player player = event.getPlayer();
-        final ChatConfig cc = ChatConfig.getConfig(player);
+        final ChatConfig cc = ChatConfig.getConfig(player); // Non critical use (concurrency).
 
         // First the arrivals check, if enabled of course.
         if (arrivals.isEnabled(player) && arrivals.check(player))
@@ -135,7 +135,7 @@ public class ChatListener implements Listener {
             event.disallow(Result.KICK_OTHER, cc.arrivalsMessage);
 
         // Then the no pwnage check, if the login isn't already disallowed.
-        if (event.getResult() != Result.KICK_OTHER && noPwnage.isEnabled(player) && noPwnage.check(player))
+        if (event.getResult() != Result.KICK_OTHER && noPwnage.check(player))
             event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);
     }
 }

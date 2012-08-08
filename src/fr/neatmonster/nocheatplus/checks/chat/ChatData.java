@@ -30,7 +30,7 @@ public class ChatData {
      *            the player
      * @return the data
      */
-    public static ChatData getData(final Player player) {
+    public synchronized static ChatData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
             playersMap.put(player.getName(), new ChatData());
         return playersMap.get(player.getName());
@@ -59,7 +59,7 @@ public class ChatData {
     /**
      * Clear the data of the no pwnage check.
      */
-    public void clearNoPwnageData() {
+    public synchronized void clearNoPwnageData() {
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";

@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerEvent;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ExecuteActionsEvent;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -49,48 +50,70 @@ public class NoPwnage extends Check {
     public NoPwnage() {
         super(CheckType.CHAT_NOPWNAGE);
 
-        for (final Player player : Bukkit.getOnlinePlayers())
-            ChatData.getData(player).noPwnageLastLocation = player.getLocation();
+        for (final Player player : Bukkit.getOnlinePlayers()){
+        	final ChatData data = ChatData.getData(player);
+        	synchronized(data){
+        		data.noPwnageLastLocation = player.getLocation();
+        	}
+        }
     }
 
     /**
      * Checks a player (join).
+     * 
+     * Only called from the main thread.
      * 
      * @param player
      *            the player
      * @return true, if successful
      */
     public boolean check(final Player player) {
+    
+    	if (!isEnabled(player)) return false;
+    	
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
-
-        boolean cancel = false;
-
-        final long now = System.currentTimeMillis();
-
-        // NoPwnage will remember the time when a player leaves the server. If he returns within "time" milliseconds, he
-        // will get warned. If he has been warned "warnings" times already, the "commands" will be executed for him.
-        // Warnings get removed if the time of the last warning was more than "timeout" milliseconds ago.
-        if (cc.noPwnageReloginCheck && now - data.noPwnageLeaveTime < cc.noPwnageReloginTimeout) {
-            if (now - data.noPwnageReloginWarningTime > cc.noPwnageReloginWarningTimeout)
-                data.noPwnageReloginWarnings = 0;
-            if (data.noPwnageReloginWarnings < cc.noPwnageReloginWarningNumber) {
-                player.sendMessage(replaceColors(cc.noPwnageReloginWarningMessage));
-                data.noPwnageReloginWarningTime = now;
-                data.noPwnageReloginWarnings++;
-            } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
-                // Find out if we need to ban the player or not.
-                cancel = executeActions_(player);
+        
+        synchronized(data){
+        	return unsafeCheck(player, cc, data);
         }
-
-        // Store his location and some other data.
-        data.noPwnageLastLocation = player.getLocation();
-        data.noPwnageJoinTime = now;
-
-        return cancel;
     }
 
     /**
+     * Check (Join), only call from synchronized code. 
+     * @param player
+     * @param cc
+     * @param data
+     * @return
+     */
+    private boolean unsafeCheck(final Player player, final ChatConfig cc, final ChatData data) {
+    	 boolean cancel = false;
+
+         final long now = System.currentTimeMillis();
+
+         // NoPwnage will remember the time when a player leaves the server. If he returns within "time" milliseconds, he
+         // will get warned. If he has been warned "warnings" times already, the "commands" will be executed for him.
+         // Warnings get removed if the time of the last warning was more than "timeout" milliseconds ago.
+         if (cc.noPwnageReloginCheck && now - data.noPwnageLeaveTime < cc.noPwnageReloginTimeout) {
+             if (now - data.noPwnageReloginWarningTime > cc.noPwnageReloginWarningTimeout)
+                 data.noPwnageReloginWarnings = 0;
+             if (data.noPwnageReloginWarnings < cc.noPwnageReloginWarningNumber) {
+                 player.sendMessage(replaceColors(cc.noPwnageReloginWarningMessage));
+                 data.noPwnageReloginWarningTime = now;
+                 data.noPwnageReloginWarnings++;
+             } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
+                 // Find out if we need to ban the player or not.
+                 cancel = executeActionsThreadSafe(player, true);
+         }
+
+         // Store his location and some other data.
+         data.noPwnageLastLocation = player.getLocation();
+         data.noPwnageJoinTime = now;
+
+         return cancel;
+	}
+
+	/**
      * Checks a player (chat).
      * 
      * @param player
@@ -99,10 +122,29 @@ public class NoPwnage extends Check {
      *            the event
      * @return true, if successful
      */
-    public boolean check(final Player player, final PlayerEvent event) {
+    public boolean check(final Player player, final PlayerEvent event, final boolean isMainThread) {
+    	
+    	if (isMainThread && !isEnabled(player)) return false;
+    	
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
-        data.noPwnageVL = 0D;
+        
+        synchronized(data){
+        	return unsafeCheck(player, event, isMainThread, cc, data);
+        }
+    }
+    
+    /**
+     * Only to be called form synchronized code.
+     * @param player
+     * @param event
+     * @param isMainThread
+     * @param cc
+     * @param data
+     * @return
+     */
+    private boolean  unsafeCheck(final Player player, final PlayerEvent event, final boolean isMainThread, final ChatConfig cc, final ChatData data) {
+    	data.noPwnageVL = 0D;
 
         boolean cancel = false;
 
@@ -126,7 +168,7 @@ public class NoPwnage extends Check {
                     // Does he failed too much times?
                     if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
                         // Find out if we need to ban the player or not.
-                        cancel = executeActions_(player);
+                        cancel = executeActionsThreadSafe(player, isMainThread);
 
                     // Increment his tries number counter.
                     data.noPwnageCaptchTries++;
@@ -223,7 +265,7 @@ public class NoPwnage extends Check {
                         ((PlayerCommandPreprocessEvent) event).setCancelled(true);
 
                     // Find out if we need to ban the player or not.
-                    cancel = executeActions_(player);
+                    cancel = executeActionsThreadSafe(player, isMainThread);
                 }
 
             // Store the message and some other data.
@@ -234,21 +276,41 @@ public class NoPwnage extends Check {
         }
 
         return cancel;
-    }
+	}
 
+	@Override
+    public final boolean executeActions(final Player player){
+		// To be called from synchronized code (ChatData).
+    	// Late check of bypass permissions:
+		// (One might use a bypass flag, set if its already been checked and then reset.)
+       	if (!isEnabled(player)) return false;
+    	return super.executeActions(player);
+    }
+    
     /**
-     * Execute actions.
-     * 
+     * Execute actions from another thread (not the main thread).<br>
+     * This does not use extra synchronization.
      * @param player
-     *            the player
-     * @return true, if successful
+     * @return
      */
-    private boolean executeActions_(final Player player) {
-        if (super.executeActions(player)) {
-            ChatData.getData(player).clearNoPwnageData();
-            return true;
-        }
-        return false;
+    public final boolean executeActionsThreadSafe(final Player player, boolean isMainThread){
+    	if (isMainThread){
+    		// Just execute.
+    		if (executeActions(player)){
+    			ChatData.getData(player).clearNoPwnageData();
+    			return true;
+    		}
+    		else
+    			return false;
+    	}
+    	else {
+    		// Sync it into the main thread by using an event.
+    		final ExecuteActionsEvent event = new ExecuteActionsEvent(this, player);
+        	Bukkit.getPluginManager().callEvent(event);
+        	final boolean cancel = event.getCancel();
+        	if (cancel) ChatData.getData(player).clearNoPwnageData();
+        	return cancel;
+    	}
     }
 
     /* (non-Javadoc)
@@ -261,4 +323,5 @@ public class NoPwnage extends Check {
         else
             return super.getParameter(wildcard, player);
     }
+    
 }
