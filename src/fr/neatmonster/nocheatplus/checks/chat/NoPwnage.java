@@ -131,6 +131,8 @@ public class NoPwnage extends Check {
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
         
+        if (!isMainThread && !cc.isEnabled(this.type)) return false;
+        
         synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
         	return unsafeCheck(player, event, isMainThread, cc, data);
         }
@@ -290,7 +292,12 @@ public class NoPwnage extends Check {
      * @return
      */
     public final boolean executeActionsThreadSafe(final Player player, double VL, ActionList actions, boolean isMainThread){
-        final boolean cancel = super.executeActionsThreadSafe(player, VL, actions, isMainThread);
+    	final boolean cancel;
+    	if (isMainThread) cancel = super.executeActions(player, VL, actions);
+    	else{
+    		// Permission check is done in the main thread (!). 
+    		cancel = super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
+    	}
         if (cancel) ChatData.getData(player).clearNoPwnageData();
         return cancel;
     }

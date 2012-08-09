@@ -52,8 +52,7 @@ public class ChatListener implements Listener {
         final Player player = event.getPlayer();
 
         // First the color check.
-        if (color.isEnabled(player))
-            event.setMessage(color.check(player, event.getMessage(), false));
+        event.setMessage(color.check(player, event.getMessage(), false));
         
         // Then the no pwnage check.
         if (noPwnage.check(player, event, false))
@@ -106,8 +105,7 @@ public class ChatListener implements Listener {
         }
 
         // First the color check.
-        if (color.isEnabled(player))
-            event.setMessage(color.check(player, event.getMessage(), true));
+        event.setMessage(color.check(player, event.getMessage(), true));
 
         // Then the no pwnage check.
         if (noPwnage.check(player, event, true))

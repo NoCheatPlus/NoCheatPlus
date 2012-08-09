@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.chat;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
@@ -36,6 +37,13 @@ public class Color extends Check {
      * @return the string
      */
     public String check(final Player player, final String message, final boolean isMainThread) {
+    	
+    	if (isMainThread && !isEnabled(player)) return message;
+    	
+    	final ChatConfig cc = ChatConfig.getConfig(player);
+    	
+    	if (!isMainThread && !cc.isEnabled(this.type)) return message; // Leave out the permission check.
+    	
         final ChatData data = ChatData.getData(player);
         synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
             // If the message contains colors...
@@ -44,7 +52,7 @@ public class Color extends Check {
                 data.colorVL++;
 
                 // Find out if we need to remove the colors or not.
-                if (executeActionsThreadSafe(player, data.colorVL, ChatConfig.getConfig(player).colorActions, isMainThread))
+                if (executeActionsThreadSafe(player, data.colorVL, cc.colorActions, isMainThread))
                     // Remove color codes.
                     message.replaceAll("\302\247.", "").replaceAll("\247.", "");
             }
@@ -52,4 +60,9 @@ public class Color extends Check {
 
         return message;
     }
+
+	private boolean executeActionsThreadSafe(Player player, double VL, ActionList actions, boolean isMainThread) {
+		if (isMainThread) return super.executeActions(player, VL, actions);
+		else return super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
+	}
 }

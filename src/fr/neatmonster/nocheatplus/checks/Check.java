@@ -90,7 +90,7 @@ public abstract class Check {
     }
 
     /** The type. */
-    private final CheckType type;
+    protected final CheckType type;
 
     /**
      * Instantiates a new check.
@@ -102,24 +102,6 @@ public abstract class Check {
         this.type = type;
     }
     
-	/**
-     * Execute actions in a thread safe manner if isMainThread is set to false.<br>
-	 * @param player
-	 * @param VL
-	 * @param actions
-	 * @param isMainThread
-	 * @return
-	 */
-    public  boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions, final boolean isMainThread){
-    	if (isMainThread){
-    		// Just execute.
-    		return executeActions(player, VL, actions);
-    	}
-    	else {
-    		return executeActionsThreadSafe(player, VL, actions);
-    	}
-    }
-    
     /**
      * Execute actions in a thread safe manner.<br>
      * @param player
@@ -127,12 +109,22 @@ public abstract class Check {
      * @param actions
      * @return
      */
-    public boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions){
+    public boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions, final String bypassPermission){
     	// Sync it into the main thread by using an event.
-		final ExecuteActionsEvent event = new ExecuteActionsEvent(new ViolationData(this, player, VL, actions));
+    	return executeActionsThreadSafe(new ViolationData(this, player, VL, actions, bypassPermission));
+    }
+    
+    /**
+     * Execute actions in a thread safe manner.<br>
+     * @param violationData
+     * @return
+     */
+    public boolean executeActionsThreadSafe(final ViolationData violationData){
+    	final ExecuteActionsEvent event = new ExecuteActionsEvent(violationData);
     	Bukkit.getPluginManager().callEvent(event);
     	return event.getCancel();
     }
+    		
     
     /**
      * Convenience method.
@@ -156,6 +148,11 @@ public abstract class Check {
         try {
             boolean special = false;
             final Player player = violationData.player;
+            
+            // Check a bypass permission:
+            if (violationData.bypassPermission != null){
+            	if (player.hasPermission(violationData.bypassPermission)) return false;
+            }
             
 //            final Object configFactory = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null, player);
 //            final Object dataFactory = type.getData().getDeclaredMethod("getData", Player.class).invoke(null, player);
