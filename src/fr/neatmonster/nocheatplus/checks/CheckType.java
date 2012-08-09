@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks;
 
+import org.bukkit.entity.Player;
+
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
@@ -27,33 +29,33 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  *                                                             d8888P  dP                
  */
 /**
- * Type of checks (containing configuration and data classes, name and permission).
+ * Type of checks (containing configuration and dataFactory classes, name and permission).
  */
 public enum CheckType {
     ALL,
 
-    BLOCKBREAK(BlockBreakConfig.class, BlockBreakData.class),
+    BLOCKBREAK(BlockBreakConfig.factory, BlockBreakData.factory),
     BLOCKBREAK_DIRECTION(BLOCKBREAK, "direction", Permissions.BLOCKBREAK_DIRECTION),
     BLOCKBREAK_FASTBREAK(BLOCKBREAK, "fastBreak", Permissions.BLOCKBREAK_FASTBREAK),
     BLOCKBREAK_NOSWING(BLOCKBREAK, "noSwing", Permissions.BLOCKBREAK_NOSWING),
     BLOCKBREAK_REACH(BLOCKBREAK, "reach", Permissions.BLOCKBREAK_REACH),
 
-    BLOCKINTERACT(BlockInteractConfig.class, BlockInteractData.class),
+    BLOCKINTERACT(BlockInteractConfig.factory, BlockInteractData.factory),
     BLOCKINTERACT_DIRECTION(BLOCKINTERACT, "direction", Permissions.BLOCKINTERACT_DIRECTION),
     BLOCKINTERACT_REACH(BLOCKINTERACT, "reach", Permissions.BLOCKINTERACT_REACH),
 
-    BLOCKPLACE(BlockPlaceConfig.class, BlockPlaceData.class),
+    BLOCKPLACE(BlockPlaceConfig.factory, BlockPlaceData.factory),
     BLOCKPLACE_DIRECTION(BLOCKPLACE, "direction", Permissions.BLOCKPLACE_DIRECTION),
     BLOCKPLACE_FASTPLACE(BLOCKPLACE, "fastPlace", Permissions.BLOCKPLACE_FASTPLACE),
     BLOCKPLACE_NOSWING(BLOCKPLACE, "noSwing", Permissions.BLOCKPLACE_NOSWING),
     BLOCKPLACE_REACH(BLOCKPLACE, "reach", Permissions.BLOCKBREAK_REACH),
     BLOCKPLACE_SPEED(BLOCKPLACE, "speed", Permissions.BLOCKPLACE_SPEED),
 
-    CHAT(ChatConfig.class, ChatData.class),
+    CHAT(ChatConfig.factory, ChatData.factory),
     CHAT_COLOR(CHAT, "color", Permissions.CHAT_COLOR),
     CHAT_NOPWNAGE(CHAT, "noPwnage", Permissions.CHAT_NOPWNAGE),
 
-    FIGHT(FightConfig.class, FightData.class),
+    FIGHT(FightConfig.factory, FightData.factory),
     FIGHT_ANGLE(FIGHT, "angle", Permissions.FIGHT_ANGLE),
     FIGHT_CRITICAL(FIGHT, "critical", Permissions.FIGHT_CRITICAL),
     FIGHT_DIRECTION(FIGHT, "direction", Permissions.FIGHT_DIRECTION),
@@ -64,12 +66,12 @@ public enum CheckType {
     FIGHT_REACH(FIGHT, "reach", Permissions.FIGHT_REACH),
     FIGHT_SPEED(FIGHT, "speed", Permissions.FIGHT_SPEED),
 
-    INVENTORY(InventoryConfig.class, InventoryData.class),
+    INVENTORY(InventoryConfig.factory, InventoryData.factory),
     INVENTORY_DROP(INVENTORY, "drop", Permissions.INVENTORY_DROP),
     INVENTORY_INSTANTBOW(INVENTORY, "instantBow", Permissions.INVENTORY_INSTANTBOW),
     INVENTORY_INSTANTEAT(INVENTORY, "instantEat", Permissions.INVENTORY_INSTANTEAT),
 
-    MOVING(MovingConfig.class, MovingData.class),
+    MOVING(MovingConfig.factory, MovingData.factory),
     MOVING_CREATIVEFLY(MOVING, "creativeFly", Permissions.MOVING_CREATIVEFLY),
     MOVING_MOREPACKETS(MOVING, "morePackets", Permissions.MOVING_MOREPACKETS),
     MOVING_MOREPACKETSVEHICLE(MOVING, "morePacketsVehicle", Permissions.MOVING_MOREPACKETSVEHICLE),
@@ -81,11 +83,11 @@ public enum CheckType {
     /** The group. */
     public final CheckType group;
 
-    /** The config. */
-    public final Class<?>  config;
+    /** The configFactory. */
+    public final CheckConfigFactory  configFactory;
 
-    /** The data. */
-    public final Class<?>  data;
+    /** The dataFactory. */
+    public final CheckDataFactory  dataFactory;
 
     /** The name. */
     public final String    name;
@@ -105,20 +107,20 @@ public enum CheckType {
      * 
      * @param group
      *            the group
-     * @param config
-     *            the config class
-     * @param data
-     *            the data class
+     * @param configFactory
+     *            the configFactory class
+     * @param dataFactory
+     *            the dataFactory class
      * @param name
      *            the name
      * @param permission
      *            the permission
      */
-    private CheckType(final CheckType group, final Class<?> config, final Class<?> data, final String name,
+    private CheckType(final CheckType group, final CheckConfigFactory configFactory, CheckDataFactory dataFactory, final String name,
             final String permission) {
         this.group = group;
-        this.config = config;
-        this.data = data;
+        this.configFactory = configFactory;
+        this.dataFactory = dataFactory;
         this.name = name;
         this.permission = permission;
     }
@@ -134,37 +136,37 @@ public enum CheckType {
      *            the permission
      */
     private CheckType(final CheckType group, final String name, final String permission) {
-        this(group, group.getConfig(), group.getData(), name, permission);
+        this(group, group.getConfigFactory(), group.getDataFactory(), name, permission);
     }
 
     /**
      * Instantiates a new check type.
      * 
-     * @param config
-     *            the config
-     * @param data
-     *            the data
+     * @param configFactory
+     *            the configFactory
+     * @param dataFactory
+     *            the dataFactory
      */
-    private CheckType(final Class<?> config, final Class<?> data) {
-        this(null, config, data, null, null);
+    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
+        this(null, configFactory, dataFactory, null, null);
     }
 
     /**
-     * Gets the config class.
+     * Gets the configFactory class.
      * 
-     * @return the config class
+     * @return the configFactory class
      */
-    public Class<?> getConfig() {
-        return config;
+    public CheckConfigFactory getConfigFactory() {
+        return configFactory;
     }
 
     /**
-     * Gets the data class.
+     * Gets the dataFactory class.
      * 
-     * @return the data class
+     * @return the dataFactory class
      */
-    public Class<?> getData() {
-        return data;
+    public CheckDataFactory getDataFactory() {
+        return dataFactory;
     }
 
     /**
@@ -184,4 +186,15 @@ public enum CheckType {
     public String getPermission() {
         return permission;
     }
+    
+    /**
+     * Check if the check is enabled by configuration (no permission check).
+     * @param player
+     * @return
+     */
+    public final boolean isEnabled(final Player player){
+//    	if (configFactory == null) return true; // TODO: maybe leave this out.
+    	return configFactory.getConfig(player).isEnabled(this);
+    }
+    
 }

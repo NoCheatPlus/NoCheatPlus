@@ -52,7 +52,7 @@ public class FastPlace extends Check {
 
                     // Execute whatever actions are associated with this check and the violation level and find out if
                     // we should cancel the event.
-                    cancel = executeActions(player);
+                    cancel = executeActions(player, data.fastPlaceVL, cc.fastPlaceActions);
                 }
 
                 data.fastPlaceLastRefused = true;

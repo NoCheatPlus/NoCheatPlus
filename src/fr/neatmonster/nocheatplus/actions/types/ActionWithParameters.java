@@ -2,11 +2,10 @@ package fr.neatmonster.nocheatplus.actions.types;
 
 import java.util.ArrayList;
 
-import org.bukkit.entity.Player;
-
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * MMP"""""""MM            dP   oo                   M""MMM""MMM""M oo   dP   dP       
@@ -53,7 +52,7 @@ public abstract class ActionWithParameters extends Action {
     }
 
     /**
-     * Get a string with all the wildcards replaced with data from LogData.
+     * Get a string with all the wildcards replaced with dataFactory from LogData.
      * 
      * @param player
      *            the player
@@ -61,7 +60,7 @@ public abstract class ActionWithParameters extends Action {
      *            the check
      * @return the message
      */
-    protected String getMessage(final Player player, final Check check) {
+    protected String getMessage(final Check check, final ViolationData violationData) {
         // Should be big enough most of the time.
         final StringBuilder log = new StringBuilder(100);
 
@@ -69,7 +68,7 @@ public abstract class ActionWithParameters extends Action {
             if (part instanceof String)
                 log.append((String) part);
             else
-                log.append(check.getParameter((ParameterName) part, player));
+                log.append(check.getParameter((ParameterName) part, violationData));
 
         return log.toString();
     }

@@ -53,8 +53,8 @@ public class ChatListener implements Listener {
 
         // First the color check.
         if (color.isEnabled(player))
-            event.setMessage(color.check(player, event.getMessage()));
-
+            event.setMessage(color.check(player, event.getMessage(), false));
+        
         // Then the no pwnage check.
         if (noPwnage.check(player, event, false))
             player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
@@ -107,7 +107,7 @@ public class ChatListener implements Listener {
 
         // First the color check.
         if (color.isEnabled(player))
-            event.setMessage(color.check(player, event.getMessage()));
+            event.setMessage(color.check(player, event.getMessage(), true));
 
         // Then the no pwnage check.
         if (noPwnage.check(player, event, true))
@@ -135,7 +135,7 @@ public class ChatListener implements Listener {
         final ChatConfig cc = ChatConfig.getConfig(player);
 
         // Execute the no pwnage check.
-        if (noPwnage.isEnabled(player) && noPwnage.check(player))
+        if (noPwnage.isEnabled(player) && noPwnage.checkLogin(player))
             event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);
     }
 }

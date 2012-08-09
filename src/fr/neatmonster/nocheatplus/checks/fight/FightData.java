@@ -7,6 +7,9 @@ import java.util.TreeMap;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+
 /*
  * MM""""""""`M oo          dP         dP   M""""""'YMM            dP            
  * MM  mmmmmmmM             88         88   M  mmmm. `M            88            
@@ -18,19 +21,26 @@ import org.bukkit.entity.Player;
  *                  d8888P                                                       
  */
 /**
- * Player specific data for the fight checks.
+ * Player specific dataFactory for the fight checks.
  */
-public class FightData {
+public class FightData implements CheckData {
+	
+	public static final CheckDataFactory factory = new CheckDataFactory(){
+		@Override
+		public final CheckData getData(final Player player) {
+			return FightData.getData(player);
+		}
+	};
 
-    /** The map containing the data per players. */
+    /** The map containing the dataFactory per players. */
     private static Map<String, FightData> playersMap = new HashMap<String, FightData>();
 
     /**
-     * Gets the data of a specified player.
+     * Gets the dataFactory of a specified player.
      * 
      * @param player
      *            the player
-     * @return the data
+     * @return the dataFactory
      */
     public static FightData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))

@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -13,17 +12,15 @@ public class ExecuteActionsEvent extends Event {
 	
 	private static final HandlerList handlers = new HandlerList();
 
-	private final Check check;
-	final Player player;
+	private final ViolationData violationData;
 	/**
 	 * If the actions have been executed already.
 	 */
 	private boolean actionsExecuted = false;
 	private boolean cancel = false;
-	
-	public ExecuteActionsEvent(final Check check, final Player player){
-		this.check = check;
-		this.player = player;
+
+	public ExecuteActionsEvent(final ViolationData violationData){
+		this.violationData = violationData;
 	}
 	
 	@Override
@@ -41,7 +38,7 @@ public class ExecuteActionsEvent extends Event {
 	
 	public void executeActions(){
 		if (actionsExecuted) return;
-		cancel = check.executeActions(player);
+		cancel = violationData.check.executeActions(violationData);
 		actionsExecuted = true;
 	}
 	

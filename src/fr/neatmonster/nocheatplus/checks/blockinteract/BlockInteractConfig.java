@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -33,7 +36,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the block interact checks. Every world gets one of these assigned to it, or if a world
  * doesn't get it's own, it will use the "global" version.
  */
-public class BlockInteractConfig {
+public class BlockInteractConfig implements CheckConfig {
+	
+	public static final CheckConfigFactory factory = new CheckConfigFactory(){
+		@Override
+		public final CheckConfig getConfig(final Player player) {
+			return BlockInteractConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
     private static Map<String, BlockInteractConfig> worldsMap = new HashMap<String, BlockInteractConfig>();
@@ -68,8 +78,8 @@ public class BlockInteractConfig {
     /**
      * Instantiates a new block interact configuration.
      * 
-     * @param data
-     *            the data
+     * @param dataFactory
+     *            the dataFactory
      */
     public BlockInteractConfig(final ConfigFile data) {
         directionCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK);
@@ -79,4 +89,16 @@ public class BlockInteractConfig {
         reachCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_REACH_CHECK);
         reachActions = data.getActionList(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, Permissions.BLOCKINTERACT_REACH);
     }
+    
+    @Override
+	public final boolean isEnabled(final CheckType checkType) {
+		switch(checkType){
+		case BLOCKINTERACT_DIRECTION:
+			return directionCheck;
+		case BLOCKINTERACT_REACH:
+			return reachCheck;
+		default:
+			return true;
+		}
+	}
 }

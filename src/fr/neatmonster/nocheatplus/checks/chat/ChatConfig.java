@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -25,11 +28,18 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the "chat" checks. Every world gets one of these assigned to it, or if a world doesn't
  * get it's own, it will use the "global" version.
  */
-public class ChatConfig {
+public class ChatConfig implements CheckConfig{
+	
+	public static final CheckConfigFactory factory = new CheckConfigFactory(){
+		@Override
+		public final CheckConfig getConfig(final Player player) {
+			return ChatConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
     private static Map<String, ChatConfig> worldsMap = new HashMap<String, ChatConfig>();
-
+    
     /**
      * Clear all the configurations.
      */
@@ -117,8 +127,8 @@ public class ChatConfig {
     /**
      * Instantiates a new chat configuration.
      * 
-     * @param data
-     *            the data
+     * @param dataFactory
+     *            the dataFactory
      */
     public ChatConfig(final ConfigFile data) {
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
@@ -180,4 +190,16 @@ public class ChatConfig {
 
         protectPlugins = data.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
     }
+
+	@Override
+	public boolean isEnabled(CheckType checkType) {
+		switch(checkType){
+		case CHAT_COLOR:
+			return colorCheck;
+		case CHAT_NOPWNAGE:
+			return noPwnageCheck;
+		default:
+			return true;
+		}
+	}
 }

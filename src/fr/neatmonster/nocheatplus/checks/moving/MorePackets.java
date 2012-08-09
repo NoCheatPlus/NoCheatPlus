@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -79,7 +80,7 @@ public class MorePackets extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player))
+            if (executeActions(player, data.morePacketsVL, MovingConfig.getConfig(player).morePacketsActions))
                 newTo = data.teleported = data.morePacketsSetback;
         }
 
@@ -121,10 +122,10 @@ public class MorePackets extends Check {
      * org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.PACKETS)
-            return String.valueOf(MovingData.getData(player).morePacketsPackets);
+            return String.valueOf(MovingData.getData(violationData.player).morePacketsPackets);
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
 }

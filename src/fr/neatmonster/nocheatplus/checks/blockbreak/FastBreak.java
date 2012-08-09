@@ -73,7 +73,7 @@ public class FastBreak extends Check {
                 data.fastBreakVL += Math.max(timeLimit - elapsedTime, 0D);
 
                 // Cancel the event if needed.
-                cancel = executeActions(player);
+                cancel = executeActions(player, data.fastBreakVL, cc.fastBreakActions);
             } else
                 // Remove one from the buffer.
                 data.fastBreakBuffer--;

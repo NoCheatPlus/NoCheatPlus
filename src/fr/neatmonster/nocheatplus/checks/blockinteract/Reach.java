@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -66,7 +67,7 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player);
+            cancel = executeActions(player, data.reachVL, BlockInteractConfig.getConfig(player).reachActions);
         } else
             // Player passed the check, reward him.
             data.reachVL *= 0.9D;
@@ -78,10 +79,10 @@ public class Reach extends Check {
      * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.REACH_DISTANCE)
-            return String.valueOf(Math.round(BlockInteractData.getData(player).reachDistance));
+            return String.valueOf(Math.round(BlockInteractData.getData(violationData.player).reachDistance));
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
 }

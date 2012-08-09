@@ -75,7 +75,7 @@ public class Direction extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player);
+            cancel = executeActions(player, data.directionVL, cc.directionActions);
 
             if (cancel)
                 // If we should cancel, remember the current time too.

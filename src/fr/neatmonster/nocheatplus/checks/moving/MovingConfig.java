@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -24,7 +27,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 /**
  * Configurations specific for the moving checks. Every world gets one of these assigned to it.
  */
-public class MovingConfig {
+public class MovingConfig implements CheckConfig {
+	
+	public static final CheckConfigFactory factory = new CheckConfigFactory(){
+		@Override
+		public final CheckConfig getConfig(final Player player) {
+			return MovingConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
     private static Map<String, MovingConfig> worldsMap = new HashMap<String, MovingConfig>();
@@ -81,8 +91,8 @@ public class MovingConfig {
     /**
      * Instantiates a new moving configuration.
      * 
-     * @param data
-     *            the data
+     * @param dataFactory
+     *            the dataFactory
      */
     public MovingConfig(final ConfigFile data) {
         creativeFlyCheck = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
@@ -115,4 +125,22 @@ public class MovingConfig {
         survivalFlyWaterSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WATERSPEED, 100);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
     }
+    
+    @Override
+	public final boolean isEnabled(final CheckType checkType) {
+		switch(checkType){
+		case MOVING_NOFALL:
+			return noFallCheck;
+		case MOVING_SURVIVALFLY:
+			return survivalFlyCheck;
+		case MOVING_MOREPACKETS:
+			return morePacketsCheck;
+		case MOVING_MOREPACKETSVEHICLE:
+			return morePacketsVehicleCheck;
+		case MOVING_CREATIVEFLY:
+			return creativeFlyCheck;
+		default:
+			return true;
+		}
+	}
 }

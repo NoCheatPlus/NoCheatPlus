@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * M"""""`'"""`YM                            MM"""""""`YM                   dP                  dP            
@@ -78,7 +79,7 @@ public class MorePacketsVehicle extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player))
+            if (executeActions(player, data.morePacketsVehicleVL, MovingConfig.getConfig(player).morePacketsVehicleActions))
                 newTo = data.morePacketsVehicleSetback;
         }
 
@@ -120,10 +121,10 @@ public class MorePacketsVehicle extends Check {
      * org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.PACKETS)
-            return String.valueOf(MovingData.getData(player).morePacketsVehiclePackets);
+            return String.valueOf(MovingData.getData(violationData.player).morePacketsVehiclePackets);
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
 }

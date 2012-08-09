@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+
 /*
  * M"""""`'"""`YM                   oo                   M""""""'YMM            dP            
  * M  mm.  mm.  M                                        M  mmmm. `M            88            
@@ -17,19 +20,26 @@ import org.bukkit.entity.Player;
  *                                               d8888P                                       
  */
 /**
- * Player specific data for the moving checks.
+ * Player specific dataFactory for the moving checks.
  */
-public class MovingData {
+public class MovingData implements CheckData {
+	
+	public static final CheckDataFactory factory = new CheckDataFactory(){
+		@Override
+		public final CheckData getData(final Player player) {
+			return MovingData.getData(player);
+		}
+	};
 
-    /** The map containing the data per players. */
+    /** The map containing the dataFactory per players. */
     private static Map<String, MovingData> playersMap = new HashMap<String, MovingData>();
 
     /**
-     * Gets the data of a specified player.
+     * Gets the dataFactory of a specified player.
      * 
      * @param player
      *            the player
-     * @return the data
+     * @return the dataFactory
      */
     public static MovingData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
@@ -91,7 +101,7 @@ public class MovingData {
     public Location   teleported;
 
     /**
-     * Clear the data of the fly checks.
+     * Clear the dataFactory of the fly checks.
      */
     public void clearFlyData() {
         bunnyhopDelay = 0;
@@ -102,7 +112,7 @@ public class MovingData {
     }
 
     /**
-     * Clear the data of the more packets checks.
+     * Clear the dataFactory of the more packets checks.
      */
     public void clearMorePacketsData() {
         morePacketsSetback = null;

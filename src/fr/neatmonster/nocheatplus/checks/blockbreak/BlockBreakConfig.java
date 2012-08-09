@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -33,7 +36,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the block break checks. Every world gets one of these assigned to it, or if a world
  * doesn't get it's own, it will use the "global" version.
  */
-public class BlockBreakConfig {
+public class BlockBreakConfig implements CheckConfig{
+	
+	public static final CheckConfigFactory factory = new CheckConfigFactory(){
+		@Override
+		public final CheckConfig getConfig(final Player player) {
+			return BlockBreakConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
     private static Map<String, BlockBreakConfig> worldsMap = new HashMap<String, BlockBreakConfig>();
@@ -77,8 +87,8 @@ public class BlockBreakConfig {
     /**
      * Instantiates a new block break configuration.
      * 
-     * @param data
-     *            the data
+     * @param dataFactory
+     *            the dataFactory
      */
     public BlockBreakConfig(final ConfigFile data) {
         directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
@@ -96,4 +106,20 @@ public class BlockBreakConfig {
         reachCheck = data.getBoolean(ConfPaths.BLOCKBREAK_REACH_CHECK);
         reachActions = data.getActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
     }
+
+	@Override
+	public final boolean isEnabled(final CheckType checkType) {
+		switch(checkType){
+		case BLOCKBREAK_DIRECTION:
+			return directionCheck;
+		case BLOCKBREAK_FASTBREAK:
+			return fastBreakCheck;
+		case BLOCKBREAK_NOSWING:
+			return noSwingCheck;
+		case BLOCKBREAK_REACH:
+			return reachCheck;
+		default:
+			return true;
+		}
+	}
 }

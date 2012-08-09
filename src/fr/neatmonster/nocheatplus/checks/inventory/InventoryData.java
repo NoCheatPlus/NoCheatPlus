@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+
 /*
  * M""M                                       dP                              M""""""'YMM            dP            
  * M  M                                       88                              M  mmmm. `M            88            
@@ -17,19 +20,26 @@ import org.bukkit.entity.Player;
  *                                                                    d8888P                                       
  */
 /**
- * Player specific data for the inventory checks.
+ * Player specific dataFactory for the inventory checks.
  */
-public class InventoryData {
+public class InventoryData implements CheckData {
+	
+	public static final CheckDataFactory factory = new CheckDataFactory(){
+		@Override
+		public final CheckData getData(final Player player) {
+			return InventoryData.getData(player);
+		}
+	};
 
-    /** The map containing the data per players. */
+    /** The map containing the dataFactory per players. */
     private static Map<String, InventoryData> playersMap = new HashMap<String, InventoryData>();
 
     /**
-     * Gets the data of a specified player.
+     * Gets the dataFactory of a specified player.
      * 
      * @param player
      *            the player
-     * @return the data
+     * @return the dataFactory
      */
     public static InventoryData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))

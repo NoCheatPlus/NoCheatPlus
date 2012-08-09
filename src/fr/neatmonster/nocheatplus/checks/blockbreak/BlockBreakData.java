@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+
 /*
  * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
  * ##  mmmm. `M 88                   88       ##  mmmm. `M                            88       
@@ -25,7 +28,14 @@ import org.bukkit.entity.Player;
 /**
  * Player specific data for the block break checks.
  */
-public class BlockBreakData {
+public class BlockBreakData implements CheckData {
+	
+	public static final CheckDataFactory factory = new CheckDataFactory(){
+		@Override
+		public final CheckData getData(final Player player) {
+			return BlockBreakData.getData(player);
+		}
+	};
 
     /** The map containing the data per players. */
     private static Map<String, BlockBreakData> playersMap = new HashMap<String, BlockBreakData>();
@@ -59,4 +69,6 @@ public class BlockBreakData {
 
     // Data of the reach check.
     public double  reachDistance;
+
+
 }

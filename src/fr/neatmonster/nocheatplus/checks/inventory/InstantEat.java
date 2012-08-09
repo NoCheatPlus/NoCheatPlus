@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * M""M                     dP                       dP   MM""""""""`M            dP   
@@ -60,7 +61,7 @@ public class InstantEat extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player);
+            cancel = executeActions(player, data.instantEatVL, InventoryConfig.getConfig(player).instantEatActions);
         }
 
         return cancel;
@@ -70,10 +71,10 @@ public class InstantEat extends Check {
      * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.FOOD)
-            return InventoryData.getData(player).instantEatFood.toString();
+            return InventoryData.getData(violationData.player).instantEatFood.toString();
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
 }

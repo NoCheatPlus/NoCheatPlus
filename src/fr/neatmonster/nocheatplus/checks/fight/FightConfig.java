@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -25,7 +28,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the "fight" checks. Every world gets one of these assigned to it, or if a world doesn't
  * get it's own, it will use the "global" version.
  */
-public class FightConfig {
+public class FightConfig implements CheckConfig {
+	
+	public static final CheckConfigFactory factory = new CheckConfigFactory(){
+		@Override
+		public final CheckConfig getConfig(final Player player) {
+			return FightConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
     private static Map<String, FightConfig> worldsMap = new HashMap<String, FightConfig>();
@@ -88,8 +98,8 @@ public class FightConfig {
     /**
      * Instantiates a new fight configuration.
      * 
-     * @param data
-     *            the data
+     * @param dataFactory
+     *            the dataFactory
      */
     public FightConfig(final ConfigFile data) {
         angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
@@ -126,4 +136,30 @@ public class FightConfig {
         speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
     }
+    
+    @Override
+	public final boolean isEnabled(final CheckType checkType) {
+		switch(checkType){
+		case FIGHT_ANGLE:
+			return angleCheck;
+		case FIGHT_CRITICAL:
+			return criticalCheck;
+		case FIGHT_DIRECTION:
+			return directionCheck;
+		case FIGHT_GODMODE:
+			return godModeCheck;
+		case FIGHT_INSTANTHEAL:
+			return instantHealCheck;
+		case FIGHT_KNOCKBACK:
+			return knockbackCheck;
+		case FIGHT_NOSWING:
+			return noSwingCheck;
+		case FIGHT_REACH:
+			return reachCheck;
+		case FIGHT_SPEED:
+			return speedCheck;
+		default:
+			return true;
+		}
+	}
 }

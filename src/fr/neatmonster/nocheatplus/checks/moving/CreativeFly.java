@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -133,7 +134,7 @@ public class CreativeFly extends Check {
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should
                 // cancel the event.
-                if (executeActions(player))
+                if (executeActions(player, data.creativeFlyVL, cc.creativeFlyActions))
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                     // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                     return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(),
@@ -156,8 +157,8 @@ public class CreativeFly extends Check {
      * org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        final MovingData data = MovingData.getData(player);
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
+        final MovingData data = MovingData.getData(violationData.player);
         if (wildcard == ParameterName.LOCATION_FROM)
             return String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ());
         else if (wildcard == ParameterName.LOCATION_TO)
@@ -165,6 +166,6 @@ public class CreativeFly extends Check {
         else if (wildcard == ParameterName.DISTANCE)
             return String.format(Locale.US, "%.2f", data.to.subtract(data.from).lengthSquared());
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
 }

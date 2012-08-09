@@ -9,9 +9,10 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerEvent;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
+import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.ExecuteActionsEvent;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -67,15 +68,15 @@ public class NoPwnage extends Check {
      *            the player
      * @return true, if successful
      */
-    public boolean check(final Player player) {
+    public boolean checkLogin(final Player player) {
     
     	if (!isEnabled(player)) return false;
     	
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
         
-        synchronized(data){
-        	return unsafeCheck(player, cc, data);
+        synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
+        	return unsafeLoginCheck(player, cc, data);
         }
     }
 
@@ -83,10 +84,10 @@ public class NoPwnage extends Check {
      * Check (Join), only call from synchronized code. 
      * @param player
      * @param cc
-     * @param data
+     * @param dataFactory
      * @return
      */
-    private boolean unsafeCheck(final Player player, final ChatConfig cc, final ChatData data) {
+    private boolean unsafeLoginCheck(final Player player, final ChatConfig cc, final ChatData data) {
     	 boolean cancel = false;
 
          final long now = System.currentTimeMillis();
@@ -103,10 +104,11 @@ public class NoPwnage extends Check {
                  data.noPwnageReloginWarnings++;
              } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
                  // Find out if we need to ban the player or not.
-                 cancel = executeActionsThreadSafe(player, true);
+            	 // TODO: extra actions / VL ?
+                 cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, true);
          }
 
-         // Store his location and some other data.
+         // Store his location and some other dataFactory.
          data.noPwnageLastLocation = player.getLocation();
          data.noPwnageJoinTime = now;
 
@@ -129,7 +131,7 @@ public class NoPwnage extends Check {
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
         
-        synchronized(data){
+        synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
         	return unsafeCheck(player, event, isMainThread, cc, data);
         }
     }
@@ -140,7 +142,7 @@ public class NoPwnage extends Check {
      * @param event
      * @param isMainThread
      * @param cc
-     * @param data
+     * @param dataFactory
      * @return
      */
     private boolean  unsafeCheck(final Player player, final PlayerEvent event, final boolean isMainThread, final ChatConfig cc, final ChatData data) {
@@ -160,7 +162,7 @@ public class NoPwnage extends Check {
             if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
                 // Correct answer to the captcha?
                 if (message.equals(data.noPwnageGeneratedCaptcha)) {
-                    // Yes, clear his data and do not worry anymore about him.
+                    // Yes, clear his dataFactory and do not worry anymore about him.
                     data.clearNoPwnageData();
                     data.noPwnageHasFilledCaptcha = true;
                     player.sendMessage(replaceColors(cc.noPwnageCaptchaSuccess));
@@ -168,7 +170,8 @@ public class NoPwnage extends Check {
                     // Does he failed too much times?
                     if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
                         // Find out if we need to ban the player or not.
-                        cancel = executeActionsThreadSafe(player, isMainThread);
+                    	// TODO: Extra captcha actions / VL ?
+                        cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
 
                     // Increment his tries number counter.
                     data.noPwnageCaptchTries++;
@@ -265,10 +268,10 @@ public class NoPwnage extends Check {
                         ((PlayerCommandPreprocessEvent) event).setCancelled(true);
 
                     // Find out if we need to ban the player or not.
-                    cancel = executeActionsThreadSafe(player, isMainThread);
+                    cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
                 }
 
-            // Store the message and some other data.
+            // Store the message and some other dataFactory.
             data.noPwnageLastMessage = message;
             data.noPwnageLastMessageTime = now;
             lastGlobalMessage = message;
@@ -277,51 +280,30 @@ public class NoPwnage extends Check {
 
         return cancel;
 	}
-
-	@Override
-    public final boolean executeActions(final Player player){
-		// To be called from synchronized code (ChatData).
-    	// Late check of bypass permissions:
-		// (One might use a bypass flag, set if its already been checked and then reset.)
-       	if (!isEnabled(player)) return false;
-    	return super.executeActions(player);
-    }
     
     /**
      * Execute actions from another thread (not the main thread).<br>
      * This does not use extra synchronization.
      * @param player
+     * @param actions 
+     * @param VL 
      * @return
      */
-    public final boolean executeActionsThreadSafe(final Player player, boolean isMainThread){
-    	if (isMainThread){
-    		// Just execute.
-    		if (executeActions(player)){
-    			ChatData.getData(player).clearNoPwnageData();
-    			return true;
-    		}
-    		else
-    			return false;
-    	}
-    	else {
-    		// Sync it into the main thread by using an event.
-    		final ExecuteActionsEvent event = new ExecuteActionsEvent(this, player);
-        	Bukkit.getPluginManager().callEvent(event);
-        	final boolean cancel = event.getCancel();
-        	if (cancel) ChatData.getData(player).clearNoPwnageData();
-        	return cancel;
-    	}
+    public final boolean executeActionsThreadSafe(final Player player, double VL, ActionList actions, boolean isMainThread){
+        final boolean cancel = super.executeActionsThreadSafe(player, VL, actions, isMainThread);
+        if (cancel) ChatData.getData(player).clearNoPwnageData();
+        return cancel;
     }
 
     /* (non-Javadoc)
      * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.IP)
-            return player.getAddress().toString().substring(1).split(":")[0];
+            return violationData.player.getAddress().toString().substring(1).split(":")[0];
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
     
 }

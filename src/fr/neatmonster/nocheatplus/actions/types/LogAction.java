@@ -1,8 +1,7 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
-import org.bukkit.entity.Player;
-
 import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * M""MMMMMMMM                   MMP"""""""MM            dP   oo                   
@@ -55,7 +54,7 @@ public class LogAction extends ActionWithParameters {
     }
 
     /**
-     * Parse the final log message out of various data from the player and check that triggered the action.
+     * Parse the final log message out of various dataFactory from the player and check that triggered the action.
      * 
      * @param player
      *            The player that is used as a source for the log message.
@@ -63,8 +62,8 @@ public class LogAction extends ActionWithParameters {
      *            The check that is used as a source for the log message.
      * @return the log message
      */
-    public String getLogMessage(final Player player, final Check check) {
-        return super.getMessage(player, check);
+    public String getLogMessage(final Check check, final ViolationData violationData) {
+        return super.getMessage(check, violationData);
     }
 
     /**

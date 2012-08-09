@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -34,7 +37,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the "inventory" checks. Every world gets one of these assigned to it, or if a world
  * doesn't get it's own, it will use the "global" version.
  */
-public class InventoryConfig {
+public class InventoryConfig implements CheckConfig {
+	
+	public static final CheckConfigFactory factory = new CheckConfigFactory(){
+		@Override
+		public final CheckConfig getConfig(final Player player) {
+			return InventoryConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
     private static Map<String, InventoryConfig> worldsMap = new HashMap<String, InventoryConfig>();
@@ -74,8 +84,8 @@ public class InventoryConfig {
     /**
      * Instantiates a new inventory configuration.
      * 
-     * @param data
-     *            the data
+     * @param dataFactory
+     *            the dataFactory
      */
     public InventoryConfig(final ConfigFile data) {
         dropCheck = data.getBoolean(ConfPaths.INVENTORY_DROP_CHECK);
@@ -91,4 +101,20 @@ public class InventoryConfig {
         instantEatActions = data
                 .getActionList(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, Permissions.INVENTORY_INSTANTEAT);
     }
+
+	@Override
+	public final boolean isEnabled(final CheckType checkType) {
+		switch(checkType){
+		case INVENTORY_DROP:
+			return dropCheck;
+		case INVENTORY_INSTANTBOW:
+			return instantBowCheck;
+		case INVENTORY_INSTANTEAT:
+			return instantEatCheck;
+		default:
+			return true;
+		}
+	}
+    
+    
 }

@@ -48,7 +48,7 @@ public class ActionList {
     /**
      * Get a list of actions that match the violation level. The only method that has to be called by a check.
      * 
-     * @param violationLevel
+     * @param VL
      *            The violation level that should be matched.
      * @return The array of actions whose threshold was closest to the violation level but not bigger.
      */

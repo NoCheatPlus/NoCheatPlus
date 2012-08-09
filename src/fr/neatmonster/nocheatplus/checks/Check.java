@@ -101,6 +101,49 @@ public abstract class Check {
     public Check(final CheckType type) {
         this.type = type;
     }
+    
+	/**
+     * Execute actions in a thread safe manner if isMainThread is set to false.<br>
+	 * @param player
+	 * @param VL
+	 * @param actions
+	 * @param isMainThread
+	 * @return
+	 */
+    public  boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions, final boolean isMainThread){
+    	if (isMainThread){
+    		// Just execute.
+    		return executeActions(player, VL, actions);
+    	}
+    	else {
+    		return executeActionsThreadSafe(player, VL, actions);
+    	}
+    }
+    
+    /**
+     * Execute actions in a thread safe manner.<br>
+     * @param player
+     * @param VL
+     * @param actions
+     * @return
+     */
+    public boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions){
+    	// Sync it into the main thread by using an event.
+		final ExecuteActionsEvent event = new ExecuteActionsEvent(new ViolationData(this, player, VL, actions));
+    	Bukkit.getPluginManager().callEvent(event);
+    	return event.getCancel();
+    }
+    
+    /**
+     * Convenience method.
+     * @param player
+     * @param VL
+     * @param actions
+     * @return
+     */
+    protected boolean executeActions(final Player player, final double VL, final ActionList actions){
+    	return executeActions(new ViolationData(this, player, VL, actions));
+    }
 
     /**
      * Execute some actions for the specified player.
@@ -109,18 +152,21 @@ public abstract class Check {
      *            the player
      * @return true, if successful
      */
-    protected boolean executeActions(final Player player) {
+    protected boolean executeActions(final ViolationData violationData) {
         try {
             boolean special = false;
-
-            final Object config = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null, player);
-            final Object data = type.getData().getDeclaredMethod("getData", Player.class).invoke(null, player);
-            final ActionList actionList = (ActionList) type.getConfig().getDeclaredField(type.getName() + "Actions")
-                    .get(config);
-            final double violationLevel = type.getData().getDeclaredField(type.getName() + "VL").getDouble(data);
+            final Player player = violationData.player;
+            
+//            final Object configFactory = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null, player);
+//            final Object dataFactory = type.getData().getDeclaredMethod("getData", Player.class).invoke(null, player);
+//            final ActionList actionList = (ActionList) type.getConfig().getDeclaredField(type.getName() + "Actions")
+//                    .get(configFactory);
+            
+            final ActionList actionList = violationData.actions;
+            final double violationLevel = violationData.VL;
 
             // Dispatch the VL processing to the hook manager.
-            if (NCPHookManager.shouldCancelVLProcessing(type, player))
+            if (NCPHookManager.shouldCancelVLProcessing(violationData.check.type, player))
                 // One of the hooks has decided to cancel the VL processing, return false.
                 return false;
 
@@ -130,15 +176,18 @@ public abstract class Check {
             final long time = System.currentTimeMillis() / 1000L;
 
             for (final Action ac : actions)
-                if (getHistory(player).executeAction(getClass().getName(), ac, time))
+                if (getHistory(player).executeAction(violationData.check.type.getName(), ac, time))
                     // The execution history said it really is time to execute the action, find out what it is and do
                     // what is needed.
+                	
+                	// TODO: Check design: maybe ac.execute(this) without the instance checks ?
+                	
                     if (ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent))
-                        executeLogAction((LogAction) ac, this, player);
+                        executeLogAction((LogAction) ac, violationData.check, violationData);
                     else if (ac instanceof CancelAction)
                         special = true;
                     else if (ac instanceof CommandAction)
-                        executeConsoleCommand((CommandAction) ac, this, player);
+                        executeConsoleCommand((CommandAction) ac, violationData.check, violationData);
                     else if (ac instanceof DummyAction) {
                         // Do nothing, it's a dummy action after all.
                     }
@@ -160,8 +209,8 @@ public abstract class Check {
      * @param player
      *            the player
      */
-    private void executeConsoleCommand(final CommandAction action, final Check check, final Player player) {
-        final String command = action.getCommand(player, check);
+    private void executeConsoleCommand(final CommandAction action, final Check check, final ViolationData violationData) {
+        final String command = action.getCommand(check, violationData);
 
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
@@ -183,12 +232,12 @@ public abstract class Check {
      * @param player
      *            the player
      */
-    private void executeLogAction(final LogAction logAction, final Check check, final Player player) {
+    private void executeLogAction(final LogAction logAction, final Check check, final ViolationData violationData) {
         final ConfigFile configurationFile = ConfigManager.getConfigFile();
         if (!configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE))
             return;
 
-        final String message = logAction.getLogMessage(player, check);
+        final String message = logAction.getLogMessage(check, violationData);
         if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE) && logAction.toConsole())
             // Console logs are not colored.
             System.out.println("[NoCheatPlus] " + removeColors(message));
@@ -212,15 +261,14 @@ public abstract class Check {
      *            the player
      * @return the parameter
      */
-    public String getParameter(final ParameterName wildcard, final Player player) {
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.CHECK)
             return getClass().getSimpleName();
         else if (wildcard == ParameterName.PLAYER)
-            return player.getName();
+            return violationData.player.getName();
         else if (wildcard == ParameterName.VIOLATIONS) {
             try {
-                final Object data = type.getData().getDeclaredMethod("getData", Player.class).invoke(null, player);
-                return "" + Math.round(type.getData().getDeclaredField(type.getName() + "VL").getDouble(data));
+                return "" + Math.round(violationData.VL);
             } catch (final Exception e) {
                 Bukkit.broadcastMessage("getParameter " + type.getName());
                 e.printStackTrace();
@@ -239,9 +287,7 @@ public abstract class Check {
      */
     public boolean isEnabled(final Player player) {
         try {
-            final Object config = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null, player);
-            return !player.hasPermission(type.getPermission())
-                    && type.getConfig().getDeclaredField(type.getName() + "Check").getBoolean(config);
+            return type.isEnabled(player) && !player.hasPermission(type.getPermission());
         } catch (final Exception e) {
             e.printStackTrace();
         }

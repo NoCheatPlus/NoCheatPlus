@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
@@ -118,7 +119,7 @@ public class SurvivalFly extends Check {
             data.survivalFlyVL += 100D;
 
             // And return if we need to do something or not.
-            return executeActions(player);
+            return executeActions(player, data.survivalFlyVL, MovingConfig.getConfig(player).survivalFlyActions);
         } else
             // He has, everything is alright.
             data.survivalFlyWasInBed = false;
@@ -326,7 +327,7 @@ public class SurvivalFly extends Check {
 
             // If the other plugins haven't decided to cancel the execution of the actions, then do it. If one of the
             // actions was a cancel, cancel it.
-            if (executeActions(player))
+            if (executeActions(player, data.survivalFlyVL, MovingConfig.getConfig(player).survivalFlyActions))
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
@@ -368,8 +369,8 @@ public class SurvivalFly extends Check {
      * org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
-        final MovingData data = MovingData.getData(player);
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
+        final MovingData data = MovingData.getData(violationData.player);
         if (wildcard == ParameterName.LOCATION_FROM)
             return String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ());
         else if (wildcard == ParameterName.LOCATION_TO)
@@ -377,6 +378,6 @@ public class SurvivalFly extends Check {
         else if (wildcard == ParameterName.DISTANCE)
             return String.format(Locale.US, "%.2f", data.to.subtract(data.from).lengthSquared());
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
 }

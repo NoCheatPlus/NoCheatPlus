@@ -1,8 +1,7 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
-import org.bukkit.entity.Player;
-
 import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * MM'""""'YMM                                                        dP 
@@ -48,17 +47,17 @@ public class CommandAction extends ActionWithParameters {
      * that can be directly used as a command in the console.
      * 
      * @param player
-     *            The player that is used to fill in missing data.
+     *            The player that is used to fill in missing dataFactory.
      * @param check
-     *            The check that is used to fill in missing data.
+     *            The check that is used to fill in missing dataFactory.
      * @return The complete, ready to use, command.
      */
-    public String getCommand(final Player player, final Check check) {
-        return super.getMessage(player, check);
+    public String getCommand(final Check check, final ViolationData violationData) {
+        return super.getMessage(check, violationData);
     }
 
     /**
-     * Convert the commands data into a string that can be used in the configuration files.
+     * Convert the commands dataFactory into a string that can be used in the configuration files.
      * 
      * @return the string
      */

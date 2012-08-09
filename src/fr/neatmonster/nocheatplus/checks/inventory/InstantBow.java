@@ -55,7 +55,7 @@ public class InstantBow extends Check {
 
             // Execute whatever actions are associated with this check and the
             // violation level and find out if we should cancel the event
-            cancel = executeActions(player);
+            cancel = executeActions(player, data.instantBowVL, InventoryConfig.getConfig(player).instantBowActions);
         }
 
         return cancel;

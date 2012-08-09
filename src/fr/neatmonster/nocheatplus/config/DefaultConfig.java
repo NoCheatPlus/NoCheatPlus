@@ -12,7 +12,7 @@ package fr.neatmonster.nocheatplus.config;
  */
 /**
  * These are the default settings for NoCheatPlus. They will be used in addition to/in replacement of configurations
- * given in the config.yml file.
+ * given in the configFactory.yml file.
  */
 public class DefaultConfig extends ConfigFile {
 

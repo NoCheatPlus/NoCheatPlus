@@ -54,7 +54,7 @@ public class Angle extends Check {
         // Add the new location to the map.
         data.angleHits.put(System.currentTimeMillis(), player.getLocation());
 
-        // Not enough data to calculate deltas.
+        // Not enough dataFactory to calculate deltas.
         if (data.angleHits.size() < 2)
             return false;
 
@@ -118,7 +118,7 @@ public class Angle extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player);
+            cancel = executeActions(player, data.angleVL, cc.angleActions);
         } else
             // Reward the player by lowering his violation level.
             data.angleVL *= 0.98D;

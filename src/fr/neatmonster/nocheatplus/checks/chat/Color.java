@@ -35,18 +35,19 @@ public class Color extends Check {
      *            the message
      * @return the string
      */
-    public String check(final Player player, final String message) {
+    public String check(final Player player, final String message, final boolean isMainThread) {
         final ChatData data = ChatData.getData(player);
+        synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
+            // If the message contains colors...
+            if (message.contains("\247")) {
+                // Increment the violation level of the player.
+                data.colorVL++;
 
-        // If the message contains colors...
-        if (message.contains("\247")) {
-            // Increment the violation level of the player.
-            data.colorVL++;
-
-            // Find out if we need to remove the colors or not.
-            if (executeActions(player))
-                // Remove color codes.
-                message.replaceAll("\302\247.", "").replaceAll("\247.", "");
+                // Find out if we need to remove the colors or not.
+                if (executeActionsThreadSafe(player, data.colorVL, ChatConfig.getConfig(player).colorActions, isMainThread))
+                    // Remove color codes.
+                    message.replaceAll("\302\247.", "").replaceAll("\247.", "");
+            }
         }
 
         return message;

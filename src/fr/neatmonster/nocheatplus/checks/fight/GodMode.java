@@ -63,7 +63,7 @@ public class GodMode extends Check {
 
                     // Execute whatever actions are associated with this check and the violation level and find out if
                     // we should cancel the event.
-                    cancel = executeActions(player);
+                    cancel = executeActions(player, data.godModeVL, FightConfig.getConfig(player).godModeActions);
                 }
             } else {
                 // Give some new points, once a second.

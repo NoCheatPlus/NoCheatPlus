@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -69,7 +70,7 @@ public class NoFall extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player))
+            if (executeActions(player, data.noFallVL, cc.noFallActions))
                 // Deal fall damages to the player.
                 ((CraftPlayer) player).getHandle().b(0D, true);
             data.noFallDistance = 0F;
@@ -91,7 +92,7 @@ public class NoFall extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event. If "cancelled", the fall damage gets dealt in a way that's visible to other plugins.
-            if (executeActions(player))
+            if (executeActions(player, data.noFallVL, cc.noFallActions))
                 // Increase the fall distance a bit. :)
                 player.setFallDistance(data.noFallDistance + difference);
             data.noFallDistance = 0F;
@@ -126,10 +127,10 @@ public class NoFall extends Check {
      * org.bukkit.entity.Player)
      */
     @Override
-    public String getParameter(final ParameterName wildcard, final Player player) {
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.FALL_DISTANCE)
-            return String.format(Locale.US, "%.2f", MovingData.getData(player).noFallDistance);
+            return String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallDistance);
         else
-            return super.getParameter(wildcard, player);
+            return super.getParameter(wildcard, violationData);
     }
 }

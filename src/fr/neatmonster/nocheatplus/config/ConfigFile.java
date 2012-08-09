@@ -41,7 +41,7 @@ public class ConfigFile extends YamlConfiguration {
     }
 
     /**
-     * Do this after reading new data.
+     * Do this after reading new dataFactory.
      */
     public void regenerateActionLists() {
         factory = new ActionFactory(((MemorySection) this.get(ConfPaths.STRINGS)).getValues(false));

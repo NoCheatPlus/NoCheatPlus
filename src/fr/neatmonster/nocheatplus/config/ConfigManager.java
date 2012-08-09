@@ -130,7 +130,7 @@ public class ConfigManager {
     public static void init(final NoCheatPlus plugin) {
         // First try to obtain and parse the global configuration file.
         final File folder = plugin.getDataFolder();
-        final File globalFile = new File(folder, "config.yml");
+        final File globalFile = new File(folder, "configFactory.yml");
 
         final ConfigFile global = new ConfigFile();
         global.setDefaults(new DefaultConfig());

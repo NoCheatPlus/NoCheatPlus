@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+
 /*
  * MM'""""'YMM dP                  dP   M""""""'YMM            dP            
  * M' .mmm. `M 88                  88   M  mmmm. `M            88            
@@ -16,19 +19,26 @@ import org.bukkit.entity.Player;
  * MMMMMMMMMMM                          MMMMMMMMMMM                          
  */
 /**
- * Player specific data for the chat checks.
+ * Player specific dataFactory for the chat checks.
  */
-public class ChatData {
+public class ChatData implements CheckData{
+	
+	public static final CheckDataFactory factory = new CheckDataFactory(){
+		@Override
+		public final CheckData getData(final Player player) {
+			return ChatData.getData(player);
+		}
+	};
 
-    /** The map containing the data per players. */
+    /** The map containing the dataFactory per players. */
     private static Map<String, ChatData> playersMap = new HashMap<String, ChatData>();
 
     /**
-     * Gets the data of a specified player.
+     * Gets the dataFactory of a specified player.
      * 
      * @param player
      *            the player
-     * @return the data
+     * @return the dataFactory
      */
     public synchronized static ChatData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
@@ -56,12 +66,14 @@ public class ChatData {
     public long     noPwnageReloginWarningTime;
 
     /**
-     * Clear the data of the no pwnage check.
+     * Clear the dataFactory of the no pwnage check.
      */
     public synchronized void clearNoPwnageData() {
+    	// TODO: re-think this sync [keep related to ChatData/NoPwnage/Color used lock.]
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
         noPwnageLastLocation = null;
     }
+
 }

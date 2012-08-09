@@ -5,6 +5,9 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+
 /*
  * M#"""""""'M  dP                   dP       M""M            dP                                         dP   
  * ##  mmmm. `M 88                   88       M  M            88                                         88   
@@ -23,19 +26,26 @@ import org.bukkit.entity.Player;
  * MMMMMMMMMMM                          
  */
 /**
- * Player specific data for the block interact checks.
+ * Player specific dataFactory for the block interact checks.
  */
-public class BlockInteractData {
+public class BlockInteractData implements CheckData {
+	
+	public static final CheckDataFactory factory = new CheckDataFactory(){
+		@Override
+		public final CheckData getData(final Player player) {
+			return BlockInteractData.getData(player);
+		}
+	};
 
-    /** The map containing the data per players. */
+    /** The map containing the dataFactory per players. */
     private static Map<String, BlockInteractData> playersMap = new HashMap<String, BlockInteractData>();
 
     /**
-     * Gets the data of a specified player.
+     * Gets the dataFactory of a specified player.
      * 
      * @param player
      *            the player
-     * @return the data
+     * @return the dataFactory
      */
     public static BlockInteractData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
