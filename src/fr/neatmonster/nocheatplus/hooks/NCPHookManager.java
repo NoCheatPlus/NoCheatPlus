@@ -388,8 +388,8 @@ public final class NCPHookManager {
 
         // Group specific.
         if (checkType.group != null) {
-            final List<NCPHook> hooksGroup = hooksByChecks.get(checkType);
-            if (hooksCheck != null)
+            final List<NCPHook> hooksGroup = hooksByChecks.get(checkType.group);
+            if (hooksGroup != null)
                 if (applyHooks(checkType, player, hooksGroup))
                     return true;
         }
