@@ -128,16 +128,22 @@ public final class NCPHookManager {
      * @param checkType
      * @param refType
      * @param hook
+     * @return If the 
      */
-    private static void addToMappingsRecursively(final CheckType checkType, CheckType refType, final NCPHook hook) {
+    private static boolean addToMappingsRecursively(final CheckType checkType, final CheckType refType, final NCPHook hook) {
     	if (refType.group == null) 
-    		return;
+    		return false;
     	else if (refType.group == checkType){
 			addToMapping(refType, hook);
-			return;
+			return true;
 		}
-    	else
-    		addToMappingsRecursively(checkType, refType.group, hook);
+    	else {
+    		if (addToMappingsRecursively(checkType, refType.group, hook)){
+    			addToMapping(refType, hook);
+    			return true;
+    		}
+    		else return false;
+    	}	
 	}
 
 	/**
