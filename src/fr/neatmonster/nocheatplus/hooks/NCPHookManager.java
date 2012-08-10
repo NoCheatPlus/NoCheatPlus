@@ -84,7 +84,7 @@ public final class NCPHookManager {
     }
 
     /**
-     * Add to the mapping for given check type (only).
+     * Add to the mapping for given check type, no extra actions or recursion.
      * 
      * @param checkType
      *            the check type
@@ -102,8 +102,8 @@ public final class NCPHookManager {
     }
 
     /**
-     * Add hook to the hooksByChecks mappings, for the check type and if present, group type. Assumes that the hook
-     * already has been registered in the allHooks map.
+     * Add hook to the hooksByChecks mappings.<br> 
+     * Assumes that the hook already has been registered in the allHooks map.
      * 
      * @param checkType
      *            the check type
@@ -111,12 +111,36 @@ public final class NCPHookManager {
      *            the hook
      */
     private static void addToMappings(final CheckType checkType, final NCPHook hook) {
+    	if (checkType == CheckType.ALL){
+    		for (final CheckType refType : CheckType.values()){
+    			addToMapping(refType, hook);
+    		}
+    		return;
+    	}
         addToMapping(checkType, hook);
-        if (checkType.group != null)
-            addToMapping(checkType.group, hook);
+        for (final CheckType refType : CheckType.values()){
+			addToMappingsRecursively(checkType, refType, hook);
+		}
     }
-
+    
     /**
+     * Add to mappings if checkType is a parent in the tree structure leading to refType.
+     * @param checkType
+     * @param refType
+     * @param hook
+     */
+    private static void addToMappingsRecursively(final CheckType checkType, CheckType refType, final NCPHook hook) {
+    	if (refType.group == null) 
+    		return;
+    	else if (refType.group == checkType){
+			addToMapping(refType, hook);
+			return;
+		}
+    	else
+    		addToMappingsRecursively(checkType, refType.group, hook);
+	}
+
+	/**
      * Call the hooks for the specified check type and player.
      * 
      * @param checkType
@@ -377,29 +401,14 @@ public final class NCPHookManager {
      * @return if we should cancel the VL processing
      */
     public static final boolean shouldCancelVLProcessing(final CheckType checkType, final Player player) {
-        // Checks for hooks registered for all events, only for the group and specifically for the check.
-        // A paradigm could be to return true as soon as one hook has returned true.
-
-        // Check specific.
+        // Checks for hooks registered for this event, parent groups or ALL will be inserted into the list.
+        // Return true as soon as one hook returns true. 
+    	
+        // Test hooks, if present:
         final List<NCPHook> hooksCheck = hooksByChecks.get(checkType);
         if (hooksCheck != null)
             if (applyHooks(checkType, player, hooksCheck))
                 return true;
-
-        // Group specific.
-        if (checkType.group != null) {
-            final List<NCPHook> hooksGroup = hooksByChecks.get(checkType.group);
-            if (hooksGroup != null)
-                if (applyHooks(checkType, player, hooksGroup))
-                    return true;
-        }
-
-        // General (all).
-        final List<NCPHook> hooksAll = hooksByChecks.get(CheckType.ALL);
-        if (hooksAll != null)
-            if (applyHooks(checkType, player, hooksAll))
-                return true;
-
         return false;
     }
 }
