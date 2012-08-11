@@ -55,9 +55,6 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class MovingListener implements Listener {
 
-    /** The no fall check. **/
-    public static NoFall             noFall             = new NoFall();
-
     /** The instance of NoCheatPlus. */
     private final NoCheatPlus        plugin             = (NoCheatPlus) Bukkit.getPluginManager().getPlugin(
                                                                 "NoCheatPlus");
@@ -69,6 +66,9 @@ public class MovingListener implements Listener {
 
     /** The more packets vehicle check. */
     private final MorePacketsVehicle morePacketsVehicle = new MorePacketsVehicle();
+
+    /** The no fall check. **/
+    private final NoFall             noFall             = new NoFall();
 
     /** The survival fly check. */
     private final SurvivalFly        survivalFly        = new SurvivalFly();
@@ -316,10 +316,13 @@ public class MovingListener implements Listener {
         if ((player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight()) && creativeFly.isEnabled(player))
             // If the player is handled by the creative fly check, execute it.
             newTo = creativeFly.check(player, from, to);
-        else if (survivalFly.isEnabled(player))
+        else if (survivalFly.isEnabled(player)) {
             // If he is handled by the survival fly check, execute it.
             newTo = survivalFly.check(player, from, to);
-        else
+            // If don't have a new location and if he is handled by the no fall check, execute it.
+            if (newTo == null && noFall.isEnabled(player))
+                noFall.check(player, from, to);
+        } else
             // He isn't handled by any fly check, clear his dataFactory.
             data.clearFlyData();
 

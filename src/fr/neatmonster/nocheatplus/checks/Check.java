@@ -134,13 +134,6 @@ public abstract class Check {
                 if (player.hasPermission(violationData.bypassPermission))
                     return false;
 
-            // final Object configFactory = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null,
-            // player);
-            // final Object dataFactory = type.getData().getDeclaredMethod("getData", Player.class).invoke(null,
-            // player);
-            // final ActionList actionList = (ActionList) type.getConfig().getDeclaredField(type.getName() + "Actions")
-            // .get(configFactory);
-
             final ActionList actionList = violationData.actions;
             final double violationLevel = violationData.VL;
 

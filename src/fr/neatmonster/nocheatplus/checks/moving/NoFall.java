@@ -2,16 +2,15 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
 
-import net.minecraft.server.AxisAlignedBB;
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Packet10Flying;
-
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.CustomNetServerHandler;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
  * M"""""""`YM          MM""""""""`M          dP dP 
@@ -44,71 +43,56 @@ public class NoFall extends Check {
      * @param to
      *            the to
      */
-    public void check(final EntityPlayer player, final Packet10Flying packet) {
-        final Player bukkitPlayer = player.getBukkitEntity();
-        final MovingConfig cc = MovingConfig.getConfig(bukkitPlayer);
-        final MovingData data = MovingData.getData(bukkitPlayer);
+    public void check(final Player player, final PlayerLocation from, final PlayerLocation to) {
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        final MovingData data = MovingData.getData(player);
 
-        // Check the player is now on the ground (for the client and for the server).
-        final boolean onGroundClient = packet.g;
-        final AxisAlignedBB boundingBoxGround = player.boundingBox.clone().d(packet.x - player.locX,
-                packet.y - player.locY - 0.001D, packet.z - player.locZ);
-        final boolean onGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
+        // Get the CustomNetServerHandler of the player.
+        final CustomNetServerHandler customNSH = (CustomNetServerHandler) ((CraftPlayer) player).getHandle().netServerHandler;
 
-        // If the packet has position information.
-        if (packet.hasPos)
-            // If the player has just started falling.
-            if (data.noFallWasOnGroundServer && !onGroundServer)
-                // Reset his fall distance.
-                data.noFallFallDistance = 0D;
-            else {
-                final int id = player.world.getTypeId((int) Math.ceil(packet.x), (int) Math.ceil(packet.y),
-                        (int) Math.ceil(packet.z));
+        // If the player has just started falling, is falling into a liquid, in web or is on a ladder.
+        if (to.isInLiquid() || to.isInWeb() || to.isOnLadder())
+            // Reset his fall distance.
+            customNSH.fallDistance = 0D;
 
-                // If the player is falling into water.
-                if (id > 7 && id < 12)
-                    // Reset his fall distance.
-                    data.noFallFallDistance = 0D;
-                else if (player.locY - packet.y > 0D)
-                    // Add the distance to the fall distance.
-                    data.noFallFallDistance += player.locY - packet.y;
-            }
+        data.noFallFallDistance = customNSH.fallDistance;
 
         // If the player just touched the ground for the server, but no for the client.
-        if (!data.noFallWasOnGroundServer && onGroundServer && (data.noFallWasOnGroundClient || !onGroundClient)) {
+        if (!customNSH.wasOnGroundServer && customNSH.onGroundServer
+                && (customNSH.wasOnGroundClient || !customNSH.onGroundClient)) {
             // Calculate the fall damages to be dealt.
-            final int fallDamage = (int) data.noFallFallDistance - 2;
-            if (fallDamage > 1) {
+            final int fallDamage = (int) customNSH.fallDistance - 2;
+            if (fallDamage > 0) {
                 // Add the fall distance to the violation level.
-                data.noFallVL += data.noFallFallDistance;
+                data.noFallVL += customNSH.fallDistance;
 
                 // Execute the actions to find out if we need to cancel the event or not.
-                if (executeActions(bukkitPlayer, data.noFallVL, cc.noFallActions))
+                if (executeActions(player, data.noFallVL, cc.noFallActions))
                     // Deal the fall damages to the player.
-                    bukkitPlayer.damage(fallDamage);
+                    player.damage(fallDamage);
             }
         }
 
         // If the player just touched the ground for the server.
-        else if (!data.noFallWasOnGroundServer && onGroundServer) {
+        else if (!customNSH.wasOnGroundServer && customNSH.onGroundServer) {
             // Calculate the difference between the fall distance calculated by the server and by the plugin.
-            final int difference = (int) data.noFallFallDistance - (int) bukkitPlayer.getFallDistance();
+            final double difference = (customNSH.fallDistance - player.getFallDistance()) / customNSH.fallDistance;
 
             // If the difference is too big and the fall distance calculated by the plugin should hurt the player.
-            if (difference > 1 && (int) data.noFallFallDistance - 3 > 0) {
+            if (difference > 0.15D && (int) customNSH.fallDistance > 2) {
                 // Add the difference to the violation level.
-                data.noFallVL += data.noFallFallDistance - bukkitPlayer.getFallDistance();
+                data.noFallVL += customNSH.fallDistance - player.getFallDistance();
 
                 // Execute the actions to find out if we need to cancel the event or not.
-                if (executeActions(bukkitPlayer, data.noFallVL, cc.noFallActions))
+                if (executeActions(player, data.noFallVL, cc.noFallActions))
                     // Set the fall distance to its right value.
-                    bukkitPlayer.setFallDistance((float) data.noFallFallDistance);
-            }
-        }
-
-        // Remember if the player was on ground for the client and for the server.
-        data.noFallWasOnGroundClient = onGroundClient;
-        data.noFallWasOnGroundServer = onGroundServer;
+                    player.setFallDistance((float) customNSH.fallDistance);
+            } else
+                // Reward the player by lowering his violation level.
+                data.noFallVL *= 0.95D;
+        } else
+            // Reward the player by lowering his violation level.
+            data.noFallVL *= 0.95D;
     }
 
     /* (non-Javadoc)

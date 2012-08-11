@@ -1,11 +1,11 @@
 package fr.neatmonster.nocheatplus;
 
+import net.minecraft.server.AxisAlignedBB;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.INetworkManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.NetServerHandler;
 import net.minecraft.server.Packet10Flying;
-import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 
 /*
  * MM'""""'YMM                     dP                       M"""""""`YM            dP   
@@ -29,6 +29,21 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
  */
 public class CustomNetServerHandler extends NetServerHandler {
 
+    /** The distance the player has falled. */
+    public double  fallDistance;
+
+    /** Is the player on the ground? Client-side value. */
+    public boolean onGroundClient;
+
+    /** Is the player on the ground? Server-side value. */
+    public boolean onGroundServer;
+
+    /** Was the player on the ground? Client-side value. */
+    public boolean wasOnGroundClient;
+
+    /** Was the player on the ground? Server-side value. */
+    public boolean wasOnGroundServer;
+
     /**
      * Instantiates a new custom net server handler.
      * 
@@ -49,8 +64,16 @@ public class CustomNetServerHandler extends NetServerHandler {
      */
     @Override
     public void a(final Packet10Flying packet) {
-        if (MovingListener.noFall.isEnabled(player.getBukkitEntity()))
-            MovingListener.noFall.check(player, packet);
+        wasOnGroundClient = onGroundClient;
+        wasOnGroundServer = onGroundServer;
+        onGroundClient = packet.g;
+        final AxisAlignedBB boundingBoxGround = player.boundingBox.clone().d(packet.x - player.locX,
+                packet.y - player.locY - 0.001D, packet.z - player.locZ);
+        onGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
+        if (packet.hasPos && wasOnGroundServer && !onGroundServer)
+            fallDistance = 0D;
+        else if (packet.hasPos && player.locY - packet.y > 0D)
+            fallDistance += player.locY - packet.y;
         super.a(packet);
     }
 }

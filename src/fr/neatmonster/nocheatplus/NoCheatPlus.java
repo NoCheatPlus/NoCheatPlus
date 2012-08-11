@@ -4,12 +4,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.server.INetworkManager;
+import net.minecraft.server.DedicatedServer;
+import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.NetServerHandler;
 import net.minecraft.server.NetworkManager;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -102,6 +102,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Register the commands handler.
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
+        // Set the NetServerHandler of every player.
+        for (final Player player : Bukkit.getOnlinePlayers())
+            setCustomNetServerHandler(player);
+
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
     }
@@ -128,6 +132,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
+
+        // Set the NetServerHandler of the player.
+        setCustomNetServerHandler(player);
 
         // Check if we allow all the client mods.
         final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);
@@ -208,34 +215,25 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         player.sendMessage(message);
     }
 
-    /**
-     * This event handler is used to replace the NetServerHandler of the player by our CustomNetServerHandler.
-     * 
-     * @param event
-     *            the event handled
-     */
-    @EventHandler(
-            priority = EventPriority.LOWEST)
-    public void onPlayerJoin_(final PlayerJoinEvent event) {
-        final CraftPlayer player = (CraftPlayer) event.getPlayer();
-        final CraftServer server = (CraftServer) Bukkit.getServer();
-        final NetServerHandler nSH = player.getHandle().netServerHandler;
-        if (!(nSH instanceof CustomNetServerHandler)) {
-            final Location location = event.getPlayer().getLocation();
-            final CustomNetServerHandler customNSH = new CustomNetServerHandler(server.getHandle().getServer(),
-                    player.getHandle().netServerHandler.networkManager, player.getHandle());
-            customNSH.a(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-            player.getHandle().netServerHandler = customNSH;
-            final INetworkManager iNM = player.getHandle().netServerHandler.networkManager;
-            try {
-                final Field field = NetworkManager.class.getDeclaredField("packetListener");
-                field.setAccessible(true);
-                field.set(iNM, customNSH);
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-            nSH.disconnected = true;
-            server.getHandle().getServer().ac().a(customNSH);
+    private boolean setCustomNetServerHandler(final Player player) {
+        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        final NetServerHandler oldNSH = entityPlayer.netServerHandler;
+        if (oldNSH instanceof CustomNetServerHandler)
+            return false;
+        final DedicatedServer server = ((CraftServer) Bukkit.getServer()).getHandle().getServer();
+        final NetServerHandler newNSH = new CustomNetServerHandler(server, oldNSH.networkManager, entityPlayer);
+        newNSH.a(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player
+                .getLocation().getYaw(), player.getLocation().getPitch());
+        entityPlayer.netServerHandler = newNSH;
+        try {
+            final Field field = NetworkManager.class.getDeclaredField("packetListener");
+            field.setAccessible(true);
+            field.set(oldNSH.networkManager, newNSH);
+        } catch (final Exception e) {
+            e.printStackTrace();
         }
+        oldNSH.disconnected = true;
+        server.ac().a(newNSH);
+        return true;
     }
 }
