@@ -48,9 +48,9 @@ public class ActionList {
     /**
      * Get a list of actions that match the violation level. The only method that has to be called by a check.
      * 
-     * @param VL
-     *            The violation level that should be matched.
-     * @return The array of actions whose threshold was closest to the violation level but not bigger.
+     * @param violationLevel
+     *            the violation level that should be matched
+     * @return the array of actions whose threshold was closest to the violation level but not bigger
      */
     public Action[] getActions(final double violationLevel) {
         Integer result = null;
@@ -68,7 +68,7 @@ public class ActionList {
     /**
      * Get a sorted list of the thresholds/violation levels that were used in this list.
      * 
-     * @return The sorted list of thresholds.
+     * @return the sorted list of thresholds.
      */
     public List<Integer> getThresholds() {
         return thresholds;
@@ -77,10 +77,10 @@ public class ActionList {
     /**
      * Add an entry to this actionList. The list will be sorted by thresholds automatically after the insertion.
      * 
-     * @param treshold
-     *            The minimum violation level a player needs to have to be suspected to the given actions.
+     * @param threshold
+     *            the minimum violation level a player needs to have to be suspected to the given actions
      * @param actions
-     *            The actions that will be used if the player reached the accompanying threshold/violation level.
+     *            the actions that will be used if the player reached the accompanying threshold/violation level
      */
     public void setActions(final Integer threshold, final Action[] actions) {
         if (!thresholds.contains(threshold)) {

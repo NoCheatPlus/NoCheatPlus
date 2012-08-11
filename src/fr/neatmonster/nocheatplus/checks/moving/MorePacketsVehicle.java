@@ -79,7 +79,8 @@ public class MorePacketsVehicle extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player, data.morePacketsVehicleVL, MovingConfig.getConfig(player).morePacketsVehicleActions))
+            if (executeActions(player, data.morePacketsVehicleVL,
+                    MovingConfig.getConfig(player).morePacketsVehicleActions))
                 newTo = data.morePacketsVehicleSetback;
         }
 

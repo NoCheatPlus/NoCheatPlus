@@ -2,15 +2,16 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
 
-import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import net.minecraft.server.AxisAlignedBB;
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.Packet10Flying;
+
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
  * M"""""""`YM          MM""""""""`M          dP dP 
@@ -43,83 +44,71 @@ public class NoFall extends Check {
      * @param to
      *            the to
      */
-    public void check(final Player player, final PlayerLocation from, final PlayerLocation to) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        final MovingData data = MovingData.getData(player);
+    public void check(final EntityPlayer player, final Packet10Flying packet) {
+        final Player bukkitPlayer = player.getBukkitEntity();
+        final MovingConfig cc = MovingConfig.getConfig(bukkitPlayer);
+        final MovingData data = MovingData.getData(bukkitPlayer);
 
-        // If the player is server-side in creative mode, we have to stop here to avoid hurting him when he switches
-        // back to "normal" mode.
-        if (player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight()) {
-            data.noFallDistance = 0F;
-            data.noFallLastAddedDistance = 0F;
-            return;
+        // Check the player is now on the ground (for the client and for the server).
+        final boolean onGroundClient = packet.g;
+        final AxisAlignedBB boundingBoxGround = player.boundingBox.clone().d(packet.x - player.locX,
+                packet.y - player.locY - 0.001D, packet.z - player.locZ);
+        final boolean onGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
+
+        // If the packet has position information.
+        if (packet.hasPos)
+            // If the player has just started falling.
+            if (data.noFallWasOnGroundServer && !onGroundServer)
+                // Reset his fall distance.
+                data.noFallFallDistance = 0D;
+            else {
+                final int id = player.world.getTypeId((int) Math.ceil(packet.x), (int) Math.ceil(packet.y),
+                        (int) Math.ceil(packet.z));
+
+                // If the player is falling into water.
+                if (id > 7 && id < 12)
+                    // Reset his fall distance.
+                    data.noFallFallDistance = 0D;
+                else if (player.locY - packet.y > 0D)
+                    // Add the distance to the fall distance.
+                    data.noFallFallDistance += player.locY - packet.y;
+            }
+
+        // If the player just touched the ground for the server, but no for the client.
+        if (!data.noFallWasOnGroundServer && onGroundServer && (data.noFallWasOnGroundClient || !onGroundClient)) {
+            // Calculate the fall damages to be dealt.
+            final int fallDamage = (int) data.noFallFallDistance - 2;
+            if (fallDamage > 1) {
+                // Add the fall distance to the violation level.
+                data.noFallVL += data.noFallFallDistance;
+
+                // Execute the actions to find out if we need to cancel the event or not.
+                if (executeActions(bukkitPlayer, data.noFallVL, cc.noFallActions))
+                    // Deal the fall damages to the player.
+                    bukkitPlayer.damage(fallDamage);
+            }
         }
 
-        // This check is pretty much always a step behind for technical reasons.
-        if (from.isInLiquid() || from.isOnGround() || from.isOnLadder())
-            // Start with zero fall distance.
-            data.noFallDistance = 0F;
+        // If the player just touched the ground for the server.
+        else if (!data.noFallWasOnGroundServer && onGroundServer) {
+            // Calculate the difference between the fall distance calculated by the server and by the plugin.
+            final int difference = (int) data.noFallFallDistance - (int) bukkitPlayer.getFallDistance();
 
-        if (cc.noFallAggressive && (from.isInLiquid() || from.isOnGround() || from.isOnLadder())
-                && (to.isInLiquid() || to.isOnGround() || to.isOnLadder()) && from.getY() <= to.getY()
-                && player.getFallDistance() > 3F) {
-            data.noFallDistance = player.getFallDistance();
+            // If the difference is too big and the fall distance calculated by the plugin should hurt the player.
+            if (difference > 1 && (int) data.noFallFallDistance - 3 > 0) {
+                // Add the difference to the violation level.
+                data.noFallVL += data.noFallFallDistance - bukkitPlayer.getFallDistance();
 
-            // Increment violation level.
-            data.noFallVL += player.getFallDistance();
-
-            // Execute whatever actions are associated with this check and the violation level and find out if we should
-            // cancel the event.
-            if (executeActions(player, data.noFallVL, cc.noFallActions))
-                // Deal fall damages to the player.
-                ((CraftPlayer) player).getHandle().b(0D, true);
-            data.noFallDistance = 0F;
+                // Execute the actions to find out if we need to cancel the event or not.
+                if (executeActions(bukkitPlayer, data.noFallVL, cc.noFallActions))
+                    // Set the fall distance to its right value.
+                    bukkitPlayer.setFallDistance((float) data.noFallFallDistance);
+            }
         }
 
-        // If we increased fall height before for no good reason, reduce now by the same amount.
-        if (player.getFallDistance() > data.noFallLastAddedDistance)
-            player.setFallDistance(player.getFallDistance() - data.noFallLastAddedDistance);
-
-        data.noFallLastAddedDistance = 0F;
-
-        final float difference = data.noFallDistance - player.getFallDistance();
-
-        // We want to know if the fallDistance recorded by the game is smaller than the fall distance recorded by the
-        // plugin.
-        if (difference > 1F && (to.isInWater() || to.isOnGround() || to.isOnLadder()) && data.noFallDistance > 2F) {
-            // Increment violation level.
-            data.noFallVL += difference;
-
-            // Execute whatever actions are associated with this check and the violation level and find out if we should
-            // cancel the event. If "cancelled", the fall damage gets dealt in a way that's visible to other plugins.
-            if (executeActions(player, data.noFallVL, cc.noFallActions))
-                // Increase the fall distance a bit. :)
-                player.setFallDistance(data.noFallDistance + difference);
-            data.noFallDistance = 0F;
-        }
-
-        // Increase the fall distance that is recorded by the plugin, AND set the fall distance of the player to
-        // whatever he would get with this move event. This modifies Minecrafts fall damage calculation slightly, but
-        // that's still better than ignoring players that try to use "teleports" or "stepdown" to avoid falldamage. It
-        // is only added for big height differences anyway, as to avoid to much deviation from the original Minecraft
-        // feeling.
-        if (from.getY() > to.getY()) {
-            final float deltaY = (float) (from.getY() - to.getY());
-            data.noFallDistance += deltaY * 0.75D; // Magic number. :)
-
-            if (deltaY > 1F) {
-                data.noFallLastAddedDistance = deltaY;
-                player.setFallDistance(player.getFallDistance() + deltaY);
-            } else
-                data.noFallLastAddedDistance = 0F;
-        } else
-            data.noFallLastAddedDistance = 0F;
-
-        if (to.isOnGround() || from.isOnStairs())
-            data.noFallDistance = 0F;
-
-        // Reduce violation level.
-        data.noFallVL *= 0.95D;
+        // Remember if the player was on ground for the client and for the server.
+        data.noFallWasOnGroundClient = onGroundClient;
+        data.noFallWasOnGroundServer = onGroundServer;
     }
 
     /* (non-Javadoc)
@@ -129,7 +118,7 @@ public class NoFall extends Check {
     @Override
     public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
         if (wildcard == ParameterName.FALL_DISTANCE)
-            return String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallDistance);
+            return String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallFallDistance);
         else
             return super.getParameter(wildcard, violationData);
     }

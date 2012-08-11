@@ -309,7 +309,6 @@ public abstract class ConfPaths {
 
     private static final String MOVING_NOFALL                         = MOVING + "nofall.";
     public static final String  MOVING_NOFALL_CHECK                   = MOVING_NOFALL + "active";
-    public static final String  MOVING_NOFALL_AGGRESSIVE              = MOVING_NOFALL + "aggressive";
     public static final String  MOVING_NOFALL_ACTIONS                 = MOVING_NOFALL + "actions";
 
     private static final String MOVING_SURVIVALFLY                    = MOVING + "survivalfly.";

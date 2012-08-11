@@ -37,13 +37,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * doesn't get it's own, it will use the "global" version.
  */
 public class BlockInteractConfig implements CheckConfig {
-	
-	public static final CheckConfigFactory factory = new CheckConfigFactory(){
-		@Override
-		public final CheckConfig getConfig(final Player player) {
-			return BlockInteractConfig.getConfig(player);
-		}
-	};
+
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory          factory   = new CheckConfigFactory() {
+                                                                  @Override
+                                                                  public final CheckConfig getConfig(final Player player) {
+                                                                      return BlockInteractConfig.getConfig(player);
+                                                                  }
+                                                              };
 
     /** The map containing the configurations per world. */
     private static Map<String, BlockInteractConfig> worldsMap = new HashMap<String, BlockInteractConfig>();
@@ -78,8 +79,8 @@ public class BlockInteractConfig implements CheckConfig {
     /**
      * Instantiates a new block interact configuration.
      * 
-     * @param dataFactory
-     *            the dataFactory
+     * @param data
+     *            the data
      */
     public BlockInteractConfig(final ConfigFile data) {
         directionCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK);
@@ -89,16 +90,19 @@ public class BlockInteractConfig implements CheckConfig {
         reachCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_REACH_CHECK);
         reachActions = data.getActionList(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, Permissions.BLOCKINTERACT_REACH);
     }
-    
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     */
     @Override
-	public final boolean isEnabled(final CheckType checkType) {
-		switch(checkType){
-		case BLOCKINTERACT_DIRECTION:
-			return directionCheck;
-		case BLOCKINTERACT_REACH:
-			return reachCheck;
-		default:
-			return true;
-		}
-	}
+    public final boolean isEnabled(final CheckType checkType) {
+        switch (checkType) {
+        case BLOCKINTERACT_DIRECTION:
+            return directionCheck;
+        case BLOCKINTERACT_REACH:
+            return reachCheck;
+        default:
+            return true;
+        }
+    }
 }

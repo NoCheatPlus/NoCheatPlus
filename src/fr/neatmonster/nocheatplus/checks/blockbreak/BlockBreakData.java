@@ -29,13 +29,14 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  * Player specific data for the block break checks.
  */
 public class BlockBreakData implements CheckData {
-	
-	public static final CheckDataFactory factory = new CheckDataFactory(){
-		@Override
-		public final CheckData getData(final Player player) {
-			return BlockBreakData.getData(player);
-		}
-	};
+
+    /** The factory creating data. */
+    public static final CheckDataFactory       factory    = new CheckDataFactory() {
+                                                              @Override
+                                                              public final CheckData getData(final Player player) {
+                                                                  return BlockBreakData.getData(player);
+                                                              }
+                                                          };
 
     /** The map containing the data per players. */
     private static Map<String, BlockBreakData> playersMap = new HashMap<String, BlockBreakData>();
@@ -69,6 +70,5 @@ public class BlockBreakData implements CheckData {
 
     // Data of the reach check.
     public double  reachDistance;
-
 
 }

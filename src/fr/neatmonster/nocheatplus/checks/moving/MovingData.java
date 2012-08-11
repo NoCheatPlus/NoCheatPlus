@@ -23,13 +23,14 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  * Player specific dataFactory for the moving checks.
  */
 public class MovingData implements CheckData {
-	
-	public static final CheckDataFactory factory = new CheckDataFactory(){
-		@Override
-		public final CheckData getData(final Player player) {
-			return MovingData.getData(player);
-		}
-	};
+
+    /** The factory creating data. */
+    public static final CheckDataFactory   factory    = new CheckDataFactory() {
+                                                          @Override
+                                                          public final CheckData getData(final Player player) {
+                                                              return MovingData.getData(player);
+                                                          }
+                                                      };
 
     /** The map containing the dataFactory per players. */
     private static Map<String, MovingData> playersMap = new HashMap<String, MovingData>();
@@ -82,8 +83,9 @@ public class MovingData implements CheckData {
     public Location   morePacketsVehicleSetback;
 
     // Data of the no fall check.
-    public float      noFallDistance;
-    public float      noFallLastAddedDistance;
+    public double     noFallFallDistance;
+    public boolean    noFallWasOnGroundClient  = true;
+    public boolean    noFallWasOnGroundServer  = true;
 
     // Data of the survival fly check.
     public long       survivalFlyInLavaSince;
@@ -106,8 +108,9 @@ public class MovingData implements CheckData {
     public void clearFlyData() {
         bunnyhopDelay = 0;
         setBack = null;
-        noFallDistance = 0F;
-        noFallLastAddedDistance = 0F;
+        noFallFallDistance = 0D;
+        noFallWasOnGroundClient = true;
+        noFallWasOnGroundServer = true;
         survivalFlyJumpPhase = 0;
     }
 

@@ -24,13 +24,14 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  * Player specific dataFactory for the fight checks.
  */
 public class FightData implements CheckData {
-	
-	public static final CheckDataFactory factory = new CheckDataFactory(){
-		@Override
-		public final CheckData getData(final Player player) {
-			return FightData.getData(player);
-		}
-	};
+
+    /** The factory creating data. */
+    public static final CheckDataFactory  factory    = new CheckDataFactory() {
+                                                         @Override
+                                                         public final CheckData getData(final Player player) {
+                                                             return FightData.getData(player);
+                                                         }
+                                                     };
 
     /** The map containing the dataFactory per players. */
     private static Map<String, FightData> playersMap = new HashMap<String, FightData>();

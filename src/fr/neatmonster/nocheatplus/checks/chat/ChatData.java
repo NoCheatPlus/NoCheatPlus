@@ -21,14 +21,15 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
 /**
  * Player specific dataFactory for the chat checks.
  */
-public class ChatData implements CheckData{
-	
-	public static final CheckDataFactory factory = new CheckDataFactory(){
-		@Override
-		public final CheckData getData(final Player player) {
-			return ChatData.getData(player);
-		}
-	};
+public class ChatData implements CheckData {
+
+    /** The factory creating data. */
+    public static final CheckDataFactory factory    = new CheckDataFactory() {
+                                                        @Override
+                                                        public final CheckData getData(final Player player) {
+                                                            return ChatData.getData(player);
+                                                        }
+                                                    };
 
     /** The map containing the dataFactory per players. */
     private static Map<String, ChatData> playersMap = new HashMap<String, ChatData>();
@@ -69,7 +70,7 @@ public class ChatData implements CheckData{
      * Clear the dataFactory of the no pwnage check.
      */
     public synchronized void clearNoPwnageData() {
-    	// TODO: re-think this sync [keep related to ChatData/NoPwnage/Color used lock.]
+        // TODO: re-think this sync [keep related to ChatData/NoPwnage/Color used lock.]
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";

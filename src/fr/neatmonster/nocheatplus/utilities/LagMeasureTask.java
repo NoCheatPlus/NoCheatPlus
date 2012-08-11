@@ -28,6 +28,8 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
  * A task running in the background that measures tick time vs. real time.
  */
 public class LagMeasureTask implements Runnable {
+
+    /** The instance of the class for a static access. */
     private static LagMeasureTask instance = new LagMeasureTask();
 
     /**

@@ -29,13 +29,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * get it's own, it will use the "global" version.
  */
 public class FightConfig implements CheckConfig {
-	
-	public static final CheckConfigFactory factory = new CheckConfigFactory(){
-		@Override
-		public final CheckConfig getConfig(final Player player) {
-			return FightConfig.getConfig(player);
-		}
-	};
+
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory  factory   = new CheckConfigFactory() {
+                                                          @Override
+                                                          public final CheckConfig getConfig(final Player player) {
+                                                              return FightConfig.getConfig(player);
+                                                          }
+                                                      };
 
     /** The map containing the configurations per world. */
     private static Map<String, FightConfig> worldsMap = new HashMap<String, FightConfig>();
@@ -98,8 +99,8 @@ public class FightConfig implements CheckConfig {
     /**
      * Instantiates a new fight configuration.
      * 
-     * @param dataFactory
-     *            the dataFactory
+     * @param data
+     *            the data
      */
     public FightConfig(final ConfigFile data) {
         angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
@@ -136,30 +137,33 @@ public class FightConfig implements CheckConfig {
         speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
     }
-    
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     */
     @Override
-	public final boolean isEnabled(final CheckType checkType) {
-		switch(checkType){
-		case FIGHT_ANGLE:
-			return angleCheck;
-		case FIGHT_CRITICAL:
-			return criticalCheck;
-		case FIGHT_DIRECTION:
-			return directionCheck;
-		case FIGHT_GODMODE:
-			return godModeCheck;
-		case FIGHT_INSTANTHEAL:
-			return instantHealCheck;
-		case FIGHT_KNOCKBACK:
-			return knockbackCheck;
-		case FIGHT_NOSWING:
-			return noSwingCheck;
-		case FIGHT_REACH:
-			return reachCheck;
-		case FIGHT_SPEED:
-			return speedCheck;
-		default:
-			return true;
-		}
-	}
+    public final boolean isEnabled(final CheckType checkType) {
+        switch (checkType) {
+        case FIGHT_ANGLE:
+            return angleCheck;
+        case FIGHT_CRITICAL:
+            return criticalCheck;
+        case FIGHT_DIRECTION:
+            return directionCheck;
+        case FIGHT_GODMODE:
+            return godModeCheck;
+        case FIGHT_INSTANTHEAL:
+            return instantHealCheck;
+        case FIGHT_KNOCKBACK:
+            return knockbackCheck;
+        case FIGHT_NOSWING:
+            return noSwingCheck;
+        case FIGHT_REACH:
+            return reachCheck;
+        case FIGHT_SPEED:
+            return speedCheck;
+        default:
+            return true;
+        }
+    }
 }

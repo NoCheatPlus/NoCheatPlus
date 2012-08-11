@@ -27,42 +27,6 @@ public class Permissions {
     public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
     public static final String  ADMINISTRATION_RELOAD        = ADMINISTRATION + ".reload";
 
-    /*
-     *     e   e                    888 ,e,  dP,e, ,e,                    d8   ,e,                         
-     *    d8b d8b     e88 88e   e88 888  "   8b "   "   e88'888  ,"Y88b  d88    "   e88 88e  888 8e   dP"Y 
-     *   e Y8b Y8b   d888 888b d888 888 888 888888 888 d888  '8 "8" 888 d88888 888 d888 888b 888 88b C88b  
-     *  d8b Y8b Y8b  Y888 888P Y888 888 888  888   888 Y888   , ,ee 888  888   888 Y888 888P 888 888  Y88D 
-     * d888b Y8b Y8b  "88 88"   "88 888 888  888   888  "88,e8' "88 888  888   888  "88 88"  888 888 d,dP  
-     */
-    private static final String MODS                         = NOCHEATPLUS + ".mods";
-
-    private static final String CJB                          = MODS + ".cjb";
-    public static final String  CJB_FLY                      = CJB + ".fly";
-    public static final String  CJB_XRAY                     = CJB + ".xray";
-    public static final String  CJB_RADAR                    = CJB + ".radar";
-
-    private static final String MINECRAFTAUTOMAP             = MODS + ".minecraftautomap";
-    public static final String  MINECRAFTAUTOMAP_ORES        = MINECRAFTAUTOMAP + ".ores";
-    public static final String  MINECRAFTAUTOMAP_CAVE        = MINECRAFTAUTOMAP + ".cave";
-    public static final String  MINECRAFTAUTOMAP_RADAR       = MINECRAFTAUTOMAP + ".radar";
-
-    private static final String REI                          = MODS + ".rei";
-    public static final String  REI_CAVE                     = REI + ".cave";
-    public static final String  REI_RADAR                    = REI + ".radar";
-
-    private static final String SMARTMOVING                  = MODS + ".smartmoving";
-    public static final String  SMARTMOVING_CLIMBING         = SMARTMOVING + ".climbing";
-    public static final String  SMARTMOVING_SWIMMING         = SMARTMOVING + ".swimming";
-    public static final String  SMARTMOVING_CRAWLING         = SMARTMOVING + ".crawling";
-    public static final String  SMARTMOVING_SLIDING          = SMARTMOVING + ".sliding";
-    public static final String  SMARTMOVING_JUMPING          = SMARTMOVING + ".jumping";
-    public static final String  SMARTMOVING_FLYING           = SMARTMOVING + ".flying";
-
-    private static final String ZOMBE                        = MODS + ".zombe";
-    public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
-    public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
-    public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
-
     private static final String CHECKS                       = NOCHEATPLUS + ".checks";
 
     /*
@@ -167,4 +131,40 @@ public class Permissions {
     public static final String  MOVING_SURVIVALFLY_BLOCKING  = MOVING_SURVIVALFLY + ".blocking";
     public static final String  MOVING_SURVIVALFLY_SNEAKING  = MOVING_SURVIVALFLY + ".sneaking";
     public static final String  MOVING_SURVIVALFLY_SPRINTING = MOVING_SURVIVALFLY + ".sprinting";
+
+    /*
+     *     e   e                    888 ,e,  dP,e, ,e,                    d8   ,e,                         
+     *    d8b d8b     e88 88e   e88 888  "   8b "   "   e88'888  ,"Y88b  d88    "   e88 88e  888 8e   dP"Y 
+     *   e Y8b Y8b   d888 888b d888 888 888 888888 888 d888  '8 "8" 888 d88888 888 d888 888b 888 88b C88b  
+     *  d8b Y8b Y8b  Y888 888P Y888 888 888  888   888 Y888   , ,ee 888  888   888 Y888 888P 888 888  Y88D 
+     * d888b Y8b Y8b  "88 88"   "88 888 888  888   888  "88,e8' "88 888  888   888  "88 88"  888 888 d,dP  
+     */
+    private static final String MODS                         = NOCHEATPLUS + ".mods";
+
+    private static final String CJB                          = MODS + ".cjb";
+    public static final String  CJB_FLY                      = CJB + ".fly";
+    public static final String  CJB_RADAR                    = CJB + ".radar";
+    public static final String  CJB_XRAY                     = CJB + ".xray";
+
+    private static final String MINECRAFTAUTOMAP             = MODS + ".minecraftautomap";
+    public static final String  MINECRAFTAUTOMAP_CAVE        = MINECRAFTAUTOMAP + ".cave";
+    public static final String  MINECRAFTAUTOMAP_ORES        = MINECRAFTAUTOMAP + ".ores";
+    public static final String  MINECRAFTAUTOMAP_RADAR       = MINECRAFTAUTOMAP + ".radar";
+
+    private static final String REI                          = MODS + ".rei";
+    public static final String  REI_CAVE                     = REI + ".cave";
+    public static final String  REI_RADAR                    = REI + ".radar";
+
+    private static final String SMARTMOVING                  = MODS + ".smartmoving";
+    public static final String  SMARTMOVING_CLIMBING         = SMARTMOVING + ".climbing";
+    public static final String  SMARTMOVING_CRAWLING         = SMARTMOVING + ".crawling";
+    public static final String  SMARTMOVING_FLYING           = SMARTMOVING + ".flying";
+    public static final String  SMARTMOVING_JUMPING          = SMARTMOVING + ".jumping";
+    public static final String  SMARTMOVING_SLIDING          = SMARTMOVING + ".sliding";
+    public static final String  SMARTMOVING_SWIMMING         = SMARTMOVING + ".swimming";
+
+    private static final String ZOMBE                        = MODS + ".zombe";
+    public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
+    public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
+    public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
 }

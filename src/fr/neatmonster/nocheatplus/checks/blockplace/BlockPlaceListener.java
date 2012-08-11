@@ -35,10 +35,20 @@ import org.bukkit.event.player.PlayerInteractEvent;
  * @see BlockPlaceEvent
  */
 public class BlockPlaceListener implements Listener {
+
+    /** The direction check. */
     private final Direction direction = new Direction();
+
+    /** The fast place check. */
     private final FastPlace fastPlace = new FastPlace();
+
+    /** The no swing check. */
     private final NoSwing   noSwing   = new NoSwing();
+
+    /** The reach check. */
     private final Reach     reach     = new Reach();
+
+    /** The speed check. */
     private final Speed     speed     = new Speed();
 
     /**
@@ -113,6 +123,9 @@ public class BlockPlaceListener implements Listener {
 
     /**
      * We listener to PlayerInteract events to prevent players from spamming the server with monster eggs.
+     * 
+     * @param event
+     *            the event
      */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
@@ -140,6 +153,9 @@ public class BlockPlaceListener implements Listener {
 
     /**
      * We listen to ProjectileLaunch events to prevent players from launching projectiles too quickly.
+     * 
+     * @param event
+     *            the event
      */
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)

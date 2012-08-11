@@ -1,8 +1,6 @@
 package fr.neatmonster.nocheatplus.config;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -48,6 +46,7 @@ public class ConfigManager {
             return new LogFileFormatter();
         }
 
+        /** The date formatter. */
         private final SimpleDateFormat date;
 
         /**
@@ -216,28 +215,6 @@ public class ConfigManager {
             }
 
             world.regenerateActionLists();
-        }
-    }
-
-    /**
-     * Write instructions.
-     * 
-     * @param plugin
-     *            the instance of NoCheatPlus
-     */
-    public static void writeInstructions(final NoCheatPlus plugin) {
-        try {
-            final InputStream is = plugin.getResource("Instructions.txt");
-            final FileOutputStream fos = new FileOutputStream(new File(plugin.getDataFolder(), "Intructions.txt"));
-            final byte[] buffer = new byte[64 * 1024];
-            int length = 0;
-            while ((length = is.read(buffer)) != -1)
-                fos.write(buffer, 0, length);
-            fos.flush();
-            fos.close();
-            is.close();
-        } catch (final Exception e) {
-            e.printStackTrace();
         }
     }
 }

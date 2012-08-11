@@ -29,13 +29,14 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  * Player specific dataFactory for the block place checks.
  */
 public class BlockPlaceData implements CheckData {
-	
-	public static final CheckDataFactory factory = new CheckDataFactory(){
-		@Override
-		public final CheckData getData(final Player player) {
-			return BlockPlaceData.getData(player);
-		}
-	};
+
+    /** The factory creating data. */
+    public static final CheckDataFactory       factory    = new CheckDataFactory() {
+                                                              @Override
+                                                              public final CheckData getData(final Player player) {
+                                                                  return BlockPlaceData.getData(player);
+                                                              }
+                                                          };
 
     /** The map containing the dataFactory per players. */
     private static Map<String, BlockPlaceData> playersMap = new HashMap<String, BlockPlaceData>();

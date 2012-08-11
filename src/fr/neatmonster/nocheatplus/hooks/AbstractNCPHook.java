@@ -19,7 +19,6 @@ package fr.neatmonster.nocheatplus.hooks;
  */
 /**
  * Extend this class for maximum future compatibility.<br>
- * 
  * Especially the onCheckFailure method might get extended with check specific arguments, this class will provide
  * compatibility with older method signatures, where possible.
  * 

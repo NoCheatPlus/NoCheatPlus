@@ -1,9 +1,17 @@
 package fr.neatmonster.nocheatplus;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.server.INetworkManager;
+import net.minecraft.server.NetServerHandler;
+import net.minecraft.server.NetworkManager;
+
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,6 +49,7 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class NoCheatPlus extends JavaPlugin implements Listener {
     public static long     time = System.currentTimeMillis();
 
+    /** The listeners. */
     private List<Listener> listeners;
 
     /* (non-Javadoc)
@@ -93,11 +102,20 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Register the commands handler.
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
-        // Write the 'Instructions.txt' file.
-        ConfigManager.writeInstructions(this);
-
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
+    }
+
+    /**
+     * This event handler is used to execute the actions when a violation is detected.
+     * 
+     * @param event
+     *            the event handled
+     */
+    @EventHandler(
+            priority = EventPriority.LOWEST)
+    final void onExecuteActions(final ExecuteActionsEvent event) {
+        event.executeActions();
     }
 
     /**
@@ -107,7 +125,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      *            the event handled
      */
     @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
+            priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
 
@@ -189,9 +207,35 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         player.sendMessage(message);
     }
-    
-    @EventHandler(priority=EventPriority.LOWEST)
-    final void onExecuteActions(final ExecuteActionsEvent event){
-    	event.executeActions();
+
+    /**
+     * This event handler is used to replace the NetServerHandler of the player by our CustomNetServerHandler.
+     * 
+     * @param event
+     *            the event handled
+     */
+    @EventHandler(
+            priority = EventPriority.LOWEST)
+    public void onPlayerJoin_(final PlayerJoinEvent event) {
+        final CraftPlayer player = (CraftPlayer) event.getPlayer();
+        final CraftServer server = (CraftServer) Bukkit.getServer();
+        final NetServerHandler nSH = player.getHandle().netServerHandler;
+        if (!(nSH instanceof CustomNetServerHandler)) {
+            final Location location = event.getPlayer().getLocation();
+            final CustomNetServerHandler customNSH = new CustomNetServerHandler(server.getHandle().getServer(),
+                    player.getHandle().netServerHandler.networkManager, player.getHandle());
+            customNSH.a(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+            player.getHandle().netServerHandler = customNSH;
+            final INetworkManager iNM = player.getHandle().netServerHandler.networkManager;
+            try {
+                final Field field = NetworkManager.class.getDeclaredField("packetListener");
+                field.setAccessible(true);
+                field.set(iNM, customNSH);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+            nSH.disconnected = true;
+            server.getHandle().getServer().ac().a(customNSH);
+        }
     }
 }

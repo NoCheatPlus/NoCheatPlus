@@ -55,7 +55,10 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class MovingListener implements Listener {
 
-    /** The plugin. */
+    /** The no fall check. **/
+    public static NoFall             noFall             = new NoFall();
+
+    /** The instance of NoCheatPlus. */
     private final NoCheatPlus        plugin             = (NoCheatPlus) Bukkit.getPluginManager().getPlugin(
                                                                 "NoCheatPlus");
     /** The creative fly check. */
@@ -66,9 +69,6 @@ public class MovingListener implements Listener {
 
     /** The more packets vehicle check. */
     private final MorePacketsVehicle morePacketsVehicle = new MorePacketsVehicle();
-
-    /** The no fall check. */
-    private final NoFall             noFall             = new NoFall();
 
     /** The survival fly check. */
     private final SurvivalFly        survivalFly        = new SurvivalFly();
@@ -176,8 +176,8 @@ public class MovingListener implements Listener {
     }
 
     /**
-     * Just for security, if a player switches between worlds, reset the fly and more packets checks dataFactory, because it is
-     * definitely invalid now.
+     * Just for security, if a player switches between worlds, reset the fly and more packets checks dataFactory,
+     * because it is definitely invalid now.
      * 
      * @param event
      *            the event
@@ -316,13 +316,10 @@ public class MovingListener implements Listener {
         if ((player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight()) && creativeFly.isEnabled(player))
             // If the player is handled by the creative fly check, execute it.
             newTo = creativeFly.check(player, from, to);
-        else if (survivalFly.isEnabled(player)) {
+        else if (survivalFly.isEnabled(player))
             // If he is handled by the survival fly check, execute it.
             newTo = survivalFly.check(player, from, to);
-            if (newTo == null && noFall.isEnabled(player))
-                // If he is handled by the no fall check, execute it.
-                noFall.check(player, from, to);
-        } else
+        else
             // He isn't handled by any fly check, clear his dataFactory.
             data.clearFlyData();
 
@@ -413,7 +410,8 @@ public class MovingListener implements Listener {
         if (data.teleported != null && data.teleported.equals(event.getTo()))
             event.setCancelled(false);
         else
-            // Only if it wasn't NoCheatPlus, drop dataFactory from more packets check. If it was NoCheatPlus, we don't want
+            // Only if it wasn't NoCheatPlus, drop dataFactory from more packets check. If it was NoCheatPlus, we don't
+            // want
             // players to exploit the fly check teleporting to get rid of the "morepackets" dataFactory.
             data.clearMorePacketsData();
 

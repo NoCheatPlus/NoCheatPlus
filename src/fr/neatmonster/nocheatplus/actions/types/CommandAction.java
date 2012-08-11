@@ -46,10 +46,10 @@ public class CommandAction extends ActionWithParameters {
      * Fill in the placeholders (stuff that looks like '[something]') with information, make a nice String out of it
      * that can be directly used as a command in the console.
      * 
-     * @param player
-     *            The player that is used to fill in missing dataFactory.
      * @param check
      *            The check that is used to fill in missing dataFactory.
+     * @param violationData
+     *            the violation data
      * @return The complete, ready to use, command.
      */
     public String getCommand(final Check check, final ViolationData violationData) {

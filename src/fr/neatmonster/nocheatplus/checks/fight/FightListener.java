@@ -28,16 +28,36 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  */
 /**
  * Central location to listen to events that are relevant for the fight checks.
+ * 
+ * @see FightEvent
  */
 public class FightListener implements Listener {
+
+    /** The angle check. */
     private final Angle       angle       = new Angle();
+
+    /** The critical check. */
     private final Critical    critical    = new Critical();
+
+    /** The direction check. */
     private final Direction   direction   = new Direction();
+
+    /** The god mode check. */
     private final GodMode     godMode     = new GodMode();
+
+    /** The instant heal check. */
     private final InstantHeal instantHeal = new InstantHeal();
+
+    /** The knockback check. */
     private final Knockback   knockback   = new Knockback();
+
+    /** The no swing check. */
     private final NoSwing     noSwing     = new NoSwing();
+
+    /** The reach check. */
     private final Reach       reach       = new Reach();
+
+    /** The speed check. */
     private final Speed       speed       = new Speed();
 
     /**

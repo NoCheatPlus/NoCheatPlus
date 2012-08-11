@@ -268,7 +268,6 @@ public class DefaultConfig extends ConfigFile {
                 "log:morepackets:3:2:if cancel vl>20 log:morepackets:0:2:if cancel");
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
-        set(ConfPaths.MOVING_NOFALL_AGGRESSIVE, true);
         set(ConfPaths.MOVING_NOFALL_ACTIONS, "log:nofall:0:5:cif cancel");
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);

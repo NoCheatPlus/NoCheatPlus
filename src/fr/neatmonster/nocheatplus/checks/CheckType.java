@@ -81,25 +81,37 @@ public enum CheckType {
     UNKNOWN;
 
     /** The group. */
-    public final CheckType group;
+    public final CheckType          group;
 
     /** The configFactory. */
-    public final CheckConfigFactory  configFactory;
+    public final CheckConfigFactory configFactory;
 
     /** The dataFactory. */
-    public final CheckDataFactory  dataFactory;
+    public final CheckDataFactory   dataFactory;
 
     /** The name. */
-    public final String    name;
+    public final String             name;
 
     /** The permission. */
-    public final String    permission;
+    public final String             permission;
 
     /**
      * Instantiates a new check type.
      */
     private CheckType() {
         this(null, null, null, null, null);
+    }
+
+    /**
+     * Instantiates a new check type.
+     * 
+     * @param configFactory
+     *            the configFactory
+     * @param dataFactory
+     *            the dataFactory
+     */
+    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
+        this(null, configFactory, dataFactory, null, null);
     }
 
     /**
@@ -116,8 +128,8 @@ public enum CheckType {
      * @param permission
      *            the permission
      */
-    private CheckType(final CheckType group, final CheckConfigFactory configFactory, CheckDataFactory dataFactory, final String name,
-            final String permission) {
+    private CheckType(final CheckType group, final CheckConfigFactory configFactory,
+            final CheckDataFactory dataFactory, final String name, final String permission) {
         this.group = group;
         this.configFactory = configFactory;
         this.dataFactory = dataFactory;
@@ -137,18 +149,6 @@ public enum CheckType {
      */
     private CheckType(final CheckType group, final String name, final String permission) {
         this(group, group.getConfigFactory(), group.getDataFactory(), name, permission);
-    }
-
-    /**
-     * Instantiates a new check type.
-     * 
-     * @param configFactory
-     *            the configFactory
-     * @param dataFactory
-     *            the dataFactory
-     */
-    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
-        this(null, configFactory, dataFactory, null, null);
     }
 
     /**
@@ -186,15 +186,17 @@ public enum CheckType {
     public String getPermission() {
         return permission;
     }
-    
+
     /**
      * Check if the check is enabled by configuration (no permission check).
+     * 
      * @param player
-     * @return
+     *            the player
+     * @return true, if the check is enabled
      */
-    public final boolean isEnabled(final Player player){
-//    	if (configFactory == null) return true; // TODO: maybe leave this out.
-    	return configFactory.getConfig(player).isEnabled(this);
+    public final boolean isEnabled(final Player player) {
+        // if (configFactory == null) return true; // TODO: maybe leave this out.
+        return configFactory.getConfig(player).isEnabled(this);
     }
-    
+
 }

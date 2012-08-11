@@ -28,13 +28,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the moving checks. Every world gets one of these assigned to it.
  */
 public class MovingConfig implements CheckConfig {
-	
-	public static final CheckConfigFactory factory = new CheckConfigFactory(){
-		@Override
-		public final CheckConfig getConfig(final Player player) {
-			return MovingConfig.getConfig(player);
-		}
-	};
+
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory   factory   = new CheckConfigFactory() {
+                                                           @Override
+                                                           public final CheckConfig getConfig(final Player player) {
+                                                               return MovingConfig.getConfig(player);
+                                                           }
+                                                       };
 
     /** The map containing the configurations per world. */
     private static Map<String, MovingConfig> worldsMap = new HashMap<String, MovingConfig>();
@@ -73,7 +74,6 @@ public class MovingConfig implements CheckConfig {
     public final ActionList morePacketsVehicleActions;
 
     public final boolean    noFallCheck;
-    public final boolean    noFallAggressive;
     public final ActionList noFallActions;
 
     public final boolean    survivalFlyCheck;
@@ -91,8 +91,8 @@ public class MovingConfig implements CheckConfig {
     /**
      * Instantiates a new moving configuration.
      * 
-     * @param dataFactory
-     *            the dataFactory
+     * @param data
+     *            the data
      */
     public MovingConfig(final ConfigFile data) {
         creativeFlyCheck = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
@@ -109,7 +109,6 @@ public class MovingConfig implements CheckConfig {
                 Permissions.MOVING_MOREPACKETS);
 
         noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
-        noFallAggressive = data.getBoolean(ConfPaths.MOVING_NOFALL_AGGRESSIVE);
         noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
 
         survivalFlyCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
@@ -125,22 +124,25 @@ public class MovingConfig implements CheckConfig {
         survivalFlyWaterSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WATERSPEED, 100);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
     }
-    
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     */
     @Override
-	public final boolean isEnabled(final CheckType checkType) {
-		switch(checkType){
-		case MOVING_NOFALL:
-			return noFallCheck;
-		case MOVING_SURVIVALFLY:
-			return survivalFlyCheck;
-		case MOVING_MOREPACKETS:
-			return morePacketsCheck;
-		case MOVING_MOREPACKETSVEHICLE:
-			return morePacketsVehicleCheck;
-		case MOVING_CREATIVEFLY:
-			return creativeFlyCheck;
-		default:
-			return true;
-		}
-	}
+    public final boolean isEnabled(final CheckType checkType) {
+        switch (checkType) {
+        case MOVING_NOFALL:
+            return noFallCheck;
+        case MOVING_SURVIVALFLY:
+            return survivalFlyCheck;
+        case MOVING_MOREPACKETS:
+            return morePacketsCheck;
+        case MOVING_MOREPACKETSVEHICLE:
+            return morePacketsVehicleCheck;
+        case MOVING_CREATIVEFLY:
+            return creativeFlyCheck;
+        default:
+            return true;
+        }
+    }
 }

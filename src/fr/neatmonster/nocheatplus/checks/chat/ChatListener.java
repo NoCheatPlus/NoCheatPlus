@@ -22,14 +22,17 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * MM.     .dM dP    dP `88888P8   dP   M         M dP `88888P'   dP   `88888P' dP    dP `88888P' dP       
  * MMMMMMMMMMM                          MMMMMMMMMMM                                                        
  */
-
-// TODO: SYNC
-
 /**
  * Central location to listen to events that are relevant for the chat checks.
+ * 
+ * @see ChatEvent
  */
 public class ChatListener implements Listener {
+
+    /** The color check. */
     private final Color    color    = new Color();
+
+    /** The no pwnage check. */
     private final NoPwnage noPwnage = new NoPwnage();
 
     /**
@@ -53,7 +56,7 @@ public class ChatListener implements Listener {
 
         // First the color check.
         event.setMessage(color.check(player, event.getMessage(), false));
-        
+
         // Then the no pwnage check.
         if (noPwnage.check(player, event, false))
             player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));

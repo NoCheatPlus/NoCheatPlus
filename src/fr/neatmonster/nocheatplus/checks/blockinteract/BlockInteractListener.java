@@ -31,7 +31,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
  * @see BlockInteractEvent
  */
 public class BlockInteractListener implements Listener {
+
+    /** The direction check. */
     private final Direction direction = new Direction();
+
+    /** The reach check. */
     private final Reach     reach     = new Reach();
 
     /**

@@ -23,13 +23,14 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  * Player specific dataFactory for the inventory checks.
  */
 public class InventoryData implements CheckData {
-	
-	public static final CheckDataFactory factory = new CheckDataFactory(){
-		@Override
-		public final CheckData getData(final Player player) {
-			return InventoryData.getData(player);
-		}
-	};
+
+    /** The factory creating data. */
+    public static final CheckDataFactory      factory    = new CheckDataFactory() {
+                                                             @Override
+                                                             public final CheckData getData(final Player player) {
+                                                                 return InventoryData.getData(player);
+                                                             }
+                                                         };
 
     /** The map containing the dataFactory per players. */
     private static Map<String, InventoryData> playersMap = new HashMap<String, InventoryData>();

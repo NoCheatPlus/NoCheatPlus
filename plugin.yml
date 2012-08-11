@@ -3,180 +3,173 @@ version: ${project.version}
 description: ${project.description}
 
 author: NeatMonster
-authors: [Evenprime, Juliui]
+authors: [Evenprime, asofold]
 website: ${project.url}
 
 main: ${project.groupId}.${project.artifactId}
 
 commands:
-  nocheatplus:
-    description: NoCheatPlus command(s)
-    aliases: [ncp]
-    # permission: nocheatplus.admin.commands
-    usage: |
-           /<command> permlist player [permission]: list NoCheatPlus' permissions of player, optionally only if beginning with [permission]
-           /<command> playerinfo player: show the collected data NoCheatPlus collected about a player
-           /<command> reload: fast reload of NoCheatPlus' configuration file(s) - needs additional permissions
+    nocheatplus:
+        aliases: [ncp]
+        description: NoCheatPlus command(s).
+        # permission: nocheatplus.admin.reload
+        usage: "/<command> reload: reload NoCheatPlus configuration"
 
 permissions:
-  nocheatplus:
-    description: Allow a player to bypass all checks and give him all admin permissions
-    children:
-      nocheatplus.admin:
-        description: Give a player all admin rights
+    nocheatplus:
+        description: Allow the player to bypass all checks and give him all administation permissions.
         children:
-          nocheatplus.admin.chatlog:
-            description: Player can see NoCheatPlus' log messages in the ingame chat
-          nocheatplus.admin.commands:
-            description: Allow use of the "nocheatplus" commands (may be given to players to allow them to check statistics)
-          nocheatplus.admin.reload:
-            description: Allow access to the special "nocheatplus reload" command (only intended for the actual server administrator)
-          nocheatplus.admin.plugins:
-            description: Allow the player to see the plugins installed on the server
-      nocheatplus.checks:
-        description: Allow the player to bypass all checks
-        children:
-          nocheatplus.checks.blockbreak:
-            description: Allow the player to bypass all blockbreak checks
-            children:
-              nocheatplus.checks.blockbreak.fastbreak:
-                description: Allow a player to break blocks very quickly
-              nocheatplus.checks.blockbreak.reach:
-                description: Allow a player to break blocks at maximum range (about 6-7 blocks, in creative mode unlimited)
-              nocheatplus.checks.blockbreak.direction:
-                description: Allow a player to break blocks that are not in front of them
-              nocheatplus.checks.blockbreak.noswing:
-                description: Allow a player to break blocks without swinging their arm
-          nocheatplus.checks.blockplace:
-            description: Allow the player to bypass all blockplace checks
-            children:
-              nocheatplus.checks.blockplace.fastplace:
-                description: Allow a player to place blocks very quickly
-              nocheatplus.checks.blockplace.reach:
-                description: Allow a player to place blocks at maximum range (about 6-7 blocks)
-              nocheatplus.checks.blockplace.direction:
-                description: Allow a player to place blocks outside their line of view
-              nocheatplus.checks.blockplace.projectile:
-                description: Allow a player to throw projectiles very quickly
-              nocheatplus.checks.blockplace.autosign:
-                description: Allow a player to create multiple signs with the same text
-          nocheatplus.checks.chat:
-            description: Allow the player to bypass all chat checks
-            children:
-              nocheatplus.checks.chat.nopwnage:
-                description: Allow a player to bypass the nopwnage check
-              nocheatplus.checks.chat.arrivalslimit:
-                description: Allow a player to bypass the arrivals limit
-              nocheatplus.checks.chat.color:
-                description: Allow a player to send colored chat messages
-          nocheatplus.checks.fight:
-            description: Allow the player to bypass all fight checks
-            children:
-              nocheatplus.checks.fight.direction:
-                description: Allow a player to attack players and monster even if they are not in his field of view
-              nocheatplus.checks.fight.noswing:
-                description: Allow a player to fight without swinging their arm
-              nocheatplus.checks.fight.reach:
-                description: Allow a player to fight over bigger distances than usual
-              nocheatplus.checks.fight.speed:
-                description: Allow a player to attack faster than usual
-              nocheatplus.checks.fight.godmode:
-                description: Allow a player to not take damage by exploiting a design flaw in Minecraft
-              nocheatplus.checks.fight.instantheal:
-                description: Allow a player to artificially speed up his health regeneration
-              nocheatplus.checks.fight.knockback:
-                description: Allow a player to do knockbacks when it's not technically possible
-              nocheatplus.checks.fight.critical:
-                description: Allow a player to do criticals when it's not technically possible
-              nocheatplus.checks.fight.angle:
-                description: Allow a player to attack multiple entities at the same time (using a forcefield)
-          nocheatplus.checks.inventory:
-            description: Allow the player to bypass all inventory checks
-            children:
-              nocheatplus.checks.inventory.drop:
-                description: Allow a player to drop more items in a short timeframe than the defined limit
-              nocheatplus.checks.inventory.instanteat:
-                description: Allow a player to eat food faster than normally possible
-              nocheatplus.checks.inventory.instantbow:
-                description: Allow a player to charge his bow faster than usual
-          nocheatplus.checks.moving:
-            description: Allow the player to bypass all moving related checks
-            children:
-              nocheatplus.checks.moving.runfly:
-                description: Allow a player to move as free and as fast as he wants (ignores flying, swimming and sneaking settings)
-              nocheatplus.checks.moving.flying:
-                description: Allow a player to fly, but only within given speed limits (ignores swimming and sneaking settings)
-              nocheatplus.checks.moving.bedflying:
-                description: Allow a player to fly by sending fake bed leaving packets (and only cancelling his fall damages)
-              nocheatplus.checks.moving.nofall:
-                description: Allow a player to cheat and not take fall damage at all
-              nocheatplus.checks.moving.swimming:
-                description: Allow a player to move through water without slowdown
-              nocheatplus.checks.moving.sneaking:
-                description: Allow a player to sneak without slowdown
-              nocheatplus.checks.moving.blocking:
-                description: Allow a player to block without slowdown
-              nocheatplus.checks.moving.cobweb:
-                description: Allow a player to move without slowdown while being into cobweb
-              nocheatplus.checks.moving.morepackets:
-                description: Allow a player to send more move-event-packets than normal, causing him to move faster than normal
-              nocheatplus.checks.moving.morepacketsvehicle:
-                description: Allow a player to send more vehicule-move-event-packets than normal, causing him to move faster than normal
-              nocheatplus.checks.moving.waterwalk:
-                description: Allow a player to walk on the water
-              nocheatplus.checks.moving.respawntrick:
-                description: Allow a player to respawn on top if blocked by gravel or sand (instead of removing the blocks)
-              nocheatplus.checks.moving.boatonground:
-                description: Allow a player to place a boat on the ground (not only on the water)
-          nocheatplus.mods:
-            description: Allow the player to use all the client mods
-            children:
-              nocheatplus.mods.cjb:
-                description: Allow the player to use all CJB's cheats
+            nocheatplus.admin:
+                description: Give the player all administation rights.
                 children:
-                  nocheatplus.mods.cjb.fly:
-                    description: Allow the player to use CJB's fly mod
-                  nocheatplus.mods.cjb.xray:
-                    description: Allow the player to use CJB's xray
-                  nocheatplus.mods.cjb.radar:
-                    description: Allow the player to use CJB's radar
-              nocheatplus.mods.minecraftautomap:
-                description: Allow the player to use all Minecraft AutoMap's cheats
+                    nocheatplus.admin.notify:
+                        description: Allow the player to see the alerts in the ingame chat.
+                    nocheatplus.admin.plugins:
+                        description: Allow the player to see the list of all plugins (/plugins).
+                    nocheatplus.admin.reload:
+                        description: Allow the player to reload NoCheatPlus configuration.
+            nocheatplus.checks:
+                description: Allow the player to bypass all checks.
                 children:
-                  nocheatplus.mods.minecraftautomap.ores:
-                    description: Allow the player to use Minecraft AutoMap's ores detector
-                  nocheatplus.mods.minecraftautomap.cave:
-                    description: Allow the player to use Minecraft AutoMap's cave mode
-                  nocheatplus.mods.minecraftautomap.radar:
-                    description: Allow the player to use Minecraft AutoMap's radar
-              nocheatplus.mods.rei:
-                description: Allow the player to use all Rei's Minimap's cheats
+                    nocheatplus.checks.blockbreak:
+                        description: Allow the player to bypass all BlockBreak checks.
+                        children:
+                            nocheatplus.checks.blockbreak.direction:
+                                description: Allow the player to bypass to Direction check.
+                            nocheatplus.checks.blockbreak.fastbreak:
+                                description: Allow the player to bypass the FastBreak check.
+                            nocheatplus.checks.blockbreak.noswing:
+                                description: Allow the player to bypass the NoSwing check.
+                            nocheatplus.checks.blockbreak.reach:
+                                description: Allow the player to bypass the Reach check.
+                    nocheatplus.checks.blockinteract:
+                        description: Allow the player to bypass all BlockInteract checks.
+                        children:
+                            nocheatplus.checks.blockinteract.direction:
+                                description: Allow the player to bypass to Direction check.
+                            nocheatplus.checks.blockinteract.reach:
+                                description: Allow the player to bypass the Reach check.
+                    nocheatplus.checks.blockplace:
+                        description: Allow the player to bypass all BlockPlace checks.
+                        children:
+                            nocheatplus.checks.blockplace.direction:
+                                description: Allow the player to bypass to Direction check.
+                            nocheatplus.checks.blockplace.fastplace:
+                                description: Allow the player to bypass the FastPlace check.
+                            nocheatplus.checks.blockplace.noswing:
+                                description: Allow the player to bypass the NoSwing check.
+                            nocheatplus.checks.blockplace.reach:
+                                description: Allow the player to bypass the Reach check.
+                            nocheatplus.checks.blockplace.speed:
+                                description: Allow the player to bypass the Speed check.
+                    nocheatplus.checks.chat:
+                        description: Allow the player to bypass all Chat checks.
+                        children:
+                            nocheatplus.checks.chat.color:
+                                description: Allow the player to bypass the Color check.
+                            nocheatplus.checks.chat.nopwnage:
+                                description: Allow the player to bypass the NoPwnage check.
+                    nocheatplus.checks.fight:
+                        description: Allow the player to bypass all Fight checks.
+                        children:
+                            nocheatplus.checks.fight.angle:
+                                description: Allow the player to bypass the Angle check.
+                            nocheatplus.checks.fight.critical:
+                                description: Allow the player to bypass the Critical check.
+                            nocheatplus.checks.fight.direction:
+                                description: Allow the player to bypass the Direction check.
+                            nocheatplus.checks.fight.godmode:
+                                description: Allow the player to bypass the GodMode check.
+                            nocheatplus.checks.fight.instantheal:
+                                description: Allow the player to bypass the InstantHeal check.
+                            nocheatplus.checks.fight.knockback:
+                                description: Allow the player to bypass the Knockback check.
+                            nocheatplus.checks.fight.noswing:
+                                description: Allow the player to bypass the NoSwing check.
+                            nocheatplus.checks.fight.reach:
+                                description: Allow the player to bypass the Reach check.
+                            nocheatplus.checks.fight.speed:
+                                description: Allow the player to bypass the Speed check.
+                    nocheatplus.checks.inventory:
+                        description: Allow the player to bypass all Inventory checks.
+                        children:
+                            nocheatplus.checks.inventory.drop:
+                                description: Allow the player to bypass the Drop check.
+                            nocheatplus.checks.inventory.instantbow:
+                                description: Allow the player to bypass the InstantBow check.
+                            nocheatplus.checks.inventory.instanteat:
+                                description: Allow the player to bypass the InstantEat check.
+                    nocheatplus.checks.moving:
+                        description: Allow the player to bypass all Moving checks.
+                        children:
+                            nocheatplus.checks.moving.boatsanywhere:
+                                description: Allow the player to place boats on the ground.
+                            nocheatplus.checks.moving.creativefly:
+                                description: Allow the player to bypass the CreativeFly check.
+                            nocheatplus.checks.moving.morepackets:
+                                description: Allow the player to bypass the MorePackets check.
+                            nocheatplus.checks.moving.morepacketsvehicle:
+                                description: Allow the player to bypass the MorePacketsVehicle check.
+                            nocheatplus.checks.moving.nofall:
+                                description: Allow the player to bypass the NoFall check.
+                            nocheatplus.checks.moving.survivalfly:
+                                description: Allow the player to bypass the SurvivalFly check.
+                                children:
+                                    nocheatplus.checks.moving.survivalfly.blocking:
+                                        description: Allow the player to move without speed limits and to attack entities while blocking.
+                                    nocheatplus.checks.moving.survivalfly.sneaking:
+                                        description: Allow the player to move without speed limits while sneaking.
+                                    nocheatplus.checks.moving.survivalfly.sprinting:
+                                        description: Allow the player to sprint backwards.
+            nocheatplus.mods:
+                description: Allow the player to use all the client mods.
                 children:
-                  nocheatplus.mods.rei.cave:
-                    description: Allow the player to use Rei's cave mode
-                  nocheatplus.mods.rei.radar:
-                    description: Allow the player to use Rei's radar
-              nocheatplus.mods.smartmoving:
-                description: Allow the player to use all Smart Moving's moves
-                children:
-                  nocheatplus.mods.smartmoving.climbing:
-                    description: Allow the player to use Smart Moving's climb
-                  nocheatplus.mods.smartmoving.swimming:
-                    description: Allow the player to use Smart Moving's swim
-                  nocheatplus.mods.smartmoving.crawling:
-                    description: Allow the player to use Smart Moving's crawl
-                  nocheatplus.mods.smartmoving.sliding:
-                    description: Allow the player to use Smart Moving's slide
-                  nocheatplus.mods.smartmoving.jumping:
-                    description: Allow the player to use Smart Moving's jump
-                  nocheatplus.mods.smartmoving.flying:
-                    description: Allow the player to use Smart Moving's fly
-              nocheatplus.mods.zombe:
-                description: Allow the player to use all Zombe's cheats
-                children:
-                  nocheatplus.mods.zombe.fly:
-                    description: Allow the player to use Zombe's fly mod
-                  nocheatplus.mods.zombe.noclip:
-                    description: Allow the player to use Zombe's noclip
-                  nocheatplus.mods.zombe.cheat:
-                    description: Allow the player to use Zombe's cheat
+                    nocheatplus.mods.cjb:
+                        description: Allow the player to use the CJB mod.
+                        children:
+                            nocheatplus.mods.cjb.fly:
+                                description: Allow the player to use CJB's fly mod.
+                            nocheatplus.mods.cjb.radar:
+                                description: Allow the player to use CJB's radar.
+                            nocheatplus.mods.cjb.xray:
+                                description: Allow the player to use CJB's xray.
+                    nocheatplus.mods.minecraftautomap:
+                        description: Allow the player to use the Minecraft AutoMap mod.
+                        children:
+                            nocheatplus.mods.minecraftautomap.cave:
+                                description: Allow the player to use Minecraft AutoMap's cave mode.
+                            nocheatplus.mods.minecraftautomap.ores:
+                                description: Allow the player to use Minecraft AutoMap's ores detector.
+                            nocheatplus.mods.minecraftautomap.radar:
+                                description: Allow the player to use Minecraft AutoMap's radar.
+                    nocheatplus.mods.rei:
+                        description: Allow the player to use the Rei's Minimap mod.
+                        children:
+                            nocheatplus.mods.rei.cave:
+                                description: Allow the player to use Rei's Minimap cave mode.
+                            nocheatplus.mods.rei.radar:
+                                description: Allow the player to use Rei's Minimap radar.
+                    nocheatplus.mods.smartmoving:
+                        description: Allow the player to use the Smart Moving mod.
+                        children:
+                            nocheatplus.mods.smartmoving.climbing:
+                                description: Allow the player to use Smart Moving's climbing movement.
+                            nocheatplus.mods.smartmoving.crawling:
+                                description: Allow the player to use Smart Moving's crawling movement.
+                            nocheatplus.mods.smartmoving.flying:
+                                description: Allow the player to use Smart Moving's flying movement.
+                            nocheatplus.mods.smartmoving.jumping:
+                                description: Allow the player to use Smart Moving's jumping movement.
+                            nocheatplus.mods.smartmoving.sliding:
+                                description: Allow the player to use Smart Moving's sliding movement.
+                            nocheatplus.mods.smartmoving.swimming:
+                                description: Allow the player to use Smart Moving's swimming movement.
+                    nocheatplus.mods.zombe:
+                        description: Allow the player to use the Zombe mod.
+                        children:                        
+                            nocheatplus.mods.zombe.cheat:
+                                description: Allow the player to use Zombe's cheat.
+                            nocheatplus.mods.zombe.fly:
+                                description: Allow the player to use Zombe's fly mod.
+                            nocheatplus.mods.zombe.noclip:
+                                description: Allow the player to use Zombe's noclip.

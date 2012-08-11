@@ -287,10 +287,9 @@ public class SurvivalFly extends Check {
 
             if (data.survivalFlyLastDistances[0] < data.survivalFlyLastDistances[1]
                     && vDistance > data.survivalFlyLastDistances[0] && data.survivalFlyJumpPhase >= 7
-                    && data.survivalFlyJumpPhase <= 8) {
+                    && data.survivalFlyJumpPhase <= 8)
                 data.survivalFlyJumpPhase = 0;
-                data.noFallDistance = 0f;
-            } else if (vDistance <= 0D)
+            else if (vDistance <= 0D)
                 data.survivalFlyJumpPhase = 0;
 
             data.survivalFlyLastDistances[1] = data.survivalFlyLastDistances[0];

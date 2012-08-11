@@ -101,64 +101,46 @@ public abstract class Check {
     public Check(final CheckType type) {
         this.type = type;
     }
-    
-    /**
-     * Execute actions in a thread safe manner.<br>
-     * @param player
-     * @param VL
-     * @param actions
-     * @return
-     */
-    public boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions, final String bypassPermission){
-    	// Sync it into the main thread by using an event.
-    	return executeActionsThreadSafe(new ViolationData(this, player, VL, actions, bypassPermission));
-    }
-    
-    /**
-     * Execute actions in a thread safe manner.<br>
-     * @param violationData
-     * @return
-     */
-    public boolean executeActionsThreadSafe(final ViolationData violationData){
-    	final ExecuteActionsEvent event = new ExecuteActionsEvent(violationData);
-    	Bukkit.getPluginManager().callEvent(event);
-    	return event.getCancel();
-    }
-    		
-    
+
     /**
      * Convenience method.
+     * 
      * @param player
+     *            the player
      * @param VL
+     *            the vL
      * @param actions
-     * @return
+     *            the actions
+     * @return true, if the event should be cancelled
      */
-    protected boolean executeActions(final Player player, final double VL, final ActionList actions){
-    	return executeActions(new ViolationData(this, player, VL, actions));
+    protected boolean executeActions(final Player player, final double VL, final ActionList actions) {
+        return executeActions(new ViolationData(this, player, VL, actions));
     }
 
     /**
      * Execute some actions for the specified player.
      * 
-     * @param player
-     *            the player
-     * @return true, if successful
+     * @param violationData
+     *            the violation data
+     * @return true, if the event should be cancelled
      */
     protected boolean executeActions(final ViolationData violationData) {
         try {
             boolean special = false;
             final Player player = violationData.player;
-            
+
             // Check a bypass permission:
-            if (violationData.bypassPermission != null){
-            	if (player.hasPermission(violationData.bypassPermission)) return false;
-            }
-            
-//            final Object configFactory = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null, player);
-//            final Object dataFactory = type.getData().getDeclaredMethod("getData", Player.class).invoke(null, player);
-//            final ActionList actionList = (ActionList) type.getConfig().getDeclaredField(type.getName() + "Actions")
-//                    .get(configFactory);
-            
+            if (violationData.bypassPermission != null)
+                if (player.hasPermission(violationData.bypassPermission))
+                    return false;
+
+            // final Object configFactory = type.getConfig().getDeclaredMethod("getConfig", Player.class).invoke(null,
+            // player);
+            // final Object dataFactory = type.getData().getDeclaredMethod("getData", Player.class).invoke(null,
+            // player);
+            // final ActionList actionList = (ActionList) type.getConfig().getDeclaredField(type.getName() + "Actions")
+            // .get(configFactory);
+
             final ActionList actionList = violationData.actions;
             final double violationLevel = violationData.VL;
 
@@ -176,9 +158,9 @@ public abstract class Check {
                 if (getHistory(player).executeAction(violationData.check.type.getName(), ac, time))
                     // The execution history said it really is time to execute the action, find out what it is and do
                     // what is needed.
-                	
-                	// TODO: Check design: maybe ac.execute(this) without the instance checks ?
-                	
+
+                    // TODO: Check design: maybe ac.execute(this) without the instance checks ?
+
                     if (ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent))
                         executeLogAction((LogAction) ac, violationData.check, violationData);
                     else if (ac instanceof CancelAction)
@@ -197,14 +179,46 @@ public abstract class Check {
     }
 
     /**
+     * Execute actions in a thread safe manner.
+     * 
+     * @param player
+     *            the player
+     * @param VL
+     *            the vL
+     * @param actions
+     *            the actions
+     * @param bypassPermission
+     *            the bypass permission
+     * @return true, if the event should be cancelled
+     */
+    public boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions,
+            final String bypassPermission) {
+        // Sync it into the main thread by using an event.
+        return executeActionsThreadSafe(new ViolationData(this, player, VL, actions, bypassPermission));
+    }
+
+    /**
+     * Execute actions in a thread safe manner.
+     * 
+     * @param violationData
+     *            the violation data
+     * @return true, if if the event should be cancelled
+     */
+    public boolean executeActionsThreadSafe(final ViolationData violationData) {
+        final ExecuteActionsEvent event = new ExecuteActionsEvent(violationData);
+        Bukkit.getPluginManager().callEvent(event);
+        return event.getCancel();
+    }
+
+    /**
      * Execute a console command.
      * 
      * @param action
      *            the action
      * @param check
      *            the check
-     * @param player
-     *            the player
+     * @param violationData
+     *            the violation data
      */
     private void executeConsoleCommand(final CommandAction action, final Check check, final ViolationData violationData) {
         final String command = action.getCommand(check, violationData);
@@ -226,8 +240,8 @@ public abstract class Check {
      *            the log action
      * @param check
      *            the check
-     * @param player
-     *            the player
+     * @param violationData
+     *            the violation data
      */
     private void executeLogAction(final LogAction logAction, final Check check, final ViolationData violationData) {
         final ConfigFile configurationFile = ConfigManager.getConfigFile();
@@ -254,8 +268,8 @@ public abstract class Check {
      * 
      * @param wildcard
      *            the wildcard
-     * @param player
-     *            the player
+     * @param violationData
+     *            the violation data
      * @return the parameter
      */
     public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
@@ -280,7 +294,7 @@ public abstract class Check {
      * 
      * @param player
      *            the player
-     * @return true, if is enabled
+     * @return true, if the check is enabled
      */
     public boolean isEnabled(final Player player) {
         try {

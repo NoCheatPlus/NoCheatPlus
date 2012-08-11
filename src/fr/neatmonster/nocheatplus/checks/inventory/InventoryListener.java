@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -31,10 +32,18 @@ import org.bukkit.event.player.PlayerInteractEvent;
  */
 /**
  * Central location to listen to events that are relevant for the inventory checks.
+ * 
+ * @see InventoryEvent
  */
 public class InventoryListener implements Listener {
+
+    /** The drop check. */
     private final Drop       drop       = new Drop();
+
+    /** The instant bow check. */
     private final InstantBow instantBow = new InstantBow();
+
+    /** The instant eat check. */
     private final InstantEat instantEat = new InstantEat();
 
     /**

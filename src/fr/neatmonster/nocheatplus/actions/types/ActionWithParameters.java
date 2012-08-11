@@ -54,10 +54,10 @@ public abstract class ActionWithParameters extends Action {
     /**
      * Get a string with all the wildcards replaced with dataFactory from LogData.
      * 
-     * @param player
-     *            the player
      * @param check
      *            the check
+     * @param violationData
+     *            the violation data
      * @return the message
      */
     protected String getMessage(final Check check, final ViolationData violationData) {

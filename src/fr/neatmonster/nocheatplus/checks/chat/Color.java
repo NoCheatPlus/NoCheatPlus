@@ -34,18 +34,22 @@ public class Color extends Check {
      *            the player
      * @param message
      *            the message
+     * @param isMainThread
+     *            is the thread the main thread
      * @return the string
      */
     public String check(final Player player, final String message, final boolean isMainThread) {
-    	
-    	if (isMainThread && !isEnabled(player)) return message;
-    	
-    	final ChatConfig cc = ChatConfig.getConfig(player);
-    	
-    	if (!isMainThread && !cc.isEnabled(this.type)) return message; // Leave out the permission check.
-    	
+        if (isMainThread && !isEnabled(player))
+            return message;
+
+        final ChatConfig cc = ChatConfig.getConfig(player);
+        if (!isMainThread && !cc.isEnabled(type))
+            // Leave out the permission check.
+            return message;
+
         final ChatData data = ChatData.getData(player);
-        synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
+        // Keep related to ChatData/NoPwnage/Color used lock.
+        synchronized (data) {
             // If the message contains colors...
             if (message.contains("\247")) {
                 // Increment the violation level of the player.
@@ -61,8 +65,24 @@ public class Color extends Check {
         return message;
     }
 
-	private boolean executeActionsThreadSafe(Player player, double VL, ActionList actions, boolean isMainThread) {
-		if (isMainThread) return super.executeActions(player, VL, actions);
-		else return super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
-	}
+    /**
+     * Execute actions thread safe.
+     * 
+     * @param player
+     *            the player
+     * @param VL
+     *            the vL
+     * @param actions
+     *            the actions
+     * @param isMainThread
+     *            is the thread the main thread
+     * @return true, if successful
+     */
+    private boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions,
+            final boolean isMainThread) {
+        if (isMainThread)
+            return super.executeActions(player, VL, actions);
+        else
+            return super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
+    }
 }

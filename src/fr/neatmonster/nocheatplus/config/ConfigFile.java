@@ -24,6 +24,8 @@ import fr.neatmonster.nocheatplus.actions.types.ActionList;
  * A special configuration class created to handle the loading/saving of actions lists.
  */
 public class ConfigFile extends YamlConfiguration {
+
+    /** The factory. */
     private ActionFactory factory;
 
     /**

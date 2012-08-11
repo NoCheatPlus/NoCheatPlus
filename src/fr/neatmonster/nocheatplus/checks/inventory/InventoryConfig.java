@@ -38,13 +38,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * doesn't get it's own, it will use the "global" version.
  */
 public class InventoryConfig implements CheckConfig {
-	
-	public static final CheckConfigFactory factory = new CheckConfigFactory(){
-		@Override
-		public final CheckConfig getConfig(final Player player) {
-			return InventoryConfig.getConfig(player);
-		}
-	};
+
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory      factory   = new CheckConfigFactory() {
+                                                              @Override
+                                                              public final CheckConfig getConfig(final Player player) {
+                                                                  return InventoryConfig.getConfig(player);
+                                                              }
+                                                          };
 
     /** The map containing the configurations per world. */
     private static Map<String, InventoryConfig> worldsMap = new HashMap<String, InventoryConfig>();
@@ -84,8 +85,8 @@ public class InventoryConfig implements CheckConfig {
     /**
      * Instantiates a new inventory configuration.
      * 
-     * @param dataFactory
-     *            the dataFactory
+     * @param data
+     *            the data
      */
     public InventoryConfig(final ConfigFile data) {
         dropCheck = data.getBoolean(ConfPaths.INVENTORY_DROP_CHECK);
@@ -102,19 +103,21 @@ public class InventoryConfig implements CheckConfig {
                 .getActionList(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, Permissions.INVENTORY_INSTANTEAT);
     }
 
-	@Override
-	public final boolean isEnabled(final CheckType checkType) {
-		switch(checkType){
-		case INVENTORY_DROP:
-			return dropCheck;
-		case INVENTORY_INSTANTBOW:
-			return instantBowCheck;
-		case INVENTORY_INSTANTEAT:
-			return instantEatCheck;
-		default:
-			return true;
-		}
-	}
-    
-    
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     */
+    @Override
+    public final boolean isEnabled(final CheckType checkType) {
+        switch (checkType) {
+        case INVENTORY_DROP:
+            return dropCheck;
+        case INVENTORY_INSTANTBOW:
+            return instantBowCheck;
+        case INVENTORY_INSTANTEAT:
+            return instantEatCheck;
+        default:
+            return true;
+        }
+    }
+
 }

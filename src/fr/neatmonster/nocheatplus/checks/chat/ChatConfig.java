@@ -28,25 +28,26 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the "chat" checks. Every world gets one of these assigned to it, or if a world doesn't
  * get it's own, it will use the "global" version.
  */
-public class ChatConfig implements CheckConfig{
-	
-	public static final CheckConfigFactory factory = new CheckConfigFactory(){
-		@Override
-		public final CheckConfig getConfig(final Player player) {
-			return ChatConfig.getConfig(player);
-		}
-	};
+public class ChatConfig implements CheckConfig {
+
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory factory   = new CheckConfigFactory() {
+                                                         @Override
+                                                         public final CheckConfig getConfig(final Player player) {
+                                                             return ChatConfig.getConfig(player);
+                                                         }
+                                                     };
 
     /** The map containing the configurations per world. */
     private static Map<String, ChatConfig> worldsMap = new HashMap<String, ChatConfig>();
-    
+
     /**
      * Clear all the configurations.
      */
     public static void clear() {
-    	synchronized (worldsMap) {
-    		worldsMap.clear();
-    	}
+        synchronized (worldsMap) {
+            worldsMap.clear();
+        }
     }
 
     /**
@@ -57,12 +58,12 @@ public class ChatConfig implements CheckConfig{
      * @return the configuration
      */
     public static ChatConfig getConfig(final Player player) {
-    	synchronized (worldsMap) {
-    		if (!worldsMap.containsKey(player.getWorld().getName()))
+        synchronized (worldsMap) {
+            if (!worldsMap.containsKey(player.getWorld().getName()))
                 worldsMap.put(player.getWorld().getName(),
                         new ChatConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
             return worldsMap.get(player.getWorld().getName());
-		}
+        }
     }
 
     public final boolean    colorCheck;
@@ -127,8 +128,8 @@ public class ChatConfig implements CheckConfig{
     /**
      * Instantiates a new chat configuration.
      * 
-     * @param dataFactory
-     *            the dataFactory
+     * @param data
+     *            the data
      */
     public ChatConfig(final ConfigFile data) {
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
@@ -191,15 +192,18 @@ public class ChatConfig implements CheckConfig{
         protectPlugins = data.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
     }
 
-	@Override
-	public boolean isEnabled(CheckType checkType) {
-		switch(checkType){
-		case CHAT_COLOR:
-			return colorCheck;
-		case CHAT_NOPWNAGE:
-			return noPwnageCheck;
-		default:
-			return true;
-		}
-	}
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     */
+    @Override
+    public boolean isEnabled(final CheckType checkType) {
+        switch (checkType) {
+        case CHAT_COLOR:
+            return colorCheck;
+        case CHAT_NOPWNAGE:
+            return noPwnageCheck;
+        default:
+            return true;
+        }
+    }
 }

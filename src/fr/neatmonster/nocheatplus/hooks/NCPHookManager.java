@@ -102,7 +102,7 @@ public final class NCPHookManager {
     }
 
     /**
-     * Add hook to the hooksByChecks mappings.<br> 
+     * Add hook to the hooksByChecks mappings.<br>
      * Assumes that the hook already has been registered in the allHooks map.
      * 
      * @param checkType
@@ -111,42 +111,39 @@ public final class NCPHookManager {
      *            the hook
      */
     private static void addToMappings(final CheckType checkType, final NCPHook hook) {
-    	if (checkType == CheckType.ALL){
-    		for (final CheckType refType : CheckType.values()){
-    			addToMapping(refType, hook);
-    		}
-    		return;
-    	}
+        if (checkType == CheckType.ALL) {
+            for (final CheckType refType : CheckType.values())
+                addToMapping(refType, hook);
+            return;
+        }
         addToMapping(checkType, hook);
-        for (final CheckType refType : CheckType.values()){
-			addToMappingsRecursively(checkType, refType, hook);
-		}
+        for (final CheckType refType : CheckType.values())
+            addToMappingsRecursively(checkType, refType, hook);
     }
-    
+
     /**
      * Add to mappings if checkType is a parent in the tree structure leading to refType.
+     * 
      * @param checkType
      * @param refType
      * @param hook
-     * @return If the 
+     * @return If the
      */
-    private static boolean addToMappingsRecursively(final CheckType checkType, final CheckType refType, final NCPHook hook) {
-    	if (refType.group == null) 
-    		return false;
-    	else if (refType.group == checkType){
-			addToMapping(refType, hook);
-			return true;
-		}
-    	else {
-    		if (addToMappingsRecursively(checkType, refType.group, hook)){
-    			addToMapping(refType, hook);
-    			return true;
-    		}
-    		else return false;
-    	}	
-	}
+    private static boolean addToMappingsRecursively(final CheckType checkType, final CheckType refType,
+            final NCPHook hook) {
+        if (refType.group == null)
+            return false;
+        else if (refType.group == checkType) {
+            addToMapping(refType, hook);
+            return true;
+        } else if (addToMappingsRecursively(checkType, refType.group, hook)) {
+            addToMapping(refType, hook);
+            return true;
+        } else
+            return false;
+    }
 
-	/**
+    /**
      * Call the hooks for the specified check type and player.
      * 
      * @param checkType
@@ -408,8 +405,8 @@ public final class NCPHookManager {
      */
     public static final boolean shouldCancelVLProcessing(final CheckType checkType, final Player player) {
         // Checks for hooks registered for this event, parent groups or ALL will be inserted into the list.
-        // Return true as soon as one hook returns true. 
-    	
+        // Return true as soon as one hook returns true.
+
         // Test hooks, if present:
         final List<NCPHook> hooksCheck = hooksByChecks.get(checkType);
         if (hooksCheck != null)

@@ -51,11 +51,38 @@ public class NoPwnage extends Check {
     public NoPwnage() {
         super(CheckType.CHAT_NOPWNAGE);
 
-        for (final Player player : Bukkit.getOnlinePlayers()){
-        	final ChatData data = ChatData.getData(player);
-        	synchronized(data){
-        		data.noPwnageLastLocation = player.getLocation();
-        	}
+        for (final Player player : Bukkit.getOnlinePlayers()) {
+            final ChatData data = ChatData.getData(player);
+            synchronized (data) {
+                data.noPwnageLastLocation = player.getLocation();
+            }
+        }
+    }
+
+    /**
+     * Checks a player (chat).
+     * 
+     * @param player
+     *            the player
+     * @param event
+     *            the event
+     * @param isMainThread
+     *            is the thread the main thread
+     * @return true, if successful
+     */
+    public boolean check(final Player player, final PlayerEvent event, final boolean isMainThread) {
+        if (isMainThread && !isEnabled(player))
+            return false;
+
+        final ChatConfig cc = ChatConfig.getConfig(player);
+        final ChatData data = ChatData.getData(player);
+
+        if (!isMainThread && !cc.isEnabled(type))
+            return false;
+
+        // Keep related to ChatData/NoPwnage/Color used lock.
+        synchronized (data) {
+            return unsafeCheck(player, event, isMainThread, cc, data);
         }
     }
 
@@ -69,86 +96,74 @@ public class NoPwnage extends Check {
      * @return true, if successful
      */
     public boolean checkLogin(final Player player) {
-    
-    	if (!isEnabled(player)) return false;
-    	
+        if (!isEnabled(player))
+            return false;
+
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
-        
-        synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
-        	return unsafeLoginCheck(player, cc, data);
+
+        // Keep related to ChatData/NoPwnage/Color used lock.
+        synchronized (data) {
+            return unsafeLoginCheck(player, cc, data);
         }
     }
 
     /**
-     * Check (Join), only call from synchronized code. 
+     * Execute actions from another thread (not the main thread).<br>
+     * This does not use extra synchronization.
+     * 
      * @param player
-     * @param cc
-     * @param dataFactory
-     * @return
+     *            the player
+     * @param VL
+     *            the vL
+     * @param actions
+     *            the actions
+     * @param isMainThread
+     *            if the thread the main thread
+     * @return true, if successful
      */
-    private boolean unsafeLoginCheck(final Player player, final ChatConfig cc, final ChatData data) {
-    	 boolean cancel = false;
+    public final boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions,
+            final boolean isMainThread) {
+        final boolean cancel;
+        if (isMainThread)
+            cancel = super.executeActions(player, VL, actions);
+        else
+            // Permission check is done in the main thread.
+            cancel = super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
+        if (cancel)
+            ChatData.getData(player).clearNoPwnageData();
+        return cancel;
+    }
 
-         final long now = System.currentTimeMillis();
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
+     */
+    @Override
+    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
+        if (wildcard == ParameterName.IP)
+            return violationData.player.getAddress().toString().substring(1).split(":")[0];
+        else
+            return super.getParameter(wildcard, violationData);
+    }
 
-         // NoPwnage will remember the time when a player leaves the server. If he returns within "time" milliseconds, he
-         // will get warned. If he has been warned "warnings" times already, the "commands" will be executed for him.
-         // Warnings get removed if the time of the last warning was more than "timeout" milliseconds ago.
-         if (cc.noPwnageReloginCheck && now - data.noPwnageLeaveTime < cc.noPwnageReloginTimeout) {
-             if (now - data.noPwnageReloginWarningTime > cc.noPwnageReloginWarningTimeout)
-                 data.noPwnageReloginWarnings = 0;
-             if (data.noPwnageReloginWarnings < cc.noPwnageReloginWarningNumber) {
-                 player.sendMessage(replaceColors(cc.noPwnageReloginWarningMessage));
-                 data.noPwnageReloginWarningTime = now;
-                 data.noPwnageReloginWarnings++;
-             } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
-                 // Find out if we need to ban the player or not.
-            	 // TODO: extra actions / VL ?
-                 cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, true);
-         }
-
-         // Store his location and some other dataFactory.
-         data.noPwnageLastLocation = player.getLocation();
-         data.noPwnageJoinTime = now;
-
-         return cancel;
-	}
-
-	/**
-     * Checks a player (chat).
+    /**
+     * Only to be called form synchronized code.
      * 
      * @param player
      *            the player
      * @param event
      *            the event
+     * @param isMainThread
+     *            is the thread the main thread
+     * @param cc
+     *            the configuration
+     * @param data
+     *            the data
      * @return true, if successful
      */
-    public boolean check(final Player player, final PlayerEvent event, final boolean isMainThread) {
-    	
-    	if (isMainThread && !isEnabled(player)) return false;
-    	
-        final ChatConfig cc = ChatConfig.getConfig(player);
-        final ChatData data = ChatData.getData(player);
-        
-        if (!isMainThread && !cc.isEnabled(this.type)) return false;
-        
-        synchronized(data){ // [keep related to ChatData/NoPwnage/Color used lock.]
-        	return unsafeCheck(player, event, isMainThread, cc, data);
-        }
-    }
-    
-    /**
-     * Only to be called form synchronized code.
-     * @param player
-     * @param event
-     * @param isMainThread
-     * @param cc
-     * @param dataFactory
-     * @return
-     */
-    private boolean  unsafeCheck(final Player player, final PlayerEvent event, final boolean isMainThread, final ChatConfig cc, final ChatData data) {
-    	data.noPwnageVL = 0D;
+    private boolean unsafeCheck(final Player player, final PlayerEvent event, final boolean isMainThread,
+            final ChatConfig cc, final ChatData data) {
+        data.noPwnageVL = 0D;
 
         boolean cancel = false;
 
@@ -172,7 +187,7 @@ public class NoPwnage extends Check {
                     // Does he failed too much times?
                     if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
                         // Find out if we need to ban the player or not.
-                    	// TODO: Extra captcha actions / VL ?
+                        // TODO: extra captcha actions / VL ?
                         cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
 
                     // Increment his tries number counter.
@@ -281,36 +296,45 @@ public class NoPwnage extends Check {
         }
 
         return cancel;
-	}
-    
+    }
+
     /**
-     * Execute actions from another thread (not the main thread).<br>
-     * This does not use extra synchronization.
+     * Check (Join), only call from synchronized code.
+     * 
      * @param player
-     * @param actions 
-     * @param VL 
-     * @return
+     *            the player
+     * @param cc
+     *            the cc
+     * @param data
+     *            the data
+     * @return true, if successful
      */
-    public final boolean executeActionsThreadSafe(final Player player, double VL, ActionList actions, boolean isMainThread){
-    	final boolean cancel;
-    	if (isMainThread) cancel = super.executeActions(player, VL, actions);
-    	else{
-    		// Permission check is done in the main thread (!). 
-    		cancel = super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
-    	}
-        if (cancel) ChatData.getData(player).clearNoPwnageData();
+    private boolean unsafeLoginCheck(final Player player, final ChatConfig cc, final ChatData data) {
+        boolean cancel = false;
+
+        final long now = System.currentTimeMillis();
+
+        // NoPwnage will remember the time when a player leaves the server. If he returns within "time" milliseconds, he
+        // will get warned. If he has been warned "warnings" times already, the "commands" will be executed for him.
+        // Warnings get removed if the time of the last warning was more than "timeout" milliseconds ago.
+        if (cc.noPwnageReloginCheck && now - data.noPwnageLeaveTime < cc.noPwnageReloginTimeout) {
+            if (now - data.noPwnageReloginWarningTime > cc.noPwnageReloginWarningTimeout)
+                data.noPwnageReloginWarnings = 0;
+            if (data.noPwnageReloginWarnings < cc.noPwnageReloginWarningNumber) {
+                player.sendMessage(replaceColors(cc.noPwnageReloginWarningMessage));
+                data.noPwnageReloginWarningTime = now;
+                data.noPwnageReloginWarnings++;
+            } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
+                // Find out if we need to ban the player or not.
+                // TODO: extra actions / VL ?
+                cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, true);
+        }
+
+        // Store his location and some other dataFactory.
+        data.noPwnageLastLocation = player.getLocation();
+        data.noPwnageJoinTime = now;
+
         return cancel;
     }
 
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.IP)
-            return violationData.player.getAddress().toString().substring(1).split(":")[0];
-        else
-            return super.getParameter(wildcard, violationData);
-    }
-    
 }

@@ -37,13 +37,14 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * doesn't get it's own, it will use the "global" version.
  */
 public class BlockPlaceConfig implements CheckConfig {
-	
-	public static final CheckConfigFactory factory = new CheckConfigFactory(){
-		@Override
-		public final CheckConfig getConfig(final Player player) {
-			return BlockPlaceConfig.getConfig(player);
-		}
-	};
+
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory       factory   = new CheckConfigFactory() {
+                                                               @Override
+                                                               public final CheckConfig getConfig(final Player player) {
+                                                                   return BlockPlaceConfig.getConfig(player);
+                                                               }
+                                                           };
 
     /** The map containing the configurations per world. */
     private static Map<String, BlockPlaceConfig> worldsMap = new HashMap<String, BlockPlaceConfig>();
@@ -90,8 +91,8 @@ public class BlockPlaceConfig implements CheckConfig {
     /**
      * Instantiates a new block place configuration.
      * 
-     * @param dataFactory
-     *            the dataFactory
+     * @param data
+     *            the data
      */
     public BlockPlaceConfig(final ConfigFile data) {
         directionCheck = data.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
@@ -112,22 +113,25 @@ public class BlockPlaceConfig implements CheckConfig {
         speedInterval = data.getLong(ConfPaths.BLOCKPLACE_SPEED_INTERVAL);
         speedActions = data.getActionList(ConfPaths.BLOCKPLACE_SPEED_ACTIONS, Permissions.BLOCKPLACE_SPEED);
     }
-    
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     */
     @Override
-	public final boolean isEnabled(final CheckType checkType) {
-		switch(checkType){
-		case BLOCKPLACE_DIRECTION:
-			return directionCheck;
-		case BLOCKPLACE_FASTPLACE:
-			return fastPlaceCheck;
-		case BLOCKPLACE_NOSWING:
-			return noSwingCheck;
-		case BLOCKPLACE_REACH:
-			return reachCheck;
-		case BLOCKPLACE_SPEED:
-			return speedCheck;
-		default:
-			return true;
-		}
-	}
+    public final boolean isEnabled(final CheckType checkType) {
+        switch (checkType) {
+        case BLOCKPLACE_DIRECTION:
+            return directionCheck;
+        case BLOCKPLACE_FASTPLACE:
+            return fastPlaceCheck;
+        case BLOCKPLACE_NOSWING:
+            return noSwingCheck;
+        case BLOCKPLACE_REACH:
+            return reachCheck;
+        case BLOCKPLACE_SPEED:
+            return speedCheck;
+        default:
+            return true;
+        }
+    }
 }

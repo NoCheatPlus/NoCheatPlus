@@ -34,11 +34,12 @@ public enum ParameterName {
     REACH_DISTANCE("reachdistance"),
     VIOLATIONS("violations"),
     WORLD("world");
+
     /**
      * Gets the parameter associated to the text.
      * 
-     * @param s
-     *            the s
+     * @param text
+     *            the text
      * @return the parameter name
      */
     public static final ParameterName get(final String text) {

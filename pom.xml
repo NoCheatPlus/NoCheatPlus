@@ -60,7 +60,6 @@
 				<includes>
 					<include>plugin.yml</include>
 					<include>LICENSE.txt</include>
-					<include>Instructions.txt</include>
 				</includes>
 			</resource>
 		</resources>
@@ -99,14 +98,15 @@
 						<id>deploy-build</id>
 						<phase>install</phase>
 						<configuration>
-							<target>
-								<property file="auth.properties" prefix="auth" />
-								<scp todir="${auth.user}:${auth.pass}@${auth.host}:${auth.path}"
+							<target if="deploy">
+								<property file="password.properties" prefix="password" />
+								<scp
+									todir="root:${password.value}@nocheatplus.org:/home/Minecraft/plugins/"
 									file="target/NoCheatPlus.jar" sftp="yes" trust="yes"
 									failonerror="no" />
-								<sshexec host="${auth.host}" username="${auth.user}"
-									password="${auth.pass}" command="${auth.cmd}" trust="yes"
-									failonerror="no" />
+								<sshexec host="nocheatplus.org" username="root"
+									password="${password.value}" command='tmux send "reload" C-m'
+									trust="yes" failonerror="no" />
 							</target>
 						</configuration>
 						<goals>

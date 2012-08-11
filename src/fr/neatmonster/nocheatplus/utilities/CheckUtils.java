@@ -101,8 +101,6 @@ public class CheckUtils {
      * @param t
      *            the second String, must not be null
      * @return result distance
-     * @throws IllegalArgumentException
-     *             if either String input is null
      */
     private static int levenshteinDistance(CharSequence s, CharSequence t) {
         if (s == null || t == null)

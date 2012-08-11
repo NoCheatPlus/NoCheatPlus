@@ -36,14 +36,15 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the block break checks. Every world gets one of these assigned to it, or if a world
  * doesn't get it's own, it will use the "global" version.
  */
-public class BlockBreakConfig implements CheckConfig{
-	
-	public static final CheckConfigFactory factory = new CheckConfigFactory(){
-		@Override
-		public final CheckConfig getConfig(final Player player) {
-			return BlockBreakConfig.getConfig(player);
-		}
-	};
+public class BlockBreakConfig implements CheckConfig {
+
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory       factory   = new CheckConfigFactory() {
+                                                               @Override
+                                                               public final CheckConfig getConfig(final Player player) {
+                                                                   return BlockBreakConfig.getConfig(player);
+                                                               }
+                                                           };
 
     /** The map containing the configurations per world. */
     private static Map<String, BlockBreakConfig> worldsMap = new HashMap<String, BlockBreakConfig>();
@@ -87,8 +88,8 @@ public class BlockBreakConfig implements CheckConfig{
     /**
      * Instantiates a new block break configuration.
      * 
-     * @param dataFactory
-     *            the dataFactory
+     * @param data
+     *            the data
      */
     public BlockBreakConfig(final ConfigFile data) {
         directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
@@ -107,19 +108,22 @@ public class BlockBreakConfig implements CheckConfig{
         reachActions = data.getActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
     }
 
-	@Override
-	public final boolean isEnabled(final CheckType checkType) {
-		switch(checkType){
-		case BLOCKBREAK_DIRECTION:
-			return directionCheck;
-		case BLOCKBREAK_FASTBREAK:
-			return fastBreakCheck;
-		case BLOCKBREAK_NOSWING:
-			return noSwingCheck;
-		case BLOCKBREAK_REACH:
-			return reachCheck;
-		default:
-			return true;
-		}
-	}
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     */
+    @Override
+    public final boolean isEnabled(final CheckType checkType) {
+        switch (checkType) {
+        case BLOCKBREAK_DIRECTION:
+            return directionCheck;
+        case BLOCKBREAK_FASTBREAK:
+            return fastBreakCheck;
+        case BLOCKBREAK_NOSWING:
+            return noSwingCheck;
+        case BLOCKBREAK_REACH:
+            return reachCheck;
+        default:
+            return true;
+        }
+    }
 }

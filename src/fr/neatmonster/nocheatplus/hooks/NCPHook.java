@@ -36,17 +36,15 @@ public interface NCPHook {
 
     /**
      * This is called on failure of a check.<br>
-     * 
      * This is the minimal interface, it might later be extended by specific information like (target) locations and VL,
      * but with this a lot is possible already (see CNCP).<br>
-     * 
      * See AbstractNCPHook for future compatibility questions.
      * 
      * @param checkType
-     *            the check that failed.
+     *            the check that failed
      * @param player
-     *            the player that failed the check.
-     * @return if to cancel the check failure processing.
+     *            the player that failed the check
+     * @return if we need to cancel the check failure processing
      */
     public boolean onCheckFailure(CheckType checkType, Player player);
 }
