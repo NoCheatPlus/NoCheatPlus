@@ -488,12 +488,17 @@ public class MovingListener implements Listener {
 
         Location newTo = null;
         
+        // Emergency fix attempt:
+        final MovingData data = MovingData.getData(player);
+        data.clearFlyData();
+        player.setFallDistance(0.0f);
+        
         if (morePacketsVehicle.isEnabled(player))
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = morePacketsVehicle.check(player, event.getFrom(), event.getTo());
         else
             // Otherwise we need to clear his dataFactory.
-        	MovingData.getData(player).clearMorePacketsData();
+            data.clearMorePacketsData();
         
         
 
