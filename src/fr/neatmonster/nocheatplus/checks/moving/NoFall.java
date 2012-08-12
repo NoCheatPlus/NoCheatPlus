@@ -51,7 +51,8 @@ public class NoFall extends Check {
         
       	if (player.isInsideVehicle()){
       		// Emergency fix attempt:
-      		data.noFallFallDistance = 0; // Hope the vehicle move does the rest.
+      		data.clearFlyData(); // Hope the vehicle move does the rest.
+      		player.setFallDistance(0.0f);
       		return;
       	}
         
