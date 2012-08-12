@@ -86,6 +86,7 @@ public class NoFall extends Check {
                     	Bukkit.getPluginManager().callEvent(damageEvent);
                         if (!damageEvent.isCancelled()) player.damage(damageEvent.getDamage());
                 	}
+                	// Reset fall distances:
                     data.noFallFallDistance = 0.0;
                     data.noFallY = to.getY();
                     player.setFallDistance(0.0f);
@@ -154,6 +155,7 @@ public class NoFall extends Check {
         final AxisAlignedBB boundingBoxGround = player.boundingBox.clone().d(packet.x - player.locX,
                 packet.y - player.locY - 0.001D, packet.z - player.locZ);
         data.noFallOnGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
+        // make use of data.noFallY (absolute reference for falling height).
         if (packet.hasPos && data.noFallWasOnGroundServer && !data.noFallOnGroundServer){
         	data.noFallFallDistance = 0D;
         	data.noFallY = player.locY;
