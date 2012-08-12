@@ -6,7 +6,9 @@ import net.minecraft.server.AxisAlignedBB;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.Packet10Flying;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -75,8 +77,12 @@ public class NoFall extends Check {
                 // Execute the actions to find out if we need to cancel the event or not.
                 if (executeActions(player, data.noFallVL, cc.noFallActions)){
                 	// Deal the fall damages to the player.
-                	
-                    player.damage(fallDamage);
+                	// TODO: set accurate fall damage (feather falling etc).
+                	final NoFallDamageEvent damageEvent = new NoFallDamageEvent(player, DamageCause.FALL, fallDamage);
+                	Bukkit.getPluginManager().callEvent(damageEvent);
+                    if (!damageEvent.isCancelled()) player.damage(fallDamage);
+                    data.noFallFallDistance = 0.0;
+                    player.setFallDistance(0.0f);
                 }
                     
             }
@@ -85,6 +91,7 @@ public class NoFall extends Check {
         // If the player just touched the ground for the server.
         else if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer) {
             // Calculate the difference between the fall distance calculated by the server and by the plugin.
+        	// TODO: Commented out divisor, did it have significance ? Still death with 1000 blocks fall distance ...
             final double difference = (data.noFallFallDistance - player.getFallDistance());//  / data.noFallFallDistance;
 
             // If the difference is too big and the fall distance calculated by the plugin should hurt the player.
@@ -129,6 +136,8 @@ public class NoFall extends Check {
         
         // Attempt to fix vehicle problems:
         if (player.getBukkitEntity().isInsideVehicle()) return;
+        
+        // Suggestion: use reference y position in data !
         	
         data.noFallWasOnGroundClient = data.noFallOnGroundClient;
         data.noFallWasOnGroundServer = data.noFallOnGroundServer;
