@@ -487,13 +487,21 @@ public class MovingListener implements Listener {
         final Player player = (Player) event.getVehicle().getPassenger();
 
         Location newTo = null;
+        
+        // Emergency fix:
+        final MovingData data = MovingData.getData(player);
+        data.noFallFallDistance = 0;
+        data.noFallVL = 0;
+        data.noFallOnGroundClient = data.noFallOnGroundServer = data.noFallWasOnGroundClient = data.noFallWasOnGroundServer = true;
 
         if (morePacketsVehicle.isEnabled(player))
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = morePacketsVehicle.check(player, event.getFrom(), event.getTo());
         else
             // Otherwise we need to clear his dataFactory.
-            MovingData.getData(player).clearMorePacketsData();
+            data.clearMorePacketsData();
+        
+        
 
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null)
