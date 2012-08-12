@@ -7,6 +7,7 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.Packet10Flying;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
@@ -78,9 +79,11 @@ public class NoFall extends Check {
                 if (executeActions(player, data.noFallVL, cc.noFallActions)){
                 	// Deal the fall damages to the player.
                 	// TODO: set accurate fall damage (feather falling etc).
-                	final NoFallDamageEvent damageEvent = new NoFallDamageEvent(player, DamageCause.FALL, fallDamage);
-                	Bukkit.getPluginManager().callEvent(damageEvent);
-                    if (!damageEvent.isCancelled()) player.damage(fallDamage);
+                	if (player.getGameMode() != GameMode.CREATIVE){
+                		final NoFallDamageEvent damageEvent = new NoFallDamageEvent(player, DamageCause.FALL, fallDamage);
+                    	Bukkit.getPluginManager().callEvent(damageEvent);
+                        if (!damageEvent.isCancelled()) player.damage(damageEvent.getDamage());
+                	}
                     data.noFallFallDistance = 0.0;
                     player.setFallDistance(0.0f);
                 }
