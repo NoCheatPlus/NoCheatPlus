@@ -190,13 +190,14 @@ public class NoFall extends Check {
         data.noFallOnGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
         // make use of data.noFallY (absolute reference for falling height).
         if (packet.hasPos){
+        	// TODO: not 100% sure which to use as  reference...
         	if (data.noFallWasOnGroundServer && !data.noFallOnGroundServer){
              	data.noFallFallDistance = 0D;
              	data.noFallY = player.locY;
             }
-            else if (player.locY - packet.y > 0D)
-                data.noFallFallDistance = Math.max(0.0, data.noFallY - player.locY); //+= player.locY - packet.y;
-            else if (data.noFallY < player.locY) data.noFallY = player.locY;
+            else if (data.noFallY - packet.y > 0D)
+                data.noFallFallDistance = Math.max(0.0, data.noFallY - packet.y); //+= player.locY - packet.y;
+            else if (data.noFallOnGroundServer) data.noFallY = player.locY;
         }
     }
 }
