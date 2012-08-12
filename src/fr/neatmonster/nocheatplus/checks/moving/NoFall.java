@@ -55,16 +55,28 @@ public class NoFall extends Check {
       	if (player.isInsideVehicle()){
       		// Emergency fix attempt:
       		data.clearFlyData();
-      		player.setFallDistance(0.0f);
+      		data.noFallFallDistance = 0D;
       		data.noFallY = to.getY();
+      		player.setFallDistance(0.0f);
       		return;
       	}
         
         // If the player has just started falling, is falling into a liquid, in web or is on a ladder.
-        if (to.isInLiquid() || to.isInWeb() || to.isOnLadder()){
+      	if (to.isInLiquid()){
+      		// TODO: check if it is deep liquid
+      		final double dist = data.noFallY - to.getY();
+      		if (dist > 0 ){
+      			// TODO: ? different concept, at least distinguish water, lava, flowing.
+      			data.noFallY = to.getY() + dist * 0.7;
+      			data.noFallFallDistance *= 0.7;
+      		}
+      	}
+      	else if (to.isInWeb() || to.isOnLadder()){	
             // Reset his fall distance.
             data.noFallFallDistance = 0D;
             data.noFallY = to.getY();
+            player.setFallDistance(0.0f);
+            return;
         }
 
 
@@ -82,8 +94,8 @@ public class NoFall extends Check {
                 && (data.noFallWasOnGroundClient || !data.noFallOnGroundClient)) {
         	
             // Calculate the fall damages to be dealt.
-            final int fallDamage = (int) data.noFallFallDistance - 2;
-            // TODO: set accurate fall damage (feather falling etc).
+            final int fallDamage = (int) data.noFallFallDistance - 2; // Blocks - 3 ?
+            // TODO: set accurate fall damage (Boots with feather falling or protection).
             
             if (fallDamage > 0) {
                 // Add the fall distance to the violation level.
@@ -127,10 +139,9 @@ public class NoFall extends Check {
             } else
                 // Reward the player by lowering his violation level.
                 data.noFallVL *= 0.95D;
-        } else
+        } else 
             // Reward the player by lowering his violation level.
             data.noFallVL *= 0.95D;
-        
         if (data.noFallOnGroundServer){
         	data.noFallY = to.getY();
         	data.noFallFallDistance = 0.0;
@@ -161,7 +172,12 @@ public class NoFall extends Check {
         final MovingData data = MovingData.getData(player.getBukkitEntity());
         
         // Attempt to fix vehicle problems:
-        if (player.getBukkitEntity().isInsideVehicle()) return;
+        if (player.getBukkitEntity().isInsideVehicle()){
+        	// rely on vehicle-move for most.
+        	data.noFallFallDistance = 0.0;
+        	data.noFallY = player.locY;
+        	return;
+        }
         
         // Suggestion: use reference y position in data and calculate difference to that one!
         	
