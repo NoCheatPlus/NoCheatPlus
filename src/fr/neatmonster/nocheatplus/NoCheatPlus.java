@@ -129,7 +129,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      */
     @EventHandler(
             priority = EventPriority.LOWEST)
-    public void onPlayerLogin(final PlayerLoginEvent event) {
+    public void onPlayerJoinLowest(final PlayerJoinEvent event) {
     	 // Set the NetServerHandler of the player.
         setCustomNetServerHandler(event.getPlayer());
     }
