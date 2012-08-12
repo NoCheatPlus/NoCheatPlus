@@ -1,5 +1,5 @@
 name: ${project.name}
-version: ${project.pluginVersion}
+version: ${project.Version}-b${BUILD_NUMBER}
 description: ${project.description}
 
 author: NeatMonster
