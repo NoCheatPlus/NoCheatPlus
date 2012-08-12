@@ -56,15 +56,26 @@ public class NoFall extends Check {
       		// Emergency fix attempt:
       		data.clearFlyData();
       		player.setFallDistance(0.0f);
+      		data.noFallY = to.getY();
       		return;
       	}
         
         // If the player has just started falling, is falling into a liquid, in web or is on a ladder.
-        if (to.isInLiquid() || to.isInWeb() || to.isOnLadder())
+        if (to.isInLiquid() || to.isInWeb() || to.isOnLadder()){
             // Reset his fall distance.
             data.noFallFallDistance = 0D;
+            data.noFallY = to.getY();
+        }
+
 
 //        data.noFallFallDistance = data.noFallFallDistance;
+        
+        /*
+    	 * TODO: This might  actually (probably) calculated before ordinary fall damage can be dealt (!)
+    	 *       So NoCheatPlus takes over ALL fall damage dealing, currently :) -
+    	 *       This should not lead to alerts and trigger normal fall damage, probably,
+    	 *       in case it is not cheating (how to distinguish...).
+    	 */
 
         // If the player just touched the ground for the server, but no for the client.
         if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer
