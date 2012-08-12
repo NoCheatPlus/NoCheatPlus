@@ -66,9 +66,10 @@ public class NoFall extends Check {
       		// TODO: check if it is deep liquid
       		final double dist = data.noFallY - to.getY();
       		if (dist > 0 ){
-      			// TODO: ? different concept, at least distinguish water, lava, flowing.
-      			data.noFallY = to.getY() + dist * 0.7;
-      			data.noFallFallDistance *= 0.7;
+      			// TODO: ? different model, at least distinguish water, lava, flowing.
+      			final double fFLuid = 0.55;
+      			data.noFallY = to.getY() + dist *fFLuid;
+      			data.noFallFallDistance *= fFLuid;
       		}
       	}
       	else if (to.isInWeb() || to.isOnLadder()){	
