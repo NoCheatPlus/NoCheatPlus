@@ -48,13 +48,19 @@ public class NoFall extends Check {
     public void check(final Player player, final PlayerLocation from, final PlayerLocation to) {
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
-
+        
+      	if (player.isInsideVehicle()){
+      		// Emergency fix attempt:
+      		data.noFallFallDistance = 0; // Hope the vehicle move does the rest.
+      		return;
+      	}
+        
         // If the player has just started falling, is falling into a liquid, in web or is on a ladder.
         if (to.isInLiquid() || to.isInWeb() || to.isOnLadder())
             // Reset his fall distance.
             data.noFallFallDistance = 0D;
 
-        data.noFallFallDistance = data.noFallFallDistance;
+        data.noFallFallDistance = data.noFallFallDistance; // TODO: ??
 
         // If the player just touched the ground for the server, but no for the client.
         if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer

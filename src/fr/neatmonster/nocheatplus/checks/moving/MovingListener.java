@@ -488,7 +488,7 @@ public class MovingListener implements Listener {
 
         Location newTo = null;
         
-        // Emergency fix:
+        // Emergency fix attempt:
         final MovingData data = MovingData.getData(player);
         data.clearFlyData();
         player.setFallDistance(0.0f);
