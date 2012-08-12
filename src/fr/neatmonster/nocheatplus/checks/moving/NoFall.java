@@ -51,7 +51,7 @@ public class NoFall extends Check {
         
       	if (player.isInsideVehicle()){
       		// Emergency fix attempt:
-      		data.clearFlyData(); // Hope the vehicle move does the rest.
+      		data.clearFlyData();
       		player.setFallDistance(0.0f);
       		return;
       	}
@@ -123,6 +123,10 @@ public class NoFall extends Check {
      */
     public void handlePacket(final EntityPlayer player, final Packet10Flying packet) {
         final MovingData data = MovingData.getData(player.getBukkitEntity());
+        
+        // Attempt to fix vehicle problems:
+        if (player.getBukkitEntity().isInsideVehicle()) return;
+        	
         data.noFallWasOnGroundClient = data.noFallOnGroundClient;
         data.noFallWasOnGroundServer = data.noFallOnGroundServer;
         data.noFallOnGroundClient = packet.g;
