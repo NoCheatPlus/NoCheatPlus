@@ -6,7 +6,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.NetServerHandler;
 import net.minecraft.server.Packet10Flying;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
-import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
  * MM'""""'YMM                     dP                       M"""""""`YM            dP   
