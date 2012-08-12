@@ -119,6 +119,11 @@ public class NoFall extends Check {
         } else
             // Reward the player by lowering his violation level.
             data.noFallVL *= 0.95D;
+        
+        if (data.noFallOnGroundServer){
+        	data.noFallY = to.getY();
+        	data.noFallFallDistance = 0.0;
+        }
     }
 
     /* (non-Javadoc)
@@ -156,11 +161,14 @@ public class NoFall extends Check {
                 packet.y - player.locY - 0.001D, packet.z - player.locZ);
         data.noFallOnGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
         // make use of data.noFallY (absolute reference for falling height).
-        if (packet.hasPos && data.noFallWasOnGroundServer && !data.noFallOnGroundServer){
-        	data.noFallFallDistance = 0D;
-        	data.noFallY = player.locY;
+        if (packet.hasPos){
+        	if (data.noFallWasOnGroundServer && !data.noFallOnGroundServer){
+             	data.noFallFallDistance = 0D;
+             	data.noFallY = player.locY;
+            }
+            else if (player.locY - packet.y > 0D)
+                data.noFallFallDistance = Math.max(0.0, data.noFallY - player.locY); //+= player.locY - packet.y;
+            else if (data.noFallY < player.locY) data.noFallY = player.locY;
         }
-        else if (packet.hasPos && player.locY - packet.y > 0D)
-            data.noFallFallDistance = Math.max(0.0, data.noFallY - player.locY); //+= player.locY - packet.y;
     }
 }
