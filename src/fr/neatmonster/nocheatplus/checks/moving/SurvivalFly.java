@@ -82,6 +82,7 @@ public class SurvivalFly extends Check {
         // A player is considered sprinting if the flag is set and if he has enough food level.
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
 
+        // If we don't have any setBack, choose the location the player comes from.
         if (data.setBack == null)
             data.setBack = from.getLocation();
 
@@ -91,6 +92,7 @@ public class SurvivalFly extends Check {
         else if (data.survivalFlyOnIce > 0)
             data.survivalFlyOnIce--;
 
+        // Choose the right horizontal speed limit for the current activity.
         double hAllowedDistance = 0D;
         if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
             hAllowedDistance = 0.14D * cc.survivalFlySneakingSpeed / 100D;
@@ -167,15 +169,24 @@ public class SurvivalFly extends Check {
         if (jumpAmplifier > data.jumpAmplifier)
             data.jumpAmplifier = jumpAmplifier;
 
-        double vAllowedDistance = 1.35D + data.verticalFreedom;
+        // If the player has made a "double-jump" which hasn't been noticed by the plugin, the issue is fixed here.
+        if (!from.isOnGround() && to.isOnGround() && to.getY() - from.getY() > 0D && to.getY() - from.getY() <= 0.5D
+                && to.getY() - data.setBack.getY() > 0D && to.getY() - data.setBack.getY() <= 1.5D) {
+            data.setBack = to.getLocation();
+            data.survivalFlyJumpPhase = 0;
+        }
+
+        // Calculate the vertical speed limit based on the current jump phase.
+        double vAllowedDistance = (!from.isOnGround() && !to.isOnGround() ? 1.45D : 1.35D) + data.verticalFreedom;
         vAllowedDistance *= data.jumpAmplifier;
         if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
             vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
 
+        // If the player has touched the ground and this actions hasn't been noticed by the plugin, the issue is fixed
+        // here.
         final double vDistance = to.getY() - data.setBack.getY();
         if (data.survivalFlyLastDistances[0] < data.survivalFlyLastDistances[1]
-                && vDistance > data.survivalFlyLastDistances[0] && data.survivalFlyJumpPhase >= 7
-                && data.survivalFlyJumpPhase <= 8)
+                && vDistance > data.survivalFlyLastDistances[0] && vDistance > 0 && vDistance < 0.5D)
             data.survivalFlyJumpPhase = 0;
         else if (vDistance <= 0D)
             data.survivalFlyJumpPhase = 0;
@@ -183,10 +194,15 @@ public class SurvivalFly extends Check {
         data.survivalFlyLastDistances[0] = vDistance;
 
         double vDistanceAboveLimit = vDistance - vAllowedDistance;
+
+        // Fix for the issue with stairs.
         if (from.isOnStairs() || to.isOnStairs() && vDistanceAboveLimit < 0.15D) {
             data.jumpAmplifier = 0D;
+            data.noFallOnGroundClient = data.noFallOnGroundServer = true;
             vDistanceAboveLimit = 0D;
-        } else if (from.isOnGround() || to.isOnGround())
+        }
+
+        if (from.isOnGround() || to.isOnGround())
             data.jumpAmplifier = 0D;
 
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
