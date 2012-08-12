@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -121,6 +122,17 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     final void onExecuteActions(final ExecuteActionsEvent event) {
         event.executeActions();
     }
+    
+    /**
+     * Setting the net server handler at the earliest possible point.
+     * @param event
+     */
+    @EventHandler(
+            priority = EventPriority.LOWEST)
+    public void onPlayerLogin(final PlayerLoginEvent event) {
+    	 // Set the NetServerHandler of the player.
+        setCustomNetServerHandler(event.getPlayer());
+    }
 
     /**
      * This event handler is used to send all the disabling messages to the client.
@@ -132,9 +144,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-
-        // Set the NetServerHandler of the player.
-        setCustomNetServerHandler(player);
 
         // Check if we allow all the client mods.
         final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);
