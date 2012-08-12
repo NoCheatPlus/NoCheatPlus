@@ -69,8 +69,11 @@ public class NoFall extends Check {
         // If the player just touched the ground for the server, but no for the client.
         if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer
                 && (data.noFallWasOnGroundClient || !data.noFallOnGroundClient)) {
+        	
             // Calculate the fall damages to be dealt.
             final int fallDamage = (int) data.noFallFallDistance - 2;
+            // TODO: set accurate fall damage (feather falling etc).
+            
             if (fallDamage > 0) {
                 // Add the fall distance to the violation level.
                 data.noFallVL += data.noFallFallDistance;
@@ -78,7 +81,6 @@ public class NoFall extends Check {
                 // Execute the actions to find out if we need to cancel the event or not.
                 if (executeActions(player, data.noFallVL, cc.noFallActions)){
                 	// Deal the fall damages to the player.
-                	// TODO: set accurate fall damage (feather falling etc).
                 	if (player.getGameMode() != GameMode.CREATIVE){
                 		final NoFallDamageEvent damageEvent = new NoFallDamageEvent(player, DamageCause.FALL, fallDamage);
                     	Bukkit.getPluginManager().callEvent(damageEvent);
@@ -94,8 +96,9 @@ public class NoFall extends Check {
         // If the player just touched the ground for the server.
         else if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer) {
             // Calculate the difference between the fall distance calculated by the server and by the plugin.
-        	// TODO: Commented out divisor, did it have significance ? Still death with 1000 blocks fall distance ...
-            final double difference = (data.noFallFallDistance - player.getFallDistance());//  / data.noFallFallDistance;
+        	
+        	// TODO: What does the divisor do, is this experience ?
+            final double difference = (data.noFallFallDistance - player.getFallDistance()) / data.noFallFallDistance;
 
             // If the difference is too big and the fall distance calculated by the plugin should hurt the player.
             if (difference > 0.15D && (int) data.noFallFallDistance > 2) {
@@ -140,7 +143,7 @@ public class NoFall extends Check {
         // Attempt to fix vehicle problems:
         if (player.getBukkitEntity().isInsideVehicle()) return;
         
-        // Suggestion: use reference y position in data !
+        // Suggestion: use reference y position in data and calculate difference to that one!
         	
         data.noFallWasOnGroundClient = data.noFallOnGroundClient;
         data.noFallWasOnGroundServer = data.noFallOnGroundServer;
