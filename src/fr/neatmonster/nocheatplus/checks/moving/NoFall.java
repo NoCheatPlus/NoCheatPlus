@@ -87,6 +87,7 @@ public class NoFall extends Check {
                         if (!damageEvent.isCancelled()) player.damage(damageEvent.getDamage());
                 	}
                     data.noFallFallDistance = 0.0;
+                    data.noFallY = to.getY();
                     player.setFallDistance(0.0f);
                 }
                     
@@ -106,9 +107,11 @@ public class NoFall extends Check {
                 data.noFallVL += data.noFallFallDistance - player.getFallDistance();
 
                 // Execute the actions to find out if we need to cancel the event or not.
-                if (executeActions(player, data.noFallVL, cc.noFallActions))
-                    // Set the fall distance to its right value.
+                if (executeActions(player, data.noFallVL, cc.noFallActions)){
+                	// Set the fall distance to its right value.
                     player.setFallDistance((float) data.noFallFallDistance);
+                }
+                    
             } else
                 // Reward the player by lowering his violation level.
                 data.noFallVL *= 0.95D;
@@ -151,9 +154,11 @@ public class NoFall extends Check {
         final AxisAlignedBB boundingBoxGround = player.boundingBox.clone().d(packet.x - player.locX,
                 packet.y - player.locY - 0.001D, packet.z - player.locZ);
         data.noFallOnGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
-        if (packet.hasPos && data.noFallWasOnGroundServer && !data.noFallOnGroundServer)
-            data.noFallFallDistance = 0D;
+        if (packet.hasPos && data.noFallWasOnGroundServer && !data.noFallOnGroundServer){
+        	data.noFallFallDistance = 0D;
+        	data.noFallY = player.locY;
+        }
         else if (packet.hasPos && player.locY - packet.y > 0D)
-            data.noFallFallDistance += player.locY - packet.y;
+            data.noFallFallDistance = Math.max(0.0, data.noFallY - player.locY); //+= player.locY - packet.y;
     }
 }

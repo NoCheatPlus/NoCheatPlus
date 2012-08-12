@@ -88,6 +88,7 @@ public class MovingData implements CheckData {
     public boolean    noFallOnGroundServer;
     public boolean    noFallWasOnGroundClient;
     public boolean    noFallWasOnGroundServer;
+    public double     noFallY;
 
     // Data of the survival fly check.
     public int        survivalFlyJumpPhase;
