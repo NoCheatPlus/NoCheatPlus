@@ -479,30 +479,21 @@ public class MovingListener implements Listener {
          */
         // Don't care if a player isn't inside the vehicle, for movements that are very high distance or to another
         // world (such that it is very likely the event dataFactory was modified by another plugin before we got it).
-    	final Location to = event.getTo();
         if (event.getVehicle().getPassenger() == null || !(event.getVehicle().getPassenger() instanceof Player)
-                || !event.getFrom().getWorld().equals(to.getWorld())
-                || event.getFrom().distanceSquared(to) > 400D)
+                || !event.getFrom().getWorld().equals(event.getTo().getWorld())
+                || event.getFrom().distanceSquared(event.getTo()) > 400D)
             return;
 
         final Player player = (Player) event.getVehicle().getPassenger();
 
         Location newTo = null;
-        
-        // Emergency fix attempt:
-        final MovingData data = MovingData.getData(player);
-        data.clearFlyData();
-        player.setFallDistance(0.0f);
-        data.noFallY = to.getY();
-        
+
         if (morePacketsVehicle.isEnabled(player))
             // If the player is handled by the more packets vehicle check, execute it.
-            newTo = morePacketsVehicle.check(player, event.getFrom(), to);
+            newTo = morePacketsVehicle.check(player, event.getFrom(), event.getTo());
         else
             // Otherwise we need to clear his dataFactory.
-            data.clearMorePacketsData();
-        
-        
+            MovingData.getData(player).clearMorePacketsData();
 
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null)

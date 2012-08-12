@@ -49,8 +49,6 @@ public class CustomNetServerHandler extends NetServerHandler {
      */
     @Override
     public void a(final Packet10Flying packet) {
-//        if (player.getBukkitEntity().hasPermission(Permissions.MOVING_NOBUKKITCHECK))
-//            checkMovement = false;
         MovingListener.noFall.handlePacket(player, packet);
         super.a(packet);
     }

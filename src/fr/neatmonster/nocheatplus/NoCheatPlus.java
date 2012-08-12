@@ -17,7 +17,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -122,17 +121,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     final void onExecuteActions(final ExecuteActionsEvent event) {
         event.executeActions();
     }
-    
-    /**
-     * Setting the net server handler at the earliest possible point.
-     * @param event
-     */
-    @EventHandler(
-            priority = EventPriority.LOWEST)
-    public void onPlayerJoinLowest(final PlayerJoinEvent event) {
-    	 // Set the NetServerHandler of the player.
-        setCustomNetServerHandler(event.getPlayer());
-    }
 
     /**
      * This event handler is used to send all the disabling messages to the client.
@@ -222,6 +210,18 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             message = message + "§0§1§7§f§f";
 
         player.sendMessage(message);
+    }
+
+    /**
+     * Setting the net server handler at the earliest possible point.
+     * 
+     * @param event
+     */
+    @EventHandler(
+            priority = EventPriority.LOWEST)
+    public void onPlayerJoinLowest(final PlayerJoinEvent event) {
+        // Set the NetServerHandler of the player.
+        setCustomNetServerHandler(event.getPlayer());
     }
 
     private boolean setCustomNetServerHandler(final Player player) {

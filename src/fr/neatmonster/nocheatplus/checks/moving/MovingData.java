@@ -84,11 +84,11 @@ public class MovingData implements CheckData {
 
     // Data of the no fall check.
     public double     noFallFallDistance;
+    public double     noFallNewFallDistance;
     public boolean    noFallOnGroundClient;
     public boolean    noFallOnGroundServer;
     public boolean    noFallWasOnGroundClient;
     public boolean    noFallWasOnGroundServer;
-    public double     noFallY; // Absolute reference might be good with packet inspections. 
 
     // Data of the survival fly check.
     public int        survivalFlyJumpPhase;
