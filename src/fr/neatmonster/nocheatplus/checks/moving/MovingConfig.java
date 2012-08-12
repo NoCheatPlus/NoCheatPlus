@@ -78,14 +78,10 @@ public class MovingConfig implements CheckConfig {
 
     public final boolean    survivalFlyCheck;
     public final int        survivalFlyBlockingSpeed;
-    public final int        survivalFlyCobWebSpeed;
-    public final int        survivalFlyLadderSpeed;
-    public final int        survivalFlyLavaSpeed;
-    public final int        survivalFlyMoveSpeed;
     public final int        survivalFlySneakingSpeed;
-    public final int        survivalFlySoulSandSpeed;
     public final int        survivalFlySprintingSpeed;
-    public final int        survivalFlyWaterSpeed;
+    public final int        survivalFlySwimmingSpeed;
+    public final int        survivalFlyWalkingSpeed;
     public final ActionList survivalFlyActions;
 
     /**
@@ -114,14 +110,10 @@ public class MovingConfig implements CheckConfig {
         survivalFlyCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
         // Default values are specified here because this settings aren't showed by default into the configuration file.
         survivalFlyBlockingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
-        survivalFlyCobWebSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_COBWEBSPEED, 100);
-        survivalFlyLadderSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_LADDERSPEED, 100);
-        survivalFlyLavaSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_LAVASPEED, 100);
-        survivalFlyMoveSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_MOVESPEED, 100);
         survivalFlySneakingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
-        survivalFlySoulSandSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SOULSANDSPEED, 100);
         survivalFlySprintingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
-        survivalFlyWaterSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WATERSPEED, 100);
+        survivalFlySwimmingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
+        survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
     }
 

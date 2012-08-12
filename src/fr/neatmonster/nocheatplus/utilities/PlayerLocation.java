@@ -359,21 +359,9 @@ public class PlayerLocation {
      */
     public boolean isOnStairs() {
         if (!onStairs.isSet()) {
-            AxisAlignedBB boundingBoxGround = boundingBox.clone();
-            boundingBoxGround = boundingBoxGround.d(0D, -0.5D, 0D);
-            for (final Object object : world.getCubes(entity, boundingBoxGround)) {
-                final AxisAlignedBB aabbCube = (AxisAlignedBB) object;
-                final int blockX = (int) Math.floor(aabbCube.a);
-                final int blockY = (int) Math.floor(aabbCube.b);
-                final int blockZ = (int) Math.floor(aabbCube.c);
-                final int id = world.getTypeId(blockX, blockY, blockZ);
-                if (!onStairs.get()
-                        && (id == 53 || id == 67 || id == 108 || id == 109 || id == 114 || id == 128 || id == 134
-                                || id == 135 || id == 136))
-                    onStairs.set(true);
-            }
-            if (!onStairs.isSet())
-                onStairs.set(false);
+            final int id = world.getTypeId(x, y - 1, z);
+            onStairs.set(id == 53 || id == 67 || id == 108 || id == 109 || id == 114 || id == 128 || id == 134
+                    || id == 135 || id == 136);
         }
         return onStairs.get();
     }

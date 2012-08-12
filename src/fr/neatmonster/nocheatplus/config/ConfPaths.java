@@ -314,14 +314,10 @@ public abstract class ConfPaths {
     private static final String MOVING_SURVIVALFLY                    = MOVING + "survivalfly.";
     public static final String  MOVING_SURVIVALFLY_CHECK              = MOVING_SURVIVALFLY + "active";
     public static final String  MOVING_SURVIVALFLY_BLOCKINGSPEED      = MOVING_SURVIVALFLY + "blockingspeed";
-    public static final String  MOVING_SURVIVALFLY_COBWEBSPEED        = MOVING_SURVIVALFLY + "cobwebspeed";
-    public static final String  MOVING_SURVIVALFLY_LAVASPEED          = MOVING_SURVIVALFLY + "lavaspeed";
-    public static final String  MOVING_SURVIVALFLY_LADDERSPEED        = MOVING_SURVIVALFLY + "ladderspeed";
-    public static final String  MOVING_SURVIVALFLY_MOVESPEED          = MOVING_SURVIVALFLY + "movespeed";
     public static final String  MOVING_SURVIVALFLY_SNEAKINGSPEED      = MOVING_SURVIVALFLY + "sneakingspeed";
-    public static final String  MOVING_SURVIVALFLY_SOULSANDSPEED      = MOVING_SURVIVALFLY + "soulsandspeed";
     public static final String  MOVING_SURVIVALFLY_SPRINTINGSPEED     = MOVING_SURVIVALFLY + "sprintingspeed";
-    public static final String  MOVING_SURVIVALFLY_WATERSPEED         = MOVING_SURVIVALFLY + "waterspeed";
+    public static final String  MOVING_SURVIVALFLY_SWIMMINGSPEED      = MOVING_SURVIVALFLY + "swimmingspeed";
+    public static final String  MOVING_SURVIVALFLY_WALKINGSPEED       = MOVING_SURVIVALFLY + "walkingspeed";
     public static final String  MOVING_SURVIVALFLY_ACTIONS            = MOVING_SURVIVALFLY + "actions";
 
     /*

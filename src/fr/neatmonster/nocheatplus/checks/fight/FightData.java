@@ -89,5 +89,4 @@ public class FightData implements CheckData {
     // Data of the speed check.
     public int                     speedAttacks;
     public long                    speedTime;
-
 }

@@ -273,14 +273,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
         // set(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_COBWEBSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_LADDERSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_LAVASPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_MOVESPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_SOULSANDSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_WATERSPEED, 100);
+        // set(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
+        // set(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS,
                 "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
 

@@ -84,14 +84,15 @@ public class MovingData implements CheckData {
 
     // Data of the no fall check.
     public double     noFallFallDistance;
+    public boolean    noFallOnGroundClient;
+    public boolean    noFallOnGroundServer;
+    public boolean    noFallWasOnGroundClient;
+    public boolean    noFallWasOnGroundServer;
 
     // Data of the survival fly check.
-    public long       survivalFlyInLavaSince;
-    public long       survivalFlyInWaterSince;
     public int        survivalFlyJumpPhase;
     public double[]   survivalFlyLastDistances = new double[] {0D, 0D};
     public int        survivalFlyOnIce;
-    public long       survivalFlyOnLadderSince;
     public boolean    survivalFlyWasInBed;
 
     // Locations shared between all checks.
@@ -105,8 +106,10 @@ public class MovingData implements CheckData {
      */
     public void clearFlyData() {
         bunnyhopDelay = 0;
-        setBack = null;
+        noFallFallDistance = 0D;
+        noFallOnGroundClient = noFallOnGroundServer = noFallWasOnGroundClient = noFallWasOnGroundServer = true;
         survivalFlyJumpPhase = 0;
+        setBack = null;
     }
 
     /**

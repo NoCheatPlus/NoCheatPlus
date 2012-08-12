@@ -55,9 +55,25 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class MovingListener implements Listener {
 
+    /** The no fall check. **/
+    public final static NoFall noFall = new NoFall();
+
+    /**
+     * Checks if a material is liquid.
+     * 
+     * @param material
+     *            the material
+     * @return true, if the material is liquid
+     */
+    public static boolean isLiquid(final Material material) {
+        return material == Material.LAVA || material == Material.STATIONARY_LAVA
+                || material == Material.STATIONARY_WATER || material == Material.WATER;
+    }
+
     /** The instance of NoCheatPlus. */
     private final NoCheatPlus        plugin             = (NoCheatPlus) Bukkit.getPluginManager().getPlugin(
                                                                 "NoCheatPlus");
+
     /** The creative fly check. */
     private final CreativeFly        creativeFly        = new CreativeFly();
 
@@ -67,23 +83,8 @@ public class MovingListener implements Listener {
     /** The more packets vehicle check. */
     private final MorePacketsVehicle morePacketsVehicle = new MorePacketsVehicle();
 
-    /** The no fall check. **/
-    private final NoFall             noFall             = new NoFall();
-
     /** The survival fly check. */
     private final SurvivalFly        survivalFly        = new SurvivalFly();
-
-    /**
-     * Checks if a material is liquid.
-     * 
-     * @param material
-     *            the material
-     * @return true, if the material is liquid
-     */
-    private boolean isLiquid(final Material material) {
-        return material == Material.LAVA || material == Material.STATIONARY_LAVA
-                || material == Material.STATIONARY_WATER || material == Material.WATER;
-    }
 
     /**
      * A workaround for players placing blocks below them getting pushed off the block by NoCheatPlus.

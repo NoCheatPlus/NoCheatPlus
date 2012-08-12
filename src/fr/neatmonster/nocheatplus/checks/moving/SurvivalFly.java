@@ -33,69 +33,6 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class SurvivalFly extends Check {
 
-    /** The common margin of error for some speeds. */
-    private static final double MARGIN                  = 0.001D;
-
-    /** The horizontal speed limit when blocking. */
-    private static final double BLOCKING_MOVE           = 0.16D;
-
-    /** The vertical speed limit when ascending into web. */
-    private static final double COBWEB_ASCEND           = 0.02D + MARGIN;
-
-    /** The vertical speed limit when descending into web. */
-    private static final double COBWEB_DESCEND          = 0.09D + MARGIN;
-
-    /** The horizontal speed limit when moving into web. */
-    private static final double COBWEB_MOVE             = 0.11D;
-
-    /** The horizontal speed amplifier when being on ice. */
-    private static final double ICE_AMPLIFIER           = 2.5D;
-
-    /** The number of events contained in a jump phase. */
-    private static final int    JUMP_PHASE              = 6;
-
-    /** The distance removed after each jumping event. */
-    private static final double JUMP_STEP               = 0.15D;
-
-    /** The vertical speed limit when ascending on a ladder. */
-    private static final double LADDER_ASCEND           = 0.225D + MARGIN;
-
-    /** The vertical speed limit when descending on a ladder. */
-    private static final double LADDER_DESCEND          = 0.15D + MARGIN;
-
-    /** The vertical speed limit when ascending into lava. */
-    private static final double LAVA_ASCEND             = 0.08D + MARGIN;
-
-    /** The vertical speed limit when descending into lava. */
-    private static final double LAVA_DESCEND            = 0.085D + MARGIN;
-
-    /** The horizontal speed limit when moving into lava. */
-    private static final double LAVA_MOVE               = 0.12D;
-
-    /** The horizontal and usual speed limit when moving. */
-    private static final double MOVE                    = 0.22D;
-
-    /** The horizontal speed limit when sneaking. */
-    private static final double SNEAKING_MOVE           = 0.14D;
-
-    /** The horizontal speed limit when moving on soul sand. */
-    private static final double SOULSAND_MOVE           = 0.13D;
-
-    /** The horizontal speed limit when sprinting on soul sand. */
-    private static final double SOULSAND_SPRINTING_MOVE = 0.18D;
-
-    /** The horizontal speed limit when sprinting. */
-    private static final double SPRINTING_MOVE          = 0.35D;
-
-    /** The vertical speed limit when ascending into water. */
-    private static final double WATER_ASCEND            = 0.13D + MARGIN;
-
-    /** The vertical speed limit when descending into water. */
-    private static final double WATER_DESCEND           = 0.17D + MARGIN;
-
-    /** The horizontal speed limit when moving into water. */
-    private static final double WATER_MOVE              = 0.18D;
-
     /**
      * Instantiates a new survival fly check.
      */
@@ -142,6 +79,9 @@ public class SurvivalFly extends Check {
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 
+        // A player is considered sprinting if the flag is set and if he has enough food level.
+        final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
+
         if (data.setBack == null)
             data.setBack = from.getLocation();
 
@@ -151,35 +91,21 @@ public class SurvivalFly extends Check {
         else if (data.survivalFlyOnIce > 0)
             data.survivalFlyOnIce--;
 
-        // A player is considered sprinting if the flag is set and if he has enough food level.
-        final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
-
-        boolean useBuffer = true;
-
-        // Handle all the special cases.
-        double hAllowedDistance = cc.survivalFlyMoveSpeed / 100D * MOVE;
-        if (from.isInWeb() && to.isInWeb()) {
-            hAllowedDistance = cc.survivalFlyCobWebSpeed / 100D * COBWEB_MOVE;
-            useBuffer = false;
-        } else if (from.isOnSoulSand() && to.isOnSoulSand() && !sprinting) {
-            hAllowedDistance = cc.survivalFlySoulSandSpeed / 100D * SOULSAND_MOVE;
-            useBuffer = false;
-        } else if (from.isInLava() && to.isInLava())
-            hAllowedDistance = cc.survivalFlyLavaSpeed / 100D * LAVA_MOVE;
-        else if (from.isOnSoulSand() && to.isOnSoulSand() && sprinting) {
-            hAllowedDistance = cc.survivalFlySoulSandSpeed / 100D * SOULSAND_SPRINTING_MOVE;
-            useBuffer = false;
-        } else if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
-            hAllowedDistance = cc.survivalFlySneakingSpeed / 100D * SNEAKING_MOVE;
+        double hAllowedDistance = 0D;
+        if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
+            hAllowedDistance = 0.14D * cc.survivalFlySneakingSpeed / 100D;
         else if (player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
-            hAllowedDistance = cc.survivalFlyBlockingSpeed / 100D * BLOCKING_MOVE;
+            hAllowedDistance = 0.16D * cc.survivalFlyBlockingSpeed / 100D;
         else if (from.isInWater() && to.isInWater())
-            hAllowedDistance = cc.survivalFlyWaterSpeed / 100D * WATER_MOVE;
-        else if (sprinting)
-            hAllowedDistance = cc.survivalFlySprintingSpeed / 100D * SPRINTING_MOVE;
+            hAllowedDistance = 0.18D * cc.survivalFlySwimmingSpeed / 100D;
+        else if (!sprinting)
+            hAllowedDistance = 0.22D * cc.survivalFlyWalkingSpeed / 100D;
+        else
+            hAllowedDistance = 0.35D * cc.survivalFlySprintingSpeed / 100D;
 
+        // If the player is on ice, give him an higher maximum speed.
         if (data.survivalFlyOnIce > 0)
-            hAllowedDistance *= ICE_AMPLIFIER;
+            hAllowedDistance *= 2.5D;
 
         // Taken directly from Minecraft code, should work.
         final EntityPlayer entity = ((CraftPlayer) player).getHandle();
@@ -190,44 +116,44 @@ public class SurvivalFly extends Check {
         final double xDistance = to.getX() - from.getX();
         final double zDistance = to.getZ() - from.getZ();
         final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
-
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
-        data.bunnyhopDelay--;
+        // Prevent players from walking on a liquid.
+        if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && from.getY() == to.getY()
+                && MovingListener.isLiquid(to.getLocation().getBlock().getType()) && !to.isOnGround()
+                && to.getY() % 1D < 0.8D)
+            hDistanceAboveLimit = hDistance;
 
-        if (useBuffer) {
-            // Did he go too far?
-            if (hDistanceAboveLimit > 0D && sprinting)
-                // Try to treat it as a the "bunnyhop" problem.
-                if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.4D) {
-                    data.bunnyhopDelay = 9;
-                    hDistanceAboveLimit = 0D;
-                }
-
-            if (hDistanceAboveLimit > 0D) {
-                // Try to consume the "buffer".
-                hDistanceAboveLimit -= data.horizontalBuffer;
-                data.horizontalBuffer = 0D;
-
-                // Put back the "overconsumed" buffer.
-                if (hDistanceAboveLimit < 0D)
-                    data.horizontalBuffer = -hDistanceAboveLimit;
-            } else
-                // He was within limits, give the difference as buffer.
-                data.horizontalBuffer = Math.min(1D, data.horizontalBuffer - hDistanceAboveLimit);
-        }
-
-        hDistanceAboveLimit = Math.max(0D, hDistanceAboveLimit);
-
-        if (hDistanceAboveLimit == 0D && sprinting && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+        // Prevent players from sprinting if they're moving backwards.
+        if (hDistanceAboveLimit <= 0D && sprinting && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
             final double dX = to.getX() - from.getX();
             final double dZ = to.getZ() - from.getZ();
             final float yaw = from.getYaw();
-            // Prevent players from sprinting if they're moving backwards.
             if (dX < 0D && dZ > 0D && yaw > 180F && yaw < 270F || dX < 0D && dZ < 0D && yaw > 270F && yaw < 360F
                     || dX > 0D && dZ < 0D && yaw > 0F && yaw < 90F || dX > 0D && dZ > 0D && yaw > 90F && yaw < 180F)
                 hDistanceAboveLimit = hDistance;
         }
+
+        data.bunnyhopDelay--;
+
+        // Did he go too far?
+        if (hDistanceAboveLimit > 0 && sprinting)
+            // Try to treat it as a the "bunnyhop" problem.
+            if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
+                data.bunnyhopDelay = 9;
+                hDistanceAboveLimit = 0D;
+            }
+
+        if (hDistanceAboveLimit > 0D) {
+            // Try to consume the "buffer".
+            hDistanceAboveLimit -= data.horizontalBuffer;
+            data.horizontalBuffer = 0D;
+
+            // Put back the "overconsumed" buffer.
+            if (hDistanceAboveLimit < 0D)
+                data.horizontalBuffer = -hDistanceAboveLimit;
+        } else
+            data.horizontalBuffer = Math.min(1D, data.horizontalBuffer - hDistanceAboveLimit);
 
         // Potion effect "Jump".
         double jumpAmplifier = 1D;
@@ -241,78 +167,29 @@ public class SurvivalFly extends Check {
         if (jumpAmplifier > data.jumpAmplifier)
             data.jumpAmplifier = jumpAmplifier;
 
-        // Remember since when the player is in lava/in water/on ladder.
-        if (from.isInLava() && !to.isInLava())
-            data.survivalFlyInLavaSince = 0L;
-        else if (!from.isInLava() && to.isInLava())
-            data.survivalFlyInLavaSince = System.currentTimeMillis();
-        if (from.isInWater() && !to.isInWater())
-            data.survivalFlyInWaterSince = 0L;
-        else if (!from.isInWater() && to.isInWater())
-            data.survivalFlyInWaterSince = System.currentTimeMillis();
-        if (from.isOnLadder() && !to.isOnLadder())
-            data.survivalFlyOnLadderSince = 0L;
-        else if (!from.isOnLadder() && to.isOnLadder())
-            data.survivalFlyOnLadderSince = System.currentTimeMillis();
+        double vAllowedDistance = 1.35D + data.verticalFreedom;
+        vAllowedDistance *= data.jumpAmplifier;
+        if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
+            vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
 
-        double vDistance = to.getY() - from.getY();
+        final double vDistance = to.getY() - data.setBack.getY();
+        if (data.survivalFlyLastDistances[0] < data.survivalFlyLastDistances[1]
+                && vDistance > data.survivalFlyLastDistances[0] && data.survivalFlyJumpPhase >= 7
+                && data.survivalFlyJumpPhase <= 8)
+            data.survivalFlyJumpPhase = 0;
+        else if (vDistance <= 0D)
+            data.survivalFlyJumpPhase = 0;
+        data.survivalFlyLastDistances[1] = data.survivalFlyLastDistances[0];
+        data.survivalFlyLastDistances[0] = vDistance;
 
-        // Handle all the special cases.
-        double vDistanceAboveLimit = 0D;
-        if (from.isInLava() && to.isInLava() && data.survivalFlyInLavaSince > 0L
-                && System.currentTimeMillis() - data.survivalFlyInLavaSince > 1000L) {
-            if (vDistance > cc.survivalFlyLavaSpeed / 100D * LAVA_ASCEND)
-                vDistanceAboveLimit = vDistance - cc.survivalFlyLavaSpeed / 100D * LAVA_ASCEND;
-            else if (vDistance < cc.survivalFlyLavaSpeed / 100D * -LAVA_DESCEND)
-                vDistanceAboveLimit = cc.survivalFlyLavaSpeed / 100D * -LAVA_DESCEND - vDistance;
-        } else if (from.isInWater() && to.isInWater() && data.survivalFlyInWaterSince > 0L
-                && System.currentTimeMillis() - data.survivalFlyInWaterSince > 1000L) {
-            if (vDistance > cc.survivalFlyWaterSpeed / 100D * WATER_ASCEND)
-                vDistanceAboveLimit = vDistance - cc.survivalFlyWaterSpeed / 100D * WATER_ASCEND;
-            else if (vDistance < cc.survivalFlyWaterSpeed / 100D * -WATER_DESCEND)
-                vDistanceAboveLimit = cc.survivalFlyWaterSpeed / 100D * -WATER_DESCEND - vDistance;
-        } else if (from.isInWeb() && to.isInWeb()) {
-            if (vDistance > cc.survivalFlyCobWebSpeed / 100D * COBWEB_ASCEND)
-                vDistanceAboveLimit = vDistance - cc.survivalFlyCobWebSpeed / 100D * COBWEB_ASCEND;
-            else if (vDistance < cc.survivalFlyCobWebSpeed / 100D * -COBWEB_DESCEND)
-                vDistanceAboveLimit = cc.survivalFlyCobWebSpeed / 100D * -COBWEB_DESCEND - vDistance;
-        } else if (from.isOnLadder(true) && to.isOnLadder(true) && data.survivalFlyOnLadderSince > 0L
-                && System.currentTimeMillis() - data.survivalFlyOnLadderSince > 1000L) {
-            if (vDistance > cc.survivalFlyLadderSpeed / 100D * LADDER_ASCEND)
-                vDistanceAboveLimit = vDistance - cc.survivalFlyLadderSpeed / 100D * LADDER_ASCEND;
-            else if (vDistance < cc.survivalFlyLadderSpeed / 100D * -LADDER_DESCEND)
-                vDistanceAboveLimit = cc.survivalFlyLadderSpeed / 100D * -LADDER_DESCEND - vDistance;
-        } else {
-            vDistance = to.getY() - data.setBack.getY();
-
-            if (data.survivalFlyLastDistances[0] < data.survivalFlyLastDistances[1]
-                    && vDistance > data.survivalFlyLastDistances[0] && data.survivalFlyJumpPhase >= 7
-                    && data.survivalFlyJumpPhase <= 8)
-                data.survivalFlyJumpPhase = 0;
-            else if (vDistance <= 0D)
-                data.survivalFlyJumpPhase = 0;
-
-            data.survivalFlyLastDistances[1] = data.survivalFlyLastDistances[0];
-            data.survivalFlyLastDistances[0] = vDistance;
-
-            double vAllowedDistance = (data.verticalFreedom + (!from.isOnGround() && to.isOnGround() ? 1.5D : 1.35D))
-                    * data.jumpAmplifier;
-            if (data.survivalFlyJumpPhase > JUMP_PHASE + data.jumpAmplifier)
-                vAllowedDistance -= (data.survivalFlyJumpPhase - JUMP_PHASE) * JUMP_STEP;
-
-            vDistanceAboveLimit = Math.max(0D, vDistance - vAllowedDistance);
-        }
-
-        // Handle slabs placed into a liquid.
-        if ((to.isOnGround() && to.getY() - from.getY() == 0.5D || !from.isOnGround() && to.isOnGround() || from
-                .isOnGround() && !to.isOnGround())
-                && from.isInLiquid() && to.isInLiquid())
+        double vDistanceAboveLimit = vDistance - vAllowedDistance;
+        if (from.isOnStairs() || to.isOnStairs() && vDistanceAboveLimit < 0.15D) {
+            data.jumpAmplifier = 0D;
             vDistanceAboveLimit = 0D;
-
-        if (from.isOnGround() || to.isOnGround())
+        } else if (from.isOnGround() || to.isOnGround())
             data.jumpAmplifier = 0D;
 
-        final double result = (hDistanceAboveLimit + vDistanceAboveLimit) * 100D;
+        final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
         data.survivalFlyJumpPhase++;
 

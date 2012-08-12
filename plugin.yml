@@ -1,5 +1,5 @@
-name: NoCheatPlus
-version: ${project.version}
+name: ${project.name}
+version: ${project.pluginVersion}
 description: ${project.description}
 
 author: NeatMonster
@@ -110,6 +110,8 @@ permissions:
                                 description: Allow the player to bypass the MorePackets check.
                             nocheatplus.checks.moving.morepacketsvehicle:
                                 description: Allow the player to bypass the MorePacketsVehicle check.
+                            nocheatplus.checks.moving.nobukkitcheck:
+                                description: Allwo the player to bypass the internal Bukkit check.
                             nocheatplus.checks.moving.nofall:
                                 description: Allow the player to bypass the NoFall check.
                             nocheatplus.checks.moving.survivalfly:
