@@ -61,7 +61,7 @@ public class NoFall extends Check {
             // Reset his fall distance.
             data.noFallFallDistance = 0D;
 
-        data.noFallFallDistance = data.noFallFallDistance; // TODO: ??
+//        data.noFallFallDistance = data.noFallFallDistance;
 
         // If the player just touched the ground for the server, but no for the client.
         if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer
@@ -73,16 +73,19 @@ public class NoFall extends Check {
                 data.noFallVL += data.noFallFallDistance;
 
                 // Execute the actions to find out if we need to cancel the event or not.
-                if (executeActions(player, data.noFallVL, cc.noFallActions))
-                    // Deal the fall damages to the player.
+                if (executeActions(player, data.noFallVL, cc.noFallActions)){
+                	// Deal the fall damages to the player.
+                	
                     player.damage(fallDamage);
+                }
+                    
             }
         }
 
         // If the player just touched the ground for the server.
         else if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer) {
             // Calculate the difference between the fall distance calculated by the server and by the plugin.
-            final double difference = (data.noFallFallDistance - player.getFallDistance()) / data.noFallFallDistance;
+            final double difference = (data.noFallFallDistance - player.getFallDistance());//  / data.noFallFallDistance;
 
             // If the difference is too big and the fall distance calculated by the plugin should hurt the player.
             if (difference > 0.15D && (int) data.noFallFallDistance > 2) {
