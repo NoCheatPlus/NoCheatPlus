@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -514,5 +518,17 @@ public class MovingListener implements Listener {
                     return this;
                 }
             }.set(event.getVehicle(), newTo), 1L);
+    }
+    
+    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+    public void onEntityDamage(final EntityDamageEvent event){
+    	// Workaround fix attempt for NoFall multiple damage.
+    	if (event.getCause() != DamageCause.FALL) return;
+    	final Entity entity = event.getEntity();
+    	if (entity.getType() != EntityType.PLAYER) return;
+    	final Player player = (Player) entity;
+    	final MovingData data = MovingData.getData(player);
+    	// Simple model: Once damage dealt the fall distance is reset.
+    	data.noFallFallDistance = 0.0;
     }
 }
