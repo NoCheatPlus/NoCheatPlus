@@ -7,7 +7,6 @@ import net.minecraft.server.DamageSource;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.Packet10Flying;
 
-import org.bukkit.GameMode;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -51,14 +50,6 @@ public class NoFall extends Check {
     public void check(final Player player, final PlayerLocation from, final PlayerLocation to) {
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
-
-        // Exempt players with creative mode from checks.
-        if (player.getGameMode() == GameMode.CREATIVE){
-        	// Reset his fall distance.
-            data.noFallFallDistance = data.noFallNewFallDistance = 0D;
-            data.noFallVL *= 0.95D;
-            return;
-        }
         
         // If the player has just started falling, is falling into a liquid, in web or is on a ladder.
         if (to.isInLiquid() || to.isInWeb() || to.isOnLadder())
