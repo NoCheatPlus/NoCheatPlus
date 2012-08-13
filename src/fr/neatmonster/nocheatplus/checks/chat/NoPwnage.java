@@ -167,16 +167,17 @@ public class NoPwnage extends Check {
 
         boolean cancel = false;
 
+       
+        String message = "";
+        if (event instanceof AsyncPlayerChatEvent)
+            message = ((AsyncPlayerChatEvent) event).getMessage();
+        else if (event instanceof PlayerCommandPreprocessEvent)
+            message = ((PlayerCommandPreprocessEvent) event).getMessage();
+        final boolean isCommand = event instanceof PlayerCommandPreprocessEvent;
+        final long now = System.currentTimeMillis();
+        
         if (!data.noPwnageHasFilledCaptcha) {
-            String message = "";
-            if (event instanceof AsyncPlayerChatEvent)
-                message = ((AsyncPlayerChatEvent) event).getMessage();
-            else if (event instanceof PlayerCommandPreprocessEvent)
-                message = ((PlayerCommandPreprocessEvent) event).getMessage();
-            final boolean isCommand = event instanceof PlayerCommandPreprocessEvent;
-            final long now = System.currentTimeMillis();
-
-            if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
+        	if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
                 // Correct answer to the captcha?
                 if (message.equals(data.noPwnageGeneratedCaptcha)) {
                     // Yes, clear his data and do not worry anymore about him.
@@ -205,95 +206,96 @@ public class NoPwnage extends Check {
                     ((PlayerCommandPreprocessEvent) event).setCancelled(true);
                 return cancel;
             }
-
-            if (data.noPwnageLastLocation == null)
-                data.noPwnageLastLocation = player.getLocation();
-            else if (!data.noPwnageLastLocation.equals(player.getLocation())) {
-                data.noPwnageLastLocation = player.getLocation();
-                data.noPwnageLastMovedTime = now;
-            }
-
-            // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
-            // message within "timeout" milliseconds, the suspicion will be increased by "weight".
-            if (!isCommand && cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
-                    && CheckUtils.isSimilar(message, lastBanCausingMessage, 0.8f))
-                data.noPwnageVL += cc.noPwnageBannedWeight;
-
-            // NoPwnage will check if a player sends his first message within "timeout" milliseconds after his login. If
-            // he does, increase suspicion by "weight".
-            if (cc.noPwnageFirstCheck && now - data.noPwnageJoinTime < cc.noPwnageFirstTimeout)
-                data.noPwnageVL += cc.noPwnageFirstWeight;
-
-            // NoPwnage will check if a player repeats a message that has been sent by another player just before,
-            // within "timeout". If he does, suspicion will be increased by "weight".
-            if (!isCommand && cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
-                    && CheckUtils.isSimilar(message, lastGlobalMessage, 0.8f))
-                data.noPwnageVL += cc.noPwnageGlobalWeight;
-
-            // NoPwnage will check if a player sends messages too fast. If a message is sent within "timeout"
-            // milliseconds after the previous message, increase suspicion by "weight".
-            if (cc.noPwnageSpeedCheck && now - data.noPwnageLastMessageTime < cc.noPwnageSpeedTimeout)
-                data.noPwnageVL += cc.noPwnageSpeedWeight;
-
-            // NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message
-            // is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight".
-            if (!isCommand && cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
-                    && CheckUtils.isSimilar(message, data.noPwnageLastMessage, 0.8f))
-                data.noPwnageVL += cc.noPwnageRepeatWeight;
-
-            // NoPwnage will check if a player moved within the "timeout" timeframe. If he did move, the suspicion will
-            // be reduced by the "weightbonus" value. If he did not move, the suspicion will be increased by
-            // "weightmalus" value.
-            if (cc.noPwnageMoveCheck && now - data.noPwnageLastMovedTime < cc.noPwnageMoveTimeout)
-                data.noPwnageVL -= cc.noPwnageMoveWeightBonus;
-            else
-                data.noPwnageVL += cc.noPwnageMoveWeightMalus;
-
-            // Should a player that reaches the "warnLevel" get a text message telling him that he is under suspicion of
-            // being a bot.
-            boolean warned = false;
-            if (cc.noPwnageWarnPlayerCheck && now - data.noPwnageLastWarningTime < cc.noPwnageWarnTimeout) {
-                data.noPwnageVL += 100;
-                warned = true;
-            }
-
-            if (cc.noPwnageWarnPlayerCheck && data.noPwnageVL > cc.noPwnageWarnLevel && !warned) {
-                player.sendMessage(replaceColors(cc.noPwnageWarnPlayerMessage));
-                data.noPwnageLastWarningTime = now;
-            } else if (data.noPwnageVL > cc.noPwnageLevel)
-                if (cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha) {
-                    // Display a captcha to the player.
-                    for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
-                        data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
-                                .nextInt(cc.noPwnageCaptchaCharacters.length()));
-                    player.sendMessage(replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
-                            data.noPwnageGeneratedCaptcha)));
-                    data.noPwnageHasStartedCaptcha = true;
-                    if (event instanceof AsyncPlayerChatEvent)
-                        ((AsyncPlayerChatEvent) event).setCancelled(true);
-                    else if (event instanceof PlayerCommandPreprocessEvent)
-                        ((PlayerCommandPreprocessEvent) event).setCancelled(true);
-                } else {
-                    lastBanCausingMessage = message;
-                    data.noPwnageLastWarningTime = lastBanCausingMessageTime = now;
-                    if (cc.noPwnageWarnOthersCheck)
-                        Bukkit.broadcastMessage(replaceColors(cc.noPwnageWarnOthersMessage.replace("[player]",
-                                player.getName())));
-                    if (event instanceof AsyncPlayerChatEvent)
-                        ((AsyncPlayerChatEvent) event).setCancelled(true);
-                    else if (event instanceof PlayerCommandPreprocessEvent)
-                        ((PlayerCommandPreprocessEvent) event).setCancelled(true);
-
-                    // Find out if we need to ban the player or not.
-                    cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
-                }
-
-            // Store the message and some other data.
-            data.noPwnageLastMessage = message;
-            data.noPwnageLastMessageTime = now;
-            lastGlobalMessage = message;
-            lastGlobalMessageTime = now;
         }
+
+        if (data.noPwnageLastLocation == null)
+            data.noPwnageLastLocation = player.getLocation();
+        else if (!data.noPwnageLastLocation.equals(player.getLocation())) {
+            data.noPwnageLastLocation = player.getLocation();
+            data.noPwnageLastMovedTime = now;
+        }
+
+        // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
+        // message within "timeout" milliseconds, the suspicion will be increased by "weight".
+        if (!isCommand && cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
+                && CheckUtils.isSimilar(message, lastBanCausingMessage, 0.8f))
+            data.noPwnageVL += cc.noPwnageBannedWeight;
+
+        // NoPwnage will check if a player sends his first message within "timeout" milliseconds after his login. If
+        // he does, increase suspicion by "weight".
+        if (cc.noPwnageFirstCheck && now - data.noPwnageJoinTime < cc.noPwnageFirstTimeout)
+            data.noPwnageVL += cc.noPwnageFirstWeight;
+
+        // NoPwnage will check if a player repeats a message that has been sent by another player just before,
+        // within "timeout". If he does, suspicion will be increased by "weight".
+        if (!isCommand && cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
+                && CheckUtils.isSimilar(message, lastGlobalMessage, 0.8f))
+            data.noPwnageVL += cc.noPwnageGlobalWeight;
+
+        // NoPwnage will check if a player sends messages too fast. If a message is sent within "timeout"
+        // milliseconds after the previous message, increase suspicion by "weight".
+        if (cc.noPwnageSpeedCheck && now - data.noPwnageLastMessageTime < cc.noPwnageSpeedTimeout)
+            data.noPwnageVL += cc.noPwnageSpeedWeight;
+
+        // NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message
+        // is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight".
+        if (!isCommand && cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
+                && CheckUtils.isSimilar(message, data.noPwnageLastMessage, 0.8f))
+            data.noPwnageVL += cc.noPwnageRepeatWeight;
+
+        // NoPwnage will check if a player moved within the "timeout" timeframe. If he did move, the suspicion will
+        // be reduced by the "weightbonus" value. If he did not move, the suspicion will be increased by
+        // "weightmalus" value.
+        if (cc.noPwnageMoveCheck && now - data.noPwnageLastMovedTime < cc.noPwnageMoveTimeout)
+            data.noPwnageVL -= cc.noPwnageMoveWeightBonus;
+        else
+            data.noPwnageVL += cc.noPwnageMoveWeightMalus;
+
+        // Should a player that reaches the "warnLevel" get a text message telling him that he is under suspicion of
+        // being a bot.
+        boolean warned = false;
+        if (cc.noPwnageWarnPlayerCheck && now - data.noPwnageLastWarningTime < cc.noPwnageWarnTimeout) {
+            data.noPwnageVL += 100;
+            warned = true;
+        }
+
+        if (cc.noPwnageWarnPlayerCheck && data.noPwnageVL > cc.noPwnageWarnLevel && !warned) {
+            player.sendMessage(replaceColors(cc.noPwnageWarnPlayerMessage));
+            data.noPwnageLastWarningTime = now;
+        } else if (data.noPwnageVL > cc.noPwnageLevel)
+            if (cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha) {
+                // Display a captcha to the player.
+                for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
+                    data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
+                            .nextInt(cc.noPwnageCaptchaCharacters.length()));
+                player.sendMessage(replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
+                        data.noPwnageGeneratedCaptcha)));
+                data.noPwnageHasStartedCaptcha = true;
+                if (event instanceof AsyncPlayerChatEvent)
+                    ((AsyncPlayerChatEvent) event).setCancelled(true);
+                else if (event instanceof PlayerCommandPreprocessEvent)
+                    ((PlayerCommandPreprocessEvent) event).setCancelled(true);
+            } else {
+                lastBanCausingMessage = message;
+                data.noPwnageLastWarningTime = lastBanCausingMessageTime = now;
+                if (cc.noPwnageWarnOthersCheck)
+                    Bukkit.broadcastMessage(replaceColors(cc.noPwnageWarnOthersMessage.replace("[player]",
+                            player.getName())));
+                if (event instanceof AsyncPlayerChatEvent)
+                    ((AsyncPlayerChatEvent) event).setCancelled(true);
+                else if (event instanceof PlayerCommandPreprocessEvent)
+                    ((PlayerCommandPreprocessEvent) event).setCancelled(true);
+
+                // Find out if we need to ban the player or not.
+                cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
+            }
+
+        // Store the message and some other data.
+        data.noPwnageLastMessage = message;
+        data.noPwnageLastMessageTime = now;
+        lastGlobalMessage = message;
+        lastGlobalMessageTime = now;
+        
 
         return cancel;
     }
