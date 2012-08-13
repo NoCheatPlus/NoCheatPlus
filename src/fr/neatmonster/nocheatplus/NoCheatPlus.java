@@ -6,11 +6,12 @@ import java.util.List;
 
 import net.minecraft.server.DedicatedServer;
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.NetServerHandler;
 import net.minecraft.server.NetworkManager;
+import net.minecraft.server.ServerConnection;
 
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -103,8 +104,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
         // Set the NetServerHandler of every player.
-        for (final Player player : Bukkit.getOnlinePlayers())
-            setCustomNetServerHandler(player);
+        for (final Player player : Bukkit.getOnlinePlayers()) {
+            resetNetServerHandler(player);
+            updateNetServerHandler(player);
+        }
 
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
@@ -216,33 +219,87 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      * Setting the net server handler at the earliest possible point.
      * 
      * @param event
+     *            the event
      */
     @EventHandler(
             priority = EventPriority.LOWEST)
     public void onPlayerJoinLowest(final PlayerJoinEvent event) {
         // Set the NetServerHandler of the player.
-        setCustomNetServerHandler(event.getPlayer());
+        resetNetServerHandler(event.getPlayer());
+        updateNetServerHandler(event.getPlayer());
     }
 
-    private boolean setCustomNetServerHandler(final Player player) {
+    /**
+     * Reset the net server handler of the player.
+     * 
+     * @param player
+     *            the player
+     * @return true, if needed
+     */
+    private boolean resetNetServerHandler(final Player player) {
+        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        final NetServerHandler oldNSH = entityPlayer.netServerHandler;
+        if (!(oldNSH instanceof CustomNetServerHandler))
+            return false;
+        final DedicatedServer server = (DedicatedServer) MinecraftServer.getServer();
+        final NetServerHandler newNSH = new NetServerHandler(server, oldNSH.networkManager, entityPlayer);
+        newNSH.a(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player
+                .getLocation().getYaw(), player.getLocation().getPitch());
+        entityPlayer.netServerHandler = newNSH;
+        setNetServerHandler(server, oldNSH, newNSH);
+        oldNSH.disconnected = true;
+        return true;
+    }
+
+    /**
+     * Sets the net server handler.
+     * 
+     * @param server
+     *            the server
+     * @param oldNSH
+     *            the old net server handler
+     * @param newNSH
+     *            the new net server handler
+     * @return true, if successful
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private boolean setNetServerHandler(final DedicatedServer server, final NetServerHandler oldNSH,
+            final NetServerHandler newNSH) {
+        try {
+            Field field = NetworkManager.class.getDeclaredField("packetListener");
+            field.setAccessible(true);
+            field.set(oldNSH.networkManager, newNSH);
+            field = ServerConnection.class.getDeclaredField("d");
+            field.setAccessible(true);
+            final List handlerList = (List) field.get(server.ac());
+            handlerList.remove(oldNSH);
+            handlerList.add(newNSH);
+            return true;
+        } catch (final Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Update the net server handler of the player.
+     * 
+     * @param player
+     *            the player
+     * @return true, if needed
+     */
+    private boolean updateNetServerHandler(final Player player) {
         final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
         final NetServerHandler oldNSH = entityPlayer.netServerHandler;
         if (oldNSH instanceof CustomNetServerHandler)
             return false;
-        final DedicatedServer server = ((CraftServer) Bukkit.getServer()).getHandle().getServer();
+        final DedicatedServer server = (DedicatedServer) MinecraftServer.getServer();
         final NetServerHandler newNSH = new CustomNetServerHandler(server, oldNSH.networkManager, entityPlayer);
         newNSH.a(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player
                 .getLocation().getYaw(), player.getLocation().getPitch());
         entityPlayer.netServerHandler = newNSH;
-        try {
-            final Field field = NetworkManager.class.getDeclaredField("packetListener");
-            field.setAccessible(true);
-            field.set(oldNSH.networkManager, newNSH);
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+        setNetServerHandler(server, oldNSH, newNSH);
         oldNSH.disconnected = true;
-        server.ac().a(newNSH);
         return true;
     }
 }

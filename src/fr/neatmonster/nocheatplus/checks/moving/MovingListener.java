@@ -6,8 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -138,6 +136,31 @@ public class MovingListener implements Listener {
     }
 
     /**
+     * We listen to EntityDamage events the reset the fall distance when a damage is dealt.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onEntityDamage(final EntityDamageEvent event) {
+        /*
+         *  _____       _   _ _           ____                                   
+         * | ____|_ __ | |_(_) |_ _   _  |  _ \  __ _ _ __ ___   __ _  __ _  ___ 
+         * |  _| | '_ \| __| | __| | | | | | | |/ _` | '_ ` _ \ / _` |/ _` |/ _ \
+         * | |___| | | | |_| | |_| |_| | | |_| | (_| | | | | | | (_| | (_| |  __/
+         * |_____|_| |_|\__|_|\__|\__, | |____/ \__,_|_| |_| |_|\__,_|\__, |\___|
+         *                        |___/                               |___/      
+         */
+        // Workaround fix attempt for NoFall multiple damage.
+        if (event.getCause() == DamageCause.FALL && event.getEntity() instanceof Player) {
+            final MovingData data = MovingData.getData((Player) event.getEntity());
+            // Simple model: once damage dealt the fall distance is reset.
+            data.noFallFallDistance = data.noFallNewFallDistance = 0D;
+        }
+    }
+
+    /**
      * We listen to this event to prevent player from flying by sending bed leaving packets.
      * 
      * @param event
@@ -181,8 +204,8 @@ public class MovingListener implements Listener {
     }
 
     /**
-     * Just for security, if a player switches between worlds, reset the fly and more packets checks data,
-     * because it is definitely invalid now.
+     * Just for security, if a player switches between worlds, reset the fly and more packets checks data, because it is
+     * definitely invalid now.
      * 
      * @param event
      *            the event
@@ -518,17 +541,5 @@ public class MovingListener implements Listener {
                     return this;
                 }
             }.set(event.getVehicle(), newTo), 1L);
-    }
-    
-    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-    public void onEntityDamage(final EntityDamageEvent event){
-    	// Workaround fix attempt for NoFall multiple damage.
-    	if (event.getCause() != DamageCause.FALL) return;
-    	final Entity entity = event.getEntity();
-    	if (entity.getType() != EntityType.PLAYER) return;
-    	final Player player = (Player) entity;
-    	final MovingData data = MovingData.getData(player);
-    	// Simple model: Once damage dealt the fall distance is reset.
-    	data.noFallFallDistance = data.noFallNewFallDistance = 0.0;
     }
 }

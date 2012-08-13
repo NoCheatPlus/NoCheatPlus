@@ -57,7 +57,7 @@ public class CommandAction extends ActionWithParameters {
     }
 
     /**
-     * Convert the commands  into a string that can be used in the configuration files.
+     * Convert the commands data into a string that can be used in the configuration files.
      * 
      * @return the string
      */

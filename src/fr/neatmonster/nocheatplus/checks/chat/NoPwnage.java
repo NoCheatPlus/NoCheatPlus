@@ -167,7 +167,6 @@ public class NoPwnage extends Check {
 
         boolean cancel = false;
 
-       
         String message = "";
         if (event instanceof AsyncPlayerChatEvent)
             message = ((AsyncPlayerChatEvent) event).getMessage();
@@ -175,9 +174,9 @@ public class NoPwnage extends Check {
             message = ((PlayerCommandPreprocessEvent) event).getMessage();
         final boolean isCommand = event instanceof PlayerCommandPreprocessEvent;
         final long now = System.currentTimeMillis();
-        
-        if (!data.noPwnageHasFilledCaptcha) {
-        	if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
+
+        if (!data.noPwnageHasFilledCaptcha)
+            if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
                 // Correct answer to the captcha?
                 if (message.equals(data.noPwnageGeneratedCaptcha)) {
                     // Yes, clear his data and do not worry anymore about him.
@@ -206,7 +205,6 @@ public class NoPwnage extends Check {
                     ((PlayerCommandPreprocessEvent) event).setCancelled(true);
                 return cancel;
             }
-        }
 
         if (data.noPwnageLastLocation == null)
             data.noPwnageLastLocation = player.getLocation();
@@ -295,7 +293,6 @@ public class NoPwnage extends Check {
         data.noPwnageLastMessageTime = now;
         lastGlobalMessage = message;
         lastGlobalMessageTime = now;
-        
 
         return cancel;
     }

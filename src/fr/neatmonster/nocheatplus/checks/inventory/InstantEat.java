@@ -46,7 +46,7 @@ public class InstantEat extends Check {
         if (data.instantEatFood == null || level <= player.getFoodLevel())
             return false;
 
-        // rough estimation about how long it should take to eat
+        // Rough estimation about how long it should take to eat
         final long expectedTimeWhenEatingFinished = data.instantEatLastTime + 700L;
 
         if (expectedTimeWhenEatingFinished < System.currentTimeMillis())
