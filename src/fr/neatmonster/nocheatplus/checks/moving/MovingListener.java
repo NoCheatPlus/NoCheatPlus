@@ -529,6 +529,6 @@ public class MovingListener implements Listener {
     	final Player player = (Player) entity;
     	final MovingData data = MovingData.getData(player);
     	// Simple model: Once damage dealt the fall distance is reset.
-    	data.noFallFallDistance = 0.0;
+    	data.noFallFallDistance = data.noFallNewFallDistance = 0.0;
     }
 }
