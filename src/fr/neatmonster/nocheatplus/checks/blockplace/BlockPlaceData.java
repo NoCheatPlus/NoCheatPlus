@@ -38,15 +38,15 @@ public class BlockPlaceData implements CheckData {
                                                               }
                                                           };
 
-    /** The map containing the dataFactory per players. */
+    /** The map containing the data per players. */
     private static Map<String, BlockPlaceData> playersMap = new HashMap<String, BlockPlaceData>();
 
     /**
-     * Gets the dataFactory of a specified player.
+     * Gets the data of a specified player.
      * 
      * @param player
      *            the player
-     * @return the dataFactory
+     * @return the data
      */
     public static BlockPlaceData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))

@@ -177,7 +177,7 @@ public class MovingListener implements Listener {
     }
 
     /**
-     * Just for security, if a player switches between worlds, reset the fly and more packets checks dataFactory,
+     * Just for security, if a player switches between worlds, reset the fly and more packets checks data,
      * because it is definitely invalid now.
      * 
      * @param event
@@ -278,7 +278,7 @@ public class MovingListener implements Listener {
         final Player player = event.getPlayer();
 
         // Don't care for movements that are very high distance, to another world (such that it is very likely the event
-        // dataFactory was modified by another plugin before we got it) or if the player is inside a vehicle.
+        // data was modified by another plugin before we got it) or if the player is inside a vehicle.
         if (!event.getFrom().getWorld().equals(event.getTo().getWorld())
                 || event.getFrom().distanceSquared(event.getTo()) > 400D || player.isInsideVehicle())
             return;
@@ -286,7 +286,7 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(player);
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
-        // general dataFactory modifications one for each event.
+        // general data modifications one for each event.
         if (data.horizontalVelocityCounter > 0D)
             data.horizontalVelocityCounter--;
         else if (data.horizontalFreedom > 0.001D)
@@ -324,14 +324,14 @@ public class MovingListener implements Listener {
             if (newTo == null && noFall.isEnabled(player))
                 noFall.check(player, from, to);
         } else
-            // He isn't handled by any fly check, clear his dataFactory.
+            // He isn't handled by any fly check, clear his data.
             data.clearFlyData();
 
         if (newTo == null && morePackets.isEnabled(player))
             // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
             newTo = morePackets.check(player, from, to);
         else
-            // Otherwise we need to clear his dataFactory.
+            // Otherwise we need to clear his data.
             data.clearMorePacketsData();
 
         // Did one of the checks decide we need a new "to"-location?
@@ -389,9 +389,9 @@ public class MovingListener implements Listener {
 
     /**
      * If a player gets teleported, it may have two reasons. Either it was NoCheat or another plugin. If it was
-     * NoCheatPlus, the target location should match the "dataFactory.teleportedTo" value.
+     * NoCheatPlus, the target location should match the "data.teleportedTo" value.
      * 
-     * On teleports, reset some movement related dataFactory that gets invalid.
+     * On teleports, reset some movement related data that gets invalid.
      * 
      * @param event
      *            the event
@@ -414,12 +414,12 @@ public class MovingListener implements Listener {
         if (data.teleported != null && data.teleported.equals(event.getTo()))
             event.setCancelled(false);
         else
-            // Only if it wasn't NoCheatPlus, drop dataFactory from more packets check. If it was NoCheatPlus, we don't
+            // Only if it wasn't NoCheatPlus, drop data from more packets check. If it was NoCheatPlus, we don't
             // want
-            // players to exploit the fly check teleporting to get rid of the "morepackets" dataFactory.
+            // players to exploit the fly check teleporting to get rid of the "morepackets" data.
             data.clearMorePacketsData();
 
-        // Always drop dataFactory from fly checks, as it always loses its validity after teleports. Always!
+        // Always drop data from fly checks, as it always loses its validity after teleports. Always!
         data.teleported = null;
         data.clearFlyData();
     }
@@ -478,7 +478,7 @@ public class MovingListener implements Listener {
          *    \_/ \___|_| |_|_|\___|_|\___| |_|  |_|\___/ \_/ \___|
          */
         // Don't care if a player isn't inside the vehicle, for movements that are very high distance or to another
-        // world (such that it is very likely the event dataFactory was modified by another plugin before we got it).
+        // world (such that it is very likely the event data was modified by another plugin before we got it).
         if (event.getVehicle().getPassenger() == null || !(event.getVehicle().getPassenger() instanceof Player)
                 || !event.getFrom().getWorld().equals(event.getTo().getWorld())
                 || event.getFrom().distanceSquared(event.getTo()) > 400D)
@@ -492,7 +492,7 @@ public class MovingListener implements Listener {
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = morePacketsVehicle.check(player, event.getFrom(), event.getTo());
         else
-            // Otherwise we need to clear his dataFactory.
+            // Otherwise we need to clear his data.
             MovingData.getData(player).clearMorePacketsData();
 
         // Did one of the checks decide we need a new "to"-location?

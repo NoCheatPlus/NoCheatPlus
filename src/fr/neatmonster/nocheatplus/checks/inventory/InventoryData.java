@@ -32,15 +32,15 @@ public class InventoryData implements CheckData {
                                                              }
                                                          };
 
-    /** The map containing the dataFactory per players. */
+    /** The map containing the data per players. */
     private static Map<String, InventoryData> playersMap = new HashMap<String, InventoryData>();
 
     /**
-     * Gets the dataFactory of a specified player.
+     * Gets the data of a specified player.
      * 
      * @param player
      *            the player
-     * @return the dataFactory
+     * @return the data
      */
     public static InventoryData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))

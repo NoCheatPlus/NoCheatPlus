@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  *                  d8888P                                                       
  */
 /**
- * Player specific dataFactory for the fight checks.
+ * Player specific data for the fight checks.
  */
 public class FightData implements CheckData {
 
@@ -33,15 +33,15 @@ public class FightData implements CheckData {
                                                          }
                                                      };
 
-    /** The map containing the dataFactory per players. */
+    /** The map containing the data per players. */
     private static Map<String, FightData> playersMap = new HashMap<String, FightData>();
 
     /**
-     * Gets the dataFactory of a specified player.
+     * Gets the data of a specified player.
      * 
      * @param player
      *            the player
-     * @return the dataFactory
+     * @return the data
      */
     public static FightData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))

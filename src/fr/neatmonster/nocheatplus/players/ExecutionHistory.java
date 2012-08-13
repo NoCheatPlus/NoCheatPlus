@@ -130,7 +130,7 @@ public class ExecutionHistory {
         }
     }
 
-    /** Store dataFactory between events (time + action + action-counter). **/
+    /** Store data between events (time + action + action-counter). **/
     private final Map<String, Map<Action, ExecutionHistoryEntry>> executionHistories;
 
     /**

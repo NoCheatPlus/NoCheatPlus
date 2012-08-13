@@ -179,7 +179,7 @@ public class NoPwnage extends Check {
             if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
                 // Correct answer to the captcha?
                 if (message.equals(data.noPwnageGeneratedCaptcha)) {
-                    // Yes, clear his dataFactory and do not worry anymore about him.
+                    // Yes, clear his data and do not worry anymore about him.
                     data.clearNoPwnageData();
                     data.noPwnageHasFilledCaptcha = true;
                     player.sendMessage(replaceColors(cc.noPwnageCaptchaSuccess));
@@ -288,7 +288,7 @@ public class NoPwnage extends Check {
                     cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
                 }
 
-            // Store the message and some other dataFactory.
+            // Store the message and some other data.
             data.noPwnageLastMessage = message;
             data.noPwnageLastMessageTime = now;
             lastGlobalMessage = message;
@@ -330,7 +330,7 @@ public class NoPwnage extends Check {
                 cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, true);
         }
 
-        // Store his location and some other dataFactory.
+        // Store his location and some other data.
         data.noPwnageLastLocation = player.getLocation();
         data.noPwnageJoinTime = now;
 

@@ -52,7 +52,7 @@ public abstract class ActionWithParameters extends Action {
     }
 
     /**
-     * Get a string with all the wildcards replaced with dataFactory from LogData.
+     * Get a string with all the wildcards replaced with data from LogData.
      * 
      * @param check
      *            the check

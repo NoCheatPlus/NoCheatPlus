@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  * MMMMMMMMMMM                          MMMMMMMMMMM                          
  */
 /**
- * Player specific dataFactory for the chat checks.
+ * Player specific data for the chat checks.
  */
 public class ChatData implements CheckData {
 
@@ -31,15 +31,15 @@ public class ChatData implements CheckData {
                                                         }
                                                     };
 
-    /** The map containing the dataFactory per players. */
+    /** The map containing the data per players. */
     private static Map<String, ChatData> playersMap = new HashMap<String, ChatData>();
 
     /**
-     * Gets the dataFactory of a specified player.
+     * Gets the data of a specified player.
      * 
      * @param player
      *            the player
-     * @return the dataFactory
+     * @return the data
      */
     public synchronized static ChatData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
@@ -67,7 +67,7 @@ public class ChatData implements CheckData {
     public long     noPwnageReloginWarningTime;
 
     /**
-     * Clear the dataFactory of the no pwnage check.
+     * Clear the data of the no pwnage check.
      */
     public synchronized void clearNoPwnageData() {
         // TODO: re-think this sync [keep related to ChatData/NoPwnage/Color used lock.]

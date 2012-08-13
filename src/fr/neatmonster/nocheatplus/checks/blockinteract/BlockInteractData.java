@@ -26,7 +26,7 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  * MMMMMMMMMMM                          
  */
 /**
- * Player specific dataFactory for the block interact checks.
+ * Player specific data for the block interact checks.
  */
 public class BlockInteractData implements CheckData {
 
@@ -38,15 +38,15 @@ public class BlockInteractData implements CheckData {
                                                                  }
                                                              };
 
-    /** The map containing the dataFactory per players. */
+    /** The map containing the data per players. */
     private static Map<String, BlockInteractData> playersMap = new HashMap<String, BlockInteractData>();
 
     /**
-     * Gets the dataFactory of a specified player.
+     * Gets the data of a specified player.
      * 
      * @param player
      *            the player
-     * @return the dataFactory
+     * @return the data
      */
     public static BlockInteractData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))

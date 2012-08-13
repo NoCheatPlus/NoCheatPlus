@@ -47,7 +47,7 @@ public class CommandAction extends ActionWithParameters {
      * that can be directly used as a command in the console.
      * 
      * @param check
-     *            The check that is used to fill in missing dataFactory.
+     *            The check that is used to fill in missing .
      * @param violationData
      *            the violation data
      * @return The complete, ready to use, command.
@@ -57,7 +57,7 @@ public class CommandAction extends ActionWithParameters {
     }
 
     /**
-     * Convert the commands dataFactory into a string that can be used in the configuration files.
+     * Convert the commands  into a string that can be used in the configuration files.
      * 
      * @return the string
      */

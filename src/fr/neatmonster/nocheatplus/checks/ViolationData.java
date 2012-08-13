@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.actions.types.ActionList;
  * MMMMMMMMMMM                                                     MMMMMMMMMMM                          
  */
 /**
- * Violation specific dataFactory, for executing actions.<br>
+ * Violation specific data, for executing actions.<br>
  * This is meant to capture a violation incident in a potentially thread safe way.
  * 
  * @author asofold

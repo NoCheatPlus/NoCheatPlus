@@ -159,7 +159,7 @@ public class InventoryListener implements Listener {
             data.instantEatFood = event.getItem().getType();
             data.instantEatLastTime = System.currentTimeMillis();
         } else {
-            // Nothing that we are interested in, reset dataFactory.
+            // Nothing that we are interested in, reset data.
             data.instantBowLastTime = 0;
             data.instantEatLastTime = 0;
             data.instantEatFood = null;
