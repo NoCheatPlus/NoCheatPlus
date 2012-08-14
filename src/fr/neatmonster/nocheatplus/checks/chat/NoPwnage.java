@@ -163,48 +163,67 @@ public class NoPwnage extends Check {
      */
     private boolean unsafeCheck(final Player player, final PlayerEvent event, final boolean isMainThread,
             final ChatConfig cc, final ChatData data) {
+        boolean[] results = null;
+        if (event instanceof AsyncPlayerChatEvent) {
+            final AsyncPlayerChatEvent e = (AsyncPlayerChatEvent) event;
+            results = unsafeCheck(player, e.getMessage(), isMainThread, cc, data);
+            e.setCancelled(results[0]);
+        } else if (event instanceof PlayerCommandPreprocessEvent) {
+            final PlayerCommandPreprocessEvent e = (PlayerCommandPreprocessEvent) event;
+            results = unsafeCheck(player, e.getMessage(), isMainThread, cc, data);
+            e.setCancelled(results[0]);
+        }
+        return results[1];
+    }
+
+    /**
+     * Only to be called form synchronized code.
+     * 
+     * @param player
+     *            the player
+     * @param message
+     *            the message
+     * @param isMainThread
+     *            the is main thread
+     * @param cc
+     *            the cc
+     * @param data
+     *            the data
+     * @return the boolean[]
+     */
+    private boolean[] unsafeCheck(final Player player, final String message, final boolean isMainThread,
+            final ChatConfig cc, final ChatData data) {
         data.noPwnageVL = 0D;
 
         boolean cancel = false;
+        boolean kick = false;
 
-        String message = "";
-        if (event instanceof AsyncPlayerChatEvent)
-            message = ((AsyncPlayerChatEvent) event).getMessage();
-        else if (event instanceof PlayerCommandPreprocessEvent)
-            message = ((PlayerCommandPreprocessEvent) event).getMessage();
-        final boolean isCommand = event instanceof PlayerCommandPreprocessEvent;
         final long now = System.currentTimeMillis();
 
-        if (!data.noPwnageHasFilledCaptcha)
-            if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
-                // Correct answer to the captcha?
-                if (message.equals(data.noPwnageGeneratedCaptcha)) {
-                    // Yes, clear his data and do not worry anymore about him.
-                    data.clearNoPwnageData();
-                    data.noPwnageHasFilledCaptcha = true;
-                    player.sendMessage(replaceColors(cc.noPwnageCaptchaSuccess));
-                } else {
-                    // Does he failed too much times?
-                    if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
-                        // Find out if we need to ban the player or not.
-                        // TODO: extra captcha actions / VL ?
-                        cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
+        if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
+            // Correct answer to the captcha?
+            if (message.equals(data.noPwnageGeneratedCaptcha)) {
+                // Yes, clear his data and do not worry anymore about him.
+                data.clearNoPwnageData();
+                data.noPwnageHasStartedCaptcha = false;
+                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaSuccess));
+            } else {
+                // Does he failed too much times?
+                if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
+                    // Find out if we need to ban the player or not.
+                    kick = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
 
-                    // Increment his tries number counter.
-                    data.noPwnageCaptchTries++;
+                // Increment his tries number counter.
+                data.noPwnageCaptchTries++;
 
-                    // Display the question again.
-                    player.sendMessage(replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
-                            data.noPwnageGeneratedCaptcha)));
-                }
-
-                // Cancel the event and return.
-                if (event instanceof AsyncPlayerChatEvent)
-                    ((AsyncPlayerChatEvent) event).setCancelled(true);
-                else if (event instanceof PlayerCommandPreprocessEvent)
-                    ((PlayerCommandPreprocessEvent) event).setCancelled(true);
-                return cancel;
+                // Display the question again.
+                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
+                        data.noPwnageGeneratedCaptcha)));
             }
+
+            // Cancel the message and maybe event.
+            return new boolean[] {true, kick};
+        }
 
         if (data.noPwnageLastLocation == null)
             data.noPwnageLastLocation = player.getLocation();
@@ -215,7 +234,7 @@ public class NoPwnage extends Check {
 
         // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
         // message within "timeout" milliseconds, the suspicion will be increased by "weight".
-        if (!isCommand && cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
+        if (cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
                 && CheckUtils.isSimilar(message, lastBanCausingMessage, 0.8f))
             data.noPwnageVL += cc.noPwnageBannedWeight;
 
@@ -226,7 +245,7 @@ public class NoPwnage extends Check {
 
         // NoPwnage will check if a player repeats a message that has been sent by another player just before,
         // within "timeout". If he does, suspicion will be increased by "weight".
-        if (!isCommand && cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
+        if (cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
                 && CheckUtils.isSimilar(message, lastGlobalMessage, 0.8f))
             data.noPwnageVL += cc.noPwnageGlobalWeight;
 
@@ -237,7 +256,7 @@ public class NoPwnage extends Check {
 
         // NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message
         // is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight".
-        if (!isCommand && cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
+        if (cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
                 && CheckUtils.isSimilar(message, data.noPwnageLastMessage, 0.8f))
             data.noPwnageVL += cc.noPwnageRepeatWeight;
 
@@ -258,34 +277,29 @@ public class NoPwnage extends Check {
         }
 
         if (cc.noPwnageWarnPlayerCheck && data.noPwnageVL > cc.noPwnageWarnLevel && !warned) {
-            player.sendMessage(replaceColors(cc.noPwnageWarnPlayerMessage));
+            player.sendMessage(CheckUtils.replaceColors(cc.noPwnageWarnPlayerMessage));
             data.noPwnageLastWarningTime = now;
         } else if (data.noPwnageVL > cc.noPwnageLevel)
             if (cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha) {
                 // Display a captcha to the player.
+                data.noPwnageGeneratedCaptcha = "";
                 for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
                     data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
                             .nextInt(cc.noPwnageCaptchaCharacters.length()));
-                player.sendMessage(replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
+                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
                         data.noPwnageGeneratedCaptcha)));
                 data.noPwnageHasStartedCaptcha = true;
-                if (event instanceof AsyncPlayerChatEvent)
-                    ((AsyncPlayerChatEvent) event).setCancelled(true);
-                else if (event instanceof PlayerCommandPreprocessEvent)
-                    ((PlayerCommandPreprocessEvent) event).setCancelled(true);
+                cancel = true;
             } else {
                 lastBanCausingMessage = message;
                 data.noPwnageLastWarningTime = lastBanCausingMessageTime = now;
                 if (cc.noPwnageWarnOthersCheck)
-                    Bukkit.broadcastMessage(replaceColors(cc.noPwnageWarnOthersMessage.replace("[player]",
+                    Bukkit.broadcastMessage(CheckUtils.replaceColors(cc.noPwnageWarnOthersMessage.replace("[player]",
                             player.getName())));
-                if (event instanceof AsyncPlayerChatEvent)
-                    ((AsyncPlayerChatEvent) event).setCancelled(true);
-                else if (event instanceof PlayerCommandPreprocessEvent)
-                    ((PlayerCommandPreprocessEvent) event).setCancelled(true);
+                cancel = true;
 
                 // Find out if we need to ban the player or not.
-                cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
+                kick = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
             }
 
         // Store the message and some other data.
@@ -294,7 +308,7 @@ public class NoPwnage extends Check {
         lastGlobalMessage = message;
         lastGlobalMessageTime = now;
 
-        return cancel;
+        return new boolean[] {cancel, kick};
     }
 
     /**
@@ -320,12 +334,11 @@ public class NoPwnage extends Check {
             if (now - data.noPwnageReloginWarningTime > cc.noPwnageReloginWarningTimeout)
                 data.noPwnageReloginWarnings = 0;
             if (data.noPwnageReloginWarnings < cc.noPwnageReloginWarningNumber) {
-                player.sendMessage(replaceColors(cc.noPwnageReloginWarningMessage));
+                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageReloginWarningMessage));
                 data.noPwnageReloginWarningTime = now;
                 data.noPwnageReloginWarnings++;
             } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
                 // Find out if we need to ban the player or not.
-                // TODO: extra actions / VL ?
                 cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, true);
         }
 

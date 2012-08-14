@@ -132,11 +132,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS,
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH, 4);
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH, 6);
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_QUESTION,
                 "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 20);
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 3);
 
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);
@@ -301,8 +301,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
-        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too much blocks" + end);
-        set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too much blocks" + end);
+        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too many blocks" + end);
+        set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);
         set(ConfPaths.STRINGS + ".flylong", start

@@ -10,8 +10,8 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
-import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
  * MM'""""'YMM dP                  dP   M""MMMMMMMM oo            dP                                       
@@ -59,7 +59,7 @@ public class ChatListener implements Listener {
 
         // Then the no pwnage check.
         if (noPwnage.check(player, event, false))
-            player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
+            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
     /**
@@ -90,7 +90,8 @@ public class ChatListener implements Listener {
 
         // Protect some commands to prevent players for seeing which plugins are installed.
         if (ChatConfig.getConfig(player).protectPlugins
-                && (command.equals("plugins") || command.equals("pl") || command.equals("?"))
+                && (command.equals("?") || command.equals("about") || command.equals("help")
+                        || command.equals("plugins") || command.equals("pl"))
                 && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
             event.getPlayer().sendMessage(
                     ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
@@ -112,7 +113,7 @@ public class ChatListener implements Listener {
 
         // Then the no pwnage check.
         if (noPwnage.check(player, event, true))
-            player.kickPlayer(Check.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
+            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
     /**

@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
 import fr.neatmonster.nocheatplus.actions.Action;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * M""""""'YMM                                         MMP"""""""MM            dP   oo                   
@@ -29,6 +30,14 @@ public class DummyAction extends Action {
     public DummyAction(final String definition) {
         super("dummyAction", 10000, 10000);
         this.definition = definition;
+    }
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
+     */
+    @Override
+    public boolean execute(final ViolationData violationData) {
+        return false;
     }
 
     /* (non-Javadoc)

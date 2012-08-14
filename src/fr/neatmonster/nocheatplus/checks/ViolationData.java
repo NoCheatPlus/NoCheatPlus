@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
 
 /*
@@ -21,6 +22,12 @@ import fr.neatmonster.nocheatplus.actions.types.ActionList;
  */
 public class ViolationData {
 
+    /** The actions to be executed. */
+    public final ActionList actions;
+
+    /** The bypassing permission. */
+    public final String     bypassPermission;
+
     /** The check. */
     public final Check      check;
 
@@ -28,13 +35,7 @@ public class ViolationData {
     public final Player     player;
 
     /** The violation level. */
-    public final double     VL;
-
-    /** The actions to be executed. */
-    public final ActionList actions;
-
-    /** The bypassing permission. */
-    public final String     bypassPermission;
+    public final double     violationLevel;
 
     /**
      * Instantiates a new violation data.
@@ -43,13 +44,13 @@ public class ViolationData {
      *            the check
      * @param player
      *            the player
-     * @param VL
-     *            the vL
+     * @param violationLevel
+     *            the violation level
      * @param actions
      *            the actions
      */
-    public ViolationData(final Check check, final Player player, final double VL, final ActionList actions) {
-        this(check, player, VL, actions, null);
+    public ViolationData(final Check check, final Player player, final double violationLevel, final ActionList actions) {
+        this(check, player, violationLevel, actions, null);
     }
 
     /**
@@ -59,20 +60,28 @@ public class ViolationData {
      *            the check
      * @param player
      *            the player
-     * @param VL
-     *            the vL
+     * @param violationLevel
+     *            the violation level
      * @param actions
      *            the actions
      * @param bypassPermission
      *            the permission to bypass the execution, if not null
      */
-    public ViolationData(final Check check, final Player player, final double VL, final ActionList actions,
+    public ViolationData(final Check check, final Player player, final double violationLevel, final ActionList actions,
             final String bypassPermission) {
         this.check = check;
         this.player = player;
-        this.VL = VL;
+        this.violationLevel = violationLevel;
         this.actions = actions;
         this.bypassPermission = bypassPermission;
     }
 
+    /**
+     * Gets the actions.
+     * 
+     * @return the actions
+     */
+    public Action[] getActions() {
+        return actions.getActions(violationLevel);
+    }
 }

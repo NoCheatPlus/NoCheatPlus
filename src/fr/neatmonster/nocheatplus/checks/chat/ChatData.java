@@ -54,7 +54,6 @@ public class ChatData implements CheckData {
     // Data of the no pwnage check.
     public int      noPwnageCaptchTries;
     public String   noPwnageGeneratedCaptcha;
-    public boolean  noPwnageHasFilledCaptcha;
     public boolean  noPwnageHasStartedCaptcha;
     public long     noPwnageJoinTime;
     public Location noPwnageLastLocation;
@@ -70,7 +69,6 @@ public class ChatData implements CheckData {
      * Clear the data of the no pwnage check.
      */
     public synchronized void clearNoPwnageData() {
-        // TODO: re-think this sync [keep related to ChatData/NoPwnage/Color used lock.]
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";

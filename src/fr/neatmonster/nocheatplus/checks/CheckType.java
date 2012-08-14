@@ -195,8 +195,6 @@ public enum CheckType {
      * @return true, if the check is enabled
      */
     public final boolean isEnabled(final Player player) {
-        // if (configFactory == null) return true; // TODO: maybe leave this out.
         return configFactory.getConfig(player).isEnabled(this);
     }
-
 }

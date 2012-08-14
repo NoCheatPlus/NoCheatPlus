@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
 import fr.neatmonster.nocheatplus.actions.Action;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * MM'""""'YMM                                     dP MMP"""""""MM            dP   oo                   
@@ -22,6 +23,14 @@ public class CancelAction extends Action {
      */
     public CancelAction() {
         super("cancel", 0, 0);
+    }
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
+     */
+    @Override
+    public boolean execute(final ViolationData data) {
+        return true;
     }
 
     /* (non-Javadoc)

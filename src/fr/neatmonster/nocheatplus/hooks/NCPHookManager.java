@@ -13,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * M"""""""`YM MM'""""'YMM MM"""""""`YM M""MMMMM""MM                   dP       
@@ -265,7 +266,7 @@ public final class NCPHookManager {
      */
     private static final void logHookFailure(final CheckType checkType, final Player player, final NCPHook hook,
             final Throwable t) {
-        // TODO: Might accumulate failure rate and only log every so and so seconds or disable hook if spamming (leads
+        // TODO: might accumulate failure rate and only log every so and so seconds or disable hook if spamming (leads
         // to NCP spam though)?
         final StringBuilder builder = new StringBuilder(1024);
         builder.append("[NoCheatPlus] Hook " + getHookDescription(hook) + " encountered an unexpected exception:\n");
@@ -403,14 +404,12 @@ public final class NCPHookManager {
      *            the player that fails the check
      * @return if we should cancel the VL processing
      */
-    public static final boolean shouldCancelVLProcessing(final CheckType checkType, final Player player) {
+    public static final boolean shouldCancelVLProcessing(final ViolationData violationData) {
         // Checks for hooks registered for this event, parent groups or ALL will be inserted into the list.
-        // Return true as soon as one hook returns true.
-
-        // Test hooks, if present:
-        final List<NCPHook> hooksCheck = hooksByChecks.get(checkType);
+        // Return true as soon as one hook returns true. Test hooks, if present.
+        final List<NCPHook> hooksCheck = hooksByChecks.get(violationData.check.getType());
         if (hooksCheck != null)
-            if (applyHooks(checkType, player, hooksCheck))
+            if (applyHooks(violationData.check.getType(), violationData.player, hooksCheck))
                 return true;
         return false;
     }

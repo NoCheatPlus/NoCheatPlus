@@ -15,7 +15,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
-import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
  * MM'""""'YMM                   .8888b oo          M"""""`'"""`YM                                                       
@@ -182,7 +182,7 @@ public class ConfigManager {
             e.printStackTrace();
         }
 
-        Check.setFileLogger(logger);
+        CheckUtils.fileLogger = logger;
 
         // Try to find world-specific configuration files.
         final HashMap<String, File> worldFiles = new HashMap<String, File>();

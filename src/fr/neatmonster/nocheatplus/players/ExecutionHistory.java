@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.neatmonster.nocheatplus.actions.Action;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * MM""""""""`M                                       dP   oo                   
@@ -82,9 +83,9 @@ public class ExecutionHistory {
          *            the length
          */
         private void clearTimes(final long start, long length) {
-
             if (length <= 0)
-                return; // Nothing to do (yet).
+                // Nothing to do (yet).
+                return;
             if (length > executionTimes.length)
                 length = executionTimes.length;
 
@@ -144,25 +145,24 @@ public class ExecutionHistory {
      * Returns true, if the action should be executed, because all time criteria have been met. Will add a entry with
      * the time to a list which will influence further requests, so only use once and remember the result.
      * 
-     * @param check
-     *            the check
+     * @param violationData
+     *            the violation data
      * @param action
      *            the action
      * @param time
      *            a time IN SECONDS
      * @return true, if successful
      */
-    public boolean executeAction(final String check, final Action action, final long time) {
+    public boolean executeAction(final ViolationData violationData, final Action action, final long time) {
+        final String check = violationData.check.getType().getName();
 
         Map<Action, ExecutionHistoryEntry> executionHistory = executionHistories.get(check);
-
         if (executionHistory == null) {
             executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
             executionHistories.put(check, executionHistory);
         }
 
         ExecutionHistoryEntry entry = executionHistory.get(action);
-
         if (entry == null) {
             entry = new ExecutionHistoryEntry(60);
             executionHistory.put(action, entry);

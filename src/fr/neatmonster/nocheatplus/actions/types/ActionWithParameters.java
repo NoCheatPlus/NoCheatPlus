@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
-import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
@@ -54,13 +53,11 @@ public abstract class ActionWithParameters extends Action {
     /**
      * Get a string with all the wildcards replaced with data from the violation data.
      * 
-     * @param check
-     *            the check
      * @param violationData
      *            the violation data
      * @return the message
      */
-    protected String getMessage(final Check check, final ViolationData violationData) {
+    protected String getMessage(final ViolationData violationData) {
         // Should be big enough most of the time.
         final StringBuilder log = new StringBuilder(100);
 
@@ -68,7 +65,7 @@ public abstract class ActionWithParameters extends Action {
             if (part instanceof String)
                 log.append((String) part);
             else
-                log.append(check.getParameter((ParameterName) part, violationData));
+                log.append(violationData.check.getParameter((ParameterName) part, violationData));
 
         return log.toString();
     }

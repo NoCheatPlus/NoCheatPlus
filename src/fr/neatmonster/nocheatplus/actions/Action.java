@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.actions;
 
+import fr.neatmonster.nocheatplus.checks.ViolationData;
+
 /*
  * MMP"""""""MM            dP   oo                   
  * M' .mmmm  MM            88                        
@@ -46,4 +48,13 @@ public abstract class Action {
         this.delay = delay;
         this.repeat = repeat;
     }
+
+    /**
+     * Execute the action.
+     * 
+     * @param violationData
+     *            the violation data
+     * @return true, if successful
+     */
+    public abstract boolean execute(final ViolationData violationData);
 }

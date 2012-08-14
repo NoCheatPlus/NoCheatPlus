@@ -1,6 +1,8 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
-import fr.neatmonster.nocheatplus.checks.Check;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandException;
+
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
@@ -42,18 +44,21 @@ public class CommandAction extends ActionWithParameters {
         super(name, delay, repeat, command);
     }
 
-    /**
-     * Fill in the placeholders (stuff that looks like '[something]') with information, make a nice String out of it
-     * that can be directly used as a command in the console.
-     * 
-     * @param check
-     *            The check that is used to fill in missing .
-     * @param violationData
-     *            the violation data
-     * @return The complete, ready to use, command.
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
      */
-    public String getCommand(final Check check, final ViolationData violationData) {
-        return super.getMessage(check, violationData);
+    @Override
+    public boolean execute(final ViolationData violationData) {
+        final String command = super.getMessage(violationData);
+        try {
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+        } catch (final CommandException e) {
+            System.out.println("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
+                    + ", please check if everything is setup correct.");
+        } catch (final Exception e) {
+            // I don't care in this case, your problem if your command fails.
+        }
+        return false;
     }
 
     /**

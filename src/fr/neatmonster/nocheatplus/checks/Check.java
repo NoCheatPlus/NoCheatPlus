@@ -2,26 +2,15 @@ package fr.neatmonster.nocheatplus.checks;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandException;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.actions.types.CancelAction;
-import fr.neatmonster.nocheatplus.actions.types.CommandAction;
-import fr.neatmonster.nocheatplus.actions.types.DummyAction;
-import fr.neatmonster.nocheatplus.actions.types.LogAction;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
-import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
  * MM'""""'YMM dP                         dP       
@@ -36,9 +25,9 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * The Class Check.
  */
 public abstract class Check {
-    protected static Map<String, ExecutionHistory> histories  = new HashMap<String, ExecutionHistory>();
 
-    private static Logger                          fileLogger = null;
+    /** The execution histories of each check. */
+    protected static Map<String, ExecutionHistory> histories = new HashMap<String, ExecutionHistory>();
 
     /**
      * Gets the player's history.
@@ -51,42 +40,6 @@ public abstract class Check {
         if (!histories.containsKey(player.getName()))
             histories.put(player.getName(), new ExecutionHistory());
         return histories.get(player.getName());
-    }
-
-    /**
-     * Removes the colors of a message.
-     * 
-     * @param text
-     *            the text
-     * @return the string
-     */
-    public static String removeColors(String text) {
-        for (final ChatColor c : ChatColor.values())
-            text = text.replace("&" + c.getChar(), "");
-        return text;
-    }
-
-    /**
-     * Replace colors of a message.
-     * 
-     * @param text
-     *            the text
-     * @return the string
-     */
-    public static String replaceColors(String text) {
-        for (final ChatColor c : ChatColor.values())
-            text = text.replace("&" + c.getChar(), c.toString());
-        return text;
-    }
-
-    /**
-     * Sets the file logger.
-     * 
-     * @param logger
-     *            the new file logger
-     */
-    public static void setFileLogger(final Logger logger) {
-        fileLogger = logger;
     }
 
     /** The type. */
@@ -126,45 +79,26 @@ public abstract class Check {
      */
     protected boolean executeActions(final ViolationData violationData) {
         try {
-            boolean special = false;
-            final Player player = violationData.player;
-
-            // Check a bypass permission:
+            // Check a bypass permission.
             if (violationData.bypassPermission != null)
-                if (player.hasPermission(violationData.bypassPermission))
+                if (violationData.player.hasPermission(violationData.bypassPermission))
                     return false;
 
-            final ActionList actionList = violationData.actions;
-            final double violationLevel = violationData.VL;
-
             // Dispatch the VL processing to the hook manager.
-            if (NCPHookManager.shouldCancelVLProcessing(violationData.check.type, player))
+            if (NCPHookManager.shouldCancelVLProcessing(violationData))
                 // One of the hooks has decided to cancel the VL processing, return false.
                 return false;
 
-            // Get the to be executed actions.
-            final Action[] actions = actionList.getActions(violationLevel);
-
             final long time = System.currentTimeMillis() / 1000L;
 
-            for (final Action ac : actions)
-                if (getHistory(player).executeAction(violationData.check.type.getName(), ac, time))
+            boolean cancel = false;
+            for (final Action action : violationData.getActions())
+                if (getHistory(violationData.player).executeAction(violationData, action, time))
                     // The execution history said it really is time to execute the action, find out what it is and do
                     // what is needed.
+                    cancel = cancel || action.execute(violationData);
 
-                    // TODO: Check design: maybe ac.execute(this) without the instance checks ?
-
-                    if (ac instanceof LogAction && !player.hasPermission(actionList.permissionSilent))
-                        executeLogAction((LogAction) ac, violationData.check, violationData);
-                    else if (ac instanceof CancelAction)
-                        special = true;
-                    else if (ac instanceof CommandAction)
-                        executeConsoleCommand((CommandAction) ac, violationData.check, violationData);
-                    else if (ac instanceof DummyAction) {
-                        // Do nothing, it's a dummy action after all.
-                    }
-
-            return special;
+            return cancel;
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -204,58 +138,6 @@ public abstract class Check {
     }
 
     /**
-     * Execute a console command.
-     * 
-     * @param action
-     *            the action
-     * @param check
-     *            the check
-     * @param violationData
-     *            the violation data
-     */
-    private void executeConsoleCommand(final CommandAction action, final Check check, final ViolationData violationData) {
-        final String command = action.getCommand(check, violationData);
-
-        try {
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
-        } catch (final CommandException e) {
-            System.out.println("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
-                    + ", please check if everything is setup correct.");
-        } catch (final Exception e) {
-            // I don't care in this case, your problem if your command fails.
-        }
-    }
-
-    /**
-     * Execute a log action.
-     * 
-     * @param logAction
-     *            the log action
-     * @param check
-     *            the check
-     * @param violationData
-     *            the violation data
-     */
-    private void executeLogAction(final LogAction logAction, final Check check, final ViolationData violationData) {
-        final ConfigFile configurationFile = ConfigManager.getConfigFile();
-        if (!configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE))
-            return;
-
-        final String message = logAction.getLogMessage(check, violationData);
-        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE) && logAction.toConsole())
-            // Console logs are not colored.
-            System.out.println("[NoCheatPlus] " + removeColors(message));
-        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOINGAMECHAT) && logAction.toChat())
-            for (final Player otherPlayer : Bukkit.getServer().getOnlinePlayers())
-                if (otherPlayer.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
-                    // Chat logs are potentially colored.
-                    otherPlayer.sendMessage(replaceColors(ChatColor.RED + "NCP: " + ChatColor.WHITE + message));
-        if (configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOFILE) && logAction.toFile())
-            // File logs are not colored.
-            fileLogger.info(removeColors(message));
-    }
-
-    /**
      * Replace a parameter for commands or log actions with an actual value. Individual checks should override this to
      * get their own parameters handled too.
      * 
@@ -272,14 +154,22 @@ public abstract class Check {
             return violationData.player.getName();
         else if (wildcard == ParameterName.VIOLATIONS) {
             try {
-                return "" + Math.round(violationData.VL);
+                return "" + Math.round(violationData.violationLevel);
             } catch (final Exception e) {
-                Bukkit.broadcastMessage("getParameter " + type.getName());
                 e.printStackTrace();
             }
             return "";
         } else
             return "The author was lazy and forgot to define " + wildcard + ".";
+    }
+
+    /**
+     * Gets the type of the check.
+     * 
+     * @return the type
+     */
+    public CheckType getType() {
+        return type;
     }
 
     /**
