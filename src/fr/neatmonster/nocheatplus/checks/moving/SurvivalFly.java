@@ -116,23 +116,23 @@ public class SurvivalFly extends Check {
 
         // Calculate some distances.
         final double xDistance = to.getX() - from.getX();
+        final double yDistance = to.getY() - from.getY();
         final double zDistance = to.getZ() - from.getZ();
         final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
         // Prevent players from walking on a liquid.
-        if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && from.getY() == to.getY()
+        if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D
                 && MovingListener.isLiquid(to.getLocation().getBlock().getType()) && !to.isOnGround()
                 && to.getY() % 1D < 0.8D)
             hDistanceAboveLimit = hDistance;
 
         // Prevent players from sprinting if they're moving backwards.
         if (hDistanceAboveLimit <= 0D && sprinting && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
-            final double dX = to.getX() - from.getX();
-            final double dZ = to.getZ() - from.getZ();
             final float yaw = from.getYaw();
-            if (dX < 0D && dZ > 0D && yaw > 180F && yaw < 270F || dX < 0D && dZ < 0D && yaw > 270F && yaw < 360F
-                    || dX > 0D && dZ < 0D && yaw > 0F && yaw < 90F || dX > 0D && dZ > 0D && yaw > 90F && yaw < 180F)
+            if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F || xDistance < 0D && zDistance < 0D
+                    && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
+                    || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F)
                 hDistanceAboveLimit = hDistance;
         }
 
@@ -169,12 +169,19 @@ public class SurvivalFly extends Check {
         if (jumpAmplifier > data.jumpAmplifier)
             data.jumpAmplifier = jumpAmplifier;
 
-        // If the player has made a "double-jump" which hasn't been noticed by the plugin, the issue is fixed here.
-        if (!from.isOnGround() && to.isOnGround() && to.getY() - from.getY() > 0D && to.getY() - from.getY() <= 0.5D
-                && to.getY() - data.setBack.getY() > 0D && to.getY() - data.setBack.getY() <= 1.5D) {
-            data.setBack = to.getLocation();
+        // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
+        final double setBackYDistance = to.getY() - data.setBack.getY();
+        if (!from.isOnGround()
+                && (from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
+                        && setBackYDistance > 0D && setBackYDistance <= 1.5D || !to.isOnGround() && to.isAboveStairs())) {
+            // Set the new setBack and reset the jumpPhase.
+            data.setBack = from.getLocation();
+            data.setBack.setY(Math.floor(data.setBack.getY()));
             data.survivalFlyJumpPhase = 0;
+            // Reset the no fall data.
+            data.resetNoFallDistances();
         }
+        data.survivalFlyLastFromY = from.getY();
 
         // Calculate the vertical speed limit based on the current jump phase.
         double vAllowedDistance = (!from.isOnGround() && !to.isOnGround() ? 1.45D : 1.35D) + data.verticalFreedom;
@@ -182,25 +189,7 @@ public class SurvivalFly extends Check {
         if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
             vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
 
-        // If the player has touched the ground and this actions hasn't been noticed by the plugin, the issue is fixed
-        // here.
-        final double vDistance = to.getY() - data.setBack.getY();
-        if (data.survivalFlyLastDistances[0] < data.survivalFlyLastDistances[1]
-                && vDistance > data.survivalFlyLastDistances[0] && vDistance > 0 && vDistance < 0.5D)
-            data.survivalFlyJumpPhase = 0;
-        else if (vDistance <= 0D)
-            data.survivalFlyJumpPhase = 0;
-        data.survivalFlyLastDistances[1] = data.survivalFlyLastDistances[0];
-        data.survivalFlyLastDistances[0] = vDistance;
-
-        double vDistanceAboveLimit = vDistance - vAllowedDistance;
-
-        // Fix for the issue with stairs.
-        if (from.isOnStairs() || to.isOnStairs() && vDistanceAboveLimit < 0.15D) {
-            data.jumpAmplifier = 0D;
-            data.noFallOnGroundClient = data.noFallOnGroundServer = true;
-            vDistanceAboveLimit = 0D;
-        }
+        final double vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
 
         if (from.isOnGround() || to.isOnGround())
             data.jumpAmplifier = 0D;

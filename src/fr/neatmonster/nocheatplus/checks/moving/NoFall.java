@@ -51,10 +51,9 @@ public class NoFall extends Check {
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 
-        // If the player has just started falling, is falling into a liquid, in web or is on a ladder.
-        if (to.isInLiquid() || to.isInWeb() || to.isOnLadder())
-            // Reset his fall distance.
-            data.noFallFallDistance = data.noFallNewFallDistance = 0D;
+        // If the player is on the ground, is falling into a liquid, in web or is on a ladder.
+        if (from.isOnGround() && to.isOnGround() || to.isInLiquid() || to.isInWeb() || to.isOnLadder())
+            data.resetNoFallDistances();
 
         // If the player just touched the ground for the server, but no for the client.
         if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer
@@ -76,22 +75,26 @@ public class NoFall extends Check {
         else if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer) {
             // If the difference between the fall distance recorded by Bukkit and NoCheatPlus is too big and the fall
             // distance bigger than 2.
-            if (data.noFallFallDistance - player.getFallDistance() > 1D && (int) data.noFallFallDistance > 2) {
+            if (data.noFallFallDistance - player.getFallDistance() > Math.pow(1D, -3D)
+                    && (int) data.noFallFallDistance > 2) {
                 // Add the difference to the violation level.
                 data.noFallVL += data.noFallFallDistance - player.getFallDistance();
 
                 // Execute the actions to find out if we need to cancel the event or not.
                 if (executeActions(player, data.noFallVL, cc.noFallActions))
-                    // player.sendMessage("");
                     // Set the fall distance to its right value.
                     player.setFallDistance((float) data.noFallFallDistance);
-
             } else
                 // Reward the player by lowering his violation level.
                 data.noFallVL *= 0.95D;
         } else
             // Reward the player by lowering his violation level.
             data.noFallVL *= 0.95D;
+
+        // The player has touched the ground somewhere, reset his fall distance.
+        if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer || data.noFallWasOnGroundServer
+                && !data.noFallOnGroundServer)
+            data.resetNoFallDistances();
     }
 
     /* (non-Javadoc)
@@ -122,9 +125,7 @@ public class NoFall extends Check {
         final AxisAlignedBB boundingBoxGround = player.boundingBox.clone().d(packet.x - player.locX,
                 packet.y - player.locY - 0.001D, packet.z - player.locZ);
         data.noFallOnGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
-        if (packet.hasPos && packet.y > 0 && data.noFallWasOnGroundServer && !data.noFallOnGroundServer)
-            data.noFallFallDistance = data.noFallNewFallDistance = 0D;
-        else if (packet.hasPos && packet.y > 0 && player.locY - packet.y > 0D) {
+        if (packet.hasPos && packet.y > 0 && player.locY - packet.y > 0D) {
             data.noFallFallDistance = data.noFallNewFallDistance;
             data.noFallNewFallDistance += player.locY - packet.y;
         }

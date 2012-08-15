@@ -92,7 +92,7 @@ public class MovingData implements CheckData {
 
     // Data of the survival fly check.
     public int        survivalFlyJumpPhase;
-    public double[]   survivalFlyLastDistances = new double[] {0D, 0D};
+    public double     survivalFlyLastFromY;
     public int        survivalFlyOnIce;
     public boolean    survivalFlyWasInBed;
 
@@ -119,5 +119,9 @@ public class MovingData implements CheckData {
     public void clearMorePacketsData() {
         morePacketsSetback = null;
         morePacketsVehicleSetback = null;
+    }
+
+    public void resetNoFallDistances() {
+        noFallFallDistance = noFallNewFallDistance = 0D;
     }
 }

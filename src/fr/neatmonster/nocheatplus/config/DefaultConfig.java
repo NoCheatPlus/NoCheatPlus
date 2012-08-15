@@ -22,7 +22,9 @@ public class DefaultConfig extends ConfigFile {
     public DefaultConfig() {
         super();
 
-        options().header("Main configuration file for NoCheatPlus. Read \"Instructions.txt\".");
+        options().header(
+                "Main configuration file for NoCheatPlus. "
+                        + "For more information, visit http://dev.bukkit.org/server-mods/nocheatplus/.");
 
         /*
          * 888                                 ,e,                  

@@ -1,12 +1,14 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.Arrays;
+
 import net.minecraft.server.AxisAlignedBB;
 import net.minecraft.server.Block;
 import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Material;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -75,47 +77,51 @@ public class PlayerLocation {
         }
     }
 
+    private static final Material[] STAIRS      = new Material[] {Material.WOOD_STAIRS, Material.COBBLESTONE_STAIRS,
+            Material.BRICK_STAIRS, Material.SMOOTH_STAIRS, Material.NETHER_BRICK_STAIRS, Material.SANDSTONE_STAIRS,
+            Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS};
+
     /** The original location. */
-    private final Location      location;
+    private final Location          location;
+
+    /** Is the player above stairs? */
+    private final CustomBoolean     aboveStairs = new CustomBoolean();
 
     /** Is the player in lava? */
-    private final CustomBoolean inLava      = new CustomBoolean();
+    private final CustomBoolean     inLava      = new CustomBoolean();
 
     /** Is the player in water? */
-    private final CustomBoolean inWater     = new CustomBoolean();
+    private final CustomBoolean     inWater     = new CustomBoolean();
 
     /** Is the player is web? */
-    private final CustomBoolean inWeb       = new CustomBoolean();
+    private final CustomBoolean     inWeb       = new CustomBoolean();
 
     /** Is the player on the ground? */
-    private final CustomBoolean onGround    = new CustomBoolean();
+    private final CustomBoolean     onGround    = new CustomBoolean();
 
     /** Is the player on ice? */
-    private final CustomBoolean onIce       = new CustomBoolean();
+    private final CustomBoolean     onIce       = new CustomBoolean();
 
     /** Is the player on ladder? */
-    private final CustomBoolean onLadder    = new CustomBoolean();
+    private final CustomBoolean     onLadder    = new CustomBoolean();
 
     /** Is the player on ladder (ignoring unclimbable vines)? **/
-    private final CustomBoolean onLadderBis = new CustomBoolean();
+    private final CustomBoolean     onLadderBis = new CustomBoolean();
 
     /** Is the player on soul sand? */
-    private final CustomBoolean onSoulSand  = new CustomBoolean();
-
-    /** Is the player on stairs? */
-    private final CustomBoolean onStairs    = new CustomBoolean();
+    private final CustomBoolean     onSoulSand  = new CustomBoolean();
 
     /** The bounding box of the player. */
-    private final AxisAlignedBB boundingBox;
+    private final AxisAlignedBB     boundingBox;
 
     /** The entity player. */
-    private final EntityPlayer  entity;
+    private final EntityPlayer      entity;
 
     /** The x, y and z coordinates. */
-    private final int           x, y, z;
+    private final int               x, y, z;
 
     /** The world. */
-    private final WorldServer   world;
+    private final WorldServer       world;
 
     /**
      * Instantiates a new player location.
@@ -192,6 +198,17 @@ public class PlayerLocation {
     }
 
     /**
+     * Checks if the player is above stairs.
+     * 
+     * @return true, if the player above on stairs
+     */
+    public boolean isAboveStairs() {
+        if (!aboveStairs.isSet())
+            aboveStairs.set(Arrays.asList(STAIRS).contains(Material.getMaterial(world.getTypeId(x, y - 1, z))));
+        return aboveStairs.get();
+    }
+
+    /**
      * Checks if the player is in lava.
      * 
      * @return true, if the player is in lava
@@ -200,7 +217,7 @@ public class PlayerLocation {
         if (!inLava.isSet()) {
             AxisAlignedBB boundingBoxLava = boundingBox.clone();
             boundingBoxLava = boundingBoxLava.grow(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D);
-            inLava.set(world.a(boundingBoxLava, Material.LAVA));
+            inLava.set(world.a(boundingBoxLava, net.minecraft.server.Material.LAVA));
         }
         return inLava.get();
     }
@@ -224,7 +241,7 @@ public class PlayerLocation {
             AxisAlignedBB boundingBoxWater = boundingBox.clone();
             boundingBoxWater = boundingBoxWater.grow(0.0D, -0.40000000596046448D, 0.0D);
             boundingBoxWater = boundingBoxWater.shrink(0.001D, 0.001D, 0.001D);
-            inWater.set(world.a(boundingBoxWater, Material.WATER, entity));
+            inWater.set(world.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity));
         }
         return inWater.get();
     }
@@ -350,19 +367,5 @@ public class PlayerLocation {
                 onSoulSand.set(false);
         }
         return onSoulSand.get();
-    }
-
-    /**
-     * Checks if the player is on stairs.
-     * 
-     * @return true, if the player is on stairs
-     */
-    public boolean isOnStairs() {
-        if (!onStairs.isSet()) {
-            final int id = world.getTypeId(x, y - 1, z);
-            onStairs.set(id == 53 || id == 67 || id == 108 || id == 109 || id == 114 || id == 128 || id == 134
-                    || id == 135 || id == 136);
-        }
-        return onStairs.get();
     }
 }
