@@ -35,72 +35,67 @@ public enum CheckType {
     ALL,
 
     BLOCKBREAK(BlockBreakConfig.factory, BlockBreakData.factory),
-    BLOCKBREAK_DIRECTION(BLOCKBREAK, "direction", Permissions.BLOCKBREAK_DIRECTION),
-    BLOCKBREAK_FASTBREAK(BLOCKBREAK, "fastBreak", Permissions.BLOCKBREAK_FASTBREAK),
-    BLOCKBREAK_NOSWING(BLOCKBREAK, "noSwing", Permissions.BLOCKBREAK_NOSWING),
-    BLOCKBREAK_REACH(BLOCKBREAK, "reach", Permissions.BLOCKBREAK_REACH),
+    BLOCKBREAK_DIRECTION(BLOCKBREAK, Permissions.BLOCKBREAK_DIRECTION),
+    BLOCKBREAK_FASTBREAK(BLOCKBREAK, Permissions.BLOCKBREAK_FASTBREAK),
+    BLOCKBREAK_NOSWING(BLOCKBREAK, Permissions.BLOCKBREAK_NOSWING),
+    BLOCKBREAK_REACH(BLOCKBREAK, Permissions.BLOCKBREAK_REACH),
 
     BLOCKINTERACT(BlockInteractConfig.factory, BlockInteractData.factory),
-    BLOCKINTERACT_DIRECTION(BLOCKINTERACT, "direction", Permissions.BLOCKINTERACT_DIRECTION),
-    BLOCKINTERACT_REACH(BLOCKINTERACT, "reach", Permissions.BLOCKINTERACT_REACH),
+    BLOCKINTERACT_DIRECTION(BLOCKINTERACT, Permissions.BLOCKINTERACT_DIRECTION),
+    BLOCKINTERACT_REACH(BLOCKINTERACT, Permissions.BLOCKINTERACT_REACH),
 
     BLOCKPLACE(BlockPlaceConfig.factory, BlockPlaceData.factory),
-    BLOCKPLACE_DIRECTION(BLOCKPLACE, "direction", Permissions.BLOCKPLACE_DIRECTION),
-    BLOCKPLACE_FASTPLACE(BLOCKPLACE, "fastPlace", Permissions.BLOCKPLACE_FASTPLACE),
-    BLOCKPLACE_NOSWING(BLOCKPLACE, "noSwing", Permissions.BLOCKPLACE_NOSWING),
-    BLOCKPLACE_REACH(BLOCKPLACE, "reach", Permissions.BLOCKBREAK_REACH),
-    BLOCKPLACE_SPEED(BLOCKPLACE, "speed", Permissions.BLOCKPLACE_SPEED),
+    BLOCKPLACE_DIRECTION(BLOCKPLACE, Permissions.BLOCKPLACE_DIRECTION),
+    BLOCKPLACE_FASTPLACE(BLOCKPLACE, Permissions.BLOCKPLACE_FASTPLACE),
+    BLOCKPLACE_NOSWING(BLOCKPLACE, Permissions.BLOCKPLACE_NOSWING),
+    BLOCKPLACE_REACH(BLOCKPLACE, Permissions.BLOCKBREAK_REACH),
+    BLOCKPLACE_SPEED(BLOCKPLACE, Permissions.BLOCKPLACE_SPEED),
 
     CHAT(ChatConfig.factory, ChatData.factory),
-    CHAT_COLOR(CHAT, "color", Permissions.CHAT_COLOR),
-    CHAT_NOPWNAGE(CHAT, "noPwnage", Permissions.CHAT_NOPWNAGE),
+    CHAT_COLOR(CHAT, Permissions.CHAT_COLOR),
+    CHAT_NOPWNAGE(CHAT, Permissions.CHAT_NOPWNAGE),
 
     FIGHT(FightConfig.factory, FightData.factory),
-    FIGHT_ANGLE(FIGHT, "angle", Permissions.FIGHT_ANGLE),
-    FIGHT_CRITICAL(FIGHT, "critical", Permissions.FIGHT_CRITICAL),
-    FIGHT_DIRECTION(FIGHT, "direction", Permissions.FIGHT_DIRECTION),
-    FIGHT_GODMODE(FIGHT, "godMode", Permissions.FIGHT_GODMODE),
-    FIGHT_INSTANTHEAL(FIGHT, "instantHeal", Permissions.FIGHT_INSTANTHEAL),
-    FIGHT_KNOCKBACK(FIGHT, "knockback", Permissions.FIGHT_KNOCKBACK),
-    FIGHT_NOSWING(FIGHT, "noSwing", Permissions.FIGHT_NOSWING),
-    FIGHT_REACH(FIGHT, "reach", Permissions.FIGHT_REACH),
-    FIGHT_SPEED(FIGHT, "speed", Permissions.FIGHT_SPEED),
+    FIGHT_ANGLE(FIGHT, Permissions.FIGHT_ANGLE),
+    FIGHT_CRITICAL(FIGHT, Permissions.FIGHT_CRITICAL),
+    FIGHT_DIRECTION(FIGHT, Permissions.FIGHT_DIRECTION),
+    FIGHT_GODMODE(FIGHT, Permissions.FIGHT_GODMODE),
+    FIGHT_INSTANTHEAL(FIGHT, Permissions.FIGHT_INSTANTHEAL),
+    FIGHT_KNOCKBACK(FIGHT, Permissions.FIGHT_KNOCKBACK),
+    FIGHT_NOSWING(FIGHT, Permissions.FIGHT_NOSWING),
+    FIGHT_REACH(FIGHT, Permissions.FIGHT_REACH),
+    FIGHT_SPEED(FIGHT, Permissions.FIGHT_SPEED),
 
     INVENTORY(InventoryConfig.factory, InventoryData.factory),
-    INVENTORY_DROP(INVENTORY, "drop", Permissions.INVENTORY_DROP),
-    INVENTORY_INSTANTBOW(INVENTORY, "instantBow", Permissions.INVENTORY_INSTANTBOW),
-    INVENTORY_INSTANTEAT(INVENTORY, "instantEat", Permissions.INVENTORY_INSTANTEAT),
+    INVENTORY_DROP(INVENTORY, Permissions.INVENTORY_DROP),
+    INVENTORY_INSTANTBOW(INVENTORY, Permissions.INVENTORY_INSTANTBOW),
+    INVENTORY_INSTANTEAT(INVENTORY, Permissions.INVENTORY_INSTANTEAT),
 
     MOVING(MovingConfig.factory, MovingData.factory),
-    MOVING_CREATIVEFLY(MOVING, "creativeFly", Permissions.MOVING_CREATIVEFLY),
-    MOVING_MOREPACKETS(MOVING, "morePackets", Permissions.MOVING_MOREPACKETS),
-    MOVING_MOREPACKETSVEHICLE(MOVING, "morePacketsVehicle", Permissions.MOVING_MOREPACKETSVEHICLE),
-    MOVING_NOFALL(MOVING, "noFall", Permissions.MOVING_NOFALL),
-    MOVING_SURVIVALFLY(MOVING, "survivalFly", Permissions.MOVING_SURVIVALFLY),
+    MOVING_CREATIVEFLY(MOVING, Permissions.MOVING_CREATIVEFLY),
+    MOVING_MOREPACKETS(MOVING, Permissions.MOVING_MOREPACKETS),
+    MOVING_MOREPACKETSVEHICLE(MOVING, Permissions.MOVING_MOREPACKETSVEHICLE),
+    MOVING_NOFALL(MOVING, Permissions.MOVING_NOFALL),
+    MOVING_SURVIVALFLY(MOVING, Permissions.MOVING_SURVIVALFLY),
 
     UNKNOWN;
 
     /** The group. */
-    public final CheckType          group;
+    private CheckType          parent        = null;
 
     /** The configFactory. */
-    public final CheckConfigFactory configFactory;
+    private CheckConfigFactory configFactory = null;
 
     /** The dataFactory. */
-    public final CheckDataFactory   dataFactory;
-
-    /** The name. */
-    public final String             name;
+    private CheckDataFactory   dataFactory   = null;
 
     /** The permission. */
-    public final String             permission;
+    private String             permission    = null;
 
     /**
      * Instantiates a new check type.
      */
-    private CheckType() {
-        this(null, null, null, null, null);
-    }
+    private CheckType() {}
 
     /**
      * Instantiates a new check type.
@@ -111,59 +106,38 @@ public enum CheckType {
      *            the dataFactory
      */
     private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
-        this(null, configFactory, dataFactory, null, null);
+        this.configFactory = configFactory;
+        this.dataFactory = dataFactory;
     }
 
     /**
      * Instantiates a new check type.
      * 
-     * @param group
-     *            the group
-     * @param configFactory
-     *            the configFactory class
-     * @param dataFactory
-     *            the dataFactory class
-     * @param name
-     *            the name
+     * @param parent
+     *            the parent
      * @param permission
      *            the permission
      */
-    private CheckType(final CheckType group, final CheckConfigFactory configFactory,
-            final CheckDataFactory dataFactory, final String name, final String permission) {
-        this.group = group;
-        this.configFactory = configFactory;
-        this.dataFactory = dataFactory;
-        this.name = name;
+    private CheckType(final CheckType parent, final String permission) {
+        this.parent = parent;
+        configFactory = parent.getConfigFactory();
+        dataFactory = parent.getDataFactory();
         this.permission = permission;
     }
 
     /**
-     * Instantiates a new check type.
+     * Gets the configFactory.
      * 
-     * @param group
-     *            the group
-     * @param name
-     *            the name
-     * @param permission
-     *            the permission
-     */
-    private CheckType(final CheckType group, final String name, final String permission) {
-        this(group, group.getConfigFactory(), group.getDataFactory(), name, permission);
-    }
-
-    /**
-     * Gets the configFactory class.
-     * 
-     * @return the configFactory class
+     * @return the configFactory
      */
     public CheckConfigFactory getConfigFactory() {
         return configFactory;
     }
 
     /**
-     * Gets the dataFactory class.
+     * Gets the dataFactory.
      * 
-     * @return the dataFactory class
+     * @return the dataFactory
      */
     public CheckDataFactory getDataFactory() {
         return dataFactory;
@@ -175,7 +149,16 @@ public enum CheckType {
      * @return the name
      */
     public String getName() {
-        return name;
+        return toString().toLowerCase().replace("_", ".");
+    }
+
+    /**
+     * Gets the parent.
+     * 
+     * @return the parent
+     */
+    public CheckType getParent() {
+        return parent;
     }
 
     /**

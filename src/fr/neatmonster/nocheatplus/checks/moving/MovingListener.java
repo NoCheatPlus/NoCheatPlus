@@ -13,11 +13,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -136,31 +135,6 @@ public class MovingListener implements Listener {
     }
 
     /**
-     * We listen to EntityDamage events the reset the fall distance when a damage is dealt.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            priority = EventPriority.MONITOR, ignoreCancelled = false)
-    public void onEntityDamage(final EntityDamageEvent event) {
-        /*
-         *  _____       _   _ _           ____                                   
-         * | ____|_ __ | |_(_) |_ _   _  |  _ \  __ _ _ __ ___   __ _  __ _  ___ 
-         * |  _| | '_ \| __| | __| | | | | | | |/ _` | '_ ` _ \ / _` |/ _` |/ _ \
-         * | |___| | | | |_| | |_| |_| | | |_| | (_| | | | | | | (_| | (_| |  __/
-         * |_____|_| |_|\__|_|\__|\__, | |____/ \__,_|_| |_| |_|\__,_|\__, |\___|
-         *                        |___/                               |___/      
-         */
-        // Workaround fix attempt for NoFall multiple damage.
-        if (event.getCause() == DamageCause.FALL && event.getEntity() instanceof Player) {
-            final MovingData data = MovingData.getData((Player) event.getEntity());
-            // Simple model: once damage dealt the fall distance is reset.
-            data.noFallFallDistance = data.noFallNewFallDistance = 0D;
-        }
-    }
-
-    /**
      * We listen to this event to prevent player from flying by sending bed leaving packets.
      * 
      * @param event
@@ -226,6 +200,36 @@ public class MovingListener implements Listener {
         data.teleported = null;
         data.clearFlyData();
         data.clearMorePacketsData();
+        data.resetNoFallDistances();
+    }
+
+    /**
+     * When a player changes his gamemode, all information related to the moving checks becomes invalid.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onPlayerGameModeChange(final PlayerGameModeChangeEvent event) {
+        /*
+         *  ____  _                          ____                      __  __           _      
+         * |  _ \| | __ _ _   _  ___ _ __   / ___| __ _ _ __ ___   ___|  \/  | ___   __| | ___ 
+         * | |_) | |/ _` | | | |/ _ \ '__| | |  _ / _` | '_ ` _ \ / _ \ |\/| |/ _ \ / _` |/ _ \
+         * |  __/| | (_| | |_| |  __/ |    | |_| | (_| | | | | | |  __/ |  | | (_) | (_| |  __/
+         * |_|   |_|\__,_|\__, |\___|_|     \____|\__,_|_| |_| |_|\___|_|  |_|\___/ \__,_|\___|
+         *                |___/                                                                
+         *   ____ _                            
+         *  / ___| |__   __ _ _ __   __ _  ___ 
+         * | |   | '_ \ / _` | '_ \ / _` |/ _ \
+         * | |___| | | | (_| | | | | (_| |  __/
+         *  \____|_| |_|\__,_|_| |_|\__, |\___|
+         *                          |___/      
+         */
+        final MovingData data = MovingData.getData(event.getPlayer());
+        data.clearFlyData();
+        data.clearMorePacketsData();
+        data.resetNoFallDistances();
     }
 
     /**
@@ -350,9 +354,11 @@ public class MovingListener implements Listener {
             // If don't have a new location and if he is handled by the no fall check, execute it.
             if (newTo == null && noFall.isEnabled(player))
                 noFall.check(player, from, to);
-        } else
+        } else {
             // He isn't handled by any fly check, clear his data.
             data.clearFlyData();
+            data.resetNoFallDistances();
+        }
 
         if (newTo == null && morePackets.isEnabled(player))
             // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
@@ -390,6 +396,7 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(event.getPlayer());
         data.clearFlyData();
         data.clearMorePacketsData();
+        data.resetNoFallDistances();
     }
 
     /**
@@ -412,6 +419,7 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(event.getPlayer());
         data.clearFlyData();
         data.clearMorePacketsData();
+        data.resetNoFallDistances();
     }
 
     /**
@@ -449,6 +457,7 @@ public class MovingListener implements Listener {
         // Always drop data from fly checks, as it always loses its validity after teleports. Always!
         data.teleported = null;
         data.clearFlyData();
+        data.resetNoFallDistances();
     }
 
     /**

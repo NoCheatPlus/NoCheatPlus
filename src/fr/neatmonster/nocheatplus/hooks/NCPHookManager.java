@@ -132,12 +132,12 @@ public final class NCPHookManager {
      */
     private static boolean addToMappingsRecursively(final CheckType checkType, final CheckType refType,
             final NCPHook hook) {
-        if (refType.group == null)
+        if (refType.getParent() == null)
             return false;
-        else if (refType.group == checkType) {
+        else if (refType.getParent() == checkType) {
             addToMapping(refType, hook);
             return true;
-        } else if (addToMappingsRecursively(checkType, refType.group, hook)) {
+        } else if (addToMappingsRecursively(checkType, refType.getParent(), hook)) {
             addToMapping(refType, hook);
             return true;
         } else
@@ -271,8 +271,8 @@ public final class NCPHookManager {
         final StringBuilder builder = new StringBuilder(1024);
         builder.append("[NoCheatPlus] Hook " + getHookDescription(hook) + " encountered an unexpected exception:\n");
         builder.append("Processing: ");
-        if (checkType.group != null)
-            builder.append("Group " + checkType.group + " ");
+        if (checkType.getParent() != null)
+            builder.append("Prent " + checkType.getParent() + " ");
         builder.append("Check " + checkType);
         builder.append(" Player " + player.getName());
         builder.append("\n");
