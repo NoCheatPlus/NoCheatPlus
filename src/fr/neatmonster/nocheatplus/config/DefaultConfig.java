@@ -51,6 +51,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
         set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
+        set(ConfPaths.MISCELLANEOUS_USEPROXY, true);
 
         /*
          * 888 88b, 888                    888    888 88b,                        888    

@@ -2,10 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
 
-import net.minecraft.server.AxisAlignedBB;
-import net.minecraft.server.DamageSource;
 import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.Packet10Flying;
 
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -51,28 +48,15 @@ public class NoFall extends Check {
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 
+        data.noFallWasOnGround = data.noFallOnGround;
+        data.noFallOnGround = to.isOnGround();
+
         // If the player is on the ground, is falling into a liquid, in web or is on a ladder.
         if (from.isOnGround() && to.isOnGround() || to.isInLiquid() || to.isInWeb() || to.isOnLadder())
-            data.resetNoFallDistances();
-
-        // If the player just touched the ground for the server, but no for the client.
-        if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer
-                && (data.noFallWasOnGroundClient || !data.noFallOnGroundClient)) {
-            // Calculate the fall damages to be dealt.
-            final int fallDamage = (int) data.noFallFallDistance - 2;
-            if (fallDamage > 0) {
-                // Add the fall distance to the violation level.
-                data.noFallVL += data.noFallFallDistance;
-
-                // Execute the actions to find out if we need to cancel the event or not.
-                if (executeActions(player, data.noFallVL, cc.noFallActions))
-                    // Calling this method will send the event for us.
-                    ((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, fallDamage);
-            }
-        }
+            data.noFallFallDistance = 0D;
 
         // If the player just touched the ground for the server.
-        else if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer) {
+        if (!data.noFallWasOnGround && data.noFallOnGround) {
             // If the difference between the fall distance recorded by Bukkit and NoCheatPlus is too big and the fall
             // distance bigger than 2.
             if (data.noFallFallDistance - player.getFallDistance() > 0.1D && (int) data.noFallFallDistance > 2) {
@@ -91,9 +75,12 @@ public class NoFall extends Check {
             data.noFallVL *= 0.95D;
 
         // The player has touched the ground somewhere, reset his fall distance.
-        if (!data.noFallWasOnGroundServer && data.noFallOnGroundServer || data.noFallWasOnGroundServer
-                && !data.noFallOnGroundServer)
-            data.resetNoFallDistances();
+        if (!data.noFallWasOnGround && data.noFallOnGround || data.noFallWasOnGround && !data.noFallOnGround)
+            data.noFallFallDistance = 0D;
+
+        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+        if (to.getY() > 0 && entityPlayer.locY > to.getY())
+            data.noFallFallDistance += entityPlayer.locY - to.getY();
     }
 
     /* (non-Javadoc)
@@ -106,27 +93,5 @@ public class NoFall extends Check {
             return String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallFallDistance);
         else
             return super.getParameter(wildcard, violationData);
-    }
-
-    /**
-     * Handle a movement packet to extract its precious information.
-     * 
-     * @param player
-     *            the player
-     * @param packet
-     *            the packet
-     */
-    public void handlePacket(final EntityPlayer player, final Packet10Flying packet) {
-        final MovingData data = MovingData.getData(player.getBukkitEntity());
-        data.noFallWasOnGroundClient = data.noFallOnGroundClient;
-        data.noFallWasOnGroundServer = data.noFallOnGroundServer;
-        data.noFallOnGroundClient = packet.g;
-        final AxisAlignedBB boundingBoxGround = player.boundingBox.clone().d(packet.x - player.locX,
-                packet.y - player.locY - 0.001D, packet.z - player.locZ);
-        data.noFallOnGroundServer = player.world.getCubes(player, boundingBoxGround).size() > 0;
-        if (packet.hasPos && packet.y > 0 && player.locY - packet.y > 0D) {
-            data.noFallFallDistance = data.noFallNewFallDistance;
-            data.noFallNewFallDistance += player.locY - packet.y;
-        }
     }
 }

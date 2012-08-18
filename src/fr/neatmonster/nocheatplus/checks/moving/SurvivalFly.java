@@ -179,7 +179,7 @@ public class SurvivalFly extends Check {
             data.setBack.setY(Math.floor(data.setBack.getY()));
             data.survivalFlyJumpPhase = 0;
             // Reset the no fall data.
-            data.resetNoFallDistances();
+            data.clearNoFallData();
         }
         data.survivalFlyLastFromY = from.getY();
 

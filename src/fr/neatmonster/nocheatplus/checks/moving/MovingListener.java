@@ -200,7 +200,6 @@ public class MovingListener implements Listener {
         data.teleported = null;
         data.clearFlyData();
         data.clearMorePacketsData();
-        data.resetNoFallDistances();
     }
 
     /**
@@ -229,7 +228,6 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(event.getPlayer());
         data.clearFlyData();
         data.clearMorePacketsData();
-        data.resetNoFallDistances();
     }
 
     /**
@@ -354,11 +352,9 @@ public class MovingListener implements Listener {
             // If don't have a new location and if he is handled by the no fall check, execute it.
             if (newTo == null && noFall.isEnabled(player))
                 noFall.check(player, from, to);
-        } else {
+        } else
             // He isn't handled by any fly check, clear his data.
             data.clearFlyData();
-            data.resetNoFallDistances();
-        }
 
         if (newTo == null && morePackets.isEnabled(player))
             // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
@@ -396,7 +392,6 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(event.getPlayer());
         data.clearFlyData();
         data.clearMorePacketsData();
-        data.resetNoFallDistances();
     }
 
     /**
@@ -419,7 +414,6 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(event.getPlayer());
         data.clearFlyData();
         data.clearMorePacketsData();
-        data.resetNoFallDistances();
     }
 
     /**
@@ -457,7 +451,6 @@ public class MovingListener implements Listener {
         // Always drop data from fly checks, as it always loses its validity after teleports. Always!
         data.teleported = null;
         data.clearFlyData();
-        data.resetNoFallDistances();
     }
 
     /**

@@ -84,11 +84,8 @@ public class MovingData implements CheckData {
 
     // Data of the no fall check.
     public double     noFallFallDistance;
-    public double     noFallNewFallDistance;
-    public boolean    noFallOnGroundClient;
-    public boolean    noFallOnGroundServer;
-    public boolean    noFallWasOnGroundClient;
-    public boolean    noFallWasOnGroundServer;
+    public boolean    noFallOnGround;
+    public boolean    noFallWasOnGround;
 
     // Data of the survival fly check.
     public int        survivalFlyJumpPhase;
@@ -108,9 +105,9 @@ public class MovingData implements CheckData {
     public void clearFlyData() {
         bunnyhopDelay = 0;
         noFallFallDistance = 0D;
-        noFallOnGroundClient = noFallOnGroundServer = noFallWasOnGroundClient = noFallWasOnGroundServer = true;
         survivalFlyJumpPhase = 0;
         setBack = null;
+        clearNoFallData();
     }
 
     /**
@@ -121,7 +118,11 @@ public class MovingData implements CheckData {
         morePacketsVehicleSetback = null;
     }
 
-    public void resetNoFallDistances() {
-        noFallFallDistance = noFallNewFallDistance = 0D;
+    /**
+     * Clear the data of the new fall check.
+     */
+    public void clearNoFallData() {
+        noFallOnGround = noFallWasOnGround = true;
+        noFallFallDistance = 0D;
     }
 }

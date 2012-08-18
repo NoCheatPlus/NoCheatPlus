@@ -41,6 +41,7 @@ public abstract class ConfPaths {
     public static final String  MISCELLANEOUS_ALLOWCLIENTMODS         = MISCELLANEOUS + "allowclientmods";
     public static final String  MISCELLANEOUS_OPINCONSOLEONLY         = MISCELLANEOUS + "opinconsoleonly";
     public static final String  MISCELLANEOUS_PROTECTPLUGINS          = MISCELLANEOUS + "protectplugins";
+    public static final String  MISCELLANEOUS_USEPROXY                = MISCELLANEOUS + "useproxy";
 
     private static final String CHECKS                                = "checks.";
 

@@ -1,15 +1,10 @@
 package fr.neatmonster.nocheatplus;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.server.DedicatedServer;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.NetServerHandler;
-import net.minecraft.server.NetworkManager;
-import net.minecraft.server.ServerConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -48,6 +43,8 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
 public class NoCheatPlus extends JavaPlugin implements Listener {
+
+    /** The time it was when NoCheatPlus has been activated. */
     public static long     time = System.currentTimeMillis();
 
     /** The listeners. */
@@ -103,12 +100,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Register the commands handler.
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
-        // Set the NetServerHandler of every player.
-        for (final Player player : Bukkit.getOnlinePlayers()) {
-            resetNetServerHandler(player);
-            updateNetServerHandler(player);
-        }
-
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
     }
@@ -135,6 +126,14 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
+
+        // Set the proxy of the player if enabled.
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_USEPROXY)) {
+            final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+            final NetServerHandlerProxy proxy = new NetServerHandlerProxy(MinecraftServer.getServer(),
+                    entityPlayer.netServerHandler);
+            entityPlayer.netServerHandler = proxy;
+        }
 
         // Check if we allow all the client mods.
         final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);
@@ -213,93 +212,5 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             message = message + "§0§1§7§f§f";
 
         player.sendMessage(message);
-    }
-
-    /**
-     * Setting the net server handler at the earliest possible point.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            priority = EventPriority.LOWEST)
-    public void onPlayerJoinLowest(final PlayerJoinEvent event) {
-        // Set the NetServerHandler of the player.
-        resetNetServerHandler(event.getPlayer());
-        updateNetServerHandler(event.getPlayer());
-    }
-
-    /**
-     * Reset the net server handler of the player.
-     * 
-     * @param player
-     *            the player
-     * @return true, if needed
-     */
-    private boolean resetNetServerHandler(final Player player) {
-        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-        final NetServerHandler oldNSH = entityPlayer.netServerHandler;
-        if (!(oldNSH instanceof CustomNetServerHandler))
-            return false;
-        final DedicatedServer server = (DedicatedServer) MinecraftServer.getServer();
-        final NetServerHandler newNSH = new NetServerHandler(server, oldNSH.networkManager, entityPlayer);
-        newNSH.a(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player
-                .getLocation().getYaw(), player.getLocation().getPitch());
-        entityPlayer.netServerHandler = newNSH;
-        setNetServerHandler(server, oldNSH, newNSH);
-        oldNSH.disconnected = true;
-        return true;
-    }
-
-    /**
-     * Sets the net server handler.
-     * 
-     * @param server
-     *            the server
-     * @param oldNSH
-     *            the old net server handler
-     * @param newNSH
-     *            the new net server handler
-     * @return true, if successful
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private boolean setNetServerHandler(final DedicatedServer server, final NetServerHandler oldNSH,
-            final NetServerHandler newNSH) {
-        try {
-            Field field = NetworkManager.class.getDeclaredField("packetListener");
-            field.setAccessible(true);
-            field.set(oldNSH.networkManager, newNSH);
-            field = ServerConnection.class.getDeclaredField("d");
-            field.setAccessible(true);
-            final List handlerList = (List) field.get(server.ac());
-            handlerList.remove(oldNSH);
-            handlerList.add(newNSH);
-            return true;
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
-     * Update the net server handler of the player.
-     * 
-     * @param player
-     *            the player
-     * @return true, if needed
-     */
-    private boolean updateNetServerHandler(final Player player) {
-        final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-        final NetServerHandler oldNSH = entityPlayer.netServerHandler;
-        if (oldNSH instanceof CustomNetServerHandler)
-            return false;
-        final DedicatedServer server = (DedicatedServer) MinecraftServer.getServer();
-        final NetServerHandler newNSH = new CustomNetServerHandler(server, oldNSH.networkManager, entityPlayer);
-        newNSH.a(player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), player
-                .getLocation().getYaw(), player.getLocation().getPitch());
-        entityPlayer.netServerHandler = newNSH;
-        setNetServerHandler(server, oldNSH, newNSH);
-        oldNSH.disconnected = true;
-        return true;
     }
 }

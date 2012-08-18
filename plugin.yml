@@ -3,7 +3,7 @@ version: ${project.version}-b${BUILD_NUMBER}
 description: ${project.description}
 
 author: NeatMonster
-authors: [Evenprime, asofold]
+authors: [asofold, Evenprime]
 website: ${project.url}
 
 main: ${project.groupId}.${project.artifactId}
@@ -112,6 +112,8 @@ permissions:
                                 description: Allow the player to bypass the MorePacketsVehicle check.
                             nocheatplus.checks.moving.nofall:
                                 description: Allow the player to bypass the NoFall check.
+                            nocheatplus.checks.moving.overridebukkit:
+                                description: Allow the overriding of Bukkit to prevent it from blocking fly mods.
                             nocheatplus.checks.moving.survivalfly:
                                 description: Allow the player to bypass the SurvivalFly check.
                                 children:
