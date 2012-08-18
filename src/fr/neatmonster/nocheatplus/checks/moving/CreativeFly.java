@@ -134,7 +134,7 @@ public class CreativeFly extends Check {
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should
                 // cancel the event.
-                if (executeActions(player, data.creativeFlyVL, cc.creativeFlyActions))
+                if (executeActions(player, data.creativeFlyVL, result, cc.creativeFlyActions))
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                     // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                     return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(),

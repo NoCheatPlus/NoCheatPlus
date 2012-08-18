@@ -67,7 +67,7 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, BlockBreakConfig.getConfig(player).reachActions);
+            cancel = executeActions(player, data.reachVL, distance, BlockBreakConfig.getConfig(player).reachActions);
         } else
             // Player passed the check, reward him.
             data.reachVL *= 0.9D;

@@ -50,12 +50,15 @@ public class InstantBow extends Check {
             // Security check if time ran backwards, reset
             data.instantBowLastTime = 0L;
         else {
+            final double difference = (expectedTimeWhenStringDrawn - System.currentTimeMillis()) / 100D;
+
             // Player was too fast, increase his violation level.
-            data.instantBowVL += (expectedTimeWhenStringDrawn - System.currentTimeMillis()) / 100D;
+            data.instantBowVL += difference;
 
             // Execute whatever actions are associated with this check and the
             // violation level and find out if we should cancel the event
-            cancel = executeActions(player, data.instantBowVL, InventoryConfig.getConfig(player).instantBowActions);
+            cancel = executeActions(player, data.instantBowVL, difference,
+                    InventoryConfig.getConfig(player).instantBowActions);
         }
 
         return cancel;

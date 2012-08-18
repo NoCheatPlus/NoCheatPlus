@@ -60,7 +60,7 @@ public class Drop extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.dropVL, cc.dropActions);
+            cancel = executeActions(player, data.dropVL, data.dropCount - cc.dropLimit, cc.dropActions);
         }
 
         return cancel;

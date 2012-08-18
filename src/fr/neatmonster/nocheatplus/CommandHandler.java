@@ -1,5 +1,10 @@
 package fr.neatmonster.nocheatplus;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TreeMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -9,6 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import fr.neatmonster.nocheatplus.checks.ViolationHistory;
+import fr.neatmonster.nocheatplus.checks.ViolationHistory.ViolationLevel;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
@@ -68,8 +75,11 @@ public class CommandHandler implements CommandExecutor {
         }
     }
 
+    /** The prefix of every message sent by NoCheatPlus. */
+    private static final String TAG = ChatColor.RED + "NCP: " + ChatColor.WHITE;
+
     /** The plugin. */
-    private final NoCheatPlus plugin;
+    private final NoCheatPlus   plugin;
 
     /**
      * Instantiates a new command handler.
@@ -82,36 +92,63 @@ public class CommandHandler implements CommandExecutor {
     }
 
     /**
+     * Handle the '/nocheatplus info' command.
+     * 
+     * @param sender
+     *            the sender
+     * @param playerName
+     *            the player name
+     * @return true, if successful
+     */
+    private void handleInfoCommand(final CommandSender sender, final String playerName) {
+        final Player player = Bukkit.getPlayer(playerName);
+        if (player != null) {
+            final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            final TreeMap<Long, ViolationLevel> violations = ViolationHistory.getHistory(player).getViolationLevels();
+            if (violations.size() > 0) {
+                sender.sendMessage(TAG + "Displaying " + playerName + "'s violations...");
+                for (final long time : violations.descendingKeySet()) {
+                    final ViolationLevel violationLevel = violations.get(time);
+                    final String[] parts = violationLevel.check.split("\\.");
+                    final String check = parts[parts.length - 1];
+                    final String parent = parts[parts.length - 2];
+                    final double VL = Math.round(violationLevel.VL);
+                    sender.sendMessage(TAG + "[" + dateFormat.format(new Date(time)) + "] (" + parent + ".)" + check
+                            + " VL " + VL);
+                }
+            } else
+                sender.sendMessage(TAG + "Displaying " + playerName + "'s violations... nothing to display.");
+        } else {
+            sender.sendMessage(TAG + "404 Not Found");
+            sender.sendMessage(TAG + "The requested player was not found on this server.");
+        }
+    }
+
+    /**
      * Handle the '/nocheatplus reload' command.
      * 
      * @param sender
      *            the sender
      * @return true, if successful
      */
-    private boolean handleReloadCommand(final CommandSender sender) {
-        // Players need a special permission for this.
-        if (!(sender instanceof Player) || sender.hasPermission(Permissions.ADMINISTRATION_RELOAD)) {
-            sender.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Reloading configuration...");
+    private void handleReloadCommand(final CommandSender sender) {
+        sender.sendMessage(TAG + "Reloading configuration...");
 
-            // Do the actual reload.
-            ConfigManager.cleanup();
-            ConfigManager.init(plugin);
-            BlockBreakConfig.clear();
-            BlockInteractConfig.clear();
-            BlockPlaceConfig.clear();
-            ChatConfig.clear();
-            FightConfig.clear();
-            InventoryConfig.clear();
-            MovingConfig.clear();
+        // Do the actual reload.
+        ConfigManager.cleanup();
+        ConfigManager.init(plugin);
+        BlockBreakConfig.clear();
+        BlockInteractConfig.clear();
+        BlockPlaceConfig.clear();
+        ChatConfig.clear();
+        FightConfig.clear();
+        InventoryConfig.clear();
+        MovingConfig.clear();
 
-            // Say to the other plugins that we've reloaded the configuration.
-            Bukkit.getPluginManager().callEvent(new NCPReloadEvent());
+        // Say to the other plugins that we've reloaded the configuration.
+        Bukkit.getPluginManager().callEvent(new NCPReloadEvent());
 
-            sender.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Configuration reloaded!");
-        } else
-            sender.sendMessage(ChatColor.RED + "You lack the " + Permissions.ADMINISTRATION_RELOAD
-                    + " permission to use 'reload'!");
-        return true;
+        sender.sendMessage(TAG + "Configuration reloaded!");
     }
 
     /* (non-Javadoc)
@@ -121,25 +158,25 @@ public class CommandHandler implements CommandExecutor {
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String commandLabel,
             final String[] args) {
-        if (sender instanceof Player) {
-            final boolean protectPlugins = ConfigManager.getConfigFile(((Player) sender).getWorld().getName())
-                    .getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
-
-            // Hide NoCheatPlus's commands if the player doesn't have the required permission.
-            if (protectPlugins && !sender.hasPermission(Permissions.ADMINISTRATION_RELOAD)) {
-                sender.sendMessage("Unknown command. Type \"help\" for help.");
-                return true;
-            }
-        }
-
-        boolean result = false;
-
         // Not our command, how did it get here?
-        if (!command.getName().equalsIgnoreCase("nocheatplus") || args.length == 0)
-            result = false;
-        else if (args[0].equalsIgnoreCase("reload"))
+        if (!command.getName().equalsIgnoreCase("nocheatplus"))
+            return false;
+
+        final boolean protectPlugins = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
+
+        if (args.length == 2 && args[0].equalsIgnoreCase("info")
+                && sender.hasPermission(Permissions.ADMINISTRATION_INFO))
+            // Info command was used.
+            handleInfoCommand(sender, args[1]);
+        else if (args.length == 1 && args[0].equalsIgnoreCase("reload")
+                && sender.hasPermission(Permissions.ADMINISTRATION_RELOAD))
             // Reload command was used.
-            result = handleReloadCommand(sender);
-        return result;
+            handleReloadCommand(sender);
+        else if (protectPlugins && !sender.hasPermission(Permissions.ADMINISTRATION_INFO)
+                && !sender.hasPermission(Permissions.ADMINISTRATION_RELOAD))
+            sender.sendMessage("Unknown command. Type \"help\" for help.");
+        else
+            return false;
+        return true;
     }
 }

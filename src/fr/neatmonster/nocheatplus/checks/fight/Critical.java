@@ -67,7 +67,7 @@ public class Critical extends Check {
 
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should cancel the event.
-                cancel = executeActions(player, data.criticalVL, cc.criticalActions);
+                cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
             }
 
         return cancel;

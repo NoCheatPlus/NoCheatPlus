@@ -56,7 +56,7 @@ public class Color extends Check {
                 data.colorVL++;
 
                 // Find out if we need to remove the colors or not.
-                if (executeActionsThreadSafe(player, data.colorVL, cc.colorActions, isMainThread))
+                if (executeActionsThreadSafe(player, data.colorVL, 1D, cc.colorActions, isMainThread))
                     // Remove color codes.
                     message.replaceAll("\302\247.", "").replaceAll("\247.", "");
             }
@@ -78,11 +78,11 @@ public class Color extends Check {
      *            is the thread the main thread
      * @return true, if successful
      */
-    private boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions,
-            final boolean isMainThread) {
+    private boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
+            final ActionList actions, final boolean isMainThread) {
         if (isMainThread)
-            return super.executeActions(player, VL, actions);
+            return super.executeActions(player, VL, VLAdded, actions);
         else
-            return super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
+            return super.executeActionsThreadSafe(player, VL, VLAdded, actions, type.getPermission());
     }
 }

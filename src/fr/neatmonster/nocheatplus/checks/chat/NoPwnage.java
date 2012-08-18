@@ -50,13 +50,6 @@ public class NoPwnage extends Check {
      */
     public NoPwnage() {
         super(CheckType.CHAT_NOPWNAGE);
-
-        for (final Player player : Bukkit.getOnlinePlayers()) {
-            final ChatData data = ChatData.getData(player);
-            synchronized (data) {
-                data.noPwnageLastLocation = player.getLocation();
-            }
-        }
     }
 
     /**
@@ -122,14 +115,14 @@ public class NoPwnage extends Check {
      *            if the thread the main thread
      * @return true, if successful
      */
-    public final boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions,
-            final boolean isMainThread) {
+    public final boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
+            final ActionList actions, final boolean isMainThread) {
         final boolean cancel;
         if (isMainThread)
-            cancel = super.executeActions(player, VL, actions);
+            cancel = super.executeActions(player, VL, VLAdded, actions);
         else
             // Permission check is done in the main thread.
-            cancel = super.executeActionsThreadSafe(player, VL, actions, type.getPermission());
+            cancel = super.executeActionsThreadSafe(player, VL, VLAdded, actions, type.getPermission());
         if (cancel)
             ChatData.getData(player).clearNoPwnageData();
         return cancel;
@@ -198,6 +191,11 @@ public class NoPwnage extends Check {
         boolean cancel = false;
         boolean kick = false;
 
+        // Exclusions list.
+        for (final String exclusion : cc.noPwnageExclusions)
+            if (message.startsWith(exclusion))
+                return new boolean[] {false, false};
+
         final long now = System.currentTimeMillis();
 
         if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
@@ -211,7 +209,8 @@ public class NoPwnage extends Check {
                 // Does he failed too much times?
                 if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
                     // Find out if we need to ban the player or not.
-                    kick = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
+                    kick = executeActionsThreadSafe(player, data.noPwnageVL, data.noPwnageVL, cc.noPwnageActions,
+                            isMainThread);
 
                 // Increment his tries number counter.
                 data.noPwnageCaptchTries++;
@@ -223,13 +222,6 @@ public class NoPwnage extends Check {
 
             // Cancel the message and maybe event.
             return new boolean[] {true, kick};
-        }
-
-        if (data.noPwnageLastLocation == null)
-            data.noPwnageLastLocation = player.getLocation();
-        else if (!data.noPwnageLastLocation.equals(player.getLocation())) {
-            data.noPwnageLastLocation = player.getLocation();
-            data.noPwnageLastMovedTime = now;
         }
 
         // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
@@ -299,7 +291,8 @@ public class NoPwnage extends Check {
                 cancel = true;
 
                 // Find out if we need to ban the player or not.
-                kick = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, isMainThread);
+                kick = executeActionsThreadSafe(player, data.noPwnageVL, data.noPwnageVL, cc.noPwnageActions,
+                        isMainThread);
             }
 
         // Store the message and some other data.
@@ -339,14 +332,12 @@ public class NoPwnage extends Check {
                 data.noPwnageReloginWarnings++;
             } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
                 // Find out if we need to ban the player or not.
-                cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageActions, true);
+                cancel = executeActionsThreadSafe(player, data.noPwnageVL, data.noPwnageVL, cc.noPwnageActions, true);
         }
 
-        // Store his location and some other data.
-        data.noPwnageLastLocation = player.getLocation();
+        // Store his joining time.
         data.noPwnageJoinTime = now;
 
         return cancel;
     }
-
 }

@@ -59,7 +59,8 @@ public class Direction extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.directionVL, BlockBreakConfig.getConfig(player).directionActions);
+            cancel = executeActions(player, data.directionVL, distance,
+                    BlockBreakConfig.getConfig(player).directionActions);
         } else
             // Player did likely nothing wrong, reduce violation counter to reward him.
             data.directionVL *= 0.9D;

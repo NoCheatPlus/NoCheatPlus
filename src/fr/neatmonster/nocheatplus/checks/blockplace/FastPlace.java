@@ -47,12 +47,15 @@ public class FastPlace extends Check {
         if (data.fastPlaceLastTime != 0 && System.currentTimeMillis() - data.fastPlaceLastTime < cc.fastPlaceInterval) {
             if (!LagMeasureTask.skipCheck()) {
                 if (data.fastPlaceLastRefused) {
+                    final double difference = cc.fastPlaceInterval - System.currentTimeMillis()
+                            + data.fastPlaceLastTime;
+
                     // He failed, increase his violation level.
-                    data.fastPlaceVL += cc.fastPlaceInterval - System.currentTimeMillis() + data.fastPlaceLastTime;
+                    data.fastPlaceVL += difference;
 
                     // Execute whatever actions are associated with this check and the violation level and find out if
                     // we should cancel the event.
-                    cancel = executeActions(player, data.fastPlaceVL, cc.fastPlaceActions);
+                    cancel = executeActions(player, data.fastPlaceVL, difference, cc.fastPlaceActions);
                 }
 
                 data.fastPlaceLastRefused = true;

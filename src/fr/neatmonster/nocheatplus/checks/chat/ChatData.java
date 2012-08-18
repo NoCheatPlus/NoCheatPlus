@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.chat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckData;
@@ -48,22 +47,21 @@ public class ChatData implements CheckData {
     }
 
     // Violation levels.
-    public double   colorVL;
-    public double   noPwnageVL;
+    public double  colorVL;
+    public double  noPwnageVL;
 
     // Data of the no pwnage check.
-    public int      noPwnageCaptchTries;
-    public String   noPwnageGeneratedCaptcha;
-    public boolean  noPwnageHasStartedCaptcha;
-    public long     noPwnageJoinTime;
-    public Location noPwnageLastLocation;
-    public String   noPwnageLastMessage;
-    public long     noPwnageLastMessageTime;
-    public long     noPwnageLastMovedTime;
-    public long     noPwnageLastWarningTime;
-    public long     noPwnageLeaveTime;
-    public int      noPwnageReloginWarnings;
-    public long     noPwnageReloginWarningTime;
+    public int     noPwnageCaptchTries;
+    public String  noPwnageGeneratedCaptcha;
+    public boolean noPwnageHasStartedCaptcha;
+    public long    noPwnageJoinTime;
+    public String  noPwnageLastMessage;
+    public long    noPwnageLastMessageTime;
+    public long    noPwnageLastMovedTime;
+    public long    noPwnageLastWarningTime;
+    public long    noPwnageLeaveTime;
+    public int     noPwnageReloginWarnings;
+    public long    noPwnageReloginWarningTime;
 
     /**
      * Clear the data of the no pwnage check.
@@ -72,7 +70,6 @@ public class ChatData implements CheckData {
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
-        noPwnageLastLocation = null;
     }
 
 }

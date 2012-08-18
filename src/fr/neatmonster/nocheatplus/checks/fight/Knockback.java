@@ -49,14 +49,16 @@ public class Knockback extends Check {
         // How long ago has the player started sprinting?
         if (data.knockbackSprintTime > 0L
                 && System.currentTimeMillis() - data.knockbackSprintTime < cc.knockbackInterval) {
+            final double difference = cc.knockbackInterval - System.currentTimeMillis() + data.knockbackSprintTime;
+
             // Player failed the check, but this is influenced by lag, so don't do it if there was lag.
             if (!LagMeasureTask.skipCheck())
                 // Increment the violation level
-                data.knockbackVL += cc.knockbackInterval - System.currentTimeMillis() + data.knockbackSprintTime;
+                data.knockbackVL += difference;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.knockbackVL, cc.knockbackActions);
+            cancel = executeActions(player, data.knockbackVL, difference, cc.knockbackActions);
         }
 
         return cancel;

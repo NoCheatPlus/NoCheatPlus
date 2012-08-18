@@ -1,10 +1,14 @@
 package fr.neatmonster.nocheatplus;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.NetServerHandler;
+import net.minecraft.server.NetworkManager;
+import net.minecraft.server.ServerConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -122,18 +126,32 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      * @param event
      *            the event handled
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @EventHandler(
             priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
 
         // Set the proxy of the player if enabled.
         if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_USEPROXY)) {
-            final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            final NetServerHandlerProxy proxy = new NetServerHandlerProxy(MinecraftServer.getServer(),
-                    entityPlayer.netServerHandler);
-            entityPlayer.netServerHandler = proxy;
+            final EntityPlayer player = ((CraftPlayer) event.getPlayer()).getHandle();
+            final NetServerHandler nsh = player.netServerHandler;
+            final NetServerHandlerProxy proxy = new NetServerHandlerProxy(MinecraftServer.getServer(), nsh);
+            player.netServerHandler = proxy;
+            try {
+                final Field packetListener = NetworkManager.class.getDeclaredField("packetListener");
+                packetListener.setAccessible(true);
+                packetListener.set(nsh.networkManager, proxy);
+                final Field d = ServerConnection.class.getDeclaredField("d");
+                d.setAccessible(true);
+                final List handlerList = (List) d.get(MinecraftServer.getServer().ac());
+                handlerList.remove(nsh);
+                handlerList.add(proxy);
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
         }
+
+        final Player player = event.getPlayer();
 
         // Check if we allow all the client mods.
         final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);

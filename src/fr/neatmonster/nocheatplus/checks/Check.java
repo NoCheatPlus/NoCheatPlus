@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.players.ExecutionHistory;
  * MMMMMMMMMMM                                     
  */
 /**
- * The Class Check.
+ * The parent class of all checks.
  */
 public abstract class Check {
 
@@ -62,11 +62,15 @@ public abstract class Check {
      *            the player
      * @param VL
      *            the vL
+     * @param VLAdded
+     *            the vL added
      * @param actions
      *            the actions
      * @return true, if the event should be cancelled
      */
-    protected boolean executeActions(final Player player, final double VL, final ActionList actions) {
+    protected boolean executeActions(final Player player, final double VL, final double VLAdded,
+            final ActionList actions) {
+        ViolationHistory.getHistory(player).log(getClass().getName(), VLAdded);
         return executeActions(new ViolationData(this, player, VL, actions));
     }
 
@@ -112,14 +116,17 @@ public abstract class Check {
      *            the player
      * @param VL
      *            the vL
+     * @param VLAdded
+     *            the vL added
      * @param actions
      *            the actions
      * @param bypassPermission
      *            the bypass permission
      * @return true, if the event should be cancelled
      */
-    public boolean executeActionsThreadSafe(final Player player, final double VL, final ActionList actions,
-            final String bypassPermission) {
+    public boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
+            final ActionList actions, final String bypassPermission) {
+        ViolationHistory.getHistory(player).log(getClass().getName(), VLAdded);
         // Sync it into the main thread by using an event.
         return executeActionsThreadSafe(new ViolationData(this, player, VL, actions, bypassPermission));
     }

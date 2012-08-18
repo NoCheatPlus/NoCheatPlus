@@ -56,7 +56,7 @@ public class SurvivalFly extends Check {
             data.survivalFlyVL += 100D;
 
             // And return if we need to do something or not.
-            return executeActions(player, data.survivalFlyVL, MovingConfig.getConfig(player).survivalFlyActions);
+            return executeActions(player, data.survivalFlyVL, 100D, MovingConfig.getConfig(player).survivalFlyActions);
         } else
             // He has, everything is alright.
             data.survivalFlyWasInBed = false;
@@ -208,7 +208,7 @@ public class SurvivalFly extends Check {
 
             // If the other plugins haven't decided to cancel the execution of the actions, then do it. If one of the
             // actions was a cancel, cancel it.
-            if (executeActions(player, data.survivalFlyVL, MovingConfig.getConfig(player).survivalFlyActions))
+            if (executeActions(player, data.survivalFlyVL, result, MovingConfig.getConfig(player).survivalFlyActions))
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),

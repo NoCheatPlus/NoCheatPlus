@@ -64,7 +64,8 @@ public class NoFall extends Check {
                 data.noFallVL += data.noFallFallDistance - player.getFallDistance();
 
                 // Execute the actions to find out if we need to cancel the event or not.
-                if (executeActions(player, data.noFallVL, cc.noFallActions))
+                if (executeActions(player, data.noFallVL, data.noFallFallDistance - player.getFallDistance(),
+                        cc.noFallActions))
                     // Set the fall distance to its right value.
                     player.setFallDistance((float) data.noFallFallDistance);
             } else

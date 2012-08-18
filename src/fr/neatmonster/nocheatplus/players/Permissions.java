@@ -29,6 +29,7 @@ public class Permissions {
     public static final String  ADMINISTRATION_BUKKIT_PLUGINS = ADMINISTRATION_BUKKIT + ".plugins";
     public static final String  ADMINISTRATION_BUKKIT_VERSION = ADMINISTRATION_BUKKIT + ".version";
 
+    public static final String  ADMINISTRATION_INFO           = ADMINISTRATION + ".info";
     public static final String  ADMINISTRATION_NOTIFY         = ADMINISTRATION + ".notify";
     public static final String  ADMINISTRATION_RELOAD         = ADMINISTRATION + ".reload";
 

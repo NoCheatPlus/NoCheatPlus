@@ -56,7 +56,8 @@ public class InstantHeal extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.instantHealVL, FightConfig.getConfig(player).instantHealActions);
+            cancel = executeActions(player, data.instantHealVL, -data.instantHealBuffer / 1000D,
+                    FightConfig.getConfig(player).instantHealActions);
         } else
             // Decrease the violation level.
             data.instantHealVL *= 0.9D;

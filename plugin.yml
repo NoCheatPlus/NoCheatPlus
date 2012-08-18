@@ -13,7 +13,9 @@ commands:
         aliases: [ncp]
         description: NoCheatPlus command(s).
         # permission: nocheatplus.admin.reload
-        usage: "/<command> reload: reload NoCheatPlus configuration"
+        usage: |
+               /<command> info: Display the violations of a player
+               /<command> reload: reload NoCheatPlus configuration
 
 permissions:
     nocheatplus:

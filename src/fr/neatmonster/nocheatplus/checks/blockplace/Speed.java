@@ -43,12 +43,14 @@ public class Speed extends Check {
         // Has the player thrown items too quickly?
         if (data.speedLastTime != 0 && System.currentTimeMillis() - data.speedLastTime < cc.speedInterval) {
             if (data.speedLastRefused) {
+                final double difference = cc.speedInterval - System.currentTimeMillis() + data.speedLastTime;
+
                 // He failed, increase this violation level.
-                data.speedVL += cc.speedInterval - System.currentTimeMillis() + data.speedLastTime;
+                data.speedVL += difference;
 
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should cancel the event.
-                cancel = executeActions(player, data.speedVL, cc.speedActions);
+                cancel = executeActions(player, data.speedVL, difference, cc.speedActions);
             }
 
             data.speedLastRefused = true;

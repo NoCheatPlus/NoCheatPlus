@@ -80,7 +80,8 @@ public class MorePackets extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player, data.morePacketsVL, MovingConfig.getConfig(player).morePacketsActions))
+            if (executeActions(player, data.morePacketsVL, -data.morePacketsBuffer,
+                    MovingConfig.getConfig(player).morePacketsActions))
                 newTo = data.teleported = data.morePacketsSetback;
         }
 

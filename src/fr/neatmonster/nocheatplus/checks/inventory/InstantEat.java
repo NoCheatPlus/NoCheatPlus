@@ -56,12 +56,15 @@ public class InstantEat extends Check {
             // Security test, if time ran backwards, reset.
             data.instantEatLastTime = 0;
         else {
+            final double difference = (expectedTimeWhenEatingFinished - System.currentTimeMillis()) / 100D;
+
             // Player was too fast, increase his violation level.
-            data.instantEatVL += (expectedTimeWhenEatingFinished - System.currentTimeMillis()) / 100D;
+            data.instantEatVL += difference;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.instantEatVL, InventoryConfig.getConfig(player).instantEatActions);
+            cancel = executeActions(player, data.instantEatVL, difference,
+                    InventoryConfig.getConfig(player).instantEatActions);
         }
 
         return cancel;

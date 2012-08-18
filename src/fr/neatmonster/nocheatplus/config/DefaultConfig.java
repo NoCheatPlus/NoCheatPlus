@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.config;
 
+import java.util.ArrayList;
+
 /*
  * M""""""'YMM          .8888b                   dP   dP   MM'""""'YMM                   .8888b oo          
  * M  mmmm. `M          88   "                   88   88   M' .mmm. `M                   88   "             
@@ -126,7 +128,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
 
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_LEVEL, 800);
+        set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
+        set(ConfPaths.CHAT_NOPWNAGE_LEVEL, 500);
         set(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE, "You're not allowed to spam this server!");
 
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK, true);
@@ -178,7 +181,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_CHECK, false);
         set(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_MESSAGE, "&cPlease do not say anything similar to what [player] said!");
 
-        set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_CHECK, false);
+        set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE,
                 "&cOur system has detected unusual bot activities coming from you. Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
 

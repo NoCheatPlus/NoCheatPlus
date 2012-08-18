@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
@@ -66,64 +67,65 @@ public class ChatConfig implements CheckConfig {
         }
     }
 
-    public final boolean    colorCheck;
-    public final ActionList colorActions;
+    public final boolean      colorCheck;
+    public final ActionList   colorActions;
 
-    public final boolean    noPwnageCheck;
-    public final int        noPwnageLevel;
-    public final String     noPwnageKickMessage;
+    public final boolean      noPwnageCheck;
+    public final List<String> noPwnageExclusions;
+    public final int          noPwnageLevel;
+    public final String       noPwnageKickMessage;
 
-    public final boolean    noPwnageBannedCheck;
-    public final long       noPwnageBannedTimeout;
-    public final int        noPwnageBannedWeight;
+    public final boolean      noPwnageBannedCheck;
+    public final long         noPwnageBannedTimeout;
+    public final int          noPwnageBannedWeight;
 
-    public final boolean    noPwnageCaptchaCheck;
-    public final String     noPwnageCaptchaCharacters;
-    public final int        noPwnageCaptchaLength;
-    public final String     noPwnageCaptchaQuestion;
-    public final String     noPwnageCaptchaSuccess;
-    public final int        noPwnageCaptchaTries;
+    public final boolean      noPwnageCaptchaCheck;
+    public final String       noPwnageCaptchaCharacters;
+    public final int          noPwnageCaptchaLength;
+    public final String       noPwnageCaptchaQuestion;
+    public final String       noPwnageCaptchaSuccess;
+    public final int          noPwnageCaptchaTries;
 
-    public final boolean    noPwnageFirstCheck;
-    public final long       noPwnageFirstTimeout;
-    public final int        noPwnageFirstWeight;
+    public final boolean      noPwnageFirstCheck;
+    public final long         noPwnageFirstTimeout;
+    public final int          noPwnageFirstWeight;
 
-    public final boolean    noPwnageGlobalCheck;
-    public final long       noPwnageGlobalTimeout;
-    public final int        noPwnageGlobalWeight;
+    public final boolean      noPwnageGlobalCheck;
+    public final long         noPwnageGlobalTimeout;
+    public final int          noPwnageGlobalWeight;
 
-    public final boolean    noPwnageMoveCheck;
-    public final long       noPwnageMoveTimeout;
-    public final int        noPwnageMoveWeightBonus;
-    public final int        noPwnageMoveWeightMalus;
+    public final boolean      noPwnageMoveCheck;
+    public final long         noPwnageMoveTimeout;
+    public final int          noPwnageMoveWeightBonus;
+    public final int          noPwnageMoveWeightMalus;
 
-    public final boolean    noPwnageReloginCheck;
-    public final String     noPwnageReloginKickMessage;
-    public final long       noPwnageReloginTimeout;
-    public final String     noPwnageReloginWarningMessage;
-    public final int        noPwnageReloginWarningNumber;
-    public final long       noPwnageReloginWarningTimeout;
+    public final boolean      noPwnageReloginCheck;
+    public final String       noPwnageReloginKickMessage;
+    public final long         noPwnageReloginTimeout;
+    public final String       noPwnageReloginWarningMessage;
+    public final int          noPwnageReloginWarningNumber;
+    public final long         noPwnageReloginWarningTimeout;
 
-    public final boolean    noPwnageRepeatCheck;
-    public final long       noPwnageRepeatTimeout;
-    public final int        noPwnageRepeatWeight;
+    public final boolean      noPwnageRepeatCheck;
+    public final long         noPwnageRepeatTimeout;
+    public final int          noPwnageRepeatWeight;
 
-    public final boolean    noPwnageSpeedCheck;
-    public final long       noPwnageSpeedTimeout;
-    public final int        noPwnageSpeedWeight;
+    public final boolean      noPwnageSpeedCheck;
+    public final long         noPwnageSpeedTimeout;
+    public final int          noPwnageSpeedWeight;
 
-    public final int        noPwnageWarnLevel;
-    public final long       noPwnageWarnTimeout;
-    public final boolean    noPwnageWarnOthersCheck;
-    public final String     noPwnageWarnOthersMessage;
-    public final boolean    noPwnageWarnPlayerCheck;
-    public final String     noPwnageWarnPlayerMessage;
+    public final int          noPwnageWarnLevel;
+    public final long         noPwnageWarnTimeout;
+    public final boolean      noPwnageWarnOthersCheck;
+    public final String       noPwnageWarnOthersMessage;
+    public final boolean      noPwnageWarnPlayerCheck;
+    public final String       noPwnageWarnPlayerMessage;
 
-    public final ActionList noPwnageActions;
+    public final ActionList   noPwnageActions;
 
-    public final boolean    opInConsoleOnly;
+    public final boolean      opInConsoleOnly;
 
-    public final boolean    protectPlugins;
+    public final boolean      protectPlugins;
 
     /**
      * Instantiates a new chat configuration.
@@ -136,6 +138,7 @@ public class ChatConfig implements CheckConfig {
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
 
         noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
+        noPwnageExclusions = data.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS);
         noPwnageLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
         noPwnageKickMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE);
 
