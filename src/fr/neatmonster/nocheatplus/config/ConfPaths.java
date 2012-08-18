@@ -25,10 +25,11 @@ public abstract class ConfPaths {
      */
     private static final String LOGGING                               = "logging.";
     public static final String  LOGGING_ACTIVE                        = LOGGING + "active";
-    public static final String  LOGGING_LOGTOFILE                     = LOGGING + "file";
-    public static final String  LOGGING_LOGTOCONSOLE                  = LOGGING + "console";
-    public static final String  LOGGING_LOGTOINGAMECHAT               = LOGGING + "ingamechat";
-    public static final String  LOGGING_DEBUGMESSAGES                 = LOGGING + "debugmessages";
+    public static final String  LOGGING_CONSOLE                       = LOGGING + "console";
+    public static final String  LOGGING_DEBUG                         = LOGGING + "debug";
+    public static final String  LOGGING_FILE                          = LOGGING + "file";
+    public static final String  LOGGING_FILENAME                      = LOGGING + "filename";
+    public static final String  LOGGING_INGAMECHAT                    = LOGGING + "ingamechat";
 
     /*
      *     e   e     ,e,                        888 888                                                   

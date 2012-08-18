@@ -70,14 +70,14 @@ public class LogAction extends ActionWithParameters {
         if (configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE)
                 && !violationData.player.hasPermission(violationData.actions.permissionSilent)) {
             final String message = super.getMessage(violationData);
-            if (toChat && configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOINGAMECHAT))
+            if (toChat && configurationFile.getBoolean(ConfPaths.LOGGING_INGAMECHAT))
                 for (final Player otherPlayer : Bukkit.getServer().getOnlinePlayers())
                     if (otherPlayer.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
                         otherPlayer.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE
                                 + CheckUtils.replaceColors(message));
-            if (toConsole && configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOCONSOLE))
+            if (toConsole && configurationFile.getBoolean(ConfPaths.LOGGING_CONSOLE))
                 System.out.println("[NoCheatPlus] " + CheckUtils.removeColors(message));
-            if (toFile && configurationFile.getBoolean(ConfPaths.LOGGING_LOGTOFILE))
+            if (toFile && configurationFile.getBoolean(ConfPaths.LOGGING_FILE))
                 CheckUtils.fileLogger.info(CheckUtils.removeColors(message));
         }
         return false;

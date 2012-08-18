@@ -89,16 +89,19 @@ public class ChatListener implements Listener {
         final String command = event.getMessage().split(" ")[0].substring(1).toLowerCase();
 
         // Protect some commands to prevent players for seeing which plugins are installed.
-        if (ChatConfig.getConfig(player).protectPlugins
-                && (command.equals("?") || command.equals("about") || command.equals("help")
-                        || command.equals("plugins") || command.equals("pl"))
-                && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
-            event.getPlayer().sendMessage(
-                    ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
-                            + "Please contact the server administrators if you believe that this is in error.");
-            event.setCancelled(true);
-            return;
-        }
+        if (ChatConfig.getConfig(player).protectPlugins)
+            if ((command.equalsIgnoreCase("help") || command.equalsIgnoreCase("?"))
+                    && !player.hasPermission(Permissions.ADMINISTRATION_BUKKIT_HELP)
+                    || (command.equalsIgnoreCase("plugins") || command.equalsIgnoreCase("pl"))
+                    && !player.hasPermission(Permissions.ADMINISTRATION_BUKKIT_PLUGINS)
+                    || (command.equalsIgnoreCase("version") || command.equalsIgnoreCase("ver"))
+                    && !player.hasPermission(Permissions.ADMINISTRATION_BUKKIT_VERSION)) {
+                event.getPlayer().sendMessage(
+                        ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
+                                + "Please contact the server administrators if you believe that this is in error.");
+                event.setCancelled(true);
+                return;
+            }
 
         // Prevent /op and /deop commands from being used in chat.
         if (ChatConfig.getConfig(player).opInConsoleOnly && (command.equals("op") || command.equals("deop"))) {

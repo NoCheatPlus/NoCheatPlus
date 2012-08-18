@@ -166,7 +166,7 @@ public class ConfigManager {
             fileHandler = null;
         }
 
-        final File logFile = new File(folder, "nocheatplus.log");
+        final File logFile = new File(folder, global.getString(ConfPaths.LOGGING_FILENAME));
         try {
             try {
                 logFile.getParentFile().mkdirs();

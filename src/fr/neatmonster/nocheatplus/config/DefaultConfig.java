@@ -36,10 +36,11 @@ public class DefaultConfig extends ConfigFile {
          *                    "8",P"   "8",P"               "8",P"  
          */
         set(ConfPaths.LOGGING_ACTIVE, true);
-        set(ConfPaths.LOGGING_DEBUGMESSAGES, false);
-        set(ConfPaths.LOGGING_LOGTOFILE, true);
-        set(ConfPaths.LOGGING_LOGTOCONSOLE, true);
-        set(ConfPaths.LOGGING_LOGTOINGAMECHAT, true);
+        set(ConfPaths.LOGGING_DEBUG, false);
+        set(ConfPaths.LOGGING_CONSOLE, true);
+        set(ConfPaths.LOGGING_FILE, true);
+        set(ConfPaths.LOGGING_FILENAME, "nocheatplus.log");
+        set(ConfPaths.LOGGING_INGAMECHAT, true);
 
         /*
          *     e   e     ,e,                        888 888                                                   

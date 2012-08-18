@@ -13,7 +13,7 @@ package fr.neatmonster.nocheatplus.players;
  * The various permission nodes used by NoCheatPlus.
  */
 public class Permissions {
-    private static final String NOCHEATPLUS                  = "nocheatplus";
+    private static final String NOCHEATPLUS                   = "nocheatplus";
 
     /*
      *     e Y8b          888             ,e,         ,e,         d8                    d8   ,e,                   
@@ -22,12 +22,17 @@ public class Permissions {
      *  d888888888b  Y888 888 888 888 888 888 888 888 888  Y88D  888   888    ,ee 888  888   888 Y888 888P 888 888 
      * d8888888b Y8b  "88 888 888 888 888 888 888 888 888 d,dP   888   888    "88 888  888   888  "88 88"  888 888 
      */
-    private static final String ADMINISTRATION               = NOCHEATPLUS + ".admin";
-    public static final String  ADMINISTRATION_NOTIFY        = ADMINISTRATION + ".notify";
-    public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
-    public static final String  ADMINISTRATION_RELOAD        = ADMINISTRATION + ".reload";
+    private static final String ADMINISTRATION                = NOCHEATPLUS + ".admin";
 
-    private static final String CHECKS                       = NOCHEATPLUS + ".checks";
+    private static final String ADMINISTRATION_BUKKIT         = ADMINISTRATION + ".bukkit";
+    public static final String  ADMINISTRATION_BUKKIT_HELP    = ADMINISTRATION_BUKKIT + ".help";
+    public static final String  ADMINISTRATION_BUKKIT_PLUGINS = ADMINISTRATION_BUKKIT + ".plugins";
+    public static final String  ADMINISTRATION_BUKKIT_VERSION = ADMINISTRATION_BUKKIT + ".version";
+
+    public static final String  ADMINISTRATION_NOTIFY         = ADMINISTRATION + ".notify";
+    public static final String  ADMINISTRATION_RELOAD         = ADMINISTRATION + ".reload";
+
+    private static final String CHECKS                        = NOCHEATPLUS + ".checks";
 
     /*
      * 888 88b, 888                    888    888 88b,                        888    
@@ -36,11 +41,11 @@ public class Permissions {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888 88b, 888    888   , ,ee 888 888 b  
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 88P' 888     "YeeP" "88 888 888 8b 
      */
-    private static final String BLOCKBREAK                   = CHECKS + ".blockbreak";
-    public static final String  BLOCKBREAK_DIRECTION         = BLOCKBREAK + ".direction";
-    public static final String  BLOCKBREAK_FASTBREAK         = BLOCKBREAK + ".fastbreak";
-    public static final String  BLOCKBREAK_NOSWING           = BLOCKBREAK + ".noswing";
-    public static final String  BLOCKBREAK_REACH             = BLOCKBREAK + ".reach";
+    private static final String BLOCKBREAK                    = CHECKS + ".blockbreak";
+    public static final String  BLOCKBREAK_DIRECTION          = BLOCKBREAK + ".direction";
+    public static final String  BLOCKBREAK_FASTBREAK          = BLOCKBREAK + ".fastbreak";
+    public static final String  BLOCKBREAK_NOSWING            = BLOCKBREAK + ".noswing";
+    public static final String  BLOCKBREAK_REACH              = BLOCKBREAK + ".reach";
 
     /*
      * 888 88b, 888                    888    888           d8                                     d8   
@@ -49,9 +54,9 @@ public class Permissions {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888 888 888  888   888   , 888    ,ee 888 Y888   ,  888   
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 888 888  888    "YeeP" 888    "88 888  "88,e8'  888   
      */
-    private static final String BLOCKINTERACT                = CHECKS + ".blockinteract";
-    public static final String  BLOCKINTERACT_DIRECTION      = BLOCKINTERACT + ".direction";
-    public static final String  BLOCKINTERACT_REACH          = BLOCKINTERACT + ".reach";
+    private static final String BLOCKINTERACT                 = CHECKS + ".blockinteract";
+    public static final String  BLOCKINTERACT_DIRECTION       = BLOCKINTERACT + ".direction";
+    public static final String  BLOCKINTERACT_REACH           = BLOCKINTERACT + ".reach";
 
     /*
      * 888 88b, 888                    888    888 88e  888                          
@@ -60,12 +65,12 @@ public class Permissions {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888      888 ,ee 888 Y888   , 888   , 
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
      */
-    private static final String BLOCKPLACE                   = CHECKS + ".blockplace";
-    public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
-    public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";
-    public static final String  BLOCKPLACE_NOSWING           = BLOCKPLACE + ".noswing";
-    public static final String  BLOCKPLACE_REACH             = BLOCKPLACE + ".reach";
-    public static final String  BLOCKPLACE_SPEED             = BLOCKPLACE + ".speed";
+    private static final String BLOCKPLACE                    = CHECKS + ".blockplace";
+    public static final String  BLOCKPLACE_DIRECTION          = BLOCKPLACE + ".direction";
+    public static final String  BLOCKPLACE_FASTPLACE          = BLOCKPLACE + ".fastplace";
+    public static final String  BLOCKPLACE_NOSWING            = BLOCKPLACE + ".noswing";
+    public static final String  BLOCKPLACE_REACH              = BLOCKPLACE + ".reach";
+    public static final String  BLOCKPLACE_SPEED              = BLOCKPLACE + ".speed";
 
     /*
      *   e88'Y88 888               d8   
@@ -74,9 +79,9 @@ public class Permissions {
      *  Y888  ,d 888 888 ,ee 888  888   
      *   "88,d88 888 888 "88 888  888   
      */
-    private static final String CHAT                         = CHECKS + ".chat";
-    public static final String  CHAT_COLOR                   = CHAT + ".color";
-    public static final String  CHAT_NOPWNAGE                = CHAT + ".nopwnage";
+    private static final String CHAT                          = CHECKS + ".chat";
+    public static final String  CHAT_COLOR                    = CHAT + ".color";
+    public static final String  CHAT_NOPWNAGE                 = CHAT + ".nopwnage";
 
     /*
      * 888'Y88 ,e,          888       d8   
@@ -87,16 +92,16 @@ public class Permissions {
      *               ,  88P                
      *              "8",P"                 
      */
-    private static final String FIGHT                        = CHECKS + ".fight";
-    public static final String  FIGHT_ANGLE                  = FIGHT + ".angle";
-    public static final String  FIGHT_CRITICAL               = FIGHT + ".critical";
-    public static final String  FIGHT_DIRECTION              = FIGHT + ".direction";
-    public static final String  FIGHT_GODMODE                = FIGHT + ".godmode";
-    public static final String  FIGHT_INSTANTHEAL            = FIGHT + ".instantheal";
-    public static final String  FIGHT_KNOCKBACK              = FIGHT + ".knockback";
-    public static final String  FIGHT_NOSWING                = FIGHT + ".noswing";
-    public static final String  FIGHT_REACH                  = FIGHT + ".reach";
-    public static final String  FIGHT_SPEED                  = FIGHT + ".speed";
+    private static final String FIGHT                         = CHECKS + ".fight";
+    public static final String  FIGHT_ANGLE                   = FIGHT + ".angle";
+    public static final String  FIGHT_CRITICAL                = FIGHT + ".critical";
+    public static final String  FIGHT_DIRECTION               = FIGHT + ".direction";
+    public static final String  FIGHT_GODMODE                 = FIGHT + ".godmode";
+    public static final String  FIGHT_INSTANTHEAL             = FIGHT + ".instantheal";
+    public static final String  FIGHT_KNOCKBACK               = FIGHT + ".knockback";
+    public static final String  FIGHT_NOSWING                 = FIGHT + ".noswing";
+    public static final String  FIGHT_REACH                   = FIGHT + ".reach";
+    public static final String  FIGHT_SPEED                   = FIGHT + ".speed";
 
     /*
      * 888                                     d8                              
@@ -107,10 +112,10 @@ public class Permissions {
      *                                                                  888    
      *                                                                  888    
      */
-    private static final String INVENTORY                    = CHECKS + ".inventory";
-    public static final String  INVENTORY_DROP               = INVENTORY + ".drop";
-    public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
-    public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
+    private static final String INVENTORY                     = CHECKS + ".inventory";
+    public static final String  INVENTORY_DROP                = INVENTORY + ".drop";
+    public static final String  INVENTORY_INSTANTBOW          = INVENTORY + ".instantbow";
+    public static final String  INVENTORY_INSTANTEAT          = INVENTORY + ".instanteat";
 
     /*
      *     e   e                         ,e,                  
@@ -121,17 +126,17 @@ public class Permissions {
      *                                                 ,  88P 
      *                                                "8",P"  
      */
-    private static final String MOVING                       = CHECKS + ".moving";
-    public static final String  MOVING_BOATSANYWHERE         = MOVING + ".boatsanywhere";
-    public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";
-    public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
-    public static final String  MOVING_MOREPACKETSVEHICLE    = MOVING + ".morepacketsvehicle";
-    public static final String  MOVING_NOFALL                = MOVING + ".nofall";
-    public static final String  MOVING_OVERRIDEBUKKIT        = MOVING + ".overridebukkit";
-    public static final String  MOVING_SURVIVALFLY           = MOVING + ".survivalfly";
-    public static final String  MOVING_SURVIVALFLY_BLOCKING  = MOVING_SURVIVALFLY + ".blocking";
-    public static final String  MOVING_SURVIVALFLY_SNEAKING  = MOVING_SURVIVALFLY + ".sneaking";
-    public static final String  MOVING_SURVIVALFLY_SPRINTING = MOVING_SURVIVALFLY + ".sprinting";
+    private static final String MOVING                        = CHECKS + ".moving";
+    public static final String  MOVING_BOATSANYWHERE          = MOVING + ".boatsanywhere";
+    public static final String  MOVING_CREATIVEFLY            = MOVING + ".creativefly";
+    public static final String  MOVING_MOREPACKETS            = MOVING + ".morepackets";
+    public static final String  MOVING_MOREPACKETSVEHICLE     = MOVING + ".morepacketsvehicle";
+    public static final String  MOVING_NOFALL                 = MOVING + ".nofall";
+    public static final String  MOVING_OVERRIDEBUKKIT         = MOVING + ".overridebukkit";
+    public static final String  MOVING_SURVIVALFLY            = MOVING + ".survivalfly";
+    public static final String  MOVING_SURVIVALFLY_BLOCKING   = MOVING_SURVIVALFLY + ".blocking";
+    public static final String  MOVING_SURVIVALFLY_SNEAKING   = MOVING_SURVIVALFLY + ".sneaking";
+    public static final String  MOVING_SURVIVALFLY_SPRINTING  = MOVING_SURVIVALFLY + ".sprinting";
 
     /*
      *     e   e                    888 ,e,  dP,e, ,e,                    d8   ,e,                         
@@ -140,32 +145,32 @@ public class Permissions {
      *  d8b Y8b Y8b  Y888 888P Y888 888 888  888   888 Y888   , ,ee 888  888   888 Y888 888P 888 888  Y88D 
      * d888b Y8b Y8b  "88 88"   "88 888 888  888   888  "88,e8' "88 888  888   888  "88 88"  888 888 d,dP  
      */
-    private static final String MODS                         = NOCHEATPLUS + ".mods";
+    private static final String MODS                          = NOCHEATPLUS + ".mods";
 
-    private static final String CJB                          = MODS + ".cjb";
-    public static final String  CJB_FLY                      = CJB + ".fly";
-    public static final String  CJB_RADAR                    = CJB + ".radar";
-    public static final String  CJB_XRAY                     = CJB + ".xray";
+    private static final String CJB                           = MODS + ".cjb";
+    public static final String  CJB_FLY                       = CJB + ".fly";
+    public static final String  CJB_RADAR                     = CJB + ".radar";
+    public static final String  CJB_XRAY                      = CJB + ".xray";
 
-    private static final String MINECRAFTAUTOMAP             = MODS + ".minecraftautomap";
-    public static final String  MINECRAFTAUTOMAP_CAVE        = MINECRAFTAUTOMAP + ".cave";
-    public static final String  MINECRAFTAUTOMAP_ORES        = MINECRAFTAUTOMAP + ".ores";
-    public static final String  MINECRAFTAUTOMAP_RADAR       = MINECRAFTAUTOMAP + ".radar";
+    private static final String MINECRAFTAUTOMAP              = MODS + ".minecraftautomap";
+    public static final String  MINECRAFTAUTOMAP_CAVE         = MINECRAFTAUTOMAP + ".cave";
+    public static final String  MINECRAFTAUTOMAP_ORES         = MINECRAFTAUTOMAP + ".ores";
+    public static final String  MINECRAFTAUTOMAP_RADAR        = MINECRAFTAUTOMAP + ".radar";
 
-    private static final String REI                          = MODS + ".rei";
-    public static final String  REI_CAVE                     = REI + ".cave";
-    public static final String  REI_RADAR                    = REI + ".radar";
+    private static final String REI                           = MODS + ".rei";
+    public static final String  REI_CAVE                      = REI + ".cave";
+    public static final String  REI_RADAR                     = REI + ".radar";
 
-    private static final String SMARTMOVING                  = MODS + ".smartmoving";
-    public static final String  SMARTMOVING_CLIMBING         = SMARTMOVING + ".climbing";
-    public static final String  SMARTMOVING_CRAWLING         = SMARTMOVING + ".crawling";
-    public static final String  SMARTMOVING_FLYING           = SMARTMOVING + ".flying";
-    public static final String  SMARTMOVING_JUMPING          = SMARTMOVING + ".jumping";
-    public static final String  SMARTMOVING_SLIDING          = SMARTMOVING + ".sliding";
-    public static final String  SMARTMOVING_SWIMMING         = SMARTMOVING + ".swimming";
+    private static final String SMARTMOVING                   = MODS + ".smartmoving";
+    public static final String  SMARTMOVING_CLIMBING          = SMARTMOVING + ".climbing";
+    public static final String  SMARTMOVING_CRAWLING          = SMARTMOVING + ".crawling";
+    public static final String  SMARTMOVING_FLYING            = SMARTMOVING + ".flying";
+    public static final String  SMARTMOVING_JUMPING           = SMARTMOVING + ".jumping";
+    public static final String  SMARTMOVING_SLIDING           = SMARTMOVING + ".sliding";
+    public static final String  SMARTMOVING_SWIMMING          = SMARTMOVING + ".swimming";
 
-    private static final String ZOMBE                        = MODS + ".zombe";
-    public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
-    public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
-    public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
+    private static final String ZOMBE                         = MODS + ".zombe";
+    public static final String  ZOMBE_FLY                     = ZOMBE + ".fly";
+    public static final String  ZOMBE_NOCLIP                  = ZOMBE + ".noclip";
+    public static final String  ZOMBE_CHEAT                   = ZOMBE + ".cheat";
 }
