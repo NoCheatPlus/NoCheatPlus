@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * M""MMMMMMMM                   M"""""`'"""`YM                                                       
@@ -47,18 +48,6 @@ public class LagMeasureTask implements Runnable {
     }
 
     /**
-     * Gets the average ticks.
-     * 
-     * @return the average ticks
-     */
-    public static int getAverageTicks() {
-        final int averageTicks = (int) (instance.totalTicks / instance.numberOfValues);
-        instance.totalTicks = 0L;
-        instance.numberOfValues = 0;
-        return averageTicks;
-    }
-
-    /**
      * Returns if checking must be skipped (lag).
      * 
      * @return true, if successful
@@ -87,14 +76,8 @@ public class LagMeasureTask implements Runnable {
     /** The lag measure task id. */
     private int     lagMeasureTaskId         = -1;
 
-    /** The number of values. */
-    private int     numberOfValues           = 0;
-
     /** The skip check. */
     private boolean skipCheck                = false;
-
-    /** The total ticks. */
-    private long    totalTicks               = 0L;
 
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
@@ -106,8 +89,11 @@ public class LagMeasureTask implements Runnable {
             // If the previous second took to long, skip checks during this second.
             skipCheck = lastInGameSecondDuration > 2000;
 
-            totalTicks += Math.round(20000D / lastInGameSecondDuration);
-            numberOfValues++;
+            // Metrics data.
+            int ticks = (int) Math.round(20000D / lastInGameSecondDuration);
+            if (ticks > 20)
+                ticks = 20;
+            MetricsData.addTicks(ticks);
 
             if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG))
                 if (oldStatus != skipCheck && skipCheck)

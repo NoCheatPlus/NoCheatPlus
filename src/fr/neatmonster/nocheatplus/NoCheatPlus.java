@@ -28,6 +28,7 @@ import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
+import fr.neatmonster.nocheatplus.metrics.MetricsData.TicksPlotter;
 import fr.neatmonster.nocheatplus.packets.PacketsWorkaround;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
@@ -119,32 +120,33 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
                         @Override
                         public int getValue() {
-                            return MetricsData.getChecked(type);
+                            final int checked = MetricsData.getChecked(type);
+                            MetricsData.resetChecked(type);
+                            return checked;
                         }
                     });
                     checksFailed.addPlotter(new Plotter(type.name()) {
 
                         @Override
                         public int getValue() {
-                            return MetricsData.getFailed(type);
+                            final int failed = MetricsData.getFailed(type);
+                            MetricsData.resetFailed(type);
+                            return failed;
                         }
                     });
                     violationLevels.addPlotter(new Plotter(type.name()) {
 
                         @Override
                         public int getValue() {
-                            return (int) MetricsData.getViolationLevel(type);
+                            final int violationLevel = (int) MetricsData.getViolationLevel(type);
+                            MetricsData.resetViolationLevel(type);
+                            return violationLevel;
                         }
                     });
                 }
             final Graph serverTicks = metrics.createGraph("Server Ticks");
-            serverTicks.addPlotter(new Plotter("" + LagMeasureTask.getAverageTicks()) {
-
-                @Override
-                public int getValue() {
-                    return 1;
-                }
-            });
+            for (int ticks = 0; ticks < 21; ticks++)
+                serverTicks.addPlotter(new TicksPlotter(ticks));
             metrics.start();
         } catch (final Exception e) {}
 

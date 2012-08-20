@@ -5,6 +5,7 @@ import java.util.Map;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 
 /*
  * M"""""`'"""`YM            dP            oo                   M""""""'YMM            dP            
@@ -20,28 +21,71 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
  */
 public class MetricsData {
 
+    /**
+     * The ticks plotter.
+     */
+    public static class TicksPlotter extends Plotter {
+
+        /** The ticks. */
+        private final int ticks;
+
+        /**
+         * Instantiates a new ticks plotter.
+         * 
+         * @param ticks
+         *            the ticks
+         */
+        public TicksPlotter(final int ticks) {
+            super("" + ticks);
+            this.ticks = ticks;
+        }
+
+        /* (non-Javadoc)
+         * @see fr.neatmonster.nocheatplus.metrics.Metrics.Plotter#getValue()
+         */
+        @Override
+        public int getValue() {
+            final int ticks = MetricsData.getServerTicks(this.ticks);
+            MetricsData.resetServerTicks(this.ticks);
+            return ticks;
+        }
+    }
+
     /** The violation levels. */
     private static final Map<CheckType, Double>  violationLevels = new HashMap<CheckType, Double>();
 
-    /** The checks fails. */
-    private static final Map<CheckType, Integer> checksFails     = new HashMap<CheckType, Integer>();
+    /** The checks failed. */
+    private static final Map<CheckType, Integer> checksFailed    = new HashMap<CheckType, Integer>();
 
     /** The events checked. */
     private static final Map<CheckType, Integer> eventsChecked   = new HashMap<CheckType, Integer>();
 
+    /** The server ticks. */
+    private static final Map<Integer, Integer>   serverTicks     = new HashMap<Integer, Integer>();
+
     /**
-     * Called when an event is checked.
+     * Adds the checked.
      * 
      * @param type
      *            the type
      */
     public static void addChecked(final CheckType type) {
         if (type.getParent() != null)
-            eventsChecked.put(type, getChecked(type));
+            eventsChecked.put(type, getChecked(type) + 1);
     }
 
     /**
-     * Called when a player fails a check.
+     * Adds the ticks.
+     * 
+     * @param ticks
+     *            the ticks
+     */
+    public static void addTicks(final int ticks) {
+        serverTicks.put(ticks, serverTicks.get(ticks) + 1);
+    }
+
+    /**
+     * Adds the violation.
      * 
      * @param violationData
      *            the violation data
@@ -49,17 +93,17 @@ public class MetricsData {
     public static void addViolation(final ViolationData violationData) {
         final CheckType type = violationData.check.getType();
         if (type.getParent() != null) {
+            checksFailed.put(type, getFailed(type) + 1);
             violationLevels.put(type, getViolationLevel(type) + violationData.addedVL);
-            checksFails.put(type, getFailed(type) + 1);
         }
     }
 
     /**
-     * Gets the number of event checked.
+     * Gets the checked.
      * 
      * @param type
      *            the type
-     * @return the number of event checked
+     * @return the checked
      */
     public static int getChecked(final CheckType type) {
         if (type == CheckType.ALL) {
@@ -69,27 +113,40 @@ public class MetricsData {
             return eventsChecked;
         }
         if (!eventsChecked.containsKey(type))
-            eventsChecked.put(type, 0);
+            resetChecked(type);
         return eventsChecked.get(type);
     }
 
     /**
-     * Gets the number of failed checks.
+     * Gets the failed.
      * 
      * @param type
      *            the type
-     * @return the number of failed checks
+     * @return the failed
      */
     public static int getFailed(final CheckType type) {
         if (type == CheckType.ALL) {
             int checkFails = 0;
-            for (final double value : checksFails.values())
+            for (final double value : checksFailed.values())
                 checkFails += value;
             return checkFails;
         }
-        if (!checksFails.containsKey(type))
-            checksFails.put(type, 0);
-        return checksFails.get(type);
+        if (!checksFailed.containsKey(type))
+            resetFailed(type);
+        return checksFailed.get(type);
+    }
+
+    /**
+     * Gets the server ticks.
+     * 
+     * @param ticks
+     *            the ticks
+     * @return the server ticks
+     */
+    public static int getServerTicks(final int ticks) {
+        if (!serverTicks.containsKey(ticks))
+            resetServerTicks(ticks);
+        return serverTicks.get(ticks);
     }
 
     /**
@@ -107,7 +164,47 @@ public class MetricsData {
             return violationLevel;
         }
         if (!violationLevels.containsKey(type))
-            violationLevels.put(type, 0D);
+            resetViolationLevel(type);
         return violationLevels.get(type);
+    }
+
+    /**
+     * Reset checked.
+     * 
+     * @param type
+     *            the type
+     */
+    public static void resetChecked(final CheckType type) {
+        eventsChecked.put(type, 0);
+    }
+
+    /**
+     * Reset failed.
+     * 
+     * @param type
+     *            the type
+     */
+    public static void resetFailed(final CheckType type) {
+        checksFailed.put(type, 0);
+    }
+
+    /**
+     * Reset server ticks.
+     * 
+     * @param ticks
+     *            the ticks
+     */
+    public static void resetServerTicks(final int ticks) {
+        serverTicks.put(ticks, 0);
+    }
+
+    /**
+     * Reset violation level.
+     * 
+     * @param type
+     *            the type
+     */
+    public static void resetViolationLevel(final CheckType type) {
+        violationLevels.put(type, 0D);
     }
 }
