@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ExecuteActionsEvent;
 import fr.neatmonster.nocheatplus.checks.Workarounds;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
@@ -23,6 +24,10 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.metrics.Metrics;
+import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
+import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.packets.PacketsWorkaround;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
@@ -101,6 +106,47 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Register the commands handler.
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
+
+        // Start Metrics.
+        try {
+            final Metrics metrics = new Metrics(this);
+            final Graph eventsChecked = metrics.createGraph("Events Checked");
+            final Graph checksFailed = metrics.createGraph("Checks Failed");
+            final Graph violationLevels = metrics.createGraph("Violation Levels");
+            for (final CheckType type : CheckType.values())
+                if (type == CheckType.ALL || type.getParent() != null) {
+                    eventsChecked.addPlotter(new Plotter(type.name()) {
+
+                        @Override
+                        public int getValue() {
+                            return MetricsData.getChecked(type);
+                        }
+                    });
+                    checksFailed.addPlotter(new Plotter(type.name()) {
+
+                        @Override
+                        public int getValue() {
+                            return MetricsData.getFailed(type);
+                        }
+                    });
+                    violationLevels.addPlotter(new Plotter(type.name()) {
+
+                        @Override
+                        public int getValue() {
+                            return (int) MetricsData.getViolationLevel(type);
+                        }
+                    });
+                }
+            final Graph serverTicks = metrics.createGraph("Server Ticks");
+            serverTicks.addPlotter(new Plotter("" + LagMeasureTask.getAverageTicks()) {
+
+                @Override
+                public int getValue() {
+                    return 1;
+                }
+            });
+            metrics.start();
+        } catch (final Exception e) {}
 
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");

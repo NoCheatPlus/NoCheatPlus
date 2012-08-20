@@ -6,6 +6,7 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -39,6 +40,9 @@ public class Direction extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location placed, final Location against) {
+        // Metrics data.
+        MetricsData.addChecked(type);
+
         final BlockPlaceData data = BlockPlaceData.getData(player);
 
         boolean cancel = false;

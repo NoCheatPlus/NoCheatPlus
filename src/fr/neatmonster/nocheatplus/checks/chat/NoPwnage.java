@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -72,6 +73,9 @@ public class NoPwnage extends Check {
 
         if (!isMainThread && !cc.isEnabled(type))
             return false;
+
+        // Metrics data.
+        MetricsData.addChecked(type);
 
         // Keep related to ChatData/NoPwnage/Color used lock.
         synchronized (data) {

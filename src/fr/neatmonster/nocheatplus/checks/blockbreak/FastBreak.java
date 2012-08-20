@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * MM""""""""`M                     dP   M#"""""""'M                             dP       
@@ -48,6 +49,9 @@ public class FastBreak extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Block block) {
+        // Metrics data.
+        MetricsData.addChecked(type);
+
         final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
         final BlockBreakData data = BlockBreakData.getData(player);
 

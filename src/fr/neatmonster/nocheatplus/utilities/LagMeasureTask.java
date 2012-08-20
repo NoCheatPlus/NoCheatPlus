@@ -47,6 +47,18 @@ public class LagMeasureTask implements Runnable {
     }
 
     /**
+     * Gets the average ticks.
+     * 
+     * @return the average ticks
+     */
+    public static int getAverageTicks() {
+        final int averageTicks = (int) (instance.totalTicks / instance.numberOfValues);
+        instance.totalTicks = 0L;
+        instance.numberOfValues = 0;
+        return averageTicks;
+    }
+
+    /**
      * Returns if checking must be skipped (lag).
      * 
      * @return true, if successful
@@ -72,11 +84,17 @@ public class LagMeasureTask implements Runnable {
     /** The last in game second duration. */
     private long    lastInGameSecondDuration = 2000L;
 
+    /** The lag measure task id. */
+    private int     lagMeasureTaskId         = -1;
+
+    /** The number of values. */
+    private int     numberOfValues           = 0;
+
     /** The skip check. */
     private boolean skipCheck                = false;
 
-    /** The lag measure task id. */
-    private int     lagMeasureTaskId         = -1;
+    /** The total ticks. */
+    private long    totalTicks               = 0L;
 
     /* (non-Javadoc)
      * @see java.lang.Runnable#run()
@@ -88,6 +106,9 @@ public class LagMeasureTask implements Runnable {
             // If the previous second took to long, skip checks during this second.
             skipCheck = lastInGameSecondDuration > 2000;
 
+            totalTicks += Math.round(20000D / lastInGameSecondDuration);
+            numberOfValues++;
+
             if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG))
                 if (oldStatus != skipCheck && skipCheck)
                     System.out.println("[NoCheatPlus] Detected server lag, some checks will not work.");
@@ -96,11 +117,6 @@ public class LagMeasureTask implements Runnable {
 
             final long time = System.currentTimeMillis();
             lastInGameSecondDuration = time - lastInGameSecondTime;
-            if (lastInGameSecondDuration < 1000)
-                lastInGameSecondDuration = 1000;
-            else if (lastInGameSecondDuration > 3600000)
-                // Top limit of 1 hour per "second".
-                lastInGameSecondDuration = 3600000;
             lastInGameSecondTime = time;
         } catch (final Exception e) {
             // Just prevent this thread from dying for whatever reason.

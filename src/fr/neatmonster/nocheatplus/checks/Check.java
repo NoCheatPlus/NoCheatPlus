@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 
 /*
@@ -60,18 +61,17 @@ public abstract class Check {
      * 
      * @param player
      *            the player
-     * @param VL
-     *            the vL
-     * @param VLAdded
-     *            the vL added
+     * @param vL
+     *            the violation level
+     * @param addedVL
+     *            the violation level added
      * @param actions
      *            the actions
      * @return true, if the event should be cancelled
      */
-    protected boolean executeActions(final Player player, final double VL, final double VLAdded,
+    protected boolean executeActions(final Player player, final double vL, final double addedVL,
             final ActionList actions) {
-        ViolationHistory.getHistory(player).log(getClass().getName(), VLAdded);
-        return executeActions(new ViolationData(this, player, VL, actions));
+        return executeActions(new ViolationData(this, player, vL, addedVL, actions));
     }
 
     /**
@@ -82,6 +82,8 @@ public abstract class Check {
      * @return true, if the event should be cancelled
      */
     protected boolean executeActions(final ViolationData violationData) {
+        MetricsData.addViolation(violationData);
+        ViolationHistory.getHistory(violationData.player).log(getClass().getName(), violationData.addedVL);
         try {
             // Check a bypass permission.
             if (violationData.bypassPermission != null)
@@ -94,7 +96,6 @@ public abstract class Check {
                 return false;
 
             final long time = System.currentTimeMillis() / 1000L;
-
             boolean cancel = false;
             for (final Action action : violationData.getActions())
                 if (getHistory(violationData.player).executeAction(violationData, action, time))
@@ -114,21 +115,20 @@ public abstract class Check {
      * 
      * @param player
      *            the player
-     * @param VL
-     *            the vL
-     * @param VLAdded
-     *            the vL added
+     * @param vL
+     *            the violation level
+     * @param addedVL
+     *            the violation level added
      * @param actions
      *            the actions
      * @param bypassPermission
      *            the bypass permission
      * @return true, if the event should be cancelled
      */
-    public boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
+    public boolean executeActionsThreadSafe(final Player player, final double vL, final double addedVL,
             final ActionList actions, final String bypassPermission) {
-        ViolationHistory.getHistory(player).log(getClass().getName(), VLAdded);
         // Sync it into the main thread by using an event.
-        return executeActionsThreadSafe(new ViolationData(this, player, VL, actions, bypassPermission));
+        return executeActionsThreadSafe(new ViolationData(this, player, vL, addedVL, actions, bypassPermission));
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class Check {
             return violationData.player.getName();
         else if (wildcard == ParameterName.VIOLATIONS) {
             try {
-                return "" + Math.round(violationData.violationLevel);
+                return "" + Math.round(violationData.vL);
             } catch (final Exception e) {
                 e.printStackTrace();
             }

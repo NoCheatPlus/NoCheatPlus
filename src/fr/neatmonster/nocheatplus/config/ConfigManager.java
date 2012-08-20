@@ -87,6 +87,9 @@ public class ConfigManager {
     /** The file handler. */
     private static FileHandler                   fileHandler = null;
 
+    /** The log file. */
+    public static File                           logFile     = null;
+
     /**
      * Cleanup.
      */
@@ -166,7 +169,7 @@ public class ConfigManager {
             fileHandler = null;
         }
 
-        final File logFile = new File(folder, global.getString(ConfPaths.LOGGING_FILENAME));
+        logFile = new File(folder, global.getString(ConfPaths.LOGGING_FILENAME));
         try {
             try {
                 logFile.getParentFile().mkdirs();

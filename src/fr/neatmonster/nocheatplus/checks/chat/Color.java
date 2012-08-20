@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * MM'""""'YMM          dP                   
@@ -46,6 +47,9 @@ public class Color extends Check {
         if (!isMainThread && !cc.isEnabled(type))
             // Leave out the permission check.
             return message;
+
+        // Metrics data.
+        MetricsData.addChecked(type);
 
         final ChatData data = ChatData.getData(player);
         // Keep related to ChatData/NoPwnage/Color used lock.

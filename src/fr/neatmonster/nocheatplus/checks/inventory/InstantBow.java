@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * M""M                     dP                       dP   M#"""""""'M                      
@@ -36,6 +37,9 @@ public class InstantBow extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final float force) {
+        // Metrics data.
+        MetricsData.addChecked(type);
+
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;

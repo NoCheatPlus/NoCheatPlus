@@ -11,6 +11,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -45,6 +46,9 @@ public class NoFall extends Check {
      *            the to
      */
     public void check(final Player player, final PlayerLocation from, final PlayerLocation to) {
+        // Metrics data.
+        MetricsData.addChecked(type);
+
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 

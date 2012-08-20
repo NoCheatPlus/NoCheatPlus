@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -56,6 +57,9 @@ public class CreativeFly extends Check {
      * @return the location
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to) {
+        // Metrics data.
+        MetricsData.addChecked(type);
+
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
 
@@ -132,8 +136,7 @@ public class CreativeFly extends Check {
                 data.creativeFlyVL += result;
 
                 // Execute whatever actions are associated with this check and the violation level and find out if we
-                // should
-                // cancel the event.
+                // should cancel the event.
                 if (executeActions(player, data.creativeFlyVL, result, cc.creativeFlyActions))
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                     // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.

@@ -25,6 +25,9 @@ public class ViolationData {
     /** The actions to be executed. */
     public final ActionList actions;
 
+    /** The violation level added. */
+    public final double     addedVL;
+
     /** The bypassing permission. */
     public final String     bypassPermission;
 
@@ -35,7 +38,7 @@ public class ViolationData {
     public final Player     player;
 
     /** The violation level. */
-    public final double     violationLevel;
+    public final double     vL;
 
     /**
      * Instantiates a new violation data.
@@ -44,13 +47,16 @@ public class ViolationData {
      *            the check
      * @param player
      *            the player
-     * @param violationLevel
+     * @param vL
      *            the violation level
+     * @param addedVL
+     *            the violation level added
      * @param actions
      *            the actions
      */
-    public ViolationData(final Check check, final Player player, final double violationLevel, final ActionList actions) {
-        this(check, player, violationLevel, actions, null);
+    public ViolationData(final Check check, final Player player, final double vL, final double addedVL,
+            final ActionList actions) {
+        this(check, player, vL, addedVL, actions, null);
     }
 
     /**
@@ -60,18 +66,21 @@ public class ViolationData {
      *            the check
      * @param player
      *            the player
-     * @param violationLevel
+     * @param vL
      *            the violation level
+     * @param addedVL
+     *            the violation level added
      * @param actions
      *            the actions
      * @param bypassPermission
      *            the permission to bypass the execution, if not null
      */
-    public ViolationData(final Check check, final Player player, final double violationLevel, final ActionList actions,
-            final String bypassPermission) {
+    public ViolationData(final Check check, final Player player, final double vL, final double addedVL,
+            final ActionList actions, final String bypassPermission) {
         this.check = check;
         this.player = player;
-        this.violationLevel = violationLevel;
+        this.vL = vL;
+        this.addedVL = addedVL;
         this.actions = actions;
         this.bypassPermission = bypassPermission;
     }
@@ -82,6 +91,6 @@ public class ViolationData {
      * @return the actions
      */
     public Action[] getActions() {
-        return actions.getActions(violationLevel);
+        return actions.getActions(vL);
     }
 }

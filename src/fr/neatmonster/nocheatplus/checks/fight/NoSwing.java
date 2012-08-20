@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * M"""""""`YM          MP""""""`MM            oo                   
@@ -35,6 +36,9 @@ public class NoSwing extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
+        // Metrics data.
+        MetricsData.addChecked(type);
+
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
