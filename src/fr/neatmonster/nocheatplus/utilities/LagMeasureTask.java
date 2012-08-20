@@ -64,7 +64,7 @@ public class LagMeasureTask implements Runnable {
      */
     public static void start(final NoCheatPlus plugin) {
         instance.lagMeasureTaskId = Bukkit.getServer().getScheduler()
-                .scheduleSyncRepeatingTask(plugin, instance, 20, 20);
+                .scheduleSyncRepeatingTask(plugin, instance, 20L, 20L);
     }
 
     /** The last in game second time. */

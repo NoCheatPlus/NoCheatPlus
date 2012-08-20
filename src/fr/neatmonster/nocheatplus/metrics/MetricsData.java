@@ -36,7 +36,7 @@ public class MetricsData {
          *            the ticks
          */
         public TicksPlotter(final int ticks) {
-            super("" + ticks);
+            super(ticks + " tick(s)");
             this.ticks = ticks;
         }
 

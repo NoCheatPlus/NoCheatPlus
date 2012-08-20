@@ -172,10 +172,9 @@ public class MovingListener implements Listener {
          *                |___/                                                          
          */
         final Player player = event.getPlayer();
-        final MovingData data = MovingData.getData(player);
         if (survivalFly.isEnabled(player) && survivalFly.check(player))
             // To cancel the event, we simply teleport the player to his last safe location.
-            player.teleport(data.lastSafeLocations[0]);
+            player.teleport(MovingData.getData(player).lastSafeLocations[0]);
     }
 
     /**
