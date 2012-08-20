@@ -1,17 +1,9 @@
 package fr.neatmonster.nocheatplus;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.NetServerHandler;
-import net.minecraft.server.NetworkManager;
-import net.minecraft.server.ServerConnection;
-
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,6 +23,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.packets.PacketsWorkaround;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
@@ -49,10 +42,10 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class NoCheatPlus extends JavaPlugin implements Listener {
 
     /** The time it was when NoCheatPlus has been activated. */
-    public static long     time = System.currentTimeMillis();
+    public static final long     time      = System.currentTimeMillis();
 
     /** The listeners. */
-    private List<Listener> listeners;
+    private final List<Listener> listeners = new ArrayList<Listener>();
 
     /* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onDisable()
@@ -63,6 +56,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
+
+        // Disable the packets workaround.
+        PacketsWorkaround.disable();
 
         // Cleanup the configuration manager.
         ConfigManager.cleanup();
@@ -83,7 +79,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         ConfigManager.init(this);
 
         // List the events listeners.
-        listeners = new ArrayList<Listener>();
         listeners.add(new BlockBreakListener());
         listeners.add(new BlockInteractListener());
         listeners.add(new BlockPlaceListener());
@@ -92,6 +87,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         listeners.add(new InventoryListener());
         listeners.add(new MovingListener());
         listeners.add(new Workarounds());
+
+        // Enable the packets workaround.
+        PacketsWorkaround.enable();
 
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
@@ -126,31 +124,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      * @param event
      *            the event handled
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @EventHandler(
             priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-
-        // Set the proxy of the player if enabled.
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_USEPROXY)) {
-            final EntityPlayer player = ((CraftPlayer) event.getPlayer()).getHandle();
-            final NetServerHandler nsh = player.netServerHandler;
-            final NetServerHandlerProxy proxy = new NetServerHandlerProxy(MinecraftServer.getServer(), nsh);
-            player.netServerHandler = proxy;
-            try {
-                final Field packetListener = NetworkManager.class.getDeclaredField("packetListener");
-                packetListener.setAccessible(true);
-                packetListener.set(nsh.networkManager, proxy);
-                final Field d = ServerConnection.class.getDeclaredField("d");
-                d.setAccessible(true);
-                final List handlerList = (List) d.get(MinecraftServer.getServer().ac());
-                handlerList.remove(nsh);
-                handlerList.add(proxy);
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         final Player player = event.getPlayer();
 
         // Check if we allow all the client mods.
