@@ -1,9 +1,13 @@
 package fr.neatmonster.nocheatplus;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -29,7 +33,6 @@ import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.metrics.MetricsData.TicksPlotter;
-import fr.neatmonster.nocheatplus.packets.PacketsWorkaround;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
@@ -48,10 +51,13 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class NoCheatPlus extends JavaPlugin implements Listener {
 
     /** The time it was when NoCheatPlus has been activated. */
-    public static final long     time      = System.currentTimeMillis();
+    public static final long     time       = System.currentTimeMillis();
 
     /** The listeners. */
-    private final List<Listener> listeners = new ArrayList<Listener>();
+    private final List<Listener> listeners  = new ArrayList<Listener>();
+
+    /** The new version build number. */
+    private int                  newVersion = 0;
 
     /* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onDisable()
@@ -62,9 +68,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
-
-        // Disable the packets workaround.
-        PacketsWorkaround.disable();
 
         // Cleanup the configuration manager.
         ConfigManager.cleanup();
@@ -93,9 +96,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         listeners.add(new InventoryListener());
         listeners.add(new MovingListener());
         listeners.add(new Workarounds());
-
-        // Enable the packets workaround.
-        PacketsWorkaround.enable();
 
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
@@ -152,6 +152,21 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
+
+        // Check for updates.
+        try {
+            final Integer oldVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
+            final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
+            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openConnection()
+                    .getInputStream()));
+            String content = "", inputLine = "";
+            while ((inputLine = bufferedReader.readLine()) != null)
+                content += inputLine;
+            bufferedReader.close();
+            final Integer newVersion = Integer.parseInt(content.split("\"number\":")[1].split(",")[0]);
+            if (oldVersion < newVersion)
+                this.newVersion = newVersion;
+        } catch (final Exception e) {}
     }
 
     /**
@@ -177,82 +192,92 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
 
+        String message = "";
+
+        // Display a message about the new version if relevant.
+        if (newVersion > 0 && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
+            message += ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new version is available! (Build #" + newVersion
+                    + ".)";
+
         // Check if we allow all the client mods.
         final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);
-        String message = "";
 
         // Allow Rei's Minimap's cave mode.
         if (allowAll || player.hasPermission(Permissions.REI_CAVE))
-            message = message + "§0§0§1§e§f";
+            message += "§0§0§1§e§f";
 
         // Allow Rei's Minimap's radar.
         if (allowAll || player.hasPermission(Permissions.REI_RADAR))
-            message = message + "§0§0§2§3§4§5§6§7§e§f";
+            message += "§0§0§2§3§4§5§6§7§e§f";
 
         // If all the client mods are allowed, no need to go any further.
-        if (allowAll)
+        if (allowAll) {
+            if (!message.equals(""))
+                player.sendMessage(message);
             return;
+        }
 
         // Disable Zombe's fly mod.
         if (!player.hasPermission(Permissions.ZOMBE_FLY))
-            message = message + "§f §f §1 §0 §2 §4";
+            message += "§f §f §1 §0 §2 §4";
 
         // Disable Zombe's noclip.
         if (!player.hasPermission(Permissions.ZOMBE_NOCLIP))
-            message = message + "§f §f §4 §0 §9 §6";
+            message += "§f §f §4 §0 §9 §6";
 
         // Disable Zombe's cheat.
         if (!player.hasPermission(Permissions.ZOMBE_CHEAT))
-            message = message + "§f §f §2 §0 §4 §8";
+            message += "§f §f §2 §0 §4 §8";
 
         // Disable CJB's fly mod.
         if (!player.hasPermission(Permissions.CJB_FLY))
-            message = message + "§3 §9 §2 §0 §0 §1";
+            message += "§3 §9 §2 §0 §0 §1";
 
         // Disable CJB's xray.
         if (!player.hasPermission(Permissions.CJB_XRAY))
-            message = message + "§3 §9 §2 §0 §0 §2";
+            message += "§3 §9 §2 §0 §0 §2";
 
         // Disable CJB's radar.
         if (!player.hasPermission(Permissions.CJB_RADAR))
-            message = message + "§3 §9 §2 §0 §0 §3";
+            message += "§3 §9 §2 §0 §0 §3";
 
         // Disable Minecraft AutoMap's ores.
         if (!player.hasPermission(Permissions.MINECRAFTAUTOMAP_ORES))
-            message = message + "§0§0§1§f§e";
+            message += "§0§0§1§f§e";
 
         // Disable Minecraft AutoMap's cave mode.
         if (!player.hasPermission(Permissions.MINECRAFTAUTOMAP_CAVE))
-            message = message + "§0§0§2§f§e";
+            message += "§0§0§2§f§e";
 
         // Disable Minecraft AutoMap's radar.
         if (!player.hasPermission(Permissions.MINECRAFTAUTOMAP_RADAR))
-            message = message + "§0§0§3§4§5§6§7§8§f§e";
+            message += "§0§0§3§4§5§6§7§8§f§e";
 
         // Disable Smart Moving's climbing.
         if (!player.hasPermission(Permissions.SMARTMOVING_CLIMBING))
-            message = message + "§0§1§0§1§2§f§f";
+            message += "§0§1§0§1§2§f§f";
 
         // Disable Smart Moving's climbing.
         if (!player.hasPermission(Permissions.SMARTMOVING_SWIMMING))
-            message = message + "§0§1§3§4§f§f";
+            message += "§0§1§3§4§f§f";
 
         // Disable Smart Moving's climbing.
         if (!player.hasPermission(Permissions.SMARTMOVING_CRAWLING))
-            message = message + "§0§1§5§f§f";
+            message += "§0§1§5§f§f";
 
         // Disable Smart Moving's climbing.
         if (!player.hasPermission(Permissions.SMARTMOVING_SLIDING))
-            message = message + "§0§1§6§f§f";
+            message += "§0§1§6§f§f";
 
         // Disable Smart Moving's climbing.
         if (!player.hasPermission(Permissions.SMARTMOVING_JUMPING))
-            message = message + "§0§1§8§9§a§b§f§f";
+            message += "§0§1§8§9§a§b§f§f";
 
         // Disable Smart Moving's climbing.
         if (!player.hasPermission(Permissions.SMARTMOVING_FLYING))
-            message = message + "§0§1§7§f§f";
+            message += "§0§1§7§f§f";
 
-        player.sendMessage(message);
+        if (!message.equals(""))
+            player.sendMessage(message);
     }
 }

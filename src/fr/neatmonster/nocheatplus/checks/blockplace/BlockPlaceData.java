@@ -66,7 +66,7 @@ public class BlockPlaceData implements CheckData {
     public boolean fastPlaceLastRefused;
 
     // Data of the no swing check.
-    public boolean noSwingArmSwung;
+    public boolean noSwingArmSwung = true;
 
     // Data of the reach check.
     public double  reachDistance;

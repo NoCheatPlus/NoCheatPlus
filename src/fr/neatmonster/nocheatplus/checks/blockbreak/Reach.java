@@ -29,7 +29,7 @@ public class Reach extends Check {
     public final double CREATIVE_DISTANCE = 5.6D;
 
     /** The maximum distance allowed to interact with a block in survival mode. */
-    public final double SURVIVAL_DISTANCE = 5.1D;
+    public final double SURVIVAL_DISTANCE = 5.2D;
 
     /**
      * Instantiates a new reach check.

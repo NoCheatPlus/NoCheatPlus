@@ -16,7 +16,8 @@ import fr.neatmonster.nocheatplus.metrics.MetricsData;
  * MMMM                                                   MMMMMMMMMMMM                      
  */
 /**
- * The InstantHeal check should find out if a player tried to artificially accelerate the health regeneration by food.
+ * The InstantHeal check should find out if a player has tried to artificially accelerate the health regeneration by
+ * food.
  */
 public class InstantHeal extends Check {
 
