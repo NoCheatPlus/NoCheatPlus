@@ -98,12 +98,12 @@ public class SurvivalFly extends Check {
 
         // Choose the right horizontal speed limit for the current activity.
         double hAllowedDistance = 0D;
-        if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
-            hAllowedDistance = 0.14D * cc.survivalFlySneakingSpeed / 100D;
+        if (from.isInWater() && to.isInWater())
+            hAllowedDistance = 0.11D * cc.survivalFlySwimmingSpeed / 100D;
+        else if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
+            hAllowedDistance = 0.13D * cc.survivalFlySneakingSpeed / 100D;
         else if (player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
             hAllowedDistance = 0.16D * cc.survivalFlyBlockingSpeed / 100D;
-        else if (from.isInWater() && to.isInWater())
-            hAllowedDistance = 0.18D * cc.survivalFlySwimmingSpeed / 100D;
         else if (!sprinting)
             hAllowedDistance = 0.22D * cc.survivalFlyWalkingSpeed / 100D;
         else
@@ -193,7 +193,11 @@ public class SurvivalFly extends Check {
         if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
             vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
 
-        final double vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
+        double vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
+
+        // Step can also be blocked.
+        if (vDistanceAboveLimit <= 0D && from.isOnGround() && to.isOnGround() && to.getY() - from.getY() == 1D)
+            vDistanceAboveLimit = 1D;
 
         if (from.isOnGround() || to.isOnGround())
             data.jumpAmplifier = 0D;

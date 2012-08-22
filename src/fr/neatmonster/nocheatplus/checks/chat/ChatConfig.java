@@ -96,8 +96,7 @@ public class ChatConfig implements CheckConfig {
 
     public final boolean      noPwnageMoveCheck;
     public final long         noPwnageMoveTimeout;
-    public final int          noPwnageMoveWeightBonus;
-    public final int          noPwnageMoveWeightMalus;
+    public final int          noPwnageMoveWeight;
 
     public final boolean      noPwnageReloginCheck;
     public final String       noPwnageReloginKickMessage;
@@ -163,8 +162,7 @@ public class ChatConfig implements CheckConfig {
 
         noPwnageMoveCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK);
         noPwnageMoveTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT);
-        noPwnageMoveWeightBonus = data.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT_BONUS);
-        noPwnageMoveWeightMalus = data.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT_MALUS);
+        noPwnageMoveWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT);
 
         noPwnageReloginCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_RELOGIN_CHECK);
         noPwnageReloginKickMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE);

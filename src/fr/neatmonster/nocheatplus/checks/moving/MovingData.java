@@ -49,55 +49,54 @@ public class MovingData implements CheckData {
     }
 
     // Violation levels.
-    public double     creativeFlyVL            = 0D;
-    public double     morePacketsVL            = 0D;
-    public double     morePacketsVehicleVL     = 0D;
-    public double     noFallVL                 = 0D;
-    public double     survivalFlyVL            = 0D;
+    public double   creativeFlyVL            = 0D;
+    public double   morePacketsVL            = 0D;
+    public double   morePacketsVehicleVL     = 0D;
+    public double   noFallVL                 = 0D;
+    public double   survivalFlyVL            = 0D;
 
     // Data shared between the fly checks.
-    public int        bunnyhopDelay;
-    public double     horizontalBuffer;
-    public double     horizontalFreedom;
-    public double     horizontalVelocityCounter;
-    public double     jumpAmplifier;
-    public double     verticalFreedom;
-    public double     verticalVelocity;
-    public int        verticalVelocityCounter;
-
-    public Location[] lastSafeLocations        = new Location[] {null, null};
+    public int      bunnyhopDelay;
+    public double   horizontalBuffer;
+    public double   horizontalFreedom;
+    public double   horizontalVelocityCounter;
+    public double   jumpAmplifier;
+    public double   verticalFreedom;
+    public double   verticalVelocity;
+    public int      verticalVelocityCounter;
 
     // Data of the creative check.
-    public boolean    creativeFlyPreviousRefused;
+    public boolean  creativeFlyPreviousRefused;
 
     // Data of the more packets check.
-    public int        morePacketsBuffer        = 50;
-    public long       morePacketsLastTime;
-    public int        morePacketsPackets;
-    public Location   morePacketsSetback;
+    public int      morePacketsBuffer        = 50;
+    public long     morePacketsLastTime;
+    public int      morePacketsPackets;
+    public Location morePacketsSetback;
 
     // Data of the more packets vehicle check.
-    public int        morePacketsVehicleBuffer = 50;
-    public long       morePacketsVehicleLastTime;
-    public int        morePacketsVehiclePackets;
-    public Location   morePacketsVehicleSetback;
+    public int      morePacketsVehicleBuffer = 50;
+    public long     morePacketsVehicleLastTime;
+    public int      morePacketsVehiclePackets;
+    public Location morePacketsVehicleSetback;
 
     // Data of the no fall check.
-    public double     noFallFallDistance;
-    public boolean    noFallOnGround;
-    public boolean    noFallWasOnGround;
+    public double   noFallFallDistance;
+    public boolean  noFallOnGround;
+    public boolean  noFallWasOnGround;
 
     // Data of the survival fly check.
-    public int        survivalFlyJumpPhase;
-    public double     survivalFlyLastFromY;
-    public int        survivalFlyOnIce;
-    public boolean    survivalFlyWasInBed;
+    public int      survivalFlyJumpPhase;
+    public double   survivalFlyLastFromY;
+    public int      survivalFlyOnIce;
+    public boolean  survivalFlyWasInBed;
 
     // Locations shared between all checks.
-    public Location   from;
-    public Location   to;
-    public Location   setBack;
-    public Location   teleported;
+    public Location from;
+    public Location ground;
+    public Location setBack;
+    public Location teleported;
+    public Location to;
 
     /**
      * Clear the data of the fly checks.

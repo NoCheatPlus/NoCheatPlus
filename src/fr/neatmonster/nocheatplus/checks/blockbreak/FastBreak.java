@@ -24,13 +24,10 @@ import fr.neatmonster.nocheatplus.metrics.MetricsData;
 public class FastBreak extends Check {
 
     /** The minimum time that needs to be elapsed between two block breaks for a player in creative mode. */
-    private static final long CREATIVE  = 95L;
+    private static final long CREATIVE = 95L;
 
     /** The minimum time that needs to be elapsed between two block breaks for a player in survival mode. */
-    private static final long SURVIVAL  = 45L;
-
-    /** The multiplicative constant used when incrementing the limit. */
-    private static final int  TOLERANCE = 10;
+    private static final long SURVIVAL = 45L;
 
     /**
      * Instantiates a new fast break check.
@@ -46,6 +43,7 @@ public class FastBreak extends Check {
      *            the player
      * @param block
      *            the block
+     * @param elaspedTime
      * @return true, if successful
      */
     public boolean check(final Player player, final Block block) {
@@ -58,14 +56,9 @@ public class FastBreak extends Check {
         boolean cancel = false;
 
         // First, check the game mode of the player and choose the right limit.
-        long timeLimit = Math.round(cc.fastBreakInterval / 100D * SURVIVAL);
+        long elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * SURVIVAL);
         if (player.getGameMode() == GameMode.CREATIVE)
-            timeLimit = Math.round(cc.fastBreakInterval / 100D * CREATIVE);
-
-        // This is the experimental mode (incrementing the limit according to the violation level).
-        long elapsedTimeLimit = timeLimit;
-        if (cc.fastBreakExperimental)
-            elapsedTimeLimit = Math.min(timeLimit + Math.round(data.fastBreakVL / TOLERANCE), CREATIVE);
+            elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * CREATIVE);
 
         // The elapsed time is the difference between the last damage time and the last break time.
         final long elapsedTime = data.fastBreakDamageTime - data.fastBreakBreakTime;
@@ -74,11 +67,10 @@ public class FastBreak extends Check {
             // If the buffer has been consumed.
             if (data.fastBreakBuffer == 0) {
                 // Increment the violation level (but using the original limit).
-                data.fastBreakVL += Math.max(timeLimit - elapsedTime, 0D);
+                data.fastBreakVL += elapsedTimeLimit - elapsedTime;
 
                 // Cancel the event if needed.
-                cancel = executeActions(player, data.fastBreakVL, Math.max(timeLimit - elapsedTime, 0D),
-                        cc.fastBreakActions);
+                cancel = executeActions(player, data.fastBreakVL, elapsedTimeLimit - elapsedTime, cc.fastBreakActions);
             } else
                 // Remove one from the buffer.
                 data.fastBreakBuffer--;

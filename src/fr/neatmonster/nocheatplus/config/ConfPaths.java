@@ -40,6 +40,7 @@ public abstract class ConfPaths {
      */
     private static final String MISCELLANEOUS                         = "miscellaneous.";
     public static final String  MISCELLANEOUS_ALLOWCLIENTMODS         = MISCELLANEOUS + "allowclientmods";
+    public static final String  MISCELLANEOUS_FIXMOVEDTOOQUICKLY      = MISCELLANEOUS + "fixmovedtooquickly";
     public static final String  MISCELLANEOUS_OPINCONSOLEONLY         = MISCELLANEOUS + "opinconsoleonly";
     public static final String  MISCELLANEOUS_PROTECTPLUGINS          = MISCELLANEOUS + "protectplugins";
 
@@ -61,7 +62,6 @@ public abstract class ConfPaths {
     private static final String BLOCKBREAK_FASTBREAK                  = BLOCKBREAK + "fastbreak.";
     public static final String  BLOCKBREAK_FASTBREAK_CHECK            = BLOCKBREAK_FASTBREAK + "active";
     public static final String  BLOCKBREAK_FASTBREAK_BUFFER           = BLOCKBREAK_FASTBREAK + "buffer";
-    public static final String  BLOCKBREAK_FASTBREAK_EXPERIMENTAL     = BLOCKBREAK_FASTBREAK + "experimental";
     public static final String  BLOCKBREAK_FASTBREAK_INTERVAL         = BLOCKBREAK_FASTBREAK + "interval";
     public static final String  BLOCKBREAK_FASTBREAK_ACTIONS          = BLOCKBREAK_FASTBREAK + "actions";
 
@@ -167,8 +167,7 @@ public abstract class ConfPaths {
     private static final String CHAT_NOPWNAGE_MOVE                    = CHAT_NOPWNAGE + "move.";
     public static final String  CHAT_NOPWNAGE_MOVE_CHECK              = CHAT_NOPWNAGE_MOVE + "active";
     public static final String  CHAT_NOPWNAGE_MOVE_TIMEOUT            = CHAT_NOPWNAGE_MOVE + "timeout";
-    public static final String  CHAT_NOPWNAGE_MOVE_WEIGHT_BONUS       = CHAT_NOPWNAGE_MOVE + "weightbonus";
-    public static final String  CHAT_NOPWNAGE_MOVE_WEIGHT_MALUS       = CHAT_NOPWNAGE_MOVE + "weightmalus";
+    public static final String  CHAT_NOPWNAGE_MOVE_WEIGHT             = CHAT_NOPWNAGE_MOVE + "weight";
 
     private static final String CHAT_NOPWNAGE_RELOGIN                 = CHAT_NOPWNAGE + "relogin.";
     public static final String  CHAT_NOPWNAGE_RELOGIN_CHECK           = CHAT_NOPWNAGE_RELOGIN + "active";

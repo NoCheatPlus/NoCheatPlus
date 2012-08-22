@@ -3,11 +3,16 @@ package fr.neatmonster.nocheatplus;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -50,14 +55,14 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
  */
 public class NoCheatPlus extends JavaPlugin implements Listener {
 
-    /** The time it was when NoCheatPlus has been activated. */
-    public static final long     time       = System.currentTimeMillis();
+    /** The event listeners. */
+    private final List<Listener> listeners       = new ArrayList<Listener>();
 
-    /** The listeners. */
-    private final List<Listener> listeners  = new ArrayList<Listener>();
+    /** Is the configuration outdated? */
+    private boolean              configOutdated  = false;
 
-    /** The new version build number. */
-    private int                  newVersion = 0;
+    /** Is a new update available? */
+    private boolean              updateAvailable = false;
 
     /* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onDisable()
@@ -108,7 +113,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Register the commands handler.
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
-        // Start Metrics.
+        // Setup the graphs, plotters and start Metrics.
         try {
             final Metrics metrics = new Metrics(this);
             final Graph eventsChecked = metrics.createGraph("Events Checked");
@@ -150,23 +155,31 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             metrics.start();
         } catch (final Exception e) {}
 
+        // Is a new update available?
+        try {
+            final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
+            final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
+            final URLConnection connection = url.openConnection();
+            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String content = "", line = "";
+            while ((line = bufferedReader.readLine()) != null)
+                content += line;
+            bufferedReader.close();
+            final int jenkinsVersion = Integer.parseInt(content.split("\"number\":")[1].split(",")[0]);
+            updateAvailable = currentVersion < jenkinsVersion;
+        } catch (final Exception e) {}
+
+        // Is the configuration outdated?
+        try {
+            final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
+            final int configurationVersion = Integer.parseInt(ConfigManager.getConfigFile().options().header()
+                    .split("-b")[1].split("\\.")[0]);
+            if (currentVersion > configurationVersion)
+                configOutdated = true;
+        } catch (final Exception e) {}
+
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
-
-        // Check for updates.
-        try {
-            final Integer oldVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
-            final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
-            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(url.openConnection()
-                    .getInputStream()));
-            String content = "", inputLine = "";
-            while ((inputLine = bufferedReader.readLine()) != null)
-                content += inputLine;
-            bufferedReader.close();
-            final Integer newVersion = Integer.parseInt(content.split("\"number\":")[1].split(",")[0]);
-            if (oldVersion < newVersion)
-                this.newVersion = newVersion;
-        } catch (final Exception e) {}
     }
 
     /**
@@ -192,12 +205,25 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
 
-        String message = "";
+        // Set the NetServerHandler proxy if enabled in the configuration.
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_FIXMOVEDTOOQUICKLY)) {
+            final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+            final NetServerHandlerProxy proxy = new NetServerHandlerProxy(MinecraftServer.getServer(),
+                    entityPlayer.netServerHandler);
+            entityPlayer.netServerHandler = proxy;
+        }
 
-        // Display a message about the new version if relevant.
-        if (newVersion > 0 && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
-            message += ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new version is available! (Build #" + newVersion
-                    + ".)";
+        // Send a message to the player if a new update is available.
+        if (updateAvailable && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
+            player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE
+                    + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update.");
+
+        // Send a message to the player if the configuration is outdated.
+        if (configOutdated && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
+            player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration file is outdated.\n"
+                    + "Some settings might have changed, you should regenerate it!");
+
+        String message = "";
 
         // Check if we allow all the client mods.
         final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);

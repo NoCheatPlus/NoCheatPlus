@@ -172,9 +172,11 @@ public class MovingListener implements Listener {
          *                |___/                                                          
          */
         final Player player = event.getPlayer();
-        if (survivalFly.isEnabled(player) && survivalFly.check(player))
+        final MovingData data = MovingData.getData(player);
+
+        if (survivalFly.isEnabled(player) && survivalFly.check(player) && data.ground != null)
             // To cancel the event, we simply teleport the player to his last safe location.
-            player.teleport(MovingData.getData(player).lastSafeLocations[0]);
+            player.teleport(data.ground);
     }
 
     /**
@@ -278,11 +280,10 @@ public class MovingListener implements Listener {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
 
-        // If the player has joined in the air and a safe location is defined...
-        if (player.getLocation().add(0D, -1D, 0D).getBlock().getType() == Material.AIR
-                && MovingData.getData(player).lastSafeLocations[0] != null)
-            // ...teleport him to this location.
-            player.teleport(data.lastSafeLocations[0]);
+        // If the player has joined in the air and a previous location is defined...
+        if (player.getLocation().add(0D, -1D, 0D).getBlock().getType() == Material.AIR && data.ground != null)
+            // ...teleport him there.
+            player.teleport(data.ground);
     }
 
     /**
@@ -330,14 +331,10 @@ public class MovingListener implements Listener {
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
 
-        // Remember the location if it's safe.
-        if (Math.abs(event.getPlayer().getVelocity().getY()) < 0.0785D) {
-            data.lastSafeLocations[0] = data.lastSafeLocations[1];
-            data.lastSafeLocations[1] = event.getFrom();
-        }
-
         final PlayerLocation from = new PlayerLocation(event.getFrom(), player);
         data.from = from.getLocation();
+        if (from.isOnGround())
+            data.ground = from.getLocation();
         final PlayerLocation to = new PlayerLocation(event.getTo(), player);
         data.to = to.getLocation();
 
@@ -445,8 +442,7 @@ public class MovingListener implements Listener {
             event.setCancelled(false);
         else
             // Only if it wasn't NoCheatPlus, drop data from more packets check. If it was NoCheatPlus, we don't
-            // want
-            // players to exploit the fly check teleporting to get rid of the "morepackets" data.
+            // want players to exploit the fly check teleporting to get rid of the "morepackets" data.
             data.clearMorePacketsData();
 
         // Always drop data from fly checks, as it always loses its validity after teleports. Always!

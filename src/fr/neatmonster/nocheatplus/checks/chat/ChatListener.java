@@ -90,8 +90,9 @@ public class ChatListener implements Listener {
 
         // Protect some commands to prevent players for seeing which plugins are installed.
         if (ChatConfig.getConfig(player).protectPlugins)
-            if ((command.equalsIgnoreCase("plugins") || command.equalsIgnoreCase("pl")) && !player.isOp()
-                    || (command.equalsIgnoreCase("version") || command.equalsIgnoreCase("ver")) && !player.isOp()) {
+            if ((command.equalsIgnoreCase("plugins") || command.equalsIgnoreCase("pl")
+                    || command.equalsIgnoreCase("version") || command.equalsIgnoreCase("ver"))
+                    && !player.isOp()) {
                 event.getPlayer().sendMessage(
                         ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
                                 + "Please contact the server administrators if you believe that this is in error.");

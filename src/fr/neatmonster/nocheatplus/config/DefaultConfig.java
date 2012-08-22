@@ -24,10 +24,6 @@ public class DefaultConfig extends ConfigFile {
     public DefaultConfig() {
         super();
 
-        options().header(
-                "Main configuration file for NoCheatPlus. "
-                        + "For more information, visit http://dev.bukkit.org/server-mods/nocheatplus/.");
-
         /*
          * 888                                 ,e,                  
          * 888      e88 88e   e88 888  e88 888  "  888 8e   e88 888 
@@ -52,6 +48,7 @@ public class DefaultConfig extends ConfigFile {
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
+        set(ConfPaths.MISCELLANEOUS_FIXMOVEDTOOQUICKLY, false);
         set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
 
@@ -66,8 +63,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER, 5);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_EXPERIMENTAL, true);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER, 2);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastbreak:3:5:cif cancel");
 
@@ -154,8 +150,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT, 30000L);
-        set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT_BONUS, 200);
-        set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT_MALUS, 200);
+        set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT, 200);
 
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_TIMEOUT, 1500L);

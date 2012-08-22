@@ -127,8 +127,6 @@ public class NoPwnage extends Check {
         else
             // Permission check is done in the main thread.
             cancel = super.executeActionsThreadSafe(player, VL, VLAdded, actions, type.getPermission());
-        if (cancel)
-            ChatData.getData(player).clearNoPwnageData();
         return cancel;
     }
 
@@ -190,12 +188,9 @@ public class NoPwnage extends Check {
      */
     private boolean[] unsafeCheck(final Player player, final String message, final boolean isMainThread,
             final ChatConfig cc, final ChatData data) {
-        data.noPwnageVL = 0D;
+        boolean cancel = false, kick = false;
 
-        boolean cancel = false;
-        boolean kick = false;
-
-        // Exclusions list.
+        // Don't not check excluded messages/commands.
         for (final String exclusion : cc.noPwnageExclusions)
             if (message.startsWith(exclusion))
                 return new boolean[] {false, false};
@@ -211,10 +206,14 @@ public class NoPwnage extends Check {
                 player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaSuccess));
             } else {
                 // Does he failed too much times?
-                if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries)
-                    // Find out if we need to ban the player or not.
-                    kick = executeActionsThreadSafe(player, data.noPwnageVL, data.noPwnageVL, cc.noPwnageActions,
-                            isMainThread);
+                if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
+                    // Increment the violation level.
+                    data.noPwnageVL += cc.noPwnageLevel / 10D;
+
+                    // Find out if we need to kick the player or not.
+                    kick = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageLevel / 10D,
+                            cc.noPwnageActions, isMainThread);
+                }
 
                 // Increment his tries number counter.
                 data.noPwnageCaptchTries++;
@@ -228,54 +227,52 @@ public class NoPwnage extends Check {
             return new boolean[] {true, kick};
         }
 
+        int suspicion = 0;
         // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
         // message within "timeout" milliseconds, the suspicion will be increased by "weight".
         if (cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
                 && CheckUtils.isSimilar(message, lastBanCausingMessage, 0.8f))
-            data.noPwnageVL += cc.noPwnageBannedWeight;
+            suspicion += cc.noPwnageBannedWeight;
 
         // NoPwnage will check if a player sends his first message within "timeout" milliseconds after his login. If
         // he does, increase suspicion by "weight".
         if (cc.noPwnageFirstCheck && now - data.noPwnageJoinTime < cc.noPwnageFirstTimeout)
-            data.noPwnageVL += cc.noPwnageFirstWeight;
+            suspicion += cc.noPwnageFirstWeight;
 
         // NoPwnage will check if a player repeats a message that has been sent by another player just before,
         // within "timeout". If he does, suspicion will be increased by "weight".
         if (cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
                 && CheckUtils.isSimilar(message, lastGlobalMessage, 0.8f))
-            data.noPwnageVL += cc.noPwnageGlobalWeight;
+            suspicion += cc.noPwnageGlobalWeight;
 
         // NoPwnage will check if a player sends messages too fast. If a message is sent within "timeout"
         // milliseconds after the previous message, increase suspicion by "weight".
         if (cc.noPwnageSpeedCheck && now - data.noPwnageLastMessageTime < cc.noPwnageSpeedTimeout)
-            data.noPwnageVL += cc.noPwnageSpeedWeight;
+            suspicion += cc.noPwnageSpeedWeight;
 
         // NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message
         // is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight".
         if (cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
                 && CheckUtils.isSimilar(message, data.noPwnageLastMessage, 0.8f))
-            data.noPwnageVL += cc.noPwnageRepeatWeight;
+            suspicion += cc.noPwnageRepeatWeight;
 
-        // NoPwnage will check if a player moved within the "timeout" timeframe. If he did move, the suspicion will
-        // be reduced by the "weightbonus" value. If he did not move, the suspicion will be increased by
-        // "weightmalus" value.
-        if (cc.noPwnageMoveCheck && now - data.noPwnageLastMovedTime < cc.noPwnageMoveTimeout)
-            data.noPwnageVL -= cc.noPwnageMoveWeightBonus;
-        else
-            data.noPwnageVL += cc.noPwnageMoveWeightMalus;
+        // NoPwnage will check if a player moved within the "timeout" timeframe. If he did not move, the suspicion will
+        // be increased by "weight" value.
+        if (cc.noPwnageMoveCheck && now - data.noPwnageLastMovedTime > cc.noPwnageMoveTimeout)
+            suspicion += cc.noPwnageMoveWeight;
 
         // Should a player that reaches the "warnLevel" get a text message telling him that he is under suspicion of
         // being a bot.
         boolean warned = false;
         if (cc.noPwnageWarnPlayerCheck && now - data.noPwnageLastWarningTime < cc.noPwnageWarnTimeout) {
-            data.noPwnageVL += 100;
+            suspicion += 100;
             warned = true;
         }
 
-        if (cc.noPwnageWarnPlayerCheck && data.noPwnageVL > cc.noPwnageWarnLevel && !warned) {
+        if (cc.noPwnageWarnPlayerCheck && suspicion > cc.noPwnageWarnLevel && !warned) {
             player.sendMessage(CheckUtils.replaceColors(cc.noPwnageWarnPlayerMessage));
             data.noPwnageLastWarningTime = now;
-        } else if (data.noPwnageVL > cc.noPwnageLevel)
+        } else if (suspicion > cc.noPwnageLevel)
             if (cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha) {
                 // Display a captcha to the player.
                 data.noPwnageGeneratedCaptcha = "";
@@ -294,10 +291,16 @@ public class NoPwnage extends Check {
                             player.getName())));
                 cancel = true;
 
-                // Find out if we need to ban the player or not.
-                kick = executeActionsThreadSafe(player, data.noPwnageVL, data.noPwnageVL, cc.noPwnageActions,
+                // Increment the violation level.
+                data.noPwnageVL += suspicion / 10D;
+
+                // Find out if we need to kick the player or not.
+                kick = executeActionsThreadSafe(player, data.noPwnageVL, suspicion / 10D, cc.noPwnageActions,
                         isMainThread);
             }
+        else
+            // Reduce the violation level.
+            data.noPwnageVL *= 0.95D;
 
         // Store the message and some other data.
         data.noPwnageLastMessage = message;
