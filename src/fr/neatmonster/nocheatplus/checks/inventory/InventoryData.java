@@ -50,12 +50,17 @@ public class InventoryData implements CheckData {
 
     // Violation levels.
     public double   dropVL;
+    public double   fastClickVL;
     public double   instantBowVL;
     public double   instantEatVL;
 
     // Data of the drop check.
     public int      dropCount;
     public long     dropLastTime;
+
+    // Data of the fast click check.
+    public boolean  fastClickLastCancelled;
+    public long     fastClickLastTime;
 
     // Data of the instant bow check.
     public long     instantBowLastTime;

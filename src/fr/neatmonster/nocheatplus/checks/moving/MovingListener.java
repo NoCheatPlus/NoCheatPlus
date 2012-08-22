@@ -267,7 +267,7 @@ public class MovingListener implements Listener {
      *            the event
      */
     @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
+            priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         /*
          *  ____  _                             _       _       
@@ -307,10 +307,9 @@ public class MovingListener implements Listener {
          */
         final Player player = event.getPlayer();
 
-        // Don't care for movements that are very high distance, to another world (such that it is very likely the event
-        // data was modified by another plugin before we got it) or if the player is inside a vehicle.
-        if (!event.getFrom().getWorld().equals(event.getTo().getWorld())
-                || event.getFrom().distanceSquared(event.getTo()) > 400D || player.isInsideVehicle())
+        // Don't care for movements to another world (such that it is very likely the event data was modified by another
+        // plugin before we got it) or if the player is inside a vehicle.
+        if (!event.getFrom().getWorld().equals(event.getTo().getWorld()) || player.isInsideVehicle())
             return;
 
         final MovingData data = MovingData.getData(player);
@@ -424,7 +423,7 @@ public class MovingListener implements Listener {
      *            the event
      */
     @EventHandler(
-            priority = EventPriority.HIGHEST)
+            ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         /*
          *  ____  _                         _____    _                       _   
@@ -506,8 +505,7 @@ public class MovingListener implements Listener {
         // Don't care if a player isn't inside the vehicle, for movements that are very high distance or to another
         // world (such that it is very likely the event data was modified by another plugin before we got it).
         if (event.getVehicle().getPassenger() == null || !(event.getVehicle().getPassenger() instanceof Player)
-                || !event.getFrom().getWorld().equals(event.getTo().getWorld())
-                || event.getFrom().distanceSquared(event.getTo()) > 400D)
+                || !event.getFrom().getWorld().equals(event.getTo().getWorld()))
             return;
 
         final Player player = (Player) event.getVehicle().getPassenger();

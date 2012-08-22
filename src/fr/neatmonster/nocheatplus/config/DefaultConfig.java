@@ -48,7 +48,7 @@ public class DefaultConfig extends ConfigFile {
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
-        set(ConfPaths.MISCELLANEOUS_FIXMOVEDTOOQUICKLY, false);
+        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY, false);
         set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
 
@@ -238,6 +238,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
         set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20L);
         set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:kick");
+
+        set(ConfPaths.INVENTORY_FASTCLICK_CHECK, true);
+        set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel"); // TODO
 
         set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);
         set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "log:instantbow:2:5:if cancel");

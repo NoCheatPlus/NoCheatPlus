@@ -40,7 +40,7 @@ public abstract class ConfPaths {
      */
     private static final String MISCELLANEOUS                         = "miscellaneous.";
     public static final String  MISCELLANEOUS_ALLOWCLIENTMODS         = MISCELLANEOUS + "allowclientmods";
-    public static final String  MISCELLANEOUS_FIXMOVEDTOOQUICKLY      = MISCELLANEOUS + "fixmovedtooquickly";
+    public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY       = MISCELLANEOUS + "nomovedtooquickly";
     public static final String  MISCELLANEOUS_OPINCONSOLEONLY         = MISCELLANEOUS + "opinconsoleonly";
     public static final String  MISCELLANEOUS_PROTECTPLUGINS          = MISCELLANEOUS + "protectplugins";
 
@@ -273,6 +273,10 @@ public abstract class ConfPaths {
     public static final String  INVENTORY_DROP_LIMIT                  = INVENTORY_DROP + "limit";
     public static final String  INVENTORY_DROP_TIMEFRAME              = INVENTORY_DROP + "timeframe";
     public static final String  INVENTORY_DROP_ACTIONS                = INVENTORY_DROP + "actions";
+
+    private static final String INVENTORY_FASTCLICK                   = INVENTORY + "fastclick.";
+    public static final String  INVENTORY_FASTCLICK_CHECK             = INVENTORY_FASTCLICK + "active";
+    public static final String  INVENTORY_FASTCLICK_ACTIONS           = INVENTORY_FASTCLICK + "actions";
 
     private static final String INVENTORY_INSTANTBOW                  = INVENTORY + "instantbow.";
     public static final String  INVENTORY_INSTANTBOW_CHECK            = INVENTORY_INSTANTBOW + "active";

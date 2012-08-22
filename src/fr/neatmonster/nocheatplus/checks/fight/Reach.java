@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.fight;
 import net.minecraft.server.Entity;
 
 import org.bukkit.GameMode;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -60,9 +61,13 @@ public class Reach extends Check {
 
         // Distance is calculated from eye location to center of targeted. If the player is further away from his target
         // than allowed, the difference will be assigned to "distance".
-        final double distance = CheckUtils.distance(player.getEyeLocation(), damaged.getBukkitEntity().getLocation()
-                .add(0D, damaged.getHeadHeight(), 0D))
+        double distance = CheckUtils.distance(player.getEyeLocation(),
+                damaged.getBukkitEntity().getLocation().add(0D, damaged.getHeadHeight(), 0D))
                 - distanceLimit;
+
+        // Handle the EnderDragon differently.
+        if (damaged.getBukkitEntity() instanceof EnderDragon)
+            distance -= 6.5D;
 
         if (distance > 0) {
             // He failed, increment violation level. This is influenced by lag, so don't do it if there was lag.

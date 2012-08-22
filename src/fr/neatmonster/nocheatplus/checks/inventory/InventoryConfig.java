@@ -76,6 +76,9 @@ public class InventoryConfig implements CheckConfig {
     public final long       dropTimeFrame;
     public final ActionList dropActions;
 
+    public final boolean    fastClickCheck;
+    public final ActionList fastClickActions;
+
     public final boolean    instantBowCheck;
     public final ActionList instantBowActions;
 
@@ -94,6 +97,9 @@ public class InventoryConfig implements CheckConfig {
         dropTimeFrame = data.getLong(ConfPaths.INVENTORY_DROP_TIMEFRAME);
         dropActions = data.getActionList(ConfPaths.INVENTORY_DROP_ACTIONS, Permissions.INVENTORY_DROP);
 
+        fastClickCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_CHECK);
+        fastClickActions = data.getActionList(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, Permissions.INVENTORY_FASTCLICK);
+
         instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
         instantBowActions = data
                 .getActionList(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, Permissions.INVENTORY_INSTANTBOW);
@@ -111,6 +117,8 @@ public class InventoryConfig implements CheckConfig {
         switch (checkType) {
         case INVENTORY_DROP:
             return dropCheck;
+        case INVENTORY_FASTCLICK:
+            return fastClickCheck;
         case INVENTORY_INSTANTBOW:
             return instantBowCheck;
         case INVENTORY_INSTANTEAT:

@@ -110,6 +110,7 @@ public class Permissions {
      */
     private static final String INVENTORY                    = CHECKS + ".inventory";
     public static final String  INVENTORY_DROP               = INVENTORY + ".drop";
+    public static final String  INVENTORY_FASTCLICK          = INVENTORY + ".fastclick";
     public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
     public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
 
@@ -133,6 +134,7 @@ public class Permissions {
     public static final String  MOVING_SURVIVALFLY_BLOCKING  = MOVING_SURVIVALFLY + ".blocking";
     public static final String  MOVING_SURVIVALFLY_SNEAKING  = MOVING_SURVIVALFLY + ".sneaking";
     public static final String  MOVING_SURVIVALFLY_SPRINTING = MOVING_SURVIVALFLY + ".sprinting";
+    public static final String  MOVING_SURVIVALFLY_STEP      = MOVING_SURVIVALFLY + ".step";
 
     /*
      *     e   e                    888 ,e,  dP,e, ,e,                    d8   ,e,                         

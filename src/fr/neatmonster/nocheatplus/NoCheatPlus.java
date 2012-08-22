@@ -7,12 +7,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -38,6 +34,7 @@ import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.metrics.MetricsData.TicksPlotter;
+import fr.neatmonster.nocheatplus.packets.PacketsWorkaround;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
@@ -74,6 +71,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
 
+        // Disable the packets workaround.
+        PacketsWorkaround.disable();
+
         // Cleanup the configuration manager.
         ConfigManager.cleanup();
 
@@ -101,6 +101,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         listeners.add(new InventoryListener());
         listeners.add(new MovingListener());
         listeners.add(new Workarounds());
+
+        // Enable the packets workaround.
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY))
+            PacketsWorkaround.enable();
 
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
@@ -204,14 +208,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-
-        // Set the NetServerHandler proxy if enabled in the configuration.
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_FIXMOVEDTOOQUICKLY)) {
-            final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            final NetServerHandlerProxy proxy = new NetServerHandlerProxy(MinecraftServer.getServer(),
-                    entityPlayer.netServerHandler);
-            entityPlayer.netServerHandler = proxy;
-        }
 
         // Send a message to the player if a new update is available.
         if (updateAvailable && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))

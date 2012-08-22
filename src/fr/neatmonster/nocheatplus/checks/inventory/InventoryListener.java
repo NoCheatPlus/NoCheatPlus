@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -39,6 +40,9 @@ public class InventoryListener implements Listener {
 
     /** The drop check. */
     private final Drop       drop       = new Drop();
+
+    /** The fast click check. */
+    private final FastClick  fastClick  = new FastClick();
 
     /** The instant bow check. */
     private final InstantBow instantBow = new InstantBow();
@@ -101,6 +105,31 @@ public class InventoryListener implements Listener {
     }
 
     /**
+     * We listen to InventoryClick events for the FastClick check.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onInventoryClick(final InventoryClickEvent event) {
+        /*
+         *  ___                      _                      ____ _ _      _    
+         * |_ _|_ ____   _____ _ __ | |_ ___  _ __ _   _   / ___| (_) ___| | __
+         *  | || '_ \ \ / / _ \ '_ \| __/ _ \| '__| | | | | |   | | |/ __| |/ /
+         *  | || | | \ V /  __/ | | | || (_) | |  | |_| | | |___| | | (__|   < 
+         * |___|_| |_|\_/ \___|_| |_|\__\___/|_|   \__, |  \____|_|_|\___|_|\_\
+         *                                         |___/                       
+         */
+        if (event.getWhoClicked() instanceof Player) {
+            final Player player = (Player) event.getWhoClicked();
+            if (fastClick.isEnabled(player) && fastClick.check(player))
+                // The check requested the event to be cancelled.
+                event.setCancelled(true);
+        }
+    }
+
+    /**
      * We listen to DropItem events for the Drop check.
      * 
      * @param event
@@ -134,7 +163,7 @@ public class InventoryListener implements Listener {
      *            the event
      */
     @EventHandler(
-            priority = EventPriority.LOWEST)
+            ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerInteractEvent(final PlayerInteractEvent event) {
         /*
          *  ____  _                         ___       _                      _   
