@@ -4,10 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 
 /*
  * M"""""`'"""`YM            dP            oo                   M""""""'YMM            dP            
@@ -19,187 +15,76 @@ import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
  * MMMMMMMMMMMMMM                                               MMMMMMMMMMM                          
  */
 /**
- * The Metrics data.
+ * This class is used to store the data that will be sent to Metrics later.
  */
 public class MetricsData {
 
-    /**
-     * The ticks plotter.
-     */
-    public static class TicksPlotter extends Plotter {
+    /** Is data collecting enabled? */
+    private static boolean                       enabled      = false;
 
-        /** The ticks. */
-        private final int ticks;
+    /** The map containing the number of fails per check. */
+    private static final Map<CheckType, Integer> checksFailed = new HashMap<CheckType, Integer>();
 
-        /**
-         * Instantiates a new ticks plotter.
-         * 
-         * @param ticks
-         *            the ticks
-         */
-        public TicksPlotter(final int ticks) {
-            super(ticks + " tick(s)");
-            this.ticks = ticks;
-        }
-
-        /* (non-Javadoc)
-         * @see fr.neatmonster.nocheatplus.metrics.Metrics.Plotter#getValue()
-         */
-        @Override
-        public int getValue() {
-            final int ticks = MetricsData.getServerTicks(this.ticks);
-            MetricsData.resetServerTicks(this.ticks);
-            return ticks;
-        }
-    }
-
-    /** Is Metrics enabled? */
-    private static boolean                       enabled;
-
-    /** The checks failed. */
-    private static final Map<CheckType, Integer> checksFailed    = new HashMap<CheckType, Integer>();
-
-    /** The events checked. */
-    private static final Map<CheckType, Integer> eventsChecked   = new HashMap<CheckType, Integer>();
-
-    /** The server ticks. */
-    private static final Map<Integer, Integer>   serverTicks     = new HashMap<Integer, Integer>();
-
-    /** The violation levels. */
-    private static final Map<CheckType, Double>  violationLevels = new HashMap<CheckType, Double>();
+    /** The map containing the number of seconds per number of ticks this seconds contain. */
+    private static final Map<Integer, Integer>   ticksNumbers = new HashMap<Integer, Integer>();
 
     /**
-     * Adds the checked.
+     * Adds a failed check to the specified check type.
      * 
      * @param type
-     *            the type
+     *            the check type
      */
-    public static void addChecked(final CheckType type) {
+    public static void addFailed(final CheckType type) {
         if (enabled && type.getParent() != null)
-            eventsChecked.put(type, getChecked(type) + 1);
+            checksFailed.put(type, checksFailed.get(type) + 1);
     }
 
     /**
-     * Adds the ticks.
+     * Adds a seconds to the number of ticks it has contained.
      * 
      * @param ticks
-     *            the ticks
+     *            the ticks number
      */
     public static void addTicks(final int ticks) {
         if (enabled)
-            serverTicks.put(ticks, serverTicks.get(ticks) + 1);
+            ticksNumbers.put(ticks, ticksNumbers.get(ticks) + 1);
     }
 
     /**
-     * Adds the violation.
-     * 
-     * @param violationData
-     *            the violation data
-     */
-    public static void addViolation(final ViolationData violationData) {
-        final CheckType type = violationData.check.getType();
-        if (enabled && type.getParent() != null) {
-            checksFailed.put(type, getFailed(type) + 1);
-            violationLevels.put(type, getViolationLevel(type) + violationData.addedVL);
-        }
-    }
-
-    /**
-     * Gets the checked.
+     * Gets the number of failed checks for the specified check type.
      * 
      * @param type
-     *            the type
-     * @return the checked
-     */
-    public static int getChecked(final CheckType type) {
-        if (!eventsChecked.containsKey(type))
-            resetChecked(type);
-        return eventsChecked.get(type);
-    }
-
-    /**
-     * Gets the failed.
-     * 
-     * @param type
-     *            the type
+     *            the check type
      * @return the failed
      */
     public static int getFailed(final CheckType type) {
-        if (!checksFailed.containsKey(type))
-            resetFailed(type);
-        return checksFailed.get(type);
+        final int failed = checksFailed.get(type);
+        checksFailed.put(type, 0);
+        return failed;
     }
 
     /**
-     * Gets the server ticks.
+     * Gets the number of seconds which have contained the specified number of ticks.
      * 
      * @param ticks
-     *            the ticks
-     * @return the server ticks
+     *            the ticks number
+     * @return the ticks
      */
-    public static int getServerTicks(final int ticks) {
-        if (!serverTicks.containsKey(ticks))
-            resetServerTicks(ticks);
-        return serverTicks.get(ticks);
-    }
-
-    /**
-     * Gets the violation level.
-     * 
-     * @param type
-     *            the type
-     * @return the violation level
-     */
-    public static double getViolationLevel(final CheckType type) {
-        if (!violationLevels.containsKey(type))
-            resetViolationLevel(type);
-        return violationLevels.get(type);
+    public static int getTicks(final int ticks) {
+        final int number = ticksNumbers.get(ticks);
+        ticksNumbers.put(ticks, 0);
+        return number;
     }
 
     /**
      * Initialize the class.
      */
     public static void initialize() {
-        enabled = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS);
-    }
-
-    /**
-     * Reset checked.
-     * 
-     * @param type
-     *            the type
-     */
-    public static void resetChecked(final CheckType type) {
-        eventsChecked.put(type, 0);
-    }
-
-    /**
-     * Reset failed.
-     * 
-     * @param type
-     *            the type
-     */
-    public static void resetFailed(final CheckType type) {
-        checksFailed.put(type, 0);
-    }
-
-    /**
-     * Reset server ticks.
-     * 
-     * @param ticks
-     *            the ticks
-     */
-    public static void resetServerTicks(final int ticks) {
-        serverTicks.put(ticks, 0);
-    }
-
-    /**
-     * Reset violation level.
-     * 
-     * @param type
-     *            the type
-     */
-    public static void resetViolationLevel(final CheckType type) {
-        violationLevels.put(type, 0D);
+        enabled = true;
+        for (final CheckType type : CheckType.values())
+            if (type.getParent() != null)
+                checksFailed.put(type, 0);
+        for (int ticks = 0; ticks < 21; ticks++)
+            ticksNumbers.put(ticks, 0);
     }
 }

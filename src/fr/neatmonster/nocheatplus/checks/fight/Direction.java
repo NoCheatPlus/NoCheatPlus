@@ -10,7 +10,6 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -44,9 +43,6 @@ public class Direction extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Entity damaged) {
-        // Metrics data.
-        MetricsData.addChecked(type);
-
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
