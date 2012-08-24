@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
@@ -189,6 +190,7 @@ public abstract class Check {
      * @return true, if the check is enabled
      */
     public boolean isEnabled(final Player player) {
+    	if (NCPExemptionManager.isExempted(player, type)) return false;
         try {
             return type.isEnabled(player) && !player.hasPermission(type.getPermission());
         } catch (final Exception e) {

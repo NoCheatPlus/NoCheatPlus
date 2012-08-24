@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -70,7 +71,7 @@ public class NoPwnage extends Check {
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
 
-        if (!isMainThread && !cc.isEnabled(type))
+        if (!isMainThread && (NCPExemptionManager.isExempted(player, type) || !cc.isEnabled(type)))
             return false;
 
         // Keep related to ChatData/NoPwnage/Color used lock.

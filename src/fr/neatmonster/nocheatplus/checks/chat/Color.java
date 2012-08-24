@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 
 /*
  * MM'""""'YMM          dP                   
@@ -43,7 +44,7 @@ public class Color extends Check {
             return message;
 
         final ChatConfig cc = ChatConfig.getConfig(player);
-        if (!isMainThread && !cc.isEnabled(type))
+        if (!isMainThread && (NCPExemptionManager.isExempted(player, type) || !cc.isEnabled(type)))
             // Leave out the permission check.
             return message;
 

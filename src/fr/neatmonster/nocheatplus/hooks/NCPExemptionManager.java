@@ -1,8 +1,10 @@
 package fr.neatmonster.nocheatplus.hooks;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,21 +18,17 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 /**
  * API for exempting players of checks, checked before calculations are done.
  * 
- * NOTE: Solution for async: Query the related checks all under the same lock (!), like ChatData for chat.
- * 
- * TODO: Check if the above note is valid! :p
- * 
  * @author mc_dev
  *
  */
 public class NCPExemptionManager {
 	
 	/**
-	 * CheckType -> Entity id -> Exemption info (<0 = times, 0 = permanently, >0 = timestamp).
+	 * CheckType -> Entity id -> Exemption info.
 	 * 
 	 * TODO: opt: move these to checks individually for even faster access.
 	 */
-	private static final Map<CheckType, Map<Integer, Long>> exempted = new HashMap<CheckType, Map<Integer,Long>>();
+	private static final Map<CheckType, Set<Integer>> exempted = new HashMap<CheckType, Set<Integer>>();
 	
 	/**
 	 * Registered players (exact name) -> entity id (last time registered). 
@@ -44,82 +42,45 @@ public class NCPExemptionManager {
 	/**
 	 * Check if a player is exempted from a check right now.
 	 * 
-	 * NOTE: Do not set consume to true for outside access, it is for internal use only and might break other plugins intentions.
 	 * @param player
 	 * 		The player to exempt from checks.
 	 * @param checkType
 	 * 		The type of check to exempt the player from. This can be individual check types, as well as a check group like MOVING or ALL.
-	 * @param consume
-	 * 		Flag to indicate if to count down if a player is exempted from a number of such checks - do not set to true on external calls, it could break other plugins intentions.
 	 * @return
 	 * 		If the player is exempted from the check right now.
 	 */
-	public static final boolean isExempted(final Player player, final CheckType checkType, final boolean consume){
-		return isExempted(player.getEntityId(), checkType, consume);
+	public static final boolean isExempted(final Player player, final CheckType checkType){
+		return isExempted(player.getEntityId(), checkType);
 	}
 	
 	/**
 	 * Check if an entity is exempted from a check by entity id right now.
-	 * 
-	 * NOTE: Do not set consume to true for outside access, it is for internal use only and might break other plugins intentions.
 	 * <hr>
 	 * This might help exempting NPCs from checks for all time, making performance a lot better. A future purpose might be to exempt vehicles and similar (including passengers) from checks.
-	 * @param id+
+	 * @param id
 	 * 		Entity id to exempt from checks.
 	 * @param checkType
 	 * 		The type of check to exempt the player from. This can be individual check types, as well as a check group like MOVING or ALL.
-	 * @param consume
-	 * 		Flag to indicate if to count down if a player is exempted from a number of such checks - do not set to true on external calls, it could break other plugins intentions.
 	 * @return
 	 * 		If the entity is exempted from checks right now.
 	 */
-	public static final boolean isExempted(final int id, final CheckType checkType, final boolean consume){
-		final Map<Integer, Long> map = exempted.get(checkType);
-		final Long spec = map.get(id);
-		if (spec == null) 
-			return false;
-		else if (spec == 0){
-			// Exempted from checks permanently.
-			return true;
-		}
-		else if (spec < 0){
-			// Exempted for a number of checks.
-			long val = spec.longValue() + 1;
-			if (consume){
-				if (val == 0)
-					map.remove(id);
-				else 
-					map.put(id, val);
-			}
-			return 
-					true;
-		}
-		else {
-			// (spec > 0) Exempted for a period of time.
-			final long ts = System.currentTimeMillis(); // TODO: maybe make argument, but might be used very seldom.
-			if (ts > spec){
-				// Expired
-				if (consume)
-					map.remove(id);
-				return false;
-			}
-			else
-				return true;
-		}
+	public static final boolean isExempted(final int id, final CheckType checkType){
+		return exempted.get(checkType).contains(id);
 	}
 	
 	/**
 	 * Remove all exemptions.
 	 */
 	public static final void clear(){
+		registeredPlayers.clear();
 		// Use put with a new map to keep entries to stay thread safe.
 		for (final CheckType checkType : CheckType.values()){
 			if (APIUtil.needsSynchronization(checkType))
-				exempted.put(checkType, new Hashtable<Integer, Long>(10));
+				exempted.put(checkType, Collections.synchronizedSet(new HashSet<Integer>(10)));
 			else 
-				exempted.put(checkType, new HashMap<Integer, Long>(10));
+				exempted.put(checkType, new HashSet<Integer>(10));
 		}
-		registeredPlayers.clear();
+		
 	}
 	
 	/**
@@ -152,7 +113,7 @@ public class NCPExemptionManager {
 		final Integer id = player.getEntityId();
 		for (final CheckType checkType : CheckType.values()){
 			// Check if player is exempted from something.
-			if (isExempted(id, checkType, false)) return;
+			if (isExempted(id, checkType)) return;
 		}
 		// No return = remove player.
 		registeredPlayers.remove(player.getName());
@@ -176,15 +137,10 @@ public class NCPExemptionManager {
 		}
 		else {
 			// Player was registered under another id (needs exchange).
-			final long ts = System.currentTimeMillis();
-			for (final Map<Integer, Long> map : exempted.values()){
-				final Long entry = map.remove(registeredId);
-				if (entry == null) 
-					continue;
-				else{
-					// replace if not expired.
-					if (entry <= 0 || ts <= entry)
-						map.put(newId, entry);
+			for (final Set<Integer> set : exempted.values()){
+				if (set.remove(registeredId)){
+					// replace.
+					set.add(newId);
 				}
 			}
 			registeredPlayers.put(name, newId);
@@ -230,46 +186,13 @@ public class NCPExemptionManager {
 	}
 	
 	/**
-	 * Exempt a player from a check n times (english?).
+	 * Exempt a player form all checks.
 	 * @param player
-	 * @param checkType
-	 * @param n
 	 */
-	public static final void exemptTimes(final Player player, final CheckType checkType, final int n){
-		exemptTimes(player.getEntityId(), checkType, n); // mind n :p
+	public static final void exemptPermanently(final Player player){
+		exemptPermanently(player, CheckType.ALL);
 	}
-	
-	/**
-	 * Exempt an entity by entity id from a check n times, could be a check group, etc.
-	 * @param entityId
-	 * @param checkType
-	 * @param n
-	 */
-	public static final void exemptTimes(final int entityId, final CheckType checkType, final int n){
-		if (n <= 0) throw new IllegalArgumentException("Bad number given: " + n);
-		exempt(entityId, checkType, -n);
-	}
-	
-	/**
-	 * Exempt a player from a check or check group etc. for a given duration in milliseconds (i am curious if this is ever used by anyone/anything).
-	 * @param player
-	 * @param checkType
-	 * @param millis
-	 */
-	public static final void exemptMillis(final Player player, final CheckType checkType, final long millis){
-		exemptMillis(player.getEntityId(), checkType, millis);
-	}
-	
-	/**
-	 * Exempt the player from the check or check group for the given duration in milliseconds.
-	 * @param entityId
-	 * @param checkType
-	 * @param millis
-	 */
-	public static final void exemptMillis(final int entityId, final CheckType checkType, final long millis){
-		if (millis <= 0) throw new IllegalArgumentException("Bad duration given: " + millis);
-	}
-	
+			
 	/**
 	 * Exempt a player from a check or check group permanently.
 	 * @param player
@@ -280,50 +203,23 @@ public class NCPExemptionManager {
 	}
 	
 	/**
+	 * exempt an entity from all checks, by entity id. 
+	 * @param entityId
+	 */
+	public static final void exemptPermanently(final int entityId){
+		exemptPermanently(entityId, CheckType.ALL);
+	}
+	
+	/**
 	 * Exempt an entity by entity id from the given check or check group permanently (only until restart).
 	 * @param entityId
 	 * @param checkType
 	 */
 	public static final void exemptPermanently(final int entityId, final CheckType checkType){
-		exempt(entityId, checkType, 0);
-	}
-	
-	/**
-	 * Generic exempting.
-	 * @param entityId
-	 * @param checkType
-	 * @param spec <0 = times, ==0 = permanently, >0 = timestamp.
-	 */
-	private static final void exempt(final int entityId, final CheckType checkType, long spec){
 		final Integer id = entityId;
-		exempt(id, spec, exempted.get(checkType));
+		exempted.get(checkType).add(id);
 		for (final CheckType child : APIUtil.getChildren(checkType)){
-			exempt(id, spec, exempted.get(child));
-		}
-	}
-	
-	/**
-	 * Auxiliary, using the corresponding map.
-	 * @param id
-	 * @param spec
-	 * @param map
-	 */
-	private static final void exempt(final Integer id, final long spec, final Map<Integer, Long> map){
-		final Long old = map.get(id);
-		if (old == null)
-			map.put(id, spec);
-		else if (old == 0) 
-			return;
-		else if (spec == 0)
-			map.put(id, spec);
-		else if (old < 0 ){
-			if (spec > 0 || spec < old) 
-				map.put(id, spec);
-		}
-		else{
-			// old > 0
-			if (spec > old)
-				map.put(id, spec);
+			exempted.get(child).add(id);
 		}
 	}
 	
