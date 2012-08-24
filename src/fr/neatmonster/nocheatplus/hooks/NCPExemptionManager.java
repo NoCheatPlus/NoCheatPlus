@@ -209,7 +209,7 @@ public class NCPExemptionManager {
 	}
 	
 	/**
-	 * Undo exempting an entity (or player by entity id) from checks.
+	 * Undo exempting an entity by entity id from all checks.
 	 * @param entityId
 	 */
 	public static final void unExempt(final int entityId){
@@ -217,7 +217,7 @@ public class NCPExemptionManager {
 	}
 	
 	/**
-	 * Undo exempting an entity (or player by entity id) from a certain check type, also check groups, etc.
+	 * Undo exempting an entity by entity id from a certain check type, also check groups, etc.
 	 * @param entityId
 	 * @param checkType
 	 */
