@@ -82,7 +82,6 @@ public abstract class Check {
      * @return true, if the event should be cancelled
      */
     protected boolean executeActions(final ViolationData violationData) {
-        MetricsData.addViolation(violationData);
         ViolationHistory.getHistory(violationData.player).log(getClass().getName(), violationData.addedVL);
         try {
             // Check a bypass permission.
@@ -94,6 +93,9 @@ public abstract class Check {
             if (NCPHookManager.shouldCancelVLProcessing(violationData))
                 // One of the hooks has decided to cancel the VL processing, return false.
                 return false;
+
+            // Add this failed check to the Metrics data.
+            MetricsData.addFailed(type);
 
             final long time = System.currentTimeMillis() / 1000L;
             boolean cancel = false;

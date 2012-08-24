@@ -89,12 +89,13 @@ public class LagMeasureTask implements Runnable {
             // If the previous second took to long, skip checks during this second.
             skipCheck = lastInGameSecondDuration > 2000;
 
-            // Metrics data.
+            // Add the number of ticks the last second have contained to the Metrics data.
             int ticks = (int) Math.round(20000D / lastInGameSecondDuration);
             if (ticks > 20)
                 ticks = 20;
             MetricsData.addTicks(ticks);
 
+            // Show the debug messages.
             if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG))
                 if (oldStatus != skipCheck && skipCheck)
                     System.out.println("[NoCheatPlus] Detected server lag, some checks will not work.");

@@ -34,7 +34,6 @@ import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
-import fr.neatmonster.nocheatplus.metrics.MetricsData.TicksPlotter;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
@@ -125,47 +124,34 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
         // Setup the graphs, plotters and start Metrics.
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS))
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {
+            MetricsData.initialize();
             try {
                 final Metrics metrics = new Metrics(this);
-                final Graph eventsChecked = metrics.createGraph("Events Checked");
                 final Graph checksFailed = metrics.createGraph("Checks Failed");
-                final Graph violationLevels = metrics.createGraph("Violation Levels");
                 for (final CheckType type : CheckType.values())
-                    if (type.getParent() != null) {
-                        eventsChecked.addPlotter(new Plotter(type.name()) {
-
-                            @Override
-                            public int getValue() {
-                                final int checked = MetricsData.getChecked(type);
-                                MetricsData.resetChecked(type);
-                                return checked;
-                            }
-                        });
+                    if (type.getParent() != null)
                         checksFailed.addPlotter(new Plotter(type.name()) {
 
                             @Override
                             public int getValue() {
-                                final int failed = MetricsData.getFailed(type);
-                                MetricsData.resetFailed(type);
-                                return failed;
+                                return MetricsData.getFailed(type);
                             }
                         });
-                        violationLevels.addPlotter(new Plotter(type.name()) {
-
-                            @Override
-                            public int getValue() {
-                                final int violationLevel = (int) MetricsData.getViolationLevel(type);
-                                MetricsData.resetViolationLevel(type);
-                                return violationLevel;
-                            }
-                        });
-                    }
                 final Graph serverTicks = metrics.createGraph("Server Ticks");
-                for (int ticks = 0; ticks < 21; ticks++)
-                    serverTicks.addPlotter(new TicksPlotter(ticks));
+                final int[] ticksArray = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                        19, 20};
+                for (final int ticks : ticksArray)
+                    serverTicks.addPlotter(new Plotter(ticks + " tick(s)") {
+
+                        @Override
+                        public int getValue() {
+                            return MetricsData.getTicks(ticks);
+                        }
+                    });
                 metrics.start();
             } catch (final Exception e) {}
+        }
 
         // Is a new update available?
         try {

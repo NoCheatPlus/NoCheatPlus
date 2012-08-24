@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * MM""""""""`M                     dP   MM'""""'YMM dP oo          dP       
@@ -35,9 +34,6 @@ public class FastClick extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
-        // Metrics data.
-        MetricsData.addChecked(type);
-
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;

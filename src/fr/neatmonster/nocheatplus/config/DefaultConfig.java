@@ -243,7 +243,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:kick");
 
         set(ConfPaths.INVENTORY_FASTCLICK_CHECK, true);
-        set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel"); // TODO
+        set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel vl>50 log:fastclick:3:5:cif cancel");
 
         set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);
         set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "log:instantbow:2:5:if cancel");
@@ -309,6 +309,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too many blocks" + end);
+        set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);

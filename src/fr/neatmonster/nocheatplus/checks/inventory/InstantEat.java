@@ -6,7 +6,6 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * M""M                     dP                       dP   MM""""""""`M            dP   
@@ -39,9 +38,6 @@ public class InstantEat extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final int level) {
-        // Metrics data.
-        MetricsData.addChecked(type);
-
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;

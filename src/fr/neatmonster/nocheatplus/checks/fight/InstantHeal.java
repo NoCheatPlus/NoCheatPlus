@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 
 /*
  * M""M                     dP                       dP   M""MMMMM""MM                   dP 
@@ -36,9 +35,6 @@ public class InstantHeal extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
-        // Metrics data.
-        MetricsData.addChecked(type);
-
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
