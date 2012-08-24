@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.hooks;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -368,10 +368,10 @@ public final class NCPHookManager {
      * 
      * @param hooks
      *            the hooks
-     * @return a set of the removed hooks ids
+     * @return a set of the removed hooks ids, same order as the given collection (hooks).
      */
     public static Set<Integer> removeHooks(final Collection<NCPHook> hooks) {
-        final Set<Integer> ids = new HashSet<Integer>();
+        final Set<Integer> ids = new LinkedHashSet<Integer>();
         for (final NCPHook hook : hooks) {
             final Integer id = removeHook(hook);
             if (id != null)
