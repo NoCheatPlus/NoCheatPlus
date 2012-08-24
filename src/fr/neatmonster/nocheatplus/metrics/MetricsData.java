@@ -5,6 +5,8 @@ import java.util.Map;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 
 /*
@@ -51,8 +53,8 @@ public class MetricsData {
         }
     }
 
-    /** The violation levels. */
-    private static final Map<CheckType, Double>  violationLevels = new HashMap<CheckType, Double>();
+    /** Is Metrics enabled? */
+    private static boolean                       enabled;
 
     /** The checks failed. */
     private static final Map<CheckType, Integer> checksFailed    = new HashMap<CheckType, Integer>();
@@ -63,6 +65,9 @@ public class MetricsData {
     /** The server ticks. */
     private static final Map<Integer, Integer>   serverTicks     = new HashMap<Integer, Integer>();
 
+    /** The violation levels. */
+    private static final Map<CheckType, Double>  violationLevels = new HashMap<CheckType, Double>();
+
     /**
      * Adds the checked.
      * 
@@ -70,7 +75,7 @@ public class MetricsData {
      *            the type
      */
     public static void addChecked(final CheckType type) {
-        if (type.getParent() != null)
+        if (enabled && type.getParent() != null)
             eventsChecked.put(type, getChecked(type) + 1);
     }
 
@@ -81,7 +86,8 @@ public class MetricsData {
      *            the ticks
      */
     public static void addTicks(final int ticks) {
-        serverTicks.put(ticks, serverTicks.get(ticks) + 1);
+        if (enabled)
+            serverTicks.put(ticks, serverTicks.get(ticks) + 1);
     }
 
     /**
@@ -92,7 +98,7 @@ public class MetricsData {
      */
     public static void addViolation(final ViolationData violationData) {
         final CheckType type = violationData.check.getType();
-        if (type.getParent() != null) {
+        if (enabled && type.getParent() != null) {
             checksFailed.put(type, getFailed(type) + 1);
             violationLevels.put(type, getViolationLevel(type) + violationData.addedVL);
         }
@@ -106,12 +112,6 @@ public class MetricsData {
      * @return the checked
      */
     public static int getChecked(final CheckType type) {
-        if (type == CheckType.ALL) {
-            int eventsChecked = 0;
-            for (final double value : MetricsData.eventsChecked.values())
-                eventsChecked += value;
-            return eventsChecked;
-        }
         if (!eventsChecked.containsKey(type))
             resetChecked(type);
         return eventsChecked.get(type);
@@ -125,12 +125,6 @@ public class MetricsData {
      * @return the failed
      */
     public static int getFailed(final CheckType type) {
-        if (type == CheckType.ALL) {
-            int checkFails = 0;
-            for (final double value : checksFailed.values())
-                checkFails += value;
-            return checkFails;
-        }
         if (!checksFailed.containsKey(type))
             resetFailed(type);
         return checksFailed.get(type);
@@ -157,15 +151,16 @@ public class MetricsData {
      * @return the violation level
      */
     public static double getViolationLevel(final CheckType type) {
-        if (type == CheckType.ALL) {
-            double violationLevel = 0D;
-            for (final double value : violationLevels.values())
-                violationLevel += value;
-            return violationLevel;
-        }
         if (!violationLevels.containsKey(type))
             resetViolationLevel(type);
         return violationLevels.get(type);
+    }
+
+    /**
+     * Initialize the class.
+     */
+    public static void initialize() {
+        enabled = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS);
     }
 
     /**

@@ -158,6 +158,13 @@ public class CommandHandler implements CommandExecutor {
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String commandLabel,
             final String[] args) {
+        /*
+         *   ____                                          _ 
+         *  / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |
+         * | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` |
+         * | |__| (_) | | | | | | | | | | | (_| | | | | (_| |
+         *  \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|
+         */
         // Not our command, how did it get here?
         if (!command.getName().equalsIgnoreCase("nocheatplus"))
             return false;

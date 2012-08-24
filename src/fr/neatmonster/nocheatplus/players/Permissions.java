@@ -26,6 +26,7 @@ public class Permissions {
 
     public static final String  ADMINISTRATION_INFO          = ADMINISTRATION + ".info";
     public static final String  ADMINISTRATION_NOTIFY        = ADMINISTRATION + ".notify";
+    public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
     public static final String  ADMINISTRATION_RELOAD        = ADMINISTRATION + ".reload";
 
     private static final String CHECKS                       = NOCHEATPLUS + ".checks";
@@ -129,7 +130,6 @@ public class Permissions {
     public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
     public static final String  MOVING_MOREPACKETSVEHICLE    = MOVING + ".morepacketsvehicle";
     public static final String  MOVING_NOFALL                = MOVING + ".nofall";
-    public static final String  MOVING_OVERRIDEBUKKIT        = MOVING + ".overridebukkit";
     public static final String  MOVING_SURVIVALFLY           = MOVING + ".survivalfly";
     public static final String  MOVING_SURVIVALFLY_BLOCKING  = MOVING_SURVIVALFLY + ".blocking";
     public static final String  MOVING_SURVIVALFLY_SNEAKING  = MOVING_SURVIVALFLY + ".sneaking";

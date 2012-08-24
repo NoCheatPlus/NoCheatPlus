@@ -28,13 +28,13 @@ import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.metrics.MetricsData.TicksPlotter;
-import fr.neatmonster.nocheatplus.packets.PacketsWorkaround;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
@@ -66,13 +66,17 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      */
     @Override
     public void onDisable() {
+        /*
+         *  ____  _           _     _      
+         * |  _ \(_)___  __ _| |__ | | ___ 
+         * | | | | / __|/ _` | '_ \| |/ _ \
+         * | |_| | \__ \ (_| | |_) | |  __/
+         * |____/|_|___/\__,_|_.__/|_|\___|
+         */
         final PluginDescriptionFile pdfFile = getDescription();
 
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
-
-        // Disable the packets workaround.
-        PacketsWorkaround.disable();
 
         // Cleanup the configuration manager.
         ConfigManager.cleanup();
@@ -89,6 +93,13 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      */
     @Override
     public void onEnable() {
+        /*
+         *  _____             _     _      
+         * | ____|_ __   __ _| |__ | | ___ 
+         * |  _| | '_ \ / _` | '_ \| |/ _ \
+         * | |___| | | | (_| | |_) | |  __/
+         * |_____|_| |_|\__,_|_.__/|_|\___|
+         */
         // Read the configuration files.
         ConfigManager.init(this);
 
@@ -102,10 +113,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         listeners.add(new MovingListener());
         listeners.add(new Workarounds());
 
-        // Enable the packets workaround.
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY))
-            PacketsWorkaround.enable();
-
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
 
@@ -118,46 +125,47 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
         // Setup the graphs, plotters and start Metrics.
-        try {
-            final Metrics metrics = new Metrics(this);
-            final Graph eventsChecked = metrics.createGraph("Events Checked");
-            final Graph checksFailed = metrics.createGraph("Checks Failed");
-            final Graph violationLevels = metrics.createGraph("Violation Levels");
-            for (final CheckType type : CheckType.values())
-                if (type == CheckType.ALL || type.getParent() != null) {
-                    eventsChecked.addPlotter(new Plotter(type.name()) {
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS))
+            try {
+                final Metrics metrics = new Metrics(this);
+                final Graph eventsChecked = metrics.createGraph("Events Checked");
+                final Graph checksFailed = metrics.createGraph("Checks Failed");
+                final Graph violationLevels = metrics.createGraph("Violation Levels");
+                for (final CheckType type : CheckType.values())
+                    if (type.getParent() != null) {
+                        eventsChecked.addPlotter(new Plotter(type.name()) {
 
-                        @Override
-                        public int getValue() {
-                            final int checked = MetricsData.getChecked(type);
-                            MetricsData.resetChecked(type);
-                            return checked;
-                        }
-                    });
-                    checksFailed.addPlotter(new Plotter(type.name()) {
+                            @Override
+                            public int getValue() {
+                                final int checked = MetricsData.getChecked(type);
+                                MetricsData.resetChecked(type);
+                                return checked;
+                            }
+                        });
+                        checksFailed.addPlotter(new Plotter(type.name()) {
 
-                        @Override
-                        public int getValue() {
-                            final int failed = MetricsData.getFailed(type);
-                            MetricsData.resetFailed(type);
-                            return failed;
-                        }
-                    });
-                    violationLevels.addPlotter(new Plotter(type.name()) {
+                            @Override
+                            public int getValue() {
+                                final int failed = MetricsData.getFailed(type);
+                                MetricsData.resetFailed(type);
+                                return failed;
+                            }
+                        });
+                        violationLevels.addPlotter(new Plotter(type.name()) {
 
-                        @Override
-                        public int getValue() {
-                            final int violationLevel = (int) MetricsData.getViolationLevel(type);
-                            MetricsData.resetViolationLevel(type);
-                            return violationLevel;
-                        }
-                    });
-                }
-            final Graph serverTicks = metrics.createGraph("Server Ticks");
-            for (int ticks = 0; ticks < 21; ticks++)
-                serverTicks.addPlotter(new TicksPlotter(ticks));
-            metrics.start();
-        } catch (final Exception e) {}
+                            @Override
+                            public int getValue() {
+                                final int violationLevel = (int) MetricsData.getViolationLevel(type);
+                                MetricsData.resetViolationLevel(type);
+                                return violationLevel;
+                            }
+                        });
+                    }
+                final Graph serverTicks = metrics.createGraph("Server Ticks");
+                for (int ticks = 0; ticks < 21; ticks++)
+                    serverTicks.addPlotter(new TicksPlotter(ticks));
+                metrics.start();
+            } catch (final Exception e) {}
 
         // Is a new update available?
         try {
@@ -195,7 +203,30 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     @EventHandler(
             priority = EventPriority.LOWEST)
     final void onExecuteActions(final ExecuteActionsEvent event) {
+        /*
+         *  _____                     _            _        _   _                 
+         * | ____|_  _____  ___ _   _| |_ ___     / \   ___| |_(_) ___  _ __  ___ 
+         * |  _| \ \/ / _ \/ __| | | | __/ _ \   / _ \ / __| __| |/ _ \| '_ \/ __|
+         * | |___ >  <  __/ (__| |_| | ||  __/  / ___ \ (__| |_| | (_) | | | \__ \
+         * |_____/_/\_\___|\___|\__,_|\__\___| /_/   \_\___|\__|_|\___/|_| |_|___/
+         */
         event.executeActions();
+    }
+
+    public void onPlayerJoinLow(final PlayerJoinEvent event) {
+        /*
+         *  ____  _                             _       _       
+         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
+         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
+         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
+         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
+         *                |___/                                 
+         */
+        // Change the NetServerHandler of the player if requested in the configuration.
+        final ConfigFile configFile = ConfigManager.getConfigFile();
+        if (configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED))
+            NCPNetServerHandler.changeNetServerHandler(event.getPlayer(),
+                    configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY));
     }
 
     /**
@@ -206,7 +237,15 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      */
     @EventHandler(
             priority = EventPriority.MONITOR)
-    public void onPlayerJoin(final PlayerJoinEvent event) {
+    public void onPlayerJoinMonitor(final PlayerJoinEvent event) {
+        /*
+         *  ____  _                             _       _       
+         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
+         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
+         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
+         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
+         *                |___/                                 
+         */
         final Player player = event.getPlayer();
 
         // Send a message to the player if a new update is available.

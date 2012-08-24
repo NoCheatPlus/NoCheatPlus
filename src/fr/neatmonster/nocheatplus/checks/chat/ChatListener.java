@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -92,7 +93,7 @@ public class ChatListener implements Listener {
         if (ChatConfig.getConfig(player).protectPlugins)
             if ((command.equalsIgnoreCase("plugins") || command.equalsIgnoreCase("pl")
                     || command.equalsIgnoreCase("version") || command.equalsIgnoreCase("ver"))
-                    && !player.isOp()) {
+                    && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
                 event.getPlayer().sendMessage(
                         ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
                                 + "Please contact the server administrators if you believe that this is in error.");

@@ -114,8 +114,6 @@ permissions:
                                 description: Allow the player to bypass the MorePacketsVehicle check.
                             nocheatplus.checks.moving.nofall:
                                 description: Allow the player to bypass the NoFall check.
-                            nocheatplus.checks.moving.overridebukkit:
-                                description: Allow the overriding of Bukkit to prevent it from blocking fly mods.
                             nocheatplus.checks.moving.survivalfly:
                                 description: Allow the player to bypass the SurvivalFly check.
                                 children:
@@ -125,6 +123,8 @@ permissions:
                                         description: Allow the player to move without speed limits while sneaking.
                                     nocheatplus.checks.moving.survivalfly.sprinting:
                                         description: Allow the player to sprint backwards.
+                                    nocheatplus.checks.moving.survivalfly.step:
+                                        description: Allow the player to use the 'step' functionality of his client.
             nocheatplus.mods:
                 description: Allow the player to use all the client mods.
                 children:
