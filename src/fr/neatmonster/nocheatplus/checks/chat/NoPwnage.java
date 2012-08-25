@@ -159,12 +159,13 @@ public class NoPwnage extends Check {
         if (event instanceof AsyncPlayerChatEvent) {
             final AsyncPlayerChatEvent e = (AsyncPlayerChatEvent) event;
             results = unsafeCheck(player, e.getMessage(), isMainThread, cc, data);
-            e.setCancelled(results[0]);
+            if (results[0]) e.setCancelled(true);
         } else if (event instanceof PlayerCommandPreprocessEvent) {
             final PlayerCommandPreprocessEvent e = (PlayerCommandPreprocessEvent) event;
             results = unsafeCheck(player, e.getMessage(), isMainThread, cc, data);
-            e.setCancelled(results[0]);
+            if (results[0]) e.setCancelled(true);
         }
+        // else: impossible.
         return results[1];
     }
 
