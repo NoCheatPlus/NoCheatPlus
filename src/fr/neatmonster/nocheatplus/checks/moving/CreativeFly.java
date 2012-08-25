@@ -163,7 +163,8 @@ public class CreativeFly extends Check {
         else if (wildcard == ParameterName.LOCATION_TO)
             return String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ());
         else if (wildcard == ParameterName.DISTANCE)
-            return String.format(Locale.US, "%.2f", data.to.subtract(data.from).lengthSquared());
+            return String.format(Locale.US, "%.2f", data.to.getLocation().subtract(data.from.getLocation())
+                    .lengthSquared());
         else
             return super.getParameter(wildcard, violationData);
     }

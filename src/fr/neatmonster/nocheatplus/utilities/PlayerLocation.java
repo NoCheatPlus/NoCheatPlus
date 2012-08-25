@@ -36,112 +36,45 @@ import org.bukkit.entity.Player;
  */
 public class PlayerLocation {
 
-    /**
-     * Another utility class used to manipulate differently booleans.
-     */
-    private class CustomBoolean {
-
-        /** Is the boolean set? */
-        private boolean isSet = false;
-
-        /** What is its value? */
-        private boolean value = false;
-
-        /**
-         * Gets the boolean.
-         * 
-         * @return the value
-         */
-        public boolean get() {
-            return value;
-        }
-
-        /**
-         * Checks if the boolean is set.
-         * 
-         * @return true, if the boolean is set
-         */
-        public boolean isSet() {
-            return isSet;
-        }
-
-        /**
-         * Sets the boolean.
-         * 
-         * @param value
-         *            the value
-         */
-        public void set(final boolean value) {
-            this.value = value;
-            isSet = true;
-        }
-    }
-
-    private static final Material[] STAIRS      = new Material[] {Material.WOOD_STAIRS, Material.COBBLESTONE_STAIRS,
+    private static final Material[] STAIRS = new Material[] {Material.WOOD_STAIRS, Material.COBBLESTONE_STAIRS,
             Material.BRICK_STAIRS, Material.SMOOTH_STAIRS, Material.NETHER_BRICK_STAIRS, Material.SANDSTONE_STAIRS,
             Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS};
 
     /** The original location. */
-    private final Location          location;
+    private Location                location;
 
     /** Is the player above stairs? */
-    private final CustomBoolean     aboveStairs = new CustomBoolean();
+    private Boolean                 aboveStairs;
 
     /** Is the player in lava? */
-    private final CustomBoolean     inLava      = new CustomBoolean();
+    private Boolean                 inLava;
 
     /** Is the player in water? */
-    private final CustomBoolean     inWater     = new CustomBoolean();
+    private Boolean                 inWater;
 
     /** Is the player is web? */
-    private final CustomBoolean     inWeb       = new CustomBoolean();
+    private Boolean                 inWeb;
 
     /** Is the player on the ground? */
-    private final CustomBoolean     onGround    = new CustomBoolean();
+    private Boolean                 onGround;
 
     /** Is the player on ice? */
-    private final CustomBoolean     onIce       = new CustomBoolean();
+    private Boolean                 onIce;
 
     /** Is the player on ladder? */
-    private final CustomBoolean     onLadder    = new CustomBoolean();
-
-    /** Is the player on ladder (ignoring unclimbable vines)? **/
-    private final CustomBoolean     onLadderBis = new CustomBoolean();
-
-    /** Is the player on soul sand? */
-    private final CustomBoolean     onSoulSand  = new CustomBoolean();
+    private Boolean                 onLadder;
 
     /** The bounding box of the player. */
-    private final AxisAlignedBB     boundingBox;
+    private AxisAlignedBB           boundingBox;
 
     /** The entity player. */
-    private final EntityPlayer      entity;
+    private EntityPlayer            entity;
 
     /** The x, y and z coordinates. */
-    private final int               x, y, z;
+    private int                     x, y, z;
 
     /** The world. */
-    private final WorldServer       world;
-
-    /**
-     * Instantiates a new player location.
-     * 
-     * @param location
-     *            the location
-     * @param player
-     *            the player
-     */
-    public PlayerLocation(final Location location, final Player player) {
-        this.location = location;
-
-        entity = ((CraftPlayer) player).getHandle();
-        boundingBox = entity.boundingBox.clone().d(location.getX() - entity.locX, location.getY() - entity.locY,
-                location.getZ() - entity.locZ);
-        x = (int) Math.floor(location.getX());
-        y = (int) Math.floor(boundingBox.b);
-        z = (int) Math.floor(location.getZ());
-        world = ((CraftWorld) location.getWorld()).getHandle();
-    }
+    private WorldServer             world;
 
     /**
      * Gets the location.
@@ -203,9 +136,9 @@ public class PlayerLocation {
      * @return true, if the player above on stairs
      */
     public boolean isAboveStairs() {
-        if (!aboveStairs.isSet())
-            aboveStairs.set(Arrays.asList(STAIRS).contains(Material.getMaterial(world.getTypeId(x, y - 1, z))));
-        return aboveStairs.get();
+        if (aboveStairs == null)
+            aboveStairs = Arrays.asList(STAIRS).contains(Material.getMaterial(world.getTypeId(x, y - 1, z)));
+        return aboveStairs;
     }
 
     /**
@@ -214,12 +147,12 @@ public class PlayerLocation {
      * @return true, if the player is in lava
      */
     public boolean isInLava() {
-        if (!inLava.isSet()) {
+        if (inLava == null) {
             AxisAlignedBB boundingBoxLava = boundingBox.clone();
             boundingBoxLava = boundingBoxLava.grow(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D);
-            inLava.set(world.a(boundingBoxLava, net.minecraft.server.Material.LAVA));
+            inLava = world.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
         }
-        return inLava.get();
+        return inLava;
     }
 
     /**
@@ -237,13 +170,13 @@ public class PlayerLocation {
      * @return true, if the player is in water
      */
     public boolean isInWater() {
-        if (!inWater.isSet()) {
+        if (inWater == null) {
             AxisAlignedBB boundingBoxWater = boundingBox.clone();
             boundingBoxWater = boundingBoxWater.grow(0.0D, -0.40000000596046448D, 0.0D);
             boundingBoxWater = boundingBoxWater.shrink(0.001D, 0.001D, 0.001D);
-            inWater.set(world.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity));
+            inWater = world.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
         }
-        return inWater.get();
+        return inWater;
     }
 
     /**
@@ -252,19 +185,19 @@ public class PlayerLocation {
      * @return true, if the player is in web
      */
     public boolean isInWeb() {
-        if (!inWeb.isSet()) {
+        if (inWeb == null) {
             for (int blockX = (int) Math.floor(boundingBox.a + 0.001D); blockX <= (int) Math
                     .floor(boundingBox.d - 0.001D); blockX++)
                 for (int blockY = (int) Math.floor(boundingBox.b + 0.001D); blockY <= (int) Math
                         .floor(boundingBox.e - 0.001D); blockY++)
                     for (int blockZ = (int) Math.floor(boundingBox.c + 0.001D); blockZ <= (int) Math
                             .floor(boundingBox.f - 0.001D); blockZ++)
-                        if (!inWeb.get() && world.getTypeId(blockX, blockY, blockZ) == Block.WEB.id)
-                            inWeb.set(true);
-            if (!inWeb.isSet())
-                inWeb.set(false);
+                        if (world.getTypeId(blockX, blockY, blockZ) == Block.WEB.id)
+                            inWeb = true;
+            if (inWeb == null)
+                inWeb = false;
         }
-        return inWeb.get();
+        return inWeb;
     }
 
     /**
@@ -273,12 +206,12 @@ public class PlayerLocation {
      * @return true, if the player is on ground
      */
     public boolean isOnGround() {
-        if (!onGround.isSet()) {
+        if (onGround == null) {
             AxisAlignedBB boundingBoxGround = boundingBox.clone();
             boundingBoxGround = boundingBoxGround.d(0D, -0.001D, 0D);
-            onGround.set(world.getCubes(entity, boundingBoxGround).size() > 0);
+            onGround = world.getCubes(entity, boundingBoxGround).size() > 0;
         }
-        return onGround.get();
+        return onGround;
     }
 
     /**
@@ -287,12 +220,12 @@ public class PlayerLocation {
      * @return true, if the player is on ice
      */
     public boolean isOnIce() {
-        if (!onIce.isSet())
+        if (onIce == null)
             if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
-                onIce.set(world.getTypeId(x, (int) Math.floor(boundingBox.b - 0.1D), z) == Block.ICE.id);
+                onIce = world.getTypeId(x, (int) Math.floor(boundingBox.b - 0.1D), z) == Block.ICE.id;
             else
-                onIce.set(world.getTypeId(x, y - 1, z) == Block.ICE.id);
-        return onIce.get();
+                onIce = world.getTypeId(x, y - 1, z) == Block.ICE.id;
+        return onIce;
     }
 
     /**
@@ -301,71 +234,30 @@ public class PlayerLocation {
      * @return true, if the player is on a ladder
      */
     public boolean isOnLadder() {
-        return isOnLadder(false);
+        if (onLadder == null)
+            onLadder = world.getTypeId(x, y, z) == Block.LADDER.id || world.getTypeId(x, y, z) == Block.VINE.id;
+        return onLadder;
     }
 
     /**
-     * Checks if the player is on a ladder.
+     * Sets the player location object.
      * 
-     * @param ignoreUnclimbableVines
-     *            ignore unclimbable vines or not?
-     * @return true, if the player is on a ladder
+     * @param location
+     *            the location
+     * @param player
+     *            the player
      */
-    public boolean isOnLadder(final boolean ignoreUnclimbableVines) {
-        if (ignoreUnclimbableVines) {
-            if (!onLadderBis.isSet())
-                if (world.getTypeId(x, y, z) == Block.LADDER.id)
-                    onLadderBis.set(true);
-                else if (world.getTypeId(x, y, z) == Block.VINE.id) {
-                    final int data = world.getData(x, y, z);
-                    if ((data & 1) != 0) {
-                        final int id = world.getTypeId(x, y, z + 1);
-                        if (id != 0 && Block.byId[id].c() && Block.byId[id].material.isSolid())
-                            onLadderBis.set(true);
-                    }
-                    if (!onLadder.isSet() && (data & 2) != 0) {
-                        final int id = world.getTypeId(x - 1, y, z);
-                        if (id != 0 && Block.byId[id].c() && Block.byId[id].material.isSolid())
-                            onLadderBis.set(true);
-                    }
-                    if (!onLadder.isSet() && (data & 4) != 0) {
-                        final int id = world.getTypeId(x, y, z - 1);
-                        if (id != 0 && Block.byId[id].c() && Block.byId[id].material.isSolid())
-                            onLadderBis.set(true);
-                    }
-                    if (!onLadder.isSet() && (data & 8) != 0) {
-                        final int id = world.getTypeId(x + 1, y, z);
-                        if (id != 0 && Block.byId[id].c() && Block.byId[id].material.isSolid())
-                            onLadderBis.set(true);
-                    }
-                }
-            return onLadderBis.get();
-        }
-        if (!onLadder.isSet())
-            onLadder.set(world.getTypeId(x, y, z) == Block.LADDER.id || world.getTypeId(x, y, z) == Block.VINE.id);
-        return onLadder.get();
-    }
+    public void set(final Location location, final Player player) {
+        this.location = location;
 
-    /**
-     * Checks if the player is on soul sand.
-     * 
-     * @return true, if the player is on soul sand
-     */
-    public boolean isOnSoulSand() {
-        if (!onSoulSand.isSet()) {
-            AxisAlignedBB boundingBoxGround = boundingBox.clone();
-            boundingBoxGround = boundingBoxGround.d(0D, -0.001D, 0D);
-            for (final Object object : world.getCubes(entity, boundingBoxGround)) {
-                final AxisAlignedBB aabbCube = (AxisAlignedBB) object;
-                final int blockX = (int) Math.floor(aabbCube.a);
-                final int blockY = (int) Math.floor(aabbCube.b);
-                final int blockZ = (int) Math.floor(aabbCube.c);
-                if (!onSoulSand.get() && world.getTypeId(blockX, blockY, blockZ) == Block.SOUL_SAND.id)
-                    onSoulSand.set(true);
-            }
-            if (!onSoulSand.isSet())
-                onSoulSand.set(false);
-        }
-        return onSoulSand.get();
+        entity = ((CraftPlayer) player).getHandle();
+        boundingBox = entity.boundingBox.clone().d(location.getX() - entity.locX, location.getY() - entity.locY,
+                location.getZ() - entity.locZ);
+        x = (int) Math.floor(location.getX());
+        y = (int) Math.floor(boundingBox.b);
+        z = (int) Math.floor(location.getZ());
+        world = ((CraftWorld) location.getWorld()).getHandle();
+
+        aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = null;
     }
 }

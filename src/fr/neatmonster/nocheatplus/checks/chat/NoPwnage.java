@@ -71,7 +71,7 @@ public class NoPwnage extends Check {
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
 
-        if (!isMainThread && (NCPExemptionManager.isExempted(player, type) || !cc.isEnabled(type)))
+        if (!isMainThread && (!cc.isEnabled(type) || NCPExemptionManager.isExempted(player, type)))
             return false;
 
         // Keep related to ChatData/NoPwnage/Color used lock.

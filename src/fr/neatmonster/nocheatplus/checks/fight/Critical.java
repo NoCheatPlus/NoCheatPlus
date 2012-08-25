@@ -43,7 +43,8 @@ public class Critical extends Check {
         boolean cancel = false;
 
         // We'll need the PlayerLocation to know some important stuff.
-        final PlayerLocation location = new PlayerLocation(player.getLocation(), player);
+        PlayerLocation location = new PlayerLocation();
+        location.set(player.getLocation(), player);
 
         // Check if the hit was a critical hit (positive fall distance, entity in the air, not on ladder, not in liquid
         // and without blindness effect).
@@ -69,6 +70,8 @@ public class Critical extends Check {
                 // should cancel the event.
                 cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
             }
+
+        location = null;
 
         return cancel;
     }

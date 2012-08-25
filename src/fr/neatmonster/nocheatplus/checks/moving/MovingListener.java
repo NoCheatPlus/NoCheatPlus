@@ -29,7 +29,6 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.players.Permissions;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
  * M"""""`'"""`YM                   oo                   
@@ -330,31 +329,29 @@ public class MovingListener implements Listener {
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
 
-        final PlayerLocation from = new PlayerLocation(event.getFrom(), player);
-        data.from = from.getLocation();
-        if (from.isOnGround())
-            data.ground = from.getLocation();
-        final PlayerLocation to = new PlayerLocation(event.getTo(), player);
-        data.to = to.getLocation();
+        data.from.set(event.getFrom(), player);
+        if (data.from.isOnGround())
+            data.ground = data.from.getLocation();
+        data.to.set(event.getTo(), player);
 
         Location newTo = null;
 
         if ((player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight()) && creativeFly.isEnabled(player))
             // If the player is handled by the creative fly check, execute it.
-            newTo = creativeFly.check(player, from, to);
+            newTo = creativeFly.check(player, data.from, data.to);
         else if (survivalFly.isEnabled(player)) {
             // If he is handled by the survival fly check, execute it.
-            newTo = survivalFly.check(player, from, to);
+            newTo = survivalFly.check(player, data.from, data.to);
             // If don't have a new location and if he is handled by the no fall check, execute it.
             if (newTo == null && noFall.isEnabled(player))
-                noFall.check(player, from, to);
+                noFall.check(player, data.from, data.to);
         } else
             // He isn't handled by any fly check, clear his data.
             data.clearFlyData();
 
         if (newTo == null && morePackets.isEnabled(player))
             // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
-            newTo = morePackets.check(player, from, to);
+            newTo = morePackets.check(player, data.from, data.to);
         else
             // Otherwise we need to clear his data.
             data.clearMorePacketsData();

@@ -44,7 +44,7 @@ public class Color extends Check {
             return message;
 
         final ChatConfig cc = ChatConfig.getConfig(player);
-        if (!isMainThread && (NCPExemptionManager.isExempted(player, type) || !cc.isEnabled(type)))
+        if (!isMainThread && (!cc.isEnabled(type) || NCPExemptionManager.isExempted(player, type)))
             // Leave out the permission check.
             return message;
 

@@ -190,12 +190,12 @@ public abstract class Check {
      * @return true, if the check is enabled
      */
     public boolean isEnabled(final Player player) {
-    	if (NCPExemptionManager.isExempted(player, type)) return false;
         try {
-            return type.isEnabled(player) && !player.hasPermission(type.getPermission());
+            if (!type.isEnabled(player) || player.hasPermission(type.getPermission()))
+                return false;
         } catch (final Exception e) {
             e.printStackTrace();
         }
-        return false;
+        return !NCPExemptionManager.isExempted(player, type);
     }
 }
