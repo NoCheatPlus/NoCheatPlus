@@ -69,7 +69,7 @@ public class Angle extends Check {
         for (final long time : data.angleHits.descendingKeySet()) {
             final Location location = data.angleHits.get(time);
             // We need a previous location to calculate deltas.
-            if (previousLocation != null) {
+            if (previousLocation != null && location.getWorld().getName().equals(previousLocation.getWorld().getName())) {
                 // Calculate the distance between the two locations.
                 deltaMove += previousLocation.distanceSquared(location);
                 // Calculate the time elapsed between the two hits.
