@@ -4,9 +4,6 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerEvent;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
@@ -62,9 +59,9 @@ public class NoPwnage extends Check {
      *            the event
      * @param isMainThread
      *            is the thread the main thread
-     * @return true, if successful
+     * @return If to cancel the event.
      */
-    public boolean check(final Player player, final PlayerEvent event, final boolean isMainThread) {
+    public boolean check(final Player player, final String message, final boolean isMainThread) {
         if (isMainThread && !isEnabled(player))
             return false;
 
@@ -76,7 +73,7 @@ public class NoPwnage extends Check {
 
         // Keep related to ChatData/NoPwnage/Color used lock.
         synchronized (data) {
-            return unsafeCheck(player, event, isMainThread, cc, data);
+            return unsafeCheck(player, message, isMainThread, cc, data);
         }
     }
 
@@ -143,37 +140,6 @@ public class NoPwnage extends Check {
      * 
      * @param player
      *            the player
-     * @param event
-     *            the event
-     * @param isMainThread
-     *            is the thread the main thread
-     * @param cc
-     *            the configuration
-     * @param data
-     *            the data
-     * @return true, if successful
-     */
-    private boolean unsafeCheck(final Player player, final PlayerEvent event, final boolean isMainThread,
-            final ChatConfig cc, final ChatData data) {
-        boolean[] results = null;
-        if (event instanceof AsyncPlayerChatEvent) {
-            final AsyncPlayerChatEvent e = (AsyncPlayerChatEvent) event;
-            results = unsafeCheck(player, e.getMessage(), isMainThread, cc, data);
-            if (results[0]) e.setCancelled(true);
-        } else if (event instanceof PlayerCommandPreprocessEvent) {
-            final PlayerCommandPreprocessEvent e = (PlayerCommandPreprocessEvent) event;
-            results = unsafeCheck(player, e.getMessage(), isMainThread, cc, data);
-            if (results[0]) e.setCancelled(true);
-        }
-        // else: impossible.
-        return results[1];
-    }
-
-    /**
-     * Only to be called form synchronized code.
-     * 
-     * @param player
-     *            the player
      * @param message
      *            the message
      * @param isMainThread
@@ -182,16 +148,16 @@ public class NoPwnage extends Check {
      *            the cc
      * @param data
      *            the data
-     * @return the boolean[]
+     * @return If to cancel the event.
      */
-    private boolean[] unsafeCheck(final Player player, final String message, final boolean isMainThread,
+    private boolean unsafeCheck(final Player player, final String message, final boolean isMainThread,
             final ChatConfig cc, final ChatData data) {
-        boolean cancel = false, kick = false;
+        boolean cancel = false;
 
         // Don't not check excluded messages/commands.
         for (final String exclusion : cc.noPwnageExclusions)
             if (message.startsWith(exclusion))
-                return new boolean[] {false, false};
+                return false;
 
         final long now = System.currentTimeMillis();
 
@@ -209,7 +175,7 @@ public class NoPwnage extends Check {
                     data.noPwnageVL += cc.noPwnageLevel / 10D;
 
                     // Find out if we need to kick the player or not.
-                    kick = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageLevel / 10D,
+                    cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageLevel / 10D,
                             cc.noPwnageActions, isMainThread);
                 }
 
@@ -222,7 +188,7 @@ public class NoPwnage extends Check {
             }
 
             // Cancel the message and maybe event.
-            return new boolean[] {true, kick};
+            return true;
         }
 
         int suspicion = 0;
@@ -293,7 +259,7 @@ public class NoPwnage extends Check {
                 data.noPwnageVL += suspicion / 10D;
 
                 // Find out if we need to kick the player or not.
-                kick = executeActionsThreadSafe(player, data.noPwnageVL, suspicion / 10D, cc.noPwnageActions,
+                cancel = executeActionsThreadSafe(player, data.noPwnageVL, suspicion / 10D, cc.noPwnageActions,
                         isMainThread);
             }
         else
@@ -306,7 +272,7 @@ public class NoPwnage extends Check {
         lastGlobalMessage = message;
         lastGlobalMessageTime = now;
 
-        return new boolean[] {cancel, kick};
+        return cancel;
     }
 
     /**

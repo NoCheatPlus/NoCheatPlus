@@ -12,7 +12,6 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.neatmonster.nocheatplus.players.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
  * MM'""""'YMM dP                  dP   M""MMMMMMMM oo            dP                                       
@@ -59,8 +58,9 @@ public class ChatListener implements Listener {
         event.setMessage(color.check(player, event.getMessage(), false));
 
         // Then the no pwnage check.
-        if (noPwnage.check(player, event, false))
-            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
+        if (noPwnage.check(player, event.getMessage(), false))
+        	event.setCancelled(true);
+//            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
     /**
@@ -113,8 +113,9 @@ public class ChatListener implements Listener {
         event.setMessage(color.check(player, event.getMessage(), true));
 
         // Then the no pwnage check.
-        if (noPwnage.check(player, event, true))
-            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
+        if (noPwnage.check(player, event.getMessage(), true))
+        	event.setCancelled(true);
+//            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
     /**
