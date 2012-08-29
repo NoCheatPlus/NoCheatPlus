@@ -14,8 +14,12 @@ commands:
         description: NoCheatPlus command(s).
         # permission: nocheatplus.admin.reload
         usage: |
-               /<command> info: Display the violations of a player
+               /<command> info <player>: Display the violations of a player
                /<command> reload: reload NoCheatPlus configuration
+               Auxiliary:
+               /<command> ban [delay=<ticks>] <player> [<reason>...]: ban player
+               /<command> kick [delay=<ticks>] <player> [<reason>...]: kick player
+               /<command> tell [delay=<ticks>] <player> <message>: tell a message
 
 permissions:
     nocheatplus:

@@ -24,10 +24,13 @@ public class Permissions {
      */
     private static final String ADMINISTRATION               = NOCHEATPLUS + ".admin";
 
+    public static final String  ADMINISTRATION_BAN          = ADMINISTRATION + ".ban";
     public static final String  ADMINISTRATION_INFO          = ADMINISTRATION + ".info";
+    public static final String  ADMINISTRATION_KICK          = ADMINISTRATION + ".kick";
     public static final String  ADMINISTRATION_NOTIFY        = ADMINISTRATION + ".notify";
     public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
     public static final String  ADMINISTRATION_RELOAD        = ADMINISTRATION + ".reload";
+    public static final String  ADMINISTRATION_TELL          = ADMINISTRATION + ".tell";
 
     private static final String CHECKS                       = NOCHEATPLUS + ".checks";
 
