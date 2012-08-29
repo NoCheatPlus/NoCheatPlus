@@ -138,7 +138,7 @@ public class ActionFactory {
         final String name = parts[0];
         final Object command = lib.get(parts[0]);
         int delay = 0;
-        int repeat = 1;
+        int repeat = 0;
 
         if (command == null)
             throw new IllegalArgumentException("NoCheatPlus doesn't know command '" + name
@@ -152,7 +152,7 @@ public class ActionFactory {
                 System.out.println("[NoCheatPlus] Couldn't parse details of command '" + definition
                         + "', will use default values instead.");
                 delay = 0;
-                repeat = 1;
+                repeat = 0;
             }
 
         return new CommandAction(name, delay, repeat, command.toString());
