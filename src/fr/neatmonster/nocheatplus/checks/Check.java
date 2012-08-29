@@ -104,7 +104,7 @@ public abstract class Check {
                 if (getHistory(violationData.player).executeAction(violationData, action, time))
                     // The execution history said it really is time to execute the action, find out what it is and do
                     // what is needed.
-                    cancel = cancel || action.execute(violationData);
+                    if (action.execute(violationData)) cancel = true;
 
             return cancel;
         } catch (final Exception e) {
