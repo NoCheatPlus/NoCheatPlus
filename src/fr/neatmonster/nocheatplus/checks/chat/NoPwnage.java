@@ -169,22 +169,20 @@ public class NoPwnage extends Check {
                 data.noPwnageHasStartedCaptcha = false;
                 player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaSuccess));
             } else {
+            	// Increment his tries number counter.
+                data.noPwnageCaptchTries++;
+                
                 // Does he failed too much times?
                 if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
-                    // Increment the violation level.
-                    data.noPwnageVL += cc.noPwnageLevel / 10D;
-
                     // Find out if we need to kick the player or not.
-                    cancel = executeActionsThreadSafe(player, data.noPwnageVL, cc.noPwnageLevel / 10D,
-                            cc.noPwnageActions, isMainThread);
+                    cancel = executeActionsThreadSafe(player, data.noPwnageCaptchTries, 1, cc.noPwnageCaptchaActions, 
+                    		isMainThread);
                 }
 
-                // Increment his tries number counter.
-                data.noPwnageCaptchTries++;
-
-                // Display the question again.
-                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
-                        data.noPwnageGeneratedCaptcha)));
+                // Display the question again (if not kicked).
+                if (player.isOnline())
+                	player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
+                			data.noPwnageGeneratedCaptcha)));
             }
 
             // Cancel the message and maybe event.

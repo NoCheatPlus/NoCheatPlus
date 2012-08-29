@@ -79,6 +79,7 @@ public class Permissions {
     private static final String CHAT                         = CHECKS + ".chat";
     public static final String  CHAT_COLOR                   = CHAT + ".color";
     public static final String  CHAT_NOPWNAGE                = CHAT + ".nopwnage";
+    public static final String  CHAT_NOPWNAGE_CAPTCHA        = CHAT_NOPWNAGE + ".captcha";
 
     /*
      * 888'Y88 ,e,          888       d8   
@@ -171,4 +172,5 @@ public class Permissions {
     public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
     public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
+
 }

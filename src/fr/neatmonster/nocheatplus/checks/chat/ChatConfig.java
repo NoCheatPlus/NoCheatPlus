@@ -85,6 +85,7 @@ public class ChatConfig implements CheckConfig {
     public final String       noPwnageCaptchaQuestion;
     public final String       noPwnageCaptchaSuccess;
     public final int          noPwnageCaptchaTries;
+    public final ActionList   noPwnageCaptchaActions;
 
     public final boolean      noPwnageFirstCheck;
     public final long         noPwnageFirstTimeout;
@@ -151,6 +152,7 @@ public class ChatConfig implements CheckConfig {
         noPwnageCaptchaQuestion = data.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_QUESTION);
         noPwnageCaptchaSuccess = data.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS);
         noPwnageCaptchaTries = data.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES);
+        noPwnageCaptchaActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, Permissions.CHAT_NOPWNAGE_CAPTCHA);
 
         noPwnageFirstCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK);
         noPwnageFirstTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT);

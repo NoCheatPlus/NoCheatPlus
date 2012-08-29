@@ -157,6 +157,7 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_CAPTCHA_QUESTION           = CHAT_NOPWNAGE_CAPTCHA + "question";
     public static final String  CHAT_NOPWNAGE_CAPTCHA_SUCCESS            = CHAT_NOPWNAGE_CAPTCHA + "success";
     public static final String  CHAT_NOPWNAGE_CAPTCHA_TRIES              = CHAT_NOPWNAGE_CAPTCHA + "tries";
+    public static final String  CHAT_NOPWNAGE_CAPTCHA_ACTIONS            = CHAT_NOPWNAGE_CAPTCHA + "actions";
 
     private static final String CHAT_NOPWNAGE_FIRST                      = CHAT_NOPWNAGE + "first.";
     public static final String  CHAT_NOPWNAGE_FIRST_CHECK                = CHAT_NOPWNAGE_FIRST + "active";

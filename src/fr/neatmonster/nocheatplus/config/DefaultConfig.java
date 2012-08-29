@@ -142,6 +142,7 @@ public class DefaultConfig extends ConfigFile {
                 "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 3);
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kick");
 
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);
@@ -182,7 +183,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE,
                 "&cOur system has detected unusual bot activities coming from you. Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
 
-        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:ban cmd:ban-ip");
+        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:ban cmd:ban-ip cmd:kick");
 
         /*
          * 888'Y88 ,e,          888       d8   
