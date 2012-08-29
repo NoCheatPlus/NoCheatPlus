@@ -151,7 +151,7 @@ public class ExecutionHistory {
      *            the action
      * @param time
      *            a time IN SECONDS
-     * @return true, if successful
+     * @return true, if the action is to be executed.
      */
     public boolean executeAction(final ViolationData violationData, final Action action, final long time) {
         final String check = violationData.check.getType().getName();
