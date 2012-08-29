@@ -47,6 +47,7 @@ public class ChatData implements CheckData {
     }
 
     // Violation levels.
+    public double  captchaVL;
     public double  colorVL;
     public double  noPwnageVL;
 
@@ -68,6 +69,8 @@ public class ChatData implements CheckData {
      */
     public synchronized void clearNoPwnageData() {
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
+        captchaVL = 0D;
+        // colorVL, noPwnageVL <- are spared to avoid problems with spam + captcha success.
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
     }

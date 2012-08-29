@@ -141,7 +141,7 @@ public class DefaultConfig extends ConfigFile {
                 "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 3);
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha");
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha VL>4 cancel cmd:kickcaptcha log:captcha:2:5:icf");
 
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);
@@ -305,6 +305,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".captcha", "[player] failed captcha repeatedly" + end);
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);

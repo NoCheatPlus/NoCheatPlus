@@ -171,12 +171,15 @@ public class NoPwnage extends Check {
             } else {
             	// Increment his tries number counter.
                 data.noPwnageCaptchTries++;
-                
+                data.captchaVL ++;
                 // Does he failed too much times?
                 if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
                     // Find out if we need to kick the player or not.
-                    cancel = executeActionsThreadSafe(player, data.noPwnageCaptchTries, 1, cc.noPwnageCaptchaActions, 
+                    cancel = executeActionsThreadSafe(player, data.captchaVL, 1, cc.noPwnageCaptchaActions, 
                     		isMainThread);
+                    // reset in case of reconnection allowed.
+                    if (!player.isOnline()) 
+                    	data.noPwnageCaptchTries = 0;
                 }
 
                 // Display the question again (if not kicked).
