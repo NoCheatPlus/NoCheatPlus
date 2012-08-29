@@ -128,7 +128,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
         set(ConfPaths.CHAT_NOPWNAGE_LEVEL, 500);
-        set(ConfPaths.CHAT_NOPWNAGE_KICKMESSAGE, "You're not allowed to spam this server!");
 
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT, 5000L);
@@ -142,7 +141,7 @@ public class DefaultConfig extends ConfigFile {
                 "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 3);
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kick");
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha");
 
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);
@@ -183,7 +182,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE,
                 "&cOur system has detected unusual bot activities coming from you. Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
 
-        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:ban cmd:ban-ip cmd:kick");
+        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:kicknopwnage cmd:ban cmd:ban-ip");
 
         /*
          * 888'Y88 ,e,          888       d8   
@@ -323,6 +322,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
+        set(ConfPaths.STRINGS + ".kicknopwnage", "ncp kick [player] You're not allowed to spam this server!");
+        set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
