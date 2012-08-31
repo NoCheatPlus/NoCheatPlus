@@ -336,9 +336,13 @@ public class MovingListener implements Listener {
 
         Location newTo = null;
 
-        if ((player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight()) && creativeFly.isEnabled(player))
-            // If the player is handled by the creative fly check, execute it.
-            newTo = creativeFly.check(player, data.from, data.to);
+        if ((player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight())){
+        	// If the player is handled by the creative fly check, execute it.
+        	if (creativeFly.isEnabled(player))
+        		newTo = creativeFly.check(player, data.from, data.to);
+        	else 
+        		data.clearFlyData();
+        }   
         else if (survivalFly.isEnabled(player)) {
             // If he is handled by the survival fly check, execute it.
             newTo = survivalFly.check(player, data.from, data.to);
