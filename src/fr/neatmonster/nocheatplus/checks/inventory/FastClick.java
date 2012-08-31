@@ -34,16 +34,19 @@ public class FastClick extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
+    	// Take time once.
+    	final long time = System.currentTimeMillis();
+    	
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;
 
         // If the last inventory click has been made within 45 milliseconds.
-        if (System.currentTimeMillis() - data.fastClickLastTime < 45L) {
+        if (time - data.fastClickLastTime < 45L) {
             if (data.fastClickLastCancelled) {
 
                 // Calculate the difference between the limit and the time elapsed.
-                final double difference = 45L - System.currentTimeMillis() + data.fastClickLastTime;
+                final double difference = 45L - time + data.fastClickLastTime;
 
                 // Increment the violation level.
                 data.fastClickVL += difference;
@@ -61,7 +64,7 @@ public class FastClick extends Check {
         }
 
         // Remember the current time.s
-        data.fastClickLastTime = System.currentTimeMillis();
+        data.fastClickLastTime = time;
 
         return cancel;
     }

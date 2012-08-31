@@ -38,6 +38,9 @@ public class InstantEat extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final int level) {
+    	// Take time once.
+    	final long time = System.currentTimeMillis();
+    	
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;
@@ -49,14 +52,14 @@ public class InstantEat extends Check {
         // Rough estimation about how long it should take to eat
         final long expectedTimeWhenEatingFinished = data.instantEatLastTime + 700L;
 
-        if (expectedTimeWhenEatingFinished < System.currentTimeMillis())
+        if (expectedTimeWhenEatingFinished < time)
             // Acceptable, reduce VL to reward the player.
             data.instantEatVL *= 0.6D;
-        else if (data.instantEatLastTime > System.currentTimeMillis())
+        else if (data.instantEatLastTime > time)
             // Security test, if time ran backwards, reset.
             data.instantEatLastTime = 0;
         else {
-            final double difference = (expectedTimeWhenEatingFinished - System.currentTimeMillis()) / 100D;
+            final double difference = (expectedTimeWhenEatingFinished - time) / 100D;
 
             // Player was too fast, increase his violation level.
             data.instantEatVL += difference;

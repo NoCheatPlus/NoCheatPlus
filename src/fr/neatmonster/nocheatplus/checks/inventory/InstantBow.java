@@ -36,6 +36,9 @@ public class InstantBow extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final float force) {
+    	// Take time once.
+    	final long time = System.currentTimeMillis();
+    	
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;
@@ -43,14 +46,14 @@ public class InstantBow extends Check {
         // Rough estimation of how long pulling the string should've taken.
         final long expectedTimeWhenStringDrawn = data.instantBowLastTime + (int) (force * force * 700F);
 
-        if (expectedTimeWhenStringDrawn < System.currentTimeMillis())
+        if (expectedTimeWhenStringDrawn < time)
             // The player was slow enough, reward him by lowering his violation level.
             data.instantBowVL *= 0.9D;
-        else if (data.instantBowLastTime > System.currentTimeMillis())
+        else if (data.instantBowLastTime > time)
             // Security check if time ran backwards, reset
             data.instantBowLastTime = 0L;
         else {
-            final double difference = (expectedTimeWhenStringDrawn - System.currentTimeMillis()) / 100D;
+            final double difference = (expectedTimeWhenStringDrawn - time) / 100D;
 
             // Player was too fast, increase his violation level.
             data.instantBowVL += difference;

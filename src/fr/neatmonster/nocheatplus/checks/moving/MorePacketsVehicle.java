@@ -58,14 +58,15 @@ public class MorePacketsVehicle extends Check {
      * @return the location
      */
     public Location check(final Player player, final Location from, final Location to) {
+    	// Take time once, first:
+    	final long time = System.currentTimeMillis();
+    	
         final MovingData data = MovingData.getData(player);
 
         Location newTo = null;
 
         if (data.morePacketsVehicleSetback == null)
             data.morePacketsVehicleSetback = from;
-
-        final long time = System.currentTimeMillis();
 
         // Take a packet from the buffer.
         data.morePacketsVehicleBuffer--;

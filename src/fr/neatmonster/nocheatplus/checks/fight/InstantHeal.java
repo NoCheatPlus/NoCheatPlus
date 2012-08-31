@@ -35,17 +35,20 @@ public class InstantHeal extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
+    	// Take time once.
+    	final long time = System.currentTimeMillis();
+    	
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
 
         // Security check if system time ran backwards.
-        if (data.instantHealLastTime > System.currentTimeMillis()) {
+        if (data.instantHealLastTime > time) {
             data.instantHealLastTime = 0L;
             return false;
         }
 
-        final long delta = System.currentTimeMillis() - (data.instantHealLastTime + 3000L);
+        final long delta = time - (data.instantHealLastTime + 3000L);
         data.instantHealBuffer += delta;
 
         if (data.instantHealBuffer < 0) {
@@ -69,7 +72,7 @@ public class InstantHeal extends Check {
 
         if (!cancel)
             // New reference time.
-            data.instantHealLastTime = System.currentTimeMillis();
+            data.instantHealLastTime = time;
 
         return cancel;
     }

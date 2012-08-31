@@ -35,20 +35,23 @@ public class Drop extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player) {
+    	// Take time once.
+    	final long time = System.currentTimeMillis();
+    	
         final InventoryConfig cc = InventoryConfig.getConfig(player);
         final InventoryData data = InventoryData.getData(player);
 
         boolean cancel = false;
 
         // Has the configured time passed? If so, reset the counter.
-        if (data.dropLastTime + cc.dropTimeFrame <= System.currentTimeMillis()) {
-            data.dropLastTime = System.currentTimeMillis();
+        if (data.dropLastTime + cc.dropTimeFrame <= time) {
+            data.dropLastTime = time;
             data.dropCount = 0;
             data.dropVL = 0D;
         }
 
         // Security check, if the system time changes.
-        else if (data.dropLastTime > System.currentTimeMillis())
+        else if (data.dropLastTime > time)
             data.dropLastTime = Integer.MIN_VALUE;
 
         data.dropCount++;

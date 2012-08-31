@@ -59,14 +59,15 @@ public class MorePackets extends Check {
      * @return the location
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to) {
+    	// Take time once, first:
+    	final long time = System.currentTimeMillis();
+    	
         final MovingData data = MovingData.getData(player);
 
         Location newTo = null;
 
         if (data.morePacketsSetback == null)
             data.morePacketsSetback = from.getLocation();
-
-        final long time = System.currentTimeMillis();
 
         // Take a packet from the buffer.
         data.morePacketsBuffer--;
