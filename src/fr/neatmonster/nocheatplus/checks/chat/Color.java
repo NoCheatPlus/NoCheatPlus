@@ -59,7 +59,7 @@ public class Color extends Check {
                 // Find out if we need to remove the colors or not.
                 if (executeActionsThreadSafe(player, data.colorVL, 1D, cc.colorActions, isMainThread))
                     // Remove color codes.
-                    message.replaceAll("\302\247.", "").replaceAll("\247.", "");
+                    return message.replaceAll("\302\247.", "").replaceAll("\247.", "");
             }
         }
 
