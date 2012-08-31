@@ -47,6 +47,11 @@ public class NoFall extends Check {
     public void check(final Player player, final PlayerLocation from, final PlayerLocation to) {
         final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
+        
+        if (from.getY() > to.getY()){
+        	if (from.getyOnGround() != cc.noFallyOnGround) from.setyOnGround(cc.noFallyOnGround);
+        	if (to.getyOnGround() != cc.noFallyOnGround) to.setyOnGround(cc.noFallyOnGround);
+        }
 
         data.noFallWasOnGround = data.noFallOnGround;
         data.noFallOnGround = to.isOnGround();

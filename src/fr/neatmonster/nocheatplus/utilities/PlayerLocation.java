@@ -66,6 +66,9 @@ public class PlayerLocation {
 
     /** The bounding box of the player. */
     private AxisAlignedBB           boundingBox;
+    
+    /** Y parameter for growing the bounding box with the isOnGround check.*/
+    private double yOnGround = 0.001;
 
     /** The entity player. */
     private EntityPlayer            entity;
@@ -208,7 +211,7 @@ public class PlayerLocation {
     public boolean isOnGround() {
         if (onGround == null) {
             AxisAlignedBB boundingBoxGround = boundingBox.clone();
-            boundingBoxGround = boundingBoxGround.d(0D, -0.001D, 0D);
+            boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
             onGround = world.getCubes(entity, boundingBoxGround).size() > 0;
         }
         return onGround;
@@ -238,6 +241,18 @@ public class PlayerLocation {
             onLadder = world.getTypeId(x, y, z) == Block.LADDER.id || world.getTypeId(x, y, z) == Block.VINE.id;
         return onLadder;
     }
+    
+    /**
+     * Sets the player location object.
+     * 
+     * @param location
+     *            the location
+     * @param player
+     *            the player
+     */
+    public void set(final Location location, final Player player){
+    	set(location, player, 0.001);
+    }
 
     /**
      * Sets the player location object.
@@ -247,7 +262,7 @@ public class PlayerLocation {
      * @param player
      *            the player
      */
-    public void set(final Location location, final Player player) {
+    public void set(final Location location, final Player player, final double yFreedom) {
         this.location = location;
 
         entity = ((CraftPlayer) player).getHandle();
@@ -259,5 +274,16 @@ public class PlayerLocation {
         world = ((CraftWorld) location.getWorld()).getHandle();
 
         aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = null;
+        
+        this.setyOnGround(yFreedom);
     }
+
+	public double getyOnGround() {
+		return yOnGround;
+	}
+
+	public void setyOnGround(final double yOnGround) {
+		this.yOnGround = yOnGround;
+		this.onGround = null;
+	}
 }

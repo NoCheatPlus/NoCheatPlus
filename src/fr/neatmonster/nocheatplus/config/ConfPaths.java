@@ -328,6 +328,10 @@ public abstract class ConfPaths {
     public static final String  MOVING_SURVIVALFLY_SWIMMINGSPEED         = MOVING_SURVIVALFLY + "swimmingspeed";
     public static final String  MOVING_SURVIVALFLY_WALKINGSPEED          = MOVING_SURVIVALFLY + "walkingspeed";
     public static final String  MOVING_SURVIVALFLY_ACTIONS               = MOVING_SURVIVALFLY + "actions";
+    
+    // Special (to be sorted in or factored out).
+    public static final String  MOVING_NOFALL_YONGROUND                  = MOVING_NOFALL + "yonground";
+    public static final String  MOVING_YONGROUND                         = MOVING + "yonground";
 
     /*
      *  dP"8   d8          ,e,                        
@@ -339,4 +343,5 @@ public abstract class ConfPaths {
      *                                  "8",P"        
      */
     public static final String  STRINGS                                  = "strings";
+    
 }

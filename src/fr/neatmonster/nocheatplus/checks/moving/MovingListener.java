@@ -308,7 +308,9 @@ public class MovingListener implements Listener {
 
         // Don't care for movements to another world (such that it is very likely the event data was modified by another
         // plugin before we got it) or if the player is inside a vehicle.
-        if (!event.getFrom().getWorld().equals(event.getTo().getWorld()) || player.isInsideVehicle())
+        final Location from = event.getFrom();
+        final Location to = event.getTo();
+        if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle())
             return;
 
         final MovingData data = MovingData.getData(player);
@@ -328,11 +330,12 @@ public class MovingListener implements Listener {
         } else if (data.verticalFreedom > 0.001D)
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
-
-        data.from.set(event.getFrom(), player);
+        
+        final double yOnGround = MovingConfig.getConfig(player).yOnGround;
+        data.from.set(from, player, yOnGround);
         if (data.from.isOnGround())
             data.ground = data.from.getLocation();
-        data.to.set(event.getTo(), player);
+        data.to.set(to, player, yOnGround);
 
         Location newTo = null;
 
@@ -344,6 +347,7 @@ public class MovingListener implements Listener {
             newTo = survivalFly.check(player, data.from, data.to);
             // If don't have a new location and if he is handled by the no fall check, execute it.
             if (newTo == null && noFall.isEnabled(player))
+            	// NOTE: noFall might set yOnGround for the positions.
                 noFall.check(player, data.from, data.to);
         } else
             // He isn't handled by any fly check, clear his data.

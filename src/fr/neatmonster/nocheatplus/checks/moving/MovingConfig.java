@@ -83,6 +83,11 @@ public class MovingConfig implements CheckConfig {
     public final int        survivalFlySwimmingSpeed;
     public final int        survivalFlyWalkingSpeed;
     public final ActionList survivalFlyActions;
+    
+    public final double noFallyOnGround;
+    public final double yOnGround;
+
+	
 
     /**
      * Instantiates a new moving configuration.
@@ -115,6 +120,15 @@ public class MovingConfig implements CheckConfig {
         survivalFlySwimmingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
+        
+        yOnGround = readyOnGround(data, ConfPaths.MOVING_YONGROUND, 0.001);
+        noFallyOnGround = readyOnGround(data, ConfPaths.MOVING_NOFALL_YONGROUND, 0.3);
+    }
+    
+    private final double readyOnGround(final ConfigFile data, final String path, final double preset){
+    	final double yOnGround = data.getDouble(path, preset);
+        if (yOnGround < 0 || yOnGround > 2.0) return 2.0;
+        else return yOnGround;
     }
 
     /* (non-Javadoc)
