@@ -141,7 +141,7 @@ public class DefaultConfig extends ConfigFile {
                 "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 3);
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 cancel cmd:kickcaptcha log:captcha:2:5:icf");
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:icf cancel cmd:kickcaptcha");
 
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);
