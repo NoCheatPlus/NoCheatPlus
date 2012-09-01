@@ -63,7 +63,7 @@ public class ChatListener implements Listener {
         // Then the no pwnage check.
         if (noPwnage.check(player, event.getMessage(), false))
         	event.setCancelled(true);
-        else if (globalChat.check(player, event.getMessage(), (ICaptcha) noPwnage))
+        else if (globalChat.check(player, event.getMessage(), (ICaptcha) noPwnage, false))
         	// Only check those that got through.
         	// (ICaptcha to start captcha if desired.)
         	event.setCancelled(true);
@@ -93,10 +93,12 @@ public class ChatListener implements Listener {
          *                |_|                                
          */
         final Player player = event.getPlayer();
-        final String command = event.getMessage().split(" ")[0].substring(1).toLowerCase();
+        final String command = event.getMessage().trim().split(" ")[0].substring(1).toLowerCase();
 
+        final ChatConfig cc = ChatConfig.getConfig(player);
+        
         // Protect some commands to prevent players for seeing which plugins are installed.
-        if (ChatConfig.getConfig(player).protectPlugins)
+        if (cc.protectPlugins)
             if ((command.equalsIgnoreCase("plugins") || command.equalsIgnoreCase("pl")
                     || command.equalsIgnoreCase("version") || command.equalsIgnoreCase("ver"))
                     && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
@@ -108,7 +110,7 @@ public class ChatListener implements Listener {
             }
 
         // Prevent /op and /deop commands from being used in chat.
-        if (ChatConfig.getConfig(player).opInConsoleOnly && (command.equals("op") || command.equals("deop"))) {
+        if (cc.opInConsoleOnly && (command.equals("op") || command.equals("deop"))) {
             event.getPlayer().sendMessage(
                     ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
             event.setCancelled(true);
@@ -120,6 +122,8 @@ public class ChatListener implements Listener {
 
         // Then the no pwnage check.
         if (noPwnage.check(player, event.getMessage(), true))
+        	event.setCancelled(true);
+        else if ((cc.globalChatCommands.contains(command) || cc.globalChatCommands.contains("/"+command)) && globalChat.check(player, event.getMessage(), noPwnage, true))
         	event.setCancelled(true);
     }
 

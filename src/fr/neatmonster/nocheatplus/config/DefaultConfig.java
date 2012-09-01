@@ -1,6 +1,8 @@
 package fr.neatmonster.nocheatplus.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 
 /*
  * M""""""'YMM          .8888b                   dP   dP   MM'""""'YMM                   .8888b oo          
@@ -126,6 +128,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
         
         set(ConfPaths.CHAT_GLOBALCHAT_CHECK, true);
+        set(ConfPaths.CHAT_GLOBALCHAT_COMMANDS, new LinkedList<String>(Arrays.asList(
+        			new String[]{"/me"})));
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.8D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6.0D);
         set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 30D);

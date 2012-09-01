@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
-import fr.neatmonster.nocheatplus.players.Permissions;
 
 /**
  * Some alternative more or less advanced analysis methods.
@@ -28,18 +27,18 @@ public class GlobalChat extends Check{
 	 * 			Used for starting captcha on failure, if configured so.
 	 * @return
 	 */
-	public boolean check(final Player player, final String message, final ICaptcha captcha) {
+	public boolean check(final Player player, final String message, final ICaptcha captcha, boolean isMainThread) {
 		
 		final ChatConfig cc = ChatConfig.getConfig(player);
 		
-		// Checking the player, actually.
-		if (!cc.isEnabled(type) || NCPExemptionManager.isExempted(player, type))
+		if (isMainThread && !isEnabled(player)) return false;
+		if (!isMainThread && (!cc.isEnabled(type) || NCPExemptionManager.isExempted(player, type)))
 			return false;
-		
+
 		final ChatData data = ChatData.getData(player);
 		
 		synchronized (data) {
-			return unsafeCheck(player, message, captcha, cc, data);
+			return unsafeCheck(player, message, captcha, cc, data, isMainThread);
 		}	
 	}
 
@@ -50,10 +49,11 @@ public class GlobalChat extends Check{
 	 * @param captcha
 	 * @param cc
 	 * @param data
+	 * @param isMainThread 
 	 * @return
 	 */
 	private boolean unsafeCheck(final Player player, final String message, final ICaptcha captcha,
-			final ChatConfig cc, final ChatData data) {
+			final ChatConfig cc, final ChatData data, boolean isMainThread) {
 		// Take time once:
 		final long time = System.currentTimeMillis();
 				
@@ -68,6 +68,23 @@ public class GlobalChat extends Check{
 		
 		// Weight of this chat message.
 		float weight = 1.0f;
+		
+		final MessageLetterCount letterCounts = new MessageLetterCount(message);
+		
+		final int length = message.length();
+		// Upper case.
+		if (length > 8 && letterCounts.fullCount.upperCase > length / 4){
+			weight += 0.6 * letterCounts.fullCount.getUpperCaseRatio();
+		}
+		
+		// ? for words individually ?
+		
+		// Repetition of characters.
+		if (length > 4){
+			final float fullRep = letterCounts.fullCount.getLetterRatio();
+			score += (float) length / 15.0 * Math.abs(0.5 - fullRep); // Very small and very big are bad !
+		}
+	
 		// TODO Core checks....
 		
 		// Add weight to frequency counts.
@@ -81,12 +98,13 @@ public class GlobalChat extends Check{
 			}
 			else{
 				data.globalChatVL += score / 10.0;
-				if (executeActionsThreadSafe(player, data.globalChatVL, score, cc.globalChatActions, Permissions.CHAT_GLOBALCHAT))
+				if (executeActionsThreadSafe(player, data.globalChatVL, score, cc.globalChatActions, isMainThread))
 					cancel = true;
 			}
 		}
 		else
 			data.globalChatVL *= 0.95;
+		
 		
 		return cancel;
 	}
