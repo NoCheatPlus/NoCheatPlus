@@ -2,8 +2,7 @@ package fr.neatmonster.nocheatplus.utilities;
 
 /**
  * Keep track of frequency of some action, 
- * sort into buckets, representing time intervals, 
- * TODO: find a better name.
+ * put weights into buckets, which represent intervals of time. 
  * @author mc_dev
  *
  */
@@ -12,11 +11,16 @@ public class ActionFrequency {
 	/** Reference time for filling in. */
 	long time = 0;
 	
+	/**
+	 * Buckets to fill weights in, each represents an interval of durBucket duration, 
+	 * index 0 is the latest, highest index is the oldest. 
+	 * Weights will get filled into the next buckets with time passed. 
+	 */
 	final float[] buckets;
 
 	final long durBucket;
 	
-	public ActionFrequency(final int nBuckets, final long durBucket){
+ 	public ActionFrequency(final int nBuckets, final long durBucket){
 		this.buckets = new float[nBuckets];
 		this.durBucket = durBucket;
 	}
@@ -38,11 +42,11 @@ public class ActionFrequency {
 		final long diff = now - time;
 		final int shift = (int) ((float) diff / (float) durBucket);
 		if (shift == 0){
-			// No update, just fill in.
+			// No update.
 			return; 
 		}
 		else if (shift >= buckets.length){
-			// Clear and fill in (beyond range).
+			// Clear (beyond range).
 			clear(now);
 			return;
 		}
