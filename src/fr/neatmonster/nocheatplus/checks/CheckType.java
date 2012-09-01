@@ -54,6 +54,7 @@ public enum CheckType {
     CHAT(ChatConfig.factory, ChatData.factory),
     CHAT_COLOR(CHAT, Permissions.CHAT_COLOR),
     CHAT_NOPWNAGE(CHAT, Permissions.CHAT_NOPWNAGE),
+    CHAT_GLOBALCHAT(CHAT, Permissions.CHAT_GLOBALCHAT),
 
     FIGHT(FightConfig.factory, FightData.factory),
     FIGHT_ANGLE(FIGHT, Permissions.FIGHT_ANGLE),

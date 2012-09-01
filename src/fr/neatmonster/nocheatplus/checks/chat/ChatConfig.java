@@ -69,6 +69,12 @@ public class ChatConfig implements CheckConfig {
 
     public final boolean      colorCheck;
     public final ActionList   colorActions;
+    
+    public final boolean      globalChatCheck;
+	public double             globalChatFrequencyFactor;
+	public final double       globalChatFrequencyWeight;
+	public final double       globalChatLevel;
+    public final ActionList   globalChatActions;
 
     public final boolean      noPwnageCheck;
     public final List<String> noPwnageExclusions;
@@ -135,6 +141,12 @@ public class ChatConfig implements CheckConfig {
     public ChatConfig(final ConfigFile data) {
         colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
+        
+        globalChatCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
+        globalChatFrequencyFactor = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
+        globalChatFrequencyWeight = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
+    	globalChatLevel = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_LEVEL);
+        globalChatActions = data.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
 
         noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
         noPwnageExclusions = data.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS);
@@ -201,6 +213,8 @@ public class ChatConfig implements CheckConfig {
         switch (checkType) {
         case CHAT_COLOR:
             return colorCheck;
+        case CHAT_GLOBALCHAT:
+        	return globalChatCheck;
         case CHAT_NOPWNAGE:
             return noPwnageCheck;
         default:

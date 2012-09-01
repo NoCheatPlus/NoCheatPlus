@@ -81,6 +81,7 @@ public class Permissions {
      */
     private static final String CHAT                         = CHECKS + ".chat";
     public static final String  CHAT_COLOR                   = CHAT + ".color";
+    public static final String  CHAT_GLOBALCHAT              = CHAT + ".globalchat";
     public static final String  CHAT_NOPWNAGE                = CHAT + ".nopwnage";
     public static final String  CHAT_NOPWNAGE_CAPTCHA        = CHAT_NOPWNAGE + ".captcha";
 

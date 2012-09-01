@@ -138,6 +138,14 @@ public abstract class ConfPaths {
     private static final String CHAT_COLOR                               = CHAT + "color.";
     public static final String  CHAT_COLOR_CHECK                         = CHAT_COLOR + "active";
     public static final String  CHAT_COLOR_ACTIONS                       = CHAT_COLOR + "actions";
+    
+    public static final String CHAT_GLOBALCHAT                           = CHAT + "globalchat.";
+    public static final String CHAT_GLOBALCHAT_CHECK                     = CHAT_GLOBALCHAT + "active";
+    public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
+	public static final String CHAT_GLOBALCHAT_FREQUENCY_WEIGHT          = CHAT_GLOBALCHAT_FREQUENCY + "weight";
+	public static final String CHAT_GLOBALCHAT_FREQUENCY_FACTOR          = CHAT_GLOBALCHAT_FREQUENCY + "factor";
+	public static final String CHAT_GLOBALCHAT_LEVEL                     = CHAT_GLOBALCHAT + "level";
+    public static final String CHAT_GLOBALCHAT_ACTIONS                   = CHAT_GLOBALCHAT + "actions";
 
     private static final String CHAT_NOPWNAGE                            = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                      = CHAT_NOPWNAGE + "active";

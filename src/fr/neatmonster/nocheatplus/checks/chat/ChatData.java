@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*
  * MM'""""'YMM dP                  dP   M""""""'YMM            dP            
@@ -49,7 +50,11 @@ public class ChatData implements CheckData {
     // Violation levels.
     public double  captchaVL;
     public double  colorVL;
+    public double  globalChatVL;
     public double  noPwnageVL;
+    
+    // Data of the globalchat check.
+    public final ActionFrequency globalChatFrequency = new ActionFrequency(10, 3000);
 
     // Data of the no pwnage check.
     public int     noPwnageCaptchTries;

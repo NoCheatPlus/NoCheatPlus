@@ -34,6 +34,9 @@ public class ChatListener implements Listener {
 
     /** The no pwnage check. */
     private final NoPwnage noPwnage = new NoPwnage();
+    
+    /** Global chat check (experiment: alternative / supplement). */
+    private final GlobalChat globalChat = new GlobalChat();
 
     /**
      * We listen to PlayerChat events for obvious reasons.
@@ -60,7 +63,10 @@ public class ChatListener implements Listener {
         // Then the no pwnage check.
         if (noPwnage.check(player, event.getMessage(), false))
         	event.setCancelled(true);
-//            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
+        else if (globalChat.check(player, event.getMessage(), (ICaptcha) noPwnage))
+        	// Only check those that got through.
+        	// (ICaptcha to start captcha if desired.)
+        	event.setCancelled(true);
     }
 
     /**
@@ -115,7 +121,6 @@ public class ChatListener implements Listener {
         // Then the no pwnage check.
         if (noPwnage.check(player, event.getMessage(), true))
         	event.setCancelled(true);
-//            player.kickPlayer(CheckUtils.removeColors(ChatConfig.getConfig(player).noPwnageKickMessage));
     }
 
     /**

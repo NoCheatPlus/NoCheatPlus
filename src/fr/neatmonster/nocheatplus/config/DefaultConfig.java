@@ -124,6 +124,12 @@ public class DefaultConfig extends ConfigFile {
          */
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
+        
+        set(ConfPaths.CHAT_GLOBALCHAT_CHECK, true);
+        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.8D);
+        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6.0D);
+        set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 30D);
+        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:if cancel");
 
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
@@ -318,6 +324,7 @@ public class DefaultConfig extends ConfigFile {
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [limit] times per second" + end);
+        set(ConfPaths.STRINGS + ".globalchat", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow to fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
