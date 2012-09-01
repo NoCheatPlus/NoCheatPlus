@@ -196,7 +196,6 @@ public class NoPwnage extends Check implements ICaptcha{
                 if (cc.noPwnageWarnOthersCheck)
                     Bukkit.broadcastMessage(CheckUtils.replaceColors(cc.noPwnageWarnOthersMessage.replace("[player]",
                             player.getName())));
-                cancel = true;
 
                 // Increment the violation level.
                 data.noPwnageVL += suspicion / 10D;
