@@ -26,8 +26,6 @@ public class GlobalChat extends Check{
 	 * @return
 	 */
 	public boolean check(final Player player, final String message, final ICaptcha captcha) {
-		// Take time once:
-		final long time = System.currentTimeMillis();
 		
 		final ChatConfig cc = ChatConfig.getConfig(player);
 		
@@ -36,7 +34,17 @@ public class GlobalChat extends Check{
 			return false;
 		
 		final ChatData data = ChatData.getData(player);
-	
+		
+		synchronized (data) {
+			return unsafeCheck(player, message, captcha, cc, data);
+		}	
+	}
+
+	private boolean unsafeCheck(final Player player, final String message, final ICaptcha captcha,
+			final ChatConfig cc, final ChatData data) {
+		// Take time once:
+		final long time = System.currentTimeMillis();
+				
 		boolean cancel = false;
 		
 		data.globalChatFrequency.add(time);
