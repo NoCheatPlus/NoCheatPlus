@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
-import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
@@ -99,31 +98,6 @@ public class NoPwnage extends Check {
         }
     }
 
-    /**
-     * Execute actions from another thread (not the main thread).<br>
-     * This does not use extra synchronization.
-     * 
-     * @param player
-     *            the player
-     * @param VL
-     *            the vL
-     * @param actions
-     *            the actions
-     * @param isMainThread
-     *            if the thread the main thread
-     * @return true, if successful
-     */
-    public final boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
-            final ActionList actions, final boolean isMainThread) {
-        final boolean cancel;
-        if (isMainThread)
-            cancel = super.executeActions(player, VL, VLAdded, actions);
-        else
-            // Permission check is done in the main thread.
-            cancel = super.executeActionsThreadSafe(player, VL, VLAdded, actions, type.getPermission());
-        return cancel;
-    }
-
     /* (non-Javadoc)
      * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
      */
@@ -161,34 +135,9 @@ public class NoPwnage extends Check {
 
         final long now = System.currentTimeMillis();
 
-        if (cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha) {
-            // Correct answer to the captcha?
-            if (message.equals(data.noPwnageGeneratedCaptcha)) {
-                // Yes, clear his data and do not worry anymore about him.
-                data.clearNoPwnageData();
-                data.noPwnageHasStartedCaptcha = false;
-                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaSuccess));
-            } else {
-            	// Increment his tries number counter.
-                data.noPwnageCaptchTries++;
-                data.captchaVL ++;
-                // Does he failed too much times?
-                if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
-                    // Find out if we need to kick the player or not.
-                    cancel = executeActionsThreadSafe(player, data.captchaVL, 1, cc.noPwnageCaptchaActions, 
-                    		isMainThread);
-                    // reset in case of reconnection allowed.
-                    if (!player.isOnline()) 
-                    	data.noPwnageCaptchTries = 0;
-                }
-
-                // Display the question again (if not kicked).
-                if (player.isOnline())
-                	player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
-                			data.noPwnageGeneratedCaptcha)));
-            }
-
-            // Cancel the message and maybe event.
+        if (shouldCheckCaptcha(cc, data)) {
+            checkCaptcha(player, message, cc, data, isMainThread);
+            // Cancel the event.
             return true;
         }
 
@@ -238,15 +187,8 @@ public class NoPwnage extends Check {
             player.sendMessage(CheckUtils.replaceColors(cc.noPwnageWarnPlayerMessage));
             data.noPwnageLastWarningTime = now;
         } else if (suspicion > cc.noPwnageLevel)
-            if (cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha) {
-                // Display a captcha to the player.
-                data.noPwnageGeneratedCaptcha = "";
-                for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
-                    data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
-                            .nextInt(cc.noPwnageCaptchaCharacters.length()));
-                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
-                        data.noPwnageGeneratedCaptcha)));
-                data.noPwnageHasStartedCaptcha = true;
+            if (shouldStartCaptcha(cc, data)) {
+                sendNewCaptcha(player, cc, data);
                 cancel = true;
             } else {
                 lastBanCausingMessage = message;
@@ -277,6 +219,64 @@ public class NoPwnage extends Check {
     }
 
     /**
+     * Check if the captcha has been entered correctly.
+     * @param player
+     * @param message
+     * @param cc
+     * @param data
+     * @param isMainThread
+     */
+    private void checkCaptcha(Player player, String message, ChatConfig cc, ChatData data, boolean isMainThread) {
+    	// Correct answer to the captcha?
+        if (message.equals(data.noPwnageGeneratedCaptcha)) {
+            // Yes, clear his data and do not worry anymore about him.
+            data.clearNoPwnageData();
+            data.noPwnageHasStartedCaptcha = false;
+            player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaSuccess));
+        } else {
+        	// Increment his tries number counter.
+            data.noPwnageCaptchTries++;
+            data.captchaVL ++;
+            // Does he failed too much times?
+            if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
+                // Find out if we need to kick the player or not.
+                executeActionsThreadSafe(player, data.captchaVL, 1, cc.noPwnageCaptchaActions, 
+                		isMainThread);
+                // reset in case of reconnection allowed.
+                if (!player.isOnline()) 
+                	data.noPwnageCaptchTries = 0;
+            }
+
+            // Display the question again (if not kicked).
+            if (player.isOnline())
+            	sendCaptcha(player, cc, data);
+        }
+	}
+
+	private void sendNewCaptcha(Player player, ChatConfig cc, ChatData data) {
+    	// Display a captcha to the player.
+        data.noPwnageGeneratedCaptcha = "";
+        for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
+            data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
+                    .nextInt(cc.noPwnageCaptchaCharacters.length()));
+        sendCaptcha(player, cc, data);
+        data.noPwnageHasStartedCaptcha = true;
+	}
+
+	private void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
+		player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
+                data.noPwnageGeneratedCaptcha)));
+	}
+
+	private boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
+		return cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha;
+	}
+
+	private boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
+		return cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha;
+	}
+
+	/**
      * Check (Join), only call from synchronized code.
      * 
      * @param player

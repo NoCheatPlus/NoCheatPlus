@@ -2,7 +2,6 @@ package fr.neatmonster.nocheatplus.checks.chat;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -66,24 +65,4 @@ public class Color extends Check {
         return message;
     }
 
-    /**
-     * Execute actions thread safe.
-     * 
-     * @param player
-     *            the player
-     * @param VL
-     *            the vL
-     * @param actions
-     *            the actions
-     * @param isMainThread
-     *            is the thread the main thread
-     * @return true, if successful
-     */
-    private boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
-            final ActionList actions, final boolean isMainThread) {
-        if (isMainThread)
-            return super.executeActions(player, VL, VLAdded, actions);
-        else
-            return super.executeActionsThreadSafe(player, VL, VLAdded, actions, type.getPermission());
-    }
 }

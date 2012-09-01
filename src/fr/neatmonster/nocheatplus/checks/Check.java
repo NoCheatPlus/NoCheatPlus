@@ -112,6 +112,31 @@ public abstract class Check {
         }
         return false;
     }
+    
+    /**
+     * Execute actions, possibly thread safe according to the isMainThread flag.<br>
+     * This does not use extra synchronization.
+     * 
+     * @param player
+     *            the player
+     * @param VL
+     *            the vL
+     * @param actions
+     *            the actions
+     * @param isMainThread
+     *            if the thread the main thread
+     * @return true, if successful
+     */
+    public final boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
+            final ActionList actions, final boolean isMainThread) {
+        final boolean cancel;
+        if (isMainThread)
+            cancel = executeActions(player, VL, VLAdded, actions);
+        else
+            // Permission check is done in the main thread.
+            cancel = executeActionsThreadSafe(player, VL, VLAdded, actions, type.getPermission());
+        return cancel;
+    }
 
     /**
      * Execute actions in a thread safe manner.
