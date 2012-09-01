@@ -134,6 +134,9 @@ public class NoPwnage extends Check implements ICaptcha{
                 return false;
 
         final long now = System.currentTimeMillis();
+        
+        // Forget expired VL.
+        data.noPwnageVL.update(now);
 
         if (shouldCheckCaptcha(cc, data)) {
             checkCaptcha(player, message, cc, data, isMainThread);
@@ -198,15 +201,15 @@ public class NoPwnage extends Check implements ICaptcha{
                             player.getName())));
 
                 // Increment the violation level.
-                data.noPwnageVL += suspicion / 10D;
+                data.noPwnageVL.add(now, (float) (suspicion / 10D));
 
                 // Find out if we need to kick the player or not.
-                cancel = executeActionsThreadSafe(player, data.noPwnageVL, suspicion / 10D, cc.noPwnageActions,
+                cancel = executeActionsThreadSafe(player, cc.noPwnageVLFactor, suspicion / 10D, cc.noPwnageActions,
                         isMainThread);
             }
-        else
-            // Reduce the violation level.
-            data.noPwnageVL *= 0.95D;
+//        else
+//            // Reduce the violation level. <- Done automatically by queue.
+//            data.noPwnageVL *= 0.95D;
 
         // Store the message and some other data.
         data.noPwnageLastMessage = message;
@@ -300,7 +303,7 @@ public class NoPwnage extends Check implements ICaptcha{
                 data.noPwnageReloginWarnings++;
             } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
                 // Find out if we need to ban the player or not.
-                cancel = executeActionsThreadSafe(player, data.noPwnageVL, data.noPwnageVL, cc.noPwnageActions, true);
+                cancel = executeActionsThreadSafe(player, (double) data.noPwnageVL.getScore(cc.noPwnageVLFactor), 0D, cc.noPwnageActions, true);
         }
 
         // Store his joining time.

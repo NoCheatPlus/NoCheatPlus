@@ -82,6 +82,7 @@ public class ChatConfig implements CheckConfig {
     public final boolean      noPwnageCheck;
     public final List<String> noPwnageExclusions;
     public final int          noPwnageLevel;
+    public final float        noPwnageVLFactor;
 
     public final boolean      noPwnageBannedCheck;
     public final long         noPwnageBannedTimeout;
@@ -161,6 +162,8 @@ public class ChatConfig implements CheckConfig {
         noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
         noPwnageExclusions = data.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS);
         noPwnageLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
+        // VL decreasing factor, hidden option.
+        noPwnageVLFactor = (float) data.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.95);
 
         noPwnageBannedCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
         noPwnageBannedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);

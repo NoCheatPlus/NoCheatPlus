@@ -51,7 +51,7 @@ public class ChatData implements CheckData {
     public double  captchaVL;
     public double  colorVL;
     public double  globalChatVL;
-    public double  noPwnageVL;
+    public ActionFrequency  noPwnageVL = new ActionFrequency(10, 3000);
     
     // Data of the globalchat check.
     public final ActionFrequency globalChatFrequency = new ActionFrequency(10, 3000);
@@ -75,7 +75,8 @@ public class ChatData implements CheckData {
     public synchronized void clearNoPwnageData() {
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
         captchaVL = 0D;
-        // colorVL, noPwnageVL <- are spared to avoid problems with spam + captcha success.
+        // colorVL <- is spared to avoid problems with spam + captcha success.
+        // noPwnageVL <- Is handled by the ActionFrequency forgtting mechanism, currently (call clear otherwise).
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
     }
