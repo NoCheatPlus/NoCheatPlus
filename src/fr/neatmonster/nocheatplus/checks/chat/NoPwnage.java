@@ -25,7 +25,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 /**
  * The NoPwnage check will try to detect "spambots" (like the ones created by the PWN4G3 software).
  */
-public class NoPwnage extends Check {
+public class NoPwnage extends Check implements ICaptcha{
 
     /** The last message which caused ban said. */
     private String       lastBanCausingMessage;
@@ -218,15 +218,8 @@ public class NoPwnage extends Check {
         return cancel;
     }
 
-    /**
-     * Check if the captcha has been entered correctly.
-     * @param player
-     * @param message
-     * @param cc
-     * @param data
-     * @param isMainThread
-     */
-    private void checkCaptcha(Player player, String message, ChatConfig cc, ChatData data, boolean isMainThread) {
+    @Override
+    public void checkCaptcha(Player player, String message, ChatConfig cc, ChatData data, boolean isMainThread) {
     	// Correct answer to the captcha?
         if (message.equals(data.noPwnageGeneratedCaptcha)) {
             // Yes, clear his data and do not worry anymore about him.
@@ -253,7 +246,8 @@ public class NoPwnage extends Check {
         }
 	}
 
-	private void sendNewCaptcha(Player player, ChatConfig cc, ChatData data) {
+    @Override
+	public void sendNewCaptcha(Player player, ChatConfig cc, ChatData data) {
     	// Display a captcha to the player.
         data.noPwnageGeneratedCaptcha = "";
         for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
@@ -263,16 +257,19 @@ public class NoPwnage extends Check {
         data.noPwnageHasStartedCaptcha = true;
 	}
 
-	private void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
+    @Override
+	public void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
 		player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
                 data.noPwnageGeneratedCaptcha)));
 	}
 
-	private boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
+    @Override
+	public boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
 		return cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha;
 	}
 
-	private boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
+    @Override
+	public boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
 		return cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha;
 	}
 
