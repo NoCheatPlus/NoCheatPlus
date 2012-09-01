@@ -71,8 +71,8 @@ public class ChatConfig implements CheckConfig {
     public final ActionList   colorActions;
     
     public final boolean      globalChatCheck;
-	public double             globalChatFrequencyFactor;
-	public final double       globalChatFrequencyWeight;
+	public final float        globalChatFrequencyFactor;
+	public final float        globalChatFrequencyWeight;
 	public final double       globalChatLevel;
     public final ActionList   globalChatActions;
 
@@ -143,8 +143,8 @@ public class ChatConfig implements CheckConfig {
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
         globalChatCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
-        globalChatFrequencyFactor = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
-        globalChatFrequencyWeight = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
+        globalChatFrequencyFactor = (float) data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
+        globalChatFrequencyWeight = (float) data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
     	globalChatLevel = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_LEVEL);
         globalChatActions = data.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
 

@@ -19,10 +19,13 @@ public class GlobalChat extends Check{
 	}
 
 	/**
-	 * 
+	 * Start analysis.
 	 * @param player
+	 *   		The player who issued the message.
 	 * @param message
-	 * @param captcha Used for starting captcha on failure.
+	 * 			The message to check.
+	 * @param captcha 
+	 * 			Used for starting captcha on failure, if configured so.
 	 * @return
 	 */
 	public boolean check(final Player player, final String message, final ICaptcha captcha) {
@@ -40,6 +43,15 @@ public class GlobalChat extends Check{
 		}	
 	}
 
+	/**
+	 * Check without further synchronization.
+	 * @param player
+	 * @param message
+	 * @param captcha
+	 * @param cc
+	 * @param data
+	 * @return
+	 */
 	private boolean unsafeCheck(final Player player, final String message, final ICaptcha captcha,
 			final ChatConfig cc, final ChatData data) {
 		// Take time once:
@@ -47,14 +59,21 @@ public class GlobalChat extends Check{
 				
 		boolean cancel = false;
 		
-		data.globalChatFrequency.add(time);
-		double score = cc.globalChatFrequencyWeight * data.globalChatFrequency.getScore(cc.globalChatFrequencyFactor);
-		if (score < 2.0 * cc.globalChatFrequencyWeight) 
+		// Update the frequency interval weights.
+		data.globalChatFrequency.update(time);
+		double score = 0;
+		if (score < cc.globalChatFrequencyWeight)
 			// Reset the VL.
 			data.globalChatVL = 0.0;
 		
+		// Weight of this chat message.
+		float weight = 1.0f;
 		// TODO Core checks....
 		
+		// Add weight to frequency counts.
+		data.globalChatFrequency.add(time, weight);
+		score +=  cc.globalChatFrequencyWeight * data.globalChatFrequency.getScore(cc.globalChatFrequencyFactor);
+				
 		if (score > cc.globalChatLevel){
 			if (captcha.shouldStartCaptcha(cc, data)){
 				captcha.sendNewCaptcha(player, cc, data);

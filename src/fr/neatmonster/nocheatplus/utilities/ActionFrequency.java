@@ -12,12 +12,12 @@ public class ActionFrequency {
 	/** Reference time for filling in. */
 	long time = 0;
 	
-	final int[] buckets;
+	final float[] buckets;
 
 	final long durBucket;
 	
 	public ActionFrequency(final int nBuckets, final long durBucket){
-		this.buckets = new int[nBuckets];
+		this.buckets = new float[nBuckets];
 		this.durBucket = durBucket;
 	}
 	
@@ -25,8 +25,9 @@ public class ActionFrequency {
 	 * Update and add.
 	 * @param ts
 	 */
-	public void add(final long now){
+	public void add(final long now, final float amount){
 		update(now);
+		buckets[0] += amount;
 	}
 
 	/**
@@ -38,13 +39,11 @@ public class ActionFrequency {
 		final int shift = (int) ((float) diff / (float) durBucket);
 		if (shift == 0){
 			// No update, just fill in.
-			buckets[0] ++;
 			return; 
 		}
 		else if (shift >= buckets.length){
 			// Clear and fill in (beyond range).
 			clear(now);
-			buckets[0] ++;
 			return;
 		}
 		// Update buckets.
@@ -54,7 +53,6 @@ public class ActionFrequency {
 		for (int i = 0; i < shift; i++){
 			buckets[i] = 0;
 		}
-		buckets[0] ++;
 		// Set time according to bucket duration (!).
 		time += durBucket * shift;
 	}
@@ -72,9 +70,9 @@ public class ActionFrequency {
 	 * @param factor
 	 * @return
 	 */
-	public double getScore(final double factor){
-		double res = buckets[0];
-		double cf = factor;
+	public float getScore(final float factor){
+		float res = buckets[0];
+		float cf = factor;
 		for (int i = 1; i < buckets.length; i++){
 			res += cf * buckets[i];
 			cf *= factor;
