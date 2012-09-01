@@ -129,7 +129,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.8D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6.0D);
         set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 30D);
-        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:if cancel");
+        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:if cancel cmd:tellglchat");
 
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
@@ -304,6 +304,7 @@ public class DefaultConfig extends ConfigFile {
          */
         final String start = "[player] failed [check]: ";
         final String end = ". VL [violations].";
+        final String tell = "ncp tell [player] ";
         set(ConfPaths.STRINGS + ".angle", start + "tried to hit multiple entities at the same time" + end);
         set(ConfPaths.STRINGS + ".ban", "ban [player]");
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
@@ -337,6 +338,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like a spambot (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
+        set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
 
         // Update internal factory based on all the new entries to the "actions" section.
         regenerateActionLists();
