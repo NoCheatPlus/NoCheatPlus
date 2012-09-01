@@ -130,7 +130,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_CHECK, true);
         set(ConfPaths.CHAT_GLOBALCHAT_COMMANDS, new LinkedList<String>(Arrays.asList(
         			new String[]{"/me"})));
-        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.8D);
+        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6.0D);
         set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 30D);
         set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:if cancel cmd:tellglchat");
