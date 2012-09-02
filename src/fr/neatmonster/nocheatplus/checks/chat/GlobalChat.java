@@ -135,8 +135,12 @@ public class GlobalChat extends Check{
 		score += wWords;
 		
 		// Engine:
-		final float wEngine = engine.feed(letterCounts);
-		score += wEngine;
+		if (cc.globalChatEngineCheck){
+			final float wEngine = engine.feed(letterCounts);
+			score += wEngine;
+		}
+		
+//		System.out.println(score);
 		
 		// Wrapping it up. --------------------
 		// Add weight to frequency counts.

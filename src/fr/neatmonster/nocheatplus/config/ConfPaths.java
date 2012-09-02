@@ -141,6 +141,8 @@ public abstract class ConfPaths {
     
     public static final String CHAT_GLOBALCHAT                           = CHAT + "globalchat.";
     public static final String CHAT_GLOBALCHAT_CHECK                     = CHAT_GLOBALCHAT + "active";
+    public static final String CHAT_GLOBALCHAT_ENGINE                    = CHAT_GLOBALCHAT + "engine.";
+	public static final String CHAT_GLOBALCHAT_ENGINE_CHECK              = CHAT_GLOBALCHAT_ENGINE + "active";
 	public static final String CHAT_GLOBALCHAT_COMMANDS                  = CHAT_GLOBALCHAT + "commands";
     public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_WEIGHT          = CHAT_GLOBALCHAT_FREQUENCY + "weight";

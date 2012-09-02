@@ -73,6 +73,7 @@ public class ChatConfig implements CheckConfig {
     public final ActionList   colorActions;
     
     public final boolean      globalChatCheck;
+	public final boolean      globalChatEngineCheck;
     public final Set<String>  globalChatCommands; 
 	public final float        globalChatFrequencyFactor;
 	public final float        globalChatFrequencyWeight;
@@ -147,6 +148,7 @@ public class ChatConfig implements CheckConfig {
         colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
         globalChatCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
+        globalChatEngineCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK);
         final List<String> commands = data.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS);
         globalChatCommands = new HashSet<String>();
         if (commands != null){
