@@ -4,7 +4,9 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.chat.MessageLetterCount.WordLetterCount;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.LetterEngine;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 
 /**
@@ -14,6 +16,8 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
  */
 public class GlobalChat extends Check{
 
+	private final LetterEngine engine = new LetterEngine();
+	
 	public GlobalChat() {
 		super(CheckType.CHAT_GLOBALCHAT);
 	}
@@ -79,6 +83,8 @@ public class GlobalChat extends Check{
 		
 		// (Following: random/made up criteria.)
 		
+		// TODO: Create tests for all methods with wordlists, fake chat (refactor for that).
+		
 		// Full message processing. ------------
 		
 		// Upper case.
@@ -128,7 +134,9 @@ public class GlobalChat extends Check{
 		wWords /= (float) letterCounts.words.length;
 		score += wWords;
 		
-		// TODO: LetterEngine ?  + core checks
+		// Engine:
+		final float wEngine = engine.feed(letterCounts);
+		score += wEngine;
 		
 		// Wrapping it up. --------------------
 		// Add weight to frequency counts.
