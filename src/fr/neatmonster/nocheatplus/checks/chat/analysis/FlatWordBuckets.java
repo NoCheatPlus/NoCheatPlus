@@ -15,6 +15,7 @@ public class FlatWordBuckets extends AbstractWordProcessor{
 	final long durBucket;
 	final int nBuckets;
 	final float factor;
+	
 	public FlatWordBuckets(int maxSize, int nBuckets, long durBucket, float factor){
 		super("FlatWordBuckets");
 		this.maxSize = maxSize;
@@ -27,12 +28,11 @@ public class FlatWordBuckets extends AbstractWordProcessor{
 	@Override
 	public void start(MessageLetterCount message) {
 		if (entries.size() + message.words.length > maxSize)
-			releaseMap(entries, maxSize / 10);
+			releaseMap(entries, Math.max(message.words.length, maxSize / 10));
 	}
 	
 	@Override
-	public float loop(long ts, int index, String key,
-			WordLetterCount message) {
+	public float loop(long ts, int index, String key, WordLetterCount word) {
 		ActionFrequency freq = entries.get(key);
 		if (freq == null){
 			freq = new ActionFrequency(nBuckets, durBucket);
