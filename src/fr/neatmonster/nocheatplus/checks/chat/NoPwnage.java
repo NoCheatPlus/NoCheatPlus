@@ -60,7 +60,8 @@ public class NoPwnage extends Check implements ICaptcha{
      *            is the thread the main thread
      * @return If to cancel the event.
      */
-    public boolean check(final Player player, final String message, final boolean isMainThread) {
+    public boolean check(final Player player, final String message, final boolean isCommand, 
+    		final boolean isMainThread) {
         if (isMainThread && !isEnabled(player))
             return false;
 
@@ -72,7 +73,7 @@ public class NoPwnage extends Check implements ICaptcha{
 
         // Keep related to ChatData/NoPwnage/Color used lock.
         synchronized (data) {
-            return unsafeCheck(player, message, isMainThread, cc, data);
+            return unsafeCheck(player, message, isCommand, isMainThread, cc, data);
         }
     }
 
@@ -124,8 +125,8 @@ public class NoPwnage extends Check implements ICaptcha{
      *            the data
      * @return If to cancel the event.
      */
-    private boolean unsafeCheck(final Player player, final String message, final boolean isMainThread,
-            final ChatConfig cc, final ChatData data) {
+    private boolean unsafeCheck(final Player player, final String message, final boolean isCommand,
+    		final boolean isMainThread, final ChatConfig cc, final ChatData data) {
         boolean cancel = false;
 
         // Don't not check excluded messages/commands.
@@ -147,7 +148,7 @@ public class NoPwnage extends Check implements ICaptcha{
         int suspicion = 0;
         // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
         // message within "timeout" milliseconds, the suspicion will be increased by "weight".
-        if (cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
+        if (!isCommand && cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
                 && CheckUtils.isSimilar(message, lastBanCausingMessage, 0.8f))
             suspicion += cc.noPwnageBannedWeight;
 
@@ -158,7 +159,7 @@ public class NoPwnage extends Check implements ICaptcha{
 
         // NoPwnage will check if a player repeats a message that has been sent by another player just before,
         // within "timeout". If he does, suspicion will be increased by "weight".
-        if (cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
+        if (!isCommand && cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
                 && CheckUtils.isSimilar(message, lastGlobalMessage, 0.8f))
             suspicion += cc.noPwnageGlobalWeight;
 
@@ -169,13 +170,13 @@ public class NoPwnage extends Check implements ICaptcha{
 
         // NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message
         // is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight".
-        if (cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
+        if (!isCommand && cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
                 && CheckUtils.isSimilar(message, data.noPwnageLastMessage, 0.8f))
             suspicion += cc.noPwnageRepeatWeight;
 
         // NoPwnage will check if a player moved within the "timeout" timeframe. If he did not move, the suspicion will
         // be increased by "weight" value.
-        if (cc.noPwnageMoveCheck && now - data.noPwnageLastMovedTime > cc.noPwnageMoveTimeout)
+        if (!isCommand && cc.noPwnageMoveCheck && now - data.noPwnageLastMovedTime > cc.noPwnageMoveTimeout)
             suspicion += cc.noPwnageMoveWeight;
 
         // Should a player that reaches the "warnLevel" get a text message telling him that he is under suspicion of

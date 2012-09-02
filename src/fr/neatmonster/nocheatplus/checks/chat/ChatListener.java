@@ -61,7 +61,7 @@ public class ChatListener implements Listener {
         event.setMessage(color.check(player, event.getMessage(), false));
 
         // Then the no pwnage check.
-        if (noPwnage.check(player, event.getMessage(), false))
+        if (noPwnage.check(player, event.getMessage(), false, false))
         	event.setCancelled(true);
         else if (globalChat.check(player, event.getMessage(), (ICaptcha) noPwnage, false))
         	// Only check those that got through.
@@ -93,6 +93,9 @@ public class ChatListener implements Listener {
          *                |_|                                
          */
         final Player player = event.getPlayer();
+        
+        // Trim is necessary because the server accepts leading spaces with commands.
+        // TODO: Maybe: only remove the leading whitespace or spaces.
         final String command = event.getMessage().trim().split(" ")[0].substring(1).toLowerCase();
 
         final ChatConfig cc = ChatConfig.getConfig(player);
@@ -119,11 +122,13 @@ public class ChatListener implements Listener {
 
         // First the color check.
         event.setMessage(color.check(player, event.getMessage(), true));
-
+        
+        final boolean handleAsChat = cc.globalChatCommands.contains(command) || cc.globalChatCommands.contains("/"+command);
+        
         // Then the no pwnage check.
-        if (noPwnage.check(player, event.getMessage(), true))
+        if (noPwnage.check(player, event.getMessage(), !handleAsChat, true))
         	event.setCancelled(true);
-        else if ((cc.globalChatCommands.contains(command) || cc.globalChatCommands.contains("/"+command)) && globalChat.check(player, event.getMessage(), noPwnage, true))
+        else if (handleAsChat && globalChat.check(player, event.getMessage(), noPwnage, true))
         	event.setCancelled(true);
     }
 
