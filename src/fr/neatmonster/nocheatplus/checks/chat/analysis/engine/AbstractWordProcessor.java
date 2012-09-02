@@ -1,8 +1,11 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
 
 public abstract class AbstractWordProcessor implements WordProcessor{
 	
@@ -46,7 +49,6 @@ public abstract class AbstractWordProcessor implements WordProcessor{
 			score += loop(ts, index, key, word);
 		}
 		score /= (float) message.words.length;
-//		System.out.println(getProcessorName() +": " + score);
 		return score;
 	}
 	

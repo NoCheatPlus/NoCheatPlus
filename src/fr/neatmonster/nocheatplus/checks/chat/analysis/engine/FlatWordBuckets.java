@@ -1,7 +1,9 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
 
 import java.util.LinkedHashMap;
 
+import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /**

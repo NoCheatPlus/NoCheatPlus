@@ -1,4 +1,6 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
+
+import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 
 
 public interface WordProcessor{

@@ -4,9 +4,9 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.LetterEngine;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.LetterEngine;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 
 /**
@@ -140,12 +140,12 @@ public class GlobalChat extends Check{
 			score += wEngine;
 		}
 		
-//		System.out.println(score);
-		
 		// Wrapping it up. --------------------
 		// Add weight to frequency counts.
 		data.globalChatFrequency.add(time, score);
 		final float accumulated = cc.globalChatFrequencyWeight * data.globalChatFrequency.getScore(cc.globalChatFrequencyFactor);
+		
+//		System.out.println("Total score: " + score + " (" + accumulated + ")");
 		
 		if (score < 2.0f * cc.globalChatFrequencyWeight)
 			// Reset the VL.
