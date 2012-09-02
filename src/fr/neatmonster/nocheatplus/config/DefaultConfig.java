@@ -133,7 +133,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6.0D);
         set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 45D);
-        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat");
+        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>8 log:globalchat:0:5:if cancel cmd:kickglchat");
 
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
@@ -337,6 +337,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kicknopwnage", "ncp kick [player] You're not allowed to spam this server!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
+        set(ConfPaths.STRINGS + ".kickglchat", "ncp kick [player] Too many chat messages, take a break.");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
