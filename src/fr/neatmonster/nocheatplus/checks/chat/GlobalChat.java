@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.chat.MessageLetterCount.WordLetterCount;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 
 /**
@@ -61,44 +62,84 @@ public class GlobalChat extends Check{
 		
 		// Update the frequency interval weights.
 		data.globalChatFrequency.update(time);
-		double score = 0;
-		if (score < cc.globalChatFrequencyWeight)
-			// Reset the VL.
-			data.globalChatVL = 0.0;
 		
-		// Weight of this chat message.
-		float weight = 1.0f;
+		// Score for this message (violation score).
+		float score = 0;
 		
 		final MessageLetterCount letterCounts = new MessageLetterCount(message);
 		
-		final int length = message.length();
+		final int msgLen = message.length();
+		
+		// (Following: random/made up criteria.)
+		
+		// Full message processing. ------------
+		
 		// Upper case.
-		if (length > 8 && letterCounts.fullCount.upperCase > length / 4){
-			weight += 0.6 * letterCounts.fullCount.getUpperCaseRatio();
+		if (letterCounts.fullCount.upperCase > msgLen / 3){
+			final float wUpperCase = 0.6f * letterCounts.fullCount.getUpperCaseRatio();
+			score += wUpperCase;
 		}
 		
-		// ? for words individually ?
-		
-		// Repetition of characters.
-		if (length > 4){
-			final float fullRep = letterCounts.fullCount.getLetterRatio();
-			score += (float) length / 15.0 * Math.abs(0.5 - fullRep); // Very small and very big are bad !
+		// Letters vs. word length.
+		if (msgLen > 4){
+			final float fullRep = letterCounts.fullCount.getLetterCountRatio();
+			// Long messages: very small and very big are bad !
+			final float wRepetition = (float) msgLen / 15.0f * Math.abs(0.5f - fullRep);
+			score += wRepetition;
+			
+			// Number of words vs. length of message
+			final float fnWords = (float) letterCounts.words.length / (float) msgLen;
+			if (fnWords > 0.75f){
+				score += fnWords;
+			}
 		}
-	
-		// TODO Core checks....
 		
+		// Per word checks. -------------------
+		float wWords = 0.0f;
+		final float avwLen = (float) msgLen / (float) letterCounts.words.length; 
+		for (final WordLetterCount word: letterCounts.words){
+			float wWord = 0.0f;
+			final int wLen = word.word.length();
+			// TODO: ? used letters vs. word length.
+			
+			// Length of word vs. av. word length.
+			final float fLenAv = Math.abs(avwLen - (float) wLen) / avwLen;
+			wWord += fLenAv;
+			
+			// Length of word vs. message length;
+			final float fLenMsg = (float) wLen / (float) msgLen;
+			wWord += fLenMsg;
+			
+			// Not letter:
+			float notLetter = word.getNotLetterRatio();
+			notLetter *= notLetter;
+			wWord += notLetter;
+			
+			wWord *= wWord;
+			wWords += wWord;
+		}
+		wWords /= (float) letterCounts.words.length;
+		score += wWords;
+		
+		// TODO: LetterEngine ?  + core checks
+		
+		// Wrapping it up. --------------------
 		// Add weight to frequency counts.
-		data.globalChatFrequency.add(time, weight);
-		score +=  cc.globalChatFrequencyWeight * data.globalChatFrequency.getScore(cc.globalChatFrequencyFactor);
-				
-		if (score > cc.globalChatLevel){
+		data.globalChatFrequency.add(time, score);
+		final float accumulated = cc.globalChatFrequencyWeight * data.globalChatFrequency.getScore(cc.globalChatFrequencyFactor);
+		
+		if (score < 2.0f * cc.globalChatFrequencyWeight)
+			// Reset the VL.
+			data.globalChatVL = 0.0;
+		
+		if (accumulated > cc.globalChatLevel){
 			if (captcha.shouldStartCaptcha(cc, data)){
 				captcha.sendNewCaptcha(player, cc, data);
 				cancel = true;
 			}
 			else{
-				data.globalChatVL += score / 10.0;
-				if (executeActionsThreadSafe(player, data.globalChatVL, score, cc.globalChatActions, isMainThread))
+				data.globalChatVL += accumulated / 10.0;
+				if (executeActionsThreadSafe(player, data.globalChatVL, accumulated / 10.0, cc.globalChatActions, isMainThread))
 					cancel = true;
 			}
 		}
