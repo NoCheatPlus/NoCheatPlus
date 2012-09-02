@@ -55,6 +55,13 @@ public class GlobalChat extends Check{
 	 */
 	private boolean unsafeCheck(final Player player, final String message, final ICaptcha captcha,
 			final ChatConfig cc, final ChatData data, boolean isMainThread) {
+		
+		// Test captcha in case nopwnage is disabled.
+		if (captcha.shouldCheckCaptcha(cc, data)){
+			captcha.checkCaptcha(player, message, cc, data, isMainThread);
+			return true;
+		}
+		
 		// Take time once:
 		final long time = System.currentTimeMillis();
 				
