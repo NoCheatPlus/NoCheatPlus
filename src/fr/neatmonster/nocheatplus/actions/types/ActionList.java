@@ -26,7 +26,7 @@ public class ActionList {
     /** This is a very bad design decision, but it's also really convenient to define this here. */
     public final String                  permissionSilent;
 
-    /** If there are no actions registered, we still return an Array. It's just empty/maxSize=0. */
+    /** If there are no actions registered, we still return an Array. It's just empty/size=0. */
     private final static Action[]        emptyArray = new Action[0];
 
     /** The actions of this ActionList, "bundled" by treshold (violation level). */
