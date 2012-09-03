@@ -81,7 +81,8 @@ public class CommandHandler implements CommandExecutor {
         		new InfoCommand(plugin),
         		new KickCommand(plugin),
         		new ReloadCommand(plugin),
-        		new TellCommand(plugin)
+        		new TellCommand(plugin),
+        		new DelayCommand(plugin),
         }){
         	commands.put(cmd.label, cmd);
         }
