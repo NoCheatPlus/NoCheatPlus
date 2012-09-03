@@ -49,8 +49,8 @@ public class ChatListener implements Listener {
     public ChatListener(){
     	// Read some things from the global config file.
     	ConfigFile config = ConfigManager.getConfigFile();
-    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), true, true);
-    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS), true, true);
+    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), false, true);
+    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS), false, true);
     }
 
     /**
