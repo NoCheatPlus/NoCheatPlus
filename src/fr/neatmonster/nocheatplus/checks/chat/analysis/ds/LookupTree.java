@@ -26,7 +26,7 @@ public class LookupTree<K, N extends Node<K>>{
 		
 		public Node<K> getChild(final K key, final NodeFactory<K, Node<K>> factory){
 			if (children == null){
-				if (factory != null) children = new HashMap<K, Node<K>>();
+				if (factory != null) children = new HashMap<K, Node<K>>(3);
 				else return null;
 			}
 			Node<K> node = children.get(key);
@@ -108,9 +108,12 @@ public class LookupTree<K, N extends Node<K>>{
 				depth ++;
 			}
 		}
-		if (create || insertion.isEnd && depth == keys.size()){
+		if (create){
 			node = current;
-			if (insertion != current) current.isEnd = true;
+			current.isEnd = true;
+		}
+		else if (depth == keys.size()){
+			node = current;
 		}
 		return new LookupEntry<K, N>(node, insertion, depth);
 	}
