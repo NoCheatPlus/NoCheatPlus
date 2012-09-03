@@ -17,12 +17,23 @@ public abstract class DelayableCommand extends NCPCommand {
 	 * Parse an argument for a delay in ticks. The delay is specified with "delay=...".
 	 * @param args
 	 * @param index
-	 * @return ticks or -1 if no delay found.
+	 * @return
 	 */
 	public static long parseDelay(String[] args, int index){
-		if (args.length <= index) return -1;
+		return parseDelay(args, index, -1);
+	}
+	
+	/**
+	 * Parse an argument for a delay in ticks. The delay is specified with "delay=...".
+	 * @param args
+	 * @param index
+	 * @param preset Preset delay if none is given.
+	 * @return ticks or -1 if no delay found.
+	 */
+	public static long parseDelay(String[] args, int index, int preset){
+		if (args.length <= index) return preset;
 		String arg = args[index].trim().toLowerCase();
-		if (!arg.startsWith("delay=")) return -1;
+		if (!arg.startsWith("delay=")) return preset;
 		if (arg.length() < 7) return -1;
 		try{
 			long res = Long.parseLong(arg.substring(6));
@@ -35,8 +46,9 @@ public abstract class DelayableCommand extends NCPCommand {
 		}
 	}
 
-	private int delayIndex;
-	private boolean mustHaveDelay;
+	protected final int delayIndex;
+	protected final boolean mustHaveDelay;
+	protected final int delayPreset;
 	
 	/**
 	 * (Delay is not obligatory, inserted after the first argument.)
@@ -54,7 +66,7 @@ public abstract class DelayableCommand extends NCPCommand {
 	 * @param delayIndex
 	 */
 	public DelayableCommand(NoCheatPlus plugin, String label, String permission, int delayIndex){
-		this(plugin, label, permission, delayIndex, false);
+		this(plugin, label, permission, delayIndex, -1, false);
 	}
 
 	/**
@@ -64,12 +76,13 @@ public abstract class DelayableCommand extends NCPCommand {
 	 * @param delayIndex Index at which to look for the delay specification.
 	 * @param mustHaveDelay If specifying a delay is obligatory.
 	 */
-	public DelayableCommand(NoCheatPlus plugin, String label, String permission, int delayIndex, boolean mustHaveDelay) {
+	public DelayableCommand(NoCheatPlus plugin, String label, String permission, int delayIndex, int delayPreset, boolean mustHaveDelay) {
 		super(plugin, label, permission);
 		this.delayIndex = delayIndex;
 		this.mustHaveDelay = mustHaveDelay;
+		this.delayPreset = delayPreset;
 	}
-	
+
 	/**
 	 * Execute the command, check validity and schedule a task for delayed execution (use schedule(...)).
 	 * @param sender
@@ -77,6 +90,7 @@ public abstract class DelayableCommand extends NCPCommand {
 	 * @param label Command label, this is not necessarily this.label (!), this.label can be the first argument.
 	 * @param alteredArgs args with the delay specification removed.
 	 * @param delay
+	 * @return If the command was understood in general.
 	 */
 	public abstract boolean execute(CommandSender sender, Command command, String label, 
 			String[] alteredArgs, long delay);
@@ -85,7 +99,7 @@ public abstract class DelayableCommand extends NCPCommand {
 	public boolean onCommand(final CommandSender sender, final Command command, 
 			final String label, final String[] args ) {
 		// Parse the delay and alter the args accordingly.
-		long delay = parseDelay(args, delayIndex);
+		long delay = parseDelay(args, delayIndex, delayPreset);
 		String[] alteredArgs;
 		if (delay == -1){
 			// No delay found, if demanded return.
@@ -93,15 +107,18 @@ public abstract class DelayableCommand extends NCPCommand {
 			alteredArgs = args;
 		}
 		else{
-			alteredArgs = new String[args.length -1];
-			int increment = 0;
-			for (int i = 0; i < args.length; i++){
-				if (i == delayIndex){
-					// ignore this one.
-					increment = -1;
-					continue;
+			boolean hasDef = args[delayIndex].startsWith("delay=") && delay != -1;
+			alteredArgs = new String[args.length + (hasDef ? -1 : 0)];
+			if (alteredArgs.length > 0){
+				int increment = 0;
+				for (int i = 0; i < args.length; i++){
+					if (i == delayIndex && hasDef){
+						// ignore this one.
+						increment = -1;
+						continue;
+					}
+					alteredArgs[i + increment] = args[i];
 				}
-				alteredArgs[i + increment] = args[i];
 			}
 		}
 		return execute(sender, command, label, alteredArgs, delay);

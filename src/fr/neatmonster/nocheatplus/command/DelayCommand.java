@@ -8,10 +8,15 @@ import org.bukkit.command.CommandSender;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
+/**
+ * Delay an arbitrary command, the command is always delayed, unless for bad delay input.
+ * @author mc_dev
+ *
+ */
 public class DelayCommand extends DelayableCommand {
 
 	public DelayCommand(NoCheatPlus plugin){
-		super(plugin, "delay", Permissions.ADMINISTRATION_DELAY);
+		super(plugin, "delay", Permissions.ADMINISTRATION_DELAY, 1, 0, true);
 	}
 	
 	@Override
