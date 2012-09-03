@@ -100,11 +100,20 @@ public class SurvivalFly extends Check {
             hAllowedDistance = 0.13D * cc.survivalFlySneakingSpeed / 100D;
         else if (player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
             hAllowedDistance = 0.16D * cc.survivalFlyBlockingSpeed / 100D;
-        else if (!sprinting)
-            hAllowedDistance = 0.22D * cc.survivalFlyWalkingSpeed / 100D;
-        else
-            hAllowedDistance = 0.35D * cc.survivalFlySprintingSpeed / 100D;
-
+        else{
+        	if (!sprinting)
+                hAllowedDistance = 0.22D * cc.survivalFlyWalkingSpeed / 100D;
+            else
+                hAllowedDistance = 0.35D * cc.survivalFlySprintingSpeed / 100D;
+        	
+            // Speeding bypass permission (can be combined with other bypasses).
+            // TODO: How exactly to bring it on finally.
+            if (player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING))
+            	hAllowedDistance = hAllowedDistance * cc.survivalFlySpeedingSpeed/ 100D;
+        }
+        
+     // TODO: Optimize: maybe only do the permission checks and modifiers if the distance is too big.
+        
         // If the player is on ice, give him an higher maximum speed.
         if (data.survivalFlyOnIce > 0)
             hAllowedDistance *= 2.5D;
@@ -198,10 +207,6 @@ public class SurvivalFly extends Check {
 
         if (from.isOnGround() || to.isOnGround())
             data.jumpAmplifier = 0D;
-
-        // Speeding bypass permission:
-        if (hDistanceAboveLimit > 0 && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING))
-        	hDistanceAboveLimit = 0D;
         
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 

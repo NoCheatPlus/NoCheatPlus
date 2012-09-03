@@ -79,6 +79,7 @@ public class MovingConfig implements CheckConfig {
     public final boolean    survivalFlyCheck;
     public final int        survivalFlyBlockingSpeed;
     public final int        survivalFlySneakingSpeed;
+    public final int        survivalFlySpeedingSpeed;
     public final int        survivalFlySprintingSpeed;
     public final int        survivalFlySwimmingSpeed;
     public final int        survivalFlyWalkingSpeed;
@@ -86,6 +87,7 @@ public class MovingConfig implements CheckConfig {
     
     public final double noFallyOnGround;
     public final double yOnGround;
+
 
 	
 
@@ -116,6 +118,7 @@ public class MovingConfig implements CheckConfig {
         // Default values are specified here because this settings aren't showed by default into the configuration file.
         survivalFlyBlockingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
         survivalFlySneakingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
+        survivalFlySpeedingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SPEEDINGSPEED, 100);
         survivalFlySprintingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
         survivalFlySwimmingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
