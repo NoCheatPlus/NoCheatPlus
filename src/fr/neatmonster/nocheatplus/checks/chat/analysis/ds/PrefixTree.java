@@ -84,10 +84,40 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 		this.resultFactory = resultFactory;
 	}
 	
-	public LookupEntry<K, N> lookup(K[] keys, final boolean create){
+	/**
+	 * Look up without creating new nodes.
+	 * @param keys
+	 * @return
+	 */
+	public L lookup(final K[] keys){
+		return lookup( keys, false);
+	}
+	
+	/**
+	 * Look up without creating new nodes.
+	 * @param keys
+	 * @return
+	 */
+	public L lookup(final List<K> keys){
+		return lookup( keys, false);
+	}
+	
+	/**
+	 * Look up sequence, if desired fill in the given sequence.
+	 * @param keys
+	 * @param create
+	 * @return
+	 */
+	public L lookup(K[] keys, final boolean create){
 		return lookup(Arrays.asList(keys), create);
 	}
 	
+	/**
+	 * Look up sequence, if desired fill in the given sequence.
+	 * @param keys
+	 * @param create
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public L lookup(final List<K> keys, final boolean create){
 		N insertion = root;
@@ -120,6 +150,80 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 			node = current;
 		}
 		return resultFactory.newLookupEntry(node, insertion, depth, hasPrefix);
+	}
+	
+	/**
+	 * 
+	 * @param keys
+	 * @return If already inside (not necessarily as former end point).
+	 */
+	public boolean feed(final List<K> keys){
+		final L result = lookup(keys, true);
+		return result.insertion == result.node;
+	}
+	
+	/**
+	 * 
+	 * @param chars
+	 * @return If already inside (not necessarily as former end point).
+	 */
+	public boolean feed(final K[] keys){
+		return feed(Arrays.asList(keys));
+	}
+	
+	/**
+	 * Check if the tree has a prefix of keys. This does not mean a common prefix, but that the tree contains an end point that is a prefix of the input. 
+	 * @param keys
+	 * @return
+	 */
+	public boolean hasPrefix(final List<K> keys){
+		return lookup(keys, false).hasPrefix;
+	}
+	
+	/**
+	 * Check if the tree has a prefix of keys. This does not mean a common prefix, but that the tree contains an end point that is a prefix of the input. 
+	 * @param keys
+	 * @return
+	 */
+	public boolean hasPrefix(final K[] keys){
+		return hasPrefix(Arrays.asList(keys));
+	}
+	
+	/**
+	 * Check if the input is prefix of a path inside of the tree, need not be an end point.
+	 * @param keys
+	 * @return
+	 */
+	public boolean isPrefix(final List<K> keys){
+		return lookup(keys, false).depth == keys.size();
+	}
+	
+	/**
+	 * Check if the input is prefix of a path inside of the tree, need not be an end point.
+	 * @param keys
+	 * @return
+	 */
+	public boolean isPrefix(final K[] keys){
+		return isPrefix(Arrays.asList(keys));
+	}
+	
+	/**
+	 * Check if the input is an inserted sequence (end point), but not necessarily a leaf.
+	 * @param keys
+	 * @return
+	 */
+	public boolean matches(final List<K> keys){
+		final L result = lookup(keys, false);
+		return result.node == result.insertion && result.insertion.isEnd;
+	}
+	
+	/**
+	 * Check if the input is an inserted sequence (end point), but not necessarily a leaf.
+	 * @param keys
+	 * @return
+	 */
+	public boolean matches(final K[] keys){
+		return matches(Arrays.asList(keys));
 	}
 
 	public void clear() {
