@@ -181,7 +181,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT, 150);
 
         set(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT, 500L);
+//        set(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT, 500L);
         set(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT, 200);
 
         set(ConfPaths.CHAT_NOPWNAGE_WARN_LEVEL, 400);

@@ -11,6 +11,10 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.SimpleCharPrefixTree;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
@@ -37,6 +41,17 @@ public class ChatListener implements Listener {
     
     /** Global chat check (experiment: alternative / supplement). */
     private final GlobalChat globalChat = new GlobalChat();
+    
+    private final SimpleCharPrefixTree commandExclusions = new SimpleCharPrefixTree();
+    
+    private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree(); 
+    
+    public ChatListener(){
+    	// Read some things from the global config file.
+    	ConfigFile config = ConfigManager.getConfigFile();
+    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), true, true);
+    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS), true, true);
+    }
 
     /**
      * We listen to PlayerChat events for obvious reasons.
@@ -123,10 +138,12 @@ public class ChatListener implements Listener {
         // First the color check.
         event.setMessage(color.check(player, event.getMessage(), true));
         
-        final boolean handleAsChat = cc.globalChatCommands.contains(command) || cc.globalChatCommands.contains("/"+command);
+        final String lcMessage = event.getMessage().trim().toLowerCase();
         
+        final boolean handleAsChat = chatCommands.hasPrefix(lcMessage);
+
         // Then the no pwnage check.
-        if (noPwnage.check(player, event.getMessage(), !handleAsChat, true))
+        if (!commandExclusions.hasPrefix(lcMessage) && noPwnage.check(player, event.getMessage(), !handleAsChat, true))
         	event.setCancelled(true);
         else if (handleAsChat && globalChat.check(player, event.getMessage(), noPwnage, true))
         	event.setCancelled(true);

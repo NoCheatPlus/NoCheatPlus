@@ -1,10 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.entity.Player;
 
@@ -74,14 +71,12 @@ public class ChatConfig implements CheckConfig {
     
     public final boolean      globalChatCheck;
 	public final boolean      globalChatEngineCheck;
-    public final Set<String>  globalChatCommands; 
 	public final float        globalChatFrequencyFactor;
 	public final float        globalChatFrequencyWeight;
 	public final double       globalChatLevel;
     public final ActionList   globalChatActions;
 
     public final boolean      noPwnageCheck;
-    public final List<String> noPwnageExclusions;
     public final int          noPwnageLevel;
     public final float        noPwnageVLFactor;
 
@@ -121,7 +116,7 @@ public class ChatConfig implements CheckConfig {
     public final int          noPwnageRepeatWeight;
 
     public final boolean      noPwnageSpeedCheck;
-    public final long         noPwnageSpeedTimeout;
+//    public final long         noPwnageSpeedTimeout;
     public final int          noPwnageSpeedWeight;
 
     public final int          noPwnageWarnLevel;
@@ -149,20 +144,12 @@ public class ChatConfig implements CheckConfig {
         
         globalChatCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
         globalChatEngineCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK);
-        final List<String> commands = data.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS);
-        globalChatCommands = new HashSet<String>();
-        if (commands != null){
-        	for (String cmd : commands){
-        		globalChatCommands.add(cmd.trim().toLowerCase());
-        	}
-        }
         globalChatFrequencyFactor = (float) data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
         globalChatFrequencyWeight = (float) data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
     	globalChatLevel = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_LEVEL);
         globalChatActions = data.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
 
         noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
-        noPwnageExclusions = data.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS);
         noPwnageLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
         // VL decreasing factor, hidden option.
         noPwnageVLFactor = (float) data.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.95);
@@ -203,7 +190,7 @@ public class ChatConfig implements CheckConfig {
         noPwnageRepeatWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT);
 
         noPwnageSpeedCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK);
-        noPwnageSpeedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT);
+//        noPwnageSpeedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT);
         noPwnageSpeedWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT);
 
         noPwnageWarnLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_WARN_LEVEL);

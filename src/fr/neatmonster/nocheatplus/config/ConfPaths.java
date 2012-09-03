@@ -203,7 +203,7 @@ public abstract class ConfPaths {
 
     private static final String CHAT_NOPWNAGE_SPEED                      = CHAT_NOPWNAGE + "speed.";
     public static final String  CHAT_NOPWNAGE_SPEED_CHECK                = CHAT_NOPWNAGE_SPEED + "active";
-    public static final String  CHAT_NOPWNAGE_SPEED_TIMEOUT              = CHAT_NOPWNAGE_SPEED + "timeout";
+//    public static final String  CHAT_NOPWNAGE_SPEED_TIMEOUT              = CHAT_NOPWNAGE_SPEED + "timeout";
     public static final String  CHAT_NOPWNAGE_SPEED_WEIGHT               = CHAT_NOPWNAGE_SPEED + "weight";
     
     public static final String CHAT_NOPWNAGE_VL                          = CHAT_NOPWNAGE + "vl.";

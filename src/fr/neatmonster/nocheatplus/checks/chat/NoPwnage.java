@@ -129,11 +129,6 @@ public class NoPwnage extends Check implements ICaptcha{
     		final boolean isMainThread, final ChatConfig cc, final ChatData data) {
         boolean cancel = false;
 
-        // Don't not check excluded messages/commands.
-        for (final String exclusion : cc.noPwnageExclusions)
-            if (message.startsWith(exclusion))
-                return false;
-
         final long now = System.currentTimeMillis();
         
         // Forget expired VL.
@@ -165,8 +160,16 @@ public class NoPwnage extends Check implements ICaptcha{
 
         // NoPwnage will check if a player sends messages too fast. If a message is sent within "timeout"
         // milliseconds after the previous message, increase suspicion by "weight".
-        if (cc.noPwnageSpeedCheck && now - data.noPwnageLastMessageTime < cc.noPwnageSpeedTimeout)
-            suspicion += cc.noPwnageSpeedWeight;
+        // TODO: update description or method :p
+        if (cc.noPwnageSpeedCheck){
+        	// First add old messages score:
+        	data.noPwnageSpeed.update(now);
+        	suspicion += data.noPwnageSpeed.getScore(0.7f) * cc.noPwnageSpeedWeight;
+        	// Then add this message.
+        	data.noPwnageSpeed.add(now, 1.0f);
+        	
+        }
+            
 
         // NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message
         // is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight".

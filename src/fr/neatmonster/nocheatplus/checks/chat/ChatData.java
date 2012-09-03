@@ -68,6 +68,7 @@ public class ChatData implements CheckData {
     public long    noPwnageLeaveTime;
     public int     noPwnageReloginWarnings;
     public long    noPwnageReloginWarningTime;
+    public final ActionFrequency noPwnageSpeed = new ActionFrequency(5, 1000);
 
     /**
      * Clear the data of the no pwnage check.
