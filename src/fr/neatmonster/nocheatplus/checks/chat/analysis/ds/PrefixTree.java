@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.LookupTree.Node;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.Node;
 
 
 /**
@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.LookupTree.Node;
  * @author mc_dev
  *
  */
-public class LookupTree<K, N extends Node<K>>{
+public class PrefixTree<K, N extends Node<K>>{
 	
 	public static class Node<K>{
 		public boolean isEnd = false;
@@ -51,10 +51,14 @@ public class LookupTree<K, N extends Node<K>>{
 		public final N insertion;
 		/** Depth to root from insertion point. */
 		public final int depth;
-		public LookupEntry(N node , N insertion, int depth){
+		/** If the tree contained a prefix of the sequence, 
+		 * i.e. one of the existent nodes matching the input was a leaf. */
+		public final boolean hasPrefix;
+		public LookupEntry(N node , N insertion, int depth, boolean hasPrefix){
 			this.node = node;
 			this.insertion = insertion;
 			this.depth = depth;
+			this.hasPrefix = hasPrefix;
 		}
 	}
 	
@@ -62,7 +66,7 @@ public class LookupTree<K, N extends Node<K>>{
 	
 	protected N root;
 	
-	public LookupTree(final Class<N> clazz){
+	public PrefixTree(final Class<N> clazz){
 		this(new NodeFactory<K, N>() {
 			@Override
 			public N getNewNode() {
@@ -77,7 +81,7 @@ public class LookupTree<K, N extends Node<K>>{
 		});
 	}
 	
-	public LookupTree(NodeFactory<K, N> factory){
+	public PrefixTree(NodeFactory<K, N> factory){
 		this.factory = factory;
 		this.root = factory.getNewNode();
 	}
@@ -92,6 +96,7 @@ public class LookupTree<K, N extends Node<K>>{
 		N node = null;
 		int depth = 0;
 		N current = root;
+		boolean hasPrefix = false;
 		final NodeFactory<K, N> factory = (NodeFactory<K, N>) (create ? this.factory : null);
 		for (final K key : keys){
 			final N child = (N) current.getChild(key, null);
@@ -106,6 +111,7 @@ public class LookupTree<K, N extends Node<K>>{
 				// Node already exists, set as insertion point.
 				insertion = current = child;
 				depth ++;
+				if (child.isEnd) hasPrefix = true;
 			}
 		}
 		if (create){
@@ -115,7 +121,7 @@ public class LookupTree<K, N extends Node<K>>{
 		else if (depth == keys.size()){
 			node = current;
 		}
-		return new LookupEntry<K, N>(node, insertion, depth);
+		return new LookupEntry<K, N>(node, insertion, depth, hasPrefix);
 	}
 
 	public void clear() {

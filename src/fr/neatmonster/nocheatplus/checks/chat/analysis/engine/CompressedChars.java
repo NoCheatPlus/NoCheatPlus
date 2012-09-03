@@ -6,14 +6,14 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.LookupTree;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.LookupTree.LookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.LookupTree.Node;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.LookupTree.NodeFactory;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.LookupEntry;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.Node;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.NodeFactory;
 
 public class CompressedChars extends AbstractWordProcessor{
 
-	protected final LookupTree<Character, Node<Character>> tree = new LookupTree<Character, Node<Character>>(
+	protected final PrefixTree<Character, Node<Character>> tree = new PrefixTree<Character, Node<Character>>(
 			new NodeFactory<Character, Node<Character>>() {
 				@Override
 				public Node<Character> getNewNode() {
