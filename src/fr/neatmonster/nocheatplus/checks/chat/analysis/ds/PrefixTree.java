@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.LookupEntry;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.Node;
 
 
@@ -14,7 +15,7 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.Node;
  * @author mc_dev
  *
  */
-public class PrefixTree<K, N extends Node<K>>{
+public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	
 	public static class Node<K>{
 		public boolean isEnd = false;
@@ -33,7 +34,7 @@ public class PrefixTree<K, N extends Node<K>>{
 			if (node != null) return node;
 			else if (factory == null) return null;
 			else{
-				node = factory.getNewNode();
+				node = factory.newNode();
 				children.put(key, node);
 				return node;
 			}
@@ -41,7 +42,7 @@ public class PrefixTree<K, N extends Node<K>>{
 	}
 	
 	public static interface NodeFactory<K, N extends Node<K>>{
-		public N getNewNode();
+		public N newNode();
 	}
 	
 	public static class LookupEntry<K, N extends Node<K>>{
@@ -62,28 +63,20 @@ public class PrefixTree<K, N extends Node<K>>{
 		}
 	}
 	
-	protected final NodeFactory<K, N> factory;
+	public static interface LookupEntryFactory<K, N extends Node<K>, L extends LookupEntry<K, N>>{
+		public L newLookupEntry(N node , N insertion, int depth, boolean hasPrefix); 
+	}
+	
+	protected final NodeFactory<K, N> nodeFactory;
+	
+	protected final LookupEntryFactory<K, N, L> resultFactory;
 	
 	protected N root;
 	
-	public PrefixTree(final Class<N> clazz){
-		this(new NodeFactory<K, N>() {
-			@Override
-			public N getNewNode() {
-				try {
-					return clazz.newInstance();
-				} catch (InstantiationException e) {
-					return null;
-				} catch (IllegalAccessException e) {
-					return null;
-				}
-			}
-		});
-	}
-	
-	public PrefixTree(NodeFactory<K, N> factory){
-		this.factory = factory;
-		this.root = factory.getNewNode();
+	public PrefixTree(NodeFactory<K, N> nodeFactory, LookupEntryFactory<K, N, L> resultFactory){
+		this.nodeFactory = nodeFactory;
+		this.root = nodeFactory.newNode();
+		this.resultFactory = resultFactory;
 	}
 	
 	public LookupEntry<K, N> lookup(K[] keys, final boolean create){
@@ -91,13 +84,12 @@ public class PrefixTree<K, N extends Node<K>>{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public LookupEntry<K, N> lookup(final List<K> keys, final boolean create){
+	public L lookup(final List<K> keys, final boolean create){
 		N insertion = root;
-		N node = null;
 		int depth = 0;
 		N current = root;
 		boolean hasPrefix = false;
-		final NodeFactory<K, N> factory = (NodeFactory<K, N>) (create ? this.factory : null);
+		final NodeFactory<K, N> factory = (NodeFactory<K, N>) (create ? this.nodeFactory : null);
 		for (final K key : keys){
 			final N child = (N) current.getChild(key, null);
 			if (child == null){
@@ -108,12 +100,13 @@ public class PrefixTree<K, N extends Node<K>>{
 				}
 			}
 			else{
-				// Node already exists, set as insertion point.
+				// A node already exists, set as insertion point.
 				insertion = current = child;
 				depth ++;
 				if (child.isEnd) hasPrefix = true;
 			}
 		}
+		N node = null;
 		if (create){
 			node = current;
 			current.isEnd = true;
@@ -121,11 +114,30 @@ public class PrefixTree<K, N extends Node<K>>{
 		else if (depth == keys.size()){
 			node = current;
 		}
-		return new LookupEntry<K, N>(node, insertion, depth, hasPrefix);
+		return resultFactory.newLookupEntry(node, insertion, depth, hasPrefix);
 	}
 
 	public void clear() {
-		root = factory.getNewNode();
+		root = nodeFactory.newNode();
 		// TODO: maybe more unlinking ?
+	}
+	
+	/**
+	 * Factory method for a simple tree.
+	 * @param keyType
+	 * @return
+	 */
+	public static <K> PrefixTree<K, Node<K>, LookupEntry<K, Node<K>>> newPrefixTree(){
+		return new PrefixTree<K, Node<K>, LookupEntry<K, Node<K>>>(new NodeFactory<K, Node<K>>(){
+			@Override
+			public final Node<K> newNode() {
+				return new Node<K>();
+			}
+		}, new LookupEntryFactory<K, Node<K>, LookupEntry<K,Node<K>>>() {
+			@Override
+			public LookupEntry<K, Node<K>> newLookupEntry(Node<K> node, Node<K> insertion, int depth, boolean hasPrefix) {
+				return new LookupEntry<K, PrefixTree.Node<K>>(node, insertion, depth, hasPrefix);
+			}
+		});
 	}
 }
