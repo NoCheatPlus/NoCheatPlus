@@ -34,7 +34,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 			if (node != null) return node;
 			else if (factory == null) return null;
 			else{
-				node = factory.newNode();
+				node = factory.newNode(this);
 				children.put(key, node);
 				return node;
 			}
@@ -42,7 +42,12 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	}
 	
 	public static interface NodeFactory<K, N extends Node<K>>{
-		public N newNode();
+		/**
+		 * 
+		 * @param parent Can be null (root).
+		 * @return
+		 */
+		public N newNode(N parent);
 	}
 	
 	public static class LookupEntry<K, N extends Node<K>>{
@@ -75,7 +80,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	
 	public PrefixTree(NodeFactory<K, N> nodeFactory, LookupEntryFactory<K, N, L> resultFactory){
 		this.nodeFactory = nodeFactory;
-		this.root = nodeFactory.newNode();
+		this.root = nodeFactory.newNode(null);
 		this.resultFactory = resultFactory;
 	}
 	
@@ -118,7 +123,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	}
 
 	public void clear() {
-		root = nodeFactory.newNode();
+		root = nodeFactory.newNode(null);
 		// TODO: maybe more unlinking ?
 	}
 	
@@ -130,7 +135,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	public static <K> PrefixTree<K, Node<K>, LookupEntry<K, Node<K>>> newPrefixTree(){
 		return new PrefixTree<K, Node<K>, LookupEntry<K, Node<K>>>(new NodeFactory<K, Node<K>>(){
 			@Override
-			public final Node<K> newNode() {
+			public final Node<K> newNode(final Node<K> parent) {
 				return new Node<K>();
 			}
 		}, new LookupEntryFactory<K, Node<K>, LookupEntry<K,Node<K>>>() {

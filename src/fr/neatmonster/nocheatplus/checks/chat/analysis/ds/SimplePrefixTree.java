@@ -23,7 +23,7 @@ public class SimplePrefixTree<K> extends PrefixTree<K, Node<K>, SimpleLookupEntr
 	public SimplePrefixTree() {
 		super(new NodeFactory<K, Node<K>>(){
 			@Override
-			public Node<K> newNode() {
+			public final Node<K> newNode(final Node<K> parent) {
 				return new Node<K>();
 			}
 		}, new LookupEntryFactory<K, Node<K>, SimpleLookupEntry<K>>(){
