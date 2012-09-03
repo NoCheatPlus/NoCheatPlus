@@ -139,6 +139,7 @@ public class Permissions {
     public static final String  MOVING_SURVIVALFLY           = MOVING + ".survivalfly";
     public static final String  MOVING_SURVIVALFLY_BLOCKING  = MOVING_SURVIVALFLY + ".blocking";
     public static final String  MOVING_SURVIVALFLY_SNEAKING  = MOVING_SURVIVALFLY + ".sneaking";
+	public static final String  MOVING_SURVIVALFLY_SPEEDING  = MOVING_SURVIVALFLY + ".speeding";
     public static final String  MOVING_SURVIVALFLY_SPRINTING = MOVING_SURVIVALFLY + ".sprinting";
     public static final String  MOVING_SURVIVALFLY_STEP      = MOVING_SURVIVALFLY + ".step";
 

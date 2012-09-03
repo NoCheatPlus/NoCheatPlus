@@ -199,6 +199,10 @@ public class SurvivalFly extends Check {
         if (from.isOnGround() || to.isOnGround())
             data.jumpAmplifier = 0D;
 
+        // Speeding bypass permission:
+        if (hDistanceAboveLimit > 0 && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING))
+        	hDistanceAboveLimit = 0D;
+        
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
         data.survivalFlyJumpPhase++;
