@@ -124,8 +124,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Register the commands handler.
         getCommand("nocheatplus").setExecutor(new CommandHandler(this));
 
+        ConfigFile config = ConfigManager.getConfigFile();
+        
         // Setup the graphs, plotters and start Metrics.
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {
+        if (config.getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {
             MetricsData.initialize();
             try {
                 final Metrics metrics = new Metrics(this);
@@ -154,24 +156,27 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             } catch (final Exception e) {}
         }
 
-        // Is a new update available?
-        try {
-            final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
-            final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
-            final URLConnection connection = url.openConnection();
-            final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String content = "", line = "";
-            while ((line = bufferedReader.readLine()) != null)
-                content += line;
-            bufferedReader.close();
-            final int jenkinsVersion = Integer.parseInt(content.split("\"number\":")[1].split(",")[0]);
-            updateAvailable = currentVersion < jenkinsVersion;
-        } catch (final Exception e) {}
+        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
+            // Is a new update available?
+            try {
+                final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
+                final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
+                final URLConnection connection = url.openConnection();
+                connection.setReadTimeout(config.getInt(ConfPaths.MISCELLANEOUS_READTIMEOUT, 4) * 1000);
+                final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String content = "", line = "";
+                while ((line = bufferedReader.readLine()) != null)
+                    content += line;
+                bufferedReader.close();
+                final int jenkinsVersion = Integer.parseInt(content.split("\"number\":")[1].split(",")[0]);
+                updateAvailable = currentVersion < jenkinsVersion;
+            } catch (final Exception e) {}
+        }
 
         // Is the configuration outdated?
         try {
             final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
-            final int configurationVersion = Integer.parseInt(ConfigManager.getConfigFile().options().header()
+            final int configurationVersion = Integer.parseInt(config.options().header()
                     .split("-b")[1].split("\\.")[0]);
             if (currentVersion > configurationVersion)
                 configOutdated = true;
