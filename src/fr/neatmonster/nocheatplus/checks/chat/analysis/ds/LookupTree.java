@@ -89,7 +89,7 @@ public class LookupTree<K, N extends Node<K>>{
 	@SuppressWarnings("unchecked")
 	public LookupEntry<K, N> lookup(final List<K> keys, final boolean create){
 		N insertion = root;
-		N leaf = null;
+		N node = null;
 		int depth = 0;
 		N current = root;
 		final NodeFactory<K, N> factory = (NodeFactory<K, N>) (create ? this.factory : null);
@@ -109,10 +109,10 @@ public class LookupTree<K, N extends Node<K>>{
 			}
 		}
 		if (create || insertion.isEnd && depth == keys.size()){
-			leaf = current;
+			node = current;
 			if (insertion != current) current.isEnd = true;
 		}
-		return new LookupEntry<K, N>(leaf, insertion, depth);
+		return new LookupEntry<K, N>(node, insertion, depth);
 	}
 
 	public void clear() {
