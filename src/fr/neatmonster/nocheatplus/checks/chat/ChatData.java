@@ -78,6 +78,7 @@ public class ChatData implements CheckData {
         captchaVL = 0D;
         // colorVL <- is spared to avoid problems with spam + captcha success.
         // noPwnageVL <- Is handled by the ActionFrequency forgtting mechanism, currently (call clear otherwise).
+        noPwnageSpeed.clear(System.currentTimeMillis());
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
     }
