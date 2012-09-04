@@ -83,7 +83,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	/** If nodes visit method shall be called. */
 	protected boolean visit;
 	
-	public PrefixTree(NodeFactory<K, N> nodeFactory, LookupEntryFactory<K, N, L> resultFactory){
+	public PrefixTree(final NodeFactory<K, N> nodeFactory, final LookupEntryFactory<K, N, L> resultFactory){
 		this.nodeFactory = nodeFactory;
 		this.root = nodeFactory.newNode(null);
 		this.resultFactory = resultFactory;
@@ -113,7 +113,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	 * @param create
 	 * @return
 	 */
-	public L lookup(K[] keys, final boolean create){
+	public L lookup(final K[] keys, final boolean create){
 		return lookup(Arrays.asList(keys), create);
 	}
 	
@@ -156,7 +156,9 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 		else if (depth == keys.size()){
 			node = current;
 		}
-		return resultFactory.newLookupEntry(node, insertion, depth, hasPrefix);
+		final L result = resultFactory.newLookupEntry(node, insertion, depth, hasPrefix);
+		decorate(result);
+		return  result;
 	}
 	
 	/**
@@ -164,6 +166,13 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	 * @param node
 	 */
 	protected void visit(final N node){
+	}
+	
+	/**
+	 * Decorate before returning.
+	 * @param result
+	 */
+	protected void decorate(final L result){
 	}
 	
 	/**
@@ -258,7 +267,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 			}
 		}, new LookupEntryFactory<K, Node<K>, LookupEntry<K,Node<K>>>() {
 			@Override
-			public LookupEntry<K, Node<K>> newLookupEntry(Node<K> node, Node<K> insertion, int depth, boolean hasPrefix) {
+			public final LookupEntry<K, Node<K>> newLookupEntry(final Node<K> node, final Node<K> insertion, final int depth, final boolean hasPrefix) {
 				return new LookupEntry<K, PrefixTree.Node<K>>(node, insertion, depth, hasPrefix);
 			}
 		});

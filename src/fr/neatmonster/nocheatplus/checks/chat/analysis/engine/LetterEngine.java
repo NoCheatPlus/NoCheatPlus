@@ -25,7 +25,7 @@ public class LetterEngine {
 		}
 		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK, false)){
 			// TODO: Make aspects configurable.
-			processors.add(new CompressedChars(2000, false));
+			processors.add(new CompressedWords(30000, 2000, false));
 		}
 	}
 	

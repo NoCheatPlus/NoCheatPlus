@@ -18,7 +18,7 @@ public class CharPrefixTree<N extends CharNode, L extends CharLookupEntry<N>> ex
 		}
 	}
 	
-	public CharPrefixTree(NodeFactory<Character, N> nodeFactory, LookupEntryFactory<Character, N, L> resultFactory) {
+	public CharPrefixTree(final NodeFactory<Character, N> nodeFactory, final LookupEntryFactory<Character, N, L> resultFactory) {
 		super(nodeFactory, resultFactory);
 	}
 
@@ -41,7 +41,7 @@ public class CharPrefixTree<N extends CharNode, L extends CharLookupEntry<N>> ex
 	 * @param create
 	 * @return
 	 */
-	public L lookup(final char[] chars, boolean create){
+	public L lookup(final char[] chars, final boolean create){
 		return lookup(toCharacterList(chars), create);
 	}
 	
@@ -51,7 +51,7 @@ public class CharPrefixTree<N extends CharNode, L extends CharLookupEntry<N>> ex
 	 * @param create
 	 * @return
 	 */
-	public L lookup(final String input, boolean create){
+	public L lookup(final String input, final boolean create){
 		return lookup(input.toCharArray(), create);
 	}
 	
@@ -73,7 +73,7 @@ public class CharPrefixTree<N extends CharNode, L extends CharLookupEntry<N>> ex
 		return feed(toCharacterList(chars));
 	}
 	
-	public void feedAll(final Collection<String> inputs, boolean trim, boolean lowerCase){
+	public void feedAll(final Collection<String> inputs, final boolean trim, final boolean lowerCase){
 		for (String input : inputs){
 			if (trim) input = input.toLowerCase();
 			if (lowerCase) input = input.toLowerCase();
@@ -118,7 +118,7 @@ public class CharPrefixTree<N extends CharNode, L extends CharLookupEntry<N>> ex
 			}
 		}, new LookupEntryFactory<Character, CharNode, CharLookupEntry<CharNode>>() {
 			@Override
-			public CharLookupEntry<CharNode> newLookupEntry(CharNode node, CharNode insertion, int depth, boolean hasPrefix) {
+			public final CharLookupEntry<CharNode> newLookupEntry(final CharNode node, final CharNode insertion, final int depth, final boolean hasPrefix) {
 				return new CharLookupEntry<CharNode>(node, insertion, depth, hasPrefix);
 			}
 		});

@@ -25,7 +25,7 @@ public class SimpleCharPrefixTree extends CharPrefixTree<CharNode, SimpleCharLoo
 			}
 		}, new LookupEntryFactory<Character, CharNode, SimpleCharLookupEntry>() {
 			@Override
-			public SimpleCharLookupEntry newLookupEntry(CharNode node, CharNode insertion, int depth, boolean hasPrefix) {
+			public final SimpleCharLookupEntry newLookupEntry(final CharNode node, final CharNode insertion, final int depth, final boolean hasPrefix) {
 				return new SimpleCharLookupEntry(node, insertion, depth, hasPrefix);
 			}
 		});
