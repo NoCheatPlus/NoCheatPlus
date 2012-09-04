@@ -131,10 +131,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_CHECK, true);
         set(ConfPaths.CHAT_GLOBALCHAT_COMMANDS, new LinkedList<String>(Arrays.asList(
         			new String[]{"/me"})));
-        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK, true);
+        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK, false);
         // Individual engine settings: maybe hide later by checking another "expert" or "show-hidden" flag. 
         set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ_CHECK, true);
-        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK, true); // this might get hidden or removed soon.
+        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK, false); // this might get hidden or removed soon.
         // 
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6.0D);
