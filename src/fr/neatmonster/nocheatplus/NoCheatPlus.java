@@ -83,6 +83,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Just to be sure nothing gets left out.
         getServer().getScheduler().cancelTasks(this);
+        
+        // Remove listeners.
+        listeners.clear();
 
         // Tell the server administrator the we finished unloading NoCheatPlus.
         System.out.println("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
@@ -104,6 +107,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         ConfigManager.init(this);
 
         // List the events listeners.
+        listeners.clear();
         listeners.add(new BlockBreakListener());
         listeners.add(new BlockInteractListener());
         listeners.add(new BlockPlaceListener());
