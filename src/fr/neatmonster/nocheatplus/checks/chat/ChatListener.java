@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.SimpleCharPrefixTree;
+import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -31,7 +32,7 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * 
  * @see ChatEvent
  */
-public class ChatListener implements Listener {
+public class ChatListener implements Listener, INotifyReload {
 
     /** The color check. */
     private final Color    color    = new Color();
@@ -47,11 +48,17 @@ public class ChatListener implements Listener {
     private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree(); 
     
     public ChatListener(){
-    	// Read some things from the global config file.
     	ConfigFile config = ConfigManager.getConfigFile();
-    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), false, true);
-    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS), false, true);
+    	initFilters(config);
+    	// (globalChat inits in constructor.)
     }
+    
+	private void initFilters(ConfigFile config) {
+		commandExclusions.clear();
+    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), false, true);
+    	chatCommands.clear();
+    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS), false, true);
+	}
 
     /**
      * We listen to PlayerChat events for obvious reasons.
@@ -195,4 +202,13 @@ public class ChatListener implements Listener {
          */
         ChatData.getData(event.getPlayer()).noPwnageLastMovedTime = System.currentTimeMillis();
     }
+
+	@Override
+	public void onReload() {
+		// Read some things from the global config file.
+    	ConfigFile config = ConfigManager.getConfigFile();
+    	initFilters(config);
+    	globalChat.onReload();
+	}
+
 }

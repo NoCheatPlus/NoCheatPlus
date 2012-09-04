@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.command;
 
+import java.util.Collection;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,9 +19,13 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
 public class ReloadCommand extends NCPCommand {
+	
+	/** Components that need to be notified on reload */
+	private final Collection<INotifyReload> notifyReload;
 
-	public ReloadCommand(NoCheatPlus plugin) {
+	public ReloadCommand(NoCheatPlus plugin, Collection<INotifyReload> notifyReload) {
 		super(plugin, "reload", Permissions.ADMINISTRATION_RELOAD);
+		this.notifyReload = notifyReload;
 	}
 
 	@Override
@@ -50,6 +56,11 @@ public class ReloadCommand extends NCPCommand {
         FightConfig.clear();
         InventoryConfig.clear();
         MovingConfig.clear();
+        
+        // Tell the plugin to adapt to new config.
+        for (INotifyReload component : notifyReload){
+        	component.onReload();
+        }
 
         // Say to the other plugins that we've reloaded the configuration.
         Bukkit.getPluginManager().callEvent(new NCPReloadEvent());

@@ -7,6 +7,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.LetterEngine;
+import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -16,15 +17,13 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
  * @author mc_dev
  *
  */
-public class GlobalChat extends Check{
+public class GlobalChat extends Check implements INotifyReload{
 
-	private final LetterEngine engine;
+	private LetterEngine engine;
 	
 	public GlobalChat() {
 		super(CheckType.CHAT_GLOBALCHAT);
-		// Set some things from the global config.
-		ConfigFile config = ConfigManager.getConfigFile();
-		engine = new LetterEngine(config);
+		onReload();
 	}
 
 	/**
@@ -50,6 +49,14 @@ public class GlobalChat extends Check{
 		synchronized (data) {
 			return unsafeCheck(player, message, captcha, cc, data, isMainThread);
 		}	
+	}
+	
+
+	@Override
+	public void onReload() {
+		// Set some things from the global config.
+		ConfigFile config = ConfigManager.getConfigFile();
+		engine = new LetterEngine(config);
 	}
 
 	/**

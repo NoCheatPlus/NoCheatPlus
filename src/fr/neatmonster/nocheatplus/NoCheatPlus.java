@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -28,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.command.CommandHandler;
+import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -54,13 +56,28 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
     /** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
+    
+    /** Components that need notification on reloading.
+     * (Kept here, for if during runtime some might get added.)*/
+    private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
 
     /** Is the configuration outdated? */
     private boolean              configOutdated  = false;
 
     /** Is a new update available? */
     private boolean              updateAvailable = false;
-
+    
+    /**
+     * Convenience method to add to listeners and notifyReload lists.
+     * @param listener
+     */
+    private void addListener(final Listener listener){
+    	listeners.add(listener);
+    	if (listener instanceof INotifyReload){
+    		notifyReload.add((INotifyReload) listener);
+    	}
+    }
+    
     /* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onDisable()
      */
@@ -78,14 +95,17 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
 
+        // Remove listeners.
+        listeners.clear();
+        
+        // Remove config listeners.
+        notifyReload.clear();
+        
         // Cleanup the configuration manager.
         ConfigManager.cleanup();
 
         // Just to be sure nothing gets left out.
         getServer().getScheduler().cancelTasks(this);
-        
-        // Remove listeners.
-        listeners.clear();
 
         // Tell the server administrator the we finished unloading NoCheatPlus.
         System.out.println("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
@@ -108,14 +128,18 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // List the events listeners.
         listeners.clear();
-        listeners.add(new BlockBreakListener());
-        listeners.add(new BlockInteractListener());
-        listeners.add(new BlockPlaceListener());
-        listeners.add(new ChatListener());
-        listeners.add(new FightListener());
-        listeners.add(new InventoryListener());
-        listeners.add(new MovingListener());
-        listeners.add(new Workarounds());
+        for (final Listener listener : new Listener[]{
+        	new BlockBreakListener(),
+        	new BlockInteractListener(),
+        	new BlockPlaceListener(),
+        	new ChatListener(),
+        	new FightListener(),
+        	new InventoryListener(),
+        	new MovingListener(),
+        	new Workarounds(),
+        }){
+        	addListener(listener);
+        }
 
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
@@ -126,7 +150,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
 
         // Register the commands handler.
-        getCommand("nocheatplus").setExecutor(new CommandHandler(this));
+        getCommand("nocheatplus").setExecutor(new CommandHandler(this, notifyReload));
 
         ConfigFile config = ConfigManager.getConfigFile();
         
@@ -337,4 +361,5 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         if (!message.equals(""))
             player.sendMessage(message);
     }
+    
 }

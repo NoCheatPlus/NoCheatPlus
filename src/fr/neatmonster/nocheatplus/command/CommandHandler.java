@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.command;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,13 +75,13 @@ public class CommandHandler implements CommandExecutor {
      * @param plugin
      *            the instance of NoCheatPlus
      */
-    public CommandHandler(final NoCheatPlus plugin) {
+    public CommandHandler(final NoCheatPlus plugin, final Collection<INotifyReload> notifyReload) {
         // Register sub commands:
         for (NCPCommand cmd : new NCPCommand[]{
         		new BanCommand(plugin),
         		new InfoCommand(plugin),
         		new KickCommand(plugin),
-        		new ReloadCommand(plugin),
+        		new ReloadCommand(plugin, notifyReload),
         		new TellCommand(plugin),
         		new DelayCommand(plugin),
         }){
