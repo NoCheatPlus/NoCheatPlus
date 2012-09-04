@@ -73,6 +73,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
      * @param listener
      */
     private void addListener(final Listener listener){
+    	Bukkit.getPluginManager().registerEvents(listener, this);
     	listeners.add(listener);
     	if (listener instanceof INotifyReload){
     		notifyReload.add((INotifyReload) listener);
@@ -92,6 +93,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
          * |____/|_|___/\__,_|_.__/|_|\___|
          */
         final PluginDescriptionFile pdfFile = getDescription();
+        
+        // Just to be sure nothing gets left out.
+        getServer().getScheduler().cancelTasks(this);
 
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
@@ -104,9 +108,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         
         // Cleanup the configuration manager.
         ConfigManager.cleanup();
-
-        // Just to be sure nothing gets left out.
-        getServer().getScheduler().cancelTasks(this);
 
         // Tell the server administrator the we finished unloading NoCheatPlus.
         System.out.println("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
@@ -124,11 +125,12 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
          * | |___| | | | (_| | |_) | |  __/
          * |_____|_| |_|\__,_|_.__/|_|\___|
          */
+    	
         // Read the configuration files.
         ConfigManager.init(this);
 
-        // List the events listeners.
-        listeners.clear();
+        // List the events listeners and register.
+        Bukkit.getPluginManager().registerEvents(this, this);
         for (final Listener listener : new Listener[]{
         	new BlockBreakListener(),
         	new BlockInteractListener(),
@@ -141,17 +143,12 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         }){
         	addListener(listener);
         }
+        
+        // Register the commands handler.
+        getCommand("nocheatplus").setExecutor(new CommandHandler(this, notifyReload));
 
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
-
-        // Register all listeners.
-        for (final Listener listener : listeners)
-            Bukkit.getPluginManager().registerEvents(listener, this);
-        Bukkit.getPluginManager().registerEvents(this, this);
-
-        // Register the commands handler.
-        getCommand("nocheatplus").setExecutor(new CommandHandler(this, notifyReload));
 
         ConfigFile config = ConfigManager.getConfigFile();
         
