@@ -148,7 +148,10 @@ public class GlobalChat extends Check implements INotifyReload{
 		
 		// Engine:
 		if (cc.globalChatEngineCheck){
-			final float wEngine = engine.process(letterCounts);
+			final float wEngine;
+			synchronized (engine) {
+				 wEngine = engine.process(letterCounts);
+			}
 			score += wEngine;
 		}
 		
