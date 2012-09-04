@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -186,26 +187,30 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
             // Is a new update available?
+        	BufferedReader bufferedReader = null;
+        	updateAvailable = false;
             try {
                 final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
                 final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
                 final URLConnection connection = url.openConnection();
                 connection.setReadTimeout(config.getInt(ConfPaths.MISCELLANEOUS_READTIMEOUT, 4) * 1000);
-                final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String content = "", line = "";
+                bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line, content = "";
                 while ((line = bufferedReader.readLine()) != null)
                     content += line;
-                bufferedReader.close();
                 final int jenkinsVersion = Integer.parseInt(content.split("\"number\":")[1].split(",")[0]);
                 updateAvailable = currentVersion < jenkinsVersion;
             } catch (final Exception e) {}
+            finally{
+            	if (bufferedReader != null) try{bufferedReader.close();}catch (IOException e){};
+            }
         }
 
         // Is the configuration outdated?
         try {
             final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
-            final int configurationVersion = Integer.parseInt(config.options().header()
-                    .split("-b")[1].split("\\.")[0]);
+            final int configurationVersion = Integer.parseInt(
+            		config.options().header().split("-b")[1].split("\\.")[0]);
             if (currentVersion > configurationVersion)
                 configOutdated = true;
         } catch (final Exception e) {}

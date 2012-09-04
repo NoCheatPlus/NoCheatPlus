@@ -540,19 +540,29 @@ public class Metrics {
             connection = url.openConnection();
 
         connection.setDoOutput(true);
+        
+        
+        OutputStreamWriter writer = null;
+        BufferedReader reader = null;
+        String response;
+        try{
+        	// Write the data
+            writer = new OutputStreamWriter(connection.getOutputStream());
+            writer.write(data.toString());
+            writer.flush();
 
-        // Write the data
-        final OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-        writer.write(data.toString());
-        writer.flush();
-
-        // Now read the response
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        final String response = reader.readLine();
-
-        // close resources
-        writer.close();
-        reader.close();
+            // Now read the response
+            reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            response = reader.readLine();
+        }
+        catch (IOException e){
+        	response = "ERR  (" + e.getClass().getSimpleName() + "): " + e.getMessage();
+        }
+        finally{
+            // close resources
+            if (writer != null) try{writer.close();} catch (IOException e){};
+            if (reader != null) try{reader.close();} catch (IOException e){};
+        }
 
         if (response == null || response.startsWith("ERR"))
             throw new IOException(response); // Throw the exception
