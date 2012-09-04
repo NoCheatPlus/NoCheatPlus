@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.Node;
 public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	
 	public static class Node<K>{
+		protected int minCap = 4;
 		public boolean isEnd = false;
 		public Map<K, Node<K>> children = null;
 		
@@ -27,7 +28,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 		
 		public Node<K> getChild(final K key, final NodeFactory<K, Node<K>> factory){
 			if (children == null){
-				if (factory != null) children = new HashMap<K, Node<K>>(3);
+				if (factory != null) children = new HashMap<K, Node<K>>(minCap);
 				else return null;
 			}
 			Node<K> node = children.get(key);
@@ -39,6 +40,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 				return node;
 			}
 		}
+		
 	}
 	
 	public static interface NodeFactory<K, N extends Node<K>>{
@@ -77,6 +79,9 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	protected final LookupEntryFactory<K, N, L> resultFactory;
 	
 	protected N root;
+	
+	/** If nodes visit method shall be called. */
+	protected boolean visit;
 	
 	public PrefixTree(NodeFactory<K, N> nodeFactory, LookupEntryFactory<K, N, L> resultFactory){
 		this.nodeFactory = nodeFactory;
@@ -120,6 +125,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	 */
 	@SuppressWarnings("unchecked")
 	public L lookup(final List<K> keys, final boolean create){
+		final boolean visit = this.visit;
 		N insertion = root;
 		int depth = 0;
 		N current = root;
@@ -139,6 +145,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 				insertion = current = child;
 				depth ++;
 				if (child.isEnd) hasPrefix = true;
+				if (visit) visit(child);
 			}
 		}
 		N node = null;
@@ -150,6 +157,13 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 			node = current;
 		}
 		return resultFactory.newLookupEntry(node, insertion, depth, hasPrefix);
+	}
+	
+	/**
+	 * Visit a node during lookup. Override to make use, you need to det the visit flag for it to take effect.
+	 * @param node
+	 */
+	protected void visit(final N node){
 	}
 	
 	/**

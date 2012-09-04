@@ -36,9 +36,10 @@ public class CompressedChars extends AbstractWordProcessor{
 
 	@Override
 	public float loop(long ts, int index, String key, WordLetterCount word) {
-		final List<Character> letters = new ArrayList<Character>(word.counts.size());
-		final List<Character> numbers = new ArrayList<Character>(word.counts.size());
-		final List<Character> other = new ArrayList<Character>(word.counts.size());
+		final int len = word.counts.size();
+		final List<Character> letters = new ArrayList<Character>(len);
+		final List<Character> numbers = new ArrayList<Character>(Math.min(len, 10));
+		final List<Character> other = new ArrayList<Character>(Math.min(len, 10));
 		for (Character c : word.counts.keySet()){
 			if (Character.isLetter(c)) letters.add(c);
 			else if (Character.isDigit(c)) numbers.add(c);
@@ -50,20 +51,16 @@ public class CompressedChars extends AbstractWordProcessor{
 			Collections.sort(other);
 		}
 		float score = 0;
-		float div = 0;
 		if (!letters.isEmpty()){
 			score += getScore(letters);
-			div += 1;
 		}
 		if (!numbers.isEmpty()){
 			score += getScore(numbers);
-			div += 1;
 		}
 		if (!other.isEmpty()){
 			score += getScore(other);
-			div += 1;
 		}
-		return (div == 0) ? 0 : score;
+	return word.counts.isEmpty()?0f:(score / (float) len);
 	}
 
 	private float getScore(List<Character> chars) {
