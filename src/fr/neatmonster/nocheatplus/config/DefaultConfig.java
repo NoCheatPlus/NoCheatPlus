@@ -137,9 +137,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK, false); // this might get hidden or removed soon.
         // 
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
-        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6.0D);
-        set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 45D);
-        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>8 log:globalchat:0:5:if cancel cmd:kickglchat");
+        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6);
+        set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 80);
+        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>20 log:globalchat:0:5:if cancel cmd:kickglchat");
 
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
@@ -186,7 +186,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK, true);
 //        set(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT, 500L);
-        set(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT, 200);
+        set(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT, 100);
 
         set(ConfPaths.CHAT_NOPWNAGE_WARN_LEVEL, 400);
         set(ConfPaths.CHAT_NOPWNAGE_WARN_TIMEOUT, 30000L);
