@@ -7,6 +7,8 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.LetterEngine;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 
 /**
@@ -16,10 +18,13 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
  */
 public class GlobalChat extends Check{
 
-	private final LetterEngine engine = new LetterEngine();
+	private final LetterEngine engine;
 	
 	public GlobalChat() {
 		super(CheckType.CHAT_GLOBALCHAT);
+		// Set some things from the global config.
+		ConfigFile config = ConfigManager.getConfigFile();
+		engine = new LetterEngine(config);
 	}
 
 	/**
@@ -136,7 +141,7 @@ public class GlobalChat extends Check{
 		
 		// Engine:
 		if (cc.globalChatEngineCheck){
-			final float wEngine = engine.feed(letterCounts);
+			final float wEngine = engine.process(letterCounts);
 			score += wEngine;
 		}
 		
