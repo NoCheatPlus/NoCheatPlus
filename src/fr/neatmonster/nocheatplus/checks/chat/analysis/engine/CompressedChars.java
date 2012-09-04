@@ -27,7 +27,11 @@ public class CompressedChars extends AbstractWordProcessor{
 	
 	@Override
 	public void start(MessageLetterCount message) {
-		if (added + message.words.length > maxAdd) tree.clear();
+		// This allows adding up to maximum messge length more characters,
+		//  	but also allows to set size of nodes exactly.
+		// TODO: Some better method  than blunt clear (extra LinkedHashSet/LRU?).
+		if (added > maxAdd) tree.clear();
+		added = 0;
 	}
 
 	@Override
@@ -70,6 +74,7 @@ public class CompressedChars extends AbstractWordProcessor{
 			score += 0.2;
 			if (entry.insertion.isEnd) score += 0.2;
 		}
+		if (len != entry.depth) added += len - entry.depth;
 		return score;
 	}
 
