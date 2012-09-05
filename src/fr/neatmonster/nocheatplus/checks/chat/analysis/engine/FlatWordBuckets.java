@@ -28,7 +28,7 @@ public class FlatWordBuckets extends AbstractWordProcessor{
 	}
 	
 	@Override
-	public void start(MessageLetterCount message) {
+	public void start(final MessageLetterCount message) {
 		if (entries.size() + message.words.length > maxSize)
 			releaseMap(entries, Math.max(message.words.length, maxSize / 10));
 	}
@@ -46,4 +46,10 @@ public class FlatWordBuckets extends AbstractWordProcessor{
 		freq.add(ts, 1.0f);
 		return score;
 	}
+
+	@Override
+	public void clear() {
+		entries.clear();
+	}
+	
 }

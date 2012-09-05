@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckConfig;
 import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.EnginePlayerConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -71,6 +72,7 @@ public class ChatConfig implements CheckConfig {
     
     public final boolean      globalChatCheck;
 	public final boolean      globalChatEngineCheck;
+	public final EnginePlayerConfig globalChatEnginePlayerConfig;
 	public final float        globalChatFrequencyFactor;
 	public final float        globalChatFrequencyWeight;
 	public final double       globalChatLevel;
@@ -135,76 +137,77 @@ public class ChatConfig implements CheckConfig {
     /**
      * Instantiates a new chat configuration.
      * 
-     * @param data
+     * @param config
      *            the data
      */
-    public ChatConfig(final ConfigFile data) {
-        colorCheck = data.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
-        colorActions = data.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
+    public ChatConfig(final ConfigFile config) {
+        colorCheck = config.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
+        colorActions = config.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
-        globalChatCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
-        globalChatEngineCheck = data.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK);
-        globalChatFrequencyFactor = (float) data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
-        globalChatFrequencyWeight = (float) data.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
-    	globalChatLevel = data.getDouble(ConfPaths.CHAT_GLOBALCHAT_LEVEL);
-        globalChatActions = data.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
+        globalChatCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
+        globalChatEngineCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK);
+        globalChatEnginePlayerConfig = new EnginePlayerConfig(config);
+        globalChatFrequencyFactor = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
+        globalChatFrequencyWeight = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
+    	globalChatLevel = config.getDouble(ConfPaths.CHAT_GLOBALCHAT_LEVEL);
+        globalChatActions = config.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
 
-        noPwnageCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
-        noPwnageLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
+        noPwnageCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
+        noPwnageLevel = config.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
         // VL decreasing factor, hidden option.
-        noPwnageVLFactor = (float) data.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.95);
+        noPwnageVLFactor = (float) config.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.95);
 
-        noPwnageBannedCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
-        noPwnageBannedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);
-        noPwnageBannedWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT);
+        noPwnageBannedCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
+        noPwnageBannedTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);
+        noPwnageBannedWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT);
 
-        noPwnageCaptchaCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK);
-        noPwnageCaptchaCharacters = data.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS);
-        noPwnageCaptchaLength = data.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH);
-        noPwnageCaptchaQuestion = data.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_QUESTION);
-        noPwnageCaptchaSuccess = data.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS);
-        noPwnageCaptchaTries = data.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES);
-        noPwnageCaptchaActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, Permissions.CHAT_NOPWNAGE_CAPTCHA);
+        noPwnageCaptchaCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK);
+        noPwnageCaptchaCharacters = config.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS);
+        noPwnageCaptchaLength = config.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH);
+        noPwnageCaptchaQuestion = config.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_QUESTION);
+        noPwnageCaptchaSuccess = config.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS);
+        noPwnageCaptchaTries = config.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES);
+        noPwnageCaptchaActions = config.getActionList(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, Permissions.CHAT_NOPWNAGE_CAPTCHA);
 
-        noPwnageFirstCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK);
-        noPwnageFirstTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT);
-        noPwnageFirstWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_FIRST_WEIGHT);
+        noPwnageFirstCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK);
+        noPwnageFirstTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT);
+        noPwnageFirstWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_FIRST_WEIGHT);
 
-        noPwnageGlobalCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_GLOBAL_CHECK);
-        noPwnageGlobalTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_GLOBAL_TIMEOUT);
-        noPwnageGlobalWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_GLOBAL_WEIGHT);
+        noPwnageGlobalCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_GLOBAL_CHECK);
+        noPwnageGlobalTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_GLOBAL_TIMEOUT);
+        noPwnageGlobalWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_GLOBAL_WEIGHT);
 
-        noPwnageMoveCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK);
-        noPwnageMoveTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT);
-        noPwnageMoveWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT);
+        noPwnageMoveCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK);
+        noPwnageMoveTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT);
+        noPwnageMoveWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT);
 
-        noPwnageReloginCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_RELOGIN_CHECK);
-        noPwnageReloginKickMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE);
-        noPwnageReloginTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_RELOGIN_TIMEOUT);
-        noPwnageReloginWarningMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE);
-        noPwnageReloginWarningNumber = data.getInt(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER);
-        noPwnageReloginWarningTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_TIMEOUT);
+        noPwnageReloginCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_RELOGIN_CHECK);
+        noPwnageReloginKickMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE);
+        noPwnageReloginTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_RELOGIN_TIMEOUT);
+        noPwnageReloginWarningMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE);
+        noPwnageReloginWarningNumber = config.getInt(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER);
+        noPwnageReloginWarningTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_TIMEOUT);
 
-        noPwnageRepeatCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK);
-        noPwnageRepeatTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT);
-        noPwnageRepeatWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT);
+        noPwnageRepeatCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK);
+        noPwnageRepeatTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT);
+        noPwnageRepeatWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT);
 
-        noPwnageSpeedCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK);
+        noPwnageSpeedCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK);
 //        noPwnageSpeedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT);
-        noPwnageSpeedWeight = data.getInt(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT);
+        noPwnageSpeedWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT);
 
-        noPwnageWarnLevel = data.getInt(ConfPaths.CHAT_NOPWNAGE_WARN_LEVEL);
-        noPwnageWarnTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_WARN_TIMEOUT);
-        noPwnageWarnOthersCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_CHECK);
-        noPwnageWarnOthersMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_MESSAGE);
-        noPwnageWarnPlayerCheck = data.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_CHECK);
-        noPwnageWarnPlayerMessage = data.getString(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE);
+        noPwnageWarnLevel = config.getInt(ConfPaths.CHAT_NOPWNAGE_WARN_LEVEL);
+        noPwnageWarnTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_WARN_TIMEOUT);
+        noPwnageWarnOthersCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_CHECK);
+        noPwnageWarnOthersMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_MESSAGE);
+        noPwnageWarnPlayerCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_CHECK);
+        noPwnageWarnPlayerMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE);
 
-        noPwnageActions = data.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
+        noPwnageActions = config.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
 
-        opInConsoleOnly = data.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
+        opInConsoleOnly = config.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
 
-        protectPlugins = data.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
+        protectPlugins = config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
     }
 
     /* (non-Javadoc)

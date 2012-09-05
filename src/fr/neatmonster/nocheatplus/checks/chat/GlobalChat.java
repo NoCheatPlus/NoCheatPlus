@@ -23,7 +23,7 @@ public class GlobalChat extends Check implements INotifyReload{
 	
 	public GlobalChat() {
 		super(CheckType.CHAT_GLOBALCHAT);
-		onReload();
+		init();
 	}
 
 	/**
@@ -51,12 +51,18 @@ public class GlobalChat extends Check implements INotifyReload{
 		}	
 	}
 	
-
-	@Override
-	public void onReload() {
+	private void init() {
 		// Set some things from the global config.
 		ConfigFile config = ConfigManager.getConfigFile();
 		engine = new LetterEngine(config);
+	}
+
+	@Override
+	public void onReload() {
+		synchronized(engine){
+			engine.clear();
+		}
+		init();
 	}
 
 	/**
@@ -150,7 +156,7 @@ public class GlobalChat extends Check implements INotifyReload{
 		if (cc.globalChatEngineCheck){
 			final float wEngine;
 			synchronized (engine) {
-				 wEngine = engine.process(letterCounts);
+				 wEngine = engine.process(letterCounts, player.getName(), cc, data);
 			}
 			score += wEngine;
 		}

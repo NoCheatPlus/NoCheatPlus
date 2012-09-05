@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.SimpleCharPrefixTree;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.SimpleCharPrefixTree;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;

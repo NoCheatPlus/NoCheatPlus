@@ -56,6 +56,11 @@ public abstract class AbstractWordProcessor implements WordProcessor{
 		// Override if needed.
 	}
 	
+	@Override
+	public void clear(){
+		// Override if needed.
+	}
+	
 	/**
 	 * Process one word.
 	 * @param index

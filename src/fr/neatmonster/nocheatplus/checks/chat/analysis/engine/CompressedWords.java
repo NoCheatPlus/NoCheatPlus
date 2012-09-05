@@ -6,8 +6,8 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.SimpleTimedCharPrefixTree;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.SimpleTimedCharPrefixTree.SimpleTimedCharLookupEntry;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.SimpleTimedCharPrefixTree;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.SimpleTimedCharPrefixTree.SimpleTimedCharLookupEntry;
 
 public class CompressedWords extends AbstractWordProcessor{
 
@@ -33,7 +33,7 @@ public class CompressedWords extends AbstractWordProcessor{
 	}
 	
 	@Override
-	public void start(MessageLetterCount message) {
+	public void start(final MessageLetterCount message) {
 		// This allows adding up to maximum messge length more characters,
 		//  	but also allows to set size of nodes exactly.
 		// TODO: Some better method  than blunt clear (extra LinkedHashSet/LRU?).
@@ -68,6 +68,14 @@ public class CompressedWords extends AbstractWordProcessor{
 			score += getScore(other, ts);
 		}
 	return word.counts.isEmpty()?0f:(score / (float) len);
+	}
+	
+	@Override
+	public void clear() {
+		tree.clear();
+		letters.clear();
+		digits.clear();
+		other.clear();
 	}
 
 	protected float getScore(final List<Character> chars, final long ts) {

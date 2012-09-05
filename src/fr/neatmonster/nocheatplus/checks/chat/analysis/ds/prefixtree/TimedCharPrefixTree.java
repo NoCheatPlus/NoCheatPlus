@@ -1,24 +1,30 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree;
 
 import java.util.Arrays;
 import java.util.List;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.TimedCharPrefixTree.TimedCharLookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.TimedCharPrefixTree.TimedCharNode;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.TimedCharPrefixTree.TimedCharLookupEntry;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.TimedCharPrefixTree.TimedCharNode;
 
-public class TimedCharPrefixTree<N extends TimedCharNode, L extends TimedCharLookupEntry<N>> extends CharPrefixTree<N, L> {
+public class TimedCharPrefixTree<N extends TimedCharNode<N>, L extends TimedCharLookupEntry<N>> extends CharPrefixTree<N, L> {
 
-	public static class TimedCharLookupEntry<N extends TimedCharNode> extends CharLookupEntry<N>{
+	public static class TimedCharLookupEntry<N extends TimedCharNode<N>> extends CharLookupEntry<N>{
 		public long[] timeInsertion = null;
 		public TimedCharLookupEntry(N node, N insertion, int depth, boolean hasPrefix){
 			super(node, insertion, depth, hasPrefix);
 		}
 	}
 	
-	public static class TimedCharNode extends CharNode{
+	public static class TimedCharNode<N extends TimedCharNode<N>> extends CharNode<N>{
 		public long ts = 0;
 		public TimedCharNode(long ts){
 			this.ts = ts;
+		}
+	}
+	
+	public static class SimpleTimedCharNode extends TimedCharNode<SimpleTimedCharNode>{
+		public SimpleTimedCharNode(long ts) {
+			super(ts);
 		}
 	}
 	
@@ -75,23 +81,23 @@ public class TimedCharPrefixTree<N extends TimedCharNode, L extends TimedCharLoo
 	 * @param access If to set timestamps, even if create is false.
 	 * @return
 	 */
-	public static TimedCharPrefixTree<TimedCharNode, TimedCharLookupEntry<TimedCharNode>> newTimedCharPrefixTree(final boolean access) {
-		return new TimedCharPrefixTree<TimedCharNode, TimedCharLookupEntry<TimedCharNode>>(
-			new NodeFactory<Character, TimedCharNode>(){
+	public static TimedCharPrefixTree<SimpleTimedCharNode, TimedCharLookupEntry<SimpleTimedCharNode>> newTimedCharPrefixTree(final boolean access) {
+		return new TimedCharPrefixTree<SimpleTimedCharNode, TimedCharLookupEntry<SimpleTimedCharNode>>(
+			new NodeFactory<Character, SimpleTimedCharNode>(){
 			@Override
-			public final TimedCharNode newNode(final TimedCharNode parent) {
+			public final SimpleTimedCharNode newNode(final SimpleTimedCharNode parent) {
 				final long ts;
 				if (parent == null) ts = System.currentTimeMillis();
 				else ts = parent.ts;
-				return new TimedCharNode(ts);
+				return new SimpleTimedCharNode(ts);
 			}
 			}
 			,
-			 new LookupEntryFactory<Character, TimedCharNode, TimedCharLookupEntry<TimedCharNode>>() {
+			 new LookupEntryFactory<Character, SimpleTimedCharNode, TimedCharLookupEntry<SimpleTimedCharNode>>() {
 				@Override
-				public final TimedCharLookupEntry<TimedCharNode> newLookupEntry(final TimedCharNode node,
-						final TimedCharNode insertion, final int depth, final boolean hasPrefix) {
-					return new TimedCharLookupEntry<TimedCharNode>(node, insertion, depth, hasPrefix);
+				public final TimedCharLookupEntry<SimpleTimedCharNode> newLookupEntry(final SimpleTimedCharNode node,
+						final SimpleTimedCharNode insertion, final int depth, final boolean hasPrefix) {
+					return new TimedCharLookupEntry<SimpleTimedCharNode>(node, insertion, depth, hasPrefix);
 				}
 			},
 			access

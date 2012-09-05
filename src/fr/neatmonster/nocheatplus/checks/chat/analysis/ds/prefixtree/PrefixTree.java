@@ -1,12 +1,12 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.LookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.Node;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.PrefixTree.LookupEntry;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.PrefixTree.Node;
 
 
 /**
@@ -15,35 +15,52 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.PrefixTree.Node;
  * @author mc_dev
  *
  */
-public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
+public class PrefixTree<K, N extends Node<K, N>, L extends LookupEntry<K, N>>{
 	
-	public static class Node<K>{
+	/**
+	 * The real thing.
+	 * @author mc_dev
+	 *
+	 * @param <K>
+	 * @param <N>
+	 */
+	public static class Node<K, N extends Node<K,N>>{
 		protected int minCap = 4;
+		/** End of a sequence marker (not necessarily a leaf) */
 		public boolean isEnd = false;
-		public Map<K, Node<K>> children = null;
+		public Map<K, N> children = null;
 		
 		public Node(){
-			
 		}
 		
-		public Node<K> getChild(final K key, final NodeFactory<K, Node<K>> factory){
-			if (children == null){
-				if (factory != null) children = new HashMap<K, Node<K>>(minCap);
-				else return null;
-			}
-			Node<K> node = children.get(key);
-			if (node != null) return node;
-			else if (factory == null) return null;
-			else{
-				node = factory.newNode(this);
-				children.put(key, node);
-				return node;
-			}
+		public N getChild(final K key){
+			if (children == null) return null;
+			return children.get(key);
 		}
 		
+		/**
+		 * Put the child into the children map.
+		 * @param key
+		 * @param child
+		 * @return The resulting child for the key.
+		 */
+		public N putChild(final K key, final N child){
+			if (children == null) children = new HashMap<K, N>(minCap);
+			children.put(key, child);
+			return child;
+		}
 	}
 	
-	public static interface NodeFactory<K, N extends Node<K>>{
+	/**
+	 * Convenience.
+	 * @author mc_dev
+	 *
+	 * @param <K>
+	 */
+	public static class SimpleNode<K> extends Node<K, SimpleNode<K>>{
+	}
+	
+	public static interface NodeFactory<K, N extends Node<K, N>>{
 		/**
 		 * 
 		 * @param parent Can be null (root).
@@ -52,7 +69,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 		public N newNode(N parent);
 	}
 	
-	public static class LookupEntry<K, N extends Node<K>>{
+	public static class LookupEntry<K, N extends Node<K, N>>{
 		/** The node, if lookup matched.*/
 		public final N node;
 		/** The node at which insertion did/would happen */
@@ -70,7 +87,7 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 		}
 	}
 	
-	public static interface LookupEntryFactory<K, N extends Node<K>, L extends LookupEntry<K, N>>{
+	public static interface LookupEntryFactory<K, N extends Node<K, N>, L extends LookupEntry<K, N>>{
 		public L newLookupEntry(N node , N insertion, int depth, boolean hasPrefix); 
 	}
 	
@@ -123,22 +140,20 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	 * @param create
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public L lookup(final List<K> keys, final boolean create){
 		final boolean visit = this.visit;
 		N insertion = root;
 		int depth = 0;
 		N current = root;
 		boolean hasPrefix = false;
-		final NodeFactory<K, N> factory = (NodeFactory<K, N>) (create ? this.nodeFactory : null);
 		for (final K key : keys){
-			final N child = (N) current.getChild(key, null);
+			final N child = current.getChild(key);
 			if (child == null){
-				if (factory == null)
-					break;
-				else{
-					current = (N) current.getChild(key, (NodeFactory<K, Node<K>>) factory);
-				}
+				if(create){
+					final N temp = nodeFactory.newNode(current);
+					current = current.putChild(key, temp);
+				} 
+				else break;
 			}
 			else{
 				// A node already exists, set as insertion point.
@@ -259,16 +274,16 @@ public class PrefixTree<K, N extends Node<K>, L extends LookupEntry<K, N>>{
 	 * @param keyType
 	 * @return
 	 */
-	public static <K> PrefixTree<K, Node<K>, LookupEntry<K, Node<K>>> newPrefixTree(){
-		return new PrefixTree<K, Node<K>, LookupEntry<K, Node<K>>>(new NodeFactory<K, Node<K>>(){
+	public static <K> PrefixTree<K, SimpleNode<K>, LookupEntry<K, SimpleNode<K>>> newPrefixTree(){
+		return new PrefixTree<K, SimpleNode<K>, LookupEntry<K, SimpleNode<K>>>(new NodeFactory<K, SimpleNode<K>>(){
 			@Override
-			public final Node<K> newNode(final Node<K> parent) {
-				return new Node<K>();
+			public final SimpleNode<K> newNode(final SimpleNode<K> parent) {
+				return new SimpleNode<K>();
 			}
-		}, new LookupEntryFactory<K, Node<K>, LookupEntry<K,Node<K>>>() {
+		}, new LookupEntryFactory<K, SimpleNode<K>, LookupEntry<K,SimpleNode<K>>>() {
 			@Override
-			public final LookupEntry<K, Node<K>> newLookupEntry(final Node<K> node, final Node<K> insertion, final int depth, final boolean hasPrefix) {
-				return new LookupEntry<K, PrefixTree.Node<K>>(node, insertion, depth, hasPrefix);
+			public final LookupEntry<K, SimpleNode<K>> newLookupEntry(final SimpleNode<K> node, final SimpleNode<K> insertion, final int depth, final boolean hasPrefix) {
+				return new LookupEntry<K, SimpleNode<K>>(node, insertion, depth, hasPrefix);
 			}
 		});
 	}

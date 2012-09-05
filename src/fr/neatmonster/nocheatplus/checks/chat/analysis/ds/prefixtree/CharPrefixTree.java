@@ -1,18 +1,21 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.CharPrefixTree.CharLookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.CharPrefixTree.CharNode;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.CharPrefixTree.CharLookupEntry;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.CharPrefixTree.CharNode;
 
-public class CharPrefixTree<N extends CharNode, L extends CharLookupEntry<N>> extends PrefixTree<Character, N, L>{
+public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>> extends PrefixTree<Character, N, L>{
 	
-	public static class CharNode extends Node<Character>{
+	public static class CharNode<N extends CharNode<N>> extends Node<Character, N>{
 	}
 	
-	public static class CharLookupEntry<N extends CharNode> extends LookupEntry<Character, N>{
+	public static class SimpleCharNode extends CharNode<SimpleCharNode>{
+	}
+	
+	public static class CharLookupEntry<N extends CharNode<N>> extends LookupEntry<Character, N>{
 		public CharLookupEntry(N node, N insertion, int depth, boolean hasPrefix){
 			super(node, insertion, depth, hasPrefix);
 		}
@@ -110,16 +113,16 @@ public class CharPrefixTree<N extends CharNode, L extends CharLookupEntry<N>> ex
 	 * @param keyType
 	 * @return
 	 */
-	public static CharPrefixTree<CharNode, CharLookupEntry<CharNode>> newCharPrefixTree(){
-		return new CharPrefixTree<CharNode, CharLookupEntry<CharNode>>(new NodeFactory<Character, CharNode>(){
+	public static CharPrefixTree<SimpleCharNode, CharLookupEntry<SimpleCharNode>> newCharPrefixTree(){
+		return new CharPrefixTree<SimpleCharNode, CharLookupEntry<SimpleCharNode>>(new NodeFactory<Character, SimpleCharNode>(){
 			@Override
-			public final CharNode newNode(final CharNode parent) {
-				return new CharNode();
+			public final SimpleCharNode newNode(final SimpleCharNode parent) {
+				return new SimpleCharNode();
 			}
-		}, new LookupEntryFactory<Character, CharNode, CharLookupEntry<CharNode>>() {
+		}, new LookupEntryFactory<Character, SimpleCharNode, CharLookupEntry<SimpleCharNode>>() {
 			@Override
-			public final CharLookupEntry<CharNode> newLookupEntry(final CharNode node, final CharNode insertion, final int depth, final boolean hasPrefix) {
-				return new CharLookupEntry<CharNode>(node, insertion, depth, hasPrefix);
+			public final CharLookupEntry<SimpleCharNode> newLookupEntry(final SimpleCharNode node, final SimpleCharNode insertion, final int depth, final boolean hasPrefix) {
+				return new CharLookupEntry<SimpleCharNode>(node, insertion, depth, hasPrefix);
 			}
 		});
 	}

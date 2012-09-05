@@ -143,12 +143,16 @@ public abstract class ConfPaths {
     
     private static final String CHAT_GLOBALCHAT                          = CHAT + "globalchat.";
     public static final String CHAT_GLOBALCHAT_CHECK                     = CHAT_GLOBALCHAT + "active";
-    public static final String CHAT_GLOBALCHAT_ENGINE                    = CHAT_GLOBALCHAT + "engine.";
+    private static final String CHAT_GLOBALCHAT_ENGINE                   = CHAT_GLOBALCHAT + "engine.";
 	public static final String CHAT_GLOBALCHAT_ENGINE_CHECK              = CHAT_GLOBALCHAT_ENGINE + "active";
 	private static final String CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ        = CHAT_GLOBALCHAT_ENGINE + "glwordfrequency.";
 	public static final String CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ_CHECK   = CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ + "active";
 	public static final String CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS       = CHAT_GLOBALCHAT_ENGINE + "glcompressedwords.";
 	public static final String CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK = CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS + "active";
+	private static final String CHAT_GLOBALCHAT_ENGINE_PPCOMPRWORDS      = CHAT_GLOBALCHAT_ENGINE + "ppcompressedwords.";
+	public static final String CHAT_GLOBALCHAT_ENGINE_PPCOMPRWORDS_CHECK = CHAT_GLOBALCHAT_ENGINE_PPCOMPRWORDS + "check";
+	private static final String CHAT_GLOBALCHAT_ENGINE_PPWORDFREQ        = CHAT_GLOBALCHAT_ENGINE + "ppwordfrequency.";
+	public static final String CHAT_GLOBALCHAT_ENGINE_PPWORDFREQ_CHECK   = CHAT_GLOBALCHAT_ENGINE_PPWORDFREQ + "active";
 	public static final String CHAT_GLOBALCHAT_COMMANDS                  = CHAT_GLOBALCHAT + "commands";
     public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_WEIGHT          = CHAT_GLOBALCHAT_FREQUENCY + "weight";
