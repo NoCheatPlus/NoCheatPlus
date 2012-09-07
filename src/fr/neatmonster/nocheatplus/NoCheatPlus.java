@@ -246,9 +246,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
          */
         // Change the NetServerHandler of the player if requested in the configuration.
         final ConfigFile configFile = ConfigManager.getConfigFile();
-        if (configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED))
+        if (configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false))
             NCPNetServerHandler.changeNetServerHandler(event.getPlayer(),
-                    configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY));
+                    configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false));
     }
 
     /**

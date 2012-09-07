@@ -55,8 +55,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
         set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
 
-        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
-        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false);
+//        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
+//        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false);
 
         /*
          * 888 88b, 888                    888    888 88b,                        888    
@@ -305,6 +305,7 @@ public class DefaultConfig extends ConfigFile {
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
         // set(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
+        // set(ConfPaths.MOVING_SURVIVALFLY_SPEEDINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
