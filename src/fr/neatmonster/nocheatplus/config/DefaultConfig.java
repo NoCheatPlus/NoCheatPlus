@@ -128,21 +128,24 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
         
+        // globalchat (ordering on purpose).
         set(ConfPaths.CHAT_GLOBALCHAT_CHECK, true);
-        set(ConfPaths.CHAT_GLOBALCHAT_COMMANDS, new LinkedList<String>(Arrays.asList(
-        			new String[]{"/me"})));
-        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK, false);
-        // Individual engine settings: maybe hide later by checking another "expert" or "show-hidden" flag. 
-        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ_CHECK, false);
-        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK, false);
-        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_PPWORDFREQ_CHECK, false);
-        set(ConfPaths.CHAT_GLOBALCHAT_ENGINE_PPCOMPRWORDS_CHECK, true);
-        // 
+        set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 80);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6);
-        set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 80);
+        set(ConfPaths.CHAT_GLOBALCHAT_COMMANDS, 
+        		new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
+        set(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 0.5);
+        set(ConfPaths.CHAT_GLOBALCHAT_GL_WORDS_CHECK, false);
+        set(ConfPaths.CHAT_GLOBALCHAT_GL_PREFIXES_CHECK , false);
+        set(ConfPaths.CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK , false);
+        set(ConfPaths.CHAT_GLOBALCHAT_PP_WORDS_CHECK, false);
+        set(ConfPaths.CHAT_GLOBALCHAT_PP_PREFIXES_CHECK, false);
+        set(ConfPaths.CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK , false);
+        // 
         set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>20 log:globalchat:0:5:if cancel cmd:kickglchat");
-
+        
+        // nopwnage
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
         set(ConfPaths.CHAT_NOPWNAGE_LEVEL, 500);
@@ -153,7 +156,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS,
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+                "abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH, 6);
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_QUESTION,
                 "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");

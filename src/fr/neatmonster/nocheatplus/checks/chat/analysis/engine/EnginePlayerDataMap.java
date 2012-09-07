@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
 
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.ManagedMap;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
 
 /**
  * Store EnginePlayerData. Expire data on get(String, Chatonfig).
@@ -32,7 +33,7 @@ public class EnginePlayerDataMap extends ManagedMap<String, EnginePlayerData> {
 			put(key, data);
 		}
 		final long ts = System.currentTimeMillis();
-		if (ts - durExpire > lastAccess) expire(ts - durExpire);
+		if (ts - lastAccess > durExpire) expire(ts - durExpire);
 		lastAccess = ts;
 		return data;
 	}

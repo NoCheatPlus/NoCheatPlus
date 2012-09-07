@@ -71,11 +71,14 @@ public class ChatConfig implements CheckConfig {
     public final ActionList   colorActions;
     
     public final boolean      globalChatCheck;
-	public final boolean      globalChatEngineCheck;
 	public final EnginePlayerConfig globalChatEnginePlayerConfig;
 	public final float        globalChatFrequencyFactor;
 	public final float        globalChatFrequencyWeight;
+	public final float        globalChatGlobalWeight;
+	public final float        globalChatPlayerWeight;
 	public final double       globalChatLevel;
+	public boolean            globalChatEngineMaximum;
+	public final boolean      globalChatDebug;
     public final ActionList   globalChatActions;
 
     public final boolean      noPwnageCheck;
@@ -145,11 +148,14 @@ public class ChatConfig implements CheckConfig {
         colorActions = config.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
         globalChatCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
-        globalChatEngineCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_CHECK);
         globalChatEnginePlayerConfig = new EnginePlayerConfig(config);
         globalChatFrequencyFactor = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
         globalChatFrequencyWeight = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
+        globalChatGlobalWeight = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 1.0);
+        globalChatPlayerWeight = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_PP_WEIGHT, 1.0);
     	globalChatLevel = config.getDouble(ConfPaths.CHAT_GLOBALCHAT_LEVEL);
+    	globalChatEngineMaximum = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_MAXIMUM, true);
+    	globalChatDebug = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_DEBUG, false);
         globalChatActions = config.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
 
         noPwnageCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);

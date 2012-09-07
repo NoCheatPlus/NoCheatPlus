@@ -1,7 +1,12 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Collection;
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,6 +19,17 @@ public class CheckUtils {
 
     /** The file logger. */
     public static Logger fileLogger = null;
+    
+    /** Decimal format for "#.###" */
+    public static final DecimalFormat fdec3 = new DecimalFormat();
+    
+    static{
+    	DecimalFormatSymbols sym = fdec3.getDecimalFormatSymbols();
+    	sym.setDecimalSeparator('.');
+    	fdec3.setDecimalFormatSymbols(sym);
+    	fdec3.setMaximumFractionDigits(3);
+    	fdec3.setMinimumIntegerDigits(1);
+    }
 
     /**
      * Check if a player looks at a target of a specific size, with a specific precision value (roughly).
@@ -157,6 +173,53 @@ public class CheckUtils {
         }
 
         return p[n];
+    }
+    
+    /**
+     * Join parts with link. 
+     * @param input
+     * @param link
+     * @return
+     */
+    public static <O extends Object> String join(final Collection<O> input, final String link){
+    	final StringBuilder builder = new StringBuilder(Math.max(300, input.size() * 10));
+    	boolean first = true;
+    	for (final Object obj : input){
+    		if (!first) builder.append(link);
+    		builder.append(obj.toString());
+    		first = false;
+    	}
+    	return builder.toString();
+    }
+    
+    /**
+     * Convenience method.
+     * @param parts
+     * @param link
+     * @return
+     */
+    public static <O extends Object> boolean scheduleOutputJoined(final List<O> parts, String link){
+    	return scheduleOutput(join(parts, link));
+    }
+    
+    /**
+     * Schedule a message to be output by the bukkit logger.
+     * @param message
+     * @return If scheduled successfully.
+     */
+    public static boolean scheduleOutput(final String message){
+    	try{
+    		return Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"),
+    				new Runnable() {
+						@Override
+						public void run() {
+							Bukkit.getLogger().info(message);
+						}
+					}) != -1;
+    	}
+    	catch (final Exception exc){
+    		return false;
+    	}
     }
 
     /**

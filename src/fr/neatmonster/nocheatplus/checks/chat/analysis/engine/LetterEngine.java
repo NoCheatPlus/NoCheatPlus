@@ -1,11 +1,22 @@
 package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.bukkit.Bukkit;
 
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatData;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.FlatWords;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.FlatWords.FlatWordsSettings;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.SimilarWordsBKL;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.SimilarWordsBKL.SimilarWordsBKLSettings;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes.WordPrefixesSettings;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 
@@ -17,50 +28,65 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
  */
 public class LetterEngine {
 	
+	/** Global processors */
 	protected final List<WordProcessor> processors = new ArrayList<WordProcessor>();
 	
 	protected final EnginePlayerDataMap dataMap;
 	
 	public LetterEngine(ConfigFile config){
 		// Add word processors.
-		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ_CHECK, false)){
-			// TODO: Make aspects configurable.
-			processors.add(new FlatWordBuckets(1000, 4, 1500, 0.9f));
+		// NOTE: These settings should be compared to the per player settings done in the EnginePlayerConfig constructor.
+		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_WORDS_CHECK, false)){
+			FlatWordsSettings settings = new FlatWordsSettings();
+			settings.maxSize = 1000;
+			settings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_GL_WORDS);
+			processors.add(new FlatWords("glWords",settings));
 		}
-		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK, false)){
-			// TODO: Make aspects configurable.
-			processors.add(new CompressedWords(30000, 2000, false));
+		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_PREFIXES_CHECK , false)){
+			WordPrefixesSettings settings = new WordPrefixesSettings();
+			settings.maxAdd = 2000;
+			settings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_GL_PREFIXES);
+			processors.add(new WordPrefixes("glPrefixes", settings));
 		}
-		
-		// TODO: At least expiration duration configurable?
+		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK , false)){
+			SimilarWordsBKLSettings settings = new SimilarWordsBKLSettings();
+			settings.maxSize = 1000;
+			settings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_GL_SIMILARITY);
+			processors.add(new SimilarWordsBKL("glSimilarity", settings));
+		}
+		// TODO: At least expiration duration configurable? (Entries expire after 10 minutes.)
 		dataMap = new EnginePlayerDataMap(600000L, 100, 0.75f);
 	}
 	
-	public float process(final MessageLetterCount letterCount, final String playerName, final ChatConfig cc, final ChatData data){
-		float score = 0;
+	public Map<String, Float> process(final MessageLetterCount letterCount, final String playerName, final ChatConfig cc, final ChatData data){
+		
+		final Map<String, Float> result = new HashMap<String, Float>();
 		
 		// Global processors.
 		for (final WordProcessor processor : processors){
-			final float refScore = processor.process(letterCount);
-			
-//			System.out.println("global:" + processor.getProcessorName() +": " + refScore);
-			
-			score = Math.max(score, refScore);
+			try{
+				result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatGlobalWeight);
+			}
+			catch( final Exception e){
+				Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+				e.printStackTrace();
+				continue;
+			}
 		}
 		
 		// Per player processors.
 		final EnginePlayerData engineData = dataMap.get(playerName, cc); 
 		for (final WordProcessor processor : engineData.processors){
-			final float refScore = processor.process(letterCount);
-			
-//			System.out.println("player: " + processor.getProcessorName() +": " + refScore);
-			
-			score = Math.max(score, refScore);
+			try{
+				result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatPlayerWeight);
+			}
+			catch( final Exception e){
+				Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+				e.printStackTrace();
+				continue;
+			}
 		}
-		
-		// TODO: Is max the right method?
-		
-		return score;
+		return result;
 	}
 
 	public void clear() {

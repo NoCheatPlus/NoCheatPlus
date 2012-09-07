@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.SimilarWordsBKL;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.FlatWords;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
 
 /**
  * Engine specific player data.
@@ -16,15 +20,12 @@ public class EnginePlayerData {
 
 	public EnginePlayerData(ChatConfig cc) {
 		EnginePlayerConfig config = cc.globalChatEnginePlayerConfig;
-		if (config.ppWordFrequencyCheck){
-			// TODO: configure.
-			processors.add(new FlatWordBuckets(50, 4, 1500, 0.9f));
-		}
-		if (config.ppComprWordsCheck){
-			// TODO: configure.
-			processors.add(new CompressedWords(30000, 320, false));
-		}
-		
+		if (config.ppWordsCheck) 
+			processors.add(new FlatWords("ppWords", config.ppWordsSettings));
+		if (config.ppPrefixesCheck) 
+			processors.add(new WordPrefixes("ppPrefixes", config.ppPrefixesSettings));
+		if (config.ppSimilarityCheck)
+			processors.add(new SimilarWordsBKL("ppSimilarity", config.ppSimilaritySettings));
 	}
-
+	
 }

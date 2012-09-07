@@ -141,25 +141,39 @@ public abstract class ConfPaths {
     public static final String  CHAT_COLOR_CHECK                         = CHAT_COLOR + "active";
     public static final String  CHAT_COLOR_ACTIONS                       = CHAT_COLOR + "actions";
     
+    // globalchat
     private static final String CHAT_GLOBALCHAT                          = CHAT + "globalchat.";
     public static final String CHAT_GLOBALCHAT_CHECK                     = CHAT_GLOBALCHAT + "active";
-    private static final String CHAT_GLOBALCHAT_ENGINE                   = CHAT_GLOBALCHAT + "engine.";
-	public static final String CHAT_GLOBALCHAT_ENGINE_CHECK              = CHAT_GLOBALCHAT_ENGINE + "active";
-	private static final String CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ        = CHAT_GLOBALCHAT_ENGINE + "glwordfrequency.";
-	public static final String CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ_CHECK   = CHAT_GLOBALCHAT_ENGINE_GLWORDFREQ + "active";
-	public static final String CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS       = CHAT_GLOBALCHAT_ENGINE + "glcompressedwords.";
-	public static final String CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS_CHECK = CHAT_GLOBALCHAT_ENGINE_GLCOMPRWORDS + "active";
-	private static final String CHAT_GLOBALCHAT_ENGINE_PPCOMPRWORDS      = CHAT_GLOBALCHAT_ENGINE + "ppcompressedwords.";
-	public static final String CHAT_GLOBALCHAT_ENGINE_PPCOMPRWORDS_CHECK = CHAT_GLOBALCHAT_ENGINE_PPCOMPRWORDS + "check";
-	private static final String CHAT_GLOBALCHAT_ENGINE_PPWORDFREQ        = CHAT_GLOBALCHAT_ENGINE + "ppwordfrequency.";
-	public static final String CHAT_GLOBALCHAT_ENGINE_PPWORDFREQ_CHECK   = CHAT_GLOBALCHAT_ENGINE_PPWORDFREQ + "active";
-	public static final String CHAT_GLOBALCHAT_COMMANDS                  = CHAT_GLOBALCHAT + "commands";
+	public static final String CHAT_GLOBALCHAT_LEVEL                     = CHAT_GLOBALCHAT + "level";
+	public static final String CHAT_GLOBALCHAT_ENGINE_MAXIMUM            = CHAT_GLOBALCHAT + "maximum";
     public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_WEIGHT          = CHAT_GLOBALCHAT_FREQUENCY + "weight";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_FACTOR          = CHAT_GLOBALCHAT_FREQUENCY + "factor";
-	public static final String CHAT_GLOBALCHAT_LEVEL                     = CHAT_GLOBALCHAT + "level";
+	public static final String CHAT_GLOBALCHAT_COMMANDS                  = CHAT_GLOBALCHAT + "commands";
+	// (Some of the following paths must be public for generic config reading.)
+    // Extended global checks.
+    private static final String CHAT_GLOBALCHAT_GL                       = CHAT_GLOBALCHAT + "global.";
+	public static final String CHAT_GLOBALCHAT_GL_WEIGHT                 = CHAT_GLOBALCHAT_GL + "weight";
+    public static final String CHAT_GLOBALCHAT_GL_WORDS                  = CHAT_GLOBALCHAT_GL + "words.";
+	public static final String CHAT_GLOBALCHAT_GL_WORDS_CHECK            = CHAT_GLOBALCHAT_GL_WORDS + "active";
+	public static final String CHAT_GLOBALCHAT_GL_PREFIXES               = CHAT_GLOBALCHAT_GL + "prefixes.";
+	public static final String CHAT_GLOBALCHAT_GL_PREFIXES_CHECK         = CHAT_GLOBALCHAT_GL_PREFIXES + "active";
+	public static final String CHAT_GLOBALCHAT_GL_SIMILARITY             = CHAT_GLOBALCHAT_GL + "similarity.";
+	public static final String CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_GL_SIMILARITY + "active";
+	// Extended per player checks.
+	private static final String CHAT_GLOBALCHAT_PP                       = CHAT_GLOBALCHAT + "player.";
+	public static final String CHAT_GLOBALCHAT_PP_WEIGHT                 = CHAT_GLOBALCHAT_PP + "weight";
+	public static final String CHAT_GLOBALCHAT_PP_PREFIXES               = CHAT_GLOBALCHAT_PP + "prefixes.";
+	public static final String CHAT_GLOBALCHAT_PP_PREFIXES_CHECK         = CHAT_GLOBALCHAT_PP_PREFIXES + "active";
+	public static final String CHAT_GLOBALCHAT_PP_WORDS                  = CHAT_GLOBALCHAT_PP + "words.";
+	public static final String CHAT_GLOBALCHAT_PP_WORDS_CHECK            = CHAT_GLOBALCHAT_PP_WORDS + "active";
+	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY             = CHAT_GLOBALCHAT_PP + "similarity.";
+	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_PP_SIMILARITY + "active";
+	// globalchat actions
+	public static final String CHAT_GLOBALCHAT_DEBUG                     = CHAT_GLOBALCHAT + "debug";
     public static final String CHAT_GLOBALCHAT_ACTIONS                   = CHAT_GLOBALCHAT + "actions";
-
+	
+    // nopwnage
     private static final String CHAT_NOPWNAGE                            = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                      = CHAT_NOPWNAGE + "active";
     public static final String  CHAT_NOPWNAGE_EXCLUSIONS                 = CHAT_NOPWNAGE + "exclusions";

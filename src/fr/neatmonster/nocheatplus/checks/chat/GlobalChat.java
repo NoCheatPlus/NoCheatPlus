@@ -1,5 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -11,6 +16,7 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
  * Some alternative more or less advanced analysis methods.
@@ -48,7 +54,7 @@ public class GlobalChat extends Check implements INotifyReload{
 		
 		synchronized (data) {
 			return unsafeCheck(player, message, captcha, cc, data, isMainThread);
-		}	
+		}
 	}
 	
 	private void init() {
@@ -88,6 +94,15 @@ public class GlobalChat extends Check implements INotifyReload{
 		final long time = System.currentTimeMillis();
 				
 		boolean cancel = false;
+		
+		boolean debug = cc.globalChatDebug;
+		
+		final List<String> debugParts;
+		if (debug){
+			debugParts = new LinkedList<String>();
+			debugParts.add("[NoCheatPlus][globalchat] Message ("+player.getName()+"/"+message.length()+"): ");
+		}
+		else debugParts = null;
 		
 		// Update the frequency interval weights.
 		data.globalChatFrequency.update(time);
@@ -152,21 +167,27 @@ public class GlobalChat extends Check implements INotifyReload{
 		wWords /= (float) letterCounts.words.length;
 		score += wWords;
 		
+		if (debug && score > 0f) debugParts.add("Simple score: " + CheckUtils.fdec3.format(score));
+		
 		// Engine:
-		if (cc.globalChatEngineCheck){
-			final float wEngine;
-			synchronized (engine) {
-				 wEngine = engine.process(letterCounts, player.getName(), cc, data);
-			}
-			score += wEngine;
+		// TODO: more fine grained sync !
+		float wEngine = 0f;
+		final Map<String, Float> engMap;
+		synchronized (engine) {
+			 engMap = engine.process(letterCounts, player.getName(), cc, data);
+			 // TODO: more fine grained sync !s
+			 // TODO: different methods (add or max or add+max or something else).
+			 for (final  Float res : engMap.values()){
+				 if (cc.globalChatEngineMaximum) wEngine = Math.max(wEngine, res.floatValue());
+				 else wEngine += res.floatValue();
+			 }
 		}
+		score += wEngine;
 		
 		// Wrapping it up. --------------------
 		// Add weight to frequency counts.
 		data.globalChatFrequency.add(time, score);
 		final float accumulated = cc.globalChatFrequencyWeight * data.globalChatFrequency.getScore(cc.globalChatFrequencyFactor);
-		
-//		System.out.println("Total score: " + score + " (" + accumulated + ")");
 		
 		if (score < 2.0f * cc.globalChatFrequencyWeight)
 			// Reset the VL.
@@ -185,7 +206,21 @@ public class GlobalChat extends Check implements INotifyReload{
 		}
 		else
 			data.globalChatVL *= 0.95;
-		
+
+		if (debug) {
+			final List<String> keys = new LinkedList<String>(engMap.keySet());
+			Collections.sort(keys);
+			for (String key : keys) {
+				Float s = engMap.get(key);
+				if (s.floatValue() > 0.0f)
+					debugParts.add(key + ":" + CheckUtils.fdec3.format(s));
+			}
+			if (wEngine > 0.0f)
+				debugParts.add("Engine score (" + (cc.globalChatEngineMaximum?"max":"sum") + "): " + CheckUtils.fdec3.format(wEngine));
+			debugParts.add("Total score: " + CheckUtils.fdec3.format(score) + " (weigth=" + cc.globalChatFrequencyWeight + " => accumulated=" + CheckUtils.fdec3.format(accumulated) + ", vl=" + CheckUtils.fdec3.format(data.globalChatVL));
+			CheckUtils.scheduleOutputJoined(debugParts, " | ");
+			debugParts.clear();
+		}
 		
 		return cancel;
 	}

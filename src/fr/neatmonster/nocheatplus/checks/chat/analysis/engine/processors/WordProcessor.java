@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors;
 
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 
@@ -10,6 +10,12 @@ public interface WordProcessor{
 	 * @return
 	 */
 	public String getProcessorName(); 
+	
+	/**
+	 * Configured weight.
+	 * @return
+	 */
+	public float getWeight();
 	
 	/**
 	 * 

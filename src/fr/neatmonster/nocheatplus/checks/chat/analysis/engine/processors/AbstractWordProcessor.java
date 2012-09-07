@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
+package fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +28,9 @@ public abstract class AbstractWordProcessor implements WordProcessor{
 	}
 	
 	protected String name;
+	/** Not set by constructor. */
+	protected float weight = 1f;
+	
 	public AbstractWordProcessor(String name){
 		this.name = name;
 	}
@@ -37,6 +40,17 @@ public abstract class AbstractWordProcessor implements WordProcessor{
 		return name;
 	}
 	
+	
+	
+	@Override
+	public float getWeight() {
+		return weight;
+	}
+	
+	public void setWeight(float weight){
+		this.weight = weight;
+	}
+
 	@Override
 	public float process(final MessageLetterCount message) {
 		// Does the looping, scores are summed up and divided by number of words.
@@ -46,9 +60,9 @@ public abstract class AbstractWordProcessor implements WordProcessor{
 		for (int index = 0; index < message.words.length; index++){
 			final WordLetterCount word = message.words[index];
 			final String key = word.word.toLowerCase();
-			score += loop(ts, index, key, word);
+			score += loop(ts, index, key, word) * (float) (word.word.length() + 1);
 		}
-		score /= (float) message.words.length;
+		score /= (float) (message.message.length() + message.words.length);
 		return score;
 	}
 	
@@ -65,7 +79,7 @@ public abstract class AbstractWordProcessor implements WordProcessor{
 	 * Process one word.
 	 * @param index
 	 * @param message
-	 * @return Score.
+	 * @return Score, suggested to be within [0 .. 1].
 	 */
 	public abstract float loop(final long ts, final int index, final String key, final WordLetterCount word);	
 }
