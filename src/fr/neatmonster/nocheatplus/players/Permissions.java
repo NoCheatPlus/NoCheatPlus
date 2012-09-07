@@ -104,6 +104,7 @@ public class Permissions {
     public static final String  FIGHT_KNOCKBACK              = FIGHT + ".knockback";
     public static final String  FIGHT_NOSWING                = FIGHT + ".noswing";
     public static final String  FIGHT_REACH                  = FIGHT + ".reach";
+	public static final String  FIGHT_SELFHIT                = FIGHT + ".selfhit";
     public static final String  FIGHT_SPEED                  = FIGHT + ".speed";
 
     /*
@@ -178,4 +179,5 @@ public class Permissions {
     public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
     public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
+
 }

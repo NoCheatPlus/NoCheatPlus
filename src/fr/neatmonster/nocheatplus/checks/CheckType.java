@@ -65,6 +65,7 @@ public enum CheckType {
     FIGHT_KNOCKBACK(FIGHT, Permissions.FIGHT_KNOCKBACK),
     FIGHT_NOSWING(FIGHT, Permissions.FIGHT_NOSWING),
     FIGHT_REACH(FIGHT, Permissions.FIGHT_REACH),
+    FIGHT_SELFHIT(FIGHT, Permissions.FIGHT_SELFHIT),
     FIGHT_SPEED(FIGHT, Permissions.FIGHT_SPEED),
 
     INVENTORY(InventoryConfig.factory, InventoryData.factory),

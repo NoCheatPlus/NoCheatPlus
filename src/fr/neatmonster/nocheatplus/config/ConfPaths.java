@@ -294,6 +294,11 @@ public abstract class ConfPaths {
     public static final String  FIGHT_REACH_CHECK                        = FIGHT_REACH + "active";
     public static final String  FIGHT_REACH_PENALTY                      = FIGHT_REACH + "penalty";
     public static final String  FIGHT_REACH_ACTIONS                      = FIGHT_REACH + "actions";
+    
+    public static final String FIGHT_SELFHIT                             = FIGHT + "selfhit.";
+    public static final String FIGHT_SELFHIT_CHECK                       = FIGHT_SELFHIT + "check";
+	public static final String FIGHT_SELFHIT_ACTIONS                     = FIGHT_SELFHIT + "actions";
+
 
     private static final String FIGHT_SPEED                              = FIGHT + "speed.";
     public static final String  FIGHT_SPEED_CHECK                        = FIGHT_SPEED + "active";
@@ -383,5 +388,5 @@ public abstract class ConfPaths {
      *                                  "8",P"        
      */
     public static final String  STRINGS                                  = "strings";
-
+    
 }

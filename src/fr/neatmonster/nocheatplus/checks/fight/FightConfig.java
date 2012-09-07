@@ -91,6 +91,9 @@ public class FightConfig implements CheckConfig {
     public final boolean    reachCheck;
     public final long       reachPenalty;
     public final ActionList reachActions;
+    
+    public final boolean    selfHitCheck;
+	public final ActionList selfHitActions;
 
     public final boolean    speedCheck;
     public final int        speedLimit;
@@ -133,6 +136,9 @@ public class FightConfig implements CheckConfig {
         reachPenalty = data.getLong(ConfPaths.FIGHT_REACH_PENALTY);
         reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
 
+        selfHitCheck = data.getBoolean(ConfPaths.FIGHT_SELFHIT_CHECK);
+        selfHitActions = data.getActionList(ConfPaths.FIGHT_SELFHIT_ACTIONS, Permissions.FIGHT_SELFHIT);
+        
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
         speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
@@ -162,6 +168,8 @@ public class FightConfig implements CheckConfig {
             return reachCheck;
         case FIGHT_SPEED:
             return speedCheck;
+        case FIGHT_SELFHIT:
+        	return selfHitCheck;
         default:
             return true;
         }

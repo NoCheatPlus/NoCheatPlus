@@ -244,6 +244,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_REACH_CHECK, true);
         set(ConfPaths.FIGHT_REACH_PENALTY, 500);
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
+        
+        set(ConfPaths.FIGHT_SELFHIT_CHECK, true);
+        set(ConfPaths.FIGHT_SELFHIT_ACTIONS, "log:fselfhit:2:5:if cancel vl>10 log:fselfhit:0:5:if cancel cmd:kickselfhit");
 
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
         set(ConfPaths.FIGHT_SPEED_LIMIT, 15);
@@ -339,6 +342,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".flylong", start
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
+        set(ConfPaths.STRINGS + ".fselfhit", start + "tried to self-hit" + end);
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [limit] times per second" + end);
         set(ConfPaths.STRINGS + ".globalchat", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
@@ -349,6 +353,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kicknopwnage", "ncp kick [player] You're not allowed to spam this server!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickglchat", "ncp kick [player] Too many chat messages, take a break.");
+        set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);

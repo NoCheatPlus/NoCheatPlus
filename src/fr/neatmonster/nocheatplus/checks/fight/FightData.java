@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*
  * MM""""""""`M oo          dP         dP   M""""""'YMM            dP            
@@ -85,6 +86,9 @@ public class FightData implements CheckData {
 
     // Data of the reach check.
     public long                    reachLastViolationTime;
+    
+    // Data of the SelfHit check.
+    public ActionFrequency selfHitVL = new ActionFrequency(6, 5000);
 
     // Data of the speed check.
     public int                     speedAttacks;

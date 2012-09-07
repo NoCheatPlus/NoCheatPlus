@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -56,6 +57,9 @@ public class FightListener implements Listener {
 
     /** The reach check. */
     private final Reach       reach       = new Reach();
+    
+    /** The self hit check */
+    private final SelfHit     selfHit     = new SelfHit();
 
     /** The speed check. */
     private final Speed       speed       = new Speed();
@@ -82,7 +86,7 @@ public class FightListener implements Listener {
      */
     private void handleNormalDamage(final EntityDamageByEntityEvent event) {
         final Player player = (Player) event.getDamager();
-        FightConfig.getConfig(player);
+        final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
         // For some reason we decided to skip this event anyway.
@@ -92,12 +96,19 @@ public class FightListener implements Listener {
         }
 
         boolean cancelled = false;
+        
+        // Check for self hit exploits (mind that projectiles should be excluded)
+        final Entity cbEntity = event.getEntity();
+        if (cbEntity instanceof Player){
+        	if (selfHit.isEnabled(player) && selfHit.check(player, cbEntity, data, cc))
+        		cancelled = true;
+        }
 
         // Get the attacked entity.
-        final net.minecraft.server.Entity damaged = ((CraftEntity) event.getEntity()).getHandle();
+        final net.minecraft.server.Entity damaged = ((CraftEntity) cbEntity).getHandle();
 
         // Run through the main checks.
-        if (angle.isEnabled(player) && angle.check(player))
+        if (!cancelled && angle.isEnabled(player) && angle.check(player))
             cancelled = true;
 
         if (!cancelled && critical.isEnabled(player) && critical.check(player))
