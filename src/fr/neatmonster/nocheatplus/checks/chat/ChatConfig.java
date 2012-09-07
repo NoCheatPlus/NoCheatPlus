@@ -82,6 +82,7 @@ public class ChatConfig implements CheckConfig {
     public final ActionList   globalChatActions;
 
     public final boolean      noPwnageCheck;
+	public final boolean      noPwnageDebug;
     public final int          noPwnageLevel;
     public final float        noPwnageVLFactor;
 
@@ -159,6 +160,7 @@ public class ChatConfig implements CheckConfig {
         globalChatActions = config.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
 
         noPwnageCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
+        noPwnageDebug = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_DEBUG, false);
         noPwnageLevel = config.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
         // VL decreasing factor, hidden option.
         noPwnageVLFactor = (float) config.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.95);

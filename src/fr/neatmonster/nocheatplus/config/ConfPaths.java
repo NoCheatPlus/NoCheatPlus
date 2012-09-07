@@ -176,6 +176,7 @@ public abstract class ConfPaths {
     // nopwnage
     private static final String CHAT_NOPWNAGE                            = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                      = CHAT_NOPWNAGE + "active";
+	public static final String  CHAT_NOPWNAGE_DEBUG                      = CHAT_NOPWNAGE + "debug";
     public static final String  CHAT_NOPWNAGE_EXCLUSIONS                 = CHAT_NOPWNAGE + "exclusions";
     public static final String  CHAT_NOPWNAGE_LEVEL                      = CHAT_NOPWNAGE + "level";
 
@@ -382,5 +383,5 @@ public abstract class ConfPaths {
      *                                  "8",P"        
      */
     public static final String  STRINGS                                  = "strings";
-    
+
 }

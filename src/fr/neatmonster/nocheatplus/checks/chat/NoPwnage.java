@@ -208,7 +208,7 @@ public class NoPwnage extends Check implements ICaptcha{
                 data.noPwnageVL.add(now, (float) (suspicion / 10D));
 
                 // Find out if we need to kick the player or not.
-                cancel = executeActionsThreadSafe(player, cc.noPwnageVLFactor, suspicion / 10D, cc.noPwnageActions,
+                cancel = executeActionsThreadSafe(player, data.noPwnageVL.getScore(cc.noPwnageVLFactor), suspicion / 10D, cc.noPwnageActions,
                         isMainThread);
             }
 //        else
@@ -220,6 +220,11 @@ public class NoPwnage extends Check implements ICaptcha{
         data.noPwnageLastMessageTime = now;
         lastGlobalMessage = message;
         lastGlobalMessageTime = now;
+        
+        if (cc.noPwnageDebug){
+        	final String msg = "[NoCheatPlus][nopwnage]  Message ("+player.getName()+"/"+message.length()+"): suspicion="+suspicion +", vl="+CheckUtils.fdec3.format(data.noPwnageVL.getScore(cc.noPwnageVLFactor));
+        	CheckUtils.scheduleOutput(msg);
+        }
 
         return cancel;
     }
