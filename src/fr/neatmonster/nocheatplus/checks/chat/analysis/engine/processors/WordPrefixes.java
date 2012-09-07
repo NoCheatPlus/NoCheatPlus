@@ -16,12 +16,8 @@ public class WordPrefixes extends DigestedWords{
 		 * split and compress by default.
 		 */
 		public WordPrefixesSettings(){
-			super(false, true, true, 1f);
-		}
-		public WordPrefixesSettings(long durExpire, int maxAdd, boolean sort, boolean compress, boolean split, float weight) {
-			super(sort, compress, split, weight);
-			this.maxAdd = maxAdd;
-			this.durExpire = durExpire;
+			split = true;
+			compress = true;
 		}
 		public WordPrefixesSettings applyConfig(ConfigFile config, String prefix){
 			super.applyConfig(config, prefix);
@@ -42,22 +38,9 @@ public class WordPrefixes extends DigestedWords{
 	protected long lastAdd = System.currentTimeMillis();
 	
 	public WordPrefixes(String name, WordPrefixesSettings settings){
-		this(name, settings.durExpire, settings.maxAdd, settings.sort, settings.compress, settings.split);
-		this.weight = settings.weight;
-	}
-	
-	/**
-	 * 
-	 * @param durExpire
-	 * @param maxAdd
-	 * @param sort Sort letters.
-	 * @param compress Only use every letter once.
-	 * @param split Check for letters, digits, other individually (!).
-	 */
-	public WordPrefixes(String name, long durExpire, int maxAdd, boolean sort, boolean compress, boolean split) {
-		super(name, sort, compress, split);
-		this.durExpire = durExpire;
-		this.maxAdd = maxAdd;
+		super(name, settings);
+		this.durExpire = settings.durExpire;
+		this.maxAdd = settings.maxAdd;
 	}
 	
 	@Override

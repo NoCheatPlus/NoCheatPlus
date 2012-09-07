@@ -20,15 +20,9 @@ public abstract class DigestedWords extends AbstractWordProcessor{
 		public boolean compress = false;
 		public boolean split = false;
 		public float weight = 1f;
-		
+		public int minWordSize = 0;
+		public int maxWordSize = 0;
 		public DigestedWordsSettings(){	
-		}
-		
-		public DigestedWordsSettings(boolean sort, boolean compress, boolean split, float weight) {
-			this.sort = sort;
-			this.compress = compress;
-			this.split = split;
-			this.weight  = weight;
 		}
 		
 		/**
@@ -42,13 +36,18 @@ public abstract class DigestedWords extends AbstractWordProcessor{
 			this.compress = config.getBoolean(prefix + "compress", this.compress);
 			this.split = config.getBoolean(prefix + "split", this.split);
 			this.weight = (float) config.getDouble(prefix + "weight", this.weight);
+			this.minWordSize = config.getInt(prefix + "minwordsize", this.minWordSize);
+			this.maxWordSize = config.getInt(prefix + "maxwordsize", this.maxWordSize);
 			return this;
 		}
 	}
 
-	protected final boolean sort;
-	protected final boolean compress;
-	protected final boolean split;
+	protected boolean sort = false;
+	protected boolean compress = false;
+	protected boolean split = false;
+	
+	protected int minWordSize = 0;
+	protected int maxWordSize = 0;
 	
 	protected final List<Character> letters = new ArrayList<Character>(10);
 	protected final List<Character> digits = new ArrayList<Character>(10);
@@ -60,8 +59,13 @@ public abstract class DigestedWords extends AbstractWordProcessor{
 	 * @param settings
 	 */
 	public DigestedWords(String name, DigestedWordsSettings settings){
-		this(name, settings.sort, settings.compress, settings.split);
+		this(name);
 		this.weight = settings.weight;
+		this.minWordSize = settings.minWordSize;
+		this.maxWordSize = settings.maxWordSize;
+		this.sort = settings.sort;
+		this.compress = settings.compress;
+		this.split = settings.split;
 	}
 	
 	/**
@@ -72,11 +76,8 @@ public abstract class DigestedWords extends AbstractWordProcessor{
 	 * @param compress Only use every letter once.
 	 * @param split Check for letters, digits, other individually (!).
 	 */
-	public DigestedWords(String name, boolean sort, boolean compress, boolean split) {
+	public DigestedWords(String name) {
 		super(name);
-		this.sort = sort;
-		this.compress = compress;
-		this.split = split;
 	}
 
 	@Override
@@ -102,24 +103,23 @@ public abstract class DigestedWords extends AbstractWordProcessor{
 			else if (Character.isDigit(c)) digits.add(c);
 			else other.add(c);
 		}
-		if (sort){
-			Collections.sort(letters);
-			Collections.sort(digits);
-			Collections.sort(other);
-		}
+
 		float score = 0;
-		if (!letters.isEmpty()){
-			score += getScore(letters, ts) * (float) letters.size();
-		}
-		if (!digits.isEmpty()){
-			score += getScore(digits, ts) * (float) digits.size();
-		}
-		if (!other.isEmpty()){
-			score += getScore(other, ts) * (float) other.size();
-		}
-	return len == 0?0f:(score / (float) len);
+		if (prepare(letters)) score += getScore(letters, ts) * (float) letters.size();
+		if (prepare(digits)) score += getScore(digits, ts) * (float) digits.size();
+		if (prepare(other)) score += getScore(other, ts) * (float) other.size();
+		return len == 0?0f:(score / (float) len);
 	}
 	
+	protected boolean prepare(final List<Character> chars) {
+		if (chars.isEmpty()) return false;
+		final int size = chars.size();
+		if (size < minWordSize) return false;
+		if (maxWordSize > 0 && size > maxWordSize) return false;
+		if (sort) Collections.sort(chars);
+		return true;
+	}
+
 	@Override
 	public void clear() {
 		letters.clear();

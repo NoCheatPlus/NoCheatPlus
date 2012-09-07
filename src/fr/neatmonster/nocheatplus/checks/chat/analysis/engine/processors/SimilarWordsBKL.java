@@ -19,14 +19,8 @@ public class SimilarWordsBKL extends DigestedWords {
 		 * split + compress by default.
 		 */
 		public SimilarWordsBKLSettings(){
-			super(false, true, true, 1f);
-		}
-		public SimilarWordsBKLSettings(int range, long durExpire, int maxSize, int maxSeek, boolean sort, boolean compress, boolean split, float weight) {
-			super(sort, compress, split, weight);
-			this.range = range;
-			this.durExpire = durExpire;
-			this.maxSize = maxSize;
-			this.maxSeek = maxSeek;
+			split = true;
+			compress = true;
 		}
 		public SimilarWordsBKLSettings applyConfig(ConfigFile config, String  prefix){
 			super.applyConfig(config, prefix);
@@ -51,16 +45,11 @@ public class SimilarWordsBKL extends DigestedWords {
 	protected long lastAdd = System.currentTimeMillis();
 	
 	public SimilarWordsBKL(String name, SimilarWordsBKLSettings settings){
-		this(name, settings.range, settings.durExpire, settings.maxSize, settings.maxSeek , settings.sort, settings.compress, settings.split);
-		this.weight = settings.weight;
-	}
-	
-	public SimilarWordsBKL(String name, int range, long durExpire, int maxSize, int maxSeek, boolean sort, boolean compress, boolean split) {
-		super(name, sort, compress, split);
-		this.maxSize = maxSize;
-		this.range = range;
-		this.durExpire = durExpire;
-		this.maxSeek = maxSeek;
+		super(name, settings);
+		this.maxSize = settings.maxSize;
+		this.range = settings.range;
+		this.durExpire = settings.durExpire;
+		this.maxSeek = settings.maxSeek;
 	}
 	
 	@Override

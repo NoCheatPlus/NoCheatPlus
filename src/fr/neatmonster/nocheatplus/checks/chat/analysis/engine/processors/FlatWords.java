@@ -23,14 +23,7 @@ public class FlatWords extends DigestedWords{
 		 * split by default.
 		 */
 		public FlatWordsSettings(){
-			super(false, true, true, 1f);
-		}
-		public FlatWordsSettings (int maxSize, int nBuckets, long durBucket, float factor, boolean sort, boolean compress, boolean split, float weight){
-			super(sort, compress, split, weight);
-			this.maxSize = maxSize;
-			this.nBuckets = nBuckets;
-			this.durBucket = durBucket;
-			this.factor = factor;
+			this.split = true;
 		}
 		public FlatWordsSettings applyConfig(ConfigFile config, String prefix){
 			super.applyConfig(config, prefix);
@@ -52,17 +45,12 @@ public class FlatWords extends DigestedWords{
 	protected long lastAdd = System.currentTimeMillis();
 	
 	public FlatWords(String name, FlatWordsSettings settings){
-		this(name, settings.maxSize, settings.nBuckets, settings.durBucket, settings.factor, settings.sort, settings.compress, settings.split);
-		this.weight = settings.weight;
-	}
-	
-	public FlatWords(String name, int maxSize, int nBuckets, long durBucket, float factor, boolean sort, boolean compress, boolean split){
-		super(name, sort, compress, split);
-		this.maxSize = maxSize;
+		super(name, settings);
+		this.maxSize = settings.maxSize;
 		entries = new LinkedHashMap<String, ActionFrequency>(maxSize);
-		this.nBuckets = nBuckets;
-		this.durBucket = durBucket;
-		this.factor = factor;
+		this.nBuckets = settings.nBuckets;
+		this.durBucket = settings.durBucket;
+		this.factor = settings.factor;
 	}
 	
 	@Override
