@@ -351,9 +351,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
-        set(ConfPaths.STRINGS + ".kicknopwnage", "ncp kick [player] You're not allowed to spam this server!");
-        set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
-        set(ConfPaths.STRINGS + ".kickglchat", "ncp kick [player] Too many chat messages, take a break.");
+        set(ConfPaths.STRINGS + ".kicknopwnage", "ncp delay ncp kick [player] You're not allowed to spam this server!");
+        set(ConfPaths.STRINGS + ".kickcaptcha", "ncp delay ncp kick [player] Enter the captcha!");
+        set(ConfPaths.STRINGS + ".kickglchat", "ncp delay ncp kick [player] Too many chat messages, take a break.");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
