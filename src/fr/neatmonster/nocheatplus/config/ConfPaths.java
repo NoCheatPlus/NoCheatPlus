@@ -153,6 +153,7 @@ public abstract class ConfPaths {
 	// (Some of the following paths must be public for generic config reading.)
     // Extended global checks.
     private static final String CHAT_GLOBALCHAT_GL                       = CHAT_GLOBALCHAT + "global.";
+	public static final String CHAT_GLOBALCHAT_GL_CHECK                  = CHAT_GLOBALCHAT_GL + "active";
 	public static final String CHAT_GLOBALCHAT_GL_WEIGHT                 = CHAT_GLOBALCHAT_GL + "weight";
     public static final String CHAT_GLOBALCHAT_GL_WORDS                  = CHAT_GLOBALCHAT_GL + "words.";
 	public static final String CHAT_GLOBALCHAT_GL_WORDS_CHECK            = CHAT_GLOBALCHAT_GL_WORDS + "active";
@@ -162,6 +163,7 @@ public abstract class ConfPaths {
 	public static final String CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_GL_SIMILARITY + "active";
 	// Extended per player checks.
 	private static final String CHAT_GLOBALCHAT_PP                       = CHAT_GLOBALCHAT + "player.";
+	public static final String CHAT_GLOBALCHAT_PP_CHECK                  = CHAT_GLOBALCHAT_PP + "active";
 	public static final String CHAT_GLOBALCHAT_PP_WEIGHT                 = CHAT_GLOBALCHAT_PP + "weight";
 	public static final String CHAT_GLOBALCHAT_PP_PREFIXES               = CHAT_GLOBALCHAT_PP + "prefixes.";
 	public static final String CHAT_GLOBALCHAT_PP_PREFIXES_CHECK         = CHAT_GLOBALCHAT_PP_PREFIXES + "active";

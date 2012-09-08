@@ -56,6 +56,7 @@ public class SimilarWordsBKL extends DigestedWords {
 	public void clear() {
 		super.clear();
 		tree.clear();
+		added = 0;
 	}
 
 	@Override

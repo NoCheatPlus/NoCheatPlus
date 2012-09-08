@@ -58,6 +58,7 @@ public class WordPrefixes extends DigestedWords{
 	public void clear() {
 		super.clear();
 		tree.clear();
+		added = 0;
 	}
 
 	protected float getScore(final List<Character> chars, final long ts) {

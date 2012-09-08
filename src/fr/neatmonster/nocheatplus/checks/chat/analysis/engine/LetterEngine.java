@@ -63,29 +63,34 @@ public class LetterEngine {
 		final Map<String, Float> result = new HashMap<String, Float>();
 		
 		// Global processors.
-		for (final WordProcessor processor : processors){
-			try{
-				result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatGlobalWeight);
-			}
-			catch( final Exception e){
-				Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-				e.printStackTrace();
-				continue;
+		if (cc.globalChatGlobalCheck){
+			for (final WordProcessor processor : processors){
+				try{
+					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatGlobalWeight);
+				}
+				catch( final Exception e){
+					Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					e.printStackTrace();
+					continue;
+				}
 			}
 		}
 		
 		// Per player processors.
-		final EnginePlayerData engineData = dataMap.get(playerName, cc); 
-		for (final WordProcessor processor : engineData.processors){
-			try{
-				result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatPlayerWeight);
-			}
-			catch( final Exception e){
-				Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-				e.printStackTrace();
-				continue;
+		if (cc.globalChatPlayerCheck){
+			final EnginePlayerData engineData = dataMap.get(playerName, cc); 
+			for (final WordProcessor processor : engineData.processors){
+				try{
+					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatPlayerWeight);
+				}
+				catch( final Exception e){
+					Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					e.printStackTrace();
+					continue;
+				}
 			}
 		}
+		
 		return result;
 	}
 

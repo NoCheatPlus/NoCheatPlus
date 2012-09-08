@@ -125,6 +125,7 @@ public abstract class DigestedWords extends AbstractWordProcessor{
 		letters.clear();
 		digits.clear();
 		other.clear();
+		super.clear(); // Just for completeness.
 	}
 	
 	public static final char[] toArray(final Collection<Character> chars){
