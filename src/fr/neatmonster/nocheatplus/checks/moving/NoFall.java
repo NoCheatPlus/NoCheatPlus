@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import net.minecraft.server.EntityPlayer;
 
+import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
@@ -49,8 +50,11 @@ public class NoFall extends Check {
         final MovingData data = MovingData.getData(player);
         
         if (from.getY() > to.getY()){
-        	if (from.getyOnGround() != cc.noFallyOnGround) from.setyOnGround(cc.noFallyOnGround);
-        	if (to.getyOnGround() != cc.noFallyOnGround) to.setyOnGround(cc.noFallyOnGround);
+        	// Reset the on ground properties only if necessary. 
+        	if (from.getyOnGround() != cc.noFallyOnGround && (from.getY() - (double) Location.locToBlock(from.getY()) < cc.noFallyOnGround))
+        		from.setyOnGround(cc.noFallyOnGround);
+        	if (to.getyOnGround() != cc.noFallyOnGround  && (to.getY() - (double) Location.locToBlock(to.getY()) < cc.noFallyOnGround))
+        		to.setyOnGround(cc.noFallyOnGround);
         }
 
         data.noFallWasOnGround = data.noFallOnGround;
