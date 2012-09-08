@@ -379,6 +379,7 @@ public abstract class ConfPaths {
     // Special (to be sorted in or factored out).
     public static final String  MOVING_NOFALL_YONGROUND                  = MOVING_NOFALL + "yonground";
     public static final String  MOVING_YONGROUND                         = MOVING + "yonground";
+	public static final String  MOVING_SURVIVALFLY_YSTEP                 = MOVING_SURVIVALFLY + "ystep";
 
     /*
      *  dP"8   d8          ,e,                        

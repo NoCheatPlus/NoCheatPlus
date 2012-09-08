@@ -41,6 +41,23 @@ public class ConfigFile extends YamlConfiguration {
         final String value = this.getString(path);
         return factory.createActionList(value, permission);
     }
+    
+    /**
+     * Return double within given bounds, with preset. Mainly used for hidden settings.
+     * 
+     * @param data
+     * @param path
+     * @param min
+     * @param max
+     * @param preset
+     * @return
+     */
+    public double getDouble(final String path, final double min, final double max, final double preset){
+    	final double value = getDouble(path, preset);
+    	if (value < min) return min;
+    	else if (value > max) return max;
+        else return value;
+    }
 
     /**
      * Do this after reading new data.

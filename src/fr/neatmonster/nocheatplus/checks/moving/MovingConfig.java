@@ -86,11 +86,11 @@ public class MovingConfig extends ACheckConfig {
     public final int        survivalFlyWalkingSpeed;
     public final ActionList survivalFlyActions;
     
-    public final double noFallyOnGround;
-    public final double yOnGround;
-
-
-	
+    // Special tolerance values:
+    public final double     noFallyOnGround;
+    public final double     yOnGround;
+	public final double     yStep;
+    
 
     /**
      * Instantiates a new moving configuration.
@@ -125,15 +125,12 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         
-        yOnGround = readyOnGround(data, ConfPaths.MOVING_YONGROUND, 0.001);
-        noFallyOnGround = readyOnGround(data, ConfPaths.MOVING_NOFALL_YONGROUND, 0.3);
+        yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.001);
+        noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, 0.3);
+        yStep = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.49, 0.1);
     }
     
-    private final double readyOnGround(final ConfigFile data, final String path, final double preset){
-    	final double yOnGround = data.getDouble(path, preset);
-        if (yOnGround < 0 || yOnGround > 2.0) return 2.0;
-        else return yOnGround;
-    }
+
 
     /* (non-Javadoc)
      * @see fr.neatmonster.nocheatplus.checks.ICheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)

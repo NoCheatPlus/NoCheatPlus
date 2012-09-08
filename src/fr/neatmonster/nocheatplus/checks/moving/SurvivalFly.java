@@ -201,9 +201,9 @@ public class SurvivalFly extends Check {
         double vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
 
         // Step can also be blocked.
-        if (from.isOnGround() && to.isOnGround() && Math.abs(to.getY() - from.getY() - 1D) <= 0.1 && vDistanceAboveLimit <= 0D
+        if (from.isOnGround() && to.isOnGround() && Math.abs(to.getY() - from.getY() - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP))
-            vDistanceAboveLimit = 1D;
+            vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(to.getY() - from.getY()));
 
         if (from.isOnGround() || to.isOnGround())
             data.jumpAmplifier = 0D;
