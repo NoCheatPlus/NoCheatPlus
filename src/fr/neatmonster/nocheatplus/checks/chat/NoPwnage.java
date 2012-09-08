@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -298,12 +299,12 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
 
     @Override
 	public boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
-		return cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha;
+		return cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha && !data.hasCachedPermission(Permissions.CHAT_NOPWNAGE_CAPTCHA);
 	}
 
     @Override
 	public boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
-		return cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha;
+		return cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha  && !data.hasCachedPermission(Permissions.CHAT_NOPWNAGE_CAPTCHA);
 	}
 
 	/**
