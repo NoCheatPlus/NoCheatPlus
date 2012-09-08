@@ -6,7 +6,8 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.ACheckData;
+import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
 
 /*
@@ -22,12 +23,12 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
 /**
  * Player specific dataFactory for the inventory checks.
  */
-public class InventoryData implements CheckData {
+public class InventoryData extends ACheckData {
 
     /** The factory creating data. */
     public static final CheckDataFactory      factory    = new CheckDataFactory() {
                                                              @Override
-                                                             public final CheckData getData(final Player player) {
+                                                             public final ICheckData getData(final Player player) {
                                                                  return InventoryData.getData(player);
                                                              }
                                                          };

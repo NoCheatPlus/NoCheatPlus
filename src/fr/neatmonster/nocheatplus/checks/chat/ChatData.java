@@ -5,8 +5,9 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.AsyncCheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*
@@ -21,12 +22,12 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 /**
  * Player specific data for the chat checks.
  */
-public class ChatData implements CheckData {
+public class ChatData extends AsyncCheckData {
 
     /** The factory creating data. */
     public static final CheckDataFactory factory    = new CheckDataFactory() {
                                                         @Override
-                                                        public final CheckData getData(final Player player) {
+                                                        public final ICheckData getData(final Player player) {
                                                             return ChatData.getData(player);
                                                         }
                                                     };

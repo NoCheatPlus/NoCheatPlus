@@ -34,6 +34,6 @@ public interface CheckDataFactory {
      *            the player
      * @return the data
      */
-    public CheckData getData(final Player player);
+    public ICheckData getData(final Player player);
 
 }

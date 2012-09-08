@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
@@ -15,7 +15,6 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.LetterEngine;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**
@@ -23,7 +22,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  * @author mc_dev
  *
  */
-public class GlobalChat extends Check implements INotifyReload{
+public class GlobalChat extends AsyncCheck implements INotifyReload{
 
 	private LetterEngine engine;
 	
@@ -45,11 +44,6 @@ public class GlobalChat extends Check implements INotifyReload{
 	public boolean check(final Player player, final String message, final ICaptcha captcha, boolean isMainThread) {
 		
 		final ChatConfig cc = ChatConfig.getConfig(player);
-		
-		if (isMainThread && !isEnabled(player)) return false;
-		if (!isMainThread && (!cc.isEnabled(type) || NCPExemptionManager.isExempted(player, type)))
-			return false;
-
 		final ChatData data = ChatData.getData(player);
 		
 		synchronized (data) {

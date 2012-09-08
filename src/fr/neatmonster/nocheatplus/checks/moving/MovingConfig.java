@@ -6,7 +6,8 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.ACheckConfig;
+import fr.neatmonster.nocheatplus.checks.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -27,12 +28,12 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 /**
  * Configurations specific for the moving checks. Every world gets one of these assigned to it.
  */
-public class MovingConfig implements CheckConfig {
+public class MovingConfig extends ACheckConfig {
 
     /** The factory creating configurations. */
     public static final CheckConfigFactory   factory   = new CheckConfigFactory() {
                                                            @Override
-                                                           public final CheckConfig getConfig(final Player player) {
+                                                           public final ICheckConfig getConfig(final Player player) {
                                                                return MovingConfig.getConfig(player);
                                                            }
                                                        };
@@ -135,7 +136,7 @@ public class MovingConfig implements CheckConfig {
     }
 
     /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     * @see fr.neatmonster.nocheatplus.checks.ICheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
      */
     @Override
     public final boolean isEnabled(final CheckType checkType) {

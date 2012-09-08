@@ -6,9 +6,10 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
-import fr.neatmonster.nocheatplus.checks.CheckConfig;
+import fr.neatmonster.nocheatplus.checks.AsyncCheckConfig;
 import fr.neatmonster.nocheatplus.checks.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.EnginePlayerConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -29,19 +30,19 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Configurations specific for the "chat" checks. Every world gets one of these assigned to it, or if a world doesn't
  * get it's own, it will use the "global" version.
  */
-public class ChatConfig implements CheckConfig {
+public class ChatConfig extends AsyncCheckConfig {
 
     /** The factory creating configurations. */
     public static final CheckConfigFactory factory   = new CheckConfigFactory() {
                                                          @Override
-                                                         public final CheckConfig getConfig(final Player player) {
+                                                         public final ICheckConfig getConfig(final Player player) {
                                                              return ChatConfig.getConfig(player);
                                                          }
                                                      };
 
     /** The map containing the configurations per world. */
     private static Map<String, ChatConfig> worldsMap = new HashMap<String, ChatConfig>();
-
+     
     /**
      * Clear all the configurations.
      */
@@ -51,7 +52,7 @@ public class ChatConfig implements CheckConfig {
         }
     }
 
-    /**
+	/**
      * Gets the configuration for a specified player.
      * 
      * @param player
@@ -147,6 +148,12 @@ public class ChatConfig implements CheckConfig {
      *            the data
      */
     public ChatConfig(final ConfigFile config) {
+    	super(new String[]{
+    	    	Permissions.CHAT_COLOR,
+    	    	Permissions.CHAT_GLOBALCHAT,
+    	    	Permissions.CHAT_NOPWNAGE,
+    	    	Permissions.CHAT_NOPWNAGE_CAPTCHA,
+    	    });
         colorCheck = config.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = config.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
@@ -223,7 +230,7 @@ public class ChatConfig implements CheckConfig {
     }
 
     /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.CheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
+     * @see fr.neatmonster.nocheatplus.checks.ICheckConfig#isEnabled(fr.neatmonster.nocheatplus.checks.CheckType)
      */
     @Override
     public boolean isEnabled(final CheckType checkType) {

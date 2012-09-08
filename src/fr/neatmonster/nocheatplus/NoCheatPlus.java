@@ -40,6 +40,7 @@ import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * M"""""""`YM          MM'""""'YMM dP                           dP   MM"""""""`YM dP                   
@@ -94,11 +95,14 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
          */
         final PluginDescriptionFile pdfFile = getDescription();
         
-        // Just to be sure nothing gets left out.
-        getServer().getScheduler().cancelTasks(this);
-
+        // Stop the tickTask.
+        TickTask.cancel();
+        
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
+        
+        // Just to be sure nothing gets left out.
+        getServer().getScheduler().cancelTasks(this);
 
         // Remove listeners.
         listeners.clear();
@@ -149,6 +153,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
+        
+        // Set up the tick task.
+        TickTask.start(this);
 
         ConfigFile config = ConfigManager.getConfigFile();
         

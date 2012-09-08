@@ -2,9 +2,8 @@ package fr.neatmonster.nocheatplus.checks.chat;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 
 /*
  * MM'""""'YMM          dP                   
@@ -18,7 +17,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 /**
  * The Color check verifies that no color codes are sent in players' messages.
  */
-public class Color extends Check {
+public class Color extends AsyncCheck {
 
     /**
      * Instantiates a new color check.
@@ -39,13 +38,8 @@ public class Color extends Check {
      * @return the string
      */
     public String check(final Player player, final String message, final boolean isMainThread) {
-        if (isMainThread && !isEnabled(player))
-            return message;
 
         final ChatConfig cc = ChatConfig.getConfig(player);
-        if (!isMainThread && (!cc.isEnabled(type) || NCPExemptionManager.isExempted(player, type)))
-            // Leave out the permission check.
-            return message;
 
         final ChatData data = ChatData.getData(player);
         // Keep related to ChatData/NoPwnage/Color used lock.

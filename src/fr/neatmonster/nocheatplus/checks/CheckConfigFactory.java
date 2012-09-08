@@ -34,6 +34,6 @@ public interface CheckConfigFactory {
      *            the player
      * @return the configuration
      */
-    public CheckConfig getConfig(Player player);
+    public ICheckConfig getConfig(Player player);
 
 }

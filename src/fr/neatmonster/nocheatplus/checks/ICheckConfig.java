@@ -15,7 +15,7 @@ package fr.neatmonster.nocheatplus.checks;
  * 
  * @author asofold
  */
-public interface CheckConfig {
+public interface ICheckConfig {
 
     /**
      * Checks if a check is enabled.
@@ -25,5 +25,11 @@ public interface CheckConfig {
      * @return true, if the check is enabled
      */
     public boolean isEnabled(CheckType checkType);
+    
+    /**
+     * Retrieve the permissions that have to be updated for this check.
+     * @return An array of permissions, may be null.
+     */
+    public String[] getCachePermissions();
 
 }

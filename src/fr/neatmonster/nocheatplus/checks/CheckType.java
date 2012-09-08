@@ -172,6 +172,25 @@ public enum CheckType {
     public String getPermission() {
         return permission;
     }
+    
+    /**
+     * Quick permission check for cached entriy only (for async checks). If not present, after failure will need to deal with this.
+     * @param player
+     * @return
+     */
+    public boolean hasCachedPermission(final Player player){
+    	return hasCachedPermission(player, getPermission());
+    }
+    		
+    /**
+     * Quick permission check for cached entries only (for async checks). If not present, after failure will need to deal with this.
+     * @param player
+     * @param permission
+     * @return
+     */
+    public boolean hasCachedPermission(final Player player, final String permission){
+    	return dataFactory.getData(player).hasCachedPermission(permission);
+    }
 
     /**
      * Check if the check is enabled by configuration (no permission check).

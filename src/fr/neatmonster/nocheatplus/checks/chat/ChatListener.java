@@ -11,12 +11,14 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.SimpleCharPrefixTree;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM'""""'YMM dP                  dP   M""MMMMMMMM oo            dP                                       
@@ -78,14 +80,17 @@ public class ChatListener implements Listener, INotifyReload {
          *                |___/                                   
          */
         final Player player = event.getPlayer();
+        
+        // Tell TickTask to update cached permissions.
+        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
 
         // First the color check.
-        event.setMessage(color.check(player, event.getMessage(), false));
+        if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), false));
 
         // Then the no pwnage check.
-        if (noPwnage.check(player, event.getMessage(), false, false))
+        if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), false, false))
         	event.setCancelled(true);
-        else if (globalChat.check(player, event.getMessage(), (ICaptcha) noPwnage, false))
+        else if (globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), (ICaptcha) noPwnage, false))
         	// Only check those that got through.
         	// (ICaptcha to start captcha if desired.)
         	event.setCancelled(true);
@@ -116,6 +121,9 @@ public class ChatListener implements Listener, INotifyReload {
          */
         final Player player = event.getPlayer();
         
+        // Tell TickTask to update cached permissions.
+        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
+        
         // Trim is necessary because the server accepts leading spaces with commands.
         // TODO: Maybe: only remove the leading whitespace or spaces.
         final String command = event.getMessage().trim().split(" ")[0].substring(1).toLowerCase();
@@ -143,16 +151,16 @@ public class ChatListener implements Listener, INotifyReload {
         }
 
         // First the color check.
-        event.setMessage(color.check(player, event.getMessage(), true));
+        if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), true));
         
         final String lcMessage = event.getMessage().trim().toLowerCase();
         
         final boolean handleAsChat = chatCommands.hasPrefix(lcMessage);
 
         // Then the no pwnage check.
-        if (!commandExclusions.hasPrefix(lcMessage) && noPwnage.check(player, event.getMessage(), !handleAsChat, true))
+        if (!commandExclusions.hasPrefix(lcMessage) && noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), !handleAsChat, true))
         	event.setCancelled(true);
-        else if (handleAsChat && globalChat.check(player, event.getMessage(), noPwnage, true))
+        else if (handleAsChat && globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), noPwnage, true))
         	event.setCancelled(true);
     }
 
@@ -175,6 +183,11 @@ public class ChatListener implements Listener, INotifyReload {
          */
         final Player player = event.getPlayer();
         final ChatConfig cc = ChatConfig.getConfig(player);
+        
+        // Tell TickTask to update cached permissions.
+        TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
+        // Force permission update.
+        TickTask.updatePermissions();
         
         // Reset captcha of player if needed.
         noPwnage.resetCaptcha(player);

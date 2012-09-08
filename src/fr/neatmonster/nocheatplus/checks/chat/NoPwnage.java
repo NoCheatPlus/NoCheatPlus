@@ -6,10 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
-import fr.neatmonster.nocheatplus.checks.Check;
+import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -25,7 +24,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 /**
  * The NoPwnage check will try to detect "spambots" (like the ones created by the PWN4G3 software).
  */
-public class NoPwnage extends Check implements ICaptcha{
+public class NoPwnage extends AsyncCheck implements ICaptcha{
 
     /** The last message which caused ban said. */
     private String       lastBanCausingMessage;
@@ -62,14 +61,9 @@ public class NoPwnage extends Check implements ICaptcha{
      */
     public boolean check(final Player player, final String message, final boolean isCommand, 
     		final boolean isMainThread) {
-        if (isMainThread && !isEnabled(player))
-            return false;
 
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
-
-        if (!isMainThread && (!cc.isEnabled(type) || NCPExemptionManager.isExempted(player, type)))
-            return false;
 
         // Keep related to ChatData/NoPwnage/Color used lock.
         synchronized (data) {

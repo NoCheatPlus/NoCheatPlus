@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
@@ -247,4 +249,10 @@ public class CheckUtils {
             text = text.replace("&" + c.getChar(), c.toString());
         return text;
     }
+
+	public static void scheduleOutput(final Exception e) {
+		final PrintWriter pw = new PrintWriter(new StringWriter(340));
+		e.printStackTrace(pw);
+		scheduleOutput(pw.toString());
+	}
 }

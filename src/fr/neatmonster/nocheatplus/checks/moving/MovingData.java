@@ -6,8 +6,9 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.ACheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -23,12 +24,12 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 /**
  * Player specific data for the moving checks.
  */
-public class MovingData implements CheckData {
+public class MovingData extends ACheckData {
 
     /** The factory creating data. */
     public static final CheckDataFactory   factory    = new CheckDataFactory() {
                                                           @Override
-                                                          public final CheckData getData(final Player player) {
+                                                          public final ICheckData getData(final Player player) {
                                                               return MovingData.getData(player);
                                                           }
                                                       };

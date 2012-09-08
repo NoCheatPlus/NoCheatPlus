@@ -5,7 +5,8 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.CheckData;
+import fr.neatmonster.nocheatplus.checks.ACheckData;
+import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
 
 /*
@@ -28,12 +29,12 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
 /**
  * Player specific data for the block interact checks.
  */
-public class BlockInteractData implements CheckData {
+public class BlockInteractData extends ACheckData {
 
     /** The factory creating data. */
     public static final CheckDataFactory          factory    = new CheckDataFactory() {
                                                                  @Override
-                                                                 public final CheckData getData(final Player player) {
+                                                                 public final ICheckData getData(final Player player) {
                                                                      return BlockInteractData.getData(player);
                                                                  }
                                                              };
