@@ -201,9 +201,9 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE,
-                "&cOur system has detected unusual bot activities coming from you. Please be careful with what you say. DON'T repeat what you just said either, unless you want to be banned.");
+                "&cPlease don't spam, be careful with what you say. DON'T repeat what you just said either, unless you want to be kicked or even banned.");
 
-        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:kicknopwnage cmd:ban cmd:ban-ip");
+        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:kicknopwnage");
 
         /*
          * 888'Y88 ,e,          888       d8   
@@ -358,7 +358,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
-        set(ConfPaths.STRINGS + ".nopwnage", start + "acted like a spambot (IP: [ip])" + end);
+        set(ConfPaths.STRINGS + ".nopwnage", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
 
