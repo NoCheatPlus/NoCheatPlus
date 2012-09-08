@@ -202,7 +202,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
                 data.noPwnageVL.add(now, (float) (suspicion / 10D));
 
                 // Find out if we need to kick the player or not.
-                cancel = executeActionsThreadSafe(player, data.noPwnageVL.getScore(cc.noPwnageVLFactor), suspicion / 10D, cc.noPwnageActions,
+                cancel = executeActions(player, data.noPwnageVL.getScore(cc.noPwnageVLFactor), suspicion / 10D, cc.noPwnageActions,
                         isMainThread);
             }
 //        else
@@ -238,7 +238,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
             // Does he failed too much times?
             if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
                 // Find out if we need to kick the player or not.
-                executeActionsThreadSafe(player, data.captchaVL, 1, cc.noPwnageCaptchaActions, 
+                executeActions(player, data.captchaVL, 1, cc.noPwnageCaptchaActions, 
                 		isMainThread);
                 // (Resetting captcha tries is done on quit/kick).
             }
@@ -334,7 +334,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
                 data.noPwnageReloginWarnings++;
             } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
                 // Find out if we need to ban the player or not.
-                cancel = executeActionsThreadSafe(player, (double) data.noPwnageVL.getScore(cc.noPwnageVLFactor), 0D, cc.noPwnageActions, true);
+                cancel = executeActions(player, (double) data.noPwnageVL.getScore(cc.noPwnageVLFactor), 0D, cc.noPwnageActions, true);
         }
 
         // Store his joining time.

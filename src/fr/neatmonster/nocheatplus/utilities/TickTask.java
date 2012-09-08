@@ -2,6 +2,8 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -9,14 +11,16 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.DelayedActionsExecution;
 import fr.neatmonster.nocheatplus.checks.ICheckData;
 
 /**
- * Task to run every tick, to update permissions, and maybe later for extended lag measurement.
+ * Task to run every tick, to update permissions and execute actions, and maybe later for extended lag measurement.
  * @author mc_dev
  *
  */
 public class TickTask implements Runnable {
+	
 	protected static final class PermissionUpdateEntry{
 		public CheckType checkType;
 		public String playerName;
@@ -41,27 +45,50 @@ public class TickTask implements Runnable {
 	/** Permissions to update: player name -> check type. */
 	private static final Set<PermissionUpdateEntry> permissionUpdates = Collections.synchronizedSet(new HashSet<PermissionUpdateEntry>(50));
 	
+	/** Actions to execute. */
+	public static final List<DelayedActionsExecution> delayedActions = Collections.synchronizedList(new LinkedList<DelayedActionsExecution>());
+	
+	/** Task id of the running TickTask */
+	protected static int taskId = -1;
+	
+	/**
+	 * Access method to request permisison updates.
+	 * @param playerName
+	 * @param checkType
+	 */
 	public static void requestPermissionUpdate(final String playerName, final CheckType checkType){
 		permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
 	}
-	
-	protected static int taskId = -1;
-	
+
 	public static void cancel(){
 		if (taskId == -1) return;
 		Bukkit.getScheduler().cancelTask(taskId);
 		taskId = -1;
 	}
 	
-	public static int start(final NoCheatPlus plugin){
-		cancel();
-		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
-		return taskId;
+	private void executeActions() {
+		synchronized (delayedActions) {
+			for (final DelayedActionsExecution actions : delayedActions){
+				actions.execute();
+			}
+		}
+	}
+	
+	public static void requestActionsExecution(final DelayedActionsExecution actions) {
+		delayedActions.add(actions);
 	}
 	
 	@Override
 	public void run() {
+		// The isEmpty checks are faster than synchronizing fully always, the actions get delayed one tick at most.
+		if (!delayedActions.isEmpty()) executeActions();
 		if (!permissionUpdates.isEmpty()) updatePermissions();
+	}
+	
+	public static int start(final NoCheatPlus plugin){
+		cancel();
+		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
+		return taskId;
 	}
 
 	/**
@@ -83,7 +110,5 @@ public class TickTask implements Runnable {
 			permissionUpdates.clear();
 		}
 	}
-	
-
 
 }

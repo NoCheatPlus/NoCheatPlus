@@ -3,16 +3,14 @@ package fr.neatmonster.nocheatplus.checks;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM'""""'YMM dP                         dP       
@@ -56,62 +54,6 @@ public abstract class Check {
     public Check(final CheckType type) {
         this.type = type;
     }
-
-    /**
-     * Convenience method.
-     * 
-     * @param player
-     *            the player
-     * @param vL
-     *            the violation level
-     * @param addedVL
-     *            the violation level added
-     * @param actions
-     *            the actions
-     * @return true, if the event should be cancelled
-     */
-    protected boolean executeActions(final Player player, final double vL, final double addedVL,
-            final ActionList actions) {
-        return executeActions(new ViolationData(this, player, vL, addedVL, actions));
-    }
-
-    /**
-     * Execute some actions for the specified player.
-     * 
-     * @param violationData
-     *            the violation data
-     * @return true, if the event should be cancelled
-     */
-    protected boolean executeActions(final ViolationData violationData) {
-        ViolationHistory.getHistory(violationData.player).log(getClass().getName(), violationData.addedVL);
-        try {
-            // Check a bypass permission.
-            if (violationData.bypassPermission != null)
-                if (violationData.player.hasPermission(violationData.bypassPermission))
-                    return false;
-
-            // Dispatch the VL processing to the hook manager.
-            if (NCPHookManager.shouldCancelVLProcessing(violationData))
-                // One of the hooks has decided to cancel the VL processing, return false.
-                return false;
-
-            // Add this failed check to the Metrics data.
-            MetricsData.addFailed(type);
-
-            final long time = System.currentTimeMillis() / 1000L;
-            boolean cancel = false;
-            for (final Action action : violationData.getActions())
-                if (getHistory(violationData.player).executeAction(violationData, action, time))
-                    // The execution history said it really is time to execute the action, find out what it is and do
-                    // what is needed.
-                    if (action.execute(violationData)) cancel = true;
-
-            return cancel;
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
     
     /**
      * Execute actions, possibly thread safe according to the isMainThread flag.<br>
@@ -127,19 +69,14 @@ public abstract class Check {
      *            if the thread the main thread
      * @return true, if successful
      */
-    public final boolean executeActionsThreadSafe(final Player player, final double VL, final double VLAdded,
-            final ActionList actions, final boolean isMainThread) {
-        final boolean cancel;
-        if (isMainThread)
-            cancel = executeActions(player, VL, VLAdded, actions);
-        else
-            // Permission check is done in the main thread.
-            cancel = executeActionsThreadSafe(player, VL, VLAdded, actions, type.getPermission());
-        return cancel;
+    public boolean executeActions(final Player player, final double vL, final double addedVL,
+            final ActionList actions, boolean isMainThread) {
+        // Sync it into the main thread by using an event.
+        return executeActions(new ViolationData(this, player, vL, addedVL, actions), isMainThread);
     }
 
     /**
-     * Execute actions in a thread safe manner.
+     * Convenience method: Execute actions from the main thread only.
      * 
      * @param player
      *            the player
@@ -149,27 +86,49 @@ public abstract class Check {
      *            the violation level added
      * @param actions
      *            the actions
-     * @param bypassPermission
-     *            the bypass permission
      * @return true, if the event should be cancelled
      */
-    public boolean executeActionsThreadSafe(final Player player, final double vL, final double addedVL,
-            final ActionList actions, final String bypassPermission) {
-        // Sync it into the main thread by using an event.
-        return executeActionsThreadSafe(new ViolationData(this, player, vL, addedVL, actions, bypassPermission));
+    protected boolean executeActions(final Player player, final double vL, final double addedVL,
+            final ActionList actions) {
+        return executeActions(new ViolationData(this, player, vL, addedVL, actions), true);
     }
-
+    
     /**
-     * Execute actions in a thread safe manner.
+     * Execute some actions for the specified player, only for the main thread.
      * 
      * @param violationData
      *            the violation data
-     * @return true, if if the event should be cancelled
+     * @return true, if the event should be cancelled
      */
-    public boolean executeActionsThreadSafe(final ViolationData violationData) {
-        final ExecuteActionsEvent event = new ExecuteActionsEvent(violationData);
-        Bukkit.getPluginManager().callEvent(event);
-        return event.getCancel();
+    protected boolean executeActions(final ViolationData violationData){
+    	return executeActions(violationData, true);
+    }
+
+    /**
+     * Execute some actions for the specified player.
+     * 
+     * @param violationData
+     *            the violation data
+     * @param isMainThread If this is called from within the main thread. If true, this must really be the main thread and not from synchronized code coming form another thread.
+     * @return true, if the event should be cancelled
+     */
+    protected boolean executeActions(final ViolationData violationData, final boolean isMainThread) {
+    	
+    	// Dispatch the VL processing to the hook manager (now thread safe).
+        if (NCPHookManager.shouldCancelVLProcessing(violationData))
+            // One of the hooks has decided to cancel the VL processing, return false.
+            return false;
+    
+        final DelayedActionsExecution delayedActions = new DelayedActionsExecution(violationData);
+    	
+        if (isMainThread) return delayedActions.execute();
+        else{
+        	TickTask.requestActionsExecution(delayedActions);
+        	return delayedActions.hasCancel();
+        }
+        
+    	// (Design change: Permission checks are moved to cached permissions, lazily updated.)
+    	
     }
 
     /**

@@ -50,7 +50,7 @@ public class Color extends AsyncCheck {
                 data.colorVL++;
 
                 // Find out if we need to remove the colors or not.
-                if (executeActionsThreadSafe(player, data.colorVL, 1D, cc.colorActions, isMainThread))
+                if (executeActions(player, data.colorVL, 1D, cc.colorActions, isMainThread))
                     // Remove color codes.
                     return message.replaceAll("\302\247.", "").replaceAll("\247.", "");
             }

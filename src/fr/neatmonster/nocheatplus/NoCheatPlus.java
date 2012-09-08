@@ -20,7 +20,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.ExecuteActionsEvent;
 import fr.neatmonster.nocheatplus.checks.Workarounds;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
@@ -221,25 +220,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
-    }
-
-    /**
-     * This event handler is used to execute the actions when a violation is detected.
-     * 
-     * @param event
-     *            the event handled
-     */
-    @EventHandler(
-            priority = EventPriority.LOWEST)
-    final void onExecuteActions(final ExecuteActionsEvent event) {
-        /*
-         *  _____                     _            _        _   _                 
-         * | ____|_  _____  ___ _   _| |_ ___     / \   ___| |_(_) ___  _ __  ___ 
-         * |  _| \ \/ / _ \/ __| | | | __/ _ \   / _ \ / __| __| |/ _ \| '_ \/ __|
-         * | |___ >  <  __/ (__| |_| | ||  __/  / ___ \ (__| |_| | (_) | | | \__ \
-         * |_____/_/\_\___|\___|\__,_|\__\___| /_/   \_\___|\__|_|\___/|_| |_|___/
-         */
-        event.executeActions();
     }
 
     public void onPlayerJoinLow(final PlayerJoinEvent event) {

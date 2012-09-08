@@ -194,7 +194,7 @@ public class GlobalChat extends AsyncCheck implements INotifyReload{
 			}
 			else{
 				data.globalChatVL += accumulated / 10.0;
-				if (executeActionsThreadSafe(player, data.globalChatVL, accumulated / 10.0, cc.globalChatActions, isMainThread))
+				if (executeActions(player, data.globalChatVL, accumulated / 10.0, cc.globalChatActions, isMainThread))
 					cancel = true;
 			}
 		}

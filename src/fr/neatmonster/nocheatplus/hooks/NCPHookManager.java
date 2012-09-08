@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.hooks;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -48,6 +49,14 @@ public final class NCPHookManager {
     /** Mapping the check types to the hooks. */
     private static final Map<CheckType, List<NCPHook>> hooksByChecks = new HashMap<CheckType, List<NCPHook>>();
 
+    static{
+    	// Fill the map to be sure that thread safety can be guaranteed.
+    	for (final CheckType type : CheckType.values()){
+    		if (APIUtils.needsSynchronization(type)) hooksByChecks.put(type, Collections.synchronizedList(new ArrayList<NCPHook>()));
+    		else hooksByChecks.put(type, new ArrayList<NCPHook>());
+    	}
+    }
+    
     /**
      * Register a hook for a specific check type (all, group, or an individual check).
      * 
@@ -93,12 +102,8 @@ public final class NCPHookManager {
      *            the hook
      */
     private static void addToMapping(final CheckType checkType, final NCPHook hook) {
-        List<NCPHook> hooks = hooksByChecks.get(checkType);
-        if (hooks == null) {
-            hooks = new ArrayList<NCPHook>();
-            hooks.add(hook);
-            hooksByChecks.put(checkType, hooks);
-        } else if (!hooks.contains(hook))
+        final List<NCPHook> hooks = hooksByChecks.get(checkType);
+        if (!hooks.contains(hook))
             hooks.add(hook);
     }
 
@@ -315,15 +320,9 @@ public final class NCPHookManager {
      */
     private static void removeFromMappings(final NCPHook hook, final Integer hookId) {
         allHooks.remove(hookId);
-        final List<CheckType> rem = new LinkedList<CheckType>();
         for (final CheckType checkId : hooksByChecks.keySet()) {
-            final List<NCPHook> hooks = hooksByChecks.get(checkId);
-            if (hooks.remove(hook))
-                if (hooks.isEmpty())
-                    rem.add(checkId);
+            hooksByChecks.get(checkId).remove(hook);
         }
-        for (final CheckType checkId : rem)
-            hooksByChecks.remove(checkId);
     }
 
     /**
@@ -407,10 +406,18 @@ public final class NCPHookManager {
     public static final boolean shouldCancelVLProcessing(final ViolationData violationData) {
         // Checks for hooks registered for this event, parent groups or ALL will be inserted into the list.
         // Return true as soon as one hook returns true. Test hooks, if present.
-        final List<NCPHook> hooksCheck = hooksByChecks.get(violationData.check.getType());
-        if (hooksCheck != null)
-            if (applyHooks(violationData.check.getType(), violationData.player, hooksCheck))
-                return true;
+    	final CheckType type = violationData.check.getType();
+        final List<NCPHook> hooksCheck = hooksByChecks.get(type);
+        if (!hooksCheck.isEmpty()){
+        	if (APIUtils.needsSynchronization(type)){
+        		synchronized (hooksCheck) {
+        			return applyHooks(type, violationData.player, hooksCheck);
+				}
+        	}
+        	else{
+        		return applyHooks(type, violationData.player, hooksCheck);
+        	}
+        }   
         return false;
     }
 }

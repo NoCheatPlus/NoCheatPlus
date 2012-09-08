@@ -28,9 +28,6 @@ public class ViolationData {
     /** The violation level added. */
     public final double     addedVL;
 
-    /** The bypassing permission. */
-    public final String     bypassPermission;
-
     /** The check. */
     public final Check      check;
 
@@ -56,33 +53,11 @@ public class ViolationData {
      */
     public ViolationData(final Check check, final Player player, final double vL, final double addedVL,
             final ActionList actions) {
-        this(check, player, vL, addedVL, actions, null);
-    }
-
-    /**
-     * Instantiates a new violation data.
-     * 
-     * @param check
-     *            the check
-     * @param player
-     *            the player
-     * @param vL
-     *            the violation level
-     * @param addedVL
-     *            the violation level added
-     * @param actions
-     *            the actions
-     * @param bypassPermission
-     *            the permission to bypass the execution, if not null
-     */
-    public ViolationData(final Check check, final Player player, final double vL, final double addedVL,
-            final ActionList actions, final String bypassPermission) {
         this.check = check;
         this.player = player;
         this.vL = vL;
         this.addedVL = addedVL;
         this.actions = actions;
-        this.bypassPermission = bypassPermission;
     }
 
     /**

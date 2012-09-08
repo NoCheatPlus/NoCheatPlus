@@ -74,6 +74,8 @@ public class APIUtils {
 
     /**
      * Return if the check type requires synchronization.
+     * <hr>
+     * The should be chat checks, currently.
      * 
      * @param type
      *            the check type
