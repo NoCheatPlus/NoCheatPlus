@@ -246,7 +246,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
         
         set(ConfPaths.FIGHT_SELFHIT_CHECK, true);
-        set(ConfPaths.FIGHT_SELFHIT_ACTIONS, "log:fselfhit:2:5:if cancel vl>10 log:fselfhit:0:5:if cancel cmd:kickselfhit");
+        set(ConfPaths.FIGHT_SELFHIT_ACTIONS, "log:fselfhit:0:5:if cancel vl>10 log:fselfhit:0:5:if cancel cmd:kickselfhit");
 
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
         set(ConfPaths.FIGHT_SPEED_LIMIT, 15);
