@@ -35,6 +35,16 @@ permissions:
                         description: Allow the player to see the list of all plugins (/plugins).
                     nocheatplus.admin.reload:
                         description: Allow the player to reload NoCheatPlus configuration.
+                    nocheatplus.admin.info:
+                        description: Allow to see violation info about a player (/ncp info (player)).
+                    nocheatplus.admin.ban:
+                        description: Allow use of the ncp ban command.
+                    nocheatplus.admin.kick:
+                        description: Allow use of the ncp kick command.
+                    nocheatplus.admin.tell:
+                        description: Allow use of the ncp tell command.
+                    nocheatplus.admin.delay:
+                        description: Allow use of the ncp delay command.
             nocheatplus.checks:
                 description: Allow the player to bypass all checks.
                 children:
@@ -76,6 +86,11 @@ permissions:
                                 description: Allow the player to bypass the Color check.
                             nocheatplus.checks.chat.nopwnage:
                                 description: Allow the player to bypass the NoPwnage check.
+                                children:
+                                    nocheatplus.checks.chat.nopwnage.captcha:
+                                        description: Allow the player to bypass the captcha check (currently the nopwnage or globalchat violation handling would replace it!).
+                            nocheatplus.checks.chat.globalchat:
+                                description: Allow the player to bypass the GlobalChat check.
                     nocheatplus.checks.fight:
                         description: Allow the player to bypass all Fight checks.
                         children:
@@ -95,6 +110,8 @@ permissions:
                                 description: Allow the player to bypass the NoSwing check.
                             nocheatplus.checks.fight.reach:
                                 description: Allow the player to bypass the Reach check.
+                            nocheatplus.checks.fight.selfhit:
+                                description: Allow the player to bypass the SelfHit check.
                             nocheatplus.checks.fight.speed:
                                 description: Allow the player to bypass the Speed check.
                     nocheatplus.checks.inventory:
@@ -102,6 +119,8 @@ permissions:
                         children:
                             nocheatplus.checks.inventory.drop:
                                 description: Allow the player to bypass the Drop check.
+                            nocheatplus.checks.inventory.fastclick:
+                                description: Allow the player to bypass the FastClick check.
                             nocheatplus.checks.inventory.instantbow:
                                 description: Allow the player to bypass the InstantBow check.
                             nocheatplus.checks.inventory.instanteat:
@@ -126,6 +145,8 @@ permissions:
                                         description: Allow the player to move without speed limits and to attack entities while blocking.
                                     nocheatplus.checks.moving.survivalfly.sneaking:
                                         description: Allow the player to move without speed limits while sneaking.
+                                    nocheatplus.checks.moving.survivalfly.speeding:
+                                        description: Allow the player to move at higher speeds.
                                     nocheatplus.checks.moving.survivalfly.sprinting:
                                         description: Allow the player to sprint backwards.
                                     nocheatplus.checks.moving.survivalfly.step:
