@@ -35,7 +35,7 @@ public class DelayedActionsExecution {
 
            final long time = System.currentTimeMillis() / 1000L;
            boolean cancel = false;
-           for (final Action action : violationData.getActions())
+           for (final Action action : actions)
                if (Check.getHistory(violationData.player).executeAction(violationData, action, time))
                    // The execution history said it really is time to execute the action, find out what it is and do
                    // what is needed.
