@@ -53,4 +53,10 @@ public interface ICaptcha {
 	 */
 	public boolean shouldStartCaptcha(ChatConfig cc, ChatData data);
 
+	/**
+     * Just resets tries, generate new captcha if necessary.
+     * @param cc
+     * @param data
+     */
+	public void resetCaptcha(ChatConfig cc, ChatData data);
 }

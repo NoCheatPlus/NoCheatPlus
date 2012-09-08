@@ -175,7 +175,10 @@ public class ChatListener implements Listener, INotifyReload {
          */
         final Player player = event.getPlayer();
         final ChatConfig cc = ChatConfig.getConfig(player);
-
+        
+        // Reset captcha of player if needed.
+        noPwnage.resetCaptcha(player);
+        
         // Execute the no pwnage check.
         if (noPwnage.isEnabled(player) && noPwnage.checkLogin(player))
             event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);

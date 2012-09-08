@@ -246,9 +246,7 @@ public class NoPwnage extends Check implements ICaptcha{
                 // Find out if we need to kick the player or not.
                 executeActionsThreadSafe(player, data.captchaVL, 1, cc.noPwnageCaptchaActions, 
                 		isMainThread);
-                // reset in case of reconnection allowed.
-                if (!player.isOnline()) 
-                	data.noPwnageCaptchTries = 0;
+                // (Resetting captcha tries is done on quit/kick).
             }
 
             // Display the question again (if not kicked).
@@ -260,15 +258,45 @@ public class NoPwnage extends Check implements ICaptcha{
     @Override
 	public void sendNewCaptcha(Player player, ChatConfig cc, ChatData data) {
     	// Display a captcha to the player.
-        data.noPwnageGeneratedCaptcha = "";
-        for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
-            data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
-                    .nextInt(cc.noPwnageCaptchaCharacters.length()));
+        generateCaptcha(cc, data, true);
         sendCaptcha(player, cc, data);
         data.noPwnageHasStartedCaptcha = true;
 	}
 
+    /**
+     * Just generate captcha, reset tries if set so.
+     * @param cc
+     * @param data
+     * @param reset
+     */
+    public void generateCaptcha(ChatConfig cc, ChatData data, boolean reset) {
+    	if (reset) data.noPwnageCaptchTries = 0;
+    	data.noPwnageGeneratedCaptcha = "";
+        for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
+            data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
+                    .nextInt(cc.noPwnageCaptchaCharacters.length()));
+	}
+    
+    /**
+     * Reset captcha, synchronizes over ChatData instance for the player..
+     * @param player
+     */
+    public void resetCaptcha(Player player){
+    	ChatData data = ChatData.getData(player);
+    	synchronized (data) {
+    		resetCaptcha(ChatConfig.getConfig(player), data);
+		}
+    }
+    
     @Override
+    public void resetCaptcha(ChatConfig cc, ChatData data){
+    	data.noPwnageCaptchTries = 0;
+    	if (shouldCheckCaptcha(cc, data) || shouldStartCaptcha(cc, data)){
+    		generateCaptcha(cc, data, true);
+    	}
+    }
+
+	@Override
 	public void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
 		player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
                 data.noPwnageGeneratedCaptcha)));
