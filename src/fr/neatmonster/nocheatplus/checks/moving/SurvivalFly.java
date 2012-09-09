@@ -131,6 +131,7 @@ public class SurvivalFly extends Check {
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
         // Prevent players from walking on a liquid.
+        // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
         if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D
                 && MovingListener.isLiquid(to.getLocation().getBlock().getType()) && !to.isOnGround()
                 && to.getY() % 1D < 0.8D)
