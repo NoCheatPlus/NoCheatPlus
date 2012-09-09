@@ -67,10 +67,13 @@ public class TickTask implements Runnable {
 	}
 	
 	private void executeActions() {
+		final List<DelayedActionsExecution> copyActions = new LinkedList<DelayedActionsExecution>();
 		synchronized (delayedActions) {
-			for (final DelayedActionsExecution actions : delayedActions){
-				actions.execute();
-			}
+			copyActions.addAll(delayedActions);
+			delayedActions.clear();
+		}
+		for (final DelayedActionsExecution actions : copyActions){
+			actions.execute();
 		}
 	}
 	
@@ -95,19 +98,21 @@ public class TickTask implements Runnable {
 	 * Only call from the main thread!
 	 */
 	public static void updatePermissions() {
+		final List<PermissionUpdateEntry> copyPermissions = new LinkedList<PermissionUpdateEntry>();
 		synchronized (permissionUpdates) {
-			for (final PermissionUpdateEntry entry : permissionUpdates){
-				final Player player = Bukkit.getPlayerExact(entry.playerName);
-				if (player == null || !player.isOnline()) continue;
-				final String[] perms = entry.checkType.getConfigFactory().getConfig(player).getCachePermissions();
-				if (perms == null) continue;
-				final ICheckData data = entry.checkType.getDataFactory().getData(player);
-				for (final String permission : perms){
-					data.setCachedPermission(permission, player.hasPermission(permission));
-				}	
-				
-			}
+			copyPermissions.addAll(permissionUpdates);
 			permissionUpdates.clear();
+		}
+		for (final PermissionUpdateEntry entry : copyPermissions){
+			final Player player = Bukkit.getPlayerExact(entry.playerName);
+			if (player == null || !player.isOnline()) continue;
+			final String[] perms = entry.checkType.getConfigFactory().getConfig(player).getCachePermissions();
+			if (perms == null) continue;
+			final ICheckData data = entry.checkType.getDataFactory().getData(player);
+			for (final String permission : perms){
+				data.setCachedPermission(permission, player.hasPermission(permission));
+			}	
+			
 		}
 	}
 
