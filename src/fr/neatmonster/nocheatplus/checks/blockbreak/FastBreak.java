@@ -61,7 +61,7 @@ public class FastBreak extends Check {
         if (elapsedTime < elapsedTimeLimit && data.fastBreakBreakTime > 0L && data.fastBreakDamageTime > 0L
                 && (player.getItemInHand().getType() != Material.SHEARS || block.getType() != Material.LEAVES)) {
             // If the buffer has been consumed.
-            if (data.fastBreakBuffer == 0) {
+            if (data.fastBreakBuffer <= 0) {
                 // Increment the violation level (but using the original limit).
                 data.fastBreakVL += elapsedTimeLimit - elapsedTime;
 
