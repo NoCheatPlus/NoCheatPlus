@@ -28,11 +28,12 @@ public class DelayedActionsExecution {
 	public boolean execute(){
 		try {
 
-       	   ViolationHistory.getHistory(violationData.player).log(getClass().getName(), violationData.addedVL);
+       	   ViolationHistory.getHistory(violationData.player).log(violationData.check.getClass().getName(), violationData.addedVL);
 
            // Add this failed check to the Metrics data.
            MetricsData.addFailed(violationData.check.type);
 
+           // TODO: the time is taken here, which makes sense for delay, but otherwise ?
            final long time = System.currentTimeMillis() / 1000L;
            boolean cancel = false;
            for (final Action action : actions)
