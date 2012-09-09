@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
@@ -60,6 +61,12 @@ public class ChatListener implements Listener, INotifyReload {
     	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), false, true);
     	chatCommands.clear();
     	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS), false, true);
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR)
+	public void onPlayerChangedWorld(final PlayerChangedWorldEvent event){
+		// Tell TickTask to update cached permissions.
+        TickTask.requestPermissionUpdate(event.getPlayer().getName(), CheckType.CHAT);
 	}
 
     /**
