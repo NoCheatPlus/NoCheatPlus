@@ -24,6 +24,7 @@ public class SimilarWordsBKL extends DigestedWords {
 		}
 		public SimilarWordsBKLSettings applyConfig(ConfigFile config, String  prefix){
 			super.applyConfig(config, prefix);
+			this.range = config.getInt(prefix + "range", this.range);
 			this.maxSize = config.getInt(prefix + "size", this.maxSize);
 			this.maxSeek= config.getInt(prefix + "seek", this.maxSeek);
 			this.durExpire = (long) (config.getDouble(prefix + "time", (float) this.durExpire / 1000f) * 1000f);
