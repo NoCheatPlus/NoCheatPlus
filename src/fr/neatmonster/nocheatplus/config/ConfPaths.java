@@ -257,6 +257,9 @@ public abstract class ConfPaths {
 	public static final String  COMBINED_IMPROBABLE_CHECK                = COMBINED_IMPROBABLE + "active";
 	public static final String  COMBINED_IMPROBABLE_LEVEL                = COMBINED_IMPROBABLE + "level";
 	
+	private static final String COMBINED_IMPROBABLE_CHECKS               = COMBINED_IMPROBABLE + "checks.";               
+	public static final String  COMBINED_IMPROBABLE_FASTBREAK_CHECK      = COMBINED_IMPROBABLE_CHECKS + "fastbreak";
+	
 	public static final String  COMBINED_IMPROBABLE_ACTIONS              = COMBINED_IMPROBABLE + "actions";
 	
     /*

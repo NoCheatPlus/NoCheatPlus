@@ -9,8 +9,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import fr.neatmonster.nocheatplus.checks.combined.Improbable;
-
 /*
  * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
  * ##  mmmm. `M 88                   88       ##  mmmm. `M                            88       
@@ -74,10 +72,6 @@ public class BlockBreakListener implements Listener {
         // Has the player broken blocks too quickly?
         if (fastBreak.isEnabled(player) && fastBreak.check(player, block))
             cancelled = true;
-        
-        // Combined speed:
-        if (Improbable.check(player, 1f, System.currentTimeMillis()))
-        	cancelled = true;
 
         // Did the arm of the player move before breaking this block?
         if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))

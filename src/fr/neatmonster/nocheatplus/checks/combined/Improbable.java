@@ -23,10 +23,8 @@ public class Improbable extends Check {
 	 * @param now
 	 * @return
 	 */
-	@SuppressWarnings("unused")
 	public static final boolean check(final Player player, final float weight, final long now){
-		if (true) return false; // DISABLED FOR THE MOMENT.
-		else return instance.checkImprobable(player, weight, now);
+		return instance.checkImprobable(player, weight, now);
 	}
 	
 	

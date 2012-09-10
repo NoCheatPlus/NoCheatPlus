@@ -78,6 +78,8 @@ public class BlockBreakConfig extends ACheckConfig {
     public final int        fastBreakBuffer;
     public final int        fastBreakInterval;
     public final ActionList fastBreakActions;
+    
+	public boolean improbableFastBreakCheck;
 
     public final boolean    noSwingCheck;
     public final ActionList noSwingActions;
@@ -100,6 +102,8 @@ public class BlockBreakConfig extends ACheckConfig {
         fastBreakInterval = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL);
         fastBreakActions = data.getActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);
 
+        improbableFastBreakCheck = data.getBoolean(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK);
+        
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
         noSwingActions = data.getActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, Permissions.BLOCKBREAK_NOSWING);
 

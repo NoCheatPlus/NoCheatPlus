@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 
 /*
  * MM""""""""`M                     dP   M#"""""""'M                             dP       
@@ -78,10 +79,16 @@ public class FastBreak extends Check {
 
             // Reduce the violation level, the player was nice with blocks.
             data.fastBreakVL *= 0.9D;
+           
         }
 
         // Remember the block breaking time.
         data.fastBreakBreakTime = System.currentTimeMillis();
+        
+        // Combined speed:
+        // TODO: use some value corresponding to allowed block breaking speed !
+        if (cc.improbableFastBreakCheck && Improbable.check(player, 1f, System.currentTimeMillis()))
+        	cancel = true;
 
         return cancel;
     }
