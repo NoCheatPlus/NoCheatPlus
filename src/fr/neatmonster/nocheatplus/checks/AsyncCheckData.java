@@ -9,7 +9,7 @@ import java.util.Map;
  * @author mc_dev
  *
  */
-public class AsyncCheckData extends ACheckData {
+public abstract class AsyncCheckData extends ACheckData {
 
 	// TODO: consider using a PermissionEntry class with a timestamp to schedule renewing it.
 	
