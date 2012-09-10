@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.DelayedActionsExecution;
 import fr.neatmonster.nocheatplus.checks.ICheckData;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /**
  * Task to run every tick, to update permissions and execute actions, and maybe later for extended lag measurement.
@@ -46,7 +46,7 @@ public class TickTask implements Runnable {
 	private static final Set<PermissionUpdateEntry> permissionUpdates = Collections.synchronizedSet(new HashSet<PermissionUpdateEntry>(50));
 	
 	/** Actions to execute. */
-	public static final List<DelayedActionsExecution> delayedActions = Collections.synchronizedList(new LinkedList<DelayedActionsExecution>());
+	public static final List<ViolationData> delayedActions = Collections.synchronizedList(new LinkedList<ViolationData>());
 	
 	/** Task id of the running TickTask */
 	protected static int taskId = -1;
@@ -67,17 +67,17 @@ public class TickTask implements Runnable {
 	}
 	
 	private void executeActions() {
-		final List<DelayedActionsExecution> copyActions = new LinkedList<DelayedActionsExecution>();
+		final List<ViolationData> copyActions = new LinkedList<ViolationData>();
 		synchronized (delayedActions) {
 			copyActions.addAll(delayedActions);
 			delayedActions.clear();
 		}
-		for (final DelayedActionsExecution actions : copyActions){
-			actions.execute();
+		for (final ViolationData violationData : copyActions){
+			violationData.executeActions();
 		}
 	}
 	
-	public static void requestActionsExecution(final DelayedActionsExecution actions) {
+	public static void requestActionsExecution(final ViolationData actions) {
 		delayedActions.add(actions);
 	}
 	

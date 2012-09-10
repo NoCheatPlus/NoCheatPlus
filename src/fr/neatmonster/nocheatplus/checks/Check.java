@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -118,17 +119,21 @@ public abstract class Check {
         if (NCPHookManager.shouldCancelVLProcessing(violationData))
             // One of the hooks has decided to cancel the VL processing, return false.
             return false;
-    
-        final DelayedActionsExecution delayedActions = new DelayedActionsExecution(violationData);
+        
+        // Add this failed check to the Metrics data (async!).
+        MetricsData.addFailed(violationData.check.type);
+   
+        final boolean hasCancel = violationData.hasCancel(); 
     	
-        if (isMainThread) return delayedActions.execute();
-        else{
-        	TickTask.requestActionsExecution(delayedActions);
-        	return delayedActions.hasCancel();
+        if (isMainThread) return violationData.executeActions();
+        else if (violationData.applicableActions.length > 0){
+        	// Only schedule if there is something to schedule.
+        	if (!hasCancel || violationData.applicableActions.length > 1)
+        		TickTask.requestActionsExecution(violationData);
         }
         
     	// (Design change: Permission checks are moved to cached permissions, lazily updated.)
-    	
+    	return hasCancel;
     }
 
     /**

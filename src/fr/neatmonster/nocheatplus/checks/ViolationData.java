@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 
 /*
  * M""MMMMM""M oo          dP            dP   oo                   M""""""'YMM            dP            
@@ -24,6 +25,9 @@ public class ViolationData {
 
     /** The actions to be executed. */
     public final ActionList actions;
+    
+    /** The actions applicable for the violation level. */
+    public final Action[] applicableActions;
 
     /** The violation level added. */
     public final double     addedVL;
@@ -58,6 +62,7 @@ public class ViolationData {
         this.vL = vL;
         this.addedVL = addedVL;
         this.actions = actions;
+        this.applicableActions = actions.getActions(vL);
     }
 
     /**
@@ -66,6 +71,44 @@ public class ViolationData {
      * @return the actions
      */
     public Action[] getActions() {
-        return actions.getActions(vL);
+        return applicableActions;
     }
+    
+	/**
+	 * Execute actions and return if cancel. Does add it to history.
+	 * @return
+	 */
+	public boolean executeActions(){
+		try {
+
+       	   ViolationHistory.getHistory(player).log(check.getClass().getName(), addedVL);
+
+           // TODO: the time is taken here, which makes sense for delay, but otherwise ?
+           final long time = System.currentTimeMillis() / 1000L;
+           boolean cancel = false;
+           for (final Action action : getActions())
+               if (Check.getHistory(player).executeAction(this, action, time))
+                   // The execution history said it really is time to execute the action, find out what it is and do
+                   // what is needed.
+                   if (action.execute(this)) cancel = true;
+
+           return cancel;
+       } catch (final Exception e) {
+           e.printStackTrace();
+           // On exceptions cancel events.
+           return true;
+       }
+	}
+    
+	/**
+	 * Check if the actions contain a cancel. 
+	 * @return
+	 */
+	public boolean hasCancel(){
+		for (final Action action : applicableActions){
+			if (action instanceof CancelAction) return true;
+		}
+		return false;
+	}
+   
 }
