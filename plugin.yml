@@ -12,13 +12,16 @@ commands:
     nocheatplus:
         aliases: [ncp]
         description: NoCheatPlus command(s).
-        # permission: nocheatplus.admin.reload
+        # permissions: nocheatplus.admin.(...)
         usage: |
-               /<command> info (player): Display the violations of a player
                /<command> reload: reload NoCheatPlus configuration
-               Auxiliary:
+               /:Player violations:
+               /<command> info (player): Display the violations of a player
+               /<command> removeplayer (player) [(check type)]: Remove data
+               /:Auxiliary:
                /<command> ban [delay=(ticks)] (player) [(reason)...]: ban player
                /<command> kick [delay=(ticks)] (player) [(reason)...]: kick player
+               /<command> tempkick [delay=(ticks)] (player) (minutes) [(reason)...]
                /<command> tell [delay=(ticks)] (player) (message)...: tell a message
                /<command> delay [delay=(ticks)] (command)...: delay a command
 
@@ -45,6 +48,15 @@ permissions:
                         description: Allow use of the ncp tell command.
                     nocheatplus.admin.delay:
                         description: Allow use of the ncp delay command.
+                    nocheatplus.admin.tempkick:
+                        description: Allow use of the ncp tempkick command.
+                    nocheatplus.admin.removeplayer:
+                        description: Allow use of the ncp removeplayer command.
+            nocheatplus.bypass:
+                description: Bypass permission other than command permissions.
+                children:
+                    nocheatplus.bypass.denylogin:
+                        description: Bypass the login denial, such as exists with the ncp tempkick command.
             nocheatplus.checks:
                 description: Allow the player to bypass all checks.
                 children:
@@ -59,6 +71,8 @@ permissions:
                                 description: Allow the player to bypass the NoSwing check.
                             nocheatplus.checks.blockbreak.reach:
                                 description: Allow the player to bypass the Reach check.
+                            nocheatplus.checks.blockbreak.wrongblock:
+                                description: Allow the player to bypass the WorngBlock check.
                     nocheatplus.checks.blockinteract:
                         description: Allow the player to bypass all BlockInteract checks.
                         children:
@@ -91,6 +105,11 @@ permissions:
                                         description: Allow the player to bypass the captcha check (currently the nopwnage or globalchat violation handling would replace it!).
                             nocheatplus.checks.chat.globalchat:
                                 description: Allow the player to bypass the GlobalChat check.
+                    nocheatplus.checks.combined:
+                        description: Allow the player to bypass all combined checks.
+                        children:
+                             nocheatplus.checks.combined.improbable:
+                                 description: Allow the player to bypass the Improbable check.
                     nocheatplus.checks.fight:
                         description: Allow the player to bypass all Fight checks.
                         children:
