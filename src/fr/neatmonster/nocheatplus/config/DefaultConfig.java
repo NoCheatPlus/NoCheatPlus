@@ -71,6 +71,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER, 2);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 100);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_OLDCHECK, false);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastbreak:3:5:cif cancel");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);

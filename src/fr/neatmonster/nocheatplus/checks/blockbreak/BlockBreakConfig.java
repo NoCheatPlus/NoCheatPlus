@@ -75,11 +75,15 @@ public class BlockBreakConfig extends ACheckConfig {
     public final ActionList directionActions;
 
     public final boolean    fastBreakCheck;
+	public final int        fastBreakBuckets;
+	public final long       fastBreakBucketDur;
     public final int        fastBreakBuffer;
+	public final long       fastBreakContention;
     public final int        fastBreakInterval;
+	public final boolean    fastBreakOldCheck;
     public final ActionList fastBreakActions;
     
-	public boolean improbableFastBreakCheck;
+	public boolean          improbableFastBreakCheck;
 
     public final boolean    noSwingCheck;
     public final ActionList noSwingActions;
@@ -87,10 +91,9 @@ public class BlockBreakConfig extends ACheckConfig {
     public final boolean    reachCheck;
     public final ActionList reachActions;
 
-    
     public final boolean wrongBlockCheck;
 	public final ActionList wrongBlockActions;
-
+	
     /**
      * Instantiates a new block break configuration.
      * 
@@ -102,8 +105,12 @@ public class BlockBreakConfig extends ACheckConfig {
         directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
 
         fastBreakCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK);
+        fastBreakContention = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION, 2000);
+        fastBreakBucketDur = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_DUR, 1000);
+        fastBreakBuckets = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_N, 30);
         fastBreakBuffer = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER);
         fastBreakInterval = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL);
+        fastBreakOldCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_OLDCHECK);
         fastBreakActions = data.getActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);
 
         improbableFastBreakCheck = data.getBoolean(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK);

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.ACheckData;
 import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*
  * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
@@ -47,7 +48,7 @@ public class BlockBreakData extends ACheckData {
     /** The map containing the data per players. */
     private static final Map<String, BlockBreakData> playersMap = new HashMap<String, BlockBreakData>();
 
-    /**
+	/**
      * Gets the data of a specified player.
      * 
      * @param player
@@ -56,7 +57,7 @@ public class BlockBreakData extends ACheckData {
      */
     public static BlockBreakData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new BlockBreakData());
+            playersMap.put(player.getName(), new BlockBreakData(BlockBreakConfig.getConfig(player)));
         return playersMap.get(player.getName());
     }
 
@@ -77,8 +78,10 @@ public class BlockBreakData extends ACheckData {
 	public int clickedZ;
 
     // Data of the fast break check.
-    public int     fastBreakBuffer     = 5;
+	public final ActionFrequency fastBreakPenalties;
+    public int     fastBreakBuffer;
     public long    fastBreakBreakTime  = System.currentTimeMillis() - 1000L;
+    /** Old check sets this to the last interact time, new check sets to first interact time */
     public long    fastBreakDamageTime = System.currentTimeMillis();
 
     // Data of the no swing check.
@@ -86,5 +89,11 @@ public class BlockBreakData extends ACheckData {
 
     // Data of the reach check.
     public double  reachDistance;
+    
+
+    public BlockBreakData(BlockBreakConfig cc) {
+		fastBreakBuffer = cc.fastBreakBuffer;
+		fastBreakPenalties = new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur);
+	}
 
 }

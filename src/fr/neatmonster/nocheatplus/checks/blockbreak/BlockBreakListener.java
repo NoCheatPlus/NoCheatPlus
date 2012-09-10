@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -137,18 +138,21 @@ public class BlockBreakListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
          *                |___/                                                  
          */
+    	final Player player = event.getPlayer();
+    	final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
+    	// Return if it is not left clicking a block. 
+        if (!cc.fastBreakOldCheck && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+    	
         // Do not care about null blocks.
     	final Block block = event.getClickedBlock();
         if (block == null)
             return;
-        final BlockBreakData data = BlockBreakData.getData(event.getPlayer());
+        
+        final BlockBreakData data = BlockBreakData.getData(player);
+        if (!cc.fastBreakOldCheck && data.clickedX == block.getX() && data.clickedZ == block.getZ() && data.clickedY == block.getY()) return;
+        // Only record first damage:
         data.fastBreakDamageTime = System.currentTimeMillis();
         // Also set last clicked blocks position.
-        // ? only set time / block, if 
-        //   - action = left_click_block
-        //   - time not already set => design to really record the used time.
-        //     DRAWBACK: lag, thus: rather switch to accumulate the theoretically needed break times in an ActionFrequency buffer, 
-        //                           then use those to determine if to prevent or not, depending on settings + lag.
         data.clickedX = block.getX();
         data.clickedY = block.getY();
         data.clickedZ = block.getZ();

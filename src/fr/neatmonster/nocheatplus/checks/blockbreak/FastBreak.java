@@ -47,6 +47,7 @@ public class FastBreak extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Block block) {
+    	final long now = System.currentTimeMillis();
         final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
         final BlockBreakData data = BlockBreakData.getData(player);
 
@@ -56,38 +57,68 @@ public class FastBreak extends Check {
         long elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * SURVIVAL);
         if (player.getGameMode() == GameMode.CREATIVE)
             elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * CREATIVE);
+        
+        // TODO: Use exact time for block types with new method !
+        
+        
+        if (cc.fastBreakOldCheck){
+            // The elapsed time is the difference between the last damage time and the last break time.
+            final long elapsedTime = data.fastBreakDamageTime - data.fastBreakBreakTime;
+            if (elapsedTime < elapsedTimeLimit && data.fastBreakBreakTime > 0L && data.fastBreakDamageTime > 0L
+                    && (player.getItemInHand().getType() != Material.SHEARS || block.getType() != Material.LEAVES)) {
+                // If the buffer has been consumed.
+                if (data.fastBreakBuffer <= 0) {
+                    // Increment the violation level (but using the original limit).
+                    data.fastBreakVL += elapsedTimeLimit - elapsedTime;
 
-        // The elapsed time is the difference between the last damage time and the last break time.
-        final long elapsedTime = data.fastBreakDamageTime - data.fastBreakBreakTime;
-        if (elapsedTime < elapsedTimeLimit && data.fastBreakBreakTime > 0L && data.fastBreakDamageTime > 0L
-                && (player.getItemInHand().getType() != Material.SHEARS || block.getType() != Material.LEAVES)) {
-            // If the buffer has been consumed.
-            if (data.fastBreakBuffer <= 0) {
-                // Increment the violation level (but using the original limit).
-                data.fastBreakVL += elapsedTimeLimit - elapsedTime;
+                    // Cancel the event if needed.
+                    cancel = executeActions(player, data.fastBreakVL, elapsedTimeLimit - elapsedTime, cc.fastBreakActions);
+                } else
+                    // Remove one from the buffer.
+                    data.fastBreakBuffer--;
+            } else {
+                // If the buffer isn't full.
+                if (data.fastBreakBuffer < cc.fastBreakBuffer)
+                    // Add one to the buffer.
+                    data.fastBreakBuffer++;
 
-                // Cancel the event if needed.
-                cancel = executeActions(player, data.fastBreakVL, elapsedTimeLimit - elapsedTime, cc.fastBreakActions);
-            } else
-                // Remove one from the buffer.
-                data.fastBreakBuffer--;
-        } else {
-            // If the buffer isn't full.
-            if (data.fastBreakBuffer < cc.fastBreakBuffer)
-                // Add one to the buffer.
-                data.fastBreakBuffer++;
-
-            // Reduce the violation level, the player was nice with blocks.
-            data.fastBreakVL *= 0.9D;
-           
+                // Reduce the violation level, the player was nice with blocks.
+                data.fastBreakVL *= 0.9D;
+               
+            }
+        }
+        else{
+        	// fastBreakDamageTime is now first interact on block (!).
+        	if (now - data.fastBreakDamageTime < elapsedTimeLimit){
+        		// lag or cheat or Minecraft.
+        		final long elapsedTime = now - data.fastBreakDamageTime;
+        		
+        		final long missingTime = elapsedTimeLimit - elapsedTime;
+        		
+        		// Add as penalty
+        		data.fastBreakPenalties.add(now, (float) missingTime);
+        		
+        		if (data.fastBreakPenalties.getScore(1f) > cc.fastBreakContention){
+        			data.fastBreakVL += missingTime;
+        			cancel = executeActions(player, data.fastBreakVL, missingTime, cc.fastBreakActions);
+        		}
+        		// else: still within contention limits.
+        		
+//        		System.out.println("violation : " + missingTime);
+        	}
+        	else{
+        		data.fastBreakVL *= 0.9D;
+        	}
+        	
         }
 
+
         // Remember the block breaking time.
-        data.fastBreakBreakTime = System.currentTimeMillis();
+        data.fastBreakBreakTime = now;
         
         // Combined speed:
         // TODO: use some value corresponding to allowed block breaking speed !
-        if (cc.improbableFastBreakCheck && Improbable.check(player, 1f, System.currentTimeMillis()))
+        if (cc.improbableFastBreakCheck && Improbable.check(player, 1f, now))
         	cancel = true;
 
         return cancel;
