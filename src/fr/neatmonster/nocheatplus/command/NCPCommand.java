@@ -46,15 +46,21 @@ public abstract class NCPCommand implements CommandExecutor{
 	
 	/** The sub command label. */
 	public final String label;
+	
+	public final String[] aliases;
 
 	/** The command permission */
 	public String permission;
 	
-
 	public NCPCommand(NoCheatPlus plugin, String label, String permission){
+		this(plugin, label, permission, null);
+	}
+
+	public NCPCommand(NoCheatPlus plugin, String label, String permission, String[] aliases){
 		this.plugin = plugin;
 		this.label = label;
 		this.permission = permission;
+		this.aliases = aliases;
 	}
 	
 	/**

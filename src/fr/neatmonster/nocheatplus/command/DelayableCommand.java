@@ -77,7 +77,21 @@ public abstract class DelayableCommand extends NCPCommand {
 	 * @param mustHaveDelay If specifying a delay is obligatory.
 	 */
 	public DelayableCommand(NoCheatPlus plugin, String label, String permission, int delayIndex, int delayPreset, boolean mustHaveDelay) {
-		super(plugin, label, permission);
+		this(plugin, label, permission, null, delayIndex, delayPreset, mustHaveDelay);
+	}
+	
+	/**
+	 * 
+	 * @param plugin
+	 * @param label
+	 * @param permission
+	 * @param aliases Sub command label aliases.
+	 * @param delayIndex Index at which to look for the delay spec.
+	 * @param delayPreset Preset if no delay is given.
+	 * @param mustHaveDelay If delay must be specified.
+	 */
+	public DelayableCommand(NoCheatPlus plugin, String label, String permission, String[] aliases, int delayIndex, int delayPreset, boolean mustHaveDelay) {
+		super(plugin, label, permission, aliases);
 		this.delayIndex = delayIndex;
 		this.mustHaveDelay = mustHaveDelay;
 		this.delayPreset = delayPreset;

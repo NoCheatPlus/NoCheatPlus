@@ -6,8 +6,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,6 +20,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -55,8 +61,66 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
 public class NoCheatPlus extends JavaPlugin implements Listener {
+	
+	/** Lower case player name to milliseconds point of time of release */
+	private static final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
+	
+	/**
+	 * Remove expired entries.
+	 */
+    private static void checkDenyLoginsNames() {
+		final long ts = System.currentTimeMillis();
+		final List<String> rem = new LinkedList<String>();
+		synchronized (denyLoginNames) {
+			for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
+				if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
+			}
+			for (final String name : rem){
+				denyLoginNames.remove(name);
+			}
+		}
+	}
+    
+	/**
+	 * Deny the player to login. This will also remove expired entries.
+	 * @param playerName
+	 * @param duration Duration from now on, in milliseconds.
+	 */
+	public static void denyLogin(String playerName, long duration){
+		final long ts = System.currentTimeMillis() + duration;
+		playerName = playerName.trim().toLowerCase();
+		synchronized (denyLoginNames) {
+			final Long oldTs = denyLoginNames.get(playerName);
+			if (oldTs != null && ts < oldTs.longValue()) return;
+			denyLoginNames.put(playerName, ts);
+			// TODO: later maybe save these ?
+		}
+		checkDenyLoginsNames();
+	}
+	
+	/**
+	 * Check if player is denied to login right now. 
+	 * @param playerName
+	 * @return
+	 */
+	public static boolean isLoginDenied(String playerName){
+		return isLoginDenied(playerName, System.currentTimeMillis());
+	}
 
-    /** The event listeners. */
+	/**
+	 * Check if a player is denied to login at a certain point of time.
+	 * @param playerName
+	 * @param currentTimeMillis
+	 * @return
+	 */
+	public static boolean isLoginDenied(String playerName, long currentTimeMillis) {
+		playerName = playerName.trim().toLowerCase();
+		final Long oldTs = denyLoginNames.get(playerName);
+		if (oldTs == null) return false; 
+		else return System.currentTimeMillis() < oldTs.longValue();
+	}
+
+	/** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
     
     /** Components that need notification on reloading.
@@ -351,6 +415,22 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         if (!message.equals(""))
             player.sendMessage(message);
+    }
+    
+    @EventHandler(priority=EventPriority.HIGHEST)
+    public void onPlayerLogin(final PlayerLoginEvent event){
+    	// (HGHEST to give other plugins the possibility to add permissions or allow the player).
+    	if (event.getResult() != Result.ALLOWED) return;
+    	final Player player = event.getPlayer();
+    	// Check if login is denied:
+    	checkDenyLoginsNames();
+    	if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) return;
+    	if (isLoginDenied(player.getName())){
+    		// TODO: display time for which the player is banned.
+    		event.setResult(Result.KICK_OTHER);
+    		// TODO: Make message configurable.
+    		event.setKickMessage("You are temporarily denied to join server.");
+    	}
     }
     
 }

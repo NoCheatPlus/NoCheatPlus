@@ -2,7 +2,9 @@ package fr.neatmonster.nocheatplus.command;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -81,12 +83,27 @@ public class CommandHandler implements CommandExecutor {
         		new BanCommand(plugin),
         		new InfoCommand(plugin),
         		new KickCommand(plugin),
+        		new TempKickCommand(plugin),
         		new ReloadCommand(plugin, notifyReload),
         		new TellCommand(plugin),
         		new DelayCommand(plugin),
         }){
-        	commands.put(cmd.label, cmd);
+        	addCommand(cmd);
         }
+    }
+    
+    public void addCommand(NCPCommand command){
+    	Set<String> allLabels = new LinkedHashSet<String>();
+    	allLabels.add(command.label);
+    	if (command.aliases != null){
+    		for (String alias : command.aliases){
+    			allLabels.add(alias);
+    		}
+    	}
+    	for (String label : allLabels){
+    		label = label.trim().toLowerCase(); // future.
+    		if (!commands.containsKey(label)) commands.put(label, command);
+    	}
     }
 
     /* (non-Javadoc)
