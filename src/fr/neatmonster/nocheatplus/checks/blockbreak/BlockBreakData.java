@@ -70,7 +70,7 @@ public class BlockBreakData extends ACheckData {
     public double  fastBreakVL;
     public double  noSwingVL;
     public double  reachVL;
-    public double  wrongBlockVL;
+    public final ActionFrequency  wrongBlockVL;
     
     // Shared data.
 	public int clickedX;
@@ -94,6 +94,7 @@ public class BlockBreakData extends ACheckData {
     public BlockBreakData(BlockBreakConfig cc) {
 		fastBreakBuffer = cc.fastBreakBuffer;
 		fastBreakPenalties = new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur);
+		wrongBlockVL = new ActionFrequency(6, 20000);
 	}
 
 }

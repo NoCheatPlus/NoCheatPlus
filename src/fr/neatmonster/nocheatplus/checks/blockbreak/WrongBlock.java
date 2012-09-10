@@ -19,10 +19,11 @@ public class WrongBlock extends Check {
         
         boolean cancel = false;
         if (data.clickedX != block.getX() || data.clickedZ != block.getZ() || data.clickedY != block.getY()){
-        	data.wrongBlockVL += 1D;
-        	if (executeActions(player, data.wrongBlockVL, 1D, cc.wrongBlockActions))
+        	final long now = System.currentTimeMillis();
+        	data.wrongBlockVL.add(now, 1f);
+        	if (executeActions(player, data.wrongBlockVL.getScore(0.9f), 1D, cc.wrongBlockActions))
         		cancel = true;
-        	if (Improbable.check(player, 5.0f, System.currentTimeMillis()))
+        	if (Improbable.check(player, 5.0f, now))
         		cancel = true;
         }
         
