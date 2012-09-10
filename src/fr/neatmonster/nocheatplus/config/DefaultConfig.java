@@ -372,6 +372,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
+        set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 
         // Update internal factory based on all the new entries to the "actions" section.
         regenerateActionLists();
