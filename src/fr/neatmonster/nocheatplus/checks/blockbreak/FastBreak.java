@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.utilities.BlockUtils;
 
 /*
  * MM""""""""`M                     dP   M#"""""""'M                             dP       
@@ -52,16 +53,12 @@ public class FastBreak extends Check {
         final BlockBreakData data = BlockBreakData.getData(player);
 
         boolean cancel = false;
-
-        // First, check the game mode of the player and choose the right limit.
-        long elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * SURVIVAL);
-        if (player.getGameMode() == GameMode.CREATIVE)
-            elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * CREATIVE);
-        
-        // TODO: Use exact time for block types with new method !
-        
         
         if (cc.fastBreakOldCheck){
+            // First, check the game mode of the player and choose the right limit.
+            long elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * SURVIVAL);
+            if (player.getGameMode() == GameMode.CREATIVE)
+                elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * CREATIVE);
             // The elapsed time is the difference between the last damage time and the last break time.
             final long elapsedTime = data.fastBreakDamageTime - data.fastBreakBreakTime;
             if (elapsedTime < elapsedTimeLimit && data.fastBreakBreakTime > 0L && data.fastBreakDamageTime > 0L
@@ -88,17 +85,23 @@ public class FastBreak extends Check {
             }
         }
         else{
+            // First, check the game mode of the player and choose the right limit.
+            long breakingTime = Math.round((double) cc.fastBreakInterval / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player.getItemInHand()));
+            if (player.getGameMode() == GameMode.CREATIVE)
+                breakingTime = Math.round((double) cc.fastBreakInterval / 100D * (double) CREATIVE);
+            
         	// fastBreakDamageTime is now first interact on block (!).
-        	if (now - data.fastBreakDamageTime < elapsedTimeLimit){
+        	if (now - data.fastBreakDamageTime < breakingTime){
         		// lag or cheat or Minecraft.
         		final long elapsedTime = now - data.fastBreakDamageTime;
         		
-        		final long missingTime = elapsedTimeLimit - elapsedTime;
+        		final long missingTime = breakingTime - elapsedTime;
         		
         		// Add as penalty
         		data.fastBreakPenalties.add(now, (float) missingTime);
         		
         		if (data.fastBreakPenalties.getScore(1f) > cc.fastBreakContention){
+        			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
         			data.fastBreakVL += missingTime;
         			cancel = executeActions(player, data.fastBreakVL, missingTime, cc.fastBreakActions);
         		}
