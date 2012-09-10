@@ -212,7 +212,7 @@ public class DefaultConfig extends ConfigFile {
         /*
          * Combined !
          */
-        set(ConfPaths.COMBINED_IMPROBABLE_CHECK , false);
+        set(ConfPaths.COMBINED_IMPROBABLE_CHECK , true);
         set(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
         set(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK, false);
         set(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, "cancel log:improbable:2:8:if");
