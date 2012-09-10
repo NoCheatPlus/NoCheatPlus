@@ -30,16 +30,16 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  */
 public class MovingConfig extends ACheckConfig {
 
-    /** The factory creating configurations. */
-    public static final CheckConfigFactory   factory   = new CheckConfigFactory() {
-                                                           @Override
-                                                           public final ICheckConfig getConfig(final Player player) {
-                                                               return MovingConfig.getConfig(player);
-                                                           }
-                                                       };
+	/** The factory creating configurations. */
+	public static final CheckConfigFactory factory = new CheckConfigFactory() {
+		@Override
+		public final ICheckConfig getConfig(final Player player) {
+			return MovingConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
-    private static Map<String, MovingConfig> worldsMap = new HashMap<String, MovingConfig>();
+    private static final Map<String, MovingConfig> worldsMap = new HashMap<String, MovingConfig>();
 
     /**
      * Clear all the configurations.

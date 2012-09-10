@@ -31,16 +31,21 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  */
 public class BlockBreakData extends ACheckData {
 
-    /** The factory creating data. */
-    public static final CheckDataFactory       factory    = new CheckDataFactory() {
-                                                              @Override
-                                                              public final ICheckData getData(final Player player) {
-                                                                  return BlockBreakData.getData(player);
-                                                              }
-                                                          };
+	/** The factory creating data. */
+	public static final CheckDataFactory factory = new CheckDataFactory() {
+		@Override
+		public final ICheckData getData(final Player player) {
+			return BlockBreakData.getData(player);
+		}
+
+		@Override
+		public ICheckData removeData(final String playerName) {
+			return BlockBreakData.removeData(playerName);
+		}
+	};
 
     /** The map containing the data per players. */
-    private static Map<String, BlockBreakData> playersMap = new HashMap<String, BlockBreakData>();
+    private static final Map<String, BlockBreakData> playersMap = new HashMap<String, BlockBreakData>();
 
     /**
      * Gets the data of a specified player.
@@ -55,7 +60,11 @@ public class BlockBreakData extends ACheckData {
         return playersMap.get(player.getName());
     }
 
-    // Violation levels.
+    public static ICheckData removeData(final String playerName) {
+		return playersMap.remove(playerName);
+	}
+
+	// Violation levels.
     public double  directionVL;
     public double  fastBreakVL;
     public double  noSwingVL;

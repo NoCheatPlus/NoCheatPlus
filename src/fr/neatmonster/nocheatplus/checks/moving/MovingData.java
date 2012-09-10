@@ -26,13 +26,18 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class MovingData extends ACheckData {
 
-    /** The factory creating data. */
-    public static final CheckDataFactory   factory    = new CheckDataFactory() {
-                                                          @Override
-                                                          public final ICheckData getData(final Player player) {
-                                                              return MovingData.getData(player);
-                                                          }
-                                                      };
+	/** The factory creating data. */
+	public static final CheckDataFactory factory = new CheckDataFactory() {
+		@Override
+		public final ICheckData getData(final Player player) {
+			return MovingData.getData(player);
+		}
+
+		@Override
+		public ICheckData removeData(final String playerName) {
+			return MovingData.removeData(playerName);
+		}
+	};
 
     /** The map containing the data per players. */
     private static Map<String, MovingData> playersMap = new HashMap<String, MovingData>();
@@ -50,7 +55,11 @@ public class MovingData extends ACheckData {
         return playersMap.get(player.getName());
     }
 
-    // Violation levels.
+    public static ICheckData removeData(final String playerName) {
+		return playersMap.remove(playerName);
+	}
+
+	// Violation levels.
     public double         creativeFlyVL            = 0D;
     public double         morePacketsVL            = 0D;
     public double         morePacketsVehicleVL     = 0D;

@@ -81,12 +81,14 @@ public class CommandHandler implements CommandExecutor {
         // Register sub commands:
         for (NCPCommand cmd : new NCPCommand[]{
         		new BanCommand(plugin),
+        		new DelayCommand(plugin),
         		new InfoCommand(plugin),
         		new KickCommand(plugin),
-        		new TempKickCommand(plugin),
         		new ReloadCommand(plugin, notifyReload),
         		new TellCommand(plugin),
-        		new DelayCommand(plugin),
+        		new TempKickCommand(plugin),
+        		new RemovePlayerCommand(plugin),
+        		
         }){
         	addCommand(cmd);
         }

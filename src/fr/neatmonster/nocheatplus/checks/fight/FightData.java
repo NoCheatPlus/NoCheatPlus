@@ -27,16 +27,21 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class FightData extends ACheckData {
 
-    /** The factory creating data. */
-    public static final CheckDataFactory  factory    = new CheckDataFactory() {
-                                                         @Override
-                                                         public final ICheckData getData(final Player player) {
-                                                             return FightData.getData(player);
-                                                         }
-                                                     };
+	/** The factory creating data. */
+	public static final CheckDataFactory factory = new CheckDataFactory() {
+		@Override
+		public final ICheckData getData(final Player player) {
+			return FightData.getData(player);
+		}
+
+		@Override
+		public ICheckData removeData(final String playerName) {
+			return FightData.removeData(playerName);
+		}
+	};
 
     /** The map containing the data per players. */
-    private static Map<String, FightData> playersMap = new HashMap<String, FightData>();
+    private static final Map<String, FightData> playersMap = new HashMap<String, FightData>();
 
     /**
      * Gets the data of a specified player.
@@ -51,7 +56,11 @@ public class FightData extends ACheckData {
         return playersMap.get(player.getName());
     }
 
-    // Violation levels.
+    public static ICheckData removeData(final String playerName) {
+		return playersMap.remove(playerName);
+	}
+
+	// Violation levels.
     public double                  angleVL;
     public double                  criticalVL;
     public double                  directionVL;

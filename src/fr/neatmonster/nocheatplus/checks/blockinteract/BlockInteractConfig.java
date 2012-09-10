@@ -39,16 +39,16 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  */
 public class BlockInteractConfig extends ACheckConfig {
 
-    /** The factory creating configurations. */
-    public static final CheckConfigFactory          factory   = new CheckConfigFactory() {
-                                                                  @Override
-                                                                  public final ICheckConfig getConfig(final Player player) {
-                                                                      return BlockInteractConfig.getConfig(player);
-                                                                  }
-                                                              };
+	/** The factory creating configurations. */
+	public static final CheckConfigFactory factory = new CheckConfigFactory() {
+		@Override
+		public final ICheckConfig getConfig(final Player player) {
+			return BlockInteractConfig.getConfig(player);
+		}
+	};
 
     /** The map containing the configurations per world. */
-    private static Map<String, BlockInteractConfig> worldsMap = new HashMap<String, BlockInteractConfig>();
+    private static final Map<String, BlockInteractConfig> worldsMap = new HashMap<String, BlockInteractConfig>();
 
     /**
      * Clear all the configurations.

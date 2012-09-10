@@ -24,16 +24,21 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class ChatData extends AsyncCheckData {
 
-    /** The factory creating data. */
-    public static final CheckDataFactory factory    = new CheckDataFactory() {
-                                                        @Override
-                                                        public final ICheckData getData(final Player player) {
-                                                            return ChatData.getData(player);
-                                                        }
-                                                    };
+	/** The factory creating data. */
+	public static final CheckDataFactory factory = new CheckDataFactory() {
+		@Override
+		public final ICheckData getData(final Player player) {
+			return ChatData.getData(player);
+		}
+
+		@Override
+		public ICheckData removeData(final String playerName) {
+			return ChatData.removeData(playerName);
+		}
+	};
 
     /** The map containing the data per players. */
-    private static Map<String, ChatData> playersMap = new HashMap<String, ChatData>();
+    private static final Map<String, ChatData> playersMap = new HashMap<String, ChatData>();
 
     /**
      * Gets the data of a specified player.
@@ -48,7 +53,11 @@ public class ChatData extends AsyncCheckData {
         return playersMap.get(player.getName());
     }
 
-    // Violation levels.
+    public synchronized static ICheckData removeData(final String playerName) {
+		return playersMap.remove(playerName);
+	}
+
+	// Violation levels.
     public double  captchaVL;
     public double  colorVL;
     public double  globalChatVL;

@@ -25,16 +25,21 @@ import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
  */
 public class InventoryData extends ACheckData {
 
-    /** The factory creating data. */
-    public static final CheckDataFactory      factory    = new CheckDataFactory() {
-                                                             @Override
-                                                             public final ICheckData getData(final Player player) {
-                                                                 return InventoryData.getData(player);
-                                                             }
-                                                         };
+	/** The factory creating data. */
+	public static final CheckDataFactory factory = new CheckDataFactory() {
+		@Override
+		public final ICheckData getData(final Player player) {
+			return InventoryData.getData(player);
+		}
+
+		@Override
+		public ICheckData removeData(final String playerName) {
+			return InventoryData.removeData(playerName);
+		}
+	};
 
     /** The map containing the data per players. */
-    private static Map<String, InventoryData> playersMap = new HashMap<String, InventoryData>();
+    private static final Map<String, InventoryData> playersMap = new HashMap<String, InventoryData>();
 
     /**
      * Gets the data of a specified player.
@@ -49,7 +54,11 @@ public class InventoryData extends ACheckData {
         return playersMap.get(player.getName());
     }
 
-    // Violation levels.
+    public static ICheckData removeData(final String playerName) {
+		return playersMap.remove(playerName);
+	}
+
+	// Violation levels.
     public double   dropVL;
     public double   fastClickVL;
     public double   instantBowVL;

@@ -18,20 +18,29 @@ public class CombinedData extends ACheckData {
 		public final ICheckData getData(final Player player) {
 			return CombinedData.getData(player);
 		}
+
+		@Override
+		public ICheckData removeData(final String playerName) {
+			return CombinedData.removeData(playerName);
+		}
 	};
                                                     
-    private static final Map<String, CombinedData> dataMap = new HashMap<String, CombinedData>();
+    private static final Map<String, CombinedData> playersMap = new HashMap<String, CombinedData>();
 
 	public static CombinedData getData(final Player player) {
 		final String playerName = player.getName(); 
-		CombinedData data = dataMap.get(playerName);
+		CombinedData data = playersMap.get(playerName);
 		if (data == null){
 			data = new CombinedData(player);
-			dataMap.put(playerName, data);
+			playersMap.put(playerName, data);
 		}
 		return data;
 	}
 	
+	public static ICheckData removeData(final String playerName) {
+		return playersMap.remove(playerName);
+	}
+
 	public double improbableVL = 0;
 	public double speedVL = 0;
 	

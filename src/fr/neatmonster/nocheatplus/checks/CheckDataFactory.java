@@ -35,5 +35,12 @@ public interface CheckDataFactory {
      * @return the data
      */
     public ICheckData getData(final Player player);
+    
+    /**
+     * Remove data of a player.
+     * @param playerName Must match exactly, must be player name for command use and cleanup tasks.
+     * @return
+     */
+    public ICheckData removeData(final String playerName);
 
 }

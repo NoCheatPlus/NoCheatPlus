@@ -41,7 +41,7 @@ public class ChatConfig extends AsyncCheckConfig {
                                                      };
 
     /** The map containing the configurations per world. */
-    private static Map<String, ChatConfig> worldsMap = new HashMap<String, ChatConfig>();
+    private static final Map<String, ChatConfig> worldsMap = new HashMap<String, ChatConfig>();
      
     /**
      * Clear all the configurations.

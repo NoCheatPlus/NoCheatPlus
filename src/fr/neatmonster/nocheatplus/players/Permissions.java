@@ -31,6 +31,7 @@ public class Permissions {
     public static final String  ADMINISTRATION_NOTIFY        = ADMINISTRATION + ".notify";
     public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
     public static final String  ADMINISTRATION_RELOAD        = ADMINISTRATION + ".reload";
+	public static final String  ADMINISTRATION_REMOVEPLAYER  = ADMINISTRATION + ".removeplayer";
     public static final String  ADMINISTRATION_TELL          = ADMINISTRATION + ".tell";
     public static final String  ADMINISTRATION_TEMPKICK      = ADMINISTRATION + ".tempkick";
     
