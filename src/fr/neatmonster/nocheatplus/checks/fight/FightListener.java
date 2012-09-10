@@ -277,7 +277,7 @@ public class FightListener implements Listener {
      *            the event
      */
     @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+            ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerToggleSprint(final PlayerToggleSprintEvent event) {
         /*
          *  ____  _                         _____                 _        ____             _       _   
@@ -287,6 +287,6 @@ public class FightListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|      |_|\___/ \__, |\__, |_|\___| |____/| .__/|_|  |_|_| |_|\__|
          *                |___/                       |___/ |___/               |_|                     
          */
-        FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
+        if (event.isSprinting()) FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
     }
 }
