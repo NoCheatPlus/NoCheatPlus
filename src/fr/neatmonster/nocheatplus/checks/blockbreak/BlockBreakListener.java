@@ -44,6 +44,9 @@ public class BlockBreakListener implements Listener {
 
     /** The reach check. */
     private final Reach     reach     = new Reach();
+    
+    /** The wrong block check. */
+    private final WrongBlock wrongBlock = new WrongBlock();
 
     /**
      * We listen to BlockBreak events for obvious reasons.
@@ -69,6 +72,10 @@ public class BlockBreakListener implements Listener {
         // Do the actual checks, if still needed. It's a good idea to make computationally cheap checks first, because
         // it may save us from doing the computationally expensive checks.
 
+        // Has the player broken a block that was not damaged before?
+        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block))
+        	cancelled = true;
+        
         // Has the player broken blocks too quickly?
         if (fastBreak.isEnabled(player) && fastBreak.check(player, block))
             cancelled = true;
@@ -131,9 +138,19 @@ public class BlockBreakListener implements Listener {
          *                |___/                                                  
          */
         // Do not care about null blocks.
-        if (event.getClickedBlock() == null)
+    	final Block block = event.getClickedBlock();
+        if (block == null)
             return;
-
-        BlockBreakData.getData(event.getPlayer()).fastBreakDamageTime = System.currentTimeMillis();
+        final BlockBreakData data = BlockBreakData.getData(event.getPlayer());
+        data.fastBreakDamageTime = System.currentTimeMillis();
+        // Also set last clicked blocks position.
+        // ? only set time / block, if 
+        //   - action = left_click_block
+        //   - time not already set => design to really record the used time.
+        //     DRAWBACK: lag, thus: rather switch to accumulate the theoretically needed break times in an ActionFrequency buffer, 
+        //                           then use those to determine if to prevent or not, depending on settings + lag.
+        data.clickedX = block.getX();
+        data.clickedY = block.getY();
+        data.clickedZ = block.getZ();
     }
 }

@@ -78,6 +78,10 @@ public abstract class ConfPaths {
     private static final String BLOCKBREAK_REACH                         = BLOCKBREAK + "reach.";
     public static final String  BLOCKBREAK_REACH_CHECK                   = BLOCKBREAK_REACH + "active";
     public static final String  BLOCKBREAK_REACH_ACTIONS                 = BLOCKBREAK_REACH + "actions";
+    
+    private static final String BLOCKBREAK_WRONGBLOCK                    = BLOCKBREAK + "wrongblock.";
+	public static final String  BLOCKBREAK_WRONGBLOCK_CHECK              = BLOCKBREAK_WRONGBLOCK + "active";
+	public static final String  BLOCKBREAK_WRONGBLOCK_ACTIONS            = BLOCKBREAK_WRONGBLOCK + "actions";
 
     /*
      * 888 88b, 888                    888    888           d8                                     d8   
@@ -257,7 +261,7 @@ public abstract class ConfPaths {
 	public static final String  COMBINED_IMPROBABLE_CHECK                = COMBINED_IMPROBABLE + "active";
 	public static final String  COMBINED_IMPROBABLE_LEVEL                = COMBINED_IMPROBABLE + "level";
 	
-	private static final String COMBINED_IMPROBABLE_CHECKS               = COMBINED_IMPROBABLE + "checks.";               
+	private static final String COMBINED_IMPROBABLE_CHECKS               = COMBINED_IMPROBABLE + "options.";               
 	public static final String  COMBINED_IMPROBABLE_FASTBREAK_CHECK      = COMBINED_IMPROBABLE_CHECKS + "fastbreak";
 	
 	public static final String  COMBINED_IMPROBABLE_ACTIONS              = COMBINED_IMPROBABLE + "actions";

@@ -78,7 +78,10 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
-
+        
+        set(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK, true);
+        set(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, "log:bwrong:0:5:if cancel vl>20 log:bwrong:0:5:if cancel cmd:kickwb");
+        
         /*
          * 888 88b, 888                    888    888           d8                                     d8   
          * 888 88P' 888  e88 88e   e88'888 888 ee 888 888 8e   d88    ,e e,  888,8,  ,"Y88b  e88'888  d88   
@@ -212,7 +215,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMBINED_IMPROBABLE_CHECK , false);
         set(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
         set(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK, false);
-        set(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, "cancel log:improbable:2:5:if");
+        set(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, "cancel log:improbable:2:8:if");
         
         /*
          * 888'Y88 ,e,          888       d8   
@@ -340,6 +343,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".bwrong", start + "broke another block than clicked" + end);
         set(ConfPaths.STRINGS + ".captcha", "[player] failed captcha repeatedly" + end);
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
@@ -366,6 +370,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickglchat", "ncp kick [player] Too many chat messages, take a break.");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
+        set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Wrong block!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);

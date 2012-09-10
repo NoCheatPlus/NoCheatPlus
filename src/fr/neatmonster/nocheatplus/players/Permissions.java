@@ -51,6 +51,7 @@ public class Permissions {
     public static final String  BLOCKBREAK_FASTBREAK         = BLOCKBREAK + ".fastbreak";
     public static final String  BLOCKBREAK_NOSWING           = BLOCKBREAK + ".noswing";
     public static final String  BLOCKBREAK_REACH             = BLOCKBREAK + ".reach";
+	public static final String  BLOCKBREAK_WRONGBLOCK        = BLOCKBREAK + ".wrongblock";
 
     /*
      * 888 88b, 888                    888    888           d8                                     d8   

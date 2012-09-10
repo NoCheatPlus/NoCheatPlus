@@ -60,6 +60,12 @@ public class BlockBreakData extends ACheckData {
     public double  fastBreakVL;
     public double  noSwingVL;
     public double  reachVL;
+    public double  wrongBlockVL;
+    
+    // Shared data.
+	public int clickedX;
+	public int clickedY;
+	public int clickedZ;
 
     // Data of the fast break check.
     public int     fastBreakBuffer     = 5;

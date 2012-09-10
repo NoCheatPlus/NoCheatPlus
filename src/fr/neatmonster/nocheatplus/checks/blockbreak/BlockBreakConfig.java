@@ -87,6 +87,10 @@ public class BlockBreakConfig extends ACheckConfig {
     public final boolean    reachCheck;
     public final ActionList reachActions;
 
+    
+    public final boolean wrongBlockCheck;
+	public final ActionList wrongBlockActions;
+
     /**
      * Instantiates a new block break configuration.
      * 
@@ -109,6 +113,9 @@ public class BlockBreakConfig extends ACheckConfig {
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKBREAK_REACH_CHECK);
         reachActions = data.getActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
+        
+        wrongBlockCheck = data.getBoolean(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK);
+        wrongBlockActions = data.getActionList(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, Permissions.BLOCKBREAK_WRONGBLOCK);
     }
 
     /* (non-Javadoc)
@@ -125,6 +132,8 @@ public class BlockBreakConfig extends ACheckConfig {
             return noSwingCheck;
         case BLOCKBREAK_REACH:
             return reachCheck;
+        case BLOCKBREAK_WRONGBLOCK:
+        	return wrongBlockCheck;
         default:
             return true;
         }
