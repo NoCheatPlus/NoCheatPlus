@@ -8,6 +8,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -68,9 +69,17 @@ public class Reach extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.reachVL, distance, BlockPlaceConfig.getConfig(player).reachActions);
-        } else
+        } else{
             // Player passed the check, reward him.
             data.reachVL *= 0.9D;
+            
+        	// Check if improbable.
+            if (distance > -0.3){
+            	if (Improbable.check(player, 2.0f, System.currentTimeMillis()))
+            		cancel = true;
+            }
+        }
+
 
         return cancel;
     }

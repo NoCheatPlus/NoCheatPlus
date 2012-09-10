@@ -85,6 +85,12 @@ public class Permissions {
     public static final String  CHAT_GLOBALCHAT              = CHAT + ".globalchat";
     public static final String  CHAT_NOPWNAGE                = CHAT + ".nopwnage";
     public static final String  CHAT_NOPWNAGE_CAPTCHA        = CHAT_NOPWNAGE + ".captcha";
+    
+    /*
+     * Combined !
+     */
+    private static final String COMBINED                     = CHECKS + ".combined";
+	public static  final String COMBINED_IMPROBABLE          = COMBINED + ".improbable";
 
     /*
      * 888'Y88 ,e,          888       d8   

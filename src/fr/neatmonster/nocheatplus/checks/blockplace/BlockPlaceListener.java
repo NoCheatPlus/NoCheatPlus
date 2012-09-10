@@ -12,6 +12,8 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+
 /*
  * M#"""""""'M  dP                   dP       MM"""""""`YM dP                            
  * ##  mmmm. `M 88                   88       MM  mmmmm  M 88                            
@@ -79,6 +81,10 @@ public class BlockPlaceListener implements Listener {
         // First, the fast place check.
         if (fastPlace.isEnabled(player) && fastPlace.check(player, block))
             cancelled = true;
+        
+        // Combined speed:
+        if (Improbable.check(player, 1f, System.currentTimeMillis()))
+        	cancelled = true;
 
         // Second, the no swing check (player doesn't swing his arm when placing a lily pad).
         if (!cancelled && event.getBlockPlaced().getType() != Material.WATER_LILY && noSwing.isEnabled(player)

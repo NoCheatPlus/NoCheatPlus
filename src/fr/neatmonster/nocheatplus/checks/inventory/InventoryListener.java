@@ -13,6 +13,8 @@ import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+
 /*
  * M""M                                       dP                              
  * M  M                                       88                              
@@ -73,6 +75,10 @@ public class InventoryListener implements Listener {
             if (instantBow.isEnabled(player) && instantBow.check(player, event.getForce()))
                 // The check requested the event to be cancelled.
                 event.setCancelled(true);
+            else         
+            	// Combined speed:
+                if (Improbable.check(player, 1f, System.currentTimeMillis()))
+                	event.setCancelled(true);
         }
     }
 
@@ -126,6 +132,10 @@ public class InventoryListener implements Listener {
             if (fastClick.isEnabled(player) && fastClick.check(player))
                 // The check requested the event to be cancelled.
                 event.setCancelled(true);
+            
+            // Combined speed:
+            else if (Improbable.check(player, 1f, System.currentTimeMillis()))
+            	event.setCancelled(true);
         }
     }
 
@@ -154,6 +164,10 @@ public class InventoryListener implements Listener {
             // Cancelling drop events is not save (in certain circumstances items will disappear completely). So don't
             // do it and kick players instead by default.
             event.getPlayer().kickPlayer("You're not allowed to crash the server by dropping items!");
+        else         
+        	// Combined speed:
+            if (Improbable.check(event.getPlayer(), 1f, System.currentTimeMillis()))
+            	event.setCancelled(true);
     }
 
     /**

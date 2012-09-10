@@ -25,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
 import fr.neatmonster.nocheatplus.checks.chat.ChatListener;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedListener;
 import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
@@ -139,6 +140,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         	new BlockInteractListener(),
         	new BlockPlaceListener(),
         	new ChatListener(),
+        	new CombinedListener(),
         	new FightListener(),
         	new InventoryListener(),
         	new MovingListener(),

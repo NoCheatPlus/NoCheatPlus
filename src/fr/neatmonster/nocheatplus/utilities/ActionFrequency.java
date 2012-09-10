@@ -84,4 +84,31 @@ public class ActionFrequency {
 		return res;
 	}
 	
+	/**
+	 * Get score of a certain bucket. At own risk.
+	 * @param bucket
+	 * @return
+	 */
+	public float getScore(final int bucket){
+		return buckets[bucket];
+	}
+	
+	/**
+	 * Get score of first maxBuckets buckets, with factor.
+	 * @param maxBucket
+	 * @param factor
+	 * @return
+	 */
+	public final float getScore(final int maxBuckets, float factor){
+		float score = buckets[0];
+		float cf = factor;
+		for (int i = 1; i < maxBuckets; i++){
+			score += buckets[i] * cf;
+			cf *= factor;
+		}
+		return score;
+			
+			
+	}
+	
 }

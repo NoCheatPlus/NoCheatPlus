@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
@@ -77,9 +78,17 @@ public class Reach extends Check {
             if (cancel)
                 // If we should cancel, remember the current time too.
                 data.reachLastViolationTime = System.currentTimeMillis();
-        } else
+        } else{
             // Player passed the check, reward him.
             data.reachVL *= 0.8D;
+            
+            // Check if improbable
+            if (distance > -0.3){
+            	if (Improbable.check(player, 2.0f, System.currentTimeMillis()))
+            		cancel = true;
+            }
+        }
+
 
         // If the player is still in penalty time, cancel the event anyway.
         if (data.reachLastViolationTime + cc.reachPenalty > System.currentTimeMillis()) {

@@ -10,6 +10,8 @@ import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceData;
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatData;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
 import fr.neatmonster.nocheatplus.checks.fight.FightData;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
@@ -55,6 +57,9 @@ public enum CheckType {
     CHAT_COLOR(CHAT, Permissions.CHAT_COLOR),
     CHAT_NOPWNAGE(CHAT, Permissions.CHAT_NOPWNAGE),
     CHAT_GLOBALCHAT(CHAT, Permissions.CHAT_GLOBALCHAT),
+    
+    COMBINED(CombinedConfig.factory, CombinedData.factory),
+    COMBINED_IMPROBABLE(COMBINED, Permissions.COMBINED_IMPROBABLE),
 
     FIGHT(FightConfig.factory, FightData.factory),
     FIGHT_ANGLE(FIGHT, Permissions.FIGHT_ANGLE),

@@ -11,6 +11,7 @@ import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
@@ -53,12 +54,13 @@ public class ReloadCommand extends NCPCommand {
         BlockInteractConfig.clear();
         BlockPlaceConfig.clear();
         ChatConfig.clear();
+        CombinedConfig.clear();
         FightConfig.clear();
         InventoryConfig.clear();
         MovingConfig.clear();
         
         // Tell the plugin to adapt to new config.
-        for (INotifyReload component : notifyReload){
+        for (final INotifyReload component : notifyReload){
         	component.onReload();
         }
 

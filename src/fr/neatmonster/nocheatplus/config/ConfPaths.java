@@ -249,6 +249,17 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_ACTIONS                    = CHAT_NOPWNAGE + "actions";
 
     /*
+     * Combined !
+     */
+    private static final String COMBINED                                 = CHECKS + "combined.";
+	
+    private static final String COMBINED_IMPROBABLE                      = COMBINED + "improbable.";
+	public static final String  COMBINED_IMPROBABLE_CHECK                = COMBINED_IMPROBABLE + "active";
+	public static final String  COMBINED_IMPROBABLE_LEVEL                = COMBINED_IMPROBABLE + "level";
+	
+	public static final String  COMBINED_IMPROBABLE_ACTIONS              = COMBINED_IMPROBABLE + "actions";
+	
+    /*
      * 888'Y88 ,e,          888       d8   
      * 888 ,'Y  "   e88 888 888 ee   d88   
      * 888C8   888 d888 888 888 88b d88888 

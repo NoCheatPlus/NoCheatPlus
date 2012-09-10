@@ -205,6 +205,14 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:kicknopwnage");
 
+        
+//        /*
+//         * Combined !
+//         */
+//        set(ConfPaths.COMBINED_IMPROBABLE_CHECK , true);
+//        set(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
+//        set(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, "cancel log:improbable:2:5:if");
+        
         /*
          * 888'Y88 ,e,          888       d8   
          * 888 ,'Y  "   e88 888 888 ee   d88   
@@ -333,6 +341,7 @@ public class DefaultConfig extends ConfigFile {
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
         set(ConfPaths.STRINGS + ".captcha", "[player] failed captcha repeatedly" + end);
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
+        set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too many blocks" + end);
@@ -347,6 +356,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [limit] times per second" + end);
         set(ConfPaths.STRINGS + ".globalchat", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
+        set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow to fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
