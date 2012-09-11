@@ -6,9 +6,10 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.ACheckData;
-import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.Stats;
 
 /*
  * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
@@ -76,6 +77,8 @@ public class BlockBreakData extends ACheckData {
 	public int clickedX;
 	public int clickedY;
 	public int clickedZ;
+	
+	public final Stats stats;
 
     // Data of the fast break check.
 	public final ActionFrequency fastBreakPenalties;
@@ -95,6 +98,7 @@ public class BlockBreakData extends ACheckData {
 		fastBreakBuffer = cc.fastBreakBuffer;
 		fastBreakPenalties = new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur);
 		wrongBlockVL = new ActionFrequency(6, 20000);
+		stats = cc.fastBreakDebug?(new Stats("NCP/FASTBREAK")):null;
 	}
 
 }

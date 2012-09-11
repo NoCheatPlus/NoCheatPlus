@@ -34,7 +34,10 @@ public class Permissions {
 	public static final String  ADMINISTRATION_REMOVEPLAYER  = ADMINISTRATION + ".removeplayer";
     public static final String  ADMINISTRATION_TELL          = ADMINISTRATION + ".tell";
     public static final String  ADMINISTRATION_TEMPKICK      = ADMINISTRATION + ".tempkick";
+    // Debug permission, for player spam (not in plugin.yml, currently).
+	public static final String ADMINISTRATION_DEBUG          = ADMINISTRATION + ".debug";
     
+    // Bypasses held extra from command permissions.
     private final static String BYPASS                       = NOCHEATPLUS + ".bypass";
     public static final  String BYPASS_DENY_LOGIN            = BYPASS + "denylogin";
 

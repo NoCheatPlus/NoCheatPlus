@@ -66,12 +66,16 @@ public abstract class ConfPaths {
     public static final String  BLOCKBREAK_DIRECTION_ACTIONS             = BLOCKBREAK_DIRECTION + "actions";
 
     private static final String BLOCKBREAK_FASTBREAK                     = BLOCKBREAK + "fastbreak.";
+	public static final  String BLOCKBREAK_FASTBREAK_DEBUG               = BLOCKBREAK_FASTBREAK + "debug";
     public static final String  BLOCKBREAK_FASTBREAK_CHECK               = BLOCKBREAK_FASTBREAK + "active";
-    private static final String  BLOCKBREAK_FASTBREAK_BUCKETS            = BLOCKBREAK + "buckets.";
+    private static final String BLOCKBREAK_FASTBREAK_BUCKETS             = BLOCKBREAK + "buckets.";
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION  = BLOCKBREAK_FASTBREAK_BUCKETS + "contention";
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_N           = BLOCKBREAK_FASTBREAK_BUCKETS + "number";
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_DUR         = BLOCKBREAK_FASTBREAK_BUCKETS + "duration";
+	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR      = BLOCKBREAK_FASTBREAK_BUCKETS + "factor";
+    
     public static final String  BLOCKBREAK_FASTBREAK_BUFFER              = BLOCKBREAK_FASTBREAK + "buffer";
+	public static final String  BLOCKBREAK_FASTBREAK_DELAY               = BLOCKBREAK_FASTBREAK + "delay";
     public static final String  BLOCKBREAK_FASTBREAK_INTERVAL            = BLOCKBREAK_FASTBREAK + "interval";
 	public static final String  BLOCKBREAK_FASTBREAK_OLDCHECK            = BLOCKBREAK_FASTBREAK + "oldcheck";
     public static final String  BLOCKBREAK_FASTBREAK_ACTIONS             = BLOCKBREAK_FASTBREAK + "actions";
@@ -414,5 +418,5 @@ public abstract class ConfPaths {
      *                                  "8",P"        
      */
     public static final String  STRINGS                                  = "strings";
-    
+
 }

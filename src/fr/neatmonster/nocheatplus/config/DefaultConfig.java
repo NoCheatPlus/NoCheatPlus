@@ -81,7 +81,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
         
         set(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, "log:bwrong:0:5:if cancel vl>20 log:bwrong:0:5:if cancel cmd:kickwb");
+        set(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, "cancel vl>5 log:bwrong:0:5:if cancel vl>20 log:bwrong:0:5:if cancel cmd:kickwb");
         
         /*
          * 888 88b, 888                    888    888           d8                                     d8   

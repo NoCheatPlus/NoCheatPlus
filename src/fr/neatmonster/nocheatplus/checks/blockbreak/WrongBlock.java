@@ -25,6 +25,11 @@ public class WrongBlock extends Check {
         		cancel = true;
         	if (Improbable.check(player, 5.0f, now))
         		cancel = true;
+        	// Reset, to prevent endless violation level farming.
+    		data.fastBreakDamageTime = now;
+    		data.clickedX = block.getX();
+    		data.clickedY = block.getY();
+    		data.clickedZ = block.getZ();
         }
         
         return cancel;

@@ -96,6 +96,7 @@ public class BlockBreakListener implements Listener {
         // At least one check failed and demanded to cancel the event.
         if (cancelled)
             event.setCancelled(cancelled);
+        
     }
 
     /**

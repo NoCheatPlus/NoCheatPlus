@@ -45,6 +45,7 @@ import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.BlockUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -283,6 +284,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             if (currentVersion > configurationVersion)
                 configOutdated = true;
         } catch (final Exception e) {}
+        
+        // Debug information about unknown blocks.
+        if (!config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_OLDCHECK)) BlockUtils.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false)); // false);
 
         // Tell the server administrator that we finished loading NoCheatPlus now.
         System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");

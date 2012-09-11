@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockUtils;
 
 /*
@@ -86,21 +87,26 @@ public class FastBreak extends Check {
         }
         else{
             // First, check the game mode of the player and choose the right limit.
-            long breakingTime = Math.round((double) cc.fastBreakInterval / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player.getItemInHand()));
+            long breakingTime = Math.round((double) cc.fastBreakInterval / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player));
             if (player.getGameMode() == GameMode.CREATIVE)
                 breakingTime = Math.round((double) cc.fastBreakInterval / 100D * (double) CREATIVE);
             
         	// fastBreakDamageTime is now first interact on block (!).
-        	if (now - data.fastBreakDamageTime < breakingTime){
+            final long elapsedTime = now - data.fastBreakDamageTime;
+            
+            // Check if the time used time is lower than expected.
+        	if (elapsedTime + cc.fastBreakDelay < breakingTime){
         		// lag or cheat or Minecraft.
-        		final long elapsedTime = now - data.fastBreakDamageTime;
-        		
+        		        		
         		final long missingTime = breakingTime - elapsedTime;
+        		
+        		
         		
         		// Add as penalty
         		data.fastBreakPenalties.add(now, (float) missingTime);
         		
-        		if (data.fastBreakPenalties.getScore(1f) > cc.fastBreakContention){
+        		// Only raise a violation, if the total penalty score exceeds the contention duration (for lag, delay).
+        		if (data.fastBreakPenalties.getScore(cc.fastBreakBucketFactor) > cc.fastBreakContention){
         			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
         			data.fastBreakVL += missingTime;
         			cancel = executeActions(player, data.fastBreakVL, missingTime, cc.fastBreakActions);
@@ -113,9 +119,14 @@ public class FastBreak extends Check {
         		data.fastBreakVL *= 0.9D;
         	}
         	
+        	 if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+                 data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+"u", true), elapsedTime);
+                 data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+ "r", true), breakingTime);
+                 player.sendMessage(data.stats.getStatsStr(true));
+             }
+        	
         }
-
-
+      
         // Remember the block breaking time.
         data.fastBreakBreakTime = now;
         
