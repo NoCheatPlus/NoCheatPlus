@@ -86,7 +86,7 @@ public class BlockBreakData extends ACheckData {
     public int     fastBreakBuffer;
     public long    fastBreakBreakTime  = System.currentTimeMillis() - 1000L;
     /** Old check sets this to the last interact time, new check sets to first interact time for one block. */
-    public long    fastBreakDamageTime = System.currentTimeMillis();
+    public long    fastBreakfirstDamage = System.currentTimeMillis();
     
     public final ActionFrequency frequencyBuckets;
 

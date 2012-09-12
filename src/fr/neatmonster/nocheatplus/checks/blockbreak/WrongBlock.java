@@ -31,7 +31,7 @@ public class WrongBlock extends Check {
         	data.wrongBlockVL.add(now, 1f);
         	if (executeActions(player, data.wrongBlockVL.getScore(0.9f), 1D, cc.wrongBlockActions))
         		cancel = true;
-        	if (Improbable.check(player, 5.0f, now))
+        	if (Improbable.check(player, 2.0f, now))
         		cancel = true;
         }
         

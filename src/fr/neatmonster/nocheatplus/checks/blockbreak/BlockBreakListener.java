@@ -108,7 +108,7 @@ public class BlockBreakListener implements Listener {
         if (cancelled){
         	event.setCancelled(cancelled);
         	// Reset damage position:
-    		data.fastBreakDamageTime = now;
+    		data.fastBreakfirstDamage = now;
     		data.clickedX = block.getX();
     		data.clickedY = block.getY();
     		data.clickedZ = block.getZ();
@@ -150,7 +150,7 @@ public class BlockBreakListener implements Listener {
      *            the event
      */
     @EventHandler(
-            ignoreCancelled = false, priority = EventPriority.MONITOR)
+            ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
         /*
          *  ____  _                         ___       _                      _   
@@ -168,11 +168,12 @@ public class BlockBreakListener implements Listener {
     	// (Allows right click to be ignored.) 
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         
+        final long now = System.currentTimeMillis();
         final BlockBreakData data = BlockBreakData.getData(player); 
         
         if (event.isCancelled()){
         	// Reset the time, to avoid certain kinds of cheating.
-        	data.fastBreakDamageTime = System.currentTimeMillis();
+        	data.fastBreakfirstDamage = now;
         	data.clickedX = Integer.MAX_VALUE; // Should be enough to reset that one.
         	return;
         }
@@ -182,12 +183,13 @@ public class BlockBreakListener implements Listener {
         if (block == null)
             return;
         
-        if (data.clickedX == block.getX() && data.clickedZ == block.getZ() && data.clickedY == block.getY()) return;
+//        if (data.clickedX == block.getX() && data.clickedZ == block.getZ() && data.clickedY == block.getY()) return;
         // Only record first damage:
-        data.fastBreakDamageTime = System.currentTimeMillis();
+        data.fastBreakfirstDamage = now;
         // Also set last clicked blocks position.
         data.clickedX = block.getX();
         data.clickedY = block.getY();
         data.clickedZ = block.getZ();
     }
+    
 }

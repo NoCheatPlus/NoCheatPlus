@@ -8,7 +8,6 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -72,11 +71,11 @@ public class Reach extends Check {
             // Player passed the check, reward him.
             data.reachVL *= 0.9D;
             
-        	// Check if improbable
-            if (distance > -0.3){
-            	if (Improbable.check(player, 2.0f, System.currentTimeMillis()))
-            		cancel = true;
-            }
+//        	// Check if improbable
+//            if (distance > -0.1){
+//            	if (Improbable.check(player, 1.0f, System.currentTimeMillis()))
+//            		cancel = true;
+//            }
         }
 
         return cancel;

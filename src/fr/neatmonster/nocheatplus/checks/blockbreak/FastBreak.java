@@ -53,8 +53,8 @@ public class FastBreak extends Check {
         if (player.getGameMode() == GameMode.CREATIVE)
             breakingTime = Math.round((double) cc.fastBreakModCreative / 100D * (double) 95);
         
-    	// fastBreakDamageTime is now first interact on block (!).
-        final long elapsedTime = now - data.fastBreakDamageTime;
+    	// fastBreakfirstDamage is now first interact on block (!).
+        final long elapsedTime = now - data.fastBreakfirstDamage;
         
         // Check if the time used time is lower than expected.
     	if (elapsedTime + cc.fastBreakDelay < breakingTime){
