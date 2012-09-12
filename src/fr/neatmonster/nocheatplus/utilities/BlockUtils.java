@@ -327,7 +327,7 @@ public class BlockUtils {
 		blocks[Material.SIGN_POST.getId()] = pumpkinType;
 		blocks[Material.PUMPKIN.getId()] = pumpkinType;
 		blocks[Material.JACK_O_LANTERN.getId()] = pumpkinType;
-		blocks[Material.MELON_BLOCK.getId()] = new BlockProps(noTool, 1, secToMs(1.5));
+		blocks[Material.MELON_BLOCK.getId()] = new BlockProps(noTool, 1, secToMs(1.45), 3); // 1.5 but maybe event delay one tick.
 		blocks[Material.BOOKSHELF.getId()] = new BlockProps(woodAxe, 1.5f, secToMs(2.25, 1.15, 0.6, 0.4, 0.3, 0.2));
 		for (Material mat : new Material[]{
 				Material.WOOD_STAIRS, Material.WOOD, Material.WOOD_STEP, Material.LOG,
