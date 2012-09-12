@@ -99,9 +99,9 @@ public class BlockBreakData extends ACheckData {
 
     public BlockBreakData(final BlockBreakConfig cc) {
 		stats = cc.fastBreakDebug?(new Stats("NCP/FASTBREAK")):null;
-		fastBreakPenalties = cc.fastBreakCheck ? new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur) : null;
-		frequencyBuckets = cc.frequencyCheck ? new ActionFrequency(cc.frequencyBuckets, cc.frequencyBucketDur) : null;
-		wrongBlockVL = cc.wrongBlockCheck ? new ActionFrequency(6, 20000) : null;
+		fastBreakPenalties = new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur);
+		frequencyBuckets = new ActionFrequency(cc.frequencyBuckets, cc.frequencyBucketDur);
+		wrongBlockVL = new ActionFrequency(6, 20000);
 	}
 
 }
