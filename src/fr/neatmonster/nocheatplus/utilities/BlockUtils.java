@@ -530,10 +530,12 @@ public class BlockUtils {
 
 	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {
 		
-		if (efficiency > 0 && blockId == Material.LEAVES.getId()){
+		if (efficiency > 0){
 			// Workaround until something better is found..
-			if (efficiency == 1) return 100;
-			else return 0; // insta break.
+			if (blockId == Material.LEAVES.getId() || blockProps == glassType){
+				if (efficiency == 1) return 100;
+				else return 0; // insta break.
+			}
 		}
 		
 		long duration;
