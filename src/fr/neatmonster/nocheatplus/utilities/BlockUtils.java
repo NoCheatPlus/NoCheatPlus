@@ -70,7 +70,12 @@ public class BlockUtils {
 		public final ToolProps tool;
 		public final long[] breakingTimes;
 		public final float hardness;
+		/** Factor 2 = 2 times faster. */
+		public final float efficiencyMod;
 		public BlockProps(ToolProps tool, float hardness){
+			this(tool, hardness, 1);
+		}
+		public BlockProps(ToolProps tool, float hardness, float efficiencyMod){
 			this.tool = tool;
 			this.hardness = hardness;
 			breakingTimes = new long[6];
@@ -84,11 +89,16 @@ public class BlockUtils {
 					multiplier = MaterialBase.getById(i).breakMultiplier * 3.33f;
 				breakingTimes[i] = (long) (1000f * 5f * hardness / multiplier);
 			}
+			this.efficiencyMod = efficiencyMod;
 		}
 		public BlockProps(ToolProps tool, float hardness, long[] breakingTimes){
+			this(tool, hardness, breakingTimes, 1f);
+		}
+		public BlockProps(ToolProps tool, float hardness, long[] breakingTimes, float efficiencyMod){
 			this.tool = tool;
 			this.breakingTimes = breakingTimes;
 			this.hardness = hardness;
+			this.efficiencyMod = efficiencyMod;
 		}
 		public String toString(){
 			return "BlockProps(" + hardness + " / " + tool.toString() + " / " + Arrays.toString(breakingTimes) + ")";
@@ -146,7 +156,7 @@ public class BlockUtils {
 	/** Instantly breakable. */ 
 	public static final BlockProps instantType = new BlockProps(noTool, 0, instantTimes);
 	
-	public static final BlockProps glassType = new BlockProps(noTool, 0.3f, glassTimes);
+	public static final BlockProps glassType = new BlockProps(noTool, 0.3f, glassTimes, 2f);
 	
 	public static final BlockProps gravelType = new BlockProps(woodSpade, 0.6f, gravelTimes);
 	/** Stone type blocks. */
@@ -533,6 +543,9 @@ public class BlockUtils {
 		if (isValidTool){
 			// appropriate tool
 			duration = blockProps.breakingTimes[toolProps.materialBase.index];
+			if (efficiency > 0){
+				duration = (long) (duration / blockProps.efficiencyMod);
+			}
 		}
 		else{
 			// Inappropriate tool.
