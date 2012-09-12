@@ -16,6 +16,10 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * Poperties of blocks.
+ * 
+ * Likely to be added:
+ * - reading properties from files.
+ * - reading the default properties from a file too.
  *
  */
 public class BlockUtils {
@@ -515,20 +519,16 @@ public class BlockUtils {
 	}
 
 	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {
+		
+		if (efficiency > 0 && blockId == Material.LEAVES.getId()){
+			// Workaround until something better is found..
+			if (efficiency == 1) return 100;
+			else return 0; // insta break.
+		}
+		
 		long duration;
 		
-		boolean isValidTool = blockProps.tool.toolType == toolProps.toolType;
-		
-		if (!isValidTool && efficiency > 0){
-			// Efficiency makes the tool.
-			// (wood, sand, gravel, ice)
-			if (blockProps.hardness <= 2 && (blockProps.tool.toolType == ToolType.AXE || blockProps.tool.toolType == ToolType.SPADE
-					|| (blockProps.hardness < 0.8 
-							&& (blockId != Material.NETHERRACK.getId() && blockId != Material.SNOW.getId() && blockId != Material.SNOW_BLOCK.getId() && blockId != Material.STONE_PLATE.getId())))){
-				// Also roughly.
-				isValidTool = true;
-			}	
-		}
+		boolean isValidTool = isValidTool(blockId, blockProps, toolProps, efficiency);
 		
 		if (isValidTool){
 			// appropriate tool
@@ -563,7 +563,7 @@ public class BlockUtils {
 			}
 		}
 		// (sword vs web already counted)
-		
+	
 		if (isValidTool || blockProps.tool.toolType == ToolType.NONE){
 			if (inWater && ! aquaAffinity) 
 				duration *= 5;
@@ -574,12 +574,37 @@ public class BlockUtils {
 				// This seems roughly correct.
 				for (int i = 0; i < efficiency; i++){
 					duration /= 1.33; // Matches well with obsidian.
-				}
+				}	
 			}
 		}
 		return duration;
 	}
 	
+	/**
+	 * Check if the tool is officially appropriate for the block id, counting in efficiency enchantments.
+	 * @param blockId
+	 * @param blockProps
+	 * @param toolProps
+	 * @param efficiency
+	 * @return
+	 */
+	public static boolean isValidTool(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final int efficiency) {
+		boolean isValidTool = blockProps.tool.toolType == toolProps.toolType;
+		
+		if (!isValidTool && efficiency > 0){
+			// Efficiency makes the tool.
+			// (wood, sand, gravel, ice)
+			if (blockProps.hardness <= 2 && (blockProps.tool.toolType == ToolType.AXE || blockProps.tool.toolType == ToolType.SPADE
+					|| (blockProps.hardness < 0.8 
+							&& (blockId != Material.NETHERRACK.getId() && blockId != Material.SNOW.getId() && blockId != Material.SNOW_BLOCK.getId() && blockId != Material.STONE_PLATE.getId())))){
+				// Also roughly.
+				isValidTool = true;
+			}	
+		}
+		return isValidTool;
+	}
+
+
 	public static void read(){
 		
 	}
