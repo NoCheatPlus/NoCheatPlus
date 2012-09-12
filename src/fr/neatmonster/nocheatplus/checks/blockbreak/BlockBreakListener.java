@@ -75,34 +75,48 @@ public class BlockBreakListener implements Listener {
 
         // Do the actual checks, if still needed. It's a good idea to make computationally cheap checks first, because
         // it may save us from doing the computationally expensive checks.
-
+        
+        final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
+        final BlockBreakData data = BlockBreakData.getData(player);
+        final long now = System.currentTimeMillis();
+        
         // Has the player broken a block that was not damaged before?
-        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block))
+        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block, cc, data))
         	cancelled = true;
 
         // Has the player broken more blocks per second than allowed?
-        if (!cancelled && frequency.isEnabled(player) && frequency.check(player))
+        if (!cancelled && frequency.isEnabled(player) && frequency.check(player, cc, data))
         	cancelled = true;
         
         // Has the player broken blocks faster than possible?
-        if (!cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block))
+        if (!cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block, cc, data))
             cancelled = true;
 
         // Did the arm of the player move before breaking this block?
-        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
+        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player, data))
             cancelled = true;
 
         // Is the block really in reach distance?
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation()))
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation(), data))
             cancelled = true;
 
         // Did the player look at the block at all?
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, block.getLocation()))
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, block.getLocation(), data))
             cancelled = true;
 
         // At least one check failed and demanded to cancel the event.
-        if (cancelled)
-            event.setCancelled(cancelled);
+        if (cancelled){
+        	event.setCancelled(cancelled);
+        	// Reset damage position:
+    		data.fastBreakDamageTime = now;
+    		data.clickedX = block.getX();
+    		data.clickedY = block.getY();
+    		data.clickedZ = block.getZ();
+        }
+        else{
+        	// Invalidate last damage position:
+        	data.clickedX = Integer.MAX_VALUE;
+        }
         
     }
 

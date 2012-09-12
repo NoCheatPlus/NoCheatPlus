@@ -38,13 +38,13 @@ public class FastBreak extends Check {
      *            the player
      * @param block
      *            the block
+     * @param data 
+     * @param cc 
      * @param elaspedTime
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block) {
+    public boolean check(final Player player, final Block block, final BlockBreakConfig cc, final BlockBreakData data) {
     	final long now = System.currentTimeMillis();
-        final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
-        final BlockBreakData data = BlockBreakData.getData(player);
 
         boolean cancel = false;
         

@@ -34,8 +34,7 @@ public class NoSwing extends Check {
      *            the player
      * @return true, if successful
      */
-    public boolean check(final Player player) {
-        final BlockBreakData data = BlockBreakData.getData(player);
+    public boolean check(final Player player, final BlockBreakData data) {
 
         boolean cancel = false;
 

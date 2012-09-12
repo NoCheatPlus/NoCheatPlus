@@ -17,9 +17,7 @@ public class Frequency extends Check {
 		super(CheckType.BLOCKBREAK_FREQUENCY);
 	}
 	
-	public boolean check(final Player player){
-        final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
-        final BlockBreakData data = BlockBreakData.getData(player);
+	public boolean check(final Player player, final BlockBreakConfig cc, final BlockBreakData data){
         
         final float interval = (float) ((player.getGameMode() == GameMode.CREATIVE)?(cc.frequencyIntervalCreative):(cc.frequencyIntervalSurvival));
         data.frequencyBuckets.add(System.currentTimeMillis(), interval);
