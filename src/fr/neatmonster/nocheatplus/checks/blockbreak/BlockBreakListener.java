@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -51,6 +52,8 @@ public class BlockBreakListener implements Listener {
     
     /** The wrong block check. */
     private final WrongBlock wrongBlock = new WrongBlock();
+    
+    private boolean isInstaBreak = false;
 
     /**
      * We listen to BlockBreak events for obvious reasons.
@@ -59,7 +62,7 @@ public class BlockBreakListener implements Listener {
      *            the event
      */
     @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+            ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onBlockBreak(final BlockBreakEvent event) {
         /*
          *  ____  _            _      ____                 _    
@@ -68,6 +71,13 @@ public class BlockBreakListener implements Listener {
          * | |_) | | (_) | (__|   <  | |_) | | |  __/ (_| |   < 
          * |____/|_|\___/ \___|_|\_\ |____/|_|  \___|\__,_|_|\_\
          */
+    	
+    	// Cancelled events only leads to resetting insta break.
+    	if (event.isCancelled()){
+    		isInstaBreak = false;
+    		return;
+    	}
+    	
         final Player player = event.getPlayer();
         final Block block = event.getBlock();
 
@@ -89,7 +99,7 @@ public class BlockBreakListener implements Listener {
         	cancelled = true;
         
         // Has the player broken blocks faster than possible?
-        if (!cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block, cc, data))
+        if (!isInstaBreak && !cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block, cc, data))
             cancelled = true;
 
         // Did the arm of the player move before breaking this block?
@@ -117,7 +127,7 @@ public class BlockBreakListener implements Listener {
         	// Invalidate last damage position:
         	data.clickedX = Integer.MAX_VALUE;
         }
-        
+        isInstaBreak = false;
     }
 
     /**
@@ -190,6 +200,12 @@ public class BlockBreakListener implements Listener {
         data.clickedX = block.getX();
         data.clickedY = block.getY();
         data.clickedZ = block.getZ();
+    }
+    
+    @EventHandler(
+            ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onBlockDamage(final BlockDamageEvent event) {
+    	if (event.getInstaBreak()) isInstaBreak = true;
     }
     
 }
