@@ -67,6 +67,8 @@ permissions:
                                 description: Allow the player to bypass to Direction check.
                             nocheatplus.checks.blockbreak.fastbreak:
                                 description: Allow the player to bypass the FastBreak check.
+                            nocheatplus.checks.blockbreak.frequency:
+                                description: Allow the player to bypass the Frequency check.
                             nocheatplus.checks.blockbreak.noswing:
                                 description: Allow the player to bypass the NoSwing check.
                             nocheatplus.checks.blockbreak.reach:
