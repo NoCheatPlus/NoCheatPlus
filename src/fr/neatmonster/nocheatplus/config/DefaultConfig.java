@@ -69,10 +69,14 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER, 2);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL, 100);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_OLDCHECK, false);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>100 log:fastbreak:3:5:cif cancel");
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 50);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL, 100);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>500 log:fastbreak:3:5:cif cancel");
+        
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_CHECK, true);
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_CREATIVE, 100);
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL, 50);
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, "cancel vl>5 log:bbfrequency:3:5:cif cancel vl>60 log:bbfrequency:0:5:cif cancel cmd:kickfrequency");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
         set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
@@ -340,6 +344,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".angle", start + "tried to hit multiple entities at the same time" + end);
         set(ConfPaths.STRINGS + ".ban", "ban [player]");
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
+        set(ConfPaths.STRINGS + ".bbfrequency", start + "tried to break too many blocks within time frame" + end);
         set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of his line of sight" + end);
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
@@ -350,7 +355,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
-        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break too many blocks" + end);
+        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks faster than possible" + end);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
@@ -369,6 +374,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kicknopwnage", "ncp kick [player] You're not allowed to spam this server!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
+        set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
         set(ConfPaths.STRINGS + ".kickglchat", "ncp kick [player] Too many chat messages, take a break.");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Wrong block!");

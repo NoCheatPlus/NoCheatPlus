@@ -69,6 +69,7 @@ public class BlockBreakData extends ACheckData {
 	// Violation levels.
     public double  directionVL;
     public double  fastBreakVL;
+    public double  frequencyVL;
     public double  noSwingVL;
     public double  reachVL;
     public final ActionFrequency  wrongBlockVL;
@@ -84,8 +85,10 @@ public class BlockBreakData extends ACheckData {
 	public final ActionFrequency fastBreakPenalties;
     public int     fastBreakBuffer;
     public long    fastBreakBreakTime  = System.currentTimeMillis() - 1000L;
-    /** Old check sets this to the last interact time, new check sets to first interact time */
+    /** Old check sets this to the last interact time, new check sets to first interact time for one block. */
     public long    fastBreakDamageTime = System.currentTimeMillis();
+    
+    public final ActionFrequency frequencyBuckets;
 
     // Data of the no swing check.
     public boolean noSwingArmSwung     = true;
@@ -94,11 +97,11 @@ public class BlockBreakData extends ACheckData {
     public double  reachDistance;
     
 
-    public BlockBreakData(BlockBreakConfig cc) {
-		fastBreakBuffer = cc.fastBreakBuffer;
-		fastBreakPenalties = new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur);
-		wrongBlockVL = new ActionFrequency(6, 20000);
+    public BlockBreakData(final BlockBreakConfig cc) {
 		stats = cc.fastBreakDebug?(new Stats("NCP/FASTBREAK")):null;
+		fastBreakPenalties = cc.fastBreakCheck ? new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur) : null;
+		frequencyBuckets = cc.frequencyCheck ? new ActionFrequency(cc.frequencyBuckets, cc.frequencyBucketDur) : null;
+		wrongBlockVL = cc.wrongBlockCheck ? new ActionFrequency(6, 20000) : null;
 	}
 
 }

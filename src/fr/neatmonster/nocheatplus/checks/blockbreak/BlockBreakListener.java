@@ -37,8 +37,11 @@ public class BlockBreakListener implements Listener {
     /** The direction check. */
     private final Direction direction = new Direction();
 
-    /** The fast break check. */
+    /** The fast break check (per block breaking speed). */
     private final FastBreak fastBreak = new FastBreak();
+    
+    /** The frequency check (number of blocks broken) */
+    private final Frequency frequency = new Frequency();
 
     /** The no swing check. */
     private final NoSwing   noSwing   = new NoSwing();
@@ -76,9 +79,13 @@ public class BlockBreakListener implements Listener {
         // Has the player broken a block that was not damaged before?
         if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block))
         	cancelled = true;
+
+        // Has the player broken more blocks per second than allowed?
+        if (!cancelled && frequency.isEnabled(player) && frequency.check(player))
+        	cancelled = true;
         
-        // Has the player broken blocks too quickly?
-        if (fastBreak.isEnabled(player) && fastBreak.check(player, block))
+        // Has the player broken blocks faster than possible?
+        if (!cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block))
             cancelled = true;
 
         // Did the arm of the player move before breaking this block?
@@ -129,7 +136,7 @@ public class BlockBreakListener implements Listener {
      *            the event
      */
     @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
+            ignoreCancelled = false, priority = EventPriority.MONITOR)
     public void onPlayerInteract(final PlayerInteractEvent event) {
         /*
          *  ____  _                         ___       _                      _   
@@ -140,17 +147,28 @@ public class BlockBreakListener implements Listener {
          *                |___/                                                  
          */
     	final Player player = event.getPlayer();
-    	final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
+    	
+    	// The following is to set the "first damage time" for a block.
+    	
     	// Return if it is not left clicking a block. 
-        if (!cc.fastBreakOldCheck && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+    	// (Allows right click to be ignored.) 
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        
+        final BlockBreakData data = BlockBreakData.getData(player); 
+        
+        if (event.isCancelled()){
+        	// Reset the time, to avoid certain kinds of cheating.
+        	data.fastBreakDamageTime = System.currentTimeMillis();
+        	data.clickedX = Integer.MAX_VALUE; // Should be enough to reset that one.
+        	return;
+        }
     	
         // Do not care about null blocks.
     	final Block block = event.getClickedBlock();
         if (block == null)
             return;
         
-        final BlockBreakData data = BlockBreakData.getData(player);
-        if (!cc.fastBreakOldCheck && data.clickedX == block.getX() && data.clickedZ == block.getZ() && data.clickedY == block.getY()) return;
+        if (data.clickedX == block.getX() && data.clickedZ == block.getZ() && data.clickedY == block.getY()) return;
         // Only record first damage:
         data.fastBreakDamageTime = System.currentTimeMillis();
         // Also set last clicked blocks position.

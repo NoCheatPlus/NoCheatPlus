@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
  *             dP                                  
  */
 /**
- * The Speed check is used to detect players who are attacking entities too quickly.
+ * The Frequency check is used to detect players who are attacking entities too quickly.
  */
 public class Speed extends Check {
 

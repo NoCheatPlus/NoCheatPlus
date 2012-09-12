@@ -13,6 +13,14 @@ public class WrongBlock extends Check {
 		super(CheckType.BLOCKBREAK_WRONGBLOCK);
 	}
 	
+	/**
+	 * Check if the player destroys another block than interacted with last.<br>
+	 * This does occasionally trigger for players that destroy grass or snow, 
+	 * probably due to packet delaying issues for insta breaking. very effective against some nuker techniques.
+	 * @param player
+	 * @param block
+	 * @return
+	 */
 	public boolean check(final Player player, final Block block){
         final BlockBreakConfig cc = BlockBreakConfig.getConfig(player);
         final BlockBreakData data = BlockBreakData.getData(player);

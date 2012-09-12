@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
 import org.bukkit.GameMode;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -21,15 +20,9 @@ import fr.neatmonster.nocheatplus.utilities.BlockUtils;
  * MMMMMMMMMMMM                          M#########M                                      
  */
 /**
- * A check used to verify if the player isn't breaking his blocks too quickly.
+ * A check used to verify if the player isn't breaking blocks faster than possible.
  */
 public class FastBreak extends Check {
-
-    /** The minimum time that needs to be elapsed between two block breaks for a player in creative mode. */
-    private static final long CREATIVE = 95L;
-
-    /** The minimum time that needs to be elapsed between two block breaks for a player in survival mode. */
-    private static final long SURVIVAL = 45L;
 
     /**
      * Instantiates a new fast break check.
@@ -55,77 +48,46 @@ public class FastBreak extends Check {
 
         boolean cancel = false;
         
-        if (cc.fastBreakOldCheck){
-            // First, check the game mode of the player and choose the right limit.
-            long elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * SURVIVAL);
-            if (player.getGameMode() == GameMode.CREATIVE)
-                elapsedTimeLimit = Math.round(cc.fastBreakInterval / 100D * CREATIVE);
-            // The elapsed time is the difference between the last damage time and the last break time.
-            final long elapsedTime = data.fastBreakDamageTime - data.fastBreakBreakTime;
-            if (elapsedTime < elapsedTimeLimit && data.fastBreakBreakTime > 0L && data.fastBreakDamageTime > 0L
-                    && (player.getItemInHand().getType() != Material.SHEARS || block.getType() != Material.LEAVES)) {
-                // If the buffer has been consumed.
-                if (data.fastBreakBuffer <= 0) {
-                    // Increment the violation level (but using the original limit).
-                    data.fastBreakVL += elapsedTimeLimit - elapsedTime;
-
-                    // Cancel the event if needed.
-                    cancel = executeActions(player, data.fastBreakVL, elapsedTimeLimit - elapsedTime, cc.fastBreakActions);
-                } else
-                    // Remove one from the buffer.
-                    data.fastBreakBuffer--;
-            } else {
-                // If the buffer isn't full.
-                if (data.fastBreakBuffer < cc.fastBreakBuffer)
-                    // Add one to the buffer.
-                    data.fastBreakBuffer++;
-
-                // Reduce the violation level, the player was nice with blocks.
-                data.fastBreakVL *= 0.9D;
-               
-            }
-        }
-        else{
-            // First, check the game mode of the player and choose the right limit.
-            long breakingTime = Math.round((double) cc.fastBreakInterval / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player));
-            if (player.getGameMode() == GameMode.CREATIVE)
-                breakingTime = Math.round((double) cc.fastBreakInterval / 100D * (double) CREATIVE);
-            
-        	// fastBreakDamageTime is now first interact on block (!).
-            final long elapsedTime = now - data.fastBreakDamageTime;
-            
-            // Check if the time used time is lower than expected.
-        	if (elapsedTime + cc.fastBreakDelay < breakingTime){
-        		// lag or cheat or Minecraft.
-        		        		
-        		final long missingTime = breakingTime - elapsedTime;
-        		
-        		
-        		
-        		// Add as penalty
-        		data.fastBreakPenalties.add(now, (float) missingTime);
-        		
-        		// Only raise a violation, if the total penalty score exceeds the contention duration (for lag, delay).
-        		if (data.fastBreakPenalties.getScore(cc.fastBreakBucketFactor) > cc.fastBreakContention){
-        			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
-        			data.fastBreakVL += missingTime;
-        			cancel = executeActions(player, data.fastBreakVL, missingTime, cc.fastBreakActions);
-        		}
-        		// else: still within contention limits.
-        		
+        // First, check the game mode of the player and choose the right limit.
+        long breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player));
+        if (player.getGameMode() == GameMode.CREATIVE)
+            breakingTime = Math.round((double) cc.fastBreakModCreative / 100D * (double) 95);
+        
+    	// fastBreakDamageTime is now first interact on block (!).
+        final long elapsedTime = now - data.fastBreakDamageTime;
+        
+        // Check if the time used time is lower than expected.
+    	if (elapsedTime + cc.fastBreakDelay < breakingTime){
+    		// lag or cheat or Minecraft.
+    		        		
+    		final long missingTime = breakingTime - elapsedTime;
+    		
+    		
+    		
+    		// Add as penalty
+    		data.fastBreakPenalties.add(now, (float) missingTime);
+    		
+    		// Only raise a violation, if the total penalty score exceeds the contention duration (for lag, delay).
+    		if (data.fastBreakPenalties.getScore(cc.fastBreakBucketFactor) > cc.fastBreakBucketContention){
+    			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
+    			data.fastBreakVL += missingTime;
+    			cancel = executeActions(player, data.fastBreakVL, missingTime, cc.fastBreakActions);
+    		}
+    		// else: still within contention limits.
+    		
 //        		System.out.println("violation : " + missingTime);
-        	}
-        	else{
-        		data.fastBreakVL *= 0.9D;
-        	}
-        	
-        	 if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-                 data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+"u", true), elapsedTime);
-                 data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+ "r", true), breakingTime);
-                 player.sendMessage(data.stats.getStatsStr(true));
-             }
-        	
-        }
+    	}
+    	else{
+    		data.fastBreakVL *= 0.9D;
+    	}
+    	
+    	 if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+             data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+"u", true), elapsedTime);
+             data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+ "r", true), breakingTime);
+             player.sendMessage(data.stats.getStatsStr(true));
+         }
+    	
+        
       
         // Remember the block breaking time.
         data.fastBreakBreakTime = now;

@@ -37,10 +37,13 @@ public class Permissions {
     // Debug permission, for player spam (not in plugin.yml, currently).
 	public static final String ADMINISTRATION_DEBUG          = ADMINISTRATION + ".debug";
     
+	
     // Bypasses held extra from command permissions.
     private final static String BYPASS                       = NOCHEATPLUS + ".bypass";
     public static final  String BYPASS_DENY_LOGIN            = BYPASS + "denylogin";
 
+ 
+    // Permissions for the individual checks.
     private static final String CHECKS                       = NOCHEATPLUS + ".checks";
 
     /*
@@ -53,6 +56,7 @@ public class Permissions {
     private static final String BLOCKBREAK                   = CHECKS + ".blockbreak";
     public static final String  BLOCKBREAK_DIRECTION         = BLOCKBREAK + ".direction";
     public static final String  BLOCKBREAK_FASTBREAK         = BLOCKBREAK + ".fastbreak";
+	public static final String  BLOCKBREAK_FREQUENCY         = BLOCKBREAK + ".frequency";
     public static final String  BLOCKBREAK_NOSWING           = BLOCKBREAK + ".noswing";
     public static final String  BLOCKBREAK_REACH             = BLOCKBREAK + ".reach";
 	public static final String  BLOCKBREAK_WRONGBLOCK        = BLOCKBREAK + ".wrongblock";

@@ -79,12 +79,20 @@ public class BlockBreakConfig extends ACheckConfig {
 	public final int        fastBreakBuckets;
 	public final long       fastBreakBucketDur;
 	public final float      fastBreakBucketFactor;
-    public final int        fastBreakBuffer;
-	public final long       fastBreakContention;
-	public final long       fastBreakDelay;
-    public final int        fastBreakInterval;
-	public final boolean    fastBreakOldCheck;
+	public final long       fastBreakBucketContention;
+	public final long       fastBreakDelay;	
+	public final int        fastBreakModSurvival;
+	public final int        fastBreakModCreative;
     public final ActionList fastBreakActions;
+    
+    
+	public final boolean    frequencyCheck;
+	public final int        frequencyBuckets;
+	public final long       frequencyBucketDur;
+	public final float      frequencyBucketFactor;  
+	public final int        frequencyIntervalCreative;
+	public final int        frequencyIntervalSurvival;
+	public final ActionList frequencyActions;
     
 	public boolean          improbableFastBreakCheck;
 
@@ -107,18 +115,28 @@ public class BlockBreakConfig extends ACheckConfig {
         directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
         directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
 
+        // Fastbreak.
         fastBreakCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK);
-        fastBreakDebug = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false); // hidden
-        fastBreakContention = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION, 2000);
+        // Hidden settings of new check.
+        fastBreakDebug = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false);
+        fastBreakDelay = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY);
+        fastBreakBucketContention = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION, 2000);
         fastBreakBucketDur = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_DUR, 4000);
         fastBreakBucketFactor = (float) data.getDouble(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR, 0.99);
         fastBreakBuckets = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_N, 30);
-        fastBreakBuffer = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUFFER);
-        fastBreakDelay = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 50);
-        fastBreakInterval = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_INTERVAL);
-        fastBreakOldCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_OLDCHECK);
+        fastBreakModCreative = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_CREATIVE, 0);
+        fastBreakModSurvival = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL);
+        // Fastbreak  actions, shared.
         fastBreakActions = data.getActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);
 
+        frequencyCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FREQUENCY_CHECK);
+        frequencyBuckets = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_BUCKETS_N, 2);
+        frequencyBucketDur = data.getLong(ConfPaths.BLOCKBREAK_FREQUENCY_BUCKETS_DUR, 1000);
+        frequencyBucketFactor = (float) data.getDouble(ConfPaths.BLOCKBREAK_FREQUENCY_BUCKETS_FACTOR, 1f);
+        frequencyIntervalCreative = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_CREATIVE);
+        frequencyIntervalSurvival = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL);
+        frequencyActions = data.getActionList(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, Permissions.BLOCKBREAK_FREQUENCY);
+        
         improbableFastBreakCheck = data.getBoolean(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK);
         
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
@@ -141,6 +159,8 @@ public class BlockBreakConfig extends ACheckConfig {
             return directionCheck;
         case BLOCKBREAK_FASTBREAK:
             return fastBreakCheck;
+        case BLOCKBREAK_FREQUENCY:
+        	return frequencyCheck; 
         case BLOCKBREAK_NOSWING:
             return noSwingCheck;
         case BLOCKBREAK_REACH:
