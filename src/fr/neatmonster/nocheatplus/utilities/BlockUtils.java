@@ -533,8 +533,17 @@ public class BlockUtils {
 		if (efficiency > 0){
 			// Workaround until something better is found..
 			if (blockId == Material.LEAVES.getId() || blockProps == glassType){
+				/*
+				 * TODO: Some might be dealt with by insta break, by now, 
+				 * still getting exact durations would be nice to have, for expected breaking times and 
+				 * general API use (spin off, analysis?).
+				 */
 				if (efficiency == 1) return 100;
 				else return 0; // insta break.
+			}
+			else if (blockId == Material.MELON_BLOCK.getId()){
+				// 450, 200 , 100 , 50 , 0
+				return 450 / (long) Math.pow(2, efficiency - 1); 
 			}
 		}
 		
@@ -609,9 +618,10 @@ public class BlockUtils {
 		if (!isValidTool && efficiency > 0){
 			// Efficiency makes the tool.
 			// (wood, sand, gravel, ice)
-			if (blockProps.hardness <= 2 && (blockProps.tool.toolType == ToolType.AXE || blockProps.tool.toolType == ToolType.SPADE
-					|| (blockProps.hardness < 0.8 
-							&& (blockId != Material.NETHERRACK.getId() && blockId != Material.SNOW.getId() && blockId != Material.SNOW_BLOCK.getId() && blockId != Material.STONE_PLATE.getId())))){
+			if (blockProps.hardness <= 2 
+					&& (blockProps.tool.toolType == ToolType.AXE 
+					|| blockProps.tool.toolType == ToolType.SPADE
+					|| (blockProps.hardness < 0.8 && (blockId != Material.NETHERRACK.getId() && blockId != Material.SNOW.getId() && blockId != Material.SNOW_BLOCK.getId() && blockId != Material.STONE_PLATE.getId())))){
 				// Also roughly.
 				isValidTool = true;
 			}	
