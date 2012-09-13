@@ -125,12 +125,11 @@ public abstract class Check {
    
         final boolean hasCancel = violationData.hasCancel(); 
     	
-        if (isMainThread) return violationData.executeActions();
-        else if (violationData.applicableActions.length > 0){
-        	// Only schedule if there is something to schedule.
-        	if (!hasCancel || violationData.applicableActions.length > 1)
-        		TickTask.requestActionsExecution(violationData);
-        }
+        if (isMainThread) 
+        	return violationData.executeActions();
+        else 
+        	// Always schedule to add to ViolationHistory.
+        	TickTask.requestActionsExecution(violationData);
         
     	// (Design change: Permission checks are moved to cached permissions, lazily updated.)
     	return hasCancel;
