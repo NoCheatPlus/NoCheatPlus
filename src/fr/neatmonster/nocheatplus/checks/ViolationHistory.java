@@ -82,9 +82,40 @@ public class ViolationHistory {
      * @return the history
      */
     public static ViolationHistory getHistory(final Player player) {
-        if (!violationHistories.containsKey(player.getName()))
-            violationHistories.put(player.getName(), new ViolationHistory());
-        return violationHistories.get(player.getName());
+        return getHistory(player.getName(), true);
+    }
+    
+    /**
+     * Get the history of a player, create if desired and not present.
+     * @param player
+     * @param create 
+     * 			If to create if not present.
+     * @return 
+     * 			The history, or null if create is set to false and no history is present.
+     */
+    public static ViolationHistory getHistory(final Player player, final boolean create) {
+        return getHistory(player.getName(), create);
+    }
+    
+    /**
+     * Gets the history of a player by exact name.
+     * @param playerName
+     * 			Name of the player in exact writing.
+     * @param create 
+     * 			If to create the entry, if not present.
+     * @return 
+     */
+    public static ViolationHistory getHistory(final String playerName, final boolean create) {
+    	final ViolationHistory hist = violationHistories.get(playerName);
+    	if (hist != null) 
+    		return hist;
+    	else if (create){
+    		final ViolationHistory newHist = new ViolationHistory();
+    		violationHistories.put(playerName, newHist);
+    		return newHist;
+    	}
+    	else 
+    		return null;
     }
 
     /** The violation levels for every check. */
