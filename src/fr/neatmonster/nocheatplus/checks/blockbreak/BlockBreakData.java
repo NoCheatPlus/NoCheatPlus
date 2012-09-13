@@ -75,9 +75,10 @@ public class BlockBreakData extends ACheckData {
     public final ActionFrequency  wrongBlockVL;
     
     // Shared data.
-	public int clickedX;
-	public int clickedY;
-	public int clickedZ;
+	public int     clickedX;
+	public int     clickedY;
+	public int     clickedZ;
+	public long    wasInstaBreak;
 	
 	public final Stats stats;
 
@@ -85,12 +86,12 @@ public class BlockBreakData extends ACheckData {
 	public final ActionFrequency fastBreakPenalties;
     public int     fastBreakBuffer;
     public long    fastBreakBreakTime  = System.currentTimeMillis() - 1000L;
-    /** Old check sets this to the last interact time, new check sets to first interact time for one block. */
+    /** First time interaction with a block. */
     public long    fastBreakfirstDamage = System.currentTimeMillis();
     
     public final ActionFrequency frequencyBuckets;
-	public int        frequencyShortTermCount;
-	public int        frequencyShortTermTick;
+	public int     frequencyShortTermCount;
+	public int     frequencyShortTermTick;
 
     // Data of the no swing check.
     public boolean noSwingArmSwung     = true;

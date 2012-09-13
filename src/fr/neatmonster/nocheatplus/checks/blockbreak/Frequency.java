@@ -32,7 +32,6 @@ public class Frequency extends Check {
         if (tick - data.frequencyShortTermTick < cc.frequencyShortTermTicks){
         	// Within range, add.
         	data.frequencyShortTermCount ++;
-        	System.out.println(data.frequencyShortTermCount);
         }
         else{
         	data.frequencyShortTermTick = tick;

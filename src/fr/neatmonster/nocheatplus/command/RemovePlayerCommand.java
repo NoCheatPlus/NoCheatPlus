@@ -29,7 +29,7 @@ public class RemovePlayerCommand extends NCPCommand {
 		final CheckType checkType;
 		if (args.length == 3){
 			try{
-				checkType = CheckType.valueOf(args[2].toUpperCase().replace('-', '_'));
+				checkType = CheckType.valueOf(args[2].toUpperCase().replace('-', '_').replace('.', '_'));
 			} catch (Exception e){
 				sender.sendMessage(TAG + "Could not interpret: " + args[2]);
 				sender.sendMessage(TAG + "Check type should be one of: " + CheckUtils.join(Arrays.asList(CheckType.values()), " | "));

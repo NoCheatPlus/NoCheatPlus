@@ -105,7 +105,8 @@ public class BlockBreakConfig extends ACheckConfig {
     public final boolean    reachCheck;
     public final ActionList reachActions;
 
-    public final boolean wrongBlockCheck;
+    public final boolean    wrongBlockCheck;
+	public final float      wrongBLockLevel;
 	public final ActionList wrongBlockActions;
 	
     /**
@@ -151,6 +152,7 @@ public class BlockBreakConfig extends ACheckConfig {
         reachActions = data.getActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
         
         wrongBlockCheck = data.getBoolean(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK);
+        wrongBLockLevel = data.getInt(ConfPaths.BLOCKBREAK_WRONGBLOCK_LEVEL);
         wrongBlockActions = data.getActionList(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, Permissions.BLOCKBREAK_WRONGBLOCK);
     }
 

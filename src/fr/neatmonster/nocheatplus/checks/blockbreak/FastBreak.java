@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockUtils;
 
@@ -49,20 +48,20 @@ public class FastBreak extends Check {
         boolean cancel = false;
         
         // First, check the game mode of the player and choose the right limit.
-        long breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player));
+        final long breakingTime;
         if (player.getGameMode() == GameMode.CREATIVE)
-            breakingTime = Math.round((double) cc.fastBreakModCreative / 100D * (double) 95);
-        
-    	// fastBreakfirstDamage is now first interact on block (!).
-        final long elapsedTime = now - data.fastBreakfirstDamage;
+        	// Modifier defaults to 0, the Frequency check is responsible for those.
+            breakingTime = Math.round((double) cc.fastBreakModCreative / 100D * (double) 100);
+        else
+        	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player));
+    	// fastBreakfirstDamage is the first interact on block (!).
+        final long elapsedTime = (data.fastBreakBreakTime > data.fastBreakfirstDamage) ? 0 : now - data.fastBreakfirstDamage;
         
         // Check if the time used time is lower than expected.
     	if (elapsedTime + cc.fastBreakDelay < breakingTime){
     		// lag or cheat or Minecraft.
     		        		
     		final long missingTime = breakingTime - elapsedTime;
-    		
-    		
     		
     		// Add as penalty
     		data.fastBreakPenalties.add(now, (float) missingTime);
@@ -74,28 +73,23 @@ public class FastBreak extends Check {
     			cancel = executeActions(player, data.fastBreakVL, missingTime, cc.fastBreakActions);
     		}
     		// else: still within contention limits.
-    		
-//        		System.out.println("violation : " + missingTime);
     	}
     	else{
     		data.fastBreakVL *= 0.9D;
     	}
     	
-    	 if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+    	 if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG) && data.stats != null){
              data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+"u", true), elapsedTime);
              data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+ "r", true), breakingTime);
              player.sendMessage(data.stats.getStatsStr(true));
          }
-    	
+    	 
+    	 // (The break time is set in the listener).
         
-      
-        // Remember the block breaking time.
-        data.fastBreakBreakTime = now;
-        
-        // Combined speed:
-        // TODO: use some value corresponding to allowed block breaking speed !
-        if (cc.improbableFastBreakCheck && Improbable.check(player, 1f, now))
-        	cancel = true;
+//        // Combined speed:
+//        // TODO: use some value corresponding to allowed block breaking speed !
+//        if (cc.improbableFastBreakCheck && Improbable.check(player, 1f, now)) // <- the weight should reflect needed duration
+//        	cancel = true;
 
         return cancel;
     }

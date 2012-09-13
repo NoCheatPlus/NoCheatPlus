@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.blockbreak;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -10,6 +11,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
  * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
@@ -91,13 +94,13 @@ public class BlockBreakListener implements Listener {
         final long now = System.currentTimeMillis();
         
         // Has the player broken a block that was not damaged before?
-        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block, cc, data))
+        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block, cc, data, isInstaBreak))
         	cancelled = true;
 
         // Has the player broken more blocks per second than allowed?
         if (!cancelled && frequency.isEnabled(player) && frequency.check(player, cc, data))
         	cancelled = true;
-        
+        	
         // Has the player broken blocks faster than possible?
         if (!isInstaBreak && !cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block, cc, data))
             cancelled = true;
@@ -118,15 +121,25 @@ public class BlockBreakListener implements Listener {
         if (cancelled){
         	event.setCancelled(cancelled);
         	// Reset damage position:
-    		data.fastBreakfirstDamage = now;
     		data.clickedX = block.getX();
     		data.clickedY = block.getY();
     		data.clickedZ = block.getZ();
         }
         else{
         	// Invalidate last damage position:
-        	data.clickedX = Integer.MAX_VALUE;
+//        	data.clickedX = Integer.MAX_VALUE;
         }
+        
+        if (isInstaBreak){
+        	if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) player.sendMessage("[InstaBreak]");
+        	data.wasInstaBreak = now;
+        }
+        else
+        	data.wasInstaBreak = 0;
+        
+        // Adjust data.
+        data.fastBreakBreakTime = now;
+//        data.fastBreakfirstDamage = now;
         isInstaBreak = false;
     }
 
@@ -170,42 +183,49 @@ public class BlockBreakListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
          *                |___/                                                  
          */
-    	final Player player = event.getPlayer();
     	
     	// The following is to set the "first damage time" for a block.
     	
     	// Return if it is not left clicking a block. 
     	// (Allows right click to be ignored.) 
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        checkBlockDamage(event.getPlayer(), event.getClickedBlock(), event);
         
-        final long now = System.currentTimeMillis();
+    }
+    
+    @EventHandler(
+    		ignoreCancelled = false, priority = EventPriority.MONITOR)
+    public void onBlockDamage(final BlockDamageEvent event) {
+    	if (!event.isCancelled() && event.getInstaBreak()) isInstaBreak = true;
+    	 checkBlockDamage(event.getPlayer(), event.getBlock(), event);
+    }
+    
+    private void checkBlockDamage(final Player player, final Block block, final Cancellable event){
+    	final long now = System.currentTimeMillis();
         final BlockBreakData data = BlockBreakData.getData(player); 
         
-        if (event.isCancelled()){
-        	// Reset the time, to avoid certain kinds of cheating.
-        	data.fastBreakfirstDamage = now;
-        	data.clickedX = Integer.MAX_VALUE; // Should be enough to reset that one.
-        	return;
-        }
+//        if (event.isCancelled()){
+//        	// Reset the time, to avoid certain kinds of cheating. => WHICH ?
+//        	data.fastBreakfirstDamage = now;
+//        	data.clickedX = Integer.MAX_VALUE; // Should be enough to reset that one.
+//        	return;
+//        }
     	
         // Do not care about null blocks.
-    	final Block block = event.getClickedBlock();
         if (block == null)
             return;
         
-//        if (data.clickedX == block.getX() && data.clickedZ == block.getZ() && data.clickedY == block.getY()) return;
+        // Skip if already set to the same block without breaking.
+        if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY())
+        	return;
+        
+        // (Always set, the interact event only fires once: the first time.)
         // Only record first damage:
         data.fastBreakfirstDamage = now;
         // Also set last clicked blocks position.
         data.clickedX = block.getX();
         data.clickedY = block.getY();
         data.clickedZ = block.getZ();
-    }
-    
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onBlockDamage(final BlockDamageEvent event) {
-    	if (event.getInstaBreak()) isInstaBreak = true;
     }
     
 }

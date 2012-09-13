@@ -55,7 +55,6 @@ public class Improbable extends Check {
 			violated = true;
 		}
 		boolean cancel = false;
-//		System.out.println("IMPROBABLE("+player.getName()+"): " + shortTerm + " / " + full + " / " + violation);
 		if (violated){
 			// Execute actions
 			data.improbableVL += violation / 10.0;

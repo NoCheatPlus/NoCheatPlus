@@ -314,7 +314,7 @@ public class BlockUtils {
 			blocks[mat.getId()] = new BlockProps(woodPickaxe, 0.7f, railsTimes);
 		}
 		blocks[Material.MONSTER_EGGS.getId()] = new BlockProps(noTool, 0.75f, secToMs(1.15)); 
-		blocks[Material.WOOL.getId()] = new BlockProps(noTool, 0.8f, secToMs(1.2));
+		blocks[Material.WOOL.getId()] = new BlockProps(noTool, 0.8f, secToMs(1.2), 3f);
 		blocks[Material.SANDSTONE.getId()] = sandStoneType;
 		blocks[Material.SANDSTONE_STAIRS.getId()] = sandStoneType;
 		for (Material mat : new Material[]{
@@ -507,7 +507,7 @@ public class BlockUtils {
 //		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
 		final PlayerLocation loc = new PlayerLocation(); 
 		// Bit fat workaround, maybe put the object through from check listener ?
-		loc.set(location, player);
+		loc.set(location, player, 0.3);
 		return loc.isOnGround();
 	}
 
@@ -618,12 +618,13 @@ public class BlockUtils {
 		if (!isValidTool && efficiency > 0){
 			// Efficiency makes the tool.
 			// (wood, sand, gravel, ice)
+			if (blockId == Material.WOOL.getId()) return true;
 			if (blockProps.hardness <= 2 
 					&& (blockProps.tool.toolType == ToolType.AXE 
 					|| blockProps.tool.toolType == ToolType.SPADE
 					|| (blockProps.hardness < 0.8 && (blockId != Material.NETHERRACK.getId() && blockId != Material.SNOW.getId() && blockId != Material.SNOW_BLOCK.getId() && blockId != Material.STONE_PLATE.getId())))){
 				// Also roughly.
-				isValidTool = true;
+				return true;
 			}	
 		}
 		return isValidTool;
