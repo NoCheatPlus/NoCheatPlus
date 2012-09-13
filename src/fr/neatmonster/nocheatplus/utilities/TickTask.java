@@ -16,6 +16,9 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /**
  * Task to run every tick, to update permissions and execute actions, and maybe later for extended lag measurement.
+ * 
+ * <hr>
+ * The permissions updates and actions execution is meant for use by the asynchronously run checks, not for normal use.
  * @author mc_dev
  *
  */
@@ -51,22 +54,18 @@ public class TickTask implements Runnable {
 	/** Task id of the running TickTask */
 	protected static int taskId = -1;
 	
-	/**
-	 * Access method to request permisison updates.
-	 * @param playerName
-	 * @param checkType
-	 */
-	public static void requestPermissionUpdate(final String playerName, final CheckType checkType){
-		permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
-	}
-
-	public static void cancel(){
-		if (taskId == -1) return;
-		Bukkit.getScheduler().cancelTask(taskId);
-		taskId = -1;
-	}
+	protected static int tick = 0;
 	
-	private void executeActions() {
+	
+	//////////////////////////////////////////////////////////////
+	// Special static methods, usually not called from outside.
+	//////////////////////////////////////////////////////////////
+	
+	/**
+	 * Force executing actions.<br>
+	 * Note: Only call from the main thread!
+	 */
+	public void executeActions() {
 		final List<ViolationData> copyActions = new LinkedList<ViolationData>();
 		synchronized (delayedActions) {
 			copyActions.addAll(delayedActions);
@@ -77,25 +76,9 @@ public class TickTask implements Runnable {
 		}
 	}
 	
-	public static void requestActionsExecution(final ViolationData actions) {
-		delayedActions.add(actions);
-	}
-	
-	@Override
-	public void run() {
-		// The isEmpty checks are faster than synchronizing fully always, the actions get delayed one tick at most.
-		if (!delayedActions.isEmpty()) executeActions();
-		if (!permissionUpdates.isEmpty()) updatePermissions();
-	}
-	
-	public static int start(final NoCheatPlus plugin){
-		cancel();
-		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
-		return taskId;
-	}
-
 	/**
-	 * Only call from the main thread!
+	 * Force a permissions update.<br>
+	 * Note: Only call from the main thread!
 	 */
 	public static void updatePermissions() {
 		final List<PermissionUpdateEntry> copyPermissions = new LinkedList<PermissionUpdateEntry>();
@@ -114,6 +97,66 @@ public class TickTask implements Runnable {
 			}	
 			
 		}
+	}
+	
+	///////////////////////////////////
+	// Public static access methods
+	///////////////////////////////////
+	
+	/**
+	 * Access method to request permission updates.<br>
+	 * NOTE: Thread safe.
+	 * @param playerName
+	 * @param checkType
+	 */
+	public static void requestPermissionUpdate(final String playerName, final CheckType checkType){
+		permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
+	}
+	
+	/**
+	 * Request actions execution.<br>
+	 * NOTE: Thread safe.
+	 * @param actions
+	 */
+	public static void requestActionsExecution(final ViolationData actions) {
+		delayedActions.add(actions);
+	}
+	
+	/**
+	 * Get the tasks tick count. It is increased with every server tick.<br>
+	 * NOTE: Can be called from other threads.
+	 * @return The current tick count.
+	 */
+	public static final int getTick(){
+		return tick;
+	}
+	
+	////////////////////////////////////////
+	// Public methods for internal use.
+	////////////////////////////////////////
+	
+	public static int start(final NoCheatPlus plugin){
+		cancel();
+		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
+		return taskId;
+	}
+	
+	public static void cancel(){
+		if (taskId == -1) return;
+		Bukkit.getScheduler().cancelTask(taskId);
+		taskId = -1;
+	}
+	
+	//////////////////////////
+	// Instance methods
+	//////////////////////////
+	
+	@Override
+	public void run() {
+		tick ++;
+		// The isEmpty checks are faster than synchronizing fully always, the actions get delayed one tick at most.
+		if (!delayedActions.isEmpty()) executeActions();
+		if (!permissionUpdates.isEmpty()) updatePermissions();
 	}
 
 }
