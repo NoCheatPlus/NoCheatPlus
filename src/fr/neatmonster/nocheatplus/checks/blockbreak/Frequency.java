@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
  * This checks just limits the number of blocks broken per time frame.
@@ -22,16 +23,36 @@ public class Frequency extends Check {
         final float interval = (float) ((player.getGameMode() == GameMode.CREATIVE)?(cc.frequencyIntervalCreative):(cc.frequencyIntervalSurvival));
         data.frequencyBuckets.add(System.currentTimeMillis(), interval);
         
-        final float score = data.frequencyBuckets.getScore(cc.frequencyBucketFactor);
-        final float allowed = cc.frequencyBuckets * cc.frequencyBucketDur;
+        // Full period frequency.
+        final float fullScore = data.frequencyBuckets.getScore(cc.frequencyBucketFactor);
+        final float fullTime = cc.frequencyBuckets * cc.frequencyBucketDur;
+        
+        // Short term arrivals.
+        final int tick = TickTask.getTick();
+        if (tick - data.frequencyShortTermTick < cc.frequencyShortTermTicks){
+        	// Within range, add.
+        	data.frequencyShortTermCount ++;
+        	System.out.println(data.frequencyShortTermCount);
+        }
+        else{
+        	data.frequencyShortTermTick = tick;
+        	data.frequencyShortTermCount = 1;
+        }
+        
+        // Find if one of both or both are violations:
+        final float fullViolation = (fullScore > fullTime) ? (fullScore - fullTime) : 0;
+        final float shortTermWeight = 50f * cc.frequencyShortTermTicks / (float) cc.frequencyShortTermLimit; 
+        final float shortTermViolation = (data.frequencyShortTermCount > cc.frequencyShortTermLimit) 
+        		? (data.frequencyShortTermCount - cc.frequencyShortTermLimit) * shortTermWeight : 0; 
+        final float violation = Math.max(fullViolation, shortTermViolation);
         
         boolean cancel = false;
-        if (score > allowed){
-        	final double change = (score - allowed) / 1000;
+        if (violation > 0){
+        	final double change = violation / 1000;
         	data.frequencyVL += change;
         	cancel = executeActions(player, data.frequencyVL, change, cc.frequencyActions);
         }
-        else if (data.frequencyVL > 0d && score < allowed * .75)
+        else if (data.frequencyVL > 0d && fullScore < fullTime * .75)
         	data.frequencyVL *= 0.95;
         
 		return cancel;

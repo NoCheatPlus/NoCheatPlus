@@ -92,6 +92,9 @@ public class BlockBreakConfig extends ACheckConfig {
 	public final float      frequencyBucketFactor;  
 	public final int        frequencyIntervalCreative;
 	public final int        frequencyIntervalSurvival;
+
+    public final int        frequencyShortTermLimit;
+	public final int        frequencyShortTermTicks;
 	public final ActionList frequencyActions;
     
 	public boolean          improbableFastBreakCheck;
@@ -135,6 +138,8 @@ public class BlockBreakConfig extends ACheckConfig {
         frequencyBucketFactor = (float) data.getDouble(ConfPaths.BLOCKBREAK_FREQUENCY_BUCKETS_FACTOR, 1f);
         frequencyIntervalCreative = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_CREATIVE);
         frequencyIntervalSurvival = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL);
+        frequencyShortTermLimit = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_LIMIT);
+    	frequencyShortTermTicks = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_TICKS);
         frequencyActions = data.getActionList(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, Permissions.BLOCKBREAK_FREQUENCY);
         
         improbableFastBreakCheck = data.getBoolean(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK);

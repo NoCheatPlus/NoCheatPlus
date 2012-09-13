@@ -74,8 +74,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>500 log:fastbreak:3:5:cif cancel");
         
         set(ConfPaths.BLOCKBREAK_FREQUENCY_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_CREATIVE, 100);
-        set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL, 50);
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_CREATIVE, 95);
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL, 45);
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_TICKS, 5);
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_LIMIT, 7);
         set(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, "cancel vl>5 log:bbfrequency:3:5:cif cancel vl>60 log:bbfrequency:0:5:cif cancel cmd:kickfrequency");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);

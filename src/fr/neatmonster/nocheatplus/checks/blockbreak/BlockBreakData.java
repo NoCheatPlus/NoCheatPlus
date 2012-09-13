@@ -89,6 +89,8 @@ public class BlockBreakData extends ACheckData {
     public long    fastBreakfirstDamage = System.currentTimeMillis();
     
     public final ActionFrequency frequencyBuckets;
+	public int        frequencyShortTermCount;
+	public int        frequencyShortTermTick;
 
     // Data of the no swing check.
     public boolean noSwingArmSwung     = true;
