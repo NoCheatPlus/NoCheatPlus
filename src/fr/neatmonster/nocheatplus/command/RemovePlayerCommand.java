@@ -2,11 +2,14 @@ package fr.neatmonster.nocheatplus.command;
 
 import java.util.Arrays;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
@@ -34,10 +37,25 @@ public class RemovePlayerCommand extends NCPCommand {
 			}
 		}
 		else checkType = CheckType.ALL;
-		if (CheckType.removeData(playerName, checkType))
-			sender.sendMessage(TAG + "Removed data (" + checkType + "): " + playerName);
+		
+		final Player player = Bukkit.getPlayerExact(playerName);
+		if (player != null) playerName = player.getName();
+		
+		ViolationHistory hist = ViolationHistory.getHistory(playerName, false);
+		boolean histRemoved = false;
+		if (hist != null) histRemoved = hist.remove(checkType);
+		
+		final boolean dataRemoved = CheckType.removeData(playerName, checkType);
+		
+		if (dataRemoved || histRemoved){
+			String which;
+			if (dataRemoved && histRemoved) which = "data and history";
+			else if (dataRemoved) which = "data";
+			else which = "history";
+			sender.sendMessage(TAG + "Removed " + which + " (" + checkType + "): " + playerName);
+		}
 		else
-			sender.sendMessage(TAG + "No data present (" + checkType + ", exact spelling): " + playerName);
+			sender.sendMessage(TAG + "Nothing found (" + checkType + ", exact spelling): " + playerName);
 		return true;
 	}
 

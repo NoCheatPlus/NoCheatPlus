@@ -1,12 +1,16 @@
 package fr.neatmonster.nocheatplus.checks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.bukkit.entity.Player;
+
+import fr.neatmonster.nocheatplus.hooks.APIUtils;
 
 /*
  * M""MMMMM""M oo          dP            dP   oo                   
@@ -32,9 +36,21 @@ import org.bukkit.entity.Player;
 public class ViolationHistory {
 
     /**
-     * The class storing the violation level for a check and a player.
+     * The class storing the violation level for a check and a player.<br>
+     * (Comparable by time.)
      */
-    public class ViolationLevel {
+    public static class ViolationLevel{
+    	/**
+    	 * Descending sort.
+    	 */
+    	public static Comparator<ViolationLevel> VLComparator = new Comparator<ViolationHistory.ViolationLevel>() {
+			@Override
+			public int compare(final ViolationLevel vl1, final ViolationLevel vl2) {
+				if (vl1.time == vl2.time) return 0;
+				else if (vl1.time < vl2.time) return 1;
+				else return -1;
+			}
+    	};
 
         /** The check. */
         public final String check;
@@ -43,7 +59,7 @@ public class ViolationHistory {
         public double       VL;
 
         /** The last VL time. */
-        private long        time;
+        public long        time;
 
         /**
          * Instantiates a new violation level.
@@ -69,8 +85,25 @@ public class ViolationHistory {
             this.VL += VL;
             time = System.currentTimeMillis();
         }
-    }
 
+		@Override
+		public boolean equals(final Object obj) {
+			// Might add String.
+			if (obj instanceof ViolationLevel) 
+				return this.check.equals(((ViolationLevel) obj).check);
+			else return false;
+		}
+
+		@Override
+		public int hashCode() {
+			return check.hashCode();
+		}
+    }
+    
+    /** Map the check string names to check types (workaround, keep at default, set by Check)*/
+    static Map<String, CheckType> checkTypeMap = new HashMap<String, CheckType>();
+
+    // TODO: Maybe add to metrics: average length of violation histories (does it pay to use SkipListSet or so).
     /** The histories of all the players. */
     private static Map<String, ViolationHistory> violationHistories = new HashMap<String, ViolationHistory>();
 
@@ -126,11 +159,11 @@ public class ViolationHistory {
      * 
      * @return the violation levels
      */
-    public TreeMap<Long, ViolationLevel> getViolationLevels() {
-        final TreeMap<Long, ViolationLevel> violationLevels = new TreeMap<Long, ViolationLevel>();
-        for (final ViolationLevel violationLevel : this.violationLevels)
-            violationLevels.put(violationLevel.time, violationLevel);
-        return violationLevels;
+    public ViolationLevel[] getViolationLevels() {
+    	final ViolationLevel[] sortedLevels = new ViolationLevel[violationLevels.size()];
+    	violationLevels.toArray(sortedLevels);
+    	Arrays.sort(sortedLevels, ViolationLevel.VLComparator); // Descending sort.;
+        return sortedLevels;
     }
 
     /**
@@ -149,4 +182,29 @@ public class ViolationHistory {
             }
         violationLevels.add(new ViolationLevel(check, VL));
     }
+
+    /**
+     * Remove entries for certain check types. Will also remove sub check entries, or all for heckType.ALL
+     * @param checkType
+     * @return If entries were removed.
+     */
+	public boolean remove(final CheckType checkType) {
+		if (checkType == CheckType.ALL){
+			final boolean empty = violationLevels.isEmpty();
+			violationLevels.clear();
+			return !empty;
+		}
+		final Iterator<ViolationLevel> it = violationLevels.iterator();
+		boolean found = false;
+		while (it.hasNext()){
+			final ViolationLevel vl = it.next();
+			final CheckType refType = checkTypeMap.get(vl.check);
+			if (refType == null) continue;
+			if (refType == checkType || APIUtils.isParent(checkType, refType)){
+				found = true;
+				it.remove();
+			}
+		}
+		return found;
+	}
 }

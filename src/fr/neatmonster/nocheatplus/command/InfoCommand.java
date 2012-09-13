@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.command;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TreeMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -38,28 +37,33 @@ public class InfoCommand extends NCPCommand {
      *            the player name
      * @return true, if successful
      */
-    private void handleInfoCommand(final CommandSender sender, final String playerName) {
-        final Player player = Bukkit.getPlayer(playerName);
-        if (player != null) {
-            final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            final TreeMap<Long, ViolationLevel> violations = ViolationHistory.getHistory(player).getViolationLevels();
-            if (violations.size() > 0) {
-                sender.sendMessage(TAG + "Displaying " + playerName + "'s violations...");
-                for (final long time : violations.descendingKeySet()) {
-                    final ViolationLevel violationLevel = violations.get(time);
-                    final String[] parts = violationLevel.check.split("\\.");
-                    final String check = parts[parts.length - 1];
-                    final String parent = parts[parts.length - 2];
-                    final double VL = Math.round(violationLevel.VL);
-                    sender.sendMessage(TAG + "[" + dateFormat.format(new Date(time)) + "] (" + parent + ".)" + check
-                            + " VL " + VL);
-                }
-            } else
-                sender.sendMessage(TAG + "Displaying " + playerName + "'s violations... nothing to display.");
-        } else {
-            sender.sendMessage(TAG + "404 Not Found");
-            sender.sendMessage(TAG + "The requested player was not found on this server.");
-        }
+    private void handleInfoCommand(final CommandSender sender, String playerName) {
+    	final Player player = Bukkit.getPlayerExact(playerName);
+    	if (player != null) playerName = player.getName();
+    	
+    	final ViolationHistory history = ViolationHistory.getHistory(playerName, false);
+    	final boolean known = player != null || history != null;
+    	if (history == null){
+    		sender.sendMessage(TAG + "No entries for " + playerName + "'s violations... " + (known?"":"(exact spelling?)") +".");
+    		return;
+    	}
+    	
+        final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        final ViolationLevel[] violations = history.getViolationLevels();
+        if (violations.length > 0) {
+            sender.sendMessage(TAG + "Displaying " + playerName + "'s violations...");
+            for (final ViolationLevel violationLevel : violations) {
+                final long time = violationLevel.time;
+                final String[] parts = violationLevel.check.split("\\.");
+                final String check = parts[parts.length - 1];
+                final String parent = parts[parts.length - 2];
+                final double VL = Math.round(violationLevel.VL);
+                sender.sendMessage(TAG + "[" + dateFormat.format(new Date(time)) + "] (" + parent + ".)" + check
+                        + " VL " + VL);
+            }
+        } else
+            sender.sendMessage(TAG + "Displaying " + playerName + "'s violations... nothing to display.");
+        
     }
 	
 }

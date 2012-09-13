@@ -54,6 +54,7 @@ public abstract class Check {
      */
     public Check(final CheckType type) {
         this.type = type;
+        ViolationHistory.checkTypeMap.put(getClass().getName(), type);
     }
     
     /**
