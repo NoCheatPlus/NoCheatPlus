@@ -146,10 +146,13 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6);
         set(ConfPaths.CHAT_GLOBALCHAT_COMMANDS, 
         		new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
+        set(ConfPaths.CHAT_GLOBALCHAT_GL_CHECK, true);
         set(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 0.5);
         set(ConfPaths.CHAT_GLOBALCHAT_GL_WORDS_CHECK, false);
+        set(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 1.0);
         set(ConfPaths.CHAT_GLOBALCHAT_GL_PREFIXES_CHECK , false);
         set(ConfPaths.CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK , false);
+        set(ConfPaths.CHAT_GLOBALCHAT_PP_CHECK, true);
         set(ConfPaths.CHAT_GLOBALCHAT_PP_WORDS_CHECK, false);
         set(ConfPaths.CHAT_GLOBALCHAT_PP_PREFIXES_CHECK, false);
         set(ConfPaths.CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK , false);
@@ -251,7 +254,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
         set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel");
 
-        set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, true);
+        set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, false);
         set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:instantheal:1:1:if cancel");
 
         set(ConfPaths.FIGHT_KNOCKBACK_CHECK, true);
