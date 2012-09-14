@@ -74,7 +74,8 @@ public class FastBreak extends Check {
     		}
     		// else: still within contention limits.
     	}
-    	else{
+    	else if (breakingTime > cc.fastBreakDelay){
+    		// Fast breaking does not decrease violation level.
     		data.fastBreakVL *= 0.9D;
     	}
     	

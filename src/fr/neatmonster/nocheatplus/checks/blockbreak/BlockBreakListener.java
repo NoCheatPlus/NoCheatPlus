@@ -74,7 +74,7 @@ public class BlockBreakListener implements Listener {
          * | |_) | | (_) | (__|   <  | |_) | | |  __/ (_| |   < 
          * |____/|_|\___/ \___|_|\_\ |____/|_|  \___|\__,_|_|\_\
          */
-    	
+//    	System.out.println("Break("+event.isCancelled()+"): " + event.getBlock());
     	// Cancelled events only leads to resetting insta break.
     	if (event.isCancelled()){
     		isInstaBreak = false;
@@ -162,6 +162,7 @@ public class BlockBreakListener implements Listener {
          *                |___/                                                               
          */
         // Just set a flag to true when the arm was swung.
+//    	System.out.println("Animation");
         BlockBreakData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
 
@@ -184,6 +185,7 @@ public class BlockBreakListener implements Listener {
          *                |___/                                                  
          */
     	
+//    	System.out.println("Interact("+event.isCancelled()+"): " + event.getClickedBlock());
     	// The following is to set the "first damage time" for a block.
     	
     	// Return if it is not left clicking a block. 
@@ -196,8 +198,9 @@ public class BlockBreakListener implements Listener {
     @EventHandler(
     		ignoreCancelled = false, priority = EventPriority.MONITOR)
     public void onBlockDamage(final BlockDamageEvent event) {
+//    	System.out.println("Damage("+event.isCancelled()+"): " + event.getBlock());
     	if (!event.isCancelled() && event.getInstaBreak()) isInstaBreak = true;
-    	 checkBlockDamage(event.getPlayer(), event.getBlock(), event);
+    	checkBlockDamage(event.getPlayer(), event.getBlock(), event);
     }
     
     private void checkBlockDamage(final Player player, final Block block, final Cancellable event){

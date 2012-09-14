@@ -42,7 +42,7 @@ public class WrongBlock extends Check {
         	wrongBlock = false;
         }
         else if (dist == 1){
-        	// One might to a concession in case of insta breaking.
+        	// One might to a concession in case of instant breaking.
         	if (now - data.wasInstaBreak < 60)
         		wrongBlock = false;
         	else 
