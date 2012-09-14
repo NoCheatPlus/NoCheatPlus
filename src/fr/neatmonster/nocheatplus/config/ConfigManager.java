@@ -15,6 +15,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.MemoryConfiguration;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
@@ -192,6 +193,8 @@ public class ConfigManager {
         }
         CheckUtils.fileLogger = logger;
 
+        final MemoryConfiguration worldDefaults = PathUtils.getWorldsDefaultConfig(globalConfig); 
+        
         // Try to obtain and parse the world-specific configuration files.
         final HashMap<String, File> worldFiles = new HashMap<String, File>();
         if (plugin.getDataFolder().isDirectory())
@@ -199,16 +202,18 @@ public class ConfigManager {
                 if (file.isFile()) {
                     final String fileName = file.getName();
                     if (fileName.matches(".+_config.yml$")) {
-                        final String worldname = fileName.substring(0, fileName.length() - 10);
+                        final String worldname = fileName.substring(0, fileName.length() - 11);
                         worldFiles.put(worldname, file);
                     }
                 }
         for (final Entry<String, File> worldEntry : worldFiles.entrySet()) {
             final File worldFile = worldEntry.getValue();
+            PathUtils.warnGlobalOnlyPaths(worldFile, worldEntry.getKey());
             final ConfigFile worldConfig = new ConfigFile();
-            worldConfig.setDefaults(globalConfig);
+            worldConfig.setDefaults(worldDefaults);
+            worldConfig.options().copyDefaults(true);
             try {
-                worldConfig.load(worldFile);
+            	worldConfig.load(worldFile);
                 worldsMap.put(worldEntry.getKey(), worldConfig);
                 try{
                 	worldConfig.save(worldFile);
@@ -222,6 +227,8 @@ public class ConfigManager {
                         + worldEntry.getKey() + " (see exception below). Continue with global default settings...");
                 e.printStackTrace();
             }
+            worldConfig.setDefaults(globalConfig);
+            worldConfig.options().copyDefaults(true);
             worldConfig.regenerateActionLists();
         }
     }

@@ -23,6 +23,7 @@ public abstract class ConfPaths {
      *                     ,  88P   ,  88P               ,  88P 
      *                    "8",P"   "8",P"               "8",P"  
      */
+	@GlobalConfig
     private static final String LOGGING                                  = "logging.";
     public static final String  LOGGING_ACTIVE                           = LOGGING + "active";
     public static final String  LOGGING_CONSOLE                          = LOGGING + "console";
@@ -38,6 +39,7 @@ public abstract class ConfPaths {
      *  d8b Y8b Y8b  888  Y88D Y888   , 888   , 888 888 ,ee 888 888 888 888   , Y888 888P Y888 888P  Y88D 
      * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
      */
+    @GlobalConfig
     private static final String MISCELLANEOUS                            = "miscellaneous.";
     public static final String  MISCELLANEOUS_ALLOWCLIENTMODS            = MISCELLANEOUS + "allowclientmods";
     public static final String  MISCELLANEOUS_OPINCONSOLEONLY            = MISCELLANEOUS + "opinconsoleonly";
@@ -45,7 +47,6 @@ public abstract class ConfPaths {
 	public static final String  MISCELLANEOUS_CHECKFORUPDATES            = MISCELLANEOUS + "checkforupdates";
 	public static final String  MISCELLANEOUS_READTIMEOUT                = MISCELLANEOUS + "readtimeout";
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = MISCELLANEOUS + "reporttometrics";
-
     private static final String MISCELLANEOUS_NOMOVEDTOOQUICKLY          = MISCELLANEOUS + "nomovedtooquickly.";
     public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED  = MISCELLANEOUS_NOMOVEDTOOQUICKLY + "enabled";
     public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY = MISCELLANEOUS_NOMOVEDTOOQUICKLY + "useproxy";
@@ -70,7 +71,9 @@ public abstract class ConfPaths {
 	public static final  String BLOCKBREAK_FASTBREAK_DEBUG               = BLOCKBREAK_FASTBREAK + "debug";
     private static final String BLOCKBREAK_FASTBREAK_BUCKETS             = BLOCKBREAK + "buckets.";
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION  = BLOCKBREAK_FASTBREAK_BUCKETS + "contention";
+	@GlobalConfig
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_N           = BLOCKBREAK_FASTBREAK_BUCKETS + "number";
+	@GlobalConfig
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_DUR         = BLOCKBREAK_FASTBREAK_BUCKETS + "duration";
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR      = BLOCKBREAK_FASTBREAK_BUCKETS + "factor";
 	public static final String  BLOCKBREAK_FASTBREAK_DELAY               = BLOCKBREAK_FASTBREAK + "delay";
@@ -83,8 +86,10 @@ public abstract class ConfPaths {
 	public static final String  BLOCKBREAK_FREQUENCY_MOD_CREATIVE        = BLOCKBREAK_FREQUENCY + "intervalcreative";
 	public static final String  BLOCKBREAK_FREQUENCY_MOD_SURVIVAL        = BLOCKBREAK_FREQUENCY + "intervalsurvival";
 	private static final String BLOCKBREAK_FREQUENCY_BUCKETS             = BLOCKBREAK_FREQUENCY + "buckets.";
+	@GlobalConfig
 	public static final String  BLOCKBREAK_FREQUENCY_BUCKETS_DUR         = BLOCKBREAK_FREQUENCY_BUCKETS + "duration";
 	public static final String  BLOCKBREAK_FREQUENCY_BUCKETS_FACTOR      = BLOCKBREAK_FREQUENCY_BUCKETS + "factor";
+	@GlobalConfig
 	public static final String  BLOCKBREAK_FREQUENCY_BUCKETS_N           = BLOCKBREAK_FREQUENCY_BUCKETS + "number";
 	private static final String BLOCKBREAK_FREQUENCY_SHORTTERM           = BLOCKBREAK_FREQUENCY + "shortterm.";
 	public static final String  BLOCKBREAK_FREQUENCY_SHORTTERM_LIMIT     = BLOCKBREAK_FREQUENCY_SHORTTERM + "limit";
@@ -169,6 +174,7 @@ public abstract class ConfPaths {
     // globalchat
     private static final String CHAT_GLOBALCHAT                          = CHAT + "globalchat.";
     public static final String CHAT_GLOBALCHAT_CHECK                     = CHAT_GLOBALCHAT + "active";
+	public static final String CHAT_GLOBALCHAT_DEBUG                     = CHAT_GLOBALCHAT + "debug";
 	public static final String CHAT_GLOBALCHAT_LEVEL                     = CHAT_GLOBALCHAT + "level";
 	public static final String CHAT_GLOBALCHAT_ENGINE_MAXIMUM            = CHAT_GLOBALCHAT + "maximum";
     public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
@@ -180,24 +186,29 @@ public abstract class ConfPaths {
     private static final String CHAT_GLOBALCHAT_GL                       = CHAT_GLOBALCHAT + "global.";
 	public static final String CHAT_GLOBALCHAT_GL_CHECK                  = CHAT_GLOBALCHAT_GL + "active";
 	public static final String CHAT_GLOBALCHAT_GL_WEIGHT                 = CHAT_GLOBALCHAT_GL + "weight";
+	@GlobalConfig
     public static final String CHAT_GLOBALCHAT_GL_WORDS                  = CHAT_GLOBALCHAT_GL + "words.";
 	public static final String CHAT_GLOBALCHAT_GL_WORDS_CHECK            = CHAT_GLOBALCHAT_GL_WORDS + "active";
+	@GlobalConfig
 	public static final String CHAT_GLOBALCHAT_GL_PREFIXES               = CHAT_GLOBALCHAT_GL + "prefixes.";
 	public static final String CHAT_GLOBALCHAT_GL_PREFIXES_CHECK         = CHAT_GLOBALCHAT_GL_PREFIXES + "active";
+	@GlobalConfig
 	public static final String CHAT_GLOBALCHAT_GL_SIMILARITY             = CHAT_GLOBALCHAT_GL + "similarity.";
 	public static final String CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_GL_SIMILARITY + "active";
 	// Extended per player checks.
 	private static final String CHAT_GLOBALCHAT_PP                       = CHAT_GLOBALCHAT + "player.";
 	public static final String CHAT_GLOBALCHAT_PP_CHECK                  = CHAT_GLOBALCHAT_PP + "active";
 	public static final String CHAT_GLOBALCHAT_PP_WEIGHT                 = CHAT_GLOBALCHAT_PP + "weight";
+	@GlobalConfig
 	public static final String CHAT_GLOBALCHAT_PP_PREFIXES               = CHAT_GLOBALCHAT_PP + "prefixes.";
 	public static final String CHAT_GLOBALCHAT_PP_PREFIXES_CHECK         = CHAT_GLOBALCHAT_PP_PREFIXES + "active";
+	@GlobalConfig
 	public static final String CHAT_GLOBALCHAT_PP_WORDS                  = CHAT_GLOBALCHAT_PP + "words.";
 	public static final String CHAT_GLOBALCHAT_PP_WORDS_CHECK            = CHAT_GLOBALCHAT_PP_WORDS + "active";
+	@GlobalConfig
 	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY             = CHAT_GLOBALCHAT_PP + "similarity.";
 	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_PP_SIMILARITY + "active";
 	// globalchat actions
-	public static final String CHAT_GLOBALCHAT_DEBUG                     = CHAT_GLOBALCHAT + "debug";
     public static final String CHAT_GLOBALCHAT_ACTIONS                   = CHAT_GLOBALCHAT + "actions";
 	
     // nopwnage
