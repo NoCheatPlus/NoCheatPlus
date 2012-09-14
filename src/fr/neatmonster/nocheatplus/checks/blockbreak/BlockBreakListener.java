@@ -75,6 +75,7 @@ public class BlockBreakListener implements Listener {
          * |____/|_|\___/ \___|_|\_\ |____/|_|  \___|\__,_|_|\_\
          */
 //    	System.out.println("Break("+event.isCancelled()+"): " + event.getBlock());
+        if (event.getClass != BlockBreakEvent.class) return;
     	// Cancelled events only leads to resetting insta break.
     	if (event.isCancelled()){
     		isInstaBreak = false;
