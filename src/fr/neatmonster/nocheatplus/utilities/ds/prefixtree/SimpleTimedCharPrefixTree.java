@@ -1,8 +1,8 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree;
+package fr.neatmonster.nocheatplus.utilities.ds.prefixtree;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.SimpleTimedCharPrefixTree.SimpleTimedCharLookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.TimedCharPrefixTree.SimpleTimedCharNode;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.TimedCharPrefixTree.TimedCharLookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleTimedCharPrefixTree.SimpleTimedCharLookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.TimedCharPrefixTree.SimpleTimedCharNode;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.TimedCharPrefixTree.TimedCharLookupEntry;
 
 public class SimpleTimedCharPrefixTree extends TimedCharPrefixTree<SimpleTimedCharNode, SimpleTimedCharLookupEntry> {
 	

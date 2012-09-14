@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds;
+package fr.neatmonster.nocheatplus.utilities.ds;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

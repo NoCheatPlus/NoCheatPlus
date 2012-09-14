@@ -1,8 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
 
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.ManagedMap;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
+import fr.neatmonster.nocheatplus.utilities.ds.ManagedMap;
 
 /**
  * Store EnginePlayerData. Expire data on get(String, Chatonfig).

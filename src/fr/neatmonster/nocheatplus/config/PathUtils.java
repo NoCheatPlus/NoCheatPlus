@@ -17,7 +17,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.MemoryConfiguration;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.SimpleCharPrefixTree;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
 public class PathUtils {
 	

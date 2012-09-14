@@ -3,10 +3,10 @@ package fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors;
 import java.util.List;
 
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.SimpleTimedBKLevenshtein;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.SimpleTimedBKLevenshtein.STBKLResult;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.TimedBKLevenshtein.SimpleTimedLevenNode;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.SimpleTimedBKLevenshtein;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.SimpleTimedBKLevenshtein.STBKLResult;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.TimedBKLevenshtein.SimpleTimedLevenNode;
 
 public class SimilarWordsBKL extends DigestedWords {
 	

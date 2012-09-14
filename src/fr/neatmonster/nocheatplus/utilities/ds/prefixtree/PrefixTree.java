@@ -1,12 +1,12 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree;
+package fr.neatmonster.nocheatplus.utilities.ds.prefixtree;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.PrefixTree.LookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.PrefixTree.Node;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.PrefixTree.LookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.PrefixTree.Node;
 
 
 /**

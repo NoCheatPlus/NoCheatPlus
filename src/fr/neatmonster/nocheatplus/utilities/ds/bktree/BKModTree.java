@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree;
+package fr.neatmonster.nocheatplus.utilities.ds.bktree;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.BKModTree.LookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.BKModTree.Node;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.BKModTree.LookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.BKModTree.Node;
 
 /**
  * BK tree for int distances.

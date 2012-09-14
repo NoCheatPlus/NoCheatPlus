@@ -1,11 +1,11 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree;
+package fr.neatmonster.nocheatplus.utilities.ds.prefixtree;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.CharPrefixTree.CharLookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.CharPrefixTree.CharNode;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.CharPrefixTree.CharLookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.CharPrefixTree.CharNode;
 
 public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>> extends PrefixTree<Character, N, L>{
 	

@@ -1,8 +1,8 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree;
+package fr.neatmonster.nocheatplus.utilities.ds.prefixtree;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.CharPrefixTree.CharLookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.CharPrefixTree.SimpleCharNode;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.prefixtree.SimpleCharPrefixTree.SimpleCharLookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.CharPrefixTree.CharLookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.CharPrefixTree.SimpleCharNode;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree.SimpleCharLookupEntry;
 
 /**
  * Adding some convenience methods.

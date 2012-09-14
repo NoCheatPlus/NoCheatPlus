@@ -1,7 +1,7 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree;
+package fr.neatmonster.nocheatplus.utilities.ds.bktree;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.BKModTree.LookupEntry;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.TimedBKLevenshtein.TimedLevenNode;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.BKModTree.LookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.TimedBKLevenshtein.TimedLevenNode;
 
 public class TimedBKLevenshtein<N extends TimedLevenNode<N>, L extends LookupEntry<char[], N>> extends BKLevenshtein<N, L> {
 

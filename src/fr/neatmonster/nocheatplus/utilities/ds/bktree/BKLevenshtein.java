@@ -1,7 +1,7 @@
-package fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree;
+package fr.neatmonster.nocheatplus.utilities.ds.bktree;
 
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.BKLevenshtein.LevenNode;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.ds.bktree.BKModTree.LookupEntry;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.BKLevenshtein.LevenNode;
+import fr.neatmonster.nocheatplus.utilities.ds.bktree.BKModTree.LookupEntry;
 
 /**
  * Some version of a BK-Levenshtein tree.
