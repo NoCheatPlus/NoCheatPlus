@@ -64,6 +64,10 @@ public class BlockUtils {
 		public String toString(){
 			return "ToolProps("+toolType + "/"+materialBase+")";
 		}
+		public void validate() {
+			if (toolType == null) throw new IllegalArgumentException("ToolType must not be null.");
+			if (materialBase == null) throw new IllegalArgumentException("MaterialBase must not be null");
+		}
 	}
 	/** Properties of a block. */
 	public static class BlockProps{
@@ -102,6 +106,12 @@ public class BlockUtils {
 		}
 		public String toString(){
 			return "BlockProps(" + hardness + " / " + tool.toString() + " / " + Arrays.toString(breakingTimes) + ")";
+		}
+		public void validate() {
+			if (breakingTimes == null) throw new IllegalArgumentException("Breaking times must not be null.");
+			if (breakingTimes.length != 6) throw new IllegalArgumentException("Breaking times length must match the number of available tool types (6).");
+			if (tool == null)  throw new IllegalArgumentException("Tool must not be null.");
+			tool.validate();
 		}
 	}
 	
@@ -630,10 +640,29 @@ public class BlockUtils {
 		return isValidTool;
 	}
 
-
-	public static void read(){
-		
+	/**
+	 * Access API for setting tool properties.<br>
+	 * NOTE: No guarantee that this harmonizes with internals and workarounds, currently.
+	 * @param itemId
+	 * @param toolProps
+	 */
+	public static void setToolProps(int itemId, ToolProps toolProps){
+		if (toolProps == null) throw new NullPointerException("ToolProps must not be null");
+		toolProps.validate();
+		// No range check.
+		tools.put(itemId, toolProps);
 	}
-
-
+	
+	/**
+	 * Access API to set a blocks properties.
+	 * NOTE: No guarantee that this harmonizes with internals and workarounds, currently.
+	 * @param blockId
+	 * @param blockProps
+	 */
+	public static void setBlockProps(int blockId, BlockProps blockProps){
+		if (blockProps == null) throw new NullPointerException("BlockProps must not be null");
+		blockProps.validate();
+		if (blockId < 0 || blockId >= blocks.length) throw new IllegalArgumentException("The blockId is outside of supported range: " + blockId);
+		blocks[blockId] = blockProps;
+	}
 }
