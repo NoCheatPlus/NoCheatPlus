@@ -180,6 +180,7 @@ public abstract class ConfPaths {
     public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_WEIGHT          = CHAT_GLOBALCHAT_FREQUENCY + "weight";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_FACTOR          = CHAT_GLOBALCHAT_FREQUENCY + "factor";
+	@GlobalConfig
 	public static final String CHAT_GLOBALCHAT_COMMANDS                  = CHAT_GLOBALCHAT + "commands";
 	// (Some of the following paths must be public for generic config reading.)
     // Extended global checks.
@@ -215,6 +216,7 @@ public abstract class ConfPaths {
     private static final String CHAT_NOPWNAGE                            = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                      = CHAT_NOPWNAGE + "active";
 	public static final String  CHAT_NOPWNAGE_DEBUG                      = CHAT_NOPWNAGE + "debug";
+	@GlobalConfig
     public static final String  CHAT_NOPWNAGE_EXCLUSIONS                 = CHAT_NOPWNAGE + "exclusions";
     public static final String  CHAT_NOPWNAGE_LEVEL                      = CHAT_NOPWNAGE + "level";
 
