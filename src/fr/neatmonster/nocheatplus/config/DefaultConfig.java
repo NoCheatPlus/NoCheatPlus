@@ -78,17 +78,17 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL, 45);
         set(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_TICKS, 5);
         set(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_LIMIT, 7);
-        set(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, "cancel vl>5 log:bbfrequency:3:5:cif cancel vl>60 log:bbfrequency:0:5:cif cancel cmd:kickfrequency");
+        set(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, "cancel vl>5 log:bbfrequency:3:5:if cancel vl>60 log:bbfrequency:0:5:cif cancel cmd:kickfrequency");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
+        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:noswing:3:2:f cancel vl>2 log:noswing:3:2:if cancel");
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
         
         set(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK, true);
         set(ConfPaths.BLOCKBREAK_WRONGBLOCK_LEVEL, 10);
-        set(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, "cancel vl>10 log:bwrong:0:5:if cancel vl>30 log:bwrong:0:5:if cancel cmd:kickwb");
+        set(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, "cancel vl>10 log:bwrong:0:5:if cancel vl>30 log:bwrong:0:5:cif cancel cmd:kickwb");
         
         /*
          * 888 88b, 888                    888    888           d8                                     d8   
@@ -122,7 +122,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
 
         set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "log:noswing:3:2:if cancel");
+        set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "log:noswing:3:2:f cancel vl>2 log:noswing:0:2:if cancel");
 
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, true);
         set(ConfPaths.BLOCKPLACE_SPEED_INTERVAL, 45L);
@@ -157,7 +157,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_PP_PREFIXES_CHECK, false);
         set(ConfPaths.CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK , false);
         // 
-        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>20 log:globalchat:0:5:if cancel cmd:kickglchat");
+        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>20 log:globalchat:0:5:cf cancel cmd:kickglchat");
         
         // nopwnage
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
@@ -176,7 +176,7 @@ public class DefaultConfig extends ConfigFile {
                 "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 3);
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:icf cancel cmd:kickcaptcha");
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:cf cancel cmd:kickcaptcha");
 
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);
@@ -262,14 +262,14 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:knockback:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_NOSWING_CHECK, true);
-        set(ConfPaths.FIGHT_NOSWING_ACTIONS, "log:noswing:0:5:cif cancel");
+        set(ConfPaths.FIGHT_NOSWING_ACTIONS, "log:noswing:0:5:f cancel vl>1 log:noswing:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_REACH_CHECK, true);
         set(ConfPaths.FIGHT_REACH_PENALTY, 500);
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
         
         set(ConfPaths.FIGHT_SELFHIT_CHECK, true);
-        set(ConfPaths.FIGHT_SELFHIT_ACTIONS, "log:fselfhit:0:5:if cancel vl>10 log:fselfhit:0:5:if cancel cmd:kickselfhit");
+        set(ConfPaths.FIGHT_SELFHIT_ACTIONS, "log:fselfhit:0:5:if cancel vl>10 log:fselfhit:0:5:icf cancel cmd:kickselfhit");
 
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
         set(ConfPaths.FIGHT_SPEED_LIMIT, 15);
@@ -312,17 +312,17 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT, 128);
         set(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED, 100);
         set(ConfPaths.MOVING_CREATIVEFLY_ACTIONS,
-                "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
+            "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
 
         set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);
-        set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "log:morepackets:3:2:if cancel vl>20 log:morepackets:0:2:if cancel");
+        set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel");
 
         set(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK, true);
         set(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
-                "log:morepackets:3:2:if cancel vl>20 log:morepackets:0:2:if cancel");
+                "cancel vl>10 log:morepackets:0:2:if cancel");
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
-        set(ConfPaths.MOVING_NOFALL_ACTIONS, "log:nofall:0:5:cif cancel");
+        set(ConfPaths.MOVING_NOFALL_ACTIONS, "cancel vl>0 log:nofall:0:5:if cancel vl>6 log:nofall:0:5:icf cancel");
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
