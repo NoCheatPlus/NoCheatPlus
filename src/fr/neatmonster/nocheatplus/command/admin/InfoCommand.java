@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -53,14 +54,17 @@ public class InfoCommand extends NCPCommand {
         final ViolationLevel[] violations = history.getViolationLevels();
         if (violations.length > 0) {
             sender.sendMessage(TAG + "Displaying " + playerName + "'s violations...");
+            final String c = (sender instanceof Player) ? ChatColor.GRAY.toString() : ""; 
             for (final ViolationLevel violationLevel : violations) {
                 final long time = violationLevel.time;
                 final String[] parts = violationLevel.check.split("\\.");
-                final String check = parts[parts.length - 1];
-                final String parent = parts[parts.length - 2];
-                final double VL = Math.round(violationLevel.VL);
-                sender.sendMessage(TAG + "[" + dateFormat.format(new Date(time)) + "] (" + parent + ".)" + check
-                        + " VL " + VL);
+                final String check = parts[parts.length - 1].toLowerCase();
+                final String parent = parts[parts.length - 2].toLowerCase();
+                final long sumVL = Math.round(violationLevel.sumVL);
+                final long maxVL = Math.round(violationLevel.maxVL);
+                final long avVl  = Math.round(violationLevel.sumVL / (double) violationLevel.nVL);
+                sender.sendMessage(TAG + "[" + dateFormat.format(new Date(time)) + "] " + parent + "." + check
+                        + " VL " + sumVL + c + "  (n" + violationLevel.nVL + "a" + avVl +"m" + maxVL +")");
             }
         } else
             sender.sendMessage(TAG + "Displaying " + playerName + "'s violations... nothing to display.");

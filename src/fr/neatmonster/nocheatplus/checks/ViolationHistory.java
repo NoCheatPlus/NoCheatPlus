@@ -55,8 +55,15 @@ public class ViolationHistory {
         /** The check. */
         public final String check;
 
-        /** The VL. */
-        public double       VL;
+        /** The sum of violation levels added. */
+        public double       sumVL;
+        
+        /** Number of violations. */
+        public int          nVL;
+        
+        /** Maximal violation level added. */
+        public double       maxVL;  
+        
 
         /** The last VL time. */
         public long        time;
@@ -71,7 +78,9 @@ public class ViolationHistory {
          */
         public ViolationLevel(final String check, final double VL) {
             this.check = check;
-            this.VL = VL;
+            this.sumVL = VL;
+            this.nVL   = 1;
+            this.maxVL = VL;
             time = System.currentTimeMillis();
         }
 
@@ -82,7 +91,9 @@ public class ViolationHistory {
          *            the vL
          */
         public void add(final double VL) {
-            this.VL += VL;
+            this.sumVL += VL;
+            this.nVL   ++;
+            this.maxVL = Math.max(maxVL, VL);
             time = System.currentTimeMillis();
         }
 
