@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack;
  * - reading the default properties from a file too.
  *
  */
-public class BlockUtils {
+public class BlockProperties {
 	public static enum ToolType{
 		NONE,
 		SWORD,

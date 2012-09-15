@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.players.Permissions;
-import fr.neatmonster.nocheatplus.utilities.BlockUtils;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /*
  * MM""""""""`M                     dP   M#"""""""'M                             dP       
@@ -53,7 +53,7 @@ public class FastBreak extends Check {
         	// Modifier defaults to 0, the Frequency check is responsible for those.
             breakingTime = Math.round((double) cc.fastBreakModCreative / 100D * (double) 100);
         else
-        	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockUtils.getBreakingDuration(block.getTypeId(), player));
+        	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockProperties.getBreakingDuration(block.getTypeId(), player));
     	// fastBreakfirstDamage is the first interact on block (!).
         final long elapsedTime = (data.fastBreakBreakTime > data.fastBreakfirstDamage) ? 0 : now - data.fastBreakfirstDamage;
         
