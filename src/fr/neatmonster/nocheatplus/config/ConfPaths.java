@@ -166,6 +166,9 @@ public abstract class ConfPaths {
      *   "88,d88 888 888 "88 888  888   
      */
     private static final String CHAT                                     = CHECKS + "chat.";
+    
+	@GlobalConfig
+	public static final String CHAT_HANDLEASCHAT                         = CHAT + "handleaschat";
 
     private static final String CHAT_COLOR                               = CHAT + "color.";
     public static final String  CHAT_COLOR_CHECK                         = CHAT_COLOR + "active";
@@ -180,8 +183,6 @@ public abstract class ConfPaths {
     public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_WEIGHT          = CHAT_GLOBALCHAT_FREQUENCY + "weight";
 	public static final String CHAT_GLOBALCHAT_FREQUENCY_FACTOR          = CHAT_GLOBALCHAT_FREQUENCY + "factor";
-	@GlobalConfig
-	public static final String CHAT_GLOBALCHAT_COMMANDS                  = CHAT_GLOBALCHAT + "commands";
 	// (Some of the following paths must be public for generic config reading.)
     // Extended global checks.
     private static final String CHAT_GLOBALCHAT_GL                       = CHAT_GLOBALCHAT + "global.";

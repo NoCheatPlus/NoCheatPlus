@@ -174,7 +174,7 @@ public class ChatConfig extends AsyncCheckConfig {
         noPwnageDebug = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_DEBUG, false);
         noPwnageLevel = config.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
         // VL decreasing factor, hidden option.
-        noPwnageVLFactor = (float) config.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.95);
+        noPwnageVLFactor = (float) config.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.9);
 
         noPwnageBannedCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
         noPwnageBannedTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);

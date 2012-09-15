@@ -115,9 +115,6 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
         boolean cancel = false;
 
         final long now = System.currentTimeMillis();
-        
-        // Forget expired VL.
-        data.noPwnageVL.update(now);
 
         if (shouldCheckCaptcha(cc, data)) {
             checkCaptcha(player, message, cc, data, isMainThread);
@@ -190,15 +187,15 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
                             player.getName())));
 
                 // Increment the violation level.
-                data.noPwnageVL.add(now, (float) (suspicion / 10D));
+                data.noPwnageVL += (double) suspicion / 10D ;
 
                 // Find out if we need to kick the player or not.
-                cancel = executeActions(player, data.noPwnageVL.getScore(cc.noPwnageVLFactor), suspicion / 10D, cc.noPwnageActions,
+                cancel = executeActions(player, data.noPwnageVL, suspicion / 10D, cc.noPwnageActions,
                         isMainThread);
             }
-//        else
-//            // Reduce the violation level. <- Done automatically by queue.
-//            data.noPwnageVL *= 0.95D;
+        else
+            // Reduce the violation level. <- Done automatically by queue.
+            data.noPwnageVL *= 0.95D;
 
         // Store the message and some other data.
         data.noPwnageLastMessage = message;
@@ -207,7 +204,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
         lastGlobalMessageTime = now;
         
         if (cc.noPwnageDebug){
-        	final String msg = "[NoCheatPlus][nopwnage]  Message ("+player.getName()+"/"+message.length()+"): suspicion="+suspicion +", vl="+CheckUtils.fdec3.format(data.noPwnageVL.getScore(cc.noPwnageVLFactor));
+        	final String msg = "[NoCheatPlus][nopwnage]  Message ("+player.getName()+"/"+message.length()+"): suspicion="+suspicion +", vl="+CheckUtils.fdec3.format(data.noPwnageVL);
         	CheckUtils.scheduleOutput(msg);
         }
 
@@ -325,7 +322,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
                 data.noPwnageReloginWarnings++;
             } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
                 // Find out if we need to ban the player or not.
-                cancel = executeActions(player, (double) data.noPwnageVL.getScore(cc.noPwnageVLFactor), 0D, cc.noPwnageActions, true);
+                cancel = executeActions(player, (double) data.noPwnageVL, 0D, cc.noPwnageActions, true);
         }
 
         // Store his joining time.

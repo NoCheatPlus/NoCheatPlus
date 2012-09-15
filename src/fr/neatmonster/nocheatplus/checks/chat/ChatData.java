@@ -61,7 +61,7 @@ public class ChatData extends AsyncCheckData {
     public double  captchaVL;
     public double  colorVL;
     public double  globalChatVL;
-    public ActionFrequency  noPwnageVL = new ActionFrequency(10, 3000);
+    public double noPwnageVL;
     
     // Data of the globalchat check.
     public final ActionFrequency globalChatFrequency = new ActionFrequency(10, 3000);
@@ -87,7 +87,7 @@ public class ChatData extends AsyncCheckData {
         noPwnageCaptchTries = noPwnageReloginWarnings = 0;
         captchaVL = 0D;
         // colorVL <- is spared to avoid problems with spam + captcha success.
-        // noPwnageVL <- Is handled by the ActionFrequency forgtting mechanism, currently (call clear otherwise).
+        noPwnageVL = 0;
         noPwnageSpeed.clear(System.currentTimeMillis());
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";

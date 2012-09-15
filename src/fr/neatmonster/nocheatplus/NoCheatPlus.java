@@ -455,7 +455,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     		// TODO: display time for which the player is banned.
     		event.setResult(Result.KICK_OTHER);
     		// TODO: Make message configurable.
-    		event.setKickMessage("You are temporarily denied to join server.");
+    		event.setKickMessage("You are temporarily denied to join this server.");
     	}
     }
     

@@ -144,7 +144,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 80);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6);
-        set(ConfPaths.CHAT_GLOBALCHAT_COMMANDS, 
+        set(ConfPaths.CHAT_HANDLEASCHAT, 
         		new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
         set(ConfPaths.CHAT_GLOBALCHAT_GL_CHECK, true);
         set(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 0.5);
@@ -157,7 +157,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_GLOBALCHAT_PP_PREFIXES_CHECK, false);
         set(ConfPaths.CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK , false);
         // 
-        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>20 log:globalchat:0:5:cf cancel cmd:kickglchat");
+        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>20 log:globalchat:0:5:cf cancel cmd:kickglchat vl>50 log:globalchat:0:5:cf cancel cmd:tempkick5");
         
         // nopwnage
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
@@ -168,7 +168,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT, 5000L);
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT, 100);
 
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK, true);
+        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK, false);
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS,
                 "abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789");
         set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH, 6);
@@ -217,7 +217,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE,
                 "&cPlease don't spam, be careful with what you say. DON'T repeat what you just said either, unless you want to be kicked or even banned.");
 
-        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:2:5:cf cmd:kicknopwnage");
+        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:0:5:cf cmd:kicknopwnage vl>150 cancel log:nopwnage:0:5:cf cmd:tempkick5");
 
         
         /*
@@ -378,7 +378,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
-        set(ConfPaths.STRINGS + ".kicknopwnage", "ncp kick [player] You're not allowed to spam this server!");
+        set(ConfPaths.STRINGS + ".kicknopwnage", "ncp tempkick [player] 1 You're not allowed to spam this server!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
         set(ConfPaths.STRINGS + ".kickglchat", "ncp kick [player] Too many chat messages, take a break.");
@@ -390,6 +390,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
+        set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 
         // Update internal factory based on all the new entries to the "actions" section.

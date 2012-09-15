@@ -60,7 +60,7 @@ public class ChatListener implements Listener, INotifyReload {
 		commandExclusions.clear();
     	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), false, true);
     	chatCommands.clear();
-    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_GLOBALCHAT_COMMANDS), false, true);
+    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_HANDLEASCHAT), false, true);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR)
