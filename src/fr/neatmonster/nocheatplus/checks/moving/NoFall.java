@@ -68,7 +68,7 @@ public class NoFall extends Check {
         if (!data.noFallWasOnGround && data.noFallOnGround) {
             // If the difference between the fall distance recorded by Bukkit and NoCheatPlus is too big and the fall
             // distance bigger than 2.
-            if (data.noFallFallDistance - player.getFallDistance() > 0.1D && (int) data.noFallFallDistance > 2) {
+            if (data.noFallFallDistance - player.getFallDistance() > 0.1D && data.noFallFallDistance > 3) {
                 // Add the difference to the violation level.
                 data.noFallVL += data.noFallFallDistance - player.getFallDistance();
 

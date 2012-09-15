@@ -122,8 +122,8 @@ public class MovingListener implements Listener {
             event.setCancelled(true);
         else if ((creativeFly.isEnabled(player) || survivalFly.isEnabled(player)) && event.getBlock() != null
                 && data.setBack != null && blockY + 1D >= data.setBack.getY()
-                && Math.abs(player.getLocation().getX() - event.getBlock().getX()) <= 1D
-                && Math.abs(player.getLocation().getZ() - event.getBlock().getZ()) <= 1D
+                && Math.abs(player.getLocation().getX() - 0.5 - event.getBlock().getX()) <= 1D
+                && Math.abs(player.getLocation().getZ() - 0.5 - event.getBlock().getZ()) <= 1D
                 && player.getLocation().getY() - blockY > 0D && player.getLocation().getY() - blockY < 2D
                 && (Block.i(event.getBlock().getTypeId()) || isLiquid(event.getBlock().getType()))) {
             // The creative fly and/or survival fly check is enabled, the block was placed below the player and is
