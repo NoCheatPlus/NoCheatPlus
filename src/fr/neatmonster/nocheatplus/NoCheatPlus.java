@@ -83,6 +83,18 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 		}
 	}
     
+    /**
+     * Allow login (remove from deny login map).
+     * @param playerName
+     * @return If player was denied to login.
+     */
+    public static boolean allowLogin(String playerName){
+    	playerName = playerName.trim().toLowerCase();
+    	final Long time = denyLoginNames.remove(playerName);
+    	if (time == null) return false;
+    	return System.currentTimeMillis() <= time;
+    }
+    
 	/**
 	 * Deny the player to login. This will also remove expired entries.
 	 * @param playerName
@@ -107,6 +119,13 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 	 */
 	public static boolean isLoginDenied(String playerName){
 		return isLoginDenied(playerName, System.currentTimeMillis());
+	}
+	
+	public String[] getLoginDeniedPlayers() {
+		checkDenyLoginsNames();
+		String[] kicked = new String[denyLoginNames.size()];
+		denyLoginNames.keySet().toArray(kicked);
+		return kicked;
 	}
 
 	/**

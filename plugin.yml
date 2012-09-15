@@ -21,7 +21,9 @@ commands:
                /:Auxiliary:
                /<command> ban [delay=(ticks)] (player) [(reason)...]: ban player
                /<command> kick [delay=(ticks)] (player) [(reason)...]: kick player
+               /<command> kicklist: Show temporarily kicked players.
                /<command> tempkick [delay=(ticks)] (player) (minutes) [(reason)...]
+               /<command> unkick (player): Allow a player to login again.
                /<command> tell [delay=(ticks)] (player) (message)...: tell a message
                /<command> delay [delay=(ticks)] (command)...: delay a command
 
@@ -44,12 +46,16 @@ permissions:
                         description: Allow use of the ncp ban command.
                     nocheatplus.admin.kick:
                         description: Allow use of the ncp kick command.
+                    nocheatplus.admin.kicklist:
+                        description: Allow use of the ncp kicklist command.
                     nocheatplus.admin.tell:
                         description: Allow use of the ncp tell command.
                     nocheatplus.admin.delay:
                         description: Allow use of the ncp delay command.
                     nocheatplus.admin.tempkick:
                         description: Allow use of the ncp tempkick command.
+                    nocheatplus.admin.unkick:
+                        description: Allow use of the ncp unkick command.
                     nocheatplus.admin.removeplayer:
                         description: Allow use of the ncp removeplayer command.
             nocheatplus.bypass:

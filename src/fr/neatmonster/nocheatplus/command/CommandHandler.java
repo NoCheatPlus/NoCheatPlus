@@ -19,7 +19,9 @@ import fr.neatmonster.nocheatplus.command.actions.DelayCommand;
 import fr.neatmonster.nocheatplus.command.actions.KickCommand;
 import fr.neatmonster.nocheatplus.command.actions.TellCommand;
 import fr.neatmonster.nocheatplus.command.actions.TempKickCommand;
+import fr.neatmonster.nocheatplus.command.actions.UnKickCommand;
 import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
+import fr.neatmonster.nocheatplus.command.admin.KickListCommand;
 import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
 import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -96,7 +98,8 @@ public class CommandHandler implements CommandExecutor {
         		new TellCommand(plugin),
         		new TempKickCommand(plugin),
         		new RemovePlayerCommand(plugin),
-        		
+        		new KickListCommand(plugin),
+        		new UnKickCommand(plugin),
         }){
         	addCommand(cmd);
         }
