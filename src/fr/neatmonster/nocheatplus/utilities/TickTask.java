@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.ICheckData;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 
 /**
  * Task to run every tick, to update permissions and execute actions, and maybe later for extended lag measurement.

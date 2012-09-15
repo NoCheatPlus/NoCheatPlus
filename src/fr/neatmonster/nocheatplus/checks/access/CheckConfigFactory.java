@@ -1,6 +1,7 @@
-package fr.neatmonster.nocheatplus.checks;
+package fr.neatmonster.nocheatplus.checks.access;
 
 import org.bukkit.entity.Player;
+
 
 /*
  * MM'""""'YMM dP                         dP       MM'""""'YMM                   .8888b oo          

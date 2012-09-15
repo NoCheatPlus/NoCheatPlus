@@ -1,4 +1,5 @@
-package fr.neatmonster.nocheatplus.checks;
+package fr.neatmonster.nocheatplus.checks.access;
+
 
 /**
  * Abstract implementation to do nothing.

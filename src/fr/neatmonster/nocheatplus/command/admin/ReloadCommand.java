@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.command;
+package fr.neatmonster.nocheatplus.command.admin;
 
 import java.util.Collection;
 
@@ -16,6 +16,8 @@ import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.command.CommandHandler.NCPReloadEvent;
+import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 

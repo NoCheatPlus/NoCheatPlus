@@ -14,6 +14,14 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.command.actions.BanCommand;
+import fr.neatmonster.nocheatplus.command.actions.DelayCommand;
+import fr.neatmonster.nocheatplus.command.actions.KickCommand;
+import fr.neatmonster.nocheatplus.command.actions.TellCommand;
+import fr.neatmonster.nocheatplus.command.actions.TempKickCommand;
+import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
+import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
+import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 

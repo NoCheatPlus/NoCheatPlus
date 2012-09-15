@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.command;
+package fr.neatmonster.nocheatplus.command.actions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
 /**

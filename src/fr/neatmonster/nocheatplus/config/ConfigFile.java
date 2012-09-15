@@ -8,7 +8,7 @@ import org.yaml.snakeyaml.DumperOptions;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
-import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.actions.ActionList;
 
 /*
  * MM'""""'YMM                   .8888b oo          MM""""""""`M oo dP          

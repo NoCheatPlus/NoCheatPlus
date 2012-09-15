@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks;
+package fr.neatmonster.nocheatplus.checks.access;
 
 /**
  * CheckConfig for async checks such as chat, adding permissions to cache.

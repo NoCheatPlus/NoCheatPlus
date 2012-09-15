@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.actions.types;
+package fr.neatmonster.nocheatplus.actions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fr.neatmonster.nocheatplus.actions.Action;
 
 /*
  * MMP"""""""MM            dP   oo                   M""MMMMMMMM oo            dP   

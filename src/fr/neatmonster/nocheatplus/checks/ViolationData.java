@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.checks;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.Action;
-import fr.neatmonster.nocheatplus.actions.types.ActionList;
+import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 
 /*

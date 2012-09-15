@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks;
+package fr.neatmonster.nocheatplus.checks.access;
 
 /*
  * MM'""""'YMM dP                         dP       M""""""'YMM            dP            

@@ -5,6 +5,8 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
+import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;

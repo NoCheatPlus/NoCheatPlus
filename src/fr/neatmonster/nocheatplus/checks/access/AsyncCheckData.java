@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks;
+package fr.neatmonster.nocheatplus.checks.access;
 
 import java.util.Collections;
 import java.util.HashMap;

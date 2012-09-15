@@ -1,4 +1,6 @@
-package fr.neatmonster.nocheatplus.checks;
+package fr.neatmonster.nocheatplus.checks.access;
+
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * MM'""""'YMM dP                         dP       MM'""""'YMM                   .8888b oo          

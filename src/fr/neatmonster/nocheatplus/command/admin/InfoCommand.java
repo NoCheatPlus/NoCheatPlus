@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.command;
+package fr.neatmonster.nocheatplus.command.admin;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory.ViolationLevel;
+import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
 public class InfoCommand extends NCPCommand {

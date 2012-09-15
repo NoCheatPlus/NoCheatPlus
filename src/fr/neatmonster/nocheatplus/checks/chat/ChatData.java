@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.AsyncCheckData;
-import fr.neatmonster.nocheatplus.checks.CheckDataFactory;
-import fr.neatmonster.nocheatplus.checks.ICheckData;
+import fr.neatmonster.nocheatplus.checks.access.AsyncCheckData;
+import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*

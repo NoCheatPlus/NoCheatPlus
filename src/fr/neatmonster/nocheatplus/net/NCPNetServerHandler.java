@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus;
+package fr.neatmonster.nocheatplus.net;
 
 import java.lang.reflect.Field;
 import java.util.List;
