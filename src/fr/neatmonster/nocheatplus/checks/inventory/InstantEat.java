@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import java.util.Map;
+
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -73,14 +75,10 @@ public class InstantEat extends Check {
         return cancel;
     }
 
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.FOOD)
-            return InventoryData.getData(violationData.player).instantEatFood.toString();
-        else
-            return super.getParameter(wildcard, violationData);
-    }
+	@Override
+	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
+		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
+		parameters.put(ParameterName.FOOD, InventoryData.getData(violationData.player).instantEatFood.toString());
+		return parameters;
+	}
 }

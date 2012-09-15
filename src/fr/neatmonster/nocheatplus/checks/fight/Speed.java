@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import java.util.Map;
+
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -66,15 +68,11 @@ public class Speed extends Check {
 
         return cancel;
     }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.LIMIT)
-            return String.valueOf(Math.round(FightConfig.getConfig(violationData.player).speedLimit));
-        else
-            return super.getParameter(wildcard, violationData);
-    }
+    
+	@Override
+	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
+		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
+		parameters.put(ParameterName.LIMIT, String.valueOf(Math.round(FightConfig.getConfig(violationData.player).speedLimit)));
+		return parameters;
+	}
 }

@@ -65,7 +65,7 @@ public abstract class ActionWithParameters extends Action {
             if (part instanceof String)
                 log.append((String) part);
             else
-                log.append(violationData.check.getParameter((ParameterName) part, violationData));
+                log.append(violationData.getParameter((ParameterName) part));
 
         return log.toString();
     }
@@ -103,4 +103,9 @@ public abstract class ActionWithParameters extends Action {
             }
         }
     }
+
+	@Override
+	public boolean needsParameters() {
+		return true;
+	}
 }

@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
+import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -93,18 +94,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
             return unsafeLoginCheck(player, cc, data);
         }
     }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.IP)
-            return violationData.player.getAddress().toString().substring(1).split(":")[0];
-        else
-            return super.getParameter(wildcard, violationData);
-    }
-
+    
     /**
      * Only to be called form synchronized code.
      * 
@@ -343,4 +333,12 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
 
         return cancel;
     }
+    
+	@Override
+	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
+		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
+		parameters.put(ParameterName.IP, violationData.player.getAddress().toString().substring(1).split(":")[0]);
+		return parameters;
+	}
+
 }

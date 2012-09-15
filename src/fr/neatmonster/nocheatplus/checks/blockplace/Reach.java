@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
+import java.util.Map;
+
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -83,15 +85,12 @@ public class Reach extends Check {
 
         return cancel;
     }
+    
+	@Override
+	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
+		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
+		parameters.put(ParameterName.REACH_DISTANCE, "" +Math.round(BlockPlaceData.getData(violationData.player).reachDistance));
+		return parameters;
+	}
 
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName, org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.REACH_DISTANCE)
-            return String.valueOf(Math.round(BlockPlaceData.getData(violationData.player).reachDistance));
-        else
-            return super.getParameter(wildcard, violationData);
-    }
 }

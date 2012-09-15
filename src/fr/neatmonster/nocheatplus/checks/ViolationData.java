@@ -1,9 +1,12 @@
 package fr.neatmonster.nocheatplus.checks;
 
+import java.util.Map;
+
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionList;
+import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 
 /*
@@ -40,6 +43,9 @@ public class ViolationData {
 
     /** The violation level. */
     public final double     vL;
+    
+    /** Filled in parameters. */
+    private final Map<ParameterName, String> parameters;
 
     /**
      * Instantiates a new violation data.
@@ -63,6 +69,14 @@ public class ViolationData {
         this.addedVL = addedVL;
         this.actions = actions;
         this.applicableActions = actions.getActions(vL);
+        boolean needsParameters = false;
+        for (int i = 0; i < applicableActions.length; i++){
+        	if (applicableActions[i].needsParameters()){
+        		needsParameters = true;
+        		break;
+        	}
+        }
+        parameters = needsParameters ? check.getParameterMap(this) : null;
     }
 
     /**
@@ -109,6 +123,27 @@ public class ViolationData {
 			if (action instanceof CancelAction) return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Get the parameters value for this violation.
+	 * @param parameterName
+	 * @return Will always return some string, if not set: "<?PARAMETERNAME>".
+	 */
+	public String getParameter(final ParameterName parameterName){
+		switch (parameterName) {
+		case CHECK:
+			return check.getClass().getSimpleName();
+		case PLAYER:
+			return player.getName();
+		case VIOLATIONS:
+			return String.valueOf(Math.round(vL));
+		default:
+			break;
+		}
+		if (parameters == null) return "<?" + parameterName + ">";
+		final String value = parameters.get(parameterName);
+		return(value == null) ? ("<?" + parameterName + ">") : value;
 	}
    
 }

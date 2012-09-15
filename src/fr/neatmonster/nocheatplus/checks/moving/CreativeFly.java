@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
+import java.util.Map;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
@@ -150,22 +151,15 @@ public class CreativeFly extends Check {
         data.setBack = to.getLocation();
         return null;
     }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName,
-     * org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        final MovingData data = MovingData.getData(violationData.player);
-        if (wildcard == ParameterName.LOCATION_FROM)
-            return String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ());
-        else if (wildcard == ParameterName.LOCATION_TO)
-            return String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ());
-        else if (wildcard == ParameterName.DISTANCE)
-            return String.format(Locale.US, "%.2f", data.to.getLocation().subtract(data.from.getLocation())
-                    .lengthSquared());
-        else
-            return super.getParameter(wildcard, violationData);
-    }
+    
+	@Override
+	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
+		final MovingData data = MovingData.getData(violationData.player);
+		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
+		parameters.put(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ()));
+		parameters.put(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ()));
+		parameters.put(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", data.to.getLocation().subtract(data.from.getLocation()).lengthSquared()));
+		return parameters;
+	}
+	
 }

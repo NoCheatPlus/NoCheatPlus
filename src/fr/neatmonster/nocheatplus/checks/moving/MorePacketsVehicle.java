@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.Map;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -117,16 +119,11 @@ public class MorePacketsVehicle extends Check {
         // player to look somewhere else despite getting pulled back by NoCheatPlus.
         return new Location(player.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), to.getYaw(), to.getPitch());
     }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName,
-     * org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.PACKETS)
-            return String.valueOf(MovingData.getData(violationData.player).morePacketsVehiclePackets);
-        else
-            return super.getParameter(wildcard, violationData);
-    }
+    
+	@Override
+	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
+		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
+		parameters.put(ParameterName.PACKETS, String.valueOf(MovingData.getData(violationData.player).morePacketsVehiclePackets));
+		return parameters;
+	}
 }

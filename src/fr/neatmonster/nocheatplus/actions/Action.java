@@ -57,4 +57,12 @@ public abstract class Action {
      * @return true, if successful
      */
     public abstract boolean execute(final ViolationData violationData);
+    
+    /**
+     * Check if parameters are needed at all for faster processing.
+     * @return
+     */
+    public boolean needsParameters(){
+    	return false;
+    }
 }

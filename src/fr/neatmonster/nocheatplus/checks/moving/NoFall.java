@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
+import java.util.Map;
 
 import net.minecraft.server.EntityPlayer;
 
@@ -92,16 +93,12 @@ public class NoFall extends Check {
         if (to.getY() > 0 && entityPlayer.locY > to.getY())
             data.noFallFallDistance += entityPlayer.locY - to.getY();
     }
-
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.checks.Check#getParameter(fr.neatmonster.nocheatplus.actions.ParameterName,
-     * org.bukkit.entity.Player)
-     */
-    @Override
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.FALL_DISTANCE)
-            return String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallFallDistance);
-        else
-            return super.getParameter(wildcard, violationData);
-    }
+    
+	@Override
+	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
+		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
+		parameters.put(ParameterName.FALL_DISTANCE, String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallFallDistance));
+		return parameters;
+	}
+	
 }

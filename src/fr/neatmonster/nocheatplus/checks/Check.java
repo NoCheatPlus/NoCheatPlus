@@ -135,31 +135,18 @@ public abstract class Check {
     	// (Design change: Permission checks are moved to cached permissions, lazily updated.)
     	return hasCancel;
     }
-
+    
     /**
-     * Replace a parameter for commands or log actions with an actual value. Individual checks should override this to
-     * get their own parameters handled too.
-     * 
-     * @param wildcard
-     *            the wildcard
-     * @param violationData
-     *            the violation data
-     * @return the parameter
+     * Fill in parameters for creating violation data. 
+     * Individual checks should override this to fill in check specific parameters,
+     * which then are fetched by the violation data instance.
+     * @param player
+     * @return
      */
-    public String getParameter(final ParameterName wildcard, final ViolationData violationData) {
-        if (wildcard == ParameterName.CHECK)
-            return getClass().getSimpleName();
-        else if (wildcard == ParameterName.PLAYER)
-            return violationData.player.getName();
-        else if (wildcard == ParameterName.VIOLATIONS) {
-            try {
-                return "" + Math.round(violationData.vL);
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-            return "";
-        } else
-            return "The author was lazy and forgot to define " + wildcard + ".";
+    protected Map<ParameterName, String> getParameterMap(final ViolationData violationData){
+    	final Map<ParameterName, String> params = new HashMap<ParameterName, String>();
+    	// (Standard parameters like player, vl, check name are filled in in ViolationData.getParameter!)
+    	return params;
     }
 
     /**
