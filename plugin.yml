@@ -1,5 +1,5 @@
 name: ${project.name}
-version: ${project.version}-b${BUILD_NUMBER}
+version: ${project.version}-beta-b${BUILD_NUMBER}
 description: ${project.description}
 
 author: NeatMonster
