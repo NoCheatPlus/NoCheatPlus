@@ -332,7 +332,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // Send a message to the player if a new update is available.
         if (updateAvailable && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
             player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE
-                    + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update.");
+                    + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 
         // Send a message to the player if the configuration is outdated.
         if (configOutdated && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
