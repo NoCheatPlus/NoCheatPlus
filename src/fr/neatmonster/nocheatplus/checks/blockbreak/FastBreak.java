@@ -37,14 +37,14 @@ public class FastBreak extends Check {
      *            the player
      * @param block
      *            the block
+     * @param isInstaBreak 
      * @param data 
      * @param cc 
      * @param elaspedTime
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block, final BlockBreakConfig cc, final BlockBreakData data) {
+    public boolean check(final Player player, final Block block, final boolean isInstaBreak, final BlockBreakConfig cc, final BlockBreakData data) {
     	final long now = System.currentTimeMillis();
-
         boolean cancel = false;
         
         // First, check the game mode of the player and choose the right limit.
@@ -56,9 +56,12 @@ public class FastBreak extends Check {
         	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockProperties.getBreakingDuration(block.getTypeId(), player));
     	// fastBreakfirstDamage is the first interact on block (!).
         final long elapsedTime = (data.fastBreakBreakTime > data.fastBreakfirstDamage) ? 0 : now - data.fastBreakfirstDamage;
-        
+          
         // Check if the time used time is lower than expected.
-    	if (elapsedTime + cc.fastBreakDelay < breakingTime){
+        if (isInstaBreak){
+        	// Ignore those for now.
+        }
+        else if (elapsedTime + cc.fastBreakDelay < breakingTime){
     		// lag or cheat or Minecraft.
     		        		
     		final long missingTime = breakingTime - elapsedTime;
@@ -79,11 +82,19 @@ public class FastBreak extends Check {
     		data.fastBreakVL *= 0.9D;
     	}
     	
-    	 if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG) && data.stats != null){
-             data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+"u", true), elapsedTime);
-             data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+ "r", true), breakingTime);
-             player.sendMessage(data.stats.getStatsStr(true));
-         }
+        if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        	// General stats:
+        	if (data.stats != null){
+                data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+"u", true), elapsedTime);
+                data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+ "r", true), breakingTime);
+                player.sendMessage(data.stats.getStatsStr(true));
+            }
+        	// Send info about current break:
+        	final int blockId = block.getTypeId();
+        	final boolean isValidTool = BlockProperties.isValidTool(blockId, player.getItemInHand());
+        	String msg = (isInstaBreak ? "[Insta]" : "[Normal]") + "[" + blockId + "] "+ elapsedTime + "u / " + breakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")";
+        	player.sendMessage(msg);
+        }
     	 
     	 // (The break time is set in the listener).
         

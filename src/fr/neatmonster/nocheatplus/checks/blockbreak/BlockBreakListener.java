@@ -220,6 +220,7 @@ public class BlockBreakListener implements Listener {
             return;
         
         // Skip if already set to the same block without breaking.
+        // TODO: should probably always set or depending on configuration.
         if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY())
         	return;
         

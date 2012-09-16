@@ -453,6 +453,11 @@ public class BlockProperties {
 		return new long[]{v, v, v, v, v, v};
 	}
 	
+	public static ToolProps getToolProps(final ItemStack stack){
+		if (stack == null) return noTool;
+		else return getToolProps(stack.getTypeId());
+	}
+	
 	public static ToolProps getToolProps(final Material mat){
 		if (mat == null) return noTool;
 		else return getToolProps(mat.getId());
@@ -462,6 +467,16 @@ public class BlockProperties {
 		final ToolProps props = tools.get(id);
 		if (props == null) return noTool;
 		else return props;
+	}
+	
+	public static BlockProps getBlockProps(final ItemStack stack){
+		if (stack == null) return defaultBlockProps;
+		else return getBlockProps(stack.getTypeId());
+	}
+	
+	public static BlockProps getBlockProps(final Material mat){
+		if (mat == null) return defaultBlockProps;
+		else return getBlockProps(mat.getId());
 	}
 	
 	public static BlockProps getBlockProps(final int blockId){
@@ -664,5 +679,13 @@ public class BlockProperties {
 		blockProps.validate();
 		if (blockId < 0 || blockId >= blocks.length) throw new IllegalArgumentException("The blockId is outside of supported range: " + blockId);
 		blocks[blockId] = blockProps;
+	}
+
+
+	public static boolean isValidTool(final int blockId, final ItemStack itemInHand) {
+		final BlockProps blockProps = getBlockProps(blockId);
+		final ToolProps toolProps = getToolProps(itemInHand);
+		final int efficiency = itemInHand == null ? 0 : itemInHand.getEnchantmentLevel(Enchantment.DIG_SPEED);
+		return isValidTool(blockId, blockProps, toolProps, efficiency);
 	}
 }
