@@ -52,7 +52,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
         set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
-        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
+//        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
         set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
 
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
