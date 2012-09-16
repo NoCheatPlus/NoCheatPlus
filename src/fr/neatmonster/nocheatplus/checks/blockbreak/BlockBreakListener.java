@@ -12,8 +12,6 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import fr.neatmonster.nocheatplus.players.Permissions;
-
 /*
  * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
  * ##  mmmm. `M 88                   88       ##  mmmm. `M                            88       
@@ -81,6 +79,8 @@ public class BlockBreakListener implements Listener {
     		return;
     	}
     	
+    	// TODO: maybe invalidate instaBreak on some occasions.
+    	
         final Player player = event.getPlayer();
         final Block block = event.getBlock();
 
@@ -102,7 +102,7 @@ public class BlockBreakListener implements Listener {
         	cancelled = true;
         	
         // Has the player broken blocks faster than possible?
-        if (!isInstaBreak && !cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block, cc, data))
+        if (!cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data))
             cancelled = true;
 
         // Did the arm of the player move before breaking this block?
@@ -131,7 +131,6 @@ public class BlockBreakListener implements Listener {
         }
         
         if (isInstaBreak){
-        	if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) player.sendMessage("[InstaBreak]");
         	data.wasInstaBreak = now;
         }
         else
@@ -189,7 +188,8 @@ public class BlockBreakListener implements Listener {
     	// The following is to set the "first damage time" for a block.
     	
     	// Return if it is not left clicking a block. 
-    	// (Allows right click to be ignored.) 
+    	// (Allows right click to be ignored.)
+    	isInstaBreak = false;
         if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         checkBlockDamage(event.getPlayer(), event.getClickedBlock(), event);
         
@@ -200,6 +200,7 @@ public class BlockBreakListener implements Listener {
     public void onBlockDamage(final BlockDamageEvent event) {
 //    	System.out.println("Damage("+event.isCancelled()+"): " + event.getBlock());
     	if (!event.isCancelled() && event.getInstaBreak()) isInstaBreak = true;
+    	else isInstaBreak = false;
     	checkBlockDamage(event.getPlayer(), event.getBlock(), event);
     }
     

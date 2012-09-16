@@ -17,13 +17,17 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.actions.BanCommand;
 import fr.neatmonster.nocheatplus.command.actions.DelayCommand;
 import fr.neatmonster.nocheatplus.command.actions.KickCommand;
+import fr.neatmonster.nocheatplus.command.actions.KickListCommand;
 import fr.neatmonster.nocheatplus.command.actions.TellCommand;
 import fr.neatmonster.nocheatplus.command.actions.TempKickCommand;
 import fr.neatmonster.nocheatplus.command.actions.UnKickCommand;
+import fr.neatmonster.nocheatplus.command.admin.CommandsCommand;
+import fr.neatmonster.nocheatplus.command.admin.ExemptCommand;
+import fr.neatmonster.nocheatplus.command.admin.ExemptionsCommand;
 import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
-import fr.neatmonster.nocheatplus.command.admin.KickListCommand;
 import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
 import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
+import fr.neatmonster.nocheatplus.command.admin.UnexemptCommand;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 
@@ -100,6 +104,10 @@ public class CommandHandler implements CommandExecutor {
         		new RemovePlayerCommand(plugin),
         		new KickListCommand(plugin),
         		new UnKickCommand(plugin),
+        		new ExemptionsCommand(plugin),
+        		new ExemptCommand(plugin),
+        		new UnexemptCommand(plugin),
+        		new CommandsCommand(plugin),
         }){
         	addCommand(cmd);
         }

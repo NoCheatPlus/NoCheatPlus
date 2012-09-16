@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.command.admin;
+package fr.neatmonster.nocheatplus.command.actions;
 
 import java.util.Arrays;
 

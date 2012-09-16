@@ -26,7 +26,13 @@ public class Permissions {
 
     public static final String  ADMINISTRATION_BAN           = ADMINISTRATION + ".ban";
 	public static final String  ADMINISTRATION_DELAY         = ADMINISTRATION + ".delay";
+	
+	public static final String  ADMINISTRATION_EXEMPT        = ADMINISTRATION + ".exempt";
+	public static final String  ADMINISTRATION_UNEXEMPT      = ADMINISTRATION + ".unexempt";
+	public static final String  ADMINISTRATION_EXEMPTIONS    = ADMINISTRATION + ".exemptions";
+	
     public static final String  ADMINISTRATION_INFO          = ADMINISTRATION + ".info";
+    public static final String  ADMINISTRATION_COMMANDS      = ADMINISTRATION + ".commands";
     public static final String  ADMINISTRATION_KICK          = ADMINISTRATION + ".kick";
 	public static final String  ADMINISTRATION_KICKLIST      = ADMINISTRATION + ".kicklist";
     public static final String  ADMINISTRATION_NOTIFY        = ADMINISTRATION + ".notify";

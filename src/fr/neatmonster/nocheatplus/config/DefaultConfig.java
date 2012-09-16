@@ -69,7 +69,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 60);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 90);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>500 log:fastbreak:3:5:cif cancel");
         

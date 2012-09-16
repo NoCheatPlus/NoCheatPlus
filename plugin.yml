@@ -15,17 +15,12 @@ commands:
         # permissions: nocheatplus.admin.(...)
         usage: |
                /<command> reload: reload NoCheatPlus configuration
-               /:Player violations:
                /<command> info (player): Display the violations of a player
                /<command> removeplayer (player) [(check type)]: Remove data
-               /:Auxiliary:
-               /<command> ban [delay=(ticks)] (player) [(reason)...]: ban player
-               /<command> kick [delay=(ticks)] (player) [(reason)...]: kick player
-               /<command> kicklist: Show temporarily kicked players.
-               /<command> tempkick [delay=(ticks)] (player) (minutes) [(reason)...]
-               /<command> unkick (player): Allow a player to login again.
-               /<command> tell [delay=(ticks)] (player) (message)...: tell a message
-               /<command> delay [delay=(ticks)] (command)...: delay a command
+               /<command> exemptions (player) [(check type)]: Show exemptions
+               /<command> exempt (player) [(check type)]: Exempt the player
+               /<command> unexempt (player) [(check type)]: Unexempt the player
+               /<command> commands: List all commands, more than shown here
 
 permissions:
     nocheatplus:
@@ -41,7 +36,13 @@ permissions:
                     nocheatplus.admin.reload:
                         description: Allow the player to reload NoCheatPlus configuration.
                     nocheatplus.admin.info:
-                        description: Allow to see violation info about a player (/ncp info (player)).
+                        description: Allow to see violation info about a player.
+                    nocheatplus.admin.exemptions:
+                        description: Allow to see exemptions for a player.
+                    nocheatplus.admin.exempt:
+                        description: Allow to add exemptions for a player.
+                    nocheatplus.admin.unexempt:
+                        description: Allow to remove exemptions from  a player.
                     nocheatplus.admin.ban:
                         description: Allow use of the ncp ban command.
                     nocheatplus.admin.kick:
@@ -58,6 +59,8 @@ permissions:
                         description: Allow use of the ncp unkick command.
                     nocheatplus.admin.removeplayer:
                         description: Allow use of the ncp removeplayer command.
+                    nocheatplus.admin.commands:
+                        description: Allow use of the ncp commands command.
             nocheatplus.bypass:
                 description: Bypass permission other than command permissions.
                 children:
