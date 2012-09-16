@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -56,11 +57,11 @@ public class NCPExemptionManager {
     public static final void clear() {
         registeredPlayers.clear();
         // Use put with a new map to keep entries to stay thread safe.
-        for (final CheckType type : CheckType.values())
-            if (APIUtils.needsSynchronization(type))
-                exempted.put(type, Collections.synchronizedSet(new HashSet<Integer>()));
+        for (final CheckType checkType : CheckType.values())
+            if (APIUtils.needsSynchronization(checkType))
+                exempted.put(checkType, Collections.synchronizedSet(new HashSet<Integer>()));
             else
-                exempted.put(type, new HashSet<Integer>());
+                exempted.put(checkType, new HashSet<Integer>());
     }
 
     /**
@@ -103,11 +104,11 @@ public class NCPExemptionManager {
      * 
      * @param player
      *            the player
-     * @param type
+     * @param checkType
      *            the check type
      */
-    public static final void exemptPermanently(final Player player, final CheckType type) {
-        exemptPermanently(player.getEntityId(), type);
+    public static final void exemptPermanently(final Player player, final CheckType checkType) {
+        exemptPermanently(player.getEntityId(), checkType);
     }
 
     /**
@@ -132,24 +133,31 @@ public class NCPExemptionManager {
             public void onPlayerQuit(final PlayerQuitEvent event) {
                 NCPExemptionManager.tryToRemove(event.getPlayer());
             }
+            
+            @SuppressWarnings("unused")
+            @EventHandler(
+                    ignoreCancelled = true, priority = EventPriority.MONITOR)
+            public void onPlayerKick(final PlayerKickEvent event) {
+                NCPExemptionManager.tryToRemove(event.getPlayer());
+            }
         };
     }
 
     /**
-     * Check if an entity is exempted from a check right now.
+     * Check if an entity is exempted from a check right now by entity id.
      * <hr>
      * This might help exempting NPCs from checks for all time, making performance a lot better. A future purpose might
      * be to exempt vehicles and similar (including passengers) from checks.
      * 
      * @param entityId
      *            the entity id to exempt from checks
-     * @param type
+     * @param checkType
      *            the type of check to exempt the player from. This can be individual check types, as well as a check
      *            group like MOVING or ALL
      * @return if the entity is exempted from checks right now
      */
-    public static final boolean isExempted(final int entityId, final CheckType type) {
-        return exempted.get(type).contains(entityId);
+    public static final boolean isExempted(final int entityId, final CheckType checkType) {
+        return exempted.get(checkType).contains(entityId);
     }
 
     /**
@@ -157,13 +165,28 @@ public class NCPExemptionManager {
      * 
      * @param player
      *            the player to exempt from checks
-     * @param type
+     * @param checkType
      *            the type of check to exempt the player from. This can be individual check types, as well as a check
      *            group like MOVING or ALL
      * @return if the player is exempted from the check right now
      */
-    public static final boolean isExempted(final Player player, final CheckType type) {
-        return isExempted(player.getEntityId(), type);
+    public static final boolean isExempted(final Player player, final CheckType checkType) {
+        return isExempted(player.getEntityId(), checkType);
+    }
+    
+    /**
+     * Check if a player is exempted from a check right now by player name.
+     * @param playerName
+     * 			The exact player name.
+     * @param checkType
+     *            the type of check to exempt the player from. This can be individual check types, as well as a check
+     *            group like MOVING or ALL
+     * @return  if the player is exempted from the check right now
+     */
+    public static final boolean isExempted(final String playerName, final CheckType checkType) {
+    	final Integer entityId = registeredPlayers.get(playerName);
+    	if (entityId == null) return false;
+        return isExempted(entityId, checkType);
     }
 
     /**
@@ -200,9 +223,9 @@ public class NCPExemptionManager {
         if (!registeredPlayers.containsKey(player.getName()))
             return;
         final Integer entityId = player.getEntityId();
-        for (final CheckType type : CheckType.values())
+        for (final CheckType checkType : CheckType.values())
             // Check if player is exempted from something.
-            if (isExempted(entityId, type))
+            if (isExempted(entityId, checkType))
                 // If he is, we can't remove him so we return.
                 return;
         registeredPlayers.remove(player.getName());
@@ -223,13 +246,13 @@ public class NCPExemptionManager {
      * 
      * @param entityId
      *            the entity id
-     * @param type
+     * @param checkType
      *            the check type
      */
-    public static final void unexempt(final int entityId, final CheckType type) {
+    public static final void unexempt(final int entityId, final CheckType checkType) {
         final Integer id = entityId;
-        exempted.get(type).remove(id);
-        for (final CheckType child : APIUtils.getChildren(type))
+        exempted.get(checkType).remove(id);
+        for (final CheckType child : APIUtils.getChildren(checkType))
             exempted.get(child).remove(id);
     }
 
@@ -242,6 +265,16 @@ public class NCPExemptionManager {
     public static final void unexempt(final Player player) {
         unexempt(player, CheckType.ALL);
     }
+    
+    /**
+     * Undo exempting a player from all checks.
+     * 
+     * @param playerName
+     *            the players exact name
+     */
+    public static final void unexempt(final String playerName) {
+        unexempt(playerName, CheckType.ALL);
+    }
 
     /**
      * Undo exempting a player form a certain check, or check group, as given.
@@ -253,6 +286,19 @@ public class NCPExemptionManager {
      */
     public static final void unexempt(final Player player, final CheckType checkType) {
         unexempt(player.getEntityId(), checkType);
+    }
+    
+    /**
+     * Undo exempting a player form a certain check, or check group, as given.
+     * 
+     * @param playerName
+     *            the exact player name.
+     * @param checkType
+     *            the check type
+     */
+    public static final void unexempt(final String playerName, final CheckType checkType) {
+    	final Integer entityId = registeredPlayers.get(playerName);
+    	if (entityId != null) unexempt(entityId, checkType);
     }
 
 }

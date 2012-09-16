@@ -32,10 +32,12 @@ public class APIUtils {
         final Map<CheckType, Set<CheckType>> map = new HashMap<CheckType, Set<CheckType>>();
         for (final CheckType type : CheckType.values())
             map.put(type, new HashSet<CheckType>());
-        for (final CheckType type : CheckType.values())
-            for (final CheckType other : CheckType.values())
-                if (isParent(other, type))
-                    map.get(other).add(type);
+        for (final CheckType type : CheckType.values()){
+        	if (type != CheckType.ALL) map.get(CheckType.ALL).add(type);
+            for (final CheckType other : CheckType.values()){
+                if (isParent(other, type)) map.get(other).add(type);
+            }
+        }
         for (final CheckType parent : map.keySet())
             childrenMap.put(parent, map.get(parent).toArray(new CheckType[] {}));
     }
@@ -63,6 +65,8 @@ public class APIUtils {
      * @return true, if is parent
      */
     public static final boolean isParent(final CheckType supposedParent, final CheckType supposedChild) {
+    	if (supposedParent == supposedChild) return false;
+    	else if (supposedParent == CheckType.ALL) return true;
         CheckType parent = supposedChild.getParent();
         while (parent != null)
             if (parent == supposedParent)

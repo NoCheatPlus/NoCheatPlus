@@ -40,6 +40,7 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
@@ -230,6 +231,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         	new InventoryListener(),
         	new MovingListener(),
         	new Workarounds(),
+        	NCPExemptionManager.getListener(),
         }){
         	addListener(listener);
         }
