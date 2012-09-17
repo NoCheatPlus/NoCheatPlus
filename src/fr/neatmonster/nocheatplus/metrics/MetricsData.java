@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.hooks.APIUtils;
 
 /*
  * M"""""`'"""`YM            dP            oo                   M""""""'YMM            dP            
@@ -35,8 +36,15 @@ public class MetricsData {
      *            the check type
      */
     public static void addFailed(final CheckType type) {
-        if (enabled && type.getParent() != null)
-            checksFailed.put(type, checksFailed.get(type) + 1);
+        if (enabled && type.getParent() != null){
+        	if (APIUtils.needsSynchronization(type)){
+        		// (Synchronization prevents the rare case of adding up without ever resetting, in effect).
+        		synchronized (checksFailed) {
+        			checksFailed.put(type, checksFailed.get(type) + 1);
+				}
+        	}
+        	else checksFailed.put(type, checksFailed.get(type) + 1);
+        }
     }
 
     /**
@@ -80,11 +88,14 @@ public class MetricsData {
      * Initialize the class.
      */
     public static void initialize() {
-        enabled = true;
-        for (final CheckType type : CheckType.values())
-            if (type.getParent() != null)
-                checksFailed.put(type, 0);
-        for (int ticks = 0; ticks < 21; ticks++)
-            ticksNumbers.put(ticks, 0);
+    	// (Synchronization prevents the rare case of adding up without ever resetting, in effect).
+    	synchronized (checksFailed) {
+            enabled = true;
+            for (final CheckType type : CheckType.values())
+                if (type.getParent() != null)
+                    checksFailed.put(type, 0);
+            for (int ticks = 0; ticks < 21; ticks++)
+                ticksNumbers.put(ticks, 0);
+		}
     }
 }
