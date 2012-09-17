@@ -132,7 +132,14 @@ public class ConfigManager {
     public static ConfigFile getConfigFile(final String worldName) {
     	final ConfigFile configFile = worldsMap.get(worldName);
         if (configFile != null) return configFile;
-        return getConfigFile();
+        // Expensive only once, for the rest of runtime the file is returned fast.
+    	synchronized(ConfigManager.class){
+    		// Need to check again.
+    		if (worldsMap.containsKey(worldName)) return worldsMap.get(worldName);
+    		final ConfigFile globalConfig = getConfigFile();
+    		worldsMap.put(worldName, globalConfig);
+    		return globalConfig;
+    	}
     }
     
     /**
