@@ -280,8 +280,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 //            	final String[] split = getDescription().getVersion().split("-b");
 //                final int currentVersion = Integer.parseInt(split[split.length - 1]);
 //                final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
-//                final URLConnection connection = url.openConnection();
 //                connection.setReadTimeout(config.getInt(ConfPaths.MISCELLANEOUS_READTIMEOUT, 4) * 1000);
+//                final URLConnection connection = url.openConnection();
+//              
 //                bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 //                String line, content = "";
 //                while ((line = bufferedReader.readLine()) != null)
