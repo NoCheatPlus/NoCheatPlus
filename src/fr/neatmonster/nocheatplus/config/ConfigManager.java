@@ -31,7 +31,8 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  *                                          d8888P                                             d8888P                    
  */
 /**
- * Central location for everything that's described in the configuration file(s).
+ * Central location for everything that's described in the configuration file(s).<br>
+ * The synchronized methods are to ensure that changing the configurations won't lead to trouble for the asynchronous checks.
  */
 public class ConfigManager {
 
@@ -112,6 +113,14 @@ public class ConfigManager {
     public static ConfigFile getConfigFile() {
         return worldsMap.get(null);
     }
+    
+    /**
+     * (Synchronized version).
+     * @return
+     */
+    public static synchronized ConfigFile getConfigFileSync() {
+    	return getConfigFile();
+    }
 
     /**
      * Gets the configuration file.
@@ -121,9 +130,18 @@ public class ConfigManager {
      * @return the configuration file
      */
     public static ConfigFile getConfigFile(final String worldName) {
-        if (worldsMap.containsKey(worldName))
-            return worldsMap.get(worldName);
+    	final ConfigFile configFile = worldsMap.get(worldName);
+        if (configFile != null) return configFile;
         return getConfigFile();
+    }
+    
+    /**
+     * (Synchronized version).
+     * @param worldName
+     * @return
+     */
+    public static synchronized ConfigFile getConfigFileSync(final String worldName) {
+    	return getConfigFile(worldName);
     }
 
     /**
@@ -132,7 +150,8 @@ public class ConfigManager {
      * @param plugin
      *            the instance of NoCheatPlus
      */
-    public static void init(final NoCheatPlus plugin) {
+    public static synchronized void init(final NoCheatPlus plugin) {
+    	worldsMap.clear();
         // Try to obtain and parse the global configuration file.
         final File globalFile = new File(plugin.getDataFolder(), "config.yml");
         final ConfigFile globalConfig = new ConfigFile();
