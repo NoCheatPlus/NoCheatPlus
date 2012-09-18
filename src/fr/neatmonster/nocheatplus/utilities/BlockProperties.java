@@ -205,7 +205,7 @@ public class BlockProperties {
 	private static final BlockProps indestructibleType = new BlockProps(noTool, -1f, indestructibleTimes);
 	
 	/** Returned if unknown */
-	public static final BlockProps defaultBlockProps = stoneType;
+	private static BlockProps defaultBlockProps = instantType;
 	
 	protected static final Material[] instantMat = new Material[]{
 		// Named in wiki.
@@ -687,5 +687,19 @@ public class BlockProperties {
 		final ToolProps toolProps = getToolProps(itemInHand);
 		final int efficiency = itemInHand == null ? 0 : itemInHand.getEnchantmentLevel(Enchantment.DIG_SPEED);
 		return isValidTool(blockId, blockProps, toolProps, efficiency);
+	}
+
+
+	public static BlockProps getDefaultBlockProps() {
+		return defaultBlockProps;
+	}
+
+	/**
+	 * Feeding null will cause an npe - will validate. 
+	 * @param blockProps
+	 */
+	public static void setDefaultBlockProps(BlockProps blockProps) {
+		blockProps.validate();
+		BlockProperties.defaultBlockProps = blockProps;
 	}
 }
