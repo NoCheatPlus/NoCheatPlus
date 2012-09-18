@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
+import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
@@ -98,6 +99,8 @@ public class FightListener implements Listener {
 
         boolean cancelled = false;
         
+        final String worldName = player.getWorld().getName();
+        
         // Check for self hit exploits (mind that projectiles should be excluded)
         final Entity cbEntity = event.getEntity();
         if (cbEntity instanceof Player){
@@ -113,10 +116,11 @@ public class FightListener implements Listener {
         
         final long now = System.currentTimeMillis();
         
+        final boolean worldChanged = !worldName.equals(data.lastWorld);
+        
         // Improbable yaw:
-        if (Improbable.checkYaw(player, player.getLocation().getYaw(), now)){
+        if (Combined.checkYaw(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)){
         	cancelled = true;
-//        	System.out.println(player.getName() + " <- cancelled attack by yaw.");
         }
         
         // Combined speed:
@@ -127,7 +131,7 @@ public class FightListener implements Listener {
         final net.minecraft.server.Entity damaged = ((CraftEntity) cbEntity).getHandle();
 
         // Run through the main checks.
-        if (!cancelled && angle.isEnabled(player) && angle.check(player))
+        if (!cancelled && angle.isEnabled(player) && angle.check(player, worldChanged))
             cancelled = true;
 
         if (!cancelled && critical.isEnabled(player) && critical.check(player))
@@ -154,6 +158,8 @@ public class FightListener implements Listener {
         // One of the checks requested the event to be cancelled, so do it.
         if (cancelled)
             event.setCancelled(cancelled);
+        
+        data.lastWorld = worldName;
     }
 
     /**

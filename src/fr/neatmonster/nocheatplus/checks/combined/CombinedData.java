@@ -46,11 +46,13 @@ public class CombinedData extends ACheckData {
 	
 	public float lastYaw;
 	public long  lastYawTime;
-	public final ActionFrequency yawFreq = new ActionFrequency(4, 500);
+	public final ActionFrequency yawFreq = new ActionFrequency(3, 333);
 	
 	public long timeFreeze = 0;
 	
 	public final ActionFrequency improbableCount = new ActionFrequency(20, 3000);
+
+	public String lastWorld = "";
 	
 	public CombinedData(final Player player){
 //		final CombinedConfig cc = CombinedConfig.getConfig(player);

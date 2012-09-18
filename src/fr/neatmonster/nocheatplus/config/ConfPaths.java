@@ -301,6 +301,9 @@ public abstract class ConfPaths {
 	
 	public static final String  COMBINED_IMPROBABLE_ACTIONS              = COMBINED_IMPROBABLE + "actions";
 	
+	private static final String COMBINED_YAWRATE                         = COMBINED + "yawrate.";
+	public static final String  COMBINED_YAWRATE_RATE                    = COMBINED_YAWRATE + "rate";
+	
     /*
      * 888'Y88 ,e,          888       d8   
      * 888 ,'Y  "   e88 888 888 ee   d88   
@@ -359,6 +362,9 @@ public abstract class ConfPaths {
     public static final String  FIGHT_SPEED_CHECK                        = FIGHT_SPEED + "active";
     public static final String  FIGHT_SPEED_LIMIT                        = FIGHT_SPEED + "limit";
     public static final String  FIGHT_SPEED_ACTIONS                      = FIGHT_SPEED + "actions";
+    
+    private static final String FIGHT_YAWRATE                            = FIGHT + "yawrate.";
+	public static final String  FIGHT_YAWRATE_CHECK                      = FIGHT_YAWRATE + "active";
 
     /*
      * 888                                     d8                              

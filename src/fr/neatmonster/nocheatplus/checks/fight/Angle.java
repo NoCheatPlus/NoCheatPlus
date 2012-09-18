@@ -38,11 +38,17 @@ public class Angle extends Check {
      * 
      * @param player
      *            the player
+     * @param worldChanged 
      * @return true, if successful
      */
-    public boolean check(final Player player) {
+    public boolean check(final Player player, final boolean worldChanged) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
+        
+        if (worldChanged){
+        	// TODO: clear some data.
+        	data.angleHits.clear();
+        }
 
         boolean cancel = false;
 
@@ -69,13 +75,15 @@ public class Angle extends Check {
         for (final long time : data.angleHits.descendingKeySet()) {
             final Location location = data.angleHits.get(time);
             // We need a previous location to calculate deltas.
-            if (previousLocation != null && location.getWorld().getName().equals(previousLocation.getWorld().getName())) {
+            if (previousLocation != null){ // && location.getWorld().getName().equals(previousLocation.getWorld().getName())) {
+            	// (Risks exceptions on reloading).
                 // Calculate the distance between the two locations.
                 deltaMove += previousLocation.distanceSquared(location);
                 // Calculate the time elapsed between the two hits.
                 deltaTime += previousTime - time;
                 // Calculate the difference of the yaw between the two locations.
-                deltaYaw += (previousLocation.getYaw() - location.getYaw()) % 360f;
+                final float dYaw = (previousLocation.getYaw() - location.getYaw()) % 180;
+                deltaYaw += Math.abs(dYaw);
             }
             // Remember the current time and location.
             previousTime = time;

@@ -99,6 +99,8 @@ public class FightConfig extends ACheckConfig {
     public final boolean    speedCheck;
     public final int        speedLimit;
     public final ActionList speedActions;
+    
+	public final boolean yawRateCheck;
 
     /**
      * Instantiates a new fight configuration.
@@ -143,6 +145,8 @@ public class FightConfig extends ACheckConfig {
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
         speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
+        
+        yawRateCheck = data.getBoolean(ConfPaths.FIGHT_YAWRATE_CHECK, true);
     }
 
     /* (non-Javadoc)

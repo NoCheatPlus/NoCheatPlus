@@ -72,6 +72,10 @@ public class FightData extends ACheckData {
     public double                  speedVL;
 
     public boolean                 skipNext;
+    
+    // Shared
+    
+    public String lastWorld = "";
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
