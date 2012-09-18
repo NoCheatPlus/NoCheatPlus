@@ -15,7 +15,6 @@ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
-import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
@@ -105,15 +104,23 @@ public class FightListener implements Listener {
         	if (selfHit.isEnabled(player) && selfHit.check(player, cbEntity, data, cc))
         		cancelled = true;
         	else{
-            	// Check if improbable
-            	if (Improbable.check(player, 2.0f, System.currentTimeMillis()))
-            		cancelled = true;
-            	CombinedData.getData((Player) cbEntity).improbableCount.add(System.currentTimeMillis(), -2.0f);
+//            	// Check if improbable
+//            	if (Improbable.check(player, 2.0f, System.currentTimeMillis()))
+//            		cancelled = true;
+//            	CombinedData.getData((Player) cbEntity).improbableCount.add(System.currentTimeMillis(), -2.0f);
         	}
         }
         
+        final long now = System.currentTimeMillis();
+        
+        // Improbable yaw:
+        if (Improbable.checkYaw(player, player.getLocation().getYaw(), now)){
+        	cancelled = true;
+//        	System.out.println(player.getName() + " <- cancelled attack by yaw.");
+        }
+        
         // Combined speed:
-        if (Improbable.check(player, 1f, System.currentTimeMillis()))
+        if (!cancelled && Improbable.check(player, 1f, now))
         	cancelled = true;
 
         // Get the attacked entity.
