@@ -41,7 +41,7 @@ public class CombinedListener implements Listener {
 		// Just add the yaw to the list.
 		final Location loc = player.getLocation();
 		final String worldName = loc.getWorld().getName();
-		Combined.feedYaw(player, loc.getYaw(), System.currentTimeMillis(), worldName);
+		Combined.feedYawRate(player, loc.getYaw(), System.currentTimeMillis(), worldName);
 	}
 	
 	// (possibly other types of events, but these combine with fighting).

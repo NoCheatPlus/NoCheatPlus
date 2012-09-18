@@ -303,6 +303,7 @@ public abstract class ConfPaths {
 	
 	private static final String COMBINED_YAWRATE                         = COMBINED + "yawrate.";
 	public static final String  COMBINED_YAWRATE_RATE                    = COMBINED_YAWRATE + "rate";
+	public static final String  COMBINED_YAWRATE_IMPROBABLE              = COMBINED_YAWRATE + "improbable";
 	
     /*
      * 888'Y88 ,e,          888       d8   

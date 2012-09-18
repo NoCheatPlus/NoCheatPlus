@@ -18,8 +18,8 @@ public class Combined {
 	 * @param worldName
 	 * @return
 	 */
-	public static final boolean checkYaw(final Player player, final float yaw, final long now, final String worldName){
-		return checkYaw(player, yaw, now, worldName, CombinedData.getData(player));
+	public static final boolean checkYawRate(final Player player, final float yaw, final long now, final String worldName){
+		return checkYawRate(player, yaw, now, worldName, CombinedData.getData(player));
 	}
 	
 	/**
@@ -29,8 +29,8 @@ public class Combined {
 	 * @param now
 	 * @param worldName
 	 */
-	public static final void feedYaw(final Player player, final float yaw, final long now, final String worldName){
-		feedYaw(player, yaw, now, worldName, CombinedData.getData(player));
+	public static final void feedYawRate(final Player player, final float yaw, final long now, final String worldName){
+		feedYawRate(player, yaw, now, worldName, CombinedData.getData(player));
 	}
 	
 	/**
@@ -41,7 +41,7 @@ public class Combined {
 	 * @param worldName
 	 * @param data
 	 */
-	private static final void feedYaw(final Player player, final float yaw, final long now, final String worldName, final CombinedData data) {
+	private static final void feedYawRate(final Player player, final float yaw, final long now, final String worldName, final CombinedData data) {
 		// Reset on world change or timeout.
 		if (now - data.lastYawTime > 999 || !worldName.equals(data.lastWorld)){
 			data.lastYaw = yaw;
@@ -70,20 +70,25 @@ public class Combined {
 	 * @param worldName
 	 * @return
 	 */
-	private static final boolean checkYaw(Player player, float yaw, long now, final String worldName, final CombinedData data) {
+	private static final boolean checkYawRate(Player player, float yaw, long now, final String worldName, final CombinedData data) {
 
-		feedYaw(player, yaw, now, worldName, data);
+		feedYawRate(player, yaw, now, worldName, data);
 		
 		final CombinedConfig cc = CombinedConfig.getConfig(player);
 		
 		// Angle diff per second
 		final float total = Math.max(data.yawFreq.getScore(1f), data.yawFreq.getScore(0) * 3f);
-		final float threshold = cc.lastYawRate;
+		final float threshold = cc.yawRate;
+		boolean cancel = false;
 		if (total > threshold){
 			// Add time 
-			data.timeFreeze = Math.max(data.timeFreeze, now + (long) ((total - threshold) / threshold * 1000f));
+			final float amount = ((total - threshold) / threshold * 1000f);
+			data.timeFreeze = Math.max(data.timeFreeze, now + (long) amount);
+			if (cc.yawRateImprobable && Improbable.check(player, 5f * amount / 1000f, now))
+				cancel = true;
 		}
-		return now < data.timeFreeze;
+		if (now < data.timeFreeze) cancel = true;
+		return cancel;
 	}
 
 	/**
@@ -95,10 +100,10 @@ public class Combined {
 	 * @param yawRateCheck If to actually check the yaw rate, or just feed.
 	 * @return
 	 */
-	public static final boolean checkYaw(final Player player, final float yaw, final long now, final String worldName, final boolean yawRateCheck) {
-		if (yawRateCheck) return checkYaw(player, yaw, now, worldName);
+	public static final boolean checkYawRate(final Player player, final float yaw, final long now, final String worldName, final boolean yawRateCheck) {
+		if (yawRateCheck) return checkYawRate(player, yaw, now, worldName);
 		else {
-			feedYaw(player, yaw, now, worldName);
+			feedYawRate(player, yaw, now, worldName);
 			return false;
 		}
 	}

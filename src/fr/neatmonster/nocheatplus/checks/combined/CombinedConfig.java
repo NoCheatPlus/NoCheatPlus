@@ -43,14 +43,16 @@ public class CombinedConfig extends ACheckConfig {
 	public final ActionList improbableActions;
 	
 	// Last yaw tracking 
-	public final float lastYawRate;
+	public final float yawRate;
+	public final boolean yawRateImprobable;
 	
 	public CombinedConfig(final ConfigFile config) {
 		improbableCheck = config.getBoolean(ConfPaths.COMBINED_IMPROBABLE_CHECK, false);
 		improbableLevel = (float) config.getDouble(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
 		improbableActions = config.getActionList(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, Permissions.COMBINED_IMPROBABLE);
 		
-		lastYawRate = config.getInt(ConfPaths.COMBINED_YAWRATE_RATE);
+		yawRate = config.getInt(ConfPaths.COMBINED_YAWRATE_RATE);
+		yawRateImprobable = config.getBoolean(ConfPaths.COMBINED_YAWRATE_IMPROBABLE);
 	}
 
 	@Override
