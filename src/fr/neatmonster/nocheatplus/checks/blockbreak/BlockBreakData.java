@@ -78,6 +78,9 @@ public class BlockBreakData extends ACheckData {
 	public int     clickedX;
 	public int     clickedY;
 	public int     clickedZ;
+	public int     clickedTick;
+	
+	// TODO: use tick here too  ?
 	public long    wasInstaBreak;
 	
 	public final Stats stats;

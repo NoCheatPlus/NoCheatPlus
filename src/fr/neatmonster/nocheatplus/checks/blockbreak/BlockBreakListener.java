@@ -12,6 +12,8 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.utilities.TickTask;
+
 /*
  * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
  * ##  mmmm. `M 88                   88       ##  mmmm. `M                            88       
@@ -219,10 +221,11 @@ public class BlockBreakListener implements Listener {
         if (block == null)
             return;
         
-        // Skip if already set to the same block without breaking.
-        // TODO: should probably always set or depending on configuration.
-        if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY())
-        	return;
+        final int tick = TickTask.getTick();
+        // Skip if already set to the same block without breaking within one tick difference.
+        if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY()){
+        	if (tick - data.clickedTick <= 1 ) return;
+        }
         
         // (Always set, the interact event only fires once: the first time.)
         // Only record first damage:
@@ -231,6 +234,7 @@ public class BlockBreakListener implements Listener {
         data.clickedX = block.getX();
         data.clickedY = block.getY();
         data.clickedZ = block.getZ();
+        data.clickedTick = tick;
     }
     
 }
