@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MP""""""`MM                                  dP 
@@ -21,7 +22,7 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
  *             dP                                  
  */
 /**
- * The Frequency check is used to detect players who are attacking entities too quickly.
+ * The Speed check is used to detect players who are attacking entities too quickly.
  */
 public class Speed extends Check {
 
@@ -37,34 +38,47 @@ public class Speed extends Check {
      * 
      * @param player
      *            the player
+     * @param now 
      * @return true, if successful
      */
-    public boolean check(final Player player) {
+    public boolean check(final Player player, final long now) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
-
-        // Has one second passed? Reset counters and violation level in that case.
-        if (data.speedTime + 1000L <= System.currentTimeMillis()) {
-            data.speedTime = System.currentTimeMillis();
-            data.speedAttacks = 0;
-            data.speedVL = 0D;
+        
+        // Add to frequency.
+        data.speedBuckets.add(now, 1f);
+        
+        // Medium term (normalized to one second).
+        final float total = data.speedBuckets.getScore(cc.speedBucketFactor) * 1000f / (float) (cc.speedBucketDur * cc.speedBuckets);
+        
+        // Short term.
+        final int tick = TickTask.getTick();
+        if (tick - data.speedShortTermTick < cc.speedShortTermTicks){
+        	// Within range, add.
+        	data.speedShortTermCount ++;
         }
-
-        // Count the attack.
-        data.speedAttacks++;
+        else{
+        	data.speedShortTermTick = tick;
+        	data.speedShortTermCount = 1;
+        }
+        
+        final float shortTerm = (float ) data.speedShortTermCount * 1000f / (50f * cc.speedShortTermTicks);
+        
+        final float max = Math.max(shortTerm, total);
 
         // Too many attacks?
-        if (data.speedAttacks > cc.speedLimit) {
+        if (max > cc.speedLimit) {
             // If there was lag, don't count it towards violation level.
             if (!LagMeasureTask.skipCheck())
-                data.speedVL += 1;
+                data.speedVL += total - cc.speedLimit;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.speedVL, 1D, cc.speedActions);
+            cancel = executeActions(player, data.speedVL, total - cc.speedLimit, cc.speedActions);
         }
+        else data.speedVL *= 0.96;
 
         return cancel;
     }

@@ -240,6 +240,7 @@ public class DefaultConfig extends ConfigFile {
          *               ,  88P                
          *              "8",P"                 
          */
+        set(ConfPaths.FIGHT_CANCELDEAD, true);
         set(ConfPaths.FIGHT_YAWRATE_CHECK, true);
         
         set(ConfPaths.FIGHT_ANGLE_CHECK, true);
@@ -271,6 +272,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.FIGHT_REACH_CHECK, true);
         set(ConfPaths.FIGHT_REACH_PENALTY, 500);
+        set(ConfPaths.FIGHT_REACH_PRECISION, true);
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
         
         set(ConfPaths.FIGHT_SELFHIT_CHECK, true);
@@ -279,6 +281,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_SPEED_CHECK, true);
         set(ConfPaths.FIGHT_SPEED_LIMIT, 15);
         set(ConfPaths.FIGHT_SPEED_ACTIONS, "log:fspeed:0:5:if cancel");
+        set(ConfPaths.FIGHT_SPEED_SHORTTERM_TICKS, 7);
+        set(ConfPaths.FIGHT_SPEED_SHORTTERM_LIMIT, 6);
 
         /*
          * 888                                     d8                              

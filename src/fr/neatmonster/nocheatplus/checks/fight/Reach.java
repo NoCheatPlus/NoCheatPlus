@@ -1,15 +1,17 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import net.minecraft.server.Entity;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
 /*
@@ -55,15 +57,35 @@ public class Reach extends Check {
         boolean cancel = false;
 
         final double distanceLimit = player.getGameMode() == GameMode.SURVIVAL ? SURVIVAL_DISTANCE : CREATIVE_DISTANCE;
-
+        
+        // Reference locations to check distance for.
+        // TODO: improve reference location: depending on height difference choose min(foot/hitbox, attacker)
+        final Location dRef;
+        if (damaged instanceof LivingEntity){
+        	dRef = ((LivingEntity) damaged).getEyeLocation();
+        }
+        else dRef = damaged.getLocation();
+        final Location pRef = player.getEyeLocation();
+        
+        final Vector pRel = dRef.toVector().subtract(pRef.toVector());
+        
+        final double mod;
+        if (cc.reachPrecision){
+        	// Calculate how fast they are closing in or moving away from each other.
+        	mod = 1D;
+//            final Vector vRel = damaged.getVelocity().subtract(player.getVelocity());
+//            System.out.println(vRel.angle(pRel)); // TODO: NaN
+//            final double radial = vRel.length() * Math.cos((vRel.angle(pRel)));
+//        	mod = (radial < 0 ? 0.8 : 1.0);
+//        	System.out.println(player.getName() + " -> " + pRel.length() + ": " + radial + " => " + mod);
+        }
+        else mod = 1D;
         // Distance is calculated from eye location to center of targeted. If the player is further away from his target
         // than allowed, the difference will be assigned to "distance".
-        double distance = CheckUtils.distance(player.getEyeLocation(),
-                damaged.getBukkitEntity().getLocation().add(0D, damaged.getHeadHeight(), 0D))
-                - distanceLimit;
+        double distance = pRel.length() - distanceLimit * mod;
 
         // Handle the EnderDragon differently.
-        if (damaged.getBukkitEntity() instanceof EnderDragon)
+        if (damaged instanceof EnderDragon)
             distance -= 6.5D;
 
         if (distance > 0) {
@@ -82,11 +104,12 @@ public class Reach extends Check {
             // Player passed the check, reward him.
             data.reachVL *= 0.8D;
             
-            // Check if improbable
-            if (distance > -0.3){
-            	if (Improbable.check(player, 2.0f, System.currentTimeMillis()))
-            		cancel = true;
-            }
+        }
+        
+        // Check if improbable.
+        if (cancel || distance > -1.25){
+        	if (Improbable.check(player, (float) (distance + 1.25) / 2f, System.currentTimeMillis()))
+        		cancel = true;
         }
 
 

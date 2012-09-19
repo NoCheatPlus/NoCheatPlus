@@ -352,6 +352,7 @@ public abstract class ConfPaths {
     private static final String FIGHT_REACH                              = FIGHT + "reach.";
     public static final String  FIGHT_REACH_CHECK                        = FIGHT_REACH + "active";
     public static final String  FIGHT_REACH_PENALTY                      = FIGHT_REACH + "penalty";
+	public static final String  FIGHT_REACH_PRECISION                    = FIGHT_REACH + "precision";
     public static final String  FIGHT_REACH_ACTIONS                      = FIGHT_REACH + "actions";
     
     public static final String FIGHT_SELFHIT                             = FIGHT + "selfhit.";
@@ -362,10 +363,18 @@ public abstract class ConfPaths {
     private static final String FIGHT_SPEED                              = FIGHT + "speed.";
     public static final String  FIGHT_SPEED_CHECK                        = FIGHT_SPEED + "active";
     public static final String  FIGHT_SPEED_LIMIT                        = FIGHT_SPEED + "limit";
+    private static final String FIGHT_SPEED_BUCKETS                      = FIGHT_SPEED + "buckets.";
+	public static final String  FIGHT_SPEED_BUCKETS_N                    = FIGHT_SPEED_BUCKETS + "number";
+	public static final String  FIGHT_SPEED_BUCKETS_DUR                  = FIGHT_SPEED_BUCKETS + "duration";
+	public static final String  FIGHT_SPEED_BUCKETS_FACTOR               = FIGHT_SPEED_BUCKETS + "factor";
+	private static final String FIGHT_SPEED_SHORTTERM                    = FIGHT_SPEED + "shortterm.";
+	public static final String  FIGHT_SPEED_SHORTTERM_LIMIT              = FIGHT_SPEED_SHORTTERM + "limit";
+	public static final String  FIGHT_SPEED_SHORTTERM_TICKS              = FIGHT_SPEED_SHORTTERM + "ticks";
     public static final String  FIGHT_SPEED_ACTIONS                      = FIGHT_SPEED + "actions";
     
     private static final String FIGHT_YAWRATE                            = FIGHT + "yawrate.";
 	public static final String  FIGHT_YAWRATE_CHECK                      = FIGHT_YAWRATE + "active";
+	public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
 
     /*
      * 888                                     d8                              

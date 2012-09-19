@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -12,8 +11,8 @@ public class SelfHit extends Check {
 		super(CheckType.FIGHT_SELFHIT);
 	}
 	
-	public boolean check(final Player damager, final Entity damaged, final FightData data, final FightConfig cc){
-		if (!damager.getName().equals(((Player) damaged).getName())) return false;
+	public boolean check(final Player damager, final Player damaged, final FightData data, final FightConfig cc){
+		if (!damager.getName().equals(damaged.getName())) return false;
 		
 		boolean cancel = false;
 		// Treat self hitting as instant violation.

@@ -4,7 +4,7 @@
 
 	<!-- Informations -->
 	<name>NoCheatPlus</name>
-	<version>3.7.3-beta</version>
+	<version>3.7.3</version>
 	<description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
 	<url>http://dev.bukkit.org/server-mods/nocheatplus</url>
 

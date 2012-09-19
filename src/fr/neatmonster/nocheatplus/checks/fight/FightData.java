@@ -52,7 +52,7 @@ public class FightData extends ACheckData {
      */
     public static FightData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new FightData());
+            playersMap.put(player.getName(), new FightData(FightConfig.getConfig(player)));
         return playersMap.get(player.getName());
     }
 
@@ -72,6 +72,8 @@ public class FightData extends ACheckData {
     public double                  speedVL;
 
     public boolean                 skipNext;
+    
+    public long                    damageTakenTick;
     
     // Shared
     
@@ -104,7 +106,13 @@ public class FightData extends ACheckData {
     // Data of the SelfHit check.
     public ActionFrequency selfHitVL = new ActionFrequency(6, 5000);
 
-    // Data of the speed check.
-    public int                     speedAttacks;
-    public long                    speedTime;
+    // Data of the frequency check.
+    public final ActionFrequency   speedBuckets;
+	public int                     speedShortTermCount;
+	public int                     speedShortTermTick;
+	                   
+	
+	public FightData(final FightConfig cc){
+		speedBuckets = new ActionFrequency(cc.speedBuckets, cc.speedBucketDur);
+	}
 }

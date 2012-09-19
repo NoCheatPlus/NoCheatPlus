@@ -91,6 +91,7 @@ public class FightConfig extends ACheckConfig {
 
     public final boolean    reachCheck;
     public final long       reachPenalty;
+    public final boolean    reachPrecision;
     public final ActionList reachActions;
     
     public final boolean    selfHitCheck;
@@ -98,9 +99,17 @@ public class FightConfig extends ACheckConfig {
 
     public final boolean    speedCheck;
     public final int        speedLimit;
+	public final int        speedBuckets;
+	public final long       speedBucketDur;
+	public final float      speedBucketFactor;  
+
+    public final int        speedShortTermLimit;
+	public final int        speedShortTermTicks;
     public final ActionList speedActions;
     
-	public final boolean yawRateCheck;
+    // Special flags:
+	public final boolean    yawRateCheck;
+	public final boolean    cancelDead;
 
     /**
      * Instantiates a new fight configuration.
@@ -137,6 +146,7 @@ public class FightConfig extends ACheckConfig {
 
         reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
         reachPenalty = data.getLong(ConfPaths.FIGHT_REACH_PENALTY);
+        reachPrecision = data.getBoolean(ConfPaths.FIGHT_REACH_PRECISION);
         reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
 
         selfHitCheck = data.getBoolean(ConfPaths.FIGHT_SELFHIT_CHECK);
@@ -144,9 +154,16 @@ public class FightConfig extends ACheckConfig {
         
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
         speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
+        speedBuckets = data.getInt(ConfPaths.FIGHT_SPEED_BUCKETS_N, 6);
+        speedBucketDur = data.getLong(ConfPaths.FIGHT_SPEED_BUCKETS_DUR, 333);
+        speedBucketFactor = (float) data.getDouble(ConfPaths.FIGHT_SPEED_BUCKETS_FACTOR, 1f);
+        speedShortTermLimit = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_LIMIT);
+        speedShortTermTicks = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_TICKS);
         speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
         
+        
         yawRateCheck = data.getBoolean(ConfPaths.FIGHT_YAWRATE_CHECK, true);
+        cancelDead = data.getBoolean(ConfPaths.FIGHT_CANCELDEAD);
     }
 
     /* (non-Javadoc)

@@ -84,7 +84,8 @@ public class Combined {
 			// Add time 
 			final float amount = ((total - threshold) / threshold * 1000f);
 			data.timeFreeze = Math.max(data.timeFreeze, now + (long) amount);
-			if (cc.yawRateImprobable && Improbable.check(player, 5f * amount / 1000f, now))
+			// TODO: balance (100 ... 200 ) ?
+			if (cc.yawRateImprobable && Improbable.check(player, amount / 100f, now))
 				cancel = true;
 		}
 		if (now < data.timeFreeze) cancel = true;

@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerToggleSprintEvent;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM""""""""`M oo          dP         dP   M""MMMMMMMM oo            dP                                       
@@ -96,7 +97,7 @@ public class FightListener implements Listener {
             data.skipNext = false;
             return;
         }
-
+        
         boolean cancelled = false;
         
         final String worldName = player.getWorld().getName();
@@ -104,7 +105,8 @@ public class FightListener implements Listener {
         // Check for self hit exploits (mind that projectiles should be excluded)
         final Entity cbEntity = event.getEntity();
         if (cbEntity instanceof Player){
-        	if (selfHit.isEnabled(player) && selfHit.check(player, cbEntity, data, cc))
+        	final Player damagedPlayer = (Player) cbEntity;
+        	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc))
         		cancelled = true;
         	else{
 //            	// Check if improbable
@@ -112,6 +114,14 @@ public class FightListener implements Listener {
 //            		cancelled = true;
 //            	CombinedData.getData((Player) cbEntity).improbableCount.add(System.currentTimeMillis(), -2.0f);
         	}
+        }
+        
+        if (cc.cancelDead){
+        	if (cbEntity.isDead()) cancelled = true;
+        	// Only allow damaging others if taken damage this tick.
+            if (player.isDead() && data.damageTakenTick != TickTask.getTick()){
+            	cancelled = true;
+            }
         }
         
         final long now = System.currentTimeMillis();
@@ -131,6 +141,9 @@ public class FightListener implements Listener {
         final net.minecraft.server.Entity damaged = ((CraftEntity) cbEntity).getHandle();
 
         // Run through the main checks.
+        if (!cancelled && speed.isEnabled(player) && speed.check(player, now))
+            cancelled = true;
+        
         if (!cancelled && angle.isEnabled(player) && angle.check(player, worldChanged))
             cancelled = true;
 
@@ -146,10 +159,7 @@ public class FightListener implements Listener {
         if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
             cancelled = true;
 
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, damaged))
-            cancelled = true;
-
-        if (!cancelled && speed.isEnabled(player) && speed.check(player))
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, cbEntity))
             cancelled = true;
 
         if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
@@ -182,11 +192,18 @@ public class FightListener implements Listener {
         // Filter some unwanted events right now.
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-            if (e.getDamager() instanceof Player)
-                if (e.getCause() == DamageCause.ENTITY_ATTACK)
-                    handleNormalDamage(e);
+            final Entity damaged = e.getEntity();
+        	if (damaged instanceof Player){
+        		FightData.getData((Player) damaged).damageTakenTick = TickTask.getTick();
+        	}
+        	
+            if (e.getDamager() instanceof Player){
+                if (e.getCause() == DamageCause.ENTITY_ATTACK){
+                	handleNormalDamage(e);
+                }
                 else if (e.getCause() == DamageCause.CUSTOM)
                     handleCustomDamage(e);
+            }
         }
     }
 

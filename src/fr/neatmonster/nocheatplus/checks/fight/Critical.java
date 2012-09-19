@@ -43,14 +43,13 @@ public class Critical extends Check {
         boolean cancel = false;
 
         // We'll need the PlayerLocation to know some important stuff.
-        PlayerLocation location = new PlayerLocation();
+        final PlayerLocation location = new PlayerLocation();
         location.set(player.getLocation(), player);
 
         // Check if the hit was a critical hit (positive fall distance, entity in the air, not on ladder, not in liquid
         // and without blindness effect).
         if (player.getFallDistance() > 0f && !location.isOnGround() && !location.isOnLadder() && !location.isInLiquid()
-                && !player.hasPotionEffect(PotionEffectType.BLINDNESS))
-
+                && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
             // It was a critical hit, now check if the player has jumped or has sent a packet to mislead the server.
             if (player.getFallDistance() < cc.criticalFallDistance
                     || Math.abs(player.getVelocity().getY()) < cc.criticalVelocity) {
@@ -70,8 +69,8 @@ public class Critical extends Check {
                 // should cancel the event.
                 cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
             }
+        }
 
-        location = null;
 
         return cancel;
     }
