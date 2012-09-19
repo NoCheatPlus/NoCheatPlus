@@ -255,4 +255,37 @@ public class CheckUtils {
 		e.printStackTrace(pw);
 		scheduleOutput(pw.toString());
 	}
+	
+	/**
+	 * Angle of a 2d vector, x being the side at the angle. (radians).
+	 * @param x
+	 * @param z
+	 * @return
+	 */
+	public static final double angle(final double x, final double z){
+		final double a;
+		if (x > 0.0) a = Math.atan(z / x);
+		else if  (x < 0.0) a = Math.atan(z / x) + Math.PI;
+		else{
+	        if (z < 0.0) a=3.0 * Math.PI / 2.0;
+	        else if (z > 0.0) a = Math.PI / 2.0;
+	        else return Double.NaN;
+		}
+	    if (a < 0.0) return a + 2.0 * Math.PI;
+	    else return a;
+	}
+	
+	/**
+	 * Get the difference of angles (radians) as given from angle(x,z), from a1 to a2, i.e. rather a2 - a1 in principle.
+	 * @param a1
+	 * @param a2
+	 * @return Difference of angle from -pi to pi
+	 */
+	public static final double angleDiff(final double a1, final double a2){
+		if (Double.isNaN(a1) || Double.isNaN(a1)) return Double.NaN;
+		final double diff = a2 - a1;
+		if (diff < -Math.PI) return diff + 2.0 * Math.PI;
+		else if (diff > Math.PI) return diff - 2.0 * Math.PI;
+		else return diff;
+	}
 }

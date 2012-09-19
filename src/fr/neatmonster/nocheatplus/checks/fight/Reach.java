@@ -69,20 +69,39 @@ public class Reach extends Check {
         
         final Vector pRel = dRef.toVector().subtract(pRef.toVector());
         
-        final double mod;
-        if (cc.reachPrecision){
-        	// Calculate how fast they are closing in or moving away from each other.
-        	mod = 1D;
-//            final Vector vRel = damaged.getVelocity().subtract(player.getVelocity());
-//            System.out.println(vRel.angle(pRel)); // TODO: NaN
-//            final double radial = vRel.length() * Math.cos((vRel.angle(pRel)));
-//        	mod = (radial < 0 ? 0.8 : 1.0);
-//        	System.out.println(player.getName() + " -> " + pRel.length() + ": " + radial + " => " + mod);
-        }
-        else mod = 1D;
+        
+//        final double mod;
+//        if (cc.reachPrecision){
+//        	// Calculate how fast they are closing in or moving away from each other.
+//        	// Use x-z plane only for now.
+//            final Vector vRel = damaged.getVelocity().clone().subtract(player.getVelocity());
+//            System.out.println("vrel: " + vRel);
+//            final double avRel = CheckUtils.angle(vRel.getX(), vRel.getZ());
+//            final double apRel = CheckUtils.angle(pRel.getX(), pRel.getZ());
+//            final double angle = CheckUtils.angleDiff(apRel, avRel);
+//            
+//            System.out.println("ap=" + apRel+ " / av=" + avRel + " -> " + angle);
+//            
+//            final double radial;
+//            
+//            
+//            
+//            if (Double.isNaN(angle)){
+//            	radial = 0.0;
+//            	mod = modPenalty;
+//            }
+//            else{
+//            	radial = vRel.length() * Math.cos(angle);
+//            	mod = ((radial < 0 || Double.isNaN(radial)) ? modPenalty : 1.0);
+//            }
+//        	System.out.println(player.getName() + " -> d=" + pRel.length() + ", vr=" + radial + ", mod= " + mod);
+//        }
+//        else 
+//        	mod = 1D;
         // Distance is calculated from eye location to center of targeted. If the player is further away from his target
         // than allowed, the difference will be assigned to "distance".
-        double distance = pRel.length() - distanceLimit * mod;
+        final double lenpRel = pRel.length();
+        double distance = lenpRel - distanceLimit * data.reachMod;
 
         // Handle the EnderDragon differently.
         if (damaged instanceof EnderDragon)
@@ -111,7 +130,13 @@ public class Reach extends Check {
         	if (Improbable.check(player, (float) (distance + 1.25) / 2f, System.currentTimeMillis()))
         		cancel = true;
         }
-
+        
+        if (lenpRel > 0.8 * distanceLimit){
+        	data.reachMod = Math.max(0.8, data.reachMod - 0.05);
+        }
+        else{
+        	data.reachMod = Math.min(1.0, data.reachMod + 0.05);
+        }
 
         // If the player is still in penalty time, cancel the event anyway.
         if (data.reachLastViolationTime + cc.reachPenalty > System.currentTimeMillis()) {

@@ -102,6 +102,7 @@ public class FightData extends ACheckData {
 
     // Data of the reach check.
     public long                    reachLastViolationTime;
+	public double                  reachMod = 1;
     
     // Data of the SelfHit check.
     public ActionFrequency selfHitVL = new ActionFrequency(6, 5000);
