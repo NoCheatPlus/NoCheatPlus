@@ -92,6 +92,7 @@ public class FightConfig extends ACheckConfig {
     public final boolean    reachCheck;
     public final long       reachPenalty;
     public final boolean    reachPrecision;
+	public final boolean    reachReduce;
     public final ActionList reachActions;
     
     public final boolean    selfHitCheck;
@@ -147,6 +148,7 @@ public class FightConfig extends ACheckConfig {
         reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
         reachPenalty = data.getLong(ConfPaths.FIGHT_REACH_PENALTY);
         reachPrecision = data.getBoolean(ConfPaths.FIGHT_REACH_PRECISION);
+        reachReduce = data.getBoolean(ConfPaths.FIGHT_REACH_REDUCE);
         reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
 
         selfHitCheck = data.getBoolean(ConfPaths.FIGHT_SELFHIT_CHECK);

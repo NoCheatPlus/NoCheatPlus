@@ -272,7 +272,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.FIGHT_REACH_CHECK, true);
         set(ConfPaths.FIGHT_REACH_PENALTY, 500);
-        set(ConfPaths.FIGHT_REACH_PRECISION, true);
+        set(ConfPaths.FIGHT_REACH_REDUCE, true);
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
         
         set(ConfPaths.FIGHT_SELFHIT_CHECK, true);

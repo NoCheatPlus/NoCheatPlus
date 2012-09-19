@@ -355,6 +355,7 @@ public abstract class ConfPaths {
     public static final String  FIGHT_REACH_CHECK                        = FIGHT_REACH + "active";
     public static final String  FIGHT_REACH_PENALTY                      = FIGHT_REACH + "penalty";
 	public static final String  FIGHT_REACH_PRECISION                    = FIGHT_REACH + "precision";
+	public static final String  FIGHT_REACH_REDUCE                       = FIGHT_REACH + "reduce";
     public static final String  FIGHT_REACH_ACTIONS                      = FIGHT_REACH + "actions";
     
     public static final String FIGHT_SELFHIT                             = FIGHT + "selfhit.";

@@ -131,7 +131,8 @@ public class Reach extends Check {
         		cancel = true;
         }
         
-        if (lenpRel > 0.8 * distanceLimit){
+        if (!cc.reachReduce) data.reachMod = 1d;
+        else if (lenpRel > 0.8 * distanceLimit){
         	data.reachMod = Math.max(0.8, data.reachMod - 0.05);
         }
         else{
