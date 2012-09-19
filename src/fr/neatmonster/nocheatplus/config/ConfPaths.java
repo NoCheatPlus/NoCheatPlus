@@ -315,6 +315,8 @@ public abstract class ConfPaths {
      *              "8",P"                 
      */
     private static final String FIGHT                                    = CHECKS + "fight.";
+    
+	public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
 
     private static final String FIGHT_ANGLE                              = FIGHT + "angle.";
     public static final String  FIGHT_ANGLE_CHECK                        = FIGHT_ANGLE + "active";
@@ -364,7 +366,9 @@ public abstract class ConfPaths {
     public static final String  FIGHT_SPEED_CHECK                        = FIGHT_SPEED + "active";
     public static final String  FIGHT_SPEED_LIMIT                        = FIGHT_SPEED + "limit";
     private static final String FIGHT_SPEED_BUCKETS                      = FIGHT_SPEED + "buckets.";
+    @GlobalConfig
 	public static final String  FIGHT_SPEED_BUCKETS_N                    = FIGHT_SPEED_BUCKETS + "number";
+    @GlobalConfig
 	public static final String  FIGHT_SPEED_BUCKETS_DUR                  = FIGHT_SPEED_BUCKETS + "duration";
 	public static final String  FIGHT_SPEED_BUCKETS_FACTOR               = FIGHT_SPEED_BUCKETS + "factor";
 	private static final String FIGHT_SPEED_SHORTTERM                    = FIGHT_SPEED + "shortterm.";
@@ -374,7 +378,6 @@ public abstract class ConfPaths {
     
     private static final String FIGHT_YAWRATE                            = FIGHT + "yawrate.";
 	public static final String  FIGHT_YAWRATE_CHECK                      = FIGHT_YAWRATE + "active";
-	public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
 
     /*
      * 888                                     d8                              
