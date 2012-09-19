@@ -79,12 +79,13 @@ public class BlockPlaceListener implements Listener {
         boolean cancelled = false;
 
         // First, the fast place check.
-        if (fastPlace.isEnabled(player) && fastPlace.check(player, block))
-            cancelled = true;
-        
-        // Combined speed:
-        if (Improbable.check(player, 1f, System.currentTimeMillis()))
-        	cancelled = true;
+        if (fastPlace.isEnabled(player)){
+        	if (fastPlace.check(player, block))
+                cancelled = true;
+        	else         // Combined speed:
+                if (Improbable.check(player, 1f, System.currentTimeMillis()))
+                	cancelled = true;
+        }
 
         // Second, the no swing check (player doesn't swing his arm when placing a lily pad).
         if (!cancelled && event.getBlockPlaced().getType() != Material.WATER_LILY && noSwing.isEnabled(player)

@@ -129,13 +129,14 @@ public class InventoryListener implements Listener {
          */
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
-            if (fastClick.isEnabled(player) && fastClick.check(player))
-                // The check requested the event to be cancelled.
-                event.setCancelled(true);
-            
-            // Combined speed:
-            else if (Improbable.check(player, 1f, System.currentTimeMillis()))
-            	event.setCancelled(true);
+            if (fastClick.isEnabled(player)){
+            	if (fastClick.check(player))
+                    // The check requested the event to be cancelled.
+                    event.setCancelled(true);
+                // Combined speed:
+                else if (Improbable.check(player, 1f, System.currentTimeMillis()))
+                	event.setCancelled(true);
+            }
         }
     }
 

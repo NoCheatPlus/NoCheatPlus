@@ -132,17 +132,19 @@ public class FightListener implements Listener {
         if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)){
         	cancelled = true;
         }
-        
-        // Combined speed:
-        if (!cancelled && Improbable.check(player, 1f, now))
-        	cancelled = true;
 
         // Get the attacked entity.
         final net.minecraft.server.Entity damaged = ((CraftEntity) cbEntity).getHandle();
 
         // Run through the main checks.
-        if (!cancelled && speed.isEnabled(player) && speed.check(player, now))
-            cancelled = true;
+        if (!cancelled && speed.isEnabled(player)){
+        	if (speed.check(player, now))
+        		cancelled = true;
+	        // Combined speed:
+        	else if (Improbable.check(player, 1f, now))
+	        	cancelled = true;
+        }
+
         
         if (!cancelled && angle.isEnabled(player) && angle.check(player, worldChanged))
             cancelled = true;
