@@ -36,12 +36,15 @@ public class CombinedListener implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = false)
 	public final void onPlayerMove(final PlayerMoveEvent event){
-		// Experimental
+		final long now = System.currentTimeMillis();
 		final Player player = event.getPlayer();
-		// Just add the yaw to the list.
+		
 		final Location loc = player.getLocation();
 		final String worldName = loc.getWorld().getName();
-		Combined.feedYawRate(player, loc.getYaw(), System.currentTimeMillis(), worldName);
+		final CombinedData data = CombinedData.getData(player);
+		data.lastMoveTime = now;
+		// Just add the yaw to the list.
+		Combined.feedYawRate(player, loc.getYaw(), now, worldName, data);
 	}
 	
 	// (possibly other types of events, but these combine with fighting).

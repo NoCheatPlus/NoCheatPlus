@@ -15,6 +15,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -134,17 +135,19 @@ public class SurvivalFly extends Check {
         // Prevent players from walking on a liquid.
         // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
         if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D
-                && MovingListener.isLiquid(to.getLocation().getBlock().getType()) && !to.isOnGround()
+                && BlockProperties.isLiquid(to.getTypeId()) && !to.isOnGround()
                 && to.getY() % 1D < 0.8D)
             hDistanceAboveLimit = hDistance;
 
         // Prevent players from sprinting if they're moving backwards.
-        if (hDistanceAboveLimit <= 0D && sprinting && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+        if (hDistanceAboveLimit <= 0D && sprinting) {
             final float yaw = from.getYaw();
             if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F || xDistance < 0D && zDistance < 0D
                     && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
-                    || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F)
-                hDistanceAboveLimit = hDistance;
+                    || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F){
+            	// Assumes permission check to be the heaviest (might be mistaken).
+            	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) hDistanceAboveLimit = hDistance;
+            }
         }
 
         data.bunnyhopDelay--;

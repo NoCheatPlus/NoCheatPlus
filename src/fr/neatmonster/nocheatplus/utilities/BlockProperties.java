@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.server.Block;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -231,6 +233,12 @@ public class BlockProperties {
 		Material.CROPS,
 	};
 	
+    protected static final long[] blockFlags = new long[maxBlocks];
+    
+    /** Flag position for stairs. */
+    public static final int F_STAIRS = 0x1;
+    public static final int F_LIQUID = 0x2;
+    
 	static{
 		try{
 			initTools();
@@ -272,10 +280,24 @@ public class BlockProperties {
 
 	
 	private static void initBlocks() {
-		for (int i = 0; i <blocks.length; i++){
+		for (int i = 0; i <maxBlocks; i++){
 			blocks[i] = null;
+			blockFlags[i] = 0;
 		}
-		// 
+		// Stairs.
+		for (final Material mat : new Material[] {Material.WOOD_STAIRS, Material.COBBLESTONE_STAIRS,
+	            Material.BRICK_STAIRS, Material.SMOOTH_STAIRS, Material.NETHER_BRICK_STAIRS, Material.SANDSTONE_STAIRS,
+	            Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS}){
+			blockFlags[mat.getId()] |= F_STAIRS;
+		}
+		// Liquid.
+		for (final Material mat : new Material[]{
+				Material.LAVA, Material.STATIONARY_LAVA,
+				Material.STATIONARY_WATER, Material.WATER,
+		}) {
+			blockFlags[mat.getId()] |= F_LIQUID;	
+		}
+		// Instantly breakable.
 		for (final Material mat : instantMat){
 			blocks[mat.getId()] = instantType;
 		}
@@ -701,5 +723,25 @@ public class BlockProperties {
 	public static void setDefaultBlockProps(BlockProps blockProps) {
 		blockProps.validate();
 		BlockProperties.defaultBlockProps = blockProps;
+	}
+
+	/**
+	 * Hiding the API access here.<br>
+	 * TODO: Find description of this and use block properties from here, as well as a speaking method name.
+	 * @param id
+	 * @return
+	 */
+	public static final boolean i(final int id) {
+		return Block.i(id);
+	}
+
+
+	public static final boolean isStairs(final int id) {
+		return (blockFlags[id] & F_STAIRS) != 0;
+	}
+
+
+	public static boolean isLiquid(final int id) {
+		return (blockFlags[id] & F_LIQUID) != 0;
 	}
 }

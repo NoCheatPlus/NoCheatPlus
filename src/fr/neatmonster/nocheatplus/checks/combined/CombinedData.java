@@ -54,6 +54,8 @@ public class CombinedData extends ACheckData {
 
 	public String lastWorld = "";
 	
+	public long lastMoveTime;
+	
 	public CombinedData(final Player player){
 //		final CombinedConfig cc = CombinedConfig.getConfig(player);
 		// TODO: Get some things from the config.

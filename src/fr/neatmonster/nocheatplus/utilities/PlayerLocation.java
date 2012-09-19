@@ -1,14 +1,11 @@
 package fr.neatmonster.nocheatplus.utilities;
 
-import java.util.Arrays;
-
 import net.minecraft.server.AxisAlignedBB;
 import net.minecraft.server.Block;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -36,10 +33,12 @@ import org.bukkit.entity.Player;
  */
 public class PlayerLocation {
 
-    private static final Material[] STAIRS = new Material[] {Material.WOOD_STAIRS, Material.COBBLESTONE_STAIRS,
-            Material.BRICK_STAIRS, Material.SMOOTH_STAIRS, Material.NETHER_BRICK_STAIRS, Material.SANDSTONE_STAIRS,
-            Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS};
-
+    /** Type id of the block at the position. */
+    private Integer typeId;
+    
+    /** Type id of the block below. */
+    private Integer typeIdBelow;
+    
     /** The original location. */
     private Location                location;
 
@@ -140,7 +139,7 @@ public class PlayerLocation {
      */
     public boolean isAboveStairs() {
         if (aboveStairs == null)
-            aboveStairs = Arrays.asList(STAIRS).contains(Material.getMaterial(world.getTypeId(x, y - 1, z)));
+            aboveStairs = BlockProperties.isStairs(getTypeIdBelow().intValue());
         return aboveStairs;
     }
 
@@ -227,7 +226,7 @@ public class PlayerLocation {
             if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
                 onIce = world.getTypeId(x, (int) Math.floor(boundingBox.b - 0.1D), z) == Block.ICE.id;
             else
-                onIce = world.getTypeId(x, y - 1, z) == Block.ICE.id;
+                onIce = getTypeIdBelow() == Block.ICE.id;
         return onIce;
     }
 
@@ -237,8 +236,10 @@ public class PlayerLocation {
      * @return true, if the player is on a ladder
      */
     public boolean isOnLadder() {
-        if (onLadder == null)
-            onLadder = world.getTypeId(x, y, z) == Block.LADDER.id || world.getTypeId(x, y, z) == Block.VINE.id;
+        if (onLadder == null){
+        	final int typeId = getTypeId();
+        	onLadder = typeId == Block.LADDER.id || typeId == Block.VINE.id;
+        }
         return onLadder;
     }
     
@@ -286,4 +287,16 @@ public class PlayerLocation {
 		this.yOnGround = yOnGround;
 		this.onGround = null;
 	}
+
+	public Integer getTypeId() {
+		if (typeId == null) typeId = world.getTypeId(x, y, z);
+		return typeId;
+	}
+
+
+	public Integer getTypeIdBelow() {
+		if (typeIdBelow == null) typeIdBelow = world.getTypeId(x, y - 1, z);
+		return typeIdBelow;
+	}
+
 }

@@ -1,11 +1,10 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import net.minecraft.server.Block;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -29,6 +28,7 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /*
  * M"""""`'"""`YM                   oo                   
@@ -57,18 +57,6 @@ public class MovingListener implements Listener {
 
     /** The no fall check. **/
     public final static NoFall noFall = new NoFall();
-
-    /**
-     * Checks if a material is liquid.
-     * 
-     * @param material
-     *            the material
-     * @return true, if the material is liquid
-     */
-    public static boolean isLiquid(final Material material) {
-        return material == Material.LAVA || material == Material.STATIONARY_LAVA
-                || material == Material.STATIONARY_WATER || material == Material.WATER;
-    }
 
     /** The instance of NoCheatPlus. */
     private final NoCheatPlus        plugin             = (NoCheatPlus) Bukkit.getPluginManager().getPlugin(
@@ -110,27 +98,40 @@ public class MovingListener implements Listener {
          */
         final Player player = event.getPlayer();
 
-        // Ignore players inside a vehicle.
-        if (player.isInsideVehicle())
-            return;
+		// Ignore players inside a vehicle.
+		if (player.isInsideVehicle())
+			return;
 
-        final MovingData data = MovingData.getData(player);
+		final MovingData data = MovingData.getData(player);
 
-        final int blockY = event.getBlock().getY();
-        if (isLiquid(event.getBlockAgainst().getType()) && event.getBlock().getType() != Material.WATER_LILY)
-            // The block was placed against a liquid block, cancel its placement.
-            event.setCancelled(true);
-        else if ((creativeFly.isEnabled(player) || survivalFly.isEnabled(player)) && event.getBlock() != null
-                && data.setBack != null && blockY + 1D >= data.setBack.getY()
-                && Math.abs(player.getLocation().getX() - 0.5 - event.getBlock().getX()) <= 1D
-                && Math.abs(player.getLocation().getZ() - 0.5 - event.getBlock().getZ()) <= 1D
-                && player.getLocation().getY() - blockY > 0D && player.getLocation().getY() - blockY < 2D
-                && (Block.i(event.getBlock().getTypeId()) || isLiquid(event.getBlock().getType()))) {
-            // The creative fly and/or survival fly check is enabled, the block was placed below the player and is
-            // solid, so do what we have to do.
-            data.setBack.setY(blockY + 1D);
-            data.survivalFlyJumpPhase = 0;
-        }
+		final org.bukkit.block.Block block = event.getBlock();
+		final int blockY = block.getY();
+
+		final Material mat = block.getType();
+
+		if (BlockProperties.isLiquid(event.getBlockAgainst().getTypeId())
+				&& mat != Material.WATER_LILY)
+			// The block was placed against a liquid block, cancel its
+			// placement.
+			event.setCancelled(true);
+		else {
+			
+			if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) return;
+			
+			if (block == null || data.setBack == null || blockY + 1D < data.setBack.getY()) return;
+			
+			final Location loc = player.getLocation();
+			if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
+					&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
+					&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
+					&& (BlockProperties.i(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
+				// The creative fly and/or survival fly check is enabled, the
+				// block was placed below the player and is
+				// solid, so do what we have to do.
+				data.setBack.setY(blockY + 1D);
+				data.survivalFlyJumpPhase = 0;
+			}
+		}
     }
 
     /**
@@ -248,15 +249,24 @@ public class MovingListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
          *                |___/                                                  
          */
-        if (!event.getPlayer().hasPermission(Permissions.MOVING_BOATSANYWHERE)
-                && event.getAction() == Action.RIGHT_CLICK_BLOCK
-                && event.getPlayer().getItemInHand().getType() == Material.BOAT
-                && event.getClickedBlock().getType() != Material.WATER
-                && event.getClickedBlock().getType() != Material.STATIONARY_WATER
-                && event.getClickedBlock().getRelative(event.getBlockFace()).getType() != Material.WATER
-                && event.getClickedBlock().getRelative(event.getBlockFace()).getType() != Material.STATIONARY_WATER)
-            // If the player right clicked on a non-liquid block with a boat in his hands, cancel the event.
-            event.setCancelled(true);
+    	// If the player right clicked on a non-liquid block with a boat in his hands, cancel the event.
+    	if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+    	
+    	final Player player = event.getPlayer();
+    	if (player.getItemInHand().getType() != Material.BOAT) return;
+    	if (event.getPlayer().hasPermission(Permissions.MOVING_BOATSANYWHERE)) return;
+    	
+    	final org.bukkit.block.Block block = event.getClickedBlock();
+    	final Material mat = block.getType();
+    	
+    	if (mat == Material.WATER || mat == Material.STATIONARY_WATER) return;
+    	
+    	final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
+    	final Material relMat = relBlock.getType();
+    	
+    	if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) return;
+    	 
+        event.setCancelled(true);
     }
 
     /**
@@ -503,11 +513,14 @@ public class MovingListener implements Listener {
          *   \ V /  __/ | | | | (__| |  __/ | |  | | (_) \ V /  __/
          *    \_/ \___|_| |_|_|\___|_|\___| |_|  |_|\___/ \_/ \___|
          */
+    	final Vehicle vehicle = event.getVehicle();
+    	final Entity passenger = vehicle.getPassenger();
         // Don't care if a player isn't inside the vehicle, for movements that are very high distance or to another
         // world (such that it is very likely the event data was modified by another plugin before we got it).
-        if (event.getVehicle().getPassenger() == null || !(event.getVehicle().getPassenger() instanceof Player)
-                || !event.getFrom().getWorld().equals(event.getTo().getWorld()))
-            return;
+        if (passenger == null || !(passenger instanceof Player)) return;
+        final Location from = event.getFrom();
+        final Location to = event.getTo();
+        if (!from.getWorld().equals(to.getWorld())) return;
 
         final Player player = (Player) event.getVehicle().getPassenger();
 
@@ -515,7 +528,7 @@ public class MovingListener implements Listener {
 
         if (morePacketsVehicle.isEnabled(player))
             // If the player is handled by the more packets vehicle check, execute it.
-            newTo = morePacketsVehicle.check(player, event.getFrom(), event.getTo());
+            newTo = morePacketsVehicle.check(player, from, to);
         else
             // Otherwise we need to clear his data.
             MovingData.getData(player).clearMorePacketsData();
@@ -538,6 +551,6 @@ public class MovingListener implements Listener {
                     this.location = location;
                     return this;
                 }
-            }.set(event.getVehicle(), newTo), 1L);
+            }.set(vehicle, newTo), 1L);
     }
 }

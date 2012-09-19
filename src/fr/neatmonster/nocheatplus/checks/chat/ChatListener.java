@@ -10,7 +10,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
@@ -202,28 +201,6 @@ public class ChatListener implements Listener, INotifyReload {
         // Execute the no pwnage check.
         if (noPwnage.isEnabled(player) && noPwnage.checkLogin(player))
             event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);
-    }
-
-    /**
-     * When a player moves, he will be checked for various suspicious behaviors.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onPlayerMove(final PlayerMoveEvent event) {
-        /*
-         *  _____  _                         __  __                
-         * |  __ \| |                       |  \/  |               
-         * | |__) | | __ _ _   _  ___ _ __  | \  / | _____   _____ 
-         * |  ___/| |/ _` | | | |/ _ \ '__| | |\/| |/ _ \ \ / / _ \
-         * | |    | | (_| | |_| |  __/ |    | |  | | (_) \ V /  __/
-         * |_|    |_|\__,_|\__, |\___|_|    |_|  |_|\___/ \_/ \___|
-         *                  __/ |                                  
-         *                 |___/                                   
-         */
-        ChatData.getData(event.getPlayer()).noPwnageLastMovedTime = System.currentTimeMillis();
     }
 
 	@Override

@@ -73,7 +73,6 @@ public class ChatData extends AsyncCheckData {
     public long    noPwnageJoinTime;
     public String  noPwnageLastMessage;
     public long    noPwnageLastMessageTime;
-    public long    noPwnageLastMovedTime;
     public long    noPwnageLastWarningTime;
     public long    noPwnageLeaveTime;
     public int     noPwnageReloginWarnings;
@@ -89,7 +88,7 @@ public class ChatData extends AsyncCheckData {
         // colorVL <- is spared to avoid problems with spam + captcha success.
         noPwnageVL = 0;
         noPwnageSpeed.clear(System.currentTimeMillis());
-        noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastMovedTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
+        noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
         noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
     }
 

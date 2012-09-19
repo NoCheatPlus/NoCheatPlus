@@ -41,7 +41,7 @@ public class Combined {
 	 * @param worldName
 	 * @param data
 	 */
-	private static final void feedYawRate(final Player player, final float yaw, final long now, final String worldName, final CombinedData data) {
+	public static final void feedYawRate(final Player player, final float yaw, final long now, final String worldName, final CombinedData data) {
 		// Reset on world change or timeout.
 		if (now - data.lastYawTime > 999 || !worldName.equals(data.lastWorld)){
 			data.lastYaw = yaw;
@@ -70,7 +70,7 @@ public class Combined {
 	 * @param worldName
 	 * @return
 	 */
-	private static final boolean checkYawRate(Player player, float yaw, long now, final String worldName, final CombinedData data) {
+	public static final boolean checkYawRate(final Player player, final float yaw, final long now, final String worldName, final CombinedData data) {
 
 		feedYawRate(player, yaw, now, worldName, data);
 		

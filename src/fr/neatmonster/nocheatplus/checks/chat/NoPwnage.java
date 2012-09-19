@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
@@ -161,7 +162,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
 
         // NoPwnage will check if a player moved within the "timeout" timeframe. If he did not move, the suspicion will
         // be increased by "weight" value.
-        if (!isCommand && cc.noPwnageMoveCheck && now - data.noPwnageLastMovedTime > cc.noPwnageMoveTimeout)
+        if (!isCommand && cc.noPwnageMoveCheck && now - CombinedData.getData(player).lastMoveTime > cc.noPwnageMoveTimeout)
             suspicion += cc.noPwnageMoveWeight;
 
         // Should a player that reaches the "warnLevel" get a text message telling him that he is under suspicion of
