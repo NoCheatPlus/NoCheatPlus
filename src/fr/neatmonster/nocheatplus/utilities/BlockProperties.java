@@ -419,7 +419,7 @@ public class BlockProperties {
 		}
 		blocks[Material.IRON_BLOCK.getId()] = new BlockProps(stonePickaxe, 5, secToMs(25, 25, 1.9, 1.25, 0.95, 25));
 		blocks[Material.DIAMOND_BLOCK.getId()] = new BlockProps(ironPickaxe, 5, secToMs(25, 25, 25, 1.25, 0.95, 25));
-		blocks[Material.ENDER_CHEST.getId()] = new BlockProps(woodPickaxe, 22.5f, secToMs(112.5));
+		blocks[Material.ENDER_CHEST.getId()] = new BlockProps(woodPickaxe, 22.5f);
 		blocks[Material.OBSIDIAN.getId()] = new BlockProps(diamondPickaxe, 50, secToMs(250, 250, 250, 250, 9.4, 250));
 
 		for (Material mat : new Material[]{
