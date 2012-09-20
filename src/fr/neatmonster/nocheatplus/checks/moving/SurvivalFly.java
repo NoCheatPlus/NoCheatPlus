@@ -114,7 +114,11 @@ public class SurvivalFly extends Check {
             	hAllowedDistance = hAllowedDistance * cc.survivalFlySpeedingSpeed/ 100D;
         }
         
-     // TODO: Optimize: maybe only do the permission checks and modifiers if the distance is too big.
+        // TODO: Optimize: maybe only do the permission checks and modifiers if the distance is too big.
+        //       (Depending on permission plugin, with pex it will be hardly 1000 ns for all moving perms, if all false.)
+        // Set some flags:
+        final boolean fromOnGround = from.isOnGround();
+        final boolean toOnGround = to.isOnGround();
         
         // If the player is on ice, give him an higher maximum speed.
         if (data.survivalFlyOnIce > 0)
@@ -135,7 +139,7 @@ public class SurvivalFly extends Check {
         // Prevent players from walking on a liquid.
         // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
         if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D
-                && BlockProperties.isLiquid(to.getTypeId()) && !to.isOnGround()
+                && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround
                 && to.getY() % 1D < 0.8D)
             hDistanceAboveLimit = hDistance;
 
@@ -185,9 +189,9 @@ public class SurvivalFly extends Check {
 
         // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
         final double setBackYDistance = to.getY() - data.setBack.getY();
-        if (!from.isOnGround()
+        if (!fromOnGround
                 && (from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
-                        && setBackYDistance > 0D && setBackYDistance <= 1.5D || !to.isOnGround() && to.isAboveStairs())) {
+                        && setBackYDistance > 0D && setBackYDistance <= 1.5D || !toOnGround && to.isAboveStairs())) {
             // Set the new setBack and reset the jumpPhase.
             data.setBack = from.getLocation();
             data.setBack.setY(Math.floor(data.setBack.getY()));
@@ -198,7 +202,7 @@ public class SurvivalFly extends Check {
         data.survivalFlyLastFromY = from.getY();
 
         // Calculate the vertical speed limit based on the current jump phase.
-        double vAllowedDistance = (!from.isOnGround() && !to.isOnGround() ? 1.45D : 1.35D) + data.verticalFreedom;
+        double vAllowedDistance = (!fromOnGround && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
         vAllowedDistance *= data.jumpAmplifier;
         if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
             vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
@@ -206,11 +210,11 @@ public class SurvivalFly extends Check {
         double vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
 
         // Step can also be blocked.
-        if (from.isOnGround() && to.isOnGround() && Math.abs(to.getY() - from.getY() - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
+        if (fromOnGround && toOnGround && Math.abs(to.getY() - from.getY() - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
                 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP))
             vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(to.getY() - from.getY()));
 
-        if (from.isOnGround() || to.isOnGround())
+        if (fromOnGround || toOnGround)
             data.jumpAmplifier = 0D;
         
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
@@ -232,7 +236,7 @@ public class SurvivalFly extends Check {
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
                         to.getYaw(), to.getPitch());
-            else if (to.isInLiquid() || to.isInWeb() || to.isOnGround() || to.isOnLadder()) {
+            else if (to.isInLiquid() || to.isInWeb() || toOnGround || to.isOnLadder()) {
                 // In case it only gets logged, not stopped by NoCheatPlus, update the setback location at least a bit.
                 data.setBack = to.getLocation();
                 data.survivalFlyJumpPhase = 0;
@@ -246,17 +250,17 @@ public class SurvivalFly extends Check {
             data.setBack = to.getLocation();
             data.setBack.setY(Math.ceil(data.setBack.getY()));
             data.survivalFlyJumpPhase = 0;
-        } else if ((to.isInWeb() || to.isOnLadder() || to.isOnGround())
+        } else if ((to.isInWeb() || to.isOnLadder() || toOnGround)
                 && (from.getY() >= to.getY() || data.setBack.getY() <= Math.floor(to.getY()))) {
             // If the player moved down "onto" the ground and the new setback point is higher up than the old or at
             // least at the same height, or if the player is in web or on a ladder.
             data.setBack = to.getLocation();
             data.survivalFlyJumpPhase = 0;
         } else {
-            if (from.isInLiquid() || from.isOnGround() || from.isInWeb() || from.isOnGround())
+            if (from.isInLiquid() || fromOnGround || from.isInWeb() || fromOnGround)
                 data.setBack = from.getLocation();
-            if (from.isInLiquid() || to.isInLiquid() || from.isInWeb() || to.isInWeb() || from.isOnGround()
-                    || to.isOnGround() || from.isOnLadder() || to.isOnLadder())
+            if (from.isInLiquid() || to.isInLiquid() || from.isInWeb() || to.isInWeb() || fromOnGround
+                    || toOnGround || from.isOnLadder() || to.isOnLadder())
                 // The player at least touched the ground somehow.
                 data.survivalFlyJumpPhase = 0;
         }
