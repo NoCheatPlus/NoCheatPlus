@@ -51,6 +51,13 @@ public abstract class ConfPaths {
     public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED  = MISCELLANEOUS_NOMOVEDTOOQUICKLY + "enabled";
     public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY = MISCELLANEOUS_NOMOVEDTOOQUICKLY + "useproxy";
 
+    @GlobalConfig
+    private static final String DATA                                     = "data.";
+    private static final String DATA_EXPIRATION                          = DATA + "expiration.";
+	public static final String  DATA_EXPIRATION_DURATION                 = DATA_EXPIRATION + "duration";
+	public static final String  DATA_EXPIRATION_DATA                     = DATA_EXPIRATION + "data";
+	public static final String  DATA_EXPIRATION_HISTORY                  = DATA_EXPIRATION + "history";
+    
     private static final String CHECKS                                   = "checks.";
 
     /*

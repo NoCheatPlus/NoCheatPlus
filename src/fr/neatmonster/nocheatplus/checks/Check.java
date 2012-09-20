@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -55,6 +56,7 @@ public abstract class Check {
     public Check(final CheckType type) {
         this.type = type;
         ViolationHistory.checkTypeMap.put(getClass().getName(), type);
+        DataManager.registerExecutionHistory(type, histories);
     }
     
     /**

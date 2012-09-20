@@ -11,6 +11,7 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
@@ -44,7 +45,15 @@ public class RemovePlayerCommand extends NCPCommand {
 		
 		ViolationHistory hist = ViolationHistory.getHistory(playerName, false);
 		boolean histRemoved = false;
-		if (hist != null) histRemoved = hist.remove(checkType);
+		if (hist != null){
+			histRemoved = hist.remove(checkType);
+			if (checkType == CheckType.ALL){
+				histRemoved = true;
+				ViolationHistory.removeHistory(playerName);
+			}
+		}
+		
+		if (DataManager.removeExecutionHistory(checkType, playerName)) histRemoved = true;
 		
 		final boolean dataRemoved = CheckType.removeData(playerName, checkType);
 		

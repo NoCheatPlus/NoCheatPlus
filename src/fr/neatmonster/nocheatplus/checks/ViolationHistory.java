@@ -161,6 +161,10 @@ public class ViolationHistory {
     	else 
     		return null;
     }
+    
+    public static ViolationHistory removeHistory(final String playerName){
+    	return violationHistories.remove(playerName);
+    }
 
     /** The violation levels for every check. */
     private final List<ViolationLevel> violationLevels = new ArrayList<ViolationLevel>();

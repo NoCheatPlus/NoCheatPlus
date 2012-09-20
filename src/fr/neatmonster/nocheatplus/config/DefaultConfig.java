@@ -57,6 +57,10 @@ public class DefaultConfig extends ConfigFile {
 
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false);
+        
+        
+        set(ConfPaths.DATA_EXPIRATION_DURATION, 0);
+        set(ConfPaths.DATA_EXPIRATION_HISTORY, false);
 
         /*
          * 888 88b, 888                    888    888 88b,                        888    

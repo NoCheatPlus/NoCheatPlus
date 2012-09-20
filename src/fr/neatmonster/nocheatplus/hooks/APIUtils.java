@@ -27,6 +27,9 @@ public class APIUtils {
 
     /** Only the children. */
     private static final Map<CheckType, CheckType[]> childrenMap = new HashMap<CheckType, CheckType[]>();
+    
+    /** Check including children, for convenient iteration. */
+    private static final Map<CheckType, CheckType[]> withChildrenMap = new HashMap<CheckType, CheckType[]>();
 
     static {
         final Map<CheckType, Set<CheckType>> map = new HashMap<CheckType, Set<CheckType>>();
@@ -38,8 +41,15 @@ public class APIUtils {
                 if (isParent(other, type)) map.get(other).add(type);
             }
         }
-        for (final CheckType parent : map.keySet())
-            childrenMap.put(parent, map.get(parent).toArray(new CheckType[] {}));
+        for (final CheckType parent : map.keySet()){
+        	final Set<CheckType> set = map.get(parent);
+        	final CheckType[] a = new CheckType[set.size()];
+        	childrenMap.put(parent, set.toArray(a));
+        	final CheckType[] aw = new CheckType[set.size() + 1]; 
+        	set.toArray(aw);
+        	aw[set.size()] = parent;
+        	withChildrenMap.put(parent, aw);
+        }
     }
 
     /**
@@ -52,6 +62,18 @@ public class APIUtils {
      */
     public static final Collection<CheckType> getChildren(final CheckType type) {
         return Arrays.asList(childrenMap.get(type));
+    }
+    
+    /**
+     * Return an unmodifiable collection of the given check type with children. Always returns a collection, does 
+     * contain the check type itself.
+     * 
+     * @param type
+     *            the check type
+     * @return the children
+     */
+    public static final Collection<CheckType> getWithChildren(final CheckType type) {
+        return Arrays.asList(withChildrenMap.get(type));
     }
 
     /**

@@ -35,12 +35,14 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.config.INeedConfig;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.net.NCPNetServerHandler;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
@@ -150,15 +152,26 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     /** Is a new update available? */
     private boolean              updateAvailable = false;
     
+    /** Player data future stuff. */
+    protected final DataManager dataMan = new DataManager();
+    
     /**
-     * Convenience method to add to listeners and notifyReload lists.
-     * @param listener
+     * Convenience method to add components according to implemented interfaces,
+     * like Listener, INotifyReload, INeedConfig.<br>
+     * This must be done after the configuration has been initialized.
+     * @param obj
      */
-    private void addListener(final Listener listener){
-    	Bukkit.getPluginManager().registerEvents(listener, this);
-    	listeners.add(listener);
-    	if (listener instanceof INotifyReload){
-    		notifyReload.add((INotifyReload) listener);
+    private void addComponent(final Object obj){
+    	if (obj instanceof Listener){
+    		final Listener listener = (Listener) obj;
+    		Bukkit.getPluginManager().registerEvents(listener, this);
+    		listeners.add(listener);
+    	}
+    	if (obj instanceof INotifyReload){
+    		notifyReload.add((INotifyReload) obj);
+    		if (obj instanceof INeedConfig){
+    			((INeedConfig) obj).onReload();
+    		}
     	}
     }
     
@@ -216,7 +229,8 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // List the events listeners and register.
         Bukkit.getPluginManager().registerEvents(this, this);
-        for (final Listener listener : new Listener[]{
+        for (final Object obj : new Object[]{
+        	dataMan,
         	new BlockBreakListener(),
         	new BlockInteractListener(),
         	new BlockPlaceListener(),
@@ -228,7 +242,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         	new Workarounds(),
         	NCPExemptionManager.getListener(),
         }){
-        	addListener(listener);
+        	addComponent(obj);
         }
         
         // Register the commands handler.
@@ -239,6 +253,13 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         
         // Set up the tick task.
         TickTask.start(this);
+        
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			@Override
+			public void run() {
+				dataMan.checkExpiration();
+			}
+		}, 1207, 1207);
 
         ConfigFile config = ConfigManager.getConfigFile();
         
