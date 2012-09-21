@@ -274,6 +274,7 @@ public class PlayerLocation {
         z = (int) Math.floor(location.getZ());
         world = ((CraftWorld) location.getWorld()).getHandle();
 
+        typeId = typeIdBelow = null;
         aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = null;
         
         this.setyOnGround(yFreedom);
