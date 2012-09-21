@@ -257,7 +257,7 @@ public class SurvivalFly extends Check {
             data.setBack = to.getLocation();
             data.survivalFlyJumpPhase = 0;
         } else {
-            if (from.isInLiquid() || fromOnGround || from.isInWeb() || fromOnGround)
+            if (from.isInLiquid() || fromOnGround || from.isInWeb() || from.isOnLadder())
                 data.setBack = from.getLocation();
             if (from.isInLiquid() || to.isInLiquid() || from.isInWeb() || to.isInWeb() || fromOnGround
                     || toOnGround || from.isOnLadder() || to.isOnLadder())
