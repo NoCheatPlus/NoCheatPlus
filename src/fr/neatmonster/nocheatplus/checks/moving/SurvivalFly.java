@@ -250,19 +250,25 @@ public class SurvivalFly extends Check {
             data.setBack = to.getLocation();
             data.setBack.setY(Math.ceil(data.setBack.getY()));
             data.survivalFlyJumpPhase = 0;
-        } else if ((to.isInWeb() || to.isOnLadder() || toOnGround)
-                && (from.getY() >= to.getY() || data.setBack.getY() <= Math.floor(to.getY()))) {
-            // If the player moved down "onto" the ground and the new setback point is higher up than the old or at
-            // least at the same height, or if the player is in web or on a ladder.
+        } else if (to.isOnLadder() 
+        		||  (to.isInWeb() || toOnGround) && (from.getY() >= to.getY() || data.setBack.getY() <= Math.floor(to.getY()))) {
+        	// Set set back and jump phase, if:
+        	// 1. Moving onto ladder/vine.
+            /* 
+             * 2. If the player moved down "onto" the ground or in web and ...
+             *  the new setback point is higher up than the old or at
+             *  least at the same height.
+             */
             data.setBack = to.getLocation();
             data.survivalFlyJumpPhase = 0;
         } else {
-            if (from.isInLiquid() || fromOnGround || from.isInWeb() || from.isOnLadder())
-                data.setBack = from.getLocation();
-            if (from.isInLiquid() || to.isInLiquid() || from.isInWeb() || to.isInWeb() || fromOnGround
-                    || toOnGround || from.isOnLadder() || to.isOnLadder())
-                // The player at least touched the ground somehow.
-                data.survivalFlyJumpPhase = 0;
+            if (from.isInLiquid() || fromOnGround || from.isInWeb() || from.isOnLadder()){
+            	data.setBack = from.getLocation();
+                if ( to.isInLiquid() || to.isInWeb() || toOnGround || to.isOnLadder()){
+                    // The player at least touched the ground somehow.
+                    data.survivalFlyJumpPhase = 0;
+                }
+            }
         }
 
         return null;
