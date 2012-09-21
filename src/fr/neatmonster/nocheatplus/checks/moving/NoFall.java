@@ -46,10 +46,10 @@ public class NoFall extends Check {
      * @param to
      *            the to
      */
-    public void check(final Player player, final PlayerLocation from, final PlayerLocation to) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        final MovingData data = MovingData.getData(player);
-        
+    public void check(final Player player, final MovingData data, final MovingConfig cc) {
+	   	final PlayerLocation from = data.from;
+	    final PlayerLocation to = data.to;
+	        
         if (from.getY() > to.getY()){
         	// Reset the on ground properties only if necessary. 
         	if (from.getyOnGround() != cc.noFallyOnGround && (from.getY() - (double) Location.locToBlock(from.getY()) < cc.noFallyOnGround))

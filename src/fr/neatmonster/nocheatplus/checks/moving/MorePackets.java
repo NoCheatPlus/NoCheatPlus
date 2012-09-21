@@ -60,11 +60,12 @@ public class MorePackets extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to) {
+    public Location check(final Player player, final MovingData data, final MovingConfig cc) {
+   	    final PlayerLocation from = data.from;
+   	    final PlayerLocation to = data.to;
     	// Take time once, first:
     	final long time = System.currentTimeMillis();
     	
-        final MovingData data = MovingData.getData(player);
 
         Location newTo = null;
 

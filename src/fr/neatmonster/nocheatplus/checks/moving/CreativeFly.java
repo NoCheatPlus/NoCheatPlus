@@ -56,9 +56,9 @@ public class CreativeFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        final MovingData data = MovingData.getData(player);
+    public Location check(final Player player, final MovingData data, final MovingConfig cc) {
+    	 final PlayerLocation from = data.from;
+    	 final PlayerLocation to = data.to;
 
         // If we have no setback, define one now.
         if (data.setBack == null)

@@ -324,6 +324,7 @@ public class MovingListener implements Listener {
             return;
 
         final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
@@ -351,21 +352,21 @@ public class MovingListener implements Listener {
 
         if ((player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight()) && creativeFly.isEnabled(player))
             // If the player is handled by the creative fly check, execute it.
-            newTo = creativeFly.check(player, data.from, data.to);
+            newTo = creativeFly.check(player, data, cc);
         else if (survivalFly.isEnabled(player)) {
             // If he is handled by the survival fly check, execute it.
-            newTo = survivalFly.check(player, data.from, data.to);
+            newTo = survivalFly.check(player, data, cc);
             // If don't have a new location and if he is handled by the no fall check, execute it.
             if (newTo == null && noFall.isEnabled(player))
             	// NOTE: noFall might set yOnGround for the positions.
-                noFall.check(player, data.from, data.to);
+                noFall.check(player, data, cc);
         } else
             // He isn't handled by any fly check, clear his data.
             data.clearFlyData();
 
         if (newTo == null && morePackets.isEnabled(player))
             // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
-            newTo = morePackets.check(player, data.from, data.to);
+            newTo = morePackets.check(player, data, cc);
         else
             // Otherwise we need to clear his data.
             data.clearMorePacketsData();

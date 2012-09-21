@@ -77,9 +77,9 @@ public class SurvivalFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
-        final MovingData data = MovingData.getData(player);
+    public Location check(final Player player, final MovingData data, final MovingConfig cc) {
+   	    final PlayerLocation from = data.from;
+   	    final PlayerLocation to = data.to;
 
         // A player is considered sprinting if the flag is set and if he has enough food level.
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
