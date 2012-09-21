@@ -1,11 +1,11 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import net.minecraft.server.AxisAlignedBB;
-import net.minecraft.server.Block;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -194,7 +194,7 @@ public class PlayerLocation {
                         .floor(boundingBox.e - 0.001D); blockY++)
                     for (int blockZ = (int) Math.floor(boundingBox.c + 0.001D); blockZ <= (int) Math
                             .floor(boundingBox.f - 0.001D); blockZ++)
-                        if (world.getTypeId(blockX, blockY, blockZ) == Block.WEB.id)
+                        if (world.getTypeId(blockX, blockY, blockZ) == Material.WEB.getId())
                             inWeb = true;
             if (inWeb == null)
                 inWeb = false;
@@ -224,9 +224,9 @@ public class PlayerLocation {
     public boolean isOnIce() {
         if (onIce == null)
             if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
-                onIce = world.getTypeId(x, (int) Math.floor(boundingBox.b - 0.1D), z) == Block.ICE.id;
+                onIce = world.getTypeId(x, (int) Math.floor(boundingBox.b - 0.1D), z) == Material.ICE.getId();
             else
-                onIce = getTypeIdBelow() == Block.ICE.id;
+                onIce = getTypeIdBelow() == Material.ICE.getId();
         return onIce;
     }
 
@@ -238,7 +238,7 @@ public class PlayerLocation {
     public boolean isOnLadder() {
         if (onLadder == null){
         	final int typeId = getTypeId();
-        	onLadder = typeId == Block.LADDER.id || typeId == Block.VINE.id;
+        	onLadder = typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
         }
         return onLadder;
     }
