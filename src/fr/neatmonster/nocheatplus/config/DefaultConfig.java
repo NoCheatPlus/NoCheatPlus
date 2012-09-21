@@ -25,6 +25,10 @@ public class DefaultConfig extends ConfigFile {
      */
     public DefaultConfig() {
         super();
+        
+        
+        // General:
+        set(ConfPaths.SAVEBACKCONFIG, true);
 
         /*
          * 888                                 ,e,                  

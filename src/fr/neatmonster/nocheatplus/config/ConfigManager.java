@@ -169,7 +169,7 @@ public class ConfigManager {
                 globalConfig.load(globalFile);
                 // Quick shallow ugly fix: only save back if loading was successful.
                 try {
-                    globalConfig.save(globalFile);
+                    if (globalConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) globalConfig.save(globalFile);
                 } catch (final Exception e) {
                 	Bukkit.getLogger().severe("[NoCheatPlus] Could not save back config.yml (see exception below).");
                     e.printStackTrace();
@@ -242,7 +242,7 @@ public class ConfigManager {
             	worldConfig.load(worldFile);
                 worldsMap.put(worldEntry.getKey(), worldConfig);
                 try{
-                	worldConfig.save(worldFile);
+                	if (worldConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) worldConfig.save(worldFile);
                 } catch (final Exception e){
                 	Bukkit.getLogger().severe("[NoCheatPlus] Couldn't save back world-specific configuration for "
                             + worldEntry.getKey() + " (see exception below).");

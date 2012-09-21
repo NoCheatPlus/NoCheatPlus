@@ -13,6 +13,9 @@ package fr.neatmonster.nocheatplus.config;
  * Paths for the configuration options. Making everything final static prevents accidentally modifying any of these.
  */
 public abstract class ConfPaths {
+	
+	// General:
+	public static final String SAVEBACKCONFIG                            = "savebackconfig";
 
     /*
      * 888                                 ,e,                  
