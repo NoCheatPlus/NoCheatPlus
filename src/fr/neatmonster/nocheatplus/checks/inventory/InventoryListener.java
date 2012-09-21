@@ -164,7 +164,7 @@ public class InventoryListener implements Listener {
         if (drop.isEnabled(event.getPlayer()) && drop.check(event.getPlayer()))
             // Cancelling drop events is not save (in certain circumstances items will disappear completely). So don't
             // do it and kick players instead by default.
-            event.getPlayer().kickPlayer("You're not allowed to crash the server by dropping items!");
+            event.setCancelled(true);
         else         
         	// Combined speed:
             if (Improbable.check(event.getPlayer(), 1f, System.currentTimeMillis()))
