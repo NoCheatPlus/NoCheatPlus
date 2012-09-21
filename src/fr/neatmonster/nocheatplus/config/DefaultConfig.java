@@ -321,6 +321,8 @@ public class DefaultConfig extends ConfigFile {
          *                                                "8",P"  
          */
         set(ConfPaths.MOVING_CREATIVEFLY_CHECK, true);
+        set(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT, false);
+        set(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE, false);
         set(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED, 100);
         set(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT, 128);
         set(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED, 100);

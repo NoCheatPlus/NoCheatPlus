@@ -342,7 +342,7 @@ public class MovingListener implements Listener {
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
         
-        final double yOnGround = MovingConfig.getConfig(player).yOnGround;
+        final double yOnGround = cc.yOnGround;
         data.from.set(from, player, yOnGround);
         if (data.from.isOnGround())
             data.ground = data.from.getLocation();
@@ -350,7 +350,8 @@ public class MovingListener implements Listener {
 
         Location newTo = null;
 
-        if ((player.getGameMode() == GameMode.CREATIVE || player.getAllowFlight()) && creativeFly.isEnabled(player))
+        if ((!cc.ignoreCreative && player.getGameMode() == GameMode.CREATIVE || !cc.ignoreAllowFlight && player.getAllowFlight()) 
+        		&& creativeFly.isEnabled(player))
             // If the player is handled by the creative fly check, execute it.
             newTo = creativeFly.check(player, data, cc);
         else if (survivalFly.isEnabled(player)) {

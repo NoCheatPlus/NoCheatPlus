@@ -429,6 +429,8 @@ public abstract class ConfPaths {
 
     private static final String MOVING_CREATIVEFLY                       = MOVING + "creativefly.";
     public static final String  MOVING_CREATIVEFLY_CHECK                 = MOVING_CREATIVEFLY + "active";
+	public static final String  MOVING_CREATIVEFLY_IGNORECREATIVE        = MOVING_CREATIVEFLY + "ignorecreative";
+	public static final String  MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT     = MOVING_CREATIVEFLY + "ignoreallowflight";
     public static final String  MOVING_CREATIVEFLY_HORIZONTALSPEED       = MOVING_CREATIVEFLY + "horizontalspeed";
     public static final String  MOVING_CREATIVEFLY_MAXHEIGHT             = MOVING_CREATIVEFLY + "maxheight";
     public static final String  MOVING_CREATIVEFLY_VERTICALSPEED         = MOVING_CREATIVEFLY + "verticalspeed";

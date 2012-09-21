@@ -62,6 +62,10 @@ public class MovingConfig extends ACheckConfig {
         return worldsMap.get(player.getWorld().getName());
     }
 
+    
+	public final boolean    ignoreCreative;
+	public final boolean    ignoreAllowFlight;
+    
     public final boolean    creativeFlyCheck;
     public final int        creativeFlyHorizontalSpeed;
     public final int        creativeFlyMaxHeight;
@@ -90,7 +94,6 @@ public class MovingConfig extends ACheckConfig {
     public final double     noFallyOnGround;
     public final double     yOnGround;
 	public final double     yStep;
-    
 
     /**
      * Instantiates a new moving configuration.
@@ -99,6 +102,10 @@ public class MovingConfig extends ACheckConfig {
      *            the data
      */
     public MovingConfig(final ConfigFile data) {
+    	
+    	ignoreCreative = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE);
+    	ignoreAllowFlight = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);
+    	
         creativeFlyCheck = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
         creativeFlyHorizontalSpeed = data.getInt(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED);
         creativeFlyMaxHeight = data.getInt(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT);
