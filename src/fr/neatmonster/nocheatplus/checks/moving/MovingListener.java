@@ -27,6 +27,8 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
@@ -174,7 +176,7 @@ public class MovingListener implements Listener {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
 
-        if (survivalFly.isEnabled(player) && survivalFly.check(player) && data.ground != null)
+        if (!creativeFly.isEnabled(player) && survivalFly.isEnabled(player) && survivalFly.check(player) && data.ground != null)
             // To cancel the event, we simply teleport the player to his last safe location.
             player.teleport(data.ground);
     }
@@ -349,23 +351,29 @@ public class MovingListener implements Listener {
         data.to.set(to, player, yOnGround);
 
         Location newTo = null;
+        
+        // Optimized checking, giving creativefly permission precedence over survivalfly.
+        if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
+        	// Either survivalfly or speed check.
+        	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
+        			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
+                // If he is handled by the survival fly check, execute it.
+                newTo = survivalFly.check(player, data, cc);
+                // If don't have a new location and if he is handled by the no fall check, execute it.
+                if (newTo == null && cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL))
+                	// NOTE: noFall might set yOnGround for the positions.
+                    noFall.check(player, data, cc);
+        	}
+        	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY)){
+        		// If the player is handled by the creative fly check, execute it.
+                newTo = creativeFly.check(player, data, cc);
+        	}
+        	else data.clearFlyData();
+        }
+        else data.clearFlyData();
 
-        if ((!cc.ignoreCreative && player.getGameMode() == GameMode.CREATIVE || !cc.ignoreAllowFlight && player.getAllowFlight()) 
-        		&& creativeFly.isEnabled(player))
-            // If the player is handled by the creative fly check, execute it.
-            newTo = creativeFly.check(player, data, cc);
-        else if (survivalFly.isEnabled(player)) {
-            // If he is handled by the survival fly check, execute it.
-            newTo = survivalFly.check(player, data, cc);
-            // If don't have a new location and if he is handled by the no fall check, execute it.
-            if (newTo == null && noFall.isEnabled(player))
-            	// NOTE: noFall might set yOnGround for the positions.
-                noFall.check(player, data, cc);
-        } else
-            // He isn't handled by any fly check, clear his data.
-            data.clearFlyData();
-
-        if (newTo == null && morePackets.isEnabled(player))
+        if (newTo == null 
+        	 && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS))
             // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
             newTo = morePackets.check(player, data, cc);
         else
