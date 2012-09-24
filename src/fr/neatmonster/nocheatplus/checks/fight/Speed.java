@@ -72,11 +72,11 @@ public class Speed extends Check {
         if (max > cc.speedLimit) {
             // If there was lag, don't count it towards violation level.
             if (!LagMeasureTask.skipCheck())
-                data.speedVL += total - cc.speedLimit;
+                data.speedVL += max - cc.speedLimit;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.speedVL, total - cc.speedLimit, cc.speedActions);
+            cancel = executeActions(player, data.speedVL, max - cc.speedLimit, cc.speedActions);
         }
         else data.speedVL *= 0.96;
 
