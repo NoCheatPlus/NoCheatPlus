@@ -143,8 +143,6 @@ public class BlockBreakConfig extends ACheckConfig {
     	frequencyShortTermTicks = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_TICKS);
         frequencyActions = data.getActionList(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, Permissions.BLOCKBREAK_FREQUENCY);
         
-        improbableFastBreakCheck = data.getBoolean(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK);
-        
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
         noSwingActions = data.getActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, Permissions.BLOCKBREAK_NOSWING);
 

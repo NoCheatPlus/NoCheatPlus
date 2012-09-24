@@ -72,13 +72,14 @@ public class InventoryListener implements Listener {
         // Only if a player shot the arrow.
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
-            if (instantBow.isEnabled(player) && instantBow.check(player, event.getForce()))
-                // The check requested the event to be cancelled.
-                event.setCancelled(true);
-            else         
-            	// Combined speed:
-                if (Improbable.check(player, 1f, System.currentTimeMillis()))
+            if (instantBow.isEnabled(player)){
+            	if (instantBow.check(player, event.getForce()))
+            		 // The check requested the event to be cancelled.
+                    event.setCancelled(true);
+            	if (Improbable.check(player, 1f, System.currentTimeMillis()))
+            		// COmbined fighting speed.
                 	event.setCancelled(true);
+            }  
         }
     }
 
@@ -161,14 +162,20 @@ public class InventoryListener implements Listener {
         if (event.getPlayer().isDead())
             return;
 
-        if (drop.isEnabled(event.getPlayer()) && drop.check(event.getPlayer()))
-            // Cancelling drop events is not save (in certain circumstances items will disappear completely). So don't
-            // do it and kick players instead by default.
-            event.setCancelled(true);
-        else         
-        	// Combined speed:
-            if (Improbable.check(event.getPlayer(), 1f, System.currentTimeMillis()))
+        if (drop.isEnabled(event.getPlayer())){
+        	if (drop.check(event.getPlayer())){
+        		// TODO: Is the following command still correct? If so, adapt actions.
+                // Cancelling drop events is not save (in certain circumstances items will disappear completely). So don't
+                // do it and kick players instead by default.
+                event.setCancelled(true);
+        	}
+            else if (Improbable.check(event.getPlayer(), 1f, System.currentTimeMillis())){
+            	// Combined speed
             	event.setCancelled(true);
+            }
+        }
+
+
     }
 
     /**

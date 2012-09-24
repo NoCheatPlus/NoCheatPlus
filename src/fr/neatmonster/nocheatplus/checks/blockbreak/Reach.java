@@ -72,12 +72,6 @@ public class Reach extends Check {
         } else{
             // Player passed the check, reward him.
             data.reachVL *= 0.9D;
-            
-//        	// Check if improbable
-//            if (distance > -0.1){
-//            	if (Improbable.check(player, 1.0f, System.currentTimeMillis()))
-//            		cancel = true;
-//            }
         }
 
         return cancel;

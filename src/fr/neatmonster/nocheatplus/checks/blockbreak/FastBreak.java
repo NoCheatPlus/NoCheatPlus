@@ -97,11 +97,6 @@ public class FastBreak extends Check {
         }
     	 
     	 // (The break time is set in the listener).
-        
-//        // Combined speed:
-//        // TODO: use some value corresponding to allowed block breaking speed !
-//        if (cc.improbableFastBreakCheck && Improbable.check(player, 1f, now)) // <- the weight should reflect needed duration
-//        	cancel = true;
 
         return cancel;
     }

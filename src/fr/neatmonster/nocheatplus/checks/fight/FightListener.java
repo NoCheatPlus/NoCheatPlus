@@ -108,12 +108,6 @@ public class FightListener implements Listener {
         	final Player damagedPlayer = (Player) cbEntity;
         	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc))
         		cancelled = true;
-        	else{
-//            	// Check if improbable
-//            	if (Improbable.check(player, 2.0f, System.currentTimeMillis()))
-//            		cancelled = true;
-//            	CombinedData.getData((Player) cbEntity).improbableCount.add(System.currentTimeMillis(), -2.0f);
-        	}
         }
         
         if (cc.cancelDead){
