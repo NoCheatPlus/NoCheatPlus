@@ -47,8 +47,8 @@ public abstract class ConfPaths {
     public static final String  MISCELLANEOUS_ALLOWCLIENTMODS            = MISCELLANEOUS + "allowclientmods";
     public static final String  MISCELLANEOUS_OPINCONSOLEONLY            = MISCELLANEOUS + "opinconsoleonly";
     public static final String  MISCELLANEOUS_PROTECTPLUGINS             = MISCELLANEOUS + "protectplugins";
-//	public static final String  MISCELLANEOUS_CHECKFORUPDATES            = MISCELLANEOUS + "checkforupdates";
-//	public static final String  MISCELLANEOUS_READTIMEOUT                = MISCELLANEOUS + "readtimeout";
+	public static final String  MISCELLANEOUS_CHECKFORUPDATES            = MISCELLANEOUS + "checkforupdates";
+	public static final String  MISCELLANEOUS_UPDATETIMEOUT              = MISCELLANEOUS + "updatetimeout";
     public static final String  MISCELLANEOUS_REPORTTOMETRICS            = MISCELLANEOUS + "reporttometrics";
     private static final String MISCELLANEOUS_NOMOVEDTOOQUICKLY          = MISCELLANEOUS + "nomovedtooquickly.";
     public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED  = MISCELLANEOUS_NOMOVEDTOOQUICKLY + "enabled";

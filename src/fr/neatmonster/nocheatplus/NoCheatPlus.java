@@ -47,6 +47,7 @@ import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.Updates;
 
 /*
  * M"""""""`YM          MM'""""'YMM dP                           dP   MM"""""""`YM dP                   
@@ -295,35 +296,17 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
 //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
 //            // Is a new update available?
-//        	BufferedReader bufferedReader = null;
-//        	updateAvailable = false;
-//            try {
-//            	final String[] split = getDescription().getVersion().split("-b");
-//                final int currentVersion = Integer.parseInt(split[split.length - 1]);
-//                final URL url = new URL("http://nocheatplus.org:8080/job/NoCheatPlus/lastSuccessfulBuild/api/json");
-//                connection.setReadTimeout(config.getInt(ConfPaths.MISCELLANEOUS_READTIMEOUT, 4) * 1000);
-//                final URLConnection connection = url.openConnection();
-//              
-//                bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//                String line, content = "";
-//                while ((line = bufferedReader.readLine()) != null)
-//                    content += line;
-//                final int jenkinsVersion = Integer.parseInt(content.split("\"number\":")[1].split(",")[0]);
-//                updateAvailable = currentVersion < jenkinsVersion;
-//            } catch (final Exception e) {}
-//            finally{
-//            	if (bufferedReader != null) try{bufferedReader.close();}catch (IOException e){};
-//            }
+//        	final int timeout = config.getInt(ConfPaths.MISCELLANEOUS_UPDATETIMEOUT, 4) * 1000;
+//        	getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+//				@Override
+//				public void run() {
+//					updateAvailable = Updates.CheckForUpdatesTask(getDescription().getVersion(), timeout);
+//				}
+//			});
 //        }
 
-//        // Is the configuration outdated?
-//        try {
-//            final int currentVersion = Integer.parseInt(getDescription().getVersion().split("-b")[1]);
-//            final int configurationVersion = Integer.parseInt(
-//            		config.options().header().split("-b")[1].split("\\.")[0]);
-//            if (currentVersion > configurationVersion)
-//                configOutdated = true;
-//        } catch (final Exception e) {}
+        // Is the configuration outdated?
+        configOutdated = Updates.isConfigOutdated(getDescription().getVersion(), config);
         
         // Debug information about unknown blocks.
         // (Probably removed later.)
