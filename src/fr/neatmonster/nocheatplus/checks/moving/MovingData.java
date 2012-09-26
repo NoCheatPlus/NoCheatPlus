@@ -103,11 +103,11 @@ public class MovingData extends ACheckData {
     public boolean        survivalFlyWasInBed;
 
     // Locations shared between all checks.
-    public PlayerLocation from                     = new PlayerLocation();
+    public final PlayerLocation from   = new PlayerLocation();
     public Location       ground;
     public Location       setBack;
     public Location       teleported;
-    public PlayerLocation to                       = new PlayerLocation();
+    public final PlayerLocation to     = new PlayerLocation();
 
     /**
      * Clear the data of the fly checks.
