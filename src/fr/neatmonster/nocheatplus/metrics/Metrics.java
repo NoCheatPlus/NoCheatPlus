@@ -538,7 +538,8 @@ public class Metrics {
             connection = url.openConnection(Proxy.NO_PROXY);
         else
             connection = url.openConnection();
-
+        connection.setConnectTimeout(8000);
+        connection.setReadTimeout(16000);
         connection.setDoOutput(true);
         
         
