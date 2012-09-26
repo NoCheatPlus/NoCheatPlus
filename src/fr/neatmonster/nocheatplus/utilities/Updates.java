@@ -33,7 +33,7 @@ public class Updates {
 	 * @param updateTimeout
 	 * @return
 	 */
-	public static boolean CheckForUpdatesTask(String versionString, int updateTimeout) {
+	public static boolean checkForUpdates(String versionString, int updateTimeout) {
 		BufferedReader bufferedReader = null;
     	boolean updateAvailable = false;
         try {

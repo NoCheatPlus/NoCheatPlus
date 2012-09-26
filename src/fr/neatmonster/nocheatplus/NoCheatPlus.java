@@ -300,7 +300,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 //        	getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
 //				@Override
 //				public void run() {
-//					updateAvailable = Updates.CheckForUpdatesTask(getDescription().getVersion(), timeout);
+//					updateAvailable = Updates.checkForUpdates(getDescription().getVersion(), timeout);
 //				}
 //			});
 //        }
