@@ -280,7 +280,7 @@ public class SurvivalFly extends Check {
 		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
 		parameters.put(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ()));
 		parameters.put(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ()));
-		parameters.put(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", data.to.getLocation().subtract(data.from.getLocation()).lengthSquared()));
+		parameters.put(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", data.to.getLocation().subtract(data.from.getLocation()).length()));
 		return parameters;
 	}
     
