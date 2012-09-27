@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
@@ -18,8 +19,11 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.command.CommandHandler.NCPReloadEvent;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 public class ReloadCommand extends NCPCommand {
 	
@@ -70,6 +74,10 @@ public class ReloadCommand extends NCPCommand {
         Bukkit.getPluginManager().callEvent(new NCPReloadEvent());
 
         sender.sendMessage(TAG + "Configuration reloaded!");
+        final String info = "[NoCheatPlus] Configuration reloaded.";
+        if (!(sender instanceof ConsoleCommandSender)) Bukkit.getLogger().info(info);
+        final ConfigFile config = ConfigManager.getConfigFile();
+        if (config.getBoolean(ConfPaths.LOGGING_ACTIVE) && config.getBoolean(ConfPaths.LOGGING_FILE)) CheckUtils.fileLogger.info(info);
     }
 
 }
