@@ -67,7 +67,7 @@ public class MovingData extends ACheckData {
     public double         survivalFlyVL            = 0D;
 
     // Data shared between the fly checks.
-//    public int            bunnyhopDelay;
+    public int            bunnyhopDelay;
     public double         horizontalBuffer;
     public double         horizontalFreedom;
     public double         horizontalVelocityCounter;
@@ -113,7 +113,7 @@ public class MovingData extends ACheckData {
      * Clear the data of the fly checks.
      */
     public void clearFlyData() {
-//        bunnyhopDelay = 0;
+        bunnyhopDelay = 0;
         noFallFallDistance = 0D;
         survivalFlyJumpPhase = 0;
         setBack = null;

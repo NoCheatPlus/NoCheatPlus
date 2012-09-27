@@ -89,17 +89,17 @@ public class CreativeFly extends Check {
         // Finally, determine how far the player went beyond the set limits.
         double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
 
-//        final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
+        final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
 
-//        data.bunnyhopDelay--;
+        data.bunnyhopDelay--;
 
-//        if (resultH > 0 && sprinting)
-//            // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
-//            // again leads to a player moving almost twice as far in that step.
-//            if (data.bunnyhopDelay <= 0 && resultH < 0.4D) {
-//                data.bunnyhopDelay = 9;
-//                resultH = 0D;
-//            }
+        if (resultH > 0 && sprinting)
+            // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
+            // again leads to a player moving almost twice as far in that step.
+            if (data.bunnyhopDelay <= 0 && resultH < 0.4D) {
+                data.bunnyhopDelay = 9;
+                resultH = 0D;
+            }
 
         resultH *= 100D;
 
