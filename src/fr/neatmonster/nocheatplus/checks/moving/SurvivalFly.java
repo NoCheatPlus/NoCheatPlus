@@ -154,15 +154,15 @@ public class SurvivalFly extends Check {
             }
         }
 
-        data.bunnyhopDelay--;
+//        data.bunnyhopDelay--;
 
-        // Did he go too far?
-        if (hDistanceAboveLimit > 0 && sprinting)
-            // Try to treat it as a the "bunnyhop" problem.
-            if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
-                data.bunnyhopDelay = 9;
-                hDistanceAboveLimit = 0D;
-            }
+//        // Did he go too far?
+//        if (hDistanceAboveLimit > 0 && sprinting)
+//            // Try to treat it as a the "bunnyhop" problem.
+//            if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
+//                data.bunnyhopDelay = 9;
+//                hDistanceAboveLimit = 0D;
+//            }
 
         if (hDistanceAboveLimit > 0D) {
             // Try to consume the "buffer".
