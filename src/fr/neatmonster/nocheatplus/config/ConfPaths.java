@@ -450,6 +450,10 @@ public abstract class ConfPaths {
     private static final String MOVING_NOFALL                            = MOVING + "nofall.";
     public static final String  MOVING_NOFALL_CHECK                      = MOVING_NOFALL + "active";
     public static final String  MOVING_NOFALL_ACTIONS                    = MOVING_NOFALL + "actions";
+    
+    public static final String MOVING_PASSABLE                           = MOVING + "passable.";
+	public static final String MOVING_PASSABLE_CHECK                     = MOVING_PASSABLE + "active";
+	public static final String MOVING_PASSABLE_ACTIONS                   = MOVING_PASSABLE + "actions";
 
     private static final String MOVING_SURVIVALFLY                       = MOVING + "survivalfly.";
     public static final String  MOVING_SURVIVALFLY_CHECK                 = MOVING_SURVIVALFLY + "active";

@@ -95,6 +95,9 @@ public class MovingData extends ACheckData {
     public double         noFallFallDistance;
     public boolean        noFallOnGround;
     public boolean        noFallWasOnGround;
+    
+    // Passable check.
+    public double 	      passableVL;
 
     // Data of the survival fly check.
     public int            survivalFlyJumpPhase;

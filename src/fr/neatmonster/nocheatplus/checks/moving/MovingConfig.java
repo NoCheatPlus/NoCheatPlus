@@ -80,6 +80,9 @@ public class MovingConfig extends ACheckConfig {
 
     public final boolean    noFallCheck;
     public final ActionList noFallActions;
+    
+	public final boolean    passableCheck;
+	public final ActionList passableActions;
 
     public final boolean    survivalFlyCheck;
     public final int        survivalFlyBlockingSpeed;
@@ -121,6 +124,9 @@ public class MovingConfig extends ACheckConfig {
 
         noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
         noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
+        
+        passableCheck = data.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
+        passableActions = data.getActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
 
         survivalFlyCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
         // Default values are specified here because this settings aren't showed by default into the configuration file.
@@ -149,6 +155,8 @@ public class MovingConfig extends ACheckConfig {
             return noFallCheck;
         case MOVING_SURVIVALFLY:
             return survivalFlyCheck;
+        case MOVING_PASSABLE:
+        	return passableCheck;
         case MOVING_MOREPACKETS:
             return morePacketsCheck;
         case MOVING_MOREPACKETSVEHICLE:

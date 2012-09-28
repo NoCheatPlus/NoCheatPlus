@@ -75,6 +75,8 @@ public class MovingListener implements Listener {
 
     /** The survival fly check. */
     private final SurvivalFly        survivalFly        = new SurvivalFly();
+    
+    private final Passable passable = new Passable();
 
     /**
      * A workaround for players placing blocks below them getting pushed off the block by NoCheatPlus.
@@ -352,8 +354,11 @@ public class MovingListener implements Listener {
 
         Location newTo = null;
         
+        if (passable.isEnabled(player)) newTo = passable.check(player, data.from, data.to, data, cc);
+        
         // Optimized checking, giving creativefly permission precedence over survivalfly.
-        if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
+        if (newTo != null);
+        else if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
         	// Either survivalfly or speed check.
         	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){

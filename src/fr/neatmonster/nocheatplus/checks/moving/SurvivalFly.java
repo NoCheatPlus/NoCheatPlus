@@ -223,7 +223,7 @@ public class SurvivalFly extends Check {
 
         // Slowly reduce the level with each event.
         data.survivalFlyVL *= 0.95D;
-
+//        System.out.println("vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+")");
         // Did the player move in unexpected ways?
         if (result > 0D) {
             // Increment violation counter.

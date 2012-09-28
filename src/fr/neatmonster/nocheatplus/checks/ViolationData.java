@@ -145,5 +145,9 @@ public class ViolationData {
 		final String value = parameters.get(parameterName);
 		return(value == null) ? ("<?" + parameterName + ">") : value;
 	}
+	
+	public void setParameter(final ParameterName parameterName, String value){
+		if (parameters != null) parameters.put(parameterName, value);
+	}
    
 }

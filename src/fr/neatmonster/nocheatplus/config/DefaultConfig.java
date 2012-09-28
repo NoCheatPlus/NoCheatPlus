@@ -342,6 +342,9 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
         set(ConfPaths.MOVING_NOFALL_ACTIONS, "cancel vl>0 log:nofall:0:5:if cancel vl>6 log:nofall:0:5:icf cancel");
+        
+        set(ConfPaths.MOVING_PASSABLE_CHECK, true);
+        set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>5 log:passable:0:5:if cancel vl>50 log:passable:0:5:icf cancel");
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
@@ -408,6 +411,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
+        set(ConfPaths.STRINGS + ".passable", start + "moved into a block([blockid])" + end);
         set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");

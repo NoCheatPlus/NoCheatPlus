@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import net.minecraft.server.AxisAlignedBB;
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.IBlockAccess;
 import net.minecraft.server.WorldServer;
 
 import org.bukkit.Location;
@@ -298,6 +299,19 @@ public class PlayerLocation {
 	public Integer getTypeIdBelow() {
 		if (typeIdBelow == null) typeIdBelow = world.getTypeId(x, y - 1, z);
 		return typeIdBelow;
+	}
+
+	public final boolean isSameBlock(final PlayerLocation other) {
+		// Maybe make block coordinate fields later.
+		return Location.locToBlock(x) == Location.locToBlock(other.getX()) && Location.locToBlock(y) == Location.locToBlock(other.getY()) && Location.locToBlock(z) == Location.locToBlock(other.getZ());
+	}
+
+	/**
+	 * TODO: temp maybe
+	 * @return
+	 */
+	public final IBlockAccess getBlockAccess() {
+		return world;
 	}
 
 }

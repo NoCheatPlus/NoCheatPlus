@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.server.Block;
+import net.minecraft.server.IBlockAccess;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -236,8 +237,10 @@ public class BlockProperties {
     protected static final long[] blockFlags = new long[maxBlocks];
     
     /** Flag position for stairs. */
-    public static final int F_STAIRS = 0x1;
-    public static final int F_LIQUID = 0x2;
+    public static final int F_STAIRS 		= 0x1;
+    public static final int F_LIQUID 		= 0x2;
+    public static final int F_SOLID 		= 0x4;
+    public static final int F_IGN_SOLID 	= 0x8;
     
 	static{
 		try{
@@ -283,11 +286,19 @@ public class BlockProperties {
 		for (int i = 0; i <maxBlocks; i++){
 			blocks[i] = null;
 			blockFlags[i] = 0;
+			final net.minecraft.server.Block block = net.minecraft.server.Block.byId[i];
+			if (block != null){
+				if (block.material != null){
+					final net.minecraft.server.Material material = block.material;
+					if (material.isSolid()) blockFlags[i] |= F_SOLID;
+					if (material.isLiquid()) blockFlags[i] |= F_LIQUID;
+				}
+			}
 		}
 		// Stairs.
-		for (final Material mat : new Material[] {Material.WOOD_STAIRS, Material.COBBLESTONE_STAIRS,
-	            Material.BRICK_STAIRS, Material.SMOOTH_STAIRS, Material.NETHER_BRICK_STAIRS, Material.SANDSTONE_STAIRS,
-	            Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS}){
+		for (final Material mat : new Material[] {Material.NETHER_BRICK_STAIRS,
+				Material.COBBLESTONE_STAIRS, Material.SMOOTH_STAIRS, Material.BRICK_STAIRS,  Material.SANDSTONE_STAIRS,
+	            Material.WOOD_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS}){
 			blockFlags[mat.getId()] |= F_STAIRS;
 		}
 		// Liquid.
@@ -295,7 +306,13 @@ public class BlockProperties {
 				Material.LAVA, Material.STATIONARY_LAVA,
 				Material.STATIONARY_WATER, Material.WATER,
 		}) {
-			blockFlags[mat.getId()] |= F_LIQUID;	
+			blockFlags[mat.getId()] |= F_LIQUID;	// TODO: This might already be handled above now.
+		}
+		for (final Material mat : new Material[]{
+				Material.WOOD_PLATE, Material.STONE_PLATE, 
+				Material.WALL_SIGN, Material.SIGN_POST,
+		}){
+			blockFlags[mat.getId()] |= F_IGN_SOLID;
 		}
 		// Instantly breakable.
 		for (final Material mat : instantMat){
@@ -534,30 +551,6 @@ public class BlockProperties {
 		return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER));
 	}
 
-	public static boolean isInWater(final int blockId) {
-		if (blockId == Material.STATIONARY_WATER.getId() || blockId == Material.STATIONARY_LAVA.getId()) return true;
-		// TODO: count in water height ?
-		// TODO: lava ?
-		return false;
-	}
-
-
-	/**
-	 *  Heavy but ...
-	 * @param world
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public static boolean isOnGround(Player player, Location location) {
-//		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
-		final PlayerLocation loc = new PlayerLocation(); 
-		// Bit fat workaround, maybe put the object through from check listener ?
-		loc.set(location, player, 0.3);
-		return loc.isOnGround();
-	}
-
 
 	/**
 	 * Get the normal breaking duration, including enchantments, and tool properties.
@@ -724,6 +717,29 @@ public class BlockProperties {
 		blockProps.validate();
 		BlockProperties.defaultBlockProps = blockProps;
 	}
+	
+	public static boolean isInWater(final int blockId) {
+		if (blockId == Material.STATIONARY_WATER.getId() || blockId == Material.STATIONARY_LAVA.getId()) return true;
+		// TODO: count in water height ?
+		// TODO: lava ?
+		return false;
+	}
+
+	/**
+	 *  Heavy but ...
+	 * @param world
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public static boolean isOnGround(Player player, Location location) {
+//		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
+		final PlayerLocation loc = new PlayerLocation(); 
+		// Bit fat workaround, maybe put the object through from check listener ?
+		loc.set(location, player, 0.3);
+		return loc.isOnGround();
+	}
 
 	/**
 	 * Hiding the API access here.<br>
@@ -734,14 +750,82 @@ public class BlockProperties {
 	public static final boolean i(final int id) {
 		return Block.i(id);
 	}
+	
+	public static final long getBLockFlags(final int id){
+		return blockFlags[id];
+	}
 
+	public static final void setBlockFlags(final int id, final long flags){
+		blockFlags[id] = flags;
+	}
 
 	public static final boolean isStairs(final int id) {
 		return (blockFlags[id] & F_STAIRS) != 0;
 	}
 
 
-	public static boolean isLiquid(final int id) {
+	public static final boolean isLiquid(final int id) {
 		return (blockFlags[id] & F_LIQUID) != 0;
 	}
+	
+	/**
+	 * Might hold true for liquids too.
+	 * @param id
+	 * @return
+	 */
+	public static final boolean isSolid(final int id){
+		return (blockFlags[id] & F_SOLID) != 0;
+	}
+	
+	/**
+	 * Just check if a position is not inside of a block that has a bounding box.<br>
+	 * This is an inaccurate check, it also returns false for doors etc.
+	 * @param id
+	 * @return
+	 */
+	public static final boolean isPassable(final int id){
+		if ((blockFlags[id] & (F_LIQUID | F_IGN_SOLID)) != 0) return true;
+		else return (blockFlags[id] & F_SOLID) == 0;
+	}
+	
+	/**
+	 * Test if a position can be passed through.<br>
+	 * NOTE: This is experimental.
+	 * @param world
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param id
+	 * @return
+	 */
+	public static final boolean isPassable(final IBlockAccess blockAccess, final double x, final double y, final double z, final int id){
+		// Simple exclusion check first.
+		if (isPassable(id)) return true;
+		// Check if the position is inside of a bounding box.
+		final int bx = Location.locToBlock(x);
+		final int by = Location.locToBlock(y);
+		final int bz = Location.locToBlock(z);
+		final net.minecraft.server.Block block = net.minecraft.server.Block.byId[id];
+		if (block == null) return true;
+		block.updateShape(blockAccess, bx, by, bz);
+		final double fx = x - bx;
+		final double fy = y - by;
+		final double fz = z - bz;
+		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
+		else{
+			// Workarounds.
+			if (isStairs(id)){
+				if ((blockAccess.getData(bx, by, bz) & 0x4) == 1){
+					if (fy < 0.5) return true;
+				}
+				else if (fy >= 0.5) return true; 
+			}
+			else if ((id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()) && block.maxX == 1.0){
+				if (Math.abs(0.5 - fx) > 0.1 && Math.abs(0.5 - fz) > 0.1) return true;
+			}
+			// Nothing found.
+			return false;
+		}
+	}
+	
 }

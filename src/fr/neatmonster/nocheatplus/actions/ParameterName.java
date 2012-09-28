@@ -22,6 +22,7 @@ package fr.neatmonster.nocheatplus.actions;
  */
 public enum ParameterName {
     CHECK("check"),
+    BLOCK_ID("blockid"),
     DISTANCE("distance"),
     FALL_DISTANCE("falldistance"),
     FOOD("food"),
