@@ -815,14 +815,16 @@ public class BlockProperties {
 		else{
 			// Workarounds.
 			if (isStairs(id)){
-				if ((blockAccess.getData(bx, by, bz) & 0x4) == 1){
+				if ((blockAccess.getData(bx, by, bz) & 0x4) != 0){
 					if (fy < 0.5) return true;
 				}
 				else if (fy >= 0.5) return true; 
 			}
-			else if ((id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()) && block.maxX == 1.0){
+			else if ((id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()) 
+					&& block.maxX == 1.0 && block.maxZ == 1.0 && block.minX == 0.0 && block.minZ == 0.0){
 				if (Math.abs(0.5 - fx) > 0.1 && Math.abs(0.5 - fz) > 0.1) return true;
 			}
+			else if (id == Material.FENCE_GATE.getId() && (blockAccess.getData(bx, by, bz) & 0x4)!= 0) return true;
 			// Nothing found.
 			return false;
 		}
