@@ -92,6 +92,21 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
 		return hasPrefix(input.toCharArray());
 	}
 	
+	/**
+	 * Quick and dirty addition: Test if a prefix is contained which either matches the whole input or does not end inside of a word in the input, i.e. the inputs next character is a space.
+	 * @param lcMessage
+	 * @return
+	 */
+	public boolean hasPrefixWords(final String input) {
+		// TODO build this in in a more general way (super classes + stop symbol)!
+		final L result = lookup(input, false);
+		if (!result.hasPrefix) return false;
+		if (input.length() == result.depth) return true;
+		if (Character.isWhitespace(input.charAt(result.depth))) return true;
+		System.out.println(input + " -> " + result.depth + ":" + input.charAt(result.depth));
+		return false;
+	}
+	
 	public boolean isPrefix(final char[] chars){
 		return isPrefix(toCharacterList(chars));
 	}

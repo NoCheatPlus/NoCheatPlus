@@ -132,14 +132,15 @@ public class ChatListener implements Listener, INotifyReload {
         
         // Trim is necessary because the server accepts leading spaces with commands.
         // TODO: Maybe: only remove the leading whitespace or spaces.
-        final String command = event.getMessage().trim().split(" ")[0].substring(1).toLowerCase();
+        final String lcMessage = event.getMessage().trim().toLowerCase();
+        final String command = lcMessage.split(" ")[0].substring(1);
 
         final ChatConfig cc = ChatConfig.getConfig(player);
         
         // Protect some commands to prevent players for seeing which plugins are installed.
         if (cc.protectPlugins)
-            if ((command.equalsIgnoreCase("plugins") || command.equalsIgnoreCase("pl")
-                    || command.equalsIgnoreCase("version") || command.equalsIgnoreCase("ver"))
+            if ((command.equals("plugins") || command.equals("pl")
+                    || command.equals("version") || command.equals("ver"))
                     && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
                 event.getPlayer().sendMessage(
                         ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
@@ -159,12 +160,10 @@ public class ChatListener implements Listener, INotifyReload {
         // First the color check.
         if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), true));
         
-        final String lcMessage = event.getMessage().trim().toLowerCase();
-        
-        final boolean handleAsChat = chatCommands.hasPrefix(lcMessage);
+        final boolean handleAsChat = chatCommands.hasPrefixWords(lcMessage);
 
         // Then the no pwnage check.
-        if (!commandExclusions.hasPrefix(lcMessage) && noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), !handleAsChat, true))
+        if (!commandExclusions.hasPrefixWords(lcMessage) && noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), !handleAsChat, true))
         	event.setCancelled(true);
         else if (handleAsChat && globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), noPwnage, true))
         	event.setCancelled(true);
