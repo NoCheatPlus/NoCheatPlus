@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.players;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -121,5 +122,23 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 			if (map != null && map.remove(playerName) != null) removed = true;
 		}
 		return removed;
+	}
+
+	/**
+	 * Remove data and history of all players for the given check type and sub checks.
+	 * @param checkType
+	 */
+	public static void clear(final CheckType checkType) {
+		final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
+		for (final CheckType type : APIUtils.getWithChildren(checkType)){
+			final Map<String, ExecutionHistory> map = instance.executionHistories.get(type);
+			if (map != null) map.clear();
+			final CheckDataFactory factory = type.getDataFactory();
+			if (factory != null) factories.add(factory);
+		}
+		for (final CheckDataFactory factory : factories){
+			factory.removeAllData();
+		}
+		ViolationHistory.clear(checkType);
 	}
 }

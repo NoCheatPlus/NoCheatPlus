@@ -35,6 +35,11 @@ public class ChatData extends AsyncCheckData {
 		public ICheckData removeData(final String playerName) {
 			return ChatData.removeData(playerName);
 		}
+
+		@Override
+		public void removeAllData() {
+			clear();
+		}
 	};
 
     /** The map containing the data per players. */
@@ -47,15 +52,19 @@ public class ChatData extends AsyncCheckData {
      *            the player
      * @return the data
      */
-    public synchronized static ChatData getData(final Player player) {
+    public static synchronized ChatData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
             playersMap.put(player.getName(), new ChatData());
         return playersMap.get(player.getName());
     }
 
-    public synchronized static ICheckData removeData(final String playerName) {
+    public static synchronized ICheckData removeData(final String playerName) {
 		return playersMap.remove(playerName);
 	}
+    
+    public static synchronized void clear(){
+    	playersMap.clear();
+    }
 
 	// Violation levels.
     public double  captchaVL;

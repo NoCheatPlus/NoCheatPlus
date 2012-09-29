@@ -40,6 +40,12 @@ public class RemovePlayerCommand extends NCPCommand {
 		}
 		else checkType = CheckType.ALL;
 		
+		if (playerName.equals("*")){
+			DataManager.clear(checkType);
+			sender.sendMessage(TAG + "Removed all data and history: " + checkType);
+			return true;
+		}
+		
 		final Player player = Bukkit.getPlayerExact(playerName);
 		if (player != null) playerName = player.getName();
 		

@@ -44,4 +44,9 @@ public interface CheckDataFactory {
      */
     public ICheckData removeData(final String playerName);
 
+    /**
+     * Remove all data for all players.
+     */
+	public void removeAllData();
+
 }

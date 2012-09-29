@@ -44,6 +44,11 @@ public class BlockBreakData extends ACheckData {
 		public ICheckData removeData(final String playerName) {
 			return BlockBreakData.removeData(playerName);
 		}
+
+		@Override
+		public void removeAllData() {
+			clear();
+		}
 	};
 
     /** The map containing the data per players. */
@@ -65,6 +70,10 @@ public class BlockBreakData extends ACheckData {
     public static ICheckData removeData(final String playerName) {
 		return playersMap.remove(playerName);
 	}
+    
+    public static void clear(){
+    	playersMap.clear();
+    }
 
 	// Violation levels.
     public double  directionVL;

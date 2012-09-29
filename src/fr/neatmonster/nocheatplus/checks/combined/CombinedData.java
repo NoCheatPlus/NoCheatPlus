@@ -23,6 +23,11 @@ public class CombinedData extends ACheckData {
 		public ICheckData removeData(final String playerName) {
 			return CombinedData.removeData(playerName);
 		}
+
+		@Override
+		public void removeAllData() {
+			clear();
+		}
 	};
                                                     
     private static final Map<String, CombinedData> playersMap = new HashMap<String, CombinedData>();
@@ -40,6 +45,10 @@ public class CombinedData extends ACheckData {
 	public static ICheckData removeData(final String playerName) {
 		return playersMap.remove(playerName);
 	}
+	
+    public static void clear(){
+    	playersMap.clear();
+    }
 
 	public double improbableVL = 0;
 	public double speedVL = 0;
