@@ -109,9 +109,9 @@ public class CreativeFly extends Check {
         if (entity.hasEffect(MobEffectList.JUMP)) {
             final int amplifier = entity.getEffect(MobEffectList.JUMP).getAmplifier();
             if (amplifier > 20)
-                jumpAmplifier = 1.5D * (entity.getEffect(MobEffectList.JUMP).getAmplifier() + 1D);
+                jumpAmplifier = 1.5D * (amplifier + 1D);
             else
-                jumpAmplifier = 1.2D * (entity.getEffect(MobEffectList.JUMP).getAmplifier() + 1D);
+                jumpAmplifier = 1.2D * (amplifier + 1D);
         }
         if (jumpAmplifier > data.jumpAmplifier)
             data.jumpAmplifier = jumpAmplifier;

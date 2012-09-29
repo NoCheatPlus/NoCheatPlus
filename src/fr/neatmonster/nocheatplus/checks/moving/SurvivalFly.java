@@ -34,6 +34,17 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  * normal ground, while sprinting, sneaking, swimming, etc.
  */
 public class SurvivalFly extends Check {
+	
+	// Mostly horizontal speeds
+	public static final double sneakingSpeed 	= 0.13D;
+	public static final double walkingSpeed 	= 0.22D;
+	public static final double sprintingSpeed 	= 0.35D;
+	
+	public static final double blockingSpeed 	= 0.16D;
+	public static final double swimmingSpeed    = 0.11D;
+	public static final double webSpeed         = walkingSpeed * 0.15D;
+	
+	public static final double modIce			= 2.5D;
 
     /**
      * Instantiates a new survival fly check.
@@ -96,17 +107,23 @@ public class SurvivalFly extends Check {
 
         // Choose the right horizontal speed limit for the current activity.
         double hAllowedDistance = 0D;
-        if (from.isInWater() && to.isInWater())
-            hAllowedDistance = 0.11D * cc.survivalFlySwimmingSpeed / 100D;
+        if (from.isInWeb()){
+        	data.survivalFlyOnIce = 0;
+        	// TODO: if (from.isOnIce()) <- makes it even slower !
+        	// Roughly 15% of walking speed.
+        	hAllowedDistance = webSpeed * cc.survivalFlyWalkingSpeed / 100D;
+        }
+        else if (from.isInWater() && to.isInWater())
+            hAllowedDistance = swimmingSpeed * cc.survivalFlySwimmingSpeed / 100D;
         else if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
-            hAllowedDistance = 0.13D * cc.survivalFlySneakingSpeed / 100D;
+            hAllowedDistance = sneakingSpeed * cc.survivalFlySneakingSpeed / 100D;
         else if (player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
-            hAllowedDistance = 0.16D * cc.survivalFlyBlockingSpeed / 100D;
+            hAllowedDistance = blockingSpeed * cc.survivalFlyBlockingSpeed / 100D;
         else{
         	if (!sprinting)
-                hAllowedDistance = 0.22D * cc.survivalFlyWalkingSpeed / 100D;
+                hAllowedDistance = walkingSpeed * cc.survivalFlyWalkingSpeed / 100D;
             else
-                hAllowedDistance = 0.35D * cc.survivalFlySprintingSpeed / 100D;
+                hAllowedDistance = sprintingSpeed * cc.survivalFlySprintingSpeed / 100D;
         	
             // Speeding bypass permission (can be combined with other bypasses).
             // TODO: How exactly to bring it on finally.
@@ -122,7 +139,7 @@ public class SurvivalFly extends Check {
         
         // If the player is on ice, give him an higher maximum speed.
         if (data.survivalFlyOnIce > 0)
-            hAllowedDistance *= 2.5D;
+            hAllowedDistance *= modIce;
 
         // Taken directly from Minecraft code, should work.
         final EntityPlayer entity = ((CraftPlayer) player).getHandle();
@@ -180,9 +197,9 @@ public class SurvivalFly extends Check {
         if (entity.hasEffect(MobEffectList.JUMP)) {
             final int amplifier = entity.getEffect(MobEffectList.JUMP).getAmplifier();
             if (amplifier > 20)
-                jumpAmplifier = 1.5D * (entity.getEffect(MobEffectList.JUMP).getAmplifier() + 1D);
+                jumpAmplifier = 1.5D * (amplifier + 1D);
             else
-                jumpAmplifier = 1.2D * (entity.getEffect(MobEffectList.JUMP).getAmplifier() + 1D);
+                jumpAmplifier = 1.2D * (amplifier + 1D);
         }
         if (jumpAmplifier > data.jumpAmplifier)
             data.jumpAmplifier = jumpAmplifier;
@@ -202,18 +219,28 @@ public class SurvivalFly extends Check {
         data.survivalFlyLastFromY = from.getY();
 
         // Calculate the vertical speed limit based on the current jump phase.
-        double vAllowedDistance = (!fromOnGround && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
-        vAllowedDistance *= data.jumpAmplifier;
-        if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
-            vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
+        double vAllowedDistance, vDistanceAboveLimit;
+        if (from.isInWeb()){
+        	// Very simple: force players to descend or stay.
+         	vAllowedDistance = 0;
+        	data.jumpAmplifier = 0;
+        	final double vy = player.getVelocity().getY();
+        	vDistanceAboveLimit = vy;
+        }
+        else{
+        	vAllowedDistance = (!fromOnGround && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
+            vAllowedDistance *= data.jumpAmplifier;
+            if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
+                vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
 
-        double vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
+            vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
 
-        // Step can also be blocked.
-        if (fromOnGround && toOnGround && Math.abs(to.getY() - from.getY() - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
-                && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP))
-            vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(to.getY() - from.getY()));
+            // Step can also be blocked.
+            if (fromOnGround && toOnGround && Math.abs(to.getY() - from.getY() - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
+                    && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP))
+                vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(to.getY() - from.getY()));
 
+        }
         if (fromOnGround || toOnGround)
             data.jumpAmplifier = 0D;
         
