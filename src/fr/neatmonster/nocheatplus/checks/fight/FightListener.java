@@ -123,7 +123,7 @@ public class FightListener implements Listener {
         final boolean worldChanged = !worldName.equals(data.lastWorld);
         
         // Improbable yaw:
-        if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)){
+        if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck && !player.hasPermission(Permissions.FIGHT_ANGLE))){
         	cancelled = true;
         }
 
