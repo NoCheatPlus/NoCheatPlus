@@ -585,6 +585,10 @@ public class BlockProperties {
 				// 450, 200 , 100 , 50 , 0
 				return 450 / (long) Math.pow(2, efficiency - 1); 
 			}
+			else if (blockProps == chestType){
+				// TODO: The no tool time might be reference anyway for some block types.
+				return (long) ((double )blockProps.breakingTimes[0] / 5f / efficiency);
+			}
 		}
 		
 		long duration;
@@ -595,7 +599,7 @@ public class BlockProperties {
 			// appropriate tool
 			duration = blockProps.breakingTimes[toolProps.materialBase.index];
 			if (efficiency > 0){
-				duration = (long) (duration / blockProps.efficiencyMod);
+				duration = (long) (duration / blockProps.efficiencyMod / efficiency);
 			}
 		}
 		else{
@@ -820,6 +824,7 @@ public class BlockProperties {
 				}
 				else if (fy >= 0.5) return true; 
 			}
+			else if (id == Material.SOUL_SAND.getId() && fy >= 0.875) return true;
 			else if ((id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()) 
 					&& block.maxX == 1.0 && block.maxZ == 1.0 && block.minX == 0.0 && block.minZ == 0.0){
 				if (Math.abs(0.5 - fx) > 0.1 && Math.abs(0.5 - fz) > 0.1) return true;
