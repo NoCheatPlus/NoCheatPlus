@@ -662,6 +662,7 @@ public class BlockProperties {
 		if (!isValidTool && efficiency > 0){
 			// Efficiency makes the tool.
 			// (wood, sand, gravel, ice)
+			if (blockId == Material.SNOW.getId()) return toolProps.toolType == ToolType.SPADE;
 			if (blockId == Material.WOOL.getId()) return true;
 			if (blockProps.hardness <= 2 
 					&& (blockProps.tool.toolType == ToolType.AXE 
@@ -669,7 +670,7 @@ public class BlockProperties {
 					|| (blockProps.hardness < 0.8 && (blockId != Material.NETHERRACK.getId() && blockId != Material.SNOW.getId() && blockId != Material.SNOW_BLOCK.getId() && blockId != Material.STONE_PLATE.getId())))){
 				// Also roughly.
 				return true;
-			}	
+			}
 		}
 		return isValidTool;
 	}
