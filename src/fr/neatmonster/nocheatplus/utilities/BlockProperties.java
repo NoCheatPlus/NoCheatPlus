@@ -599,7 +599,7 @@ public class BlockProperties {
 			// appropriate tool
 			duration = blockProps.breakingTimes[toolProps.materialBase.index];
 			if (efficiency > 0){
-				duration = (long) (duration / blockProps.efficiencyMod / efficiency);
+				duration = (long) (duration / blockProps.efficiencyMod);
 			}
 		}
 		else{
