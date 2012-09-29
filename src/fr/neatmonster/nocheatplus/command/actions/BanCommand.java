@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 public class BanCommand extends DelayableCommand {
 
@@ -40,7 +41,7 @@ public class BanCommand extends DelayableCommand {
 			player.kickPlayer(reason);
 		OfflinePlayer offlinePlayer = Bukkit.getServer().getOfflinePlayer(name);
 		offlinePlayer.setBanned(true);
-		System.out.println("[NoCheatPlus] (" + sender.getName() + ") Banned " + offlinePlayer.getName() + " : " + reason);
+		CheckUtils.logInfo("[NoCheatPlus] (" + sender.getName() + ") Banned " + offlinePlayer.getName() + " : " + reason);
 	}
 
 }

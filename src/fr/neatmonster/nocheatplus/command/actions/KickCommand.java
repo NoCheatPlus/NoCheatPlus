@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 public class KickCommand extends DelayableCommand {
 
@@ -37,7 +38,7 @@ public class KickCommand extends DelayableCommand {
 		Player player = Bukkit.getPlayerExact(name);
 		if (player == null) return;
 		player.kickPlayer(reason);
-		System.out.println("[NoCheatPlus] (" + sender.getName() + ") Kicked " + player.getName() + " : " + reason);
+		CheckUtils.logInfo("[NoCheatPlus] (" + sender.getName() + ") Kicked " + player.getName() + " : " + reason);
 	}
 
 }

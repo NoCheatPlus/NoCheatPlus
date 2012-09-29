@@ -76,7 +76,7 @@ public class LogAction extends ActionWithParameters {
                         otherPlayer.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE
                                 + CheckUtils.replaceColors(message));
             if (toConsole && configurationFile.getBoolean(ConfPaths.LOGGING_CONSOLE))
-                System.out.println("[NoCheatPlus] " + CheckUtils.removeColors(message));
+                CheckUtils.logInfo("[NoCheatPlus] " + CheckUtils.removeColors(message));
             if (toFile && configurationFile.getBoolean(ConfPaths.LOGGING_FILE))
                 CheckUtils.fileLogger.info(CheckUtils.removeColors(message));
         }

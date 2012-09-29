@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.actions.types.CommandAction;
 import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
  * MMP"""""""MM            dP   oo                   MM""""""""`M                     dP                              
@@ -94,7 +95,7 @@ public class ActionFactory {
                 }
                 list.setActions(vl, createActions(def.split("\\s+")));
             } catch (final Exception e) {
-                System.out.println("[NoCheatPlus] Couldn't parse action definition 'vl:" + s + "'.");
+                CheckUtils.logWarning("[NoCheatPlus] Couldn't parse action definition 'vl:" + s + "'.");
             }
         }
 
@@ -117,7 +118,7 @@ public class ActionFactory {
             try {
                 actions.add(createAction(def));
             } catch (final IllegalArgumentException e) {
-                System.out.println("[NoCheatPlus] " + e.getMessage());
+            	CheckUtils.logWarning("[NoCheatPlus] Failed to create action: " + e.getMessage());
                 actions.add(new DummyAction(def));
             }
         }
@@ -148,7 +149,7 @@ public class ActionFactory {
                 delay = Integer.parseInt(parts[1]);
                 repeat = Integer.parseInt(parts[2]);
             } catch (final Exception e) {
-                System.out.println("[NoCheatPlus] Couldn't parse details of command '" + definition
+            	CheckUtils.logWarning("[NoCheatPlus] Couldn't parse details of command '" + definition
                         + "', will use default values instead.");
                 delay = 0;
                 repeat = 0;
@@ -185,7 +186,7 @@ public class ActionFactory {
             toChat = parts[3].contains("i");
             toFile = parts[3].contains("f");
         } catch (final Exception e) {
-            System.out.println("[NoCheatPlus] Couldn't parse details of log action '" + definition
+        	CheckUtils.logWarning("[NoCheatPlus] Couldn't parse details of log action '" + definition
                     + "', will use default values instead.");
             e.printStackTrace();
             delay = 0;

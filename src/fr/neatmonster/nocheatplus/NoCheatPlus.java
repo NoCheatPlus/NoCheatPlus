@@ -45,6 +45,7 @@ import fr.neatmonster.nocheatplus.net.NCPNetServerHandler;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.Updates;
@@ -209,7 +210,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         ConfigManager.cleanup();
 
         // Tell the server administrator the we finished unloading NoCheatPlus.
-        System.out.println("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
+        CheckUtils.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
     }
 
     /* (non-Javadoc)
@@ -313,7 +314,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false));
 
         // Tell the server administrator that we finished loading NoCheatPlus now.
-        System.out.println("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
+        CheckUtils.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
     }
 
     public void onPlayerJoinLow(final PlayerJoinEvent event) {

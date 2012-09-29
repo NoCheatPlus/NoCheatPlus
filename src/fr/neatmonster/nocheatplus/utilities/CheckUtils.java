@@ -288,4 +288,16 @@ public class CheckUtils {
 		else if (diff > Math.PI) return diff - 2.0 * Math.PI;
 		else return diff;
 	}
+	
+	public static void logSevere(final String msg) {
+		Bukkit.getLogger().severe((msg));
+	}
+
+	public static void logWarning(final String msg) {
+		Bukkit.getLogger().warning((msg));
+	}
+	
+	public static void logInfo(final String msg) {
+		Bukkit.getLogger().info((msg));
+	}
 }

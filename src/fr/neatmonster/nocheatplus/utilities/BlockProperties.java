@@ -454,8 +454,8 @@ public class BlockProperties {
 	public static void dumpBlocks(boolean all) {
 		List<String> missing = new LinkedList<String>();
 		if (all) {
-			System.out.println("[NoCheatPlus] Dump block properties for fastbreak check:");
-			System.out.println("--- Present entries -------------------------------");
+			CheckUtils.logInfo("[NoCheatPlus] Dump block properties for fastbreak check:");
+			CheckUtils.logInfo("--- Present entries -------------------------------");
 		}
 		for (int i = 0; i < blocks.length; i++){
 			String mat;
@@ -471,13 +471,13 @@ public class BlockProperties {
 				if (mat.equals("?")) continue;
 				missing.add("* MISSING "+i + "(" + mat +") ");
 			}
-			else if (all) System.out.println(i + ": (" + mat + ") " + blocks[i].toString());
+			else if (all) CheckUtils.logInfo(i + ": (" + mat + ") " + blocks[i].toString());
 		}
 		if (!missing.isEmpty()){
 			Bukkit.getLogger().warning("[NoCheatPlus] The block breaking data is incomplete, interpret some as stone :");
-			System.out.println("--- Missing entries -------------------------------");
+			CheckUtils.logWarning("--- Missing entries -------------------------------");
 			for (String spec : missing){
-				System.out.println(spec);
+				CheckUtils.logWarning(spec);
 			}
 		}
 	}
