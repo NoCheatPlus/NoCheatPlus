@@ -240,7 +240,7 @@ public class BlockProperties {
     public static final int F_STAIRS 		= 0x1;
     public static final int F_LIQUID 		= 0x2;
     public static final int F_SOLID 		= 0x4;
-    public static final int F_IGN_SOLID 	= 0x8;
+    public static final int F_IGN_PASSABLE 	= 0x8;
     
 	static{
 		try{
@@ -284,7 +284,12 @@ public class BlockProperties {
 	
 	private static void initBlocks() {
 		for (int i = 0; i <maxBlocks; i++){
-			blocks[i] = null;
+			blocks[i] = null; // hmmm
+		}
+		///////////////////////////
+		// Initalize block flags
+		///////////////////////////
+		for (int i = 0; i <maxBlocks; i++){
 			blockFlags[i] = 0;
 			final net.minecraft.server.Block block = net.minecraft.server.Block.byId[i];
 			if (block != null){
@@ -308,12 +313,17 @@ public class BlockProperties {
 		}) {
 			blockFlags[mat.getId()] |= F_LIQUID;	// TODO: This might already be handled above now.
 		}
+		// Ignore for passable.
 		for (final Material mat : new Material[]{
 				Material.WOOD_PLATE, Material.STONE_PLATE, 
 				Material.WALL_SIGN, Material.SIGN_POST,
 		}){
-			blockFlags[mat.getId()] |= F_IGN_SOLID;
+			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 		}
+		
+		////////////////////////////////
+		// Set block props.
+		////////////////////////////////
 		// Instantly breakable.
 		for (final Material mat : instantMat){
 			blocks[mat.getId()] = instantType;
@@ -447,8 +457,6 @@ public class BlockProperties {
 		}){
 			blocks[mat.getId()] = indestructibleType; 
 		}
-		
-//		dumpBlocks(true); // Do at startup maybe.
 	}
 	
 	public static void dumpBlocks(boolean all) {
@@ -789,7 +797,7 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static final boolean isPassable(final int id){
-		if ((blockFlags[id] & (F_LIQUID | F_IGN_SOLID)) != 0) return true;
+		if ((blockFlags[id] & (F_LIQUID | F_IGN_PASSABLE)) != 0) return true;
 		else return (blockFlags[id] & F_SOLID) == 0;
 	}
 	
@@ -818,19 +826,20 @@ public class BlockProperties {
 		final double fz = z - bz;
 		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
 		else{
-			// Workarounds.
+			// Workarounds (might get generalized some time).
 			if (isStairs(id)){
 				if ((blockAccess.getData(bx, by, bz) & 0x4) != 0){
 					if (fy < 0.5) return true;
 				}
 				else if (fy >= 0.5) return true; 
 			}
-			else if (id == Material.SOUL_SAND.getId() && fy >= 0.875) return true;
+			else if (id == Material.SOUL_SAND.getId() && fy >= 0.875) return true; // 0.125
 			else if ((id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()) 
 					&& block.maxX == 1.0 && block.maxZ == 1.0 && block.minX == 0.0 && block.minZ == 0.0){
 				if (Math.abs(0.5 - fx) > 0.1 && Math.abs(0.5 - fz) > 0.1) return true;
 			}
 			else if (id == Material.FENCE_GATE.getId() && (blockAccess.getData(bx, by, bz) & 0x4)!= 0) return true;
+			else if (id == Material.CAKE_BLOCK.getId() && fy >= 0.4375) return true; // 0.0625 = 0.125 / 2
 			// Nothing found.
 			return false;
 		}
