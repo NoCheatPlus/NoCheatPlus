@@ -121,11 +121,6 @@ public class FightListener implements Listener {
         final long now = System.currentTimeMillis();
         
         final boolean worldChanged = !worldName.equals(data.lastWorld);
-        
-        // Improbable yaw:
-        if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck && !player.hasPermission(Permissions.FIGHT_ANGLE))){
-        	cancelled = true;
-        }
 
         // Get the attacked entity.
         final net.minecraft.server.Entity damaged = ((CraftEntity) cbEntity).getHandle();
@@ -140,8 +135,19 @@ public class FightListener implements Listener {
         }
 
         
-        if (!cancelled && angle.isEnabled(player) && angle.check(player, worldChanged))
-            cancelled = true;
+        if (!cancelled && angle.isEnabled(player)){
+            // Improbable yaw.
+            if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)){
+            	// (Check or just feed).
+            	cancelled = true;
+            }
+            // Angle check.
+        	if (angle.check(player, worldChanged)) cancelled = true;
+        }
+        else{
+        	// Always feed yaw rate here.
+        	Combined.feedYawRate(player, player.getLocation().getYaw(), now, worldName);
+        }
 
         if (!cancelled && critical.isEnabled(player) && critical.check(player))
             cancelled = true;
