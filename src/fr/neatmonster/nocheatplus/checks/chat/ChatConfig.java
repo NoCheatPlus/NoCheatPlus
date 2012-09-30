@@ -67,6 +67,14 @@ public class ChatConfig extends AsyncCheckConfig {
             return worldsMap.get(player.getWorld().getName());
         }
     }
+    
+    public final boolean      captchaCheck;
+    public final String       captchaCharacters;
+    public final int          captchaLength;
+    public final String       captchaQuestion;
+    public final String       captchaSuccess;
+    public final int          captchaTries;
+    public final ActionList   captchaActions;
 
     public final boolean      colorCheck;
     public final ActionList   colorActions;
@@ -92,14 +100,6 @@ public class ChatConfig extends AsyncCheckConfig {
     public final boolean      noPwnageBannedCheck;
     public final long         noPwnageBannedTimeout;
     public final int          noPwnageBannedWeight;
-
-    public final boolean      noPwnageCaptchaCheck;
-    public final String       noPwnageCaptchaCharacters;
-    public final int          noPwnageCaptchaLength;
-    public final String       noPwnageCaptchaQuestion;
-    public final String       noPwnageCaptchaSuccess;
-    public final int          noPwnageCaptchaTries;
-    public final ActionList   noPwnageCaptchaActions;
 
     public final boolean      noPwnageFirstCheck;
     public final long         noPwnageFirstTimeout;
@@ -152,8 +152,17 @@ public class ChatConfig extends AsyncCheckConfig {
     	    	Permissions.CHAT_COLOR,
     	    	Permissions.CHAT_GLOBALCHAT,
     	    	Permissions.CHAT_NOPWNAGE,
-    	    	Permissions.CHAT_NOPWNAGE_CAPTCHA,
+    	    	Permissions.CHAT_CAPTCHA,
     	    });
+    	
+        captchaCheck = config.getBoolean(ConfPaths.CHAT_CAPTCHA_CHECK);
+        captchaCharacters = config.getString(ConfPaths.CHAT_CAPTCHA_CHARACTERS);
+        captchaLength = config.getInt(ConfPaths.CHAT_CAPTCHA_LENGTH);
+        captchaQuestion = config.getString(ConfPaths.CHAT_CAPTCHA_QUESTION);
+        captchaSuccess = config.getString(ConfPaths.CHAT_CAPTCHA_SUCCESS);
+        captchaTries = config.getInt(ConfPaths.CHAT_CAPTCHA_TRIES);
+        captchaActions = config.getActionList(ConfPaths.CHAT_CAPTCHA_ACTIONS, Permissions.CHAT_CAPTCHA);
+    	
         colorCheck = config.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = config.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
@@ -179,14 +188,6 @@ public class ChatConfig extends AsyncCheckConfig {
         noPwnageBannedCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
         noPwnageBannedTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);
         noPwnageBannedWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT);
-
-        noPwnageCaptchaCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK);
-        noPwnageCaptchaCharacters = config.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS);
-        noPwnageCaptchaLength = config.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH);
-        noPwnageCaptchaQuestion = config.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_QUESTION);
-        noPwnageCaptchaSuccess = config.getString(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS);
-        noPwnageCaptchaTries = config.getInt(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES);
-        noPwnageCaptchaActions = config.getActionList(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, Permissions.CHAT_NOPWNAGE_CAPTCHA);
 
         noPwnageFirstCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK);
         noPwnageFirstTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT);

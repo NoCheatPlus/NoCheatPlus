@@ -144,16 +144,28 @@ public class DefaultConfig extends ConfigFile {
          *  Y888  ,d 888 888 ,ee 888  888   
          *   "88,d88 888 888 "88 888  888   
          */
+        
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
+        
+        // Multi purpose.
+        set(ConfPaths.CHAT_HANDLEASCHAT, 
+        		new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
+        
+        // Captcha.
+        set(ConfPaths.CHAT_CAPTCHA_CHECK, false);
+        set(ConfPaths.CHAT_CAPTCHA_CHARACTERS, "abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789");
+        set(ConfPaths.CHAT_CAPTCHA_LENGTH, 6);
+        set(ConfPaths.CHAT_CAPTCHA_QUESTION, "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
+        set(ConfPaths.CHAT_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
+        set(ConfPaths.CHAT_CAPTCHA_TRIES, 3);
+        set(ConfPaths.CHAT_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:cf cancel cmd:kickcaptcha");
         
         // globalchat (ordering on purpose).
         set(ConfPaths.CHAT_GLOBALCHAT_CHECK, true);
         set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 80);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
         set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6);
-        set(ConfPaths.CHAT_HANDLEASCHAT, 
-        		new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
         set(ConfPaths.CHAT_GLOBALCHAT_GL_CHECK, true);
         set(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 0.5);
         set(ConfPaths.CHAT_GLOBALCHAT_GL_WORDS_CHECK, false);
@@ -175,16 +187,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT, 5000L);
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT, 100);
-
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHECK, false);
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_CHARACTERS,
-                "abcdefghjkmnpqrtuvwxyzABCDEFGHJKMNPQRTUVWXYZ2346789");
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_LENGTH, 6);
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_QUESTION,
-                "&cPlease type '&6[captcha]&c' to continue sending messages/commands.");
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_SUCCESS, "&aOK, it sounds like you're not a spambot.");
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_TRIES, 3);
-        set(ConfPaths.CHAT_NOPWNAGE_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:cf cancel cmd:kickcaptcha");
 
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);

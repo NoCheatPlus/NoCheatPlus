@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 /**
  * Captcha related operations.<br>
- * Auxiliary interface to avoid creating a new check type.
+ * Auxiliary interface, most methods should need sync over data, unless stated otherwise.
  * @author mc_dev
  *
  */
@@ -59,4 +59,18 @@ public interface ICaptcha {
      * @param data
      */
 	public void resetCaptcha(ChatConfig cc, ChatData data);
+	
+	/**
+	 * Convenience method. Should synchronize over data of player (!).
+	 * @param player
+	 */
+	public void resetCaptcha(Player player);
+
+	/**
+	 * Generate a captcha.
+	 * @param cc
+	 * @param data
+	 * @param reset If to reset tries.
+	 */
+	public void generateCaptcha(ChatConfig cc, ChatData data, boolean reset);
 }

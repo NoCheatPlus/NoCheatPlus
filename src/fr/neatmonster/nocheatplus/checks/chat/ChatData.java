@@ -70,35 +70,41 @@ public class ChatData extends AsyncCheckData {
     public double  captchaVL;
     public double  colorVL;
     public double  globalChatVL;
-    public double noPwnageVL;
+    public double  noPwnageVL;
+    
+    // Captcha data.
+    public int     captchTries;
+    public String  captchaGenerated;
+    public boolean captchaStarted;
     
     // Data of the globalchat check.
     public final ActionFrequency globalChatFrequency = new ActionFrequency(10, 3000);
 
-    // Data of the no pwnage check.
-    public int     noPwnageCaptchTries;
-    public String  noPwnageGeneratedCaptcha;
-    public boolean noPwnageHasStartedCaptcha;
+    // Data of the no pwnage check.    
     public long    noPwnageJoinTime;
+    
     public String  noPwnageLastMessage;
     public long    noPwnageLastMessageTime;
     public long    noPwnageLastWarningTime;
     public long    noPwnageLeaveTime;
+    
+    
     public int     noPwnageReloginWarnings;
     public long    noPwnageReloginWarningTime;
+    
     public final ActionFrequency noPwnageSpeed = new ActionFrequency(5, 1000);
 
     /**
      * Clear the data of the no pwnage check.
      */
     public synchronized void clearNoPwnageData() {
-        noPwnageCaptchTries = noPwnageReloginWarnings = 0;
+        captchTries = noPwnageReloginWarnings = 0;
         captchaVL = 0D;
         // colorVL <- is spared to avoid problems with spam + captcha success.
         noPwnageVL = 0;
         noPwnageSpeed.clear(System.currentTimeMillis());
         noPwnageJoinTime = noPwnageLastMessageTime = noPwnageLastWarningTime = noPwnageLeaveTime = noPwnageReloginWarningTime = 0L;
-        noPwnageGeneratedCaptcha = noPwnageLastMessage = "";
+        captchaGenerated = noPwnageLastMessage = "";
     }
 
 }

@@ -102,10 +102,14 @@ public class Permissions {
      *   "88,d88 888 888 "88 888  888   
      */
     private static final String CHAT                         = CHECKS + ".chat";
+    public static final String  CHAT_CAPTCHA                 = CHAT + ".captcha";
     public static final String  CHAT_COLOR                   = CHAT + ".color";
+    public static final String  CHAT_COMMANDS                = CHAT + ".commands";
     public static final String  CHAT_GLOBALCHAT              = CHAT + ".globalchat";
+    public static final String  CHAT_LOGINS                  = CHAT + ".logins";
+    public static final String  CHAT_RELOG                   = CHAT + ".relog";
+    
     public static final String  CHAT_NOPWNAGE                = CHAT + ".nopwnage";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA        = CHAT_NOPWNAGE + ".captcha";
     
     /*
      * Combined !

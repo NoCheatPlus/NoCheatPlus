@@ -62,9 +62,15 @@ public enum CheckType {
     BLOCKPLACE_SPEED(BLOCKPLACE, Permissions.BLOCKPLACE_SPEED),
 
     CHAT(ChatConfig.factory, ChatData.factory),
+    CHAT_CAPTCHA(CHAT, Permissions.CHAT_CAPTCHA),
     CHAT_COLOR(CHAT, Permissions.CHAT_COLOR),
-    CHAT_NOPWNAGE(CHAT, Permissions.CHAT_NOPWNAGE),
+    CHAT_COMMANDS(CHAT, Permissions.CHAT_COMMANDS),
     CHAT_GLOBALCHAT(CHAT, Permissions.CHAT_GLOBALCHAT),
+    CHAT_LOGINS(CHAT, Permissions.CHAT_LOGINS),
+    CHAT_RELOG(CHAT, Permissions.CHAT_RELOG),
+    // TOOD: remove nopwnage
+    CHAT_NOPWNAGE(CHAT, Permissions.CHAT_NOPWNAGE),
+    
     
     COMBINED(CombinedConfig.factory, CombinedData.factory),
     COMBINED_IMPROBABLE(COMBINED, Permissions.COMBINED_IMPROBABLE),

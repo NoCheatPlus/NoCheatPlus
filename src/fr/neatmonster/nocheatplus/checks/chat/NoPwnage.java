@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
 import java.util.Map;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,7 +10,6 @@ import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
-import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -27,7 +25,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 /**
  * The NoPwnage check will try to detect "spambots" (like the ones created by the PWN4G3 software).
  */
-public class NoPwnage extends AsyncCheck implements ICaptcha{
+public class NoPwnage extends AsyncCheck{
 
     /** The last message which caused ban said. */
     private String       lastBanCausingMessage;
@@ -40,10 +38,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
 
     /** The time it was when the last message was said. */
     private long         lastGlobalMessageTime;
-
-    /** The random number generator. */
-    private final Random random = new Random();
-
+    
     /**
      * Instantiates a new no pwnage check.
      */
@@ -56,13 +51,14 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
      * 
      * @param player
      *            the player
+     * @param captcha 
      * @param event
      *            the event
      * @param isMainThread
      *            is the thread the main thread
      * @return If to cancel the event.
      */
-    public boolean check(final Player player, final String message, final boolean isCommand, 
+    public boolean check(final Player player, final String message, final Captcha captcha, final boolean isCommand, 
     		final boolean isMainThread) {
 
         final ChatConfig cc = ChatConfig.getConfig(player);
@@ -70,7 +66,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
 
         // Keep related to ChatData/NoPwnage/Color used lock.
         synchronized (data) {
-            return unsafeCheck(player, message, isCommand, isMainThread, cc, data);
+            return unsafeCheck(player, message, captcha, isCommand, isMainThread, cc, data);
         }
     }
 
@@ -103,6 +99,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
      *            the player
      * @param message
      *            the message
+     * @param captcha 
      * @param isMainThread
      *            the is main thread
      * @param cc
@@ -111,14 +108,14 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
      *            the data
      * @return If to cancel the event.
      */
-    private boolean unsafeCheck(final Player player, final String message, final boolean isCommand,
+    private boolean unsafeCheck(final Player player, final String message, final Captcha captcha, final boolean isCommand,
     		final boolean isMainThread, final ChatConfig cc, final ChatData data) {
         boolean cancel = false;
 
         final long now = System.currentTimeMillis();
 
-        if (shouldCheckCaptcha(cc, data)) {
-            checkCaptcha(player, message, cc, data, isMainThread);
+        if (captcha.shouldCheckCaptcha(cc, data)) {
+            captcha.checkCaptcha(player, message, cc, data, isMainThread);
             // Cancel the event.
             return true;
         }
@@ -177,8 +174,8 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
             player.sendMessage(CheckUtils.replaceColors(cc.noPwnageWarnPlayerMessage));
             data.noPwnageLastWarningTime = now;
         } else if (suspicion > cc.noPwnageLevel)
-            if (shouldStartCaptcha(cc, data)) {
-                sendNewCaptcha(player, cc, data);
+            if (captcha.shouldStartCaptcha(cc, data)) {
+                captcha.sendNewCaptcha(player, cc, data);
                 cancel = true;
             } else {
                 lastBanCausingMessage = message;
@@ -212,88 +209,7 @@ public class NoPwnage extends AsyncCheck implements ICaptcha{
         return cancel;
     }
 
-    @Override
-    public void checkCaptcha(Player player, String message, ChatConfig cc, ChatData data, boolean isMainThread) {
-    	// Correct answer to the captcha?
-        if (message.equals(data.noPwnageGeneratedCaptcha)) {
-            // Yes, clear his data and do not worry anymore about him.
-            data.clearNoPwnageData();
-            data.noPwnageHasStartedCaptcha = false;
-            player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaSuccess));
-        } else {
-        	// Increment his tries number counter.
-            data.noPwnageCaptchTries++;
-            data.captchaVL ++;
-            // Does he failed too much times?
-            if (data.noPwnageCaptchTries > cc.noPwnageCaptchaTries) {
-                // Find out if we need to kick the player or not.
-                executeActions(player, data.captchaVL, 1, cc.noPwnageCaptchaActions, 
-                		isMainThread);
-                // (Resetting captcha tries is done on quit/kick).
-            }
 
-            // Display the question again (if not kicked).
-            if (player.isOnline())
-            	sendCaptcha(player, cc, data);
-        }
-	}
-
-    @Override
-	public void sendNewCaptcha(Player player, ChatConfig cc, ChatData data) {
-    	// Display a captcha to the player.
-        generateCaptcha(cc, data, true);
-        sendCaptcha(player, cc, data);
-        data.noPwnageHasStartedCaptcha = true;
-	}
-
-    /**
-     * Just generate captcha, reset tries if set so.
-     * @param cc
-     * @param data
-     * @param reset
-     */
-    public void generateCaptcha(ChatConfig cc, ChatData data, boolean reset) {
-    	if (reset) data.noPwnageCaptchTries = 0;
-    	data.noPwnageGeneratedCaptcha = "";
-        for (int i = 0; i < cc.noPwnageCaptchaLength; i++)
-            data.noPwnageGeneratedCaptcha += cc.noPwnageCaptchaCharacters.charAt(random
-                    .nextInt(cc.noPwnageCaptchaCharacters.length()));
-	}
-    
-    /**
-     * Reset captcha, synchronizes over ChatData instance for the player..
-     * @param player
-     */
-    public void resetCaptcha(Player player){
-    	ChatData data = ChatData.getData(player);
-    	synchronized (data) {
-    		resetCaptcha(ChatConfig.getConfig(player), data);
-		}
-    }
-    
-    @Override
-    public void resetCaptcha(ChatConfig cc, ChatData data){
-    	data.noPwnageCaptchTries = 0;
-    	if (shouldCheckCaptcha(cc, data) || shouldStartCaptcha(cc, data)){
-    		generateCaptcha(cc, data, true);
-    	}
-    }
-
-	@Override
-	public void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
-		player.sendMessage(CheckUtils.replaceColors(cc.noPwnageCaptchaQuestion.replace("[captcha]",
-                data.noPwnageGeneratedCaptcha)));
-	}
-
-    @Override
-	public boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
-		return cc.noPwnageCaptchaCheck && !data.noPwnageHasStartedCaptcha && !data.hasCachedPermission(Permissions.CHAT_NOPWNAGE_CAPTCHA);
-	}
-
-    @Override
-	public boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
-		return cc.noPwnageCaptchaCheck && data.noPwnageHasStartedCaptcha  && !data.hasCachedPermission(Permissions.CHAT_NOPWNAGE_CAPTCHA);
-	}
 
 	/**
      * Check (Join), only call from synchronized code.

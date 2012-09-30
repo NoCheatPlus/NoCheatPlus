@@ -42,6 +42,9 @@ public class ChatListener implements Listener, INotifyReload {
     /** The no pwnage check. */
     private final NoPwnage noPwnage = new NoPwnage();
     
+    /** Captcha handler. */
+    private final Captcha captcha = new Captcha();
+    
     /** Global chat check (experiment: alternative / supplement). */
     private final GlobalChat globalChat = new GlobalChat();
     
@@ -94,9 +97,9 @@ public class ChatListener implements Listener, INotifyReload {
         if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), false));
 
         // Then the no pwnage check.
-        if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), false, false))
+        if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, false, false))
         	event.setCancelled(true);
-        else if (globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), (ICaptcha) noPwnage, false))
+        else if (globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), captcha, false))
         	// Only check those that got through.
         	// (ICaptcha to start captcha if desired.)
         	event.setCancelled(true);
@@ -163,9 +166,9 @@ public class ChatListener implements Listener, INotifyReload {
         final boolean handleAsChat = chatCommands.hasPrefixWords(lcMessage);
 
         // Then the no pwnage check.
-        if (!commandExclusions.hasPrefixWords(lcMessage) && noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), !handleAsChat, true))
+        if (!commandExclusions.hasPrefixWords(lcMessage) && noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, !handleAsChat, true))
         	event.setCancelled(true);
-        else if (handleAsChat && globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), noPwnage, true))
+        else if (handleAsChat && globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), captcha, true))
         	event.setCancelled(true);
     }
 
@@ -195,7 +198,7 @@ public class ChatListener implements Listener, INotifyReload {
         TickTask.updatePermissions();
         
         // Reset captcha of player if needed.
-        noPwnage.resetCaptcha(player);
+        captcha.resetCaptcha(player);
         
         // Execute the no pwnage check.
         if (noPwnage.isEnabled(player) && noPwnage.checkLogin(player))

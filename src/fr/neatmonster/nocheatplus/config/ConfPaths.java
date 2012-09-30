@@ -180,6 +180,15 @@ public abstract class ConfPaths {
 	@GlobalConfig
 	public static final String CHAT_HANDLEASCHAT                         = CHAT + "handleaschat";
 
+    private static final String CHAT_CAPTCHA                    = CHAT + "captcha.";
+    public static final String  CHAT_CAPTCHA_CHECK              = CHAT_CAPTCHA + "active";
+    public static final String  CHAT_CAPTCHA_CHARACTERS         = CHAT_CAPTCHA + "characters";
+    public static final String  CHAT_CAPTCHA_LENGTH             = CHAT_CAPTCHA + "length";
+    public static final String  CHAT_CAPTCHA_QUESTION           = CHAT_CAPTCHA + "question";
+    public static final String  CHAT_CAPTCHA_SUCCESS            = CHAT_CAPTCHA + "success";
+    public static final String  CHAT_CAPTCHA_TRIES              = CHAT_CAPTCHA + "tries";
+    public static final String  CHAT_CAPTCHA_ACTIONS            = CHAT_CAPTCHA + "actions";
+	
     private static final String CHAT_COLOR                               = CHAT + "color.";
     public static final String  CHAT_COLOR_CHECK                         = CHAT_COLOR + "active";
     public static final String  CHAT_COLOR_ACTIONS                       = CHAT_COLOR + "actions";
@@ -235,15 +244,6 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_BANNED_CHECK               = CHAT_NOPWNAGE_BANNED + "active";
     public static final String  CHAT_NOPWNAGE_BANNED_TIMEOUT             = CHAT_NOPWNAGE_BANNED + "timeout";
     public static final String  CHAT_NOPWNAGE_BANNED_WEIGHT              = CHAT_NOPWNAGE_BANNED + "weight";
-
-    private static final String CHAT_NOPWNAGE_CAPTCHA                    = CHAT_NOPWNAGE + "captcha.";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA_CHECK              = CHAT_NOPWNAGE_CAPTCHA + "active";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA_CHARACTERS         = CHAT_NOPWNAGE_CAPTCHA + "characters";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA_LENGTH             = CHAT_NOPWNAGE_CAPTCHA + "length";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA_QUESTION           = CHAT_NOPWNAGE_CAPTCHA + "question";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA_SUCCESS            = CHAT_NOPWNAGE_CAPTCHA + "success";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA_TRIES              = CHAT_NOPWNAGE_CAPTCHA + "tries";
-    public static final String  CHAT_NOPWNAGE_CAPTCHA_ACTIONS            = CHAT_NOPWNAGE_CAPTCHA + "actions";
 
     private static final String CHAT_NOPWNAGE_FIRST                      = CHAT_NOPWNAGE + "first.";
     public static final String  CHAT_NOPWNAGE_FIRST_CHECK                = CHAT_NOPWNAGE_FIRST + "active";
