@@ -176,7 +176,7 @@ public class ChatListener implements Listener, INotifyReload {
      *            the event
      */
     @EventHandler(
-            priority = EventPriority.LOWEST)
+            priority = EventPriority.NORMAL)
     public void onPlayerLogin(final PlayerLoginEvent event) {
         /*
          *  ____  _                             _       _       
