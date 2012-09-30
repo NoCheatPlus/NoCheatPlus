@@ -4,8 +4,10 @@ import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
@@ -49,11 +51,12 @@ public class FastBreak extends Check {
         
         // First, check the game mode of the player and choose the right limit.
         final long breakingTime;
+        final int id = block.getTypeId();
         if (player.getGameMode() == GameMode.CREATIVE)
         	// Modifier defaults to 0, the Frequency check is responsible for those.
             breakingTime = Math.round((double) cc.fastBreakModCreative / 100D * (double) 100);
         else
-        	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockProperties.getBreakingDuration(block.getTypeId(), player));
+        	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockProperties.getBreakingDuration(id, player));
     	// fastBreakfirstDamage is the first interact on block (!).
         final long elapsedTime = (data.fastBreakBreakTime > data.fastBreakfirstDamage) ? 0 : now - data.fastBreakfirstDamage;
           
@@ -73,7 +76,9 @@ public class FastBreak extends Check {
     		if (data.fastBreakPenalties.getScore(cc.fastBreakBucketFactor) > cc.fastBreakBucketContention){
     			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
     			data.fastBreakVL += missingTime;
-    			cancel = executeActions(player, data.fastBreakVL, missingTime, cc.fastBreakActions);
+    			final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, missingTime, cc.fastBreakActions);
+    			vd.setParameter(ParameterName.BLOCK_ID, "" + id);
+    			cancel = executeActions(vd);
     		}
     		// else: still within contention limits.
     	}

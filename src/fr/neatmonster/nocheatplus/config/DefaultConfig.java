@@ -383,7 +383,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
-        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks faster than possible" + end);
+        set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
@@ -411,7 +411,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
-        set(ConfPaths.STRINGS + ".passable", start + "moved into a block([blockid])" + end);
+        set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid])" + end);
         set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
