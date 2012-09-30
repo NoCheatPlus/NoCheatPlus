@@ -131,13 +131,14 @@ public class ViolationData {
 	 * @return Will always return some string, if not set: "<?PARAMETERNAME>".
 	 */
 	public String getParameter(final ParameterName parameterName){
+		if (parameterName == null) return "<???>";
 		switch (parameterName) {
 		case CHECK:
 			return check.getClass().getSimpleName();
 		case PLAYER:
 			return player.getName();
 		case VIOLATIONS:
-			return String.valueOf(Math.round(vL));
+			return String.valueOf((long) Math.round(vL));
 		default:
 			break;
 		}

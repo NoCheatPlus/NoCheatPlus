@@ -59,13 +59,20 @@ public abstract class ActionWithParameters extends Action {
      */
     protected String getMessage(final ViolationData violationData) {
         // Should be big enough most of the time.
-        final StringBuilder log = new StringBuilder(100);
+        final StringBuilder log = new StringBuilder(150);
 
         for (final Object part : messageParts)
             if (part instanceof String)
                 log.append((String) part);
-            else
-                log.append(violationData.getParameter((ParameterName) part));
+            else if (part == null) log.append("[???]");
+            else{
+            	try{
+            		log.append(violationData.getParameter((ParameterName) part));
+            	}
+            	catch (Exception e){
+            		log.append(part.toString());
+            	}
+            }
 
         return log.toString();
     }
@@ -89,7 +96,7 @@ public abstract class ActionWithParameters extends Action {
             if (parts2.length != 2)
                 messageParts.add(message);
             else {
-                final ParameterName w = ParameterName.get(parts2[0]);
+                final ParameterName w = ParameterName.get(parts2[0].toLowerCase());
 
                 if (w != null) {
                     // Found an existing wildcard inbetween the braces.
