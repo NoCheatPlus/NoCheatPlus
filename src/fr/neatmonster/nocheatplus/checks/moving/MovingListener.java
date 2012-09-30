@@ -341,7 +341,7 @@ public class MovingListener implements Listener {
             data.verticalVelocityCounter--;
         if (data.verticalVelocityCounter > 0D) {
             data.verticalFreedom += data.verticalVelocity;
-            data.verticalVelocity *= 0.90D;
+            data.verticalVelocity *= 0.93D;
         } else if (data.verticalFreedom > 0.001D)
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;

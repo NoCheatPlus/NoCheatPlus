@@ -209,6 +209,7 @@ public class SurvivalFly extends Check {
         if (!fromOnGround
                 && (from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
                         && setBackYDistance > 0D && setBackYDistance <= 1.5D || !toOnGround && to.isAboveStairs())) {
+//        	System.out.println("*** reset setback.");
             // Set the new setBack and reset the jumpPhase.
             data.setBack = from.getLocation();
             data.setBack.setY(Math.floor(data.setBack.getY()));
@@ -230,10 +231,14 @@ public class SurvivalFly extends Check {
         else{
         	vAllowedDistance = (!fromOnGround && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
             vAllowedDistance *= data.jumpAmplifier;
-            if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier)
-                vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
+            if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier && data.verticalVelocityCounter <= 0){
+            	vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
+//            	System.out.println("jumpphase -> " + data.survivalFlyJumpPhase);
+            }
 
             vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
+            
+//            System.out.println("vda = " +vDistanceAboveLimit + " / vc = " + data.verticalVelocityCounter + " / vf = " + data.verticalFreedom + " / v = " + player.getVelocity().length());
 
             // Step can also be blocked.
             if (fromOnGround && toOnGround && Math.abs(to.getY() - from.getY() - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
