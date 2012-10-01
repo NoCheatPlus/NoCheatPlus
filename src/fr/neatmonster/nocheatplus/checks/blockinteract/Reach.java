@@ -53,7 +53,7 @@ public class Reach extends Check {
 
         boolean cancel = false;
 
-        final double distanceLimit = player.getGameMode() == GameMode.SURVIVAL ? SURVIVAL_DISTANCE : CREATIVE_DISTANCE;
+        final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE;
 
         // Distance is calculated from eye location to center of targeted block. If the player is further away from his
         // target than allowed, the difference will be assigned to "distance".

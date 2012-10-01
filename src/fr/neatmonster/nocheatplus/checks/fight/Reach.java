@@ -56,7 +56,7 @@ public class Reach extends Check {
 
         boolean cancel = false;
 
-        final double distanceLimit = player.getGameMode() == GameMode.SURVIVAL ? SURVIVAL_DISTANCE : CREATIVE_DISTANCE;
+        final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE;
         
         // Reference locations to check distance for.
         // TODO: improve reference location: depending on height difference choose min(foot/hitbox, attacker)
