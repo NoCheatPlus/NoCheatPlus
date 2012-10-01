@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 
 /*
@@ -191,6 +193,8 @@ public class BlockPlaceListener implements Listener {
             break;
         case THROWN_EXP_BOTTLE:
             break;
+        case SPLASH_POTION:
+            break;
         default:
             return;
         }
@@ -198,8 +202,18 @@ public class BlockPlaceListener implements Listener {
         final Player player = (Player) event.getEntity().getShooter();
 
         // Do the actual check...
-        if (speed.isEnabled(player) && speed.check(player))
-            // If the check was positive, cancel the event.
-            event.setCancelled(true);
+        if (speed.isEnabled(player)){
+            final long now = System.currentTimeMillis();
+            final Location loc = player.getLocation();
+            if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName()))
+                event.setCancelled(true);
+            if (speed.check(player))
+                // If the check was positive, cancel the event.
+                event.setCancelled(true);
+            else if (Improbable.check(player, 1f, now))
+                // COmbined fighting speed.
+                event.setCancelled(true);
+        }
+          
     }
 }

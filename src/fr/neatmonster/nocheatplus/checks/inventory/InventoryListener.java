@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +14,7 @@ import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 
 /*
@@ -73,10 +75,15 @@ public class InventoryListener implements Listener {
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
             if (instantBow.isEnabled(player)){
+                final long now = System.currentTimeMillis();
+                final Location loc = player.getLocation();
+                if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName()))
+                    event.setCancelled(true);
+                // Still check instantBow.
             	if (instantBow.check(player, event.getForce()))
             		 // The check requested the event to be cancelled.
                     event.setCancelled(true);
-            	if (Improbable.check(player, 1f, System.currentTimeMillis()))
+            	else if (Improbable.check(player, 1f, now))
             		// COmbined fighting speed.
                 	event.setCancelled(true);
             }  
