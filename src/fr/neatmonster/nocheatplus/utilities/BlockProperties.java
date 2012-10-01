@@ -844,5 +844,23 @@ public class BlockProperties {
 			return false;
 		}
 	}
+
+	/**
+	 * Convenience method for debugging purposes. 
+	 * @param loc
+	 * @return
+	 */
+	public static final boolean isPassable(final PlayerLocation loc) {
+		return isPassable(loc.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), loc.getTypeId());
+	}
+	
+	/**
+	 * Convenience method for debugging purposes. 
+	 * @param loc
+	 * @return
+	 */
+	public static final boolean isPassable(final Location loc) {
+		return isPassable(((org.bukkit.craftbukkit.CraftWorld) loc.getWorld()).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getBlock().getTypeId());
+	}
 	
 }
