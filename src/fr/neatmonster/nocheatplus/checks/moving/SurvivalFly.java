@@ -272,6 +272,7 @@ public class SurvivalFly extends Check {
 //        System.out.println("hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (to.getY() - from.getY()) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance + " / from passable: " + BlockProperties.isPassable(from));
 //        System.out.println(from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()) ;
         if (result > 0D) {
+//            System.out.println(BlockProperties.isStairs(from.getTypeIdBelow()) + " / " + BlockProperties.isStairs(to.getTypeIdBelow()));
             // Increment violation counter.
             data.survivalFlyVL += result;
 

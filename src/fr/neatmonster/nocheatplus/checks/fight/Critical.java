@@ -70,7 +70,8 @@ public class Critical extends Check {
                 cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
             }
         }
-
+        
+        location.cleanup(); // Slightly better for gc.
 
         return cancel;
     }

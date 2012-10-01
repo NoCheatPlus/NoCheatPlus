@@ -234,6 +234,8 @@ public class BlockProperties {
 		Material.CROPS,
 	};
 	
+	private static final PlayerLocation pLoc = new PlayerLocation();
+	
     protected static final long[] blockFlags = new long[maxBlocks];
     
     /** Flag position for stairs. */
@@ -748,10 +750,11 @@ public class BlockProperties {
 	 */
 	public static boolean isOnGround(Player player, Location location) {
 //		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
-		final PlayerLocation loc = new PlayerLocation(); 
 		// Bit fat workaround, maybe put the object through from check listener ?
-		loc.set(location, player, 0.3);
-		return loc.isOnGround();
+		pLoc.set(location, player, 0.3);
+		final boolean onGround = pLoc.isOnGround();
+		pLoc.cleanup();
+		return onGround;
 	}
 
 	/**

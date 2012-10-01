@@ -392,6 +392,9 @@ public class MovingListener implements Listener {
             // Remember where we send the player to.
             data.teleported = newTo;
         }
+        // Cleanup.
+        data.from.cleanup();
+        data.to.cleanup();
     }
 
     /**

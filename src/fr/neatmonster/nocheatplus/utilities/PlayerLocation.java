@@ -7,6 +7,7 @@ import net.minecraft.server.WorldServer;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -39,9 +40,6 @@ public class PlayerLocation {
     
     /** Type id of the block below. */
     private Integer typeIdBelow;
-    
-    /** The original location. */
-    private Location                location;
 
     /** Is the player above stairs? */
     private Boolean                 aboveStairs;
@@ -73,11 +71,19 @@ public class PlayerLocation {
     /** The entity player. */
     private EntityPlayer            entity;
 
-    /** The x, y and z coordinates. */
-    private int                     x, y, z;
+    /** The  block coordinates. */
+    private int                     blockX, blockY, blockZ;
+    
+    /** The exact coordinates. */
+    private double x,y,z;
+    
+    private float yaw, pitch;
 
-    /** The world. */
-    private WorldServer             world;
+    /** Bukkit world. */
+    private World                   world;
+    
+    /** The worldServer. */
+    private WorldServer             worldServer;
 
     /**
      * Gets the location.
@@ -85,34 +91,34 @@ public class PlayerLocation {
      * @return the location
      */
     public Location getLocation() {
-        return location;
+        return new Location(world, x, y, z);
     }
 
     /**
-     * Gets the pitch.
+     * Gets the blockX.
      * 
-     * @return the pitch
-     */
-    public float getPitch() {
-        return location.getPitch();
-    }
-
-    /**
-     * Gets the x.
-     * 
-     * @return the x
+     * @return the blockX
      */
     public double getX() {
-        return location.getX();
+        return x;
     }
 
     /**
-     * Gets the y.
+     * Gets the boundY.
      * 
-     * @return the y
+     * @return the boundY
      */
     public double getY() {
-        return location.getY();
+        return y;
+    }
+    
+    /**
+     * Gets the blockZ.
+     * 
+     * @return the blockZ
+     */
+    public double getZ() {
+        return z;
     }
 
     /**
@@ -121,16 +127,28 @@ public class PlayerLocation {
      * @return the yaw
      */
     public float getYaw() {
-        return location.getYaw();
+        return yaw;
     }
-
+    
     /**
-     * Gets the z.
+     * Gets the pitch.
      * 
-     * @return the z
+     * @return the pitch
      */
-    public double getZ() {
-        return location.getZ();
+    public float getPitch() {
+        return pitch;
+    }
+    
+    public int getBlockX(){
+        return blockX;
+    }
+    
+    public int getBlockY(){
+        return blockY;
+    }
+    
+    public int getBlockZ(){
+        return blockZ;
     }
 
     /**
@@ -153,7 +171,7 @@ public class PlayerLocation {
         if (inLava == null) {
             AxisAlignedBB boundingBoxLava = boundingBox.clone();
             boundingBoxLava = boundingBoxLava.grow(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D);
-            inLava = world.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
+            inLava = worldServer.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
         }
         return inLava;
     }
@@ -177,7 +195,7 @@ public class PlayerLocation {
             AxisAlignedBB boundingBoxWater = boundingBox.clone();
             boundingBoxWater = boundingBoxWater.grow(0.0D, -0.40000000596046448D, 0.0D);
             boundingBoxWater = boundingBoxWater.shrink(0.001D, 0.001D, 0.001D);
-            inWater = world.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
+            inWater = worldServer.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
         }
         return inWater;
     }
@@ -195,7 +213,7 @@ public class PlayerLocation {
                         .floor(boundingBox.e - 0.001D); blockY++)
                     for (int blockZ = (int) Math.floor(boundingBox.c + 0.001D); blockZ <= (int) Math
                             .floor(boundingBox.f - 0.001D); blockZ++)
-                        if (world.getTypeId(blockX, blockY, blockZ) == Material.WEB.getId())
+                        if (worldServer.getTypeId(blockX, blockY, blockZ) == Material.WEB.getId())
                             inWeb = true;
             if (inWeb == null)
                 inWeb = false;
@@ -212,8 +230,15 @@ public class PlayerLocation {
         if (onGround == null) {
             AxisAlignedBB boundingBoxGround = boundingBox.clone();
             boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
-            onGround = world.getCubes(entity, boundingBoxGround).size() > 0;
+            onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
         }
+//        if (!onGround){
+//            double y = this.getY() - this.blockY;
+//            // TODO: maybe make an auxiliary method in BlockProperties (can stand on ? id, boundY)
+//            if (y < 0) y += 1D;
+//            final int id = getTypeId();
+//            if (y >= 0.5 && BlockProperties.isStairs(id)) onGround = true;
+//        }
         return onGround;
     }
 
@@ -225,7 +250,7 @@ public class PlayerLocation {
     public boolean isOnIce() {
         if (onIce == null)
             if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
-                onIce = world.getTypeId(x, (int) Math.floor(boundingBox.b - 0.1D), z) == Material.ICE.getId();
+                onIce = worldServer.getTypeId(blockX, (int) Math.floor(boundingBox.b - 0.1D), blockZ) == Material.ICE.getId();
             else
                 onIce = getTypeIdBelow() == Material.ICE.getId();
         return onIce;
@@ -265,15 +290,20 @@ public class PlayerLocation {
      *            the player
      */
     public void set(final Location location, final Player player, final double yFreedom) {
-        this.location = location;
 
         entity = ((CraftPlayer) player).getHandle();
         boundingBox = entity.boundingBox.clone().d(location.getX() - entity.locX, location.getY() - entity.locY,
                 location.getZ() - entity.locZ);
-        x = (int) Math.floor(location.getX());
-        y = (int) Math.floor(boundingBox.b);
-        z = (int) Math.floor(location.getZ());
-        world = ((CraftWorld) location.getWorld()).getHandle();
+        blockX = location.getBlockX();
+        blockY = location.getBlockY();
+        blockZ = location.getBlockZ();
+        x = location.getX();
+        y = location.getY();
+        z = location.getZ();
+        yaw = location.getYaw();
+        pitch = location.getPitch();
+        world = location.getWorld();
+        worldServer = ((CraftWorld) world).getHandle();
 
         typeId = typeIdBelow = null;
         aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = null;
@@ -291,19 +321,19 @@ public class PlayerLocation {
 	}
 
 	public Integer getTypeId() {
-		if (typeId == null) typeId = world.getTypeId(x, y, z);
+		if (typeId == null) typeId = worldServer.getTypeId(blockX, blockY, blockZ);
 		return typeId;
 	}
 
 
 	public Integer getTypeIdBelow() {
-		if (typeIdBelow == null) typeIdBelow = world.getTypeId(x, y - 1, z);
+		if (typeIdBelow == null) typeIdBelow = worldServer.getTypeId(blockX, blockY - 1, blockZ);
 		return typeIdBelow;
 	}
 
 	public final boolean isSameBlock(final PlayerLocation other) {
 		// Maybe make block coordinate fields later.
-		return Location.locToBlock(x) == Location.locToBlock(other.getX()) && Location.locToBlock(y) == Location.locToBlock(other.getY()) && Location.locToBlock(z) == Location.locToBlock(other.getZ());
+		return blockX == other.getBlockX() && blockZ == other.getBlockZ() &&  blockY == other.getBlockY();
 	}
 
 	/**
@@ -311,7 +341,16 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public final IBlockAccess getBlockAccess() {
-		return world;
+		return worldServer;
+	}
+	
+	/**
+	 * Set some references to null.
+	 */
+	public void cleanup(){
+	    world = null;
+	    worldServer = null;
+	    boundingBox = null;
 	}
 
 }
