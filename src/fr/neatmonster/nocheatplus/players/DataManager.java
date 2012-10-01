@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -83,19 +85,26 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerJoin(final PlayerJoinEvent event){
-		lastLogout.remove(event.getPlayer().getName());
+	    final Player player = event.getPlayer();
+		lastLogout.remove(player.getName());
+		CombinedData.getData(player).lastJoinTime = System.currentTimeMillis();
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerQuit(final PlayerQuitEvent event){
-		lastLogout.put(event.getPlayer().getName(), System.currentTimeMillis());
+	    onLeave(event.getPlayer());
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onPlayerKick(final PlayerKickEvent event){
-		lastLogout.put(event.getPlayer().getName(), System.currentTimeMillis());
-	}
-
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerKick(final PlayerKickEvent event){
+        onLeave(event.getPlayer());
+    }
+	
+	private final void onLeave(final Player player) {
+	    final long now = System.currentTimeMillis();
+        lastLogout.put(player.getName(), now);
+        CombinedData.getData(player).lastLogoutTime = now;
+    }
 
 	@Override
 	public void onReload() {

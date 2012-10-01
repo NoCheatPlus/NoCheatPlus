@@ -53,6 +53,8 @@ public class ChatListener implements Listener, INotifyReload {
     
     private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree(); 
     
+    private final Relog relog = new Relog();
+    
     public ChatListener(){
     	ConfigFile config = ConfigManager.getConfigFile();
     	initFilters(config);
@@ -202,8 +204,8 @@ public class ChatListener implements Listener, INotifyReload {
         captcha.resetCaptcha(player);
         
         // Execute the no pwnage check.
-        if (noPwnage.isEnabled(player) && noPwnage.checkLogin(player))
-            event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);
+        if (relog.isEnabled(player) && relog.checkLogin(player))
+            event.disallow(Result.KICK_OTHER, cc.relogKickMessage);
     }
     
     @EventHandler(

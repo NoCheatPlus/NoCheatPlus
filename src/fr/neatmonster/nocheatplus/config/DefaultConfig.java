@@ -200,15 +200,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT, 30000L);
         set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT, 200);
 
-        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_TIMEOUT, 1500L);
-
-        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE,
-                "&cYou relogged really fast! If you keep doing that, you're going to be banned.");
-        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER, 1);
-        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE, "You've relogged too fast, joining cancelled!");
-        set(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_TIMEOUT, 60000L);
-
         set(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK, true);
         set(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT, 5000L);
         set(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT, 150);
@@ -229,6 +220,14 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:0:5:cf cmd:kicknopwnage vl>150 cancel log:nopwnage:0:5:cf cmd:tempkick5");
 
+        // Reload
+        set(ConfPaths.CHAT_RELOG_CHECK, true);
+        set(ConfPaths.CHAT_RELOG_TIMEOUT, 1500L);
+        set(ConfPaths.CHAT_RELOG_WARNING_MESSAGE, "&cYou relogged really fast! If you keep doing that, you're going to be banned.");
+        set(ConfPaths.CHAT_RELOG_WARNING_NUMBER, 1);
+        set(ConfPaths.CHAT_RELOG_KICKMESSAGE, "You've relogged too fast, joining cancelled!");
+        set(ConfPaths.CHAT_RELOG_WARNING_TIMEOUT, 60000L);
+        set(ConfPaths.CHAT_RELOG_ACTIONS, "log:relog:0:10 cancel vl>20 log:relog:0:10 cancel tempkick5");
         
         /*
          * Combined !
@@ -414,6 +413,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nopwnage", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid])" + end);
+        set(ConfPaths.STRINGS + ".relog", start + "relogs too fast" + end);
         set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");

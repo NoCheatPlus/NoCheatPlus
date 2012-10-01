@@ -193,6 +193,9 @@ public abstract class ConfPaths {
     public static final String  CHAT_COLOR_CHECK                         = CHAT_COLOR + "active";
     public static final String  CHAT_COLOR_ACTIONS                       = CHAT_COLOR + "actions";
     
+    private static final String CHAT_COMMANDS                            = CHAT + "commands.";
+    public static final String  CHAT_COMMANDS_CHECK                      = CHAT_COMMANDS + "active";
+    
     // globalchat
     private static final String CHAT_GLOBALCHAT                          = CHAT + "globalchat.";
     public static final String CHAT_GLOBALCHAT_CHECK                     = CHAT_GLOBALCHAT + "active";
@@ -230,8 +233,11 @@ public abstract class ConfPaths {
 	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY             = CHAT_GLOBALCHAT_PP + "similarity.";
 	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_PP_SIMILARITY + "active";
 	// globalchat actions
-    public static final String CHAT_GLOBALCHAT_ACTIONS                   = CHAT_GLOBALCHAT + "actions";
+    public static final String  CHAT_GLOBALCHAT_ACTIONS                  = CHAT_GLOBALCHAT + "actions";
 	
+    private static final String CHAT_LOGINS                              = CHAT + "logins.";
+    public static final String  CHAT_LOGINS_CHECK                        = CHAT_LOGINS + "active";
+    
     // nopwnage
     private static final String CHAT_NOPWNAGE                            = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                      = CHAT_NOPWNAGE + "active";
@@ -260,16 +266,6 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_MOVE_TIMEOUT               = CHAT_NOPWNAGE_MOVE + "timeout";
     public static final String  CHAT_NOPWNAGE_MOVE_WEIGHT                = CHAT_NOPWNAGE_MOVE + "weight";
 
-    private static final String CHAT_NOPWNAGE_RELOGIN                    = CHAT_NOPWNAGE + "relogin.";
-    public static final String  CHAT_NOPWNAGE_RELOGIN_CHECK              = CHAT_NOPWNAGE_RELOGIN + "active";
-    public static final String  CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE        = CHAT_NOPWNAGE_RELOGIN + "kickmessage";
-    public static final String  CHAT_NOPWNAGE_RELOGIN_TIMEOUT            = CHAT_NOPWNAGE_RELOGIN + "timeout";
-
-    private static final String CHAT_NOPWNAGE_RELOGIN_WARNING            = CHAT_NOPWNAGE_RELOGIN + "warning.";
-    public static final String  CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE    = CHAT_NOPWNAGE_RELOGIN_WARNING + "message";
-    public static final String  CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER     = CHAT_NOPWNAGE_RELOGIN_WARNING + "number";
-    public static final String  CHAT_NOPWNAGE_RELOGIN_WARNING_TIMEOUT    = CHAT_NOPWNAGE_RELOGIN_WARNING + "timeout";
-
     private static final String CHAT_NOPWNAGE_REPEAT                     = CHAT_NOPWNAGE + "repeat.";
     public static final String  CHAT_NOPWNAGE_REPEAT_CHECK               = CHAT_NOPWNAGE_REPEAT + "active";
     public static final String  CHAT_NOPWNAGE_REPEAT_TIMEOUT             = CHAT_NOPWNAGE_REPEAT + "timeout";
@@ -296,6 +292,16 @@ public abstract class ConfPaths {
     public static final String  CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE        = CHAT_NOPWNAGE_WARN_PLAYER + "message";
 
     public static final String  CHAT_NOPWNAGE_ACTIONS                    = CHAT_NOPWNAGE + "actions";
+    
+    private static final String CHAT_RELOG                               = CHAT + "relog.";
+    public static final String  CHAT_RELOG_CHECK                         = CHAT_RELOG + "active";
+    public static final String  CHAT_RELOG_KICKMESSAGE                   = CHAT_RELOG + "kickmessage";
+    public static final String  CHAT_RELOG_TIMEOUT                       = CHAT_RELOG + "timeout";
+    private static final String CHAT_RELOG_WARNING                       = CHAT_RELOG + "warning.";
+    public static final String  CHAT_RELOG_WARNING_MESSAGE               = CHAT_RELOG_WARNING + "message";
+    public static final String  CHAT_RELOG_WARNING_NUMBER                = CHAT_RELOG_WARNING + "number";
+    public static final String  CHAT_RELOG_WARNING_TIMEOUT               = CHAT_RELOG_WARNING + "timeout";
+    public static final String  CHAT_RELOG_ACTIONS                       = CHAT_RELOG + "actions";
 
     /*
      * Combined !

@@ -79,6 +79,8 @@ public class ChatConfig extends AsyncCheckConfig {
     public final boolean      colorCheck;
     public final ActionList   colorActions;
     
+    private final boolean     commandsCheck;
+    
     public final boolean      globalChatCheck;
 	public final boolean      globalChatGlobalCheck;
 	public final boolean      globalChatPlayerCheck;
@@ -91,6 +93,8 @@ public class ChatConfig extends AsyncCheckConfig {
 	public boolean            globalChatEngineMaximum;
 	public final boolean      globalChatDebug;
     public final ActionList   globalChatActions;
+    
+    private final boolean     loginsCheck;
 
     public final boolean      noPwnageCheck;
 	public final boolean      noPwnageDebug;
@@ -113,13 +117,6 @@ public class ChatConfig extends AsyncCheckConfig {
     public final long         noPwnageMoveTimeout;
     public final int          noPwnageMoveWeight;
 
-    public final boolean      noPwnageReloginCheck;
-    public final String       noPwnageReloginKickMessage;
-    public final long         noPwnageReloginTimeout;
-    public final String       noPwnageReloginWarningMessage;
-    public final int          noPwnageReloginWarningNumber;
-    public final long         noPwnageReloginWarningTimeout;
-
     public final boolean      noPwnageRepeatCheck;
     public final long         noPwnageRepeatTimeout;
     public final int          noPwnageRepeatWeight;
@@ -140,6 +137,15 @@ public class ChatConfig extends AsyncCheckConfig {
     public final boolean      opInConsoleOnly;
 
     public final boolean      protectPlugins;
+
+    
+    public final boolean      relogCheck;
+    public final String       relogKickMessage;
+    public final long         relogTimeout;
+    public final String       relogWarningMessage;
+    public final int          relogWarningNumber;
+    public final long         relogWarningTimeout;
+    public ActionList         relogActions;
 
     /**
      * Instantiates a new chat configuration.
@@ -166,6 +172,8 @@ public class ChatConfig extends AsyncCheckConfig {
         colorCheck = config.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
         colorActions = config.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
+        commandsCheck = config.getBoolean(ConfPaths.CHAT_COMMANDS_CHECK);
+        
         globalChatCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
     	globalChatGlobalCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_CHECK, true);
     	globalChatPlayerCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_PP_CHECK, true);
@@ -178,6 +186,8 @@ public class ChatConfig extends AsyncCheckConfig {
     	globalChatEngineMaximum = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_MAXIMUM, true);
     	globalChatDebug = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_DEBUG, false);
         globalChatActions = config.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
+        
+        loginsCheck = config.getBoolean(ConfPaths.CHAT_LOGINS_CHECK);
 
         noPwnageCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
         noPwnageDebug = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_DEBUG, false);
@@ -201,13 +211,6 @@ public class ChatConfig extends AsyncCheckConfig {
         noPwnageMoveTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT);
         noPwnageMoveWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT);
 
-        noPwnageReloginCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_RELOGIN_CHECK);
-        noPwnageReloginKickMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_KICKMESSAGE);
-        noPwnageReloginTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_RELOGIN_TIMEOUT);
-        noPwnageReloginWarningMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_MESSAGE);
-        noPwnageReloginWarningNumber = config.getInt(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_NUMBER);
-        noPwnageReloginWarningTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_RELOGIN_WARNING_TIMEOUT);
-
         noPwnageRepeatCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK);
         noPwnageRepeatTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT);
         noPwnageRepeatWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT);
@@ -224,6 +227,14 @@ public class ChatConfig extends AsyncCheckConfig {
         noPwnageWarnPlayerMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE);
 
         noPwnageActions = config.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
+        
+        relogCheck = config.getBoolean(ConfPaths.CHAT_RELOG_CHECK);
+        relogKickMessage = config.getString(ConfPaths.CHAT_RELOG_KICKMESSAGE);
+        relogTimeout = config.getLong(ConfPaths.CHAT_RELOG_TIMEOUT);
+        relogWarningMessage = config.getString(ConfPaths.CHAT_RELOG_WARNING_MESSAGE);
+        relogWarningNumber = config.getInt(ConfPaths.CHAT_RELOG_WARNING_NUMBER);
+        relogWarningTimeout = config.getLong(ConfPaths.CHAT_RELOG_WARNING_TIMEOUT);
+        relogActions = config.getActionList(ConfPaths.CHAT_RELOG_ACTIONS, Permissions.CHAT_RELOG);
 
         opInConsoleOnly = config.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
 
@@ -242,6 +253,14 @@ public class ChatConfig extends AsyncCheckConfig {
         	return globalChatCheck;
         case CHAT_NOPWNAGE:
             return noPwnageCheck;
+        case CHAT_COMMANDS:
+            return commandsCheck;
+        case CHAT_CAPTCHA:
+            return captchaCheck;
+        case CHAT_RELOG:
+            return relogCheck;
+        case CHAT_LOGINS:
+            return loginsCheck;
         default:
             return true;
         }

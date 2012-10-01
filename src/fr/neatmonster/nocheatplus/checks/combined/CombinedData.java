@@ -51,7 +51,6 @@ public class CombinedData extends ACheckData {
     }
 
 	public double improbableVL = 0;
-	public double speedVL = 0;
 	
 	public float lastYaw;
 	public long  lastYawTime;
@@ -62,6 +61,10 @@ public class CombinedData extends ACheckData {
 	public final ActionFrequency improbableCount = new ActionFrequency(20, 3000);
 
 	public String lastWorld = "";
+	
+	public long lastJoinTime;
+	
+	public long lastLogoutTime;
 	
 	public long lastMoveTime;
 	

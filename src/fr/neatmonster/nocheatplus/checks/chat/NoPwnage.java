@@ -70,27 +70,6 @@ public class NoPwnage extends AsyncCheck{
         }
     }
 
-    /**
-     * Checks a player (join).
-     * 
-     * Only called from the main thread.
-     * 
-     * @param player
-     *            the player
-     * @return true, if successful
-     */
-    public boolean checkLogin(final Player player) {
-        if (!isEnabled(player))
-            return false;
-
-        final ChatConfig cc = ChatConfig.getConfig(player);
-        final ChatData data = ChatData.getData(player);
-
-        // Keep related to ChatData/NoPwnage/Color used lock.
-        synchronized (data) {
-            return unsafeLoginCheck(player, cc, data);
-        }
-    }
     
     /**
      * Only to be called form synchronized code.
@@ -119,6 +98,8 @@ public class NoPwnage extends AsyncCheck{
             // Cancel the event.
             return true;
         }
+        
+        CombinedData cData = CombinedData.getData(player);
 
         int suspicion = 0;
         // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
@@ -129,7 +110,7 @@ public class NoPwnage extends AsyncCheck{
 
         // NoPwnage will check if a player sends his first message within "timeout" milliseconds after his login. If
         // he does, increase suspicion by "weight".
-        if (cc.noPwnageFirstCheck && now - data.noPwnageJoinTime < cc.noPwnageFirstTimeout)
+        if (cc.noPwnageFirstCheck && now - cData.lastJoinTime < cc.noPwnageFirstTimeout)
             suspicion += cc.noPwnageFirstWeight;
 
         // NoPwnage will check if a player repeats a message that has been sent by another player just before,
@@ -159,7 +140,7 @@ public class NoPwnage extends AsyncCheck{
 
         // NoPwnage will check if a player moved within the "timeout" timeframe. If he did not move, the suspicion will
         // be increased by "weight" value.
-        if (!isCommand && cc.noPwnageMoveCheck && now - CombinedData.getData(player).lastMoveTime > cc.noPwnageMoveTimeout)
+        if (!isCommand && cc.noPwnageMoveCheck && now - cData.lastMoveTime > cc.noPwnageMoveTimeout)
             suspicion += cc.noPwnageMoveWeight;
 
         // Should a player that reaches the "warnLevel" get a text message telling him that he is under suspicion of
@@ -211,42 +192,7 @@ public class NoPwnage extends AsyncCheck{
 
 
 
-	/**
-     * Check (Join), only call from synchronized code.
-     * 
-     * @param player
-     *            the player
-     * @param cc
-     *            the cc
-     * @param data
-     *            the data
-     * @return true, if successful
-     */
-    private boolean unsafeLoginCheck(final Player player, final ChatConfig cc, final ChatData data) {
-        boolean cancel = false;
 
-        final long now = System.currentTimeMillis();
-
-        // NoPwnage will remember the time when a player leaves the server. If he returns within "time" milliseconds, he
-        // will get warned. If he has been warned "warnings" times already, the "commands" will be executed for him.
-        // Warnings get removed if the time of the last warning was more than "timeout" milliseconds ago.
-        if (cc.noPwnageReloginCheck && now - data.noPwnageLeaveTime < cc.noPwnageReloginTimeout) {
-            if (now - data.noPwnageReloginWarningTime > cc.noPwnageReloginWarningTimeout)
-                data.noPwnageReloginWarnings = 0;
-            if (data.noPwnageReloginWarnings < cc.noPwnageReloginWarningNumber) {
-                player.sendMessage(CheckUtils.replaceColors(cc.noPwnageReloginWarningMessage));
-                data.noPwnageReloginWarningTime = now;
-                data.noPwnageReloginWarnings++;
-            } else if (now - data.noPwnageReloginWarningTime < cc.noPwnageReloginWarningTimeout)
-                // Find out if we need to ban the player or not.
-                cancel = executeActions(player, (double) data.noPwnageVL, 0D, cc.noPwnageActions, true);
-        }
-
-        // Store his joining time.
-        data.noPwnageJoinTime = now;
-
-        return cancel;
-    }
     
 	@Override
 	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
