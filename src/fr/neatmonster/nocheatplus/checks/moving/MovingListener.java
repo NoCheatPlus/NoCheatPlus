@@ -106,11 +106,10 @@ public class MovingListener implements Listener {
 		if (player.isInsideVehicle())
 			return;
 
-		final MovingData data = MovingData.getData(player);
-
 		final org.bukkit.block.Block block = event.getBlock();
+		if (block == null) return;
 		final int blockY = block.getY();
-
+		
 		final Material mat = block.getType();
 
 		if (BlockProperties.isLiquid(event.getBlockAgainst().getTypeId())
@@ -119,10 +118,10 @@ public class MovingListener implements Listener {
 			// placement.
 			event.setCancelled(true);
 		else {
-			
+			final MovingData data = MovingData.getData(player);
 			if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) return;
 			
-			if (block == null || data.setBack == null || blockY + 1D < data.setBack.getY()) return;
+			if (data.setBack == null || blockY + 1D < data.setBack.getY()) return;
 			
 			final Location loc = player.getLocation();
 			if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
