@@ -36,24 +36,31 @@ import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
  * @see ChatEvent
  */
 public class ChatListener implements Listener, INotifyReload {
-
-    /** The color check. */
-    private final Color    color    = new Color();
-
-    /** The no pwnage check. */
-    private final NoPwnage noPwnage = new NoPwnage();
+    
+    // Checks.
     
     /** Captcha handler. */
     private final Captcha captcha = new Captcha();
+
+    /** The color check. */
+    private final Color    color    = new Color();    
     
-    /** Global chat check (experiment: alternative / supplement). */
+    private final Commands commands = new Commands(); 
+    
+    /** Global chat check. */
     private final GlobalChat globalChat = new GlobalChat();
+    
+    /** The no pwnage check. */
+    private final NoPwnage noPwnage = new NoPwnage();
+   
+    private final Relog relog = new Relog();
+    
+    // Auxiliary stuff.
     
     private final SimpleCharPrefixTree commandExclusions = new SimpleCharPrefixTree();
     
     private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree(); 
     
-    private final Relog relog = new Relog();
     
     public ChatListener(){
     	ConfigFile config = ConfigManager.getConfigFile();
@@ -63,9 +70,9 @@ public class ChatListener implements Listener, INotifyReload {
     
 	private void initFilters(ConfigFile config) {
 		commandExclusions.clear();
-    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS), false, true);
+    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_COMMANDS_EXCLUSIONS), false, true);
     	chatCommands.clear();
-    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_HANDLEASCHAT), false, true);
+    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT), false, true);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR)
@@ -100,7 +107,7 @@ public class ChatListener implements Listener, INotifyReload {
         if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), false));
 
         // Then the no pwnage check.
-        if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, false, false))
+        if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, false))
         	event.setCancelled(true);
         else if (globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), captcha, false))
         	// Only check those that got through.
@@ -138,7 +145,7 @@ public class ChatListener implements Listener, INotifyReload {
         
         // Trim is necessary because the server accepts leading spaces with commands.
         // TODO: Maybe: only remove the leading whitespace or spaces.
-        final String lcMessage = event.getMessage().trim().toLowerCase();
+        String lcMessage = event.getMessage().trim().toLowerCase();
         final String command = lcMessage.split(" ")[0].substring(1);
 
         final ChatConfig cc = ChatConfig.getConfig(player);
@@ -166,13 +173,24 @@ public class ChatListener implements Listener, INotifyReload {
         // First the color check.
         if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), true));
         
+        // Reset lcMessage (might be canged by color check).
+        lcMessage = event.getMessage().trim().toLowerCase();
         final boolean handleAsChat = chatCommands.hasPrefixWords(lcMessage);
 
         // Then the no pwnage check.
-        if (!commandExclusions.hasPrefixWords(lcMessage) && noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, !handleAsChat, true))
-        	event.setCancelled(true);
-        else if (handleAsChat && globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), captcha, true))
-        	event.setCancelled(true);
+        if (handleAsChat){
+            // Treat as chat.
+            if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, true))
+                event.setCancelled(true);
+            else if (globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), captcha, true))
+                event.setCancelled(true);
+        }
+        else if (!commandExclusions.hasPrefixWords(lcMessage)){
+            // Treat as command.
+            if (commands.isEnabled(player) && commands.check(player, event.getMessage(), captcha))
+                event.setCancelled(true);
+        }
+
     }
 
     /**

@@ -69,6 +69,7 @@ public class ChatData extends AsyncCheckData {
 	// Violation levels.
     public double  captchaVL;
     public double  colorVL;
+    public double  commandsVL;
     public double  globalChatVL;
     public double  noPwnageVL;
     public double  relogVL;
@@ -77,6 +78,11 @@ public class ChatData extends AsyncCheckData {
     public int     captchTries;
     public String  captchaGenerated;
     public boolean captchaStarted;
+    
+    /// Commands data.
+    public final ActionFrequency commandsWeights = new ActionFrequency(5, 1000);
+    public long commandsShortTermTick;
+    public double commandsShortTermWeight;
     
     // Data of the globalchat check.
     public final ActionFrequency globalChatFrequency = new ActionFrequency(10, 3000);

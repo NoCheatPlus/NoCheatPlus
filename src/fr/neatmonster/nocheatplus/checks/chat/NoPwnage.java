@@ -58,7 +58,7 @@ public class NoPwnage extends AsyncCheck{
      *            is the thread the main thread
      * @return If to cancel the event.
      */
-    public boolean check(final Player player, final String message, final Captcha captcha, final boolean isCommand, 
+    public boolean check(final Player player, final String message, final Captcha captcha, 
     		final boolean isMainThread) {
 
         final ChatConfig cc = ChatConfig.getConfig(player);
@@ -66,7 +66,7 @@ public class NoPwnage extends AsyncCheck{
 
         // Keep related to ChatData/NoPwnage/Color used lock.
         synchronized (data) {
-            return unsafeCheck(player, message, captcha, isCommand, isMainThread, cc, data);
+            return unsafeCheck(player, message, captcha, isMainThread, cc, data);
         }
     }
 
@@ -87,7 +87,7 @@ public class NoPwnage extends AsyncCheck{
      *            the data
      * @return If to cancel the event.
      */
-    private boolean unsafeCheck(final Player player, final String message, final Captcha captcha, final boolean isCommand,
+    private boolean unsafeCheck(final Player player, final String message, final Captcha captcha,
     		final boolean isMainThread, final ChatConfig cc, final ChatData data) {
         boolean cancel = false;
 
@@ -104,7 +104,7 @@ public class NoPwnage extends AsyncCheck{
         int suspicion = 0;
         // NoPwnage will remember the last message that caused someone to get banned. If a player repeats that
         // message within "timeout" milliseconds, the suspicion will be increased by "weight".
-        if (!isCommand && cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
+        if (cc.noPwnageBannedCheck && now - lastBanCausingMessageTime < cc.noPwnageBannedTimeout
                 && CheckUtils.isSimilar(message, lastBanCausingMessage, 0.8f))
             suspicion += cc.noPwnageBannedWeight;
 
@@ -115,7 +115,7 @@ public class NoPwnage extends AsyncCheck{
 
         // NoPwnage will check if a player repeats a message that has been sent by another player just before,
         // within "timeout". If he does, suspicion will be increased by "weight".
-        if (!isCommand && cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
+        if (cc.noPwnageGlobalCheck && now - lastGlobalMessageTime < cc.noPwnageGlobalTimeout
                 && CheckUtils.isSimilar(message, lastGlobalMessage, 0.8f))
             suspicion += cc.noPwnageGlobalWeight;
 
@@ -134,13 +134,13 @@ public class NoPwnage extends AsyncCheck{
 
         // NoPwnage will check if a player repeats his messages within the "timeout" timeframe. Even if the message
         // is a bit different, it will be counted as being a repetition. The suspicion is increased by "weight".
-        if (!isCommand && cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
+        if (cc.noPwnageRepeatCheck && now - data.noPwnageLastMessageTime < cc.noPwnageRepeatTimeout
                 && CheckUtils.isSimilar(message, data.noPwnageLastMessage, 0.8f))
             suspicion += cc.noPwnageRepeatWeight;
 
         // NoPwnage will check if a player moved within the "timeout" timeframe. If he did not move, the suspicion will
         // be increased by "weight" value.
-        if (!isCommand && cc.noPwnageMoveCheck && now - cData.lastMoveTime > cc.noPwnageMoveTimeout)
+        if (cc.noPwnageMoveCheck && now - cData.lastMoveTime > cc.noPwnageMoveTimeout)
             suspicion += cc.noPwnageMoveWeight;
 
         // Should a player that reaches the "warnLevel" get a text message telling him that he is under suspicion of

@@ -148,9 +148,15 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_COLOR_CHECK, true);
         set(ConfPaths.CHAT_COLOR_ACTIONS, "log:color:0:1:if cancel");
         
-        // Multi purpose.
-        set(ConfPaths.CHAT_HANDLEASCHAT, 
-        		new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
+        
+        set(ConfPaths.CHAT_COMMANDS_CHECK, true);
+        set(ConfPaths.CHAT_COMMANDS_EXCLUSIONS, new ArrayList<String>());
+        set(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT, 
+                new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
+        set(ConfPaths.CHAT_COMMANDS_LEVEL, 10);
+        set(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS, 18);
+        set(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL, 3);
+        set(ConfPaths.CHAT_COMMANDS_ACTIONS, "log:commands:0:5:cf cancel cmd:kickcommands vl>20 log:commands:0:5:cf cancel cmd:tempkick1");
         
         // Captcha.
         set(ConfPaths.CHAT_CAPTCHA_CHECK, false);
@@ -181,7 +187,6 @@ public class DefaultConfig extends ConfigFile {
         
         // nopwnage
         set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_EXCLUSIONS, new ArrayList<String>());
         set(ConfPaths.CHAT_NOPWNAGE_LEVEL, 500);
 
         set(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK, true);
@@ -218,7 +223,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE,
                 "&cPlease don't spam, be careful with what you say. DON'T repeat what you just said either, unless you want to be kicked or even banned.");
 
-        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:0:5:cf cmd:kicknopwnage vl>150 cancel log:nopwnage:0:5:cf cmd:tempkick5");
+        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:0:5:cf cmd:kicknopwnage vl>150 log:nopwnage:0:5:cf cancel cmd:tempkick5");
 
         // Reload
         set(ConfPaths.CHAT_RELOG_CHECK, true);
@@ -227,7 +232,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_RELOG_WARNING_NUMBER, 1);
         set(ConfPaths.CHAT_RELOG_KICKMESSAGE, "You've relogged too fast, joining cancelled!");
         set(ConfPaths.CHAT_RELOG_WARNING_TIMEOUT, 60000L);
-        set(ConfPaths.CHAT_RELOG_ACTIONS, "log:relog:0:10 cancel vl>20 log:relog:0:10 cancel tempkick5");
+        set(ConfPaths.CHAT_RELOG_ACTIONS, "log:relog:0:10:cf cancel vl>20 log:relog:0:10:cf cancel cmd:tempkick5");
         
         /*
          * Combined !
@@ -381,6 +386,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bwrong", start + "broke another block than clicked" + end);
         set(ConfPaths.STRINGS + ".captcha", "[player] failed captcha repeatedly" + end);
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
+        set(ConfPaths.STRINGS + ".commands", start + "issued too many commands" + end);
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
@@ -401,6 +407,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
+        set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
         set(ConfPaths.STRINGS + ".kicknopwnage", "ncp tempkick [player] 1 You're not allowed to spam this server!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");

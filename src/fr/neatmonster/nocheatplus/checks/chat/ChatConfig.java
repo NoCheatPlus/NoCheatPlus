@@ -79,7 +79,11 @@ public class ChatConfig extends AsyncCheckConfig {
     public final boolean      colorCheck;
     public final ActionList   colorActions;
     
-    private final boolean     commandsCheck;
+    public final boolean      commandsCheck;
+    public final double       commandsLevel;
+    public final int          commandsShortTermTicks;
+    public final double       commandsShortTermLevel;
+    public final ActionList   commandsActions;
     
     public final boolean      globalChatCheck;
 	public final boolean      globalChatGlobalCheck;
@@ -173,6 +177,11 @@ public class ChatConfig extends AsyncCheckConfig {
         colorActions = config.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
         commandsCheck = config.getBoolean(ConfPaths.CHAT_COMMANDS_CHECK);
+        commandsLevel = config.getDouble(ConfPaths.CHAT_COMMANDS_LEVEL);
+        commandsShortTermTicks = config.getInt(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS);
+        commandsShortTermLevel = config.getDouble(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL);;
+        commandsActions = config.getActionList(ConfPaths.CHAT_COMMANDS_ACTIONS, Permissions.CHAT_COMMANDS);
+        
         
         globalChatCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
     	globalChatGlobalCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_CHECK, true);

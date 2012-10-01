@@ -176,9 +176,6 @@ public abstract class ConfPaths {
      *   "88,d88 888 888 "88 888  888   
      */
     private static final String CHAT                                     = CHECKS + "chat.";
-    
-	@GlobalConfig
-	public static final String CHAT_HANDLEASCHAT                         = CHAT + "handleaschat";
 
     private static final String CHAT_CAPTCHA                    = CHAT + "captcha.";
     public static final String  CHAT_CAPTCHA_CHECK              = CHAT_CAPTCHA + "active";
@@ -195,6 +192,15 @@ public abstract class ConfPaths {
     
     private static final String CHAT_COMMANDS                            = CHAT + "commands.";
     public static final String  CHAT_COMMANDS_CHECK                      = CHAT_COMMANDS + "active";
+    @GlobalConfig
+    public static final String  CHAT_COMMANDS_EXCLUSIONS                 = CHAT_COMMANDS + "exclusions";
+    @GlobalConfig
+    public static final String CHAT_COMMANDS_HANDLEASCHAT                = CHAT_COMMANDS + "handleaschat";
+    public static final String  CHAT_COMMANDS_LEVEL                      = CHAT_COMMANDS + "level";
+    private static final String CHAT_COMMANDS_SHORTTERM                  = CHAT_COMMANDS + "shortterm.";
+    public static final String  CHAT_COMMANDS_SHORTTERM_TICKS            = CHAT_COMMANDS_SHORTTERM + "ticks";
+    public static final String  CHAT_COMMANDS_SHORTTERM_LEVEL            = CHAT_COMMANDS_SHORTTERM + "level";
+    public static final String  CHAT_COMMANDS_ACTIONS                    = CHAT_COMMANDS + "actions";
     
     // globalchat
     private static final String CHAT_GLOBALCHAT                          = CHAT + "globalchat.";
@@ -235,6 +241,7 @@ public abstract class ConfPaths {
 	// globalchat actions
     public static final String  CHAT_GLOBALCHAT_ACTIONS                  = CHAT_GLOBALCHAT + "actions";
 	
+    // NOT YET IN USE
     private static final String CHAT_LOGINS                              = CHAT + "logins.";
     public static final String  CHAT_LOGINS_CHECK                        = CHAT_LOGINS + "active";
     
@@ -242,8 +249,6 @@ public abstract class ConfPaths {
     private static final String CHAT_NOPWNAGE                            = CHAT + "nopwnage.";
     public static final String  CHAT_NOPWNAGE_CHECK                      = CHAT_NOPWNAGE + "active";
 	public static final String  CHAT_NOPWNAGE_DEBUG                      = CHAT_NOPWNAGE + "debug";
-	@GlobalConfig
-    public static final String  CHAT_NOPWNAGE_EXCLUSIONS                 = CHAT_NOPWNAGE + "exclusions";
     public static final String  CHAT_NOPWNAGE_LEVEL                      = CHAT_NOPWNAGE + "level";
 
     private static final String CHAT_NOPWNAGE_BANNED                     = CHAT_NOPWNAGE + "banned.";
