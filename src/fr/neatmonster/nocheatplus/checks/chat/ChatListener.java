@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
@@ -203,6 +204,20 @@ public class ChatListener implements Listener, INotifyReload {
         // Execute the no pwnage check.
         if (noPwnage.isEnabled(player) && noPwnage.checkLogin(player))
             event.disallow(Result.KICK_OTHER, cc.noPwnageReloginKickMessage);
+    }
+    
+    @EventHandler(
+            priority = EventPriority.MONITOR)
+    public void onPlayerJoin(final PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        final ChatConfig cc = ChatConfig.getConfig(player);
+        final ChatData data = ChatData.getData(player);
+        if (captcha.isEnabled(player) && captcha.shouldCheckCaptcha(cc, data)){
+            // shouldCheckCaptcha: only if really enabled.
+            // Later: add check for cc.captchaOnLogin or so.
+            // TODO: maybe schedule this to coma after other plugins messages.
+            captcha.sendNewCaptcha(player, cc, data);
+        }
     }
 
 	@Override
