@@ -61,10 +61,11 @@ public class Captcha extends AsyncCheck implements ICaptcha{
     @Override
     public void generateCaptcha(ChatConfig cc, ChatData data, boolean reset) {
     	if (reset) data.captchTries = 0;
-    	data.captchaGenerated = "";
+    	final char[] chars = new char[cc.captchaLength];
         for (int i = 0; i < cc.captchaLength; i++)
-            data.captchaGenerated += cc.captchaCharacters.charAt(random
+            chars[i] = cc.captchaCharacters.charAt(random
                     .nextInt(cc.captchaCharacters.length()));
+        data.captchaGenerated = new String(chars);
 	}
     
     @Override
