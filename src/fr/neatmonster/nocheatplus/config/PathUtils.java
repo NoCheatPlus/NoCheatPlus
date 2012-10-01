@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -17,6 +16,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.MemoryConfiguration;
 
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.CharPrefixTree;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
 public class PathUtils {
@@ -73,10 +73,10 @@ public class PathUtils {
      * @param paths
      * @param msgHeader
      */
-    public static void warnPaths(ConfigFile config, Collection<String> paths, String msgPrefix){
+    public static void warnPaths(ConfigFile config, CharPrefixTree<?, ?> paths, String msgPrefix){
     	final Logger log = Bukkit.getLogger();
     	for (final String path : config.getKeys(true)){
-    		if (globalOnlyPrefixes.hasPrefix(path)) 
+    		if (paths.hasPrefix(path)) 
     			log.warning("[NoCheatPlus] Config path '" + path + "'" + msgPrefix);
     	}
     }
@@ -88,7 +88,7 @@ public class PathUtils {
      * @param configName
      */
     public static void warnGlobalOnlyPaths(ConfigFile config, String configName){
-    	warnPaths(config, globalOnlyPaths, " (" + configName + ") should only be set in the global configuration.");
+    	warnPaths(config, globalOnlyPrefixes, " (" + configName + ") should only be set in the global configuration.");
     }
     
     public static void warnGlobalOnlyPaths(File file, String configName){
