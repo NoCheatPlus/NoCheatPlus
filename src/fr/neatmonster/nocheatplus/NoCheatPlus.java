@@ -232,6 +232,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         // List the events listeners and register.
         Bukkit.getPluginManager().registerEvents(this, this);
         for (final Object obj : new Object[]{
+        	NCPExemptionManager.getListener(),
         	dataMan,
         	new BlockBreakListener(),
         	new BlockInteractListener(),
@@ -242,7 +243,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         	new InventoryListener(),
         	new MovingListener(),
         	new Workarounds(),
-        	NCPExemptionManager.getListener(),
         }){
         	addComponent(obj);
         }
