@@ -28,10 +28,10 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 public class Reach extends Check {
 
     /** The maximum distance allowed to interact with a block in creative mode. */
-    public final double CREATIVE_DISTANCE = 5.6D;
+    public static final double CREATIVE_DISTANCE = 5.6D;
 
     /** The maximum distance allowed to interact with a block in survival mode. */
-    public final double SURVIVAL_DISTANCE = 5.2D;
+    public static final double SURVIVAL_DISTANCE = 5.2D;
 
     /**
      * Instantiates a new reach check.
