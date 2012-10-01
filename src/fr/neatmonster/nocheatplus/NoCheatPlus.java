@@ -134,11 +134,11 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 	 * @param currentTimeMillis
 	 * @return
 	 */
-	public static boolean isLoginDenied(String playerName, long currentTimeMillis) {
+	public static boolean isLoginDenied(String playerName, long time) {
 		playerName = playerName.trim().toLowerCase();
 		final Long oldTs = denyLoginNames.get(playerName);
 		if (oldTs == null) return false; 
-		else return System.currentTimeMillis() < oldTs.longValue();
+		else return time < oldTs.longValue();
 	}
 
 	/** The event listeners. */
