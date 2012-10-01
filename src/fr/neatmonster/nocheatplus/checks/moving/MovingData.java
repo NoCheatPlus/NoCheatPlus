@@ -113,6 +113,8 @@ public class MovingData extends ACheckData {
     public double         survivalFlyLastFromY;
     public int            survivalFlyOnIce;
     public boolean        survivalFlyWasInBed;
+    public long           survivalFlyCobwebTime;
+    public double         survivalFlyCobwebVL;
 
     // Locations shared between all checks.
     public final PlayerLocation from   = new PlayerLocation();

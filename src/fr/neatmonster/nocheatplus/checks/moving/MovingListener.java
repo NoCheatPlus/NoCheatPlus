@@ -113,7 +113,7 @@ public class MovingListener implements Listener {
 		final Material mat = block.getType();
 
 		if (BlockProperties.isLiquid(event.getBlockAgainst().getTypeId())
-				&& mat != Material.WATER_LILY)
+				&& mat != Material.WATER_LILY && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS))
 			// The block was placed against a liquid block, cancel its
 			// placement.
 			event.setCancelled(true);

@@ -94,6 +94,11 @@ permissions:
                     nocheatplus.checks.blockplace:
                         description: Allow the player to bypass all BlockPlace checks.
                         children:
+                            nocheatplus.checks.blockplace.against:
+                                description: Allow the player to place blocks against other blocks.
+                                children:
+                                    nocheatplus.checks.blockplace.against.liquids:
+                                        description: Allow the player to place blocks against liquids.
                             nocheatplus.checks.blockplace.direction:
                                 description: Allow the player to bypass to Direction check.
                             nocheatplus.checks.blockplace.fastplace:

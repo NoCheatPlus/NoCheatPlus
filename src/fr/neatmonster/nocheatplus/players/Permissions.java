@@ -88,6 +88,8 @@ public class Permissions {
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
      */
     private static final String BLOCKPLACE                   = CHECKS + ".blockplace";
+    public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
+	public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
     public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
     public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";
     public static final String  BLOCKPLACE_NOSWING           = BLOCKPLACE + ".noswing";
@@ -211,5 +213,5 @@ public class Permissions {
     public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
     public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
-
+    
 }

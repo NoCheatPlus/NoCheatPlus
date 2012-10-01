@@ -91,6 +91,7 @@ public class MovingConfig extends ACheckConfig {
     public final int        survivalFlySprintingSpeed;
     public final int        survivalFlySwimmingSpeed;
     public final int        survivalFlyWalkingSpeed;
+    public final boolean    survivalFlyCobwebHack;
     public final ActionList survivalFlyActions;
     
     // Special tolerance values:
@@ -136,6 +137,7 @@ public class MovingConfig extends ACheckConfig {
         survivalFlySprintingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
         survivalFlySwimmingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
+        survivalFlyCobwebHack = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.001);

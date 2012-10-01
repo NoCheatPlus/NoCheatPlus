@@ -42,7 +42,7 @@ public class SurvivalFly extends Check {
 	
 	public static final double blockingSpeed 	= 0.16D;
 	public static final double swimmingSpeed    = 0.11D;
-	public static final double webSpeed         = walkingSpeed * 0.15D;
+	public static final double webSpeed         = 0.105D; // TODO: walkingSpeed * 0.15D; <- does not work
 	
 	public static final double modIce			= 2.5D;
 
@@ -223,10 +223,22 @@ public class SurvivalFly extends Check {
         double vAllowedDistance, vDistanceAboveLimit;
         if (from.isInWeb()){
         	// Very simple: force players to descend or stay.
-         	vAllowedDistance = 0;
+         	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
         	data.jumpAmplifier = 0;
-        	final double vy = player.getVelocity().getY();
-        	vDistanceAboveLimit = vy;
+        	vDistanceAboveLimit = to.getY() - from.getY();
+        	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
+        		final long now = System.currentTimeMillis();
+        		if (now - data.survivalFlyCobwebTime > 3000){
+        			data.survivalFlyCobwebTime = now;
+        			data.survivalFlyCobwebVL = vDistanceAboveLimit * 100D;
+        		}
+        		else data.survivalFlyCobwebVL += vDistanceAboveLimit * 100D;
+        		if (data.survivalFlyCobwebVL < 325) { // Totally random !
+        			if (data.setBack == null) data.setBack = player.getLocation();
+        			data.survivalFlyJumpPhase = 0;
+        			return data.setBack;
+        		}
+        	}
         }
         else{
         	vAllowedDistance = (!fromOnGround && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
@@ -257,6 +269,8 @@ public class SurvivalFly extends Check {
         data.survivalFlyVL *= 0.95D;
 //        System.out.println("vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+")");
         // Did the player move in unexpected ways?
+//        System.out.println("hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (to.getY() - from.getY()) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance + " / from passable: " + BlockProperties.isPassable(from));
+//        System.out.println(from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()) ;
         if (result > 0D) {
             // Increment violation counter.
             data.survivalFlyVL += result;
