@@ -211,7 +211,7 @@ public class GlobalChat extends AsyncCheck implements INotifyReload{
 			}
 			if (wEngine > 0.0f)
 				debugParts.add("Engine score (" + (cc.globalChatEngineMaximum?"max":"sum") + "): " + CheckUtils.fdec3.format(wEngine));
-			debugParts.add("Total score: " + CheckUtils.fdec3.format(score) + " (weigth=" + cc.globalChatFrequencyWeight + " => accumulated=" + CheckUtils.fdec3.format(accumulated) + ", vl=" + CheckUtils.fdec3.format(data.globalChatVL));
+			debugParts.add("Total score: " + CheckUtils.fdec3.format(score) + " (weight=" + cc.globalChatFrequencyWeight + " => accumulated=" + CheckUtils.fdec3.format(accumulated) + ", vl=" + CheckUtils.fdec3.format(data.globalChatVL));
 			CheckUtils.scheduleOutputJoined(debugParts, " | ");
 			debugParts.clear();
 		}
