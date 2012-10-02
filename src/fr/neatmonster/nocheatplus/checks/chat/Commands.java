@@ -24,6 +24,18 @@ public class Commands extends Check {
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
         
+        final boolean captchaEnabled = captcha.isEnabled(player); 
+        if (captchaEnabled){
+            synchronized (data) {
+                if (captcha.shouldCheckCaptcha(cc, data)){
+                    captcha.checkCaptcha(player, message, cc, data, true);
+                    return true;
+                }
+            }
+        }
+        
+        // Rest of the check is done without sync, because the data is only used by this check.
+        
         // Weight might later be read from some prefix tree (also known / unknown).
         final float weight = 1f;
         
@@ -42,7 +54,14 @@ public class Commands extends Check {
         
         if (violation > 0.0){
             data.commandsVL += violation;
-            if (executeActions(player, data.commandsVL, violation, cc.commandsActions))
+            // TODO: Evaluate if sync(data) is necessary or better for executeActions.
+            if (captchaEnabled){
+                synchronized (data) {
+                    captcha.sendNewCaptcha(player, cc, data);
+                }
+                return true;
+            }
+            else if (executeActions(player, data.commandsVL, violation, cc.commandsActions))
                 return true;
         }
         else{
