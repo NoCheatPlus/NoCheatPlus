@@ -13,29 +13,6 @@ public class Relog extends Check {
 		super(CheckType.CHAT_RELOG);
 	}
 	
-    /**
-     * Checks a player (join).
-     * 
-     * Only called from the main thread.
-     * 
-     * @param player
-     *            the player
-     * @return true, if successful
-     */
-    public boolean checkLogin(final Player player) {
-        if (!isEnabled(player))
-            return false;
-
-        final ChatConfig cc = ChatConfig.getConfig(player);
-        final ChatData data = ChatData.getData(player);
-
-        // Keep related to ChatData/NoPwnage/Color used lock.
-        synchronized (data) {
-            return unsafeLoginCheck(player, cc, data);
-        }
-    }
-	
-	
 	   /**
      * Check (Join), only call from synchronized code.
      * 
@@ -47,7 +24,7 @@ public class Relog extends Check {
      *            the data
      * @return true, if successful
      */
-    private boolean unsafeLoginCheck(final Player player, final ChatConfig cc, final ChatData data) {
+    public boolean unsafeLoginCheck(final Player player, final ChatConfig cc, final ChatData data) {
         boolean cancel = false;
 
         final long now = System.currentTimeMillis();

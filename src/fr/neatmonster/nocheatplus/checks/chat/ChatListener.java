@@ -202,16 +202,10 @@ public class ChatListener implements Listener, INotifyReload {
     @EventHandler(
             priority = EventPriority.NORMAL)
     public void onPlayerLogin(final PlayerLoginEvent event) {
-        /*
-         *  ____  _                             _       _       
-         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
-         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
-         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
-         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
-         *                |___/                                 
-         */
+
         final Player player = event.getPlayer();
         final ChatConfig cc = ChatConfig.getConfig(player);
+        final ChatData data = ChatData.getData(player);
         
         // Tell TickTask to update cached permissions.
         TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
@@ -219,11 +213,15 @@ public class ChatListener implements Listener, INotifyReload {
         TickTask.updatePermissions();
         
         // Reset captcha of player if needed.
-        captcha.resetCaptcha(player);
+        synchronized(data){
+            captcha.resetCaptcha(cc, data);
+            // Execute the no pwnage check.
+            if (relog.isEnabled(player) && relog.unsafeLoginCheck(player, cc, data))
+                event.disallow(Result.KICK_OTHER, cc.relogKickMessage);
+            
+            // TODO: Logins check.
+        }
         
-        // Execute the no pwnage check.
-        if (relog.isEnabled(player) && relog.checkLogin(player))
-            event.disallow(Result.KICK_OTHER, cc.relogKickMessage);
     }
     
     @EventHandler(
@@ -232,11 +230,13 @@ public class ChatListener implements Listener, INotifyReload {
         final Player player = event.getPlayer();
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
-        if (captcha.isEnabled(player) && captcha.shouldCheckCaptcha(cc, data)){
-            // shouldCheckCaptcha: only if really enabled.
-            // Later: add check for cc.captchaOnLogin or so.
-            // TODO: maybe schedule this to coma after other plugins messages.
-            captcha.sendNewCaptcha(player, cc, data);
+        synchronized (data) {
+            if (captcha.isEnabled(player) && captcha.shouldCheckCaptcha(cc, data)){
+                // shouldCheckCaptcha: only if really enabled.
+                // TODO: Later: add check for cc.captchaOnLogin or so (before shouldCheckCaptcha).
+                // TODO: maybe schedule this to come after other plugins messages.
+                captcha.sendNewCaptcha(player, cc, data);
+            }
         }
     }
 
