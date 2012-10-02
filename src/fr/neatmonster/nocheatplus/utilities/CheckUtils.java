@@ -111,7 +111,7 @@ public class CheckUtils {
      * @return result true if the two Strings are similar, false otherwise
      */
     public static boolean isSimilar(final String s, final String t, final float threshold) {
-        return 1.0f - (float) levenshteinDistance(s, t) / Math.max(s.length(), t.length()) > threshold;
+        return 1.0f - (float) levenshteinDistance(s, t) / Math.max(1.0, Math.max(s.length(), t.length())) > threshold;
     }
 
     /**
