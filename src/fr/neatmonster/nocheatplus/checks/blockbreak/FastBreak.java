@@ -61,10 +61,11 @@ public class FastBreak extends Check {
         final long elapsedTime = (data.fastBreakBreakTime > data.fastBreakfirstDamage) ? 0 : now - data.fastBreakfirstDamage;
           
         // Check if the time used time is lower than expected.
-        if (isInstaBreak){
-        	// Ignore those for now.
-        }
-        else if (elapsedTime + cc.fastBreakDelay < breakingTime){
+//        if (isInstaBreak){
+//        	// Ignore those for now.
+//        }
+//        else 
+        if (elapsedTime + cc.fastBreakDelay < breakingTime){
     		// lag or cheat or Minecraft.
     		        		
     		final long missingTime = breakingTime - elapsedTime;
