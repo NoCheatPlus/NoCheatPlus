@@ -42,7 +42,7 @@ public class Color extends AsyncCheck {
         final ChatConfig cc = ChatConfig.getConfig(player);
 
         final ChatData data = ChatData.getData(player);
-        // Keep related to ChatData/NoPwnage/Color used lock.
+        // Keep related to ChatData used lock.
         synchronized (data) {
             // If the message contains colors...
             if (message.contains("\247")) {

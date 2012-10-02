@@ -29,7 +29,7 @@ public class Captcha extends AsyncCheck implements ICaptcha{
     	// Correct answer to the captcha?
         if (message.equals(data.captchaGenerated)) {
             // Yes, clear his data and do not worry anymore about him.
-            data.clearNoPwnageData();
+            data.reset();
             data.captchaStarted = false;
             player.sendMessage(CheckUtils.replaceColors(cc.captchaSuccess));
         } else {

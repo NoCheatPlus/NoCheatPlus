@@ -167,72 +167,62 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_CAPTCHA_TRIES, 3);
         set(ConfPaths.CHAT_CAPTCHA_ACTIONS, "cancel cmd:kickcaptcha vl>4 log:captcha:2:5:cf cancel cmd:kickcaptcha");
         
-        // globalchat (ordering on purpose).
-        set(ConfPaths.CHAT_GLOBALCHAT_CHECK, true);
-        set(ConfPaths.CHAT_GLOBALCHAT_LEVEL, 80);
-        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR, 0.9D);
-        set(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT, 6);
-        set(ConfPaths.CHAT_GLOBALCHAT_GL_CHECK, true);
-        set(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 0.5);
-        set(ConfPaths.CHAT_GLOBALCHAT_GL_WORDS_CHECK, false);
-        set(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 1.0);
-        set(ConfPaths.CHAT_GLOBALCHAT_GL_PREFIXES_CHECK , false);
-        set(ConfPaths.CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK , false);
-        set(ConfPaths.CHAT_GLOBALCHAT_PP_CHECK, true);
-        set(ConfPaths.CHAT_GLOBALCHAT_PP_WORDS_CHECK, false);
-        set(ConfPaths.CHAT_GLOBALCHAT_PP_PREFIXES_CHECK, false);
-        set(ConfPaths.CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK , false);
-        // 
-        set(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, "log:globalchat:0:5:f cancel cmd:tellglchat vl>20 log:globalchat:0:5:cf cancel cmd:kickglchat vl>50 log:globalchat:0:5:cf cancel cmd:tempkick5");
-        
-        // nopwnage
-        set(ConfPaths.CHAT_NOPWNAGE_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_LEVEL, 500);
+        // Text (ordering on purpose).
+        set(ConfPaths.CHAT_TEXT_CHECK, true);
+        set(ConfPaths.CHAT_TEXT_FREQ_NORM_MIN, 0.0);
+        set(ConfPaths.CHAT_TEXT_FREQ_NORM_FACTOR, 0.9D);
+        set(ConfPaths.CHAT_TEXT_FREQ_NORM_WEIGHT, 6);
+        set(ConfPaths.CHAT_TEXT_FREQ_NORM_LEVEL, 130);
+        set(ConfPaths.CHAT_TEXT_FREQ_NORM_ACTIONS, "log:chatnormal:0:5:f cancel cmd:tellchatnormal vl>20 log:chatnormal:0:5:cf cancel cmd:kickchatnormal vl>40 log:chatnormal:0:5:cf cancel cmd:kickchat5");
 
-        set(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT, 5000L);
-        set(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT, 100);
-
-        set(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT, 3000L);
-        set(ConfPaths.CHAT_NOPWNAGE_FIRST_WEIGHT, 200);
-
-        set(ConfPaths.CHAT_NOPWNAGE_GLOBAL_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_GLOBAL_TIMEOUT, 5000L);
-        set(ConfPaths.CHAT_NOPWNAGE_GLOBAL_WEIGHT, 100);
-
-        set(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT, 30000L);
-        set(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT, 200);
-
-        set(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT, 5000L);
-        set(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT, 150);
-
-        set(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK, true);
-//        set(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT, 500L);
-        set(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT, 100);
-
-        set(ConfPaths.CHAT_NOPWNAGE_WARN_LEVEL, 400);
-        set(ConfPaths.CHAT_NOPWNAGE_WARN_TIMEOUT, 30000L);
-
-        set(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_CHECK, false);
-        set(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_MESSAGE, "&cPlease do not say anything similar to what [player] said!");
-
-        set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_CHECK, true);
-        set(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE,
-                "&cPlease don't spam, be careful with what you say. DON'T repeat what you just said either, unless you want to be kicked or even banned.");
-
-        set(ConfPaths.CHAT_NOPWNAGE_ACTIONS, "cancel log:nopwnage:0:5:cf cmd:kicknopwnage vl>150 log:nopwnage:0:5:cf cancel cmd:tempkick5");
-
-        // Reload
+        set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_MIN, 2.0);
+        set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_FACTOR, 0.7);
+        set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_WEIGHT, 3.0);
+        set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_LEVEL, 20.0);
+        set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_ACTIONS, "cancel log:chatfast:0:5:cf cmd:kickchatfast vl>20 log:chatfast:0:5:cf cancel cmd:kickchat1 vl>40 log:chatfast:0:5:cf cancel cmd:kickchat5");
+        // Message
+        set(ConfPaths.CHAT_TEXT_MSG_LETTERCOUNT, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_PARTITION, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_UPPERCASE, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_AFTERJOIN, 1.5);
+        set(ConfPaths.CHAT_TEXT_MSG_NOMOVING, 1.5);
+        set(ConfPaths.CHAT_TEXT_MSG_REPEATCANCEL, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_REPEATGLOBAL, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_REPEATSELF, 1.5);
+        set(ConfPaths.CHAT_TEXT_MSG_WORDS_LENGTHAV, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_WORDS_LENGTHMSG, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_WORDS_NOLETTER, 1.0);
+        // Global
+        set(ConfPaths.CHAT_TEXT_GL_CHECK, true);
+        set(ConfPaths.CHAT_TEXT_GL_WEIGHT, 0.5);
+        set(ConfPaths.CHAT_TEXT_GL_WORDS_CHECK, false);
+        set(ConfPaths.CHAT_TEXT_GL_WEIGHT, 1.0);
+        set(ConfPaths.CHAT_TEXT_GL_PREFIXES_CHECK , false);
+        set(ConfPaths.CHAT_TEXT_GL_SIMILARITY_CHECK , false);
+        // Player
+        set(ConfPaths.CHAT_TEXT_PP_CHECK, true);
+        set(ConfPaths.CHAT_TEXT_PP_WORDS_CHECK, false);
+        set(ConfPaths.CHAT_TEXT_PP_PREFIXES_CHECK, false);
+        set(ConfPaths.CHAT_TEXT_PP_SIMILARITY_CHECK , false);
+        // Warning (commands + chat).
+        set(ConfPaths.CHAT_WARNING_CHECK, true);
+        set(ConfPaths.CHAT_WARNING_LEVEL, 67);
+        set(ConfPaths.CHAT_WARNING_MESSAGE, "&e>>>\n&e>>> &cPlease don't spam, &eyou are risking a ban, &cprobably.\n&e>>>");
+        set(ConfPaths.CHAT_WARNING_TIMEOUT, 10);
+        // Relog
         set(ConfPaths.CHAT_RELOG_CHECK, true);
-        set(ConfPaths.CHAT_RELOG_TIMEOUT, 1500L);
+        set(ConfPaths.CHAT_RELOG_TIMEOUT, 5000L);
         set(ConfPaths.CHAT_RELOG_WARNING_MESSAGE, "&cYou relogged really fast! If you keep doing that, you're going to be banned.");
         set(ConfPaths.CHAT_RELOG_WARNING_NUMBER, 1);
-        set(ConfPaths.CHAT_RELOG_KICKMESSAGE, "You've relogged too fast, joining cancelled!");
+        set(ConfPaths.CHAT_RELOG_KICKMESSAGE, "Too fast re-login, try with a little delay.");
         set(ConfPaths.CHAT_RELOG_WARNING_TIMEOUT, 60000L);
         set(ConfPaths.CHAT_RELOG_ACTIONS, "log:relog:0:10:cf cancel vl>20 log:relog:0:10:cf cancel cmd:tempkick5");
+        // Logins
+        set(ConfPaths.CHAT_LOGINS_CHECK, true);
+        set(ConfPaths.CHAT_LOGINS_PERWORLDCOUNT, false);
+        set(ConfPaths.CHAT_LOGINS_SECONDS, 10);
+        set(ConfPaths.CHAT_LOGINS_LIMIT, 6);
+        set(ConfPaths.CHAT_LOGINS_KICKMESSAGE, "Too many people logging in, retry soon.");
         
         /*
          * Combined !
@@ -310,7 +300,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_DROP_CHECK, true);
         set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
         set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20L);
-        set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:kick");
+        set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:dropkick");
 
         set(ConfPaths.INVENTORY_FASTCLICK_CHECK, true);
         set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel vl>50 log:fastclick:3:5:cif cancel");
@@ -390,6 +380,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
+        set(ConfPaths.STRINGS + ".dropkick", "ncp kick [player] Dropping items too fast.");
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
@@ -400,7 +391,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
         set(ConfPaths.STRINGS + ".fselfhit", start + "tried to self-hit" + end);
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [limit] times per second" + end);
-        set(ConfPaths.STRINGS + ".globalchat", start + "potentially annoying chat" + end);
+        set(ConfPaths.STRINGS + ".chatnormal", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow to fast" + end);
@@ -408,20 +399,22 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
-        set(ConfPaths.STRINGS + ".kicknopwnage", "ncp tempkick [player] 1 You're not allowed to spam this server!");
+        set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
+        set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 1 You're still not allowed to spam!");
+        set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
-        set(ConfPaths.STRINGS + ".kickglchat", "ncp kick [player] Too many chat messages, take a break.");
+        set(ConfPaths.STRINGS + ".kickchatnormal", "ncp kick [player] Too many chat messages, take a break.");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
-        set(ConfPaths.STRINGS + ".nopwnage", start + "acted like spamming (IP: [ip])" + end);
+        set(ConfPaths.STRINGS + ".chatfast", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid])" + end);
         set(ConfPaths.STRINGS + ".relog", start + "relogs too fast" + end);
-        set(ConfPaths.STRINGS + ".tellglchat", tell + "&cNCP: &eChat can by annoying at times...");
+        set(ConfPaths.STRINGS + ".tellchatnormal", tell + "&cNCP: &eToo many messages, slow down...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 

@@ -22,25 +22,25 @@ public class EnginePlayerConfig {
 	
 	public EnginePlayerConfig(final ConfigFile config){
 		// NOTE: These settings should be compared to the global settings done in the LetterEngine constructor.
-		ppWordsCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_PP_WORDS_CHECK, false);
+		ppWordsCheck = config.getBoolean(ConfPaths.CHAT_TEXT_PP_WORDS_CHECK, false);
 		if (ppWordsCheck){
 			ppWordsSettings = new FlatWordsSettings();
 			ppWordsSettings.maxSize = 150; // Adapt to smaller size.
-			ppWordsSettings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_PP_WORDS);
+			ppWordsSettings.applyConfig(config, ConfPaths.CHAT_TEXT_PP_WORDS);
 		}
 		else ppWordsSettings = null; // spare some memory.
-		ppPrefixesCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_PP_PREFIXES_CHECK, false);
+		ppPrefixesCheck = config.getBoolean(ConfPaths.CHAT_TEXT_PP_PREFIXES_CHECK, false);
 		if (ppPrefixesCheck){
 			ppPrefixesSettings = new WordPrefixesSettings();
 			ppPrefixesSettings.maxAdd = 320; // Adapt to smaller size.
-			ppPrefixesSettings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_PP_PREFIXES);
+			ppPrefixesSettings.applyConfig(config, ConfPaths.CHAT_TEXT_PP_PREFIXES);
 		}
 		else ppPrefixesSettings = null;
-		ppSimilarityCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK, false);
+		ppSimilarityCheck = config.getBoolean(ConfPaths.CHAT_TEXT_PP_SIMILARITY_CHECK, false);
 		if (ppSimilarityCheck){
 			ppSimilaritySettings = new SimilarWordsBKLSettings();
 			ppSimilaritySettings.maxSize = 100; // Adapt to smaller size;
-			ppSimilaritySettings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_PP_SIMILARITY);
+			ppSimilaritySettings.applyConfig(config, ConfPaths.CHAT_TEXT_PP_SIMILARITY);
 		}
 		else ppSimilaritySettings = null;
 	}

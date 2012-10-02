@@ -107,11 +107,9 @@ public class Permissions {
     public static final String  CHAT_CAPTCHA                 = CHAT + ".captcha";
     public static final String  CHAT_COLOR                   = CHAT + ".color";
     public static final String  CHAT_COMMANDS                = CHAT + ".commands";
-    public static final String  CHAT_GLOBALCHAT              = CHAT + ".globalchat";
+    public static final String  CHAT_TEXT              = CHAT + ".text";
     public static final String  CHAT_LOGINS                  = CHAT + ".logins";
     public static final String  CHAT_RELOG                   = CHAT + ".relog";
-    
-    public static final String  CHAT_NOPWNAGE                = CHAT + ".nopwnage";
     
     /*
      * Combined !

@@ -36,22 +36,22 @@ public class LetterEngine {
 	public LetterEngine(ConfigFile config){
 		// Add word processors.
 		// NOTE: These settings should be compared to the per player settings done in the EnginePlayerConfig constructor.
-		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_WORDS_CHECK, false)){
+		if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_WORDS_CHECK, false)){
 			FlatWordsSettings settings = new FlatWordsSettings();
 			settings.maxSize = 1000;
-			settings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_GL_WORDS);
+			settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_WORDS);
 			processors.add(new FlatWords("glWords",settings));
 		}
-		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_PREFIXES_CHECK , false)){
+		if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_PREFIXES_CHECK , false)){
 			WordPrefixesSettings settings = new WordPrefixesSettings();
 			settings.maxAdd = 2000;
-			settings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_GL_PREFIXES);
+			settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_PREFIXES);
 			processors.add(new WordPrefixes("glPrefixes", settings));
 		}
-		if (config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK , false)){
+		if (config.getBoolean(ConfPaths.CHAT_TEXT_GL_SIMILARITY_CHECK , false)){
 			SimilarWordsBKLSettings settings = new SimilarWordsBKLSettings();
 			settings.maxSize = 1000;
-			settings.applyConfig(config, ConfPaths.CHAT_GLOBALCHAT_GL_SIMILARITY);
+			settings.applyConfig(config, ConfPaths.CHAT_TEXT_GL_SIMILARITY);
 			processors.add(new SimilarWordsBKL("glSimilarity", settings));
 		}
 		// TODO: At least expiration duration configurable? (Entries expire after 10 minutes.)
@@ -63,13 +63,13 @@ public class LetterEngine {
 		final Map<String, Float> result = new HashMap<String, Float>();
 		
 		// Global processors.
-		if (cc.globalChatGlobalCheck){
+		if (cc.textGlobalCheck){
 			for (final WordProcessor processor : processors){
 				try{
-					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatGlobalWeight);
+					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textGlobalWeight);
 				}
 				catch( final Exception e){
-					Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					Bukkit.getLogger().warning("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
 					e.printStackTrace();
 					continue;
 				}
@@ -77,14 +77,14 @@ public class LetterEngine {
 		}
 		
 		// Per player processors.
-		if (cc.globalChatPlayerCheck){
+		if (cc.textPlayerCheck){
 			final EnginePlayerData engineData = dataMap.get(playerName, cc); 
 			for (final WordProcessor processor : engineData.processors){
 				try{
-					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.globalChatPlayerWeight);
+					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textPlayerWeight);
 				}
 				catch( final Exception e){
-					Bukkit.getLogger().warning("[NoCheatPlus] globalchat: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					Bukkit.getLogger().warning("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
 					e.printStackTrace();
 					continue;
 				}

@@ -31,9 +31,7 @@ public class Relog extends Check {
 
         final CombinedData cData = CombinedData.getData(player);
         
-        // NoPwnage will remember the time when a player leaves the server. If he returns within "time" milliseconds, he
-        // will get warned. If he has been warned "warnings" times already, the "commands" will be executed for him.
-        // Warnings get removed if the time of the last warning was more than "timeout" milliseconds ago.
+        // Enforce the player does not relog too fast.
         if (now - cData.lastLogoutTime < cc.relogTimeout) {
             if (now - data.relogWarningTime > cc.relogWarningTimeout)
                 data.relogWarnings = 0;

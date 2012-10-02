@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -50,7 +51,8 @@ public class Commands extends Check {
             data.commandsShortTermWeight = 1.0;
         }
         
-        final double violation = Math.max(data.commandsWeights.getScore(1f) - cc.commandsLevel, data.commandsShortTermWeight - cc.commandsShortTermLevel);
+        final float nw = data.commandsWeights.getScore(1f);
+        final double violation = Math.max(nw - cc.commandsLevel, data.commandsShortTermWeight - cc.commandsShortTermLevel);
         
         if (violation > 0.0){
             data.commandsVL += violation;
@@ -63,6 +65,10 @@ public class Commands extends Check {
             }
             else if (executeActions(player, data.commandsVL, violation, cc.commandsActions))
                 return true;
+        }
+        else if (cc.chatWarningCheck && now - data.chatWarningTime > cc.chatWarningTimeout && (100f * nw / cc.commandsLevel > cc.chatWarningLevel || 100f * data.commandsShortTermWeight / cc.commandsShortTermLevel > cc.chatWarningLevel)){
+            player.sendMessage(CheckUtils.replaceColors(cc.chatWarningMessage));
+            data.chatWarningTime = now;
         }
         else{
             // TODO: This might need invalidation with time.

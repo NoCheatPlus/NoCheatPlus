@@ -45,27 +45,31 @@ public class ChatListener implements Listener, INotifyReload {
     /** The color check. */
     private final Color    color    = new Color();    
     
+    /** Commands repetition check. */
     private final Commands commands = new Commands(); 
     
-    /** Global chat check. */
-    private final GlobalChat globalChat = new GlobalChat();
+    /** Logins check (global) */
+    private final Logins logins = new Logins();
     
-    /** The no pwnage check. */
-    private final NoPwnage noPwnage = new NoPwnage();
+    /** Chat message check. */
+    private final Text text = new Text();
    
+    /** Relogging check. */
     private final Relog relog = new Relog();
     
     // Auxiliary stuff.
     
+    /** Commands to be ignored completely. */
     private final SimpleCharPrefixTree commandExclusions = new SimpleCharPrefixTree();
     
+    /** Commands to be handled as chat. */
     private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree(); 
     
     
     public ChatListener(){
     	ConfigFile config = ConfigManager.getConfigFile();
     	initFilters(config);
-    	// (globalChat inits in constructor.)
+    	// (text inits in constructor.)
     }
     
 	private void initFilters(ConfigFile config) {
@@ -106,12 +110,8 @@ public class ChatListener implements Listener, INotifyReload {
         // First the color check.
         if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), false));
 
-        // Then the no pwnage check.
-        if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, false))
-        	event.setCancelled(true);
-        else if (globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), captcha, false))
-        	// Only check those that got through.
-        	// (ICaptcha to start captcha if desired.)
+        // Then the no chat check.
+        if (text.isEnabled(player) && text.check(player, event.getMessage(), captcha, false))
         	event.setCancelled(true);
     }
 
@@ -180,9 +180,7 @@ public class ChatListener implements Listener, INotifyReload {
         // Then the no pwnage check.
         if (handleAsChat){
             // Treat as chat.
-            if (noPwnage.isEnabled(player) && noPwnage.check(player, event.getMessage(), captcha, true))
-                event.setCancelled(true);
-            else if (globalChat.isEnabled(player) && globalChat.check(player, event.getMessage(), captcha, true))
+            if (text.isEnabled(player) && text.check(player, event.getMessage(), captcha, true))
                 event.setCancelled(true);
         }
         else if (!commandExclusions.hasPrefixWords(lcMessage)){
@@ -215,13 +213,12 @@ public class ChatListener implements Listener, INotifyReload {
         // Reset captcha of player if needed.
         synchronized(data){
             captcha.resetCaptcha(cc, data);
-            // Execute the no pwnage check.
-            if (relog.isEnabled(player) && relog.unsafeLoginCheck(player, cc, data))
-                event.disallow(Result.KICK_OTHER, cc.relogKickMessage);
-            
-            // TODO: Logins check.
         }
-        
+        // Fast relog check.
+        if (relog.isEnabled(player) && relog.unsafeLoginCheck(player, cc, data))
+            event.disallow(Result.KICK_OTHER, cc.relogKickMessage);
+        else if (logins.isEnabled(player) && logins.check(player, cc, data))
+            event.disallow(Result.KICK_OTHER, cc.loginsKickMessage);
     }
     
     @EventHandler(
@@ -245,7 +242,7 @@ public class ChatListener implements Listener, INotifyReload {
 		// Read some things from the global config file.
     	ConfigFile config = ConfigManager.getConfigFile();
     	initFilters(config);
-    	globalChat.onReload();
+    	text.onReload();
 	}
 
 }

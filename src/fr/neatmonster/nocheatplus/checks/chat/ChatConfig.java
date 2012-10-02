@@ -85,58 +85,48 @@ public class ChatConfig extends AsyncCheckConfig {
     public final double       commandsShortTermLevel;
     public final ActionList   commandsActions;
     
-    public final boolean      globalChatCheck;
-	public final boolean      globalChatGlobalCheck;
-	public final boolean      globalChatPlayerCheck;
-	public final EnginePlayerConfig globalChatEnginePlayerConfig;
-	public final float        globalChatFrequencyFactor;
-	public final float        globalChatFrequencyWeight;
-	public final float        globalChatGlobalWeight;
-	public final float        globalChatPlayerWeight;
-	public final double       globalChatLevel;
-	public boolean            globalChatEngineMaximum;
-	public final boolean      globalChatDebug;
-    public final ActionList   globalChatActions;
+    public final boolean      textCheck;
+	public final boolean      textGlobalCheck;
+	public final boolean      textPlayerCheck;
+	public final EnginePlayerConfig textEnginePlayerConfig;
+	public final float        textFreqNormFactor;
+	public final float        textFreqNormWeight;
+    public final float        textFreqNormMin;
+    public final double       textFreqNormLevel;
+    public final ActionList   textFreqNormActions;
+    public final float        textFreqShortTermFactor;
+    public final float        textFreqShortTermWeight;
+    public final float        textFreqShortTermLevel;
+    public final float        textFreqShortTermMin;
+    public final ActionList   textFreqShortTermActions;
+    public final float        textMessageLetterCount;
+	public final float        textMessageUpperCase;
+    public final float        textMessagePartition;
+    public final float        textMsgRepeatCancel;
+    public final float        textMsgAfterJoin;
+    public final float        textMsgRepeatSelf;
+    public final float        textMsgRepeatGlobal;
+    public final float        textMsgNoMoving;
     
-    private final boolean     loginsCheck;
-
-    public final boolean      noPwnageCheck;
-	public final boolean      noPwnageDebug;
-    public final int          noPwnageLevel;
-    public final float        noPwnageVLFactor;
-
-    public final boolean      noPwnageBannedCheck;
-    public final long         noPwnageBannedTimeout;
-    public final int          noPwnageBannedWeight;
-
-    public final boolean      noPwnageFirstCheck;
-    public final long         noPwnageFirstTimeout;
-    public final int          noPwnageFirstWeight;
-
-    public final boolean      noPwnageGlobalCheck;
-    public final long         noPwnageGlobalTimeout;
-    public final int          noPwnageGlobalWeight;
-
-    public final boolean      noPwnageMoveCheck;
-    public final long         noPwnageMoveTimeout;
-    public final int          noPwnageMoveWeight;
-
-    public final boolean      noPwnageRepeatCheck;
-    public final long         noPwnageRepeatTimeout;
-    public final int          noPwnageRepeatWeight;
-
-    public final boolean      noPwnageSpeedCheck;
-//    public final long         noPwnageSpeedTimeout;
-    public final int          noPwnageSpeedWeight;
-
-    public final int          noPwnageWarnLevel;
-    public final long         noPwnageWarnTimeout;
-    public final boolean      noPwnageWarnOthersCheck;
-    public final String       noPwnageWarnOthersMessage;
-    public final boolean      noPwnageWarnPlayerCheck;
-    public final String       noPwnageWarnPlayerMessage;
-
-    public final ActionList   noPwnageActions;
+    // words
+    public final float        textMessageLengthAv;
+    public final float        textMessageLengthMsg;
+    public final float        textMessageNoLetter;
+	public final float        textGlobalWeight;
+	public final float        textPlayerWeight;
+	public boolean            textEngineMaximum;
+	public final boolean      textDebug;
+    
+    public final boolean      chatWarningCheck;
+    public final float        chatWarningLevel;
+    public final String       chatWarningMessage;
+    public final long         chatWarningTimeout;
+    
+    public final boolean      loginsCheck;
+    public final boolean      loginsPerWorldCount;
+    public final int          loginsSeconds;
+    public final int          loginsLimit;
+    public final String       loginsKickMessage;
 
     public final boolean      opInConsoleOnly;
 
@@ -149,8 +139,8 @@ public class ChatConfig extends AsyncCheckConfig {
     public final String       relogWarningMessage;
     public final int          relogWarningNumber;
     public final long         relogWarningTimeout;
-    public ActionList         relogActions;
-
+    public final ActionList   relogActions;
+    
     /**
      * Instantiates a new chat configuration.
      * 
@@ -159,9 +149,9 @@ public class ChatConfig extends AsyncCheckConfig {
      */
     public ChatConfig(final ConfigFile config) {
     	super(new String[]{
+    	        // Only the permissions needed for async. checking.
     	    	Permissions.CHAT_COLOR,
-    	    	Permissions.CHAT_GLOBALCHAT,
-    	    	Permissions.CHAT_NOPWNAGE,
+    	    	Permissions.CHAT_TEXT,
     	    	Permissions.CHAT_CAPTCHA,
     	    });
     	
@@ -183,59 +173,47 @@ public class ChatConfig extends AsyncCheckConfig {
         commandsActions = config.getActionList(ConfPaths.CHAT_COMMANDS_ACTIONS, Permissions.CHAT_COMMANDS);
         
         
-        globalChatCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_CHECK);
-    	globalChatGlobalCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_GL_CHECK, true);
-    	globalChatPlayerCheck = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_PP_CHECK, true);
-        globalChatEnginePlayerConfig = new EnginePlayerConfig(config);
-        globalChatFrequencyFactor = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_FACTOR);
-        globalChatFrequencyWeight = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_FREQUENCY_WEIGHT);
-        globalChatGlobalWeight = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_GL_WEIGHT, 1.0);
-        globalChatPlayerWeight = (float) config.getDouble(ConfPaths.CHAT_GLOBALCHAT_PP_WEIGHT, 1.0);
-    	globalChatLevel = config.getDouble(ConfPaths.CHAT_GLOBALCHAT_LEVEL);
-    	globalChatEngineMaximum = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_ENGINE_MAXIMUM, true);
-    	globalChatDebug = config.getBoolean(ConfPaths.CHAT_GLOBALCHAT_DEBUG, false);
-        globalChatActions = config.getActionList(ConfPaths.CHAT_GLOBALCHAT_ACTIONS, Permissions.CHAT_GLOBALCHAT);
+        textCheck = config.getBoolean(ConfPaths.CHAT_TEXT_CHECK);
+    	textGlobalCheck = config.getBoolean(ConfPaths.CHAT_TEXT_GL_CHECK, true);
+    	textPlayerCheck = config.getBoolean(ConfPaths.CHAT_TEXT_PP_CHECK, true);
+        textEnginePlayerConfig = new EnginePlayerConfig(config);
+        textFreqNormMin = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_NORM_MIN);
+        textFreqNormFactor = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_NORM_FACTOR);
+        textFreqNormWeight = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_NORM_WEIGHT);
+        textFreqShortTermFactor = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_FACTOR);
+        textFreqShortTermWeight = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_WEIGHT);
+        textFreqShortTermLevel = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_LEVEL);
+        textFreqShortTermMin = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_MIN);
+        textFreqShortTermActions = config.getActionList(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_ACTIONS, Permissions.CHAT_TEXT);
+        textMessageLetterCount = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_LETTERCOUNT);
+        textMessagePartition = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_PARTITION);
+        textMessageUpperCase = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_UPPERCASE);
+        textMsgRepeatCancel = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_REPEATCANCEL);
+        textMsgAfterJoin = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_AFTERJOIN); 
+        textMsgRepeatSelf = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_REPEATSELF); 
+        textMsgRepeatGlobal = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_REPEATGLOBAL); 
+        textMsgNoMoving = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_NOMOVING); 
+        
+        textMessageLengthAv = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_WORDS_LENGTHAV);
+        textMessageLengthMsg = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_WORDS_LENGTHMSG);
+        textMessageNoLetter = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_WORDS_NOLETTER);
+        textGlobalWeight = (float) config.getDouble(ConfPaths.CHAT_TEXT_GL_WEIGHT, 1.0);
+        textPlayerWeight = (float) config.getDouble(ConfPaths.CHAT_TEXT_PP_WEIGHT, 1.0);
+    	textFreqNormLevel = config.getDouble(ConfPaths.CHAT_TEXT_FREQ_NORM_LEVEL);
+    	textEngineMaximum = config.getBoolean(ConfPaths.CHAT_TEXT_ENGINE_MAXIMUM, true);
+    	textDebug = config.getBoolean(ConfPaths.CHAT_TEXT_DEBUG, false);
+        textFreqNormActions = config.getActionList(ConfPaths.CHAT_TEXT_FREQ_NORM_ACTIONS, Permissions.CHAT_TEXT);
+        
+        chatWarningCheck = config.getBoolean(ConfPaths.CHAT_WARNING_CHECK);
+        chatWarningLevel = (float) config.getDouble(ConfPaths.CHAT_WARNING_LEVEL);
+        chatWarningMessage = config.getString(ConfPaths.CHAT_WARNING_MESSAGE);
+        chatWarningTimeout = config.getLong(ConfPaths.CHAT_WARNING_TIMEOUT) * 1000;
         
         loginsCheck = config.getBoolean(ConfPaths.CHAT_LOGINS_CHECK);
-
-        noPwnageCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_CHECK);
-        noPwnageDebug = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_DEBUG, false);
-        noPwnageLevel = config.getInt(ConfPaths.CHAT_NOPWNAGE_LEVEL);
-        // VL decreasing factor, hidden option.
-        noPwnageVLFactor = (float) config.getDouble(ConfPaths.CHAT_NOPWNAGE_VL_FACTOR, 0.9);
-
-        noPwnageBannedCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_BANNED_CHECK);
-        noPwnageBannedTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_BANNED_TIMEOUT);
-        noPwnageBannedWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_BANNED_WEIGHT);
-
-        noPwnageFirstCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_FIRST_CHECK);
-        noPwnageFirstTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_FIRST_TIMEOUT);
-        noPwnageFirstWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_FIRST_WEIGHT);
-
-        noPwnageGlobalCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_GLOBAL_CHECK);
-        noPwnageGlobalTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_GLOBAL_TIMEOUT);
-        noPwnageGlobalWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_GLOBAL_WEIGHT);
-
-        noPwnageMoveCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_MOVE_CHECK);
-        noPwnageMoveTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_MOVE_TIMEOUT);
-        noPwnageMoveWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_MOVE_WEIGHT);
-
-        noPwnageRepeatCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_REPEAT_CHECK);
-        noPwnageRepeatTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_REPEAT_TIMEOUT);
-        noPwnageRepeatWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_REPEAT_WEIGHT);
-
-        noPwnageSpeedCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_SPEED_CHECK);
-//        noPwnageSpeedTimeout = data.getLong(ConfPaths.CHAT_NOPWNAGE_SPEED_TIMEOUT);
-        noPwnageSpeedWeight = config.getInt(ConfPaths.CHAT_NOPWNAGE_SPEED_WEIGHT);
-
-        noPwnageWarnLevel = config.getInt(ConfPaths.CHAT_NOPWNAGE_WARN_LEVEL);
-        noPwnageWarnTimeout = config.getLong(ConfPaths.CHAT_NOPWNAGE_WARN_TIMEOUT);
-        noPwnageWarnOthersCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_CHECK);
-        noPwnageWarnOthersMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_WARN_OTHERS_MESSAGE);
-        noPwnageWarnPlayerCheck = config.getBoolean(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_CHECK);
-        noPwnageWarnPlayerMessage = config.getString(ConfPaths.CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE);
-
-        noPwnageActions = config.getActionList(ConfPaths.CHAT_NOPWNAGE_ACTIONS, Permissions.CHAT_NOPWNAGE);
+        loginsPerWorldCount = config.getBoolean(ConfPaths.CHAT_LOGINS_PERWORLDCOUNT);
+        loginsSeconds = config.getInt(ConfPaths.CHAT_LOGINS_SECONDS);
+        loginsLimit = config.getInt(ConfPaths.CHAT_LOGINS_LIMIT);
+        loginsKickMessage =  config.getString(ConfPaths.CHAT_LOGINS_KICKMESSAGE);
         
         relogCheck = config.getBoolean(ConfPaths.CHAT_RELOG_CHECK);
         relogKickMessage = config.getString(ConfPaths.CHAT_RELOG_KICKMESSAGE);
@@ -258,10 +236,8 @@ public class ChatConfig extends AsyncCheckConfig {
         switch (checkType) {
         case CHAT_COLOR:
             return colorCheck;
-        case CHAT_GLOBALCHAT:
-        	return globalChatCheck;
-        case CHAT_NOPWNAGE:
-            return noPwnageCheck;
+        case CHAT_TEXT:
+        	return textCheck;
         case CHAT_COMMANDS:
             return commandsCheck;
         case CHAT_CAPTCHA:

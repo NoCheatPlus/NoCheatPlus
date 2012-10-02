@@ -202,101 +202,82 @@ public abstract class ConfPaths {
     public static final String  CHAT_COMMANDS_SHORTTERM_LEVEL            = CHAT_COMMANDS_SHORTTERM + "level";
     public static final String  CHAT_COMMANDS_ACTIONS                    = CHAT_COMMANDS + "actions";
     
-    // globalchat
-    private static final String CHAT_GLOBALCHAT                          = CHAT + "globalchat.";
-    public static final String CHAT_GLOBALCHAT_CHECK                     = CHAT_GLOBALCHAT + "active";
-	public static final String CHAT_GLOBALCHAT_DEBUG                     = CHAT_GLOBALCHAT + "debug";
-	public static final String CHAT_GLOBALCHAT_LEVEL                     = CHAT_GLOBALCHAT + "level";
-	public static final String CHAT_GLOBALCHAT_ENGINE_MAXIMUM            = CHAT_GLOBALCHAT + "maximum";
-    public static final String CHAT_GLOBALCHAT_FREQUENCY                 = CHAT_GLOBALCHAT + "frequency.";
-	public static final String CHAT_GLOBALCHAT_FREQUENCY_WEIGHT          = CHAT_GLOBALCHAT_FREQUENCY + "weight";
-	public static final String CHAT_GLOBALCHAT_FREQUENCY_FACTOR          = CHAT_GLOBALCHAT_FREQUENCY + "factor";
+    // Text
+    private static final String CHAT_TEXT                                 = CHAT + "text.";
+    public static final String CHAT_TEXT_CHECK                            = CHAT_TEXT + "active";
+	public static final String CHAT_TEXT_DEBUG                       = CHAT_TEXT + "debug";
+	public static final String CHAT_TEXT_ENGINE_MAXIMUM              = CHAT_TEXT + "maximum";
+    public static final String CHAT_TEXT_FREQ                        = CHAT_TEXT + "frequency.";
+    public static final String CHAT_TEXT_FREQ_NORM                   = CHAT_TEXT_FREQ + "normal.";
+	public static final String CHAT_TEXT_FREQ_NORM_FACTOR            = CHAT_TEXT_FREQ_NORM + "factor";
+	public static final String CHAT_TEXT_FREQ_NORM_LEVEL             = CHAT_TEXT_FREQ_NORM + "level";
+	public static final String CHAT_TEXT_FREQ_NORM_WEIGHT            = CHAT_TEXT_FREQ_NORM + "weight";
+	public static final String CHAT_TEXT_FREQ_NORM_MIN               = CHAT_TEXT_FREQ_NORM + "minimum";
+    public static final String CHAT_TEXT_FREQ_NORM_ACTIONS           = CHAT_TEXT_FREQ_NORM + "actions";
+	private static final String CHAT_TEXT_FREQ_SHORTTERM             = CHAT_TEXT_FREQ + "shortterm.";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_FACTOR       = CHAT_TEXT_FREQ_SHORTTERM + "factor";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_LEVEL        = CHAT_TEXT_FREQ_SHORTTERM + "level";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_WEIGHT       = CHAT_TEXT_FREQ_SHORTTERM + "weight";
+    public static final String  CHAT_TEXT_FREQ_SHORTTERM_MIN         = CHAT_TEXT_FREQ_SHORTTERM + "minimum";
+    public static final String CHAT_TEXT_FREQ_SHORTTERM_ACTIONS      = CHAT_TEXT_FREQ_SHORTTERM + "actions";
+    
 	// (Some of the following paths must be public for generic config reading.)
+	// Per message checks.
+	private static final String CHAT_TEXT_MSG                      = CHAT_TEXT + "message.";
+    public static final String  CHAT_TEXT_MSG_LETTERCOUNT          = CHAT_TEXT_MSG + "lettercount";
+    public static final String  CHAT_TEXT_MSG_PARTITION            = CHAT_TEXT_MSG + "partition";
+	public static final String  CHAT_TEXT_MSG_UPPERCASE            = CHAT_TEXT_MSG + "uppercase";
+	
+    public static final String CHAT_TEXT_MSG_REPEATCANCEL          = CHAT_TEXT_MSG + "repeatviolation";
+    public static final String CHAT_TEXT_MSG_AFTERJOIN             = CHAT_TEXT_MSG + "afterjoin";
+    public static final String CHAT_TEXT_MSG_REPEATSELF            = CHAT_TEXT_MSG + "repeatself";
+    public static final String CHAT_TEXT_MSG_REPEATGLOBAL          = CHAT_TEXT_MSG + "repeatglobal";
+    public static final String CHAT_TEXT_MSG_NOMOVING              = CHAT_TEXT_MSG + "nomoving";
+	
+	private static final String CHAT_TEXT_MSG_WORDS                = CHAT_TEXT_MSG + "words.";
+	public static final String  CHAT_TEXT_MSG_WORDS_LENGTHAV       = CHAT_TEXT_MSG_WORDS + "lengthav";
+	public static final String  CHAT_TEXT_MSG_WORDS_LENGTHMSG      = CHAT_TEXT_MSG_WORDS + "lengthmsg";
+	public static final String  CHAT_TEXT_MSG_WORDS_NOLETTER       = CHAT_TEXT_MSG_WORDS + "noletter";
     // Extended global checks.
-    private static final String CHAT_GLOBALCHAT_GL                       = CHAT_GLOBALCHAT + "global.";
-	public static final String CHAT_GLOBALCHAT_GL_CHECK                  = CHAT_GLOBALCHAT_GL + "active";
-	public static final String CHAT_GLOBALCHAT_GL_WEIGHT                 = CHAT_GLOBALCHAT_GL + "weight";
+    private static final String CHAT_TEXT_GL                       = CHAT_TEXT + "global.";
+	public static final String CHAT_TEXT_GL_CHECK                  = CHAT_TEXT_GL + "active";
+	public static final String CHAT_TEXT_GL_WEIGHT                 = CHAT_TEXT_GL + "weight";
 	@GlobalConfig
-    public static final String CHAT_GLOBALCHAT_GL_WORDS                  = CHAT_GLOBALCHAT_GL + "words.";
-	public static final String CHAT_GLOBALCHAT_GL_WORDS_CHECK            = CHAT_GLOBALCHAT_GL_WORDS + "active";
+    public static final String CHAT_TEXT_GL_WORDS                  = CHAT_TEXT_GL + "words.";
+	public static final String CHAT_TEXT_GL_WORDS_CHECK            = CHAT_TEXT_GL_WORDS + "active";
 	@GlobalConfig
-	public static final String CHAT_GLOBALCHAT_GL_PREFIXES               = CHAT_GLOBALCHAT_GL + "prefixes.";
-	public static final String CHAT_GLOBALCHAT_GL_PREFIXES_CHECK         = CHAT_GLOBALCHAT_GL_PREFIXES + "active";
+	public static final String CHAT_TEXT_GL_PREFIXES               = CHAT_TEXT_GL + "prefixes.";
+	public static final String CHAT_TEXT_GL_PREFIXES_CHECK         = CHAT_TEXT_GL_PREFIXES + "active";
 	@GlobalConfig
-	public static final String CHAT_GLOBALCHAT_GL_SIMILARITY             = CHAT_GLOBALCHAT_GL + "similarity.";
-	public static final String CHAT_GLOBALCHAT_GL_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_GL_SIMILARITY + "active";
+	public static final String CHAT_TEXT_GL_SIMILARITY             = CHAT_TEXT_GL + "similarity.";
+	public static final String CHAT_TEXT_GL_SIMILARITY_CHECK       = CHAT_TEXT_GL_SIMILARITY + "active";
 	// Extended per player checks.
-	private static final String CHAT_GLOBALCHAT_PP                       = CHAT_GLOBALCHAT + "player.";
-	public static final String CHAT_GLOBALCHAT_PP_CHECK                  = CHAT_GLOBALCHAT_PP + "active";
-	public static final String CHAT_GLOBALCHAT_PP_WEIGHT                 = CHAT_GLOBALCHAT_PP + "weight";
+	private static final String CHAT_TEXT_PP                       = CHAT_TEXT + "player.";
+	public static final String CHAT_TEXT_PP_CHECK                  = CHAT_TEXT_PP + "active";
+	public static final String CHAT_TEXT_PP_WEIGHT                 = CHAT_TEXT_PP + "weight";
 	@GlobalConfig
-	public static final String CHAT_GLOBALCHAT_PP_PREFIXES               = CHAT_GLOBALCHAT_PP + "prefixes.";
-	public static final String CHAT_GLOBALCHAT_PP_PREFIXES_CHECK         = CHAT_GLOBALCHAT_PP_PREFIXES + "active";
+	public static final String CHAT_TEXT_PP_PREFIXES               = CHAT_TEXT_PP + "prefixes.";
+	public static final String CHAT_TEXT_PP_PREFIXES_CHECK         = CHAT_TEXT_PP_PREFIXES + "active";
 	@GlobalConfig
-	public static final String CHAT_GLOBALCHAT_PP_WORDS                  = CHAT_GLOBALCHAT_PP + "words.";
-	public static final String CHAT_GLOBALCHAT_PP_WORDS_CHECK            = CHAT_GLOBALCHAT_PP_WORDS + "active";
+	public static final String CHAT_TEXT_PP_WORDS                  = CHAT_TEXT_PP + "words.";
+	public static final String CHAT_TEXT_PP_WORDS_CHECK            = CHAT_TEXT_PP_WORDS + "active";
 	@GlobalConfig
-	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY             = CHAT_GLOBALCHAT_PP + "similarity.";
-	public static final String CHAT_GLOBALCHAT_PP_SIMILARITY_CHECK       = CHAT_GLOBALCHAT_PP_SIMILARITY + "active";
-	// globalchat actions
-    public static final String  CHAT_GLOBALCHAT_ACTIONS                  = CHAT_GLOBALCHAT + "actions";
+	public static final String CHAT_TEXT_PP_SIMILARITY             = CHAT_TEXT_PP + "similarity.";
+	public static final String CHAT_TEXT_PP_SIMILARITY_CHECK       = CHAT_TEXT_PP_SIMILARITY + "active";
+	
+    private static final String CHAT_WARNING                             = CHAT + "warning.";
+    public static final String  CHAT_WARNING_CHECK                       = CHAT_WARNING + "active";
+    public static final String  CHAT_WARNING_LEVEL                       = CHAT_WARNING + "level";
+    public static final String  CHAT_WARNING_MESSAGE                     = CHAT_WARNING + "message";
+    public static final String  CHAT_WARNING_TIMEOUT                     = CHAT_WARNING + "timeout";
 	
     // NOT YET IN USE
     private static final String CHAT_LOGINS                              = CHAT + "logins.";
     public static final String  CHAT_LOGINS_CHECK                        = CHAT_LOGINS + "active";
-    
-    // nopwnage
-    private static final String CHAT_NOPWNAGE                            = CHAT + "nopwnage.";
-    public static final String  CHAT_NOPWNAGE_CHECK                      = CHAT_NOPWNAGE + "active";
-	public static final String  CHAT_NOPWNAGE_DEBUG                      = CHAT_NOPWNAGE + "debug";
-    public static final String  CHAT_NOPWNAGE_LEVEL                      = CHAT_NOPWNAGE + "level";
-
-    private static final String CHAT_NOPWNAGE_BANNED                     = CHAT_NOPWNAGE + "banned.";
-    public static final String  CHAT_NOPWNAGE_BANNED_CHECK               = CHAT_NOPWNAGE_BANNED + "active";
-    public static final String  CHAT_NOPWNAGE_BANNED_TIMEOUT             = CHAT_NOPWNAGE_BANNED + "timeout";
-    public static final String  CHAT_NOPWNAGE_BANNED_WEIGHT              = CHAT_NOPWNAGE_BANNED + "weight";
-
-    private static final String CHAT_NOPWNAGE_FIRST                      = CHAT_NOPWNAGE + "first.";
-    public static final String  CHAT_NOPWNAGE_FIRST_CHECK                = CHAT_NOPWNAGE_FIRST + "active";
-    public static final String  CHAT_NOPWNAGE_FIRST_TIMEOUT              = CHAT_NOPWNAGE_FIRST + "timeout";
-    public static final String  CHAT_NOPWNAGE_FIRST_WEIGHT               = CHAT_NOPWNAGE_FIRST + "weight";
-
-    private static final String CHAT_NOPWNAGE_GLOBAL                     = CHAT_NOPWNAGE + "global.";
-    public static final String  CHAT_NOPWNAGE_GLOBAL_CHECK               = CHAT_NOPWNAGE_GLOBAL + "active";
-    public static final String  CHAT_NOPWNAGE_GLOBAL_TIMEOUT             = CHAT_NOPWNAGE_GLOBAL + "timeout";
-    public static final String  CHAT_NOPWNAGE_GLOBAL_WEIGHT              = CHAT_NOPWNAGE_GLOBAL + "weight";
-
-    private static final String CHAT_NOPWNAGE_MOVE                       = CHAT_NOPWNAGE + "move.";
-    public static final String  CHAT_NOPWNAGE_MOVE_CHECK                 = CHAT_NOPWNAGE_MOVE + "active";
-    public static final String  CHAT_NOPWNAGE_MOVE_TIMEOUT               = CHAT_NOPWNAGE_MOVE + "timeout";
-    public static final String  CHAT_NOPWNAGE_MOVE_WEIGHT                = CHAT_NOPWNAGE_MOVE + "weight";
-
-    private static final String CHAT_NOPWNAGE_REPEAT                     = CHAT_NOPWNAGE + "repeat.";
-    public static final String  CHAT_NOPWNAGE_REPEAT_CHECK               = CHAT_NOPWNAGE_REPEAT + "active";
-    public static final String  CHAT_NOPWNAGE_REPEAT_TIMEOUT             = CHAT_NOPWNAGE_REPEAT + "timeout";
-    public static final String  CHAT_NOPWNAGE_REPEAT_WEIGHT              = CHAT_NOPWNAGE_REPEAT + "weight";
-
-    private static final String CHAT_NOPWNAGE_SPEED                      = CHAT_NOPWNAGE + "speed.";
-    public static final String  CHAT_NOPWNAGE_SPEED_CHECK                = CHAT_NOPWNAGE_SPEED + "active";
-//    public static final String  CHAT_NOPWNAGE_SPEED_TIMEOUT              = CHAT_NOPWNAGE_SPEED + "timeout";
-    public static final String  CHAT_NOPWNAGE_SPEED_WEIGHT               = CHAT_NOPWNAGE_SPEED + "weight";
-    
-    public static final String CHAT_NOPWNAGE_VL                          = CHAT_NOPWNAGE + "vl.";
-	public static final String CHAT_NOPWNAGE_VL_FACTOR                   = CHAT_NOPWNAGE_VL + "factor";
-
-    private static final String CHAT_NOPWNAGE_WARN                       = CHAT_NOPWNAGE + "warn.";
-    public static final String  CHAT_NOPWNAGE_WARN_LEVEL                 = CHAT_NOPWNAGE_WARN + "level";
-    public static final String  CHAT_NOPWNAGE_WARN_TIMEOUT               = CHAT_NOPWNAGE_WARN + "timeout";
-
-    private static final String CHAT_NOPWNAGE_WARN_OTHERS                = CHAT_NOPWNAGE_WARN + "others.";
-    public static final String  CHAT_NOPWNAGE_WARN_OTHERS_CHECK          = CHAT_NOPWNAGE_WARN_OTHERS + "active";
-    public static final String  CHAT_NOPWNAGE_WARN_OTHERS_MESSAGE        = CHAT_NOPWNAGE_WARN_OTHERS + "message";
-
-    private static final String CHAT_NOPWNAGE_WARN_PLAYER                = CHAT_NOPWNAGE_WARN + "player.";
-    public static final String  CHAT_NOPWNAGE_WARN_PLAYER_CHECK          = CHAT_NOPWNAGE_WARN_PLAYER + "active";
-    public static final String  CHAT_NOPWNAGE_WARN_PLAYER_MESSAGE        = CHAT_NOPWNAGE_WARN_PLAYER + "message";
-
-    public static final String  CHAT_NOPWNAGE_ACTIONS                    = CHAT_NOPWNAGE + "actions";
+    public static final String  CHAT_LOGINS_PERWORLDCOUNT                = CHAT_LOGINS + "perworldcount";
+    public static final String  CHAT_LOGINS_SECONDS                      = CHAT_LOGINS + "seconds";
+    public static final String  CHAT_LOGINS_LIMIT                        = CHAT_LOGINS + "limit";
+    public static final String  CHAT_LOGINS_KICKMESSAGE                  = CHAT_LOGINS + "kickmessage";
     
     private static final String CHAT_RELOG                               = CHAT + "relog.";
     public static final String  CHAT_RELOG_CHECK                         = CHAT_RELOG + "active";

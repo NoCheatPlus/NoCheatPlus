@@ -65,11 +65,9 @@ public enum CheckType {
     CHAT_CAPTCHA(CHAT, Permissions.CHAT_CAPTCHA),
     CHAT_COLOR(CHAT, Permissions.CHAT_COLOR),
     CHAT_COMMANDS(CHAT, Permissions.CHAT_COMMANDS),
-    CHAT_GLOBALCHAT(CHAT, Permissions.CHAT_GLOBALCHAT),
+    CHAT_TEXT(CHAT, Permissions.CHAT_TEXT),
     CHAT_LOGINS(CHAT, Permissions.CHAT_LOGINS),
     CHAT_RELOG(CHAT, Permissions.CHAT_RELOG),
-    // TOOD: remove nopwnage
-    CHAT_NOPWNAGE(CHAT, Permissions.CHAT_NOPWNAGE),
     
     
     COMBINED(CombinedConfig.factory, CombinedData.factory),

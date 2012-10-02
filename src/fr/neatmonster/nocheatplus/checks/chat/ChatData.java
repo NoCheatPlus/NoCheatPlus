@@ -70,8 +70,7 @@ public class ChatData extends AsyncCheckData {
     public double  captchaVL;
     public double  colorVL;
     public double  commandsVL;
-    public double  globalChatVL;
-    public double  noPwnageVL;
+    public double  textVL;
     public double  relogVL;
     
     // Captcha data.
@@ -84,34 +83,38 @@ public class ChatData extends AsyncCheckData {
     public long commandsShortTermTick;
     public double commandsShortTermWeight;
     
-    // Data of the globalchat check.
-    public final ActionFrequency globalChatFrequency = new ActionFrequency(10, 3000);
-
-    // Data of the no pwnage check.     
-    public String  noPwnageLastMessage;
-    public long    noPwnageLastMessageTime;
-    public long    noPwnageLastWarningTime;
+    // Data of the text check.
+    public final ActionFrequency chatFrequency = new ActionFrequency(10, 3000);
+    public final ActionFrequency chatShortTermFrequency = new ActionFrequency(6, 500);
     
-    public final ActionFrequency noPwnageSpeed = new ActionFrequency(5, 1000);
+    
+    // Data of the no pwnage check.     
+    public String  chatLastMessage;
+    public long    chatLastTime;
+    public long    chatWarningTime;
+    
+
     
     public int     relogWarnings;
     public long    relogWarningTime;
-    
-
-
-
 
     /**
      * Clear the data of the no pwnage check.
      */
-    public synchronized void clearNoPwnageData() {
+    public synchronized void reset() {
         captchTries = relogWarnings = 0;
         captchaVL = 0D;
         // colorVL <- is spared to avoid problems with spam + captcha success.
-        noPwnageVL = 0;
-        noPwnageSpeed.clear(System.currentTimeMillis());
-        noPwnageLastMessageTime = noPwnageLastWarningTime = relogWarningTime = 0L;
-        captchaGenerated = noPwnageLastMessage = "";
+        textVL = 0;
+        final long now = System.currentTimeMillis();
+        chatFrequency.clear(now);
+        chatShortTermFrequency.clear(now);
+        chatLastTime = relogWarningTime = 0L;
+        captchaGenerated = chatLastMessage = "";
+        chatLastTime = 0;
+        chatWarningTime = 0;
+        commandsShortTermTick = 0;
+        commandsWeights.clear(now);
     }
 
 }

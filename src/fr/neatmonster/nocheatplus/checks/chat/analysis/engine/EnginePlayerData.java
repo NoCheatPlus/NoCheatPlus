@@ -19,7 +19,7 @@ public class EnginePlayerData {
 	public final List<WordProcessor> processors = new ArrayList<WordProcessor>(5);
 
 	public EnginePlayerData(ChatConfig cc) {
-		EnginePlayerConfig config = cc.globalChatEnginePlayerConfig;
+		EnginePlayerConfig config = cc.textEnginePlayerConfig;
 		if (config.ppWordsCheck) 
 			processors.add(new FlatWords("ppWords", config.ppWordsSettings));
 		if (config.ppPrefixesCheck) 
