@@ -230,9 +230,11 @@ public class MovingListener implements Listener {
          *  \____|_| |_|\__,_|_| |_|\__, |\___|
          *                          |___/      
          */
-        final MovingData data = MovingData.getData(event.getPlayer());
-        data.clearFlyData();
-        data.clearMorePacketsData();
+        if (event.getPlayer().getGameMode() == GameMode.CREATIVE || event.getNewGameMode() == GameMode.CREATIVE){
+            final MovingData data = MovingData.getData(event.getPlayer());
+            data.clearFlyData();
+            data.clearMorePacketsData();
+        }
     }
 
     /**
