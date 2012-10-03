@@ -837,9 +837,8 @@ public class BlockProperties {
 				else if (fy >= 0.5) return true; 
 			}
 			else if (id == Material.SOUL_SAND.getId() && fy >= 0.875) return true; // 0.125
-			else if ((id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()) 
-					&& block.maxX == 1.0 && block.maxZ == 1.0 && block.minX == 0.0 && block.minZ == 0.0){
-				if (Math.abs(0.5 - fx) > 0.1 && Math.abs(0.5 - fz) > 0.1) return true;
+			else if (id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()){
+			        if (Math.abs(0.5 - fx) > 0.05 && Math.abs(0.5 - fz) > 0.05) return true;
 			}
 			else if (id == Material.FENCE_GATE.getId() && (blockAccess.getData(bx, by, bz) & 0x4)!= 0) return true;
 			else if (id == Material.CAKE_BLOCK.getId() && fy >= 0.4375) return true; // 0.0625 = 0.125 / 2
