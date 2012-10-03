@@ -33,8 +33,8 @@ public class Text extends AsyncCheck implements INotifyReload{
 	private String lastCancelledMessage = "";
 	private long lastCancelledTime = 0;
 	
-	   private String lastGlobalMessage = "";
-	    private long lastGlobalTime = 0;
+	private String lastGlobalMessage = "";
+	private long lastGlobalTime = 0;
 	
 	public Text() {
 		super(CheckType.CHAT_TEXT);
@@ -96,6 +96,8 @@ public class Text extends AsyncCheck implements INotifyReload{
 		
 		// Take time once:
 		final long time = System.currentTimeMillis();
+		
+		final String lcMessage = message.trim().toLowerCase();
 				
 		boolean cancel = false;
 		
@@ -148,15 +150,15 @@ public class Text extends AsyncCheck implements INotifyReload{
 		final long timeout = 5000; // TODO: maybe set dynamically in data.
 		// Repetition of last message.
         if (cc.textMsgRepeatSelf != 0f && time - data.chatLastTime < timeout){
-            if (CheckUtils.isSimilar(message, data.chatLastMessage, 0.8f)) score += cc.textMsgRepeatSelf;
+            if (CheckUtils.isSimilar(lcMessage, data.chatLastMessage, 0.8f)) score += cc.textMsgRepeatSelf;
         }
         // Repetition of last global message.
         if (cc.textMsgRepeatGlobal != 0f && time - lastGlobalTime < timeout){
-            if (CheckUtils.isSimilar(message, lastGlobalMessage, 0.8f)) score += cc.textMsgRepeatGlobal;
+            if (CheckUtils.isSimilar(lcMessage, lastGlobalMessage, 0.8f)) score += cc.textMsgRepeatGlobal;
         }
         // Repetition of last cancelled message.
 		if (cc.textMsgRepeatCancel != 0f && time - lastCancelledTime < timeout){
-		    if (CheckUtils.isSimilar(message, lastCancelledMessage, 0.8f)) score += cc.textMsgRepeatCancel;
+		    if (CheckUtils.isSimilar(lcMessage, lastCancelledMessage, 0.8f)) score += cc.textMsgRepeatCancel;
 		}
 		// Chat quickly after join.
 		if (cc.textMsgAfterJoin != 0f && time - cData.lastJoinTime < timeout) score += cc.textMsgAfterJoin; 
@@ -221,7 +223,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 		final boolean shortTermViolation = shortTermAccumulated > cc.textFreqShortTermLevel;
 		
 		if (normalViolation || shortTermViolation){
-		    lastCancelledMessage = message;
+		    lastCancelledMessage = lcMessage;
 		    lastCancelledTime = time;
 		    
 		    final double added;
@@ -275,7 +277,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 			debugParts.clear();
 		}
 		
-		lastGlobalMessage = data.chatLastMessage = message;
+		lastGlobalMessage = data.chatLastMessage = lcMessage;
 		lastGlobalTime = data.chatLastTime = time;
 		
 		return cancel;
