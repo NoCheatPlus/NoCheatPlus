@@ -396,7 +396,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
         set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
-        set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 1 You're still not allowed to spam!");
+        set(ConfPaths.STRINGS + ".kickchat1", "ncp tempkick [player] 1 You're still not allowed to spam!");
         set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
