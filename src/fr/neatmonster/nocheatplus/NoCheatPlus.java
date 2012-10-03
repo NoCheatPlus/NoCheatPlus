@@ -239,6 +239,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         	new BlockPlaceListener(),
         	new ChatListener(),
         	new CombinedListener(),
+        	// Do ming registration order: Combined must come before Fight.
         	new FightListener(),
         	new InventoryListener(),
         	new MovingListener(),

@@ -17,7 +17,6 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -272,32 +271,6 @@ public class MovingListener implements Listener {
     	if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) return;
     	 
         event.setCancelled(true);
-    }
-
-    /**
-     * We listen to this event to prevent players from leaving while falling, so from avoiding fall damages.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            priority = EventPriority.MONITOR)
-    public void onPlayerJoin(final PlayerJoinEvent event) {
-        /*
-         *  ____  _                             _       _       
-         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
-         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
-         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
-         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
-         *                |___/                                 
-         */
-        final Player player = event.getPlayer();
-        final MovingData data = MovingData.getData(player);
-
-        // If the player has joined in the air and a previous location is defined...
-        if (player.getLocation().add(0D, -1D, 0D).getBlock().getType() == Material.AIR && data.ground != null)
-            // ...teleport him there.
-            player.teleport(data.ground);
     }
 
     /**

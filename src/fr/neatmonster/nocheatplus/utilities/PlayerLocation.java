@@ -237,7 +237,9 @@ public class PlayerLocation {
 //            // TODO: maybe make an auxiliary method in BlockProperties (can stand on ? id, boundY)
 //            if (y < 0) y += 1D;
 //            final int id = getTypeId();
+//            final int idBelow = getTypeIdBelow();
 //            if (y >= 0.5 && BlockProperties.isStairs(id)) onGround = true;
+//            else if (y <= 0.002 && BlockProperties.isStairs(idBelow)) onGround = true;
 //        }
         return onGround;
     }

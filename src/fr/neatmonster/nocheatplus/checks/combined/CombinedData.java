@@ -50,22 +50,28 @@ public class CombinedData extends ACheckData {
     	playersMap.clear();
     }
 
+    // VLs
 	public double improbableVL = 0;
 	
+	// Invulnerable management:
+    /** This is the tick from which on the player is vulnerable again. */
+    public int            invulnerableTick = Integer.MIN_VALUE;
+	
+    // Yawrate check.
 	public float lastYaw;
 	public long  lastYawTime;
 	public final ActionFrequency yawFreq = new ActionFrequency(3, 333);
-	
+
+	// General penalty time (used for fighting mainly, set by yawrate check).
 	public long timeFreeze = 0;
 	
+	// Improbable check
 	public final ActionFrequency improbableCount = new ActionFrequency(20, 3000);
 
+	// General data
 	public String lastWorld = "";
-	
 	public long lastJoinTime;
-	
 	public long lastLogoutTime;
-	
 	public long lastMoveTime;
 	
 	public CombinedData(final Player player){

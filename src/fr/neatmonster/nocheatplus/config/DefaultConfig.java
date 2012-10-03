@@ -233,6 +233,12 @@ public class DefaultConfig extends ConfigFile {
 //        set(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK, false);
         set(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, "cancel log:improbable:2:8:if");
         
+        
+        set(ConfPaths.COMBINED_INVULNERABLE_CHECK, true);
+        set(ConfPaths.COMBINED_INVULNERABLE_INITIALTICKS_JOIN, -1);
+        set(ConfPaths.COMBINED_INVULNERABLE_IGNORE, new LinkedList<String>(Arrays.asList(new String[]{"FALL"})));
+        set(ConfPaths.COMBINED_INVULNERABLE_MODIFIERS + ".all", 0);
+        
         set(ConfPaths.COMBINED_YAWRATE_RATE , 380);
         set(ConfPaths.COMBINED_YAWRATE_IMPROBABLE, true);
         
