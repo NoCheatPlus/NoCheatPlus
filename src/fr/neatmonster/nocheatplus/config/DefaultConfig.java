@@ -235,6 +235,8 @@ public class DefaultConfig extends ConfigFile {
         
         
         set(ConfPaths.COMBINED_INVULNERABLE_CHECK, true);
+        set(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS, false);
+        set(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE, true);
         set(ConfPaths.COMBINED_INVULNERABLE_INITIALTICKS_JOIN, -1);
         set(ConfPaths.COMBINED_INVULNERABLE_IGNORE, new LinkedList<String>(Arrays.asList(new String[]{"FALL"})));
         set(ConfPaths.COMBINED_INVULNERABLE_MODIFIERS + ".all", 0);

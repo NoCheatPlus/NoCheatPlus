@@ -304,12 +304,15 @@ public abstract class ConfPaths {
 	
 	public static final String  COMBINED_IMPROBABLE_ACTIONS              = COMBINED_IMPROBABLE + "actions";
 	
-	private static final String COMBINED_INVULNERABLE                    = COMBINED + "invulnerable.";
-	public static final String  COMBINED_INVULNERABLE_CHECK              = COMBINED_INVULNERABLE + "active";
-	private static final String COMBINED_INVULNERABLE_INITIALTICKS       = COMBINED_INVULNERABLE + "initialticks.";
-    public static final String  COMBINED_INVULNERABLE_INITIALTICKS_JOIN  = COMBINED_INVULNERABLE_INITIALTICKS + "join";
-    public static final String  COMBINED_INVULNERABLE_IGNORE             = COMBINED_INVULNERABLE + "ignore";
-    public static final String  COMBINED_INVULNERABLE_MODIFIERS          = COMBINED_INVULNERABLE + "modifiers";
+	private static final String COMBINED_INVULNERABLE                       = COMBINED + "invulnerable.";
+	public static final String  COMBINED_INVULNERABLE_CHECK                 = COMBINED_INVULNERABLE + "active";
+	private static final String COMBINED_INVULNERABLE_INITIALTICKS          = COMBINED_INVULNERABLE + "initialticks.";
+    public static final String  COMBINED_INVULNERABLE_INITIALTICKS_JOIN     = COMBINED_INVULNERABLE_INITIALTICKS + "join";
+    public static final String  COMBINED_INVULNERABLE_IGNORE                = COMBINED_INVULNERABLE + "ignore";
+    public static final String  COMBINED_INVULNERABLE_MODIFIERS             = COMBINED_INVULNERABLE + "modifiers"; // no dot !
+    private static final String COMBINED_INVULNERABLE_TRIGGERS              = COMBINED_INVULNERABLE + "triggers.";
+    public static final String  COMBINED_INVULNERABLE_TRIGGERS_ALWAYS       = COMBINED_INVULNERABLE_TRIGGERS + "always";
+    public static final String  COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE = COMBINED_INVULNERABLE_TRIGGERS + "falldistance";
 
 	
 	private static final String COMBINED_YAWRATE                         = COMBINED + "yawrate.";
@@ -478,4 +481,5 @@ public abstract class ConfPaths {
      *                                  "8",P"        
      */
     public static final String  STRINGS                                  = "strings";
+
 }

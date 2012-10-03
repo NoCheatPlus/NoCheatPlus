@@ -72,8 +72,8 @@ public class CombinedListener implements Listener {
         final CombinedData data = CombinedData.getData(player);
         final CombinedConfig cc = CombinedConfig.getConfig(player);
         
-        if (cc.invulnerableCheck){
-            // TODO: maybe allow to set a different number of ticks !
+        if (cc.invulnerableCheck && (cc.invulnerableTriggerAlways || cc.invulnerableTriggerFallDistance && player.getFallDistance() > 0)){
+            // TODO: maybe make a heuristic for small fall distances with ground under feet (prevents future abuse with jumping) ?
             final EntityPlayer mcPlayer= ((CraftPlayer) player).getHandle();
             final int ticks = cc.invulnerableInitialTicksJoin >= 0 ? cc.invulnerableInitialTicksJoin : mcPlayer.invulnerableTicks;
             data.invulnerableTick = TickTask.getTick() + ticks;

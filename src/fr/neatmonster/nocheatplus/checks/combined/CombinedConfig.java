@@ -54,6 +54,8 @@ public class CombinedConfig extends ACheckConfig {
     public final Set<DamageCause>           invulnerableIgnore = new HashSet<DamageCause>();
     public final Map<DamageCause, Integer>  invulnerableModifiers = new HashMap<DamageCause, Integer>();
     public final int                        invulnerableModifierDefault;
+    public final boolean                    invulnerableTriggerAlways;
+    public final boolean                    invulnerableTriggerFallDistance;
 	
 	// Last yaw tracking 
 	public final float     yawRate;
@@ -98,6 +100,8 @@ public class CombinedConfig extends ACheckConfig {
         }
         invulnerableModifierDefault = defaultMod;
 	    if (error) CheckUtils.logInfo("[NoCheatPlus] Damage causes can be: " + CheckUtils.join(Arrays.asList(DamageCause.values()), ", "));
+	    invulnerableTriggerAlways = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS);
+	    invulnerableTriggerFallDistance = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE);
 		yawRate = config.getInt(ConfPaths.COMBINED_YAWRATE_RATE);
 		yawRateImprobable = config.getBoolean(ConfPaths.COMBINED_YAWRATE_IMPROBABLE);
 	}
