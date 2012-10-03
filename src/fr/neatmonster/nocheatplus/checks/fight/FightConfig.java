@@ -79,9 +79,6 @@ public class FightConfig extends ACheckConfig {
     public final boolean    godModeCheck;
     public final ActionList godModeActions;
 
-    public final boolean    instantHealCheck;
-    public final ActionList instantHealActions;
-
     public final boolean    knockbackCheck;
     public final long       knockbackInterval;
     public final ActionList knockbackActions;
@@ -135,9 +132,6 @@ public class FightConfig extends ACheckConfig {
         godModeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
         godModeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
 
-        instantHealCheck = data.getBoolean(ConfPaths.FIGHT_INSTANTHEAL_CHECK);
-        instantHealActions = data.getActionList(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, Permissions.FIGHT_INSTANTHEAL);
-
         knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
         knockbackInterval = data.getLong(ConfPaths.FIGHT_KNOCKBACK_INTERVAL);
         knockbackActions = data.getActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
@@ -182,8 +176,6 @@ public class FightConfig extends ACheckConfig {
             return directionCheck;
         case FIGHT_GODMODE:
             return godModeCheck;
-        case FIGHT_INSTANTHEAL:
-            return instantHealCheck;
         case FIGHT_KNOCKBACK:
             return knockbackCheck;
         case FIGHT_NOSWING:

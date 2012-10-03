@@ -10,8 +10,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
@@ -48,9 +46,6 @@ public class FightListener implements Listener {
 
     /** The god mode check. */
     private final GodMode     godMode     = new GodMode();
-
-    /** The instant heal check. */
-    private final InstantHeal instantHeal = new InstantHeal();
 
     /** The knockback check. */
     private final Knockback   knockback   = new Knockback();
@@ -255,30 +250,6 @@ public class FightListener implements Listener {
         // Only interested in dying players.
         if (event.getEntity() instanceof Player)
             godMode.death((Player) event.getEntity());
-    }
-
-    /**
-     * We listen to EntityRegainHealth events of type "satiated" for InstantHeal check.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onEntityRegainHealth(final EntityRegainHealthEvent event) {
-        /*
-         *  _____       _   _ _           ____                  _         _   _            _ _   _     
-         * | ____|_ __ | |_(_) |_ _   _  |  _ \ ___  __ _  __ _(_)_ __   | | | | ___  __ _| | |_| |__  
-         * |  _| | '_ \| __| | __| | | | | |_) / _ \/ _` |/ _` | | '_ \  | |_| |/ _ \/ _` | | __| '_ \ 
-         * | |___| | | | |_| | |_| |_| | |  _ <  __/ (_| | (_| | | | | | |  _  |  __/ (_| | | |_| | | |
-         * |_____|_| |_|\__|_|\__|\__, | |_| \_\___|\__, |\__,_|_|_| |_| |_| |_|\___|\__,_|_|\__|_| |_|
-         *                        |___/             |___/                                              
-         */
-        if (event.getEntity() instanceof Player && event.getRegainReason() == RegainReason.SATIATED) {
-            final Player player = (Player) event.getEntity();
-            if (instantHeal.isEnabled(player) && instantHeal.check(player))
-                event.setCancelled(true);
-        }
     }
 
     /**

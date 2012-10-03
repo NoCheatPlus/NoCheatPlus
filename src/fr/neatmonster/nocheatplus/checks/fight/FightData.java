@@ -74,7 +74,6 @@ public class FightData extends ACheckData {
     public double                  criticalVL;
     public double                  directionVL;
     public double                  godModeVL;
-    public double                  instantHealVL;
     public double                  knockbackVL;
     public double                  noSwingVL;
     public double                  reachVL;
@@ -98,10 +97,6 @@ public class FightData extends ACheckData {
     public int                     godModeBuffer;
     public int                     godModeLastAge;
     public long                    godModeLastTime;
-
-    // Data of the instant heal check.
-    public long                    instantHealBuffer;
-    public long                    instantHealLastTime;
 
     // Data of the knockback check.
     public long                    knockbackSprintTime;

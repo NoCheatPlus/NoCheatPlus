@@ -264,9 +264,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
         set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel");
 
-        set(ConfPaths.FIGHT_INSTANTHEAL_CHECK, false);
-        set(ConfPaths.FIGHT_INSTANTHEAL_ACTIONS, "log:instantheal:1:1:if cancel");
-
         set(ConfPaths.FIGHT_KNOCKBACK_CHECK, true);
         set(ConfPaths.FIGHT_KNOCKBACK_INTERVAL, 50L);
         set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:knockback:0:5:cif cancel");
@@ -396,7 +393,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow to fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
-        set(ConfPaths.STRINGS + ".instantheal", start + "tried to regenerate health faster than normal" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
         set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
