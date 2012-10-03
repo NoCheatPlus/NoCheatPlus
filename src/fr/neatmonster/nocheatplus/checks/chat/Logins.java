@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 public class Logins extends Check {
     
@@ -27,10 +28,12 @@ public class Logins extends Check {
 	}
 
     public boolean check(final Player player, final ChatConfig cc, final ChatData data) {
+        final long now = System.currentTimeMillis();
+        // Skip if is too close to the startup time.
+        if (now - TickTask.getTimeStart() < cc.loginsStartupDelay) return false;
         // Split into 6 buckets always.
         final long durBucket = 1000L * cc.loginsSeconds / 6;
         final ActionFrequency freq = getActionFrequency(player.getWorld().getName(), 6, durBucket, cc.loginsPerWorldCount);
-        final long now = System.currentTimeMillis();
         freq.update(now);
         final boolean cancel = freq.getScore(1f) > cc.loginsLimit;
         if (!cancel) freq.add(now, 1f);

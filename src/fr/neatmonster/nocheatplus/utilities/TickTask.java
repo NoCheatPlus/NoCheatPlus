@@ -56,6 +56,8 @@ public class TickTask implements Runnable {
 	
 	protected static int tick = 0;
 	
+	protected static long timeStart = 0;
+	
 	
 	//////////////////////////////////////////////////////////////
 	// Special static methods, usually not called from outside.
@@ -131,6 +133,14 @@ public class TickTask implements Runnable {
 		return tick;
 	}
 	
+	/**
+	 * Get the time at which the task was started.
+	 * @return
+	 */
+	public static final long getTimeStart(){
+	    return timeStart;
+	}
+	
 	////////////////////////////////////////
 	// Public methods for internal use.
 	////////////////////////////////////////
@@ -138,6 +148,7 @@ public class TickTask implements Runnable {
 	public static int start(final NoCheatPlus plugin){
 		cancel();
 		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
+		if (taskId != -1) timeStart = System.currentTimeMillis();
 		return taskId;
 	}
 	

@@ -278,6 +278,7 @@ public abstract class ConfPaths {
     public static final String  CHAT_LOGINS_SECONDS                      = CHAT_LOGINS + "seconds";
     public static final String  CHAT_LOGINS_LIMIT                        = CHAT_LOGINS + "limit";
     public static final String  CHAT_LOGINS_KICKMESSAGE                  = CHAT_LOGINS + "kickmessage";
+    public static final String  CHAT_LOGINS_STARTUPDELAY                 = CHAT_LOGINS + "startupdelay";
     
     private static final String CHAT_RELOG                               = CHAT + "relog.";
     public static final String  CHAT_RELOG_CHECK                         = CHAT_RELOG + "active";

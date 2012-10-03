@@ -219,6 +219,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_RELOG_ACTIONS, "log:relog:0:10:cf cancel vl>20 log:relog:0:10:cf cancel cmd:tempkick5");
         // Logins
         set(ConfPaths.CHAT_LOGINS_CHECK, true);
+        set(ConfPaths.CHAT_LOGINS_STARTUPDELAY, 300);
         set(ConfPaths.CHAT_LOGINS_PERWORLDCOUNT, false);
         set(ConfPaths.CHAT_LOGINS_SECONDS, 10);
         set(ConfPaths.CHAT_LOGINS_LIMIT, 6);

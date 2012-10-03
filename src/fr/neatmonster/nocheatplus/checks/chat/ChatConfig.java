@@ -127,6 +127,7 @@ public class ChatConfig extends AsyncCheckConfig {
     public final int          loginsSeconds;
     public final int          loginsLimit;
     public final String       loginsKickMessage;
+    public final long         loginsStartupDelay;
 
     public final boolean      opInConsoleOnly;
 
@@ -214,6 +215,7 @@ public class ChatConfig extends AsyncCheckConfig {
         loginsSeconds = config.getInt(ConfPaths.CHAT_LOGINS_SECONDS);
         loginsLimit = config.getInt(ConfPaths.CHAT_LOGINS_LIMIT);
         loginsKickMessage =  config.getString(ConfPaths.CHAT_LOGINS_KICKMESSAGE);
+        loginsStartupDelay = config.getInt(ConfPaths.CHAT_LOGINS_STARTUPDELAY) * 1000;
         
         relogCheck = config.getBoolean(ConfPaths.CHAT_RELOG_CHECK);
         relogKickMessage = config.getString(ConfPaths.CHAT_RELOG_KICKMESSAGE);
