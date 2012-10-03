@@ -318,6 +318,9 @@ public abstract class ConfPaths {
 	private static final String COMBINED_YAWRATE                         = COMBINED + "yawrate.";
 	public static final String  COMBINED_YAWRATE_RATE                    = COMBINED_YAWRATE + "rate";
 	public static final String  COMBINED_YAWRATE_IMPROBABLE              = COMBINED_YAWRATE + "improbable";
+	private static final String COMBINED_YAWRATE_PENALTY                 = COMBINED_YAWRATE + "penalty.";
+    public static final String  COMBINED_YAWRATE_PENALTY_FACTOR          = COMBINED_YAWRATE_PENALTY + "factor";
+    public static final String  COMBINED_YAWRATE_PENALTY_MIN             = COMBINED_YAWRATE_PENALTY + "minimum";
 	
     /*
      * 888'Y88 ,e,          888       d8   

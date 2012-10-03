@@ -58,8 +58,10 @@ public class CombinedConfig extends ACheckConfig {
     public final boolean                    invulnerableTriggerFallDistance;
 	
 	// Last yaw tracking 
-	public final float     yawRate;
-	public final boolean   yawRateImprobable;
+	public final float      yawRate;
+	public final boolean    yawRateImprobable;
+    public final float      yawRatePenaltyFactor;
+    public final int        yawRatePenaltyMin;
 	
 	public CombinedConfig(final ConfigFile config) {
 		improbableCheck = config.getBoolean(ConfPaths.COMBINED_IMPROBABLE_CHECK, false);
@@ -104,6 +106,8 @@ public class CombinedConfig extends ACheckConfig {
 	    invulnerableTriggerFallDistance = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE);
 		yawRate = config.getInt(ConfPaths.COMBINED_YAWRATE_RATE);
 		yawRateImprobable = config.getBoolean(ConfPaths.COMBINED_YAWRATE_IMPROBABLE);
+		yawRatePenaltyFactor = (float) config.getDouble(ConfPaths.COMBINED_YAWRATE_PENALTY_FACTOR);
+		yawRatePenaltyMin = config.getInt(ConfPaths.COMBINED_YAWRATE_PENALTY_MIN);
 	}
 
 	@Override
