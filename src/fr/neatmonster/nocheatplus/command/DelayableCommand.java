@@ -115,7 +115,7 @@ public abstract class DelayableCommand extends NCPCommand {
 		// Parse the delay and alter the args accordingly.
 		long delay = parseDelay(args, delayIndex, delayPreset);
 		String[] alteredArgs;
-		if (delay == -1){
+		if (args.length <= delayIndex){
 			// No delay found, if demanded return.
 			if (mustHaveDelay) return false;
 			alteredArgs = args;
