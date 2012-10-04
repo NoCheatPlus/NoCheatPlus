@@ -89,6 +89,7 @@ public class SurvivalFly extends Check {
      * @return the location
      */
     public Location check(final Player player, final MovingData data, final MovingConfig cc) {
+        final long now = System.currentTimeMillis();
    	    final PlayerLocation from = data.from;
    	    final PlayerLocation to = data.to;
 
@@ -227,7 +228,6 @@ public class SurvivalFly extends Check {
         	data.jumpAmplifier = 0;
         	vDistanceAboveLimit = to.getY() - from.getY();
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
-        		final long now = System.currentTimeMillis();
         		if (now - data.survivalFlyCobwebTime > 3000){
         			data.survivalFlyCobwebTime = now;
         			data.survivalFlyCobwebVL = vDistanceAboveLimit * 100D;
@@ -267,10 +267,19 @@ public class SurvivalFly extends Check {
 
         // Slowly reduce the level with each event.
         data.survivalFlyVL *= 0.95D;
-//        System.out.println("vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+")");
-        // Did the player move in unexpected ways?
-//        System.out.println("hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (to.getY() - from.getY()) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance + " / from passable: " + BlockProperties.isPassable(from));
-//        System.out.println(from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()) ;
+        
+//        data.hDistSum.add(now, (float) hDistance);
+//        data.vDistSum.add(now, (float) (to.getY() - from.getY()));
+//        data.hvDistCount.add(now,  1f);
+        
+        if (cc.debug){
+            System.out.println(player.getName() + " vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+")");
+            System.out.println(player.getName() + " hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (to.getY() - from.getY()) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance + " / from passable: " + BlockProperties.isPassable(from));
+            System.out.println(player.getName() + " y: " + from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()) ;
+//            System.out.println(player.getName() + " h=" + data.hDistSum.getScore(1f)+"/" + data.hDistSum.getScore(1) + " , v=" + data.vDistSum.getScore(1f)+"/"+data.vDistSum.getScore(1) );
+        }
+
+        // Did the player move in unexpected ways?// Did the player move in unexpected ways?
         if (result > 0D) {
 //            System.out.println(BlockProperties.isStairs(from.getTypeIdBelow()) + " / " + BlockProperties.isStairs(to.getTypeIdBelow()));
             // Increment violation counter.

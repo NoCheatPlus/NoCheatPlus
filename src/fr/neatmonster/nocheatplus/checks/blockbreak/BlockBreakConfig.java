@@ -116,6 +116,7 @@ public class BlockBreakConfig extends ACheckConfig {
      *            the data
      */
     public BlockBreakConfig(final ConfigFile data) {
+        super(data, ConfPaths.BLOCKBREAK);
         directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
         directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
 

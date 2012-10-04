@@ -54,7 +54,7 @@ public class WrongBlock extends Check {
         if (wrongBlock){
         	// Manhattan distance.
         	
-        	 if (cc.fastBreakDebug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        	 if ((cc.fastBreakDebug || cc.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
         		 player.sendMessage("WrongBlock failure with dist: " + dist);
         	 }
         	data.wrongBlockVL.add(now, (float) (dist + 1) / 2f);

@@ -106,6 +106,7 @@ public class MovingConfig extends ACheckConfig {
      *            the data
      */
     public MovingConfig(final ConfigFile data) {
+        super(data, ConfPaths.MOVING);
     	
     	ignoreCreative = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE);
     	ignoreAllowFlight = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);

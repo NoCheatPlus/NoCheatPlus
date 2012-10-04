@@ -64,6 +64,7 @@ public class CombinedConfig extends ACheckConfig {
     public final int        yawRatePenaltyMin;
 	
 	public CombinedConfig(final ConfigFile config) {
+	    super(config, ConfPaths.COMBINED);
 		improbableCheck = config.getBoolean(ConfPaths.COMBINED_IMPROBABLE_CHECK, false);
 		improbableLevel = (float) config.getDouble(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
 		improbableActions = config.getActionList(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, Permissions.COMBINED_IMPROBABLE);

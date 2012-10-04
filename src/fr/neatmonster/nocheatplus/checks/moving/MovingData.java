@@ -115,6 +115,12 @@ public class MovingData extends ACheckData {
     public boolean        survivalFlyWasInBed;
     public long           survivalFlyCobwebTime;
     public double         survivalFlyCobwebVL;
+    
+    // Accounting info.
+    // TODO: optimize later.
+//    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
+//    public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
+//    public final ActionFrequency hvDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
     public final PlayerLocation from   = new PlayerLocation();
@@ -131,6 +137,10 @@ public class MovingData extends ACheckData {
         noFallFallDistance = 0D;
         survivalFlyJumpPhase = 0;
         setBack = null;
+//        final long now = System.currentTimeMillis();
+//        hDistSum.clear(now);
+//        vDistSum.clear(now);
+//        hvDistCount.clear(now);
         clearNoFallData();
     }
 

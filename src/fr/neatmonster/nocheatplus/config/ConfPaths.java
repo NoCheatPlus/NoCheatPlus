@@ -70,7 +70,7 @@ public abstract class ConfPaths {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888 88b, 888    888   , ,ee 888 888 b  
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 88P' 888     "YeeP" "88 888 888 8b 
      */
-    private static final String BLOCKBREAK                               = CHECKS + "blockbreak.";
+    public static final String  BLOCKBREAK                               = CHECKS + "blockbreak.";
 
     private static final String BLOCKBREAK_DIRECTION                     = BLOCKBREAK + "direction.";
     public static final String  BLOCKBREAK_DIRECTION_CHECK               = BLOCKBREAK_DIRECTION + "active";
@@ -126,7 +126,7 @@ public abstract class ConfPaths {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888 888 888  888   888   , 888    ,ee 888 Y888   ,  888   
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 888 888  888    "YeeP" 888    "88 888  "88,e8'  888   
      */
-    private static final String BLOCKINTERACT                            = CHECKS + "blockinteract.";
+    public static final String BLOCKINTERACT                            = CHECKS + "blockinteract.";
 
     private static final String BLOCKINTERACT_DIRECTION                  = BLOCKINTERACT + "direction.";
     public static final String  BLOCKINTERACT_DIRECTION_CHECK            = BLOCKINTERACT_DIRECTION + "active";
@@ -143,7 +143,7 @@ public abstract class ConfPaths {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888      888 ,ee 888 Y888   , 888   , 
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
      */
-    private static final String BLOCKPLACE                               = CHECKS + "blockplace.";
+    public static final String  BLOCKPLACE                               = CHECKS + "blockplace.";
 
     private static final String BLOCKPLACE_DIRECTION                     = BLOCKPLACE + "direction.";
     public static final String  BLOCKPLACE_DIRECTION_CHECK               = BLOCKPLACE_DIRECTION + "active";
@@ -175,7 +175,7 @@ public abstract class ConfPaths {
      *  Y888  ,d 888 888 ,ee 888  888   
      *   "88,d88 888 888 "88 888  888   
      */
-    private static final String CHAT                                     = CHECKS + "chat.";
+    public static final String  CHAT                                     = CHECKS + "chat.";
 
     private static final String CHAT_CAPTCHA                    = CHAT + "captcha.";
     public static final String  CHAT_CAPTCHA_CHECK              = CHAT_CAPTCHA + "active";
@@ -293,7 +293,7 @@ public abstract class ConfPaths {
     /*
      * Combined !
      */
-    private static final String COMBINED                                 = CHECKS + "combined.";
+    public static final String  COMBINED                                 = CHECKS + "combined.";
 	
     private static final String COMBINED_IMPROBABLE                      = COMBINED + "improbable.";
 	public static final String  COMBINED_IMPROBABLE_CHECK                = COMBINED_IMPROBABLE + "active";
@@ -331,7 +331,7 @@ public abstract class ConfPaths {
      *               ,  88P                
      *              "8",P"                 
      */
-    private static final String FIGHT                                    = CHECKS + "fight.";
+    public static final String  FIGHT                                    = CHECKS + "fight.";
     
 	public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
 
@@ -402,7 +402,7 @@ public abstract class ConfPaths {
      *                                                                  888    
      *                                                                  888    
      */
-    private static final String INVENTORY                                = CHECKS + "inventory.";
+    public static final String  INVENTORY                                = CHECKS + "inventory.";
 
     private static final String INVENTORY_DROP                           = INVENTORY + "drop.";
     public static final String  INVENTORY_DROP_CHECK                     = INVENTORY_DROP + "active";
@@ -431,7 +431,7 @@ public abstract class ConfPaths {
      *                                                 ,  88P 
      *                                                "8",P"  
      */
-    private static final String MOVING                                   = CHECKS + "moving.";
+    public static final String  MOVING                                   = CHECKS + "moving.";
 
     private static final String MOVING_CREATIVEFLY                       = MOVING + "creativefly.";
     public static final String  MOVING_CREATIVEFLY_CHECK                 = MOVING_CREATIVEFLY + "active";

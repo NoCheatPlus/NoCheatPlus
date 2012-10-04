@@ -101,7 +101,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 				
 		boolean cancel = false;
 		
-		boolean debug = cc.textDebug;
+		boolean debug = cc.textDebug || cc.debug;
 		
 		final List<String> debugParts;
 		if (debug){

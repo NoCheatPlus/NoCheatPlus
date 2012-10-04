@@ -96,6 +96,7 @@ public class BlockPlaceConfig extends ACheckConfig {
      *            the data
      */
     public BlockPlaceConfig(final ConfigFile data) {
+        super(data, ConfPaths.BLOCKPLACE);
         directionCheck = data.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
         directionActions = data.getActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
 

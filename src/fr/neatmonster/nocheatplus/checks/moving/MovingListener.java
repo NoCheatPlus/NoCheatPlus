@@ -470,10 +470,14 @@ public class MovingListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|       \_/ \___|_|\___/ \___|_|\__|\__, |
          *                |___/                                           |___/ 
          */
-        final MovingData data = MovingData.getData(event.getPlayer());
-
+        final Player player = event.getPlayer();
+        final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        
         final Vector velocity = event.getVelocity();
-
+        
+        if (cc.debug) System.out.println(event.getPlayer().getName() + " new velocity: " + velocity);
+        
         double newVal = velocity.getY();
         if (newVal >= 0D) {
             data.verticalVelocity += newVal;

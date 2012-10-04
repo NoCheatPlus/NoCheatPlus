@@ -312,7 +312,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         
         // Debug information about unknown blocks.
         // (Probably removed later.)
-        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false));
+        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false) || config.getBoolean(ConfPaths.BLOCKBREAK, false));
 
         // Tell the server administrator that we finished loading NoCheatPlus now.
         CheckUtils.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");

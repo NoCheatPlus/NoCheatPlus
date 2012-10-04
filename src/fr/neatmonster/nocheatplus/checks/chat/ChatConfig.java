@@ -149,7 +149,7 @@ public class ChatConfig extends AsyncCheckConfig {
      *            the data
      */
     public ChatConfig(final ConfigFile config) {
-    	super(new String[]{
+    	super(config, ConfPaths.CHAT, new String[]{
     	        // Only the permissions needed for async. checking.
     	    	Permissions.CHAT_COLOR,
     	    	Permissions.CHAT_TEXT,

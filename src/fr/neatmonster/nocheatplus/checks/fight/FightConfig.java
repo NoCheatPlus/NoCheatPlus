@@ -116,6 +116,7 @@ public class FightConfig extends ACheckConfig {
      *            the data
      */
     public FightConfig(final ConfigFile data) {
+        super(data, ConfPaths.FIGHT);
         angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
         angleThreshold = data.getInt(ConfPaths.FIGHT_ANGLE_THRESHOLD);
         angleActions = data.getActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);

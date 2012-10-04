@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.access;
 
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+
 /**
  * CheckConfig for async checks such as chat, adding permissions to cache.
  * @author mc_dev
@@ -12,9 +14,12 @@ public abstract class AsyncCheckConfig extends ACheckConfig {
 
 	/**
 	 * 
-	 * @param cachePermissions Permissions to hold in player data cache.
+	 * @param config
+	 * @param pathPrefix Path prefix for the check section (example for use: prefix+"debug").
+	 * @param cachePermissions  cachePermissions Permissions to hold in player data cache.
 	 */
-	public AsyncCheckConfig(String[] cachePermissions){
+	public AsyncCheckConfig(final ConfigFile config, final String pathPrefix, final String[] cachePermissions){
+	    super(config, pathPrefix);
 		this.cachePermissions = cachePermissions;
 	}
 	

@@ -84,6 +84,7 @@ public class BlockInteractConfig extends ACheckConfig {
      *            the data
      */
     public BlockInteractConfig(final ConfigFile data) {
+        super(data, ConfPaths.BLOCKINTERACT);
         directionCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK);
         directionActions = data.getActionList(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS,
                 Permissions.BLOCKINTERACT_DIRECTION);

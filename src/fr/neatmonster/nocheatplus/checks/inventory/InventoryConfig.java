@@ -94,6 +94,7 @@ public class InventoryConfig extends ACheckConfig {
 	 *            the data
 	 */
 	public InventoryConfig(final ConfigFile data) {
+	    super(data, ConfPaths.INVENTORY);
 		dropCheck = data.getBoolean(ConfPaths.INVENTORY_DROP_CHECK);
 		dropLimit = data.getInt(ConfPaths.INVENTORY_DROP_LIMIT);
 		dropTimeFrame = data.getLong(ConfPaths.INVENTORY_DROP_TIMEFRAME);
