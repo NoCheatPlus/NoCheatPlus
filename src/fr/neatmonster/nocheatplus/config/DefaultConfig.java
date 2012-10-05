@@ -402,7 +402,7 @@ public class DefaultConfig extends ConfigFile {
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
         set(ConfPaths.STRINGS + ".fselfhit", start + "tried to self-hit" + end);
-        set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack more than [limit] times per second" + end);
+        set(ConfPaths.STRINGS + ".fspeed", start + "tried to hit at a too high rate" + end);
         set(ConfPaths.STRINGS + ".chatnormal", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
