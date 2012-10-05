@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import org.bukkit.Material;
+
 /*
  * M""""""'YMM          .8888b                   dP   dP   MM'""""'YMM                   .8888b oo          
  * M  mmmm. `M          88   "                   88   88   M' .mmm. `M                   88   "             
@@ -427,6 +429,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, new LinkedList<String>(Arrays.asList(new String[]{
+                Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),
+        })));
+        
         // Update internal factory based on all the new entries to the "actions" section.
         regenerateActionLists();
     }

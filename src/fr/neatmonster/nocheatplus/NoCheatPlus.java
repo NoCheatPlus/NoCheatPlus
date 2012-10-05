@@ -228,6 +228,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     	
         // Read the configuration files.
         ConfigManager.init(this);
+        
+        final ConfigFile config = ConfigManager.getConfigFile();
+        
+        BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS); // Temp probably,
 
         // List the events listeners and register.
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -244,6 +248,15 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         	new InventoryListener(),
         	new MovingListener(),
         	new Workarounds(),
+        	new INotifyReload() {
+                @Override
+                public void onReload() {
+                    BlockProperties.init();
+                    // TODO: This is a quick workaround, might later be split to other folder/files.
+                    final ConfigFile config = ConfigManager.getConfigFile();
+                    BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
+                }
+            },
         }){
         	addComponent(obj);
         }
@@ -264,7 +277,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 			}
 		}, 1207, 1207);
 
-        ConfigFile config = ConfigManager.getConfigFile();
         
         // Setup the graphs, plotters and start Metrics.
         if (config.getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {

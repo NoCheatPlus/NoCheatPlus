@@ -17,6 +17,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+
 /**
  * Poperties of blocks.
  * 
@@ -245,16 +248,21 @@ public class BlockProperties {
     public static final int F_IGN_PASSABLE 	= 0x8;
     
 	static{
-		try{
-			initTools();
-			initBlocks();
-		}
-		catch(Throwable t){
-			t.printStackTrace();
-		}
+		init();
 	}
 	
+   public static void init() {
+        try{
+            initTools();
+            initBlocks();
+        }
+        catch(Throwable t){
+            t.printStackTrace();
+        }
+    }
+	
 	private static void initTools() {
+	    tools.clear();
 		tools.put(268, new ToolProps(ToolType.SWORD, MaterialBase.WOOD));
 		tools.put(269, new ToolProps(ToolType.SPADE, MaterialBase.WOOD));
 		tools.put(270, new ToolProps(ToolType.PICKAXE, MaterialBase.WOOD));
@@ -283,8 +291,7 @@ public class BlockProperties {
 		tools.put(359, new ToolProps(ToolType.SHEARS, MaterialBase.NONE));
 	}
 
-	
-	private static void initBlocks() {
+    private static void initBlocks() {
 		for (int i = 0; i <maxBlocks; i++){
 			blocks[i] = null; // hmmm
 		}
@@ -864,5 +871,18 @@ public class BlockProperties {
 	public static final boolean isPassable(final Location loc) {
 		return isPassable(((org.bukkit.craftbukkit.CraftWorld) loc.getWorld()).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getBlock().getTypeId());
 	}
+
+	/**
+	 * API access to read extra properties from files.
+	 * @param config
+	 */
+    public static void applyConfig(final ConfigFile config, final String pathPrefix) {
+        // Ignore passable.
+        for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_IGNOREPASSABLE)){
+            final Integer id = ConfigFile.parseTypeId(input);
+            if (id == null || id < 0 || id >= 4096) CheckUtils.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
+            else blockFlags[id] |= F_IGN_PASSABLE;
+        }
+    }
 	
 }

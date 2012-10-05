@@ -487,4 +487,12 @@ public abstract class ConfPaths {
      */
     public static final String  STRINGS                                  = "strings";
 
+    // Compatibility section (possibly temporary).
+    @GlobalConfig
+    public static final String COMPATIBILITY                             = "compatibility.";
+    public static final String COMPATIBILITY_BLOCKS                      =  COMPATIBILITY + "blocks.";
+    
+    // Sub paths that are used with different path prefixes potentially.
+    public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
+
 }
