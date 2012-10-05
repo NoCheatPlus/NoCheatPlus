@@ -345,16 +345,18 @@ public class DefaultConfig extends ConfigFile {
                 "cancel vl>10 log:morepackets:0:2:if cancel");
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
+        set(ConfPaths.MOVING_NOFALL_DEALDAMAGE, true);
         set(ConfPaths.MOVING_NOFALL_ACTIONS, "cancel vl>0 log:nofall:0:5:if cancel vl>6 log:nofall:0:5:icf cancel");
         
         set(ConfPaths.MOVING_PASSABLE_CHECK, true);
         set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>5 log:passable:0:5:if cancel vl>50 log:passable:0:5:icf cancel");
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
+        set(ConfPaths.MOVING_SURVIVALFLY_ACCOUNTING, true);
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
         // set(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
-        // set(ConfPaths.MOVING_SURVIVALFLY_SPEEDINGSPEED, 100);
+        // set(ConfPaths.MOVING_SURVIVALFLY_SPEEDINGSPEED, 200);
         // set(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);

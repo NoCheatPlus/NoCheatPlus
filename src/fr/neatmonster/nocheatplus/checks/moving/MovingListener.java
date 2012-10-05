@@ -12,6 +12,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -448,6 +450,7 @@ public class MovingListener implements Listener {
             data.clearMorePacketsData();
 
         // Always drop data from fly checks, as it always loses its validity after teleports. Always!
+        // TODO: NoFall might be necessary to be checked here ?
         data.teleported = null;
         data.clearFlyData();
     }
@@ -548,5 +551,28 @@ public class MovingListener implements Listener {
                     return this;
                 }
             }.set(vehicle, newTo), 1L);
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+    public void onEntityDamage(final EntityDamageEvent event){
+        if (event.getCause() != DamageCause.FALL) return;
+        final Entity entity = event.getEntity();
+        if (!(entity instanceof Player)) return;
+        final Player player = (Player) entity;
+        if (!survivalFly.isEnabled(player)) return;
+        if (!noFall.isEnabled(player)) return;
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        final MovingData data = MovingData.getData(player);
+        final float fallDistance = player.getFallDistance();
+        final int damage = event.getDamage();
+        if (cc.debug) System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance);
+        // Fall-back check.
+        final int maxD = NoFall.getDamage(Math.max(fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - player.getLocation().getY()))));
+        if (maxD > damage){
+            event.setDamage(maxD);
+            if (cc.debug) System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
+        }
+        data.clearNoFallData();
+        // Entity fall-distance should be reset elsewhere.
     }
 }

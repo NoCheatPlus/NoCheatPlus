@@ -79,6 +79,7 @@ public class MovingConfig extends ACheckConfig {
     public final ActionList morePacketsVehicleActions;
 
     public final boolean    noFallCheck;
+    public final boolean    noFallDealDamage;
     public final ActionList noFallActions;
     
 	public final boolean    passableCheck;
@@ -92,6 +93,7 @@ public class MovingConfig extends ACheckConfig {
     public final int        survivalFlySwimmingSpeed;
     public final int        survivalFlyWalkingSpeed;
     public final boolean    survivalFlyCobwebHack;
+    public final boolean    survivalFlyAccounting;
     public final ActionList survivalFlyActions;
     
     // Special tolerance values:
@@ -125,6 +127,7 @@ public class MovingConfig extends ACheckConfig {
                 Permissions.MOVING_MOREPACKETS);
 
         noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
+        noFallDealDamage = data.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
         noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
         
         passableCheck = data.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
@@ -139,6 +142,7 @@ public class MovingConfig extends ACheckConfig {
         survivalFlySwimmingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         survivalFlyCobwebHack = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
+        survivalFlyAccounting = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_ACCOUNTING);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.001);

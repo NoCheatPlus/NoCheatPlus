@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -101,9 +102,11 @@ public class MovingData extends ACheckData {
     public Location       morePacketsVehicleSetback;
 
     // Data of the no fall check.
-    public double         noFallFallDistance;
-    public boolean        noFallOnGround;
-    public boolean        noFallWasOnGround;
+    public float          noFallFallDistance;
+//    public boolean        noFallOnGround;
+//    public boolean        noFallWasOnGround;
+    /** Last y coordinate from when the player was on ground. */
+    public double         noFallMaxY;
     
     // Passable check.
     public double 	      passableVL;
@@ -118,9 +121,10 @@ public class MovingData extends ACheckData {
     
     // Accounting info.
     // TODO: optimize later.
-//    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
-//    public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
-//    public final ActionFrequency hvDistCount = new ActionFrequency(3, 333);
+    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
+    public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
+    public final ActionFrequency hDistCount = new ActionFrequency(3, 333);
+    public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
     public final PlayerLocation from   = new PlayerLocation();
@@ -130,18 +134,22 @@ public class MovingData extends ACheckData {
     public final PlayerLocation to     = new PlayerLocation();
 
     /**
-     * Clear the data of the fly checks.
+     * Clear the data of the fly checks (not more-packets).
      */
     public void clearFlyData() {
         bunnyhopDelay = 0;
-        noFallFallDistance = 0D;
         survivalFlyJumpPhase = 0;
         setBack = null;
-//        final long now = System.currentTimeMillis();
-//        hDistSum.clear(now);
-//        vDistSum.clear(now);
-//        hvDistCount.clear(now);
+        clearAccounting();
         clearNoFallData();
+    }
+
+    public void clearAccounting() {
+        final long now = System.currentTimeMillis();
+        hDistSum.clear(now);
+        vDistSum.clear(now);
+        hDistCount.clear(now);
+        vDistCount.clear(now);
     }
 
     /**
@@ -156,7 +164,8 @@ public class MovingData extends ACheckData {
      * Clear the data of the new fall check.
      */
     public void clearNoFallData() {
-        noFallOnGround = noFallWasOnGround = true;
-        noFallFallDistance = 0D;
+//        noFallOnGround = noFallWasOnGround = true;
+        noFallFallDistance = 0;
+        noFallMaxY = 0D;
     }
 }

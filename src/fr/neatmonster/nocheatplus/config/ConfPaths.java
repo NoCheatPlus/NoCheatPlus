@@ -452,6 +452,7 @@ public abstract class ConfPaths {
 
     private static final String MOVING_NOFALL                            = MOVING + "nofall.";
     public static final String  MOVING_NOFALL_CHECK                      = MOVING_NOFALL + "active";
+    public static final String  MOVING_NOFALL_DEALDAMAGE                 = MOVING_NOFALL + "dealdamage";
     public static final String  MOVING_NOFALL_ACTIONS                    = MOVING_NOFALL + "actions";
     
     public static final String MOVING_PASSABLE                           = MOVING + "passable.";
@@ -467,6 +468,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_SURVIVALFLY_SWIMMINGSPEED         = MOVING_SURVIVALFLY + "swimmingspeed";
     public static final String  MOVING_SURVIVALFLY_WALKINGSPEED          = MOVING_SURVIVALFLY + "walkingspeed";
 	public static final String  MOVING_SURVIVALFLY_COBWEBHACK            = MOVING_SURVIVALFLY + "cobwebhack";
+    public static final String  MOVING_SURVIVALFLY_ACCOUNTING            = MOVING_SURVIVALFLY + "accounting";
     public static final String  MOVING_SURVIVALFLY_ACTIONS               = MOVING_SURVIVALFLY + "actions";
     
     // Special (to be sorted in or factored out).
