@@ -305,6 +305,8 @@ public class MovingListener implements Listener {
 
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
+        
+        data.noFallAssumeGround = false;
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.

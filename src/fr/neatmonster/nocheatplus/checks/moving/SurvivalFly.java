@@ -208,17 +208,18 @@ public class SurvivalFly extends Check {
         // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
         final double setBackYDistance = to.getY() - data.setBack.getY();
         if (!fromOnGround && (from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
-                        && setBackYDistance > 0D && setBackYDistance <= 1.5D || !toOnGround && to.isAboveStairs())) {
+                        && setBackYDistance > 0D && setBackYDistance <= 1.5D && !BlockProperties.isPassable(from.getTypeIdBelow())
+                        || !toOnGround && to.isAboveStairs())) {
             // Set the new setBack and reset the jumpPhase.
             
-            // TODO: this allows exploits !
-            
+            // Maybe don't adapt the setback (unless null)!
             data.setBack = from.getLocation();
             data.setBack.setY(Math.floor(data.setBack.getY()));
+            
             data.survivalFlyJumpPhase = 0;
-            // Reset the no fall data.
-            data.clearNoFallData();
-            if (cc.debug) System.out.println(player.getName() + " RESET NOFALL (WORKAROUND)");
+            // Tell NoFall that we assume the player to have been on ground somehow.
+            data.noFallAssumeGround = true;
+            if (cc.debug) System.out.println(player.getName() + " Y INCONSISTENCY WORKAROUND USED");
         }
         data.survivalFlyLastFromY = from.getY();
 

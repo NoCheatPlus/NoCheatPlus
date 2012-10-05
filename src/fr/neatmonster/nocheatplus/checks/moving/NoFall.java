@@ -114,11 +114,11 @@ public class NoFall extends Check {
             // Just reset.
             data.clearNoFallData();
         }
-        else if (fromOnGround){
+        else if (fromOnGround || data.noFallAssumeGround){
             // Check if to deal damage (fall back damage check).
             if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, from.getY(), cc);
             else{
-                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - to.getY())));
+                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - from.getY())));
                 data.clearNoFallData();
             }
         }

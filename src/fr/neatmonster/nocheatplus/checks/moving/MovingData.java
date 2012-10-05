@@ -107,6 +107,8 @@ public class MovingData extends ACheckData {
 //    public boolean        noFallWasOnGround;
     /** Last y coordinate from when the player was on ground. */
     public double         noFallMaxY;
+    /** Indicate that NoFall should assume the player to be on ground. */
+    public boolean noFallAssumeGround;
     
     // Passable check.
     public double 	      passableVL;
