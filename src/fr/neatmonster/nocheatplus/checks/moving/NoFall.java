@@ -45,7 +45,7 @@ public class NoFall extends Check {
      * @return
      */
     protected static final int getDamage(final float fallDistance){
-        return 1 + (int) (fallDistance - 3.5);
+        return (int) Math.round(fallDistance - 3.0);
     }
     
     /**
@@ -59,7 +59,7 @@ public class NoFall extends Check {
 //        final int nfD = getDamage(data.noFallFallDistance);
 //        final int yD = getDamage((float) (data.noFallMaxY - y));
 //        final int maxD = Math.max(Math.max(pD, nfD), yD);
-        final int maxD = getDamage(Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - y))));
+        final int maxD = getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, mcPlayer.fallDistance)));
         if (maxD > 0){
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
@@ -107,6 +107,7 @@ public class NoFall extends Check {
         
         final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         
+        final double yDiff = to.getY() - from.getY();
         // TODO: early returns (...) 
         
         if (fromReset){
@@ -116,7 +117,10 @@ public class NoFall extends Check {
         else if (fromOnGround){
             // Check if to deal damage (fall back damage check).
             if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, from.getY(), cc);
-            else data.clearNoFallData();
+            else{
+                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - to.getY())));
+                data.clearNoFallData();
+            }
         }
         else if (toReset){
             // Just reset.
@@ -125,7 +129,10 @@ public class NoFall extends Check {
         else if (toOnGround){
             // Check if to deal damage.
             if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, to.getY(), cc);
-            else data.clearNoFallData();
+            else{
+                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - to.getY())));
+                data.clearNoFallData();
+            }
         }
         else{
             // Ensure fall distance is correct ? or anyway !
@@ -139,67 +146,11 @@ public class NoFall extends Check {
         if (cc.debug) System.out.println(player.getName() + " NoFall: mc="+mcPlayer.fallDistance +" / nf=" + data.noFallFallDistance);
         data.noFallFallDistance = Math.max(mcPlayer.fallDistance, data.noFallFallDistance);
         
-        final double yDiff = to.getY() - from.getY();
         // Add y distance.
         if (!toReset && !toOnGround && yDiff < 0){
             data.noFallFallDistance -= yDiff;
         }
         
-//        // OLD ----------------------------------------
-//        
-//        
-//        data.noFallWasOnGround = data.noFallOnGround;
-//        data.noFallOnGround = to.isOnGround();
-//
-//        // If the player is on the ground, is falling into a liquid, in web or is on a ladder.
-//        if (from.isOnGround() && to.isOnGround() || to.isInLiquid() || to.isInWeb() || to.isOnLadder())
-//            data.noFallFallDistance = 0;
-//        
-//        // If the player just touched the ground for the server.
-//        if (data.noFallFallDistance > 3.5){
-//            
-//            
-//            
-//            if (!data.noFallWasOnGround && data.noFallOnGround) {
-//                // If the difference between the fall distance recorded by Bukkit and NoCheatPlus is too big and the fall
-//                // distance bigger than 2.
-//                
-//                // TODO: 3.5 ?
-//                if (data.noFallFallDistance - player.getFallDistance() > 0.1D) {
-//                    // Add the difference to the violation level.
-//                    data.noFallVL += data.noFallFallDistance - player.getFallDistance();
-//
-//                    // Execute the actions to find out if we need to cancel the event or not.
-//                    if (executeActions(player, data.noFallVL, data.noFallFallDistance - player.getFallDistance(),
-//                            cc.noFallActions))
-//                        // Set the fall distance to its right value.
-//                        if (cc.noFallDealDamage){
-//                            // TODO: round ?
-//                            ((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, 1 + (int) (data.noFallFallDistance - 3.5));
-//                            data.clearNoFallData();
-//                        }
-//                        else player.setFallDistance((float) data.noFallFallDistance);
-//                } else
-//                    // Reward the player by lowering his violation level.
-//                    data.noFallVL *= 0.95D;
-//            } else{
-//                // Reward the player by lowering his violation level.
-//                data.noFallVL *= 0.95D;
-//                if (cc.noFallDealDamage && data.noFallOnGround){
-//                 // TODO: round ?
-//                    ((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, 1 + (int) (data.noFallFallDistance - 3.5));
-//                    data.clearNoFallData();
-//                }
-//            }
-//        }
-//        else data.noFallVL *= 0.95D;
-//
-//        // The player has touched the ground somewhere, reset his fall distance.
-//        if (!data.noFallWasOnGround && data.noFallOnGround || data.noFallWasOnGround && !data.noFallOnGround)
-//            data.noFallFallDistance = 0;
-//
-//        if (to.getY() > 0 && from.getY() > to.getY())
-//            data.noFallFallDistance += from.getY() - to.getY();
     }
 
     @Override

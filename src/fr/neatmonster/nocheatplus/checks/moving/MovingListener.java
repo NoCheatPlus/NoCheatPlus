@@ -565,10 +565,12 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(player);
         final float fallDistance = player.getFallDistance();
         final int damage = event.getDamage();
-        if (cc.debug) System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance);
+        final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
+        if (cc.debug) System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         // Fall-back check.
-        final int maxD = NoFall.getDamage(Math.max(fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - player.getLocation().getY()))));
+        final int maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance)));
         if (maxD > damage){
+            // TODO: respect dealDamage ?
             event.setDamage(maxD);
             if (cc.debug) System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
         }
