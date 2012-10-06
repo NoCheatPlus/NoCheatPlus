@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -74,34 +75,42 @@ public class Reach extends Check {
         }
         
         // Reference locations to check distance for.
-        // TODO: improve reference location: depending on height difference choose min(foot/hitbox, attacker)
-        final Location dRef;
+        final Location dRef = damaged.getLocation();
+        final double height;
         if (damaged instanceof LivingEntity){
-        	dRef = ((LivingEntity) damaged).getEyeLocation();
+        	height = Math.max(((LivingEntity) damaged).getEyeHeight(), ((CraftEntity)damaged).getHandle().height);
         }
-        else dRef = damaged.getLocation();
+        else height = ((CraftEntity)damaged).getHandle().height;
         final Location pRef = player.getEyeLocation();
+        
+        // Refine y position.
+        // TODO: Make a little more accurate by counting in the actual bounding box.
+        final double pY = pRef.getY();
+        final double dY = dRef.getY();
+        if (pY <= dY); // Keep the foot level y.
+        else if (pY >= dY + height) dRef.setY(dY + height); // Highest ref y.
+        else dRef.setY(0); // Level with damaged.
         
         final Vector pRel = dRef.toVector().subtract(pRef.toVector());
         
         // Distance is calculated from eye location to center of targeted. If the player is further away from his target
         // than allowed, the difference will be assigned to "distance".
         final double lenpRel = pRel.length();
-        double distance = lenpRel - distanceLimit;
+        double violation = lenpRel - distanceLimit;
 
         // Handle the EnderDragon differently.
         if (damaged instanceof EnderDragon)
-            distance -= 6.5D;
+            violation -= 6.5D;
 
-        if (distance > 0) {
+        if (violation > 0) {
             // He failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
             if (!LagMeasureTask.skipCheck())
-                data.reachVL += distance;
+                data.reachVL += violation;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, distance, cc.reachActions);
-            if (Improbable.check(player, (float) distance, System.currentTimeMillis()))
+            cancel = executeActions(player, data.reachVL, violation, cc.reachActions);
+            if (Improbable.check(player, (float) violation, System.currentTimeMillis()))
                 cancel = true;
             if (cancel)
                 // If we should cancel, remember the current time too.
@@ -110,7 +119,7 @@ public class Reach extends Check {
         else if (lenpRel - distanceLimit * data.reachMod > 0){
             data.reachLastViolationTime = Math.max(data.reachLastViolationTime, System.currentTimeMillis() - cc.reachPenalty / 2);
             cancel = true;
-            Improbable.check(player, (float) distance / 2f, System.currentTimeMillis());
+            Improbable.check(player, (float) violation / 2f, System.currentTimeMillis());
         }
         else{
             // Player passed the check, reward him.
