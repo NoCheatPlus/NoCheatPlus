@@ -113,28 +113,21 @@ public class MovingListener implements Listener {
 		
 		final Material mat = block.getType();
 
-		if (BlockProperties.isLiquid(event.getBlockAgainst().getTypeId())
-				&& mat != Material.WATER_LILY && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS))
-			// The block was placed against a liquid block, cancel its
-			// placement.
-			event.setCancelled(true);
-		else {
-			final MovingData data = MovingData.getData(player);
-			if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) return;
-			
-			if (data.setBack == null || blockY + 1D < data.setBack.getY()) return;
-			
-			final Location loc = player.getLocation();
-			if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
-					&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
-					&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
-					&& (BlockProperties.i(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
-				// The creative fly and/or survival fly check is enabled, the
-				// block was placed below the player and is
-				// solid, so do what we have to do.
-				data.setBack.setY(blockY + 1D);
-				data.survivalFlyJumpPhase = 0;
-			}
+		final MovingData data = MovingData.getData(player);
+		if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) return;
+		
+		if (data.setBack == null || blockY + 1D < data.setBack.getY()) return;
+		
+		final Location loc = player.getLocation();
+		if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
+				&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
+				&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
+				&& (BlockProperties.i(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
+			// The creative fly and/or survival fly check is enabled, the
+			// block was placed below the player and is
+			// solid, so do what we have to do.
+			data.setBack.setY(blockY + 1D);
+			data.survivalFlyJumpPhase = 0;
 		}
     }
 

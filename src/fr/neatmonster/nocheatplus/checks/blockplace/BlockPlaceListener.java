@@ -15,6 +15,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /*
  * M#"""""""'M  dP                   dP       MM"""""""`YM dP                            
@@ -71,14 +73,23 @@ public class BlockPlaceListener implements Listener {
          * | |_) | | (_) | (__|   <  |  __/| | (_| | (_|  __/
          * |____/|_|\___/ \___|_|\_\ |_|   |_|\__,_|\___\___|
          */
-        // We don't care about null blocks.
-        if (event.getBlock() == null || event.getBlockAgainst() == null)
-            return;
 
-        final Player player = event.getPlayer();
+        
         final Block block = event.getBlockPlaced();
-
+        final Block blockAgainst = event.getBlockAgainst();
+        // We don't care about null blocks.
+        if (block == null || blockAgainst == null)
+            return;
+        
+        final Material mat = block.getType();
+        final Player player = event.getPlayer();
         boolean cancelled = false;
+        
+        if (BlockProperties.isLiquid(blockAgainst.getTypeId())
+                && mat != Material.WATER_LILY && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS))
+            // The block was placed against a liquid block, cancel its
+            // placement.
+            cancelled = true;
 
         // First, the fast place check.
         if (fastPlace.isEnabled(player)){
@@ -90,7 +101,7 @@ public class BlockPlaceListener implements Listener {
         }
 
         // Second, the no swing check (player doesn't swing his arm when placing a lily pad).
-        if (!cancelled && event.getBlockPlaced().getType() != Material.WATER_LILY && noSwing.isEnabled(player)
+        if (!cancelled && mat != Material.WATER_LILY && noSwing.isEnabled(player)
                 && noSwing.check(player))
             cancelled = true;
 
@@ -100,7 +111,7 @@ public class BlockPlaceListener implements Listener {
 
         // Fourth, the direction check.
         if (!cancelled && direction.isEnabled(player)
-                && direction.check(player, block.getLocation(), event.getBlockAgainst().getLocation()))
+                && direction.check(player, block.getLocation(), blockAgainst.getLocation()))
             cancelled = true;
 
         // If one of the checks requested to cancel the event, do so.
