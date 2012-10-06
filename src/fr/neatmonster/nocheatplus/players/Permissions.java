@@ -62,6 +62,8 @@ public class Permissions {
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 88P' 888     "YeeP" "88 888 888 8b 
      */
     private static final String BLOCKBREAK                   = CHECKS + ".blockbreak";
+    public static final String  BLOCKBREAK_BREAK             = BLOCKBREAK + ".break";
+    public static final String  BLOCKBREAK_BREAK_LIQUID      = BLOCKBREAK_BREAK + ".liquid";
     public static final String  BLOCKBREAK_DIRECTION         = BLOCKBREAK + ".direction";
     public static final String  BLOCKBREAK_FASTBREAK         = BLOCKBREAK + ".fastbreak";
 	public static final String  BLOCKBREAK_FREQUENCY         = BLOCKBREAK + ".frequency";

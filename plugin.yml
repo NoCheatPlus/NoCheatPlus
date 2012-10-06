@@ -72,6 +72,11 @@ permissions:
                     nocheatplus.checks.blockbreak:
                         description: Allow the player to bypass all BlockBreak checks.
                         children:
+                            nocheatplus.checks.blockbreak.break:
+                                description: Allow the player to break special blocks.
+                                children:
+                                  nocheatplus.checks.blockbreak.break.fluid:
+                                    description: Allow players to break fluids.
                             nocheatplus.checks.blockbreak.direction:
                                 description: Allow the player to bypass to Direction check.
                             nocheatplus.checks.blockbreak.fastbreak:

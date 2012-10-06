@@ -13,6 +13,8 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -121,6 +123,11 @@ public class BlockBreakListener implements Listener {
         // Did the player look at the block at all?
         if (!cancelled && direction.isEnabled(player) && direction.check(player, block.getLocation(), data))
             cancelled = true;
+        
+        // Destroying liquid blocks.
+        if (!cancelled && BlockProperties.isLiquid(block.getTypeId()) && !player.hasPermission(Permissions.BLOCKBREAK_BREAK_LIQUID)){
+            cancelled = true;
+        }
 
         // At least one check failed and demanded to cancel the event.
         if (cancelled){
