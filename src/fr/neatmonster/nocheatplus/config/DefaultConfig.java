@@ -181,7 +181,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_FACTOR, 0.7);
         set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_WEIGHT, 3.0);
         set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_LEVEL, 20.0);
-        set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_ACTIONS, "cancel log:chatfast:0:5:cf cmd:tellchatfast cmd:kickchatfast vl>20 log:chatfast:0:5:cf cancel cmd:kickchat1 vl>40 log:chatfast:0:5:cf cancel cmd:kickchat5");
+        set(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_ACTIONS, "log:chatfast:0:5:cf cancel cmd:kickchatfast vl>20 log:chatfast:0:5:cf cancel cmd:kickchat1 vl>40 log:chatfast:0:5:cf cancel cmd:kickchat5");
         // Message
         set(ConfPaths.CHAT_TEXT_MSG_LETTERCOUNT, 1.0);
         set(ConfPaths.CHAT_TEXT_MSG_PARTITION, 1.0);
