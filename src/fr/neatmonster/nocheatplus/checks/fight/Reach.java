@@ -29,10 +29,16 @@ import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 public class Reach extends Check {
 
     /** The maximum distance allowed to interact with an entity in creative mode. */
-    public final double CREATIVE_DISTANCE = 6D;
+    public static final double CREATIVE_DISTANCE = 6D;
 
     /** The maximum distance allowed to interact with an entity in survival mode. */
-    public final double SURVIVAL_DISTANCE = 4.25D;
+    public static final double SURVIVAL_DISTANCE = 4.25D;
+    
+    /** Amount which can be reduced by reach adaption. */
+    public static final double DYNAMIC_RANGE = 0.75;
+    
+    /** Adaption amount for dynamicv range. */
+    public static final double DYNAMIC_STEP = DYNAMIC_RANGE / 3.0;
 
     /**
      * Instantiates a new reach check.
@@ -56,7 +62,16 @@ public class Reach extends Check {
 
         boolean cancel = false;
 
-        final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE;
+        final double distanceLimit;
+        final double distanceMin;
+        if (player.getGameMode() == GameMode.CREATIVE){
+            distanceLimit = CREATIVE_DISTANCE;
+            distanceMin = (CREATIVE_DISTANCE - DYNAMIC_RANGE) / CREATIVE_DISTANCE;
+        }
+        else{
+           distanceLimit = SURVIVAL_DISTANCE;
+           distanceMin = (SURVIVAL_DISTANCE - DYNAMIC_RANGE) / CREATIVE_DISTANCE;
+        }
         
         // Reference locations to check distance for.
         // TODO: improve reference location: depending on height difference choose min(foot/hitbox, attacker)
@@ -69,39 +84,10 @@ public class Reach extends Check {
         
         final Vector pRel = dRef.toVector().subtract(pRef.toVector());
         
-        
-//        final double mod;
-//        if (cc.reachPrecision){
-//        	// Calculate how fast they are closing in or moving away from each other.
-//        	// Use x-z plane only for now.
-//            final Vector vRel = damaged.getVelocity().clone().subtract(player.getVelocity());
-//            System.out.println("vrel: " + vRel);
-//            final double avRel = CheckUtils.angle(vRel.getX(), vRel.getZ());
-//            final double apRel = CheckUtils.angle(pRel.getX(), pRel.getZ());
-//            final double angle = CheckUtils.angleDiff(apRel, avRel);
-//            
-//            System.out.println("ap=" + apRel+ " / av=" + avRel + " -> " + angle);
-//            
-//            final double radial;
-//            
-//            
-//            
-//            if (Double.isNaN(angle)){
-//            	radial = 0.0;
-//            	mod = modPenalty;
-//            }
-//            else{
-//            	radial = vRel.length() * Math.cos(angle);
-//            	mod = ((radial < 0 || Double.isNaN(radial)) ? modPenalty : 1.0);
-//            }
-//        	System.out.println(player.getName() + " -> d=" + pRel.length() + ", vr=" + radial + ", mod= " + mod);
-//        }
-//        else 
-//        	mod = 1D;
         // Distance is calculated from eye location to center of targeted. If the player is further away from his target
         // than allowed, the difference will be assigned to "distance".
         final double lenpRel = pRel.length();
-        double distance = lenpRel - distanceLimit * data.reachMod;
+        double distance = lenpRel - distanceLimit;
 
         // Handle the EnderDragon differently.
         if (damaged instanceof EnderDragon)
@@ -115,28 +101,29 @@ public class Reach extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.reachVL, distance, cc.reachActions);
-
+            if (Improbable.check(player, (float) distance, System.currentTimeMillis()))
+                cancel = true;
             if (cancel)
                 // If we should cancel, remember the current time too.
                 data.reachLastViolationTime = System.currentTimeMillis();
-        } else{
+        }
+        else if (lenpRel - distanceLimit * data.reachMod > 0){
+            data.reachLastViolationTime = Math.max(data.reachLastViolationTime, System.currentTimeMillis() - cc.reachPenalty / 2);
+            cancel = true;
+            Improbable.check(player, (float) distance / 2f, System.currentTimeMillis());
+        }
+        else{
             // Player passed the check, reward him.
             data.reachVL *= 0.8D;
             
         }
         
-        // Check if improbable.
-        if (cancel || distance > -1.25){
-        	if (Improbable.check(player, (float) (distance + 1.25) / 2f, System.currentTimeMillis()))
-        		cancel = true;
-        }
-        
         if (!cc.reachReduce) data.reachMod = 1d;
-        else if (lenpRel > 0.8 * distanceLimit){
-        	data.reachMod = Math.max(0.8, data.reachMod - 0.05);
+        else if (lenpRel > distanceLimit - DYNAMIC_RANGE){
+        	data.reachMod = Math.max(distanceMin, data.reachMod - DYNAMIC_STEP);
         }
         else{
-        	data.reachMod = Math.min(1.0, data.reachMod + 0.05);
+        	data.reachMod = Math.min(1.0, data.reachMod + DYNAMIC_STEP);
         }
 
         // If the player is still in penalty time, cancel the event anyway.
