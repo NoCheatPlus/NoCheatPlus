@@ -95,10 +95,39 @@ public class SurvivalFly extends Check {
 
         // A player is considered sprinting if the flag is set and if he has enough food level.
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
-
+        
+        // Set some flags:
+        final boolean fromOnGround = from.isOnGround();
+        final boolean toOnGround = to.isOnGround();
+        
+        // Calculate some distances.
+        final double xDistance = to.getX() - from.getX();
+        final double yDistance = to.getY() - from.getY();
+        final double zDistance = to.getZ() - from.getZ();
+        final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
+        
         // If we don't have any setBack, choose the location the player comes from.
         if (data.setBack == null)
             data.setBack = from.getLocation();
+        
+        final double setBackYDistance = to.getY() - data.setBack.getY();
+        // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
+        if (!fromOnGround && (from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
+                        && setBackYDistance > 0D && setBackYDistance <= 1.5D && !BlockProperties.isPassable(from.getTypeIdBelow())
+                        || !toOnGround && to.isAboveStairs())) {
+            // Set the new setBack and reset the jumpPhase.
+            
+            // Maybe don't adapt the setback (unless null)!
+            data.setBack = from.getLocation();
+            data.setBack.setY(Math.floor(data.setBack.getY()));
+            // data.ground ?
+            data.survivalFlyJumpPhase = 0;
+            data.clearAccounting();
+            // Tell NoFall that we assume the player to have been on ground somehow.
+            data.noFallAssumeGround = true;
+            if (cc.debug) System.out.println(player.getName() + " Y INCONSISTENCY WORKAROUND USED");
+        }
+        data.survivalFlyLastFromY = from.getY();
 
         // Player on ice? Give him higher max speed.
         if (from.isOnIce() || to.isOnIce())
@@ -134,9 +163,6 @@ public class SurvivalFly extends Check {
         
         // TODO: Optimize: maybe only do the permission checks and modifiers if the distance is too big.
         //       (Depending on permission plugin, with pex it will be hardly 1000 ns for all moving perms, if all false.)
-        // Set some flags:
-        final boolean fromOnGround = from.isOnGround();
-        final boolean toOnGround = to.isOnGround();
         
         // If the player is on ice, give him an higher maximum speed.
         if (data.survivalFlyOnIce > 0)
@@ -147,11 +173,7 @@ public class SurvivalFly extends Check {
         if (entity.hasEffect(MobEffectList.FASTER_MOVEMENT))
             hAllowedDistance *= 1.0D + 0.2D * (entity.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
 
-        // Calculate some distances.
-        final double xDistance = to.getX() - from.getX();
-        final double yDistance = to.getY() - from.getY();
-        final double zDistance = to.getZ() - from.getZ();
-        final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
+        // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
         // Prevent players from walking on a liquid.
@@ -205,24 +227,6 @@ public class SurvivalFly extends Check {
         if (jumpAmplifier > data.jumpAmplifier)
             data.jumpAmplifier = jumpAmplifier;
 
-        // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
-        final double setBackYDistance = to.getY() - data.setBack.getY();
-        if (!fromOnGround && (from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
-                        && setBackYDistance > 0D && setBackYDistance <= 1.5D && !BlockProperties.isPassable(from.getTypeIdBelow())
-                        || !toOnGround && to.isAboveStairs())) {
-            // Set the new setBack and reset the jumpPhase.
-            
-            // Maybe don't adapt the setback (unless null)!
-            data.setBack = from.getLocation();
-            data.setBack.setY(Math.floor(data.setBack.getY()));
-            
-            data.survivalFlyJumpPhase = 0;
-            // Tell NoFall that we assume the player to have been on ground somehow.
-            data.noFallAssumeGround = true;
-            if (cc.debug) System.out.println(player.getName() + " Y INCONSISTENCY WORKAROUND USED");
-        }
-        data.survivalFlyLastFromY = from.getY();
-
         // Calculate the vertical speed limit based on the current jump phase.
         double vAllowedDistance, vDistanceAboveLimit;
         if (from.isInWeb()){
@@ -244,7 +248,7 @@ public class SurvivalFly extends Check {
         	}
         }
         else{
-        	vAllowedDistance = (!fromOnGround && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
+        	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
             vAllowedDistance *= data.jumpAmplifier;
             if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier && data.verticalVelocityCounter <= 0){
             	vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
@@ -256,15 +260,15 @@ public class SurvivalFly extends Check {
 //            System.out.println("vda = " +vDistanceAboveLimit + " / vc = " + data.verticalVelocityCounter + " / vf = " + data.verticalFreedom + " / v = " + player.getVelocity().length());
 
             // Step can also be blocked.
-            if (fromOnGround && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
+            if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
                     && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP))
                 vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
 
         }
-        if (fromOnGround || toOnGround)
+        if (data.noFallAssumeGround || fromOnGround || toOnGround)
             data.jumpAmplifier = 0D;
         
-        final boolean resetFrom = fromOnGround || from.isInLiquid() || from.isOnLadder() ||  from.isInWeb();
+        final boolean resetFrom = data.noFallAssumeGround || fromOnGround || from.isInLiquid() || from.isOnLadder() ||  from.isInWeb();
         
         if (cc.survivalFlyAccounting && !resetFrom){
             final boolean useH = data.horizontalFreedom <= 0.001D;
