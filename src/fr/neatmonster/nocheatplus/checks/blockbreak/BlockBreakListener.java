@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -95,6 +96,8 @@ public class BlockBreakListener implements Listener {
         final BlockBreakData data = BlockBreakData.getData(player);
         final long now = System.currentTimeMillis();
         
+        final GameMode gameMode = player.getGameMode();
+        
         // Has the player broken a block that was not damaged before?
         if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block, cc, data, isInstaBreak))
         	cancelled = true;
@@ -104,7 +107,7 @@ public class BlockBreakListener implements Listener {
         	cancelled = true;
         	
         // Has the player broken blocks faster than possible?
-        if (!cancelled && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data))
+        if (!cancelled && gameMode != GameMode.CREATIVE && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data))
             cancelled = true;
 
         // Did the arm of the player move before breaking this block?
