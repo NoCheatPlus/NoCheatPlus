@@ -89,7 +89,7 @@ public class Reach extends Check {
         final double dY = dRef.getY();
         if (pY <= dY); // Keep the foot level y.
         else if (pY >= dY + height) dRef.setY(dY + height); // Highest ref y.
-        else dRef.setY(0); // Level with damaged.
+        else dRef.setY(pY); // Level with damaged.
         
         final Vector pRel = dRef.toVector().subtract(pRef.toVector());
         
