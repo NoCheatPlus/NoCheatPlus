@@ -128,6 +128,7 @@ public class NoFall extends Check {
         }
         else if (toOnGround){
             // Check if to deal damage.
+            if (yDiff < 0) data.noFallFallDistance -= yDiff;
             if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, to.getY(), cc);
             else{
                 mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - to.getY())));
