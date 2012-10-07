@@ -63,16 +63,8 @@ public class Reach extends Check {
 
         boolean cancel = false;
 
-        final double distanceLimit;
-        final double distanceMin;
-        if (player.getGameMode() == GameMode.CREATIVE){
-            distanceLimit = CREATIVE_DISTANCE;
-            distanceMin = (CREATIVE_DISTANCE - DYNAMIC_RANGE) / CREATIVE_DISTANCE;
-        }
-        else{
-           distanceLimit = SURVIVAL_DISTANCE;
-           distanceMin = (SURVIVAL_DISTANCE - DYNAMIC_RANGE) / CREATIVE_DISTANCE;
-        }
+        final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE;
+        final double distanceMin = (distanceLimit - DYNAMIC_RANGE) / distanceLimit;
         
         // Reference locations to check distance for.
         final Location dRef = damaged.getLocation();
