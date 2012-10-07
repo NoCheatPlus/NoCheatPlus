@@ -308,7 +308,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_DROP_CHECK, true);
         set(ConfPaths.INVENTORY_DROP_LIMIT, 100);
         set(ConfPaths.INVENTORY_DROP_TIMEFRAME, 20L);
-        set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cmd:dropkick");
+        set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cancel cmd:dropkick:0:1");
 
         set(ConfPaths.INVENTORY_FASTCLICK_CHECK, true);
         set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel vl>50 log:fastclick:3:5:cif cancel");
@@ -390,7 +390,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
         set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
-        set(ConfPaths.STRINGS + ".dropkick", "ncp kick [player] Dropping items too fast.");
+        set(ConfPaths.STRINGS + ".dropkick", "ncp delay ncp kick [player] Dropping items too fast.");
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
