@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -563,7 +564,8 @@ public class BlockProperties {
 		final World world = location.getWorld();
 		final boolean onGround = isOnGround(player, location) || world.getBlockTypeIdAt(x, y, z) == Material.WATER_LILY.getId();
 		final boolean inWater = isInWater(world.getBlockTypeIdAt(x, y + 1, z));
-		return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER));
+		final int haste = player.hasPotionEffect(PotionEffectType.FAST_DIGGING) ? 1 : 0;
+		return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), haste);
 	}
 
 
@@ -573,18 +575,34 @@ public class BlockProperties {
 	 * @param itemInHand
 	 * @return
 	 */
-	public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final boolean onGround, final boolean inWater, final boolean aquaAffinity){
+	public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final boolean onGround, final boolean inWater, final boolean aquaAffinity, final int haste){
 		// TODO: more configurability / load from file for blocks (i.e. set for shears etc.
 		if (itemInHand == null) return getBreakingDuration(blockId, getBlockProps(blockId), noTool, onGround, inWater, aquaAffinity, 0);
 		else{
 			int efficiency = 0;
 			if (itemInHand.containsEnchantment(Enchantment.DIG_SPEED)) efficiency = itemInHand.getEnchantmentLevel(Enchantment.DIG_SPEED);
-			return getBreakingDuration(blockId, getBlockProps(blockId), getToolProps(itemInHand.getTypeId()), onGround, inWater, aquaAffinity, efficiency);
+			return getBreakingDuration(blockId, getBlockProps(blockId), getToolProps(itemInHand.getTypeId()), onGround, inWater, aquaAffinity, efficiency, haste);
 		}
 	}
+	
+	    /**
+	     * 
+	     * @param blockId
+	     * @param blockProps
+	     * @param toolProps
+	     * @param onGround
+	     * @param inWater
+	     * @param aquaAffinity
+	     * @param efficiency
+	     * @param haste Amplifier of haste potion effect (assume >0 for effect there at all).
+	     * @return
+	     */
+	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency, int haste) {
+	    final long dur = getBreakingDuration(blockId, blockProps, toolProps, onGround, inWater, aquaAffinity, efficiency);
+	    return haste > 0 ? ((long) (dur * 0.66)) : dur;
+	}
 
-	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {
-		
+	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {	
 		if (efficiency > 0){
 			// Workaround until something better is found..
 			if (blockId == Material.LEAVES.getId() || blockProps == glassType){
