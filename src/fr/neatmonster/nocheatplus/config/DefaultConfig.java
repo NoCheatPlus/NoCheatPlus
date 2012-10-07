@@ -430,7 +430,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, new LinkedList<String>(Arrays.asList(new String[]{
-                Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),
+                Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(), 
+                Material.PISTON_EXTENSION.name(), 
+                Material.PISTON_MOVING_PIECE.name(), // TODO: ?
         })));
         
         // Update internal factory based on all the new entries to the "actions" section.
