@@ -413,6 +413,7 @@ public class PlayerLocation {
 	 * Set some references to null.
 	 */
 	public void cleanup(){
+	    entity = null;
 	    world = null;
 	    worldServer = null;
 	    boundingBox = null;
