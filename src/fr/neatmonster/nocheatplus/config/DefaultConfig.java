@@ -2,7 +2,6 @@ package fr.neatmonster.nocheatplus.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 
 import org.bukkit.Material;
 
@@ -153,8 +152,7 @@ public class DefaultConfig extends ConfigFile {
         
         set(ConfPaths.CHAT_COMMANDS_CHECK, true);
         set(ConfPaths.CHAT_COMMANDS_EXCLUSIONS, new ArrayList<String>());
-        set(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT, 
-                new LinkedList<String>(Arrays.asList(new String[]{"/me"})));
+        set(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT, Arrays.asList("/me"));
         set(ConfPaths.CHAT_COMMANDS_LEVEL, 10);
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS, 18);
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL, 3);
@@ -240,7 +238,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS, false);
         set(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE, true);
         set(ConfPaths.COMBINED_INVULNERABLE_INITIALTICKS_JOIN, -1);
-        set(ConfPaths.COMBINED_INVULNERABLE_IGNORE, new LinkedList<String>(Arrays.asList(new String[]{"FALL"})));
+        set(ConfPaths.COMBINED_INVULNERABLE_IGNORE, Arrays.asList("FALL"));
         set(ConfPaths.COMBINED_INVULNERABLE_MODIFIERS + ".all", 0);
         
         set(ConfPaths.COMBINED_YAWRATE_RATE , 380);
@@ -402,7 +400,7 @@ public class DefaultConfig extends ConfigFile {
                 + "tried to move from [locationfrom] to [locationto] over a distance of [distance] block(s)" + end);
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
         set(ConfPaths.STRINGS + ".fselfhit", start + "tried to self-hit" + end);
-        set(ConfPaths.STRINGS + ".fspeed", start + "tried to hit at a too high rate" + end);
+        set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack with too high a frequency" + end);
         set(ConfPaths.STRINGS + ".chatnormal", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
@@ -429,11 +427,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 
-        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, new LinkedList<String>(Arrays.asList(new String[]{
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, Arrays.asList(
                 Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(), 
                 Material.PISTON_EXTENSION.name(), 
-                Material.PISTON_MOVING_PIECE.name(), // TODO: ?
-        })));
+                Material.PISTON_MOVING_PIECE.name() // TODO: ?
+        ));
         
         // Update internal factory based on all the new entries to the "actions" section.
         regenerateActionLists();
