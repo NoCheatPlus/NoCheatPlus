@@ -265,7 +265,6 @@ public class SurvivalFly extends Check {
             vAllowedDistance *= data.jumpAmplifier;
             if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier && data.verticalVelocityCounter <= 0){
             	vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
-            	if (cc.debug) System.out.println("jumpphase -> " + data.survivalFlyJumpPhase);
             }
 
             vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
@@ -318,7 +317,7 @@ public class SurvivalFly extends Check {
         data.survivalFlyVL *= 0.95D;
         
         if (cc.debug){
-            System.out.println(player.getName() + " vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+")");
+            System.out.println(player.getName() + " vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+"), jumpphase: " + data.survivalFlyJumpPhase);
             System.out.println(player.getName() + " hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (yDistance) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance);
             System.out.println(player.getName() + " y: " + from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()) ;
             if (cc.survivalFlyAccounting) System.out.println(player.getName() + " h=" + data.hDistSum.getScore(1f)+"/" + data.hDistSum.getScore(1) + " , v=" + data.vDistSum.getScore(1f)+"/"+data.vDistSum.getScore(1) );
