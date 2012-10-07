@@ -45,6 +45,9 @@ public class SurvivalFly extends Check {
 	public static final double webSpeed         = 0.105D; // TODO: walkingSpeed * 0.15D; <- does not work
 	
 	public static final double modIce			= 2.5D;
+	
+	/** Faster moving down stream (water mainly). */
+	public static final double modDownStream      = 0.19 / swimmingSpeed;
 
     /**
      * Instantiates a new survival fly check.
@@ -112,20 +115,25 @@ public class SurvivalFly extends Check {
         
         final double setBackYDistance = to.getY() - data.setBack.getY();
         // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
-        if (!fromOnGround && (from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
-                        && setBackYDistance > 0D && setBackYDistance <= 1.5D && !BlockProperties.isPassable(from.getTypeIdBelow())
-                        || !toOnGround && to.isAboveStairs())) {
-            // Set the new setBack and reset the jumpPhase.
-            
-            // Maybe don't adapt the setback (unless null)!
-            data.setBack = from.getLocation();
-            data.setBack.setY(Math.floor(data.setBack.getY()));
-            // data.ground ?
-            data.survivalFlyJumpPhase = 0;
-            data.clearAccounting();
-            // Tell NoFall that we assume the player to have been on ground somehow.
-            data.noFallAssumeGround = true;
-            if (cc.debug) System.out.println(player.getName() + " Y INCONSISTENCY WORKAROUND USED");
+        if (!fromOnGround){
+            // TODO: more precise 
+            final boolean inconsistent = from.getY() < data.survivalFlyLastFromY && yDistance > 0D && yDistance < 0.5D
+                    && setBackYDistance > 0D && setBackYDistance <= 1.5D 
+                    && !BlockProperties.isPassable(from.getTypeIdBelow());
+            // TODO: fromAboveStairs ?
+            if (inconsistent || from.isAboveStairs()){ // !toOnGround && to.isAboveStairs()) {
+                // Set the new setBack and reset the jumpPhase.
+                
+                // Maybe don't adapt the setback (unless null)!
+                data.setBack = from.getLocation();
+                data.setBack.setY(Math.floor(data.setBack.getY()));
+                // data.ground ?
+                data.survivalFlyJumpPhase = 0;
+                data.clearAccounting();
+                // Tell NoFall that we assume the player to have been on ground somehow.
+                data.noFallAssumeGround = true;
+                if (cc.debug) System.out.println(player.getName() + " Y INCONSISTENCY WORKAROUND USED");
+            }
         }
         data.survivalFlyLastFromY = from.getY();
 
@@ -158,7 +166,7 @@ public class SurvivalFly extends Check {
             // Speeding bypass permission (can be combined with other bypasses).
             // TODO: How exactly to bring it on finally.
             if (player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING))
-            	hAllowedDistance = hAllowedDistance * cc.survivalFlySpeedingSpeed/ 100D;
+            	hAllowedDistance *= cc.survivalFlySpeedingSpeed/ 100D;
         }
         
         // TODO: Optimize: maybe only do the permission checks and modifiers if the distance is too big.
@@ -172,6 +180,11 @@ public class SurvivalFly extends Check {
         final EntityPlayer entity = ((CraftPlayer) player).getHandle();
         if (entity.hasEffect(MobEffectList.FASTER_MOVEMENT))
             hAllowedDistance *= 1.0D + 0.2D * (entity.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
+        
+        // Account for flowing liquids (only if needed).
+        if (hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance)){
+                hAllowedDistance *= modDownStream;
+        }
 
         // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
@@ -252,7 +265,7 @@ public class SurvivalFly extends Check {
             vAllowedDistance *= data.jumpAmplifier;
             if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier && data.verticalVelocityCounter <= 0){
             	vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
-//            	System.out.println("jumpphase -> " + data.survivalFlyJumpPhase);
+            	if (cc.debug) System.out.println("jumpphase -> " + data.survivalFlyJumpPhase);
             }
 
             vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
@@ -281,14 +294,14 @@ public class SurvivalFly extends Check {
                 data.vDistSum.add(now, (float) (yDistance));
                 data.vDistCount.add(now,  1f);
             }
-            if (useH && data.hDistCount.getScore(2) > 0){
+            if (useH && data.hDistCount.getScore(2) > 0 && data.hDistCount.getScore(1) > 0){
                 final float hsc0 = data.hDistSum.getScore(1);
                 final float hsc1 = data.hDistSum.getScore(2);
                 if (hsc0 < hsc1 || hDistance < 3.9 && hsc0 == hsc1){
                     hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hsc0 - hsc1);
                 }
             }
-            if (useV && data.vDistCount.getScore(2) > 0){
+            if (useV && data.vDistCount.getScore(2) > 0 && data.vDistCount.getScore(1) > 0){
                 final float vsc0 = data.vDistSum.getScore(1);
                 final float vsc1 = data.vDistSum.getScore(2);
                 if (vsc0 < vsc1 || yDistance < 3.9 && vsc0 == vsc1){

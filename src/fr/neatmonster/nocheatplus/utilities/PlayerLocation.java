@@ -40,6 +40,8 @@ public class PlayerLocation {
     
     /** Type id of the block below. */
     private Integer typeIdBelow;
+    
+    private Integer data;
 
     /** Is the player above stairs? */
     private Boolean                 aboveStairs;
@@ -259,9 +261,9 @@ public class PlayerLocation {
     }
 
     /**
-     * Checks if the player is on a ladder.
+     * Checks if the player is on a ladder or vine.
      * 
-     * @return true, if the player is on a ladder
+     * @return If so.
      */
     public boolean isOnLadder() {
         if (onLadder == null){
@@ -269,6 +271,17 @@ public class PlayerLocation {
         	onLadder = typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
         }
         return onLadder;
+    }
+    
+    /**
+     * Checks if the player is above a ladder or vine.<br>
+     * Does not save back value to field.
+     * 
+     * @return If so.
+     */
+    public boolean isAboveLadder() {
+        final int typeId = getTypeIdBelow();
+        return typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
     }
     
     /**
@@ -331,6 +344,56 @@ public class PlayerLocation {
 	public Integer getTypeIdBelow() {
 		if (typeIdBelow == null) typeIdBelow = worldServer.getTypeId(blockX, blockY - 1, blockZ);
 		return typeIdBelow;
+	}
+	
+	public Integer getData(){
+	    if (data == null) data = worldServer.getData(blockX, blockY, blockZ);
+	    return data;
+	}
+	
+	public boolean isDownStream(final double xDistance, final double zDistance){
+        // x > 0 -> south, z > 0 -> west
+        final int fromData = getData();
+        
+        if ((fromData & 0x8) == 0){
+            // not falling.
+            if ((xDistance > 0)){
+                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX + 1, blockY, blockZ)) && worldServer.getData(blockX + 1, blockY, blockZ) > fromData){
+                    return true;
+                }
+                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX - 1, blockY, blockZ)) && worldServer.getData(blockX - 1, blockY, blockZ) < fromData){
+                    // reverse direction.
+                    return true;
+                }
+            } else if (xDistance < 0){
+                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX - 1, blockY, blockZ)) && worldServer.getData(blockX - 1, blockY, blockZ) > fromData){
+                    return true;
+                }
+                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX + 1, blockY, blockZ)) && worldServer.getData(blockX + 1, blockY, blockZ) < fromData){
+                    // reverse direction.
+                    return true;
+                }
+            }
+            if (zDistance > 0){
+                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX, blockY, blockZ + 1)) && worldServer.getData(blockX, blockY, blockZ + 1) > fromData){
+                    return true;
+                }
+                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX , blockY, blockZ - 1)) && worldServer.getData(blockX, blockY, blockZ - 1) < fromData){
+                    // reverse direction.
+                    return true;
+                }
+            }
+            else if (zDistance < 0 ){
+                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX, blockY, blockZ - 1)) && worldServer.getData(blockX, blockY, blockZ - 1) > fromData){
+                    return true;
+                }
+                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX , blockY, blockZ + 1)) && worldServer.getData(blockX, blockY, blockZ + 1) < fromData){
+                    // reverse direction.
+                    return true;
+                }
+            }
+        }
+	    return false;
 	}
 
 	public final boolean isSameBlock(final PlayerLocation other) {
