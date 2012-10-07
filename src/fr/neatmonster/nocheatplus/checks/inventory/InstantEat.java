@@ -52,7 +52,7 @@ public class InstantEat extends Check {
             return false;
 
         // Rough estimation about how long it should take to eat
-        final long expectedTimeWhenEatingFinished = data.instantEatLastTime + 700L;
+        final long expectedTimeWhenEatingFinished = Math.max(data.instantEatLastTime, data.fastClickLastTime) + 700L;
 
         if (expectedTimeWhenEatingFinished < time)
             // Acceptable, reduce VL to reward the player.
