@@ -292,9 +292,7 @@ public class BlockProperties {
 	}
 
     private static void initBlocks() {
-		for (int i = 0; i <maxBlocks; i++){
-			blocks[i] = null; // hmmm
-		}
+		Arrays.fill(blocks, null);
 		///////////////////////////
 		// Initalize block flags
 		///////////////////////////
@@ -849,6 +847,9 @@ public class BlockProperties {
 			}
 			else if (id == Material.FENCE_GATE.getId() && (blockAccess.getData(bx, by, bz) & 0x4)!= 0) return true;
 			else if (id == Material.CAKE_BLOCK.getId() && fy >= 0.4375) return true; // 0.0625 = 0.125 / 2
+			else if (id == Material.CAULDRON.getId()){
+			    if (Math.abs(0.5 - fx) < 0.1 && Math.abs(0.5 - fz) < 0.1 && fy > 0.1) return true;
+			}
 			// Nothing found.
 			return false;
 		}
