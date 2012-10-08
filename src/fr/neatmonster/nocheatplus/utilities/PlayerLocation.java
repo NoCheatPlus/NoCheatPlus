@@ -211,12 +211,9 @@ public class PlayerLocation {
      */
     public boolean isInWeb() {
         if (inWeb == null) {
-            for (int blockX = (int) Math.floor(boundingBox.a + 0.001D); blockX <= (int) Math
-                    .floor(boundingBox.d - 0.001D); blockX++)
-                for (int blockY = (int) Math.floor(boundingBox.b + 0.001D); blockY <= (int) Math
-                        .floor(boundingBox.e - 0.001D); blockY++)
-                    for (int blockZ = (int) Math.floor(boundingBox.c + 0.001D); blockZ <= (int) Math
-                            .floor(boundingBox.f - 0.001D); blockZ++)
+            for (int blockX = Location.locToBlock(boundingBox.a + 0.001D); blockX <= Location.locToBlock(boundingBox.d - 0.001D); blockX++)
+                for (int blockY = Location.locToBlock(boundingBox.b + 0.001D); blockY <= Location.locToBlock(boundingBox.e - 0.001D); blockY++)
+                    for (int blockZ = Location.locToBlock(boundingBox.c + 0.001D); blockZ <= Location.locToBlock(boundingBox.f - 0.001D); blockZ++)
                         if (getTypeId(blockX, blockY, blockZ) == Material.WEB.getId())
                             inWeb = true;
             if (inWeb == null)
@@ -236,15 +233,6 @@ public class PlayerLocation {
             boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
             onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
         }
-//        if (!onGround){
-//            double y = this.getY() - this.blockY;
-//            // TODO: maybe make an auxiliary method in BlockProperties (can stand on ? id, boundY)
-//            if (y < 0) y += 1D;
-//            final int id = getTypeId();
-//            final int idBelow = getTypeIdBelow();
-//            if (y >= 0.5 && BlockProperties.isStairs(id)) onGround = true;
-//            else if (y <= 0.002 && BlockProperties.isStairs(idBelow)) onGround = true;
-//        }
         return onGround;
     }
 
@@ -256,7 +244,7 @@ public class PlayerLocation {
     public boolean isOnIce() {
         if (onIce == null)
             if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
-                onIce = getTypeId(blockX, (int) Math.floor(boundingBox.b - 0.1D), blockZ) == Material.ICE.getId();
+                onIce = getTypeId(blockX, Location.locToBlock(boundingBox.b - 0.1D), blockZ) == Material.ICE.getId();
             else
                 onIce = getTypeIdBelow() == Material.ICE.getId();
         return onIce;

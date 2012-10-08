@@ -123,7 +123,7 @@ public class SurvivalFly extends Check {
                 
                 // Maybe don't adapt the setback (unless null)!
                 data.setBack = from.getLocation();
-                data.setBack.setY(Math.floor(data.setBack.getY()));
+                data.setBack.setY(Location.locToBlock(data.setBack.getY()));
                 // data.ground ?
                 data.survivalFlyJumpPhase = 0;
                 data.clearAccounting();
@@ -354,7 +354,7 @@ public class SurvivalFly extends Check {
 //                data.setBack.setY(Math.ceil(data.setBack.getY()));
 //                data.survivalFlyJumpPhase = 0;
 //                data.clearAccounting();
-//            } else if (resetTo && (from.getY() >= to.getY() || data.setBack.getY() <= Math.floor(to.getY()))) {
+//            } else if (resetTo && (from.getY() >= to.getY() || data.setBack.getY() <= Location.locToBlock(to.getY()))) {
 //                // Set set back and jump phase, if:
 //                // 1. Moving onto ladder/vine.
 //                /* 
