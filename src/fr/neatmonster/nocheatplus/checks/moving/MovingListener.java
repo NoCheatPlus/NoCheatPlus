@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TypeIdCache;
 
 /*
  * M"""""`'"""`YM                   oo                   
@@ -62,12 +63,21 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class MovingListener implements Listener {
 
-    private static final class LocationData{
+    private static final class MoveInfo{
         public final PlayerLocation from = new PlayerLocation();
         public final PlayerLocation to = new PlayerLocation();
+        public final TypeIdCache cache = new TypeIdCache();
+        public final void set(final Player player, final Location from, final Location to, final double yOnGround){
+            this.from.set(from, player, yOnGround);
+            this.to.set(to, player, yOnGround);
+            this.cache.setAccess(this.from.getBlockAccess());
+            this.from.setIdCache(cache);
+            this.to.setIdCache(cache);
+        }
         public final void cleanup(){
             from.cleanup();
             to.cleanup();
+            cache.cleanup();
         }
     }
 
@@ -96,7 +106,7 @@ public class MovingListener implements Listener {
      * Unused instances.<br>
      * TODO: Not sure this is needed by contract, might be better due to cascading events in case of actions.
      */
-    private final List<LocationData> parkedInfo = new ArrayList<LocationData>(10);
+    private final List<MoveInfo> parkedInfo = new ArrayList<MoveInfo>(10);
 
     /**
      * A workaround for players placing blocks below them getting pushed off the block by NoCheatPlus.
@@ -316,16 +326,18 @@ public class MovingListener implements Listener {
             return;
         
         // Use existent locations if possible.
-        final LocationData locationData;
+        final MoveInfo moveInfo;
         final PlayerLocation pFrom, pTo;
-        if (parkedInfo.isEmpty()) locationData = new LocationData();
+        if (parkedInfo.isEmpty()) moveInfo = new MoveInfo();
         
-        else locationData = parkedInfo.remove(parkedInfo.size() - 1);
-        pFrom = locationData.from;
-        pTo = locationData.to;
-        final MovingData data = MovingData.getData(player);
+        else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        pFrom = moveInfo.from;
+        pTo = moveInfo.to;
+        
         final MovingConfig cc = MovingConfig.getConfig(player);
+        moveInfo.set(player, from, to, cc.yOnGround);
         
+        final MovingData data = MovingData.getData(player);
         data.noFallAssumeGround = false;
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
@@ -344,12 +356,9 @@ public class MovingListener implements Listener {
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
         
-        final double yOnGround = cc.yOnGround;
-        
-        pFrom.set(from, player, yOnGround);
         if (pFrom.isOnGround())
             data.ground = from; // pFrom.getLocation();
-        pTo.set(to, player, yOnGround);
+        
 
         Location newTo = null;
         
@@ -393,8 +402,8 @@ public class MovingListener implements Listener {
             data.teleported = newTo;
         }
         // Cleanup.
-        locationData.cleanup();
-        parkedInfo.add(locationData);
+        moveInfo.cleanup();
+        parkedInfo.add(moveInfo);
     }
 
     /**
