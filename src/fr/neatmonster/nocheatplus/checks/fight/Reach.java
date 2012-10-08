@@ -3,16 +3,17 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Giant;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
 /*
@@ -38,8 +39,19 @@ public class Reach extends Check {
     /** Amount which can be reduced by reach adaption. */
     public static final double DYNAMIC_RANGE = 0.75;
     
-    /** Adaption amount for dynamicv range. */
+    /** Adaption amount for dynamic range. */
     public static final double DYNAMIC_STEP = DYNAMIC_RANGE / 3.0;
+    
+    /** Additum for distance, based on entity. */
+    private static double getDistMod(final Entity damaged) {
+        // Handle the EnderDragon differently.
+        if (damaged instanceof EnderDragon)
+            return 6.5D;
+        else if (damaged instanceof Giant){
+            return 1.5D;
+        }
+        else return 0;
+    }
 
     /**
      * Instantiates a new reach check.
@@ -63,16 +75,12 @@ public class Reach extends Check {
 
         boolean cancel = false;
 
-        final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE;
+        final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE + getDistMod(damaged);
         final double distanceMin = (distanceLimit - DYNAMIC_RANGE) / distanceLimit;
         
         // Reference locations to check distance for.
         final Location dRef = damaged.getLocation();
-        final double height;
-        if (damaged instanceof LivingEntity){
-        	height = Math.max(((LivingEntity) damaged).getEyeHeight(), ((CraftEntity)damaged).getHandle().height);
-        }
-        else height = ((CraftEntity)damaged).getHandle().height;
+        final double height = CheckUtils.getHeight(damaged);
         final Location pRef = player.getEyeLocation();
         
         // Refine y position.
@@ -88,11 +96,10 @@ public class Reach extends Check {
         // Distance is calculated from eye location to center of targeted. If the player is further away from his target
         // than allowed, the difference will be assigned to "distance".
         final double lenpRel = pRel.length();
+        
         double violation = lenpRel - distanceLimit;
-
-        // Handle the EnderDragon differently.
-        if (damaged instanceof EnderDragon)
-            violation -= 6.5D;
+        
+        final double reachMod = data.reachMod; 
 
         if (violation > 0) {
             // He failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
@@ -108,7 +115,7 @@ public class Reach extends Check {
                 // If we should cancel, remember the current time too.
                 data.reachLastViolationTime = System.currentTimeMillis();
         }
-        else if (lenpRel - distanceLimit * data.reachMod > 0){
+        else if (lenpRel - distanceLimit * reachMod > 0){
             data.reachLastViolationTime = Math.max(data.reachLastViolationTime, System.currentTimeMillis() - cc.reachPenalty / 2);
             cancel = true;
             Improbable.check(player, (float) violation / 2f, System.currentTimeMillis());
@@ -126,7 +133,7 @@ public class Reach extends Check {
         else{
         	data.reachMod = Math.min(1.0, data.reachMod + DYNAMIC_STEP);
         }
-
+        final boolean cancelByPenalty;
         // If the player is still in penalty time, cancel the event anyway.
         if (data.reachLastViolationTime + cc.reachPenalty > System.currentTimeMillis()) {
             // A safeguard to avoid people getting stuck in penalty time indefinitely in case the system time of the
@@ -135,7 +142,13 @@ public class Reach extends Check {
                 data.reachLastViolationTime = 0;
 
             // He is in penalty time, therefore request cancelling of the event.
-            return true;
+            cancelByPenalty = !cancel;
+            cancel = true;
+        }
+        else cancelByPenalty = false;
+        
+        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+            player.sendMessage("NC+: Attack " + (cancel ? (cancelByPenalty ? "(cancel/penalty) ":"(cancel/reach) ") : "") + damaged.getType()+ " height="+ CheckUtils.fdec3.format(height) + " dist=" + CheckUtils.fdec3.format(lenpRel) +" @" + CheckUtils.fdec3.format(reachMod));
         }
 
         return cancel;

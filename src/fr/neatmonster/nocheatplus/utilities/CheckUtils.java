@@ -11,6 +11,9 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -300,4 +303,19 @@ public class CheckUtils {
 	public static void logInfo(final String msg) {
 		Bukkit.getLogger().info((msg));
 	}
+
+	/**
+	 * Get the height from getLocation().getY() to head / above head.<br>
+	 * NOTE: Currently this is pretty much useless, it returns 1.0 most of the time.
+	 * @param entity
+	 * @return
+	 */
+    public static double getHeight(final Entity entity) {
+        final net.minecraft.server.Entity mcEntity = ((CraftEntity)entity).getHandle();
+        final double entityHeight = mcEntity.height;
+        if (entity instanceof LivingEntity){
+            return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
+        }
+        else return mcEntity.height;
+    }
 }
