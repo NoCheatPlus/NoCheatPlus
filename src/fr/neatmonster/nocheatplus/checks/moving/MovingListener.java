@@ -1,5 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -32,6 +35,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
  * M"""""`'"""`YM                   oo                   
@@ -58,13 +62,21 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
  */
 public class MovingListener implements Listener {
 
-    /** The no fall check. **/
-    public final static NoFall noFall = new NoFall();
+    private static final class LocationData{
+        public final PlayerLocation from = new PlayerLocation();
+        public final PlayerLocation to = new PlayerLocation();
+        public final void cleanup(){
+            from.cleanup();
+            to.cleanup();
+        }
+    }
 
     /** The instance of NoCheatPlus. */
     private final NoCheatPlus        plugin             = (NoCheatPlus) Bukkit.getPluginManager().getPlugin(
                                                                 "NoCheatPlus");
-
+    /** The no fall check. **/
+    public final NoFall noFall = new NoFall();
+    
     /** The creative fly check. */
     private final CreativeFly        creativeFly        = new CreativeFly();
 
@@ -77,7 +89,14 @@ public class MovingListener implements Listener {
     /** The survival fly check. */
     private final SurvivalFly        survivalFly        = new SurvivalFly();
     
+    /** The Passable (simple no-clip) check.*/
     private final Passable passable = new Passable();
+    
+    /**
+     * Unused instances.<br>
+     * TODO: Not sure this is needed by contract, might be better due to cascading events in case of actions.
+     */
+    private final List<LocationData> parkedInfo = new ArrayList<LocationData>(10);
 
     /**
      * A workaround for players placing blocks below them getting pushed off the block by NoCheatPlus.
@@ -295,7 +314,15 @@ public class MovingListener implements Listener {
         final Location to = event.getTo();
         if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle())
             return;
-
+        
+        // Use existent locations if possible.
+        final LocationData locationData;
+        final PlayerLocation pFrom, pTo;
+        if (parkedInfo.isEmpty()) locationData = new LocationData();
+        
+        else locationData = parkedInfo.remove(parkedInfo.size() - 1);
+        pFrom = locationData.from;
+        pTo = locationData.to;
         final MovingData data = MovingData.getData(player);
         final MovingConfig cc = MovingConfig.getConfig(player);
         
@@ -318,14 +345,15 @@ public class MovingListener implements Listener {
             data.verticalFreedom *= 0.93D;
         
         final double yOnGround = cc.yOnGround;
-        data.from.set(from, player, yOnGround);
-        if (data.from.isOnGround())
-            data.ground = data.from.getLocation();
-        data.to.set(to, player, yOnGround);
+        
+        pFrom.set(from, player, yOnGround);
+        if (pFrom.isOnGround())
+            data.ground = from; // pFrom.getLocation();
+        pTo.set(to, player, yOnGround);
 
         Location newTo = null;
         
-        if (passable.isEnabled(player)) newTo = passable.check(player, data.from, data.to, data, cc);
+        if (passable.isEnabled(player)) newTo = passable.check(player, pFrom, pTo, data, cc);
         
         // Optimized checking, giving creativefly permission precedence over survivalfly.
         if (newTo != null);
@@ -334,15 +362,15 @@ public class MovingListener implements Listener {
         	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
                 // If he is handled by the survival fly check, execute it.
-                newTo = survivalFly.check(player, data, cc);
+                newTo = survivalFly.check(player, pFrom, pTo, data, cc);
                 // If don't have a new location and if he is handled by the no fall check, execute it.
                 if (newTo == null && cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL))
                 	// NOTE: noFall might set yOnGround for the positions.
-                    noFall.check(player, data, cc);
+                    noFall.check(player, pFrom, pTo, data, cc);
         	}
         	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY)){
         		// If the player is handled by the creative fly check, execute it.
-                newTo = creativeFly.check(player, data, cc);
+                newTo = creativeFly.check(player, pFrom, pTo, data, cc);
         	}
         	else data.clearFlyData();
         }
@@ -351,7 +379,7 @@ public class MovingListener implements Listener {
         if (newTo == null 
         	 && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS))
             // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
-            newTo = morePackets.check(player, data, cc);
+            newTo = morePackets.check(player, pFrom, pTo, data, cc);
         else
             // Otherwise we need to clear his data.
             data.clearMorePacketsData();
@@ -365,8 +393,8 @@ public class MovingListener implements Listener {
             data.teleported = newTo;
         }
         // Cleanup.
-        data.from.cleanup();
-        data.to.cleanup();
+        locationData.cleanup();
+        parkedInfo.add(locationData);
     }
 
     /**

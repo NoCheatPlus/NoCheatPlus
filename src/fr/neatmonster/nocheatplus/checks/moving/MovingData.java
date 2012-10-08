@@ -10,7 +10,6 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
  * M"""""`'"""`YM                   oo                   M""""""'YMM            dP            
@@ -129,11 +128,10 @@ public class MovingData extends ACheckData {
     public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
-    public final PlayerLocation from   = new PlayerLocation();
     public Location       ground;
     public Location       setBack;
     public Location       teleported;
-    public final PlayerLocation to     = new PlayerLocation();
+
 
     /**
      * Clear the data of the fly checks (not more-packets).

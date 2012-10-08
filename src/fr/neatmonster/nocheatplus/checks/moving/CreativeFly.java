@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
-import java.util.Map;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
@@ -56,9 +55,7 @@ public class CreativeFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final MovingData data, final MovingConfig cc) {
-    	 final PlayerLocation from = data.from;
-    	 final PlayerLocation to = data.to;
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
 
         // If we have no setback, define one now.
         if (data.setBack == null)
@@ -134,7 +131,11 @@ public class CreativeFly extends Check {
 
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should cancel the event.
-                if (executeActions(player, data.creativeFlyVL, result, cc.creativeFlyActions))
+                final ViolationData vd = new ViolationData(this, player, data.creativeFlyVL, result, cc.creativeFlyActions);
+                vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
+                vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
+                vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
+                if (executeActions(vd))
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                     // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                     return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(),
@@ -151,15 +152,4 @@ public class CreativeFly extends Check {
         data.setBack = to.getLocation();
         return null;
     }
-    
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final MovingData data = MovingData.getData(violationData.player);
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ()));
-		parameters.put(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ()));
-		parameters.put(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", data.to.getLocation().subtract(data.from.getLocation()).length()));
-		return parameters;
-	}
-	
 }

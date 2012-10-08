@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Locale;
-import java.util.Map;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
@@ -91,10 +90,8 @@ public class SurvivalFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final MovingData data, final MovingConfig cc) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
         final long now = System.currentTimeMillis();
-   	    final PlayerLocation from = data.from;
-   	    final PlayerLocation to = data.to;
 
         // A player is considered sprinting if the flag is set and if he has enough food level.
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
@@ -332,7 +329,11 @@ public class SurvivalFly extends Check {
             data.survivalFlyJumpPhase = 0;
             // If the other plugins haven't decided to cancel the execution of the actions, then do it. If one of the
             // actions was a cancel, cancel it.
-            if (executeActions(player, data.survivalFlyVL, result, MovingConfig.getConfig(player).survivalFlyActions)){
+            final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, result, cc.survivalFlyActions);
+            vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
+            vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
+            vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
+            if (executeActions(vd)){
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
@@ -379,15 +380,5 @@ public class SurvivalFly extends Check {
         // trial and error.
         return null;
     }
-    
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final MovingData data = MovingData.getData(violationData.player);
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", data.from.getX(), data.from.getY(), data.from.getZ()));
-		parameters.put(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", data.to.getX(), data.to.getY(), data.to.getZ()));
-		parameters.put(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", data.to.getLocation().subtract(data.from.getLocation()).length()));
-		return parameters;
-	}
     
 }
