@@ -3,8 +3,13 @@ package fr.neatmonster.nocheatplus.utilities;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.server.AxisAlignedBB;
+import net.minecraft.server.Block;
 import net.minecraft.server.IBlockAccess;
+import net.minecraft.server.Material;
+import net.minecraft.server.TileEntity;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 
@@ -13,7 +18,7 @@ import org.bukkit.craftbukkit.CraftWorld;
  * @author mc_dev
  *
  */
-public class TypeIdCache {
+public class TypeIdCache implements IBlockAccess{
     /**
      * TODO: Make a map for faster queries (without object creation).
      * TODO: Not sure the prime numbers are too big for normal use.
@@ -114,7 +119,7 @@ public class TypeIdCache {
     }
     
     
-    public Integer getTypeId(final int x, final int y, final int z){
+    public int getTypeId(final int x, final int y, final int z){
         final Pos3D pos = new Pos3D(x, y, z);
         final Integer pId = idMap.get(pos);
         if (pId != null) return pId;
@@ -123,7 +128,7 @@ public class TypeIdCache {
         return nId;
     }
     
-    public Integer getData(final int x, final int y, final int z){
+    public int getData(final int x, final int y, final int z){
         final Pos3D pos = new Pos3D(x, y, z);
         final Integer pData = dataMap.get(pos);
         if (pData != null) return pData;
@@ -132,5 +137,117 @@ public class TypeIdCache {
         return nData;
     }
     
+    /**
+     * 
+     * @param box
+     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     * @return If any block has the flags.
+     */
+    public final boolean hasAnyFlags(final AxisAlignedBB box, final long flags){
+        return hasAnyFlags(box.a, box.b, box.c, box.d, box.e, box.f, flags);
+    }
+    
+    /**
+     * 
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     * @return If any block has the flags.
+     */
+    public final boolean hasAnyFlags(final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
+        return hasAnyFlags(Location.locToBlock(minX), Location.locToBlock(minY), Location.locToBlock(minZ), Location.locToBlock(maxX), Location.locToBlock(maxY), Location.locToBlock(maxZ), flags);
+    }
+
+    
+    /**
+     * 
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     * @return If any block has the flags.
+     */
+    public final boolean hasAnyFlags(final int minX, int minY, final int minZ, final int maxX, final int maxY, final int maxZ, final long flags){
+        for (int x = minX; x <= maxX; x++){
+            for (int z = minZ; z <= maxZ; z++){
+                for (int y = minY; y <= maxY; y++){
+                    if ((BlockProperties.getBLockFlags(getTypeId(x, y, z)) & flags) != 0) return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Test if the box collide with any block that matches the flags somehow.
+     * @param box
+     * @param flags
+     * @return
+     */
+    public final boolean collides(final AxisAlignedBB box, final long flags){
+        return collides(box.a, box.b, box.c, box.d, box.e, box.f, flags);
+    }
+    
+    /**
+     * Test if the box collide with any block that matches the flags somehow.
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param flags
+     * @return
+     */
+    public final boolean collides(final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
+        for (int x = Location.locToBlock(minX); x <= Location.locToBlock(maxX); x++){
+            for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
+                for (int y = Location.locToBlock(minY); y <= Location.locToBlock(maxY); y++){
+                    final int id = getTypeId(x, y, z);
+                    if ((BlockProperties.getBLockFlags(id) & flags) != 0){
+                        // Might collide.
+                        final Block block = Block.byId[id];
+                        block.updateShape(this, x, y, z);
+                        if (minX > block.maxX + x || maxX < block.minX + x) continue;
+                        else if (minY > block.maxY + y || maxY < block.minY + y) continue;
+                        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) continue;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Not Optimized.
+     */
+    @Override
+    public Material getMaterial(int arg0, int arg1, int arg2) {
+        return access.getMaterial(arg0, arg1, arg2);
+    }
+
+    /**
+     * Not optimized.
+     */
+    @Override
+    public TileEntity getTileEntity(int arg0, int arg1, int arg2) {
+        return access.getTileEntity(arg0, arg1, arg2);
+    }
+
+    /**
+     * Not optimized.
+     */
+    @Override
+    public boolean s(int arg0, int arg1, int arg2) {
+        return access.s(arg0, arg1, arg2);
+    }
     
 }

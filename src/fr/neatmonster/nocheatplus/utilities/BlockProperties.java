@@ -247,6 +247,8 @@ public class BlockProperties {
     public static final int F_LIQUID 		= 0x2;
     public static final int F_SOLID 		= 0x4;
     public static final int F_IGN_PASSABLE 	= 0x8;
+    public static final int F_WATER         = 0x10;
+    public static final int F_LAVA          = 0x20;
     
 	static{
 		init();
@@ -314,13 +316,20 @@ public class BlockProperties {
 	            Material.WOOD_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS}){
 			blockFlags[mat.getId()] |= F_STAIRS;
 		}
-		// Liquid.
+		// WATER.
 		for (final Material mat : new Material[]{
-				Material.LAVA, Material.STATIONARY_LAVA,
 				Material.STATIONARY_WATER, Material.WATER,
 		}) {
-			blockFlags[mat.getId()] |= F_LIQUID;	// TODO: This might already be handled above now.
+			blockFlags[mat.getId()] |= F_LIQUID | F_WATER;
 		}
+		// LAVA.
+        for (final Material mat : new Material[]{
+                Material.LAVA, Material.STATIONARY_LAVA,
+        }) {
+            blockFlags[mat.getId()] |= F_LIQUID | F_LAVA;
+        }
+        // Workarounds.
+        blockFlags[Material.WATER_LILY.getId()] |= F_SOLID;
 		// Ignore for passable.
 		for (final Material mat : new Material[]{
 				Material.WOOD_PLATE, Material.STONE_PLATE, 

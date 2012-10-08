@@ -70,7 +70,7 @@ public class MovingListener implements Listener {
         public final void set(final Player player, final Location from, final Location to, final double yOnGround){
             this.from.set(from, player, yOnGround);
             this.to.set(to, player, yOnGround);
-            this.cache.setAccess(this.from.getBlockAccess());
+            this.cache.setAccess(this.from.getWorldServer());
             this.from.setIdCache(cache);
             this.to.setIdCache(cache);
         }

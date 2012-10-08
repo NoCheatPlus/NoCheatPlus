@@ -175,20 +175,16 @@ public class PlayerLocation {
         if (inLava == null) {
             AxisAlignedBB boundingBoxLava = boundingBox.clone();
             boundingBoxLava = boundingBoxLava.grow(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D);
-            inLava = worldServer.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
+            inLava = idCache.collides(boundingBoxLava, BlockProperties.F_LAVA);
+//            inLava = worldServer.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
+//            if (inLava.booleanValue() != idCache.collides(boundingBoxLava, BlockProperties.F_LAVA)){
+//                System.out.println("INCONSISTENCY IN LAVA (" + inWater + ")."); // TODO: remove
+//                System.out.println("("+ x +"," + y + "," + z + ":"+ getTypeId() + ")");
+//            }
         }
         return inLava;
     }
-
-    /**
-     * Checks if the player is in a liquid.
-     * 
-     * @return true, if the player is in a liquid
-     */
-    public boolean isInLiquid() {
-        return isInLava() || isInWater();
-    }
-
+    
     /**
      * Checks if the player is in water.
      * 
@@ -199,9 +195,24 @@ public class PlayerLocation {
             AxisAlignedBB boundingBoxWater = boundingBox.clone();
             boundingBoxWater = boundingBoxWater.grow(0.0D, -0.40000000596046448D, 0.0D);
             boundingBoxWater = boundingBoxWater.shrink(0.001D, 0.001D, 0.001D);
-            inWater = worldServer.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
+            inWater = idCache.collides(boundingBoxWater, BlockProperties.F_WATER);
+//            inWater = worldServer.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
+//            if (inWater.booleanValue() != idCache.collides(boundingBoxWater, BlockProperties.F_WATER)){
+//                System.out.println("INCONSISTENCY IN WATER (" + inWater + ")."); // TODO: remove
+//                System.out.println("("+ x +"," + y + "," + z + ":"+ getTypeId() + ")");
+//            }
         }
         return inWater;
+    }
+
+    /**
+     * Checks if the player is in a liquid.
+     * 
+     * @return true, if the player is in a liquid
+     */
+    public boolean isInLiquid() {
+        // TODO: optimize (check liquid first and only if liquid check further)
+        return isInLava() || isInWater();
     }
 
     /**
@@ -210,14 +221,19 @@ public class PlayerLocation {
      * @return true, if the player is in web
      */
     public boolean isInWeb() {
+        final int webId = Material.WEB.getId();
         if (inWeb == null) {
-            for (int blockX = Location.locToBlock(boundingBox.a + 0.001D); blockX <= Location.locToBlock(boundingBox.d - 0.001D); blockX++)
-                for (int blockY = Location.locToBlock(boundingBox.b + 0.001D); blockY <= Location.locToBlock(boundingBox.e - 0.001D); blockY++)
-                    for (int blockZ = Location.locToBlock(boundingBox.c + 0.001D); blockZ <= Location.locToBlock(boundingBox.f - 0.001D); blockZ++)
-                        if (getTypeId(blockX, blockY, blockZ) == Material.WEB.getId())
+            for (int blockX = Location.locToBlock(boundingBox.a + 0.001D); blockX <= Location.locToBlock(boundingBox.d - 0.001D); blockX++){
+                for (int blockY = Location.locToBlock(boundingBox.b + 0.001D); blockY <= Location.locToBlock(boundingBox.e - 0.001D); blockY++){
+                    for (int blockZ = Location.locToBlock(boundingBox.c + 0.001D); blockZ <= Location.locToBlock(boundingBox.f - 0.001D); blockZ++){
+                        if (getTypeId(blockX, blockY, blockZ) == webId){
                             inWeb = true;
-            if (inWeb == null)
-                inWeb = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            inWeb = false;
         }
         return inWeb;
     }
@@ -231,7 +247,13 @@ public class PlayerLocation {
         if (onGround == null) {
             AxisAlignedBB boundingBoxGround = boundingBox.clone();
             boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
-            onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
+            onGround = idCache.collides(boundingBoxGround, BlockProperties.F_SOLID);
+//            onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
+//            if (onGround.booleanValue() != idCache.collides(boundingBoxGround, BlockProperties.F_SOLID)){
+//                System.out.println("INCONSISTENCY ON GROUND (" + onGround + ")."); // TODO: remove
+//                System.out.println("("+ x +"," + y + "," + z + ":"+ getTypeId() + ")");
+//            }
+            // TODO: Check for entities (boats etc.)
         }
         return onGround;
     }
@@ -242,11 +264,13 @@ public class PlayerLocation {
      * @return true, if the player is on ice
      */
     public boolean isOnIce() {
-        if (onIce == null)
-            if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
+        if (onIce == null){
+            final org.bukkit.entity.Player entity = this.entity.getBukkitEntity();
+            if (entity.isSneaking() || entity.isBlocking())
                 onIce = getTypeId(blockX, Location.locToBlock(boundingBox.b - 0.1D), blockZ) == Material.ICE.getId();
             else
-                onIce = getTypeIdBelow() == Material.ICE.getId();
+                onIce = getTypeIdBelow().intValue() == Material.ICE.getId();
+        }
         return onIce;
     }
 
@@ -287,7 +311,7 @@ public class PlayerLocation {
     }
 
     /**
-     * Sets the player location object.
+     * Sets the player location object. Does not set or reset idCache.
      * 
      * @param location
      *            the location
@@ -312,6 +336,8 @@ public class PlayerLocation {
 
         typeId = typeIdBelow = null;
         aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = null;
+        
+        // TODO: consider idCache.setAccess.
         
         this.setyOnGround(yFreedom);
     }
@@ -414,11 +440,11 @@ public class PlayerLocation {
     }
 	   
 	/**
-	 * TODO: temp maybe
+	 *
 	 * @return
 	 */
 	public final IBlockAccess getBlockAccess() {
-		return worldServer;
+		return idCache == null ? worldServer : idCache;
 	}
 	
 	   /**
@@ -437,6 +463,11 @@ public class PlayerLocation {
 	    world = null;
 	    worldServer = null;
 	    boundingBox = null;
+	    idCache = null;
 	}
+
+    public WorldServer getWorldServer() {
+        return worldServer;
+    }
 
 }
