@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.players.DataManager;
 
 /**
  * Task to run every tick, to update permissions and execute actions, and maybe later for extended lag measurement.
@@ -57,6 +58,8 @@ public class TickTask implements Runnable {
 	protected static int tick = 0;
 	
 	protected static long timeStart = 0;
+	
+	protected static long timeLast = 0;
 	
 	
 	//////////////////////////////////////////////////////////////
@@ -141,6 +144,10 @@ public class TickTask implements Runnable {
 	    return timeStart;
 	}
 	
+	public static final long getTimeLast(){
+	    return timeLast;
+	}
+	
 	////////////////////////////////////////
 	// Public methods for internal use.
 	////////////////////////////////////////
@@ -165,9 +172,15 @@ public class TickTask implements Runnable {
 	@Override
 	public void run() {
 		tick ++;
+		final long time = System.currentTimeMillis();
 		// The isEmpty checks are faster than synchronizing fully always, the actions get delayed one tick at most.
 		if (!delayedActions.isEmpty()) executeActions();
 		if (!permissionUpdates.isEmpty()) updatePermissions();
+		if (timeLast > time){
+		    CheckUtils.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
+		    DataManager.clear(CheckType.ALL);
+		}
+		timeLast = time;
 	}
 
 }
