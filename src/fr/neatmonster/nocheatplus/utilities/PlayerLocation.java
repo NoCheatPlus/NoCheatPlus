@@ -86,6 +86,8 @@ public class PlayerLocation {
     
     /** The worldServer. */
     private WorldServer             worldServer;
+    
+    private TypeIdCache idCache;
 
     /**
      * Gets the location.
@@ -215,7 +217,7 @@ public class PlayerLocation {
                         .floor(boundingBox.e - 0.001D); blockY++)
                     for (int blockZ = (int) Math.floor(boundingBox.c + 0.001D); blockZ <= (int) Math
                             .floor(boundingBox.f - 0.001D); blockZ++)
-                        if (worldServer.getTypeId(blockX, blockY, blockZ) == Material.WEB.getId())
+                        if (getTypeId(blockX, blockY, blockZ) == Material.WEB.getId())
                             inWeb = true;
             if (inWeb == null)
                 inWeb = false;
@@ -254,7 +256,7 @@ public class PlayerLocation {
     public boolean isOnIce() {
         if (onIce == null)
             if (entity.getBukkitEntity().isSneaking() || entity.getBukkitEntity().isBlocking())
-                onIce = worldServer.getTypeId(blockX, (int) Math.floor(boundingBox.b - 0.1D), blockZ) == Material.ICE.getId();
+                onIce = getTypeId(blockX, (int) Math.floor(boundingBox.b - 0.1D), blockZ) == Material.ICE.getId();
             else
                 onIce = getTypeIdBelow() == Material.ICE.getId();
         return onIce;
@@ -336,18 +338,18 @@ public class PlayerLocation {
 	}
 
 	public Integer getTypeId() {
-		if (typeId == null) typeId = worldServer.getTypeId(blockX, blockY, blockZ);
+		if (typeId == null) typeId = getTypeId(blockX, blockY, blockZ);
 		return typeId;
 	}
 
 
 	public Integer getTypeIdBelow() {
-		if (typeIdBelow == null) typeIdBelow = worldServer.getTypeId(blockX, blockY - 1, blockZ);
+		if (typeIdBelow == null) typeIdBelow = getTypeId(blockX, blockY - 1, blockZ);
 		return typeIdBelow;
 	}
 	
 	public Integer getData(){
-	    if (data == null) data = worldServer.getData(blockX, blockY, blockZ);
+	    if (data == null) data = getData(blockX, blockY, blockZ);
 	    return data;
 	}
 	
@@ -358,36 +360,36 @@ public class PlayerLocation {
         if ((fromData & 0x8) == 0){
             // not falling.
             if ((xDistance > 0)){
-                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX + 1, blockY, blockZ)) && worldServer.getData(blockX + 1, blockY, blockZ) > fromData){
+                if (fromData < 7 && BlockProperties.isLiquid(getTypeId(blockX + 1, blockY, blockZ)) && getData(blockX + 1, blockY, blockZ) > fromData){
                     return true;
                 }
-                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX - 1, blockY, blockZ)) && worldServer.getData(blockX - 1, blockY, blockZ) < fromData){
+                else if (fromData > 0  && BlockProperties.isLiquid(getTypeId(blockX - 1, blockY, blockZ)) && getData(blockX - 1, blockY, blockZ) < fromData){
                     // reverse direction.
                     return true;
                 }
             } else if (xDistance < 0){
-                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX - 1, blockY, blockZ)) && worldServer.getData(blockX - 1, blockY, blockZ) > fromData){
+                if (fromData < 7 && BlockProperties.isLiquid(getTypeId(blockX - 1, blockY, blockZ)) && getData(blockX - 1, blockY, blockZ) > fromData){
                     return true;
                 }
-                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX + 1, blockY, blockZ)) && worldServer.getData(blockX + 1, blockY, blockZ) < fromData){
+                else if (fromData > 0  && BlockProperties.isLiquid(getTypeId(blockX + 1, blockY, blockZ)) && getData(blockX + 1, blockY, blockZ) < fromData){
                     // reverse direction.
                     return true;
                 }
             }
             if (zDistance > 0){
-                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX, blockY, blockZ + 1)) && worldServer.getData(blockX, blockY, blockZ + 1) > fromData){
+                if (fromData < 7 && BlockProperties.isLiquid(getTypeId(blockX, blockY, blockZ + 1)) && getData(blockX, blockY, blockZ + 1) > fromData){
                     return true;
                 }
-                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX , blockY, blockZ - 1)) && worldServer.getData(blockX, blockY, blockZ - 1) < fromData){
+                else if (fromData > 0  && BlockProperties.isLiquid(getTypeId(blockX , blockY, blockZ - 1)) && getData(blockX, blockY, blockZ - 1) < fromData){
                     // reverse direction.
                     return true;
                 }
             }
             else if (zDistance < 0 ){
-                if (fromData < 7 && BlockProperties.isLiquid(worldServer.getTypeId(blockX, blockY, blockZ - 1)) && worldServer.getData(blockX, blockY, blockZ - 1) > fromData){
+                if (fromData < 7 && BlockProperties.isLiquid(getTypeId(blockX, blockY, blockZ - 1)) && getData(blockX, blockY, blockZ - 1) > fromData){
                     return true;
                 }
-                else if (fromData > 0  && BlockProperties.isLiquid(worldServer.getTypeId(blockX , blockY, blockZ + 1)) && worldServer.getData(blockX, blockY, blockZ + 1) < fromData){
+                else if (fromData > 0  && BlockProperties.isLiquid(getTypeId(blockX , blockY, blockZ + 1)) && getData(blockX, blockY, blockZ + 1) < fromData){
                     // reverse direction.
                     return true;
                 }
@@ -400,7 +402,29 @@ public class PlayerLocation {
 		// Maybe make block coordinate fields later.
 		return blockX == other.getBlockX() && blockZ == other.getBlockZ() &&  blockY == other.getBlockY();
 	}
+	
+	/**
+	 * Uses id cache if present.
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public final int getTypeId(final int x, final int y, final int z){
+	    return idCache == null ? worldServer.getTypeId(x, y, z) : idCache.getTypeId(x, y, z);
+	}
 
+	/**
+	 * Uses id cache if present.
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+    public final int getData(final int x, final int y, final int z){
+        return idCache == null ? worldServer.getData(x, y, z) : idCache.getData(x, y, z);
+    }
+	   
 	/**
 	 * TODO: temp maybe
 	 * @return
@@ -408,6 +432,14 @@ public class PlayerLocation {
 	public final IBlockAccess getBlockAccess() {
 		return worldServer;
 	}
+	
+	   /**
+     * Set the id cache for faster id getting.
+     * @param cache
+     */
+    public void setIdCache(final TypeIdCache cache) {
+        this.idCache = cache;
+    }
 	
 	/**
 	 * Set some references to null.
