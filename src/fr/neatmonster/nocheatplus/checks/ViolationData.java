@@ -150,5 +150,9 @@ public class ViolationData {
 	public void setParameter(final ParameterName parameterName, String value){
 		if (parameters != null) parameters.put(parameterName, value);
 	}
+
+    public boolean needsParameters() {
+        return parameters != null;
+    }
    
 }

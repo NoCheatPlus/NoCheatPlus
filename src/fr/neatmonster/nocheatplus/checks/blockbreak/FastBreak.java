@@ -78,7 +78,7 @@ public class FastBreak extends Check {
     			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
     			data.fastBreakVL += missingTime;
     			final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, missingTime, cc.fastBreakActions);
-    			vd.setParameter(ParameterName.BLOCK_ID, "" + id);
+    			if (vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + id);
     			cancel = executeActions(vd);
     		}
     		// else: still within contention limits.

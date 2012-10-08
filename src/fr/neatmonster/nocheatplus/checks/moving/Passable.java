@@ -29,7 +29,7 @@ public class Passable extends Check {
 			// Return the reset position.
 			data.passableVL += 1d;
 			final ViolationData vd = new ViolationData(this, player, data.passableVL, 1, cc.passableActions);
-			vd.setParameter(ParameterName.BLOCK_ID, "" + toId);
+			if (vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + toId);
 			if (executeActions(vd)){
 				final Location newTo = from.getLocation();
 				newTo.setYaw(to.getYaw());
