@@ -1,6 +1,10 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.server.AxisAlignedBB;
+import net.minecraft.server.Entity;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.IBlockAccess;
 import net.minecraft.server.WorldServer;
@@ -10,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 /*
@@ -248,7 +253,30 @@ public class PlayerLocation {
             if (idCache != null){
                 onGround = idCache.collides(boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.e, boundingBox.f, BlockProperties.F_SOLID);
                 if (!onGround){
-                    // TODO: Account for entities !
+                    // TODO: Probably check other ids too before doing this ?
+                    // TODO: clean this up, use other checking method.
+                    double d0 = 0.25D;
+                    AxisAlignedBB axisalignedbb = boundingBox.clone();
+                    axisalignedbb = axisalignedbb.d(0D, -getyOnGround(), 0D);
+                    @SuppressWarnings("rawtypes")
+                    List list = worldServer.getEntities(entity, axisalignedbb.grow(d0, d0, d0));
+                    @SuppressWarnings("rawtypes")
+                    Iterator iterator = list.iterator();
+                    while (iterator.hasNext()) {
+                        final Entity entity1 = (Entity) iterator.next();
+                        final EntityType type = entity.getBukkitEntity().getType();
+                        if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
+                        AxisAlignedBB axisalignedbb1 = entity1.E();
+                        if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
+                            onGround = true;
+                            return true;
+                        }
+                        axisalignedbb1 = entity.g(entity1);
+                        if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
+                            onGround = true;
+                            return true;
+                        }
+                    }
                 }
             }
             else{
