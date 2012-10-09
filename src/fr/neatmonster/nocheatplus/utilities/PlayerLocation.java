@@ -175,12 +175,12 @@ public class PlayerLocation {
         if (inLava == null) {
             AxisAlignedBB boundingBoxLava = boundingBox.clone();
             boundingBoxLava = boundingBoxLava.grow(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D);
-            inLava = idCache.collides(boundingBoxLava, BlockProperties.F_LAVA);
-//            inLava = worldServer.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
-//            if (inLava.booleanValue() != idCache.collides(boundingBoxLava, BlockProperties.F_LAVA)){
-//                System.out.println("INCONSISTENCY IN LAVA (" + inWater + ")."); // TODO: remove
-//                System.out.println("("+ x +"," + y + "," + z + ":"+ getTypeId() + ")");
-//            }
+            if (idCache != null){
+                inLava = idCache.collides(boundingBoxLava, BlockProperties.F_LAVA);
+            }
+            else{
+                inLava = worldServer.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
+            }
         }
         return inLava;
     }
@@ -195,12 +195,12 @@ public class PlayerLocation {
             AxisAlignedBB boundingBoxWater = boundingBox.clone();
             boundingBoxWater = boundingBoxWater.grow(0.0D, -0.40000000596046448D, 0.0D);
             boundingBoxWater = boundingBoxWater.shrink(0.001D, 0.001D, 0.001D);
-            inWater = idCache.collides(boundingBoxWater, BlockProperties.F_WATER);
-//            inWater = worldServer.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
-//            if (inWater.booleanValue() != idCache.collides(boundingBoxWater, BlockProperties.F_WATER)){
-//                System.out.println("INCONSISTENCY IN WATER (" + inWater + ")."); // TODO: remove
-//                System.out.println("("+ x +"," + y + "," + z + ":"+ getTypeId() + ")");
-//            }
+            if (idCache !=null){
+                inWater = idCache.collides(boundingBoxWater, BlockProperties.F_WATER);
+            }
+            else{
+                inWater = worldServer.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
+            } 
         }
         return inWater;
     }
@@ -245,14 +245,17 @@ public class PlayerLocation {
      */
     public boolean isOnGround() {
         if (onGround == null) {
-//            AxisAlignedBB boundingBoxGround = boundingBox.clone();
-//            boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
-            onGround = idCache.collides(boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.e, boundingBox.f, BlockProperties.F_SOLID);
-//            onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
-//            if (onGround.booleanValue() != idCache.collides(boundingBoxGround, BlockProperties.F_SOLID)){
-//                System.out.println("INCONSISTENCY ON GROUND (" + onGround + ")."); // TODO: remove
-//                System.out.println("("+ x +"," + y + "," + z + ":"+ getTypeId() + ")");
-//            }
+            if (idCache != null){
+                onGround = idCache.collides(boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.e, boundingBox.f, BlockProperties.F_SOLID);
+                if (!onGround){
+                    // TODO: Account for entities !
+                }
+            }
+            else{
+              AxisAlignedBB boundingBoxGround = boundingBox.clone();
+              boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
+                onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
+            }
             // TODO: Check for entities (boats etc.)
         }
         return onGround;
