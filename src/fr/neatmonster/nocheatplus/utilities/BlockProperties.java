@@ -836,8 +836,9 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static final boolean isPassable(final int id){
-		if ((blockFlags[id] & (F_LIQUID | F_IGN_PASSABLE)) != 0) return true;
-		else return (blockFlags[id] & F_SOLID) == 0;
+	    final long flags = blockFlags[id];
+		if ((flags & (F_LIQUID | F_IGN_PASSABLE)) != 0) return true;
+		else return (flags & F_SOLID) == 0;
 	}
 	
 	/**
