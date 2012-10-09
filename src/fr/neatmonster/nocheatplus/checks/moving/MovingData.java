@@ -115,6 +115,8 @@ public class MovingData extends ACheckData {
     // Data of the survival fly check.
     public int            survivalFlyJumpPhase;
     public double         survivalFlyLastFromY;
+    /** Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set". */
+    public double         survivalFlyLastYDist = Integer.MAX_VALUE;
     public int            survivalFlyOnIce;
     public boolean        survivalFlyWasInBed;
     public long           survivalFlyCobwebTime;
@@ -140,6 +142,7 @@ public class MovingData extends ACheckData {
         bunnyhopDelay = 0;
         survivalFlyJumpPhase = 0;
         setBack = null;
+        survivalFlyLastYDist = Integer.MAX_VALUE;
         clearAccounting();
         clearNoFallData();
     }

@@ -228,7 +228,7 @@ public class PlayerLocation {
                     for (int blockZ = Location.locToBlock(boundingBox.c + 0.001D); blockZ <= Location.locToBlock(boundingBox.f - 0.001D); blockZ++){
                         if (getTypeId(blockX, blockY, blockZ) == webId){
                             inWeb = true;
-                            break;
+                            return true;
                         }
                     }
                 }
@@ -245,9 +245,9 @@ public class PlayerLocation {
      */
     public boolean isOnGround() {
         if (onGround == null) {
-            AxisAlignedBB boundingBoxGround = boundingBox.clone();
-            boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
-            onGround = idCache.collides(boundingBoxGround, BlockProperties.F_SOLID);
+//            AxisAlignedBB boundingBoxGround = boundingBox.clone();
+//            boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
+            onGround = idCache.collides(boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.e, boundingBox.f, BlockProperties.F_SOLID);
 //            onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
 //            if (onGround.booleanValue() != idCache.collides(boundingBoxGround, BlockProperties.F_SOLID)){
 //                System.out.println("INCONSISTENCY ON GROUND (" + onGround + ")."); // TODO: remove

@@ -329,7 +329,11 @@ public class BlockProperties {
             blockFlags[mat.getId()] |= F_LIQUID | F_LAVA;
         }
         // Workarounds.
-        blockFlags[Material.WATER_LILY.getId()] |= F_SOLID;
+        for (final Material mat : new Material[]{
+                Material.WATER_LILY, Material.LADDER,
+        }){
+            blockFlags[mat.getId()] |= F_SOLID;
+        }
 		// Ignore for passable.
 		for (final Material mat : new Material[]{
 				Material.WOOD_PLATE, Material.STONE_PLATE, 

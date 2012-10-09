@@ -356,8 +356,10 @@ public class MovingListener implements Listener {
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
         
-        if (pFrom.isOnGround())
+        if (pFrom.isOnGround()){
             data.ground = from; // pFrom.getLocation();
+            data.survivalFlyLastFromY = Integer.MAX_VALUE;
+        }
         
 
         Location newTo = null;
