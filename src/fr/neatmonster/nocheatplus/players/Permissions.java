@@ -91,6 +91,7 @@ public class Permissions {
      */
     private static final String BLOCKPLACE                   = CHECKS + ".blockplace";
     public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
+    public static final String BLOCKPLACE_AGAINST_AIR        = BLOCKPLACE_AGAINST + ".air";
 	public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
     public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
     public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";

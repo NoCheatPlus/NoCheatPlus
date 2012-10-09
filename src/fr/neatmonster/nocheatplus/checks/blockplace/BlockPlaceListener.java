@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.blockplace;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -85,11 +86,16 @@ public class BlockPlaceListener implements Listener {
         final Player player = event.getPlayer();
         boolean cancelled = false;
         
-        if (BlockProperties.isLiquid(blockAgainst.getTypeId())
-                && mat != Material.WATER_LILY && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS))
-            // The block was placed against a liquid block, cancel its
-            // placement.
-            cancelled = true;
+        // Check if the block may be placed against a certain material.
+        // TODO: Maybe make it an extra check after all.
+        final int againstId = blockAgainst.getTypeId();
+        if (BlockProperties.isLiquid(againstId)){
+            if ((mat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getTypeId())) 
+                    && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) cancelled = true;
+        }
+        else if (againstId == Material.AIR.getId()){
+            if (!player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) cancelled = true;
+        }
 
         // First, the fast place check.
         if (fastPlace.isEnabled(player)){
