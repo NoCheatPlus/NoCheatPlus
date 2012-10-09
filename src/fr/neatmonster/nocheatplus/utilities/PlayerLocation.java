@@ -244,7 +244,7 @@ public class PlayerLocation {
      */
     public boolean isOnGround() {
         if (onGround == null) {
-            onGround = BlockProperties.isOnGround(getBlockAccess(), boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.e, boundingBox.f);
+            onGround = BlockProperties.isOnGround(getBlockAccess(), boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.b + 0.25, boundingBox.f);
             if (!onGround){
                 // TODO: Probably check other ids too before doing this ?
                 // TODO: clean this up, use other checking method, detach it to blockproperties ?
