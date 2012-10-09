@@ -995,12 +995,7 @@ public class BlockProperties {
                     final int id = access.getTypeId(x, y, z);
                     if ((BlockProperties.getBLockFlags(id) & flags) != 0){
                         // Might collide.
-                        final Block block = Block.byId[id];
-                        block.updateShape(access, x, y, z);
-                        if (minX > block.maxX + x || maxX < block.minX + x) continue;
-                        else if (minY > block.maxY + y || maxY < block.minY + y) continue;
-                        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) continue;
-                        return true;
+                        if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)) return true;
                     }
                 }
             }
@@ -1008,8 +1003,60 @@ public class BlockProperties {
         return false;
     }
     
+    /**
+     * Check if the bounds collide with the block for the given type id.
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param id
+     */
+    public static final boolean collidesBlock(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id){
+        // TODO: use internal block data unless delegation wanted?
+        final Block block = Block.byId[id];
+        block.updateShape(access, x, y, z);
+        if (minX > block.maxX + x || maxX < block.minX + x) return false;
+        else if (minY > block.maxY + y || maxY < block.minY + y) return false;
+        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) return false;
+        else return true;
+    }
+    
+    /**
+     * Similar to collides(... , F_SOLID), but also checks the block above.
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
     public static final boolean isOnGround(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
-        return collides(access, minX, minY, minZ, maxX, maxY, maxZ, F_SOLID);
+        for (int x = Location.locToBlock(minX); x <= Location.locToBlock(maxX); x++){
+            for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
+                for (int y = Location.locToBlock(minY); y <= Location.locToBlock(maxY); y++){
+                    final int id = access.getTypeId(x, y, z);
+                    if ((BlockProperties.getBLockFlags(id) & F_SOLID) != 0){
+                        // Might collide.
+                        if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
+                            if ((BlockProperties.getBLockFlags(access.getTypeId(x, y + 1, z)) & F_SOLID) != 0){
+                                // Check against spider type hacks.
+                                if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y, z, id)){
+                                    // TODO: This might be seen as a violation for many block types.
+                                    continue;
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 	
 }
