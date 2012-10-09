@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 /*
  * MM"""""""`YM dP                                     
@@ -68,6 +69,9 @@ public class PlayerLocation {
 
     /** Is the player on ladder? */
     private Boolean                 onLadder;
+    
+    /** Simple test if the exact position is passable. */
+    private Boolean                 passable;
 
     /** The bounding box of the player. */
     private AxisAlignedBB           boundingBox;
@@ -330,6 +334,15 @@ public class PlayerLocation {
     }
     
     /**
+     * Simple at the spot passability test, no bounding boxes.
+     * @return
+     */
+    public boolean isPassable(){
+        if (passable == null) passable = BlockProperties.isPassable(getBlockAccess(), x, y, z, getTypeId());
+        return passable;
+    }
+    
+    /**
      * Sets the player location object.
      * 
      * @param location
@@ -499,6 +512,10 @@ public class PlayerLocation {
 
     public WorldServer getWorldServer() {
         return worldServer;
+    }
+
+    public Vector getVector() {
+        return new Vector(x, y, z);
     }
 
 }
