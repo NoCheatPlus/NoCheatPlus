@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.server.AxisAlignedBB;
 import net.minecraft.server.Block;
 import net.minecraft.server.IBlockAccess;
 
@@ -916,6 +917,99 @@ public class BlockProperties {
             if (id == null || id < 0 || id >= 4096) CheckUtils.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
             else blockFlags[id] |= F_IGN_PASSABLE;
         }
+    }
+    
+    /**
+     * 
+     * @param box
+     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     * @return If any block has the flags.
+     */
+    public static final boolean hasAnyFlags(final IBlockAccess access, final AxisAlignedBB box, final long flags){
+        return hasAnyFlags(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
+    }
+    
+    /**
+     * 
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     * @return If any block has the flags.
+     */
+    public static final boolean hasAnyFlags(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
+        return hasAnyFlags(access, Location.locToBlock(minX), Location.locToBlock(minY), Location.locToBlock(minZ), Location.locToBlock(maxX), Location.locToBlock(maxY), Location.locToBlock(maxZ), flags);
+    }
+
+    
+    /**
+     * 
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+     * @return If any block has the flags.
+     */
+    public static final boolean hasAnyFlags(final IBlockAccess access,final int minX, int minY, final int minZ, final int maxX, final int maxY, final int maxZ, final long flags){
+        for (int x = minX; x <= maxX; x++){
+            for (int z = minZ; z <= maxZ; z++){
+                for (int y = minY; y <= maxY; y++){
+                    if ((BlockProperties.getBLockFlags(access.getTypeId(x, y, z)) & flags) != 0) return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Test if the box collide with any block that matches the flags somehow.
+     * @param box
+     * @param flags
+     * @return
+     */
+    public static final boolean collides(final IBlockAccess access, final AxisAlignedBB box, final long flags){
+        return collides(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
+    }
+    
+    /**
+     * Test if the box collide with any block that matches the flags somehow.
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param flags
+     * @return
+     */
+    public static final boolean collides(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
+        for (int x = Location.locToBlock(minX); x <= Location.locToBlock(maxX); x++){
+            for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
+                for (int y = Location.locToBlock(minY); y <= Location.locToBlock(maxY); y++){
+                    final int id = access.getTypeId(x, y, z);
+                    if ((BlockProperties.getBLockFlags(id) & flags) != 0){
+                        // Might collide.
+                        final Block block = Block.byId[id];
+                        block.updateShape(access, x, y, z);
+                        if (minX > block.maxX + x || maxX < block.minX + x) continue;
+                        else if (minY > block.maxY + y || maxY < block.minY + y) continue;
+                        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) continue;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    public static final boolean isOnGround(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
+        return collides(access, minX, minY, minZ, maxX, maxY, maxZ, F_SOLID);
     }
 	
 }

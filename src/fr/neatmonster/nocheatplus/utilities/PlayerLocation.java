@@ -184,12 +184,7 @@ public class PlayerLocation {
         if (inLava == null) {
             AxisAlignedBB boundingBoxLava = boundingBox.clone();
             boundingBoxLava = boundingBoxLava.grow(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D);
-            if (idCache != null){
-                inLava = idCache.collides(boundingBoxLava, BlockProperties.F_LAVA);
-            }
-            else{
-                inLava = worldServer.a(boundingBoxLava, net.minecraft.server.Material.LAVA);
-            }
+            inLava = BlockProperties.collides(getBlockAccess(), boundingBoxLava, BlockProperties.F_LAVA);
         }
         return inLava;
     }
@@ -204,12 +199,7 @@ public class PlayerLocation {
             AxisAlignedBB boundingBoxWater = boundingBox.clone();
             boundingBoxWater = boundingBoxWater.grow(0.0D, -0.40000000596046448D, 0.0D);
             boundingBoxWater = boundingBoxWater.shrink(0.001D, 0.001D, 0.001D);
-            if (idCache !=null){
-                inWater = idCache.collides(boundingBoxWater, BlockProperties.F_WATER);
-            }
-            else{
-                inWater = worldServer.a(boundingBoxWater, net.minecraft.server.Material.WATER, entity);
-            } 
+            inWater = BlockProperties.collides(getBlockAccess(), boundingBoxWater, BlockProperties.F_WATER);
         }
         return inWater;
     }
@@ -254,41 +244,33 @@ public class PlayerLocation {
      */
     public boolean isOnGround() {
         if (onGround == null) {
-            if (idCache != null){
-                onGround = idCache.collides(boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.e, boundingBox.f, BlockProperties.F_SOLID);
-                if (!onGround){
-                    // TODO: Probably check other ids too before doing this ?
-                    // TODO: clean this up, use other checking method.
-                    double d0 = 0.25D;
-                    AxisAlignedBB axisalignedbb = boundingBox.clone();
-                    axisalignedbb = axisalignedbb.d(0D, -getyOnGround(), 0D);
-                    @SuppressWarnings("rawtypes")
-                    List list = worldServer.getEntities(entity, axisalignedbb.grow(d0, d0, d0));
-                    @SuppressWarnings("rawtypes")
-                    Iterator iterator = list.iterator();
-                    while (iterator.hasNext()) {
-                        final Entity entity1 = (Entity) iterator.next();
-                        final EntityType type = entity.getBukkitEntity().getType();
-                        if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
-                        AxisAlignedBB axisalignedbb1 = entity1.E();
-                        if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
-                            onGround = true;
-                            return true;
-                        }
-                        axisalignedbb1 = entity.g(entity1);
-                        if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
-                            onGround = true;
-                            return true;
-                        }
+            onGround = BlockProperties.isOnGround(getBlockAccess(), boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.e, boundingBox.f);
+            if (!onGround){
+                // TODO: Probably check other ids too before doing this ?
+                // TODO: clean this up, use other checking method, detach it to blockproperties ?
+                double d0 = 0.25D;
+                AxisAlignedBB axisalignedbb = boundingBox.clone();
+                axisalignedbb = axisalignedbb.d(0D, -getyOnGround(), 0D);
+                @SuppressWarnings("rawtypes")
+                List list = worldServer.getEntities(entity, axisalignedbb.grow(d0, d0, d0));
+                @SuppressWarnings("rawtypes")
+                Iterator iterator = list.iterator();
+                while (iterator.hasNext()) {
+                    final Entity entity1 = (Entity) iterator.next();
+                    final EntityType type = entity.getBukkitEntity().getType();
+                    if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
+                    AxisAlignedBB axisalignedbb1 = entity1.E();
+                    if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
+                        onGround = true;
+                        return true;
+                    }
+                    axisalignedbb1 = entity.g(entity1);
+                    if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
+                        onGround = true;
+                        return true;
                     }
                 }
             }
-            else{
-              AxisAlignedBB boundingBoxGround = boundingBox.clone();
-              boundingBoxGround = boundingBoxGround.d(0D, -getyOnGround(), 0D);
-                onGround = worldServer.getCubes(entity, boundingBoxGround).size() > 0;
-            }
-            // TODO: Check for entities (boats etc.)
         }
         return onGround;
     }
