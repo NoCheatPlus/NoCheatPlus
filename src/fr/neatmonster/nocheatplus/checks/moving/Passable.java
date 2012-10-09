@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -20,23 +21,43 @@ public class Passable extends Check {
 	
 	public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc){
 		// Simple check.
-		final int toId = to.getTypeId();
-		if (!BlockProperties.isPassable(to.getBlockAccess(), to.getX(), to.getY(), to.getZ(), toId)){
+		if (!to.isPassable()){
+		    Location loc = null; // players location if should be used.
 			// Allow moving into the same block.
 			if (from.isSameBlock(to)){
-				if (!BlockProperties.isPassable(from.getBlockAccess(), from.getX(), from.getY(), from.getZ(), from.getTypeId())) return null;
+				if (!from.isPassable()){
+				    // Only allow moving further out of the block (still allows going round in circles :p)
+				    final Vector blockMiddle = new Vector(0.5 + from.getBlockX(), 0.5 + from.getBlockY(), 0.5 + from.getBlockZ());
+				    if (blockMiddle.distanceSquared(from.getVector()) < blockMiddle.distanceSquared(to.getVector())) {
+				        // Further check for the players location as possible set back.
+				        loc = player.getLocation();
+				        if (!BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))){
+				            // Allow the move
+				            return null;
+				        }
+				    }
+				}
 			}
 			// Return the reset position.
 			data.passableVL += 1d;
 			final ViolationData vd = new ViolationData(this, player, data.passableVL, 1, cc.passableActions);
-			if (vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + toId);
+			if (vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + to.getTypeId());
 			if (executeActions(vd)){
-				final Location newTo = from.getLocation();
+			    // TODO: Consider another set back position for this, also keeping track of players moving around in blocks.
+				final Location newTo;
+				if (!from.isPassable() && loc == null){
+				    // Check if passable.
+				    loc = player.getLocation();
+				    if (!BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(from.getBlockX(), from.getBlockY(), from.getBlockZ()))){
+				        loc = null;
+				    }
+				}
+				if (loc != null) newTo = loc;
+				else newTo = from.getLocation();
 				newTo.setYaw(to.getYaw());
 				newTo.setPitch(to.getPitch());
 				return newTo;
-			}
-				
+			}		
 		}
 		else{
 			data.passableVL *= 0.99;
