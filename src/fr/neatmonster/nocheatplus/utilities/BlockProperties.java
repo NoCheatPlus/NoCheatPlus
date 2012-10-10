@@ -1043,9 +1043,10 @@ public class BlockProperties {
                     if ((BlockProperties.getBLockFlags(id) & F_SOLID) != 0){
                         // Might collide.
                         if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
-                            if ((BlockProperties.getBLockFlags(access.getTypeId(x, y + 1, z)) & F_SOLID) != 0){
+                            final int aboveId = access.getTypeId(x, y + 1, z);
+                            if ((BlockProperties.getBLockFlags(aboveId) & F_SOLID) != 0){
                                 // Check against spider type hacks.
-                                if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y, z, id)){
+                                if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId)){
                                     // TODO: This might be seen as a violation for many block types.
                                     continue;
                                 }
