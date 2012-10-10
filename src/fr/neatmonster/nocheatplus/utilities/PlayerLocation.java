@@ -360,12 +360,23 @@ public class PlayerLocation {
         world = location.getWorld();
         worldServer = ((CraftWorld) world).getHandle();
 
-        typeId = typeIdBelow = null;
-        aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = null;
+        typeId = typeIdBelow = data = null;
+        aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = passable = null;
         
         // TODO: consider idCache.setAccess.
         
         this.setyOnGround(yFreedom);
+    }
+    
+    /**
+     * Set some references to null.
+     */
+    public void cleanup(){
+        entity = null;
+        world = null;
+        worldServer = null;
+        boundingBox = null;
+        idCache = null;
     }
 
 	public double getyOnGround() {
@@ -481,16 +492,6 @@ public class PlayerLocation {
         this.idCache = cache;
     }
 	
-	/**
-	 * Set some references to null.
-	 */
-	public void cleanup(){
-	    entity = null;
-	    world = null;
-	    worldServer = null;
-	    boundingBox = null;
-	    idCache = null;
-	}
 
     public WorldServer getWorldServer() {
         return worldServer;
