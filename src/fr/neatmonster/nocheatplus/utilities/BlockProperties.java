@@ -903,7 +903,8 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static final boolean isPassable(final Location loc) {
-		return isPassable(((org.bukkit.craftbukkit.CraftWorld) loc.getWorld()).getHandle(), loc.getX(), loc.getY(), loc.getZ(), loc.getBlock().getTypeId());
+	    final IBlockAccess access = ((org.bukkit.craftbukkit.CraftWorld) loc.getWorld()).getHandle();
+		return isPassable(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 	}
 
 	/**
