@@ -246,10 +246,13 @@ public class BlockProperties {
     /** Flag position for stairs. */
     public static final int F_STAIRS 		= 0x1;
     public static final int F_LIQUID 		= 0x2;
+    /** Subject to change / rename.*/
     public static final int F_SOLID 		= 0x4;
     public static final int F_IGN_PASSABLE 	= 0x8;
     public static final int F_WATER         = 0x10;
     public static final int F_LAVA          = 0x20;
+    /** 150% height, like fences.*/
+    public static final int F_HEIGHT150     = 0x40;
     
 	static{
 		init();
@@ -328,6 +331,13 @@ public class BlockProperties {
                 Material.LAVA, Material.STATIONARY_LAVA,
         }) {
             blockFlags[mat.getId()] |= F_LIQUID | F_LAVA;
+        }
+        // Fence types (150% height).
+        for (final Material mat : new Material[]{
+                Material.FENCE, Material.FENCE_GATE,
+                Material.NETHER_FENCE,
+        }){
+            blockFlags[mat.getId()] |= F_HEIGHT150;
         }
         // Workarounds.
         for (final Material mat : new Material[]{
@@ -1019,6 +1029,7 @@ public class BlockProperties {
         // TODO: use internal block data unless delegation wanted?
         final Block block = Block.byId[id];
         block.updateShape(access, x, y, z);
+        if ((blockFlags[id] & F_HEIGHT150) != 0) block.maxY = 1.5;
         if (minX > block.maxX + x || maxX < block.minX + x) return false;
         else if (minY > block.maxY + y || maxY < block.minY + y) return false;
         else if (minZ > block.maxZ + z || maxZ < block.minZ + z) return false;
@@ -1039,7 +1050,7 @@ public class BlockProperties {
     public static final boolean isOnGround(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
         for (int x = Location.locToBlock(minX); x <= Location.locToBlock(maxX); x++){
             for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
-                for (int y = Location.locToBlock(minY); y <= Location.locToBlock(maxY); y++){
+                for (int y = Location.locToBlock(minY - 0.5626); y <= Location.locToBlock(maxY); y++){
                     final int id = access.getTypeId(x, y, z);
                     if ((BlockProperties.getBLockFlags(id) & F_SOLID) != 0){
                         // Might collide.
