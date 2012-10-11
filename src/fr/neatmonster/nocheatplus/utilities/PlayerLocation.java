@@ -96,7 +96,7 @@ public class PlayerLocation {
     /** The worldServer. */
     private WorldServer             worldServer;
     
-    private TypeIdCache idCache;
+    private BlockCache blockCache;
 
     /**
      * Gets the location.
@@ -337,7 +337,7 @@ public class PlayerLocation {
     }
 
     /**
-     * Sets the player location object. Does not set or reset idCache.
+     * Sets the player location object. Does not set or reset blockCache.
      * 
      * @param location
      *            the location
@@ -363,7 +363,7 @@ public class PlayerLocation {
         typeId = typeIdBelow = data = null;
         aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = passable = null;
         
-        // TODO: consider idCache.setAccess.
+        // TODO: consider blockCache.setAccess.
         
         this.setyOnGround(yFreedom);
     }
@@ -376,7 +376,7 @@ public class PlayerLocation {
         world = null;
         worldServer = null;
         boundingBox = null;
-        idCache = null;
+        blockCache = null;
     }
 
 	public double getyOnGround() {
@@ -462,7 +462,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public final int getTypeId(final int x, final int y, final int z){
-	    return idCache == null ? worldServer.getTypeId(x, y, z) : idCache.getTypeId(x, y, z);
+	    return blockCache == null ? worldServer.getTypeId(x, y, z) : blockCache.getTypeId(x, y, z);
 	}
 
 	/**
@@ -473,7 +473,7 @@ public class PlayerLocation {
 	 * @return
 	 */
     public final int getData(final int x, final int y, final int z){
-        return idCache == null ? worldServer.getData(x, y, z) : idCache.getData(x, y, z);
+        return blockCache == null ? worldServer.getData(x, y, z) : blockCache.getData(x, y, z);
     }
 	   
 	/**
@@ -481,15 +481,15 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public final IBlockAccess getBlockAccess() {
-		return idCache == null ? worldServer : idCache;
+		return blockCache == null ? worldServer : blockCache;
 	}
 	
 	   /**
      * Set the id cache for faster id getting.
      * @param cache
      */
-    public void setIdCache(final TypeIdCache cache) {
-        this.idCache = cache;
+    public void setBlockCache(final BlockCache cache) {
+        this.blockCache = cache;
     }
 	
 

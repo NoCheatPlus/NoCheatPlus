@@ -36,7 +36,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.TypeIdCache;
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
 /*
  * M"""""`'"""`YM                   oo                   
@@ -66,13 +66,13 @@ public class MovingListener implements Listener {
     private static final class MoveInfo{
         public final PlayerLocation from = new PlayerLocation();
         public final PlayerLocation to = new PlayerLocation();
-        public final TypeIdCache cache = new TypeIdCache();
+        public final BlockCache cache = new BlockCache();
         public final void set(final Player player, final Location from, final Location to, final double yOnGround){
             this.from.set(from, player, yOnGround);
             this.to.set(to, player, yOnGround);
             this.cache.setAccess(this.from.getWorldServer());
-            this.from.setIdCache(cache);
-            this.to.setIdCache(cache);
+            this.from.setBlockCache(cache);
+            this.to.setBlockCache(cache);
         }
         public final void cleanup(){
             from.cleanup();

@@ -11,11 +11,11 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
 
 /**
- * Access to type-ids using caching techniques.
+ * Access to type-ids and data using caching techniques.
  * @author mc_dev
  *
  */
-public class TypeIdCache implements IBlockAccess{
+public class BlockCache implements IBlockAccess{
     /**
      * TODO: Make a map for faster queries (without object creation).
      * TODO: Not sure the prime numbers are too big for normal use.
@@ -79,14 +79,14 @@ public class TypeIdCache implements IBlockAccess{
 //    private int[] id = null;
 //    private int[] data = null;
     
-    public TypeIdCache(){
+    public BlockCache(){
     }
     
-    public TypeIdCache(final World world){
+    public BlockCache(final World world){
         setAccess(world);
     }
     
-    public TypeIdCache(final IBlockAccess access){
+    public BlockCache(final IBlockAccess access){
         setAccess(access);
     }
     
