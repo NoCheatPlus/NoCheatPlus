@@ -84,6 +84,8 @@ public class MovingData extends ACheckData {
     public double         verticalFreedom;
     public double         verticalVelocity;
     public int            verticalVelocityCounter;
+    /** Last to coordinates. */
+    public double         fromX, fromY, fromZ, toY;
 
     // Data of the creative check.
     public boolean        creativeFlyPreviousRefused;
@@ -114,7 +116,7 @@ public class MovingData extends ACheckData {
 
     // Data of the survival fly check.
     public int            survivalFlyJumpPhase;
-    public double         survivalFlyLastFromY;
+//    public double         survivalFlyLastFromY;
     /** Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set". */
     public double         survivalFlyLastYDist = Integer.MAX_VALUE;
     public int            survivalFlyOnIce;
@@ -143,6 +145,7 @@ public class MovingData extends ACheckData {
         survivalFlyJumpPhase = 0;
         setBack = null;
         survivalFlyLastYDist = Integer.MAX_VALUE;
+        fromX = Double.MAX_VALUE;
         clearAccounting();
         clearNoFallData();
     }

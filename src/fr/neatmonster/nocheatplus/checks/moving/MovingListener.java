@@ -358,7 +358,6 @@ public class MovingListener implements Listener {
         
         if (pFrom.isOnGround()){
             data.ground = from; // pFrom.getLocation();
-            data.survivalFlyLastFromY = Integer.MAX_VALUE;
         }
         
 

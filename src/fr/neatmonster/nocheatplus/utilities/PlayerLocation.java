@@ -500,5 +500,9 @@ public class PlayerLocation {
     public Vector getVector() {
         return new Vector(x, y, z);
     }
+    
+    public double getWidth(){
+        return entity.width;
+    }
 
 }
