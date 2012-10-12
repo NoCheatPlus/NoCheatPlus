@@ -20,6 +20,9 @@ import org.bukkit.Material;
  * given in the configFactory.yml file.
  */
 public class DefaultConfig extends ConfigFile {
+    
+    /** NCP build needed for this config. */
+    public static final int buildNumber = 153;
 
     /**
      * Instantiates a new default configuration.

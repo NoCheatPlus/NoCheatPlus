@@ -35,6 +35,7 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.config.DefaultConfig;
 import fr.neatmonster.nocheatplus.config.INeedConfig;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
@@ -320,7 +321,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 //        }
 
         // Is the configuration outdated?
-        configOutdated = Updates.isConfigOutdated(getDescription().getVersion(), config);
+        configOutdated = Updates.isConfigOutdated(DefaultConfig.buildNumber, config);
         
         // Debug information about unknown blocks.
         // (Probably removed later.)
@@ -372,8 +373,8 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 
         // Send a message to the player if the configuration is outdated.
         if (configOutdated && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
-            player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration file is outdated.\n"
-                    + "Some settings might have changed, you should regenerate it!");
+            player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n"
+                    + "Some settings could have changed, you should regenerate it!");
 
         String message = "";
 

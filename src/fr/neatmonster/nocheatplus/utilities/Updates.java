@@ -12,16 +12,15 @@ public class Updates {
 	
 	/**
 	 * 
-	 * @param versionString Current version string (getDescription().getVersion()).
+	 * @param neededVersion Version needed.
 	 * @param config
 	 * @return
 	 */
-	public static boolean isConfigOutdated(String versionString, ConfigFile config){
+	public static boolean isConfigOutdated(int neededVersion, ConfigFile config){
         try {
-            final int currentVersion = Integer.parseInt(versionString.split("-b")[1]);
             final int configurationVersion = Integer.parseInt(
             		config.options().header().split("-b")[1].split("\\.")[0]);
-            if (currentVersion > configurationVersion)
+            if (neededVersion > configurationVersion)
                 return true;
         } catch (final Exception e) {}
         return false;
