@@ -407,7 +407,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".chatnormal", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
-        set(ConfPaths.STRINGS + ".instantbow", start + "fires bow to fast" + end);
+        set(ConfPaths.STRINGS + ".instantbow", start + "fires bow too fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
