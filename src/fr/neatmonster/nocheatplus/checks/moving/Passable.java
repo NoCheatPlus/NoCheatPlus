@@ -28,6 +28,8 @@ public class Passable extends Check {
 				if (!from.isPassable()){
 				    // Only allow moving further out of the block (still allows going round in circles :p)
 				    final Vector blockMiddle = new Vector(0.5 + from.getBlockX(), 0.5 + from.getBlockY(), 0.5 + from.getBlockZ());
+				    // TODO: Allow moving out of one block towards non-solid blocks (closest only ?).
+				    // TODO: Allow moving out of half steps ?
 				    if (blockMiddle.distanceSquared(from.getVector()) < blockMiddle.distanceSquared(to.getVector())) {
 				        // Further check for the players location as possible set back.
 				        loc = player.getLocation();
