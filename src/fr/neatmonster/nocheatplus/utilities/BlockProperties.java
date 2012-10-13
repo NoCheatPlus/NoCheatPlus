@@ -376,7 +376,7 @@ public class BlockProperties {
 		}
 		blocks[102] = glassType; // glass panes
 		blocks[Material.NETHERRACK.getId()] = new BlockProps(woodPickaxe, 0.4f, secToMs(2, 0.3, 0.15, 0.1, 0.1, 0.05));
-		blocks[Material.LADDER.getId()] = new BlockProps(noTool, 0.4f, secToMs(0.6));
+		blocks[Material.LADDER.getId()] = new BlockProps(noTool, 0.4f, secToMs(0.6), 2.5f);
 		blocks[Material.CACTUS.getId()] = new BlockProps(noTool, 0.4f, secToMs(0.6));
 		blocks[Material.WOOD_PLATE.getId()] = new BlockProps(woodAxe, 0.5f, secToMs(0.75, 0.4, 0.2, 0.15, 0.1, 0.1));
 		blocks[Material.STONE_PLATE.getId()] = new BlockProps(woodPickaxe, 0.5f, secToMs(2.5, 0.4, 0.2, 0.15, 0.1, 0.07));
@@ -893,6 +893,7 @@ public class BlockProperties {
 			else if (id == Material.CAULDRON.getId()){
 			    if (Math.abs(0.5 - fx) < 0.1 && Math.abs(0.5 - fz) < 0.1 && fy > 0.1) return true;
 			}
+			else if (id == Material.CACTUS.getId() && fy >= 0.9375) return true;
 			// Nothing found.
 			return false;
 		}
