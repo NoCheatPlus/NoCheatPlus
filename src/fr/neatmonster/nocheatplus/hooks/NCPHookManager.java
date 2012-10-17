@@ -167,7 +167,7 @@ public final class NCPHookManager {
         for (int i = 0; i < hooks.size(); i++) {
             final NCPHook hook = hooks.get(i);
             try {
-                if (hook.onCheckFailure(checkType, player, info))
+                if (hook.onCheckFailure(checkType, player, info) && !(hook instanceof IStats))
                     return true;
             } catch (final Throwable t) {
                 // TODO: maybe distinguish some exceptions here (interrupted ?).
