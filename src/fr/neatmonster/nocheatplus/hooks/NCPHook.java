@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.hooks;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.IViolationInfo;
 
 /*
  * M"""""""`YM MM'""""'YMM MM"""""""`YM M""MMMMM""MM                   dP       
@@ -47,7 +48,9 @@ public interface NCPHook {
      *            the check that failed
      * @param player
      *            the player that failed the check
+     * @param info 
+     *            Extended information about the violations.
      * @return if we need to cancel the check failure processing
      */
-    public boolean onCheckFailure(CheckType checkType, Player player);
+    public boolean onCheckFailure(CheckType checkType, Player player, IViolationInfo info);
 }

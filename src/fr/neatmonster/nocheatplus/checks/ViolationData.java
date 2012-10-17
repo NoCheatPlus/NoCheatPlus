@@ -24,7 +24,7 @@ import fr.neatmonster.nocheatplus.actions.types.CancelAction;
  * 
  * @author asofold
  */
-public class ViolationData {
+public class ViolationData implements IViolationInfo{
 
     /** The actions to be executed. */
     public final ActionList actions;
@@ -118,6 +118,7 @@ public class ViolationData {
 	 * Check if the actions contain a cancel. 
 	 * @return
 	 */
+	@Override
 	public boolean hasCancel(){
 		for (final Action action : applicableActions){
 			if (action instanceof CancelAction) return true;
@@ -151,8 +152,18 @@ public class ViolationData {
 		if (parameters != null) parameters.put(parameterName, value);
 	}
 
+	@Override
     public boolean needsParameters() {
         return parameters != null;
     }
-   
+
+    @Override
+    public double getAddedVl() {
+        return addedVL;
+    }
+
+    @Override
+    public double getTotalVl() {
+        return vL;
+    }
 }

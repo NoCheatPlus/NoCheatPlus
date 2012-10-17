@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.IViolationInfo;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
@@ -103,8 +104,10 @@ public final class NCPHookManager {
      */
     private static void addToMapping(final CheckType checkType, final NCPHook hook) {
         final List<NCPHook> hooks = hooksByChecks.get(checkType);
-        if (!hooks.contains(hook))
-            hooks.add(hook);
+        if (!hooks.contains(hook)){
+            if (hook instanceof IStats) hooks.add(0, hook);
+            else hooks.add(hook);
+        }
     }
 
     /**
@@ -160,11 +163,11 @@ public final class NCPHookManager {
      *            the hooks
      * @return true, if a hook as decided to cancel the VL processing
      */
-    private static final boolean applyHooks(final CheckType checkType, final Player player, final List<NCPHook> hooks) {
+    private static final boolean applyHooks(final CheckType checkType, final Player player, final IViolationInfo info, final List<NCPHook> hooks) {
         for (int i = 0; i < hooks.size(); i++) {
             final NCPHook hook = hooks.get(i);
             try {
-                if (hook.onCheckFailure(checkType, player))
+                if (hook.onCheckFailure(checkType, player, info))
                     return true;
             } catch (final Throwable t) {
                 // TODO: maybe distinguish some exceptions here (interrupted ?).
@@ -411,11 +414,11 @@ public final class NCPHookManager {
         if (!hooksCheck.isEmpty()){
         	if (APIUtils.needsSynchronization(type)){
         		synchronized (hooksCheck) {
-        			return applyHooks(type, violationData.player, hooksCheck);
+        			return applyHooks(type, violationData.player, violationData, hooksCheck);
 				}
         	}
         	else{
-        		return applyHooks(type, violationData.player, hooksCheck);
+        		return applyHooks(type, violationData.player, violationData, hooksCheck);
         	}
         }   
         return false;

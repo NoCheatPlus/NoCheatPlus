@@ -1,5 +1,10 @@
 package fr.neatmonster.nocheatplus.hooks;
 
+import org.bukkit.entity.Player;
+
+import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.IViolationInfo;
+
 /*
  * MMP"""""""MM dP                  dP                                dP   
  * M' .mmmm  MM 88                  88                                88   
@@ -24,4 +29,23 @@ package fr.neatmonster.nocheatplus.hooks;
  * 
  * @author asofold
  */
-public abstract class AbstractNCPHook implements NCPHook {}
+public abstract class AbstractNCPHook implements NCPHook {
+    /**
+     * 
+     * @deprecated See new signature in NCPHook.
+     * @param checkType
+     * @param player
+     * @return
+     */
+    public boolean onCheckFailure(CheckType checkType, Player player){
+        // Implemented because of API change.
+        return false;
+    }
+
+    @Override
+    public boolean onCheckFailure(final CheckType checkType, final Player player, final IViolationInfo info) {
+        // Kept for compatibility reasons.
+        return onCheckFailure(checkType, player);
+    }
+    
+}
