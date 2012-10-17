@@ -42,7 +42,6 @@ import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
-import fr.neatmonster.nocheatplus.net.NCPNetServerHandler;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -331,21 +330,21 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         CheckUtils.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
     }
 
-    public void onPlayerJoinLow(final PlayerJoinEvent event) {
-        /*
-         *  ____  _                             _       _       
-         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
-         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
-         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
-         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
-         *                |___/                                 
-         */
-        // Change the NetServerHandler of the player if requested in the configuration.
-        final ConfigFile configFile = ConfigManager.getConfigFile();
-        if (configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false))
-            NCPNetServerHandler.changeNetServerHandler(event.getPlayer(),
-                    configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false));
-    }
+//    public void onPlayerJoinLow(final PlayerJoinEvent event) {
+//        /*
+//         *  ____  _                             _       _       
+//         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
+//         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
+//         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
+//         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
+//         *                |___/                                 
+//         */
+//        // Change the NetServerHandler of the player if requested in the configuration.
+//        final ConfigFile configFile = ConfigManager.getConfigFile();
+//        if (configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false))
+//            NCPNetServerHandler.changeNetServerHandler(event.getPlayer(),
+//                    configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false));
+//    }
 
     /**
      * This event handler is used to send all the disabling messages to the client.
@@ -376,6 +375,14 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
             player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n"
                     + "Some settings could have changed, you should regenerate it!");
 
+        checkModsMessage(player);
+    }
+    
+    /**
+     * Send block codes to the player according to allowed or disallowed client-mods or client-mod features.
+     * @param player
+     */
+    private void checkModsMessage(Player player) {
         String message = "";
 
         // Check if we allow all the client mods.
@@ -459,7 +466,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         if (!message.equals(""))
             player.sendMessage(message);
     }
-    
+
     @EventHandler(priority=EventPriority.HIGHEST)
     public void onPlayerLogin(final PlayerLoginEvent event){
     	// (HGHEST to give other plugins the possibility to add permissions or allow the player).

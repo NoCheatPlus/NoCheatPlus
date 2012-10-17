@@ -61,6 +61,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
  */
 /**
  * A custom NetServerHandler used as a workaround to prevent CraftBukkit from blocking fly mods.
+ * @deprecated Needs updating.
  */
 public class NCPNetServerHandler extends NetServerHandler {
 
