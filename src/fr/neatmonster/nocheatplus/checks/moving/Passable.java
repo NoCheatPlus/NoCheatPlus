@@ -26,7 +26,14 @@ public class Passable extends Check {
 			// Allow moving into the same block.
 			if (from.isSameBlock(to)){
 				if (!from.isPassable()){
-				    
+				    final double eyeY = to.getY() + player.getEyeHeight();
+				    final int eyeBlockY = Location.locToBlock(eyeY);
+				    if (eyeBlockY != to.getBlockY()){
+				        if (BlockProperties.isPassable(to.getBlockAccess(), to.getX(), eyeY, to.getZ(), to.getTypeId(to.getBlockX(), eyeBlockY, to.getBlockZ()))){
+				            // Allow moving inside the same block if head is free.
+				            return null;
+				        }
+				    }
 				    // Only allow moving further out of the block (still allows going round in circles :p)
 				    // TODO: account for actual bounding box.
 				    final Vector blockMiddle = new Vector(0.5 + from.getBlockX(), 0.5 + from.getBlockY(), 0.5 + from.getBlockZ());
