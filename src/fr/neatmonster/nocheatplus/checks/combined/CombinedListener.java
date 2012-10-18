@@ -48,7 +48,7 @@ public class CombinedListener implements Listener {
 		final long now = System.currentTimeMillis();
 		final Player player = event.getPlayer();
 		
-		final Location loc = player.getLocation();
+		final Location loc = event.getTo(); // player.getLocation();
 		final String worldName = loc.getWorld().getName();
 		final CombinedData data = CombinedData.getData(player);
 		data.lastMoveTime = now;
