@@ -332,9 +332,6 @@ public class SurvivalFly extends Check {
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
         data.survivalFlyJumpPhase++;
-
-        // Slowly reduce the level with each event.
-        data.survivalFlyVL *= 0.95D;
         
         if (cc.debug){
             System.out.println(player.getName() + " vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+"), jumpphase: " + data.survivalFlyJumpPhase);
@@ -358,6 +355,7 @@ public class SurvivalFly extends Check {
                 vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
                 vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
             }
+            data.survivalFlyVLTime = now;
             if (executeActions(vd)){
                 data.survivalFlyLastYDist = Double.MAX_VALUE;
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
@@ -366,6 +364,11 @@ public class SurvivalFly extends Check {
                         to.getYaw(), to.getPitch());
             }
         }
+        else{
+            // Slowly reduce the level with each event, if violations have not recently happened.
+            if (now - data.survivalFlyVLTime > cc.survivalFlyVLFreeze) data.survivalFlyVL *= 0.95D;
+        }
+        
         // Violation or not, apply reset conditions (cancel would have returned above).
         final boolean resetTo = toOnGround || to.isInLiquid()  || to.isOnLadder()|| to.isInWeb();
         if (resetTo){

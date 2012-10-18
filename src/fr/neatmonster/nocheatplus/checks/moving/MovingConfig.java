@@ -94,6 +94,7 @@ public class MovingConfig extends ACheckConfig {
     public final int        survivalFlyWalkingSpeed;
     public final boolean    survivalFlyCobwebHack;
     public final boolean    survivalFlyAccounting;
+    public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
     
     // Special tolerance values:
@@ -143,6 +144,7 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         survivalFlyCobwebHack = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
         survivalFlyAccounting = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_ACCOUNTING);
+        survivalFlyVLFreeze = data.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.

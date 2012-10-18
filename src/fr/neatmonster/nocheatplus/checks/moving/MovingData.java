@@ -125,6 +125,7 @@ public class MovingData extends ACheckData {
     public boolean        survivalFlyWasInBed;
     public long           survivalFlyCobwebTime;
     public double         survivalFlyCobwebVL;
+    public long           survivalFlyVLTime;
     
     // Accounting info.
     // TODO: optimize later.
@@ -137,7 +138,6 @@ public class MovingData extends ACheckData {
     public Location       ground;
     public Location       setBack;
     public Location       teleported;
-
 
     /**
      * Clear the data of the fly checks (not more-packets).
