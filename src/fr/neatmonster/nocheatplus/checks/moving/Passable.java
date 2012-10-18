@@ -33,10 +33,14 @@ public class Passable extends Check {
 				    if (blockMiddle.distanceSquared(from.getVector()) < blockMiddle.distanceSquared(to.getVector())) {
 				        // Further check for the players location as possible set back.
 				        loc = player.getLocation();
-				        if (!BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))){
+				        if (to.isSamePos(loc) ){
+				            loc = null;
+				        }
+				        else if (!BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()))){
 				            // Allow the move
 				            return null;
 				        }
+				        // else is passable: use the location instead of from.
 				    }
 				}
 			}
@@ -50,7 +54,7 @@ public class Passable extends Check {
 				if (!from.isPassable() && loc == null){
 				    // Check if passable.
 				    loc = player.getLocation();
-				    if (!BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(from.getBlockX(), from.getBlockY(), from.getBlockZ()))){
+				    if (to.isSamePos(loc) || !BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(from.getBlockX(), from.getBlockY(), from.getBlockZ()))){
 				        loc = null;
 				    }
 				}

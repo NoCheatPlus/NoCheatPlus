@@ -175,9 +175,31 @@ public class PlayerLocation {
         return blockZ;
     }
     
+    /**
+     * Compares block coordinates (not the world). 
+     * @param other
+     * @return
+     */
     public final boolean isSameBlock(final PlayerLocation other) {
-        // Maybe make block coordinate fields later.
         return blockX == other.getBlockX() && blockZ == other.getBlockZ() &&  blockY == other.getBlockY();
+    }
+    
+    /**
+     * Compares exact coordinates (not the world).
+     * @param loc
+     * @return
+     */
+    public boolean isSamePos(final PlayerLocation loc) {
+        return x == loc.getX() && z == loc.getZ() && y == loc.getY();
+    }
+    
+    /**
+     * Compares exact coordinates (not the world).
+     * @param loc
+     * @return
+     */
+    public boolean isSamePos(final Location loc) {
+        return x == loc.getX() && z == loc.getZ() && y == loc.getY();
     }
 
     /**
