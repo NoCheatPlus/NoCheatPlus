@@ -277,7 +277,7 @@ public class SurvivalFly extends Check {
         			data.survivalFlyJumpPhase = 0;
         			data.setBack.setYaw(to.getYaw());
         			data.setBack.setPitch(to.getPitch());
-        			data.survivalFlyLastYDist = Integer.MAX_VALUE;
+        			data.survivalFlyLastYDist = Double.MAX_VALUE;
         			return data.setBack;
         		}
         	}
@@ -359,7 +359,7 @@ public class SurvivalFly extends Check {
                 vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
             }
             if (executeActions(vd)){
-                data.survivalFlyLastYDist = Integer.MAX_VALUE;
+                data.survivalFlyLastYDist = Double.MAX_VALUE;
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
@@ -381,10 +381,6 @@ public class SurvivalFly extends Check {
             data.clearAccounting();
         }
         data.survivalFlyLastYDist = yDistance;
-        data.fromX = from.getX();
-        data.fromY = from.getY();
-        data.fromZ = from.getZ();
-        data.toY = to.getY();
         return null;
     }
     

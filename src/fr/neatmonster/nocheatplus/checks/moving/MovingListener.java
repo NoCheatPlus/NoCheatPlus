@@ -322,8 +322,12 @@ public class MovingListener implements Listener {
         // plugin before we got it) or if the player is inside a vehicle.
         final Location from = event.getFrom();
         final Location to = event.getTo();
-        if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle())
+        if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle()){
+            // TODO: move somewhere else (monitor)
+            // TODO: 
+            MovingData.getData(player).resetPositions(event.getTo());
             return;
+        }
         
         // Use existent locations if possible.
         final MoveInfo moveInfo;
@@ -402,6 +406,13 @@ public class MovingListener implements Listener {
             // Remember where we send the player to.
             data.teleported = newTo;
         }
+        // Set positions.
+        data.fromX = from.getX();
+        data.fromY = from.getY();
+        data.fromZ = from.getZ();
+        data.toX = to.getX();
+        data.toY = to.getY();
+        data.toZ = to.getZ();
         // Cleanup.
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
@@ -473,19 +484,33 @@ public class MovingListener implements Listener {
          */
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
-
+        
+        final Location teleported = data.teleported;
+        
         // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
-        if (data.teleported != null && data.teleported.equals(event.getTo()))
+        final Location to = event.getTo();
+        if (event.isCancelled() && teleported != null && data.teleported.equals(to)){
+            // TODO: even more strict enforcing ?
             event.setCancelled(false);
-        else
+            event.setTo(teleported);
+            event.setFrom(teleported);
+            data.clearFlyData();
+            data.resetPositions(teleported);
+        }
+        else{
             // Only if it wasn't NoCheatPlus, drop data from more packets check. If it was NoCheatPlus, we don't
             // want players to exploit the fly check teleporting to get rid of the "morepackets" data.
+            // TODO: check if to do with cancelled teleports !
             data.clearMorePacketsData();
+            data.clearFlyData();
+            data.resetPositions(event.isCancelled() ? event.getFrom() : to);
+        }
+
 
         // Always drop data from fly checks, as it always loses its validity after teleports. Always!
         // TODO: NoFall might be necessary to be checked here ?
         data.teleported = null;
-        data.clearFlyData();
+        
     }
 
     /**

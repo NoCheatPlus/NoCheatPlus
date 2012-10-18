@@ -84,8 +84,10 @@ public class MovingData extends ACheckData {
     public double         verticalFreedom;
     public double         verticalVelocity;
     public int            verticalVelocityCounter;
+    /** Last from coordinates. */
+    public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. */
-    public double         fromX, fromY, fromZ, toY;
+    public double toX = Double.MAX_VALUE, toY, toZ;
 
     // Data of the creative check.
     public boolean        creativeFlyPreviousRefused;
@@ -118,7 +120,7 @@ public class MovingData extends ACheckData {
     public int            survivalFlyJumpPhase;
 //    public double         survivalFlyLastFromY;
     /** Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set". */
-    public double         survivalFlyLastYDist = Integer.MAX_VALUE;
+    public double         survivalFlyLastYDist = Double.MAX_VALUE;
     public int            survivalFlyOnIce;
     public boolean        survivalFlyWasInBed;
     public long           survivalFlyCobwebTime;
@@ -144,8 +146,8 @@ public class MovingData extends ACheckData {
         bunnyhopDelay = 0;
         survivalFlyJumpPhase = 0;
         setBack = null;
-        survivalFlyLastYDist = Integer.MAX_VALUE;
-        fromX = Double.MAX_VALUE;
+        survivalFlyLastYDist = Double.MAX_VALUE;
+        fromX = toX = Double.MAX_VALUE;
         clearAccounting();
         clearNoFallData();
     }
@@ -173,5 +175,16 @@ public class MovingData extends ACheckData {
 //        noFallOnGround = noFallWasOnGround = true;
         noFallFallDistance = 0;
         noFallMaxY = 0D;
+    }
+    
+    public void resetPositions(final Location loc){
+        resetPositions(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    public void resetPositions(final double x, final double y, final double z) {
+        fromX = toX = x;
+        fromY = toY = y;
+        fromZ = toZ = z;
+        survivalFlyLastYDist = Double.MAX_VALUE;
     }
 }
