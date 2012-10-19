@@ -646,10 +646,12 @@ public class MovingListener implements Listener {
         final Entity entity = event.getEntity();
         if (!(entity instanceof Player)) return;
         final Player player = (Player) entity;
-        if (!survivalFly.isEnabled(player)) return;
-        if (!noFall.isEnabled(player)) return;
-        final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
+        if (event.isCancelled() || !survivalFly.isEnabled(player) || !noFall.isEnabled(player)){
+            data.clearNoFallData();
+            return;
+        }
+        final MovingConfig cc = MovingConfig.getConfig(player);
         final float fallDistance = player.getFallDistance();
         final int damage = event.getDamage();
         final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
