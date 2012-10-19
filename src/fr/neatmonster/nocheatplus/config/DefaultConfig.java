@@ -194,7 +194,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_TEXT_MSG_REPEATSELF, 1.5);
         set(ConfPaths.CHAT_TEXT_MSG_WORDS_LENGTHAV, 1.0);
         set(ConfPaths.CHAT_TEXT_MSG_WORDS_LENGTHMSG, 1.0);
-        set(ConfPaths.CHAT_TEXT_MSG_WORDS_NOLETTER, 1.0);
+        set(ConfPaths.CHAT_TEXT_MSG_WORDS_NOLETTER, 0.0);
         // Global
         set(ConfPaths.CHAT_TEXT_GL_CHECK, true);
         set(ConfPaths.CHAT_TEXT_GL_WEIGHT, 0.5);
