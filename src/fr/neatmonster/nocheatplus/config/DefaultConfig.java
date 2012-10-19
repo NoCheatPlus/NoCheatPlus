@@ -22,7 +22,7 @@ import org.bukkit.Material;
 public class DefaultConfig extends ConfigFile {
     
     /** NCP build needed for this config. */
-    public static final int buildNumber = 158;
+    public static final int buildNumber = 162;
 
     /**
      * Instantiates a new default configuration.
