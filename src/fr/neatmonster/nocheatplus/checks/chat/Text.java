@@ -147,23 +147,37 @@ public class Text extends AsyncCheck implements INotifyReload{
 		}
 		
 		final CombinedData cData = CombinedData.getData(player);
-		final long timeout = 5000; // TODO: maybe set dynamically in data.
+		final long timeout = 8000; // TODO: maybe set dynamically in data.
 		// Repetition of last message.
         if (cc.textMsgRepeatSelf != 0f && time - data.chatLastTime < timeout){
-            if (CheckUtils.isSimilar(lcMessage, data.chatLastMessage, 0.8f)) score += cc.textMsgRepeatSelf;
+            if (CheckUtils.isSimilar(lcMessage, data.chatLastMessage, 0.8f)){
+                final float timeWeight = (float) (timeout - (time - data.chatLastTime)) / (float) timeout; 
+                score += cc.textMsgRepeatSelf * timeWeight;
+            }
         }
         // Repetition of last global message.
         if (cc.textMsgRepeatGlobal != 0f && time - lastGlobalTime < timeout){
-            if (CheckUtils.isSimilar(lcMessage, lastGlobalMessage, 0.8f)) score += cc.textMsgRepeatGlobal;
+            if (CheckUtils.isSimilar(lcMessage, lastGlobalMessage, 0.8f)){
+                final float timeWeight = (float) (timeout - (time - lastGlobalTime)) / (float) timeout; 
+                score += cc.textMsgRepeatGlobal * timeWeight;
+            }
         }
         // Repetition of last cancelled message.
 		if (cc.textMsgRepeatCancel != 0f && time - lastCancelledTime < timeout){
-		    if (CheckUtils.isSimilar(lcMessage, lastCancelledMessage, 0.8f)) score += cc.textMsgRepeatCancel;
+		    if (CheckUtils.isSimilar(lcMessage, lastCancelledMessage, 0.8f)){
+		        final float timeWeight = (float) (timeout - (time - lastCancelledTime)) / (float) timeout; 
+		        score += cc.textMsgRepeatCancel * timeWeight;
+		    }
 		}
 		// Chat quickly after join.
-		if (cc.textMsgAfterJoin != 0f && time - cData.lastJoinTime < timeout) score += cc.textMsgAfterJoin; 
+		if (cc.textMsgAfterJoin != 0f && time - cData.lastJoinTime < timeout){
+		    final float timeWeight = (float) (timeout - (time - cData.lastJoinTime)) / (float) timeout;
+		    score += cc.textMsgAfterJoin * timeWeight; 
+		}
 		// Chat without moving.
-        if (cc.textMsgNoMoving != 0f && time - cData.lastMoveTime > timeout) score += cc.textMsgNoMoving;
+        if (cc.textMsgNoMoving != 0f && time - cData.lastMoveTime > timeout){
+            score += cc.textMsgNoMoving;
+        }
 		
 		// Per word checks. -------------------
 		float wWords = 0.0f;
