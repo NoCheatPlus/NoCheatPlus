@@ -210,7 +210,7 @@ public class DefaultConfig extends ConfigFile {
         // Warning (commands + chat).
         set(ConfPaths.CHAT_WARNING_CHECK, true);
         set(ConfPaths.CHAT_WARNING_LEVEL, 67);
-        set(ConfPaths.CHAT_WARNING_MESSAGE, "&e>>>\n&e>>> &cPlease don't spam, &eyou are risking a ban, &cprobably.\n&e>>>");
+        set(ConfPaths.CHAT_WARNING_MESSAGE, "&e>>>\n&e>>> &cPlease &eslow down &cchat, &eyou might get kicked &cfor spam.\n&e>>>");
         set(ConfPaths.CHAT_WARNING_TIMEOUT, 10);
         // Relog
         set(ConfPaths.CHAT_RELOG_CHECK, true);
