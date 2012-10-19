@@ -349,6 +349,7 @@ public class BlockProperties {
 		for (final Material mat : new Material[]{
 				Material.WOOD_PLATE, Material.STONE_PLATE, 
 				Material.WALL_SIGN, Material.SIGN_POST,
+				Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
 		}){
 			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 		}
