@@ -247,6 +247,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMBINED_YAWRATE_RATE , 380);
         set(ConfPaths.COMBINED_YAWRATE_PENALTY_FACTOR, 1.0);
         set(ConfPaths.COMBINED_YAWRATE_PENALTY_MIN, 250);
+        set(ConfPaths.COMBINED_YAWRATE_PENALTY_MAX, 2000);
         set(ConfPaths.COMBINED_YAWRATE_IMPROBABLE, true);
         
         /*

@@ -62,6 +62,7 @@ public class CombinedConfig extends ACheckConfig {
 	public final boolean    yawRateImprobable;
     public final float      yawRatePenaltyFactor;
     public final int        yawRatePenaltyMin;
+    public final int        yawRatePenaltyMax;
 	
 	public CombinedConfig(final ConfigFile config) {
 	    super(config, ConfPaths.COMBINED);
@@ -109,6 +110,7 @@ public class CombinedConfig extends ACheckConfig {
 		yawRateImprobable = config.getBoolean(ConfPaths.COMBINED_YAWRATE_IMPROBABLE);
 		yawRatePenaltyFactor = (float) config.getDouble(ConfPaths.COMBINED_YAWRATE_PENALTY_FACTOR);
 		yawRatePenaltyMin = config.getInt(ConfPaths.COMBINED_YAWRATE_PENALTY_MIN);
+		yawRatePenaltyMax = config.getInt(ConfPaths.COMBINED_YAWRATE_PENALTY_MAX);
 	}
 
 	@Override
