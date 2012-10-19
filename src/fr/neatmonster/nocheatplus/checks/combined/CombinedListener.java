@@ -2,7 +2,6 @@ package fr.neatmonster.nocheatplus.checks.combined;
 
 import net.minecraft.server.EntityPlayer;
 
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -12,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
@@ -29,19 +27,6 @@ public class CombinedListener implements Listener {
 
 	public CombinedListener(){
 		this.improbable = new Improbable();
-	}
-	
-	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = false)
-	public final void onPlayerMove(final PlayerMoveEvent event){
-		final long now = System.currentTimeMillis();
-		final Player player = event.getPlayer();
-		
-		final Location loc = event.getTo(); // player.getLocation();
-		final String worldName = loc.getWorld().getName();
-		final CombinedData data = CombinedData.getData(player);
-		data.lastMoveTime = now;
-		// Just add the yaw to the list.
-		Combined.feedYawRate(player, loc.getYaw(), now, worldName, data);
 	}
 	
     /**

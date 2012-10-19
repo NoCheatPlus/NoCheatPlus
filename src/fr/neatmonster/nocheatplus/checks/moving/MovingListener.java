@@ -32,6 +32,8 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.combined.Combined;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -298,7 +300,8 @@ public class MovingListener implements Listener {
     }
 
     /**
-     * When a player moves, he will be checked for various suspicious behaviors.
+     * When a player moves, he will be checked for various suspicious behaviors.<br>
+     * (lowest priority)
      * 
      * @param event
      *            the event
@@ -445,6 +448,24 @@ public class MovingListener implements Listener {
         // location to the from location).
         event.setCancelled(false);
         event.setTo(event.getFrom().clone());
+    }
+    
+    /**
+     * Monitor level PlayerMoveEvent.
+     * @param event
+     */
+    @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = false)
+    public final void onPlayerMoveMonitor(final PlayerMoveEvent event){
+        final long now = System.currentTimeMillis();
+        final Player player = event.getPlayer();
+        final Location loc = event.getTo(); // player.getLocation();
+        final String worldName = loc.getWorld().getName();
+        
+        // Feed combined check.
+        final CombinedData data = CombinedData.getData(player);
+        data.lastMoveTime = now;
+        // Just add the yaw to the list.
+        Combined.feedYawRate(player, loc.getYaw(), now, worldName, data);
     }
 
     /**
