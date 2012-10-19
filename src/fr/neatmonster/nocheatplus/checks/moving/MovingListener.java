@@ -417,6 +417,35 @@ public class MovingListener implements Listener {
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
     }
+    
+    /**
+     * A workaround for cancelled PlayerMoveEvents.
+     * 
+     * @param event
+     *            the event
+     */
+    @EventHandler(
+            priority = EventPriority.HIGHEST)
+    public void onPlayerMoveHighest(final PlayerMoveEvent event) {
+        /*
+         *  _____  _                         __  __                
+         * |  __ \| |                       |  \/  |               
+         * | |__) | | __ _ _   _  ___ _ __  | \  / | _____   _____ 
+         * |  ___/| |/ _` | | | |/ _ \ '__| | |\/| |/ _ \ \ / / _ \
+         * | |    | | (_| | |_| |  __/ |    | |  | | (_) \ V /  __/
+         * |_|    |_|\__,_|\__, |\___|_|    |_|  |_|\___/ \_/ \___|
+         *                  __/ |                                  
+         *                 |___/                                   
+         */
+        // No typo here. I really only handle cancelled events and ignore others.
+        if (!event.isCancelled())
+            return;
+
+        // Fix a common mistake that other developers make (cancelling move events is crazy, rather set the target
+        // location to the from location).
+        event.setCancelled(false);
+        event.setTo(event.getFrom().clone());
+    }
 
     /**
      * When a player uses a portal, all information related to the moving checks becomes invalid.

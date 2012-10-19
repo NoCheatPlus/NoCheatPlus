@@ -21,7 +21,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.Workarounds;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
@@ -247,7 +246,6 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         	new FightListener(),
         	new InventoryListener(),
         	new MovingListener(),
-        	new Workarounds(),
         	new INotifyReload() {
                 @Override
                 public void onReload() {
