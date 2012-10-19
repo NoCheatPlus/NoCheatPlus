@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.checks;
+package fr.neatmonster.nocheatplus.checks.access;
 
 /**
  * Access interface for extended information about violations.

@@ -14,8 +14,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.IViolationInfo;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 
 /*
  * M"""""""`YM MM'""""'YMM MM"""""""`YM M""MMMMM""MM                   dP       

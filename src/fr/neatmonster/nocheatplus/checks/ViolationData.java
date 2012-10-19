@@ -8,6 +8,7 @@ import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
+import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 
 /*
  * M""MMMMM""M oo          dP            dP   oo                   M""""""'YMM            dP            
