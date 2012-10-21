@@ -32,7 +32,7 @@ public class ExecutionHistory {
     /**
      * Represents an entry in the execution history.
      */
-    private static class ExecutionHistoryEntry {
+    public static class ExecutionHistoryEntry {
 
         /** The execution times. */
         private final int executionTimes[];
@@ -132,13 +132,13 @@ public class ExecutionHistory {
     }
 
     /** Store data between events (time + action + action-counter). **/
-    private final Map<String, Map<Action, ExecutionHistoryEntry>> executionHistories;
+    private final Map<Action, ExecutionHistoryEntry> entries;
 
     /**
      * Instantiates a new execution history.
      */
     public ExecutionHistory() {
-        executionHistories = new HashMap<String, Map<Action, ExecutionHistoryEntry>>();
+        entries = new HashMap<Action, ExecutionHistoryEntry>();
     }
 
     /**
@@ -154,18 +154,11 @@ public class ExecutionHistory {
      * @return true, if the action is to be executed.
      */
     public boolean executeAction(final ViolationData violationData, final Action action, final long time) {
-        final String check = violationData.check.getType().getName();
 
-        Map<Action, ExecutionHistoryEntry> executionHistory = executionHistories.get(check);
-        if (executionHistory == null) {
-            executionHistory = new HashMap<Action, ExecutionHistoryEntry>();
-            executionHistories.put(check, executionHistory);
-        }
-
-        ExecutionHistoryEntry entry = executionHistory.get(action);
+        ExecutionHistoryEntry entry = entries.get(action);
         if (entry == null) {
             entry = new ExecutionHistoryEntry(60);
-            executionHistory.put(action, entry);
+            entries.put(action, entry);
         }
 
         // Update entry.
