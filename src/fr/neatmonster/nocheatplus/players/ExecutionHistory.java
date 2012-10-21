@@ -52,7 +52,7 @@ public class ExecutionHistory {
          * @param monitoredTimeFrame
          *            the monitored time frame
          */
-        private ExecutionHistoryEntry(final int monitoredTimeFrame) {
+        public ExecutionHistoryEntry(final int monitoredTimeFrame) {
             executionTimes = new int[monitoredTimeFrame];
         }
 
@@ -62,16 +62,24 @@ public class ExecutionHistory {
          * @param time
          *            the time
          */
-        private void addCounter(final long time) {
+        public void addCounter(final long time) {
             // Clear out now outdated values from the array.
+            checkCounter(time);
+
+            executionTimes[(int) (time % executionTimes.length)]++;
+            totalEntries++;
+        }
+        
+        /**
+         * Access method to adjust state to point of time.
+         * @param time
+         */
+        public void checkCounter(final long time){
             if (time - lastClearedTime > 0) {
                 // Clear the next few fields of the array.
                 clearTimes(lastClearedTime + 1, time - lastClearedTime);
                 lastClearedTime = time + 1;
             }
-
-            executionTimes[(int) (time % executionTimes.length)]++;
-            totalEntries++;
         }
 
         /**
@@ -82,7 +90,7 @@ public class ExecutionHistory {
          * @param length
          *            the length
          */
-        private void clearTimes(final long start, long length) {
+        protected void clearTimes(final long start, long length) {
             if (length <= 0)
                 // Nothing to do (yet).
                 return;
@@ -173,5 +181,36 @@ public class ExecutionHistory {
             }
 
         return false;
+    }
+    
+    /**
+     * Access API to check if the aciton would get executed.
+     * @param violationData
+     * @param action
+     * @param time
+     * @return
+     */
+    public boolean wouldExecute(final ViolationData violationData, final Action action, final long time) {
+        ExecutionHistoryEntry entry = entries.get(action);
+        if (entry == null) {
+            return action.delay <= 0;
+        }
+
+        // Update entry (not adding).
+        entry.checkCounter(time);
+
+        if (entry.getCounter() + 1 > action.delay){
+            if (entry.getLastExecution() <= time - action.repeat) return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Access method.
+     * @param action
+     * @return
+     */
+    public ExecutionHistoryEntry getEntry(final Action action){
+        return entries.get(action);
     }
 }

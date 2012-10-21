@@ -123,6 +123,18 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 		instance.executionHistories.put(type, histories);
 	}
 	
+	/**
+	 * Access method to the the execution history for check type for a player.
+	 * @param type
+	 * @param playerName Exact case for player name.
+	 * @return null if not present.
+	 */
+	public static ExecutionHistory getExecutionHistory(final CheckType type, final String playerName){
+	    final Map<String, ExecutionHistory> map = instance.executionHistories.get(type);
+        if (map != null) return map.get(playerName);
+        return null;
+	}
+	
 	public static boolean removeExecutionHistory(final CheckType type, final String playerName){
 		boolean removed = false;
 		// TODO: design ...
