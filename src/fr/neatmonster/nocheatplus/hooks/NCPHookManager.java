@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.hooks;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -49,6 +50,25 @@ public final class NCPHookManager {
 
     /** Mapping the check types to the hooks. */
     private static final Map<CheckType, List<NCPHook>> hooksByChecks = new HashMap<CheckType, List<NCPHook>>();
+    
+    private static Comparator<NCPHook> HookComparator = new Comparator<NCPHook>() {
+        @Override
+        public int compare(final NCPHook o1, final NCPHook o2) {
+            final boolean s1 = o1 instanceof IStats;
+            final boolean f1 = o1 instanceof IFirst;
+            final boolean l1 = o1 instanceof ILast;
+            final boolean s2 = o2 instanceof IStats;
+            final boolean f2 = o2 instanceof IFirst;
+            final boolean l2 = o2 instanceof ILast;
+            if      (s1 && !s2) return l1 ? 1 : -1;
+            else if (!s1 && s2) return l2 ? -1 : 1;
+            else if (l2)        return -1;
+            else if (l1)        return 1;
+            else if (f1)        return -1;
+            else if (f2)        return 1;
+            else                return 0;
+        }
+    };
 
     static{
     	// Fill the map to be sure that thread safety can be guaranteed.
@@ -105,11 +125,12 @@ public final class NCPHookManager {
     private static void addToMapping(final CheckType checkType, final NCPHook hook) {
         final List<NCPHook> hooks = hooksByChecks.get(checkType);
         if (!hooks.contains(hook)){
-            if (hook instanceof IStats) hooks.add(0, hook);
+            if (!(hook instanceof ILast) && (hook instanceof IStats || hook instanceof IFirst)) hooks.add(0, hook);
             else hooks.add(hook);
+            Collections.sort(hooks, HookComparator);
         }
     }
-
+    
     /**
      * Add hook to the hooksByChecks mappings.<br>
      * Assumes that the hook already has been registered in the allHooks map.
