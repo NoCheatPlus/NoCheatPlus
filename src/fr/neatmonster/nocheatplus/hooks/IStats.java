@@ -7,5 +7,5 @@ package fr.neatmonster.nocheatplus.hooks;
  * @author mc_dev
  *
  */
-public class IStats {
+public interface IStats {
 }
