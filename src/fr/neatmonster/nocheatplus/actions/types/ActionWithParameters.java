@@ -28,7 +28,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
  */
 public abstract class ActionWithParameters extends Action {
     /** The parts of the message. */
-    private final ArrayList<Object> messageParts;
+    protected final ArrayList<Object> messageParts;
 
     /**
      * Instantiates a new action with parameters.
@@ -83,7 +83,7 @@ public abstract class ActionWithParameters extends Action {
      * @param message
      *            the message
      */
-    private void parseMessage(final String message) {
+    protected void parseMessage(final String message) {
         final String parts[] = message.split("\\[", 2);
 
         // No opening braces left.

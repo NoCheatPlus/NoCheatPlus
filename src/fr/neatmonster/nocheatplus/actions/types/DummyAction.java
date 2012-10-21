@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
  */
 public class DummyAction extends Action {
     /** The original string used for this action definition. */
-    private final String definition;
+    protected final String definition;
 
     /**
      * Instantiates a new dummy.

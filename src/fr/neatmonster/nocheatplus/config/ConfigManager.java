@@ -18,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.MemoryConfiguration;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.actions.ActionFactory;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /*
@@ -93,6 +94,43 @@ public class ConfigManager {
 
     /** The log file. */
     public static File                           logFile     = null;
+    
+    public static interface ActionFactoryFactory{
+        public ActionFactory newActionFactory(Map<String, Object> library);
+    }
+    
+    private static ActionFactoryFactory actionFactoryFactory = new ActionFactoryFactory() {
+        @Override
+        public final ActionFactory newActionFactory(final Map<String, Object> library) {
+            return new ActionFactory(library);
+        }
+    };
+    
+    /**
+     * Factory method.
+     * @param library
+     * @return
+     */
+    public static ActionFactory getActionFactory(final Map<String, Object> library){
+        return actionFactoryFactory.newActionFactory(library);
+    }
+    
+    /**
+     * Set the factory to get actions from.
+     * @param factory
+     */
+    public static void setActionFactoryFactory(ActionFactoryFactory factory){
+        if (factory != null) actionFactoryFactory = factory;
+        else actionFactoryFactory = new ActionFactoryFactory() {
+            @Override
+            public final ActionFactory newActionFactory(final Map<String, Object> library) {
+                return new ActionFactory(library);
+            }
+        };
+        for (final ConfigFile config : worldsMap.values()){
+            config.regenerateActionLists();
+        }
+    }
 
     /**
      * Cleanup.
@@ -103,6 +141,7 @@ public class ConfigManager {
         final Logger logger = Logger.getLogger("NoCheatPlus");
         logger.removeHandler(fileHandler);
         fileHandler = null;
+        setActionFactoryFactory(null);
     }
 
     /**

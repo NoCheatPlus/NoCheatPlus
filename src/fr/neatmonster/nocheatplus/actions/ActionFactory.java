@@ -25,7 +25,7 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
  * Helps with creating Actions out of text string definitions.
  */
 public class ActionFactory {
-    private static final Map<String, Object> lib = new HashMap<String, Object>();
+    protected static final Map<String, Object> lib = new HashMap<String, Object>();
 
     /**
      * Instantiates a new action factory.
@@ -133,7 +133,7 @@ public class ActionFactory {
      *            the definition
      * @return the action
      */
-    private Action parseCmdAction(final String definition) {
+    protected Action parseCmdAction(final String definition) {
         final String[] parts = definition.split(":");
         final String name = parts[0];
         final Object command = lib.get(parts[0]);
@@ -165,7 +165,7 @@ public class ActionFactory {
      *            the definition
      * @return the action
      */
-    private Action parseLogAction(final String definition) {
+    protected Action parseLogAction(final String definition) {
         final String[] parts = definition.split(":");
         final String name = parts[0];
         final Object message = lib.get(parts[0]);

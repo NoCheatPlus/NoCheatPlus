@@ -27,13 +27,13 @@ import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 public class LogAction extends ActionWithParameters {
     // Some flags to decide where the log message should show up, based on the configuration file.
     /** Log to chat? */
-    private final boolean toChat;
+    public final boolean toChat;
 
     /** Log to console? */
-    private final boolean toConsole;
+    public final boolean toConsole;
 
     /** Log to file? */
-    private final boolean toFile;
+    public final boolean toFile;
 
     /**
      * Instantiates a new log action.
@@ -59,6 +59,7 @@ public class LogAction extends ActionWithParameters {
         this.toChat = toChat;
         this.toConsole = toConsole;
         this.toFile = toFile;
+        // TODO: already use && flagfromconfig.
     }
 
     /* (non-Javadoc)

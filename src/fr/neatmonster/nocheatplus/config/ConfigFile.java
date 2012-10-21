@@ -111,7 +111,7 @@ public class ConfigFile extends YamlConfiguration {
      * Do this after reading new data.
      */
     public void regenerateActionLists() {
-        factory = new ActionFactory(((MemorySection) this.get(ConfPaths.STRINGS)).getValues(false));
+        factory = ConfigManager.getActionFactory(((MemorySection) this.get(ConfPaths.STRINGS)).getValues(false));
     }
 
     /* (non-Javadoc)
