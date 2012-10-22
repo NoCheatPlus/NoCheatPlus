@@ -328,7 +328,7 @@ public class MovingListener implements Listener {
         if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle()){
             // TODO: move somewhere else (monitor)
             // TODO: 
-            MovingData.getData(player).resetPositions(event.getTo());
+            MovingData.getData(player).resetPositions(to);
             return;
         }
         
@@ -458,14 +458,14 @@ public class MovingListener implements Listener {
     public final void onPlayerMoveMonitor(final PlayerMoveEvent event){
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
-        final Location loc = event.getTo(); // player.getLocation();
-        final String worldName = loc.getWorld().getName();
+        final Location to = event.getTo(); // player.getLocation();
+        final String worldName = to.getWorld().getName();
         
         // Feed combined check.
         final CombinedData data = CombinedData.getData(player);
         data.lastMoveTime = now;
         // Just add the yaw to the list.
-        Combined.feedYawRate(player, loc.getYaw(), now, worldName, data);
+        Combined.feedYawRate(player, to.getYaw(), now, worldName, data);
     }
 
     /**
