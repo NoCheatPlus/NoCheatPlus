@@ -326,9 +326,6 @@ public class MovingListener implements Listener {
         final Location from = event.getFrom();
         final Location to = event.getTo();
         if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle()){
-            // TODO: move somewhere else (monitor)
-            // TODO: 
-            MovingData.getData(player).resetPositions(to);
             return;
         }
         
@@ -336,7 +333,6 @@ public class MovingListener implements Listener {
         final MoveInfo moveInfo;
         final PlayerLocation pFrom, pTo;
         if (parkedInfo.isEmpty()) moveInfo = new MoveInfo();
-        
         else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
         pFrom = moveInfo.from;
         pTo = moveInfo.to;
@@ -346,6 +342,7 @@ public class MovingListener implements Listener {
         
         final MovingData data = MovingData.getData(player);
         data.noFallAssumeGround = false;
+        data.teleported = null;
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
@@ -427,8 +424,7 @@ public class MovingListener implements Listener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerMoveHighest(final PlayerMoveEvent event) {
         /*
          *  _____  _                         __  __                
@@ -464,8 +460,18 @@ public class MovingListener implements Listener {
         // Feed combined check.
         final CombinedData data = CombinedData.getData(player);
         data.lastMoveTime = now;
+        
         // Just add the yaw to the list.
         Combined.feedYawRate(player, to.getYaw(), now, worldName, data);
+        
+        final Location from = event.getFrom();
+        // TODO: Might enforce data.teleported (!).
+        
+        // TODO: maybe even not count vehicles at all ?
+        if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle()){
+            MovingData.getData(player).resetPositions(to);
+            return;
+        }
     }
 
     /**
