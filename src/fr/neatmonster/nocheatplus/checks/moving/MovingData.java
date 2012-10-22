@@ -178,7 +178,8 @@ public class MovingData extends ACheckData {
     }
     
     public void resetPositions(final Location loc){
-        resetPositions(loc.getX(), loc.getY(), loc.getZ());
+        if (loc == null) resetPositions(Double.MAX_VALUE, 0, 0);
+        else resetPositions(loc.getX(), loc.getY(), loc.getZ());
     }
 
     public void resetPositions(final double x, final double y, final double z) {
