@@ -151,6 +151,22 @@ public class NoFall extends Check {
         }
         
     }
+    
+    /**
+     * Quit or kick: adjust fall distance if necessary.
+     * @param player
+     */
+    public void onLeave(final Player player) {
+        final MovingData data = MovingData.getData(player);
+        final float fallDistance = player.getFallDistance();
+        if (data.noFallFallDistance - fallDistance > 0){
+            // Might use tolerance, might log, might use method (compare: MovingListener.onEntityDamage).
+            // Might consider triggering violations here as well.
+            final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
+            final float maxDist = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
+            player.setFallDistance(maxDist);
+        }
+    }
 
     @Override
 	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
