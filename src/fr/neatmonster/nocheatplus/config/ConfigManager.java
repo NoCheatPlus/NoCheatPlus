@@ -131,6 +131,10 @@ public class ConfigManager {
             config.regenerateActionLists();
         }
     }
+    
+    public static ActionFactoryFactory getActionFactoryFactory(){
+        return actionFactoryFactory;
+    }
 
     /**
      * Cleanup.
