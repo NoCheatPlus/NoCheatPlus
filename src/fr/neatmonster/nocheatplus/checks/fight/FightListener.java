@@ -248,8 +248,11 @@ public class FightListener implements Listener {
          *                        |___/                              
          */
         // Only interested in dying players.
-        if (event.getEntity() instanceof Player)
-            godMode.death((Player) event.getEntity());
+        final Entity entity = event.getEntity();
+        if (entity instanceof Player){
+            final Player player = (Player) entity;
+            if (godMode.isEnabled(player)) godMode.death(player);
+        }
     }
 
     /**

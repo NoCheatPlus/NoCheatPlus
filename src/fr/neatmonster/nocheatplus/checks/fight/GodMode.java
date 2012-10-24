@@ -99,20 +99,18 @@ public class GodMode extends Check {
         // First check if the player is really dead (e.g. another plugin could have just fired an artificial event).
         if (player.getHealth() <= 0 && player.isDead())
             try {
-                final EntityPlayer entity = ((CraftPlayer) player).getHandle();
-
                 // Schedule a task to be executed in roughly 1.5 seconds.
                 final NoCheatPlus plugin = (NoCheatPlus) Bukkit.getPluginManager().getPlugin("NoCheatPlus");
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
                     @Override
                     public void run() {
                         try {
+                            final EntityPlayer entity = ((CraftPlayer) player).getHandle();
                             // Check again if the player should be dead, and if the game didn't mark him as dead.
                             if (entity.getHealth() <= 0 && !entity.dead) {
                                 // Artificially "kill" him.
                                 entity.deathTicks = 19;
-                                entity.g();
+                                entity.dead = true;
                             }
                         } catch (final Exception e) {}
                     }
