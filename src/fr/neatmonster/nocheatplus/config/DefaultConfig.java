@@ -22,7 +22,7 @@ import org.bukkit.Material;
 public class DefaultConfig extends ConfigFile {
     
     /** NCP build needed for this config. */
-    public static final int buildNumber = 169;
+    public static final int buildNumber = 173;
 
     /**
      * Instantiates a new default configuration.
@@ -83,7 +83,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 90);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL, 100);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>500 log:fastbreak:3:5:cif cancel");
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>0 log:fastbreak:3:5:cif cancel");
         
         set(ConfPaths.BLOCKBREAK_FREQUENCY_CHECK, true);
         set(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_CREATIVE, 95);

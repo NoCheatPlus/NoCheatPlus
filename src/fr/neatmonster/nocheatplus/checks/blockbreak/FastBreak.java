@@ -76,8 +76,9 @@ public class FastBreak extends Check {
     		// Only raise a violation, if the total penalty score exceeds the contention duration (for lag, delay).
     		if (data.fastBreakPenalties.getScore(cc.fastBreakBucketFactor) > cc.fastBreakBucketContention){
     			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
-    			data.fastBreakVL += missingTime;
-    			final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, missingTime, cc.fastBreakActions);
+    		    final double vlAdded = (double) missingTime / 1000.0;
+    			data.fastBreakVL += vlAdded;
+    			final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, vlAdded, cc.fastBreakActions);
     			if (vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + id);
     			cancel = executeActions(vd);
     		}
