@@ -706,10 +706,19 @@ public class BlockProperties {
 				// This seems roughly correct.
 				for (int i = 0; i < efficiency; i++){
 					duration /= 1.33; // Matches well with obsidian.
-				}	
+				}
+				// More Workarounds:
+				if (toolProps.materialBase == MaterialBase.WOOD){
+				    if (blockId == Material.LOG.getId()) duration -= efficiency >= 4 ? 250 : 400;
+				    else if (blockProps.tool.toolType == toolProps.toolType) duration -= 250;
+				    else duration -= efficiency * 30;
+                }
+				else if (toolProps.materialBase == MaterialBase.STONE){
+				    if (blockId == Material.LOG.getId()) duration -= 100;
+                }
 			}
 		}
-		return duration;
+		return Math.max(0, duration);
 	}
 	
 	/**
