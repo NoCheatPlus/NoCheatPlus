@@ -22,7 +22,7 @@ import org.bukkit.Material;
 public class DefaultConfig extends ConfigFile {
     
     /** NCP build needed for this config. */
-    public static final int buildNumber = 164;
+    public static final int buildNumber = 169;
 
     /**
      * Instantiates a new default configuration.
@@ -434,8 +434,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, Arrays.asList(
                 Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(), 
                 Material.PISTON_EXTENSION.name(), 
-                Material.PISTON_MOVING_PIECE.name(), // TODO: ?
-                Material.LADDER.name()
+                Material.PISTON_MOVING_PIECE.name() // TODO: ?
         ));
         
         // Update internal factory based on all the new entries to the "actions" section.

@@ -355,6 +355,7 @@ public class BlockProperties {
 				Material.WOOD_PLATE, Material.STONE_PLATE, 
 				Material.WALL_SIGN, Material.SIGN_POST,
 				Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+				Material.LADDER,
 		}){
 			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 		}
