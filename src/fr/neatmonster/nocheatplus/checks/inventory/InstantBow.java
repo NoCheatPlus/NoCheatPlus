@@ -1,9 +1,11 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
  * M""M                     dP                       dP   M#"""""""'M                      
@@ -40,6 +42,7 @@ public class InstantBow extends Check {
     	final long time = System.currentTimeMillis();
     	
         final InventoryData data = InventoryData.getData(player);
+        final InventoryConfig cc = InventoryConfig.getConfig(player);
 
         boolean cancel = false;
 
@@ -61,7 +64,11 @@ public class InstantBow extends Check {
             // Execute whatever actions are associated with this check and the
             // violation level and find out if we should cancel the event
             cancel = executeActions(player, data.instantBowVL, difference,
-                    InventoryConfig.getConfig(player).instantBowActions);
+                    cc.instantBowActions);
+        }
+        
+        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+            player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow force: " + force);
         }
 
         return cancel;
