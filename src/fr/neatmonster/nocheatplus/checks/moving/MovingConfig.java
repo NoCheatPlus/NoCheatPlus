@@ -80,7 +80,7 @@ public class MovingConfig extends ACheckConfig {
 
     public final boolean    noFallCheck;
     public final boolean    noFallDealDamage;
-    public final ActionList noFallActions;
+//    public final ActionList noFallActions;
     
 	public final boolean    passableCheck;
 	public final ActionList passableActions;
@@ -129,7 +129,7 @@ public class MovingConfig extends ACheckConfig {
 
         noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
         noFallDealDamage = data.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
-        noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
+//        noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
         
         passableCheck = data.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
         passableActions = data.getActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
