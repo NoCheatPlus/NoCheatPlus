@@ -70,6 +70,9 @@ public class ActionFactory {
      */
     public ActionList createActionList(final String definition, final String permission) {
         final ActionList list = new ActionList(permission);
+        
+        // Do check for null, to allow removing default actions, for better robustness.
+        if (definition == null) return list;
 
         boolean first = true;
 
