@@ -417,6 +417,7 @@ public abstract class ConfPaths {
 
     private static final String INVENTORY_INSTANTBOW                     = INVENTORY + "instantbow.";
     public static final String  INVENTORY_INSTANTBOW_CHECK               = INVENTORY_INSTANTBOW + "active";
+    public static final String  INVENTORY_INSTANTBOW_DELAY               = INVENTORY_INSTANTBOW + "delay";
     public static final String  INVENTORY_INSTANTBOW_ACTIONS             = INVENTORY_INSTANTBOW + "actions";
 
     private static final String INVENTORY_INSTANTEAT                     = INVENTORY + "instanteat.";

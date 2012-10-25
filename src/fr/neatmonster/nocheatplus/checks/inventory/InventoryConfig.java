@@ -73,18 +73,19 @@ public class InventoryConfig extends ACheckConfig {
 		return worldsMap.get(player.getWorld().getName());
 	}
 
-	public final boolean dropCheck;
-	public final int dropLimit;
-	public final long dropTimeFrame;
+	public final boolean    dropCheck;
+	public final int        dropLimit;
+	public final long       dropTimeFrame;
 	public final ActionList dropActions;
 
-	public final boolean fastClickCheck;
+	public final boolean    fastClickCheck;
 	public final ActionList fastClickActions;
 
-	public final boolean instantBowCheck;
+	public final boolean    instantBowCheck;
+    public final long       instantBowDelay;
 	public final ActionList instantBowActions;
 
-	public final boolean instantEatCheck;
+	public final boolean    instantEatCheck;
 	public final ActionList instantEatActions;
 
 	/**
@@ -107,6 +108,7 @@ public class InventoryConfig extends ACheckConfig {
 				Permissions.INVENTORY_FASTCLICK);
 
 		instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
+		instantBowDelay = data.getInt(ConfPaths.INVENTORY_INSTANTBOW_DELAY);
 		instantBowActions = data.getActionList(
 				ConfPaths.INVENTORY_INSTANTBOW_ACTIONS,
 				Permissions.INVENTORY_INSTANTBOW);

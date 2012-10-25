@@ -82,9 +82,9 @@ public class InventoryData extends ACheckData {
     public long     fastClickLastTime;
 
     // Data of the instant bow check.
-    public long     instantBowLastTime;
+    public long     instantBowInteractTime;
 
     // Data of the instant eat check.
     public Material instantEatFood;
-    public long     instantEatLastTime;
+    public long     instantEatInteract;
 }

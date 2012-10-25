@@ -13,6 +13,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
@@ -77,15 +79,19 @@ public class InventoryListener implements Listener {
             if (instantBow.isEnabled(player)){
                 final long now = System.currentTimeMillis();
                 final Location loc = player.getLocation();
-                if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName()))
+                if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())){
+                    // No else if with this, could be cancelled due to other checks feeding, does not have actions.
                     event.setCancelled(true);
-                // Still check instantBow.
-            	if (instantBow.check(player, event.getForce()))
-            		 // The check requested the event to be cancelled.
+                }
+                // Still check instantBow, whatever yawrate says.
+            	if (instantBow.check(player, event.getForce(), now)){
+            	    // The check requested the event to be cancelled.
+            	    event.setCancelled(true);
+            	}
+            	else if (Improbable.check(player, 1f, now)){
+                    // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
                     event.setCancelled(true);
-            	else if (Improbable.check(player, 1f, now))
-            		// COmbined fighting speed.
-                	event.setCancelled(true);
+            	}
             }  
         }
     }
@@ -191,8 +197,7 @@ public class InventoryListener implements Listener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onPlayerInteractEvent(final PlayerInteractEvent event) {
         /*
          *  ____  _                         ___       _                      _   
@@ -203,24 +208,43 @@ public class InventoryListener implements Listener {
          *                |___/                                                  
          */
         // Only interested in right-clicks while holding an item.
-        if (!event.hasItem()
-                || !(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK))
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK)
             return;
 
         final InventoryData data = InventoryData.getData(event.getPlayer());
-
-        if (event.getItem().getType() == Material.BOW)
-            // It was a bow, the player starts to pull the string, remember this time.
-            data.instantBowLastTime = System.currentTimeMillis();
-        else if (event.getItem().getType().isEdible()) {
-            // It was food, the player starts to eat some food, remember this time and the type of food.
-            data.instantEatFood = event.getItem().getType();
-            data.instantEatLastTime = System.currentTimeMillis();
-        } else {
+        
+        boolean resetAll = false;
+        
+        
+        if (event.hasItem()){
+            final ItemStack item = event.getItem();
+            final Material type = item.getType();
+            if (type == Material.BOW)
+                // It was a bow, the player starts to pull the string, remember this time.
+                data.instantBowInteractTime = System.currentTimeMillis();
+            else if (type.isEdible()) {
+                // It was food, the player starts to eat some food, remember this time and the type of food.
+                data.instantEatFood = type;
+                data.instantEatInteract = System.currentTimeMillis();
+                data.instantBowInteractTime = 0;
+            } else resetAll = true;
+        }
+        else resetAll = true;
+        
+        if (resetAll){
             // Nothing that we are interested in, reset data.
-            data.instantBowLastTime = 0;
-            data.instantEatLastTime = 0;
+            data.instantBowInteractTime = 0;
+            data.instantEatInteract = 0;
             data.instantEatFood = null;
         }
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onItemHeldChange(final PlayerItemHeldEvent event){
+        final Player player = event.getPlayer();
+        final InventoryData data = InventoryData.getData(player);
+        data.instantBowInteractTime = 0;
+        data.instantEatInteract = 0;
+        data.instantEatFood = null;
     }
 }

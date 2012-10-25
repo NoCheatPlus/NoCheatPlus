@@ -52,14 +52,15 @@ public class InstantEat extends Check {
             return false;
 
         // Rough estimation about how long it should take to eat
-        final long expectedTimeWhenEatingFinished = Math.max(data.instantEatLastTime, data.fastClickLastTime) + 700L;
+        final long expectedTimeWhenEatingFinished = Math.max(data.instantEatInteract, data.fastClickLastTime) + 700L;
 
-        if (expectedTimeWhenEatingFinished < time)
+        if (data.instantEatInteract > 0 && expectedTimeWhenEatingFinished < time){
             // Acceptable, reduce VL to reward the player.
             data.instantEatVL *= 0.6D;
-        else if (data.instantEatLastTime > time)
-            // Security test, if time ran backwards, reset.
-            data.instantEatLastTime = 0;
+        }
+        else if (data.instantEatInteract > time){
+            // Security test, if time ran backwards.
+        }
         else {
             final double difference = (expectedTimeWhenEatingFinished - time) / 100D;
 
@@ -71,6 +72,8 @@ public class InstantEat extends Check {
             cancel = executeActions(player, data.instantEatVL, difference,
                     InventoryConfig.getConfig(player).instantEatActions);
         }
+        
+        data.instantEatInteract = 0;
 
         return cancel;
     }

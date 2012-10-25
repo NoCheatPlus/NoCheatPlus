@@ -20,6 +20,8 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * The InstantBow check will find out if a player pulled the string of his bow too fast.
  */
 public class InstantBow extends Check {
+    
+    private static final float maxTime = 800f;
 
     /**
      * Instantiates a new instant bow check.
@@ -37,9 +39,7 @@ public class InstantBow extends Check {
      *            the force
      * @return true, if successful
      */
-    public boolean check(final Player player, final float force) {
-    	// Take time once.
-    	final long time = System.currentTimeMillis();
+    public boolean check(final Player player, final float force, final long now) {
     	
         final InventoryData data = InventoryData.getData(player);
         final InventoryConfig cc = InventoryConfig.getConfig(player);
@@ -47,16 +47,22 @@ public class InstantBow extends Check {
         boolean cancel = false;
 
         // Rough estimation of how long pulling the string should've taken.
-        final long expectedTimeWhenStringDrawn = data.instantBowLastTime + (int) (force * force * 700F);
+        final long expectedPullDuration = (long) (maxTime - maxTime * (1f - force) * (1f - force)) - cc.instantBowDelay;
+        
+        // Time taken to pull the string.
+        final long pullDuration = now - data.instantBowInteractTime;
 
-        if (expectedTimeWhenStringDrawn < time)
+        if (data.instantBowInteractTime > 0 && pullDuration >= expectedPullDuration){
             // The player was slow enough, reward him by lowering his violation level.
             data.instantBowVL *= 0.9D;
-        else if (data.instantBowLastTime > time)
-            // Security check if time ran backwards, reset
-            data.instantBowLastTime = 0L;
+        }
+        else if (data.instantBowInteractTime > now){
+            // Security check if time ran backwards.
+            // TODO: Maybe this can be removed, though TickTask does not reset at the exact moment.
+        }
         else {
-            final double difference = (expectedTimeWhenStringDrawn - time) / 100D;
+            // TODO: Consider: Allow one time but set yawrate penalty time ?
+            final double difference = (expectedPullDuration - pullDuration) / 100D;
 
             // Player was too fast, increase his violation level.
             data.instantBowVL += difference;
@@ -68,8 +74,11 @@ public class InstantBow extends Check {
         }
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-            player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow force: " + force);
+            player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", pull time: " + pullDuration + "(" + expectedPullDuration +")");
         }
+        
+        // Reset data here.
+        data.instantBowInteractTime = 0;
 
         return cancel;
     }
