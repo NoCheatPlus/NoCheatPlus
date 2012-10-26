@@ -219,21 +219,24 @@ public class InventoryListener implements Listener {
         if (event.hasItem()){
             final ItemStack item = event.getItem();
             final Material type = item.getType();
-            if (type == Material.BOW)
+            if (type == Material.BOW){
+                final long now = System.currentTimeMillis();
                 // It was a bow, the player starts to pull the string, remember this time.
-                data.instantBowInteractTime = System.currentTimeMillis();
+                data.instantBowInteract = (data.instantBowInteract > 0 && now - data.instantBowInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantBowInteract) : System.currentTimeMillis();
+            }
             else if (type.isEdible()) {
+                final long now = System.currentTimeMillis();
                 // It was food, the player starts to eat some food, remember this time and the type of food.
                 data.instantEatFood = type;
-                data.instantEatInteract = System.currentTimeMillis();
-                data.instantBowInteractTime = 0;
+                data.instantEatInteract = (data.instantEatInteract > 0 && now - data.instantEatInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantEatInteract) : System.currentTimeMillis();
+                data.instantBowInteract = 0;
             } else resetAll = true;
         }
         else resetAll = true;
         
         if (resetAll){
             // Nothing that we are interested in, reset data.
-            data.instantBowInteractTime = 0;
+            data.instantBowInteract = 0;
             data.instantEatInteract = 0;
             data.instantEatFood = null;
         }
@@ -243,7 +246,7 @@ public class InventoryListener implements Listener {
     public void onItemHeldChange(final PlayerItemHeldEvent event){
         final Player player = event.getPlayer();
         final InventoryData data = InventoryData.getData(player);
-        data.instantBowInteractTime = 0;
+        data.instantBowInteract = 0;
         data.instantEatInteract = 0;
         data.instantEatFood = null;
     }

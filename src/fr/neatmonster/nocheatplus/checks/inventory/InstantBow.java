@@ -50,13 +50,13 @@ public class InstantBow extends Check {
         final long expectedPullDuration = (long) (maxTime - maxTime * (1f - force) * (1f - force)) - cc.instantBowDelay;
         
         // Time taken to pull the string.
-        final long pullDuration = now - data.instantBowInteractTime;
+        final long pullDuration = now - data.instantBowInteract;
 
-        if (data.instantBowInteractTime > 0 && pullDuration >= expectedPullDuration){
+        if (data.instantBowInteract > 0 && pullDuration >= expectedPullDuration){
             // The player was slow enough, reward him by lowering his violation level.
             data.instantBowVL *= 0.9D;
         }
-        else if (data.instantBowInteractTime > now){
+        else if (data.instantBowInteract > now){
             // Security check if time ran backwards.
             // TODO: Maybe this can be removed, though TickTask does not reset at the exact moment.
         }
@@ -78,7 +78,7 @@ public class InstantBow extends Check {
         }
         
         // Reset data here.
-        data.instantBowInteractTime = 0;
+        data.instantBowInteract = 0;
 
         return cancel;
     }
