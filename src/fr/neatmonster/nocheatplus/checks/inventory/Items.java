@@ -1,5 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import java.util.HashSet;
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -29,9 +32,10 @@ public class Items extends Check{
         // Fastest checks first.
         // TODO: Make stuff configurable.
         if (type == Material.WRITTEN_BOOK){
-            if (!stack.getEnchantments().isEmpty() && instance.isEnabled(player)){
+            final Map<Enchantment, Integer> enchantments = stack.getEnchantments();
+            if (enchantments != null && !enchantments.isEmpty() && instance.isEnabled(player)){
                 // TODO: differentiate sub checks maybe or add extra permissions, later.
-                for (final Enchantment ench : stack.getEnchantments().keySet()){
+                for (final Enchantment ench : new HashSet<Enchantment>(enchantments.keySet())){
                     stack.removeEnchantment(ench);
                 }
                 // TODO: actions and similar.

@@ -57,6 +57,8 @@ public class InventoryListener implements Listener {
 
     /** The instant eat check. */
     private final InstantEat instantEat = new InstantEat();
+    
+    protected final Items items = new Items();
 
     /**
      * We listen to EntityShootBow events for the InstantBow check.
