@@ -63,42 +63,21 @@ public class FightListener implements Listener {
     private final Speed       speed       = new Speed();
 
     /**
-     * There is an unofficial agreement that if a plugin wants an attack to not get checked by NoCheatPlus, it either
-     * has to use a damage type different from ENTITY_ATTACK or fire an event with damage type CUSTOM and damage 0
-     * directly before the to-be-ignored event.
-     * 
-     * @param event
-     *            the event
-     */
-    private void handleCustomDamage(final EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player)
-            // Skip the next damage event, because it is with high probability something from the Heroes plugin.
-            FightData.getData((Player) event.getDamager()).skipNext = true;
-    }
-
-    /**
      * A player attacked something with DamageCause ENTITY_ATTACK. That's most likely what we want to really check.
      * 
      * @param event
      *            The EntityDamageByEntityEvent
+     * @return 
      */
-    private void handleNormalDamage(final EntityDamageByEntityEvent event) {
-        final Player player = (Player) event.getDamager();
+    private boolean handleNormalDamage(final Player player, final Entity cbEntity) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
-
-        // For some reason we decided to skip this event anyway.
-        if (data.skipNext) {
-            data.skipNext = false;
-            return;
-        }
         
         boolean cancelled = false;
         
         final String worldName = player.getWorld().getName();
         
         // Check for self hit exploits (mind that projectiles should be excluded)
-        final Entity cbEntity = event.getEntity();
         if (cbEntity instanceof Player){
         	final Player damagedPlayer = (Player) cbEntity;
         	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc))
@@ -161,12 +140,9 @@ public class FightListener implements Listener {
 
         if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
             cancelled = true;
-
-        // One of the checks requested the event to be cancelled, so do it.
-        if (cancelled)
-            event.setCancelled(cancelled);
         
         data.lastWorld = worldName;
+        return cancelled;
     }
 
     /**
@@ -191,15 +167,15 @@ public class FightListener implements Listener {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
             final Entity damaged = e.getEntity();
         	if (damaged instanceof Player){
+        	    // TODO: check once more when to set this (!) in terms of order.
         		FightData.getData((Player) damaged).damageTakenTick = TickTask.getTick();
         	}
-        	
-            if (e.getDamager() instanceof Player){
+        	final Entity damager = e.getDamager();
+            if (damager instanceof Player){
+                final Player player = (Player) damager;
                 if (e.getCause() == DamageCause.ENTITY_ATTACK){
-                	handleNormalDamage(e);
+                	if (handleNormalDamage(player, damaged)) e.setCancelled(true);
                 }
-                else if (e.getCause() == DamageCause.CUSTOM)
-                    handleCustomDamage(e);
             }
         }
     }
