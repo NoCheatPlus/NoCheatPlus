@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -17,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -78,9 +78,8 @@ public class FightListener implements Listener {
         // Hotfix attempt for enchanted books.
         // TODO: maybe a generaluzed version for the future...
         final ItemStack stack = player.getItemInHand();
-        if (stack != null && stack.getType() == Material.WRITTEN_BOOK){
-            if (!stack.getEnchantments().isEmpty()) return true;
-        }
+        // Illegal enchantments hotfix check.
+        if (Items.checkIllegalEnchantments(player, stack)) return true;
         
         boolean cancelled = false;
         

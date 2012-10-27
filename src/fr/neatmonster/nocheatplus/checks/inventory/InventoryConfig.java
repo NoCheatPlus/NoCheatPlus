@@ -88,6 +88,8 @@ public class InventoryConfig extends ACheckConfig {
 	public final boolean    instantEatCheck;
 	public final ActionList instantEatActions;
 
+    public final boolean    itemsCheck;
+
 	/**
 	 * Instantiates a new inventory configuration.
 	 * 
@@ -117,6 +119,8 @@ public class InventoryConfig extends ACheckConfig {
 		instantEatActions = data.getActionList(
 				ConfPaths.INVENTORY_INSTANTEAT_ACTIONS,
 				Permissions.INVENTORY_INSTANTEAT);
+		
+		itemsCheck = data.getBoolean(ConfPaths.INVENTORY_ITEMS_CHECK);
 	}
 
 	/*
@@ -137,6 +141,8 @@ public class InventoryConfig extends ACheckConfig {
 			return instantBowCheck;
 		case INVENTORY_INSTANTEAT:
 			return instantEatCheck;
+		case INVENTORY_ITEMS:
+		    return itemsCheck;
 		default:
 			return true;
 		}

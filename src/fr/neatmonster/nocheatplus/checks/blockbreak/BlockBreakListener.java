@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -77,7 +78,12 @@ public class BlockBreakListener implements Listener {
          * | |_) | | (_) | (__|   <  | |_) | | |  __/ (_| |   < 
          * |____/|_|\___/ \___|_|\_\ |____/|_|  \___|\__,_|_|\_\
          */
-//    	System.out.println("Break("+event.isCancelled()+"): " + event.getBlock());
+        
+        final Player player = event.getPlayer();
+        
+        // Illegal enchantments hotfix check.
+        if (Items.checkIllegalEnchantments(player, player.getItemInHand())) event.setCancelled(true);
+        
     	// Cancelled events only leads to resetting insta break.
     	if (event.isCancelled()){
     		isInstaBreak = false;
@@ -86,7 +92,7 @@ public class BlockBreakListener implements Listener {
     	
     	// TODO: maybe invalidate instaBreak on some occasions.
     	
-        final Player player = event.getPlayer();
+
         final Block block = event.getBlock();
 
         boolean cancelled = false;

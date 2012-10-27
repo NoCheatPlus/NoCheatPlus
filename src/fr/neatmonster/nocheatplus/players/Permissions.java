@@ -154,6 +154,7 @@ public class Permissions {
     public static final String  INVENTORY_FASTCLICK          = INVENTORY + ".fastclick";
     public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
     public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
+    public static final String  INVENTORY_ITEMS              = INVENTORY + ".items";
 
     /*
      *     e   e                         ,e,                  

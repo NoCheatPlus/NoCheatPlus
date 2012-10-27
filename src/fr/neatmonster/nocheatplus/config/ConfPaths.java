@@ -423,6 +423,9 @@ public abstract class ConfPaths {
     private static final String INVENTORY_INSTANTEAT                     = INVENTORY + "instanteat.";
     public static final String  INVENTORY_INSTANTEAT_CHECK               = INVENTORY_INSTANTEAT + "active";
     public static final String  INVENTORY_INSTANTEAT_ACTIONS             = INVENTORY_INSTANTEAT + "actions";
+    
+    private static final String INVENTORY_ITEMS                          = INVENTORY + ".items";
+    public static final String  INVENTORY_ITEMS_CHECK                    = INVENTORY_ITEMS + ".active";
 
     /*
      *     e   e                         ,e,                  

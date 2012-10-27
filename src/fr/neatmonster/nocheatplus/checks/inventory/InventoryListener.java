@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.inventory;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,6 +16,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
@@ -143,6 +145,12 @@ public class InventoryListener implements Listener {
          */
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
+            
+            // Illegal enchantments hotfixes
+            if (Items.checkIllegalEnchantments(player, event.getCurrentItem())) event.setCancelled(true);
+            if (Items.checkIllegalEnchantments(player, event.getCursor())) event.setCancelled(true);
+            
+            // Fast inventory manipulation check.
             if (fastClick.isEnabled(player)){
             	if (fastClick.check(player))
                     // The check requested the event to be cancelled.
@@ -171,6 +179,16 @@ public class InventoryListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |____/|_|  \___/| .__/ 
          *                |___/                            |_|    
          */
+        
+        final Player player = event.getPlayer();
+        
+        // Illegal enchantments hotfix check.
+        final Item item = event.getItemDrop();
+        if (item != null){
+            // No cancel here.
+            Items.checkIllegalEnchantments(player, item.getItemStack());
+        }
+        
         // If the player died, all his items are dropped so ignore him.
         if (event.getPlayer().isDead())
             return;
@@ -210,8 +228,9 @@ public class InventoryListener implements Listener {
         // Only interested in right-clicks while holding an item.
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK)
             return;
-
-        final InventoryData data = InventoryData.getData(event.getPlayer());
+        
+        final Player player = event.getPlayer();
+        final InventoryData data = InventoryData.getData(player);
         
         boolean resetAll = false;
         
@@ -231,6 +250,9 @@ public class InventoryListener implements Listener {
                 data.instantEatInteract = (data.instantEatInteract > 0 && now - data.instantEatInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantEatInteract) : System.currentTimeMillis();
                 data.instantBowInteract = 0;
             } else resetAll = true;
+            
+            // Illegal enchantments hotfix check.
+            if (Items.checkIllegalEnchantments(player, item)) event.setCancelled(true);
         }
         else resetAll = true;
         
@@ -249,5 +271,10 @@ public class InventoryListener implements Listener {
         data.instantBowInteract = 0;
         data.instantEatInteract = 0;
         data.instantEatFood = null;
+        
+        // Illegal enchantments hotfix check.
+        final PlayerInventory inv = player.getInventory();
+        Items.checkIllegalEnchantments(player, inv.getItem(event.getNewSlot()));
+        Items.checkIllegalEnchantments(player, inv.getItem(event.getPreviousSlot()));
     }
 }
