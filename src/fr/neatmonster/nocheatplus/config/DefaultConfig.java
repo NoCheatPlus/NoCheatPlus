@@ -22,7 +22,7 @@ import org.bukkit.Material;
 public class DefaultConfig extends ConfigFile {
     
     /** NCP build needed for this config. */
-    public static final int buildNumber = 185;
+    public static final int buildNumber = 188;
 
     /**
      * Instantiates a new default configuration.
@@ -323,6 +323,8 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.INVENTORY_INSTANTEAT_CHECK, true);
         set(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, "log:instanteat:2:5:if cancel");
+        
+        set(ConfPaths.INVENTORY_ITEMS_CHECK, true);
 
         /*
          *     e   e                         ,e,                  
