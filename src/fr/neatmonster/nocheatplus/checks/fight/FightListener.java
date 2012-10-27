@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -12,6 +13,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
@@ -72,6 +74,13 @@ public class FightListener implements Listener {
     private boolean handleNormalDamage(final Player player, final Entity cbEntity) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
+        
+        // Hotfix attempt for enchanted books.
+        // TODO: maybe a generaluzed version for the future...
+        final ItemStack stack = player.getItemInHand();
+        if (stack != null && stack.getType() == Material.WRITTEN_BOOK){
+            if (!stack.getEnchantments().isEmpty()) return true;
+        }
         
         boolean cancelled = false;
         
