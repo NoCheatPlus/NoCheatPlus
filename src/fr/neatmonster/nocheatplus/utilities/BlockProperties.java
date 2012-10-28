@@ -499,6 +499,7 @@ public class BlockProperties {
 		blocks[Material.COBBLE_WALL.getId()] = brickType;
 		blocks[Material.WOOD_BUTTON.getId()] = leverType;
 		blocks[Material.SKULL.getId()] = new BlockProps(noTool, 8.5f, secToMs(1.45)); // TODO
+		blockFlags[Material.SKULL.getId()] |= F_GROUND;
 		blocks[Material.ANVIL.getId()] = new BlockProps(woodPickaxe, 5f); // TODO
 		
 		// Indestructible.
