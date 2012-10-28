@@ -237,6 +237,12 @@ public class BlockProperties {
 		Material.DEAD_BUSH,
 		//
 		Material.CROPS,
+		
+		// 1.4
+		Material.COMMAND,
+		Material.FLOWER_POT,
+		Material.CARROT,
+		Material.POTATO,
 	};
 	
 	private static final PlayerLocation pLoc = new PlayerLocation();
@@ -487,7 +493,15 @@ public class BlockProperties {
 		blocks[Material.DIAMOND_BLOCK.getId()] = new BlockProps(ironPickaxe, 5, secToMs(25, 25, 25, 1.25, 0.95, 25));
 		blocks[Material.ENDER_CHEST.getId()] = new BlockProps(woodPickaxe, 22.5f);
 		blocks[Material.OBSIDIAN.getId()] = new BlockProps(diamondPickaxe, 50, secToMs(250, 250, 250, 250, 9.4, 250));
-
+		
+		// More 1.4 (not insta).
+		blocks[Material.BEACON.getId()] = new BlockProps(noTool, 25f, secToMs(4.45)); // TODO
+		blocks[Material.COBBLE_WALL.getId()] = brickType;
+		blocks[Material.WOOD_BUTTON.getId()] = leverType;
+		blocks[Material.SKULL.getId()] = new BlockProps(noTool, 8.5f, secToMs(1.45)); // TODO
+		blocks[Material.ANVIL.getId()] = new BlockProps(woodPickaxe, 5f); // TODO
+		
+		// Indestructible.
 		for (Material mat : new Material[]{
 				Material.AIR, Material.ENDER_PORTAL, Material.ENDER_PORTAL_FRAME,
 				Material.PORTAL, Material.LAVA, Material.WATER, Material.BEDROCK,
