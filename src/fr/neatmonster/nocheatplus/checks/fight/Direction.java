@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
 import net.minecraft.server.Entity;
-import net.minecraft.server.EntityComplex;
 import net.minecraft.server.EntityComplexPart;
 
 import org.bukkit.Location;
@@ -49,7 +48,8 @@ public class Direction extends Check {
         boolean cancel = false;
 
         // Safeguard, if entity is complex, this check will fail due to giant and hard to define hitboxes.
-        if (damaged instanceof EntityComplex || damaged instanceof EntityComplexPart)
+//        if (damaged instanceof EntityComplex || damaged instanceof EntityComplexPart)
+        if (damaged instanceof EntityComplexPart)
             return false;
 
         // Find out how wide the entity is.

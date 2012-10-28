@@ -6,6 +6,7 @@ import java.util.Map;
 import net.minecraft.server.IBlockAccess;
 import net.minecraft.server.Material;
 import net.minecraft.server.TileEntity;
+import net.minecraft.server.Vec3DPool;
 
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -156,6 +157,16 @@ public class BlockCache implements IBlockAccess{
     @Override
     public boolean s(int arg0, int arg1, int arg2) {
         return access.s(arg0, arg1, arg2);
+    }
+
+    @Override
+    public Vec3DPool getVec3DPool() {
+        return access.getVec3DPool();
+    }
+
+    @Override
+    public boolean isBlockFacePowered(int arg0, int arg1, int arg2, int arg3) {
+        return access.isBlockFacePowered(arg0, arg1, arg2, arg3);
     }
     
 }

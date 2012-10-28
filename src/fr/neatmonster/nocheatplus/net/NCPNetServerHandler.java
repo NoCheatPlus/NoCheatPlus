@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.net;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import net.minecraft.server.AxisAlignedBB;
 import net.minecraft.server.EntityPlayer;
@@ -82,11 +81,13 @@ public class NCPNetServerHandler extends NetServerHandler {
         final NCPNetServerHandler customNSH = new NCPNetServerHandler(MinecraftServer.getServer(),
                 vanillaNSH.networkManager, entityPlayer, useProxy ? vanillaNSH : null);
         customNSH.a(entityPlayer.locX, entityPlayer.locY, entityPlayer.locZ, entityPlayer.yaw, entityPlayer.pitch);
-        MinecraftServer.getServer().ac().a(customNSH);
+        // TODO: MC method changed.
+//        MinecraftServer.getServer().ac().a(customNSH);
         try {
             final Field connectionsField = ServerConnection.class.getDeclaredField("d");
             connectionsField.setAccessible(true);
-            ((List<?>) connectionsField.get(MinecraftServer.getServer().ac())).remove(vanillaNSH);
+            // TODO: MC method changed.
+//            ((List<?>) connectionsField.get(MinecraftServer.getServer().ac())).remove(vanillaNSH);
         } catch (final Exception e) {
             e.printStackTrace();
         }

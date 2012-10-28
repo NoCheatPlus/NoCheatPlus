@@ -521,7 +521,7 @@ public class BlockProperties {
 			else if (all) CheckUtils.logInfo(i + ": (" + mat + ") " + blocks[i].toString());
 		}
 		if (!missing.isEmpty()){
-			Bukkit.getLogger().warning("[NoCheatPlus] The block breaking data is incomplete, interpret some as stone :");
+			Bukkit.getLogger().warning("[NoCheatPlus] The block breaking data is incomplete, default to allow instant breaking:");
 			CheckUtils.logWarning("--- Missing entries -------------------------------");
 			for (String spec : missing){
 				CheckUtils.logWarning(spec);
@@ -900,7 +900,8 @@ public class BlockProperties {
 		final double fx = x - bx;
 		final double fy = y - by;
 		final double fz = z - bz;
-		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
+//		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
+		if (fx < block.v() || fx >= block.w() || fy < block.x() || fy >= block.y() || fz < block.z() || fz >= block.A()) return true;
 		else{
 			// Workarounds (might get generalized some time).
 			if (isStairs(id)){
@@ -1055,10 +1056,17 @@ public class BlockProperties {
         // TODO: use internal block data unless delegation wanted?
         final Block block = Block.byId[id];
         block.updateShape(access, x, y, z);
-        if ((blockFlags[id] & F_HEIGHT150) != 0) block.maxY = 1.5;
-        if (minX > block.maxX + x || maxX < block.minX + x) return false;
-        else if (minY > block.maxY + y || maxY < block.minY + y) return false;
-        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) return false;
+        final double bmaxY;
+//        if ((blockFlags[id] & F_HEIGHT150) != 0) block.maxY = 1.5;
+        if ((blockFlags[id] & F_HEIGHT150) != 0) bmaxY = 1.5;
+        else bmaxY = block.y(); // maxY
+//        if (minX > block.maxX + x || maxX < block.minX + x) return false;
+//        else if (minY > block.maxY + y || maxY < block.minY + y) return false;
+//        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) return false;
+        if (minX > block.w() + x || maxX < block.v() + x) return false;
+        else if (minY > bmaxY + y || maxY < block.x() + y) return false;
+        else if (minZ > block.A() + z || maxZ < block.z() + z) return false;
+
         else return true;
     }
     
@@ -1152,5 +1160,4 @@ public class BlockProperties {
         }
         return false;
     }
-	
 }
