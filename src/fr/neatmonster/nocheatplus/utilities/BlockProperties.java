@@ -497,6 +497,7 @@ public class BlockProperties {
 		// More 1.4 (not insta).
 		blocks[Material.BEACON.getId()] = new BlockProps(noTool, 25f, secToMs(4.45)); // TODO
 		blocks[Material.COBBLE_WALL.getId()] = brickType;
+		blockFlags[Material.COBBLE_WALL.getId()] |= F_HEIGHT150;
 		blocks[Material.WOOD_BUTTON.getId()] = leverType;
 		blocks[Material.SKULL.getId()] = new BlockProps(noTool, 8.5f, secToMs(1.45)); // TODO
 		blockFlags[Material.SKULL.getId()] |= F_GROUND;
