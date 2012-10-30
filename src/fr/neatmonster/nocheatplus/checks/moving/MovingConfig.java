@@ -149,7 +149,8 @@ public class MovingConfig extends ACheckConfig {
         
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, 0.3);
-        yStep = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.49, 0.1);
+        // ystep is set to 0.45 by default, for stairs / steps.
+        yStep = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
     }
     
 
