@@ -238,11 +238,11 @@ public class BlockProperties {
 		//
 		Material.CROPS,
 		
-//		// 1.4
-//		Material.COMMAND,
-//		Material.FLOWER_POT,
-//		Material.CARROT,
-//		Material.POTATO,
+		// 1.4
+		Material.COMMAND,
+		Material.FLOWER_POT,
+		Material.CARROT,
+		Material.POTATO,
 	};
 	
 	private static final PlayerLocation pLoc = new PlayerLocation();
@@ -494,14 +494,14 @@ public class BlockProperties {
 		blocks[Material.ENDER_CHEST.getId()] = new BlockProps(woodPickaxe, 22.5f);
 		blocks[Material.OBSIDIAN.getId()] = new BlockProps(diamondPickaxe, 50, secToMs(250, 250, 250, 250, 9.4, 250));
 		
-//		// More 1.4 (not insta).
-//		blocks[Material.BEACON.getId()] = new BlockProps(noTool, 25f, secToMs(4.45)); // TODO
-//		blocks[Material.COBBLE_WALL.getId()] = brickType;
-//		blockFlags[Material.COBBLE_WALL.getId()] |= F_HEIGHT150;
-//		blocks[Material.WOOD_BUTTON.getId()] = leverType;
-//		blocks[Material.SKULL.getId()] = new BlockProps(noTool, 8.5f, secToMs(1.45)); // TODO
-//		blockFlags[Material.SKULL.getId()] |= F_GROUND;
-//		blocks[Material.ANVIL.getId()] = new BlockProps(woodPickaxe, 5f); // TODO
+		// More 1.4 (not insta).
+		blocks[Material.BEACON.getId()] = new BlockProps(noTool, 25f, secToMs(4.45)); // TODO
+		blocks[Material.COBBLE_WALL.getId()] = brickType;
+		blockFlags[Material.COBBLE_WALL.getId()] |= F_HEIGHT150;
+		blocks[Material.WOOD_BUTTON.getId()] = leverType;
+		blocks[Material.SKULL.getId()] = new BlockProps(noTool, 8.5f, secToMs(1.45)); // TODO
+		blockFlags[Material.SKULL.getId()] |= F_GROUND;
+		blocks[Material.ANVIL.getId()] = new BlockProps(woodPickaxe, 5f); // TODO
 		
 		// Indestructible.
 		for (Material mat : new Material[]{
@@ -916,8 +916,8 @@ public class BlockProperties {
 		final double fx = x - bx;
 		final double fy = y - by;
 		final double fz = z - bz;
-		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
-//		if (fx < block.v() || fx >= block.w() || fy < block.x() || fy >= block.y() || fz < block.z() || fz >= block.A()) return true;
+//		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
+		if (fx < block.v() || fx >= block.w() || fy < block.x() || fy >= block.y() || fz < block.z() || fz >= block.A()) return true;
 		else{
 			// Workarounds (might get generalized some time).
 			if (isStairs(id)){
@@ -1076,13 +1076,13 @@ public class BlockProperties {
 //        if ((blockFlags[id] & F_HEIGHT150) != 0) block.maxY = 1.5;
         if ((blockFlags[id] & F_HEIGHT150) != 0) bmaxY = 1.5;
         else if (isStairs(id)) bmaxY = 1.0;
-        else bmaxY = block.maxY; // block.y(); // maxY
-        if (minX > block.maxX + x || maxX < block.minX + x) return false;
-        else if (minY > bmaxY + y || maxY < block.minY + y) return false;
-        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) return false;
-//        if (minX > block.w() + x || maxX < block.v() + x) return false;
-//        else if (minY > bmaxY + y || maxY < block.x() + y) return false;
-//        else if (minZ > block.A() + z || maxZ < block.z() + z) return false;
+        else bmaxY = block.y(); // maxY
+//        if (minX > block.maxX + x || maxX < block.minX + x) return false;
+//        else if (minY > block.maxY + y || maxY < block.minY + y) return false;
+//        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) return false;
+        if (minX > block.w() + x || maxX < block.v() + x) return false;
+        else if (minY > bmaxY + y || maxY < block.x() + y) return false;
+        else if (minZ > block.A() + z || maxZ < block.z() + z) return false;
 
         else return true;
     }
