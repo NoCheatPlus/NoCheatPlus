@@ -150,8 +150,14 @@ public class InventoryListener implements Listener {
             final Player player = (Player) event.getWhoClicked();
             
             // Illegal enchantments hotfixes
-            if (Items.checkIllegalEnchantments(player, event.getCurrentItem())) event.setCancelled(true);
-            if (Items.checkIllegalEnchantments(player, event.getCursor())) event.setCancelled(true);
+            try{
+                if (Items.checkIllegalEnchantments(player, event.getCurrentItem())) event.setCancelled(true);
+            }
+            catch(final ArrayIndexOutOfBoundsException e){} // Hotfix
+            try{
+                if (Items.checkIllegalEnchantments(player, event.getCursor())) event.setCancelled(true);
+            }
+            catch(final ArrayIndexOutOfBoundsException e){} // Hotfix
             
             // Fast inventory manipulation check.
             if (fastClick.isEnabled(player)){
