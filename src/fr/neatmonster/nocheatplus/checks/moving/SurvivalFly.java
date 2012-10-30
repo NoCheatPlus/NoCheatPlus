@@ -195,6 +195,7 @@ public class SurvivalFly extends Check {
 
         // Taken directly from Minecraft code, should work.
         final EntityPlayer entity = ((CraftPlayer) player).getHandle();
+//        player.hasPotionEffect(PotionEffectType.SPEED);
         if (entity.hasEffect(MobEffectList.FASTER_MOVEMENT))
             hAllowedDistance *= 1.0D + 0.2D * (entity.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
         
@@ -247,6 +248,7 @@ public class SurvivalFly extends Check {
 
         // Potion effect "Jump".
         double jumpAmplifier = 1D;
+//        player.hasPotionEffect(PotionEffectType.JUMP)
         if (entity.hasEffect(MobEffectList.JUMP)) {
             final int amplifier = entity.getEffect(MobEffectList.JUMP).getAmplifier();
             if (amplifier > 20)

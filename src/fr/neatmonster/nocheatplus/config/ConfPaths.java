@@ -413,6 +413,7 @@ public abstract class ConfPaths {
 
     private static final String INVENTORY_FASTCLICK                      = INVENTORY + "fastclick.";
     public static final String  INVENTORY_FASTCLICK_CHECK                = INVENTORY_FASTCLICK + "active";
+    public static final String  INVENTORY_FASTCLICK_SPARECREATIVE        = INVENTORY_FASTCLICK + "sparecreative";
     public static final String  INVENTORY_FASTCLICK_ACTIONS              = INVENTORY_FASTCLICK + "actions";
 
     private static final String INVENTORY_INSTANTBOW                     = INVENTORY + "instantbow.";

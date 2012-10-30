@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -154,12 +155,16 @@ public class InventoryListener implements Listener {
             
             // Fast inventory manipulation check.
             if (fastClick.isEnabled(player)){
-            	if (fastClick.check(player))
-                    // The check requested the event to be cancelled.
-                    event.setCancelled(true);
-                // Combined speed:
-                else if (Improbable.check(player, 1f, System.currentTimeMillis()))
-                	event.setCancelled(true);
+                if (player.getGameMode() != GameMode.CREATIVE || !InventoryConfig.getConfig(player).fastClickSpareCreative){
+                    if (fastClick.check(player)){
+                        // The check requested the event to be cancelled.
+                        event.setCancelled(true);
+                    }
+                    else if (Improbable.check(player, 1f, System.currentTimeMillis())){
+                        // Combined speed:
+                        event.setCancelled(true);
+                    }
+                }
             }
         }
     }

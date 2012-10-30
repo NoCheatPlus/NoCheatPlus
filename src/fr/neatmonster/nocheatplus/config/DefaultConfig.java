@@ -22,7 +22,7 @@ import org.bukkit.Material;
 public class DefaultConfig extends ConfigFile {
     
     /** NCP build needed for this config. */
-    public static final int buildNumber = 188;
+    public static final int buildNumber = 197;
 
     /**
      * Instantiates a new default configuration.
@@ -315,6 +315,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_DROP_ACTIONS, "log:drop:0:1:cif cancel cmd:dropkick:0:1");
 
         set(ConfPaths.INVENTORY_FASTCLICK_CHECK, true);
+        set(ConfPaths.INVENTORY_FASTCLICK_SPARECREATIVE, true);
         set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel vl>50 log:fastclick:3:5:cif cancel");
 
         set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);

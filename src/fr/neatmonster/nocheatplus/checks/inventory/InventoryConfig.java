@@ -79,6 +79,7 @@ public class InventoryConfig extends ACheckConfig {
 	public final ActionList dropActions;
 
 	public final boolean    fastClickCheck;
+    public final boolean    fastClickSpareCreative;
 	public final ActionList fastClickActions;
 
 	public final boolean    instantBowCheck;
@@ -89,7 +90,7 @@ public class InventoryConfig extends ACheckConfig {
 	public final ActionList instantEatActions;
 
     public final boolean    itemsCheck;
-
+    
 	/**
 	 * Instantiates a new inventory configuration.
 	 * 
@@ -105,6 +106,7 @@ public class InventoryConfig extends ACheckConfig {
 				Permissions.INVENTORY_DROP);
 
 		fastClickCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_CHECK);
+		fastClickSpareCreative = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_SPARECREATIVE);
 		fastClickActions = data.getActionList(
 				ConfPaths.INVENTORY_FASTCLICK_ACTIONS,
 				Permissions.INVENTORY_FASTCLICK);

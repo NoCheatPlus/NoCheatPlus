@@ -31,6 +31,7 @@ public class FastClick extends Check {
      * 
      * @param player
      *            the player
+     * @param cc 
      * @return true, if successful
      */
     public boolean check(final Player player) {
