@@ -115,27 +115,31 @@ public class SurvivalFly extends Check {
         final double setBackYDistance = to.getY() - data.setBack.getY();
         // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
         if (!resetFrom){
-            // TODO: check versus last to position ?
-            final boolean inconsistent = yDistance > 0 && yDistance < 0.5 && data.survivalFlyLastYDist < 0 
-                    && setBackYDistance > 0D && setBackYDistance <= 1.5D;
-            boolean useWorkaround = from.isAboveStairs();
-            if (inconsistent){
-                if (cc.debug) System.out.println(player.getName() + " Y-INCONSISTENCY");
-                if (!useWorkaround && data.fromX != Double.MAX_VALUE){
-                    // Interpolate from last to-coordinates to the from coordinates (with some safe-guard).
-                    final double dX = from.getX() - data.fromX;
-                    final double dY = from.getY() - data.fromY;
-                    final double dZ = from.getZ() - data.fromZ;
-                    if (dX * dX + dY * dY + dZ * dZ < 0.5){ // TODO: adjust limit maybe.
-                        // Check full bounding box since last from.
-                        if (cc.debug) System.out.println(player.getName() + " CONSIDER WORKAROUND");
-                        final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
-                        final double iY =  minY; // TODO ...
-                        final double r = from.getWidth() / 2.0;
-                        useWorkaround = BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r);
-
-                    }
-                }  
+            // Don't set "useWorkaround = x()", to avoid potential trouble with reordering to come, and similar.
+            boolean useWorkaround = false;
+            // Check for moving off stairs.
+            if (!useWorkaround && from.isAboveStairs()) useWorkaround = true;
+            // Check for "lost touch",  for when moving events were not created, for instance (1/256).
+            if (!useWorkaround){
+                final boolean inconsistent = yDistance > 0 && yDistance < 0.5 && data.survivalFlyLastYDist < 0 
+                        && setBackYDistance > 0D && setBackYDistance <= 1.5D;
+                if (inconsistent){
+                    if (cc.debug) System.out.println(player.getName() + " Y-INCONSISTENCY");
+                    if (data.fromX != Double.MAX_VALUE){
+                        // Interpolate from last to-coordinates to the from coordinates (with some safe-guard).
+                        final double dX = from.getX() - data.fromX;
+                        final double dY = from.getY() - data.fromY;
+                        final double dZ = from.getZ() - data.fromZ;
+                        if (dX * dX + dY * dY + dZ * dZ < 0.5){ // TODO: adjust limit maybe.
+                            // Check full bounding box since last from.
+                            if (cc.debug) System.out.println(player.getName() + " CONSIDER WORKAROUND");
+                            final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
+                            final double iY =  minY; // TODO ...
+                            final double r = from.getWidth() / 2.0;
+                            if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) useWorkaround = true;
+                        }
+                    }  
+                } 
             }
             if (useWorkaround){ // !toOnGround && to.isAboveStairs()) {
                 // Set the new setBack and reset the jumpPhase.
