@@ -1075,6 +1075,7 @@ public class BlockProperties {
         final double bmaxY;
 //        if ((blockFlags[id] & F_HEIGHT150) != 0) block.maxY = 1.5;
         if ((blockFlags[id] & F_HEIGHT150) != 0) bmaxY = 1.5;
+        else if (isStairs(id)) bmaxY = 1.0;
         else bmaxY = block.y(); // maxY
 //        if (minX > block.maxX + x || maxX < block.minX + x) return false;
 //        else if (minY > block.maxY + y || maxY < block.minY + y) return false;
