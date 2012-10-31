@@ -6,7 +6,6 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -90,7 +89,7 @@ public class SurvivalFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    public Location check(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
         final long now = System.currentTimeMillis();
 
         // A player is considered sprinting if the flag is set and if he has enough food level.
@@ -150,6 +149,7 @@ public class SurvivalFly extends Check {
                 // data.ground ?
                 // ? set jumpphase to height / 0.15 ?
                 data.survivalFlyJumpPhase = 0;
+                data.jumpAmplifier = 0;
                 data.clearAccounting();
                 // Tell NoFall that we assume the player to have been on ground somehow.
                 data.noFallAssumeGround = true;
@@ -198,10 +198,10 @@ public class SurvivalFly extends Check {
             hAllowedDistance *= modIce;
 
         // Taken directly from Minecraft code, should work.
-        final EntityPlayer entity = ((CraftPlayer) player).getHandle();
+        
 //        player.hasPotionEffect(PotionEffectType.SPEED);
-        if (entity.hasEffect(MobEffectList.FASTER_MOVEMENT))
-            hAllowedDistance *= 1.0D + 0.2D * (entity.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
+        if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT))
+            hAllowedDistance *= 1.0D + 0.2D * (mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
         
         // Account for flowing liquids (only if needed).
         if (hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance)){
@@ -250,25 +250,12 @@ public class SurvivalFly extends Check {
         } else
             data.horizontalBuffer = Math.min(1D, data.horizontalBuffer - hDistanceAboveLimit);
 
-        // Potion effect "Jump".
-        double jumpAmplifier = 1D;
-//        player.hasPotionEffect(PotionEffectType.JUMP)
-        if (entity.hasEffect(MobEffectList.JUMP)) {
-            final int amplifier = entity.getEffect(MobEffectList.JUMP).getAmplifier();
-            if (amplifier > 20)
-                jumpAmplifier = 1.5D * (amplifier + 1D);
-            else
-                jumpAmplifier = 1.2D * (amplifier + 1D);
-        }
-        if (jumpAmplifier > data.jumpAmplifier)
-            data.jumpAmplifier = jumpAmplifier;
-
         // Calculate the vertical speed limit based on the current jump phase.
         double vAllowedDistance, vDistanceAboveLimit;
         if (from.isInWeb()){
         	// Very simple: force players to descend or stay.
          	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
-        	data.jumpAmplifier = 0;
+         	data.jumpAmplifier = 0;
         	vDistanceAboveLimit = yDistance;
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
         		if (now - data.survivalFlyCobwebTime > 3000){
@@ -290,9 +277,14 @@ public class SurvivalFly extends Check {
         }
         else{
         	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
-            vAllowedDistance *= data.jumpAmplifier;
-            if (data.survivalFlyJumpPhase > 6 + data.jumpAmplifier && data.verticalVelocityCounter <= 0){
-            	vAllowedDistance -= (data.survivalFlyJumpPhase - 6) * 0.15D;
+        	final int maxJumpPhase;
+            if (data.jumpAmplifier > 0){
+                vAllowedDistance += 0.5 + data.jumpAmplifier - 1.0;
+                maxJumpPhase = (int) (9 + (data.jumpAmplifier - 1.0) * 6);
+            }
+            else maxJumpPhase = 6;
+            if (data.survivalFlyJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0){
+            	vAllowedDistance -= Math.max(0, (data.survivalFlyJumpPhase - maxJumpPhase) * 0.15D);
             }
 
             vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;

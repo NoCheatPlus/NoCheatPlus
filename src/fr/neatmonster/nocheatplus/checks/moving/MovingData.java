@@ -145,6 +145,7 @@ public class MovingData extends ACheckData {
     public void clearFlyData() {
         bunnyhopDelay = 0;
         survivalFlyJumpPhase = 0;
+        jumpAmplifier = 0;
         setBack = null;
         survivalFlyLastYDist = Double.MAX_VALUE;
         fromX = toX = Double.MAX_VALUE;

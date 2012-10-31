@@ -3,10 +3,14 @@ package fr.neatmonster.nocheatplus.checks.moving;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.MobEffectList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -345,6 +349,21 @@ public class MovingListener implements Listener {
         final MovingData data = MovingData.getData(player);
         data.noFallAssumeGround = false;
         data.teleported = null;
+        
+        final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+        // Potion effect "Jump".
+        final double jumpAmplifier;
+        if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
+//            final int amplifier = mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
+//            if (amplifier > 20)
+//                jumpAmplifier = 1.5D * (amplifier + 1D);
+//            else
+//                jumpAmplifier = 1.2D * (amplifier + 1D);
+            jumpAmplifier =  1D + mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
+          if (cc.debug) System.out.println(player.getName() + " Jump effect: " + data.jumpAmplifier);
+        }
+        else jumpAmplifier = 1D;
+        if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
@@ -378,7 +397,7 @@ public class MovingListener implements Listener {
         	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
                 // If he is handled by the survival fly check, execute it.
-                newTo = survivalFly.check(player, pFrom, pTo, data, cc);
+                newTo = survivalFly.check(player, mcPlayer, pFrom, pTo, data, cc);
                 // If don't have a new location and if he is handled by the no fall check, execute it.
                 if (newTo == null && cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL))
                 	// NOTE: noFall might set yOnGround for the positions.

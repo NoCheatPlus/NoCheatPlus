@@ -100,23 +100,7 @@ public class CreativeFly extends Check {
 
         resultH *= 100D;
 
-        // Is the player affected by the "jumping" potion. This is really just a very, very crude estimation and far
-        // from reality.
-        double jumpAmplifier = 1D;
-        if (entity.hasEffect(MobEffectList.JUMP)) {
-            final int amplifier = entity.getEffect(MobEffectList.JUMP).getAmplifier();
-            if (amplifier > 20)
-                jumpAmplifier = 1.5D * (amplifier + 1D);
-            else
-                jumpAmplifier = 1.2D * (amplifier + 1D);
-        }
-        if (jumpAmplifier > data.jumpAmplifier)
-            data.jumpAmplifier = jumpAmplifier;
-
-        final double limitV = cc.creativeFlyVerticalSpeed / 100D * VERTICAL_SPEED * data.jumpAmplifier;
-
-        if (from.getY() >= to.getY() && data.jumpAmplifier > 0D)
-            data.jumpAmplifier--;
+        final double limitV = cc.creativeFlyVerticalSpeed / 100D * VERTICAL_SPEED; // * data.jumpAmplifier;
 
         // Super simple, just check distance compared to max distance vertical.
         final double resultV = Math.max(0D, yDistance - data.verticalFreedom - limitV) * 100D;
