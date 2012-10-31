@@ -144,12 +144,12 @@ public class SurvivalFly extends Check {
                 // Set the new setBack and reset the jumpPhase.
                 
                 // Maybe don't adapt the setback (unless null)!
-                data.setBack = from.getLocation();
+//                data.setBack = from.getLocation();
                 data.setBack.setY(Location.locToBlock(data.setBack.getY()));
                 // data.ground ?
                 // ? set jumpphase to height / 0.15 ?
                 data.survivalFlyJumpPhase = 0;
-                data.jumpAmplifier = 0;
+                data.jumpAmplifier = 0; // Might conflict, should probably fetch.
                 data.clearAccounting();
                 // Tell NoFall that we assume the player to have been on ground somehow.
                 data.noFallAssumeGround = true;
