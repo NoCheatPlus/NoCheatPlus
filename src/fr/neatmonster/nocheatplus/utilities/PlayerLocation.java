@@ -211,7 +211,7 @@ public class PlayerLocation {
         if (aboveStairs == null){
 //            aboveStairs = BlockProperties.isStairs(getTypeIdBelow().intValue());
             // TODO: maybe distinguish upside down stairs and normal stairs !
-            final double diff = getWidth();
+            final double diff = getWidth() + 0.001;
             aboveStairs = BlockProperties.collides(getBlockAccess(), x - diff, y + 0.25, z - diff, x + diff, y - 1.0, z + diff, BlockProperties.F_STAIRS);
         }
         return aboveStairs;
