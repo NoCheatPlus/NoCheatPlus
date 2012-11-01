@@ -394,6 +394,30 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         if (allowAll || player.hasPermission(Permissions.REI_RADAR))
             message += "§0§0§2§3§4§5§6§7§e§f";
 
+        // Allow Rei's Minimap's player radar
+        if (allowAll || player.hasPermission(Permissions.REI_RADAR_PLAYER))
+           message += "§0§0§2§e§f";
+
+        // Allow Rei's Minimap's animal radar
+        if (allowAll || player.hasPermission(Permissions.REI_RADAR_ANIMAL))
+           message += "§0§0§3§e§f";
+
+        // Allow Rei's Minimap's mob radar
+        if (allowAll || player.hasPermission(Permissions.REI_RADAR_MOB))
+           message += "§0§0§4§e§f";
+
+        // Allow Rei's Minimap's slime radar
+        if (allowAll || player.hasPermission(Permissions.REI_RADAR_SLIME))
+           message += "§0§0§5§e§f";
+
+        // Allow Rei's Minimap's squid radar
+        if (allowAll || player.hasPermission(Permissions.REI_RADAR_SQUID))
+           message += "§0§0§6§e§f";
+
+        // Allow Rei's Minimap's other radar
+        if (allowAll || player.hasPermission(Permissions.REI_RADAR_OTHER))
+           message += "§0§0§7§e§f";
+
         // If all the client mods are allowed, no need to go any further.
         if (allowAll) {
             if (!message.equals(""))

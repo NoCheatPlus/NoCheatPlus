@@ -221,6 +221,19 @@ permissions:
                                 description: Allow the player to use Rei's Minimap cave mode.
                             nocheatplus.mods.rei.radar:
                                 description: Allow the player to use Rei's Minimap radar.
+                                children:
+                                    nocheatplus.mods.rei.radar.player:
+                                        description: Allow the player to use Rei's Minimap player radar
+                                    nocheatplus.mods.rei.radar.animal:
+                                        description: Allow the player to use Rei's Minimap animal radar
+                                    nocheatplus.mods.rei.radar.mob:
+                                        description: Allow the player to use Rei's Minimap mob radar
+                                    nocheatplus.mods.rei.radar.slime:
+                                        description: Allow the player to use Rei's Minimap slime radar
+                                    nocheatplus.mods.rei.radar.squid:
+                                        description: Allow the player to use Rei's Minimap squid radar
+                                    nocheatplus.mods.rei.radar.other:
+                                        description: Allow the player to use Rei's Minimap other radar
                     nocheatplus.mods.smartmoving:
                         description: Allow the player to use the Smart Moving mod.
                         children:
