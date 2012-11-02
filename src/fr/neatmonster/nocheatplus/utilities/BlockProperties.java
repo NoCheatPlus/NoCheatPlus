@@ -1014,7 +1014,7 @@ public class BlockProperties {
         for (int x = minX; x <= maxX; x++){
             for (int z = minZ; z <= maxZ; z++){
                 for (int y = minY; y <= maxY; y++){
-                    if ((BlockProperties.getBLockFlags(access.getTypeId(x, y, z)) & flags) != 0) return true;
+                    if ((blockFlags[access.getTypeId(x, y, z)] & flags) != 0) return true;
                 }
             }
         }
@@ -1047,7 +1047,7 @@ public class BlockProperties {
             for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
                 for (int y = Location.locToBlock(minY); y <= Location.locToBlock(maxY); y++){
                     final int id = access.getTypeId(x, y, z);
-                    if ((BlockProperties.getBLockFlags(id) & flags) != 0){
+                    if ((blockFlags[id] & flags) != 0){
                         // Might collide.
                         if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)) return true;
                     }
@@ -1103,11 +1103,11 @@ public class BlockProperties {
             for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
                 for (int y = Location.locToBlock(minY - 0.5626); y <= Location.locToBlock(maxY); y++){
                     final int id = access.getTypeId(x, y, z);
-                    if ((BlockProperties.getBLockFlags(id) & F_GROUND) != 0){
+                    if ((blockFlags[id] & F_GROUND) != 0){
                         // Might collide.
                         if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
                             final int aboveId = access.getTypeId(x, y + 1, z);
-                            if ((BlockProperties.getBLockFlags(aboveId) & F_GROUND) != 0){
+                            if ((blockFlags[aboveId] & F_GROUND) != 0){
                                 // Check against spider type hacks.
                                 if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId)){
                                     // TODO: This might be seen as a violation for many block types.
@@ -1124,7 +1124,7 @@ public class BlockProperties {
     }
 
     /**
-     * Check if a move determined by xDistance and zDistance is leading dowm stream.
+     * Check if a move determined by xDistance and zDistance is leading down stream.
      * @param access
      * @param x
      * @param y
