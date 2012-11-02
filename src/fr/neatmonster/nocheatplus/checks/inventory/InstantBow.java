@@ -50,9 +50,9 @@ public class InstantBow extends Check {
         final long expectedPullDuration = (long) (maxTime - maxTime * (1f - force) * (1f - force)) - cc.instantBowDelay;
         
         // Time taken to pull the string.
-        final long pullDuration = now - data.instantBowInteract;
+        final long pullDuration = now - (cc.instantBowStrict ? data.instantBowInteract : data.instantBowShoot);
 
-        if (data.instantBowInteract > 0 && pullDuration >= expectedPullDuration){
+        if ((!cc.instantBowStrict || data.instantBowInteract > 0) && pullDuration >= expectedPullDuration){
             // The player was slow enough, reward him by lowering his violation level.
             data.instantBowVL *= 0.9D;
         }
@@ -69,17 +69,16 @@ public class InstantBow extends Check {
 
             // Execute whatever actions are associated with this check and the
             // violation level and find out if we should cancel the event
-            cancel = executeActions(player, data.instantBowVL, difference,
-                    cc.instantBowActions);
+			cancel = executeActions(player, data.instantBowVL, difference, cc.instantBowActions);
         }
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-            player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", pull time: " + pullDuration + "(" + expectedPullDuration +")");
+            player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", " + (cc.instantBowStrict || pullDuration < 2 * expectedPullDuration ? ("pull time: " + pullDuration) : "") + "(" + expectedPullDuration +")");
         }
         
         // Reset data here.
         data.instantBowInteract = 0;
-
+        data.instantBowShoot = now;
         return cancel;
     }
 }

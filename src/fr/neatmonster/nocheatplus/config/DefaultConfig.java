@@ -319,6 +319,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, "cancel vl>50 log:fastclick:3:5:cif cancel");
 
         set(ConfPaths.INVENTORY_INSTANTBOW_CHECK, true);
+        set(ConfPaths.INVENTORY_INSTANTBOW_STRICT, true);
         set(ConfPaths.INVENTORY_INSTANTBOW_DELAY, 130);
         set(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, "cancel vl>15 log:instantbow:2:5:if cancel");
 

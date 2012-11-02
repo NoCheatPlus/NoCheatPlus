@@ -83,6 +83,7 @@ public class InventoryConfig extends ACheckConfig {
 	public final ActionList fastClickActions;
 
 	public final boolean    instantBowCheck;
+	public final boolean 	instantBowStrict;
     public final long       instantBowDelay;
 	public final ActionList instantBowActions;
 
@@ -112,6 +113,7 @@ public class InventoryConfig extends ACheckConfig {
 				Permissions.INVENTORY_FASTCLICK);
 
 		instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
+		instantBowStrict = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_STRICT);
 		instantBowDelay = data.getInt(ConfPaths.INVENTORY_INSTANTBOW_DELAY);
 		instantBowActions = data.getActionList(
 				ConfPaths.INVENTORY_INSTANTBOW_ACTIONS,
