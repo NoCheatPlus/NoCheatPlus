@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.access;
 
+import fr.neatmonster.nocheatplus.components.IData;
+
 /*
  * MM'""""'YMM dP                         dP       M""""""'YMM            dP            
  * M' .mmm. `M 88                         88       M  mmmm. `M            88            
@@ -17,7 +19,7 @@ package fr.neatmonster.nocheatplus.checks.access;
  * 
  * @author asofold
  */
-public interface ICheckData {
+public interface ICheckData extends IData{
 	
 	/**
 	 * Check if an entry for the given permission exists.

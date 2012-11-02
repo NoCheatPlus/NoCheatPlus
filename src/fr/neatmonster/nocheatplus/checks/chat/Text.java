@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -64,7 +65,12 @@ public class Text extends AsyncCheck implements INotifyReload{
 	private void init() {
 		// Set some things from the global config.
 		ConfigFile config = ConfigManager.getConfigFile();
+		if (engine != null){
+			engine.clear();
+			NoCheatPlus.getAPI().removeComponent(engine);
+		}
 		engine = new LetterEngine(config);
+		NoCheatPlus.getAPI().addComponent(engine);
 	}
 
 	@Override

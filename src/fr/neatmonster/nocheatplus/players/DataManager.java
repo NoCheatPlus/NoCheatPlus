@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.players;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,13 +31,16 @@ import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.components.IComponentRegistry;
+import fr.neatmonster.nocheatplus.components.IHaveCheckType;
+import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.config.INeedConfig;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 
-public class DataManager implements Listener, INotifyReload, INeedConfig{
+public class DataManager implements Listener, INotifyReload, INeedConfig, IComponentRegistry{
 	
 	protected static DataManager instance = null;
 	
@@ -49,6 +53,12 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 	 * Later this might hold central player data objects instead of the long only.
 	 */
 	private final Map<String, Long> lastLogout = new LinkedHashMap<String, Long>(50, 0.75f, true);
+	
+	/**
+	 * IRemoveData instances.
+	 * // TODO: might use a map for those later (extra or not).
+	 */
+	protected final ArrayList<IRemoveData> iRemoveData = new ArrayList<IRemoveData>();
 	
 	/**
 	 * Execution histories of the checks.
@@ -84,6 +94,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 				for (final CheckDataFactory factory : factories){
 					factory.removeData(playerName);
 				}
+				clearComponentData(CheckType.ALL, playerName);
 			}
 			if (deleteData || deleteHistory) removeExecutionHistory(CheckType.ALL, playerName);
 			if (deleteHistory) ViolationHistory.removeHistory(playerName);
@@ -152,12 +163,21 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 		}
 		return removed;
 	}
+	
+	/**
+	 * Removes all data and history for a player.
+	 * @deprecated Use clearData instead, this likely to be removed later.
+	 * @param checkType
+	 */
+	public static void clear(final CheckType checkType){
+		clearData(checkType);
+	}
 
 	/**
 	 * Remove data and history of all players for the given check type and sub checks.
 	 * @param checkType
 	 */
-	public static void clear(final CheckType checkType) {
+	public static void clearData(final CheckType checkType) {
 		final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
 		for (final CheckType type : APIUtils.getWithChildren(checkType)){
 			final Map<String, ExecutionHistory> map = instance.executionHistories.get(type);
@@ -168,7 +188,33 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 		for (final CheckDataFactory factory : factories){
 			factory.removeAllData();
 		}
+		for (final IRemoveData rmd : instance.iRemoveData){
+			if (rmd instanceof IHaveCheckType){
+				final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
+				if (refType == checkType || APIUtils.isParent(checkType, refType)) rmd.removeAllData();
+			}
+		}
 		ViolationHistory.clear(checkType);
+	}
+	
+	/**
+	 * Clear player related data, only for registered components (not execution history, violation history, normal check data).<br>
+	 * That should at least go for chat engione data.
+	 * @param CheckType
+	 * @param PlayerName
+	 * @return If something was removed.
+	 */
+	public static boolean clearComponentData(final CheckType checkType, final String PlayerName){
+		boolean removed = false;
+		for (final IRemoveData rmd : instance.iRemoveData){
+			if (rmd instanceof IHaveCheckType){
+				final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
+				if (refType == checkType || APIUtils.isParent(checkType, refType)){
+					if (rmd.removeData(PlayerName) != null) removed = true;
+				}
+			}
+		}
+		return removed;
 	}
 	
 	/**
@@ -185,5 +231,34 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 		FightConfig.clear();
 		InventoryConfig.clear();
 		MovingConfig.clear();
+	}
+	
+	
+	@Override
+	public void addComponent(Object obj) {
+		if (obj instanceof IRemoveData) {
+			iRemoveData.add((IRemoveData) obj);
+		}
+	}
+
+	@Override
+	public void removeComponent(Object obj) {
+		if (obj instanceof IRemoveData) {
+			iRemoveData.remove((IRemoveData) obj);
+		}
+	}
+	
+	/**
+	 * Cleanup method.
+	 */
+	public void onDisable() {
+		clearData(CheckType.ALL);
+		for (IRemoveData rmd : iRemoveData){
+			if (!(rmd instanceof IHaveCheckType)) rmd.removeAllData();
+		}
+		iRemoveData.clear();
+		clearConfigs();
+		lastLogout.clear();
+		executionHistories.clear();
 	}
 }

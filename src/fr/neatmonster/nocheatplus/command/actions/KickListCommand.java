@@ -18,7 +18,7 @@ public class KickListCommand extends NCPCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		final String[] kicked = plugin.getLoginDeniedPlayers();
+		final String[] kicked = NoCheatPlus.getLoginDeniedPlayers();
 		if (kicked.length < 100) Arrays.sort(kicked);
 		sender.sendMessage(TAG + "Temporarily kicked players:");
 		sender.sendMessage(CheckUtils.join(Arrays.asList(kicked), " "));

@@ -41,7 +41,7 @@ public class RemovePlayerCommand extends NCPCommand {
 		else checkType = CheckType.ALL;
 		
 		if (playerName.equals("*")){
-			DataManager.clear(checkType);
+			DataManager.clearData(checkType);
 			sender.sendMessage(TAG + "Removed all data and history: " + checkType);
 			return true;
 		}
@@ -61,7 +61,7 @@ public class RemovePlayerCommand extends NCPCommand {
 		
 		if (DataManager.removeExecutionHistory(checkType, playerName)) histRemoved = true;
 		
-		final boolean dataRemoved = CheckType.removeData(playerName, checkType);
+		final boolean dataRemoved = CheckType.removeData(playerName, checkType) || DataManager.clearComponentData(checkType, playerName);
 		
 		if (dataRemoved || histRemoved){
 			String which;

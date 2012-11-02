@@ -176,9 +176,9 @@ public class TickTask implements Runnable {
 		// The isEmpty checks are faster than synchronizing fully always, the actions get delayed one tick at most.
 		if (!delayedActions.isEmpty()) executeActions();
 		if (!permissionUpdates.isEmpty()) updatePermissions();
-		if (timeLast > time){
-		    CheckUtils.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
-		    DataManager.clear(CheckType.ALL);
+		if (timeLast > time) {
+			CheckUtils.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
+			DataManager.clearData(CheckType.ALL);
 		}
 		timeLast = time;
 	}

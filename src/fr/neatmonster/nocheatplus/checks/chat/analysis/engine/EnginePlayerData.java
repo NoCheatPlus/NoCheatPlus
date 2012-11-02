@@ -4,17 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
+import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.FlatWords;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.SimilarWordsBKL;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes;
-import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.FlatWords;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
+import fr.neatmonster.nocheatplus.components.IData;
 
 /**
  * Engine specific player data.
  * @author mc_dev
  *
  */
-public class EnginePlayerData {
+public class EnginePlayerData implements IData{
 	
 	public final List<WordProcessor> processors = new ArrayList<WordProcessor>(5);
 

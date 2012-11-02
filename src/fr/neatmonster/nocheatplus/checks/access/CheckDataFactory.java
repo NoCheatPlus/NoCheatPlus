@@ -2,6 +2,8 @@ package fr.neatmonster.nocheatplus.checks.access;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.components.IRemoveData;
+
 
 /*
  * MM'""""'YMM dP                         dP       M""""""'YMM            dP            
@@ -26,7 +28,7 @@ import org.bukkit.entity.Player;
  * 
  * @author asofold
  */
-public interface CheckDataFactory {
+public interface CheckDataFactory extends IRemoveData{
 
     /**
      * Gets the data of the specified player.
@@ -37,16 +39,7 @@ public interface CheckDataFactory {
      */
     public ICheckData getData(final Player player);
     
-    /**
-     * Remove data of a player.
-     * @param playerName Must match exactly, must be player name for command use and cleanup tasks.
-     * @return
-     */
+    @Override
     public ICheckData removeData(final String playerName);
-
-    /**
-     * Remove all data for all players.
-     */
-	public void removeAllData();
 
 }

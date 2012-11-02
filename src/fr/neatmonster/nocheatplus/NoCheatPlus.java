@@ -31,11 +31,12 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.command.CommandHandler;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
-import fr.neatmonster.nocheatplus.config.INeedConfig;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
@@ -61,7 +62,7 @@ import fr.neatmonster.nocheatplus.utilities.Updates;
 /**
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
-public class NoCheatPlus extends JavaPlugin implements Listener {
+public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI {
 	
 	/** Lower case player name to milliseconds point of time of release */
 	private static final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
@@ -120,7 +121,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 		return isLoginDenied(playerName, System.currentTimeMillis());
 	}
 	
-	public String[] getLoginDeniedPlayers() {
+	public static String[] getLoginDeniedPlayers() {
 		checkDenyLoginsNames();
 		String[] kicked = new String[denyLoginNames.size()];
 		denyLoginNames.keySet().toArray(kicked);
@@ -139,6 +140,14 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
 		if (oldTs == null) return false; 
 		else return time < oldTs.longValue();
 	}
+	
+	/**
+	 * Convenience method, delegates to 
+	 * @return
+	 */
+	public static NoCheatPlusAPI getAPI() {
+		return (NoCheatPlusAPI) Bukkit.getPluginManager().getPlugin("NoCheatPlus");
+	}
 
 	/** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
@@ -156,25 +165,28 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
     /** Player data future stuff. */
     protected final DataManager dataMan = new DataManager();
     
-    /**
-     * Convenience method to add components according to implemented interfaces,
-     * like Listener, INotifyReload, INeedConfig.<br>
-     * This must be done after the configuration has been initialized.
-     * @param obj
-     */
-    private void addComponent(final Object obj){
-    	if (obj instanceof Listener){
-    		final Listener listener = (Listener) obj;
-    		Bukkit.getPluginManager().registerEvents(listener, this);
-    		listeners.add(listener);
-    	}
-    	if (obj instanceof INotifyReload){
-    		notifyReload.add((INotifyReload) obj);
-    		if (obj instanceof INeedConfig){
-    			((INeedConfig) obj).onReload();
-    		}
-    	}
-    }
+	@Override
+	public void addComponent(final Object obj) {
+		if (obj instanceof Listener) {
+			final Listener listener = (Listener) obj;
+			Bukkit.getPluginManager().registerEvents(listener, this);
+			listeners.add(listener);
+		}
+		if (obj instanceof INotifyReload) {
+			notifyReload.add((INotifyReload) obj);
+			if (obj instanceof INeedConfig) {
+				((INeedConfig) obj).onReload();
+			}
+		}
+		dataMan.addComponent(obj);
+	}
+
+	@Override
+	public void removeComponent(final Object obj) {
+		listeners.remove(obj);
+		notifyReload.remove(obj);
+		dataMan.removeComponent(obj);
+	}
     
     /* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onDisable()
@@ -204,6 +216,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener {
         
         // Remove config listeners.
         notifyReload.clear();
+        
+        // More cleanup.
+        dataMan.onDisable();
         
         // Cleanup the configuration manager.
         ConfigManager.cleanup();

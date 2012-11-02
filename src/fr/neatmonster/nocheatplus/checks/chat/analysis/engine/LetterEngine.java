@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatData;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
@@ -17,6 +18,9 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.Similar
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes.WordPrefixesSettings;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
+import fr.neatmonster.nocheatplus.components.IData;
+import fr.neatmonster.nocheatplus.components.IHaveCheckType;
+import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 
@@ -26,11 +30,14 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
  * @author mc_dev
  *
  */
-public class LetterEngine {
+public class LetterEngine implements IRemoveData, IHaveCheckType{
 	
 	/** Global processors */
 	protected final List<WordProcessor> processors = new ArrayList<WordProcessor>();
 	
+	/**
+	 * Mapping players to data.
+	 */
 	protected final EnginePlayerDataMap dataMap;
 	
 	public LetterEngine(ConfigFile config){
@@ -100,5 +107,20 @@ public class LetterEngine {
 		}
 		processors.clear();
 		dataMap.clear();
+	}
+
+	@Override
+	public IData removeData(final String playerName) {
+		return dataMap.remove(playerName);
+	}
+
+	@Override
+	public void removeAllData() {
+		dataMap.clear();
+	}
+
+	@Override
+	public final CheckType getCheckType() {
+		return CheckType.CHAT_TEXT;
 	}
 }
