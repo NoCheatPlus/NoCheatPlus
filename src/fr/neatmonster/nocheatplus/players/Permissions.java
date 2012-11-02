@@ -201,6 +201,12 @@ public class Permissions {
     private static final String REI                          = MODS + ".rei";
     public static final String  REI_CAVE                     = REI + ".cave";
     public static final String  REI_RADAR                    = REI + ".radar";
+    public static final String  REI_RADAR_PLAYER             = REI_RADAR + ".player";
+    public static final String  REI_RADAR_ANIMAL             = REI_RADAR + ".animal";
+    public static final String  REI_RADAR_MOB                = REI_RADAR + ".mob";
+    public static final String  REI_RADAR_SLIME              = REI_RADAR + ".slime";
+    public static final String  REI_RADAR_SQUID              = REI_RADAR + ".squid";
+    public static final String  REI_RADAR_OTHER              = REI_RADAR + ".other";
 
     private static final String SMARTMOVING                  = MODS + ".smartmoving";
     public static final String  SMARTMOVING_CLIMBING         = SMARTMOVING + ".climbing";
