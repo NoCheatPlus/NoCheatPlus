@@ -8,20 +8,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
-import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
-import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
-import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
-import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
-import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
-import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
-import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
-import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.command.CommandHandler.NCPReloadEvent;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
@@ -56,14 +49,7 @@ public class ReloadCommand extends NCPCommand {
         // Do the actual reload.
         ConfigManager.cleanup();
         ConfigManager.init(plugin);
-        BlockBreakConfig.clear();
-        BlockInteractConfig.clear();
-        BlockPlaceConfig.clear();
-        ChatConfig.clear();
-        CombinedConfig.clear();
-        FightConfig.clear();
-        InventoryConfig.clear();
-        MovingConfig.clear();
+        DataManager.clearConfigs(); // Here you have to add XConfig.clear() form now on.
         
         // Tell the plugin to adapt to new config.
         for (final INotifyReload component : notifyReload){

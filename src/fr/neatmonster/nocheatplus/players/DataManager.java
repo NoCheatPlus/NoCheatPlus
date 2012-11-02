@@ -20,7 +20,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
+import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
+import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
+import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
+import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -161,5 +169,21 @@ public class DataManager implements Listener, INotifyReload, INeedConfig{
 			factory.removeAllData();
 		}
 		ViolationHistory.clear(checkType);
+	}
+	
+	/**
+	 * Clear all stored (check) config instances.<br>
+	 * This does not cleanup ConfigManager, i.e. stored yml-versions.
+	 */
+	public static void clearConfigs() {
+		// The dirty bit !
+		BlockBreakConfig.clear();
+		BlockInteractConfig.clear();
+		BlockPlaceConfig.clear();
+		ChatConfig.clear();
+		CombinedConfig.clear();
+		FightConfig.clear();
+		InventoryConfig.clear();
+		MovingConfig.clear();
 	}
 }
