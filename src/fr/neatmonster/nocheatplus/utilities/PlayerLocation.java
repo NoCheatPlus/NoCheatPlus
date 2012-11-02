@@ -40,6 +40,9 @@ import org.bukkit.util.Vector;
  * An utility class used to know a lot of things for a player and a location given.
  */
 public class PlayerLocation {
+	
+	/** Box for one time use, no nesting, no extra storing this(!). */
+	protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
     /** Type id of the block at the position. */
     private Integer typeId;
@@ -89,8 +92,8 @@ public class PlayerLocation {
     /** The entity player. */
     private EntityPlayer            entity;
     
-    /** The bounding box of the player. */
-    private AxisAlignedBB           boundingBox;
+    /** Bounding box of the player. */
+    private double 					minX, maxX, minY, maxY, minZ, maxZ;
 
     /** Bukkit world. */
     private World                   world;
@@ -224,9 +227,10 @@ public class PlayerLocation {
      */
     public boolean isInLava() {
         if (inLava == null) {
-            AxisAlignedBB boundingBoxLava = boundingBox.clone();
-            boundingBoxLava = boundingBoxLava.grow(-0.10000000149011612D, -0.40000000596046448D, -0.10000000149011612D);
-            inLava = BlockProperties.collides(getBlockAccess(), boundingBoxLava, BlockProperties.F_LAVA);
+            final double dX = -0.10000000149011612D;
+            final double dY = -0.40000000596046448D;
+            final double dZ = dX;
+            inLava = BlockProperties.collides(getBlockAccess(), minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_LAVA);
         }
         return inLava;
     }
@@ -238,10 +242,10 @@ public class PlayerLocation {
      */
     public boolean isInWater() {
         if (inWater == null) {
-            AxisAlignedBB boundingBoxWater = boundingBox.clone();
-            boundingBoxWater = boundingBoxWater.grow(0.0D, -0.40000000596046448D, 0.0D);
-            boundingBoxWater = boundingBoxWater.shrink(0.001D, 0.001D, 0.001D);
-            inWater = BlockProperties.collides(getBlockAccess(), boundingBoxWater, BlockProperties.F_WATER);
+            final double dX = -0.001D;
+            final double dY = -0.40000000596046448D - 0.001D;
+            final double dZ = -0.001D;
+            inWater = BlockProperties.collides(getBlockAccess(),  minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_WATER);
         }
         return inWater;
     }
@@ -266,7 +270,7 @@ public class PlayerLocation {
         if (onIce == null){
             final org.bukkit.entity.Player entity = this.entity.getBukkitEntity();
             if (entity.isSneaking() || entity.isBlocking())
-                onIce = getTypeId(blockX, Location.locToBlock(boundingBox.b - 0.1D), blockZ) == Material.ICE.getId();
+                onIce = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ) == Material.ICE.getId();
             else
                 onIce = getTypeIdBelow().intValue() == Material.ICE.getId();
         }
@@ -305,9 +309,9 @@ public class PlayerLocation {
     public boolean isInWeb() {
         final int webId = Material.WEB.getId();
         if (inWeb == null) {
-            for (int blockX = Location.locToBlock(boundingBox.a + 0.001D); blockX <= Location.locToBlock(boundingBox.d - 0.001D); blockX++){
-                for (int blockY = Location.locToBlock(boundingBox.b + 0.001D); blockY <= Location.locToBlock(boundingBox.e - 0.001D); blockY++){
-                    for (int blockZ = Location.locToBlock(boundingBox.c + 0.001D); blockZ <= Location.locToBlock(boundingBox.f - 0.001D); blockZ++){
+            for (int blockX = Location.locToBlock(minX + 0.001D); blockX <= Location.locToBlock(maxX - 0.001D); blockX++){
+                for (int blockY = Location.locToBlock(minY + 0.001D); blockY <= Location.locToBlock(maxY - 0.001D); blockY++){
+                    for (int blockZ = Location.locToBlock(minZ + 0.001D); blockZ <= Location.locToBlock(maxZ - 0.001D); blockZ++){
                         if (getTypeId(blockX, blockY, blockZ) == webId){
                             inWeb = true;
                             return true;
@@ -327,38 +331,33 @@ public class PlayerLocation {
      */
     public boolean isOnGround() {
         if (onGround == null) {
-            onGround = BlockProperties.isOnGround(getBlockAccess(), boundingBox.a, boundingBox.b - yOnGround, boundingBox.c, boundingBox.d, boundingBox.b + 0.25, boundingBox.f);
+            onGround = BlockProperties.isOnGround(getBlockAccess(), minX, minY - yOnGround, minZ, maxX, maxY + 0.25, maxZ);
             if (!onGround){
                 // TODO: Probably check other ids too before doing this ?
-                // TODO: clean this up, use other checking method, detach it to blockproperties ?
-                double d0 = 0.25D;
-                AxisAlignedBB axisalignedbb = boundingBox.clone();
-                axisalignedbb = axisalignedbb.d(0D, -getyOnGround(), 0D);
+                final double d0 = 0.25D;
+                // TODO: Check if this uses the ounding box pool.
+                final AxisAlignedBB box = useBox.b(minX - d0, minY - getyOnGround() - d0, minZ - d0, maxX + d0, maxY + d0, maxZ + d0);
                 @SuppressWarnings("rawtypes")
-                List list = worldServer.getEntities(entity, axisalignedbb.grow(d0, d0, d0));
+                List list = worldServer.getEntities(entity, box);
                 @SuppressWarnings("rawtypes")
                 Iterator iterator = list.iterator();
                 while (iterator.hasNext()) {
                     final Entity entity1 = (Entity) iterator.next();
                     final EntityType type = entity.getBukkitEntity().getType();
                     if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
-                    AxisAlignedBB axisalignedbb1 = entity1.E();
-                    if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
-                        onGround = true;
-                        return true;
-                    }
-                    axisalignedbb1 = entity.g(entity1);
-                    if (axisalignedbb1 != null && axisalignedbb1.a(axisalignedbb)) {
-                        onGround = true;
-                        return true;
+                    final AxisAlignedBB otherBox = entity1.boundingBox;
+                    if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
+                    else {
+                    	onGround = true;
+                    	break;
                     }
                 }
             }
         }
         return onGround;
     }
-    
-    public double getyOnGround() {
+
+	public double getyOnGround() {
         return yOnGround;
     }
 
@@ -456,37 +455,54 @@ public class PlayerLocation {
        set(location, player, 0.001);
    }
     
-    /**
-     * Sets the player location object. Does not set or reset blockCache.
-     * 
-     * @param location
-     *            the location
-     * @param player
-     *            the player
-     */
-    public void set(final Location location, final Player player, final double yFreedom) {
+	/**
+	 * Sets the player location object. Does not set or reset blockCache.
+	 * 
+	 * @param location
+	 *            the location
+	 * @param player
+	 *            the player
+	 */
+	public void set(final Location location, final Player player, final double yFreedom)
+	{
 
-        entity = ((CraftPlayer) player).getHandle();
-        boundingBox = entity.boundingBox.clone().d(location.getX() - entity.locX, location.getY() - entity.locY,
-                location.getZ() - entity.locZ);
-        blockX = location.getBlockX();
-        blockY = location.getBlockY();
-        blockZ = location.getBlockZ();
-        x = location.getX();
-        y = location.getY();
-        z = location.getZ();
-        yaw = location.getYaw();
-        pitch = location.getPitch();
-        world = location.getWorld();
-        worldServer = ((CraftWorld) world).getHandle();
+		// Entity reference.
+		entity = ((CraftPlayer) player).getHandle();
 
-        typeId = typeIdBelow = data = null;
-        aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = passable = null;
-        
-        // TODO: consider blockCache.setAccess.
-        
-        this.setyOnGround(yFreedom);
-    }
+		// Set coordinates.
+		blockX = location.getBlockX();
+		blockY = location.getBlockY();
+		blockZ = location.getBlockZ();
+		x = location.getX();
+		y = location.getY();
+		z = location.getZ();
+		yaw = location.getYaw();
+		pitch = location.getPitch();
+
+		// Set bounding box.
+		final double dX = x - entity.locX;
+		final double dY = y - entity.locY;
+		final double dZ = z - entity.locZ;
+		minX = entity.boundingBox.a + dX;
+		minY = entity.boundingBox.b + dY;
+		minZ = entity.boundingBox.c + dZ;
+		maxX = entity.boundingBox.d + dX;
+		maxY = entity.boundingBox.e + dY;
+		maxZ = entity.boundingBox.f + dZ;
+
+		// Set world / block access.
+		world = location.getWorld();
+		worldServer = ((CraftWorld) world).getHandle();
+
+		// Reset cached values.
+		typeId = typeIdBelow = data = null;
+		aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = passable = null;
+
+		// TODO: consider blockCache.setAccess? <- currently rather not, because
+		// it might be anything.
+
+		this.setyOnGround(yFreedom);
+	}
     
     /**
      * Set some references to null.
@@ -495,8 +511,7 @@ public class PlayerLocation {
         entity = null;
         world = null;
         worldServer = null;
-        boundingBox = null;
-        blockCache = null;
+        blockCache = null; // No reset here.
     }
 
 }
