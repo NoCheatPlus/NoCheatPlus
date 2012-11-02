@@ -711,20 +711,37 @@ public class BlockProperties {
 			}
 		}
 		// (sword vs web already counted)
-	
+		
 		if (isValidTool || blockProps.tool.toolType == ToolType.NONE){
-			if (inWater && ! aquaAffinity) 
-				duration *= 5;
-			if (!onGround) 
-				duration *= 5;
+		    long mult = 1;
+			if (inWater && !aquaAffinity) 	mult *= 5;
+			if (!onGround) 					mult *= 5;
+			duration *= mult;
+			
 			// Efficiency level.
-			if (efficiency > 0){
+			if (efficiency > 0) {
+				// Workarounds ...
+				if (blockId == Material.WOODEN_DOOR.getId() && toolProps.toolType != ToolType.AXE) {
+					// Heck [Cleanup pending]...
+					switch (efficiency) {
+					case 1:
+						return 1500 * mult;
+					case 2:
+						return 750 * mult;
+					case 3:
+						return 450 * mult;
+					case 4:
+						return 250 * mult;
+					case 5:
+						return 150 * mult;
+					}
+				}
 				// This seems roughly correct.
 				for (int i = 0; i < efficiency; i++){
 					duration /= 1.33; // Matches well with obsidian.
 				}
 				// More Workarounds:
-				if (toolProps.materialBase == MaterialBase.WOOD){
+	            if (toolProps.materialBase == MaterialBase.WOOD){
 				    if (blockId == Material.LOG.getId()) duration -= efficiency >= 4 ? 250 : 400;
 				    else if (blockProps.tool.toolType == toolProps.toolType) duration -= 250;
 				    else duration -= efficiency * 30;
@@ -753,6 +770,7 @@ public class BlockProperties {
 			// (wood, sand, gravel, ice)
 			if (blockId == Material.SNOW.getId()) return toolProps.toolType == ToolType.SPADE;
 			if (blockId == Material.WOOL.getId()) return true;
+			if (blockId == Material.WOODEN_DOOR.getId()) return true;
 			if (blockProps.hardness <= 2 
 					&& (blockProps.tool.toolType == ToolType.AXE 
 					|| blockProps.tool.toolType == ToolType.SPADE
