@@ -52,7 +52,7 @@ public class Permissions {
 
  
     // Permissions for the individual checks.
-    private static final String CHECKS                       = NOCHEATPLUS + ".checks";
+    public static final String  CHECKS                       = NOCHEATPLUS + ".checks";
 
     /*
      * 888 88b, 888                    888    888 88b,                        888    
@@ -61,7 +61,7 @@ public class Permissions {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888 88b, 888    888   , ,ee 888 888 b  
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 88P' 888     "YeeP" "88 888 888 8b 
      */
-    private static final String BLOCKBREAK                   = CHECKS + ".blockbreak";
+    public static final String  BLOCKBREAK                   = CHECKS + ".blockbreak";
     public static final String  BLOCKBREAK_BREAK             = BLOCKBREAK + ".break";
     public static final String  BLOCKBREAK_BREAK_LIQUID      = BLOCKBREAK_BREAK + ".liquid";
     public static final String  BLOCKBREAK_DIRECTION         = BLOCKBREAK + ".direction";
@@ -78,7 +78,7 @@ public class Permissions {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888 888 888  888   888   , 888    ,ee 888 Y888   ,  888   
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 888 888  888    "YeeP" 888    "88 888  "88,e8'  888   
      */
-    private static final String BLOCKINTERACT                = CHECKS + ".blockinteract";
+    public static final String  BLOCKINTERACT                = CHECKS + ".blockinteract";
     public static final String  BLOCKINTERACT_DIRECTION      = BLOCKINTERACT + ".direction";
     public static final String  BLOCKINTERACT_REACH          = BLOCKINTERACT + ".reach";
 
@@ -89,9 +89,9 @@ public class Permissions {
      * 888 88b, 888 Y888 888P Y888   , 888 b  888      888 ,ee 888 Y888   , 888   , 
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
      */
-    private static final String BLOCKPLACE                   = CHECKS + ".blockplace";
+    public static final String  BLOCKPLACE                   = CHECKS + ".blockplace";
     public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
-    public static final String BLOCKPLACE_AGAINST_AIR        = BLOCKPLACE_AGAINST + ".air";
+    public static final String  BLOCKPLACE_AGAINST_AIR       = BLOCKPLACE_AGAINST + ".air";
 	public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
     public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
     public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";
@@ -106,19 +106,19 @@ public class Permissions {
      *  Y888  ,d 888 888 ,ee 888  888   
      *   "88,d88 888 888 "88 888  888   
      */
-    private static final String CHAT                         = CHECKS + ".chat";
+    public static final String  CHAT                         = CHECKS + ".chat";
     public static final String  CHAT_CAPTCHA                 = CHAT + ".captcha";
     public static final String  CHAT_COLOR                   = CHAT + ".color";
     public static final String  CHAT_COMMANDS                = CHAT + ".commands";
-    public static final String  CHAT_TEXT              = CHAT + ".text";
+    public static final String  CHAT_TEXT                    = CHAT + ".text";
     public static final String  CHAT_LOGINS                  = CHAT + ".logins";
     public static final String  CHAT_RELOG                   = CHAT + ".relog";
     
     /*
      * Combined !
      */
-    private static final String COMBINED                     = CHECKS + ".combined";
-	public static  final String COMBINED_IMPROBABLE          = COMBINED + ".improbable";
+    public static final String  COMBINED                     = CHECKS + ".combined";
+	public static final String  COMBINED_IMPROBABLE          = COMBINED + ".improbable";
 
     /*
      * 888'Y88 ,e,          888       d8   
@@ -129,7 +129,7 @@ public class Permissions {
      *               ,  88P                
      *              "8",P"                 
      */
-    private static final String FIGHT                        = CHECKS + ".fight";
+    public static final String  FIGHT                        = CHECKS + ".fight";
     public static final String  FIGHT_ANGLE                  = FIGHT + ".angle";
     public static final String  FIGHT_CRITICAL               = FIGHT + ".critical";
     public static final String  FIGHT_DIRECTION              = FIGHT + ".direction";
@@ -149,7 +149,7 @@ public class Permissions {
      *                                                                  888    
      *                                                                  888    
      */
-    private static final String INVENTORY                    = CHECKS + ".inventory";
+    public static final String  INVENTORY                    = CHECKS + ".inventory";
     public static final String  INVENTORY_DROP               = INVENTORY + ".drop";
     public static final String  INVENTORY_FASTCLICK          = INVENTORY + ".fastclick";
     public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
@@ -165,7 +165,7 @@ public class Permissions {
      *                                                 ,  88P 
      *                                                "8",P"  
      */
-    private static final String MOVING                       = CHECKS + ".moving";
+    public static final String  MOVING                       = CHECKS + ".moving";
     public static final String  MOVING_BOATSANYWHERE         = MOVING + ".boatsanywhere";
     public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";
     public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
