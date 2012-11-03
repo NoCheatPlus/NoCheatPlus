@@ -391,7 +391,7 @@ public class MovingListener implements Listener {
 
 		final Location passableTo;
 		// Check passable in any case (!)
-		if (passable.isEnabled(player)) {
+		if (cc.passableCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
 			// Passable is checked first to get the original set-back locations from the other checks, if needed. 
 			passableTo = passable.check(player, pFrom, pTo, data, cc);
 		}
