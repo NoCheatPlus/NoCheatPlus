@@ -61,7 +61,7 @@ public class RemovePlayerCommand extends NCPCommand {
 		
 		if (DataManager.removeExecutionHistory(checkType, playerName)) histRemoved = true;
 		
-		final boolean dataRemoved = CheckType.removeData(playerName, checkType) || DataManager.clearComponentData(checkType, playerName);
+		final boolean dataRemoved = DataManager.removeData(playerName, checkType);
 		
 		if (dataRemoved || histRemoved){
 			String which;

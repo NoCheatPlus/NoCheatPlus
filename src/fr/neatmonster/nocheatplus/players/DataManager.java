@@ -197,6 +197,38 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
 		ViolationHistory.clear(checkType);
 	}
 	
+    /**
+     * Remove the player data for a given player and a given check type. CheckType.ALL and null will be interpreted as removing all data.<br>
+     * @param playerName
+     * @param checkType 
+     * @return If any data was present.
+     */
+	public static boolean removeData(final String playerName, CheckType checkType) {
+		if (checkType == null) checkType = CheckType.ALL;
+		
+		// Attempt for direct removal.
+		CheckDataFactory dataFactory = checkType.getDataFactory();
+		if (dataFactory != null) return dataFactory.removeData(playerName) != null;
+		
+		// Remove all for which it seems necessary.
+		final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
+		for (CheckType otherType : CheckType.values()){
+			if (checkType == CheckType.ALL || APIUtils.isParent(checkType, otherType)){
+				final CheckDataFactory otherFactory = otherType.getDataFactory();
+				if (otherFactory != null) factories.add(otherFactory);
+			}
+		}
+		boolean had = false;
+		for (final CheckDataFactory otherFactory : factories){
+			if (otherFactory.removeData(playerName) != null) had = true;
+		}
+		
+		// Check extended registered components.
+		if (clearComponentData(checkType, playerName)) had = true;
+		
+		return had;
+	}
+	
 	/**
 	 * Clear player related data, only for registered components (not execution history, violation history, normal check data).<br>
 	 * That should at least go for chat engione data.

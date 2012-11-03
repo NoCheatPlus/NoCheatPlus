@@ -1,8 +1,5 @@
 package fr.neatmonster.nocheatplus.checks;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
@@ -23,7 +20,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
@@ -238,29 +235,12 @@ public enum CheckType {
 
     /**
      * Remove the player data for a given player and a given check type. CheckType.ALL and null will be interpreted as removing all data.<br>
+     * @deprecated Will be removed, use DataManager.removeData instead.
      * @param playerName
      * @param checkType 
      * @return If any data was present.
      */
-	public static boolean removeData(final String playerName, CheckType checkType) {
-		if (checkType == null) checkType = ALL;
-		
-		// Attempt for direct removal.
-		CheckDataFactory dataFactory = checkType.getDataFactory();
-		if (dataFactory != null) return dataFactory.removeData(playerName) != null;
-		
-		// Remove all for which it seems necessary.
-		final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-		for (CheckType otherType : CheckType.values()){
-			if (checkType == ALL || APIUtils.isParent(checkType, otherType)){
-				final CheckDataFactory otherFactory = otherType.getDataFactory();
-				if (otherFactory != null) factories.add(otherFactory);
-			}
-		}
-		boolean had = false;
-		for (final CheckDataFactory otherFactory : factories){
-			if (otherFactory.removeData(playerName) != null) had = true;
-		}
-		return had;
+	public static boolean removeData(final String playerName, final CheckType checkType) {
+		return DataManager.removeData(playerName, checkType);
 	}
 }
