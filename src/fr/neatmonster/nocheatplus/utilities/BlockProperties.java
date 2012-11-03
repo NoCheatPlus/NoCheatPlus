@@ -977,6 +977,17 @@ public class BlockProperties {
 	    final IBlockAccess access = ((org.bukkit.craftbukkit.CraftWorld) loc.getWorld()).getHandle();
 		return isPassable(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 	}
+	
+	/**
+	 * Convenience method to allow using an already fetched or prepared IBlockAccess.
+	 * @param access
+	 * @param loc
+	 * @return
+	 */
+	public static final boolean isPassable(final IBlockAccess  access, final Location loc)
+	{
+		return isPassable(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+	}
 
 	/**
 	 * API access to read extra properties from files.
