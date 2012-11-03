@@ -205,26 +205,21 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
      */
 	public static boolean removeData(final String playerName, CheckType checkType) {
 		if (checkType == null) checkType = CheckType.ALL;
-		
-		// Attempt for direct removal.
-		CheckDataFactory dataFactory = checkType.getDataFactory();
-		if (dataFactory != null) return dataFactory.removeData(playerName) != null;
-		
-		// Remove all for which it seems necessary.
-		final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-		for (CheckType otherType : CheckType.values()){
-			if (checkType == CheckType.ALL || APIUtils.isParent(checkType, otherType)){
-				final CheckDataFactory otherFactory = otherType.getDataFactory();
-				if (otherFactory != null) factories.add(otherFactory);
-			}
-		}
 		boolean had = false;
-		for (final CheckDataFactory otherFactory : factories){
-			if (otherFactory.removeData(playerName) != null) had = true;
-		}
 		
 		// Check extended registered components.
 		if (clearComponentData(checkType, playerName)) had = true;
+		
+		// Collect factories.
+		final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
+		for (CheckType otherType : APIUtils.getWithChildren(checkType)){
+			final CheckDataFactory otherFactory = otherType.getDataFactory();
+			if (otherFactory != null) factories.add(otherFactory);
+		}
+		// Remove data.
+		for (final CheckDataFactory otherFactory : factories){
+			if (otherFactory.removeData(playerName) != null) had = true;
+		}
 		
 		return had;
 	}
