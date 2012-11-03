@@ -1,7 +1,8 @@
 package fr.neatmonster.nocheatplus.components;
 
 /**
- * Interface for component registration to allow cleanup for player data. 
+ * Interface for component registration to allow cleanup for player data.<br>
+ * NOTE: For CheckType-specific data removal, IHaveCheckType should be implemented, otherwise this data might get ignored until plugin-disable.
  * @author mc_dev
  *
  */
