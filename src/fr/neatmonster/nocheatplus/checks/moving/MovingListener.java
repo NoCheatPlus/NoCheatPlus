@@ -387,13 +387,18 @@ public class MovingListener implements Listener {
         }
         
 
-        Location newTo = null;
-        
-        if (passable.isEnabled(player)) newTo = passable.check(player, pFrom, pTo, data, cc);
+		Location newTo = null;
+
+		final Location passableTo;
+		// Check passable in any case (!)
+		if (passable.isEnabled(player)) {
+			// Passable is checked first to get the original set-back locations from the other checks, if needed. 
+			passableTo = passable.check(player, pFrom, pTo, data, cc);
+		}
+		else passableTo = null;
         
         // Optimized checking, giving creativefly permission precedence over survivalfly.
-        if (newTo != null);
-        else if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
+        if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
         	// Either survivalfly or speed check.
         	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
@@ -412,13 +417,16 @@ public class MovingListener implements Listener {
         }
         else data.clearFlyData();
 
-        if (newTo == null 
-        	 && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS))
-            // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
-            newTo = morePackets.check(player, pFrom, pTo, data, cc);
-        else
-            // Otherwise we need to clear his data.
-            data.clearMorePacketsData();
+		if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
+			// If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
+			newTo = morePackets.check(player, pFrom, pTo, data, cc);
+		} else {
+			// Otherwise we need to clear his data.
+			data.clearMorePacketsData();
+		}
+		
+		// Prefer the location returned by passable.
+		if (passableTo != null) newTo = passableTo;
 
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null) {
@@ -428,13 +436,16 @@ public class MovingListener implements Listener {
             // Remember where we send the player to.
             data.teleported = newTo;
         }
+        
         // Set positions.
+        // TODO: Should these be set on monitor ?
         data.fromX = from.getX();
         data.fromY = from.getY();
         data.fromZ = from.getZ();
         data.toX = to.getX();
         data.toY = to.getY();
         data.toZ = to.getZ();
+        
         // Cleanup.
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
