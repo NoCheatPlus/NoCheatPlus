@@ -40,6 +40,14 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 
+/**
+ * Central access point for a lot of functionality for managing data, especially removing data for cleanup.<br>
+ * Originally intended as temporary or intermediate design, this might help reorganizing the API at some point.<br>
+ * However i could not yet find a pleasing way for generic configuration access for a centralized data management (all in one),
+ * so this might just be a workarounds class for coping with the current design, until somehow resolved in another way.
+ * @author mc_dev
+ *
+ */
 public class DataManager implements Listener, INotifyReload, INeedConfig, IComponentRegistry{
 	
 	protected static DataManager instance = null;
@@ -65,15 +73,28 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
 	 */
 	protected final Map<CheckType, Map<String, ExecutionHistory>> executionHistories = new HashMap<CheckType, Map<String,ExecutionHistory>>();
 	
+	/** 
+	 * Duration in milliseconds for expiration of logged off players data. 
+	 * Disabled with 0, in the config minutes are used as unit.
+	 */
 	protected long durExpireData = 0;
 	
+	/** Data and execution history. */
 	protected boolean deleteData = true;
+	/** Violation history and execution history. */
 	protected boolean deleteHistory = false;
 	
+	/**
+	 * Sets the static instance reference.
+	 */
 	public DataManager(){
 		instance = this;
 	}
 	
+	/**
+	 * Check the logged out players for if any data can be removed.<br>
+	 * Currently only "dumb" full removal is performed. Later it is thinkable to remove "as much as reasonable".
+	 */
 	public void checkExpiration(){
 		if (durExpireData <= 0) return;
 		final long now = System.currentTimeMillis();
@@ -119,6 +140,10 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
         onLeave(event.getPlayer());
     }
 	
+    /**
+     * Quit or kick.
+     * @param player
+     */
 	private final void onLeave(final Player player) {
 	    final long now = System.currentTimeMillis();
         lastLogout.put(player.getName(), now);
@@ -127,10 +152,13 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
 
 	@Override
 	public void onReload() {
-		// future
+		// present.
 		adjustSettings();
 	}
 
+	/**
+	 * Fetch settings from the current default config.
+	 */
 	private void adjustSettings() {
 		final ConfigFile config = ConfigManager.getConfigFile();
 		durExpireData = config.getLong(ConfPaths.DATA_EXPIRATION_DURATION) * 60000L; // in minutes
@@ -138,6 +166,12 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
 		deleteHistory = config.getBoolean(ConfPaths.DATA_EXPIRATION_HISTORY);
 	}
 
+	/**
+	 * Used by checks to register the history for external access.<br>
+	 * NOTE: This method is not really meant ot be used from outside NCP.
+	 * @param type
+	 * @param histories
+	 */
 	public static void registerExecutionHistory(CheckType type, Map<String, ExecutionHistory> histories) {
 		instance.executionHistories.put(type, histories);
 	}
@@ -154,6 +188,12 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
         return null;
 	}
 	
+	/**
+	 * Remove the execution history for a player for the given check type.
+	 * @param type
+	 * @param playerName
+	 * @return
+	 */
 	public static boolean removeExecutionHistory(final CheckType type, final String playerName){
 		boolean removed = false;
 		// TODO: design ...
@@ -199,8 +239,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
 	
     /**
      * Remove the player data for a given player and a given check type. CheckType.ALL and null will be interpreted as removing all data.<br>
-     * @param playerName
-     * @param checkType 
+     * @param playerName Exact player name.
+     * @param checkType Check type to remove data for, null is regarded as ALL.
      * @return If any data was present.
      */
 	public static boolean removeData(final String playerName, CheckType checkType) {
@@ -226,7 +266,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
 	
 	/**
 	 * Clear player related data, only for registered components (not execution history, violation history, normal check data).<br>
-	 * That should at least go for chat engione data.
+	 * That should at least go for chat engine data.
 	 * @param CheckType
 	 * @param PlayerName
 	 * @return If something was removed.
@@ -276,7 +316,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, ICompo
 	}
 	
 	/**
-	 * Cleanup method.
+	 * Cleanup method, removes all data and config, but does not call ConfigManager.cleanup.
 	 */
 	public void onDisable() {
 		clearData(CheckType.ALL);
