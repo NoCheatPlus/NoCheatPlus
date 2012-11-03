@@ -335,7 +335,6 @@ public class PlayerLocation {
             if (!onGround){
                 // TODO: Probably check other ids too before doing this ?
                 final double d0 = 0.25D;
-                // TODO: Check if this uses the ounding box pool.
                 final AxisAlignedBB box = useBox.b(minX - d0, minY - getyOnGround() - d0, minZ - d0, maxX + d0, maxY + d0, maxZ + d0);
                 @SuppressWarnings("rawtypes")
                 List list = worldServer.getEntities(entity, box);
@@ -498,8 +497,7 @@ public class PlayerLocation {
 		typeId = typeIdBelow = data = null;
 		aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = passable = null;
 
-		// TODO: consider blockCache.setAccess? <- currently rather not, because
-		// it might be anything.
+		// TODO: Consider blockCache.setAccess? <- currently rather not, because it might be anything.
 
 		this.setyOnGround(yFreedom);
 	}
