@@ -54,6 +54,10 @@ public class Passable extends Check {
 				    }
 				}
 			}
+
+			// Prefer the set-back location from the data.
+			if (data.setBack != null && BlockProperties.isPassable(from.getBlockAccess(), data.setBack)) loc = data.setBack;
+
 			// Return the reset position.
 			data.passableVL += 1d;
 			final ViolationData vd = new ViolationData(this, player, data.passableVL, 1, cc.passableActions);
@@ -61,7 +65,7 @@ public class Passable extends Check {
 			if (executeActions(vd)){
 			    // TODO: Consider another set back position for this, also keeping track of players moving around in blocks.
 				final Location newTo;
-				if (!from.isPassable() && loc == null){
+				if (loc == null && !from.isPassable()){
 				    // Check if passable.
 				    loc = player.getLocation();
 				    if (to.isSamePos(loc) || !BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(from.getBlockX(), from.getBlockY(), from.getBlockZ()))){
