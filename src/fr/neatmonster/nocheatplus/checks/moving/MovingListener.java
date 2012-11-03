@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -714,6 +715,22 @@ public class MovingListener implements Listener {
         data.clearNoFallData();
         // Entity fall-distance should be reset elsewhere.
     }
+    
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerJoin(final PlayerJoinEvent event) {
+		final Player player = event.getPlayer();
+		if (survivalFly.isEnabled(player)){
+			final MovingData data = MovingData.getData(player);
+			// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
+			if (data.setBack == null){
+				data.setBack = player.getLocation();
+			}
+			if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
+				// TODO: re-think: more fine grained reset?
+				data.resetPositions(data.setBack);
+			}
+		}
+	}
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(final PlayerQuitEvent event){
