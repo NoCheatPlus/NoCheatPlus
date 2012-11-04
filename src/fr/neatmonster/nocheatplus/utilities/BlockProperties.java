@@ -502,6 +502,7 @@ public class BlockProperties {
 		blocks[Material.SKULL.getId()] = new BlockProps(noTool, 8.5f, secToMs(1.45)); // TODO
 		blockFlags[Material.SKULL.getId()] |= F_GROUND;
 		blocks[Material.ANVIL.getId()] = new BlockProps(woodPickaxe, 5f); // TODO
+		blockFlags[Material.FLOWER_POT.getId()] |= F_GROUND;
 		
 		// Indestructible.
 		for (Material mat : new Material[]{
