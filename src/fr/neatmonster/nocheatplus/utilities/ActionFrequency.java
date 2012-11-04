@@ -107,8 +107,14 @@ public class ActionFrequency {
 			cf *= factor;
 		}
 		return score;
-			
-			
+	}
+	
+	/**
+	 * Get reference time.
+	 * @return
+	 */
+	public final long lastAccess(){
+		return time;
 	}
 	
 }
