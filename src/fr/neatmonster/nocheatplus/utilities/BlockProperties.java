@@ -261,6 +261,8 @@ public class BlockProperties {
     public static final int F_HEIGHT150     = 0x40;
     /** The player can stand on these, sneaking or not. */
     public static final int F_GROUND        = 0x80;
+    /** 1 block height. */
+    public static final int F_HEIGHT100     = 0x100;
     
 	static{
 		init();
@@ -328,7 +330,7 @@ public class BlockProperties {
 		for (final Material mat : new Material[] {Material.NETHER_BRICK_STAIRS,
 				Material.COBBLESTONE_STAIRS, Material.SMOOTH_STAIRS, Material.BRICK_STAIRS,  Material.SANDSTONE_STAIRS,
 	            Material.WOOD_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS}){
-			blockFlags[mat.getId()] |= F_STAIRS;
+			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100;
 		}
 		// WATER.
 		for (final Material mat : new Material[]{
@@ -356,6 +358,7 @@ public class BlockProperties {
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
+        blockFlags[Material.ENDER_PORTAL_FRAME.getId()] |= F_HEIGHT100;
 		// Ignore for passable.
 		for (final Material mat : new Material[]{
 				Material.WOOD_PLATE, Material.STONE_PLATE, 
@@ -1105,7 +1108,7 @@ public class BlockProperties {
         final double bmaxY;
 //        if ((blockFlags[id] & F_HEIGHT150) != 0) block.maxY = 1.5;
         if ((blockFlags[id] & F_HEIGHT150) != 0) bmaxY = 1.5;
-        else if (isStairs(id)) bmaxY = 1.0;
+        else if ((blockFlags[id] & F_HEIGHT100) != 0)  bmaxY = 1.0;
         else bmaxY = block.y(); // maxY
 //        if (minX > block.maxX + x || maxX < block.minX + x) return false;
 //        else if (minY > block.maxY + y || maxY < block.minY + y) return false;
