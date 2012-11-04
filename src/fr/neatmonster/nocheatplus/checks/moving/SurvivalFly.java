@@ -115,9 +115,13 @@ public class SurvivalFly extends Check {
         // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
         if (!resetFrom){
             // Don't set "useWorkaround = x()", to avoid potential trouble with reordering to come, and similar.
-            boolean useWorkaround = false;
-            // Check for moving off stairs.
-            if (!useWorkaround && from.isAboveStairs()) useWorkaround = true;
+			boolean useWorkaround = false;
+			boolean setBackSafe = false; // Let compiler remove this if necessary.
+			// Check for moving off stairs.
+			if (!useWorkaround && from.isAboveStairs()) {
+				useWorkaround = true;
+				setBackSafe = true;
+			}
             // Check for "lost touch",  for when moving events were not created, for instance (1/256).
             if (!useWorkaround){
                 final boolean inconsistent = yDistance > 0 && yDistance < 0.5 && data.survivalFlyLastYDist < 0 
@@ -135,16 +139,17 @@ public class SurvivalFly extends Check {
                             final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
                             final double iY =  minY; // TODO ...
                             final double r = from.getWidth() / 2.0;
-                            if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) useWorkaround = true;
+							if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
+								useWorkaround = true;
+								setBackSafe = true;
+							}
                         }
                     }  
                 } 
             }
             if (useWorkaround){ // !toOnGround && to.isAboveStairs()) {
                 // Set the new setBack and reset the jumpPhase.
-                
-                // Maybe don't adapt the setback (unless null)!
-//                data.setBack = from.getLocation();
+				if (setBackSafe) data.setBack = from.getLocation();
                 data.setBack.setY(Location.locToBlock(data.setBack.getY()));
                 // data.ground ?
                 // ? set jumpphase to height / 0.15 ?
