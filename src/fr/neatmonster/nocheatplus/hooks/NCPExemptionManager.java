@@ -111,37 +111,34 @@ public class NCPExemptionManager {
         exemptPermanently(player.getEntityId(), checkType);
     }
 
-    /**
-     * This should be registered before all other listeners of NoCheatPlus.
-     * 
-     * NOTE: For internal use only, DO NOT CALL FROM OUTSIDE.
-     * 
-     * @return the listener
-     */
-    public static Listener getListener() {
-        return new Listener() {
-            @SuppressWarnings("unused")
-            @EventHandler(
-                    ignoreCancelled = true, priority = EventPriority.LOWEST)
-            public void onPlayerJoin(final PlayerJoinEvent event) {
-                NCPExemptionManager.registerPlayer(event.getPlayer());
-            }
+	/**
+	 * This should be registered before all other listeners of NoCheatPlus.
+	 * 
+	 * NOTE: For internal use only, DO NOT CALL FROM OUTSIDE.
+	 * 
+	 * @return the listener
+	 */
+	public static Listener getListener() {
+		return new Listener() {
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.LOWEST)
+			public void onPlayerJoin(final PlayerJoinEvent event) {
+				NCPExemptionManager.registerPlayer(event.getPlayer());
+			}
 
-            @SuppressWarnings("unused")
-            @EventHandler(
-                    ignoreCancelled = true, priority = EventPriority.MONITOR)
-            public void onPlayerQuit(final PlayerQuitEvent event) {
-                NCPExemptionManager.tryToRemove(event.getPlayer());
-            }
-            
-            @SuppressWarnings("unused")
-            @EventHandler(
-                    ignoreCancelled = true, priority = EventPriority.MONITOR)
-            public void onPlayerKick(final PlayerKickEvent event) {
-                NCPExemptionManager.tryToRemove(event.getPlayer());
-            }
-        };
-    }
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.MONITOR)
+			public void onPlayerQuit(final PlayerQuitEvent event) {
+				NCPExemptionManager.tryToRemove(event.getPlayer());
+			}
+
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+			public void onPlayerKick(final PlayerKickEvent event) {
+				NCPExemptionManager.tryToRemove(event.getPlayer());
+			}
+		};
+	}
 
     /**
      * Check if an entity is exempted from a check right now by entity id.
