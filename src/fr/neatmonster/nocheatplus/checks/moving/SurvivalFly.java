@@ -332,6 +332,12 @@ public class SurvivalFly extends Check {
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, vsc0 - vsc1);
                 }
             }
+
+			// Check if y-direction is going upwards without speed / ground.
+			if (!data.noFallAssumeGround && yDistance > 0 && data.survivalFlyLastYDist < 0 && data.verticalFreedom <= 0.001) {
+				// Moving upwards without having touched the ground.
+				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+			}
         }
         
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
