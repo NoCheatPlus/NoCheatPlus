@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import net.minecraft.server.EntityPlayer;
@@ -14,6 +15,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.players.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -47,6 +49,9 @@ public class SurvivalFly extends Check {
 	/** Faster moving down stream (water mainly). */
 	public static final double modDownStream      = 0.19 / swimmingSpeed;
 
+	/** To join some components with moving check violations. */
+	private final ArrayList<String> components = new ArrayList<String>(15);
+	
     /**
      * Instantiates a new survival fly check.
      */
@@ -91,7 +96,7 @@ public class SurvivalFly extends Check {
      */
     public Location check(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
         final long now = System.currentTimeMillis();
-
+        components.clear();
         // A player is considered sprinting if the flag is set and if he has enough food level.
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
         
@@ -216,12 +221,14 @@ public class SurvivalFly extends Check {
         // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
-        // Prevent players from walking on a liquid.
-        // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
-        if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D
-                && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround
-                && to.getY() % 1D < 0.8D)
-            hDistanceAboveLimit = hDistance;
+        if (hDistanceAboveLimit > 0) components.add("hspeed");
+        
+		// Prevent players from walking on a liquid.
+		// TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
+		if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround && to.getY() % 1D < 0.8D) {
+			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+			components.add("waterwalk");
+		}
 
         // Prevent players from sprinting if they're moving backwards.
         if (hDistanceAboveLimit <= 0D && sprinting) {
@@ -230,7 +237,10 @@ public class SurvivalFly extends Check {
                     && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
                     || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F){
             	// Assumes permission check to be the heaviest (might be mistaken).
-            	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) hDistanceAboveLimit = hDistance;
+            	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)){
+            		hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+            		components.add("sprintback");
+            	}
             }
         }
 
@@ -242,6 +252,8 @@ public class SurvivalFly extends Check {
             if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
                 data.bunnyhopDelay = 9;
                 hDistanceAboveLimit = 0D;
+                components.clear();
+                components.add("bunny"); // TODO: Which here...
             }
 
         if (hDistanceAboveLimit > 0D) {
@@ -250,8 +262,13 @@ public class SurvivalFly extends Check {
             data.horizontalBuffer = 0D;
 
             // Put back the "overconsumed" buffer.
-            if (hDistanceAboveLimit < 0D)
-                data.horizontalBuffer = -hDistanceAboveLimit;
+            if (hDistanceAboveLimit < 0D){
+            	data.horizontalBuffer = -hDistanceAboveLimit;
+            }
+            if (hDistanceAboveLimit >= 0){
+            	components.clear();
+            	components.add("hbuffer"); // TODO: ...
+            }
         } else
             data.horizontalBuffer = Math.min(1D, data.horizontalBuffer - hDistanceAboveLimit);
 
@@ -278,6 +295,7 @@ public class SurvivalFly extends Check {
         			data.survivalFlyLastYDist = Double.MAX_VALUE;
         			return data.setBack;
         		}
+        		if (vDistanceAboveLimit > 0) components.add("vweb");
         	}
         }
         else{
@@ -296,10 +314,11 @@ public class SurvivalFly extends Check {
             
 //            System.out.println("vda = " +vDistanceAboveLimit + " / vc = " + data.verticalVelocityCounter + " / vf = " + data.verticalFreedom + " / v = " + player.getVelocity().length());
 
-            // Step can also be blocked.
-            if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
-                    && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP))
-                vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+			// Step can also be blocked.
+			if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
+				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+				components.add("step");
+			}
 
         }
 		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
@@ -323,6 +342,7 @@ public class SurvivalFly extends Check {
                 final float hsc1 = data.hDistSum.getScore(2);
                 if (hsc0 < hsc1 || hDistance < 3.9 && hsc0 == hsc1){
                     hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hsc0 - hsc1);
+                    components.add("hacc");
                 }
             }
             if (useV && data.vDistCount.getScore(2) > 0 && data.vDistCount.getScore(1) > 0){
@@ -330,6 +350,7 @@ public class SurvivalFly extends Check {
                 final float vsc1 = data.vDistSum.getScore(2);
                 if (vsc0 < vsc1 || yDistance < 3.9 && vsc0 == vsc1){
                     vDistanceAboveLimit = Math.max(vDistanceAboveLimit, vsc0 - vsc1);
+                    components.add("vacc");
                 }
             }
 
@@ -337,6 +358,7 @@ public class SurvivalFly extends Check {
 			if (!data.noFallAssumeGround && yDistance > 0 && data.survivalFlyLastYDist < 0 && data.verticalFreedom <= 0.001) {
 				// Moving upwards without having touched the ground.
 				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+				components.add("ychange");
 			}
         }
         
@@ -365,6 +387,7 @@ public class SurvivalFly extends Check {
                 vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
                 vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
                 vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
+                vd.setParameter(ParameterName.COMPONENT, CheckUtils.join(components, "+"));
             }
             data.survivalFlyVLTime = now;
             if (executeActions(vd)){
