@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,194 +19,195 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 /**
- * The Class CheckUtils.
+ * Random auxiliary gear, some might have general quality.
  */
 public class CheckUtils {
 
-    /** The file logger. */
-    public static Logger fileLogger = null;
-    
-    /** Decimal format for "#.###" */
-    public static final DecimalFormat fdec3 = new DecimalFormat();
-    
-    static{
-    	DecimalFormatSymbols sym = fdec3.getDecimalFormatSymbols();
-    	sym.setDecimalSeparator('.');
-    	fdec3.setDecimalFormatSymbols(sym);
-    	fdec3.setMaximumFractionDigits(3);
-    	fdec3.setMinimumIntegerDigits(1);
-    }
+	/** The file logger. */
+	public static Logger fileLogger = null;
 
-    /**
-     * Check if a player looks at a target of a specific size, with a specific precision value (roughly).
-     * 
-     * @param player
-     *            the player
-     * @param targetX
-     *            the target x
-     * @param targetY
-     *            the target y
-     * @param targetZ
-     *            the target z
-     * @param targetWidth
-     *            the target width
-     * @param targetHeight
-     *            the target height
-     * @param precision
-     *            the precision
-     * @return the double
-     */
-    public static double directionCheck(final Player player, final double targetX, final double targetY,
-            final double targetZ, final double targetWidth, final double targetHeight, final double precision) {
+	/** Decimal format for "#.###" */
+	public static final DecimalFormat fdec3 = new DecimalFormat();
 
-        // Get the eye location of the player.
-        final Location eyes = player.getEyeLocation();
+	static {
+		DecimalFormatSymbols sym = fdec3.getDecimalFormatSymbols();
+		sym.setDecimalSeparator('.');
+		fdec3.setDecimalFormatSymbols(sym);
+		fdec3.setMaximumFractionDigits(3);
+		fdec3.setMinimumIntegerDigits(1);
+	}
 
-        final double factor = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2)
-                + Math.pow(eyes.getZ() - targetZ, 2));
+	/**
+	 * Check if a player looks at a target of a specific size, with a specific
+	 * precision value (roughly).
+	 * 
+	 * @param player
+	 *            the player
+	 * @param targetX
+	 *            the target x
+	 * @param targetY
+	 *            the target y
+	 * @param targetZ
+	 *            the target z
+	 * @param targetWidth
+	 *            the target width
+	 * @param targetHeight
+	 *            the target height
+	 * @param precision
+	 *            the precision
+	 * @return the double
+	 */
+	public static double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
+	{
 
-        // Get the view direction of the player.
-        final Vector direction = eyes.getDirection();
+		// Get the eye location of the player.
+		final Location eyes = player.getEyeLocation();
 
-        final double x = targetX - eyes.getX();
-        final double y = targetY - eyes.getY();
-        final double z = targetZ - eyes.getZ();
+		final double factor = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
 
-        final double xPrediction = factor * direction.getX();
-        final double yPrediction = factor * direction.getY();
-        final double zPrediction = factor * direction.getZ();
+		// Get the view direction of the player.
+		final Vector direction = eyes.getDirection();
 
-        double off = 0.0D;
+		final double x = targetX - eyes.getX();
+		final double y = targetY - eyes.getY();
+		final double z = targetZ - eyes.getZ();
 
-        off += Math.max(Math.abs(x - xPrediction) - (targetWidth / 2 + precision), 0.0D);
-        off += Math.max(Math.abs(z - zPrediction) - (targetWidth / 2 + precision), 0.0D);
-        off += Math.max(Math.abs(y - yPrediction) - (targetHeight / 2 + precision), 0.0D);
+		final double xPrediction = factor * direction.getX();
+		final double yPrediction = factor * direction.getY();
+		final double zPrediction = factor * direction.getZ();
 
-        if (off > 1)
-            off = Math.sqrt(off);
+		double off = 0.0D;
 
-        return off;
-    }
+		off += Math.max(Math.abs(x - xPrediction) - (targetWidth / 2 + precision), 0.0D);
+		off += Math.max(Math.abs(z - zPrediction) - (targetWidth / 2 + precision), 0.0D);
+		off += Math.max(Math.abs(y - yPrediction) - (targetHeight / 2 + precision), 0.0D);
 
-    /**
-     * Calculate the distance between two location, because for Bukkit distance is the distance squared and
-     * distanceSquared is the distance non-squared.
-     * 
-     * @param location1
-     *            the location1
-     * @param location2
-     *            the location2
-     * @return the double
-     */
-    public static double distance(final Location location1, final Location location2) {
-        return Math.sqrt(Math.pow(location2.getX() - location1.getX(), 2)
-                + Math.pow(location2.getY() - location1.getY(), 2) + Math.pow(location2.getZ() - location1.getZ(), 2));
-    }
+		if (off > 1) off = Math.sqrt(off);
 
-    /**
-     * Return if the two Strings are similar based on the given threshold.
-     * 
-     * @param s
-     *            the first String, must not be null
-     * @param t
-     *            the second String, must not be null
-     * @param threshold
-     *            the minimum value of the correlation coefficient
-     * @return result true if the two Strings are similar, false otherwise
-     */
-    public static boolean isSimilar(final String s, final String t, final float threshold) {
-        return 1.0f - (float) levenshteinDistance(s, t) / Math.max(1.0, Math.max(s.length(), t.length())) > threshold;
-    }
+		return off;
+	}
 
-    /**
-     * Find the Levenshtein distance between two Strings.
-     * 
-     * This is the number of changes needed to change one String into another, where each change is a single character
-     * modification (deletion, insertion or substitution).
-     * 
-     * @param s
-     *            the first String, must not be null
-     * @param t
-     *            the second String, must not be null
-     * @return result distance
-     */
-    private static int levenshteinDistance(CharSequence s, CharSequence t) {
-        if (s == null || t == null)
-            throw new IllegalArgumentException("Strings must not be null");
+	/**
+	 * Calculate the distance between two location, because for Bukkit distance
+	 * is the distance squared and distanceSquared is the distance non-squared.
+	 * 
+	 * @param location1
+	 *            the location1
+	 * @param location2
+	 *            the location2
+	 * @return the double
+	 */
+	public static double distance(final Location location1, final Location location2)
+	{
+		return Math.sqrt(Math.pow(location2.getX() - location1.getX(), 2) + Math.pow(location2.getY() - location1.getY(), 2) + Math.pow(location2.getZ() - location1.getZ(), 2));
+	}
 
-        int n = s.length();
-        int m = t.length();
+	/**
+	 * Return if the two Strings are similar based on the given threshold.
+	 * 
+	 * @param s
+	 *            the first String, must not be null
+	 * @param t
+	 *            the second String, must not be null
+	 * @param threshold
+	 *            the minimum value of the correlation coefficient
+	 * @return result true if the two Strings are similar, false otherwise
+	 */
+	public static boolean isSimilar(final String s, final String t, final float threshold)
+	{
+		return 1.0f - (float) levenshteinDistance(s, t) / Math.max(1.0, Math.max(s.length(), t.length())) > threshold;
+	}
 
-        if (n == 0)
-            return m;
-        else if (m == 0)
-            return n;
+	/**
+	 * Find the Levenshtein distance between two Strings.
+	 * 
+	 * This is the number of changes needed to change one String into another,
+	 * where each change is a single character modification (deletion, insertion or substitution).
+	 * 
+	 * @param s
+	 *            the first String, must not be null
+	 * @param t
+	 *            the second String, must not be null
+	 * @return result distance
+	 */
+	private static int levenshteinDistance(CharSequence s, CharSequence t) {
+		if (s == null || t == null) throw new IllegalArgumentException("Strings must not be null");
 
-        if (n > m) {
-            final CharSequence tmp = s;
-            s = t;
-            t = tmp;
-            n = m;
-            m = t.length();
-        }
+		int n = s.length();
+		int m = t.length();
 
-        int p[] = new int[n + 1];
-        int d[] = new int[n + 1];
-        int _d[];
+		if (n == 0) return m;
+		else if (m == 0) return n;
 
-        int i;
-        int j;
+		if (n > m) {
+			final CharSequence tmp = s;
+			s = t;
+			t = tmp;
+			n = m;
+			m = t.length();
+		}
 
-        char t_j;
+		int p[] = new int[n + 1];
+		int d[] = new int[n + 1];
+		int _d[];
 
-        int cost;
+		int i;
+		int j;
 
-        for (i = 0; i <= n; i++)
-            p[i] = i;
+		char t_j;
 
-        for (j = 1; j <= m; j++) {
-            t_j = t.charAt(j - 1);
-            d[0] = j;
+		int cost;
 
-            for (i = 1; i <= n; i++) {
-                cost = s.charAt(i - 1) == t_j ? 0 : 1;
-                d[i] = Math.min(Math.min(d[i - 1] + 1, p[i] + 1), p[i - 1] + cost);
-            }
+		for (i = 0; i <= n; i++)
+			p[i] = i;
 
-            _d = p;
-            p = d;
-            d = _d;
-        }
+		for (j = 1; j <= m; j++) {
+			t_j = t.charAt(j - 1);
+			d[0] = j;
 
-        return p[n];
-    }
-    
-    /**
-     * Join parts with link. 
-     * @param input
-     * @param link
-     * @return
-     */
-    public static <O extends Object> String join(final Collection<O> input, final String link){
-    	final StringBuilder builder = new StringBuilder(Math.max(300, input.size() * 10));
-    	boolean first = true;
-    	for (final Object obj : input){
-    		if (!first) builder.append(link);
-    		builder.append(obj.toString());
-    		first = false;
-    	}
-    	return builder.toString();
-    }
-    
-    /**
-     * Convenience method.
-     * @param parts
-     * @param link
-     * @return
-     */
-    public static <O extends Object> boolean scheduleOutputJoined(final List<O> parts, String link){
-    	return scheduleOutput(join(parts, link));
-    }
+			for (i = 1; i <= n; i++) {
+				cost = s.charAt(i - 1) == t_j ? 0 : 1;
+				d[i] = Math.min(Math.min(d[i - 1] + 1, p[i] + 1), p[i - 1] + cost);
+			}
+
+			_d = p;
+			p = d;
+			d = _d;
+		}
+
+		return p[n];
+	}
+
+	/**
+	 * Join parts with link.
+	 * 
+	 * @param input
+	 * @param link
+	 * @return
+	 */
+	public static <O extends Object> String join(final Collection<O> input, final String link)
+	{
+		final StringBuilder builder = new StringBuilder(Math.max(300, input.size() * 10));
+		boolean first = true;
+		for (final Object obj : input) {
+			if (!first) builder.append(link);
+			builder.append(obj.toString());
+			first = false;
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * Convenience method.
+	 * 
+	 * @param parts
+	 * @param link
+	 * @return
+	 */
+	public static <O extends Object> boolean scheduleOutputJoined(final List<O> parts, String link)
+	{
+		return scheduleOutput(join(parts, link));
+	}
     
     /**
      * Schedule a message to be output by the bukkit logger.
@@ -307,15 +309,15 @@ public class CheckUtils {
 	/**
 	 * Get the height from getLocation().getY() to head / above head.<br>
 	 * NOTE: Currently this is pretty much useless, it returns 1.0 most of the time.
+	 * 
 	 * @param entity
 	 * @return
 	 */
-    public static double getHeight(final Entity entity) {
-        final net.minecraft.server.Entity mcEntity = ((CraftEntity)entity).getHandle();
-        final double entityHeight = mcEntity.height;
-        if (entity instanceof LivingEntity){
-            return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
-        }
-        else return mcEntity.height;
-    }
+	public static double getHeight(final Entity entity) {
+		final net.minecraft.server.Entity mcEntity = ((CraftEntity) entity).getHandle();
+		final double entityHeight = mcEntity.height;
+		if (entity instanceof LivingEntity) {
+			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
+		} else return mcEntity.height;
+	}
 }
