@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -149,7 +150,7 @@ public class SurvivalFly extends Check {
 								setBackSafe = true;
 							}
                         }
-                    }  
+                    }
                 } 
             }
             if (useWorkaround){ // !toOnGround && to.isAboveStairs()) {
@@ -163,7 +164,7 @@ public class SurvivalFly extends Check {
                 data.clearAccounting();
                 // Tell NoFall that we assume the player to have been on ground somehow.
                 data.noFallAssumeGround = true;
-                resetFrom = true;
+                resetFrom = true; // Note: if removing this, other conditions need to check noFallAssume... 
                 if (cc.debug) System.out.println(player.getName() + " Y-INCONSISTENCY WORKAROUND USED");
             }
         }
@@ -310,8 +311,8 @@ public class SurvivalFly extends Check {
             	vAllowedDistance -= Math.max(0, (data.survivalFlyJumpPhase - maxJumpPhase) * 0.15D);
             }
 
-            vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
-            
+			vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
+
 //            System.out.println("vda = " +vDistanceAboveLimit + " / vc = " + data.verticalVelocityCounter + " / vf = " + data.verticalFreedom + " / v = " + player.getVelocity().length());
 
 			// Step can also be blocked.
@@ -319,49 +320,34 @@ public class SurvivalFly extends Check {
 				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
 				components.add("step");
 			}
-
-        }
+		}
+        
 		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
 			// Some reset condition.
 			data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
 		}
-        
-        if (cc.survivalFlyAccounting && !resetFrom){
-            final boolean useH = data.horizontalFreedom <= 0.001D;
-            final boolean useV = data.verticalFreedom <= 0.001D;
-            if (useH){
-                data.hDistSum.add(now, (float) hDistance);
-                data.hDistCount.add(now,  1f);
-            }
-            if (useV){
-                data.vDistSum.add(now, (float) (yDistance));
-                data.vDistCount.add(now,  1f);
-            }
-            if (useH && data.hDistCount.getScore(2) > 0 && data.hDistCount.getScore(1) > 0){
-                final float hsc0 = data.hDistSum.getScore(1);
-                final float hsc1 = data.hDistSum.getScore(2);
-                if (hsc0 < hsc1 || hDistance < 3.9 && hsc0 == hsc1){
-                    hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hsc0 - hsc1);
-                    components.add("hacc");
-                }
-            }
-            if (useV && data.vDistCount.getScore(2) > 0 && data.vDistCount.getScore(1) > 0){
-                final float vsc0 = data.vDistSum.getScore(1);
-                final float vsc1 = data.vDistSum.getScore(2);
-                if (vsc0 < vsc1 || yDistance < 3.9 && vsc0 == vsc1){
-                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, vsc0 - vsc1);
-                    components.add("vacc");
-                }
-            }
-
-			// Check if y-direction is going upwards without speed / ground.
-			if (!data.noFallAssumeGround && yDistance > 0 && data.survivalFlyLastYDist < 0 && data.verticalFreedom <= 0.001) {
-				// Moving upwards without having touched the ground.
-				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
-				components.add("ychange");
+		
+		// Accounting support.
+		if (cc.survivalFlyAccounting && !resetFrom) {
+			// Horizontal.
+			if (data.horizontalFreedom <= 0.001D){
+				// This only checks general speed decrease oncevelocity is smoked up.
+				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, components, "hacc"));
 			}
-        }
-        
+			// Vertical.
+			if (data.verticalFreedom <= 0.001D) {
+				// Here yDistance can be negative and positive (!).
+				// TODO: Might demand resetting on some direction changes (bunny,)
+				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount, components, "vacc"));
+				// Check if y-direction is going upwards without speed / ground.
+				if (yDistance >= 0 && data.survivalFlyLastYDist < 0) {
+					// Moving upwards without having touched the ground.
+					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+					components.add("ychange");
+				}
+			}
+		}
+
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
         data.survivalFlyJumpPhase++;
@@ -420,5 +406,30 @@ public class SurvivalFly extends Check {
         data.survivalFlyLastYDist = yDistance;
         return null;
     }
-    
+
+    /**
+     * Keep track of values, demanding that with time the values decrease.<br>
+     * The ActionFrequency objects have 3 buckets.
+     * @param now
+     * @param value
+     * @param sum
+     * @param count
+     * @param tags
+     * @param tag
+     * @return
+     */
+	private static final double doAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
+	{
+		sum.add(now, (float) value);
+		count.add(now, 1f);
+		if (count.getScore(2) > 0 && count.getScore(1) > 0) {
+			final float sc0 = sum.getScore(1);
+			final float sc1 = sum.getScore(2);
+			if (sc0 < sc1 || value < 3.9 && sc0 == sc1) {
+				tags.add(tag);
+				return 	sc0 - sc1;
+			}
+		}
+		return 0;
+	}
 }
