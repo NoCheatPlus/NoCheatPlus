@@ -54,7 +54,7 @@ public class CombinedListener implements Listener {
         }
     }
     
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntityDamage(final EntityDamageEvent event){
         final Entity entity = event.getEntity();
         if (!(entity instanceof Player)) return;
