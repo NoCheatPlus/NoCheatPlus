@@ -267,7 +267,7 @@ public class SurvivalFly extends Check {
             if (hDistanceAboveLimit < 0D){
             	data.horizontalBuffer = -hDistanceAboveLimit;
             }
-            if (hDistanceAboveLimit >= 0){
+            if (hDistanceAboveLimit <= 0){
             	tags.clear();
             	tags.add("hbuffer"); // TODO: ...
             }
