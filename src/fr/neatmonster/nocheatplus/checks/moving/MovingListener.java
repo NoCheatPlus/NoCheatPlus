@@ -565,7 +565,7 @@ public class MovingListener implements Listener {
      * @param event
      *            the event
      */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         /*
          *  ____  _                         _____    _                       _   
