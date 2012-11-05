@@ -50,8 +50,8 @@ public class SurvivalFly extends Check {
 	/** Faster moving down stream (water mainly). */
 	public static final double modDownStream      = 0.19 / swimmingSpeed;
 
-	/** To join some components with moving check violations. */
-	private final ArrayList<String> components = new ArrayList<String>(15);
+	/** To join some tags with moving check violations. */
+	private final ArrayList<String> tags = new ArrayList<String>(15);
 	
     /**
      * Instantiates a new survival fly check.
@@ -97,7 +97,7 @@ public class SurvivalFly extends Check {
      */
     public Location check(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
         final long now = System.currentTimeMillis();
-        components.clear();
+        tags.clear();
         // A player is considered sprinting if the flag is set and if he has enough food level.
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
         
@@ -222,13 +222,13 @@ public class SurvivalFly extends Check {
         // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
-        if (hDistanceAboveLimit > 0) components.add("hspeed");
+        if (hDistanceAboveLimit > 0) tags.add("hspeed");
         
 		// Prevent players from walking on a liquid.
 		// TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
 		if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround && to.getY() % 1D < 0.8D) {
 			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-			components.add("waterwalk");
+			tags.add("waterwalk");
 		}
 
         // Prevent players from sprinting if they're moving backwards.
@@ -240,7 +240,7 @@ public class SurvivalFly extends Check {
             	// Assumes permission check to be the heaviest (might be mistaken).
             	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)){
             		hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-            		components.add("sprintback");
+            		tags.add("sprintback");
             	}
             }
         }
@@ -253,8 +253,8 @@ public class SurvivalFly extends Check {
             if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
                 data.bunnyhopDelay = 9;
                 hDistanceAboveLimit = 0D;
-                components.clear();
-                components.add("bunny"); // TODO: Which here...
+                tags.clear();
+                tags.add("bunny"); // TODO: Which here...
             }
 
         if (hDistanceAboveLimit > 0D) {
@@ -267,8 +267,8 @@ public class SurvivalFly extends Check {
             	data.horizontalBuffer = -hDistanceAboveLimit;
             }
             if (hDistanceAboveLimit >= 0){
-            	components.clear();
-            	components.add("hbuffer"); // TODO: ...
+            	tags.clear();
+            	tags.add("hbuffer"); // TODO: ...
             }
         } else
             data.horizontalBuffer = Math.min(1D, data.horizontalBuffer - hDistanceAboveLimit);
@@ -296,7 +296,7 @@ public class SurvivalFly extends Check {
         			data.survivalFlyLastYDist = Double.MAX_VALUE;
         			return data.setBack;
         		}
-        		if (vDistanceAboveLimit > 0) components.add("vweb");
+        		if (vDistanceAboveLimit > 0) tags.add("vweb");
         	}
         }
         else{
@@ -318,7 +318,7 @@ public class SurvivalFly extends Check {
 			// Step can also be blocked.
 			if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
 				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
-				components.add("step");
+				tags.add("step");
 			}
 		}
         
@@ -332,18 +332,18 @@ public class SurvivalFly extends Check {
 			// Horizontal.
 			if (data.horizontalFreedom <= 0.001D){
 				// This only checks general speed decrease oncevelocity is smoked up.
-				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, components, "hacc"));
+				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
 			}
 			// Vertical.
 			if (data.verticalFreedom <= 0.001D) {
 				// Here yDistance can be negative and positive (!).
 				// TODO: Might demand resetting on some direction changes (bunny,)
-				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount, components, "vacc"));
+				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount, tags, "vacc"));
 				// Check if y-direction is going upwards without speed / ground.
 				if (yDistance >= 0 && data.survivalFlyLastYDist < 0) {
 					// Moving upwards without having touched the ground.
 					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
-					components.add("ychange");
+					tags.add("ychange");
 				}
 			}
 		}
@@ -373,7 +373,7 @@ public class SurvivalFly extends Check {
                 vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
                 vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
                 vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
-                vd.setParameter(ParameterName.COMPONENT, CheckUtils.join(components, "+"));
+                vd.setParameter(ParameterName.TAGS, CheckUtils.join(tags, "+"));
             }
             data.survivalFlyVLTime = now;
             if (executeActions(vd)){
