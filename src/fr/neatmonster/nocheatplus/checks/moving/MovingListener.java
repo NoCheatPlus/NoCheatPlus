@@ -360,20 +360,11 @@ public class MovingListener implements Listener {
         data.noFallAssumeGround = false;
         data.teleported = null;
         
-        final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-        // Potion effect "Jump".
-        final double jumpAmplifier;
-        if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
-//            final int amplifier = mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
-//            if (amplifier > 20)
-//                jumpAmplifier = 1.5D * (amplifier + 1D);
-//            else
-//                jumpAmplifier = 1.2D * (amplifier + 1D);
-            jumpAmplifier =  1D + mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
-          if (cc.debug) System.out.println(player.getName() + " Jump effect: " + data.jumpAmplifier);
-        }
-        else jumpAmplifier = 1D;
-        if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		// Potion effect "Jump".
+		final double jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+		if (jumpAmplifier > 0D && cc.debug) System.out.println(player.getName() + " Jump effect: " + data.jumpAmplifier);
+		if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
@@ -459,7 +450,7 @@ public class MovingListener implements Listener {
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
     }
-    
+
     /**
      * A workaround for cancelled PlayerMoveEvents.
      * 
@@ -770,4 +761,15 @@ public class MovingListener implements Listener {
     public void onPlayerKick(final PlayerKickEvent event){
         noFall.onLeave(event.getPlayer());
     }
+
+	/**
+	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II.
+	 * @param mcPlayer
+	 * @return
+	 */
+	public static final double getJumpAmplifier(final EntityPlayer mcPlayer) {
+		if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
+			return 1D + mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
+		} else return 0D;
+	}
 }

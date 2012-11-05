@@ -154,7 +154,7 @@ public class SurvivalFly extends Check {
                 // data.ground ?
                 // ? set jumpphase to height / 0.15 ?
                 data.survivalFlyJumpPhase = 0;
-                data.jumpAmplifier = 0; // Might conflict, should probably fetch.
+                data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
                 data.clearAccounting();
                 // Tell NoFall that we assume the player to have been on ground somehow.
                 data.noFallAssumeGround = true;
@@ -260,7 +260,7 @@ public class SurvivalFly extends Check {
         if (from.isInWeb()){
         	// Very simple: force players to descend or stay.
          	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
-         	data.jumpAmplifier = 0;
+         	data.jumpAmplifier = 0; // TODO: later maybe fetch.
         	vDistanceAboveLimit = yDistance;
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
         		if (now - data.survivalFlyCobwebTime > 3000){
@@ -302,8 +302,10 @@ public class SurvivalFly extends Check {
                 vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
 
         }
-        if (data.noFallAssumeGround || fromOnGround || toOnGround)
-            data.jumpAmplifier = 0D;
+		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
+			// Some reset condition.
+			data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+		}
         
         if (cc.survivalFlyAccounting && !resetFrom){
             final boolean useH = data.horizontalFreedom <= 0.001D;
