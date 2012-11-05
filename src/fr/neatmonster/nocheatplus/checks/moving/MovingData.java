@@ -87,7 +87,9 @@ public class MovingData extends ACheckData {
     /** Last from coordinates. */
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. */
-    public double toX = Double.MAX_VALUE, toY, toZ;
+    public double 		  toX = Double.MAX_VALUE, toY, toZ;
+    /** To was ground or web etc. */
+    public boolean		  toWasReset;
 
     // Data of the creative check.
     public boolean        creativeFlyPreviousRefused;
