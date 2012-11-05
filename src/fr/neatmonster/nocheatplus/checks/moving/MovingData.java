@@ -152,6 +152,25 @@ public class MovingData extends ACheckData {
         clearAccounting();
         clearNoFallData();
     }
+    
+	/**
+	 * Mildly reset the flying data without losing any important information.
+	 * 
+	 * @param setBack
+	 */
+	public void onSetBack(final Location setBack) {
+		// Reset positions
+		resetPositions(teleported);
+		this.setBack = teleported;
+		clearAccounting(); // Might be more safe to do this.
+		// Keep no-fall data.
+		// Fly data: problem is we don't remember the settings for the set back location.
+		// Assume the player to start falling from there rather, or be on ground.
+		survivalFlyLastYDist = Double.MAX_VALUE;
+		// Keep jump amplifier
+		// Keep bunny-hop delay (?)
+		// keep jump phase.
+	}
 
     public void clearAccounting() {
         final long now = System.currentTimeMillis();

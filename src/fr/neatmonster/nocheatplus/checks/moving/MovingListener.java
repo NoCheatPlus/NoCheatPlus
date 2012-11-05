@@ -209,9 +209,18 @@ public class MovingListener implements Listener {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
 
-        if (!creativeFly.isEnabled(player) && survivalFly.isEnabled(player) && survivalFly.check(player) && data.ground != null)
-            // To cancel the event, we simply teleport the player to his last safe location.
-            player.teleport(data.ground);
+		if (!creativeFly.isEnabled(player) && survivalFly.isEnabled(player) && survivalFly.check(player)) {
+			// To cancel the event, we simply teleport the player to his last
+			// safe location.
+			Location target = null;
+			if (data.ground != null) target = data.ground;
+			else if (data.setBack != null) target = data.setBack;
+//			else target = player.getLocation(); // TODO
+			
+			
+			if (target != null) player.teleport(target);// TODO: schedule / other measures ?
+		}
+
     }
 
     /**
@@ -529,15 +538,15 @@ public class MovingListener implements Listener {
         data.clearMorePacketsData();
     }
 
-    /**
-     * When a player respawns, all information related to the moving checks becomes invalid.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            priority = EventPriority.MONITOR)
-    public void onPlayerRespawn(final PlayerRespawnEvent event) {
+	/**
+	 * When a player respawns, all information related to the moving checks
+	 * becomes invalid.
+	 * 
+	 * @param event
+	 *            the event
+	 */
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerRespawn(final PlayerRespawnEvent event) {
         /*
          *  ____  _                         ____                                      
          * |  _ \| | __ _ _   _  ___ _ __  |  _ \ ___  ___ _ __   __ ___      ___ __  
@@ -546,10 +555,15 @@ public class MovingListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |_| \_\___||___/ .__/ \__,_| \_/\_/ |_| |_|
          *                |___/                           |_|                         
          */
-        final MovingData data = MovingData.getData(event.getPlayer());
-        data.clearFlyData();
-        data.clearMorePacketsData();
-    }
+		final Player player = event.getPlayer();
+		final MovingData data = MovingData.getData(player);
+		data.clearFlyData();
+		data.clearMorePacketsData();
+		if (survivalFly.isEnabled(player)) {
+			data.setBack = event.getRespawnLocation();
+			data.ground = event.getRespawnLocation();
+		}
+	}
 
     /**
      * If a player gets teleported, it may have two reasons. Either it was NoCheat or another plugin. If it was
@@ -560,8 +574,7 @@ public class MovingListener implements Listener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         /*
          *  ____  _                         _____    _                       _   
@@ -571,29 +584,34 @@ public class MovingListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|      |_|\___|_|\___| .__/ \___/|_|   \__|
          *                |___/                            |_|                   
          */
-        final Player player = event.getPlayer();
-        final MovingData data = MovingData.getData(player);
-        
-        final Location teleported = data.teleported;
-        
-        // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
-        final Location to = event.getTo();
-        if (event.isCancelled() && teleported != null && data.teleported.equals(to)){
-            // TODO: even more strict enforcing ?
-            event.setCancelled(false);
-            event.setTo(teleported);
-            event.setFrom(teleported);
-            data.clearFlyData();
-            data.resetPositions(teleported);
-        }
-        else{
-            // Only if it wasn't NoCheatPlus, drop data from more packets check. If it was NoCheatPlus, we don't
-            // want players to exploit the fly check teleporting to get rid of the "morepackets" data.
-            // TODO: check if to do with cancelled teleports !
-            data.clearMorePacketsData();
-            data.clearFlyData();
-            data.resetPositions(event.isCancelled() ? event.getFrom() : to);
-        }
+		final Player player = event.getPlayer();
+		final MovingData data = MovingData.getData(player);
+
+		final Location teleported = data.teleported;
+
+		// If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
+		final Location to = event.getTo();
+		if (teleported != null && teleported.equals(to)) {
+			// Teleport by NCP.
+			// Prevent cheaters getting rid of flying data (morepackets, other).
+			// TODO: even more strict enforcing ?
+			if (event.isCancelled()) {
+				event.setCancelled(false);
+				event.setTo(teleported);
+				event.setFrom(teleported);
+			}
+			else{
+				// Not cancelled but NCP teleport.
+			}
+			// TODO: This could be done on MONITOR.
+			data.onSetBack(teleported);
+		} else {
+			// Only if it wasn't NoCheatPlus, drop data from more packets check.
+			// TODO: check if to do with cancelled teleports !
+			data.clearMorePacketsData();
+			data.clearFlyData();
+			data.resetPositions(event.isCancelled() ? event.getFrom() : to);
+		}
 
 
         // Always drop data from fly checks, as it always loses its validity after teleports. Always!
