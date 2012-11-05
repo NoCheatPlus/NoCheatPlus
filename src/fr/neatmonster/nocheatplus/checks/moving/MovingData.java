@@ -166,7 +166,6 @@ public class MovingData extends ACheckData {
 		// Keep no-fall data.
 		// Fly data: problem is we don't remember the settings for the set back location.
 		// Assume the player to start falling from there rather, or be on ground.
-		survivalFlyLastYDist = Double.MAX_VALUE;
 		// Keep jump amplifier
 		// Keep bunny-hop delay (?)
 		// keep jump phase.
