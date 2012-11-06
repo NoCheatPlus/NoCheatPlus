@@ -18,11 +18,16 @@ public class CommandUtil {
 	 * @return
 	 */
 	public static String getCommandLabel(final String alias, final boolean strict){
-		final String lcAlias = alias.trim().toLowerCase();
-		final Command command = getCommandMap().getCommand(alias);
+		final Command command = getCommand(alias);
 		if (command == null){
-			return strict ? null : lcAlias;
+			return strict ? null : alias.trim().toLowerCase();
 		}
 		else return command.getLabel().trim().toLowerCase();
+	}
+
+	public static Command getCommand(final String alias) {
+		final SimpleCommandMap map = getCommandMap();
+		final String lcAlias = alias.trim().toLowerCase();
+		return map.getCommand(lcAlias);
 	}
 }
