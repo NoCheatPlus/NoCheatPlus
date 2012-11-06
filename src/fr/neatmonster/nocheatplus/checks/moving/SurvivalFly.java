@@ -124,8 +124,7 @@ public class SurvivalFly extends Check {
 			// Don't set "useWorkaround = x()", to avoid potential trouble with
 			// reordering to come, and similar.
 			boolean useWorkaround = false;
-			boolean setBackSafe = false; // Let compiler remove this if
-										 // necessary.
+			boolean setBackSafe = false; // Let compiler remove this if necessary.
 			// Check for moving off stairs.
 			if (!useWorkaround && from.isAboveStairs()) {
 				useWorkaround = true;
@@ -254,7 +253,6 @@ public class SurvivalFly extends Check {
             if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
                 data.bunnyhopDelay = 9;
                 hDistanceAboveLimit = 0D;
-                tags.clear();
                 tags.add("bunny"); // TODO: Which here...
             }
 
@@ -268,7 +266,6 @@ public class SurvivalFly extends Check {
             	data.horizontalBuffer = -hDistanceAboveLimit;
             }
             if (hDistanceAboveLimit <= 0){
-            	tags.clear();
             	tags.add("hbuffer"); // TODO: ...
             }
         } else
