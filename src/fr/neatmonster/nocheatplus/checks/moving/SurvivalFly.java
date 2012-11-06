@@ -320,14 +320,14 @@ public class SurvivalFly extends Check {
 		final boolean resetTo = toOnGround || to.isInLiquid()  || to.isOnLadder()|| to.isInWeb();
 		
 		// Accounting support.
-		if (cc.survivalFlyAccounting && !resetFrom) {
+		if (cc.survivalFlyAccounting && !resetFrom && !resetTo) {
 			// Horizontal.
 			if (data.horizontalFreedom <= 0.001D){
 				// This only checks general speed decrease oncevelocity is smoked up.
 				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
 			}
 			// Vertical.
-			if (data.verticalFreedom <= 0.001D && ! resetTo) {
+			if (data.verticalFreedom <= 0.001D) { // && ! resetTo) {
 				// Here yDistance can be negative and positive (!).
 				// TODO: Might demand resetting on some direction changes (bunny,)
 				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount, tags, "vacc"));
