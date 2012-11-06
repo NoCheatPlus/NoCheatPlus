@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -144,31 +145,28 @@ public class ChatListener implements Listener, INotifyReload {
         TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
         
         // Trim is necessary because the server accepts leading spaces with commands.
-        // TODO: Maybe: only remove the leading whitespace or spaces.
         String lcMessage = event.getMessage().trim().toLowerCase();
-        final String command = lcMessage.split(" ")[0].substring(1);
+		final String alias = lcMessage.split(" ")[0].substring(1);
+		final String commandLabel = CommandUtil.getCommandLabel(alias, false);
 
-        final ChatConfig cc = ChatConfig.getConfig(player);
-        
-        // Protect some commands to prevent players for seeing which plugins are installed.
-        if (cc.protectPlugins)
-            if ((command.equals("plugins") || command.equals("pl")
-                    || command.equals("version") || command.equals("ver"))
-                    && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
-                event.getPlayer().sendMessage(
-                        ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. "
-                                + "Please contact the server administrators if you believe that this is in error.");
-                event.setCancelled(true);
-                return;
-            }
+		final ChatConfig cc = ChatConfig.getConfig(player);
+		
+		// Protect some commands to prevent players for seeing which plugins are installed.
+		if (cc.protectPlugins) {
+			// TODO: Use a prefix map  and generalize this.
+			if ((commandLabel.equals("plugins") || commandLabel.equals("version") || commandLabel.equals("icanhasbukkit")) && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
+				player.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
+				event.setCancelled(true);
+				return;
+			}
+		}
 
-        // Prevent /op and /deop commands from being used in chat.
-        if (cc.opInConsoleOnly && (command.equals("op") || command.equals("deop"))) {
-            event.getPlayer().sendMessage(
-                    ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
-            event.setCancelled(true);
-            return;
-        }
+		// Prevent /op and /deop commands from being used by players.
+		if (cc.opInConsoleOnly && (commandLabel.equals("op") || commandLabel.equals("deop"))) {
+			player.sendMessage(ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
+			event.setCancelled(true);
+			return;
+		}
 
         // First the color check.
         if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), true));
