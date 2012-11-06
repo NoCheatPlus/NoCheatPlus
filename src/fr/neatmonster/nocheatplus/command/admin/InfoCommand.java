@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory.ViolationLevel;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 public class InfoCommand extends NCPCommand {
 

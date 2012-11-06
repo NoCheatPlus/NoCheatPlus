@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 /**

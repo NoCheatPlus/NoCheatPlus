@@ -20,8 +20,8 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
  * MM'""""'YMM dP                         dP       M""""""""M                            

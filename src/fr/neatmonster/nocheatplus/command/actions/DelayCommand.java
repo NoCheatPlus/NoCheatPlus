@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /**
  * Delay an arbitrary command, the command is always delayed, unless for bad delay input.

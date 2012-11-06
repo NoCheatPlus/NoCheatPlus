@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.players;
+package fr.neatmonster.nocheatplus.permissions;
 
 /*
  * MM"""""""`YM                              oo                   oo                            

@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.EnginePlayerConfig
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /*
  * MM'""""'YMM dP                  dP   MM'""""'YMM                   .8888b oo          
