@@ -1,8 +1,5 @@
 package fr.neatmonster.nocheatplus.checks;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
@@ -23,7 +20,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.Permissions;
 
 /*
@@ -40,9 +37,9 @@ import fr.neatmonster.nocheatplus.players.Permissions;
  * Type of checks (containing configuration and dataFactory classes, name and permission).
  */
 public enum CheckType {
-    ALL,
+    ALL(Permissions.CHECKS),
 
-    BLOCKBREAK(BlockBreakConfig.factory, BlockBreakData.factory),
+    BLOCKBREAK(BlockBreakConfig.factory, BlockBreakData.factory, Permissions.BLOCKBREAK),
     BLOCKBREAK_DIRECTION(BLOCKBREAK, Permissions.BLOCKBREAK_DIRECTION),
     BLOCKBREAK_FASTBREAK(BLOCKBREAK, Permissions.BLOCKBREAK_FASTBREAK),
     BLOCKBREAK_FREQUENCY(BLOCKBREAK, Permissions.BLOCKBREAK_FREQUENCY),
@@ -50,18 +47,18 @@ public enum CheckType {
     BLOCKBREAK_REACH(BLOCKBREAK, Permissions.BLOCKBREAK_REACH),
     BLOCKBREAK_WRONGBLOCK(BLOCKBREAK, Permissions.BLOCKBREAK_WRONGBLOCK),
 
-    BLOCKINTERACT(BlockInteractConfig.factory, BlockInteractData.factory),
+    BLOCKINTERACT(BlockInteractConfig.factory, BlockInteractData.factory, Permissions.BLOCKINTERACT),
     BLOCKINTERACT_DIRECTION(BLOCKINTERACT, Permissions.BLOCKINTERACT_DIRECTION),
     BLOCKINTERACT_REACH(BLOCKINTERACT, Permissions.BLOCKINTERACT_REACH),
 
-    BLOCKPLACE(BlockPlaceConfig.factory, BlockPlaceData.factory),
+    BLOCKPLACE(BlockPlaceConfig.factory, BlockPlaceData.factory, Permissions.BLOCKPLACE),
     BLOCKPLACE_DIRECTION(BLOCKPLACE, Permissions.BLOCKPLACE_DIRECTION),
     BLOCKPLACE_FASTPLACE(BLOCKPLACE, Permissions.BLOCKPLACE_FASTPLACE),
     BLOCKPLACE_NOSWING(BLOCKPLACE, Permissions.BLOCKPLACE_NOSWING),
     BLOCKPLACE_REACH(BLOCKPLACE, Permissions.BLOCKBREAK_REACH),
     BLOCKPLACE_SPEED(BLOCKPLACE, Permissions.BLOCKPLACE_SPEED),
 
-    CHAT(ChatConfig.factory, ChatData.factory),
+    CHAT(ChatConfig.factory, ChatData.factory, Permissions.CHAT),
     CHAT_CAPTCHA(CHAT, Permissions.CHAT_CAPTCHA),
     CHAT_COLOR(CHAT, Permissions.CHAT_COLOR),
     CHAT_COMMANDS(CHAT, Permissions.CHAT_COMMANDS),
@@ -70,10 +67,10 @@ public enum CheckType {
     CHAT_RELOG(CHAT, Permissions.CHAT_RELOG),
     
     
-    COMBINED(CombinedConfig.factory, CombinedData.factory),
+    COMBINED(CombinedConfig.factory, CombinedData.factory, Permissions.COMBINED),
     COMBINED_IMPROBABLE(COMBINED, Permissions.COMBINED_IMPROBABLE),
 
-    FIGHT(FightConfig.factory, FightData.factory),
+    FIGHT(FightConfig.factory, FightData.factory, Permissions.FIGHT),
     FIGHT_ANGLE(FIGHT, Permissions.FIGHT_ANGLE),
     FIGHT_CRITICAL(FIGHT, Permissions.FIGHT_CRITICAL),
     FIGHT_DIRECTION(FIGHT, Permissions.FIGHT_DIRECTION),
@@ -84,14 +81,14 @@ public enum CheckType {
     FIGHT_SELFHIT(FIGHT, Permissions.FIGHT_SELFHIT),
     FIGHT_SPEED(FIGHT, Permissions.FIGHT_SPEED),
 
-    INVENTORY(InventoryConfig.factory, InventoryData.factory),
+    INVENTORY(InventoryConfig.factory, InventoryData.factory, Permissions.INVENTORY),
     INVENTORY_DROP(INVENTORY, Permissions.INVENTORY_DROP),
     INVENTORY_FASTCLICK(INVENTORY, Permissions.INVENTORY_FASTCLICK),
     INVENTORY_INSTANTBOW(INVENTORY, Permissions.INVENTORY_INSTANTBOW),
     INVENTORY_INSTANTEAT(INVENTORY, Permissions.INVENTORY_INSTANTEAT),
     INVENTORY_ITEMS(INVENTORY, Permissions.INVENTORY_ITEMS),
 
-    MOVING(MovingConfig.factory, MovingData.factory),
+    MOVING(MovingConfig.factory, MovingData.factory, Permissions.MOVING),
     MOVING_CREATIVEFLY(MOVING, Permissions.MOVING_CREATIVEFLY),
     MOVING_MOREPACKETS(MOVING, Permissions.MOVING_MOREPACKETS),
     MOVING_MOREPACKETSVEHICLE(MOVING, Permissions.MOVING_MOREPACKETSVEHICLE),
@@ -101,50 +98,65 @@ public enum CheckType {
     
     UNKNOWN;
 
-    /** The group. */
-    private CheckType          parent        = null;
+	/** If not null, this is the check group usually. */
+	private final CheckType parent;
 
-    /** The configFactory. */
-    private CheckConfigFactory configFactory = null;
+	/** The check config factory (access CheckConfig instances by CheckType). */
+	private final CheckConfigFactory configFactory;
 
-    /** The dataFactory. */
-    private CheckDataFactory   dataFactory   = null;
+	/** The check data factory (access CheckData instances by CheckType). */
+	private final CheckDataFactory dataFactory;
 
-    /** The permission. */
-    private String             permission    = null;
+	/** The bypass permission. */
+	private final String permission;
 
-    /**
-     * Instantiates a new check type.
-     */
-    private CheckType() {}
+	/**
+	 * Special purpose check types (likely not actual checks).
+	 */
+	private CheckType() {
+		this(null, null, null);
+	}
+	
+	/**
+	 * Special purpose for grouping (ALL).
+	 * @param permission
+	 */
+	private CheckType(final String permission){
+		this(null, null, permission);
+	}
+	
+	/**
+	 * Constructor for root checks or check groups, that are not grouped under another check type.
+	 * @param configFactory
+	 * @param dataFactory
+	 * @param permission
+	 */
+	private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory, final String permission) {
+		this(null, permission, configFactory, dataFactory);
+	}
 
-    /**
-     * Instantiates a new check type.
-     * 
-     * @param configFactory
-     *            the configFactory
-     * @param dataFactory
-     *            the dataFactory
-     */
-    private CheckType(final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
-        this.configFactory = configFactory;
-        this.dataFactory = dataFactory;
-    }
+	/**
+	 * Constructor for sub-checks grouped under another check type.
+	 * @param parent
+	 * @param permission
+	 */
+	private CheckType(final CheckType parent, final String permission) {
+		this(parent, permission, parent.getConfigFactory(), parent.getDataFactory());
+	}
 
-    /**
-     * Instantiates a new check type.
-     * 
-     * @param parent
-     *            the parent
-     * @param permission
-     *            the permission
-     */
-    private CheckType(final CheckType parent, final String permission) {
-        this.parent = parent;
-        configFactory = parent.getConfigFactory();
-        dataFactory = parent.getDataFactory();
-        this.permission = permission;
-    }
+	/**
+	 * Root constructor.
+	 * @param parent Super check type (usually the group).
+	 * @param permission Bypass permission.
+	 * @param configFactory Check config factory.
+	 * @param dataFactory Check data factory.
+	 */
+	private CheckType(final CheckType parent, final String permission, final CheckConfigFactory configFactory, final CheckDataFactory dataFactory) {
+		this.parent = parent;
+		this.permission = permission;
+		this.configFactory = configFactory;
+		this.dataFactory = dataFactory;
+	}
 
     /**
      * Gets the configFactory.
@@ -183,7 +195,7 @@ public enum CheckType {
     }
 
     /**
-     * Gets the permission.
+     * Gets the bypass permission for this check type.
      * 
      * @return the permission
      */
@@ -223,29 +235,12 @@ public enum CheckType {
 
     /**
      * Remove the player data for a given player and a given check type. CheckType.ALL and null will be interpreted as removing all data.<br>
+     * @deprecated Will be removed, use DataManager.removeData instead.
      * @param playerName
      * @param checkType 
      * @return If any data was present.
      */
-	public static boolean removeData(final String playerName, CheckType checkType) {
-		if (checkType == null) checkType = ALL;
-		
-		// Attempt for direct removal.
-		CheckDataFactory dataFactory = checkType.getDataFactory();
-		if (dataFactory != null) return dataFactory.removeData(playerName) != null;
-		
-		// Remove all for which it seems necessary.
-		final Set<CheckDataFactory> factories = new HashSet<CheckDataFactory>();
-		for (CheckType otherType : CheckType.values()){
-			if (checkType == ALL || APIUtils.isParent(checkType, otherType)){
-				final CheckDataFactory otherFactory = otherType.getDataFactory();
-				if (otherFactory != null) factories.add(otherFactory);
-			}
-		}
-		boolean had = false;
-		for (final CheckDataFactory otherFactory : factories){
-			if (otherFactory.removeData(playerName) != null) had = true;
-		}
-		return had;
+	public static boolean removeData(final String playerName, final CheckType checkType) {
+		return DataManager.removeData(playerName, checkType);
 	}
 }

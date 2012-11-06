@@ -87,7 +87,9 @@ public class MovingData extends ACheckData {
     /** Last from coordinates. */
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. */
-    public double toX = Double.MAX_VALUE, toY, toZ;
+    public double 		  toX = Double.MAX_VALUE, toY, toZ;
+    /** To was ground or web etc. */
+    public boolean		  toWasReset;
 
     // Data of the creative check.
     public boolean        creativeFlyPreviousRefused;
@@ -152,6 +154,24 @@ public class MovingData extends ACheckData {
         clearAccounting();
         clearNoFallData();
     }
+    
+	/**
+	 * Mildly reset the flying data without losing any important information.
+	 * 
+	 * @param setBack
+	 */
+	public void onSetBack(final Location setBack) {
+		// Reset positions
+		resetPositions(teleported);
+		this.setBack = teleported;
+		clearAccounting(); // Might be more safe to do this.
+		// Keep no-fall data.
+		// Fly data: problem is we don't remember the settings for the set back location.
+		// Assume the player to start falling from there rather, or be on ground.
+		// Keep jump amplifier
+		// Keep bunny-hop delay (?)
+		// keep jump phase.
+	}
 
     public void clearAccounting() {
         final long now = System.currentTimeMillis();

@@ -334,10 +334,13 @@ public class PlayerLocation {
             onGround = BlockProperties.isOnGround(getBlockAccess(), minX, minY - yOnGround, minZ, maxX, maxY + 0.25, maxZ);
             if (!onGround){
                 // TODO: Probably check other ids too before doing this ?
-                final double d0 = 0.25D;
+                final double d0 = 1D; //0.25D;
+//                for (org.bukkit.entity.Entity test : entity.getBukkitEntity().getNearbyEntities(1, 1, 1)){
+//                	System.out.println("*" + test.getType());
+//                }
                 final AxisAlignedBB box = useBox.b(minX - d0, minY - getyOnGround() - d0, minZ - d0, maxX + d0, maxY + d0, maxZ + d0);
                 @SuppressWarnings("rawtypes")
-                List list = worldServer.getEntities(entity, box);
+                final List list = worldServer.getEntities(entity, box);
                 @SuppressWarnings("rawtypes")
                 Iterator iterator = list.iterator();
                 while (iterator.hasNext()) {

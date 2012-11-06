@@ -26,6 +26,7 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
@@ -208,9 +209,18 @@ public class MovingListener implements Listener {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
 
-        if (!creativeFly.isEnabled(player) && survivalFly.isEnabled(player) && survivalFly.check(player) && data.ground != null)
-            // To cancel the event, we simply teleport the player to his last safe location.
-            player.teleport(data.ground);
+		if (!creativeFly.isEnabled(player) && survivalFly.isEnabled(player) && survivalFly.check(player)) {
+			// To cancel the event, we simply teleport the player to his last
+			// safe location.
+			Location target = null;
+			if (data.ground != null) target = data.ground;
+			else if (data.setBack != null) target = data.setBack;
+//			else target = player.getLocation(); // TODO
+			
+			
+			if (target != null) player.teleport(target);// TODO: schedule / other measures ?
+		}
+
     }
 
     /**
@@ -350,20 +360,11 @@ public class MovingListener implements Listener {
         data.noFallAssumeGround = false;
         data.teleported = null;
         
-        final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-        // Potion effect "Jump".
-        final double jumpAmplifier;
-        if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
-//            final int amplifier = mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
-//            if (amplifier > 20)
-//                jumpAmplifier = 1.5D * (amplifier + 1D);
-//            else
-//                jumpAmplifier = 1.2D * (amplifier + 1D);
-            jumpAmplifier =  1D + mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
-          if (cc.debug) System.out.println(player.getName() + " Jump effect: " + data.jumpAmplifier);
-        }
-        else jumpAmplifier = 1D;
-        if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		// Potion effect "Jump".
+		final double jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+		if (jumpAmplifier > 0D && cc.debug) System.out.println(player.getName() + " Jump effect: " + data.jumpAmplifier);
+		if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
@@ -386,13 +387,18 @@ public class MovingListener implements Listener {
         }
         
 
-        Location newTo = null;
-        
-        if (passable.isEnabled(player)) newTo = passable.check(player, pFrom, pTo, data, cc);
+		Location newTo = null;
+
+		final Location passableTo;
+		// Check passable in any case (!)
+		if (cc.passableCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
+			// Passable is checked first to get the original set-back locations from the other checks, if needed. 
+			passableTo = passable.check(player, pFrom, pTo, data, cc);
+		}
+		else passableTo = null;
         
         // Optimized checking, giving creativefly permission precedence over survivalfly.
-        if (newTo != null);
-        else if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
+        if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
         	// Either survivalfly or speed check.
         	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
@@ -411,13 +417,16 @@ public class MovingListener implements Listener {
         }
         else data.clearFlyData();
 
-        if (newTo == null 
-        	 && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS))
-            // If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
-            newTo = morePackets.check(player, pFrom, pTo, data, cc);
-        else
-            // Otherwise we need to clear his data.
-            data.clearMorePacketsData();
+		if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
+			// If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
+			newTo = morePackets.check(player, pFrom, pTo, data, cc);
+		} else {
+			// Otherwise we need to clear his data.
+			data.clearMorePacketsData();
+		}
+		
+		// Prefer the location returned by passable.
+		if (passableTo != null) newTo = passableTo;
 
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null) {
@@ -427,18 +436,21 @@ public class MovingListener implements Listener {
             // Remember where we send the player to.
             data.teleported = newTo;
         }
+        
         // Set positions.
+        // TODO: Should these be set on monitor ?
         data.fromX = from.getX();
         data.fromY = from.getY();
         data.fromZ = from.getZ();
         data.toX = to.getX();
         data.toY = to.getY();
         data.toZ = to.getZ();
+        
         // Cleanup.
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
     }
-    
+
     /**
      * A workaround for cancelled PlayerMoveEvents.
      * 
@@ -517,15 +529,15 @@ public class MovingListener implements Listener {
         data.clearMorePacketsData();
     }
 
-    /**
-     * When a player respawns, all information related to the moving checks becomes invalid.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            priority = EventPriority.MONITOR)
-    public void onPlayerRespawn(final PlayerRespawnEvent event) {
+	/**
+	 * When a player respawns, all information related to the moving checks
+	 * becomes invalid.
+	 * 
+	 * @param event
+	 *            the event
+	 */
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerRespawn(final PlayerRespawnEvent event) {
         /*
          *  ____  _                         ____                                      
          * |  _ \| | __ _ _   _  ___ _ __  |  _ \ ___  ___ _ __   __ ___      ___ __  
@@ -534,10 +546,15 @@ public class MovingListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |_| \_\___||___/ .__/ \__,_| \_/\_/ |_| |_|
          *                |___/                           |_|                         
          */
-        final MovingData data = MovingData.getData(event.getPlayer());
-        data.clearFlyData();
-        data.clearMorePacketsData();
-    }
+		final Player player = event.getPlayer();
+		final MovingData data = MovingData.getData(player);
+		data.clearFlyData();
+		data.clearMorePacketsData();
+		if (survivalFly.isEnabled(player)) {
+			data.setBack = event.getRespawnLocation();
+			data.ground = event.getRespawnLocation();
+		}
+	}
 
     /**
      * If a player gets teleported, it may have two reasons. Either it was NoCheat or another plugin. If it was
@@ -548,8 +565,7 @@ public class MovingListener implements Listener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
     public void onPlayerTeleport(final PlayerTeleportEvent event) {
         /*
          *  ____  _                         _____    _                       _   
@@ -559,29 +575,34 @@ public class MovingListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|      |_|\___|_|\___| .__/ \___/|_|   \__|
          *                |___/                            |_|                   
          */
-        final Player player = event.getPlayer();
-        final MovingData data = MovingData.getData(player);
-        
-        final Location teleported = data.teleported;
-        
-        // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
-        final Location to = event.getTo();
-        if (event.isCancelled() && teleported != null && data.teleported.equals(to)){
-            // TODO: even more strict enforcing ?
-            event.setCancelled(false);
-            event.setTo(teleported);
-            event.setFrom(teleported);
-            data.clearFlyData();
-            data.resetPositions(teleported);
-        }
-        else{
-            // Only if it wasn't NoCheatPlus, drop data from more packets check. If it was NoCheatPlus, we don't
-            // want players to exploit the fly check teleporting to get rid of the "morepackets" data.
-            // TODO: check if to do with cancelled teleports !
-            data.clearMorePacketsData();
-            data.clearFlyData();
-            data.resetPositions(event.isCancelled() ? event.getFrom() : to);
-        }
+		final Player player = event.getPlayer();
+		final MovingData data = MovingData.getData(player);
+
+		final Location teleported = data.teleported;
+
+		// If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
+		final Location to = event.getTo();
+		if (teleported != null && teleported.equals(to)) {
+			// Teleport by NCP.
+			// Prevent cheaters getting rid of flying data (morepackets, other).
+			// TODO: even more strict enforcing ?
+			if (event.isCancelled()) {
+				event.setCancelled(false);
+				event.setTo(teleported);
+				event.setFrom(teleported);
+			}
+			else{
+				// Not cancelled but NCP teleport.
+			}
+			// TODO: This could be done on MONITOR.
+			data.onSetBack(teleported);
+		} else {
+			// Only if it wasn't NoCheatPlus, drop data from more packets check.
+			// TODO: check if to do with cancelled teleports !
+			data.clearMorePacketsData();
+			data.clearFlyData();
+			data.resetPositions(event.isCancelled() ? event.getFrom() : to);
+		}
 
 
         // Always drop data from fly checks, as it always loses its validity after teleports. Always!
@@ -715,6 +736,22 @@ public class MovingListener implements Listener {
         // Entity fall-distance should be reset elsewhere.
     }
     
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerJoin(final PlayerJoinEvent event) {
+		final Player player = event.getPlayer();
+		if (survivalFly.isEnabled(player)){
+			final MovingData data = MovingData.getData(player);
+			// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
+			if (data.setBack == null){
+				data.setBack = player.getLocation();
+			}
+			if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
+				// TODO: re-think: more fine grained reset?
+				data.resetPositions(data.setBack);
+			}
+		}
+	}
+    
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(final PlayerQuitEvent event){
         noFall.onLeave(event.getPlayer());
@@ -724,4 +761,15 @@ public class MovingListener implements Listener {
     public void onPlayerKick(final PlayerKickEvent event){
         noFall.onLeave(event.getPlayer());
     }
+
+	/**
+	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II.
+	 * @param mcPlayer
+	 * @return
+	 */
+	public static final double getJumpAmplifier(final EntityPlayer mcPlayer) {
+		if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
+			return 1D + mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
+		} else return 0D;
+	}
 }

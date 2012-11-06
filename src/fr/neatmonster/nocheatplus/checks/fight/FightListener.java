@@ -116,20 +116,16 @@ public class FightListener implements Listener {
 	        	cancelled = true;
         }
 
-        
-        if (!cancelled && angle.isEnabled(player)){
-            // Improbable yaw.
-            if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)){
-            	// (Check or just feed).
-            	cancelled = true;
-            }
-            // Angle check.
-        	if (angle.check(player, worldChanged)) cancelled = true;
-        }
-        else{
-        	// Always feed yaw rate here.
-        	Combined.feedYawRate(player, player.getLocation().getYaw(), now, worldName);
-        }
+		if (angle.isEnabled(player)) {
+			// The "fast turning" checks are checked in any case because they accumulate data.
+			// Improbable yaw changing.
+			if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)) {
+				// (Check or just feed).
+				cancelled = true;
+			}
+			// Angle check.
+			if (angle.check(player, worldChanged)) cancelled = true;
+		}
 
         if (!cancelled && critical.isEnabled(player) && critical.check(player))
             cancelled = true;

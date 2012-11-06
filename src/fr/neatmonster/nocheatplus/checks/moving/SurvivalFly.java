@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import net.minecraft.server.EntityPlayer;
@@ -13,7 +14,9 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.players.Permissions;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -47,6 +50,9 @@ public class SurvivalFly extends Check {
 	/** Faster moving down stream (water mainly). */
 	public static final double modDownStream      = 0.19 / swimmingSpeed;
 
+	/** To join some tags with moving check violations. */
+	private final ArrayList<String> tags = new ArrayList<String>(15);
+	
     /**
      * Instantiates a new survival fly check.
      */
@@ -91,7 +97,7 @@ public class SurvivalFly extends Check {
      */
     public Location check(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
         final long now = System.currentTimeMillis();
-
+        tags.clear();
         // A player is considered sprinting if the flag is set and if he has enough food level.
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
         
@@ -108,55 +114,61 @@ public class SurvivalFly extends Check {
         // If we don't have any setBack, choose the location the player comes from.
         if (data.setBack == null)
             data.setBack = from.getLocation();
-        
-        boolean resetFrom = fromOnGround || from.isInLiquid() || from.isOnLadder() || from.isInWeb();
-        
-        final double setBackYDistance = to.getY() - data.setBack.getY();
-        // If the player has touched the ground but it hasn't been noticed by the plugin, the workaround is here.
-        if (!resetFrom){
-            // Don't set "useWorkaround = x()", to avoid potential trouble with reordering to come, and similar.
-            boolean useWorkaround = false;
-            // Check for moving off stairs.
-            if (!useWorkaround && from.isAboveStairs()) useWorkaround = true;
-            // Check for "lost touch",  for when moving events were not created, for instance (1/256).
-            if (!useWorkaround){
-                final boolean inconsistent = yDistance > 0 && yDistance < 0.5 && data.survivalFlyLastYDist < 0 
-                        && setBackYDistance > 0D && setBackYDistance <= 1.5D;
-                if (inconsistent){
-                    if (cc.debug) System.out.println(player.getName() + " Y-INCONSISTENCY");
-                    if (data.fromX != Double.MAX_VALUE){
-                        // Interpolate from last to-coordinates to the from coordinates (with some safe-guard).
-                        final double dX = from.getX() - data.fromX;
-                        final double dY = from.getY() - data.fromY;
-                        final double dZ = from.getZ() - data.fromZ;
-                        if (dX * dX + dY * dY + dZ * dZ < 0.5){ // TODO: adjust limit maybe.
-                            // Check full bounding box since last from.
-                            if (cc.debug) System.out.println(player.getName() + " CONSIDER WORKAROUND");
-                            final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
-                            final double iY =  minY; // TODO ...
-                            final double r = from.getWidth() / 2.0;
-                            if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) useWorkaround = true;
-                        }
-                    }  
-                } 
-            }
-            if (useWorkaround){ // !toOnGround && to.isAboveStairs()) {
-                // Set the new setBack and reset the jumpPhase.
-                
-                // Maybe don't adapt the setback (unless null)!
-//                data.setBack = from.getLocation();
-                data.setBack.setY(Location.locToBlock(data.setBack.getY()));
-                // data.ground ?
-                // ? set jumpphase to height / 0.15 ?
-                data.survivalFlyJumpPhase = 0;
-                data.jumpAmplifier = 0; // Might conflict, should probably fetch.
-                data.clearAccounting();
-                // Tell NoFall that we assume the player to have been on ground somehow.
-                data.noFallAssumeGround = true;
-                resetFrom = true;
-                if (cc.debug) System.out.println(player.getName() + " Y-INCONSISTENCY WORKAROUND USED");
-            }
-        }
+
+		boolean resetFrom = fromOnGround || from.isInLiquid() || from.isOnLadder() || from.isInWeb();
+
+		final double setBackYDistance = to.getY() - data.setBack.getY();
+		// If the player has touched the ground but it hasn't been noticed by
+		// the plugin, the workaround is here.
+		if (!resetFrom) {
+			// Don't set "useWorkaround = x()", to avoid potential trouble with
+			// reordering to come, and similar.
+			boolean useWorkaround = false;
+			boolean setBackSafe = false; // Let compiler remove this if necessary.
+			// Check for moving off stairs.
+			if (!useWorkaround && from.isAboveStairs()) {
+				useWorkaround = true;
+				setBackSafe = true;
+			}
+			// Check for "lost touch", for when moving events were not created,
+			// for instance (1/256).
+			if (!useWorkaround && yDistance > 0 && yDistance < 0.5 && data.survivalFlyLastYDist < 0 
+					&& setBackYDistance > 0D && setBackYDistance <= 1.5D) {
+				if (data.fromX != Double.MAX_VALUE) {
+					// Interpolate from last to-coordinates to the from
+					// coordinates (with some safe-guard).
+					final double dX = from.getX() - data.fromX;
+					final double dY = from.getY() - data.fromY;
+					final double dZ = from.getZ() - data.fromZ;
+					if (dX * dX + dY * dY + dZ * dZ < 0.5) { // TODO: adjust
+															 // limit maybe.
+						// Check full bounding box since last from.
+						final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
+						final double iY = minY; // TODO ...
+						final double r = from.getWidth() / 2.0;
+						if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
+							useWorkaround = true;
+							setBackSafe = true;
+						}
+					}
+				}
+			}
+			if (useWorkaround) { // !toOnGround && to.isAboveStairs()) {
+				// Set the new setBack and reset the jumpPhase.
+				if (setBackSafe) data.setBack = from.getLocation();
+				// TODO: This seems dubious !
+				data.setBack.setY(Location.locToBlock(data.setBack.getY()));
+				// data.ground ?
+				// ? set jumpphase to height / 0.15 ?
+				data.survivalFlyJumpPhase = 0;
+				data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+				data.clearAccounting();
+				// Tell NoFall that we assume the player to have been on ground somehow.
+				data.noFallAssumeGround = true;
+				resetFrom = true; // Note: if removing this, other conditions need to check noFallAssume...
+				tags.add("lostground");
+			}
+		}
 
         // Player on ice? Give him higher max speed.
         if (from.isOnIce() || to.isOnIce())
@@ -190,16 +202,14 @@ public class SurvivalFly extends Check {
             	hAllowedDistance *= cc.survivalFlySpeedingSpeed/ 100D;
         }
         
-        // TODO: Optimize: maybe only do the permission checks and modifiers if the distance is too big.
-        //       (Depending on permission plugin, with pex it will be hardly 1000 ns for all moving perms, if all false.)
+        // TODO: More after-failure checks, to prevent unnecessary permission checking etc.
+        // TODO: Split off not frequently used parts to methods.
         
         // If the player is on ice, give him an higher maximum speed.
         if (data.survivalFlyOnIce > 0)
             hAllowedDistance *= modIce;
 
-        // Taken directly from Minecraft code, should work.
-        
-//        player.hasPotionEffect(PotionEffectType.SPEED);
+        // Speed amplifier.
         if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT))
             hAllowedDistance *= 1.0D + 0.2D * (mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
         
@@ -211,12 +221,15 @@ public class SurvivalFly extends Check {
         // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
-        // Prevent players from walking on a liquid.
-        // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
-        if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D
-                && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround
-                && to.getY() % 1D < 0.8D)
-            hDistanceAboveLimit = hDistance;
+		// Tag for simple speed violation (medium), might get overridden.
+		if (hDistanceAboveLimit > 0) tags.add("hspeed");
+
+		// Prevent players from walking on a liquid.
+		// TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
+		if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround && to.getY() % 1D < 0.8D) {
+			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+			tags.add("waterwalk");
+		}
 
         // Prevent players from sprinting if they're moving backwards.
         if (hDistanceAboveLimit <= 0D && sprinting) {
@@ -225,7 +238,10 @@ public class SurvivalFly extends Check {
                     && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
                     || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F){
             	// Assumes permission check to be the heaviest (might be mistaken).
-            	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) hDistanceAboveLimit = hDistance;
+            	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)){
+            		hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+            		tags.add("sprintback");
+            	}
             }
         }
 
@@ -233,10 +249,11 @@ public class SurvivalFly extends Check {
 
         // Did he go too far?
         if (hDistanceAboveLimit > 0 && sprinting)
-            // Try to treat it as a the "bunnyhop" problem.
+            // Try to treat it as a the "bunny-hop" problem.
             if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
                 data.bunnyhopDelay = 9;
                 hDistanceAboveLimit = 0D;
+                tags.add("bunny"); // TODO: Which here...
             }
 
         if (hDistanceAboveLimit > 0D) {
@@ -244,9 +261,13 @@ public class SurvivalFly extends Check {
             hDistanceAboveLimit -= data.horizontalBuffer;
             data.horizontalBuffer = 0D;
 
-            // Put back the "overconsumed" buffer.
-            if (hDistanceAboveLimit < 0D)
-                data.horizontalBuffer = -hDistanceAboveLimit;
+            // Put back the "over-consumed" buffer.
+            if (hDistanceAboveLimit < 0D){
+            	data.horizontalBuffer = -hDistanceAboveLimit;
+            }
+            if (hDistanceAboveLimit <= 0){
+            	tags.add("hbuffer"); // TODO: ...
+            }
         } else
             data.horizontalBuffer = Math.min(1D, data.horizontalBuffer - hDistanceAboveLimit);
 
@@ -255,27 +276,22 @@ public class SurvivalFly extends Check {
         if (from.isInWeb()){
         	// Very simple: force players to descend or stay.
          	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
-         	data.jumpAmplifier = 0;
+         	data.jumpAmplifier = 0; // TODO: later maybe fetch.
         	vDistanceAboveLimit = yDistance;
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
-        		if (now - data.survivalFlyCobwebTime > 3000){
-        			data.survivalFlyCobwebTime = now;
-        			data.survivalFlyCobwebVL = vDistanceAboveLimit * 100D;
-        		}
-        		else data.survivalFlyCobwebVL += vDistanceAboveLimit * 100D;
-        		if (data.survivalFlyCobwebVL < 550) { // Totally random !
-        		    if (cc.debug) System.out.println(player.getName()+ " (Cobweb: silent set-back-)");
-        		    // Silently set back.
-        			if (data.setBack == null) data.setBack = player.getLocation();
-        			data.survivalFlyJumpPhase = 0;
-        			data.setBack.setYaw(to.getYaw());
-        			data.setBack.setPitch(to.getPitch());
-        			data.survivalFlyLastYDist = Double.MAX_VALUE;
-        			return data.setBack;
+        		// TODO: This seemed fixed by latest builds of CraftBukkit, test and remove if appropriate!
+        		final Location silentSetBack = hackCobweb(player, data, to, now, vDistanceAboveLimit);
+        		if (silentSetBack != null){
+        			if (cc.debug) System.out.println(player.getName()+ " (Cobweb: silent set-back)");
+        			return silentSetBack;
         		}
         	}
+        	if (vDistanceAboveLimit > 0) tags.add("vweb");
         }
+        // else if (verticalFreedom <= 0.001 && from.isOnLadder) ....
+        // else if (verticalFreedom <= 0.001 (?) & from.isInFluid
         else{
+        	// Check traveled y-distance, orientation is air + jumping + velocity (as far as it gets).
         	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
         	final int maxJumpPhase;
             if (data.jumpAmplifier > 0){
@@ -287,46 +303,44 @@ public class SurvivalFly extends Check {
             	vAllowedDistance -= Math.max(0, (data.survivalFlyJumpPhase - maxJumpPhase) * 0.15D);
             }
 
-            vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
-            
-//            System.out.println("vda = " +vDistanceAboveLimit + " / vc = " + data.verticalVelocityCounter + " / vf = " + data.verticalFreedom + " / v = " + player.getVelocity().length());
+			vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
 
-            // Step can also be blocked.
-            if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D
-                    && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP))
-                vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+			// Simple-step blocker.
+			if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
+				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+				tags.add("step");
+			}
+		}
+        
+		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
+			// Some reset condition.
+			data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+		}
+		
+		final boolean resetTo = toOnGround || to.isInLiquid()  || to.isOnLadder()|| to.isInWeb();
+		
+		// Accounting support.
+		if (cc.survivalFlyAccounting && !resetFrom && !resetTo) {
+			// Currently only for "air" phases.
+			// Horizontal.
+			if (data.horizontalFreedom <= 0.001D){
+				// This only checks general speed decrease oncevelocity is smoked up.
+				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
+			}
+			// Vertical.
+			if (data.verticalFreedom <= 0.001D) { // && ! resetTo) {
+				// Here yDistance can be negative and positive (!).
+				// TODO: Might demand resetting on some direction changes (bunny,)
+				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount, tags, "vacc"));
+//				// Check if y-direction is going upwards without speed / ground.
+//				if (yDistance >= 0 && data.survivalFlyLastYDist < 0 && !data.toWasReset) {
+//					// Moving upwards without having touched the ground.
+//					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+//					tags.add("ychange");
+//				}
+			}
+		}
 
-        }
-        if (data.noFallAssumeGround || fromOnGround || toOnGround)
-            data.jumpAmplifier = 0D;
-        
-        if (cc.survivalFlyAccounting && !resetFrom){
-            final boolean useH = data.horizontalFreedom <= 0.001D;
-            final boolean useV = data.verticalFreedom <= 0.001D;
-            if (useH){
-                data.hDistSum.add(now, (float) hDistance);
-                data.hDistCount.add(now,  1f);
-            }
-            if (useV){
-                data.vDistSum.add(now, (float) (yDistance));
-                data.vDistCount.add(now,  1f);
-            }
-            if (useH && data.hDistCount.getScore(2) > 0 && data.hDistCount.getScore(1) > 0){
-                final float hsc0 = data.hDistSum.getScore(1);
-                final float hsc1 = data.hDistSum.getScore(2);
-                if (hsc0 < hsc1 || hDistance < 3.9 && hsc0 == hsc1){
-                    hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hsc0 - hsc1);
-                }
-            }
-            if (useV && data.vDistCount.getScore(2) > 0 && data.vDistCount.getScore(1) > 0){
-                final float vsc0 = data.vDistSum.getScore(1);
-                final float vsc1 = data.vDistSum.getScore(2);
-                if (vsc0 < vsc1 || yDistance < 3.9 && vsc0 == vsc1){
-                    vDistanceAboveLimit = Math.max(vDistanceAboveLimit, vsc0 - vsc1);
-                }
-            }
-        }
-        
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
         data.survivalFlyJumpPhase++;
@@ -336,11 +350,11 @@ public class SurvivalFly extends Check {
             System.out.println(player.getName() + " hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (yDistance) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance);
             System.out.println(player.getName() + " y" + (fromOnGround?"(onground)":"") + (data.noFallAssumeGround?"(assumeonground)":"") + ": " + from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()+ (toOnGround?"(onground)":""));
             if (cc.survivalFlyAccounting) System.out.println(player.getName() + " h=" + data.hDistSum.getScore(1f)+"/" + data.hDistSum.getScore(1) + " , v=" + data.vDistSum.getScore(1f)+"/"+data.vDistSum.getScore(1) );
+            System.out.println(player.getName() + " tags: " + CheckUtils.join(tags, "+"));
         }
 
         // Did the player move in unexpected ways?// Did the player move in unexpected ways?
         if (result > 0D) {
-//            System.out.println(BlockProperties.isStairs(from.getTypeIdBelow()) + " / " + BlockProperties.isStairs(to.getTypeIdBelow()));
             // Increment violation counter.
             data.survivalFlyVL += result;
             data.clearAccounting();
@@ -352,10 +366,12 @@ public class SurvivalFly extends Check {
                 vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
                 vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
                 vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
+                vd.setParameter(ParameterName.TAGS, CheckUtils.join(tags, "+")); // Always set.
             }
             data.survivalFlyVLTime = now;
             if (executeActions(vd)){
                 data.survivalFlyLastYDist = Double.MAX_VALUE;
+                data.toWasReset = false;
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
@@ -368,7 +384,7 @@ public class SurvivalFly extends Check {
         }
         
         // Violation or not, apply reset conditions (cancel would have returned above).
-        final boolean resetTo = toOnGround || to.isInLiquid()  || to.isOnLadder()|| to.isInWeb();
+        data.toWasReset = resetTo || data.noFallAssumeGround;
         if (resetTo){
             // The player has moved onto ground.
             data.setBack = to.getLocation();
@@ -384,5 +400,59 @@ public class SurvivalFly extends Check {
         data.survivalFlyLastYDist = yDistance;
         return null;
     }
-    
+
+	/**
+	 * Allow accumulating some vls and silently set the player back.
+	 * 
+	 * @param player
+	 * @param data
+	 * @param cc
+	 * @param to
+	 * @param now
+	 * @param vDistanceAboveLimit
+	 * @return
+	 */
+	private final Location hackCobweb(final Player player, final MovingData data, final PlayerLocation to, 
+			final long now, final double vDistanceAboveLimit)
+	{
+		if (now - data.survivalFlyCobwebTime > 3000) {
+			data.survivalFlyCobwebTime = now;
+			data.survivalFlyCobwebVL = vDistanceAboveLimit * 100D;
+		} else data.survivalFlyCobwebVL += vDistanceAboveLimit * 100D;
+		if (data.survivalFlyCobwebVL < 550) { // Totally random !
+			// Silently set back.
+			if (data.setBack == null) data.setBack = player.getLocation();
+			data.survivalFlyJumpPhase = 0;
+			data.setBack.setYaw(to.getYaw());
+			data.setBack.setPitch(to.getPitch());
+			data.survivalFlyLastYDist = Double.MAX_VALUE;
+			return data.setBack;
+		} else return null;
+	}
+
+	/**
+     * Keep track of values, demanding that with time the values decrease.<br>
+     * The ActionFrequency objects have 3 buckets.
+     * @param now
+     * @param value
+     * @param sum
+     * @param count
+     * @param tags
+     * @param tag
+     * @return
+     */
+	private static final double doAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
+	{
+		sum.add(now, (float) value);
+		count.add(now, 1f);
+		if (count.getScore(2) > 0 && count.getScore(1) > 0) {
+			final float sc0 = sum.getScore(1);
+			final float sc1 = sum.getScore(2);
+			if (sc0 < sc1 || value < 3.9 && sc0 == sc1) {
+				tags.add(tag);
+				return 	sc0 - sc1;
+			}
+		}
+		return 0;
+	}
 }
