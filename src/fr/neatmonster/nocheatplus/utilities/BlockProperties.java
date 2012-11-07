@@ -252,16 +252,22 @@ public class BlockProperties {
     /** Flag position for stairs. */
     public static final int F_STAIRS 		= 0x1;
     public static final int F_LIQUID 		= 0x2;
+    // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
     /** Subject to change / rename.*/
     public static final int F_SOLID 		= 0x4;
+    /** Compatibility flag: regard this block as passable always. */
     public static final int F_IGN_PASSABLE 	= 0x8;
     public static final int F_WATER         = 0x10;
     public static final int F_LAVA          = 0x20;
-    /** 150% height, like fences.*/
+    /** Override bounding box: 1.5 blocks high, like fences.<br>
+     *  NOTE: This might have relevance for passable later.
+     */
     public static final int F_HEIGHT150     = 0x40;
     /** The player can stand on these, sneaking or not. */
-    public static final int F_GROUND        = 0x80;
-    /** 1 block height. */
+    public static final int F_GROUND        = 0x80; // TODO: 
+    /** Override bounding box: 1 block height.<br>
+     * NOTE: This should later be ignored by passable, rather.
+     */
     public static final int F_HEIGHT100     = 0x100;
     
 	static{
@@ -322,15 +328,18 @@ public class BlockProperties {
 					if (material.isSolid()){
 					    blockFlags[i] |= F_SOLID | F_GROUND;
 					}
-					if (material.isLiquid()) blockFlags[i] |= F_LIQUID;
+					if (material.isLiquid()){
+						// TODO: do not set F_GROUND for fluids ?
+						blockFlags[i] |= F_LIQUID;
+					}
 				}
 			}
 		}
 		// Stairs.
-		for (final Material mat : new Material[] {Material.NETHER_BRICK_STAIRS,
-				Material.COBBLESTONE_STAIRS, Material.SMOOTH_STAIRS, Material.BRICK_STAIRS,  Material.SANDSTONE_STAIRS,
-	            Material.WOOD_STAIRS, Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS}){
-			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100;
+		for (final Material mat : new Material[] { Material.NETHER_BRICK_STAIRS, Material.COBBLESTONE_STAIRS, 
+				Material.SMOOTH_STAIRS, Material.BRICK_STAIRS, Material.SANDSTONE_STAIRS, Material.WOOD_STAIRS, 
+				Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS }) {
+			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100 | F_GROUND; // Set ground too, to be sure.
 		}
 		// WATER.
 		for (final Material mat : new Material[]{
