@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -265,9 +264,9 @@ public class CheckUtils {
 	
 	public static String toString(final Throwable t){
 		// TODO: Find the fastest way.
-		final PrintWriter pw = new PrintWriter(new StringWriter(340));
-		t.printStackTrace(pw);
-		return pw.toString();
+		final StringWriter w = new StringWriter();
+		t.printStackTrace(new PrintWriter(w));
+		return w.toString();
 	}
 	
 	/**
