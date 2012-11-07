@@ -39,6 +39,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
+import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
@@ -174,12 +175,16 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 	 * use.
 	 */
 	protected List<CommandProtectionEntry> changedCommands = null;
+	
+	
+	protected final ListenerManager listenerManager = new ListenerManager(this, false);
     
 	@Override
 	public void addComponent(final Object obj) {
 		if (obj instanceof Listener) {
 			final Listener listener = (Listener) obj;
-			Bukkit.getPluginManager().registerEvents(listener, this);
+//			Bukkit.getPluginManager().registerEvents(listener, this);
+			listenerManager.registerAllEventHandlers(listener, "NoCheatPlus");
 			listeners.add(listener);
 		}
 		if (obj instanceof INotifyReload) {
@@ -193,7 +198,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 
 	@Override
 	public void removeComponent(final Object obj) {
-		listeners.remove(obj);
+		if (obj instanceof Listener){
+			listeners.remove(obj);
+			listenerManager.remove((Listener) obj);
+		}
 		notifyReload.remove(obj);
 		dataMan.removeComponent(obj);
 	}
@@ -235,6 +243,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 
 		// Restore changed commands.
 		undoCommandChanges();
+		
+		// Remove listener references.
+		listenerManager.setRegisterDirectly(false);
+		listenerManager.clear();
 
         // Tell the server administrator the we finished unloading NoCheatPlus.
         CheckUtils.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
@@ -281,7 +293,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS); // Temp probably,
 
         // List the events listeners and register.
-        Bukkit.getPluginManager().registerEvents(this, this);
+//        Bukkit.getPluginManager().registerEvents(this, this);
+        listenerManager.setRegisterDirectly(true);
+        listenerManager.registerAllWithBukkit();
+        listenerManager.registerAllEventHandlers(this, "NoCheatPlus");
         for (final Object obj : new Object[]{
         	NCPExemptionManager.getListener(),
         	dataMan,
