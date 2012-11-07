@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.command.admin;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -42,6 +44,14 @@ public class UnexemptCommand extends NCPCommand {
 		NCPExemptionManager.unexempt(playerName, checkType);
 		sender.sendMessage(TAG + "Player " + playerName + " will not be exempted from: " + checkType);
 		return true;
+	}
+	
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+	{
+		// At least complete CheckType
+		if (args.length == 3) return CommandUtil.getCheckTypeTabMatches(args[2]);
+		return null;
 	}
 
 }

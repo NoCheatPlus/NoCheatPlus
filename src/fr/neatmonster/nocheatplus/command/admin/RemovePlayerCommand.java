@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.command.admin;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
+import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
@@ -73,6 +75,14 @@ public class RemovePlayerCommand extends NCPCommand {
 		else
 			sender.sendMessage(TAG + "Nothing found (" + checkType + ", exact spelling): " + playerName);
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+	{
+		// At least complete CheckType
+		if (args.length == 3) return CommandUtil.getCheckTypeTabMatches(args[2]);
+		return null;
 	}
 
 }
