@@ -255,10 +255,19 @@ public class CheckUtils {
         return text;
     }
 
-	public static void scheduleOutput(final Exception e) {
+	public static void scheduleOutput(final Throwable t) {
+		scheduleOutput(toString(t));
+	}
+	
+	public static void logSevere(final Throwable t) {
+		Bukkit.getLogger().severe(toString(t));
+	}
+	
+	public static String toString(final Throwable t){
+		// TODO: Find the fastest way.
 		final PrintWriter pw = new PrintWriter(new StringWriter(340));
-		e.printStackTrace(pw);
-		scheduleOutput(pw.toString());
+		t.printStackTrace(pw);
+		return pw.toString();
 	}
 	
 	/**
