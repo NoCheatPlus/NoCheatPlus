@@ -64,7 +64,7 @@ public class PermissionUtil {
 	 * @param ops
 	 * @return
 	 */
-	public static Collection<CommandProtectionEntry> protectCommands(Collection<String> commands, String permissionBase, boolean ops){
+	public static List<CommandProtectionEntry> protectCommands(Collection<String> commands, String permissionBase, boolean ops){
 		return protectCommands(permissionBase, commands, true, ops);
 	}
 	
@@ -76,7 +76,7 @@ public class PermissionUtil {
 	 * @param ops
 	 * @return
 	 */
-	public static Collection<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops){
+	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops){
 		Set<String> checked = new HashSet<String>();
 		for (String label : ignoredCommands){
 			checked.add(CommandUtil.getCommandLabel(label, false));

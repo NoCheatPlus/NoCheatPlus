@@ -2,7 +2,6 @@ package fr.neatmonster.nocheatplus;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -174,7 +173,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 	 * Commands that were changed for protecting them against tab complete or
 	 * use.
 	 */
-	protected Collection<CommandProtectionEntry> changedCommands = null;
+	protected List<CommandProtectionEntry> changedCommands = null;
     
 	@Override
 	public void addComponent(final Object obj) {
@@ -242,18 +241,20 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
     }
 
 	/**
-	 * Does not undo 100%, but restore old permission, permission-message, label (unliekly to be changed), permission default.
+	 * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
 	 */
 	public void undoCommandChanges() {
 		if (changedCommands != null){
-			for (final CommandProtectionEntry entry : changedCommands){
+			while (!changedCommands.isEmpty()){
+				final CommandProtectionEntry entry = changedCommands.remove(changedCommands.size() - 1);
 				entry.restore();
 			}
+			changedCommands = null;
 		}
 	}
 	
 	private void setupCommandProtection() {
-		final Collection<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
+		final List<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
 				Arrays.asList("plugins", "version", "icanhasbukkit"), "nocheatplus.feature.command", false);
 		if (this.changedCommands == null) this.changedCommands = changedCommands;
 		else this.changedCommands.addAll(changedCommands);
