@@ -109,6 +109,8 @@ public class SurvivalFly extends Check {
         final double xDistance = to.getX() - from.getX();
         final double yDistance = to.getY() - from.getY();
         final double zDistance = to.getZ() - from.getZ();
+        
+        // TODO: Later switch to squared distances.
         final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
         
         // If we don't have any setBack, choose the location the player comes from.
@@ -299,11 +301,14 @@ public class SurvivalFly extends Check {
                 maxJumpPhase = (int) (9 + (data.jumpAmplifier - 1.0) * 6);
             }
             else maxJumpPhase = 6;
+            // TODO: consider tags for jumping as well (!).
             if (data.survivalFlyJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0){
             	vAllowedDistance -= Math.max(0, (data.survivalFlyJumpPhase - maxJumpPhase) * 0.15D);
             }
 
 			vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
+			
+			if (vDistanceAboveLimit > 0) tags.add("vdist");
 
 			// Simple-step blocker.
 			if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
