@@ -1,6 +1,8 @@
 package fr.neatmonster.nocheatplus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -10,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -42,6 +45,8 @@ import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
+import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
+import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -165,6 +170,12 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
     /** Player data future stuff. */
     protected final DataManager dataMan = new DataManager();
     
+	/**
+	 * Commands that were changed for protecting them against tab complete or
+	 * use.
+	 */
+	protected Collection<CommandProtectionEntry> changedCommands = null;
+    
 	@Override
 	public void addComponent(final Object obj) {
 		if (obj instanceof Listener) {
@@ -223,11 +234,32 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
         // Cleanup the configuration manager.
         ConfigManager.cleanup();
 
+		// Restore changed commands.
+		undoCommandChanges();
+
         // Tell the server administrator the we finished unloading NoCheatPlus.
         CheckUtils.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
     }
 
-    /* (non-Javadoc)
+	/**
+	 * Does not undo 100%, but restore old permission, permission-message, label (unliekly to be changed), permission default.
+	 */
+	public void undoCommandChanges() {
+		if (changedCommands != null){
+			for (final CommandProtectionEntry entry : changedCommands){
+				entry.restore();
+			}
+		}
+	}
+	
+	private void setupCommandProtection() {
+		final Collection<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
+				Arrays.asList("plugins", "version", "icanhasbukkit"), "nocheatplus.feature.command", false);
+		if (this.changedCommands == null) this.changedCommands = changedCommands;
+		else this.changedCommands.addAll(changedCommands);
+	}
+
+	/* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onEnable()
      */
     @Override
@@ -262,20 +294,25 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
         	new InventoryListener(),
         	new MovingListener(),
         	new INotifyReload() {
-                @Override
-                public void onReload() {
-                    BlockProperties.init();
-                    // TODO: This is a quick workaround, might later be split to other folder/files.
-                    final ConfigFile config = ConfigManager.getConfigFile();
-                    BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
-                }
-            },
+			@Override
+			public void onReload() {
+				// Only for reloading, not INeedConfig.
+				BlockProperties.init();
+				final ConfigFile config = ConfigManager.getConfigFile();
+				BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
+				undoCommandChanges();
+				if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
+			}
+		},
         }){
         	addComponent(obj);
         }
         
         // Register the commands handler.
-        getCommand("nocheatplus").setExecutor(new CommandHandler(this, notifyReload));
+        PluginCommand command = getCommand("nocheatplus");
+        CommandHandler commandHandler = new CommandHandler(this, notifyReload);
+        command.setExecutor(commandHandler);
+        // (CommandHandler is TabExecutor.)
 
         // Set up a task to monitor server lag.
         LagMeasureTask.start(this);
@@ -338,7 +375,16 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
         // Debug information about unknown blocks.
         // (Probably removed later.)
         BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false) || config.getBoolean(ConfPaths.BLOCKBREAK, false));
-
+        
+		if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+				@Override
+				public void run() {
+					setupCommandProtection();
+				}
+			}); 
+		}
+        
         // Tell the server administrator that we finished loading NoCheatPlus now.
         CheckUtils.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
     }
