@@ -1,15 +1,19 @@
 package fr.neatmonster.nocheatplus.command;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -51,7 +55,7 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 /**
  * This the class handling all the commands.
  */
-public class CommandHandler implements CommandExecutor {
+public class CommandHandler implements TabExecutor {
 
     /**
      * The event triggered when NoCheatPlus configuration is reloaded.
@@ -85,6 +89,8 @@ public class CommandHandler implements CommandExecutor {
     /** Sub command map.  */
     private final Map<String, NCPCommand> commands = new HashMap<String, NCPCommand>();
 
+	private Set<String> rootLabels = new LinkedHashSet<String>();
+
     /**
      * Instantiates a new command handler.
      * 
@@ -114,6 +120,7 @@ public class CommandHandler implements CommandExecutor {
     }
     
     public void addCommand(NCPCommand command){
+    	rootLabels.add(command.label);
     	Set<String> allLabels = new LinkedHashSet<String>();
     	allLabels.add(command.label);
     	if (command.aliases != null){
@@ -168,4 +175,52 @@ public class CommandHandler implements CommandExecutor {
         else
             return false;
     }
+
+	/**
+	 * Check which of the choices starts with prefix
+	 * @param sender
+	 * @param choices
+	 * @return
+	 */
+	protected List<String> getTabMatches(CommandSender sender, Collection<String> choices, String prefix){
+		final List<String> res = new ArrayList<String>(choices.size());
+		final Set<NCPCommand> done = new HashSet<NCPCommand>();
+		for (final String label : choices){
+			if (!label.startsWith(prefix)) continue;
+			final NCPCommand cmd = commands.get(label);
+			if (done.contains(cmd)) continue;
+			done.add(cmd);
+			if (sender.hasPermission(cmd.permission)) res.add(cmd.label);
+		}
+		if (!res.isEmpty()){
+			Collections.sort(res);
+			return res;
+		}
+		return null;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+	{
+		// TODO: TabComplete check ?
+		if (args.length == 0 || args.length == 1 && args[0].trim().isEmpty()){
+			// Add labels without aliases.
+			return getTabMatches(sender, rootLabels, "");
+		}
+		else {
+			final String subLabel = args[0].trim().toLowerCase();
+			if (args.length == 1){
+				// Also check aliases for matches.
+				return getTabMatches(sender, commands.keySet(), subLabel);
+			}
+			else{
+				final NCPCommand cmd = commands.get(subLabel);
+				if (cmd != null && sender.hasPermission(cmd.permission)){
+					// Delegate the tab-completion.
+					return cmd.onTabComplete(sender, command, alias, args);
+				}
+			}
+		}
+		return null;
+	}
 }

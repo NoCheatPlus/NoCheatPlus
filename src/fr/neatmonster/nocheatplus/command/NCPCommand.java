@@ -1,8 +1,10 @@
 package fr.neatmonster.nocheatplus.command;
 
+import java.util.List;
+
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 
@@ -12,7 +14,7 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
  * @author mc_dev
  *
  */
-public abstract class NCPCommand implements CommandExecutor{
+public abstract class NCPCommand implements TabExecutor{
 	
 	protected static final String TAG = CommandHandler.TAG;
 	
@@ -68,4 +70,16 @@ public abstract class NCPCommand implements CommandExecutor{
 	 */
 	public abstract boolean onCommand(CommandSender sender, Command command, String label, String[] args);
 	
+	/**
+	 * 
+	 * @param sender
+	 * @param command
+	 * @param alias
+	 * @param args
+	 * @return
+	 */
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+	{
+		return null;
+	}
 }
