@@ -89,8 +89,8 @@ public class PlayerLocation {
     
     // Members that need cleanup:
     
-    /** The entity player. */
-    private EntityPlayer            entity;
+    /** The entityPlayer player. */
+    private EntityPlayer            entityPlayer;
     
     /** Bounding box of the player. */
     private double 					minX, maxX, minY, maxY, minZ, maxZ;
@@ -163,7 +163,7 @@ public class PlayerLocation {
     }
     
     public double getWidth(){
-        return entity.width;
+        return entityPlayer.width;
     }
     
     public int getBlockX(){
@@ -268,7 +268,7 @@ public class PlayerLocation {
      */
     public boolean isOnIce() {
         if (onIce == null){
-            final org.bukkit.entity.Player entity = this.entity.getBukkitEntity();
+            final org.bukkit.entity.Player entity = this.entityPlayer.getBukkitEntity();
             if (entity.isSneaking() || entity.isBlocking())
                 onIce = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ) == Material.ICE.getId();
             else
@@ -331,23 +331,21 @@ public class PlayerLocation {
      */
     public boolean isOnGround() {
         if (onGround == null) {
-            onGround = BlockProperties.isOnGround(getBlockAccess(), minX, minY - yOnGround, minZ, maxX, maxY + 0.25, maxZ);
+        	final double d0 = 0.0D; // 0.01D;
+            onGround = BlockProperties.isOnGround(getBlockAccess(), minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
             if (!onGround){
                 // TODO: Probably check other ids too before doing this ?
-                final double d0 = 1D; //0.25D;
-//                for (org.bukkit.entity.Entity test : entity.getBukkitEntity().getNearbyEntities(1, 1, 1)){
-//                	System.out.println("*" + test.getType());
-//                }
-                final AxisAlignedBB box = useBox.b(minX - d0, minY - getyOnGround() - d0, minZ - d0, maxX + d0, maxY + d0, maxZ + d0);
+                final double d1 = 0.25D;
+                final AxisAlignedBB box = useBox.b(minX - d1, minY - getyOnGround() - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
                 @SuppressWarnings("rawtypes")
-                final List list = worldServer.getEntities(entity, box);
+                final List list = worldServer.getEntities(entityPlayer, box);
                 @SuppressWarnings("rawtypes")
                 Iterator iterator = list.iterator();
                 while (iterator.hasNext()) {
-                    final Entity entity1 = (Entity) iterator.next();
+                    final Entity entity = (Entity) iterator.next();
                     final EntityType type = entity.getBukkitEntity().getType();
                     if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
-                    final AxisAlignedBB otherBox = entity1.boundingBox;
+                    final AxisAlignedBB otherBox = entity.boundingBox;
                     if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
                     else {
                     	onGround = true;
@@ -469,7 +467,7 @@ public class PlayerLocation {
 	{
 
 		// Entity reference.
-		entity = ((CraftPlayer) player).getHandle();
+		entityPlayer = ((CraftPlayer) player).getHandle();
 
 		// Set coordinates.
 		blockX = location.getBlockX();
@@ -482,15 +480,15 @@ public class PlayerLocation {
 		pitch = location.getPitch();
 
 		// Set bounding box.
-		final double dX = x - entity.locX;
-		final double dY = y - entity.locY;
-		final double dZ = z - entity.locZ;
-		minX = entity.boundingBox.a + dX;
-		minY = entity.boundingBox.b + dY;
-		minZ = entity.boundingBox.c + dZ;
-		maxX = entity.boundingBox.d + dX;
-		maxY = entity.boundingBox.e + dY;
-		maxZ = entity.boundingBox.f + dZ;
+		final double dX = x - entityPlayer.locX;
+		final double dY = y - entityPlayer.locY;
+		final double dZ = z - entityPlayer.locZ;
+		minX = entityPlayer.boundingBox.a + dX;
+		minY = entityPlayer.boundingBox.b + dY;
+		minZ = entityPlayer.boundingBox.c + dZ;
+		maxX = entityPlayer.boundingBox.d + dX;
+		maxY = entityPlayer.boundingBox.e + dY;
+		maxZ = entityPlayer.boundingBox.f + dZ;
 
 		// Set world / block access.
 		world = location.getWorld();
@@ -509,7 +507,7 @@ public class PlayerLocation {
      * Set some references to null.
      */
     public void cleanup(){
-        entity = null;
+        entityPlayer = null;
         world = null;
         worldServer = null;
         blockCache = null; // No reset here.
