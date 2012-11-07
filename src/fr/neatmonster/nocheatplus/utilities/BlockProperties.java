@@ -253,7 +253,7 @@ public class BlockProperties {
     public static final int F_STAIRS 		= 0x1;
     public static final int F_LIQUID 		= 0x2;
     // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
-    /** Subject to change / rename.*/
+    /** Minecraft isSolid result. Used for setting ground flag - Subject to change / rename.*/
     public static final int F_SOLID 		= 0x4;
     /** Compatibility flag: regard this block as passable always. */
     public static final int F_IGN_PASSABLE 	= 0x8;
@@ -325,12 +325,13 @@ public class BlockProperties {
 			if (block != null){
 				if (block.material != null){
 					final net.minecraft.server.Material material = block.material;
-					if (material.isSolid()){
-					    blockFlags[i] |= F_SOLID | F_GROUND;
-					}
 					if (material.isLiquid()){
 						// TODO: do not set F_GROUND for fluids ?
 						blockFlags[i] |= F_LIQUID;
+						if (material.isSolid()) blockFlags[i] |= F_SOLID;
+					}
+					else if (material.isSolid()){
+					    blockFlags[i] |= F_SOLID | F_GROUND;
 					}
 				}
 			}
