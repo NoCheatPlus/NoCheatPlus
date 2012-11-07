@@ -331,7 +331,7 @@ public class PlayerLocation {
      */
     public boolean isOnGround() {
         if (onGround == null) {
-        	final double d0 = 0.0D; // 0.01D;
+        	final double d0 = 0.01D;
             onGround = BlockProperties.isOnGround(getBlockAccess(), minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
             if (!onGround){
                 // TODO: Probably check other ids too before doing this ?
