@@ -363,7 +363,7 @@ public class MovingListener implements Listener {
 		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		// Potion effect "Jump".
 		final double jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
-		if (jumpAmplifier > 0D && cc.debug) System.out.println(player.getName() + " Jump effect: " + data.jumpAmplifier);
+		if (jumpAmplifier > 0D && cc.debug) System.out.println(player.getName() + " Jump effect: " + jumpAmplifier);
 		if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
