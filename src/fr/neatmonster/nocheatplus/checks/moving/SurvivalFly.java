@@ -174,59 +174,30 @@ public class SurvivalFly extends Check {
 			}
 		}
 
-        // Player on ice? Give him higher max speed.
-        if (from.isOnIce() || to.isOnIce())
-            data.sfFlyOnIce = 20;
-        else if (data.sfFlyOnIce > 0)
-            data.sfFlyOnIce--;
+		double hAllowedDistance = getAllowedhDist(player, mcPlayer, from, to, sprinting, hDistance, data, cc, false);
 
-        // Choose the right horizontal speed limit for the current activity.
-        double hAllowedDistance = 0D;
-        if (from.isInWeb()){
-        	data.sfFlyOnIce = 0;
-        	// TODO: if (from.isOnIce()) <- makes it even slower !
-        	// Roughly 15% of walking speed.
-        	hAllowedDistance = webSpeed * cc.survivalFlyWalkingSpeed / 100D;
-        }
-        else if (from.isInWater() && to.isInWater())
-            hAllowedDistance = swimmingSpeed * cc.survivalFlySwimmingSpeed / 100D;
-        else if (player.isSneaking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))
-            hAllowedDistance = sneakingSpeed * cc.survivalFlySneakingSpeed / 100D;
-        else if (player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
-            hAllowedDistance = blockingSpeed * cc.survivalFlyBlockingSpeed / 100D;
-        else{
-        	if (!sprinting)
-                hAllowedDistance = walkingSpeed * cc.survivalFlyWalkingSpeed / 100D;
-            else
-                hAllowedDistance = sprintingSpeed * cc.survivalFlySprintingSpeed / 100D;
-        	
-            // Speeding bypass permission (can be combined with other bypasses).
-            // TODO: How exactly to bring it on finally.
-            if (player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING))
-            	hAllowedDistance *= cc.survivalFlySpeedingSpeed/ 100D;
-        }
-        
-        // TODO: More after-failure checks, to prevent unnecessary permission checking etc.
-        // TODO: Split off not frequently used parts to methods.
-        
-        // If the player is on ice, give him an higher maximum speed.
-        if (data.sfFlyOnIce > 0)
-            hAllowedDistance *= modIce;
-
-        // Speed amplifier.
-        if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT))
-            hAllowedDistance *= 1.0D + 0.2D * (mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
-        
-        // Account for flowing liquids (only if needed).
-        if (hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance)){
-                hAllowedDistance *= modDownStream;
-        }
-
+		// Account for flowing liquids (only if needed).
+		// Assume: If in fluids this would be placed right here.
+		if (hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance)) {
+			hAllowedDistance *= modDownStream;
+		}
+		
         // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 
 		// Tag for simple speed violation (medium), might get overridden.
-		if (hDistanceAboveLimit > 0) tags.add("hspeed");
+		if (hDistanceAboveLimit > 0){
+			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) !
+			hAllowedDistance = getAllowedhDist(player, mcPlayer, from, to, sprinting, hDistance, data, cc, true);
+			hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
+			if (hAllowedDistance > 0){
+				tags.add("hspeed");
+			}
+		}
+		
+		///////
+		// Note: here the normal speed checks must be  finished.
+		//////
 
 		// Prevent players from walking on a liquid.
 		// TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
@@ -370,32 +341,11 @@ public class SurvivalFly extends Check {
 			System.out.print(builder.toString());
 		}
 
-        // Did the player move in unexpected ways?// Did the player move in unexpected ways?
-        if (result > 0D) {
-            // Increment violation counter.
-            data.survivalFlyVL += result;
-            data.clearAccounting();
-            data.sfJumpPhase = 0;
-            // If the other plugins haven't decided to cancel the execution of the actions, then do it. If one of the
-            // actions was a cancel, cancel it.
-            final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, result, cc.survivalFlyActions);
-            if (vd.needsParameters()){
-                vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
-                vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
-                vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
-                vd.setParameter(ParameterName.TAGS, CheckUtils.join(tags, "+")); // Always set.
-            }
-            data.sfVLTime = now;
-            if (executeActions(vd)){
-                data.sfLastYDist = Double.MAX_VALUE;
-                data.toWasReset = false;
-                data.fromWasReset = false;
-                // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
-                // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
-                return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
-                        to.getYaw(), to.getPitch());
-            }
-        }
+		// Handle violations.
+		if (result > 0D) {
+			final Location vLoc = (handleViolation(now, result, player, from, to, data, cc));
+			if (vLoc != null) return vLoc;
+		}
         else{
             // Slowly reduce the level with each event, if violations have not recently happened.
             if (now - data.sfVLTime > cc.survivalFlyVLFreeze) data.survivalFlyVL *= 0.95D;
@@ -419,6 +369,88 @@ public class SurvivalFly extends Check {
         data.sfLastYDist = yDistance;
         return null;
     }
+
+	/**
+	 * Return hAllowedDistance, not exact, check permissions as far as
+	 * necessary, if flag is set to check them.
+	 * 
+	 * @param player
+	 * @param sprinting
+	 * @param hDistance
+	 * @param hAllowedDistance
+	 * @param data
+	 * @param cc
+	 * @return
+	 */
+	private double getAllowedhDist(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final double hDistance, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+	{
+		if (checkPermissions) tags.add("permchecks");
+		// TODO: re-arrange for fastest checks first (check vs. allowed distance
+		// multiple times if necessary.
+		double hAllowedDistance = 0D;
+		// Player on ice? Give him higher max speed.
+		// TODO: maybe re-model ice stuff (check what is really needed).
+		if (from.isOnIce() || to.isOnIce()) data.sfFlyOnIce = 20;
+		else if (data.sfFlyOnIce > 0) data.sfFlyOnIce--;
+
+		if (from.isInWeb()) {
+			data.sfFlyOnIce = 0;
+			// TODO: if (from.isOnIce()) <- makes it even slower !
+			// Does include sprinting by now (would need other accounting methods).
+			hAllowedDistance = webSpeed * cc.survivalFlyWalkingSpeed / 100D;
+		} else if (from.isInLiquid() && to.isInLiquid()) {
+			// Check all liquids (lava might demand even slower speed though).
+			// TODO: too many false positives with just checking from ?
+			// TODO: Sneaking and blocking applies to when in water !
+			hAllowedDistance = swimmingSpeed * cc.survivalFlySwimmingSpeed / 100D;
+		} else if (player.isSneaking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) hAllowedDistance = sneakingSpeed * cc.survivalFlySneakingSpeed / 100D;
+		else if (player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) hAllowedDistance = blockingSpeed * cc.survivalFlyBlockingSpeed / 100D;
+		else {
+			if (!sprinting) hAllowedDistance = walkingSpeed * cc.survivalFlyWalkingSpeed / 100D;
+			else hAllowedDistance = sprintingSpeed * cc.survivalFlySprintingSpeed / 100D;
+
+			// Speeding bypass permission (can be combined with other bypasses).
+			// TODO: How exactly to bring it on finally.
+			if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
+		}
+
+		// If the player is on ice, give him an higher maximum speed.
+		if (data.sfFlyOnIce > 0) hAllowedDistance *= modIce;
+		
+		if (hDistance <= hAllowedDistance) return hAllowedDistance;
+		
+		// Speed amplifier.
+		if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) hAllowedDistance *= 1.0D + 0.2D * (mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
+		
+		return hAllowedDistance;
+	}
+
+	private final Location handleViolation(final long now, final double result, final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
+	{
+		// Increment violation level.
+		data.survivalFlyVL += result;
+		data.sfVLTime = now;
+		data.clearAccounting();
+		data.sfJumpPhase = 0;
+		final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, result, cc.survivalFlyActions);
+		if (vd.needsParameters()) {
+			vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
+			vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
+			vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
+			vd.setParameter(ParameterName.TAGS, CheckUtils.join(tags, "+"));
+		}
+		if (executeActions(vd)) {
+			data.sfLastYDist = Double.MAX_VALUE;
+			data.toWasReset = false;
+			data.fromWasReset = false;
+			// Set-back + view direction of to (more smooth).
+			return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(), to.getYaw(), to.getPitch());
+		}
+		else{
+			// Cancelled by other plugin, or no cancel set by configuration.
+			return null;
+		}
+	}
 
 	/**
 	 * First split-off. Not strictly accounting only, actually.<br>
