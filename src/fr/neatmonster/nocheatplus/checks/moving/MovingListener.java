@@ -20,6 +20,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -335,16 +336,20 @@ public class MovingListener implements Listener {
          *                  __/ |                                  
          *                 |___/                                   
          */
-        final Player player = event.getPlayer();
+		final Player player = event.getPlayer();
+		
+		// Ignore players in vehicles.
+		if (player.isInsideVehicle()) return;
+		
+		// Ignore dead players.
+		if (player.isDead()) return;
 
-        // Don't care for movements to another world (such that it is very likely the event data was modified by another
-        // plugin before we got it) or if the player is inside a vehicle.
-        final Location from = event.getFrom();
-        final Location to = event.getTo();
-        if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle()){
-            return;
-        }
-        
+		final Location from = event.getFrom();
+		final Location to = event.getTo();
+		
+		// Ignore changing worlds.
+		if (!from.getWorld().equals(to.getWorld())) return;
+
         // Use existent locations if possible.
         final MoveInfo moveInfo;
         final PlayerLocation pFrom, pTo;
@@ -512,7 +517,7 @@ public class MovingListener implements Listener {
          *                 |___/                                   
          */
         // No typo here. I really only handle cancelled events and ignore others.
-        if (!event.isCancelled())
+        if (!event.isCancelled() || event.getPlayer().isDead())
             return;
 
         // Fix a common mistake that other developers make (cancelling move events is crazy, rather set the target
@@ -529,6 +534,7 @@ public class MovingListener implements Listener {
     public final void onPlayerMoveMonitor(final PlayerMoveEvent event){
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
+        if (player.isDead()) return;
         final Location to = event.getTo(); // player.getLocation();
         final String worldName = to.getWorld().getName();
         
@@ -596,6 +602,18 @@ public class MovingListener implements Listener {
 			data.setBack = event.getRespawnLocation();
 			data.ground = event.getRespawnLocation();
 		}
+	}
+	
+	/**
+	 * Clear fly data on death.
+	 * @param event
+	 */
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerDeath(final PlayerDeathEvent event) {
+		final Player player = event.getEntity();
+		final MovingData data = MovingData.getData(player);
+		data.clearFlyData();
+		data.clearMorePacketsData();
 	}
 
     /**
