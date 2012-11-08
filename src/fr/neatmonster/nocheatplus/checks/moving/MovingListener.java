@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -356,34 +355,19 @@ public class MovingListener implements Listener {
         
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
-        final MovingData data = MovingData.getData(player);
+		final MovingData data = MovingData.getData(player);
+		data.noFallAssumeGround = false;
+		data.teleported = null;
+		
+		// Check for illegal move and bounding box etc.
 		if (pFrom.isIllegal() || pTo.isIllegal()) {
+			handleIllegalMove(event, player, data);
 			moveInfo.cleanup();
 			parkedInfo.add(moveInfo);
-			CheckUtils.onIllegalMove(player);
-			if (data.setBack != null){
-				event.setFrom(data.setBack);
-				event.setTo(data.setBack);
-			}
-			else{
-				pFrom.set(player.getLocation(), player);
-				if (!pFrom.isIllegal()){
-					event.setFrom(pFrom.getLocation());
-					event.setTo(pFrom.getLocation());
-				}
-				else{
-					NoCheatPlus.denyLogin(player.getName(), 24L*60L*60L*1000L);
-					CheckUtils.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
-				}
-				pFrom.cleanup();
-			}
 			return;
 		}
 
-        data.noFallAssumeGround = false;
-        data.teleported = null;
-        
-		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = pFrom.getEntityPlayer();
 		// Potion effect "Jump".
 		final double jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
 		if (jumpAmplifier > 0D && cc.debug) System.out.println(player.getName() + " Jump effect: " + jumpAmplifier);
@@ -474,7 +458,42 @@ public class MovingListener implements Listener {
         parkedInfo.add(moveInfo);
     }
 
-    /**
+
+	public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, final MovingData data)
+	{
+		// This might get extended to a check-like thing.
+		boolean restored = false;
+		final PlayerLocation pLoc = new PlayerLocation();
+		// (Mind that we don't set the block cache here).
+		if (!restored && data.setBack != null) {
+			pLoc.set(data.setBack, player);
+			if (!pLoc.isIllegal()){
+				event.setFrom(data.setBack);
+				event.setTo(data.setBack);
+				restored = true;
+			}
+			else data.setBack = null;
+		} 
+		if (!restored){
+			final Location loc = player.getLocation();
+			pLoc.set(loc, player);
+			if (!pLoc.isIllegal()) {
+				event.setFrom(loc);
+				event.setTo(loc);
+				restored = true;
+			}
+		}
+		pLoc.cleanup();
+		if (!restored){
+			 // TODO: correct the location ?
+			NoCheatPlus.denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
+			CheckUtils.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
+		}
+		// TODO: reset the bounding box of the player ?
+		CheckUtils.onIllegalMove(player);
+	}
+
+	/**
      * A workaround for cancelled PlayerMoveEvents.
      * 
      * @param event
