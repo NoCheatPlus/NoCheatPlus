@@ -87,14 +87,18 @@ public class NoFall extends Check {
      *            the to
      */
     public void check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
-	    
-	    // Reset the on ground properties only if necessary. 
-        if (from.getY() > to.getY()){
-        	if (from.getyOnGround() != cc.noFallyOnGround && from.getY() - from.getBlockY() < cc.noFallyOnGround)
-        		from.setyOnGround(cc.noFallyOnGround);
-        	if (to.getyOnGround() != cc.noFallyOnGround  && to.getY() - to.getBlockY() < cc.noFallyOnGround)
-        		to.setyOnGround(cc.noFallyOnGround);
-        }
+    	
+    	final double fromY = from.getY();
+    	final double toY = to.getY();
+		final double yDiff = toY - fromY;
+		
+		// Adapt yOnGround if necessary (sf uses another setting).
+		if (yDiff < 0) {
+			// In fact this is somewhat heuristic, but it seems to work well.
+			// Missing on-ground seems to happen with running down pyramids rather.
+			if (from.getyOnGround() != cc.noFallyOnGround && fromY - from.getBlockY() < cc.noFallyOnGround) from.setyOnGround(cc.noFallyOnGround);
+			if (to.getyOnGround() != cc.noFallyOnGround && toY - to.getBlockY() < cc.noFallyOnGround) to.setyOnGround(cc.noFallyOnGround);
+		}
         
         // TODO: Distinguish water depth vs. fall distance!
         
@@ -105,8 +109,11 @@ public class NoFall extends Check {
         
         final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         
-        final double yDiff = to.getY() - from.getY();
+        
         // TODO: early returns (...) 
+        
+        final double pY =  player.getLocation().getY();
+        final double minY = Math.min(fromY, Math.min(toY, pY));
         
         if (fromReset){
             // Just reset.
@@ -114,9 +121,9 @@ public class NoFall extends Check {
         }
         else if (fromOnGround || data.noFallAssumeGround){
             // Check if to deal damage (fall back damage check).
-            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, from.getY(), cc);
+            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc);
             else{
-                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - from.getY())));
+                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY)));
                 data.clearNoFallData();
             }
         }
@@ -127,9 +134,9 @@ public class NoFall extends Check {
         else if (toOnGround){
             // Check if to deal damage.
             if (yDiff < 0) data.noFallFallDistance -= yDiff;
-            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, to.getY(), cc);
+            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc);
             else{
-                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - to.getY())));
+                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY)));
                 data.clearNoFallData();
             }
         }
@@ -138,7 +145,8 @@ public class NoFall extends Check {
         }
         
         // Set reference y for nofall (always).
-        data.noFallMaxY = Math.max(Math.max(from.getY(), to.getY()), data.noFallMaxY);
+        // TODO: Consider setting this before handleOnGround (at least for resetTo).
+        data.noFallMaxY = Math.max(Math.max(fromY, Math.max(toY, pY)), data.noFallMaxY);
         
         // TODO: fall distance might be behind (!)
         // TODO: should be the data.noFallMaxY be counted in ?
