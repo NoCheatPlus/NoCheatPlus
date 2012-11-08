@@ -79,7 +79,7 @@ public class FlatWords extends DigestedWords{
 			return 0.0f;
 		}
 		freq.update(ts);
-		float score = Math.min(1.0f, freq.getScore(factor));
+		float score = Math.min(1.0f, freq.score(factor));
 		freq.add(ts, 1.0f);
 		return score;
 	}

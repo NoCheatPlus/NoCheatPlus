@@ -77,7 +77,7 @@ public class Combined {
 		final CombinedConfig cc = CombinedConfig.getConfig(player);
 		
 		// Angle diff per second
-		final float total = Math.max(data.yawFreq.getScore(1f), data.yawFreq.getScore(0) * 3f);
+		final float total = Math.max(data.yawFreq.score(1f), data.yawFreq.bucketScore(0) * 3f);
 		final float threshold = cc.yawRate;
 		boolean cancel = false;
 		if (total > threshold){

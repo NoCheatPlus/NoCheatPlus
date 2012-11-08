@@ -41,14 +41,14 @@ public class Improbable extends Check {
 		final CombinedData data = CombinedData.getData(player);
 		final CombinedConfig cc = CombinedConfig.getConfig(player);
 		data.improbableCount.add(now, weight);
-		final float shortTerm = data.improbableCount.getScore(0);
+		final float shortTerm = data.improbableCount.bucketScore(0);
 		double violation = 0;
 		boolean violated = false;
 		if (shortTerm * 0.8f > cc.improbableLevel / 20.0){
 			violation += shortTerm * 2d;
 			violated = true;
 		}
-		final double full = data.improbableCount.getScore(1.0f);
+		final double full = data.improbableCount.score(1.0f);
 		if (full > cc.improbableLevel){
 			violation += full;
 			violated = true;

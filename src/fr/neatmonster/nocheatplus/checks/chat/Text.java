@@ -233,13 +233,13 @@ public class Text extends AsyncCheck implements INotifyReload{
 		// Add weight to frequency counts.
 		final float normalScore = Math.max(cc.textFreqNormMin, score);
 		data.chatFrequency.add(time, normalScore);
-		final float accumulated = cc.textFreqNormWeight * data.chatFrequency.getScore(cc.textFreqNormFactor);
+		final float accumulated = cc.textFreqNormWeight * data.chatFrequency.score(cc.textFreqNormFactor);
 	    final boolean normalViolation = accumulated > cc.textFreqNormLevel;
 
 		final float shortTermScore = Math.max(cc.textFreqShortTermMin, score);
 		data.chatShortTermFrequency.add(time, shortTermScore);
 		// TODO: very short term (1st bucket) or do it indirectly.
-		final float shortTermAccumulated = cc.textFreqShortTermWeight * data.chatShortTermFrequency.getScore(cc.textFreqShortTermFactor);
+		final float shortTermAccumulated = cc.textFreqShortTermWeight * data.chatShortTermFrequency.score(cc.textFreqShortTermFactor);
 		final boolean shortTermViolation = shortTermAccumulated > cc.textFreqShortTermLevel;
 		
 		if (normalViolation || shortTermViolation){

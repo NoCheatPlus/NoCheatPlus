@@ -74,7 +74,7 @@ public class FastBreak extends Check {
     		data.fastBreakPenalties.add(now, (float) missingTime);
     		
     		// Only raise a violation, if the total penalty score exceeds the contention duration (for lag, delay).
-    		if (data.fastBreakPenalties.getScore(cc.fastBreakBucketFactor) > cc.fastBreakBucketContention){
+    		if (data.fastBreakPenalties.score(cc.fastBreakBucketFactor) > cc.fastBreakBucketContention){
     			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
     		    final double vlAdded = (double) missingTime / 1000.0;
     			data.fastBreakVL += vlAdded;

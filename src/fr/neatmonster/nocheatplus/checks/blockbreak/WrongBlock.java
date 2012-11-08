@@ -58,7 +58,7 @@ public class WrongBlock extends Check {
         		 player.sendMessage("WrongBlock failure with dist: " + dist);
         	 }
         	data.wrongBlockVL.add(now, (float) (dist + 1) / 2f);
-        	final float score = data.wrongBlockVL.getScore(0.9f);
+        	final float score = data.wrongBlockVL.score(0.9f);
         	if (score > cc.wrongBLockLevel){
             	if (executeActions(player, score, 1D, cc.wrongBlockActions))
             		cancel = true;

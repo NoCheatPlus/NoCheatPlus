@@ -354,7 +354,7 @@ public class SurvivalFly extends Check {
             System.out.println(player.getName() + " vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+"), jumpphase: " + data.survivalFlyJumpPhase);
             System.out.println(player.getName() + " hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (yDistance) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance);
             System.out.println(player.getName() + " y" + (fromOnGround?"(onground)":"") + (data.noFallAssumeGround?"(assumeonground)":"") + ": " + from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()+ (toOnGround?"(onground)":""));
-            if (cc.survivalFlyAccounting) System.out.println(player.getName() + " h=" + data.hDistSum.getScore(1f)+"/" + data.hDistSum.getScore(1) + " , v=" + data.vDistSum.getScore(1f)+"/"+data.vDistSum.getScore(1) );
+            if (cc.survivalFlyAccounting) System.out.println(player.getName() + " h=" + data.hDistSum.score(1f)+"/" + data.hDistSum.bucketScore(1) + " , v=" + data.vDistSum.score(1f)+"/"+data.vDistSum.bucketScore(1) );
             System.out.println(player.getName() + " tags: " + CheckUtils.join(tags, "+"));
         }
 
@@ -437,25 +437,27 @@ public class SurvivalFly extends Check {
 
 	/**
      * Keep track of values, demanding that with time the values decrease.<br>
-     * The ActionFrequency objects have 3 buckets.
+     * The ActionFrequency objects have 3 buckets, bucket 1 is checked against bucket 2, 0 is ignored.
      * @param now
      * @param value
      * @param sum
      * @param count
      * @param tags
      * @param tag
-     * @return
+     * @return absolute difference on violation.;
      */
 	private static final double doAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
 	{
 		sum.add(now, (float) value);
 		count.add(now, 1f);
-		if (count.getScore(2) > 0 && count.getScore(1) > 0) {
-			final float sc0 = sum.getScore(1);
-			final float sc1 = sum.getScore(2);
-			if (sc0 < sc1 || value < 3.9 && sc0 == sc1) {
+		// TODO: This does not make sense (vertical vs horizontal up vs down: needs parameter !).
+		// TODO: Add hover return parameter
+		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
+			final float sc1 = sum.bucketScore(1);
+			final float sc2 = sum.bucketScore(2);
+			if (sc1 < sc2 || value < 3.9 && sc1 == sc2) {
 				tags.add(tag);
-				return 	sc0 - sc1;
+				return 	sc1 - sc2;
 			}
 		}
 		return 0;

@@ -51,7 +51,7 @@ public class Speed extends Check {
         data.speedBuckets.add(now, 1f);
         
         // Medium term (normalized to one second).
-        final float total = data.speedBuckets.getScore(cc.speedBucketFactor) * 1000f / (float) (cc.speedBucketDur * cc.speedBuckets);
+        final float total = data.speedBuckets.score(cc.speedBucketFactor) * 1000f / (float) (cc.speedBucketDur * cc.speedBuckets);
         
         // Short term.
         final int tick = TickTask.getTick();

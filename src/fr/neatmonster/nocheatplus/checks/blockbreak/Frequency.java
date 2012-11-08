@@ -24,7 +24,7 @@ public class Frequency extends Check {
         data.frequencyBuckets.add(System.currentTimeMillis(), interval);
         
         // Full period frequency.
-        final float fullScore = data.frequencyBuckets.getScore(cc.frequencyBucketFactor);
+        final float fullScore = data.frequencyBuckets.score(cc.frequencyBucketFactor);
         final float fullTime = cc.frequencyBuckets * cc.frequencyBucketDur;
         
         // Short term arrivals.

@@ -51,7 +51,7 @@ public class Commands extends Check {
             data.commandsShortTermWeight = 1.0;
         }
         
-        final float nw = data.commandsWeights.getScore(1f);
+        final float nw = data.commandsWeights.score(1f);
         final double violation = Math.max(nw - cc.commandsLevel, data.commandsShortTermWeight - cc.commandsShortTermLevel);
         
         if (violation > 0.0){
