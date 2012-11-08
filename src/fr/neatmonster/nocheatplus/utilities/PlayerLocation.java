@@ -538,4 +538,8 @@ public class PlayerLocation {
 		return false;
 	}
 
+	public EntityPlayer getEntityPlayer() {
+		return entityPlayer;
+	}
+
 }
