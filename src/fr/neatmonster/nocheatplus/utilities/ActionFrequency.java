@@ -9,16 +9,17 @@ package fr.neatmonster.nocheatplus.utilities;
 public class ActionFrequency {
 	
 	/** Reference time for filling in. */
-	long time = 0;
+	private long time = 0;
 	
 	/**
 	 * Buckets to fill weights in, each represents an interval of durBucket duration, 
 	 * index 0 is the latest, highest index is the oldest. 
 	 * Weights will get filled into the next buckets with time passed. 
 	 */
-	final float[] buckets;
+	private final float[] buckets;
 
-	final long durBucket;
+	/** Duration in milliseconds that oe bucket covers. */
+	private final long durBucket;
 	
  	public ActionFrequency(final int nBuckets, final long durBucket){
 		this.buckets = new float[nBuckets];
@@ -27,10 +28,19 @@ public class ActionFrequency {
 	
 	/**
 	 * Update and add.
-	 * @param ts
+	 * @param now
+	 * @param amount
 	 */
-	public void add(final long now, final float amount){
+	public final void add(final long now, final float amount){
 		update(now);
+		buckets[0] += amount;
+	}
+	
+	/**
+	 * Unchecked addition of amount to the first bucket.
+	 * @param amount
+	 */
+	public final void add(final float amount){
 		buckets[0] += amount;
 	}
 
@@ -38,7 +48,7 @@ public class ActionFrequency {
 	 * Update without adding, also updates time.
 	 * @param now
 	 */
-	public void update(final long now) {
+	public final void update(final long now) {
 		final long diff = now - time;
 		final int shift = (int) ((float) diff / (float) durBucket);
 		if (shift == 0){
@@ -61,27 +71,38 @@ public class ActionFrequency {
 		time += durBucket * shift;
 	}
 
-	public void clear(final long now) {
+	public final void clear(final long now) {
 		for (int i = 0; i < buckets.length; i++){
-			buckets[i] = 0;
+			buckets[i] = 0f;
 		}
 		time = now;
 	}
 	
+	/**
+	 * @deprecated Use instead: score(float).
+	 * @param factor
+	 * @return
+	 */
+	public final float getScore(final float factor){
+		return score(factor);
+	}
+	
+	/**
+	 * @deprecated Use instead: score(float).
+	 * @param factor
+	 * @return
+	 */
+	public final float getScore(final int bucket){
+		return bucketScore(bucket);
+	}
 	
 	/**
 	 * Get a weighted sum score, weight for bucket i: w(i) = factor^i. 
 	 * @param factor
 	 * @return
 	 */
-	public float getScore(final float factor){
-		float res = buckets[0];
-		float cf = factor;
-		for (int i = 1; i < buckets.length; i++){
-			res += cf * buckets[i];
-			cf *= factor;
-		}
-		return res;
+	public final float score(final float factor){
+		return sliceScore(0, buckets.length, factor);
 	}
 	
 	/**
@@ -89,20 +110,41 @@ public class ActionFrequency {
 	 * @param bucket
 	 * @return
 	 */
-	public float getScore(final int bucket){
+	public final float bucketScore(final int bucket){
 		return buckets[bucket];
 	}
 	
 	/**
-	 * Get score of first maxBuckets buckets, with factor.
-	 * @param maxBucket
+	 * Get score of first end buckets, with factor.
+	 * @param end Number of buckets including start. This is not included.
 	 * @param factor
 	 * @return
 	 */
-	public final float getScore(final int maxBuckets, float factor){
-		float score = buckets[0];
+	public final float leadingScore(final int end, float factor){
+		return sliceScore(0, end, factor);
+	}
+	
+	/**
+	 * Get score from startBucket on, with factor.
+	 * @param start This is included.
+	 * @param factor
+	 * @return
+	 */
+	public final float trailingScore(final int start, float factor){
+		return sliceScore(start, buckets.length, factor);
+	}
+	
+	/**
+	 * Get score from startBucket on, until before maxBucket, with factor.
+	 * @param start This is included.
+	 * @param end This is not included.
+	 * @param factor
+	 * @return
+	 */
+	public final float sliceScore(final int start, final int end, float factor){
+		float score = buckets[start];
 		float cf = factor;
-		for (int i = 1; i < maxBuckets; i++){
+		for (int i = start; i < end; i++){
 			score += buckets[i] * cf;
 			cf *= factor;
 		}
@@ -115,6 +157,22 @@ public class ActionFrequency {
 	 */
 	public final long lastAccess(){
 		return time;
+	}
+	
+	/**
+	 * Get the number of buckets.
+	 * @return
+	 */
+	public final int numberOfBuckets(){
+		return buckets.length;
+	}
+	
+	/**
+	 * Get the duration of a bucket in milliseconds.
+	 * @return
+	 */
+	public final long bucketDuration(){
+		return durBucket;
 	}
 	
 }
