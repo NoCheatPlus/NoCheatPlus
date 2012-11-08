@@ -45,6 +45,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -355,8 +356,30 @@ public class MovingListener implements Listener {
         
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
-        
         final MovingData data = MovingData.getData(player);
+		if (pFrom.isIllegal() || pTo.isIllegal()) {
+			moveInfo.cleanup();
+			parkedInfo.add(moveInfo);
+			CheckUtils.onIllegalMove(player);
+			if (data.setBack != null){
+				event.setFrom(data.setBack);
+				event.setTo(data.setBack);
+			}
+			else{
+				pFrom.set(player.getLocation(), player);
+				if (!pFrom.isIllegal()){
+					event.setFrom(pFrom.getLocation());
+					event.setTo(pFrom.getLocation());
+				}
+				else{
+					NoCheatPlus.denyLogin(player.getName(), 24L*60L*60L*1000L);
+					CheckUtils.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
+				}
+				pFrom.cleanup();
+			}
+			return;
+		}
+
         data.noFallAssumeGround = false;
         data.teleported = null;
         

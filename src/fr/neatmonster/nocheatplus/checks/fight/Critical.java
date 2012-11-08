@@ -5,6 +5,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
@@ -45,6 +46,11 @@ public class Critical extends Check {
         // We'll need the PlayerLocation to know some important stuff.
         final PlayerLocation location = new PlayerLocation();
         location.set(player.getLocation(), player);
+		if (location.isIllegal()) {
+			location.cleanup();
+			CheckUtils.onIllegalMove(player);
+			return true;
+		}
 
         // Check if the hit was a critical hit (positive fall distance, entity in the air, not on ladder, not in liquid
         // and without blindness effect).

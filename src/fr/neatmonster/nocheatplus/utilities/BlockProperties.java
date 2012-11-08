@@ -863,6 +863,11 @@ public class BlockProperties {
 //		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
 		// Bit fat workaround, maybe put the object through from check listener ?
 		pLoc.set(location, player, 0.3);
+		if (pLoc.isIllegal()) {
+			pLoc.cleanup();
+			CheckUtils.onIllegalMove(player);
+			return false;
+		}
 		final boolean onGround = pLoc.isOnGround();
 		pLoc.cleanup();
 		return onGround;

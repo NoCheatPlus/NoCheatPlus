@@ -328,4 +328,9 @@ public class CheckUtils {
 			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
 		} else return mcEntity.height;
 	}
+	
+	public static void onIllegalMove(final Player player){
+		player.kickPlayer("Illegal move.");
+		logWarning("[NCP] Disconnect " + player.getName() + " due to illegal move!");
+	}
 }
