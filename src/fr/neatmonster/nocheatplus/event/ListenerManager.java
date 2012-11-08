@@ -13,6 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry.MethodOrder;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
@@ -93,6 +94,7 @@ public class ListenerManager {
 	
 	/**
 	 * This registers all declared methods that have the @EventHandler annotation.<br>
+	 * Interfaces checked if arguments are not given: IHaveMethodOrder (order), ComponentWithName (tag)<br>
 	 * NOTE: Does not do any super class checking.
 	 * @param listener
 	 * @param tag Identifier for the registering plugin / agent, null is not discouraged, but null entries are ignored concerning sortin order.
@@ -103,6 +105,7 @@ public class ListenerManager {
 	
 	/**
 	 * This registers all methods that have the @EventHandler annotation.<br>
+	 * Interfaces checked if arguments are not given: IHaveMethodOrder (order), ComponentWithName (tag)<br>
 	 * NOTE: Does not do any super class checking.
 	 * @param listener
 	 * @param tag Identifier for the registering plugin / agent, null is not discouraged, but null entries are ignored concerning sortin order.
@@ -111,6 +114,10 @@ public class ListenerManager {
 	public void registerAllEventHandlers(Listener listener, String tag, MethodOrder order){
 		if (order == null && listener instanceof IHaveMethodOrder){
 			order = ((IHaveMethodOrder) listener).getMethodOrder();
+		}
+		if (tag == null && listener instanceof ComponentWithName){
+			// TODO: maybe change to an interface only defined here. 
+			tag = ((ComponentWithName) listener).getComponentName();
 		}
 		Class<?> clazz = listener.getClass();
 		Set<Method> allMethods = new HashSet<Method>();
@@ -144,15 +151,6 @@ public class ListenerManager {
 			Class<? extends Event> checkedEventType = eventType.asSubclass(Event.class);
 			getListener(checkedEventType, anno.priority()).addMethodEntry(new MethodEntry(listener, method, anno.ignoreCancelled(), tag, order));
 		}
-	}
-
-	protected static boolean extendsEvent(Class<?> eventType) {
-		Class<?> superClass = eventType.getSuperclass();
-		while (superClass != null && superClass != Object.class){
-			if (superClass == Event.class) return true;
-			superClass = superClass.getSuperclass();
-		}
-		return false;
 	}
 
 	/**

@@ -33,6 +33,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.command.CommandHandler;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
@@ -182,6 +183,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 	
 	private boolean manageListeners = true;
 
+	/**
+	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
+	 */
 	@Override
 	public void addComponent(final Object obj) {
 		if (obj instanceof Listener) {
@@ -195,10 +199,18 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 		}
 		dataMan.addComponent(obj);
 	}
-
+	
+	/**
+	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
+	 * @param listener
+	 */
 	private void addListener(final Listener listener) {
 		if (manageListeners){
-			listenerManager.registerAllEventHandlers(listener, "NoCheatPlus");
+			String tag = "NoCheatPlus";
+			if (listener instanceof ComponentWithName){
+				tag = ((ComponentWithName) listener).getComponentName();
+			}
+			listenerManager.registerAllEventHandlers(listener, tag);
 			listeners.add(listener);
 		}
 		else{
