@@ -119,60 +119,16 @@ public class SurvivalFly extends Check {
         if (data.setBack == null)
             data.setBack = from.getLocation();
 
-		boolean resetFrom = fromOnGround || from.isInLiquid() || from.isOnLadder() || from.isInWeb();
+		final boolean resetFrom;
 
-		final double setBackYDistance = to.getY() - data.setBack.getY();
-		// If the player has touched the ground but it hasn't been noticed by
-		// the plugin, the workaround is here.
-		if (!resetFrom) {
-			// Don't set "useWorkaround = x()", to avoid potential trouble with
-			// reordering to come, and similar.
-			boolean useWorkaround = false;
-			boolean setBackSafe = false; // Let compiler remove this if necessary.
-			// Check for moving off stairs.
-			if (!useWorkaround && from.isAboveStairs()) {
-				useWorkaround = true;
-				setBackSafe = true;
-			}
-			// Check for "lost touch", for when moving events were not created,
-			// for instance (1/256).
-			if (!useWorkaround && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0 
-					&& setBackYDistance > 0D && setBackYDistance <= 1.5D) {
-				if (data.fromX != Double.MAX_VALUE) {
-					// Interpolate from last to-coordinates to the from
-					// coordinates (with some safe-guard).
-					final double dX = from.getX() - data.fromX;
-					final double dY = from.getY() - data.fromY;
-					final double dZ = from.getZ() - data.fromZ;
-					if (dX * dX + dY * dY + dZ * dZ < 0.5) { // TODO: adjust
-															 // limit maybe.
-						// Check full bounding box since last from.
-						final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
-						final double iY = minY; // TODO ...
-						final double r = from.getWidth() / 2.0;
-						if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
-							useWorkaround = true;
-							setBackSafe = true;
-						}
-					}
-				}
-			}
-			if (useWorkaround) { // !toOnGround && to.isAboveStairs()) {
-				// Set the new setBack and reset the jumpPhase.
-				if (setBackSafe) data.setBack = from.getLocation();
-				// TODO: This seems dubious !
-				data.setBack.setY(Location.locToBlock(data.setBack.getY()));
-				// data.ground ?
-				// ? set jumpphase to height / 0.15 ?
-				data.sfJumpPhase = 0;
-				data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
-				data.clearAccounting();
-				// Tell NoFall that we assume the player to have been on ground somehow.
-				data.noFallAssumeGround = true;
-				resetFrom = true; // Note: if removing this, other conditions need to check noFallAssume...
-				tags.add("lostground");
-			}
+		// "Lost ground" workaround.
+		if (fromOnGround || from.isInLiquid() || from.isOnLadder() || from.isInWeb()) resetFrom = true;
+		else if (lostGround(player, mcPlayer, from, to, yDistance, data, cc)){
+			resetFrom = true;
+			// TODO: Consider && !resetTo ?
+			// Note: if not setting resetFrom, other places have to check assumeGround...
 		}
+		else resetFrom = false;
 
 		double hAllowedDistance = getAllowedhDist(player, mcPlayer, from, to, sprinting, hDistance, data, cc, false);
 
@@ -343,7 +299,7 @@ public class SurvivalFly extends Check {
 
 		// Handle violations.
 		if (result > 0D) {
-			final Location vLoc = (handleViolation(now, result, player, from, to, data, cc));
+			final Location vLoc = handleViolation(now, result, player, from, to, data, cc);
 			if (vLoc != null) return vLoc;
 		}
         else{
@@ -369,6 +325,58 @@ public class SurvivalFly extends Check {
         data.sfLastYDist = yDistance;
         return null;
     }
+
+	private boolean lostGround(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
+		// Don't set "useWorkaround = x()", to avoid potential trouble with
+		// reordering to come, and similar.
+		final double setBackYDistance = to.getY() - data.setBack.getY();
+		boolean useWorkaround = false;
+		boolean setBackSafe = false; // Let compiler remove this if necessary.
+		// Check for moving off stairs.
+		if (!useWorkaround && from.isAboveStairs()) {
+			useWorkaround = true;
+			setBackSafe = true;
+		}
+		// Check for "lost touch", for when moving events were not created,
+		// for instance (1/256).
+		if (!useWorkaround && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0 
+				&& setBackYDistance > 0D && setBackYDistance <= 1.5D) {
+			if (data.fromX != Double.MAX_VALUE) {
+				// Interpolate from last to-coordinates to the from
+				// coordinates (with some safe-guard).
+				final double dX = from.getX() - data.fromX;
+				final double dY = from.getY() - data.fromY;
+				final double dZ = from.getZ() - data.fromZ;
+				if (dX * dX + dY * dY + dZ * dZ < 0.5) { // TODO: adjust
+														 // limit maybe.
+					// Check full bounding box since last from.
+					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
+					final double iY = minY; // TODO ...
+					final double r = from.getWidth() / 2.0;
+					if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
+						useWorkaround = true;
+						setBackSafe = true;
+					}
+				}
+			}
+		}
+		if (useWorkaround) { // !toOnGround && to.isAboveStairs()) {
+			// Set the new setBack and reset the jumpPhase.
+			if (setBackSafe) data.setBack = from.getLocation();
+			// TODO: This seems dubious !
+			data.setBack.setY(Location.locToBlock(data.setBack.getY()));
+			// data.ground ?
+			// ? set jumpphase to height / 0.15 ?
+			data.sfJumpPhase = 0;
+			data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+			data.clearAccounting();
+			// Tell NoFall that we assume the player to have been on ground somehow.
+			data.noFallAssumeGround = true;
+			tags.add("lostground");
+			return true; 
+		}
+		else return false;
+	}
 
 	/**
 	 * Return hAllowedDistance, not exact, check permissions as far as
