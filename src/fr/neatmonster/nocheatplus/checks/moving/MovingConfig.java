@@ -93,7 +93,8 @@ public class MovingConfig extends ACheckConfig {
     public final int        survivalFlySwimmingSpeed;
     public final int        survivalFlyWalkingSpeed;
     public final boolean    survivalFlyCobwebHack;
-    public final boolean    survivalFlyAccounting;
+    public final boolean    survivalFlyAccountingH;
+    public final boolean    survivalFlyAccountingV;
     public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
     
@@ -143,7 +144,8 @@ public class MovingConfig extends ACheckConfig {
         survivalFlySwimmingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         survivalFlyCobwebHack = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
-        survivalFlyAccounting = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_ACCOUNTING);
+        survivalFlyAccountingH = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC);
+        survivalFlyAccountingV = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
         survivalFlyVLFreeze = data.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
         survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         

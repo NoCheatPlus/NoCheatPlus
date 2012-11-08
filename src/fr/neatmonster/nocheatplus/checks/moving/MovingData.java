@@ -87,8 +87,8 @@ public class MovingData extends ACheckData {
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. */
     public double 		  toX = Double.MAX_VALUE, toY, toZ;
-    /** To was ground or web etc. */
-    public boolean		  toWasReset;
+    /** To/from was ground or web or assumed to be etc. */
+    public boolean		  toWasReset, fromWasReset;
 
     // Data of the creative check.
     public boolean        creativeFlyPreviousRefused;
@@ -156,7 +156,7 @@ public class MovingData extends ACheckData {
 		clearAccounting();
 		clearNoFallData();
 		sfHorizontalBuffer = 0;
-
+		toWasReset = fromWasReset = false; // TODO: true maybe
 	}
 
 	/**
@@ -177,6 +177,7 @@ public class MovingData extends ACheckData {
 		// Keep bunny-hop delay (?)
 		// keep jump phase.
 		sfHorizontalBuffer = Math.min(0, sfHorizontalBuffer);
+		toWasReset = fromWasReset = false; // TODO: true maybe
 	}
 
     public void clearAccounting() {

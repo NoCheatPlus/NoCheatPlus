@@ -49,6 +49,8 @@ public class SurvivalFly extends Check {
 	
 	/** Faster moving down stream (water mainly). */
 	public static final double modDownStream      = 0.19 / swimmingSpeed;
+	/** Bunny-hop delay. */
+	private static final int   bunnyHopMax = 9;
 
 	/** To join some tags with moving check violations. */
 	private final ArrayList<String> tags = new ArrayList<String>(15);
@@ -247,16 +249,34 @@ public class SurvivalFly extends Check {
             }
         }
 
-        data.bunnyhopDelay--;
+		data.bunnyhopDelay--;
+		// "Bunny-hop".
+		if (hDistanceAboveLimit > 0 && sprinting){
+			// Try to treat it as a the "bunny-hop" problem.
+			// TODO: sharpen the pre-conditions (fromWasReset or distance to last on-ground position).
+			if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
+				data.bunnyhopDelay = bunnyHopMax;
+				hDistanceAboveLimit = 0D;
+				tags.add("bunny"); // TODO: Which here...
+			}
+		}
+		
 
-        // Did he go too far?
-        if (hDistanceAboveLimit > 0 && sprinting)
-            // Try to treat it as a the "bunny-hop" problem.
-            if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
-                data.bunnyhopDelay = 9;
-                hDistanceAboveLimit = 0D;
-                tags.add("bunny"); // TODO: Which here...
-            }
+		final boolean resetTo = toOnGround || to.isInLiquid()  || to.isOnLadder() || to.isInWeb();
+		
+		if (cc.survivalFlyAccountingH && !resetFrom && !resetTo) {
+			// Currently only for "air" phases.
+			// Horizontal.
+			if (data.horizontalFreedom <= 0.001D) {
+				// This only checks general speed decrease once velocity is smoked up.
+				// TODO: account for bunny-hop
+				if (hDistance != 0.0) hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
+			} else {
+				// TODO: Just to exclude source of error, might be redundant.
+				data.hDistCount.clear(now);
+				data.hDistSum.clear(now);
+			}
+		}
 
 		// Horizontal buffer.
 		if (hDistanceAboveLimit > 0D && data.sfHorizontalBuffer != 0D) {
@@ -270,7 +290,9 @@ public class SurvivalFly extends Check {
 			if (hDistanceAboveLimit < 0D) {
 				data.sfHorizontalBuffer = -hDistanceAboveLimit;
 			}
-		} else data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
+		} else if (hDistance != 0D){
+			data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
+		}
 
         // Calculate the vertical speed limit based on the current jump phase.
         double vAllowedDistance, vDistanceAboveLimit;
@@ -280,7 +302,7 @@ public class SurvivalFly extends Check {
          	data.jumpAmplifier = 0; // TODO: later maybe fetch.
         	vDistanceAboveLimit = yDistance;
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
-        		// TODO: This seemed fixed by latest builds of CraftBukkit, test and remove if appropriate!
+        		// TODO: Seemed fixed at first by CB/MC, but still does occur. 
         		final Location silentSetBack = hackCobweb(player, data, to, now, vDistanceAboveLimit);
         		if (silentSetBack != null){
         			if (cc.debug) System.out.println(player.getName()+ " (Cobweb: silent set-back)");
@@ -315,36 +337,19 @@ public class SurvivalFly extends Check {
 				tags.add("step");
 			}
 		}
-        
+
 		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
 			// Some reset condition.
 			data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
 		}
 		
-		final boolean resetTo = toOnGround || to.isInLiquid()  || to.isOnLadder()|| to.isInWeb();
+		// TODO: on ground -> on ground improvements
 		
-		// Accounting support.
-		if (cc.survivalFlyAccounting && !resetFrom && !resetTo) {
-			// Currently only for "air" phases.
-			// Horizontal.
-			if (data.horizontalFreedom <= 0.001D){
-				// This only checks general speed decrease oncevelocity is smoked up.
-				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
-			}
-			else 
-			// Vertical.
-			if (data.verticalFreedom <= 0.001D) { // && ! resetTo) {
-				// Here yDistance can be negative and positive (!).
-				// TODO: Might demand resetting on some direction changes (bunny,)
-				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount, tags, "vacc"));
-//				// Check if y-direction is going upwards without speed / ground.
-//				if (yDistance >= 0 && data.survivalFlyLastYDist < 0 && !data.toWasReset) {
-//					// Moving upwards without having touched the ground.
-//					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
-//					tags.add("ychange");
-//				}
-			}
+		if (!resetFrom && !resetTo){
+			// "On-air" checks (vertical)
+			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, yDistance, data, cc));
 		}
+		
 
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
@@ -352,15 +357,17 @@ public class SurvivalFly extends Check {
 
 		if (cc.debug) {
 			StringBuilder builder = new StringBuilder(500);
-			builder.append(player.getName() + " vertical freedom: " +  CheckUtils.fdec3.format(data.verticalFreedom) + " (vv=" +  CheckUtils.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
+			builder.append(player.getName() + " vfreedom: " +  CheckUtils.fdec3.format(data.verticalFreedom) + " (vv=" +  CheckUtils.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
 			builder.append(player.getName() + " hDist: " + CheckUtils.fdec3.format(hDistance) + " / " +  CheckUtils.fdec3.format(hAllowedDistance) + " , vDist: " +  CheckUtils.fdec3.format(yDistance) + " / " +  CheckUtils.fdec3.format(vAllowedDistance) + "\n");
-			builder.append(player.getName() + " y" + (fromOnGround ? "(onground)" : "") + (data.noFallAssumeGround ? "(assumeonground)" : "") + ": " +  CheckUtils.fdec3.format(from.getY()) + "(" +  CheckUtils.fdec3.format(player.getLocation().getY()) + ") -> " +  CheckUtils.fdec3.format(to.getY()) + (toOnGround ? "(onground)" : "") + "\n");
-			if (cc.survivalFlyAccounting && !resetFrom && !resetTo) {
-				if (data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
-				if (data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
+			final double plY = player.getLocation().getY();
+			final String plYs = from.getY() == plY ? "" : ("|" +  CheckUtils.fdec3.format(plY));
+			builder.append(player.getName() + " y: " +  CheckUtils.fdec3.format(from.getY()) + plYs + (fromOnGround ? "(onground)" : "") + (data.noFallAssumeGround ? "(assumeonground)" : "") + " -> " +  CheckUtils.fdec3.format(to.getY()) + (toOnGround ? "(onground)" : "") + "\n");
+			if (!resetFrom && !resetTo) {
+				if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
+				if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
 			}
 			if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + CheckUtils.join(tags, "+") + "\n");
-			System.out.println(builder.toString());
+			System.out.print(builder.toString());
 		}
 
         // Did the player move in unexpected ways?// Did the player move in unexpected ways?
@@ -382,6 +389,7 @@ public class SurvivalFly extends Check {
             if (executeActions(vd)){
                 data.sfLastYDist = Double.MAX_VALUE;
                 data.toWasReset = false;
+                data.fromWasReset = false;
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                 return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(),
@@ -395,6 +403,7 @@ public class SurvivalFly extends Check {
         
         // Violation or not, apply reset conditions (cancel would have returned above).
         data.toWasReset = resetTo || data.noFallAssumeGround;
+        data.fromWasReset = resetFrom || data.noFallAssumeGround;
         if (resetTo){
             // The player has moved onto ground.
             data.setBack = to.getLocation();
@@ -410,6 +419,99 @@ public class SurvivalFly extends Check {
         data.sfLastYDist = yDistance;
         return null;
     }
+
+	/**
+	 * First split-off. Not strictly accounting only, actually.<br>
+	 * In-air checks.
+	 * 
+	 * @param now
+	 * @param yDistance
+	 * @param data
+	 * @param cc
+	 * @return
+	 */
+	private double verticalAccounting(final long now, final double yDistance, final MovingData data, final MovingConfig cc) {
+		double vDistanceAboveLimit = 0;
+		// y direction change detection.
+		// TODO: Consider using accounting for y-change detection.
+		boolean yDirChange = data.sfLastYDist != Double.MAX_VALUE && data.sfLastYDist != yDistance && (yDistance <= 0 && data.sfLastYDist >= 0 || yDistance >= 0 && data.sfLastYDist <= 0 ); 
+		if (yDirChange){
+			// TODO: account for velocity,
+			if (yDistance > 0){
+				// Increase
+				if (data.toWasReset){
+					tags.add("ychinc");
+				}
+				else {
+					// Moving upwards after falling without having touched the ground.
+					if (data.verticalFreedom <= 0.001 && data.bunnyhopDelay < 9 && !(data.fromWasReset && data.sfLastYDist == 0D)){
+						// TODO: adjust limit for bunny-hop.
+						vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+						tags.add("ychincfly");
+					}
+					else tags.add("ychincair");
+				}
+			}
+			else{
+				// Decrease
+				tags.add("ychdec");
+			}
+		}
+		
+		// Accounting support.
+		if (cc.survivalFlyAccountingV) {
+			// Currently only for "air" phases.
+			// Vertical.
+			if (yDirChange && data.sfLastYDist > 0){
+				// Change to descending phase !
+				data.vDistCount.clear(now);
+				data.vDistSum.clear(now);
+				data.vDistCount.add(1f);
+				data.vDistSum.add((float) yDistance);
+			}
+			else if (data.verticalFreedom <= 0.001D) {
+				// Here yDistance can be negative and positive (!).
+				if (yDistance != 0D) vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc"));
+			}
+			else{
+				// TODO: Just to exclude source of error, might be redundant.
+				data.vDistCount.clear(now);
+				data.vDistSum.clear(now);
+			}
+		}
+		return vDistanceAboveLimit;
+	}
+	
+	/**
+	 * Keep track of values, demanding that with time the values decrease.<br>
+	 * The ActionFrequency objects have 3 buckets, bucket 1 is checked against
+	 * bucket 2, 0 is ignored.
+	 * 
+	 * @param now
+	 * @param value
+	 * @param sum
+	 * @param count
+	 * @param tags
+	 * @param tag
+	 * @return absolute difference on violation.;
+	 */
+	private static final double doAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
+	{
+		sum.add(now, (float) value);
+		count.add(now, 1f);
+		// TODO: Add on-eq-return parameter
+		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
+			final float sc1 = sum.bucketScore(1);
+			final float sc2 = sum.bucketScore(2);
+			final double diff = sc1 - sc2;
+			if (diff > 0 || value > -3.9 && diff == 0) {
+				tags.add(tag);
+				return diff;
+			}
+		}
+		// TODO: return Float.MAX_VALUE if no violation ?
+		return 0;
+	}
 
 	/**
 	 * Allow accumulating some vls and silently set the player back.
@@ -439,32 +541,5 @@ public class SurvivalFly extends Check {
 			return data.setBack;
 		} else return null;
 	}
-
-	/**
-     * Keep track of values, demanding that with time the values decrease.<br>
-     * The ActionFrequency objects have 3 buckets, bucket 1 is checked against bucket 2, 0 is ignored.
-     * @param now
-     * @param value
-     * @param sum
-     * @param count
-     * @param tags
-     * @param tag
-     * @return absolute difference on violation.;
-     */
-	private static final double doAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
-	{
-		sum.add(now, (float) value);
-		count.add(now, 1f);
-		// TODO: This does not make sense (vertical vs horizontal up vs down: needs parameter !).
-		// TODO: Add hover return parameter
-		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
-			final float sc1 = sum.bucketScore(1);
-			final float sc2 = sum.bucketScore(2);
-			if (sc1 < sc2 || value < 3.9 && sc1 == sc2) {
-				tags.add(tag);
-				return 	sc1 - sc2;
-			}
-		}
-		return 0;
-	}
+	
 }
