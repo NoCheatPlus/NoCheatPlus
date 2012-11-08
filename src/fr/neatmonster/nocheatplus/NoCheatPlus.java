@@ -39,6 +39,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
+import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
@@ -177,15 +178,14 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 	protected List<CommandProtectionEntry> changedCommands = null;
 	
 	
-	protected final ListenerManager listenerManager = new ListenerManager(this, false);
-    
+	private final ListenerManager listenerManager = new ListenerManager(this, false);
+	
+	private boolean manageListeners = true;
+
 	@Override
 	public void addComponent(final Object obj) {
 		if (obj instanceof Listener) {
-			final Listener listener = (Listener) obj;
-//			Bukkit.getPluginManager().registerEvents(listener, this);
-			listenerManager.registerAllEventHandlers(listener, "NoCheatPlus");
-			listeners.add(listener);
+			addListener((Listener) obj);
 		}
 		if (obj instanceof INotifyReload) {
 			notifyReload.add((INotifyReload) obj);
@@ -194,6 +194,29 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 			}
 		}
 		dataMan.addComponent(obj);
+	}
+
+	private void addListener(final Listener listener) {
+		if (manageListeners){
+			listenerManager.registerAllEventHandlers(listener, "NoCheatPlus");
+			listeners.add(listener);
+		}
+		else{
+			Bukkit.getPluginManager().registerEvents(listener, this);
+			if (listener instanceof IHaveMethodOrder){
+				// TODO: Might log the order too, might prevent registration ?
+				// TODO: Alternative: queue listeners and register after startup (!)
+				CheckUtils.logWarning("[NoCheatPlus] Listener demands registration order, but listeners are not managed: " + listener.getClass().getName());
+			}
+		}
+	}
+	
+	/**
+	 * Test if NCP uses the ListenerManager at all.
+	 * @return If so.
+	 */
+	public boolean doesManageListeners(){
+		return manageListeners;
 	}
 
 	@Override
@@ -292,11 +315,18 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
         
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS); // Temp probably,
 
-        // List the events listeners and register.
-//        Bukkit.getPluginManager().registerEvents(this, this);
-        listenerManager.setRegisterDirectly(true);
-        listenerManager.registerAllWithBukkit();
-        listenerManager.registerAllEventHandlers(this, "NoCheatPlus");
+		// List the events listeners and register.
+		manageListeners = config.getBoolean(ConfPaths.MISCELLANEOUS_MANAGELISTENERS);
+		if (manageListeners) {
+			listenerManager.setRegisterDirectly(true);
+			listenerManager.registerAllWithBukkit();
+		}
+		else{
+			// Just for safety.
+			listenerManager.setRegisterDirectly(false);
+			listenerManager.clear();
+		}
+		addListener(this);
         for (final Object obj : new Object[]{
         	NCPExemptionManager.getListener(),
         	dataMan,
