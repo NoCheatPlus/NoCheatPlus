@@ -109,6 +109,9 @@ public class ListenerManager {
 	 * @param order Allows to register before other tags or just first. Expect MethodOrder to change in near future. The method order of already registered methods will not be compared to.
 	 */
 	public void registerAllEventHandlers(Listener listener, String tag, MethodOrder order){
+		if (order == null && listener instanceof IHaveMethodOrder){
+			order = ((IHaveMethodOrder) listener).getMethodOrder();
+		}
 		Class<?> clazz = listener.getClass();
 		Set<Method> allMethods = new HashSet<Method>();
 		for (Method method : clazz.getMethods()){
