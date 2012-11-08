@@ -88,6 +88,10 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 	
 	@Override
 	public final void execute(final Listener listener, final Event event){
+		if (!clazz.isAssignableFrom(event.getClass())){
+			// Strange but true.
+			return;
+		}
 		// TODO: profiling option !
 		final Cancellable cancellable = isCancellable ? (Cancellable) event : null;
 
