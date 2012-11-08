@@ -258,20 +258,19 @@ public class SurvivalFly extends Check {
                 tags.add("bunny"); // TODO: Which here...
             }
 
-        if (hDistanceAboveLimit > 0D) {
-            // Try to consume the "buffer".
-            hDistanceAboveLimit -= data.sfHorizontalBuffer;
-            data.sfHorizontalBuffer = 0D;
+		// Horizontal buffer.
+		if (hDistanceAboveLimit > 0D && data.sfHorizontalBuffer != 0D) {
+			if (data.sfHorizontalBuffer > 0D) tags.add("hbufuse");
+			else tags.add("hbufpen");
+			// Try to consume the "buffer".
+			hDistanceAboveLimit -= data.sfHorizontalBuffer;
+			data.sfHorizontalBuffer = 0D;
 
-            // Put back the "over-consumed" buffer.
-            if (hDistanceAboveLimit < 0D){
-            	data.sfHorizontalBuffer = -hDistanceAboveLimit;
-            }
-            if (hDistanceAboveLimit <= 0){
-            	tags.add("hbuffer"); // TODO: ...
-            }
-        } else
-            data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
+			// Put back the "over-consumed" buffer.
+			if (hDistanceAboveLimit < 0D) {
+				data.sfHorizontalBuffer = -hDistanceAboveLimit;
+			}
+		} else data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
 
         // Calculate the vertical speed limit based on the current jump phase.
         double vAllowedDistance, vDistanceAboveLimit;
@@ -360,7 +359,7 @@ public class SurvivalFly extends Check {
 				if (data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
 				if (data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
 			}
-			builder.append(player.getName() + " tags: " + CheckUtils.join(tags, "+") + "\n");
+			if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + CheckUtils.join(tags, "+") + "\n");
 			System.out.println(builder.toString());
 		}
 
