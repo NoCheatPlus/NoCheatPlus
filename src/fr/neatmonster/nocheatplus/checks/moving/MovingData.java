@@ -143,22 +143,22 @@ public class MovingData extends ACheckData {
     public Location       setBack;
     public Location       teleported;
 
-    /**
-     * Clear the data of the fly checks (not more-packets).
-     */
-    public void clearFlyData() {
-        bunnyhopDelay = 0;
-        sfJumpPhase = 0;
-        jumpAmplifier = 0;
-        setBack = null;
-        sfLastYDist = Double.MAX_VALUE;
-        fromX = toX = Double.MAX_VALUE;
-        clearAccounting();
-        clearNoFallData();
-        // TODO: Check if to clear buffers etc
-        
-    }
-    
+	/**
+	 * Clear the data of the fly checks (not more-packets).
+	 */
+	public void clearFlyData() {
+		bunnyhopDelay = 0;
+		sfJumpPhase = 0;
+		jumpAmplifier = 0;
+		setBack = null;
+		sfLastYDist = Double.MAX_VALUE;
+		fromX = toX = Double.MAX_VALUE;
+		clearAccounting();
+		clearNoFallData();
+		sfHorizontalBuffer = 0;
+
+	}
+
 	/**
 	 * Mildly reset the flying data without losing any important information.
 	 * 
@@ -176,6 +176,7 @@ public class MovingData extends ACheckData {
 		// Keep jump amplifier
 		// Keep bunny-hop delay (?)
 		// keep jump phase.
+		sfHorizontalBuffer = Math.min(0, sfHorizontalBuffer);
 	}
 
     public void clearAccounting() {
