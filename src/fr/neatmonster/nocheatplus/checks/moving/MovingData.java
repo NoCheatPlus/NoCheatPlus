@@ -77,11 +77,10 @@ public class MovingData extends ACheckData {
 
     // Data shared between the fly checks.
     public int            bunnyhopDelay;
-    public double         horizontalBuffer;
     public double         horizontalFreedom;
-    public double         horizontalVelocityCounter;
     public double         jumpAmplifier;
     public double         verticalFreedom;
+    public double         horizontalVelocityCounter;
     public double         verticalVelocity;
     public int            verticalVelocityCounter;
     /** Last from coordinates. */
@@ -118,16 +117,19 @@ public class MovingData extends ACheckData {
     // Passable check.
     public double 	      passableVL;
 
-    // Data of the survival fly check.
-    public int            survivalFlyJumpPhase;
-//    public double         survivalFlyLastFromY;
-    /** Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set". */
-    public double         survivalFlyLastYDist = Double.MAX_VALUE;
-    public int            survivalFlyOnIce;
-    public boolean        survivalFlyWasInBed;
-    public long           survivalFlyCobwebTime;
-    public double         survivalFlyCobwebVL;
-    public long           survivalFlyVLTime;
+	// Data of the survival fly check.
+	public double 		sfHorizontalBuffer;
+	public int 			sfJumpPhase;
+	// public double survivalFlyLastFromY;
+	/**
+	 * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
+	 */
+	public double		sfLastYDist = Double.MAX_VALUE;
+	public int			sfFlyOnIce;
+	public boolean		sfWasInBed;
+	public long			sfCobwebTime;
+	public double		sfCobwebVL;
+	public long			sfVLTime;
     
     // Accounting info.
     // TODO: optimize later.
@@ -146,13 +148,15 @@ public class MovingData extends ACheckData {
      */
     public void clearFlyData() {
         bunnyhopDelay = 0;
-        survivalFlyJumpPhase = 0;
+        sfJumpPhase = 0;
         jumpAmplifier = 0;
         setBack = null;
-        survivalFlyLastYDist = Double.MAX_VALUE;
+        sfLastYDist = Double.MAX_VALUE;
         fromX = toX = Double.MAX_VALUE;
         clearAccounting();
         clearNoFallData();
+        // TODO: Check if to clear buffers etc
+        
     }
     
 	/**
@@ -168,6 +172,7 @@ public class MovingData extends ACheckData {
 		// Keep no-fall data.
 		// Fly data: problem is we don't remember the settings for the set back location.
 		// Assume the player to start falling from there rather, or be on ground.
+		// TODO: Check if to adjust some counters to state before setback? 
 		// Keep jump amplifier
 		// Keep bunny-hop delay (?)
 		// keep jump phase.
@@ -207,6 +212,6 @@ public class MovingData extends ACheckData {
         fromX = toX = x;
         fromY = toY = y;
         fromZ = toZ = z;
-        survivalFlyLastYDist = Double.MAX_VALUE;
+        sfLastYDist = Double.MAX_VALUE;
     }
 }

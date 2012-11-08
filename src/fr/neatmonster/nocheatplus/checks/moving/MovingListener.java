@@ -165,7 +165,7 @@ public class MovingListener implements Listener {
 			// block was placed below the player and is
 			// solid, so do what we have to do.
 			data.setBack.setY(blockY + 1D);
-			data.survivalFlyJumpPhase = 0;
+			data.sfJumpPhase = 0;
 		}
     }
 
@@ -186,7 +186,7 @@ public class MovingListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |____/ \___|\__,_| |_____|_| |_|\__\___|_|   
          *                |___/                                                         
          */
-        MovingData.getData(event.getPlayer()).survivalFlyWasInBed = true;
+        MovingData.getData(event.getPlayer()).sfWasInBed = true;
     }
 
     /**

@@ -71,7 +71,7 @@ public class SurvivalFly extends Check {
         final MovingData data = MovingData.getData(player);
 
         // Check if the player has entered the bed he is trying to leave.
-        if (!data.survivalFlyWasInBed) {
+        if (!data.sfWasInBed) {
             // He hasn't, increment his violation level.
             data.survivalFlyVL += 100D;
 
@@ -79,7 +79,7 @@ public class SurvivalFly extends Check {
             return executeActions(player, data.survivalFlyVL, 100D, MovingConfig.getConfig(player).survivalFlyActions);
         } else
             // He has, everything is alright.
-            data.survivalFlyWasInBed = false;
+            data.sfWasInBed = false;
 
         return false;
     }
@@ -134,7 +134,7 @@ public class SurvivalFly extends Check {
 			}
 			// Check for "lost touch", for when moving events were not created,
 			// for instance (1/256).
-			if (!useWorkaround && yDistance > 0 && yDistance < 0.5 && data.survivalFlyLastYDist < 0 
+			if (!useWorkaround && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0 
 					&& setBackYDistance > 0D && setBackYDistance <= 1.5D) {
 				if (data.fromX != Double.MAX_VALUE) {
 					// Interpolate from last to-coordinates to the from
@@ -162,7 +162,7 @@ public class SurvivalFly extends Check {
 				data.setBack.setY(Location.locToBlock(data.setBack.getY()));
 				// data.ground ?
 				// ? set jumpphase to height / 0.15 ?
-				data.survivalFlyJumpPhase = 0;
+				data.sfJumpPhase = 0;
 				data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
 				data.clearAccounting();
 				// Tell NoFall that we assume the player to have been on ground somehow.
@@ -174,14 +174,14 @@ public class SurvivalFly extends Check {
 
         // Player on ice? Give him higher max speed.
         if (from.isOnIce() || to.isOnIce())
-            data.survivalFlyOnIce = 20;
-        else if (data.survivalFlyOnIce > 0)
-            data.survivalFlyOnIce--;
+            data.sfFlyOnIce = 20;
+        else if (data.sfFlyOnIce > 0)
+            data.sfFlyOnIce--;
 
         // Choose the right horizontal speed limit for the current activity.
         double hAllowedDistance = 0D;
         if (from.isInWeb()){
-        	data.survivalFlyOnIce = 0;
+        	data.sfFlyOnIce = 0;
         	// TODO: if (from.isOnIce()) <- makes it even slower !
         	// Roughly 15% of walking speed.
         	hAllowedDistance = webSpeed * cc.survivalFlyWalkingSpeed / 100D;
@@ -208,7 +208,7 @@ public class SurvivalFly extends Check {
         // TODO: Split off not frequently used parts to methods.
         
         // If the player is on ice, give him an higher maximum speed.
-        if (data.survivalFlyOnIce > 0)
+        if (data.sfFlyOnIce > 0)
             hAllowedDistance *= modIce;
 
         // Speed amplifier.
@@ -260,18 +260,18 @@ public class SurvivalFly extends Check {
 
         if (hDistanceAboveLimit > 0D) {
             // Try to consume the "buffer".
-            hDistanceAboveLimit -= data.horizontalBuffer;
-            data.horizontalBuffer = 0D;
+            hDistanceAboveLimit -= data.sfHorizontalBuffer;
+            data.sfHorizontalBuffer = 0D;
 
             // Put back the "over-consumed" buffer.
             if (hDistanceAboveLimit < 0D){
-            	data.horizontalBuffer = -hDistanceAboveLimit;
+            	data.sfHorizontalBuffer = -hDistanceAboveLimit;
             }
             if (hDistanceAboveLimit <= 0){
             	tags.add("hbuffer"); // TODO: ...
             }
         } else
-            data.horizontalBuffer = Math.min(1D, data.horizontalBuffer - hDistanceAboveLimit);
+            data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
 
         // Calculate the vertical speed limit based on the current jump phase.
         double vAllowedDistance, vDistanceAboveLimit;
@@ -302,8 +302,8 @@ public class SurvivalFly extends Check {
             }
             else maxJumpPhase = 6;
             // TODO: consider tags for jumping as well (!).
-            if (data.survivalFlyJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0){
-            	vAllowedDistance -= Math.max(0, (data.survivalFlyJumpPhase - maxJumpPhase) * 0.15D);
+            if (data.sfJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0){
+            	vAllowedDistance -= Math.max(0, (data.sfJumpPhase - maxJumpPhase) * 0.15D);
             }
 
 			vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
@@ -332,6 +332,7 @@ public class SurvivalFly extends Check {
 				// This only checks general speed decrease oncevelocity is smoked up.
 				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
 			}
+			else 
 			// Vertical.
 			if (data.verticalFreedom <= 0.001D) { // && ! resetTo) {
 				// Here yDistance can be negative and positive (!).
@@ -348,22 +349,27 @@ public class SurvivalFly extends Check {
 
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
-        data.survivalFlyJumpPhase++;
-        
-        if (cc.debug){
-            System.out.println(player.getName() + " vertical freedom: " + data.verticalFreedom + " ("+data.verticalVelocity+"/"+data.verticalVelocityCounter+"), jumpphase: " + data.survivalFlyJumpPhase);
-            System.out.println(player.getName() + " hDist: " + hDistance + " / " + hAllowedDistance + " , vDist: " + (yDistance) + " ("+player.getVelocity().getY()+")" + " / " + vAllowedDistance);
-            System.out.println(player.getName() + " y" + (fromOnGround?"(onground)":"") + (data.noFallAssumeGround?"(assumeonground)":"") + ": " + from.getY() +"(" + player.getLocation().getY() + ") -> " + to.getY()+ (toOnGround?"(onground)":""));
-            if (cc.survivalFlyAccounting) System.out.println(player.getName() + " h=" + data.hDistSum.score(1f)+"/" + data.hDistSum.bucketScore(1) + " , v=" + data.vDistSum.score(1f)+"/"+data.vDistSum.bucketScore(1) );
-            System.out.println(player.getName() + " tags: " + CheckUtils.join(tags, "+"));
-        }
+        data.sfJumpPhase++;
+
+		if (cc.debug) {
+			StringBuilder builder = new StringBuilder(500);
+			builder.append(player.getName() + " vertical freedom: " +  CheckUtils.fdec3.format(data.verticalFreedom) + " (vv=" +  CheckUtils.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
+			builder.append(player.getName() + " hDist: " + CheckUtils.fdec3.format(hDistance) + " / " +  CheckUtils.fdec3.format(hAllowedDistance) + " , vDist: " +  CheckUtils.fdec3.format(yDistance) + " / " +  CheckUtils.fdec3.format(vAllowedDistance) + "\n");
+			builder.append(player.getName() + " y" + (fromOnGround ? "(onground)" : "") + (data.noFallAssumeGround ? "(assumeonground)" : "") + ": " +  CheckUtils.fdec3.format(from.getY()) + "(" +  CheckUtils.fdec3.format(player.getLocation().getY()) + ") -> " +  CheckUtils.fdec3.format(to.getY()) + (toOnGround ? "(onground)" : "") + "\n");
+			if (cc.survivalFlyAccounting && !resetFrom && !resetTo) {
+				if (data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
+				if (data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
+			}
+			builder.append(player.getName() + " tags: " + CheckUtils.join(tags, "+") + "\n");
+			System.out.println(builder.toString());
+		}
 
         // Did the player move in unexpected ways?// Did the player move in unexpected ways?
         if (result > 0D) {
             // Increment violation counter.
             data.survivalFlyVL += result;
             data.clearAccounting();
-            data.survivalFlyJumpPhase = 0;
+            data.sfJumpPhase = 0;
             // If the other plugins haven't decided to cancel the execution of the actions, then do it. If one of the
             // actions was a cancel, cancel it.
             final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, result, cc.survivalFlyActions);
@@ -373,9 +379,9 @@ public class SurvivalFly extends Check {
                 vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
                 vd.setParameter(ParameterName.TAGS, CheckUtils.join(tags, "+")); // Always set.
             }
-            data.survivalFlyVLTime = now;
+            data.sfVLTime = now;
             if (executeActions(vd)){
-                data.survivalFlyLastYDist = Double.MAX_VALUE;
+                data.sfLastYDist = Double.MAX_VALUE;
                 data.toWasReset = false;
                 // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to
                 // allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
@@ -385,7 +391,7 @@ public class SurvivalFly extends Check {
         }
         else{
             // Slowly reduce the level with each event, if violations have not recently happened.
-            if (now - data.survivalFlyVLTime > cc.survivalFlyVLFreeze) data.survivalFlyVL *= 0.95D;
+            if (now - data.sfVLTime > cc.survivalFlyVLFreeze) data.survivalFlyVL *= 0.95D;
         }
         
         // Violation or not, apply reset conditions (cancel would have returned above).
@@ -393,16 +399,16 @@ public class SurvivalFly extends Check {
         if (resetTo){
             // The player has moved onto ground.
             data.setBack = to.getLocation();
-            data.survivalFlyJumpPhase = 0;
+            data.sfJumpPhase = 0;
             data.clearAccounting();
         }
         else if (resetFrom){
             // The player moved from ground.
             data.setBack = from.getLocation();
-            data.survivalFlyJumpPhase = 1; // TODO: ?
+            data.sfJumpPhase = 1; // TODO: ?
             data.clearAccounting();
         }
-        data.survivalFlyLastYDist = yDistance;
+        data.sfLastYDist = yDistance;
         return null;
     }
 
@@ -420,17 +426,17 @@ public class SurvivalFly extends Check {
 	private final Location hackCobweb(final Player player, final MovingData data, final PlayerLocation to, 
 			final long now, final double vDistanceAboveLimit)
 	{
-		if (now - data.survivalFlyCobwebTime > 3000) {
-			data.survivalFlyCobwebTime = now;
-			data.survivalFlyCobwebVL = vDistanceAboveLimit * 100D;
-		} else data.survivalFlyCobwebVL += vDistanceAboveLimit * 100D;
-		if (data.survivalFlyCobwebVL < 550) { // Totally random !
+		if (now - data.sfCobwebTime > 3000) {
+			data.sfCobwebTime = now;
+			data.sfCobwebVL = vDistanceAboveLimit * 100D;
+		} else data.sfCobwebVL += vDistanceAboveLimit * 100D;
+		if (data.sfCobwebVL < 550) { // Totally random !
 			// Silently set back.
 			if (data.setBack == null) data.setBack = player.getLocation();
-			data.survivalFlyJumpPhase = 0;
+			data.sfJumpPhase = 0;
 			data.setBack.setYaw(to.getYaw());
 			data.setBack.setPitch(to.getPitch());
-			data.survivalFlyLastYDist = Double.MAX_VALUE;
+			data.sfLastYDist = Double.MAX_VALUE;
 			return data.setBack;
 		} else return null;
 	}
