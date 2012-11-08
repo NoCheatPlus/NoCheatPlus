@@ -122,7 +122,7 @@ public class SurvivalFly extends Check {
 		final boolean resetFrom;
 
 		// "Lost ground" workaround.
-		if (fromOnGround || from.isInLiquid() || from.isOnLadder() || from.isInWeb()) resetFrom = true;
+		if (fromOnGround || from.isResetCond()) resetFrom = true;
 		else if (lostGround(player, mcPlayer, from, to, yDistance, data, cc)){
 			resetFrom = true;
 			// TODO: Consider && !resetTo ?
@@ -189,7 +189,7 @@ public class SurvivalFly extends Check {
 		}
 		
 
-		final boolean resetTo = toOnGround || to.isInLiquid()  || to.isOnLadder() || to.isInWeb();
+		final boolean resetTo = toOnGround || to.isResetCond();
 		
 		if (cc.survivalFlyAccountingH && !resetFrom && !resetTo) {
 			// Currently only for "air" phases.

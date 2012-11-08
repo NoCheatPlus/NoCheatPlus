@@ -99,9 +99,9 @@ public class NoFall extends Check {
         // TODO: Distinguish water depth vs. fall distance!
         
         final boolean fromOnGround = from.isOnGround();
-        final boolean fromReset = from.isInLiquid() || from.isInWeb() || from.isOnLadder();
+        final boolean fromReset = from.isResetCond();
         final boolean toOnGround = to.isOnGround();
-        final boolean toReset = to.isInLiquid() || to.isInWeb() || to.isOnLadder();
+        final boolean toReset = to.isResetCond();
         
         final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         

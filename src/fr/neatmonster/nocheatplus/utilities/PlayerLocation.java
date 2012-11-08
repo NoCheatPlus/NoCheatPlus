@@ -358,6 +358,15 @@ public class PlayerLocation {
 		}
 		return onGround;
 	}
+	
+	/**
+	 * Reset condition for flying checks (sf + nofall): fluids, web, ladder (not on-ground, though).
+	 * @return
+	 */
+	public boolean isResetCond(){
+		// NOTE: if optimizing, setYOnGround has to be kept in mind. 
+		return isInLiquid()  || isOnLadder() || isInWeb();
+	}
 
 	public double getyOnGround() {
 		return yOnGround;
