@@ -31,7 +31,7 @@ import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
-import fr.neatmonster.nocheatplus.components.IComponentRegistry;
+import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
@@ -48,7 +48,7 @@ import fr.neatmonster.nocheatplus.hooks.APIUtils;
  * @author mc_dev
  *
  */
-public class DataManager implements Listener, INotifyReload, INeedConfig, IComponentRegistry{
+public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry{
 	
 	protected static DataManager instance = null;
 	

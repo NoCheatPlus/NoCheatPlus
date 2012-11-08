@@ -1,6 +1,6 @@
 package fr.neatmonster.nocheatplus.components;
 
-public interface IComponentRegistry {
+public interface ComponentRegistry {
 	/**
      * Convenience method to add components according to implemented interfaces,
      * like Listener, INotifyReload, INeedConfig.<br>
