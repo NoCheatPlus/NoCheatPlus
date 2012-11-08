@@ -362,7 +362,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>10 log:passable:0:5:if cancel vl>50 log:passable:0:5:icf cancel");
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
-        set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
+//        set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC, true);
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
         // set(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
