@@ -149,20 +149,22 @@ public class ExecutionHistory {
         entries = new HashMap<Action, ExecutionHistoryEntry>();
     }
 
-    /**
-     * Returns true, if the action should be executed, because all time criteria have been met. Will add a entry with
-     * the time to a list which will influence further requests, so only use once and remember the result.
-     * 
-     * @param violationData
-     *            the violation data
-     * @param action
-     *            the action
-     * @param time
-     *            a time IN SECONDS
-     * @return true, if the action is to be executed.
-     */
-    public boolean executeAction(final ViolationData violationData, final Action action, final long time) {
-
+	/**
+	 * Returns true, if the action should be executed, because all time criteria
+	 * have been met. Will add a entry with the time to a list which will
+	 * influence further requests, so only use once and remember the result.
+	 * If the action is to be executed always, it will not be added to the history.
+	 * @param violationData
+	 *            the violation data
+	 * @param action
+	 *            the action
+	 * @param time
+	 *            a time IN SECONDS
+	 * @return true, if the action is to be executed.
+	 */
+	public boolean executeAction(final ViolationData violationData, final Action action, final long time)
+	{
+		if (action.executesAlways()) return true;
         ExecutionHistoryEntry entry = entries.get(action);
         if (entry == null) {
             entry = new ExecutionHistoryEntry(60);
@@ -190,7 +192,9 @@ public class ExecutionHistory {
      * @param time
      * @return
      */
-    public boolean wouldExecute(final ViolationData violationData, final Action action, final long time) {
+	public boolean wouldExecute(final ViolationData violationData, final Action action, final long time)
+	{
+		if (action.executesAlways()) return true;
         ExecutionHistoryEntry entry = entries.get(action);
         if (entry == null) {
             return action.delay <= 0;
