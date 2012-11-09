@@ -53,7 +53,7 @@ public class NameSetPermState implements PermStateReceiver{
 
 	@Override
 	public void removePlayer(final String player) {
-		// TODO: Something more efficient ? [mostly used with few defaultPermissions, though].
+		// TODO: Something more efficient ? [mostly used with few permissions, though].
 		final Iterator<Entry<String, Set<String>>> it = playerSets.entrySet().iterator();
 		while (it.hasNext()){
 			final Entry<String, Set<String>> entry = it.next();

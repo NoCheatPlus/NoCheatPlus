@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.components;
 
 
 /**
- * Receive permission changes for certain defaultPermissions.
+ * Receive permission changes for certain permissions.
  * @author mc_dev
  *
  */
