@@ -144,11 +144,19 @@ public class ActionFrequency {
 	public final float sliceScore(final int start, final int end, float factor){
 		float score = buckets[start];
 		float cf = factor;
-		for (int i = start; i < end; i++){
+		for (int i = start + 1; i < end; i++){
 			score += buckets[i] * cf;
 			cf *= factor;
 		}
 		return score;
+	}
+	
+	public final void setBucket(final int n, final float value){
+		buckets[n] = value;
+	}
+	
+	public final void setTime(final long time){
+		this.time = time;
 	}
 	
 	/**
@@ -175,4 +183,31 @@ public class ActionFrequency {
 		return durBucket;
 	}
 	
+	public final String toLine(){
+		final StringBuilder buffer = new StringBuilder(50);
+		buffer.append(buckets.length + ","+durBucket+","+time);
+		for (int i = 0; i < buckets.length; i++){
+			buffer.append("," + buckets[i]);
+		}
+		return buffer.toString();
+	}
+	
+	public static ActionFrequency fromLine(final String line){
+		String[] split = line.split(",");
+		if (split.length < 3) throw new RuntimeException("Bad argument length."); // TODO
+		final int n = Integer.parseInt(split[0]);
+		final long durBucket = Long.parseLong(split[1]);
+		final long time = Long.parseLong(split[2]);
+		final float[] buckets = new float[split.length -3];
+		if (split.length != buckets.length) throw new RuntimeException("Bad argument length."); // TODO
+		for (int i = 3; i < split.length; i ++){
+			buckets[i - 3] = Float.parseFloat(split[i]);
+		}
+		ActionFrequency freq = new ActionFrequency(n, durBucket);
+		freq.setTime(time);
+		for (int i = 0; i < buckets.length; i ++){
+			freq.setBucket(i, buckets[i]);
+		}
+		return freq;
+	}
 }
