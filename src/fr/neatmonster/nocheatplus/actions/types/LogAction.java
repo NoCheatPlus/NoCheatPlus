@@ -1,15 +1,13 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
@@ -77,12 +75,8 @@ public class LogAction extends ActionWithParameters {
 		if (configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE) && !violationData.player.hasPermission(violationData.getPermissionSilent())) {
 			final String message = super.getMessage(violationData);
 			if (toChat && configurationFile.getBoolean(ConfPaths.LOGGING_INGAMECHAT)) {
-				// TODO: ingame chat perms: more efficient
-				for (final Player otherPlayer : Bukkit.getServer().getOnlinePlayers()){
-					if (otherPlayer.hasPermission(Permissions.ADMINISTRATION_NOTIFY)) otherPlayer.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + CheckUtils.replaceColors(message));
-				}
+				NoCheatPlus.sendAdminNotifyMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + CheckUtils.replaceColors(message));
 			}
-				
 			if (toConsole && configurationFile.getBoolean(ConfPaths.LOGGING_CONSOLE)) LogUtil.logInfo("[NoCheatPlus] " + CheckUtils.removeColors(message));
 			if (toFile && configurationFile.getBoolean(ConfPaths.LOGGING_FILE)) CheckUtils.fileLogger.info(CheckUtils.removeColors(message));
 		}
