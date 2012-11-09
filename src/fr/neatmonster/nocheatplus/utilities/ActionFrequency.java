@@ -199,7 +199,7 @@ public class ActionFrequency {
 		final long durBucket = Long.parseLong(split[1]);
 		final long time = Long.parseLong(split[2]);
 		final float[] buckets = new float[split.length -3];
-		if (split.length != buckets.length) throw new RuntimeException("Bad argument length."); // TODO
+		if (split.length - 3 != buckets.length) throw new RuntimeException("Bad argument length."); // TODO
 		for (int i = 3; i < split.length; i ++){
 			buckets[i - 3] = Float.parseFloat(split[i]);
 		}
