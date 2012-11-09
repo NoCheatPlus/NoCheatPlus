@@ -65,4 +65,14 @@ public abstract class Action {
     public boolean needsParameters(){
     	return false;
     }
+
+	/**
+	 * Indicates that the action will be executed in any case (delay, repeat).
+	 * executed at all.
+	 * 
+	 * @return
+	 */
+	public boolean executesAlways() {
+		return delay == 0 && repeat == 0;
+	}
 }
