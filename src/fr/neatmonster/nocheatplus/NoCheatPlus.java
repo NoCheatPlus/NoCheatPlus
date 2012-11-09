@@ -8,17 +8,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Server;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,7 +40,9 @@ import fr.neatmonster.nocheatplus.command.CommandHandler;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.NameSetPermState;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
+import fr.neatmonster.nocheatplus.components.PermStateReceiver;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -69,10 +76,13 @@ import fr.neatmonster.nocheatplus.utilities.Updates;
 /**
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
-public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI {
+public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	/** Lower case player name to milliseconds point of time of release */
 	private static final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
+	
+	/** Names of players with a certain permission. */
+	protected static final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.ADMINISTRATION_NOTIFY);
 	
 	/**
 	 * Remove expired entries.
@@ -155,6 +165,30 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 	public static NoCheatPlusAPI getAPI() {
 		return (NoCheatPlusAPI) Bukkit.getPluginManager().getPlugin("NoCheatPlus");
 	}
+	
+	/**
+	 * Send all players with the nocheatplus.admin.notify permission a message.
+	 * This is likely to be more efficient than iterating over all players and
+	 * checking their permissions. However this only updates permissions with
+	 * login and world changes currently.
+	 * 
+	 * @param message
+	 * @return Number of players messaged.
+	 */
+	public static int sendAdminNotifyMessage(final String message){
+		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
+		if (names == null) return 0;
+		int done = 0;
+		final Server server = Bukkit.getServer();
+		for (final String name : names){
+			final Player player = server.getPlayerExact(name);
+			if (player != null){
+				player.sendMessage(message);
+				done ++;
+			}
+		}
+		return done;
+	}
 
 	/** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
@@ -182,6 +216,8 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 	private final ListenerManager listenerManager = new ListenerManager(this, false);
 	
 	private boolean manageListeners = true;
+	
+	protected final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
 
 	/**
 	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
@@ -197,6 +233,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 				((INeedConfig) obj).onReload();
 			}
 		}
+		if (obj instanceof PermStateReceiver){
+			// No immediate update done.
+			permStateReceivers.add((PermStateReceiver) obj);
+		}
 		dataMan.addComponent(obj);
 	}
 	
@@ -204,7 +244,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
 	 * @param listener
 	 */
-	private void addListener(final Listener listener) {
+	protected void addListener(final Listener listener) {
 		if (manageListeners){
 			String tag = "NoCheatPlus";
 			if (listener instanceof ComponentWithName){
@@ -237,7 +277,12 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 			listeners.remove(obj);
 			listenerManager.remove((Listener) obj);
 		}
-		notifyReload.remove(obj);
+		if (obj instanceof PermStateReceiver){
+			permStateReceivers.remove((PermStateReceiver) obj);
+		}
+		if (obj instanceof INotifyReload) {
+			notifyReload.remove(obj);
+		}
 		dataMan.removeComponent(obj);
 	}
     
@@ -269,16 +314,18 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
         
         // Remove config listeners.
         notifyReload.clear();
-        
-        // More cleanup.
-        dataMan.onDisable();
-        
-        // Cleanup the configuration manager.
-        ConfigManager.cleanup();
+
+		permStateReceivers.clear();
+
+		// More cleanup.
+		dataMan.onDisable();
 
 		// Restore changed commands.
 		undoCommandChanges();
 		
+		// Cleanup the configuration manager.
+		ConfigManager.cleanup();
+
 		// Remove listener references.
 		listenerManager.setRegisterDirectly(false);
 		listenerManager.clear();
@@ -300,7 +347,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 		}
 	}
 	
-	private void setupCommandProtection() {
+	protected void setupCommandProtection() {
 		final List<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
 				Arrays.asList("plugins", "version", "icanhasbukkit"), "nocheatplus.feature.command", false);
 		if (this.changedCommands == null) this.changedCommands = changedCommands;
@@ -338,7 +385,8 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 			listenerManager.setRegisterDirectly(false);
 			listenerManager.clear();
 		}
-		addListener(this);
+		addComponent(nameSetPerms);
+		addListener(getCoreListener());
         for (final Object obj : new Object[]{
         	NCPExemptionManager.getListener(),
         	dataMan,
@@ -347,7 +395,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
         	new BlockPlaceListener(),
         	new ChatListener(),
         	new CombinedListener(),
-        	// Do ming registration order: Combined must come before Fight.
+        	// Do mind registration order: Combined must come before Fight.
         	new FightListener(),
         	new InventoryListener(),
         	new MovingListener(),
@@ -463,43 +511,12 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 //                    configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false));
 //    }
 
-    /**
-     * This event handler is used to send all the disabling messages to the client.
-     * 
-     * @param event
-     *            the event handled
-     */
-    @EventHandler(
-            priority = EventPriority.MONITOR)
-    public void onPlayerJoinMonitor(final PlayerJoinEvent event) {
-        /*
-         *  ____  _                             _       _       
-         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
-         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
-         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
-         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
-         *                |___/                                 
-         */
-        final Player player = event.getPlayer();
-
-        // Send a message to the player if a new update is available.
-        if (updateAvailable && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
-            player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE
-                    + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
-
-        // Send a message to the player if the configuration is outdated.
-        if (configOutdated && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
-            player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n"
-                    + "Some settings could have changed, you should regenerate it!");
-
-        checkModsMessage(player);
-    }
     
     /**
      * Send block codes to the player according to allowed or disallowed client-mods or client-mod features.
      * @param player
      */
-    private void checkModsMessage(Player player) {
+    protected void checkModsMessage(Player player) {
         String message = "";
 
         // Check if we allow all the client mods.
@@ -584,20 +601,91 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
             player.sendMessage(message);
     }
 
-    @EventHandler(priority=EventPriority.HIGHEST)
-    public void onPlayerLogin(final PlayerLoginEvent event){
-    	// (HGHEST to give other plugins the possibility to add permissions or allow the player).
-    	if (event.getResult() != Result.ALLOWED) return;
-    	final Player player = event.getPlayer();
-    	// Check if login is denied:
-    	checkDenyLoginsNames();
-    	if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) return;
-    	if (isLoginDenied(player.getName())){
-    		// TODO: display time for which the player is banned.
-    		event.setResult(Result.KICK_OTHER);
-    		// TODO: Make message configurable.
-    		event.setKickMessage("You are temporarily denied to join this server.");
-    	}
-    }
-    
+	/**
+	 * Quick solution to hide the listener methods, expect refactoring.
+	 * @return
+	 */
+	private Listener getCoreListener() {
+		return new Listener() {
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.HIGHEST)
+			public void onPlayerLogin(final PlayerLoginEvent event) {
+				// (HGHEST to give other plugins the possibility to add
+				// permissions or allow the player).
+				if (event.getResult() != Result.ALLOWED) return;
+				final Player player = event.getPlayer();
+				// Check if login is denied:
+				checkDenyLoginsNames();
+				if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) return;
+				if (isLoginDenied(player.getName())) {
+					// TODO: display time for which the player is banned.
+					event.setResult(Result.KICK_OTHER);
+					// TODO: Make message configurable.
+					event.setKickMessage("You are temporarily denied to join this server.");
+				}
+			}
+
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.MONITOR)
+			public void onPlayerJoin(final PlayerJoinEvent event) {
+				final Player player = event.getPlayer();
+
+				updatePermStateReceivers(player);
+				
+				if (nameSetPerms.hasPermission(player.getName(), Permissions.ADMINISTRATION_NOTIFY)){
+					// Login notifications...
+					
+					// Update available.
+					if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
+					
+					// Outdated config.
+					if (configOutdated) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!");
+
+				}
+				checkModsMessage(player);
+			}
+
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.MONITOR)
+			public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
+			{
+				final Player player = event.getPlayer();
+				updatePermStateReceivers(player);
+			}
+
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+			public void onPlayerKick(final PlayerKickEvent event) {
+				onLeave(event.getPlayer());
+			}
+
+			@SuppressWarnings("unused")
+			@EventHandler(priority = EventPriority.MONITOR)
+			public void onPlayerQuitMonitor(final PlayerQuitEvent event) {
+				onLeave(event.getPlayer());
+			}
+		};
+	}
+	
+	protected void onLeave(final Player player) {
+		for (final PermStateReceiver pr : permStateReceivers) {
+			pr.removePlayer(player.getName());
+		}
+	}
+	
+	protected void updatePermStateReceivers(final Player player) {
+		final Map<String, Boolean> checked = new HashMap<String, Boolean>(20);
+		final String name = player.getName();
+		for (final PermStateReceiver pr : permStateReceivers) {
+			for (final String permission : pr.getDefaultPermissions()) {
+				Boolean state = checked.get(permission);
+				if (state == null) {
+					state = player.hasPermission(permission);
+					checked.put(permission, state);
+				}
+				pr.setPermission(name, permission, state);
+			}
+		}
+	}
+
 }
