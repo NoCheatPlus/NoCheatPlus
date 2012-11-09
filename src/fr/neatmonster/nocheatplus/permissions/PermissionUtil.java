@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
@@ -88,8 +87,7 @@ public class PermissionUtil {
 			pm.addPermission(rootPerm);
 		}
 		List<CommandProtectionEntry> changed = new LinkedList<CommandProtectionEntry>();
-		SimpleCommandMap map = CommandUtil.getCommandMap();
-		for (Command command : map.getCommands()){
+		for (Command command : CommandUtil.getCommands()){
 			String lcLabel = command.getLabel().trim().toLowerCase();
 			if (checked != null){
 				if (checked.contains(lcLabel)){
