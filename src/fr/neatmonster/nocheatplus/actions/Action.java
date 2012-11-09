@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.actions;
 
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 
 /*
  * MMP"""""""MM            dP   oo                   
@@ -74,5 +75,15 @@ public abstract class Action {
 	 */
 	public boolean executesAlways() {
 		return delay == 0 && repeat == 0;
+	}
+
+	/**
+	 * Get an optimized copy, given the config in use. The default implementation returns this instance.
+	 * @param config
+	 * @param threshold
+	 * @return Can return this (unchanged), null (not to be executed ever) or a new instance (changed, optimized).
+	 */
+	public Action getOptimizedCopy(final ConfigFile config, final Integer threshold) {
+		return this;
 	}
 }

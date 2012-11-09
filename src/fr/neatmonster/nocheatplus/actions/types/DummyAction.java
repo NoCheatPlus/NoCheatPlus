@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.actions.types;
 
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 
 /*
  * M""""""'YMM                                         MMP"""""""MM            dP   oo                   
@@ -47,5 +48,12 @@ public class DummyAction extends Action {
     public String toString() {
         return definition;
     }
+
+	@Override
+	public Action getOptimizedCopy(final ConfigFile config, final Integer threshold)
+	{
+		// Never execute this.
+		return null;
+	}
 
 }

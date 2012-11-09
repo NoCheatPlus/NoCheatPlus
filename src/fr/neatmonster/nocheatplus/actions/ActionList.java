@@ -5,6 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 
 
 /*
@@ -19,14 +22,16 @@ import java.util.Map;
 /**
  * A list of actions, that associates actions to thresholds. It allows to retrieve all actions that match a certain
  * threshold.
+ * <hr>
+ * TODO: refactor to an array of Actions entries (threshold + Action[]) + sort that one.
  */
 public class ActionList {
+	
+	/** Something to return if nothing is set. */
+	private static final Action[] emptyArray = new Action[0];
 
     /** This is a very bad design decision, but it's also really convenient to define this here. */
     public final String                  permissionSilent;
-
-    /** If there are no actions registered, we still return an Array. It's just empty/size=0. */
-    private final static Action[]        emptyArray = new Action[0];
 
     /** The actions of this ActionList, "bundled" by treshold (violation level). */
     private final Map<Integer, Action[]> actions    = new HashMap<Integer, Action[]>();
@@ -37,11 +42,11 @@ public class ActionList {
     /**
      * Instantiates a new action list.
      * 
-     * @param permission
+     * @param permissionSilent
      *            the permission
      */
-    public ActionList(final String permission) {
-        permissionSilent = permission + ".silent";
+    public ActionList(final String permissionSilent) {
+        this.permissionSilent = permissionSilent + ".silent";
     }
 
     /**
@@ -89,4 +94,46 @@ public class ActionList {
 
         this.actions.put(threshold, actions);
     }
+
+	/**
+	 * Return a copy of this list, but optimize it, i.e. remove entries that are
+	 * never called, possibly do other optimizations which are possible given
+	 * the specific configuration.
+	 * 
+	 * @param config Configuration to adapt to.
+	 * @return Optimized ActionList, individual Actions can be identical instances, altered Action instances must always be new instances, arrays are always new arrays.
+	 */
+	public ActionList getOptimizedCopy(final ConfigFile config) {
+		final ActionList newList = new ActionList(this.permissionSilent);
+		for (final Entry<Integer, Action[]> entry : actions.entrySet()){
+			final Integer t = entry.getKey();
+			final Action[] a = getOptimizedCopy(config, t, entry.getValue());
+			if (a != null && a.length > 0){
+				newList.setActions(t, a);
+			}
+		}
+		
+		return newList;
+	}
+
+	/**
+	 * Get an optimized copy of the Actions array, given the config in use.
+	 * @param config
+	 * @param threshold
+	 * @param actions
+	 * @return Copy with optimized entries, null or empty arrays are possible. Contained Actions might be identical to the given ones, just changed actions must be new instances to preserve consistency, Action instances are not to be altered.
+	 */
+	public Action[] getOptimizedCopy(final ConfigFile config, final Integer threshold, final Action[] actions)
+	{
+		if (actions == null || actions.length == 0) return null;
+		final ArrayList<Action> optimized = new ArrayList<Action>();
+		for (final Action action : actions){
+			final Action optAction = action.getOptimizedCopy(config, threshold);
+			if (optAction != null) optimized.add(optAction);
+		}
+		if (optimized.isEmpty()) return null;
+		final Action[] optActions = new Action[optimized.size()];
+		optimized.toArray(optActions);
+		return optActions;
+	}
 }

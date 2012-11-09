@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -63,27 +64,30 @@ public class LogAction extends ActionWithParameters {
         // TODO: already use && flagfromconfig.
     }
 
-    /* (non-Javadoc)
-     * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
-     */
-    @Override
-    public boolean execute(final ViolationData violationData) {
-        final ConfigFile configurationFile = ConfigManager.getConfigFile();
-        if (configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE)
-                && !violationData.player.hasPermission(violationData.getPermissionSilent())) {
-            final String message = super.getMessage(violationData);
-            if (toChat && configurationFile.getBoolean(ConfPaths.LOGGING_INGAMECHAT))
-                for (final Player otherPlayer : Bukkit.getServer().getOnlinePlayers())
-                    if (otherPlayer.hasPermission(Permissions.ADMINISTRATION_NOTIFY))
-                        otherPlayer.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE
-                                + CheckUtils.replaceColors(message));
-            if (toConsole && configurationFile.getBoolean(ConfPaths.LOGGING_CONSOLE))
-                LogUtil.logInfo("[NoCheatPlus] " + CheckUtils.removeColors(message));
-            if (toFile && configurationFile.getBoolean(ConfPaths.LOGGING_FILE))
-                CheckUtils.fileLogger.info(CheckUtils.removeColors(message));
-        }
-        return false;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus
+	 * .checks.ViolationData)
+	 */
+	@Override
+	public boolean execute(final ViolationData violationData) {
+		final ConfigFile configurationFile = ConfigManager.getConfigFile();
+		if (configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE) && !violationData.player.hasPermission(violationData.getPermissionSilent())) {
+			final String message = super.getMessage(violationData);
+			if (toChat && configurationFile.getBoolean(ConfPaths.LOGGING_INGAMECHAT)) {
+				// TODO: ingame chat perms: more efficient
+				for (final Player otherPlayer : Bukkit.getServer().getOnlinePlayers()){
+					if (otherPlayer.hasPermission(Permissions.ADMINISTRATION_NOTIFY)) otherPlayer.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + CheckUtils.replaceColors(message));
+				}
+			}
+				
+			if (toConsole && configurationFile.getBoolean(ConfPaths.LOGGING_CONSOLE)) LogUtil.logInfo("[NoCheatPlus] " + CheckUtils.removeColors(message));
+			if (toFile && configurationFile.getBoolean(ConfPaths.LOGGING_FILE)) CheckUtils.fileLogger.info(CheckUtils.removeColors(message));
+		}
+		return false;
+	}
 
     /**
      * Create the string that's used to define the action in the logfile.
@@ -95,4 +99,15 @@ public class LogAction extends ActionWithParameters {
         return "log:" + name + ":" + delay + ":" + repeat + ":" + (toConsole ? "c" : "") + (toChat ? "i" : "")
                 + (toFile ? "f" : "");
     }
+
+	@Override
+	public Action getOptimizedCopy(final ConfigFile config, final Integer threshold) {
+		if (!config.getBoolean(ConfPaths.LOGGING_ACTIVE)) return null;
+		final boolean toConsole = this.toConsole && config.getBoolean(ConfPaths.LOGGING_CONSOLE);
+		final boolean toFile = this.toFile&& config.getBoolean(ConfPaths.LOGGING_FILE);
+		final boolean toChat= this.toChat&& config.getBoolean(ConfPaths.LOGGING_INGAMECHAT);
+		if (!toChat && ! toConsole && !toFile) return null;
+		return new LogAction(name, delay, repeat, toChat, toConsole, toFile, message);
+	}
+	
 }
