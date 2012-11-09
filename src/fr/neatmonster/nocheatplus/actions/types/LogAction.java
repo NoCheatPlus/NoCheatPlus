@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /*
  * M""MMMMMMMM                   MMP"""""""MM            dP   oo                   
@@ -77,7 +78,7 @@ public class LogAction extends ActionWithParameters {
                         otherPlayer.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE
                                 + CheckUtils.replaceColors(message));
             if (toConsole && configurationFile.getBoolean(ConfPaths.LOGGING_CONSOLE))
-                CheckUtils.logInfo("[NoCheatPlus] " + CheckUtils.removeColors(message));
+                LogUtil.logInfo("[NoCheatPlus] " + CheckUtils.removeColors(message));
             if (toFile && configurationFile.getBoolean(ConfPaths.LOGGING_FILE))
                 CheckUtils.fileLogger.info(CheckUtils.removeColors(message));
         }

@@ -14,7 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /**
  * listener registered for one event only. Allows to delegate to other registered listeners.
@@ -87,7 +87,7 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 	}
 	
 	@Override
-	public final void execute(final Listener listener, final Event event){
+	public void execute(final Listener listener, final Event event){
 		if (!clazz.isAssignableFrom(event.getClass())){
 			// Strange but true.
 			return;
@@ -102,14 +102,24 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 				if (!isCancellable || !entry.ignoreCancelled || !cancellable.isCancelled()) entry.method.invoke(entry.listener, event);
 			} catch (Throwable t) {
 				// IllegalArgumentException IllegalAccessException InvocationTargetException
-				final EventException e = new EventException(t, "GenericListener<" + clazz.getName() +"> @" + priority +" encountered an exception for " + entry.listener.getClass().getName() + " with method " + entry.method.toGenericString());
-				// TODO: log it / more details!
-				if (event.isAsynchronous()) CheckUtils.scheduleOutput(e);
-				else CheckUtils.logSevere(e);
+				onError(entry, event, t);
 			}
 		}
 	}
 
+
+	private void onError(final MethodEntry entry, final Event event, final Throwable t) {
+		final String descr = "GenericListener<" + clazz.getName() +"> @" + priority +" encountered an exception for " + entry.listener.getClass().getName() + " with method " + entry.method.toGenericString();
+		try{
+			final EventException e = new EventException(t, descr);
+			// TODO: log it / more details!
+			if (event.isAsynchronous()) LogUtil.scheduleLogSevere(e);
+			else LogUtil.logSevere(e);
+		}
+		catch (Throwable t2){
+			LogUtil.scheduleLogSevere("Could not log exception: " + descr);
+		}
+	}
 
 	public void register(Plugin plugin) {
 		if (registered) return;

@@ -46,6 +46,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -492,7 +493,7 @@ public class MovingListener implements Listener {
 		if (!restored){
 			 // TODO: correct the location ?
 			NoCheatPlus.denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
-			CheckUtils.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
+			LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
 		}
 		// TODO: reset the bounding box of the player ?
 		CheckUtils.onIllegalMove(player);

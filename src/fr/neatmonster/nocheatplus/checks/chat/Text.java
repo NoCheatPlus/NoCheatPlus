@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /**
  * Some alternative more or less advanced analysis methods.
@@ -293,7 +294,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 			debugParts.add("Normal: min=" +  CheckUtils.fdec3.format(cc.textFreqNormMin) +", weight=" +  CheckUtils.fdec3.format(cc.textFreqNormWeight) + " => accumulated=" + CheckUtils.fdec3.format(accumulated));
 	        debugParts.add("Short-term: min=" +  CheckUtils.fdec3.format(cc.textFreqShortTermMin) +", weight=" +  CheckUtils.fdec3.format(cc.textFreqShortTermWeight) + " => accumulated=" + CheckUtils.fdec3.format(shortTermAccumulated));
 			debugParts.add("vl: " + CheckUtils.fdec3.format(data.textVL));
-			CheckUtils.scheduleOutputJoined(debugParts, " | ");
+			LogUtil.scheduleLogInfo(debugParts, " | ");
 			debugParts.clear();
 		}
 		

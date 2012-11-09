@@ -4,7 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandException;
 
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /*
  * MM'""""'YMM                                                        dP 
@@ -54,7 +54,7 @@ public class CommandAction extends ActionWithParameters {
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
         } catch (final CommandException e) {
-            CheckUtils.logWarning("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
+            LogUtil.logWarning("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
                     + ", please check if everything is setup correct.");
         } catch (final Exception e) {
             // I don't care in this case, your problem if your command fails.

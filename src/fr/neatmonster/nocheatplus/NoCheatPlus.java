@@ -52,8 +52,8 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEn
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.Updates;
 
@@ -218,7 +218,7 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 			if (listener instanceof IHaveMethodOrder){
 				// TODO: Might log the order too, might prevent registration ?
 				// TODO: Alternative: queue listeners and register after startup (!)
-				CheckUtils.logWarning("[NoCheatPlus] Listener demands registration order, but listeners are not managed: " + listener.getClass().getName());
+				LogUtil.logWarning("[NoCheatPlus] Listener demands registration order, but listeners are not managed: " + listener.getClass().getName());
 			}
 		}
 	}
@@ -283,9 +283,9 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 		listenerManager.setRegisterDirectly(false);
 		listenerManager.clear();
 
-        // Tell the server administrator the we finished unloading NoCheatPlus.
-        CheckUtils.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
-    }
+		// Tell the server administrator the we finished unloading NoCheatPlus.
+		LogUtil.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
+	}
 
 	/**
 	 * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
@@ -442,10 +442,10 @@ public class NoCheatPlus extends JavaPlugin implements Listener, NoCheatPlusAPI 
 				}
 			}); 
 		}
-        
-        // Tell the server administrator that we finished loading NoCheatPlus now.
-        CheckUtils.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
-    }
+
+		// Tell the server administrator that we finished loading NoCheatPlus now.
+		LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
+	}
 
 //    public void onPlayerJoinLow(final PlayerJoinEvent event) {
 //        /*

@@ -177,7 +177,7 @@ public class TickTask implements Runnable {
 		if (!delayedActions.isEmpty()) executeActions();
 		if (!permissionUpdates.isEmpty()) updatePermissions();
 		if (timeLast > time) {
-			CheckUtils.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
+			LogUtil.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
 			DataManager.clearData(CheckType.ALL);
 		}
 		timeLast = time;

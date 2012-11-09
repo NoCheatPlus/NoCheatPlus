@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 public class TempKickCommand extends DelayableCommand {
 
@@ -51,6 +51,6 @@ public class TempKickCommand extends DelayableCommand {
 		NoCheatPlus.denyLogin(name, duration);
 		if (player == null) return;
 		player.kickPlayer(reason);
-		CheckUtils.logInfo("[NoCheatPlus] (" + sender.getName() + ") Kicked " + player.getName() + " for " + duration/60000 +" minutes: " + reason);
+		LogUtil.logInfo("[NoCheatPlus] (" + sender.getName() + ") Kicked " + player.getName() + " for " + duration/60000 +" minutes: " + reason);
 	}
 }

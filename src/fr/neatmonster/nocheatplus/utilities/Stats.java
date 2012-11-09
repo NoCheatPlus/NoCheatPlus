@@ -81,7 +81,7 @@ public final class Stats {
 			if ( ts > tsStats+periodStats){
 				tsStats = ts;
 				// print out stats !
-				CheckUtils.logInfo(getStatsStr());
+				LogUtil.logInfo(getStatsStr());
 			}
 		}
 	}

@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.checks;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 public abstract class AsyncCheck extends Check {
 
@@ -17,7 +17,7 @@ public abstract class AsyncCheck extends Check {
             if (!type.isEnabled(player) || type.hasCachedPermission(player))
                 return false;
         } catch (final Exception e) {
-            CheckUtils.scheduleOutput(e);
+        	LogUtil.scheduleLogSevere(e);
         }
         return !NCPExemptionManager.isExempted(player, type);
 	}

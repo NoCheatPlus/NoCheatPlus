@@ -41,7 +41,7 @@ public class LagMeasureTask implements Runnable {
             try {
                 Bukkit.getServer().getScheduler().cancelTask(instance.lagMeasureTaskId);
             } catch (final Exception e) {
-            	CheckUtils.logWarning("[NoCheatPlus] Couldn't cancel LagMeasureTask: " + e.getMessage() + ".");
+            	LogUtil.logWarning("[NoCheatPlus] Couldn't cancel LagMeasureTask: " + e.getMessage() + ".");
             }
             instance.lagMeasureTaskId = -1;
         }
@@ -98,9 +98,9 @@ public class LagMeasureTask implements Runnable {
             // Show the debug messages.
             if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG))
                 if (oldStatus != skipCheck && skipCheck)
-                	CheckUtils.logInfo("[NoCheatPlus] Detected server lag, some checks will not work.");
+                	LogUtil.logInfo("[NoCheatPlus] Detected server lag, some checks will not work.");
                 else if (oldStatus != skipCheck && !skipCheck)
-                	CheckUtils.logInfo("[NoCheatPlus] Server lag seems to have stopped, reenabling checks.");
+                	LogUtil.logInfo("[NoCheatPlus] Server lag seems to have stopped, reenabling checks.");
 
             final long time = System.currentTimeMillis();
             lastInGameSecondDuration = time - lastInGameSecondTime;

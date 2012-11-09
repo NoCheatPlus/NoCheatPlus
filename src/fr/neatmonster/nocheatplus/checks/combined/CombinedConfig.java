@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 public class CombinedConfig extends ACheckConfig {
 	
@@ -81,7 +82,7 @@ public class CombinedConfig extends ACheckConfig {
 	        }
 	        catch (final Exception e){
 	            error = true;
-	            CheckUtils.logWarning("[NoCheatPlus] Bad damage cause (combined.invulnerable.ignore): " + input);
+	            LogUtil.logWarning("[NoCheatPlus] Bad damage cause (combined.invulnerable.ignore): " + input);
 	        }
 	    }
 	    // Read modifiers for causes.
@@ -99,11 +100,11 @@ public class CombinedConfig extends ACheckConfig {
             }
             catch (final Exception e){
                 error = true;
-                CheckUtils.logWarning("[NoCheatPlus] Bad damage cause (combined.invulnerable.modifiers): " + input);
+                LogUtil.logWarning("[NoCheatPlus] Bad damage cause (combined.invulnerable.modifiers): " + input);
             }
         }
         invulnerableModifierDefault = defaultMod;
-	    if (error) CheckUtils.logInfo("[NoCheatPlus] Damage causes can be: " + CheckUtils.join(Arrays.asList(DamageCause.values()), ", "));
+	    if (error) LogUtil.logInfo("[NoCheatPlus] Damage causes can be: " + CheckUtils.join(Arrays.asList(DamageCause.values()), ", "));
 	    invulnerableTriggerAlways = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS);
 	    invulnerableTriggerFallDistance = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE);
 		yawRate = config.getInt(ConfPaths.COMBINED_YAWRATE_RATE);

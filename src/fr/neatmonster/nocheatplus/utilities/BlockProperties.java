@@ -531,8 +531,8 @@ public class BlockProperties {
 	public static void dumpBlocks(boolean all) {
 		List<String> missing = new LinkedList<String>();
 		if (all) {
-			CheckUtils.logInfo("[NoCheatPlus] Dump block properties for fastbreak check:");
-			CheckUtils.logInfo("--- Present entries -------------------------------");
+			LogUtil.logInfo("[NoCheatPlus] Dump block properties for fastbreak check:");
+			LogUtil.logInfo("--- Present entries -------------------------------");
 		}
 		for (int i = 0; i < blocks.length; i++){
 			String mat;
@@ -548,13 +548,13 @@ public class BlockProperties {
 				if (mat.equals("?")) continue;
 				missing.add("* MISSING "+i + "(" + mat +") ");
 			}
-			else if (all) CheckUtils.logInfo(i + ": (" + mat + ") " + blocks[i].toString());
+			else if (all) LogUtil.logInfo(i + ": (" + mat + ") " + blocks[i].toString());
 		}
 		if (!missing.isEmpty()){
 			Bukkit.getLogger().warning("[NoCheatPlus] The block breaking data is incomplete, default to allow instant breaking:");
-			CheckUtils.logWarning("--- Missing entries -------------------------------");
+			LogUtil.logWarning("--- Missing entries -------------------------------");
 			for (String spec : missing){
-				CheckUtils.logWarning(spec);
+				LogUtil.logWarning(spec);
 			}
 		}
 	}
@@ -1016,7 +1016,7 @@ public class BlockProperties {
         // Ignore passable.
         for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_IGNOREPASSABLE)){
             final Integer id = ConfigFile.parseTypeId(input);
-            if (id == null || id < 0 || id >= 4096) CheckUtils.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
+            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
             else blockFlags[id] |= F_IGN_PASSABLE;
         }
     }
