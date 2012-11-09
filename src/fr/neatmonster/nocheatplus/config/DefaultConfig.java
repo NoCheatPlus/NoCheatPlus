@@ -22,7 +22,7 @@ import org.bukkit.Material;
 public class DefaultConfig extends ConfigFile {
 
 	/** NCP build needed for this config. */
-	public static final int buildNumber = 230;
+	public static final int buildNumber = 235;
 
     /**
      * Instantiates a new default configuration.
@@ -439,7 +439,8 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
 
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, Arrays.asList(
-                Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(), 
+                Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),
+                Material.TRAP_DOOR.name(),
                 Material.PISTON_EXTENSION.name(), 
                 Material.PISTON_MOVING_PIECE.name() // TODO: ?
         ));
