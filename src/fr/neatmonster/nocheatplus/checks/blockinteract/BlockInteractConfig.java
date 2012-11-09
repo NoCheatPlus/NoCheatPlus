@@ -86,11 +86,11 @@ public class BlockInteractConfig extends ACheckConfig {
     public BlockInteractConfig(final ConfigFile data) {
         super(data, ConfPaths.BLOCKINTERACT);
         directionCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_DIRECTION_CHECK);
-        directionActions = data.getActionList(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS,
+        directionActions = data.getOptimizedActionList(ConfPaths.BLOCKINTERACT_DIRECTION_ACTIONS,
                 Permissions.BLOCKINTERACT_DIRECTION);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_REACH_CHECK);
-        reachActions = data.getActionList(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, Permissions.BLOCKINTERACT_REACH);
+        reachActions = data.getOptimizedActionList(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, Permissions.BLOCKINTERACT_REACH);
     }
 
     /* (non-Javadoc)

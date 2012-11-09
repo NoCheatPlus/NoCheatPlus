@@ -162,16 +162,16 @@ public class ChatConfig extends AsyncCheckConfig {
         captchaQuestion = config.getString(ConfPaths.CHAT_CAPTCHA_QUESTION);
         captchaSuccess = config.getString(ConfPaths.CHAT_CAPTCHA_SUCCESS);
         captchaTries = config.getInt(ConfPaths.CHAT_CAPTCHA_TRIES);
-        captchaActions = config.getActionList(ConfPaths.CHAT_CAPTCHA_ACTIONS, Permissions.CHAT_CAPTCHA);
+        captchaActions = config.getOptimizedActionList(ConfPaths.CHAT_CAPTCHA_ACTIONS, Permissions.CHAT_CAPTCHA);
     	
         colorCheck = config.getBoolean(ConfPaths.CHAT_COLOR_CHECK);
-        colorActions = config.getActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
+        colorActions = config.getOptimizedActionList(ConfPaths.CHAT_COLOR_ACTIONS, Permissions.CHAT_COLOR);
         
         commandsCheck = config.getBoolean(ConfPaths.CHAT_COMMANDS_CHECK);
         commandsLevel = config.getDouble(ConfPaths.CHAT_COMMANDS_LEVEL);
         commandsShortTermTicks = config.getInt(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS);
         commandsShortTermLevel = config.getDouble(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL);;
-        commandsActions = config.getActionList(ConfPaths.CHAT_COMMANDS_ACTIONS, Permissions.CHAT_COMMANDS);
+        commandsActions = config.getOptimizedActionList(ConfPaths.CHAT_COMMANDS_ACTIONS, Permissions.CHAT_COMMANDS);
         
         
         textCheck = config.getBoolean(ConfPaths.CHAT_TEXT_CHECK);
@@ -185,7 +185,7 @@ public class ChatConfig extends AsyncCheckConfig {
         textFreqShortTermWeight = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_WEIGHT);
         textFreqShortTermLevel = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_LEVEL);
         textFreqShortTermMin = (float) config.getDouble(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_MIN);
-        textFreqShortTermActions = config.getActionList(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_ACTIONS, Permissions.CHAT_TEXT);
+        textFreqShortTermActions = config.getOptimizedActionList(ConfPaths.CHAT_TEXT_FREQ_SHORTTERM_ACTIONS, Permissions.CHAT_TEXT);
         textMessageLetterCount = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_LETTERCOUNT);
         textMessagePartition = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_PARTITION);
         textMessageUpperCase = (float) config.getDouble(ConfPaths.CHAT_TEXT_MSG_UPPERCASE);
@@ -203,7 +203,7 @@ public class ChatConfig extends AsyncCheckConfig {
     	textFreqNormLevel = config.getDouble(ConfPaths.CHAT_TEXT_FREQ_NORM_LEVEL);
     	textEngineMaximum = config.getBoolean(ConfPaths.CHAT_TEXT_ENGINE_MAXIMUM, true);
     	textDebug = config.getBoolean(ConfPaths.CHAT_TEXT_DEBUG, false);
-        textFreqNormActions = config.getActionList(ConfPaths.CHAT_TEXT_FREQ_NORM_ACTIONS, Permissions.CHAT_TEXT);
+        textFreqNormActions = config.getOptimizedActionList(ConfPaths.CHAT_TEXT_FREQ_NORM_ACTIONS, Permissions.CHAT_TEXT);
         
         chatWarningCheck = config.getBoolean(ConfPaths.CHAT_WARNING_CHECK);
         chatWarningLevel = (float) config.getDouble(ConfPaths.CHAT_WARNING_LEVEL);
@@ -223,7 +223,7 @@ public class ChatConfig extends AsyncCheckConfig {
         relogWarningMessage = config.getString(ConfPaths.CHAT_RELOG_WARNING_MESSAGE);
         relogWarningNumber = config.getInt(ConfPaths.CHAT_RELOG_WARNING_NUMBER);
         relogWarningTimeout = config.getLong(ConfPaths.CHAT_RELOG_WARNING_TIMEOUT);
-        relogActions = config.getActionList(ConfPaths.CHAT_RELOG_ACTIONS, Permissions.CHAT_RELOG);
+        relogActions = config.getOptimizedActionList(ConfPaths.CHAT_RELOG_ACTIONS, Permissions.CHAT_RELOG);
 
         opInConsoleOnly = config.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
 

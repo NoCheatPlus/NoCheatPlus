@@ -29,20 +29,37 @@ public class ConfigFile extends YamlConfiguration {
     /** The factory. */
     private ActionFactory factory;
 
-    /**
-     * A convenience method to get action lists from the configuration.
-     * 
-     * @param path
-     *            the path
-     * @param permission
-     *            the permission
-     * @return the action list
-     */
-    public ActionList getActionList(final String path, final String permission) {
-        final String value = this.getString(path);
-        return factory.createActionList(value, permission);
-    }
-    
+	/**
+	 * A convenience method to get an optimized action list from the configuration.
+	 * 
+	 * @param path
+	 *            the path
+	 * @param permission
+	 *            the permission
+	 * @return the action list
+	 */
+	public ActionList getOptimizedActionList(final String path, final String permission)
+	{
+		final String value = this.getString(path);
+		return factory.createActionList(value, permission).getOptimizedCopy(this);
+	}
+
+	/**
+	 * A convenience method to get default action lists from the configuration, without
+	 * applying any optimization.
+	 * 
+	 * @param path
+	 *            the path
+	 * @param permission
+	 *            the permission
+	 * @return the action list
+	 */
+	public ActionList getDefaultActionList(final String path, final String permission)
+	{
+		final String value = this.getString(path);
+		return factory.createActionList(value, permission);
+	}
+
     /**
      * Return double within given bounds, with preset. Mainly used for hidden settings.
      * 

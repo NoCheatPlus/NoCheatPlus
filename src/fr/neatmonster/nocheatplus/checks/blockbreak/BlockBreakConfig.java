@@ -118,7 +118,7 @@ public class BlockBreakConfig extends ACheckConfig {
     public BlockBreakConfig(final ConfigFile data) {
         super(data, ConfPaths.BLOCKBREAK);
         directionCheck = data.getBoolean(ConfPaths.BLOCKBREAK_DIRECTION_CHECK);
-        directionActions = data.getActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
+        directionActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, Permissions.BLOCKBREAK_DIRECTION);
 
         // Fastbreak.
         fastBreakCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK);
@@ -132,7 +132,7 @@ public class BlockBreakConfig extends ACheckConfig {
         fastBreakModCreative = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_CREATIVE, 0);
         fastBreakModSurvival = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL);
         // Fastbreak  actions, shared.
-        fastBreakActions = data.getActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);
+        fastBreakActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);
 
         frequencyCheck = data.getBoolean(ConfPaths.BLOCKBREAK_FREQUENCY_CHECK);
         frequencyBuckets = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_BUCKETS_N, 2);
@@ -142,17 +142,17 @@ public class BlockBreakConfig extends ACheckConfig {
         frequencyIntervalSurvival = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_MOD_SURVIVAL);
         frequencyShortTermLimit = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_LIMIT);
     	frequencyShortTermTicks = data.getInt(ConfPaths.BLOCKBREAK_FREQUENCY_SHORTTERM_TICKS);
-        frequencyActions = data.getActionList(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, Permissions.BLOCKBREAK_FREQUENCY);
+        frequencyActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, Permissions.BLOCKBREAK_FREQUENCY);
         
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKBREAK_NOSWING_CHECK);
-        noSwingActions = data.getActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, Permissions.BLOCKBREAK_NOSWING);
+        noSwingActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, Permissions.BLOCKBREAK_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKBREAK_REACH_CHECK);
-        reachActions = data.getActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
+        reachActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_REACH_ACTIONS, Permissions.BLOCKBREAK_REACH);
         
         wrongBlockCheck = data.getBoolean(ConfPaths.BLOCKBREAK_WRONGBLOCK_CHECK);
         wrongBLockLevel = data.getInt(ConfPaths.BLOCKBREAK_WRONGBLOCK_LEVEL);
-        wrongBlockActions = data.getActionList(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, Permissions.BLOCKBREAK_WRONGBLOCK);
+        wrongBlockActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_WRONGBLOCK_ACTIONS, Permissions.BLOCKBREAK_WRONGBLOCK);
     }
 
     /* (non-Javadoc)

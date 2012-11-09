@@ -69,7 +69,7 @@ public class CombinedConfig extends ACheckConfig {
 	    super(config, ConfPaths.COMBINED);
 		improbableCheck = config.getBoolean(ConfPaths.COMBINED_IMPROBABLE_CHECK, false);
 		improbableLevel = (float) config.getDouble(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
-		improbableActions = config.getActionList(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, Permissions.COMBINED_IMPROBABLE);
+		improbableActions = config.getOptimizedActionList(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, Permissions.COMBINED_IMPROBABLE);
 		
 	    invulnerableCheck = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_CHECK);
 	    invulnerableInitialTicksJoin = config.getInt(ConfPaths.COMBINED_INVULNERABLE_INITIALTICKS_JOIN);

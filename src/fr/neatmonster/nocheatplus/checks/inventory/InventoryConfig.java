@@ -103,24 +103,24 @@ public class InventoryConfig extends ACheckConfig {
 		dropCheck = data.getBoolean(ConfPaths.INVENTORY_DROP_CHECK);
 		dropLimit = data.getInt(ConfPaths.INVENTORY_DROP_LIMIT);
 		dropTimeFrame = data.getLong(ConfPaths.INVENTORY_DROP_TIMEFRAME);
-		dropActions = data.getActionList(ConfPaths.INVENTORY_DROP_ACTIONS,
+		dropActions = data.getOptimizedActionList(ConfPaths.INVENTORY_DROP_ACTIONS,
 				Permissions.INVENTORY_DROP);
 
 		fastClickCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_CHECK);
 		fastClickSpareCreative = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_SPARECREATIVE);
-		fastClickActions = data.getActionList(
+		fastClickActions = data.getOptimizedActionList(
 				ConfPaths.INVENTORY_FASTCLICK_ACTIONS,
 				Permissions.INVENTORY_FASTCLICK);
 
 		instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
 		instantBowStrict = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_STRICT);
 		instantBowDelay = data.getInt(ConfPaths.INVENTORY_INSTANTBOW_DELAY);
-		instantBowActions = data.getActionList(
+		instantBowActions = data.getOptimizedActionList(
 				ConfPaths.INVENTORY_INSTANTBOW_ACTIONS,
 				Permissions.INVENTORY_INSTANTBOW);
 
 		instantEatCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTEAT_CHECK);
-		instantEatActions = data.getActionList(
+		instantEatActions = data.getOptimizedActionList(
 				ConfPaths.INVENTORY_INSTANTEAT_ACTIONS,
 				Permissions.INVENTORY_INSTANTEAT);
 		

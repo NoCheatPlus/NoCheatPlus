@@ -119,13 +119,13 @@ public class MovingConfig extends ACheckConfig {
         creativeFlyHorizontalSpeed = data.getInt(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED);
         creativeFlyMaxHeight = data.getInt(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT);
         creativeFlyVerticalSpeed = data.getInt(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED);
-        creativeFlyActions = data.getActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
+        creativeFlyActions = data.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
         morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
-        morePacketsActions = data.getActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
+        morePacketsActions = data.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
 
         morePacketsVehicleCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
-        morePacketsVehicleActions = data.getActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
+        morePacketsVehicleActions = data.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
                 Permissions.MOVING_MOREPACKETS);
 
         noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
@@ -133,7 +133,7 @@ public class MovingConfig extends ACheckConfig {
 //        noFallActions = data.getActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
         
         passableCheck = data.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
-        passableActions = data.getActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
+        passableActions = data.getOptimizedActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
 
         survivalFlyCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
         // Default values are specified here because this settings aren't showed by default into the configuration file.
@@ -147,7 +147,7 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyAccountingH = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         survivalFlyAccountingV = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
         survivalFlyVLFreeze = data.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
-        survivalFlyActions = data.getActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
+        survivalFlyActions = data.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, 0.3);

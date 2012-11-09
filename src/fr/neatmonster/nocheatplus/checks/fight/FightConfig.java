@@ -119,35 +119,35 @@ public class FightConfig extends ACheckConfig {
         super(data, ConfPaths.FIGHT);
         angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
         angleThreshold = data.getInt(ConfPaths.FIGHT_ANGLE_THRESHOLD);
-        angleActions = data.getActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);
+        angleActions = data.getOptimizedActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);
 
         criticalCheck = data.getBoolean(ConfPaths.FIGHT_CRITICAL_CHECK);
         criticalFallDistance = data.getDouble(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE);
         criticalVelocity = data.getDouble(ConfPaths.FIGHT_CRITICAL_VELOCITY);
-        criticalActions = data.getActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
+        criticalActions = data.getOptimizedActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
 
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
         directionPenalty = data.getLong(ConfPaths.FIGHT_DIRECTION_PENALTY);
-        directionActions = data.getActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
+        directionActions = data.getOptimizedActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
 
         godModeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
-        godModeActions = data.getActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
+        godModeActions = data.getOptimizedActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
 
         knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
         knockbackInterval = data.getLong(ConfPaths.FIGHT_KNOCKBACK_INTERVAL);
-        knockbackActions = data.getActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
+        knockbackActions = data.getOptimizedActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
 
         noSwingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
-        noSwingActions = data.getActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
+        noSwingActions = data.getOptimizedActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
         reachPenalty = data.getLong(ConfPaths.FIGHT_REACH_PENALTY);
         reachPrecision = data.getBoolean(ConfPaths.FIGHT_REACH_PRECISION);
         reachReduce = data.getBoolean(ConfPaths.FIGHT_REACH_REDUCE);
-        reachActions = data.getActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
+        reachActions = data.getOptimizedActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
 
         selfHitCheck = data.getBoolean(ConfPaths.FIGHT_SELFHIT_CHECK);
-        selfHitActions = data.getActionList(ConfPaths.FIGHT_SELFHIT_ACTIONS, Permissions.FIGHT_SELFHIT);
+        selfHitActions = data.getOptimizedActionList(ConfPaths.FIGHT_SELFHIT_ACTIONS, Permissions.FIGHT_SELFHIT);
         
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
         speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
@@ -156,7 +156,7 @@ public class FightConfig extends ACheckConfig {
         speedBucketFactor = (float) data.getDouble(ConfPaths.FIGHT_SPEED_BUCKETS_FACTOR, 1f);
         speedShortTermLimit = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_LIMIT);
         speedShortTermTicks = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_TICKS);
-        speedActions = data.getActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
+        speedActions = data.getOptimizedActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
         
         
         yawRateCheck = data.getBoolean(ConfPaths.FIGHT_YAWRATE_CHECK, true);

@@ -98,22 +98,22 @@ public class BlockPlaceConfig extends ACheckConfig {
     public BlockPlaceConfig(final ConfigFile data) {
         super(data, ConfPaths.BLOCKPLACE);
         directionCheck = data.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
-        directionActions = data.getActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
+        directionActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
 
         fastPlaceCheck = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK);
         fastPlaceExperimental = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_EXPERIMENTAL);
         fastPlaceInterval = data.getLong(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL);
-        fastPlaceActions = data.getActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
+        fastPlaceActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
 
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKPLACE_NOSWING_CHECK);
-        noSwingActions = data.getActionList(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, Permissions.BLOCKPLACE_NOSWING);
+        noSwingActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, Permissions.BLOCKPLACE_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKPLACE_REACH_CHECK);
-        reachActions = data.getActionList(ConfPaths.BLOCKPLACE_REACH_ACTIONS, Permissions.BLOCKPLACE_REACH);
+        reachActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_REACH_ACTIONS, Permissions.BLOCKPLACE_REACH);
 
         speedCheck = data.getBoolean(ConfPaths.BLOCKPLACE_SPEED_CHECK);
         speedInterval = data.getLong(ConfPaths.BLOCKPLACE_SPEED_INTERVAL);
-        speedActions = data.getActionList(ConfPaths.BLOCKPLACE_SPEED_ACTIONS, Permissions.BLOCKPLACE_SPEED);
+        speedActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_SPEED_ACTIONS, Permissions.BLOCKPLACE_SPEED);
     }
 
     /* (non-Javadoc)
