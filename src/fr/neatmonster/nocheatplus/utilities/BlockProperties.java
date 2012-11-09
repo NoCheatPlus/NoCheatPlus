@@ -1155,7 +1155,9 @@ public class BlockProperties {
                         // Might collide.
                         if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
                             final int aboveId = access.getTypeId(x, y + 1, z);
-                            if ((blockFlags[aboveId] & F_GROUND) != 0){
+                            final long flags = blockFlags[aboveId];
+                            if ((flags & (F_IGN_PASSABLE)) != 0); // Ignore these.
+                            else if ((flags & (F_GROUND)) != 0){
                                 // Check against spider type hacks.
                                 if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId)){
                                     // TODO: This might be seen as a violation for many block types.
