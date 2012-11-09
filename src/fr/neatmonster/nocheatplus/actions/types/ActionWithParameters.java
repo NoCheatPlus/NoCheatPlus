@@ -30,6 +30,8 @@ public abstract class ActionWithParameters extends Action {
     /** The parts of the message. */
     protected final ArrayList<Object> messageParts;
 
+	protected boolean needsParameters = true;
+
     /**
      * Instantiates a new action with parameters.
      * 
@@ -42,16 +44,18 @@ public abstract class ActionWithParameters extends Action {
      * @param message
      *            the message
      */
-    public ActionWithParameters(final String name, final int delay, final int repeat, final String message) {
-        super(name, delay, repeat);
+	public ActionWithParameters(final String name, final int delay, final int repeat, final String message) {
+		super(name, delay, repeat);
 
-        messageParts = new ArrayList<Object>();
-
-        parseMessage(message);
-    }
+		messageParts = new ArrayList<Object>();
+		// Assume we don't nee parameters.
+		needsParameters = false;
+		parseMessage(message);
+	}
 
     /**
-     * Get a string with all the wildcards replaced with data from the violation data.
+     * Get a string with all the wildcards replaced with data from the violation data.<br>
+     * This should set the flag needsParameters if parameters are actually needed.
      * 
      * @param violationData
      *            the violation data
@@ -99,7 +103,8 @@ public abstract class ActionWithParameters extends Action {
                 final ParameterName w = ParameterName.get(parts2[0].toLowerCase());
 
                 if (w != null) {
-                    // Found an existing wildcard inbetween the braces.
+                	needsParameters = true;
+                    // Found an existing wildcard in between the braces.
                     messageParts.add(parts[0]);
                     messageParts.add(w);
 
@@ -113,6 +118,6 @@ public abstract class ActionWithParameters extends Action {
 
 	@Override
 	public boolean needsParameters() {
-		return true;
+		return needsParameters;
 	}
 }
