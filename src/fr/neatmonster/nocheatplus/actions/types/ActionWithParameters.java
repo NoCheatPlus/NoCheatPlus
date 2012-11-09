@@ -27,8 +27,10 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
  * Action with parameters is used for the messages (chat, console, log) or the commands.
  */
 public abstract class ActionWithParameters extends Action {
-    /** The parts of the message. */
-    protected final ArrayList<Object> messageParts;
+	/** The parts of the message. */
+	protected final ArrayList<Object> messageParts;
+
+	protected final String message;
 
 	protected boolean needsParameters = true;
 
@@ -48,6 +50,7 @@ public abstract class ActionWithParameters extends Action {
 		super(name, delay, repeat);
 
 		messageParts = new ArrayList<Object>();
+		this.message = message;
 		// Assume we don't nee parameters.
 		needsParameters = false;
 		parseMessage(message);
