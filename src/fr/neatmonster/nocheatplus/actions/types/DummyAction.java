@@ -21,16 +21,16 @@ public class DummyAction extends Action {
     /** The original string used for this action definition. */
     protected final String definition;
 
-    /**
-     * Instantiates a new dummy.
-     * 
-     * @param definition
-     *            the definition
-     */
-    public DummyAction(final String definition) {
-        super("dummyAction", 10000, 10000);
-        this.definition = definition;
-    }
+	/**
+	 * Instantiates a new dummy.
+	 * 
+	 * @param definition
+	 *            the definition
+	 */
+	public DummyAction(final String definition) {
+		super("dummyAction", 0, 0);
+		this.definition = definition;
+	}
 
     /* (non-Javadoc)
      * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
@@ -47,4 +47,5 @@ public class DummyAction extends Action {
     public String toString() {
         return definition;
     }
+
 }
