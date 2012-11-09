@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.utilities;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
@@ -198,37 +196,35 @@ public class CheckUtils {
 
 	/**
 	 * Convenience method.
-	 * 
+	 * @deprecated Use LogUtil.scheduleLogInfo instead.
 	 * @param parts
 	 * @param link
 	 * @return
 	 */
 	public static <O extends Object> boolean scheduleOutputJoined(final List<O> parts, String link)
 	{
-		return scheduleOutput(join(parts, link));
+		return LogUtil.scheduleLogInfo(parts, link);
 	}
-    
-    /**
-     * Schedule a message to be output by the bukkit logger.
-     * @param message
-     * @return If scheduled successfully.
-     */
-    public static boolean scheduleOutput(final String message){
-    	try{
-    		return Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"),
-    				new Runnable() {
-						@Override
-						public void run() {
-							Bukkit.getLogger().info(message);
-						}
-					}) != -1;
-    	}
-    	catch (final Exception exc){
-    		return false;
-    	}
-    }
 
-    /**
+	/**
+	 * @deprecated Use instead: scheduleLogInfo
+	 * @param message
+	 * @return
+	 */
+	public static boolean scheduleOutput(final String message) {
+		try {
+			return Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"), new Runnable() {
+				@Override
+				public void run() {
+					Bukkit.getLogger().info(message);
+				}
+			}) != -1;
+		} catch (final Exception exc) {
+			return false;
+		}
+	}
+	
+	/**
      * Removes the colors of a message.
      * 
      * @param text
@@ -254,19 +250,30 @@ public class CheckUtils {
         return text;
     }
 
+    /**
+     * @deprecated Use instead: LogUtil.scheduleLogInfo or similar.
+     * @param t
+     */
 	public static void scheduleOutput(final Throwable t) {
 		scheduleOutput(toString(t));
 	}
 	
+	
+	/**
+	 * @deprecated Use instead: LogUtil.logSevere
+	 * @param t
+	 */
 	public static void logSevere(final Throwable t) {
-		Bukkit.getLogger().severe(toString(t));
+		LogUtil.logSevere(toString(t));
 	}
 	
-	public static String toString(final Throwable t){
-		// TODO: Find the fastest way.
-		final StringWriter w = new StringWriter();
-		t.printStackTrace(new PrintWriter(w));
-		return w.toString();
+	/**
+	 * @deprecated Use instead: LogUtil.toString
+	 * @param t
+	 * @return
+	 */
+	public static final String toString(final Throwable t){
+		return LogUtil.toString(t);
 	}
 	
 	/**
@@ -302,14 +309,26 @@ public class CheckUtils {
 		else return diff;
 	}
 	
+	 /**
+	  * @deprecated Use instead: LogUtil.logSevere
+	  * @param msg
+	  */
 	public static void logSevere(final String msg) {
 		Bukkit.getLogger().severe((msg));
 	}
 
+	/**
+	 * @deprecated Use instead: LogUtil.logWarning
+	 * @param msg
+	 */
 	public static void logWarning(final String msg) {
 		Bukkit.getLogger().warning((msg));
 	}
 	
+	/**
+	 * @deprecated Use instead: LogUtil.logInfo
+	 * @param msg
+	 */
 	public static void logInfo(final String msg) {
 		Bukkit.getLogger().info((msg));
 	}
