@@ -70,7 +70,7 @@ public class LogAction extends ActionWithParameters {
     public boolean execute(final ViolationData violationData) {
         final ConfigFile configurationFile = ConfigManager.getConfigFile();
         if (configurationFile.getBoolean(ConfPaths.LOGGING_ACTIVE)
-                && !violationData.player.hasPermission(violationData.actions.permissionSilent)) {
+                && !violationData.player.hasPermission(violationData.getPermissionSilent())) {
             final String message = super.getMessage(violationData);
             if (toChat && configurationFile.getBoolean(ConfPaths.LOGGING_INGAMECHAT))
                 for (final Player otherPlayer : Bukkit.getServer().getOnlinePlayers())

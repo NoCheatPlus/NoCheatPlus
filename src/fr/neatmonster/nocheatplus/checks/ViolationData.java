@@ -22,7 +22,8 @@ import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
 /**
  * Violation specific data, for executing actions.<br>
  * This is meant to capture a violation incident in a potentially thread safe way.
- * 
+ * <hr>
+ * TODO: Re-think visibility questions.
  * @author asofold
  */
 public class ViolationData implements IViolationInfo{
@@ -167,4 +168,12 @@ public class ViolationData implements IViolationInfo{
     public double getTotalVl() {
         return vL;
     }
+
+	public String getPermissionSilent() {
+		return actions.permissionSilent;
+	}
+	
+	public ActionList getActionList(){
+		return actions;
+	}
 }
