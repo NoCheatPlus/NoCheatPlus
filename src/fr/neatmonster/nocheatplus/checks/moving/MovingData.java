@@ -139,7 +139,6 @@ public class MovingData extends ACheckData {
     public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
-    public Location       ground;
     public Location       setBack;
     public Location       teleported;
 

@@ -209,18 +209,22 @@ public class MovingListener implements Listener {
          *                |___/                                                          
          */
         final Player player = event.getPlayer();
-        final MovingData data = MovingData.getData(player);
 
-		if (!creativeFly.isEnabled(player) && survivalFly.isEnabled(player) && survivalFly.check(player)) {
-			// To cancel the event, we simply teleport the player to his last
-			// safe location.
-			Location target = null;
-			if (data.ground != null) target = data.ground;
-			else if (data.setBack != null) target = data.setBack;
-//			else target = player.getLocation(); // TODO
-			
-			
-			if (target != null) player.teleport(target);// TODO: schedule / other measures ?
+		if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY) && survivalFly.isEnabled(player)) {
+			final MovingData data = MovingData.getData(player);
+			// Check if the player has to be reset.
+			final Location target = survivalFly.checkBed(player, data);
+			// To cancel the event, we teleport the player.
+			if (target != null){
+				if (noFall.isEnabled(player)){
+					// Check if to deal damage.
+					noFall.checkDamage(player, data);
+				}
+				// Teleport.
+				data.teleported = target;
+				player.teleport(target);// TODO: schedule / other measures ?
+				
+			}
 		}
 
     }
@@ -394,11 +398,6 @@ public class MovingListener implements Listener {
         } else if (data.verticalFreedom > 0.001D)
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
-        
-        if (pFrom.isOnGround()){
-            data.ground = from; // pFrom.getLocation();
-        }
-        
 
 		Location newTo = null;
 
@@ -417,10 +416,17 @@ public class MovingListener implements Listener {
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
                 // If he is handled by the survival fly check, execute it.
                 newTo = survivalFly.check(player, mcPlayer, pFrom, pTo, data, cc);
-                // If don't have a new location and if he is handled by the no fall check, execute it.
-                if (newTo == null && cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL))
-                	// NOTE: noFall might set yOnGround for the positions.
-                    noFall.check(player, pFrom, pTo, data, cc);
+				// Check NoFall if no reset is done.
+				if (cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL)) {
+					if (newTo == null) {
+						// NOTE: noFall might set yOnGround for the positions.
+						noFall.check(player, pFrom, pTo, data, cc);
+					}
+					else{
+						// Deal damage if necessary.
+						noFall.checkDamage(player, data);
+					}
+				}
         	}
         	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY)){
         		// If the player is handled by the creative fly check, execute it.
@@ -601,7 +607,6 @@ public class MovingListener implements Listener {
 		data.clearMorePacketsData();
 		if (survivalFly.isEnabled(player)) {
 			data.setBack = event.getRespawnLocation();
-			data.ground = event.getRespawnLocation();
 		}
 	}
 	
@@ -615,6 +620,7 @@ public class MovingListener implements Listener {
 		final MovingData data = MovingData.getData(player);
 		data.clearFlyData();
 		data.clearMorePacketsData();
+		data.setBack = player.getLocation(); // TODO: Monitor this change (!).
 	}
 
     /**

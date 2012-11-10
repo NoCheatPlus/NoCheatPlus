@@ -62,29 +62,38 @@ public class SurvivalFly extends Check {
         super(CheckType.MOVING_SURVIVALFLY);
     }
 
-    /**
-     * Checks a player.
-     * 
-     * @param player
-     *            the player
-     * @return true, if successful
-     */
-    public boolean check(final Player player) {
-        final MovingData data = MovingData.getData(player);
+	/**
+	 * Checks a player.
+	 * 
+	 * @param player
+	 *            the player
+	 * @return Location to teleport to if it is a violation.
+	 */
+	public Location checkBed(final Player player, final MovingData data) {
+		Location newTo = null;
+		// Check if the player had been in bed at all.
+		if (!data.sfWasInBed) {
+			// Violation ...
+			data.survivalFlyVL += 100D;
+			
 
-        // Check if the player has entered the bed he is trying to leave.
-        if (!data.sfWasInBed) {
-            // He hasn't, increment his violation level.
-            data.survivalFlyVL += 100D;
-
-            // And return if we need to do something or not.
-            return executeActions(player, data.survivalFlyVL, 100D, MovingConfig.getConfig(player).survivalFlyActions);
-        } else
-            // He has, everything is alright.
-            data.sfWasInBed = false;
-
-        return false;
-    }
+			// And return if we need to do something or not.
+			if (executeActions(player, data.survivalFlyVL, 100D, MovingConfig.getConfig(player).survivalFlyActions)){
+				final Location loc = player.getLocation();
+				newTo = data.setBack;
+				if (newTo == null){
+					// TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
+					newTo = loc;
+				}
+				newTo.setPitch(loc.getPitch());
+				newTo.setYaw(loc.getYaw());
+			}
+		} else{
+			// He has, everything is alright.
+			data.sfWasInBed = false;
+		}
+		return newTo;
+	}
 
     /**
      * Checks a player.

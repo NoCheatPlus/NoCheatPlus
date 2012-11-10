@@ -64,19 +64,23 @@ public class NoFall extends Check {
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
             if (cc.debug) System.out.println(mcPlayer.name + " NoFall deal damage: " + maxD);
-            final EntityDamageEvent event = new EntityDamageEvent(mcPlayer.getBukkitEntity(), DamageCause.FALL, maxD);
-            Bukkit.getPluginManager().callEvent(event);
-            if (!event.isCancelled()){
-                mcPlayer.damageEntity(DamageSource.FALL, event.getDamage());
-            }
-            // TODO: let this be done by the damage event (!).
-//            data.clearNoFallData(); // -> currently done in the damage eventhandling method.
-            mcPlayer.fallDistance = 0;
+			dealFallDamage(mcPlayer, maxD);
         }
         else data.clearNoFallData();
     }
 
-    /**
+    private static void dealFallDamage(EntityPlayer mcPlayer, int damage) {
+    	final EntityDamageEvent event = new EntityDamageEvent(mcPlayer.getBukkitEntity(), DamageCause.FALL, damage);
+        Bukkit.getPluginManager().callEvent(event);
+        if (!event.isCancelled()){
+            mcPlayer.damageEntity(DamageSource.FALL, event.getDamage());
+        }
+        // TODO: let this be done by the damage event (!).
+//        data.clearNoFallData(); // -> currently done in the damage eventhandling method.
+        mcPlayer.fallDistance = 0;
+	}
+
+	/**
      * Checks a player.
      * 
      * @param player
@@ -90,6 +94,8 @@ public class NoFall extends Check {
     	
     	final double fromY = from.getY();
     	final double toY = to.getY();
+    	
+    	// TODO: account for player.getLocation.getY (how exactly ?)
 		final double yDiff = toY - fromY;
 		
 		// Adapt yOnGround if necessary (sf uses another setting).
@@ -181,6 +187,38 @@ public class NoFall extends Check {
 		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
 		parameters.put(ParameterName.FALL_DISTANCE, String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallFallDistance));
 		return parameters;
+	}
+
+    /**
+     * This is called if a player fails a check and gets set back, to avoid using that to avoid fall damage the player might be dealt damage here. 
+     * @param player
+     * @param data
+     */
+	public void checkDamage(final Player player, final MovingData data) {
+		final MovingConfig cc = MovingConfig.getConfig(player);
+		// Get the max difference for fall distance.
+		final float fallDistance = player.getFallDistance();
+		final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
+		final double maxDiff = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
+		// Calculate damage that would be dealt (plus return if none).
+		final int damage = NoFall.getDamage((float) maxDiff);
+		if (damage <= 0) return;
+//		// Heuristic check for if damage would count at all.
+//		final long fDamage = BlockProperties.F_GROUND | BlockProperties.F_SOLID | BlockProperties.F_STAIRS | BlockProperties.F_LAVA;
+//		final long fNoDamage = BlockProperties.F_LIQUID; // Checked second.
+//		final IBlockAccess access = ((CraftWorld) player.getWorld()).getHandle();
+//		final Location loc = player.getLocation();
+//		final int x = loc.getBlockX();
+//		final int y = loc.getBlockY();
+//		final int z = loc.getBlockZ();
+//		while (y > 0){
+//			
+//		}
+//		// TODO
+		
+		// Deal damage.
+		if (cc.debug) System.out.println(player.getName() + " NoFall deal damage (violation): " + damage);
+		dealFallDamage(((CraftPlayer) player).getHandle(), damage);
 	}
 	
 }
