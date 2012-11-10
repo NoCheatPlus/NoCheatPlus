@@ -23,7 +23,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 
 /**
- * Poperties of blocks.
+ * Properties of blocks.
  * 
  * Likely to be added:
  * - reading properties from files.
@@ -365,6 +365,7 @@ public class BlockProperties {
         for (final Material mat : new Material[]{
                 Material.WATER_LILY, Material.LADDER,
                 Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
+                Material.COCOA,
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
