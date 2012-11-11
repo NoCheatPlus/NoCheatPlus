@@ -310,19 +310,9 @@ public class PlayerLocation {
 	 * @return true, if the player is in web
 	 */
 	public boolean isInWeb() {
-		final int webId = Material.WEB.getId();
 		if (inWeb == null) {
-			for (int blockX = Location.locToBlock(minX + 0.001D); blockX <= Location.locToBlock(maxX - 0.001D); blockX++) {
-				for (int blockY = Location.locToBlock(minY + 0.001D); blockY <= Location.locToBlock(maxY - 0.001D); blockY++) {
-					for (int blockZ = Location.locToBlock(minZ + 0.001D); blockZ <= Location.locToBlock(maxZ - 0.001D); blockZ++) {
-						if (getTypeId(blockX, blockY, blockZ) == webId) {
-							inWeb = true;
-							return true;
-						}
-					}
-				}
-			}
-			inWeb = false;
+			final double inset = 0.001d;
+			inWeb = BlockProperties.collidesId(getBlockAccess(), minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB.getId());
 		}
 		return inWeb;
 	}
