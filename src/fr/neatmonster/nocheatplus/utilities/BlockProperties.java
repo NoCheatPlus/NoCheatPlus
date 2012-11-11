@@ -1092,13 +1092,83 @@ public class BlockProperties {
      * @return
      */
     public static final boolean collides(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
-        for (int x = Location.locToBlock(minX); x <= Location.locToBlock(maxX); x++){
-            for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
-                for (int y = Location.locToBlock(minY); y <= Location.locToBlock(maxY); y++){
+    	final int iMinX = Location.locToBlock(minX);
+    	final int iMaxX = Location.locToBlock(maxX);
+    	final int iMinY = Location.locToBlock(minY);
+    	final int iMaxY = Location.locToBlock(maxY);
+    	final int iMinZ = Location.locToBlock(minZ);
+    	final int iMaxZ = Location.locToBlock(maxZ);
+        for (int x = iMinX; x <= iMaxX; x++){
+            for (int z = iMinZ; z <= iMaxZ; z++){
+                for (int y = iMinY; y <= iMaxY; y++){
                     final int id = access.getTypeId(x, y, z);
                     if ((blockFlags[id] & flags) != 0){
                         // Might collide.
                         if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check if a block with the given id is overlapping with the bounds, this does not check the blocks actual bounds (All bounds of the block are seen as 0...1, for exact box match use collidesBlock). 
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param id
+     * @return
+     */
+    public static final boolean collidesId(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
+    	final int iMinX = Location.locToBlock(minX);
+    	final int iMaxX = Location.locToBlock(maxX);
+    	final int iMinY = Location.locToBlock(minY);
+    	final int iMaxY = Location.locToBlock(maxY);
+    	final int iMinZ = Location.locToBlock(minZ);
+    	final int iMaxZ = Location.locToBlock(maxZ);
+        for (int x = iMinX; x <= iMaxX; x++){
+            for (int z = iMinZ; z <= iMaxZ; z++){
+                for (int y = iMinY; y <= iMaxY; y++){
+                    if (id == access.getTypeId(x, y, z)){
+                    	return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Check if the given bounding box collides with a block of the given id, taking into account the actual bounds of the block. 
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param id
+     * @return
+     */
+    public static final boolean collidesBlock(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
+    	final int iMinX = Location.locToBlock(minX);
+    	final int iMaxX = Location.locToBlock(maxX);
+    	final int iMinY = Location.locToBlock(minY);
+    	final int iMaxY = Location.locToBlock(maxY);
+    	final int iMinZ = Location.locToBlock(minZ);
+    	final int iMaxZ = Location.locToBlock(maxZ);
+        for (int x = iMinX; x <= iMaxX; x++){
+            for (int z = iMinZ; z <= iMaxZ; z++){
+                for (int y = iMinY; y <= iMaxY; y++){
+                    if (id == access.getTypeId(x, y, z)){
+                    	if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
+                    		return true;
+                    	}
                     }
                 }
             }
@@ -1122,7 +1192,6 @@ public class BlockProperties {
         final Block block = Block.byId[id];
         block.updateShape(access, x, y, z);
         final double bmaxY;
-//        if ((blockFlags[id] & F_HEIGHT150) != 0) block.maxY = 1.5;
         if ((blockFlags[id] & F_HEIGHT150) != 0) bmaxY = 1.5;
         else if ((blockFlags[id] & F_HEIGHT100) != 0)  bmaxY = 1.0;
         else bmaxY = block.y(); // maxY
@@ -1148,9 +1217,15 @@ public class BlockProperties {
      * @return
      */
     public static final boolean isOnGround(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
-        for (int x = Location.locToBlock(minX); x <= Location.locToBlock(maxX); x++){
-            for (int z = Location.locToBlock(minZ); z <= Location.locToBlock(maxZ); z++){
-                for (int y = Location.locToBlock(minY - 0.5626); y <= Location.locToBlock(maxY); y++){
+    	final int iMinX = Location.locToBlock(minX);
+    	final int iMaxX = Location.locToBlock(maxX);
+    	final int iMinY = Location.locToBlock(minY - 0.5626);
+    	final int iMaxY = Location.locToBlock(maxY);
+    	final int iMinZ = Location.locToBlock(minZ);
+    	final int iMaxZ = Location.locToBlock(maxZ);
+        for (int x = iMinX; x <= iMaxX; x++){
+            for (int z = iMinZ; z <= iMaxZ; z++){
+                for (int y = iMinY; y <= iMaxY; y++){
                     final int id = access.getTypeId(x, y, z);
                     if ((blockFlags[id] & F_GROUND) != 0){
                         // Might collide.
