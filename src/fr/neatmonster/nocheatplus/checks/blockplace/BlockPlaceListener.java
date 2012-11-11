@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
@@ -164,17 +165,38 @@ public class BlockPlaceListener implements Listener {
          * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
          *                |___/                                                  
          */
-        // We are only interested by monster eggs.
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().getItemInHand() == null
-                || event.getPlayer().getItemInHand().getType() != Material.MONSTER_EGG)
-            return;
-
-        final Player player = event.getPlayer();
-
-        // Do the actual check...
-        if (speed.isEnabled(player) && speed.check(player))
-            // If the check was positive, cancel the event.
-            event.setCancelled(true);
+    	if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+    	final Player player = event.getPlayer();
+    	
+    	final ItemStack stack = player.getItemInHand();
+    	if (stack == null) return;
+    	
+    	final Material type = stack.getType();
+    	
+    	if (type == Material.BOAT){
+    		// Check boats-anywhere.
+        	final org.bukkit.block.Block block = event.getClickedBlock();
+        	final Material mat = block.getType();
+        	
+        	// TODO: allow lava ?
+        	if (mat == Material.WATER || mat == Material.STATIONARY_WATER) return;
+        	
+        	final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
+        	final Material relMat = relBlock.getType();
+        	
+        	if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) return;
+        	
+        	if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)){
+        		event.setCancelled(true);
+        	}
+            
+    	}
+    	else if (type == Material.MONSTER_EGG){
+    		// Check blockplace.speed.
+    		if (speed.isEnabled(player) && speed.check(player))
+                // If the check was positive, cancel the event.
+                event.setCancelled(true);
+    	} 
     }
 
     /**

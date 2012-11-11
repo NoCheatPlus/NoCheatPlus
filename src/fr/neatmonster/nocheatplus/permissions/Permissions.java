@@ -93,6 +93,7 @@ public class Permissions {
     public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
     public static final String  BLOCKPLACE_AGAINST_AIR       = BLOCKPLACE_AGAINST + ".air";
 	public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
+    public static final String  BLOCKPLACE_BOATSANYWHERE     = BLOCKPLACE + ".boatsanywhere";
     public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
     public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";
     public static final String  BLOCKPLACE_NOSWING           = BLOCKPLACE + ".noswing";
@@ -166,7 +167,6 @@ public class Permissions {
      *                                                "8",P"  
      */
     public static final String  MOVING                       = CHECKS + ".moving";
-    public static final String  MOVING_BOATSANYWHERE         = MOVING + ".boatsanywhere";
     public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";
     public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
     public static final String  MOVING_MOREPACKETSVEHICLE    = MOVING + ".morepacketsvehicle";

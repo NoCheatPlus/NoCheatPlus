@@ -106,6 +106,8 @@ permissions:
                                         description: Allow the player to place blocks against liquids.
                                     nocheatplus.checks.blockplace.against.air:
                                         description: Allow the player to place blocks against air.
+                            nocheatplus.checks.blockplace.boatsanywhere:
+                                description: Allow the player to place boats on the ground.
                             nocheatplus.checks.blockplace.direction:
                                 description: Allow the player to bypass to Direction check.
                             nocheatplus.checks.blockplace.fastplace:
@@ -170,8 +172,6 @@ permissions:
                     nocheatplus.checks.moving:
                         description: Allow the player to bypass all Moving checks.
                         children:
-                            nocheatplus.checks.moving.boatsanywhere:
-                                description: Allow the player to place boats on the ground.
                             nocheatplus.checks.moving.creativefly:
                                 description: Allow the player to bypass the CreativeFly check.
                             nocheatplus.checks.moving.morepackets:

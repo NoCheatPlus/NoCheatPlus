@@ -16,7 +16,6 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -25,7 +24,6 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -286,43 +284,6 @@ public class MovingListener implements Listener {
             data.clearFlyData();
             data.clearMorePacketsData();
         }
-    }
-
-    /**
-     * We listen to this event to cancel the placement of boat the ground. Boats are made to float on water, right?
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
-    public void onPlayerInteract(final PlayerInteractEvent event) {
-        /*
-         *  ____  _                         ___       _                      _   
-         * |  _ \| | __ _ _   _  ___ _ __  |_ _|_ __ | |_ ___ _ __ __ _  ___| |_ 
-         * | |_) | |/ _` | | | |/ _ \ '__|  | || '_ \| __/ _ \ '__/ _` |/ __| __|
-         * |  __/| | (_| | |_| |  __/ |     | || | | | ||  __/ | | (_| | (__| |_ 
-         * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
-         *                |___/                                                  
-         */
-    	// If the player right clicked on a non-liquid block with a boat in his hands, cancel the event.
-    	if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-    	
-    	final Player player = event.getPlayer();
-    	if (player.getItemInHand().getType() != Material.BOAT) return;
-    	if (event.getPlayer().hasPermission(Permissions.MOVING_BOATSANYWHERE)) return;
-    	
-    	final org.bukkit.block.Block block = event.getClickedBlock();
-    	final Material mat = block.getType();
-    	
-    	if (mat == Material.WATER || mat == Material.STATIONARY_WATER) return;
-    	
-    	final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
-    	final Material relMat = relBlock.getType();
-    	
-    	if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) return;
-    	 
-        event.setCancelled(true);
     }
 
     /**
