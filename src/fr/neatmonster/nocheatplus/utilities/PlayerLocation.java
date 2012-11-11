@@ -218,9 +218,9 @@ public class PlayerLocation {
 		if (aboveStairs == null) {
 			// aboveStairs =
 			// BlockProperties.isStairs(getTypeIdBelow().intValue());
-			// TODO: maybe distinguish upside down stairs and normal stairs !
-			final double diff = getWidth() + 0.001;
-			aboveStairs = BlockProperties.collides(getBlockAccess(), x - diff, y + 0.25, z - diff, x + diff, y - 1.0, z + diff, BlockProperties.F_STAIRS);
+			// TODO: Distinguish based on actual height off .0 ?
+			final double diff = 0.001;
+			aboveStairs = BlockProperties.collides(getBlockAccess(), minX - diff, minY - 1.0, minZ - diff, maxX + diff, minY + 0.25, maxZ + diff, BlockProperties.F_STAIRS);
 		}
 		return aboveStairs;
 	}
@@ -273,6 +273,7 @@ public class PlayerLocation {
 	public boolean isOnIce() {
 		if (onIce == null) {
 			final org.bukkit.entity.Player entity = this.entityPlayer.getBukkitEntity();
+			// TODO: Use a box here too ?
 			if (entity.isSneaking() || entity.isBlocking()) onIce = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ) == Material.ICE.getId();
 			else onIce = getTypeIdBelow().intValue() == Material.ICE.getId();
 		}
