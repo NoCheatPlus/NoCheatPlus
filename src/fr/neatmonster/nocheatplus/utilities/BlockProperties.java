@@ -1127,7 +1127,7 @@ public class BlockProperties {
     public static final boolean collidesId(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
-    	final int iMinY = Location.locToBlock(minY);
+    	final int iMinY = Location.locToBlock(minY - (blockFlags[id] & F_HEIGHT150) != 0 ? 0.5625 : 0);
     	final int iMaxY = Location.locToBlock(maxY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);
@@ -1158,7 +1158,7 @@ public class BlockProperties {
     public static final boolean collidesBlock(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
-    	final int iMinY = Location.locToBlock(minY);
+    	final int iMinY = Location.locToBlock(minY - (blockFlags[id] & F_HEIGHT150) != 0 ? 0.5625 : 0);
     	final int iMaxY = Location.locToBlock(maxY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);
