@@ -209,9 +209,10 @@ public class MovingListener implements Listener {
          *                |___/                                                          
          */
         final Player player = event.getPlayer();
-
-		if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY) && survivalFly.isEnabled(player)) {
-			final MovingData data = MovingData.getData(player);
+        final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        
+		if (shouldCheckSurvivalFly(player, data, cc)) {
 			// Check if the player has to be reset.
 			final Location target = survivalFly.checkBed(player, data);
 			// To cancel the event, we teleport the player.
@@ -248,10 +249,13 @@ public class MovingListener implements Listener {
          *                |___/                                     |___/                                          
          */
         // Maybe this helps with people teleporting through Multiverse portals having problems?
-        final MovingData data = MovingData.getData(event.getPlayer());
+    	final Player player = event.getPlayer();
+        final MovingData data = MovingData.getData(player);
         data.teleported = null;
         data.clearFlyData();
         data.clearMorePacketsData();
+        // TODO: Might omit this if neither check is activated.
+        data.setBack = player.getLocation();
     }
 
     /**
@@ -605,9 +609,7 @@ public class MovingListener implements Listener {
 		final MovingData data = MovingData.getData(player);
 		data.clearFlyData();
 		data.clearMorePacketsData();
-		if (survivalFly.isEnabled(player)) {
-			data.setBack = event.getRespawnLocation();
-		}
+		data.setBack = event.getRespawnLocation();
 	}
 	
 	/**
@@ -783,11 +785,11 @@ public class MovingListener implements Listener {
         if (!(entity instanceof Player)) return;
         final Player player = (Player) entity;
         final MovingData data = MovingData.getData(player);
-        if (event.isCancelled() || !survivalFly.isEnabled(player) || !noFall.isEnabled(player)){
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        if (event.isCancelled() || !shouldCheckSurvivalFly(player, data, cc) || !noFall.isEnabled(player)){
             data.clearNoFallData();
             return;
         }
-        final MovingConfig cc = MovingConfig.getConfig(player);
         final float fallDistance = player.getFallDistance();
         final int damage = event.getDamage();
         final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
@@ -806,16 +808,14 @@ public class MovingListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerJoin(final PlayerJoinEvent event) {
 		final Player player = event.getPlayer();
-		if (survivalFly.isEnabled(player)){
-			final MovingData data = MovingData.getData(player);
-			// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
-			if (data.setBack == null){
-				data.setBack = player.getLocation();
-			}
-			if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
-				// TODO: re-think: more fine grained reset?
-				data.resetPositions(data.setBack);
-			}
+		final MovingData data = MovingData.getData(player);
+		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
+		if (data.setBack == null){
+			data.setBack = player.getLocation();
+		}
+		if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
+			// TODO: re-think: more fine grained reset?
+			data.resetPositions(data.setBack);
 		}
 	}
     
@@ -838,5 +838,21 @@ public class MovingListener implements Listener {
 		if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
 			return 1D + mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
 		} else return 0D;
+	}
+	
+	/**
+	 * Heavier check, but convenient for seldom events (not for use in the player-move check).
+	 * @param player
+	 * @param data
+	 * @param cc
+	 * @return
+	 */
+	public final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc){
+		if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)) return false;
+		else if (!survivalFly.isEnabled(player)) return false;
+		else if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight())){
+			return true;
+		}
+		else return false;
 	}
 }
