@@ -1094,7 +1094,9 @@ public class BlockProperties {
     public static final boolean collides(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
-    	final int iMinY = Location.locToBlock(minY);
+    	// At least find fences etc. if searched for.
+    	// TODO: this is a bit difficult ...
+    	final int iMinY = Location.locToBlock(minY - (flags & F_HEIGHT150) != 0 ? 0.5625 : 0);
     	final int iMaxY = Location.locToBlock(maxY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);
