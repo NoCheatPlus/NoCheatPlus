@@ -6,13 +6,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import fr.neatmonster.nocheatplus.checks.CheckListener;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -40,7 +41,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * 
  * @see BlockBreakEvent
  */
-public class BlockBreakListener implements Listener {
+public class BlockBreakListener extends CheckListener {
 
     /** The direction check. */
     private final Direction direction = new Direction();
@@ -61,6 +62,10 @@ public class BlockBreakListener implements Listener {
     private final WrongBlock wrongBlock = new WrongBlock();
     
     private boolean isInstaBreak = false;
+    
+    public BlockBreakListener(){
+    	super(CheckType.BLOCKBREAK);
+    }
 
     /**
      * We listen to BlockBreak events for obvious reasons.

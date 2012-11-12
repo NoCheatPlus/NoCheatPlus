@@ -40,6 +40,7 @@ import fr.neatmonster.nocheatplus.command.CommandHandler;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.NCPListener;
 import fr.neatmonster.nocheatplus.components.NameSetPermState;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.PermStateReceiver;
@@ -606,7 +607,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	 * @return
 	 */
 	private Listener getCoreListener() {
-		return new Listener() {
+		return new NCPListener() {
 			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.HIGHEST)
 			public void onPlayerLogin(final PlayerLoginEvent event) {

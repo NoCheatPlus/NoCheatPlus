@@ -7,13 +7,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
+import fr.neatmonster.nocheatplus.checks.CheckListener;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -21,11 +22,12 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * @author mc_dev
  *
  */
-public class CombinedListener implements Listener {
+public class CombinedListener extends CheckListener {
 	
 	protected final Improbable improbable;
 
 	public CombinedListener(){
+		super(CheckType.COMBINED);
 		this.improbable = new Improbable();
 	}
 	

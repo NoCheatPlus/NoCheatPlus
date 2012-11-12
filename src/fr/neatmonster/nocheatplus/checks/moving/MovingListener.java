@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -36,6 +35,7 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
@@ -70,9 +70,9 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  * 
  * @see MovingEvent
  */
-public class MovingListener implements Listener {
+public class MovingListener extends CheckListener{
 
-    private static final class MoveInfo{
+	private static final class MoveInfo{
         public final PlayerLocation from = new PlayerLocation();
         public final PlayerLocation to = new PlayerLocation();
         public final BlockCache cache = new BlockCache();
@@ -116,6 +116,10 @@ public class MovingListener implements Listener {
      * TODO: Not sure this is needed by contract, might be better due to cascading events in case of actions.
      */
     private final List<MoveInfo> parkedInfo = new ArrayList<MoveInfo>(10);
+    
+    public MovingListener() {
+		super(CheckType.MOVING);
+	}
 
     /**
      * A workaround for players placing blocks below them getting pushed off the block by NoCheatPlus.

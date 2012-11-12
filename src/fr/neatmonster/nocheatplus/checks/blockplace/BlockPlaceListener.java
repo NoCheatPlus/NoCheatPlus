@@ -7,7 +7,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -15,6 +14,8 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.checks.CheckListener;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -42,7 +43,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
  * 
  * @see BlockPlaceEvent
  */
-public class BlockPlaceListener implements Listener {
+public class BlockPlaceListener extends CheckListener {
 
     /** The direction check. */
     private final Direction direction = new Direction();
@@ -58,6 +59,10 @@ public class BlockPlaceListener implements Listener {
 
     /** The speed check. */
     private final Speed     speed     = new Speed();
+    
+    public BlockPlaceListener(){
+    	super(CheckType.BLOCKPLACE);
+    }
 
     /**
      * We listen to BlockPlace events for obvious reasons.

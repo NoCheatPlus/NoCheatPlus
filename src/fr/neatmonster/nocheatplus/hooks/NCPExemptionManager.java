@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.components.NCPListener;
 
 /*
  * M"""""""`YM MM'""""'YMM MM"""""""`YM MM""""""""`M                                         dP   oo                   
@@ -119,7 +120,7 @@ public class NCPExemptionManager {
 	 * @return the listener
 	 */
 	public static Listener getListener() {
-		return new Listener() {
+		return new NCPListener() {
 			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.LOWEST)
 			public void onPlayerJoin(final PlayerJoinEvent event) {

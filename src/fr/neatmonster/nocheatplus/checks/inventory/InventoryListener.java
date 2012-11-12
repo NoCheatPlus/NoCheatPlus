@@ -7,7 +7,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -19,6 +18,8 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import fr.neatmonster.nocheatplus.checks.CheckListener;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 
@@ -45,7 +46,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
  * 
  * @see InventoryEvent
  */
-public class InventoryListener implements Listener {
+public class InventoryListener  extends CheckListener {
 
     /** The drop check. */
     private final Drop       drop       = new Drop();
@@ -60,6 +61,10 @@ public class InventoryListener implements Listener {
     private final InstantEat instantEat = new InstantEat();
     
     protected final Items items = new Items();
+    
+    public InventoryListener(){
+    	super(CheckType.INVENTORY);
+    }
 
     /**
      * We listen to EntityShootBow events for the InstantBow check.

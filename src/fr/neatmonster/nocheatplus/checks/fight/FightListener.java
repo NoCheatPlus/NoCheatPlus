@@ -5,7 +5,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -14,6 +13,8 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.checks.CheckListener;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
@@ -35,7 +36,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * 
  * @see FightEvent
  */
-public class FightListener implements Listener {
+public class FightListener extends CheckListener {
 
     /** The angle check. */
     private final Angle       angle       = new Angle();
@@ -63,6 +64,10 @@ public class FightListener implements Listener {
 
     /** The speed check. */
     private final Speed       speed       = new Speed();
+    
+    public FightListener(){
+    	super(CheckType.FIGHT);
+    }
 
     /**
      * A player attacked something with DamageCause ENTITY_ATTACK. That's most likely what we want to really check.

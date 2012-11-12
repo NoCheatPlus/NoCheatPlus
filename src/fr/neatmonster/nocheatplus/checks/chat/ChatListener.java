@@ -4,7 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -12,6 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
+import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
@@ -36,7 +36,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
  * 
  * @see ChatEvent
  */
-public class ChatListener implements Listener, INotifyReload {
+public class ChatListener extends CheckListener implements INotifyReload {
     
     // Checks.
     
@@ -66,8 +66,8 @@ public class ChatListener implements Listener, INotifyReload {
     /** Commands to be handled as chat. */
     private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree(); 
     
-    
     public ChatListener(){
+    	super(CheckType.CHAT);
     	ConfigFile config = ConfigManager.getConfigFile();
     	initFilters(config);
     	// (text inits in constructor.)

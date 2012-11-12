@@ -4,9 +4,11 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import fr.neatmonster.nocheatplus.checks.CheckListener;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /*
  * M#"""""""'M  dP                   dP       M""M            dP                                         dP   
@@ -30,13 +32,17 @@ import org.bukkit.event.player.PlayerInteractEvent;
  * 
  * @see BlockInteractEvent
  */
-public class BlockInteractListener implements Listener {
+public class BlockInteractListener extends CheckListener {
 
     /** The direction check. */
     private final Direction direction = new Direction();
 
     /** The reach check. */
     private final Reach     reach     = new Reach();
+    
+    public BlockInteractListener(){
+    	super(CheckType.BLOCKINTERACT);
+    }
 
     /**
      * We listen to PlayerInteractEvent events for obvious reasons.
