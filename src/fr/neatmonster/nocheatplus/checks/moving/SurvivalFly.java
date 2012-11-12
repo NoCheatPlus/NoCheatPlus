@@ -76,6 +76,7 @@ public class SurvivalFly extends Check {
 			// Violation ...
 			data.survivalFlyVL += 100D;
 			
+			// TODO: add tag
 
 			// And return if we need to do something or not.
 			if (executeActions(player, data.survivalFlyVL, 100D, MovingConfig.getConfig(player).survivalFlyActions)){
@@ -164,7 +165,7 @@ public class SurvivalFly extends Check {
 		// Note: here the normal speed checks must be  finished.
 		//////
 
-		// Prevent players from walking on a liquid.
+		// Prevent players from walking on a liquid in a too simple way.
 		// TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
 		if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround && to.getY() % 1D < 0.8D) {
 			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
@@ -180,7 +181,7 @@ public class SurvivalFly extends Check {
             	// Assumes permission check to be the heaviest (might be mistaken).
             	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)){
             		hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-            		tags.add("sprintback");
+            		tags.add("sprintback"); // Might add it anyway.
             	}
             }
         }
@@ -192,7 +193,7 @@ public class SurvivalFly extends Check {
 			// TODO: sharpen the pre-conditions (fromWasReset or distance to last on-ground position).
 			if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
 				data.bunnyhopDelay = bunnyHopMax;
-				hDistanceAboveLimit = 0D;
+				hDistanceAboveLimit = 0D; // TODO: maybe relate buffer use to this + sprinting ?
 				tags.add("bunny"); // TODO: Which here...
 			}
 		}
@@ -292,6 +293,7 @@ public class SurvivalFly extends Check {
         data.sfJumpPhase++;
 
 		if (cc.debug) {
+			// TODO: also show resetcond (!)
 			StringBuilder builder = new StringBuilder(500);
 			builder.append(player.getName() + " vfreedom: " +  CheckUtils.fdec3.format(data.verticalFreedom) + " (vv=" +  CheckUtils.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
 			builder.append(player.getName() + " hDist: " + CheckUtils.fdec3.format(hDistance) + " / " +  CheckUtils.fdec3.format(hAllowedDistance) + " , vDist: " +  CheckUtils.fdec3.format(yDistance) + " / " +  CheckUtils.fdec3.format(vAllowedDistance) + "\n");
@@ -338,7 +340,6 @@ public class SurvivalFly extends Check {
 	private boolean lostGround(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
 		// Don't set "useWorkaround = x()", to avoid potential trouble with
 		// reordering to come, and similar.
-		final double setBackYDistance = to.getY() - data.setBack.getY();
 		boolean useWorkaround = false;
 		boolean setBackSafe = false; // Let compiler remove this if necessary.
 		// Check for moving off stairs.
@@ -348,9 +349,9 @@ public class SurvivalFly extends Check {
 		}
 		// Check for "lost touch", for when moving events were not created,
 		// for instance (1/256).
-		if (!useWorkaround && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0 
-				&& setBackYDistance > 0D && setBackYDistance <= 1.5D) {
-			if (data.fromX != Double.MAX_VALUE) {
+		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0) {
+			final double setBackYDistance = to.getY() - data.setBack.getY();
+			if (setBackYDistance > 0D && setBackYDistance <= 1.5D) {
 				// Interpolate from last to-coordinates to the from
 				// coordinates (with some safe-guard).
 				final double dX = from.getX() - data.fromX;
