@@ -301,6 +301,7 @@ public class PlayerLocation {
 	 */
 	public boolean isAboveLadder() {
 		final int typeId = getTypeIdBelow();
+		// TODO: bounding box ...
 		return typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
 	}
 
@@ -487,15 +488,17 @@ public class PlayerLocation {
 		pitch = location.getPitch();
 
 		// Set bounding box.
-		final double dX = x - entityPlayer.locX;
-		final double dY = y - entityPlayer.locY;
-		final double dZ = z - entityPlayer.locZ;
-		minX = entityPlayer.boundingBox.a + dX;
-		minY = entityPlayer.boundingBox.b + dY;
-		minZ = entityPlayer.boundingBox.c + dZ;
-		maxX = entityPlayer.boundingBox.d + dX;
-		maxY = entityPlayer.boundingBox.e + dY;
-		maxZ = entityPlayer.boundingBox.f + dZ;
+//		final double dX = x - entityPlayer.locX;
+//		final double dY = y - entityPlayer.locY;
+//		final double dZ = z - entityPlayer.locZ;
+		// TODO: inset, outset ?
+		final double dxz = entityPlayer.width/2;
+		minX = x - dxz; //entityPlayer.boundingBox.a + dX;
+		minY = y; // entityPlayer.boundingBox.b + dY;
+		minZ = z - dxz; //entityPlayer.boundingBox.c + dZ;
+		maxX = x + dxz; //entityPlayer.boundingBox.d + dX;
+		maxY = y + player.getEyeHeight(); // entityPlayer.boundingBox.e + dY;
+		maxZ = z + dxz; //entityPlayer.boundingBox.f + dZ;
 
 		// Set world / block access.
 		world = location.getWorld();
