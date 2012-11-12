@@ -1179,7 +1179,7 @@ public class BlockProperties {
     }
     
     /**
-     * Check if the bounds collide with the block for the given type id.
+     * Check if the bounds collide with the block for the given type id at the given position.
      * @param access
      * @param minX
      * @param minY
@@ -1193,16 +1193,28 @@ public class BlockProperties {
         // TODO: use internal block data unless delegation wanted?
         final Block block = Block.byId[id];
         block.updateShape(access, x, y, z);
-        final double bmaxY;
-        if ((blockFlags[id] & F_HEIGHT150) != 0) bmaxY = 1.5;
-        else if ((blockFlags[id] & F_HEIGHT100) != 0)  bmaxY = 1.0;
-        else bmaxY = block.y(); // maxY
-//        if (minX > block.maxX + x || maxX < block.minX + x) return false;
-//        else if (minY > block.maxY + y || maxY < block.minY + y) return false;
-//        else if (minZ > block.maxZ + z || maxZ < block.minZ + z) return false;
-        if (minX > block.w() + x || maxX < block.v() + x) return false;
-        else if (minY > bmaxY + y || maxY < block.x() + y) return false;
-        else if (minZ > block.A() + z || maxZ < block.z() + z) return false;
+        final long flags = blockFlags[id];
+        final double bminX, bminZ, bminY;
+        final double bmaxX, bmaxY, bmaxZ;
+        bmaxX = block.w(); // maxX
+        bmaxZ = block.A(); // maxZ
+        if ((flags & F_STAIRS) != 0){
+        	// Mainly for on ground style checks, would not go too well with passable.
+        	// TODO: change this to something like F_FULLBOX probably.
+        	bminX = bminY = bminZ = 0D;
+        	bmaxY = 1D;
+        }
+        else{
+        	bminX = block.v(); // minX
+        	bminY = block.x(); // minY
+        	bminZ = block.z(); // minZ
+            if (( flags & F_HEIGHT150) != 0) bmaxY = 1.5;
+            else if ((flags & F_HEIGHT100) != 0) bmaxY = 1.0;
+            else bmaxY = block.y(); // maxY
+        }
+        if (minX > bmaxX + x || maxX < bminX + x) return false;
+        else if (minY > bmaxY + y || maxY < bminY + y) return false;
+        else if (minZ > bmaxZ + z || maxZ < bminZ + z) return false;
 
         else return true;
     }
