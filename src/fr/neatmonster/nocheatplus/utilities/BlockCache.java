@@ -68,7 +68,7 @@ public class BlockCache implements IBlockAccess{
         dataMap.clear();
     }
     
-    
+    @Override
 	public int getTypeId(final int x, final int y, final int z) {
 		final Integer pId = idMap.get(x, y, z);
 		if (pId != null) return pId;
@@ -77,6 +77,7 @@ public class BlockCache implements IBlockAccess{
 		return nId;
 	}
 
+    @Override
 	public int getData(final int x, final int y, final int z) {
 		final Integer pData = dataMap.get(x, y, z);
 		if (pData != null) return pData;
