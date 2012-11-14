@@ -325,7 +325,7 @@ public class PlayerLocation {
 	 */
 	public boolean isOnGround() {
 		if (onGround == null) {
-			final double d0 = 0.01D;
+			final double d0 = 0; //0.001D;
 			onGround = BlockProperties.isOnGround(getBlockAccess(), minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
 			if (!onGround) {
 				// TODO: Probably check other ids too before doing this ?
@@ -491,14 +491,24 @@ public class PlayerLocation {
 //		final double dX = x - entityPlayer.locX;
 //		final double dY = y - entityPlayer.locY;
 //		final double dZ = z - entityPlayer.locZ;
-		// TODO: inset, outset ?
+//		minX = x - entityPlayer.boundingBox.a + dX;
+//		minY = y - entityPlayer.boundingBox.b + dY;
+//		minZ = z - entityPlayer.boundingBox.c + dZ;
+//		maxX = x + entityPlayer.boundingBox.d + dX;
+//		maxY = y + entityPlayer.boundingBox.e + dY;
+//		maxZ = z + entityPlayer.boundingBox.f + dZ;
+//		// TODO: inset, outset ?
 		final double dxz = entityPlayer.width/2;
-		minX = x - dxz; //entityPlayer.boundingBox.a + dX;
-		minY = y; // entityPlayer.boundingBox.b + dY;
-		minZ = z - dxz; //entityPlayer.boundingBox.c + dZ;
-		maxX = x + dxz; //entityPlayer.boundingBox.d + dX;
-		maxY = y + player.getEyeHeight(); // entityPlayer.boundingBox.e + dY;
-		maxZ = z + dxz; //entityPlayer.boundingBox.f + dZ;
+//		final double dX = (entityPlayer.boundingBox.d - entityPlayer.boundingBox.a) / 2D;
+//		final double dY = entityPlayer.boundingBox.e - entityPlayer.boundingBox.b;
+//		final double dZ = (entityPlayer.boundingBox.f - entityPlayer.boundingBox.c) / 2D;
+		minX = x - dxz;
+		minY = y;
+		minZ = z - dxz;
+		maxX = x + dxz;
+		maxY = y + player.getEyeHeight();
+		maxZ = z + dxz;
+		// TODO: With current bounding box the stance is never checked.
 
 		// Set world / block access.
 		world = location.getWorld();
