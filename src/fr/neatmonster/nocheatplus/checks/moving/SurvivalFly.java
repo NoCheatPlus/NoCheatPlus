@@ -201,19 +201,19 @@ public class SurvivalFly extends Check {
 
 		final boolean resetTo = toOnGround || to.isResetCond();
 		
-		if (cc.survivalFlyAccountingH && !resetFrom && !resetTo) {
-			// Currently only for "air" phases.
-			// Horizontal.
-			if (data.horizontalFreedom <= 0.001D) {
-				// This only checks general speed decrease once velocity is smoked up.
-				// TODO: account for bunny-hop
-				if (hDistance != 0.0) hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
-			} else {
-				// TODO: Just to exclude source of error, might be redundant.
-				data.hDistCount.clear(now);
-				data.hDistSum.clear(now);
-			}
-		}
+//		if (cc.survivalFlyAccountingH && !resetFrom && !resetTo) {
+//			// Currently only for "air" phases.
+//			// Horizontal.
+//			if (data.horizontalFreedom <= 0.001D) {
+//				// This only checks general speed decrease once velocity is smoked up.
+//				// TODO: account for bunny-hop
+//				if (hDistance != 0.0) hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
+//			} else {
+//				// TODO: Just to exclude source of error, might be redundant.
+//				data.hDistCount.clear(now);
+//				data.hDistSum.clear(now);
+//			}
+//		}
 
 		// Horizontal buffer.
 		if (hDistanceAboveLimit > 0D && data.sfHorizontalBuffer != 0D) {
@@ -521,7 +521,7 @@ public class SurvivalFly extends Check {
 			}
 			else if (data.verticalFreedom <= 0.001D) {
 				// Here yDistance can be negative and positive (!).
-				if (yDistance != 0D) vDistanceAboveLimit = Math.max(vDistanceAboveLimit, doAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc"));
+				if (yDistance != 0D) vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc"));
 			}
 			else{
 				// TODO: Just to exclude source of error, might be redundant.
@@ -535,7 +535,7 @@ public class SurvivalFly extends Check {
 	/**
 	 * Keep track of values, demanding that with time the values decrease.<br>
 	 * The ActionFrequency objects have 3 buckets, bucket 1 is checked against
-	 * bucket 2, 0 is ignored.
+	 * bucket 2, 0 is ignored. [Vertical accounting.]
 	 * 
 	 * @param now
 	 * @param value
@@ -545,7 +545,7 @@ public class SurvivalFly extends Check {
 	 * @param tag
 	 * @return absolute difference on violation.;
 	 */
-	private static final double doAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
+	private static final double verticalAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
 	{
 		sum.add(now, (float) value);
 		count.add(now, 1f);
@@ -554,7 +554,11 @@ public class SurvivalFly extends Check {
 			final float sc1 = sum.bucketScore(1);
 			final float sc2 = sum.bucketScore(2);
 			final double diff = sc1 - sc2;
-			if (diff > 0 || value > -3.9 && diff == 0) {
+			if (diff > 0 || value > -1.5 && diff == 0) {
+				if (value < -1.5 && (Math.abs(diff) < Math.abs(value) || sc2 < - 10)){
+					tags.add(tag+"grace");
+					return 0;
+				}
 				tags.add(tag);
 				return diff;
 			}
