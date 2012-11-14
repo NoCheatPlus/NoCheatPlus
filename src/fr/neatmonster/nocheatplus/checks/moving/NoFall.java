@@ -16,6 +16,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -98,6 +99,8 @@ public class NoFall extends Check {
     	// TODO: account for player.getLocation.getY (how exactly ?)
 		final double yDiff = toY - fromY;
 		
+		final double oldNFDist = data.noFallFallDistance;
+		
 		// Adapt yOnGround if necessary (sf uses another setting).
 		if (yDiff < 0) {
 			// In fact this is somewhat heuristic, but it seems to work well.
@@ -139,7 +142,10 @@ public class NoFall extends Check {
         }
         else if (toOnGround){
             // Check if to deal damage.
-            if (yDiff < 0) data.noFallFallDistance -= yDiff;
+            if (yDiff < 0){
+            	// In this case the player has traveled further: add the difference.
+            	data.noFallFallDistance -= yDiff;
+            }
             if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc);
             else{
                 mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY)));
@@ -147,7 +153,7 @@ public class NoFall extends Check {
             }
         }
         else{
-            // Ensure fall distance is correct ? or anyway !
+            // Ensure fall distance is correct, or "anyway"?
         }
         
         // Set reference y for nofall (always).
@@ -156,13 +162,14 @@ public class NoFall extends Check {
         
         // TODO: fall distance might be behind (!)
         // TODO: should be the data.noFallMaxY be counted in ?
-        if (cc.debug) System.out.println(player.getName() + " NoFall: mc="+mcPlayer.fallDistance +" / nf=" + data.noFallFallDistance);
         data.noFallFallDistance = Math.max(mcPlayer.fallDistance, data.noFallFallDistance);
         
         // Add y distance.
         if (!toReset && !toOnGround && yDiff < 0){
             data.noFallFallDistance -= yDiff;
         }
+        
+        if (cc.debug) System.out.println(player.getName() + " NoFall: mc=" + CheckUtils.fdec3.format(mcPlayer.fallDistance) +" / nf=" + CheckUtils.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + CheckUtils.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
         
     }
     
