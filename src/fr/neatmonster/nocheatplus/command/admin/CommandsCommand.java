@@ -37,7 +37,7 @@ public class CommandsCommand extends NCPCommand {
 		String all = TAG + "All commands info:\n";
 		Command cmd = plugin.getCommand("nocheatplus");
 		if (cmd != null){
-			all += cmd.getUsage().replace("<command>", "ncp") + "\n";
+			all += cmd.getUsage().replace("<command>", "ncp") + "Auxiliary commands (actions):\n";
 		}
 		all += CheckUtils.join(Arrays.asList(moreCommands), "\n");
 		allCommands = all;

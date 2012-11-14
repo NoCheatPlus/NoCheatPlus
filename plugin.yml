@@ -14,6 +14,7 @@ commands:
         description: NoCheatPlus command(s).
         # permissions: nocheatplus.admin.(...)
         usage: |
+               Administrative commands overview:
                /<command> reload: reload NoCheatPlus configuration
                /<command> info (player): Display the violations of a player
                /<command> removeplayer (player) [(check type)]: Remove data
