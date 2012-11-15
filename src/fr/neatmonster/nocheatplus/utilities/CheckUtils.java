@@ -350,6 +350,6 @@ public class CheckUtils {
 	
 	public static void onIllegalMove(final Player player){
 		player.kickPlayer("Illegal move.");
-		logWarning("[NCP] Disconnect " + player.getName() + " due to illegal move!");
+		LogUtil.logWarning("[NCP] Disconnect " + player.getName() + " due to illegal move!");
 	}
 }

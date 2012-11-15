@@ -288,7 +288,7 @@ public class PlayerLocation {
 	public boolean isOnClimbable() {
 		if (onClimbable == null) {
 			// Climbable blocks.
-			onClimbable = typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
+			onClimbable = getTypeId() == Material.LADDER.getId() || typeId == Material.VINE.getId();
 			// TODO: maybe use specialized bounding box.
 //			final double d = 0.1d;
 //			onClimbable = BlockProperties.collides(getBlockAccess(), minX - d, minY - d, minZ - d, maxX + d, minY + 1.0, maxZ + d, BlockProperties.F_CLIMBABLE);
@@ -546,7 +546,7 @@ public class PlayerLocation {
 		if (entityPlayer.dead) return false;
 		if (!entityPlayer.isSleeping()){
 			// This can not really test stance but height of bounding box.
-			final double dY = Math.abs(maxY - minY);
+			final double dY = Math.abs(entityPlayer.boundingBox.e - entityPlayer.boundingBox.b);
 			if (dY > 1.8) return true; // dY > 1.65D || 
 			if (dY < 0.1D) return true;
 		}
