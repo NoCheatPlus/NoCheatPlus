@@ -45,6 +45,8 @@ public class SurvivalFly extends Check {
 	public static final double swimmingSpeed    = 0.11D;
 	public static final double webSpeed         = 0.105D; // TODO: walkingSpeed * 0.15D; <- does not work
 	
+//	public static final double climbSpeed      = sprintingSpeed; // TODO.
+	
 	public static final double modIce			= 2.5D;
 	
 	/** Faster moving down stream (water mainly). */
@@ -248,8 +250,50 @@ public class SurvivalFly extends Check {
         	}
         	if (vDistanceAboveLimit > 0) tags.add("vweb");
         }
-        // else if (verticalFreedom <= 0.001 && from.isOnLadder) ....
-        // else if (verticalFreedom <= 0.001 (?) & from.isInFluid
+//        else if (data.verticalFreedom <= 0.001 && from.isOnClimbable()){
+//        	// Ladder types.
+//        	// TODO: make these extra checks to the jumpphase thing ?
+//        	if (fromOnGround) vAllowedDistance = climbSpeed + 0.3;
+//        	else vAllowedDistance = climbSpeed;
+//        	vDistanceAboveLimit = Math.abs(yDistance) - vAllowedDistance;
+//        	if (vDistanceAboveLimit > 0) tags.add("vclimb");
+//        }
+//        else if (data.verticalFreedom <= 0.001 && from.isInLiquid()){
+//        	// Swimming...
+//        	// TODO: This is more complex, depends on speed of diving into it.
+//        	if (yDistance >= 0){
+//        		// TODO: This is more simple to test.
+//        		if (!to.isInLiquid()){
+//            		vAllowedDistance = swimmingSpeed + 0.3;
+//        		}
+//        		else{
+//            		vAllowedDistance = swimmingSpeed;
+//
+//        		}
+//        		vDistanceAboveLimit = yDistance - vAllowedDistance;
+//        		if (vDistanceAboveLimit > 0) tags.add("swimup");
+//        	}
+//        	else{
+//        		// TODO
+//        		if (-yDistance > swimmingSpeed * modDownStream){
+//        			if (data.sfLastYDist != Double.MAX_VALUE && yDistance - swimmingSpeed <= data.sfLastYDist){
+//        				// Expect to get less as much as swimming speed (heuristic).
+//        				vAllowedDistance = Math.abs(data.sfLastYDist) - swimmingSpeed; // Just for reference.
+//        				vDistanceAboveLimit = -yDistance - swimmingSpeed; // TODO
+//        				if (vDistanceAboveLimit > 0) tags.add("swimdown");
+//        			}
+//        			else{
+//        				// Ignore.
+//        				vDistanceAboveLimit = 0;
+//        				vAllowedDistance = Math.abs(yDistance);
+//        			}
+//        		} else{
+//        			// Ignore.
+//    				vDistanceAboveLimit = 0;
+//    				vAllowedDistance = Math.abs(yDistance);
+//        		}
+//        	}
+//        }
         else{
         	// Check traveled y-distance, orientation is air + jumping + velocity (as far as it gets).
         	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;

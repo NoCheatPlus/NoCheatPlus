@@ -269,6 +269,8 @@ public class BlockProperties {
      * NOTE: This should later be ignored by passable, rather.
      */
     public static final int F_HEIGHT100     = 0x100;
+    /** Climbable like ladder and vine (allow to land on without taking damage). */
+    public static final int F_CLIMBABLE     = 0x200;
     
 	static{
 		init();
@@ -360,6 +362,12 @@ public class BlockProperties {
                 Material.NETHER_FENCE,
         }){
             blockFlags[mat.getId()] |= F_HEIGHT150;
+        }
+        // Climbable
+        for (final Material mat : new Material[]{
+                Material.VINE, Material.LADDER,
+        }){
+            blockFlags[mat.getId()] |= F_CLIMBABLE;
         }
         // Workarounds.
         for (final Material mat : new Material[]{
@@ -1023,7 +1031,7 @@ public class BlockProperties {
     }
     
     /**
-     * 
+     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
      * @param box
      * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
      * @return If any block has the flags.
@@ -1033,7 +1041,7 @@ public class BlockProperties {
     }
     
     /**
-     * 
+     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
      * @param minX
      * @param minY
      * @param minZ
@@ -1049,7 +1057,7 @@ public class BlockProperties {
 
     
     /**
-     * 
+     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
      * @param minX
      * @param minY
      * @param minZ

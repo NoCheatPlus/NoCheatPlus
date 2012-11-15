@@ -72,7 +72,7 @@ public class PlayerLocation {
 	private Boolean onIce;
 
 	/** Is the player on ladder? */
-	private Boolean onLadder;
+	private Boolean onClimbable;
 
 	/** Simple test if the exact position is passable. */
 	private Boolean passable;
@@ -285,12 +285,15 @@ public class PlayerLocation {
 	 * 
 	 * @return If so.
 	 */
-	public boolean isOnLadder() {
-		if (onLadder == null) {
-			final int typeId = getTypeId();
-			onLadder = typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
+	public boolean isOnClimbable() {
+		if (onClimbable == null) {
+			// Climbable blocks.
+			onClimbable = typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
+			// TODO: maybe use specialized bounding box.
+//			final double d = 0.1d;
+//			onClimbable = BlockProperties.collides(getBlockAccess(), minX - d, minY - d, minZ - d, maxX + d, minY + 1.0, maxZ + d, BlockProperties.F_CLIMBABLE);
 		}
-		return onLadder;
+		return onClimbable;
 	}
 
 	/**
@@ -357,7 +360,7 @@ public class PlayerLocation {
 	 */
 	public boolean isResetCond(){
 		// NOTE: if optimizing, setYOnGround has to be kept in mind. 
-		return isInLiquid()  || isOnLadder() || isInWeb();
+		return isInLiquid()  || isOnClimbable() || isInWeb();
 	}
 
 	public double getyOnGround() {
@@ -516,7 +519,7 @@ public class PlayerLocation {
 
 		// Reset cached values.
 		typeId = typeIdBelow = data = null;
-		aboveStairs = inLava = inWater = inWeb = onGround = onIce = onLadder = passable = null;
+		aboveStairs = inLava = inWater = inWeb = onGround = onIce = onClimbable = passable = null;
 
 		// TODO: Consider blockCache.setAccess? <- currently rather not, because
 		// it might be anything.

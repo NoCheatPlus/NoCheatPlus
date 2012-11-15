@@ -54,7 +54,7 @@ public class Critical extends Check {
 
         // Check if the hit was a critical hit (positive fall distance, entity in the air, not on ladder, not in liquid
         // and without blindness effect).
-        if (player.getFallDistance() > 0f && !location.isOnGround() && !location.isOnLadder() && !location.isInLiquid()
+        if (player.getFallDistance() > 0f && !location.isOnGround() && !location.isOnClimbable() && !location.isInLiquid()
                 && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
             // It was a critical hit, now check if the player has jumped or has sent a packet to mislead the server.
             if (player.getFallDistance() < cc.criticalFallDistance
