@@ -102,14 +102,6 @@ public class BlockCache implements IBlockAccess{
         return access.getTileEntity(arg0, arg1, arg2);
     }
 
-    /**
-     * Not optimized.
-     */
-    @Override
-    public boolean s(int arg0, int arg1, int arg2) {
-        return access.s(arg0, arg1, arg2);
-    }
-
     @Override
     public Vec3DPool getVec3DPool() {
         return access.getVec3DPool();
@@ -119,5 +111,10 @@ public class BlockCache implements IBlockAccess{
     public boolean isBlockFacePowered(int arg0, int arg1, int arg2, int arg3) {
         return access.isBlockFacePowered(arg0, arg1, arg2, arg3);
     }
+
+	@Override
+	public boolean t(int arg0, int arg1, int arg2) {
+		return access.t(arg0, arg1, arg2);
+	}
     
 }
