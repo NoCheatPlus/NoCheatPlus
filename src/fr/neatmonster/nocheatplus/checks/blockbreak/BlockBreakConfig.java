@@ -79,7 +79,7 @@ public class BlockBreakConfig extends ACheckConfig {
 	public final int        fastBreakBuckets;
 	public final long       fastBreakBucketDur;
 	public final float      fastBreakBucketFactor;
-	public final long       fastBreakBucketContention;
+	public final long       fastBreakGrace;
 	public final long       fastBreakDelay;	
 	public final int        fastBreakModSurvival;
 	public final int        fastBreakModCreative;
@@ -125,7 +125,7 @@ public class BlockBreakConfig extends ACheckConfig {
         // Hidden settings of new check.
         fastBreakDebug = data.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false);
         fastBreakDelay = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY);
-        fastBreakBucketContention = data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION, 2000);
+        fastBreakGrace = Math.max(data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION, 2000), data.getLong(ConfPaths.BLOCKBREAK_FASTBREAK_GRACE));
         fastBreakBucketDur = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_DUR, 4000);
         fastBreakBucketFactor = (float) data.getDouble(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR, 0.99);
         fastBreakBuckets = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_N, 30);
