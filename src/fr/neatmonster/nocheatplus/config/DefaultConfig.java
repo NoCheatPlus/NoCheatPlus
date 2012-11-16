@@ -128,7 +128,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel");
 
         set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
-        set(ConfPaths.BLOCKPLACE_FASTPLACE_EXPERIMENTAL, true);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 95L);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, "cancel vl>100 log:fastplace:3:5:cif cancel");
 

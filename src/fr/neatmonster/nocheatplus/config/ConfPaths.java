@@ -153,7 +153,6 @@ public abstract class ConfPaths {
 
     private static final String BLOCKPLACE_FASTPLACE                     = BLOCKPLACE + "fastplace.";
     public static final String  BLOCKPLACE_FASTPLACE_CHECK               = BLOCKPLACE_FASTPLACE + "active";
-    public static final String  BLOCKPLACE_FASTPLACE_EXPERIMENTAL        = BLOCKPLACE_FASTPLACE + "experimental";
     public static final String  BLOCKPLACE_FASTPLACE_INTERVAL            = BLOCKPLACE_FASTPLACE + "interval";
     public static final String  BLOCKPLACE_FASTPLACE_ACTIONS             = BLOCKPLACE_FASTPLACE + "actions";
 

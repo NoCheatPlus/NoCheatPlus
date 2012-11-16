@@ -75,7 +75,6 @@ public class BlockPlaceConfig extends ACheckConfig {
     public final ActionList directionActions;
 
     public final boolean    fastPlaceCheck;
-    public final boolean    fastPlaceExperimental;
     public final long       fastPlaceInterval;
     public final ActionList fastPlaceActions;
 
@@ -101,7 +100,6 @@ public class BlockPlaceConfig extends ACheckConfig {
         directionActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
 
         fastPlaceCheck = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK);
-        fastPlaceExperimental = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_EXPERIMENTAL);
         fastPlaceInterval = data.getLong(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL);
         fastPlaceActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
 
