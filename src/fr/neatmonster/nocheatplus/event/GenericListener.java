@@ -31,6 +31,9 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 		 *
 		 */
 		public static class MethodOrder{
+			public static final MethodOrder getMethodOrder(fr.neatmonster.nocheatplus.event.MethodOrder anno){
+				return anno.beforeTag().isEmpty() ? null : new MethodOrder(anno.beforeTag());
+			}
 			public final String beforeTag;
 			/**
 			 * You can use regular expressions for beforeTag, so it will be checked from position 0 on.<br>

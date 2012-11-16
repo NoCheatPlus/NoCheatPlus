@@ -106,16 +106,19 @@ public class ListenerManager {
 	/**
 	 * This registers all methods that have the @EventHandler annotation.<br>
 	 * Interfaces checked if arguments are not given: IHaveMethodOrder (order), ComponentWithName (tag)<br>
-	 * NOTE: Does not do any super class checking.
+	 * NOTES: <br>
+	 * - Does not do any super class checking.<br>
+	 * - Given MethodOrder overridden by implementing IHaveMethodOrder overridden by per method @MethodOrder annotations.<br>
+	 * - Given tag overridden by Listener implementing ComponentWithName overridden by per method @MEthodOrder annotations.<br> 
 	 * @param listener
-	 * @param tag Identifier for the registering plugin / agent, null is not discouraged, but null entries are ignored concerning sortin order.
+	 * @param tag Identifier for the registering plugin / agent, null is not discouraged, but null entries are ignored concerning sorting order.
 	 * @param order Allows to register before other tags or just first. Expect MethodOrder to change in near future. The method order of already registered methods will not be compared to.
 	 */
 	public void registerAllEventHandlers(Listener listener, String tag, MethodOrder order){
-		if (order == null && listener instanceof IHaveMethodOrder){
+		if (listener instanceof IHaveMethodOrder){
 			order = ((IHaveMethodOrder) listener).getMethodOrder();
 		}
-		if (tag == null && listener instanceof ComponentWithName){
+		if (listener instanceof ComponentWithName){
 			// TODO: maybe change to an interface only defined here. 
 			tag = ((ComponentWithName) listener).getComponentName();
 		}
@@ -149,7 +152,15 @@ public class ListenerManager {
 				continue;
 			}
 			Class<? extends Event> checkedEventType = eventType.asSubclass(Event.class);
-			getListener(checkedEventType, anno.priority()).addMethodEntry(new MethodEntry(listener, method, anno.ignoreCancelled(), tag, order));
+			MethodOrder tempOrder = order;
+			String tempTag = tag;
+			fr.neatmonster.nocheatplus.event.MethodOrder orderAnno = method.getAnnotation(fr.neatmonster.nocheatplus.event.MethodOrder.class);
+			if (orderAnno != null){
+				MethodOrder veryTempOrder = tempOrder = MethodOrder.getMethodOrder(orderAnno);
+				if (veryTempOrder != null) tempOrder = veryTempOrder;
+				if (!orderAnno.tag().isEmpty()) tempTag = orderAnno.tag();
+			}
+			getListener(checkedEventType, anno.priority()).addMethodEntry(new MethodEntry(listener, method, anno.ignoreCancelled(), tempTag, tempOrder));
 		}
 	}
 
