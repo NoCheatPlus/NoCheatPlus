@@ -13,6 +13,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
@@ -234,7 +235,7 @@ public class InventoryListener  extends CheckListener {
      *            the event
      */
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
-    public void onPlayerInteractEvent(final PlayerInteractEvent event) {
+    public final void onPlayerInteract(final PlayerInteractEvent event) {
         /*
          *  ____  _                         ___       _                      _   
          * |  _ \| | __ _ _   _  ___ _ __  |_ _|_ __ | |_ ___ _ __ __ _  ___| |_ 
@@ -280,6 +281,14 @@ public class InventoryListener  extends CheckListener {
             data.instantEatInteract = 0;
             data.instantEatFood = null;
         }
+    }
+    
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    public final void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
+    	final ItemStack stack = event.getPlayer().getItemInHand();
+    	if (stack != null && stack.getTypeId() == Material.MONSTER_EGG.getId()){
+    		event.setCancelled(true);
+    	}
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
