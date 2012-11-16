@@ -331,23 +331,28 @@ public class PlayerLocation {
 			final double d0 = 0; //0.001D;
 			onGround = BlockProperties.isOnGround(getBlockAccess(), minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
 			if (!onGround) {
-				// TODO: Probably check other ids too before doing this ?
-				final double d1 = 0.25D;
-				final AxisAlignedBB box = useBox.b(minX - d1, minY - getyOnGround() - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
-				@SuppressWarnings("rawtypes")
-				final List list = worldServer.getEntities(entityPlayer, box);
-				@SuppressWarnings("rawtypes")
-				Iterator iterator = list.iterator();
-				while (iterator.hasNext()) {
-					final Entity entity = (Entity) iterator.next();
-					final EntityType type = entity.getBukkitEntity().getType();
-					if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
-					final AxisAlignedBB otherBox = entity.boundingBox;
-					if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
-					else {
-						onGround = true;
-						break;
+				try{
+					// TODO: Probably check other ids too before doing this ?
+					final double d1 = 0.25D;
+					final AxisAlignedBB box = useBox.b(minX - d1, minY - getyOnGround() - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
+					@SuppressWarnings("rawtypes")
+					final List list = worldServer.getEntities(entityPlayer, box);
+					@SuppressWarnings("rawtypes")
+					Iterator iterator = list.iterator();
+					while (iterator.hasNext()) {
+						final Entity entity = (Entity) iterator.next();
+						final EntityType type = entity.getBukkitEntity().getType();
+						if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
+						final AxisAlignedBB otherBox = entity.boundingBox;
+						if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
+						else {
+							onGround = true;
+							break;
+						}
 					}
+				}
+				catch (Throwable t){
+					// Ignore exceptions (Context: DisguiseCraft).
 				}
 			}
 		}

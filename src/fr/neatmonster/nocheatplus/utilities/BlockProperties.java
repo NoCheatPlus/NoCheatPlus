@@ -884,12 +884,20 @@ public class BlockProperties {
 
 	/**
 	 * Hiding the API access here.<br>
-	 * TODO: Find description of this and use block properties from here, as well as a speaking method name.
+	 * TODO: Find description of this and use block properties from here, as well as a speaking method name.<br>
+	 * Assumption: This is something like "can stand on this type of block".
 	 * @param id
 	 * @return
 	 */
 	public static final boolean i(final int id) {
-		return Block.i(id);
+		// TODO: Replace by independent method.
+		try{
+			return Block.i(id);
+		}
+		catch(Throwable t){
+			// Minecraft default value.
+			return true;
+		}
 	}
 	
 	public static final long getBLockFlags(final int id){
