@@ -285,7 +285,9 @@ public class InventoryListener  extends CheckListener {
     
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public final void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
-    	final ItemStack stack = event.getPlayer().getItemInHand();
+    	final Player player = event.getPlayer();
+    	if (player.getGameMode() == GameMode.CREATIVE) return;
+    	final ItemStack stack = player.getItemInHand();
     	if (stack != null && stack.getTypeId() == Material.MONSTER_EGG.getId()){
     		event.setCancelled(true);
     	}
