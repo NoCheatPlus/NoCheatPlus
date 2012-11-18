@@ -373,7 +373,7 @@ public class BlockProperties {
         for (final Material mat : new Material[]{
                 Material.WATER_LILY, Material.LADDER,
                 Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
-                Material.COCOA,
+                Material.COCOA, Material.SNOW,
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
@@ -1224,7 +1224,12 @@ public class BlockProperties {
         	bminX = block.v(); // minX
         	bminY = block.x(); // minY
         	bminZ = block.z(); // minZ
-            if (( flags & F_HEIGHT150) != 0) bmaxY = 1.5;
+        	if (id == Material.SNOW.getId()){
+        		// TODO: remove / solve differently ?
+        		final int data = (access.getData(x, y, z) & 0xF) % 8;
+        		bmaxY = (double) (1 +  data) / 8.0;
+        	}
+        	else if (( flags & F_HEIGHT150) != 0) bmaxY = 1.5;
             else if ((flags & F_HEIGHT100) != 0) bmaxY = 1.0;
             else bmaxY = block.y(); // maxY
         }
