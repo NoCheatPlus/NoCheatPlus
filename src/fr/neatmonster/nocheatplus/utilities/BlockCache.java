@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import net.minecraft.server.Block;
 import net.minecraft.server.IBlockAccess;
 import net.minecraft.server.Material;
 import net.minecraft.server.TileEntity;
@@ -113,8 +114,20 @@ public class BlockCache implements IBlockAccess{
     }
 
 	@Override
-	public boolean t(int arg0, int arg1, int arg2) {
-		return access.t(arg0, arg1, arg2);
+	public boolean t(int x, int y, int z) {
+		// Routes to Block.i(getTypeId(x,y,z)) <- ominous i !
+		return access.t(x, y, z);
+	}
+	
+	/**
+	 * Compatibility: CB 1.4.2
+	 * @param arg0
+	 * @param arg1
+	 * @param arg2
+	 * @return
+	 */
+	public boolean s(int x, int y, int z) {
+		return Block.i(getTypeId(x, y, z));
 	}
     
 }
