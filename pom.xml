@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.4.4-R0.1-SNAPSHOT</version>
+			<version>1.4.5-R0.1</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
