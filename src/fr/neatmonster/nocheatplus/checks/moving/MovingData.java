@@ -126,7 +126,6 @@ public class MovingData extends ACheckData {
 	 */
 	public double		sfLastYDist = Double.MAX_VALUE;
 	public int			sfFlyOnIce;
-	public boolean		sfWasInBed;
 	public long			sfCobwebTime;
 	public double		sfCobwebVL;
 	public long			sfVLTime;

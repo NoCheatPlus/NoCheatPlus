@@ -194,7 +194,7 @@ public class MovingListener extends CheckListener{
          * |_|   |_|\__,_|\__, |\___|_|    |____/ \___|\__,_| |_____|_| |_|\__\___|_|   
          *                |___/                                                         
          */
-        MovingData.getData(event.getPlayer()).sfWasInBed = true;
+        CombinedData.getData(event.getPlayer()).wasInBed = true;
     }
 
     /**
