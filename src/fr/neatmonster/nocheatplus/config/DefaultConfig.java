@@ -22,7 +22,7 @@ import org.bukkit.Material;
 public class DefaultConfig extends ConfigFile {
 
 	/** NCP build needed for this config. */
-	public static final int buildNumber = 236;
+	public static final int buildNumber = 256;
 
     /**
      * Instantiates a new default configuration.
@@ -128,7 +128,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel");
 
         set(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK, true);
-        set(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL, 95L);
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_LIMIT, 22);
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_TICKS, 10);
+        set(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_LIMIT, 6);
         set(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, "cancel vl>100 log:fastplace:3:5:cif cancel");
 
         set(ConfPaths.BLOCKPLACE_REACH_CHECK, true);

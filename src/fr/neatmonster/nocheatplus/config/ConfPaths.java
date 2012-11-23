@@ -153,7 +153,10 @@ public abstract class ConfPaths {
 
     private static final String BLOCKPLACE_FASTPLACE                     = BLOCKPLACE + "fastplace.";
     public static final String  BLOCKPLACE_FASTPLACE_CHECK               = BLOCKPLACE_FASTPLACE + "active";
-    public static final String  BLOCKPLACE_FASTPLACE_INTERVAL            = BLOCKPLACE_FASTPLACE + "interval";
+	public static final String  BLOCKPLACE_FASTPLACE_LIMIT               = BLOCKPLACE_FASTPLACE + "limit";
+	private static final String BLOCKPLACE_FASTPLACE_SHORTTERM			 = BLOCKPLACE_FASTPLACE + "shortterm.";
+	public static final String  BLOCKPLACE_FASTPLACE_SHORTTERM_TICKS	 = BLOCKPLACE_FASTPLACE_SHORTTERM + "ticks";
+	public static final String  BLOCKPLACE_FASTPLACE_SHORTTERM_LIMIT	 = BLOCKPLACE_FASTPLACE_SHORTTERM + "limit";
     public static final String  BLOCKPLACE_FASTPLACE_ACTIONS             = BLOCKPLACE_FASTPLACE + "actions";
 
     private static final String BLOCKPLACE_NOSWING                       = BLOCKPLACE + "noswing.";

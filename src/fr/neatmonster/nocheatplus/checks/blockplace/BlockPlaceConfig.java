@@ -75,7 +75,9 @@ public class BlockPlaceConfig extends ACheckConfig {
     public final ActionList directionActions;
 
     public final boolean    fastPlaceCheck;
-    public final long       fastPlaceInterval;
+    public final int        fastPlaceLimit;
+    public final int        fastPlaceShortTermTicks;
+    public final int        fastPlaceShortTermLimit;
     public final ActionList fastPlaceActions;
 
     public final boolean    noSwingCheck;
@@ -100,7 +102,9 @@ public class BlockPlaceConfig extends ACheckConfig {
         directionActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
 
         fastPlaceCheck = data.getBoolean(ConfPaths.BLOCKPLACE_FASTPLACE_CHECK);
-        fastPlaceInterval = data.getLong(ConfPaths.BLOCKPLACE_FASTPLACE_INTERVAL);
+        fastPlaceLimit = data.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_LIMIT);
+        fastPlaceShortTermTicks = data.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_TICKS);
+        fastPlaceShortTermLimit = data.getInt(ConfPaths.BLOCKPLACE_FASTPLACE_SHORTTERM_LIMIT);
         fastPlaceActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
 
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKPLACE_NOSWING_CHECK);

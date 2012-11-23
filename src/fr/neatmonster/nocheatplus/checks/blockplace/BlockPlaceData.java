@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*
  * M#"""""""'M  dP                   dP       MM"""""""`YM dP                            
@@ -81,8 +82,9 @@ public class BlockPlaceData extends ACheckData {
     public double  speedVL;
 
     // Data of the fast place check.
-    public long    fastPlaceLastTime;
-    public boolean fastPlaceLastRefused;
+    public final ActionFrequency fastPlaceBuckets	= new ActionFrequency(2, 1000);
+    public int fastPlaceShortTermTick				= 0;
+    public int fastPlaceShortTermCount				= 0;
 
     // Data of the no swing check.
     public boolean noSwingArmSwung = true;

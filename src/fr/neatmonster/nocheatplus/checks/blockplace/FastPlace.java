@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM""""""""`M                     dP   MM"""""""`YM dP                            
@@ -41,33 +41,36 @@ public class FastPlace extends Check {
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         final BlockPlaceData data = BlockPlaceData.getData(player);
 
-        boolean cancel = false;
-
-        // Has the player placed blocks too quickly?
-        if (data.fastPlaceLastTime != 0 && System.currentTimeMillis() - data.fastPlaceLastTime < cc.fastPlaceInterval) {
-            if (!LagMeasureTask.skipCheck()) {
-                if (data.fastPlaceLastRefused) {
-                    final double difference = cc.fastPlaceInterval - System.currentTimeMillis()
-                            + data.fastPlaceLastTime;
-
-                    // He failed, increase his violation level.
-                    data.fastPlaceVL += difference;
-
-                    // Execute whatever actions are associated with this check and the violation level and find out if
-                    // we should cancel the event.
-                    cancel = executeActions(player, data.fastPlaceVL, difference, cc.fastPlaceActions);
-                }
-
-                data.fastPlaceLastRefused = true;
-            }
-        } else {
-            // Reward him by lowering his violation level.
-            data.fastPlaceVL *= 0.9D;
-            data.fastPlaceLastRefused = false;
+        data.fastPlaceBuckets.add(System.currentTimeMillis(), 1f);
+        
+        // Full period frequency.
+        final float fullScore = data.fastPlaceBuckets.score(1f);
+        
+        // Short term arrivals.
+        final int tick = TickTask.getTick();
+        if (tick - data.fastPlaceShortTermTick < cc.fastPlaceShortTermTicks){
+        	// Within range, add.
+        	data.fastPlaceShortTermCount ++;
         }
-
-        data.fastPlaceLastTime = System.currentTimeMillis();
-
-        return cancel;
+        else{
+        	data.fastPlaceShortTermTick = tick;
+        	data.fastPlaceShortTermCount = 1;
+        }
+        
+        // Find if one of both or both are violations:
+        final float fullViolation = fullScore - cc.fastPlaceLimit;
+        final float shortTermViolation = data.fastPlaceShortTermCount - cc.fastPlaceShortTermLimit; 
+        final float violation = Math.max(fullViolation, shortTermViolation);
+        
+        boolean cancel = false;
+        if (violation > 0){
+        	final double change = violation / 1000;
+        	data.fastPlaceVL += change;
+        	cancel = executeActions(player, data.fastPlaceVL, change, cc.fastPlaceActions);
+        }
+        else if (data.fastPlaceVL > 0d && fullScore < cc.fastPlaceLimit * .75)
+        	data.fastPlaceVL *= 0.95;
+        
+		return cancel;
     }
 }
