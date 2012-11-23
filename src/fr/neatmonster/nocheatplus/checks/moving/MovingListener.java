@@ -726,6 +726,7 @@ public class MovingListener extends CheckListener{
         if (newTo != null)
             // Yes, so schedule a delayed task to teleport back the vehicle (this event isn't cancellable and we can't
             // teleport the vehicle within the event).
+        	// TODO: cleanup?
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 private Vehicle  vehicle;
                 private Location location;
