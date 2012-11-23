@@ -549,13 +549,14 @@ public class PlayerLocation {
 	 */
 	public boolean isIllegal() {
 		if (entityPlayer.dead) return false;
+		AxisAlignedBB box = entityPlayer.boundingBox;
 		if (!entityPlayer.isSleeping()){
 			// This can not really test stance but height of bounding box.
-			final double dY = Math.abs(entityPlayer.boundingBox.e - entityPlayer.boundingBox.b);
+			final double dY = Math.abs(box.e - box.b);
 			if (dY > 1.8) return true; // dY > 1.65D || 
 			if (dY < 0.1D) return true;
 		}
-		if (Math.abs(minX) > 3.2E7D || Math.abs(maxX) > 3.2E7D || Math.abs(minY) > 3.2E7D || Math.abs(maxY) > 3.2E7D || Math.abs(minZ) > 3.2E7D || Math.abs(maxZ) > 3.2E7D) return true;
+		if (Math.abs(box.a) > 3.2E7D || Math.abs(box.b) > 3.2E7D || Math.abs(box.c) > 3.2E7D || Math.abs(box.d) > 3.2E7D || Math.abs(box.e) > 3.2E7D || Math.abs(box.f) > 3.2E7D) return true;
 		return false;
 	}
 
