@@ -239,7 +239,7 @@ public class DefaultConfig extends ConfigFile {
          */
         
         set(ConfPaths.COMBINED_BEDLEAVE_CHECK, true);
-        set(ConfPaths.COMBINED_BEDLEAVE_ACTIONS, "cancel log:bedleave:0:5:if vl>2 cancel log:bedleave:0:5:if cmd:kickbedleave");
+        set(ConfPaths.COMBINED_BEDLEAVE_ACTIONS, "cancel log:bedleave:0:5:if cmd:kickbedleave");
         
         set(ConfPaths.COMBINED_IMPROBABLE_CHECK , true);
         set(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
