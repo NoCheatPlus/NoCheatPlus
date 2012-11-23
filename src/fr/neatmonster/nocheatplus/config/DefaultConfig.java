@@ -433,11 +433,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");
         set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
         set(ConfPaths.STRINGS + ".kickchatnormal", "ncp kick [player] Too many chat messages, take a break.");
-        set(ConfPaths.STRINGS + ".kickfly", "ncp kick [player] Kicked for flying (or related).");
+        set(ConfPaths.STRINGS + ".kickfly", "ncp delay ncp kick [player] Kicked for flying (or related).");
         set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
         set(ConfPaths.STRINGS + ".kickgod", "ncp kick [player] God mode?");
-        set(ConfPaths.STRINGS + ".kickpackets", "ncp kick [player] Too many packets (extreme lag?).");
+        set(ConfPaths.STRINGS + ".kickpackets", "ncp delay ncp kick [player] Too many packets (extreme lag?).");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
