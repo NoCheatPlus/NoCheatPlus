@@ -280,7 +280,7 @@ public class DefaultConfig extends ConfigFile {
                 "cancel vl>5 log:fdirection:3:5:f cancel vl>20 log:fdirection:0:5:if cancel vl>50 log:fdirection:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
-        set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel");
+        set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel vl>15 log:godmode:2:5:if cancel cmd:kickgod");
 
         set(ConfPaths.FIGHT_KNOCKBACK_CHECK, true);
         set(ConfPaths.FIGHT_KNOCKBACK_INTERVAL, 50L);
@@ -420,13 +420,14 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow too fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
-        set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
-        set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
+        set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickchat1", "ncp tempkick [player] 1 You're still not allowed to spam!");
         set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");
-        set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
-        set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
+        set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
         set(ConfPaths.STRINGS + ".kickchatnormal", "ncp kick [player] Too many chat messages, take a break.");
+        set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
+        set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
+        set(ConfPaths.STRINGS + ".kickgod", "ncp kick [player] God mode?");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
