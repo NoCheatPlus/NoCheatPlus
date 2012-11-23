@@ -16,7 +16,7 @@ public class BedLeave extends Check {
 	 * 
 	 * @param player
 	 *            the player
-	 * @return Location to teleport to if it is a violation.
+	 * @return If to prevent action (would be set back location of survivalfly).
 	 */
 	public boolean checkBed(final Player player) {
 		final CombinedData data = CombinedData.getData(player);
@@ -34,8 +34,9 @@ public class BedLeave extends Check {
 				cancel = true;
 			}
 		} else{
-			// He has, everything is alright.
+			// He has, everything is allright.
 			data.wasInBed = false;
+			// TODO: think about decreasing the vl ?
 		}
 		return cancel;
 	}
