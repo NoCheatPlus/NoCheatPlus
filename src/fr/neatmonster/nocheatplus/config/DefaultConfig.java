@@ -350,7 +350,7 @@ public class DefaultConfig extends ConfigFile {
             "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
 
         set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);
-        set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel");
+        set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel vl>100 log:morepackets:0:2:if cancel cmd:kickpackets");
 
         set(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK, true);
         set(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
@@ -374,7 +374,7 @@ public class DefaultConfig extends ConfigFile {
         // set(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
         set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS,
-                "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
+                "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel vl>1000 log:flylong:0:5:cif cancel cmd:kickfly");
 
         /*
          *  dP"8   d8          ,e,                        
@@ -425,9 +425,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");
         set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
         set(ConfPaths.STRINGS + ".kickchatnormal", "ncp kick [player] Too many chat messages, take a break.");
+        set(ConfPaths.STRINGS + ".kickfly", "ncp kick [player] Kicked for flying (or related).");
         set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] How about doing that less often?");
         set(ConfPaths.STRINGS + ".kickgod", "ncp kick [player] God mode?");
+        set(ConfPaths.STRINGS + ".kickpackets", "ncp kick [player] Too many packets (extreme lag?).");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] That must be exhausting!");
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
