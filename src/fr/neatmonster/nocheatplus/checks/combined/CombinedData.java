@@ -51,6 +51,7 @@ public class CombinedData extends ACheckData {
     }
 
     // VLs
+	public double bedLeaveVL = 0;
 	public double improbableVL = 0;
 	
 	// Invulnerable management:
@@ -64,6 +65,9 @@ public class CombinedData extends ACheckData {
 
 	// General penalty time (used for fighting mainly, set by yawrate check).
 	public long timeFreeze = 0;
+	
+	// Bedleave check
+	public boolean wasInBed = false;
 	
 	// Improbable check
 	public final ActionFrequency improbableCount = new ActionFrequency(20, 3000);

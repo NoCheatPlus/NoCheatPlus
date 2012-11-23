@@ -21,7 +21,10 @@ import org.bukkit.Material;
  */
 public class DefaultConfig extends ConfigFile {
 
-	/** NCP build needed for this config. */
+	/** 
+	 * NCP build needed for this config.
+	 * (Should only increment with changing or removing paths.) 
+	 */
 	public static final int buildNumber = 256;
 
     /**
@@ -234,11 +237,14 @@ public class DefaultConfig extends ConfigFile {
         /*
          * Combined !
          */
+        
+        set(ConfPaths.COMBINED_BEDLEAVE_CHECK, true);
+        set(ConfPaths.COMBINED_BEDLEAVE_ACTIONS, "cancel log:bedleave:0:5:if vl>2 cancel log:bedleave:0:5:if cmd:kickbedleave");
+        
         set(ConfPaths.COMBINED_IMPROBABLE_CHECK , true);
         set(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
 //        set(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK, false);
         set(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, "cancel log:improbable:2:8:if");
-        
         
         set(ConfPaths.COMBINED_INVULNERABLE_CHECK, true);
         set(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS, false);
@@ -393,6 +399,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
         set(ConfPaths.STRINGS + ".bbfrequency", start + "tried to break too many blocks within time frame" + end);
         set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of his line of sight" + end);
+        set(ConfPaths.STRINGS + ".bedleave", start + "sends bed leave packets (was not in bed)" + end);
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start
                 + "tried to interact with a block over distance [reachdistance] block(s)" + end);
@@ -420,6 +427,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow too fast" + end);
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
+        set(ConfPaths.STRINGS + ".kickbedleave", "ncp delay ncp kick [player] Go find a bed!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickchat1", "ncp tempkick [player] 1 You're still not allowed to spam!");
         set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");

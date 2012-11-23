@@ -37,6 +37,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -110,6 +111,9 @@ public class MovingListener extends CheckListener{
     
     /** The Passable (simple no-clip) check.*/
     private final Passable passable = new Passable();
+    
+	/** Combined check but handled here (subject to change!) */
+	private final BedLeave bedLeave = new BedLeave();
     
     /**
      * Unused instances.<br>
@@ -211,13 +215,19 @@ public class MovingListener extends CheckListener{
          *                |___/                                                          
          */
         final Player player = event.getPlayer();
-        final MovingData data = MovingData.getData(player);
-        final MovingConfig cc = MovingConfig.getConfig(player);
         
-		if (shouldCheckSurvivalFly(player, data, cc)) {
+		if (bedLeave.isEnabled(player) && bedLeave.checkBed(player)) {
 			// Check if the player has to be reset.
-			final Location target = survivalFly.checkBed(player, data);
 			// To cancel the event, we teleport the player.
+			final Location loc = player.getLocation();
+			final MovingData data = MovingData.getData(player);
+			Location target = data.setBack;
+			if (target == null){
+				// TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
+				target = loc;
+			}
+			target.setPitch(loc.getPitch());
+			target.setYaw(loc.getYaw());
 			if (target != null){
 				if (noFall.isEnabled(player)){
 					// Check if to deal damage.

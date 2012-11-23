@@ -43,7 +43,13 @@ public class CombinedConfig extends ACheckConfig {
 		}
 		return cc;
 	}
+	
+	
+	// Bedleave check.
+	public final boolean        bedLeaveCheck;
+	public final ActionList     bedLeaveActions;
 
+	// Improbable check
 	/** Do mind that this flag is not used by all components. */
 	public final boolean        improbableCheck;
 	public final float          improbableLevel;
@@ -67,6 +73,10 @@ public class CombinedConfig extends ACheckConfig {
 	
 	public CombinedConfig(final ConfigFile config) {
 	    super(config, ConfPaths.COMBINED);
+	    
+		bedLeaveCheck = config.getBoolean(ConfPaths.COMBINED_BEDLEAVE_CHECK, false);
+		bedLeaveActions = config.getOptimizedActionList(ConfPaths.COMBINED_BEDLEAVE_ACTIONS, Permissions.COMBINED_BEDLEAVE);
+
 		improbableCheck = config.getBoolean(ConfPaths.COMBINED_IMPROBABLE_CHECK, false);
 		improbableLevel = (float) config.getDouble(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
 		improbableActions = config.getOptimizedActionList(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, Permissions.COMBINED_IMPROBABLE);
@@ -119,6 +129,8 @@ public class CombinedConfig extends ACheckConfig {
 		switch(checkType){
 		case COMBINED_IMPROBABLE:
 			return improbableCheck;
+		case COMBINED_BEDLEAVE:
+			return bedLeaveCheck;
 		}
 		return false;
 	}

@@ -299,6 +299,10 @@ public abstract class ConfPaths {
      */
     public static final String  COMBINED                                 = CHECKS + "combined.";
 	
+    private static final String COMBINED_BEDLEAVE						 = COMBINED + "bedleave.";
+    public static final String  COMBINED_BEDLEAVE_CHECK					 = COMBINED_BEDLEAVE + "active";
+	public static final String  COMBINED_BEDLEAVE_ACTIONS				 = COMBINED_BEDLEAVE + "actions";
+	
     private static final String COMBINED_IMPROBABLE                      = COMBINED + "improbable.";
 	public static final String  COMBINED_IMPROBABLE_CHECK                = COMBINED_IMPROBABLE + "active";
 	public static final String  COMBINED_IMPROBABLE_LEVEL                = COMBINED_IMPROBABLE + "level";

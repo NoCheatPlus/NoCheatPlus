@@ -119,6 +119,7 @@ public class Permissions {
      * Combined !
      */
     public static final String  COMBINED                     = CHECKS + ".combined";
+	public static final String  COMBINED_BEDLEAVE			 = COMBINED + ".bedleave";
 	public static final String  COMBINED_IMPROBABLE          = COMBINED + ".improbable";
 
     /*
