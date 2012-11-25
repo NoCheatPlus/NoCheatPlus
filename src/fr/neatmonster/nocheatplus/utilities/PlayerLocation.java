@@ -188,6 +188,26 @@ public class PlayerLocation {
 	public final boolean isSameBlock(final PlayerLocation other) {
 		return blockX == other.getBlockX() && blockZ == other.getBlockZ() && blockY == other.getBlockY();
 	}
+	
+	/**
+	 * Block coordinate comparison.
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public final boolean isSameBlock(final int x, final int y, final int z) {
+		return blockX == x && blockZ == z && blockY == y;
+	}
+	
+	/**
+	 * Compares block coordinates (not the world).
+	 * @param loc
+	 * @return
+	 */
+	public final boolean isSameBlock(final Location loc) {
+		return x == loc.getBlockX() && z == loc.getBlockZ() && y == loc.getBlockY();
+	}
 
 	/**
 	 * Compares exact coordinates (not the world).
