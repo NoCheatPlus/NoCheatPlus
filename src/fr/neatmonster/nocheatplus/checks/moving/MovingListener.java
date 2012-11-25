@@ -229,17 +229,17 @@ public class MovingListener extends CheckListener{
 			target.setPitch(loc.getPitch());
 			target.setYaw(loc.getYaw());
 			if (target != null){
-				if (noFall.isEnabled(player)){
+				if (noFall.isEnabled(player) && shouldCheckSurvivalFly(player, data, MovingConfig.getConfig(player))){
 					// Check if to deal damage.
-					noFall.checkDamage(player, data);
+					double y = loc.getY();
+					if (data.setBack != null) y = Math.min(y, data.setBack.getY());
+					noFall.checkDamage(player, data, y);
 				}
 				// Teleport.
 				data.teleported = target;
 				player.teleport(target);// TODO: schedule / other measures ?
-				
 			}
 		}
-
     }
 
     /**
@@ -397,13 +397,19 @@ public class MovingListener extends CheckListener{
                 newTo = survivalFly.check(player, mcPlayer, pFrom, pTo, data, cc);
 				// Check NoFall if no reset is done.
 				if (cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL)) {
-					if (newTo == null) {
+					if (passableTo != null){
+						// Deal damage if necessary.
+						// Leaving out: player.getLocation().getY()
+						noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
+					}
+					else if (newTo == null) {
 						// NOTE: noFall might set yOnGround for the positions.
 						noFall.check(player, pFrom, pTo, data, cc);
 					}
 					else{
 						// Deal damage if necessary.
-						noFall.checkDamage(player, data);
+						// Leaving out: player.getLocation().getY()
+						noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
 					}
 				}
         	}

@@ -201,11 +201,11 @@ public class NoFall extends Check {
      * @param player
      * @param data
      */
-	public void checkDamage(final Player player, final MovingData data) {
+	public void checkDamage(final Player player, final MovingData data, final double y) {
 		final MovingConfig cc = MovingConfig.getConfig(player);
 		// Get the max difference for fall distance.
 		final float fallDistance = player.getFallDistance();
-		final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
+		final float yDiff = (float) (data.noFallMaxY - y);
 		final double maxDiff = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
 		// Calculate damage that would be dealt (plus return if none).
 		final int damage = NoFall.getDamage((float) maxDiff);
