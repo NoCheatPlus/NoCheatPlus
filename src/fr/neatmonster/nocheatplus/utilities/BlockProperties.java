@@ -1208,6 +1208,7 @@ public class BlockProperties {
     public static final boolean collidesBlock(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id){
         // TODO: use internal block data unless delegation wanted?
         final Block block = Block.byId[id];
+        if (block == null) return false; // TODO: policy ?
         block.updateShape(access, x, y, z);
         final long flags = blockFlags[id];
         final double bminX, bminZ, bminY;
