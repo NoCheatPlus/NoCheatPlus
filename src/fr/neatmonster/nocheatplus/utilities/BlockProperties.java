@@ -1241,7 +1241,8 @@ public class BlockProperties {
     }
     
     /**
-     * Similar to collides(... , F_GROUND), but also checks the block above (against spider).
+     * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
+     * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
      * @param access
      * @param minX
      * @param minY
@@ -1337,5 +1338,34 @@ public class BlockProperties {
             }
         }
         return false;
+    }
+    
+    /**
+     * Collect all flags of blocks touched by the bounds, this does not check versus the blocks bounding box.
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @return
+     */
+    public static final long collectFlagsSimple(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
+    	final int iMinX = Location.locToBlock(minX);
+    	final int iMaxX = Location.locToBlock(maxX);
+    	final int iMinY = Location.locToBlock(minY);
+    	final int iMaxY = Location.locToBlock(maxY);
+    	final int iMinZ = Location.locToBlock(minZ);
+    	final int iMaxZ = Location.locToBlock(maxZ);
+    	long flags = 0;
+        for (int x = iMinX; x <= iMaxX; x++){
+            for (int z = iMinZ; z <= iMaxZ; z++){
+                for (int y = iMinY; y <= iMaxY; y++){
+                    flags |= blockFlags[access.getTypeId(x, y, z)];
+                }
+            }
+        }
+        return flags;
     }
 }
