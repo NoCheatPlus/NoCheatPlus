@@ -104,6 +104,9 @@ public class PlayerLocation {
 
 	/** Optional block property cache. */
 	private BlockCache blockCache;
+	
+	/** All block flags collected for maximum used bounds. */
+	private Long blockFlags;
 
 	/**
 	 * Gets the location.
@@ -236,8 +239,10 @@ public class PlayerLocation {
 	 */
 	public boolean isAboveStairs() {
 		if (aboveStairs == null) {
-			// aboveStairs =
-			// BlockProperties.isStairs(getTypeIdBelow().intValue());
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_STAIRS) == 0 ){
+				aboveStairs = false;
+				return false;
+			}
 			// TODO: Distinguish based on actual height off .0 ?
 			final double diff = 0.001;
 			aboveStairs = BlockProperties.collides(getBlockAccess(), minX - diff, minY - 1.0, minZ - diff, maxX + diff, minY + 0.25, maxZ + diff, BlockProperties.F_STAIRS);
@@ -252,6 +257,10 @@ public class PlayerLocation {
 	 */
 	public boolean isInLava() {
 		if (inLava == null) {
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_LAVA) == 0 ){
+				inLava = false;
+				return false;
+			}
 			final double dX = -0.10000000149011612D;
 			final double dY = -0.40000000596046448D;
 			final double dZ = dX;
@@ -267,6 +276,10 @@ public class PlayerLocation {
 	 */
 	public boolean isInWater() {
 		if (inWater == null) {
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_WATER) == 0 ){
+				inWater = false;
+				return false;
+			}
 			final double dX = -0.001D;
 			final double dY = -0.40000000596046448D - 0.001D;
 			final double dZ = -0.001D;
@@ -282,6 +295,7 @@ public class PlayerLocation {
 	 */
 	public boolean isInLiquid() {
 		// TODO: optimize (check liquid first and only if liquid check further)
+		if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_LIQUID) == 0 ) return false;
 		return isInLava() || isInWater();
 	}
 
@@ -308,7 +322,11 @@ public class PlayerLocation {
 	public boolean isOnClimbable() {
 		if (onClimbable == null) {
 			// Climbable blocks.
-			onClimbable = getTypeId() == Material.LADDER.getId() || typeId == Material.VINE.getId();
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_CLIMBABLE) == 0 ){
+				onClimbable = false;
+				return false;
+			}
+			onClimbable = (BlockProperties.getBLockFlags(getTypeId()) & BlockProperties.F_CLIMBABLE) != 0;
 			// TODO: maybe use specialized bounding box.
 //			final double d = 0.1d;
 //			onClimbable = BlockProperties.collides(getBlockAccess(), minX - d, minY - d, minZ - d, maxX + d, minY + 1.0, maxZ + d, BlockProperties.F_CLIMBABLE);
@@ -323,9 +341,9 @@ public class PlayerLocation {
 	 * @return If so.
 	 */
 	public boolean isAboveLadder() {
-		final int typeId = getTypeIdBelow();
-		// TODO: bounding box ...
-		return typeId == Material.LADDER.getId() || typeId == Material.VINE.getId();
+		if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_CLIMBABLE) == 0 ) return false;
+		// TODO: bounding box ?
+		return (BlockProperties.getBLockFlags(getTypeIdBelow()) & BlockProperties.F_CLIMBABLE) != 0;
 	}
 
 	/**
@@ -349,7 +367,14 @@ public class PlayerLocation {
 	public boolean isOnGround() {
 		if (onGround == null) {
 			final double d0 = 0; //0.001D;
-			onGround = BlockProperties.isOnGround(getBlockAccess(), minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
+			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
+				final IBlockAccess access = getBlockAccess();
+				if (BlockProperties.collidesBlock(access, x, minY - yOnGround, z, x, minY + 0.25, z, blockX, blockY, blockZ, getTypeId())){
+					onGround = true;
+				}
+				else onGround = BlockProperties.isOnGround(access, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
+			}
+			else onGround = false;
 			if (!onGround) {
 				try{
 					// TODO: Probably check other ids too before doing this ?
@@ -545,11 +570,21 @@ public class PlayerLocation {
 		// Reset cached values.
 		typeId = typeIdBelow = data = null;
 		aboveStairs = inLava = inWater = inWeb = onGround = onIce = onClimbable = passable = null;
+		blockFlags = null;
 
 		// TODO: Consider blockCache.setAccess? <- currently rather not, because
 		// it might be anything.
 
 		this.setyOnGround(yFreedom);
+	}
+	
+	/**
+	 * Check the maximally used bounds for the block checking,
+	 * to have flags ready for faster denial.
+	 * @param maxYonGround
+	 */
+	public void collectBlockFlags(double maxYonGround){
+		blockFlags = BlockProperties.collectFlagsSimple(getBlockAccess(), minX - 0.001, minY - Math.max(Math.max(1.0, yOnGround), maxYonGround), minZ - 0.001, maxX + 0.001, maxY + .25, maxZ + .001);
 	}
 
 	/**
