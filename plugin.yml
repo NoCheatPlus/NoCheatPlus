@@ -43,7 +43,7 @@ permissions:
                     nocheatplus.admin.exempt:
                         description: Allow to add exemptions for a player.
                     nocheatplus.admin.unexempt:
-                        description: Allow to remove exemptions from  a player.
+                        description: Allow to remove exemptions from a player.
                     nocheatplus.admin.ban:
                         description: Allow use of the ncp ban command.
                     nocheatplus.admin.kick:
