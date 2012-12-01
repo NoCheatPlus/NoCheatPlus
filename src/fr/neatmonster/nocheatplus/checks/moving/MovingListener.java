@@ -344,8 +344,6 @@ public class MovingListener extends CheckListener{
         
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
-        pFrom.collectBlockFlags(cc.noFallyOnGround);
-        pTo.collectBlockFlags(cc.noFallyOnGround);
 		final MovingData data = MovingData.getData(player);
 		data.noFallAssumeGround = false;
 		data.teleported = null;
@@ -357,6 +355,8 @@ public class MovingListener extends CheckListener{
 			parkedInfo.add(moveInfo);
 			return;
 		}
+        pFrom.collectBlockFlags(cc.noFallyOnGround);
+        pTo.collectBlockFlags(cc.noFallyOnGround);
 
 		final EntityPlayer mcPlayer = pFrom.getEntityPlayer();
 		// Potion effect "Jump".
