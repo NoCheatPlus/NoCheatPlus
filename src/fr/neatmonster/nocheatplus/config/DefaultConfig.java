@@ -455,7 +455,8 @@ public class DefaultConfig extends ConfigFile {
                 Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),
                 Material.TRAP_DOOR.name(),
                 Material.PISTON_EXTENSION.name(), 
-                Material.PISTON_MOVING_PIECE.name() // TODO: ?
+                Material.PISTON_MOVING_PIECE.name(),
+                Material.FENCE_GATE.name() // TODO: ?
         ));
         
         // Update internal factory based on all the new entries to the "actions" section.
