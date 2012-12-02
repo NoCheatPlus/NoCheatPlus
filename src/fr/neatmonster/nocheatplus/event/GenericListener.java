@@ -160,11 +160,11 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 		final MethodEntry[] newEntries;
 		if (insertion == entries.length || insertion == -1){
 			newEntries = Arrays.copyOf(entries, entries.length + 1);
-			newEntries[entries.length - 1] = entry;
+			newEntries[newEntries.length - 1] = entry;
 		}
 		else{
 			newEntries = new MethodEntry[entries.length + 1];
-			for (int i = 0; i < entries.length + 1; i ++ ){
+			for (int i = 0; i < newEntries.length; i ++ ){
 				if (i < insertion) newEntries[i] = entries[i];
 				else if (i == insertion) newEntries[i] = entry;
 				else{
