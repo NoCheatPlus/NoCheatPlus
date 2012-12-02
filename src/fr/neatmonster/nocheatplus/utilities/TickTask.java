@@ -190,6 +190,14 @@ public class TickTask implements Runnable {
 		TickTask.locked = locked;
 	}
 	
+	/**
+	 * Empty queues (call after setLocked(true)
+	 */
+	public static void purge(){
+		permissionUpdates.clear();
+		delayedActions.clear();
+	}
+	
 	//////////////////////////
 	// Instance methods
 	//////////////////////////
