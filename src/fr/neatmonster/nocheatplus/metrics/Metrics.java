@@ -635,4 +635,18 @@ public class Metrics {
             return true;
         }
     }
+    
+    public void cancel() {
+    	final int taskId;
+        synchronized (optOutLock) {
+            // Is metrics not running.
+        	taskId = this.taskId;
+            if (taskId < 0)
+                return;
+            this.taskId = -1;
+        }
+        // Cancel the task.
+        plugin.getServer().getScheduler().cancelTask(taskId);
+    }
+
 }
