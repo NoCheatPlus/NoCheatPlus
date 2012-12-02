@@ -302,6 +302,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         final PluginDescriptionFile pdfFile = getDescription();
         
         // Stop the tickTask.
+        TickTask.setLocked(true);
         TickTask.cancel();
         
         // Stop the lag measuring task.
@@ -330,6 +331,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Remove listener references.
 		listenerManager.setRegisterDirectly(false);
 		listenerManager.clear();
+		
+		// More cleanup.
+		TickTask.purge();
 
 		// Tell the server administrator the we finished unloading NoCheatPlus.
 		LogUtil.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
@@ -371,8 +375,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Read the configuration files.
         ConfigManager.init(this);
         
-        final ConfigFile config = ConfigManager.getConfigFile();
+        // Allow entries to TickTask (just in case).
+        TickTask.setLocked(false);
         
+        // 
+        final ConfigFile config = ConfigManager.getConfigFile();
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS); // Temp probably,
 
 		// List the events listeners and register.
