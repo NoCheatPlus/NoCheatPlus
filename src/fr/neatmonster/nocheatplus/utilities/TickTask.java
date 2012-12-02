@@ -61,6 +61,9 @@ public class TickTask implements Runnable {
 	
 	protected static long timeLast = 0;
 	
+	/** Lock flag set on disable. */
+	protected static boolean locked = false;
+	
 	
 	//////////////////////////////////////////////////////////////
 	// Special static methods, usually not called from outside.
@@ -115,6 +118,7 @@ public class TickTask implements Runnable {
 	 * @param checkType
 	 */
 	public static void requestPermissionUpdate(final String playerName, final CheckType checkType){
+		if (locked) return;
 		permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
 	}
 	
@@ -124,6 +128,7 @@ public class TickTask implements Runnable {
 	 * @param actions
 	 */
 	public static void requestActionsExecution(final ViolationData actions) {
+		if (locked) return;
 		delayedActions.add(actions);
 	}
 	
@@ -144,8 +149,20 @@ public class TickTask implements Runnable {
 	    return timeStart;
 	}
 	
+	/**
+	 * Time when last time processing was finished.
+	 * @return
+	 */
 	public static final long getTimeLast(){
 	    return timeLast;
+	}
+	
+	/**
+	 * Check if new permission update requests and actions can be added.
+	 * @return True if locked.
+	 */
+	public boolean isLocked(){
+		return locked;
 	}
 	
 	////////////////////////////////////////
@@ -163,6 +180,14 @@ public class TickTask implements Runnable {
 		if (taskId == -1) return;
 		Bukkit.getScheduler().cancelTask(taskId);
 		taskId = -1;
+	}
+	
+	/**
+	 * Control if new elements can be added to request queues.
+	 * @param locked
+	 */
+	public static void setLocked(boolean locked){
+		TickTask.locked = locked;
 	}
 	
 	//////////////////////////
