@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -47,10 +46,10 @@ public class TickTask implements Runnable {
 	}
 	
 	/** Permissions to update: player name -> check type. */
-	private static final Set<PermissionUpdateEntry> permissionUpdates = Collections.synchronizedSet(new HashSet<PermissionUpdateEntry>(50));
+	private static final Set<PermissionUpdateEntry> permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
 	
 	/** Actions to execute. */
-	public static final List<ViolationData> delayedActions = Collections.synchronizedList(new LinkedList<ViolationData>());
+	public static final List<ViolationData> delayedActions = new LinkedList<ViolationData>();
 	
 	/** Task id of the running TickTask */
 	protected static int taskId = -1;
@@ -76,6 +75,7 @@ public class TickTask implements Runnable {
 	public void executeActions() {
 		final List<ViolationData> copyActions = new LinkedList<ViolationData>();
 		synchronized (delayedActions) {
+			if (delayedActions.isEmpty()) return;
 			copyActions.addAll(delayedActions);
 			delayedActions.clear();
 		}
@@ -91,6 +91,7 @@ public class TickTask implements Runnable {
 	public static void updatePermissions() {
 		final List<PermissionUpdateEntry> copyPermissions = new LinkedList<PermissionUpdateEntry>();
 		synchronized (permissionUpdates) {
+			if (permissionUpdates.isEmpty()) return;
 			copyPermissions.addAll(permissionUpdates);
 			permissionUpdates.clear();
 		}
@@ -118,8 +119,10 @@ public class TickTask implements Runnable {
 	 * @param checkType
 	 */
 	public static void requestPermissionUpdate(final String playerName, final CheckType checkType){
-		if (locked) return;
-		permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
+		synchronized(permissionUpdates){
+			if (locked) return;
+			permissionUpdates.add(new PermissionUpdateEntry(playerName, checkType));
+		}
 	}
 	
 	/**
@@ -128,8 +131,10 @@ public class TickTask implements Runnable {
 	 * @param actions
 	 */
 	public static void requestActionsExecution(final ViolationData actions) {
-		if (locked) return;
-		delayedActions.add(actions);
+		synchronized (delayedActions) {
+			if (locked) return;
+			delayedActions.add(actions);
+		}
 	}
 	
 	/**
@@ -183,7 +188,8 @@ public class TickTask implements Runnable {
 	}
 	
 	/**
-	 * Control if new elements can be added to request queues.
+	 * Control if new elements can be added to request queues.<br>
+	 * NOTE: This is just a flag, no sync is done here.
 	 * @param locked
 	 */
 	public static void setLocked(boolean locked){
@@ -194,8 +200,12 @@ public class TickTask implements Runnable {
 	 * Empty queues (call after setLocked(true)
 	 */
 	public static void purge(){
-		permissionUpdates.clear();
-		delayedActions.clear();
+		synchronized (permissionUpdates) {
+			permissionUpdates.clear();
+		}
+		synchronized (delayedActions) {
+			delayedActions.clear();
+		}
 	}
 	
 	//////////////////////////
@@ -207,8 +217,8 @@ public class TickTask implements Runnable {
 		tick ++;
 		final long time = System.currentTimeMillis();
 		// The isEmpty checks are faster than synchronizing fully always, the actions get delayed one tick at most.
-		if (!delayedActions.isEmpty()) executeActions();
-		if (!permissionUpdates.isEmpty()) updatePermissions();
+		executeActions();
+		updatePermissions();
 		if (timeLast > time) {
 			LogUtil.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
 			DataManager.clearData(CheckType.ALL);
