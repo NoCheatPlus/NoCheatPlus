@@ -276,7 +276,7 @@ public class CoordMap<V> {
 
 	private final void resize(final int size) {
 		// TODO: other capacity / allow to set strategy [also for reducing for long time use]
-		final int newCapacity =  Math.max((int) ((size + 4) / loadFactor), entries.length + entries.length / 4);
+		final int newCapacity =  Math.min(Math.max((int) ((size + 4) / loadFactor), entries.length + entries.length / 4), 4);
 		@SuppressWarnings("unchecked")
 		final List<Entry<V>>[] newEntries = new List[newCapacity];
 		int used = -1; //  Fill old buckets to fornt of old array.
