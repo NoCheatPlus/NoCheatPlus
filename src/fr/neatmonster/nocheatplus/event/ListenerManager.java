@@ -40,7 +40,8 @@ public class ListenerManager {
 	}
 	
 	/**
-	 * Probably put to protected later.
+	 * Probably put to protected later.<br>
+	 * NOTE: Not thread-safe.
 	 * @param clazz
 	 * @param priority
 	 * @return
@@ -89,6 +90,11 @@ public class ListenerManager {
 	 * Clear internal mappings.
 	 */
 	public void clear(){
+		for (final Map<EventPriority, GenericListener<?>> prioMap : map.values()){
+			for (final GenericListener<?> listener : prioMap.values()){
+				listener.clear();
+			}
+		}
 		map.clear();
 	}
 	

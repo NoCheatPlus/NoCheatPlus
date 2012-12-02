@@ -136,7 +136,8 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 	
 	public void addMethodEntry(final MethodEntry entry){
 		// TODO: maybe optimize later.
-		// MethodOrder: the new enties order will be compared versus the old entries tags, not the other way round !). 
+		// MethodOrder: the new enties order will be compared versus the old entries tags, not the other way round !).
+		final MethodEntry[] entries = this.entries;
 		int insertion = -1;
 		if (entry.order != null){
 			if (entry.order.beforeTag != null){
@@ -156,12 +157,13 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 				}
 			}
 		}
+		final MethodEntry[] newEntries;
 		if (insertion == entries.length || insertion == -1){
-			entries = Arrays.copyOf(entries, entries.length + 1);
-			entries[entries.length - 1] = entry;
+			newEntries = Arrays.copyOf(entries, entries.length + 1);
+			newEntries[entries.length - 1] = entry;
 		}
 		else{
-			MethodEntry[] newEntries = new MethodEntry[entries.length + 1];
+			newEntries = new MethodEntry[entries.length + 1];
 			for (int i = 0; i < entries.length + 1; i ++ ){
 				if (i < insertion) newEntries[i] = entries[i];
 				else if (i == insertion) newEntries[i] = entry;
@@ -170,9 +172,9 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 					newEntries[i] = entries[i - 1];
 				}
 			}
-			entries = newEntries;
 		}
-
+		Arrays.fill(entries, null);
+		this.entries = newEntries;
 	}
 
 	/**
@@ -180,13 +182,27 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 	 * @param listener
 	 */
 	public void remove(Listener listener) {
-		List<MethodEntry> keep = new ArrayList<MethodEntry>(entries.length);
+		final MethodEntry[] entries = this.entries;
+		final List<MethodEntry> keep = new ArrayList<MethodEntry>(entries.length);
 		for (MethodEntry entry : entries){
 			if (entry.listener != listener) keep.add(entry);
 		}
 		if (keep.size() != entries.length){
-			entries = new MethodEntry[keep.size()];
-			keep.toArray(entries);
+			final MethodEntry[] newEntries = new MethodEntry[keep.size()];
+			keep.toArray(newEntries);
+			Arrays.fill(entries, null);
+			this.entries = newEntries;
+		}
+	}
+
+	/**
+	 * Remove all MethodEntry references.
+	 */
+	public void clear() {
+		MethodEntry[] oldEntries = this.entries;
+		this.entries = new MethodEntry[0];
+		for (int i = 0; i < oldEntries.length; i++){
+			oldEntries[i] = null;
 		}
 	}
 }
