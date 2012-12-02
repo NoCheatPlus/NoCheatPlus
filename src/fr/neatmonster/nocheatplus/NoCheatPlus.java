@@ -220,6 +220,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	protected final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
 
+	protected Metrics metrics = null;
+	
 	/**
 	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
 	 */
@@ -299,11 +301,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
          * | |_| | \__ \ (_| | |_) | |  __/
          * |____/|_|___/\__,_|_.__/|_|\___|
          */
-        final PluginDescriptionFile pdfFile = getDescription();
+        
+		// Remove listener references.
+		listenerManager.setRegisterDirectly(false);
+		listenerManager.clear();
         
         // Stop the tickTask.
         TickTask.setLocked(true);
+        TickTask.purge();
         TickTask.cancel();
+        
+		// Stop metrics task.
+		if (metrics != null){
+			metrics.cancel();
+			metrics = null;
+		}
         
         // Stop the lag measuring task.
         LagMeasureTask.cancel();
@@ -328,14 +340,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Cleanup the configuration manager.
 		ConfigManager.cleanup();
 
-		// Remove listener references.
-		listenerManager.setRegisterDirectly(false);
-		listenerManager.clear();
-		
-		// More cleanup.
-		TickTask.purge();
-
 		// Tell the server administrator the we finished unloading NoCheatPlus.
+		final PluginDescriptionFile pdfFile = getDescription();
 		LogUtil.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
 	}
 
@@ -446,7 +452,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (config.getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {
             MetricsData.initialize();
             try {
-                final Metrics metrics = new Metrics(this);
+                this.metrics = new Metrics(this);
                 final Graph checksFailed = metrics.createGraph("Checks Failed");
                 for (final CheckType type : CheckType.values())
                     if (type.getParent() != null)
@@ -469,7 +475,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                         }
                     });
                 metrics.start();
-            } catch (final Exception e) {}
+            } catch (final Exception e) {
+            	LogUtil.logWarning("[NoCheatPlus] Failed to initialize metrics:");
+            	LogUtil.logWarning(e);
+            	if (metrics != null){
+            		metrics.cancel();
+            		metrics = null;
+            	}
+            }
         }
 
 //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
