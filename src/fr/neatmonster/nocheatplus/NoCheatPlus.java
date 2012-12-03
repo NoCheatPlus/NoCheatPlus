@@ -302,45 +302,59 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
          * |____/|_|___/\__,_|_.__/|_|\___|
          */
         
+    	final boolean verbose = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG);
+    	
 		// Remove listener references.
+    	if (verbose){
+    		if (listenerManager.hasListenerMethods()) LogUtil.logInfo("[NoCheatPlus] Cleanup ListenerManager...");
+    		else LogUtil.logInfo("[NoCheatPlus] (ListenerManager empty...)");
+    	}
 		listenerManager.setRegisterDirectly(false);
 		listenerManager.clear();
         
         // Stop the tickTask.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop TickTask...");
         TickTask.setLocked(true);
         TickTask.purge();
         TickTask.cancel();
         
 		// Stop metrics task.
 		if (metrics != null){
+			if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop Metrics...");
 			metrics.cancel();
 			metrics = null;
 		}
         
         // Stop the lag measuring task.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop LagMeasureTask...");
         LagMeasureTask.cancel();
         
         // Just to be sure nothing gets left out.
+        if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop all remaining tasks...");
         getServer().getScheduler().cancelTasks(this);
 
+        if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup some mappings...");
         // Remove listeners.
         listeners.clear();
-        
         // Remove config listeners.
         notifyReload.clear();
-
+        // World specific permissions.
 		permStateReceivers.clear();
 
 		// More cleanup.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup DataManager...");
 		dataMan.onDisable();
 
 		// Restore changed commands.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
 		undoCommandChanges();
 		
 		// Cleanup the configuration manager.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup ConfigManager...");
 		ConfigManager.cleanup();
 
 		// Tell the server administrator the we finished unloading NoCheatPlus.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] All cleanup done.");
 		final PluginDescriptionFile pdfFile = getDescription();
 		LogUtil.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
 	}
