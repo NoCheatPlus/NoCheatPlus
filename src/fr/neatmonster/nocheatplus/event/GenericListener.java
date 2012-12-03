@@ -205,4 +205,12 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 			oldEntries[i] = null;
 		}
 	}
+
+	/**
+	 * If any methods are actually registered.
+	 * @return
+	 */
+	public boolean hasListenerMethods() {
+		return entries.length > 0;
+	}
 }

@@ -175,11 +175,58 @@ public class ListenerManager {
 	 * @param listener
 	 */
 	public void remove(Listener listener) {
-		for (EnumMap<EventPriority, GenericListener<?>> prioMap : map.values()){
+		for (Map<EventPriority, GenericListener<?>> prioMap : map.values()){
 			for (GenericListener<?> gl : prioMap.values()){
 				gl.remove(listener);
 			}
 		}
+	}
+	
+	/**
+	 * Check if any GenericListeners are registered with Bukkit. <br>(To check if actually any listener methods are registered use: hasListenerMethods) 
+	 * @return
+	 */
+	public boolean hasListeners(){
+		return !map.isEmpty();
+	}
+	
+	/**
+	 * Check if any GenericListeners are present that are registered.
+	 * @return
+	 */
+	public boolean hasRegisteredListeners(){
+		for (Map<EventPriority, GenericListener<?>> prioMap : map.values()){
+			for (GenericListener<?> gl : prioMap.values()){
+				if (gl.isRegistered()) return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if any GenericListeners are present that are not yet registered.
+	 * @return
+	 */
+	public boolean hasPendingListeners(){
+		for (Map<EventPriority, GenericListener<?>> prioMap : map.values()){
+			for (GenericListener<?> gl : prioMap.values()){
+				if (!gl.isRegistered()) return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if any methods are registered for listening.
+	 * @return
+	 */
+	public boolean hasListenerMethods(){
+		for (Map<EventPriority, GenericListener<?>> prioMap : map.values()){
+			for (GenericListener<?> gl : prioMap.values()){
+				if (gl.hasListenerMethods()) return true;
+			}
+		}
+		return false;
 	}
 	
 }
