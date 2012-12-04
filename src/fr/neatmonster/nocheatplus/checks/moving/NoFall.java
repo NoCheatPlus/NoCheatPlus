@@ -55,7 +55,7 @@ public class NoFall extends Check {
      * @param data
      * @param y
      */
-    private static final void handleOnGround(final EntityPlayer mcPlayer, final MovingData data, final double y, final MovingConfig cc) {
+    private static final void handleOnGround(final EntityPlayer mcPlayer, final MovingData data, final double y, final MovingConfig cc, final boolean reallyOnGround) {
 //        final int pD = getDamage(mcPlayer.fallDistance);
 //        final int nfD = getDamage(data.noFallFallDistance);
 //        final int yD = getDamage((float) (data.noFallMaxY - y));
@@ -64,7 +64,7 @@ public class NoFall extends Check {
         if (maxD > 0){
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
-            if (cc.debug) System.out.println(mcPlayer.name + " NoFall deal damage: " + maxD);
+            if (cc.debug) System.out.println(mcPlayer.name + " NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
 			dealFallDamage(mcPlayer, maxD);
         }
         else data.clearNoFallData();
@@ -130,7 +130,7 @@ public class NoFall extends Check {
         }
         else if (fromOnGround || data.noFallAssumeGround){
             // Check if to deal damage (fall back damage check).
-            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc);
+            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc, true);
             else{
                 mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY)));
                 data.clearNoFallData();
@@ -146,7 +146,7 @@ public class NoFall extends Check {
             	// In this case the player has traveled further: add the difference.
             	data.noFallFallDistance -= yDiff;
             }
-            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc);
+            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc, true);
             else{
                 mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY)));
                 data.clearNoFallData();
@@ -203,29 +203,9 @@ public class NoFall extends Check {
      */
 	public void checkDamage(final Player player, final MovingData data, final double y) {
 		final MovingConfig cc = MovingConfig.getConfig(player);
-		// Get the max difference for fall distance.
-		final float fallDistance = player.getFallDistance();
-		final float yDiff = (float) (data.noFallMaxY - y);
-		final double maxDiff = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
-		// Calculate damage that would be dealt (plus return if none).
-		final int damage = NoFall.getDamage((float) maxDiff);
-		if (damage <= 0) return;
-//		// Heuristic check for if damage would count at all.
-//		final long fDamage = BlockProperties.F_GROUND | BlockProperties.F_SOLID | BlockProperties.F_STAIRS | BlockProperties.F_LAVA;
-//		final long fNoDamage = BlockProperties.F_LIQUID; // Checked second.
-//		final IBlockAccess access = ((CraftWorld) player.getWorld()).getHandle();
-//		final Location loc = player.getLocation();
-//		final int x = loc.getBlockX();
-//		final int y = loc.getBlockY();
-//		final int z = loc.getBlockZ();
-//		while (y > 0){
-//			
-//		}
-//		// TODO
 		
 		// Deal damage.
-		if (cc.debug) System.out.println(player.getName() + " NoFall deal damage (violation): " + damage);
-		dealFallDamage(((CraftPlayer) player).getHandle(), damage);
+		handleOnGround(((CraftPlayer) player).getHandle(), data, y, cc, false);
 	}
 	
 }
