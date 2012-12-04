@@ -245,6 +245,7 @@ public class BlockProperties {
 		Material.POTATO,
 	};
 	
+	private static BlockCache blockCache = new BlockCache(); 
 	private static final PlayerLocation pLoc = new PlayerLocation();
 	
     protected static final long[] blockFlags = new long[maxBlocks];
@@ -871,13 +872,16 @@ public class BlockProperties {
 	public static boolean isOnGround(Player player, Location location) {
 //		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
 		// Bit fat workaround, maybe put the object through from check listener ?
+		pLoc.setBlockCache(blockCache);
 		pLoc.set(location, player, 0.3);
 		if (pLoc.isIllegal()) {
+			blockCache.cleanup();
 			pLoc.cleanup();
 			CheckUtils.onIllegalMove(player);
 			return false;
 		}
 		final boolean onGround = pLoc.isOnGround();
+		blockCache.cleanup();
 		pLoc.cleanup();
 		return onGround;
 	}
