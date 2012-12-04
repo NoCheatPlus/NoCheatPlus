@@ -345,9 +345,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup DataManager...");
 		dataMan.onDisable();
 
-		// Restore changed commands.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
-		undoCommandChanges();
+		// Clear command changes list (compatibility issues with NPCs, leads to rrecalculation of perms).
+		changedCommands.clear();
+		changedCommands = null;
+//		// Restore changed commands.
+//		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
+//		undoCommandChanges();
 		
 		// Cleanup the configuration manager.
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup ConfigManager...");
@@ -361,6 +364,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
 	/**
 	 * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
+	 * @deprecated Leads to compatibility issues with NPC plugins such as Citizens 2, due to recalculation of permissions (specifically during disabling).
 	 */
 	public void undoCommandChanges() {
 		if (changedCommands != null){
