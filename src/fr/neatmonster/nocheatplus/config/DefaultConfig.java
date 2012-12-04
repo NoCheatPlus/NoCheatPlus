@@ -364,7 +364,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
         set(ConfPaths.MOVING_NOFALL_DEALDAMAGE, true);
-//        set(ConfPaths.MOVING_NOFALL_ACTIONS, "cancel vl>0 log:nofall:0:5:if cancel vl>6 log:nofall:0:5:icf cancel");
+        set(ConfPaths.MOVING_NOFALL_ACTIONS, "log:nofall:0:5:if cancel vl>30 log:nofall:0:5:icf cancel");
         
         set(ConfPaths.MOVING_PASSABLE_CHECK, true);
         set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>10 log:passable:0:5:if cancel vl>50 log:passable:0:5:icf cancel");
@@ -442,7 +442,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
-        set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage for ~[falldistance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage" + end);
         set(ConfPaths.STRINGS + ".chatfast", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
         set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid])" + end);

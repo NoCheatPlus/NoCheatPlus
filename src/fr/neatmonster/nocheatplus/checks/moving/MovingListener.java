@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -77,12 +78,21 @@ public class MovingListener extends CheckListener{
         public final PlayerLocation from = new PlayerLocation();
         public final PlayerLocation to = new PlayerLocation();
         public final BlockCache cache = new BlockCache();
+        /**
+         * Demands at least setting from.
+         * @param player
+         * @param from
+         * @param to
+         * @param yOnGround
+         */
         public final void set(final Player player, final Location from, final Location to, final double yOnGround){
             this.from.set(from, player, yOnGround);
-            this.to.set(to, player, yOnGround);
             this.cache.setAccess(this.from.getWorldServer());
             this.from.setBlockCache(cache);
-            this.to.setBlockCache(cache);
+            if (to != null){
+                this.to.set(to, player, yOnGround);
+                this.to.setBlockCache(cache);
+            }
         }
         public final void cleanup(){
             from.cleanup();
@@ -237,7 +247,7 @@ public class MovingListener extends CheckListener{
 				}
 				// Teleport.
 				data.teleported = target;
-				player.teleport(target);// TODO: schedule / other measures ?
+				player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
 			}
 		}
     }
@@ -751,7 +761,7 @@ public class MovingListener extends CheckListener{
 
                 @Override
                 public void run() {
-                    vehicle.teleport(location);
+                    vehicle.teleport(location, TeleportCause.PLUGIN);
                 }
 
                 public Runnable set(final Vehicle vehicle, final Location location) {
@@ -774,9 +784,29 @@ public class MovingListener extends CheckListener{
             data.clearNoFallData();
             return;
         }
+        final Location loc = player.getLocation();
+        boolean allowReset = true;
+        if (!data.noFallSkipAirCheck){
+        	final MoveInfo moveInfo;
+        	if (parkedInfo.isEmpty()) moveInfo = new MoveInfo();
+            else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        	moveInfo.set(player, loc, null, cc.noFallyOnGround);
+        	// NOTE: No isIllegal check here.
+        	moveInfo.from.collectBlockFlags(cc.noFallyOnGround);
+        	if (!moveInfo.from.isOnGround() && !moveInfo.from.isResetCond()){
+        		// Likely a new style no-fall bypass (damage in mid-air).
+        		data.noFallVL += 1.0;
+        		if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions, true) && data.setBack != null){
+        			// Cancel the event and restore fall distance.
+        			// NoFall data will not be reset 
+        			allowReset = false;
+        		}
+        	}
+        	moveInfo.cleanup();
+        }
         final float fallDistance = player.getFallDistance();
         final int damage = event.getDamage();
-        final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
+        final float yDiff = (float) (data.noFallMaxY - loc.getY());
         if (cc.debug) System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         // Fall-back check.
         final int maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance)));
@@ -785,7 +815,7 @@ public class MovingListener extends CheckListener{
             event.setDamage(maxD);
             if (cc.debug) System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
         }
-        data.clearNoFallData();
+        if (allowReset) data.clearNoFallData();
         // Entity fall-distance should be reset elsewhere.
     }
     

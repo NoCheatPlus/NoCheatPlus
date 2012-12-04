@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.blockbreak;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -98,9 +99,15 @@ public class FastBreak extends Check {
             }
         	// Send info about current break:
         	final int blockId = block.getTypeId();
-        	final boolean isValidTool = BlockProperties.isValidTool(blockId, player.getItemInHand());
+        	final ItemStack stack = player.getItemInHand();
+        	final boolean isValidTool = BlockProperties.isValidTool(blockId, stack);
         	String msg = (isInstaBreak ? "[Insta]" : "[Normal]") + "[" + blockId + "] "+ elapsedTime + "u / " + breakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")";
         	player.sendMessage(msg);
+//        	net.minecraft.server.Item mcItem = net.minecraft.server.Item.byId[stack.getTypeId()];
+//        	if (mcItem != null){
+//        		double x = mcItem.getDestroySpeed(((CraftItemStack) stack).getHandle(), net.minecraft.server.Block.byId[blockId]);
+//        		player.sendMessage("mc speed: " + x);
+//        	}
         }
     	 
     	 // (The break time is set in the listener).

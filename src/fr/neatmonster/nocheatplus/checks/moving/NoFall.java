@@ -1,8 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import java.util.Locale;
-import java.util.Map;
-
 import net.minecraft.server.DamageSource;
 import net.minecraft.server.EntityPlayer;
 
@@ -12,10 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
@@ -65,6 +60,8 @@ public class NoFall extends Check {
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
             if (cc.debug) System.out.println(mcPlayer.name + " NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
+            // TODO: might not be necessary: if (mcPlayer.invulnerableTicks <= 0)  [no damage event for resetting]
+            data.noFallSkipAirCheck = true;
 			dealFallDamage(mcPlayer, maxD);
         }
         else data.clearNoFallData();
@@ -188,13 +185,6 @@ public class NoFall extends Check {
             player.setFallDistance(maxDist);
         }
     }
-
-    @Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.FALL_DISTANCE, String.format(Locale.US, "%.2f", MovingData.getData(violationData.player).noFallFallDistance));
-		return parameters;
-	}
 
     /**
      * This is called if a player fails a check and gets set back, to avoid using that to avoid fall damage the player might be dealt damage here. 

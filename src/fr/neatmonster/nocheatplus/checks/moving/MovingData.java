@@ -113,7 +113,8 @@ public class MovingData extends ACheckData {
     public double         noFallMaxY;
     /** Indicate that NoFall should assume the player to be on ground. */
     public boolean noFallAssumeGround;
-    
+    /** Indicate that NoFall is not to use next damage event for checking on-ground properties. */ 
+    public boolean noFallSkipAirCheck = false;
     // Passable check.
     public double 	      passableVL;
 
@@ -201,6 +202,7 @@ public class MovingData extends ACheckData {
 //        noFallOnGround = noFallWasOnGround = true;
         noFallFallDistance = 0;
         noFallMaxY = 0D;
+        noFallSkipAirCheck = false;
     }
     
     public void resetPositions(final Location loc){
