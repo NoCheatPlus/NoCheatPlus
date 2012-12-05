@@ -49,7 +49,7 @@ public class TickTask implements Runnable {
 	private static final Set<PermissionUpdateEntry> permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
 	
 	/** Actions to execute. */
-	public static final List<ViolationData> delayedActions = new LinkedList<ViolationData>();
+	private static final List<ViolationData> delayedActions = new LinkedList<ViolationData>();
 	
 	/** Task id of the running TickTask */
 	protected static int taskId = -1;
@@ -216,13 +216,20 @@ public class TickTask implements Runnable {
 	public void run() {
 		tick ++;
 		final long time = System.currentTimeMillis();
-		// The isEmpty checks are faster than synchronizing fully always, the actions get delayed one tick at most.
+		
+		// Now sync is forced, for the ability to lock.
 		executeActions();
 		updatePermissions();
+		
+		// Time running backwards check (not only players can!).
 		if (timeLast > time) {
 			LogUtil.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
 			DataManager.clearData(CheckType.ALL);
 		}
+		
+		// TODO: Lag measurement !
+		
+		// Finish.
 		timeLast = time;
 	}
 
