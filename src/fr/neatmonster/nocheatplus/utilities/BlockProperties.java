@@ -872,6 +872,7 @@ public class BlockProperties {
 	public static boolean isOnGround(Player player, Location location) {
 //		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
 		// Bit fat workaround, maybe put the object through from check listener ?
+		blockCache.setAccess(location.getWorld());
 		pLoc.setBlockCache(blockCache);
 		pLoc.set(location, player, 0.3);
 		if (pLoc.isIllegal()) {
