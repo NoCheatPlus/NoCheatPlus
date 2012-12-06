@@ -22,7 +22,6 @@ public class LagCommand extends NCPCommand {
 		long medium = 50L * TickTask.lagMaxTicks;
 		long second = 1200L;
 		StringBuilder builder = new StringBuilder(300);
-		// TODO: lag spikes !
 		builder.append("Lag tracking (roughly):");
 		builder.append("\nAverage lag:");
 		for (long ms : new long[]{second, medium, max}){
