@@ -38,6 +38,8 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.command.CommandHandler;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.NCPListener;
@@ -85,6 +87,26 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	/** Names of players with a certain permission. */
 	protected static final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.ADMINISTRATION_NOTIFY);
 	
+	/** MCAccess instance. */
+	protected static MCAccess mcAccess = null;
+	
+	/**
+	 * Get the wrapper for accessing Minecraft properties.
+	 * @return
+	 */
+	public static MCAccess getMCAccess(){
+		if (mcAccess == null) initMCAccess();
+		return mcAccess;
+	}
+	
+	private static void initMCAccess() {
+		synchronized (NoCheatPlus.class) {
+			if (mcAccess != null) return;
+			mcAccess = new MCAccessFactory().getMCAccess();
+		}
+		LogUtil.logInfo("[NoCheatPlus] McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
+	}
+
 	/**
 	 * Remove expired entries.
 	 */

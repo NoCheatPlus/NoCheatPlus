@@ -6,10 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.server.AxisAlignedBB;
-import net.minecraft.server.Block;
-import net.minecraft.server.IBlockAccess;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,6 +15,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 
@@ -245,8 +243,8 @@ public class BlockProperties {
 		Material.POTATO,
 	};
 	
-	private static BlockCache blockCache = new BlockCache(); 
-	private static final PlayerLocation pLoc = new PlayerLocation();
+	private static BlockCache blockCache = NoCheatPlus.getMCAccess().getBlockCache(null); 
+	private static final PlayerLocation pLoc = new PlayerLocation(null);
 	
     protected static final long[] blockFlags = new long[maxBlocks];
     
@@ -322,23 +320,21 @@ public class BlockProperties {
 		///////////////////////////
 		// Initalize block flags
 		///////////////////////////
+		final MCAccess mcAccess = NoCheatPlus.getMCAccess();
 		for (int i = 0; i <maxBlocks; i++){
 			blockFlags[i] = 0;
-			final net.minecraft.server.Block block = net.minecraft.server.Block.byId[i];
-			if (block != null){
-				if (block.material != null){
-					final net.minecraft.server.Material material = block.material;
-					if (material.isLiquid()){
-						// TODO: do not set F_GROUND for fluids ?
-						blockFlags[i] |= F_LIQUID;
-						if (material.isSolid()) blockFlags[i] |= F_SOLID;
-					}
-					else if (material.isSolid()){
-					    blockFlags[i] |= F_SOLID | F_GROUND;
-					}
-				}
+
+			if (mcAccess.isBlockLiquid(i).decide()){
+				// TODO: do not set F_GROUND for fluids ?
+				blockFlags[i] |= F_LIQUID;
+				if (mcAccess.isBlockSolid(i).decide()) blockFlags[i] |= F_SOLID;
 			}
+			else if (mcAccess.isBlockSolid(i).decide()){
+			    blockFlags[i] |= F_SOLID | F_GROUND;
+			}
+			
 		}
+		
 		// Stairs.
 		for (final Material mat : new Material[] { Material.NETHER_BRICK_STAIRS, Material.COBBLESTONE_STAIRS, 
 				Material.SMOOTH_STAIRS, Material.BRICK_STAIRS, Material.SANDSTONE_STAIRS, Material.WOOD_STAIRS, 
@@ -887,24 +883,6 @@ public class BlockProperties {
 		return onGround;
 	}
 
-	/**
-	 * Hiding the API access here.<br>
-	 * TODO: Find description of this and use block properties from here, as well as a speaking method name.<br>
-	 * Assumption: This is something like "can stand on this type of block".
-	 * @param id
-	 * @return
-	 */
-	public static final boolean i(final int id) {
-		// TODO: Replace by independent method.
-		try{
-			return Block.i(id);
-		}
-		catch(Throwable t){
-			// Minecraft default value.
-			return true;
-		}
-	}
-	
 	public static final long getBLockFlags(final int id){
 		return blockFlags[id];
 	}
@@ -962,25 +940,26 @@ public class BlockProperties {
 	 * @param id
 	 * @return
 	 */
-	public static final boolean isPassable(final IBlockAccess blockAccess, final double x, final double y, final double z, final int id){
+	public static final boolean isPassable(final BlockCache access, final double x, final double y, final double z, final int id){
 		// Simple exclusion check first.
 		if (isPassable(id)) return true;
 		// Check if the position is inside of a bounding box.
 		final int bx = Location.locToBlock(x);
 		final int by = Location.locToBlock(y);
 		final int bz = Location.locToBlock(z);
-		final net.minecraft.server.Block block = net.minecraft.server.Block.byId[id];
-		if (block == null) return true;
-		block.updateShape(blockAccess, bx, by, bz);
+		final double[] bounds = access.getBounds(bx, by, bz);
+		
+		if (bounds == null) return true;
+		
 		final double fx = x - bx;
 		final double fy = y - by;
 		final double fz = z - bz;
 //		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
-		if (fx < block.v() || fx >= block.w() || fy < block.x() || fy >= block.y() || fz < block.z() || fz >= block.A()) return true;
+		if (fx < bounds[0] || fx >= bounds[3] || fy < bounds[1] || fy >= bounds[4] || fz < bounds[2] || fz >= bounds[5]) return true;
 		else{
 			// Workarounds (might get generalized some time).
 			if (isStairs(id)){
-				if ((blockAccess.getData(bx, by, bz) & 0x4) != 0){
+				if ((access.getData(bx, by, bz) & 0x4) != 0){
 					if (fy < 0.5) return true;
 				}
 				else if (fy >= 0.5) return true; 
@@ -989,7 +968,7 @@ public class BlockProperties {
 			else if (id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()){
 			        if (Math.abs(0.5 - fx) > 0.05 && Math.abs(0.5 - fz) > 0.05) return true;
 			}
-			else if (id == Material.FENCE_GATE.getId() && (blockAccess.getData(bx, by, bz) & 0x4)!= 0) return true;
+			else if (id == Material.FENCE_GATE.getId() && (access.getData(bx, by, bz) & 0x4)!= 0) return true;
 			else if (id == Material.CAKE_BLOCK.getId() && fy >= 0.4375) return true; // 0.0625 = 0.125 / 2
 			else if (id == Material.CAULDRON.getId()){
 			    if (Math.abs(0.5 - fx) < 0.1 && Math.abs(0.5 - fz) < 0.1 && fy > 0.1) return true;
@@ -1006,7 +985,7 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static final boolean isPassable(final PlayerLocation loc) {
-		return isPassable(loc.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), loc.getTypeId());
+		return isPassable(loc.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), loc.getTypeId());
 	}
 	
 	/**
@@ -1015,8 +994,10 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static final boolean isPassable(final Location loc) {
-	    final IBlockAccess access = ((org.bukkit.craftbukkit.CraftWorld) loc.getWorld()).getHandle();
-		return isPassable(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+	    blockCache.setAccess(loc.getWorld());
+		boolean res = isPassable(blockCache, loc.getX(), loc.getY(), loc.getZ(), blockCache.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+		blockCache.cleanup();
+		return res;
 	}
 	
 	/**
@@ -1025,7 +1006,7 @@ public class BlockProperties {
 	 * @param loc
 	 * @return
 	 */
-	public static final boolean isPassable(final IBlockAccess  access, final Location loc)
+	public static final boolean isPassable(final BlockCache  access, final Location loc)
 	{
 		return isPassable(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
 	}
@@ -1043,15 +1024,15 @@ public class BlockProperties {
         }
     }
     
-    /**
-     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
-     * @param box
-     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
-     * @return If any block has the flags.
-     */
-    public static final boolean hasAnyFlags(final IBlockAccess access, final AxisAlignedBB box, final long flags){
-        return hasAnyFlags(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
-    }
+//    /**
+//     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
+//     * @param box
+//     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
+//     * @return If any block has the flags.
+//     */
+//    public static final boolean hasAnyFlags(final BlockCache access, final AxisAlignedBB box, final long flags){
+//        return hasAnyFlags(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
+//    }
     
     /**
      * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
@@ -1064,7 +1045,7 @@ public class BlockProperties {
      * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
      * @return If any block has the flags.
      */
-    public static final boolean hasAnyFlags(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
+    public static final boolean hasAnyFlags(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
         return hasAnyFlags(access, Location.locToBlock(minX), Location.locToBlock(minY), Location.locToBlock(minZ), Location.locToBlock(maxX), Location.locToBlock(maxY), Location.locToBlock(maxZ), flags);
     }
 
@@ -1080,7 +1061,7 @@ public class BlockProperties {
      * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
      * @return If any block has the flags.
      */
-    public static final boolean hasAnyFlags(final IBlockAccess access,final int minX, int minY, final int minZ, final int maxX, final int maxY, final int maxZ, final long flags){
+    public static final boolean hasAnyFlags(final BlockCache access,final int minX, int minY, final int minZ, final int maxX, final int maxY, final int maxZ, final long flags){
         for (int x = minX; x <= maxX; x++){
             for (int z = minZ; z <= maxZ; z++){
                 for (int y = minY; y <= maxY; y++){
@@ -1091,15 +1072,15 @@ public class BlockProperties {
         return false;
     }
     
-    /**
-     * Test if the box collide with any block that matches the flags somehow.
-     * @param box
-     * @param flags
-     * @return
-     */
-    public static final boolean collides(final IBlockAccess access, final AxisAlignedBB box, final long flags){
-        return collides(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
-    }
+//    /**
+//     * Test if the box collide with any block that matches the flags somehow.
+//     * @param box
+//     * @param flags
+//     * @return
+//     */
+//    public static final boolean collides(final BlockCache access, final AxisAlignedBB box, final long flags){
+//        return collides(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
+//    }
     
     /**
      * Test if the box collide with any block that matches the flags somehow.
@@ -1112,7 +1093,7 @@ public class BlockProperties {
      * @param flags
      * @return
      */
-    public static final boolean collides(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
+    public static final boolean collides(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	// At least find fences etc. if searched for.
@@ -1147,7 +1128,7 @@ public class BlockProperties {
      * @param id
      * @return
      */
-    public static final boolean collidesId(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
+    public static final boolean collidesId(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	final int iMinY = Location.locToBlock(minY - ((blockFlags[id] & F_HEIGHT150) != 0 ? 0.5625 : 0));
@@ -1178,7 +1159,7 @@ public class BlockProperties {
      * @param id
      * @return
      */
-    public static final boolean collidesBlock(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
+    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int id){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	final int iMinY = Location.locToBlock(minY - ((blockFlags[id] & F_HEIGHT150) != 0 ? 0.5625 : 0));
@@ -1210,16 +1191,15 @@ public class BlockProperties {
      * @param maxZ
      * @param id
      */
-    public static final boolean collidesBlock(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id){
+    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id){
         // TODO: use internal block data unless delegation wanted?
-        final Block block = Block.byId[id];
-        if (block == null) return false; // TODO: policy ?
-        block.updateShape(access, x, y, z);
+    	final double[] bounds = access.getBounds(x,y,z);
+        if (bounds == null) return false; // TODO: policy ?
         final long flags = blockFlags[id];
         final double bminX, bminZ, bminY;
         final double bmaxX, bmaxY, bmaxZ;
-        bmaxX = block.w(); // maxX
-        bmaxZ = block.A(); // maxZ
+        bmaxX = bounds[3]; //block.w(); // maxX
+        bmaxZ = bounds[5]; //block.A(); // maxZ
         if ((flags & F_STAIRS) != 0){
         	// Mainly for on ground style checks, would not go too well with passable.
         	// TODO: change this to something like F_FULLBOX probably.
@@ -1227,9 +1207,9 @@ public class BlockProperties {
         	bmaxY = 1D;
         }
         else{
-        	bminX = block.v(); // minX
-        	bminY = block.x(); // minY
-        	bminZ = block.z(); // minZ
+        	bminX = bounds[0]; // block.v(); // minX
+        	bminY = bounds[1]; // block.x(); // minY
+        	bminZ = bounds[2]; // block.z(); // minZ
         	if (id == Material.SNOW.getId()){
         		// TODO: remove / solve differently ?
         		final int data = (access.getData(x, y, z) & 0xF) % 8;
@@ -1237,7 +1217,7 @@ public class BlockProperties {
         	}
         	else if (( flags & F_HEIGHT150) != 0) bmaxY = 1.5;
             else if ((flags & F_HEIGHT100) != 0) bmaxY = 1.0;
-            else bmaxY = block.y(); // maxY
+            else bmaxY = bounds[4]; // block.y(); // maxY
         }
         if (minX > bmaxX + x || maxX < bminX + x) return false;
         else if (minY > bmaxY + y || maxY < bminY + y) return false;
@@ -1258,7 +1238,7 @@ public class BlockProperties {
      * @param maxZ
      * @return
      */
-    public static final boolean isOnGround(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
+    public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	final int iMinY = Location.locToBlock(minY - 0.5626);
@@ -1302,7 +1282,7 @@ public class BlockProperties {
      * @param dZ
      * @return
      */
-    public static final boolean isDownStream(final IBlockAccess access, final int x, final int y, final int z, final int data, 
+    public static final boolean isDownStream(final BlockCache access, final int x, final int y, final int z, final int data, 
             final double dX, final double dZ) {
         // x > 0 -> south, z > 0 -> west
         if ((data & 0x8) == 0){
@@ -1357,7 +1337,7 @@ public class BlockProperties {
      * @param maxZ
      * @return
      */
-    public static final long collectFlagsSimple(final IBlockAccess access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
+    public static final long collectFlagsSimple(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	final int iMinY = Location.locToBlock(minY);

@@ -80,7 +80,7 @@ public class Reach extends Check {
         
         // Reference locations to check distance for.
         final Location dRef = damaged.getLocation();
-        final double height = CheckUtils.getHeight(damaged);
+        final double height = mcAccess.getHeight(damaged);
         final Location pRef = player.getEyeLocation();
         
         // Refine y position.

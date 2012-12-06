@@ -44,7 +44,7 @@ public class Passable extends Check {
 		if (from.isPassable()){
 			// From should be the set-back.
 			loc = null;
-		} else if (BlockProperties.isPassable(from.getBlockAccess(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
+		} else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
 			// (Mind that this can be the case on the same block theoretically.)
 			// Keep loc as set-back.
 		}
@@ -61,7 +61,7 @@ public class Passable extends Check {
 		}
 		
 		// Prefer the set-back location from the data.
-		if (data.setBack != null && BlockProperties.isPassable(from.getBlockAccess(), data.setBack)) loc = data.setBack;
+		if (data.setBack != null && BlockProperties.isPassable(from.getBlockCache(), data.setBack)) loc = data.setBack;
 
 		// TODO: set data.set-back ? or something: still some aji here.
 		

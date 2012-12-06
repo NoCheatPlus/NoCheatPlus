@@ -1,13 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
-import net.minecraft.server.Block;
-import net.minecraft.server.IBlockAccess;
-import net.minecraft.server.Material;
-import net.minecraft.server.TileEntity;
-import net.minecraft.server.Vec3DPool;
-
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
 
@@ -16,18 +10,18 @@ import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
  * @author mc_dev
  *
  */
-public class BlockCache implements IBlockAccess{
-    
-    /**
-     * For getting ids.
-     */
-    private IBlockAccess access = null;
+public abstract class BlockCache {
     
     /** Cached type-ids. */
     private final CoordMap<Integer> idMap = new CoordMap<Integer>();
     
     /** Cached data values. */
     private final CoordMap<Integer> dataMap = new CoordMap<Integer>();
+    
+    /** Cached shape values. */
+    private final CoordMap<double[]> boundsMap = new CoordMap<double[]>();
+    
+    // TODO: switch to nodes with all details on, store a working node ?
     
     // TODO: maybe make very fast access arrays for the ray tracing checks. 
 //    private int[] id = null;
@@ -40,94 +34,99 @@ public class BlockCache implements IBlockAccess{
         setAccess(world);
     }
     
-    public BlockCache(final IBlockAccess access){
-        setAccess(access);
-    }
-    
     /**
      * Does not do cleanup.
      * @param world
      */
-    public void setAccess(final World world){
-        setAccess(((CraftWorld) world).getHandle());
-    }
+    public abstract void setAccess(final World world);
     
     /**
-     * Does not do cleanup.
-     * @param access
+     * Fetch the type id from the underlying world.
+     * @param x
+     * @param y
+     * @param z
+     * @return
      */
-    public void setAccess(final IBlockAccess access){
-        this.access = access;
-    }
+    public abstract int fetchTypeId(int x, int y, int z);
+	
+    /**
+     * Fetch the data from the underlying world.
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+	public abstract int fetchData(int x, int y, int z);
+	
+	public abstract double[] fetchBounds(int x, int y, int z);
+	
+	/**
+	 * This is a on-ground type check just for standing on minecarts / boats.
+	 * @param entity
+	 * @param minX
+	 * @param minY
+	 * @param minZ
+	 * @param maxX
+	 * @param maxY
+	 * @param maxZ
+	 * @return
+	 */
+	public abstract boolean standsOnEntity(Entity entity, final double minX, final double minY, final double minZ, final double maxX, final double maxY, final double maxZ);
+
     
     /**
-     * Remove references.
+     * Remove references.<br>
+     * NOTE: You must delete world references with this one.
      */
     public void cleanup(){
-        access = null;
         idMap.clear();
         dataMap.clear();
+        boundsMap.clear();
     }
     
-    @Override
+    /**
+     * Get type id with cache access.
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
 	public int getTypeId(final int x, final int y, final int z) {
 		final Integer pId = idMap.get(x, y, z);
 		if (pId != null) return pId;
-		final Integer nId = access.getTypeId(x, y, z);
+		final Integer nId = fetchTypeId(x, y, z);
 		idMap.put(x, y, z, nId);
 		return nId;
 	}
 
-    @Override
+	/**
+	 * Get data value with cache access.
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
 	public int getData(final int x, final int y, final int z) {
 		final Integer pData = dataMap.get(x, y, z);
 		if (pData != null) return pData;
-		final Integer nData = access.getData(x, y, z);
+		final Integer nData = fetchData(x, y, z);
 		dataMap.put(x, y, z, nData);
 		return nData;
 	}
-
-    /**
-     * Not Optimized.
-     */
-    @Override
-    public Material getMaterial(int arg0, int arg1, int arg2) {
-        return access.getMaterial(arg0, arg1, arg2);
-    }
-
-    /**
-     * Not optimized.
-     */
-    @Override
-    public TileEntity getTileEntity(int arg0, int arg1, int arg2) {
-        return access.getTileEntity(arg0, arg1, arg2);
-    }
-
-    @Override
-    public Vec3DPool getVec3DPool() {
-        return access.getVec3DPool();
-    }
-
-    @Override
-    public boolean isBlockFacePowered(int arg0, int arg1, int arg2, int arg3) {
-        return access.isBlockFacePowered(arg0, arg1, arg2, arg3);
-    }
-
-	@Override
-	public boolean t(int x, int y, int z) {
-		// Routes to Block.i(getTypeId(x,y,z)) <- ominous i !
-		return access.t(x, y, z);
-	}
 	
 	/**
-	 * Compatibility: CB 1.4.2
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @return
+	 * Get block bounds
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return Array of floats (minX, minY, minZ, maxX, maxY, maxZ), may be null theoretically.
 	 */
-	public boolean s(int x, int y, int z) {
-		return Block.i(getTypeId(x, y, z));
+	public double[] getBounds(final int x, final int y, final int z){
+		final double[] pBounds = boundsMap.get(x, y, z);
+		if (pBounds != null) return pBounds;
+		final double[] nBounds = fetchBounds(x, y, z);
+		boundsMap.put(x, y, z, nBounds);
+		return nBounds;
 	}
     
 }

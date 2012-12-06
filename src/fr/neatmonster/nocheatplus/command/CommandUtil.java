@@ -5,12 +5,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
-import org.bukkit.craftbukkit.CraftServer;
 
+import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
@@ -23,7 +22,7 @@ public class CommandUtil {
 	public static CommandMap getCommandMap(){
 		// TODO: compat / null
 		try{
-			return (((CraftServer) Bukkit.getServer()).getCommandMap());
+			return NoCheatPlus.getMCAccess().getCommandMap();
 		}
 		catch(Throwable t){
 			LogUtil.logSevere(t);

@@ -3,9 +3,6 @@ package fr.neatmonster.nocheatplus.checks.moving;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MobEffectList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -30,8 +27,8 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -75,9 +72,9 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 public class MovingListener extends CheckListener{
 
 	private static final class MoveInfo{
-        public final PlayerLocation from = new PlayerLocation();
-        public final PlayerLocation to = new PlayerLocation();
-        public final BlockCache cache = new BlockCache();
+		public final BlockCache cache = NoCheatPlus.getMCAccess().getBlockCache(null);
+        public final PlayerLocation from = new PlayerLocation(null);
+        public final PlayerLocation to = new PlayerLocation(null);
         /**
          * Demands at least setting from.
          * @param player
@@ -87,7 +84,7 @@ public class MovingListener extends CheckListener{
          */
         public final void set(final Player player, final Location from, final Location to, final double yOnGround){
             this.from.set(from, player, yOnGround);
-            this.cache.setAccess(this.from.getWorldServer());
+            this.cache.setAccess(from.getWorld());
             this.from.setBlockCache(cache);
             if (to != null){
                 this.to.set(to, player, yOnGround);
@@ -178,7 +175,7 @@ public class MovingListener extends CheckListener{
 		if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
 				&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
 				&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
-				&& (BlockProperties.i(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
+				&& (mcAccess.Block_i(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
 			// The creative fly and/or survival fly check is enabled, the
 			// block was placed below the player and is
 			// solid, so do what we have to do.
@@ -367,10 +364,9 @@ public class MovingListener extends CheckListener{
 		}
         pFrom.collectBlockFlags(cc.noFallyOnGround);
         pTo.collectBlockFlags(cc.noFallyOnGround);
-
-		final EntityPlayer mcPlayer = pFrom.getEntityPlayer();
+        
 		// Potion effect "Jump".
-		final double jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+		final double jumpAmplifier = MovingListener.getJumpAmplifier(player);
 		if (jumpAmplifier > 0D && cc.debug) System.out.println(player.getName() + " Jump effect: " + jumpAmplifier);
 		if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
 
@@ -406,7 +402,7 @@ public class MovingListener extends CheckListener{
         	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
                 // If he is handled by the survival fly check, execute it.
-                newTo = survivalFly.check(player, mcPlayer, pFrom, pTo, data, cc);
+                newTo = survivalFly.check(player, pFrom, pTo, data, cc);
 				// Check NoFall if no reset is done.
 				if (cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL)) {
 					if (passableTo != null){
@@ -472,7 +468,7 @@ public class MovingListener extends CheckListener{
 	{
 		// This might get extended to a check-like thing.
 		boolean restored = false;
-		final PlayerLocation pLoc = new PlayerLocation();
+		final PlayerLocation pLoc = new PlayerLocation(null);
 		// (Mind that we don't set the block cache here).
 		if (!restored && data.setBack != null) {
 			pLoc.set(data.setBack, player);
@@ -846,14 +842,15 @@ public class MovingListener extends CheckListener{
     }
 
 	/**
-	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II.
+	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
+	 * NOTE: This is not the original amplifier value (use mcAccess for that).
 	 * @param mcPlayer
 	 * @return
 	 */
-	public static final double getJumpAmplifier(final EntityPlayer mcPlayer) {
-		if (mcPlayer.hasEffect(MobEffectList.JUMP)) {
-			return 1D + mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
-		} else return 0D;
+	public static final double getJumpAmplifier(final Player player) {
+		final double amplifier = NoCheatPlus.getMCAccess().getJumpAmplifier(player);
+		if (amplifier == Double.MIN_VALUE) return 0D;
+		else return 1D + amplifier;
 	}
 	
 	/**

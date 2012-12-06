@@ -3,9 +3,6 @@ package fr.neatmonster.nocheatplus.checks.moving;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MobEffectList;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -75,7 +72,7 @@ public class SurvivalFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
         final long now = System.currentTimeMillis();
         tags.clear();
         // A player is considered sprinting if the flag is set and if he has enough food level.
@@ -101,14 +98,14 @@ public class SurvivalFly extends Check {
 
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) resetFrom = true;
-		else if (lostGround(player, mcPlayer, from, to, yDistance, data, cc)){
+		else if (lostGround(player, from, to, yDistance, data, cc)){
 			resetFrom = true;
 			// TODO: Consider && !resetTo ?
 			// Note: if not setting resetFrom, other places have to check assumeGround...
 		}
 		else resetFrom = false;
 
-		double hAllowedDistance = getAllowedhDist(player, mcPlayer, from, to, sprinting, hDistance, data, cc, false);
+		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, false);
 
 		// Account for flowing liquids (only if needed).
 		// Assume: If in fluids this would be placed right here.
@@ -122,7 +119,7 @@ public class SurvivalFly extends Check {
 		// Tag for simple speed violation (medium), might get overridden.
 		if (hDistanceAboveLimit > 0){
 			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) !
-			hAllowedDistance = getAllowedhDist(player, mcPlayer, from, to, sprinting, hDistance, data, cc, true);
+			hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, true);
 			hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
 			if (hAllowedDistance > 0){
 				tags.add("hspeed");
@@ -287,7 +284,7 @@ public class SurvivalFly extends Check {
 
 		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
 			// Some reset condition.
-			data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+			data.jumpAmplifier = MovingListener.getJumpAmplifier(player);
 		}
 		
 		// TODO: on ground -> on ground improvements
@@ -347,7 +344,7 @@ public class SurvivalFly extends Check {
         return null;
     }
 
-	private boolean lostGround(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
+	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
 		// Don't set "useWorkaround = x()", to avoid potential trouble with
 		// reordering to come, and similar.
 		boolean useWorkaround = false;
@@ -373,7 +370,7 @@ public class SurvivalFly extends Check {
 					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
 					final double iY = minY; // TODO ...
 					final double r = from.getWidth() / 2.0;
-					if (BlockProperties.isOnGround(from.getBlockAccess(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
+					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
 						useWorkaround = true;
 						setBackSafe = true;
 					}
@@ -388,7 +385,7 @@ public class SurvivalFly extends Check {
 			// data.ground ?
 			// ? set jumpphase to height / 0.15 ?
 			data.sfJumpPhase = 0;
-			data.jumpAmplifier = MovingListener.getJumpAmplifier(mcPlayer);
+			data.jumpAmplifier = mcAccess.getJumpAmplifier(player);
 			data.clearAccounting();
 			// Tell NoFall that we assume the player to have been on ground somehow.
 			data.noFallAssumeGround = true;
@@ -410,7 +407,7 @@ public class SurvivalFly extends Check {
 	 * @param cc
 	 * @return
 	 */
-	private double getAllowedhDist(final Player player, final EntityPlayer mcPlayer, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final double hDistance, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+	private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final double hDistance, final MovingData data, final MovingConfig cc, boolean checkPermissions)
 	{
 		if (checkPermissions) tags.add("permchecks");
 		// TODO: re-arrange for fastest checks first (check vs. allowed distance
@@ -448,7 +445,8 @@ public class SurvivalFly extends Check {
 		if (hDistance <= hAllowedDistance) return hAllowedDistance;
 		
 		// Speed amplifier.
-		if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) hAllowedDistance *= 1.0D + 0.2D * (mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier() + 1);
+		final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);
+		if (speedAmplifier != Double.MIN_VALUE) hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
 		
 		return hAllowedDistance;
 	}

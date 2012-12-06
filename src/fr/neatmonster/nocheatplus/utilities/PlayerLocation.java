@@ -1,22 +1,12 @@
 package fr.neatmonster.nocheatplus.utilities;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.server.AxisAlignedBB;
-import net.minecraft.server.Entity;
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.IBlockAccess;
-import net.minecraft.server.WorldServer;
-
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.CraftWorld;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import fr.neatmonster.nocheatplus.NoCheatPlus;
 
 /*
  * MM"""""""`YM dP                                     
@@ -41,9 +31,6 @@ import org.bukkit.util.Vector;
  * given.
  */
 public class PlayerLocation {
-
-	/** Box for one time use, no nesting, no extra storing this(!). */
-	protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
 	/** Type id of the block at the position. */
 	private Integer typeId;
@@ -88,25 +75,29 @@ public class PlayerLocation {
 
 	private float yaw, pitch;
 
-	// Members that need cleanup:
-
-	/** The entityPlayer player. */
-	private EntityPlayer entityPlayer;
-
+	private double width;
+	
 	/** Bounding box of the player. */
 	private double minX, maxX, minY, maxY, minZ, maxZ;
 
+	// Members that need cleanup //
+
+	/** The player ! */
+	private Player player;
+	
 	/** Bukkit world. */
 	private World world;
-
-	/** The worldServer. */
-	private WorldServer worldServer;
 
 	/** Optional block property cache. */
 	private BlockCache blockCache;
 	
 	/** All block flags collected for maximum used bounds. */
 	private Long blockFlags;
+	
+	
+	public PlayerLocation(final BlockCache blockCache){
+		this.blockCache = blockCache;
+	}
 
 	/**
 	 * Gets the location.
@@ -167,7 +158,7 @@ public class PlayerLocation {
 	}
 
 	public double getWidth() {
-		return entityPlayer.width;
+		return width;
 	}
 
 	public int getBlockX() {
@@ -245,7 +236,7 @@ public class PlayerLocation {
 			}
 			// TODO: Distinguish based on actual height off .0 ?
 			final double diff = 0.001;
-			aboveStairs = BlockProperties.collides(getBlockAccess(), minX - diff, minY - 1.0, minZ - diff, maxX + diff, minY + 0.25, maxZ + diff, BlockProperties.F_STAIRS);
+			aboveStairs = BlockProperties.collides(blockCache, minX - diff, minY - 1.0, minZ - diff, maxX + diff, minY + 0.25, maxZ + diff, BlockProperties.F_STAIRS);
 		}
 		return aboveStairs;
 	}
@@ -264,7 +255,7 @@ public class PlayerLocation {
 			final double dX = -0.10000000149011612D;
 			final double dY = -0.40000000596046448D;
 			final double dZ = dX;
-			inLava = BlockProperties.collides(getBlockAccess(), minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_LAVA);
+			inLava = BlockProperties.collides(blockCache, minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_LAVA);
 		}
 		return inLava;
 	}
@@ -283,7 +274,7 @@ public class PlayerLocation {
 			final double dX = -0.001D;
 			final double dY = -0.40000000596046448D - 0.001D;
 			final double dZ = -0.001D;
-			inWater = BlockProperties.collides(getBlockAccess(), minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_WATER);
+			inWater = BlockProperties.collides(blockCache, minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_WATER);
 		}
 		return inWater;
 	}
@@ -306,9 +297,8 @@ public class PlayerLocation {
 	 */
 	public boolean isOnIce() {
 		if (onIce == null) {
-			final org.bukkit.entity.Player entity = this.entityPlayer.getBukkitEntity();
 			// TODO: Use a box here too ?
-			if (entity.isSneaking() || entity.isBlocking()) onIce = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ) == Material.ICE.getId();
+			if (player.isSneaking() || player.isBlocking()) onIce = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ) == Material.ICE.getId();
 			else onIce = getTypeIdBelow().intValue() == Material.ICE.getId();
 		}
 		return onIce;
@@ -354,7 +344,7 @@ public class PlayerLocation {
 	public boolean isInWeb() {
 		if (inWeb == null) {
 			final double inset = 0.001d;
-			inWeb = BlockProperties.collidesId(getBlockAccess(), minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB.getId());
+			inWeb = BlockProperties.collidesId(blockCache, minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB.getId());
 		}
 		return inWeb;
 	}
@@ -368,37 +358,15 @@ public class PlayerLocation {
 		if (onGround == null) {
 			final double d0 = 0; //0.001D;
 			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
-				final IBlockAccess access = getBlockAccess();
-				if (BlockProperties.collidesBlock(access, x, minY - yOnGround, z, x, minY + 0.25, z, blockX, blockY, blockZ, getTypeId())){
+				if (BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY + 0.25, z, blockX, blockY, blockZ, getTypeId())){
 					onGround = true;
 				}
-				else onGround = BlockProperties.isOnGround(access, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
+				else onGround = BlockProperties.isOnGround(blockCache, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
 			}
 			else onGround = false;
 			if (!onGround) {
-				try{
-					// TODO: Probably check other ids too before doing this ?
-					final double d1 = 0.25D;
-					final AxisAlignedBB box = useBox.b(minX - d1, minY - getyOnGround() - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
-					@SuppressWarnings("rawtypes")
-					final List list = worldServer.getEntities(entityPlayer, box);
-					@SuppressWarnings("rawtypes")
-					Iterator iterator = list.iterator();
-					while (iterator.hasNext()) {
-						final Entity entity = (Entity) iterator.next();
-						final EntityType type = entity.getBukkitEntity().getType();
-						if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
-						final AxisAlignedBB otherBox = entity.boundingBox;
-						if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
-						else {
-							onGround = true;
-							break;
-						}
-					}
-				}
-				catch (Throwable t){
-					// Ignore exceptions (Context: DisguiseCraft).
-				}
+				final double d1 = 0.25D;
+				onGround = blockCache.standsOnEntity(player, minX - d1, minY - getyOnGround() - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
 			}
 		}
 		return onGround;
@@ -428,7 +396,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isPassable() {
-		if (passable == null) passable = BlockProperties.isPassable(getBlockAccess(), x, y, z, getTypeId());
+		if (passable == null) passable = BlockProperties.isPassable(blockCache, x, y, z, getTypeId());
 		return passable;
 	}
 
@@ -441,7 +409,7 @@ public class PlayerLocation {
 	 */
 	public boolean isDownStream(final double xDistance, final double zDistance)
 	{
-		return BlockProperties.isDownStream(getBlockAccess(), blockX, blockY, blockZ, getData(), xDistance, zDistance);
+		return BlockProperties.isDownStream(blockCache, blockX, blockY, blockZ, getData(), xDistance, zDistance);
 	}
 
 	public Integer getTypeId() {
@@ -468,7 +436,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public final int getTypeId(final int x, final int y, final int z) {
-		return blockCache == null ? worldServer.getTypeId(x, y, z) : blockCache.getTypeId(x, y, z);
+		return blockCache.getTypeId(x, y, z);
 	}
 
 	/**
@@ -480,11 +448,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public final int getData(final int x, final int y, final int z) {
-		return blockCache == null ? worldServer.getData(x, y, z) : blockCache.getData(x, y, z);
-	}
-
-	public WorldServer getWorldServer() {
-		return worldServer;
+		return blockCache.getData(x, y, z);
 	}
 
 	/**
@@ -497,11 +461,11 @@ public class PlayerLocation {
 	}
 
 	/**
-	 * 
+	 * Get the underlying BLockCache.
 	 * @return
 	 */
-	public final IBlockAccess getBlockAccess() {
-		return blockCache == null ? worldServer : blockCache;
+	public final BlockCache getBlockCache() {
+		return blockCache;
 	}
 
 	/**
@@ -528,7 +492,7 @@ public class PlayerLocation {
 	{
 
 		// Entity reference.
-		entityPlayer = ((CraftPlayer) player).getHandle();
+		this.player = player;
 
 		// Set coordinates.
 		blockX = location.getBlockX();
@@ -551,7 +515,9 @@ public class PlayerLocation {
 //		maxY = y + entityPlayer.boundingBox.e + dY;
 //		maxZ = z + entityPlayer.boundingBox.f + dZ;
 //		// TODO: inset, outset ?
-		final double dxz = entityPlayer.width/2;
+		this.width = NoCheatPlus.getMCAccess().getWidthOrLength(player);
+		final double dxz = this.width / 2;
+		 
 //		final double dX = (entityPlayer.boundingBox.d - entityPlayer.boundingBox.a) / 2D;
 //		final double dY = entityPlayer.boundingBox.e - entityPlayer.boundingBox.b;
 //		final double dZ = (entityPlayer.boundingBox.f - entityPlayer.boundingBox.c) / 2D;
@@ -565,7 +531,6 @@ public class PlayerLocation {
 
 		// Set world / block access.
 		world = location.getWorld();
-		worldServer = ((CraftWorld) world).getHandle();
 
 		// Reset cached values.
 		typeId = typeIdBelow = data = null;
@@ -584,16 +549,15 @@ public class PlayerLocation {
 	 * @param maxYonGround
 	 */
 	public void collectBlockFlags(double maxYonGround){
-		blockFlags = BlockProperties.collectFlagsSimple(getBlockAccess(), minX - 0.001, minY - Math.max(Math.max(1.0, yOnGround), maxYonGround), minZ - 0.001, maxX + 0.001, maxY + .25, maxZ + .001);
+		blockFlags = BlockProperties.collectFlagsSimple(blockCache, minX - 0.001, minY - Math.max(Math.max(1.0, yOnGround), maxYonGround), minZ - 0.001, maxX + 0.001, maxY + .25, maxZ + .001);
 	}
 
 	/**
 	 * Set some references to null.
 	 */
 	public void cleanup() {
-		entityPlayer = null;
+		player = null;
 		world = null;
-		worldServer = null;
 		blockCache = null; // No reset here.
 	}
 
@@ -603,21 +567,11 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isIllegal() {
-		if (entityPlayer.dead) return false;
-		AxisAlignedBB box = entityPlayer.boundingBox;
-		if (!entityPlayer.isSleeping()){
-			// This can not really test stance but height of bounding box.
-			final double dY = Math.abs(box.e - box.b);
-			if (dY > 1.8) return true; // dY > 1.65D || 
-			if (dY < 0.1D) return true;
-		}
-		if (Math.abs(minX) > 3.2E7D || Math.abs(maxX) > 3.2E7D || Math.abs(minY) > 3.2E7D || Math.abs(maxY) > 3.2E7D || Math.abs(minZ) > 3.2E7D || Math.abs(maxZ) > 3.2E7D) return true;
+		final Boolean spec = NoCheatPlus.getMCAccess().isIllegalBounds(player);
+		if (spec != null) return spec.booleanValue();
+		else if (Math.abs(minX) > 3.2E7D || Math.abs(maxX) > 3.2E7D || Math.abs(minY) > 3.2E7D || Math.abs(maxY) > 3.2E7D || Math.abs(minZ) > 3.2E7D || Math.abs(maxZ) > 3.2E7D) return true;
 		// if (Math.abs(box.a) > 3.2E7D || Math.abs(box.b) > 3.2E7D || Math.abs(box.c) > 3.2E7D || Math.abs(box.d) > 3.2E7D || Math.abs(box.e) > 3.2E7D || Math.abs(box.f) > 3.2E7D) return true;
-		return false;
-	}
-
-	public EntityPlayer getEntityPlayer() {
-		return entityPlayer;
+		else return false;
 	}
 
 }

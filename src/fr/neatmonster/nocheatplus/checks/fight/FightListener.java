@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
-import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -76,7 +75,7 @@ public class FightListener extends CheckListener {
      *            The EntityDamageByEntityEvent
      * @return 
      */
-    private boolean handleNormalDamage(final Player player, final Entity cbEntity) {
+    private boolean handleNormalDamage(final Player player, final Entity damaged) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
         
@@ -91,14 +90,14 @@ public class FightListener extends CheckListener {
         final String worldName = player.getWorld().getName();
         
         // Check for self hit exploits (mind that projectiles should be excluded)
-        if (cbEntity instanceof Player){
-        	final Player damagedPlayer = (Player) cbEntity;
+        if (damaged instanceof Player){
+        	final Player damagedPlayer = (Player) damaged;
         	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc))
         		cancelled = true;
         }
         
         if (cc.cancelDead){
-        	if (cbEntity.isDead()) cancelled = true;
+        	if (damaged.isDead()) cancelled = true;
         	// Only allow damaging others if taken damage this tick.
             if (player.isDead() && data.damageTakenTick != TickTask.getTick()){
             	cancelled = true;
@@ -108,9 +107,6 @@ public class FightListener extends CheckListener {
         final long now = System.currentTimeMillis();
         
         final boolean worldChanged = !worldName.equals(data.lastWorld);
-
-        // Get the attacked entity.
-        final net.minecraft.server.Entity damaged = ((CraftEntity) cbEntity).getHandle();
 
         // Run through the main checks.
         if (!cancelled && speed.isEnabled(player)){
@@ -144,7 +140,7 @@ public class FightListener extends CheckListener {
         if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
             cancelled = true;
 
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, cbEntity))
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, damaged))
             cancelled = true;
 
         if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))

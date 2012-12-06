@@ -1,10 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import net.minecraft.server.DamageSource;
-import net.minecraft.server.EntityPlayer;
-
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -50,32 +46,32 @@ public class NoFall extends Check {
      * @param data
      * @param y
      */
-    private static final void handleOnGround(final EntityPlayer mcPlayer, final MovingData data, final double y, final MovingConfig cc, final boolean reallyOnGround) {
+    private final void handleOnGround(final Player player, final MovingData data, final double y, final MovingConfig cc, final boolean reallyOnGround) {
 //        final int pD = getDamage(mcPlayer.fallDistance);
 //        final int nfD = getDamage(data.noFallFallDistance);
 //        final int yD = getDamage((float) (data.noFallMaxY - y));
 //        final int maxD = Math.max(Math.max(pD, nfD), yD);
-        final int maxD = getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, mcPlayer.fallDistance)));
+        final int maxD = getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
         if (maxD > 0){
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
-            if (cc.debug) System.out.println(mcPlayer.name + " NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
+            if (cc.debug) System.out.println(player.getName() + " NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
             // TODO: might not be necessary: if (mcPlayer.invulnerableTicks <= 0)  [no damage event for resetting]
             data.noFallSkipAirCheck = true;
-			dealFallDamage(mcPlayer, maxD);
+			dealFallDamage(player, maxD);
         }
         else data.clearNoFallData();
     }
 
-    private static void dealFallDamage(EntityPlayer mcPlayer, int damage) {
-    	final EntityDamageEvent event = new EntityDamageEvent(mcPlayer.getBukkitEntity(), DamageCause.FALL, damage);
+    private void dealFallDamage(final Player player, final int damage) {
+    	final EntityDamageEvent event = new EntityDamageEvent(player, DamageCause.FALL, damage);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()){
-            mcPlayer.damageEntity(DamageSource.FALL, event.getDamage());
+            mcAccess.dealFallDamage(player, event.getDamage());
         }
         // TODO: let this be done by the damage event (!).
 //        data.clearNoFallData(); // -> currently done in the damage eventhandling method.
-        mcPlayer.fallDistance = 0;
+        player.setFallDistance(0);
 	}
 
 	/**
@@ -113,9 +109,6 @@ public class NoFall extends Check {
         final boolean toOnGround = to.isOnGround();
         final boolean toReset = to.isResetCond();
         
-        final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-        
-        
         // TODO: early returns (...) 
         
         final double pY =  player.getLocation().getY();
@@ -127,9 +120,9 @@ public class NoFall extends Check {
         }
         else if (fromOnGround || data.noFallAssumeGround){
             // Check if to deal damage (fall back damage check).
-            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc, true);
+            if (cc.noFallDealDamage) handleOnGround(player, data, minY, cc, true);
             else{
-                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY)));
+                player.setFallDistance(Math.max(player.getFallDistance(), Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY))));
                 data.clearNoFallData();
             }
         }
@@ -143,9 +136,9 @@ public class NoFall extends Check {
             	// In this case the player has traveled further: add the difference.
             	data.noFallFallDistance -= yDiff;
             }
-            if (cc.noFallDealDamage) handleOnGround(mcPlayer, data, minY, cc, true);
+            if (cc.noFallDealDamage) handleOnGround(player, data, minY, cc, true);
             else{
-                mcPlayer.fallDistance = Math.max(mcPlayer.fallDistance, Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY)));
+                player.setFallDistance(Math.max(player.getFallDistance(), Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY))));
                 data.clearNoFallData();
             }
         }
@@ -159,14 +152,14 @@ public class NoFall extends Check {
         
         // TODO: fall distance might be behind (!)
         // TODO: should be the data.noFallMaxY be counted in ?
-        data.noFallFallDistance = Math.max(mcPlayer.fallDistance, data.noFallFallDistance);
+        data.noFallFallDistance = Math.max(player.getFallDistance(), data.noFallFallDistance);
         
         // Add y distance.
         if (!toReset && !toOnGround && yDiff < 0){
             data.noFallFallDistance -= yDiff;
         }
         
-        if (cc.debug) System.out.println(player.getName() + " NoFall: mc=" + CheckUtils.fdec3.format(mcPlayer.fallDistance) +" / nf=" + CheckUtils.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + CheckUtils.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
+        if (cc.debug) System.out.println(player.getName() + " NoFall: mc=" + CheckUtils.fdec3.format(player.getFallDistance()) +" / nf=" + CheckUtils.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + CheckUtils.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
         
     }
     
@@ -193,9 +186,8 @@ public class NoFall extends Check {
      */
 	public void checkDamage(final Player player, final MovingData data, final double y) {
 		final MovingConfig cc = MovingConfig.getConfig(player);
-		
 		// Deal damage.
-		handleOnGround(((CraftPlayer) player).getHandle(), data, y, cc, false);
+		handleOnGround(player, data, y, cc, false);
 	}
 	
 }

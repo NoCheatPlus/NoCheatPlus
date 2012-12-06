@@ -9,11 +9,11 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import fr.neatmonster.nocheatplus.NoCheatPlus;
 
 /**
  * Random auxiliary gear, some might have general quality.
@@ -346,16 +346,12 @@ public class CheckUtils {
 	/**
 	 * Get the height from getLocation().getY() to head / above head.<br>
 	 * NOTE: Currently this is pretty much useless, it returns 1.0 most of the time.
-	 * 
+	 * @deprecated This has been moved to MCAccess (compat).
 	 * @param entity
 	 * @return
 	 */
 	public static double getHeight(final Entity entity) {
-		final net.minecraft.server.Entity mcEntity = ((CraftEntity) entity).getHandle();
-		final double entityHeight = mcEntity.height;
-		if (entity instanceof LivingEntity) {
-			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
-		} else return mcEntity.height;
+		return NoCheatPlus.getMCAccess().getHeight(entity);
 	}
 	
 	public static void onIllegalMove(final Player player){
