@@ -45,11 +45,25 @@ public class TickTask implements Runnable {
 		}
 	}
 	
+	public static final int lagMaxTicks = 80;
+	
 	/** Permissions to update: player name -> check type. */
 	private static final Set<PermissionUpdateEntry> permissionUpdates = new LinkedHashSet<PermissionUpdateEntry>(50);
 	
 	/** Actions to execute. */
 	private static final List<ViolationData> delayedActions = new LinkedList<ViolationData>();
+	
+	/** Last n tick durations, measured from run to run.*/
+	private static final long[] tickDurations = new long[lagMaxTicks];
+	
+	/** Tick durations summed up in packs of n (nxn time covered) */
+	private static final long[] tickDurationsSq = new long[lagMaxTicks];
+	
+	/** Lag spikes > 150 ms counting (3 x 20 minutes). */
+	private static final ActionFrequency spikes150 = new ActionFrequency(3, 1000L * 60L * 20L);
+	
+	/** Lag spikes > 1000 ms counting (3 x 20 minutes). */
+	private static final ActionFrequency spikes1000 = new ActionFrequency(3, 1000L * 60L * 20L);
 	
 	/** Task id of the running TickTask */
 	protected static int taskId = -1;
@@ -163,6 +177,50 @@ public class TickTask implements Runnable {
 	}
 	
 	/**
+	 * Get lag percentage for the last ms milliseconds.<br>
+	 * NOTE: Will not be synchronized, still can be called from other threads.
+	 * @return
+	 */
+	public static final float getLag(final long ms){
+		// TODO: Account for freezing (i.e. check timeLast, might be an extra method)!
+		final int tick = TickTask.tick;
+		if (tick == 0) return 1f;
+		
+		final int totalTicks = Math.min(tick, 1 + (int) (ms / 50));
+		final int maxTick = Math.min(lagMaxTicks, totalTicks);
+		long sum = tickDurations[maxTick - 1];
+		long covered = maxTick * 50;
+		
+		// Only count fully covered:
+		if (totalTicks > lagMaxTicks){
+			int maxTickSq = Math.min(lagMaxTicks, totalTicks / lagMaxTicks);
+			if (lagMaxTicks * maxTickSq == totalTicks) maxTickSq -= 1;
+			sum += tickDurationsSq[maxTickSq - 1];
+			covered += lagMaxTicks * 50 * maxTickSq; 
+		}
+		
+		return (float) sum / (float) covered;
+	}
+	
+	/**
+	 * Get moderate lag spikes of the last hour (>150 ms).
+	 * @return
+	 */
+	public static final int getModerateLagSpikes(){
+		spikes150.update(System.currentTimeMillis());
+		return (int) spikes150.score(1f);
+	}
+	
+	/**
+	 * Get heavy lag spikes of the last hour (> 1 s).
+	 * @return
+	 */
+	public static final int getHeavyLagSpikes(){
+		spikes1000.update(System.currentTimeMillis());
+		return (int) spikes1000.score(1f);
+	}
+	
+	/**
 	 * Check if new permission update requests and actions can be added.
 	 * @return True if locked.
 	 */
@@ -178,6 +236,7 @@ public class TickTask implements Runnable {
 		cancel();
 		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
 		if (taskId != -1) timeStart = System.currentTimeMillis();
+		else timeStart = 0;
 		return taskId;
 	}
 	
@@ -208,6 +267,20 @@ public class TickTask implements Runnable {
 		}
 	}
 	
+	/** 
+	 * Reset tick and tick stats to 0 (!).
+	 */
+	public static void reset(){
+		tick = 0;
+		timeLast = 0;
+		for (int i = 0; i < lagMaxTicks; i++){
+			tickDurations[i] = 0;
+			tickDurationsSq[i] = 0;
+		}
+		spikes150.clear(0);
+		spikes1000.clear(0);
+	}
+	
 	//////////////////////////
 	// Instance methods
 	//////////////////////////
@@ -215,20 +288,46 @@ public class TickTask implements Runnable {
 	@Override
 	public void run() {
 		tick ++;
-		final long time = System.currentTimeMillis();
 		
 		// Now sync is forced, for the ability to lock.
 		executeActions();
 		updatePermissions();
 		
+		// Measure time after heavy stuff.
+		final long time = System.currentTimeMillis();
+		final long lastDur;
+		
 		// Time running backwards check (not only players can!).
 		if (timeLast > time) {
+			lastDur = 50;
 			LogUtil.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
 			DataManager.clearData(CheckType.ALL);
 		}
+		else{
+			lastDur = time - timeLast;
+		}
 		
-		// TODO: Lag measurement !
+		// Update sums of sums of tick durations.
+		if (tick > 0 && (tick % lagMaxTicks) == 0){
+			final long sum = tickDurations[lagMaxTicks - 1];
+			for (int i = 1; i < lagMaxTicks; i++){
+				tickDurationsSq[i] = tickDurationsSq[i - 1] + sum;
+			}
+			tickDurationsSq[0] = sum;
+		}
 		
+		// Update tick duraiton sums.
+		for (int i = 1; i < lagMaxTicks; i++){
+			tickDurations[i] = tickDurations[i - 1] + lastDur;
+		}
+		tickDurations[0] = lastDur;
+		
+		// Lag spikes150 counting. [Subject to adjustments!]
+		if (lastDur > 150){
+			spikes150.add(time, 1f);
+			if (lastDur > 1000) spikes1000.add(time, 1f);
+		}
+			
 		// Finish.
 		timeLast = time;
 	}

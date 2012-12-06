@@ -396,6 +396,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
          * |_____|_| |_|\__,_|_.__/|_|\___|
          */
     	
+    	// Reset TickTask (just in case).
+    	TickTask.reset();
+    	
         // Read the configuration files.
         ConfigManager.init(this);
         

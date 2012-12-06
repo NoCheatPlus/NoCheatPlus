@@ -35,6 +35,7 @@ public class Permissions {
     public static final String  ADMINISTRATION_COMMANDS      = ADMINISTRATION + ".commands";
     public static final String  ADMINISTRATION_KICK          = ADMINISTRATION + ".kick";
 	public static final String  ADMINISTRATION_KICKLIST      = ADMINISTRATION + ".kicklist";
+	public static final String  ADMINISTRATION_LAG 			 = ADMINISTRATION + ".lag";
     public static final String  ADMINISTRATION_NOTIFY        = ADMINISTRATION + ".notify";
     public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
     public static final String  ADMINISTRATION_RELOAD        = ADMINISTRATION + ".reload";
@@ -42,9 +43,9 @@ public class Permissions {
     public static final String  ADMINISTRATION_TELL          = ADMINISTRATION + ".tell";
     public static final String  ADMINISTRATION_TEMPKICK      = ADMINISTRATION + ".tempkick";
 	public static final String  ADMINISTRATION_UNKICK        = ADMINISTRATION + ".unkick";
+	
     // Debug permission, for player spam (not in plugin.yml, currently).
-	public static final String  ADMINISTRATION_DEBUG          = ADMINISTRATION + ".debug";
-    
+	public static final String  ADMINISTRATION_DEBUG         = ADMINISTRATION + ".debug";
 	
     // Bypasses held extra from command permissions.
     private final static String BYPASS                       = NOCHEATPLUS + ".bypass";

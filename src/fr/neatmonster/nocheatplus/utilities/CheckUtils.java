@@ -25,13 +25,23 @@ public class CheckUtils {
 
 	/** Decimal format for "#.###" */
 	public static final DecimalFormat fdec3 = new DecimalFormat();
+	
+	/** Decimal format for "#.#" */
+	public static final DecimalFormat fdec1 = new DecimalFormat();
 
 	static {
+		// 3 digits.
 		DecimalFormatSymbols sym = fdec3.getDecimalFormatSymbols();
 		sym.setDecimalSeparator('.');
 		fdec3.setDecimalFormatSymbols(sym);
 		fdec3.setMaximumFractionDigits(3);
 		fdec3.setMinimumIntegerDigits(1);
+		// 1 digit.
+		sym = fdec1.getDecimalFormatSymbols();
+		sym.setDecimalSeparator('.');
+		fdec1.setDecimalFormatSymbols(sym);
+		fdec1.setMaximumFractionDigits(1);
+		fdec1.setMinimumIntegerDigits(1);
 	}
 
 	/**

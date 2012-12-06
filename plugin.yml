@@ -16,6 +16,7 @@ commands:
         usage: |
                Administrative commands overview:
                /<command> reload: reload NoCheatPlus configuration
+               /<command> lag: Lag related info [expect changes] 
                /<command> info (player): Display the violations of a player
                /<command> removeplayer (player) [(check type)]: Remove data
                /<command> exemptions (player) [(check type)]: Show exemptions
@@ -50,6 +51,8 @@ permissions:
                         description: Allow use of the ncp kick command.
                     nocheatplus.admin.kicklist:
                         description: Allow use of the ncp kicklist command.
+                    nocheatplus.admin.lag:
+                        description: Allow use of the ncp lag command.
                     nocheatplus.admin.tell:
                         description: Allow use of the ncp tell command.
                     nocheatplus.admin.delay:
