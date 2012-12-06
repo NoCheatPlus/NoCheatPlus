@@ -316,7 +316,7 @@ public class TickTask implements Runnable {
 			tickDurationsSq[0] = sum;
 		}
 		
-		// Update tick duraiton sums.
+		// Update tick duration sums.
 		for (int i = 1; i < lagMaxTicks; i++){
 			tickDurations[i] = tickDurations[i - 1] + lastDur;
 		}
