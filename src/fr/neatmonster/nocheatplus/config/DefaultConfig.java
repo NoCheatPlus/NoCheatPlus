@@ -253,6 +253,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMBINED_INVULNERABLE_IGNORE, Arrays.asList("FALL"));
         set(ConfPaths.COMBINED_INVULNERABLE_MODIFIERS + ".all", 0);
         
+        set(ConfPaths.COMBINED_MUNCHHAUSEN_CHECK, false);
+        set(ConfPaths.COMBINED_MUNCHHAUSEN_ACTIONS, "cancel vl>100 cancel log:munchhausen:0:60:if");
+        
         set(ConfPaths.COMBINED_YAWRATE_RATE , 380);
         set(ConfPaths.COMBINED_YAWRATE_PENALTY_FACTOR, 1.0);
         set(ConfPaths.COMBINED_YAWRATE_PENALTY_MIN, 250);
@@ -442,6 +445,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
         set(ConfPaths.STRINGS + ".knockback", start + "tried to do a knockback but wasn't technically sprinting" + end);
         set(ConfPaths.STRINGS + ".morepackets", start + "sent [packets] more packet(s) than expected" + end);
+        set(ConfPaths.STRINGS + ".munchhausen", start + "almost made it off the pit" + end);
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage" + end);
         set(ConfPaths.STRINGS + ".chatfast", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);

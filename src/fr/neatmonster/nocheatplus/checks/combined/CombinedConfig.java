@@ -63,6 +63,9 @@ public class CombinedConfig extends ACheckConfig {
     public final int                        invulnerableModifierDefault;
     public final boolean                    invulnerableTriggerAlways;
     public final boolean                    invulnerableTriggerFallDistance;
+    
+	public final boolean 		munchHausenCheck;
+	public final ActionList 	munchHausenActions;
 	
 	// Last yaw tracking 
 	public final float      yawRate;
@@ -117,6 +120,10 @@ public class CombinedConfig extends ACheckConfig {
 	    if (error) LogUtil.logInfo("[NoCheatPlus] Damage causes can be: " + CheckUtils.join(Arrays.asList(DamageCause.values()), ", "));
 	    invulnerableTriggerAlways = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS);
 	    invulnerableTriggerFallDistance = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE);
+	    
+	    munchHausenCheck = config.getBoolean(ConfPaths.COMBINED_MUNCHHAUSEN_CHECK);
+	    munchHausenActions = config.getOptimizedActionList(ConfPaths.COMBINED_MUNCHHAUSEN_ACTIONS, Permissions.COMBINED_MUNCHHAUSEN);
+	    
 		yawRate = config.getInt(ConfPaths.COMBINED_YAWRATE_RATE);
 		yawRateImprobable = config.getBoolean(ConfPaths.COMBINED_YAWRATE_IMPROBABLE);
 		yawRatePenaltyFactor = (float) config.getDouble(ConfPaths.COMBINED_YAWRATE_PENALTY_FACTOR);

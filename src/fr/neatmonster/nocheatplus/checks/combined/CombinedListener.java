@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
@@ -25,6 +26,8 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 public class CombinedListener extends CheckListener {
 	
 	protected final Improbable improbable;
+	
+	protected final MunchHausen munchHausen = new MunchHausen();
 
 	public CombinedListener(){
 		super(CheckType.COMBINED);
@@ -100,6 +103,15 @@ public class CombinedListener extends CheckListener {
     public void onPlayerToggleSneak(final PlayerToggleSneakEvent event){
         // Check also in case of cancelled events.
         if (Improbable.check(event.getPlayer(), 0.35f, System.currentTimeMillis())) event.setCancelled(true);
+    }
+    
+    @EventHandler(priority=EventPriority.LOWEST)
+    public void onPlayerFish(final PlayerFishEvent event){
+        // Check also in case of cancelled events.
+    	final Player player = event.getPlayer();
+        if (munchHausen.isEnabled(player) && munchHausen.checkFish(player, event.getCaught(), event.getState())){
+        	event.setCancelled(true);
+        }
     }
 	
 }

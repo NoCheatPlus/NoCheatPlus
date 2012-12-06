@@ -53,6 +53,7 @@ public class CombinedData extends ACheckData {
     // VLs
 	public double bedLeaveVL = 0;
 	public double improbableVL = 0;
+	public double munchHausenVL = 0;
 	
 	// Invulnerable management:
     /** This is the tick from which on the player is vulnerable again. */

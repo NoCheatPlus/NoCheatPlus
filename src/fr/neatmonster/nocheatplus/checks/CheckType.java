@@ -70,6 +70,7 @@ public enum CheckType {
     COMBINED(CombinedConfig.factory, CombinedData.factory, Permissions.COMBINED),
     COMBINED_BEDLEAVE(COMBINED, Permissions.COMBINED_BEDLEAVE),
     COMBINED_IMPROBABLE(COMBINED, Permissions.COMBINED_IMPROBABLE),
+    COMBINED_MUNCHHAUSEN(COMBINED, Permissions.COMBINED_MUNCHHAUSEN),
 
     FIGHT(FightConfig.factory, FightData.factory, Permissions.FIGHT),
     FIGHT_ANGLE(FIGHT, Permissions.FIGHT_ANGLE),

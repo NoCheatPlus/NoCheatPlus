@@ -122,6 +122,7 @@ public class Permissions {
     public static final String  COMBINED                     = CHECKS + ".combined";
 	public static final String  COMBINED_BEDLEAVE			 = COMBINED + ".bedleave";
 	public static final String  COMBINED_IMPROBABLE          = COMBINED + ".improbable";
+	public static final String  COMBINED_MUNCHHAUSEN		 = COMBINED + ".munchhausen";
 
     /*
      * 888'Y88 ,e,          888       d8   
