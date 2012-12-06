@@ -792,8 +792,9 @@ public class MovingListener extends CheckListener{
             else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
         	moveInfo.set(player, loc, null, cc.noFallyOnGround);
         	// NOTE: No isIllegal check here.
+        	final PlayerLocation pLoc = moveInfo.from;
         	moveInfo.from.collectBlockFlags(cc.noFallyOnGround);
-        	if (!moveInfo.from.isOnGround() && !moveInfo.from.isResetCond()){
+        	if (!pLoc.isOnGround() && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()){
         		// Likely a new style no-fall bypass (damage in mid-air).
         		data.noFallVL += 1.0;
         		if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions, true) && data.setBack != null){
@@ -803,6 +804,7 @@ public class MovingListener extends CheckListener{
         		}
         	}
         	moveInfo.cleanup();
+        	parkedInfo.add(moveInfo);
         }
         final float fallDistance = player.getFallDistance();
         final int damage = event.getDamage();
