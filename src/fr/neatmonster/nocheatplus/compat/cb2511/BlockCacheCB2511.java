@@ -29,26 +29,27 @@ public class BlockCacheCB2511 extends BlockCache implements IBlockAccess{
 	}
 
 	@Override
-	public void setAccess(World world) {
-		this.world = ((CraftWorld) world).getHandle();
+	public void setAccess(final World world) {
+		this.world = world == null ? null : ((CraftWorld) world).getHandle();
 	}
 
 	@Override
-	public int fetchTypeId(int x, int y, int z) {
+	public int fetchTypeId(final int x, final int y, final int z) {
 		return world.getTypeId(x, y, z);
 	}
 
 	@Override
-	public int fetchData(int x, int y, int z) {
+	public int fetchData(final int x, final int y, final int z) {
 		return world.getData(x, y, z);
 	}
 
 	@Override
-	public double[] fetchBounds(int x, int y, int z){
+	public double[] fetchBounds(final int x, final int y, final int z){
 		
 		// TODO: change api for this / use nodes (!)
 		final int id = getTypeId(x, y, z);		
 		final net.minecraft.server.Block block = net.minecraft.server.Block.byId[id];
+		if (block == null) return null;
 		block.updateShape(this, x, y, z); // TODO: use THIS instead of world.
 		
 		// minX, minY, minZ, maxX, maxY, maxZ
