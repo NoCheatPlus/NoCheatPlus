@@ -49,7 +49,7 @@ public class BlockCacheCB2511 extends BlockCache implements IBlockAccess{
 		// TODO: change api for this / use nodes (!)
 		final int id = getTypeId(x, y, z);		
 		final net.minecraft.server.Block block = net.minecraft.server.Block.byId[id];
-		block.updateShape(world, x, y, z); // TODO: use THIS instead of world.
+		block.updateShape(this, x, y, z); // TODO: use THIS instead of world.
 		
 		// minX, minY, minZ, maxX, maxY, maxZ
 		return new double[]{block.v(), block.x(), block.z(), block.w(),  block.y(),  block.A()};
