@@ -1,5 +1,5 @@
 name: NoCheatPlus
-version: Split-b${build-number}
+version: ${project.version}-b${build-number}
 description: Fight hackers.
 
 author: NeatMonster
