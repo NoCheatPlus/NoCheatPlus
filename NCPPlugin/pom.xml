@@ -3,7 +3,7 @@
   
   <!-- Informations -->
   <groupId>fr.neatmonster</groupId>
-  <artifactId>NoCheatPlus</artifactId>
+  <artifactId>nocheatplus</artifactId>
   <name>NoCheatPlus</name>
   <version>3.8.6</version>
   <description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>

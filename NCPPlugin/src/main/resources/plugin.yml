@@ -1,12 +1,12 @@
-name: NoCheatPlus
-version: ${project.version}-b${build-number}
-description: Fight hackers.
+name: ${project.name}
+version: ${project.version}-b${BUILD_NUMBER}
+description: ${project.description}
 
 author: NeatMonster
 authors: [asofold, Evenprime]
-website: http://nocheatplus.org
+website: ${project.url}
 
-main: fr.neatmonster.nocheatplus.NoCheatPlus
+main: ${project.groupId}.${project.artifactId}.${project.name}
 
 commands:
     nocheatplus:
