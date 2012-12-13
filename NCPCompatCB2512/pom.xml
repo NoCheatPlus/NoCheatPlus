@@ -18,13 +18,11 @@
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcommons</artifactId>
     	<version>1.0.0</version>
-    	<classifier>NCPCommons</classifier>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompat</artifactId>
     	<version>1.0.0</version>
-    	<classifier>NCPCompat</classifier>
     </dependency>
     <dependency>
     	<groupId>org.bukkit</groupId>
