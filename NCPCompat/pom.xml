@@ -28,5 +28,7 @@
     </dependency>
   </dependencies>
 
-  <description>API for the compatibility modules. Uses Bukkit.</description>
+  <description>API for the compatibility modules. Uses Bukkit.
+
+Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 </project>

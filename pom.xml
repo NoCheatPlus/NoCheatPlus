@@ -4,7 +4,7 @@
   <groupId>fr.neatmonster</groupId>
   <artifactId>nocheatplus-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>NoCheatPlus Parent</name>
   <url>http://nocheatplus.org</url>
   <properties>
@@ -27,4 +27,9 @@
     </repository>
   </repositories>
 
+  <description>The pom design has been taken from mbax (GitHub, TODO: link).
+
+TODO: Switch it to an assembly pom + consider using one bukkit version only  for compilation? [Downside: the compat part should be the minimal bukkit version supported, though then the plugin would be taken out, so... do it!]
+
+Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 </project>
