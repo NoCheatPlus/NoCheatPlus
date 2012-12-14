@@ -116,7 +116,7 @@ public class ActionFrequency {
 	
 	/**
 	 * Get score of first end buckets, with factor.
-	 * @param end Number of buckets including start. This is not included.
+	 * @param end Number of buckets including start. The end is not included.
 	 * @param factor
 	 * @return
 	 */
@@ -125,7 +125,7 @@ public class ActionFrequency {
 	}
 	
 	/**
-	 * Get score from startBucket on, with factor.
+	 * Get score from start on, with factor.
 	 * @param start This is included.
 	 * @param factor
 	 * @return
@@ -135,7 +135,7 @@ public class ActionFrequency {
 	}
 	
 	/**
-	 * Get score from startBucket on, until before maxBucket, with factor.
+	 * Get score from start on, until before end, with factor.
 	 * @param start This is included.
 	 * @param end This is not included.
 	 * @param factor
@@ -151,10 +151,19 @@ public class ActionFrequency {
 		return score;
 	}
 	
+	/**
+	 * Set the value for a buckt.
+	 * @param n
+	 * @param value
+	 */
 	public final void setBucket(final int n, final float value){
 		buckets[n] = value;
 	}
 	
+	/**
+	 * Set the reference time.
+	 * @param time
+	 */
 	public final void setTime(final long time){
 		this.time = time;
 	}
@@ -183,6 +192,10 @@ public class ActionFrequency {
 		return durBucket;
 	}
 	
+	/**
+	 * Serialize to a String line.
+	 * @return
+	 */
 	public final String toLine(){
 		final StringBuilder buffer = new StringBuilder(50);
 		buffer.append(buckets.length + ","+durBucket+","+time);
@@ -192,6 +205,11 @@ public class ActionFrequency {
 		return buffer.toString();
 	}
 	
+	/**
+	 * Deserialize from a string.
+	 * @param line
+	 * @return
+	 */
 	public static ActionFrequency fromLine(final String line){
 		String[] split = line.split(",");
 		if (split.length < 3) throw new RuntimeException("Bad argument length."); // TODO
