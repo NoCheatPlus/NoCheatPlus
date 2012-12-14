@@ -238,9 +238,10 @@ public class MovingListener extends CheckListener{
 				// TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
 				target = loc;
 			}
-			target.setPitch(loc.getPitch());
-			target.setYaw(loc.getYaw());
 			if (target != null){
+				// Actually this should not possibly be null, this is a block for "future" purpose, feel free to criticize it.
+				target.setPitch(loc.getPitch());
+				target.setYaw(loc.getYaw());
 				if (sfCheck && noFall.isEnabled(player)){
 					// Check if to deal damage.
 					double y = loc.getY();
