@@ -288,7 +288,7 @@ public class InventoryListener  extends CheckListener {
     	final Player player = event.getPlayer();
     	if (player.getGameMode() == GameMode.CREATIVE) return;
     	final ItemStack stack = player.getItemInHand();
-    	if (stack != null && stack.getTypeId() == Material.MONSTER_EGG.getId()){
+    	if (stack != null && stack.getTypeId() == Material.MONSTER_EGG.getId() && items.isEnabled(player)){
     		event.setCancelled(true);
     	}
     }
