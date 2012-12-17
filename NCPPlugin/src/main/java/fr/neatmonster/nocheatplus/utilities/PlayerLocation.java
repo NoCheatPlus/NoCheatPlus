@@ -6,8 +6,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 
 /*
  * MM"""""""`YM dP                                     
@@ -32,6 +32,9 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
  * given.
  */
 public class PlayerLocation {
+	
+	// Final members //
+	private final MCAccess mcAccess;
 	
 	// Simple members // 
 	
@@ -101,7 +104,8 @@ public class PlayerLocation {
 	private BlockCache blockCache = null;
 	
 	
-	public PlayerLocation(final BlockCache blockCache){
+	public PlayerLocation(final MCAccess mcAccess, final BlockCache blockCache){
+		this.mcAccess = mcAccess;
 		this.blockCache = blockCache;
 	}
 
@@ -522,7 +526,7 @@ public class PlayerLocation {
 //		maxY = y + entityPlayer.boundingBox.e + dY;
 //		maxZ = z + entityPlayer.boundingBox.f + dZ;
 //		// TODO: inset, outset ?
-		this.width = NoCheatPlus.getMCAccess().getWidthOrLength(player);
+		this.width = mcAccess.getWidthOrLength(player);
 		final double dxz = this.width / 2;
 		 
 //		final double dX = (entityPlayer.boundingBox.d - entityPlayer.boundingBox.a) / 2D;
@@ -574,7 +578,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isIllegal() {
-		final AlmostBoolean spec = NoCheatPlus.getMCAccess().isIllegalBounds(player);
+		final AlmostBoolean spec = mcAccess.isIllegalBounds(player);
 		if (spec != AlmostBoolean.MAYBE) return spec.decide();
 		else if (Math.abs(minX) > 3.2E7D || Math.abs(maxX) > 3.2E7D || Math.abs(minY) > 3.2E7D || Math.abs(maxY) > 3.2E7D || Math.abs(minZ) > 3.2E7D || Math.abs(maxZ) > 3.2E7D) return true;
 		// if (Math.abs(box.a) > 3.2E7D || Math.abs(box.b) > 3.2E7D || Math.abs(box.c) > 3.2E7D || Math.abs(box.d) > 3.2E7D || Math.abs(box.e) > 3.2E7D || Math.abs(box.f) > 3.2E7D) return true;

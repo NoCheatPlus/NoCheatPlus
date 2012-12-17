@@ -245,7 +245,7 @@ public class BlockProperties {
 	};
 	
 	private static BlockCache blockCache = NoCheatPlus.getMCAccess().getBlockCache(null); 
-	private static final PlayerLocation pLoc = new PlayerLocation(null);
+	private static final PlayerLocation pLoc = new PlayerLocation(NoCheatPlus.getMCAccess(), null);
 	
     protected static final long[] blockFlags = new long[maxBlocks];
     

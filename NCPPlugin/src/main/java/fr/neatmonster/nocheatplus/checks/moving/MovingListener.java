@@ -39,6 +39,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
+import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -73,9 +74,16 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 public class MovingListener extends CheckListener{
 
 	private static final class MoveInfo{
-		public final BlockCache cache = NoCheatPlus.getMCAccess().getBlockCache(null);
-        public final PlayerLocation from = new PlayerLocation(null);
-        public final PlayerLocation to = new PlayerLocation(null);
+		public final BlockCache cache;
+        public final PlayerLocation from;
+        public final PlayerLocation to;
+        
+        public MoveInfo(final MCAccess mcAccess){
+        	cache = mcAccess.getBlockCache(null);
+        	from = new PlayerLocation(mcAccess, null);
+        	to = new PlayerLocation(mcAccess, null);
+        }
+        
         /**
          * Demands at least setting from.
          * @param player
@@ -355,7 +363,7 @@ public class MovingListener extends CheckListener{
         // Use existent locations if possible.
         final MoveInfo moveInfo;
         final PlayerLocation pFrom, pTo;
-        if (parkedInfo.isEmpty()) moveInfo = new MoveInfo();
+        if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
         else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
         pFrom = moveInfo.from;
         pTo = moveInfo.to;
@@ -479,7 +487,7 @@ public class MovingListener extends CheckListener{
 	{
 		// This might get extended to a check-like thing.
 		boolean restored = false;
-		final PlayerLocation pLoc = new PlayerLocation(null);
+		final PlayerLocation pLoc = new PlayerLocation(NoCheatPlus.getMCAccess(), null);
 		// (Mind that we don't set the block cache here).
 		if (!restored && data.setBack != null) {
 			pLoc.set(data.setBack, player);
@@ -795,7 +803,7 @@ public class MovingListener extends CheckListener{
         boolean allowReset = true;
         if (!data.noFallSkipAirCheck){
         	final MoveInfo moveInfo;
-        	if (parkedInfo.isEmpty()) moveInfo = new MoveInfo();
+        	if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
             else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
         	moveInfo.set(player, loc, null, cc.noFallyOnGround);
         	// NOTE: No isIllegal check here.

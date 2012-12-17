@@ -46,7 +46,7 @@ public class Critical extends Check {
 
         // We'll need the PlayerLocation to know some important stuff.
         final Location loc = player.getLocation();
-        final PlayerLocation location = new PlayerLocation(mcAccess.getBlockCache(loc.getWorld()));
+        final PlayerLocation location = new PlayerLocation(mcAccess, mcAccess.getBlockCache(loc.getWorld()));
         location.set(loc, player);
 		if (location.isIllegal()) {
 			location.cleanup();
