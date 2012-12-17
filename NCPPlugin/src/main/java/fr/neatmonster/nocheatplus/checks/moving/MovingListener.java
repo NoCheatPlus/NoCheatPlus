@@ -226,11 +226,10 @@ public class MovingListener extends CheckListener{
         
 		if (bedLeave.isEnabled(player) && bedLeave.checkBed(player)) {
 			// Check if the player has to be reset.
-			// To cancel the event, we teleport the player.
+			// To "cancel" the event, we teleport the player.
 			final Location loc = player.getLocation();
 			final MovingData data = MovingData.getData(player);
 			final MovingConfig cc = MovingConfig.getConfig(player); 
-			// TODO: Check if survivalfly is active at all for tp loc?
 			Location target = null;
 			final boolean sfCheck = shouldCheckSurvivalFly(player, data, cc);
 			if (sfCheck) target = data.setBack;

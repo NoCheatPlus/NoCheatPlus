@@ -32,39 +32,9 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
  * given.
  */
 public class PlayerLocation {
-
-	/** Type id of the block at the position. */
-	private Integer typeId;
-
-	/** Type id of the block below. */
-	private Integer typeIdBelow;
-
-	private Integer data;
-
-	/** Is the player above stairs? */
-	private Boolean aboveStairs;
-
-	/** Is the player in lava? */
-	private Boolean inLava;
-
-	/** Is the player in water? */
-	private Boolean inWater;
-
-	/** Is the player is web? */
-	private Boolean inWeb;
-
-	/** Is the player on the ground? */
-	private Boolean onGround;
-
-	/** Is the player on ice? */
-	private Boolean onIce;
-
-	/** Is the player on ladder? */
-	private Boolean onClimbable;
-
-	/** Simple test if the exact position is passable. */
-	private Boolean passable;
-
+	
+	// Simple members // 
+	
 	/** Y parameter for growing the bounding box with the isOnGround check. */
 	private double yOnGround = 0.001;
 
@@ -80,20 +50,55 @@ public class PlayerLocation {
 	
 	/** Bounding box of the player. */
 	private double minX, maxX, minY, maxY, minZ, maxZ;
-
-	// Members that need cleanup //
-
-	/** The player ! */
-	private Player player;
 	
-	/** Bukkit world. */
-	private World world;
+	// Object members (reset to null) //
 
-	/** Optional block property cache. */
-	private BlockCache blockCache;
+	/** Type id of the block at the position. */
+	private Integer typeId = null;
+
+	/** Type id of the block below. */
+	private Integer typeIdBelow = null;
+
+	/** Data value of the block this position is on. */
+	private Integer data = null;
+
+	/** Is the player above stairs? */
+	private Boolean aboveStairs = null;
+
+	/** Is the player in lava? */
+	private Boolean inLava = null;
+
+	/** Is the player in water? */
+	private Boolean inWater = null;
+
+	/** Is the player is web? */
+	private Boolean inWeb = null;
+
+	/** Is the player on the ground? */
+	private Boolean onGround = null;
+
+	/** Is the player on ice? */
+	private Boolean onIce = null;
+
+	/** Is the player on ladder? */
+	private Boolean onClimbable = null;
+
+	/** Simple test if the exact position is passable. */
+	private Boolean passable = null;
 	
 	/** All block flags collected for maximum used bounds. */
-	private Long blockFlags;
+	private Long blockFlags = null;
+
+	// "Heavy" members (should be reset to null or cleaned up at some point) //
+
+	/** The player ! */
+	private Player player = null;
+	
+	/** Bukkit world. */
+	private World world = null;
+
+	/** Optional block property cache. */
+	private BlockCache blockCache = null;
 	
 	
 	public PlayerLocation(final BlockCache blockCache){
