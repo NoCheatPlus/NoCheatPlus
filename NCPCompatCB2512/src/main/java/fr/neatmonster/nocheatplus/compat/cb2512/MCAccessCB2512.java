@@ -91,17 +91,17 @@ public class MCAccessCB2512 implements MCAccess{
 	}
 
 	@Override
-	public Boolean isIllegalBounds(final Player player) {
+	public AlmostBoolean isIllegalBounds(final Player player) {
 		final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-		if (entityPlayer.dead) return false;
+		if (entityPlayer.dead) return AlmostBoolean.NO;
 		final AxisAlignedBB box = entityPlayer.boundingBox;
 		if (!entityPlayer.isSleeping()){
 			// This can not really test stance but height of bounding box.
 			final double dY = Math.abs(box.e - box.b);
-			if (dY > 1.8) return true; // dY > 1.65D || 
-			if (dY < 0.1D) return true;
+			if (dY > 1.8) return AlmostBoolean.YES; // dY > 1.65D || 
+			if (dY < 0.1D) return AlmostBoolean.YES;
 		}
-		return null;
+		return AlmostBoolean.MAYBE;
 	}
 
 	@Override

@@ -10,7 +10,8 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
 /**
  * Compatibility interface to get properties for Bukkit instances that need access of CraftBukkit or Minecraft classes.<br>
- * NOTE: Expect API changes in the near future!
+ * NOTE: All methods returning AlmostBoolean must never return null, unless stated otherwise.<br>
+ * NOTE: Expect API changes in the near future!<br>
  * <hr>
  * TODO: Make minimal (do we need WorldServer yet)?
  * @author mc_dev
@@ -71,7 +72,7 @@ public interface MCAccess {
 	 * @param player
 	 * @return null If undecided, true / false if decided.
 	 */
-	public Boolean isIllegalBounds(Player player);
+	public AlmostBoolean isIllegalBounds(Player player);
 	
 	/**
 	 * 

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 
 /*
  * MM"""""""`YM dP                                     
@@ -569,8 +569,8 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isIllegal() {
-		final Boolean spec = NoCheatPlus.getMCAccess().isIllegalBounds(player);
-		if (spec != null) return spec.booleanValue();
+		final AlmostBoolean spec = NoCheatPlus.getMCAccess().isIllegalBounds(player);
+		if (spec != AlmostBoolean.MAYBE) return spec.decide();
 		else if (Math.abs(minX) > 3.2E7D || Math.abs(maxX) > 3.2E7D || Math.abs(minY) > 3.2E7D || Math.abs(maxY) > 3.2E7D || Math.abs(minZ) > 3.2E7D || Math.abs(maxZ) > 3.2E7D) return true;
 		// if (Math.abs(box.a) > 3.2E7D || Math.abs(box.b) > 3.2E7D || Math.abs(box.c) > 3.2E7D || Math.abs(box.d) > 3.2E7D || Math.abs(box.e) > 3.2E7D || Math.abs(box.f) > 3.2E7D) return true;
 		else return false;
