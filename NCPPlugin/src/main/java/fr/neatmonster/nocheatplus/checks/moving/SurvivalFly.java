@@ -386,9 +386,14 @@ public class SurvivalFly extends Check {
 		}
 		if (useWorkaround) { // !toOnGround && to.isAboveStairs()) {
 			// Set the new setBack and reset the jumpPhase.
+			// TODO: Some interpolated position ?
+			// TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
 			if (setBackSafe) data.setBack = from.getLocation();
-			// TODO: This seems dubious !
-			data.setBack.setY(Location.locToBlock(data.setBack.getY()));
+			else{
+				// TODO: This seems dubious !
+				// Consider: 1.0 + ? or max(from.getY(), 1.0 + ...) ?
+				data.setBack.setY(Location.locToBlock(data.setBack.getY())); 
+			}
 			// data.ground ?
 			// ? set jumpphase to height / 0.15 ?
 			data.sfJumpPhase = 0;
