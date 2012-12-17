@@ -358,6 +358,7 @@ public class SurvivalFly extends Check {
 		boolean setBackSafe = false; // Let compiler remove this if necessary.
 		// Check for moving off stairs.
 		if (!useWorkaround && from.isAboveStairs()) {
+			// TODO: This needs some safety guards.
 			useWorkaround = true;
 			setBackSafe = true;
 		}
