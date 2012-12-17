@@ -276,6 +276,7 @@ public class SurvivalFly extends Check {
             	vAllowedDistance -= Math.max(0, (data.sfJumpPhase - maxJumpPhase) * 0.15D);
             }
 
+            // TODO: This might need max(0, for ydiff)
 			vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
 			
 			if (vDistanceAboveLimit > 0) tags.add("vdist");
@@ -302,8 +303,6 @@ public class SurvivalFly extends Check {
 
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
-        data.sfJumpPhase++;
-
 		if (cc.debug) {
 			// TODO: also show resetcond (!)
 			StringBuilder builder = new StringBuilder(500);
@@ -320,6 +319,8 @@ public class SurvivalFly extends Check {
 			if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + CheckUtils.join(tags, "+") + "\n");
 			System.out.print(builder.toString());
 		}
+		
+		data.sfJumpPhase++;
 
 		// Handle violations.
 		if (result > 0D) {
