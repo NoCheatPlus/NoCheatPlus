@@ -1199,18 +1199,18 @@ public class BlockProperties {
         final long flags = blockFlags[id];
         final double bminX, bminZ, bminY;
         final double bmaxX, bmaxY, bmaxZ;
-        bmaxX = bounds[3]; //block.w(); // maxX
-        bmaxZ = bounds[5]; //block.A(); // maxZ
-        if ((flags & F_STAIRS) != 0){
+        if ((flags & F_STAIRS) != 0){ // TODO: make this a full block flag ?
         	// Mainly for on ground style checks, would not go too well with passable.
         	// TODO: change this to something like F_FULLBOX probably.
         	bminX = bminY = bminZ = 0D;
-        	bmaxY = 1D;
+        	bmaxX = bmaxY = bmaxZ = 1D;
         }
         else{
         	bminX = bounds[0]; // block.v(); // minX
         	bminY = bounds[1]; // block.x(); // minY
         	bminZ = bounds[2]; // block.z(); // minZ
+        	bmaxX = bounds[3]; //block.w(); // maxX
+            bmaxZ = bounds[5]; //block.A(); // maxZ
         	if (id == Material.SNOW.getId()){
         		// TODO: remove / solve differently ?
         		final int data = (access.getData(x, y, z) & 0xF) % 8;
