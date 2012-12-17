@@ -53,7 +53,7 @@ public class MCAccessCB2512 implements MCAccess{
 	@Override
 	public double getHeight(final Entity entity) {
 		final net.minecraft.server.v1_4_5.Entity mcEntity = ((CraftEntity) entity).getHandle();
-		final double entityHeight = Math.max(mcEntity.height, mcEntity.boundingBox.e - mcEntity.boundingBox.b);
+		final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.height, mcEntity.boundingBox.e - mcEntity.boundingBox.b));
 		if (entity instanceof LivingEntity) {
 			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
 		} else return entityHeight;
@@ -85,9 +85,8 @@ public class MCAccessCB2512 implements MCAccess{
 	}
 
 	@Override
-	public double getWidthOrLength(final Entity entity) {
-		final net.minecraft.server.v1_4_5.Entity mcEntity = ((CraftEntity) entity).getHandle();
-		return Math.max(mcEntity.width, mcEntity.length);
+	public double getWidth(final Entity entity) {
+		return ((CraftEntity) entity).getHandle().width;
 	}
 
 	@Override

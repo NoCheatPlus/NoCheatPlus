@@ -526,9 +526,8 @@ public class PlayerLocation {
 //		maxY = y + entityPlayer.boundingBox.e + dY;
 //		maxZ = z + entityPlayer.boundingBox.f + dZ;
 //		// TODO: inset, outset ?
-		this.width = mcAccess.getWidthOrLength(player);
+		this.width = mcAccess.getWidth(player);
 		final double dxz = this.width / 2;
-		 
 //		final double dX = (entityPlayer.boundingBox.d - entityPlayer.boundingBox.a) / 2D;
 //		final double dY = entityPlayer.boundingBox.e - entityPlayer.boundingBox.b;
 //		final double dZ = (entityPlayer.boundingBox.f - entityPlayer.boundingBox.c) / 2D;

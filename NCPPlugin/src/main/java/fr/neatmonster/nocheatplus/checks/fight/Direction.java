@@ -51,7 +51,7 @@ public class Direction extends Check {
             return false;
 
         // Find out how wide the entity is.
-        final double width = mcAccess.getWidthOrLength(damaged);
+        final double width = mcAccess.getWidth(damaged);
 
         // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
         final double height = mcAccess.getHeight(damaged);

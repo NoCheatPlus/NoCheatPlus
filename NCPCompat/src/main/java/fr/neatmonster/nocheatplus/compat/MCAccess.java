@@ -46,15 +46,24 @@ public interface MCAccess {
 	public double  getHeight(Entity entity);
 	
 	/**
-	 * Return maximum.
+	 * Return some width.
 	 * @param entity
 	 * @return
 	 */
-	public double getWidthOrLength(Entity entity);
+	public double getWidth(Entity entity);
 	
-	
+	/**
+	 * NMS Block static.
+	 * @param id
+	 * @return
+	 */
 	public AlmostBoolean isBlockSolid(int id);
 	
+	/**
+	 * NMS Block static..
+	 * @param id
+	 * @return
+	 */
 	public AlmostBoolean isBlockLiquid(int id);
 	
 	/**
@@ -93,6 +102,11 @@ public interface MCAccess {
 
 	public void dealFallDamage(Player player, int damage);
 
+	/**
+	 * This may well be removed, if possible to check with Bukkit.
+	 * @param damaged
+	 * @return
+	 */
 	public boolean isComplexPart(Entity damaged);
 
 	/**
