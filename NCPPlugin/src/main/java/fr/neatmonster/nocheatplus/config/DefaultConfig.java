@@ -25,7 +25,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 260;
+	public static final int buildNumber = 284;
 
     /**
      * Instantiates a new default configuration.
@@ -63,7 +63,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
         set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
-        set(ConfPaths.MISCELLANEOUS_MANAGELISTENERS, true);
+        set(ConfPaths.MISCELLANEOUS_MANAGELISTENERS, false);
 //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
         set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
 
