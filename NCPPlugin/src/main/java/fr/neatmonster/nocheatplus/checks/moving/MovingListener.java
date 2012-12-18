@@ -260,6 +260,10 @@ public class MovingListener extends CheckListener{
 				player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
 			}
 		}
+		else{
+			// Reset bed ...
+			CombinedData.getData(player).wasInBed = false;
+		}
     }
 
     /**
