@@ -371,11 +371,15 @@ public class BlockProperties {
         for (final Material mat : new Material[]{
                 Material.WATER_LILY, Material.LADDER,
                 Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
-                Material.COCOA, Material.SNOW,
+                Material.COCOA, Material.SNOW, Material.BREWING_STAND,
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
-        blockFlags[Material.ENDER_PORTAL_FRAME.getId()] |= F_HEIGHT100;
+        for (final Material mat : new Material[]{
+        		Material.ENDER_PORTAL_FRAME, Material.BREWING_STAND,
+        }){
+            blockFlags[mat.getId()] |= F_HEIGHT100;
+        }
 		// Ignore for passable.
 		for (final Material mat : new Material[]{
 				Material.WOOD_PLATE, Material.STONE_PLATE, 
