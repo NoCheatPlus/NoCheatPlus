@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.compat;
 
 import fr.neatmonster.nocheatplus.compat.cb2511.MCAccessCB2511;
 import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512;
+import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
 
 /**
  * Factory class to hide potentially dirty stuff.
@@ -22,6 +23,11 @@ public class MCAccessFactory {
 		
 		try{
 			return new MCAccessCB2512();
+		}
+		catch(Throwable t){};
+		
+		try{
+			return new MCAccessCB2545();
 		}
 		catch(Throwable t){};
 		
