@@ -17,6 +17,7 @@
     <module>NCPCompatCB2511</module>
     <module>NCPCompatCB2512</module>
     <module>NCPPlugin</module>
+    <module>NCPCompatMC1_4_6</module>
   </modules>
 
   <repositories>

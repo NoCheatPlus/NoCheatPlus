@@ -31,7 +31,7 @@
   		<artifactId>junit</artifactId>
   		<version>4.8.2</version>
   	</dependency>
-  	    <dependency>
+  	<dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcommons</artifactId>
     	<version>1.0.0</version>
@@ -41,14 +41,19 @@
     	<artifactId>ncpcompat</artifactId>
     	<version>1.0.0</version>
     </dependency>
-        <dependency>
+    <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2511</artifactId>
     	<version>1.0.0</version>
     </dependency>
-        <dependency>
+    <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2512</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcompatmc1_4_6</artifactId>
     	<version>1.0.0</version>
     </dependency>
   </dependencies>
