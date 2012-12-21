@@ -1,18 +1,18 @@
 package fr.neatmonster.nocheatplus.compat.cb2512;
 
-import net.minecraft.server.v1_4_5.AxisAlignedBB;
-import net.minecraft.server.v1_4_5.Block;
-import net.minecraft.server.v1_4_5.DamageSource;
-import net.minecraft.server.v1_4_5.EntityComplexPart;
-import net.minecraft.server.v1_4_5.EntityPlayer;
-import net.minecraft.server.v1_4_5.MobEffectList;
+import net.minecraft.server.v1_4_6.AxisAlignedBB;
+import net.minecraft.server.v1_4_6.Block;
+import net.minecraft.server.v1_4_6.DamageSource;
+import net.minecraft.server.v1_4_6.EntityComplexPart;
+import net.minecraft.server.v1_4_6.EntityPlayer;
+import net.minecraft.server.v1_4_6.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.v1_4_5.CraftServer;
-import org.bukkit.craftbukkit.v1_4_5.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_4_5.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_4_6.CraftServer;
+import org.bukkit.craftbukkit.v1_4_6.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_4_6.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -52,7 +52,7 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public double getHeight(final Entity entity) {
-		final net.minecraft.server.v1_4_5.Entity mcEntity = ((CraftEntity) entity).getHandle();
+		final net.minecraft.server.v1_4_6.Entity mcEntity = ((CraftEntity) entity).getHandle();
 		final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.height, mcEntity.boundingBox.e - mcEntity.boundingBox.b));
 		if (entity instanceof LivingEntity) {
 			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
@@ -105,7 +105,7 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public double getJumpAmplifier(final Player player) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_4_6.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 	
 		if (mcPlayer.hasEffect(MobEffectList.JUMP)) return mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
 		else return Double.MIN_VALUE;
@@ -113,7 +113,7 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public double getFasterMovementAmplifier(final Player player) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_4_6.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
 		else return Double.MIN_VALUE;
 	}
@@ -140,13 +140,13 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public boolean shouldBeZombie(final Player player) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_4_6.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		return !mcPlayer.dead && mcPlayer.getHealth() <= 0 ;
 	}
 
 	@Override
 	public void setDead(final Player player, final int deathTicks) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_4_6.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         mcPlayer.deathTicks = deathTicks;
         mcPlayer.dead = true;
 	}
