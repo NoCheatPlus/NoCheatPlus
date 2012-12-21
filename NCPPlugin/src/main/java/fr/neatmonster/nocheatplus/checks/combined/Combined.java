@@ -41,20 +41,32 @@ public class Combined {
 	 * @param worldName
 	 * @param data
 	 */
-	public static final void feedYawRate(final Player player, final float yaw, final long now, final String worldName, final CombinedData data) {
+	public static final void feedYawRate(final Player player, float yaw, final long now, final String worldName, final CombinedData data) {
 		// Reset on world change or timeout.
+		
+		// Ensure the yaw is within bounds (TODO: better method, maybe).
+		while (yaw <= -360.0) yaw += 360.0;
+		if (yaw >= 360.0) yaw -= 360.0;
+		
+		// Timeout, world change.
 		if (now - data.lastYawTime > 999 || !worldName.equals(data.lastWorld)){
 			data.lastYaw = yaw;
 			data.lastYawTime = now;
 			data.lastWorld = worldName;
 		}
 		
-		final float yawDiff = (yaw - data.lastYaw) % 180;
+		// Ensure difference is between -180, 180 (shortest used).
+		float yawDiff = data.lastYaw - yaw;
+		if (yawDiff < -180f) yawDiff += 360f;
+		else if (yawDiff > 180f) yawDiff -= 360f;
+		
 		final long elapsed = now - data.lastYawTime;
 		
 		// Set data to current state.
 		data.lastYaw = yaw;
 		data.lastYawTime = now;
+		
+		// TODO: If it should still be a problem, keep another yaw as stationary, add yaw without abs if near.
 		
 		final float dAbs = Math.abs(yawDiff);
 		final float dNorm = (float) dAbs / (float) (1 + elapsed);	
