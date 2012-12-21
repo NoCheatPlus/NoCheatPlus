@@ -20,7 +20,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 public interface MCAccess {
 	
 	/**
-	 * Simple version identifier like 1.4.
+	 * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5".
 	 * @return
 	 */
 	public String getMCVersion();

@@ -32,7 +32,7 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public String getMCVersion() {
-		return "1.4";
+		return "1.4.5";
 	}
 
 	@Override

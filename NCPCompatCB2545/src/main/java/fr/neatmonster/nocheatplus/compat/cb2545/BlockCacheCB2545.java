@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.compat.mc1_4_6;
+package fr.neatmonster.nocheatplus.compat.cb2545;
 
 import java.util.Iterator;
 import java.util.List;
@@ -17,14 +17,14 @@ import org.bukkit.entity.EntityType;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
-public class BlockCacheMC1_4_6 extends BlockCache implements IBlockAccess{
+public class BlockCacheCB2545 extends BlockCache implements IBlockAccess{
 	
 	/** Box for one time use, no nesting, no extra storing this(!). */
 	protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
 	protected net.minecraft.server.v1_4_6.World world;
 	
-	public BlockCacheMC1_4_6(World world) {
+	public BlockCacheCB2545(World world) {
 		setAccess(world);
 	}
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.compat.cb2511.MCAccessCB2511;
 import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512;
-import fr.neatmonster.nocheatplus.compat.mc1_4_6.MCAccessMC1_4_6;
+import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
 import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /**
@@ -35,7 +35,7 @@ public class MCAccessFactory {
 			throwables.add(t);
 		};
 		try{
-			return new MCAccessMC1_4_6();
+			return new MCAccessCB2545();
 		}
 		catch(Throwable t){
 			throwables.add(t);

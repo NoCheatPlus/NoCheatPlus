@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcompatmc1_4_6</artifactId>
+  <artifactId>ncpcompatcb2545</artifactId>
   <packaging>jar</packaging>
-  <name>NCPCompatMC1_4_6</name>
+  <name>NCPCompatCB2545</name>
   <version>1.0.0</version>
 
   <parent>
@@ -31,7 +31,7 @@
     </dependency>
   </dependencies>
 
-  <description>Compatibility since MC 1.4.6.
+  <description>Compatibility since CB2545 (MC 1.4.6).
 
 Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 </project>

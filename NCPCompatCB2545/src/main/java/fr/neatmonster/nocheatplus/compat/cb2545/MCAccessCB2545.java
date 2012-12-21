@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.compat.mc1_4_6;
+package fr.neatmonster.nocheatplus.compat.cb2545;
 
 import net.minecraft.server.v1_4_6.AxisAlignedBB;
 import net.minecraft.server.v1_4_6.Block;
@@ -21,12 +21,12 @@ import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
-public class MCAccessMC1_4_6 implements MCAccess{
+public class MCAccessCB2545 implements MCAccess{
 	
 	/**
 	 * Constructor to let it fail.
 	 */
-	public MCAccessMC1_4_6(){
+	public MCAccessCB2545(){
 		getCommandMap();
 	}
 
@@ -37,7 +37,7 @@ public class MCAccessMC1_4_6 implements MCAccess{
 
 	@Override
 	public String getServerVersionTag() {
-		return "MC1_4_6";
+		return "CB2545";
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class MCAccessMC1_4_6 implements MCAccess{
 
 	@Override
 	public BlockCache getBlockCache(final World world) {
-		return new BlockCacheMC1_4_6(world);
+		return new BlockCacheCB2545(world);
 	}
 
 	@Override
