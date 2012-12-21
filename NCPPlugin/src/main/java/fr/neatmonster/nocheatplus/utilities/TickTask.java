@@ -211,6 +211,7 @@ public class TickTask implements Runnable {
 	
 	/**
 	 * Get moderate lag spikes of the last hour (>150 ms, lowest tracked spike duration).
+	 * @deprecated What is moderate :) ?
 	 * @return
 	 */
 	public static final int getModerateLagSpikes(){
@@ -220,12 +221,21 @@ public class TickTask implements Runnable {
 	
 	/**
 	 * Get heavy lag spikes of the last hour (> 450 ms supposedly, first duration bigger than 150 ms).
-	 * @deprecated What is heavy :)
+	 * @deprecated What is heavy :) ?
 	 * @return
 	 */
 	public static final int getHeavyLagSpikes(){
 		spikes[1].update(System.currentTimeMillis());
 		return (int) spikes[1].score(1f);
+	}
+	
+	/**
+	 * Get total number of lag spikes counted at all. This is the number of lag spikes with a duration above spikeDuations[0] which should be 150 ms. This is the score of spikes[0].
+	 * @return
+	 */
+	public static final int getNumberOfLagSpikes(){
+		spikes[0].update(System.currentTimeMillis());
+		return (int) spikes[0].score(1f);
 	}
 	
 	/**
