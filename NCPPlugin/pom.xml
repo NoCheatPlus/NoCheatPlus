@@ -102,6 +102,7 @@
                   <include>fr.neatmonster:ncpcompat</include>
                   <include>fr.neatmonster:ncpcompatcb2511</include>
                   <include>fr.neatmonster:ncpcompatcb2512</include>
+                  <include>fr.neatmonster:ncpcompatmc1_4_6</include>
 <!--                   <include>fr.neatmonster:ncpplugin</include> -->
 <!--                   <include>fr.neatmonster:nocheatplus-parent</include> -->
                 </includes>
