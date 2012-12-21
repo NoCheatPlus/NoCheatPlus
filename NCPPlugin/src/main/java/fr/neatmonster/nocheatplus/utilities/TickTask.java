@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,11 +60,11 @@ public class TickTask implements Runnable {
 	/** Tick durations summed up in packs of n (nxn time covered) */
 	private static final long[] tickDurationsSq = new long[lagMaxTicks];
 	
-	/** Lag spikes > 150 ms counting (3 x 20 minutes). */
-	private static final ActionFrequency spikes150 = new ActionFrequency(3, 1000L * 60L * 20L);
+	/** Lag spike durations (min) to keep track of. */
+	private static long[] spikeDurations = new long[]{150, 450, 1000, 5000};
 	
-	/** Lag spikes > 1000 ms counting (3 x 20 minutes). */
-	private static final ActionFrequency spikes1000 = new ActionFrequency(3, 1000L * 60L * 20L);
+	/** Lag spikes > 150 ms counting (3 x 20 minutes). For lag spike length see spikeDurations. */
+	private static ActionFrequency[] spikes = new ActionFrequency[spikeDurations.length];
 	
 	/** Task id of the running TickTask */
 	protected static int taskId = -1;
@@ -76,6 +77,12 @@ public class TickTask implements Runnable {
 	
 	/** Lock flag set on disable. */
 	protected static boolean locked = false;
+	
+	static{
+		for (int i = 0; i < spikeDurations.length; i++){
+			spikes[i] = new ActionFrequency(3, 1000L * 60L * 20L);
+		}
+	}
 	
 	
 	//////////////////////////////////////////////////////////////
@@ -203,21 +210,44 @@ public class TickTask implements Runnable {
 	}
 	
 	/**
-	 * Get moderate lag spikes of the last hour (>150 ms).
+	 * Get moderate lag spikes of the last hour (>150 ms, lowest tracked spike duration).
 	 * @return
 	 */
 	public static final int getModerateLagSpikes(){
-		spikes150.update(System.currentTimeMillis());
-		return (int) spikes150.score(1f);
+		spikes[0].update(System.currentTimeMillis());
+		return (int) spikes[0].score(1f);
 	}
 	
 	/**
-	 * Get heavy lag spikes of the last hour (> 1 s).
+	 * Get heavy lag spikes of the last hour (> 450 ms supposedly, first duration bigger than 150 ms).
+	 * @deprecated What is heavy :)
 	 * @return
 	 */
 	public static final int getHeavyLagSpikes(){
-		spikes1000.update(System.currentTimeMillis());
-		return (int) spikes1000.score(1f);
+		spikes[1].update(System.currentTimeMillis());
+		return (int) spikes[1].score(1f);
+	}
+	
+	/**
+	 * Get the stepping for lag spike duration tracking.
+	 * @return
+	 */
+	public static final long[] getLagSpikeDurations(){
+		return Arrays.copyOf(spikeDurations, spikeDurations.length);
+	}
+	
+	/**
+	 * Get lag spike count according to getLagSpikeDurations() values. Entries of lower indexes contain the entries of higher indexes (so subtraction would be necessary to get spikes from...to).
+	 * @return
+	 */
+	public static final int[] getLagSpikes(){
+		final int[] out = new int[spikeDurations.length];
+		final long now = System.currentTimeMillis();
+		for (int i = 0; i < spikeDurations.length; i++){
+			spikes[i].update(now);
+			out[i] = (int) spikes[i].score(1f);
+		}
+		return out;
 	}
 	
 	/**
@@ -277,8 +307,9 @@ public class TickTask implements Runnable {
 			tickDurations[i] = 0;
 			tickDurationsSq[i] = 0;
 		}
-		spikes150.clear(0);
-		spikes1000.clear(0);
+		for (int i = 0; i < spikeDurations.length; i++){
+			spikes[i].clear(0);
+		}
 	}
 	
 	//////////////////////////
@@ -323,9 +354,14 @@ public class TickTask implements Runnable {
 		tickDurations[0] = lastDur;
 		
 		// Lag spikes150 counting. [Subject to adjustments!]
-		if (lastDur > 150){
-			spikes150.add(time, 1f);
-			if (lastDur > 1000) spikes1000.add(time, 1f);
+		if (lastDur > spikeDurations[0]){
+			spikes[0].add(time, 1f);
+			for (int i = 1; i < spikeDurations.length; i++){
+				if (lastDur > spikeDurations[i]){
+					spikes[i].add(time, 1f);
+				}
+				else break;
+			}
 		}
 			
 		// Finish.

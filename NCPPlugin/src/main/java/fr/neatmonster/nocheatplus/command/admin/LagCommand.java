@@ -29,11 +29,21 @@ public class LagCommand extends NCPCommand {
 			int p = Math.max(0, (int) ((lag - 1.0) * 100.0));
 			builder.append(" " + p + "%[" + CheckUtils.fdec1.format((double) ms / 1200.0) + "s]" );
 		}
-		builder.append("\nLast hour spikes: ");
-		int spikesM = TickTask.getModerateLagSpikes();
-		builder.append((spikesM > 0 ? (" | " + spikesM) : " | none") + " over 150 ms");
-		int spikesH = TickTask.getHeavyLagSpikes();
-		builder.append((spikesH > 0 ? (" | " + spikesH) : " | none") + " of which over 1 s");
+		builder.append("\nLast hour spikes:\n| ");
+		long[] spikeDurations = TickTask.getLagSpikeDurations();
+		int[] spikes = TickTask.getLagSpikes();
+		if (spikes[0] > 0){
+			for (int i = 0; i < spikeDurations.length; i++){
+				if (i < spikeDurations.length - 1 && spikes[i] == spikes[i + 1]){
+					// Ignore these, get printed later.
+					continue;
+				}
+				builder.append((spikes[i] > 0 ? (spikes[i]) : "none") + " > " + spikeDurations[i] + " ms | ");
+			}
+		}
+		else{
+			builder.append("none > " + spikeDurations[0] +  " ms |");
+		}
 		sender.sendMessage(builder.toString());
 		return true;
 	}
