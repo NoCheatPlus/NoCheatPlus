@@ -5,7 +5,7 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.compat.cb2511.MCAccessCB2511;
 import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512;
-import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessMC1_4_6;
+import fr.neatmonster.nocheatplus.compat.mc1_4_6.MCAccessMC1_4_6;
 import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /**

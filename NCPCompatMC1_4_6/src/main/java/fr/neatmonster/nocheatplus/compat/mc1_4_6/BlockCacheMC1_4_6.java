@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.compat.cb2512;
+package fr.neatmonster.nocheatplus.compat.mc1_4_6;
 
 import java.util.Iterator;
 import java.util.List;
