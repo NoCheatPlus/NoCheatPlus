@@ -127,13 +127,16 @@ permissions:
                         children:
                             nocheatplus.checks.chat.color:
                                 description: Allow the player to bypass the Color check.
-                            nocheatplus.checks.chat.nopwnage:
-                                description: Allow the player to bypass the NoPwnage check.
-                                children:
-                                    nocheatplus.checks.chat.nopwnage.captcha:
-                                        description: Allow the player to bypass the captcha check (currently the nopwnage or globalchat violation handling would replace it!).
-                            nocheatplus.checks.chat.globalchat:
-                                description: Allow the player to bypass the GlobalChat check.
+                            nocheatplus.checks.chat.text:
+                                description: Allow the player to bypass the text check.
+                            nocheatplus.checks.chat.commands:
+                                description: Allow the player to bypass the commands check.
+                            nocheatplus.checks.chat.captcha:
+                                description: Allow the player to bypass the captcha check (currently the text/commands violation handling would replace it!).
+                            nocheatplus.checks.chat.relog:
+                                description: Allow the player to bypass the relog check.
+                            nocheatplus.checks.chat.logins:
+                                description: Allow the player to bypass the logins check.
                     nocheatplus.checks.combined:
                         description: Allow the player to bypass all combined checks.
                         children:
@@ -173,6 +176,8 @@ permissions:
                                 description: Allow the player to bypass the InstantBow check.
                             nocheatplus.checks.inventory.instanteat:
                                 description: Allow the player to bypass the InstantEat check.
+                            nocheatplus.checks.inventory.items:
+                                description: Allow the player to bypass the items check (illegal enchantments/dupes).
                     nocheatplus.checks.moving:
                         description: Allow the player to bypass all Moving checks.
                         children:
