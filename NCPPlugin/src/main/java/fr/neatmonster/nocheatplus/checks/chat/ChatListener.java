@@ -206,7 +206,7 @@ public class ChatListener extends CheckListener implements INotifyReload {
         // Tell TickTask to update cached permissions.
         TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
         // Force permission update.
-        TickTask.updatePermissions();
+        TickTask.updatePermissions(); // TODO: This updates ALL... something more efficient ?
         
         // Reset captcha of player if needed.
         synchronized(data){

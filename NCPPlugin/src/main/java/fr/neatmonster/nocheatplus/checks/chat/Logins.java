@@ -35,7 +35,7 @@ public class Logins extends Check{
         final long durBucket = 1000L * cc.loginsSeconds / 6;
         final ActionFrequency freq = getActionFrequency(player.getWorld().getName(), 6, durBucket, cc.loginsPerWorldCount);
         freq.update(now);
-        final boolean cancel = freq.score(1f) > cc.loginsLimit;
+        final boolean cancel = freq.score(1f) > cc.loginsLimit; // TODO: >= ...  This will be 1 after the first login (!).
         if (!cancel) freq.add(now, 1f);
         return cancel;
     }
