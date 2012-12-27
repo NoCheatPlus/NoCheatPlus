@@ -7,10 +7,11 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-public class Logins extends Check {
+public class Logins extends Check implements INotifyReload{
     
     /** Per world count (only used if set in config). */
     private final Map<String, ActionFrequency> counts = new HashMap<String, ActionFrequency>();
@@ -39,5 +40,10 @@ public class Logins extends Check {
         if (!cancel) freq.add(now, 1f);
         return cancel;
     }
+
+	@Override
+	public void onReload() {
+		counts.clear();
+	}
 
 }
