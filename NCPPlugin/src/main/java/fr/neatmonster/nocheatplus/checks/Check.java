@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -177,7 +178,7 @@ public abstract class Check {
             if (!type.isEnabled(player) || player.hasPermission(type.getPermission()))
                 return false;
         } catch (final Exception e) {
-            e.printStackTrace();
+        	LogUtil.logSevere(e);
         }
         return !NCPExemptionManager.isExempted(player, type);
     }

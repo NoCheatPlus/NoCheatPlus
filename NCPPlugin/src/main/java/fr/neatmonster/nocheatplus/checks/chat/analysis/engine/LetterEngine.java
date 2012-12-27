@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
-
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatData;
@@ -23,6 +21,7 @@ import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 
 /**
@@ -76,8 +75,8 @@ public class LetterEngine implements IRemoveData, IHaveCheckType{
 					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textGlobalWeight);
 				}
 				catch( final Exception e){
-					Bukkit.getLogger().warning("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-					e.printStackTrace();
+					LogUtil.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					LogUtil.logSevere(e);
 					continue;
 				}
 			}
@@ -91,8 +90,8 @@ public class LetterEngine implements IRemoveData, IHaveCheckType{
 					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textPlayerWeight);
 				}
 				catch( final Exception e){
-					Bukkit.getLogger().warning("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-					e.printStackTrace();
+					LogUtil.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					LogUtil.logSevere(e);
 					continue;
 				}
 			}

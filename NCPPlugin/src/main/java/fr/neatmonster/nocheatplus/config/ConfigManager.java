@@ -20,6 +20,7 @@ import org.bukkit.configuration.MemoryConfiguration;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /*
  * MM'""""'YMM                   .8888b oo          M"""""`'"""`YM                                                       
@@ -215,11 +216,11 @@ public class ConfigManager {
                     if (globalConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) globalConfig.save(globalFile);
                 } catch (final Exception e) {
                 	Bukkit.getLogger().severe("[NoCheatPlus] Could not save back config.yml (see exception below).");
-                    e.printStackTrace();
+                    LogUtil.logSevere(e);
                 }
             } catch (final Exception e) {
             	Bukkit.getLogger().severe("[NoCheatPlus] Could not load config.yml (see exception below).  Continue with default settings...");
-                e.printStackTrace();
+            	LogUtil.logSevere(e);
             }
         else {
             globalConfig.options().header(
@@ -229,7 +230,7 @@ public class ConfigManager {
                 globalConfig.save(globalFile);
             } catch (final Exception e) {
             	Bukkit.getLogger().severe("[NoCheatPlus] Could not save default config.yml (see exception below).");
-                e.printStackTrace();
+            	LogUtil.logSevere(e);
             }
         }
         globalConfig.regenerateActionLists();
@@ -251,14 +252,14 @@ public class ConfigManager {
             try {
                 logFile.getParentFile().mkdirs();
             } catch (final Exception e) {
-                e.printStackTrace();
+            	LogUtil.logSevere(e);
             }
             fileHandler = new FileHandler(logFile.getCanonicalPath(), true);
             fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(LogFileFormatter.newInstance());
             logger.addHandler(fileHandler);
         } catch (final Exception e) {
-            e.printStackTrace();
+        	LogUtil.logSevere(e);
         }
         CheckUtils.fileLogger = logger;
 
@@ -289,12 +290,12 @@ public class ConfigManager {
                 } catch (final Exception e){
                 	Bukkit.getLogger().severe("[NoCheatPlus] Couldn't save back world-specific configuration for "
                             + worldEntry.getKey() + " (see exception below).");
-                	e.printStackTrace();
+                	LogUtil.logSevere(e);
                 }
             } catch (final Exception e) {
             	Bukkit.getLogger().severe("[NoCheatPlus] Couldn't load world-specific configuration for "
                         + worldEntry.getKey() + " (see exception below). Continue with global default settings...");
-                e.printStackTrace();
+            	LogUtil.logSevere(e);
             }
             worldConfig.setDefaults(globalConfig);
             worldConfig.options().copyDefaults(true);

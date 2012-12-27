@@ -191,7 +191,7 @@ public class ActionFactory {
         } catch (final Exception e) {
         	LogUtil.logWarning("[NoCheatPlus] Couldn't parse details of log action '" + definition
                     + "', will use default values instead.");
-            e.printStackTrace();
+        	LogUtil.logWarning(e);
             delay = 0;
             repeat = 1;
             toConsole = true;

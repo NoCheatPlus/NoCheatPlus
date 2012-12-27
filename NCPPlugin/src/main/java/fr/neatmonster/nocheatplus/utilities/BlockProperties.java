@@ -282,7 +282,7 @@ public class BlockProperties {
             initBlocks();
         }
         catch(Throwable t){
-            t.printStackTrace();
+        	LogUtil.logSevere(t);
         }
     }
 	
