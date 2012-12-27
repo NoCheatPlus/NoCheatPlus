@@ -213,10 +213,12 @@ public class ChatListener extends CheckListener implements INotifyReload {
             captcha.resetCaptcha(cc, data);
         }
         // Fast relog check.
-        if (relog.isEnabled(player) && relog.unsafeLoginCheck(player, cc, data))
-            event.disallow(Result.KICK_OTHER, cc.relogKickMessage);
-        else if (logins.isEnabled(player) && logins.check(player, cc, data))
-            event.disallow(Result.KICK_OTHER, cc.loginsKickMessage);
+        if (relog.isEnabled(player) && relog.unsafeLoginCheck(player, cc, data)){
+        	event.disallow(Result.KICK_OTHER, cc.relogKickMessage);
+        }
+        else if (logins.isEnabled(player) && logins.check(player, cc, data)){
+        	event.disallow(Result.KICK_OTHER, cc.loginsKickMessage);
+        }
     }
     
     @EventHandler(
@@ -241,6 +243,7 @@ public class ChatListener extends CheckListener implements INotifyReload {
     	ConfigFile config = ConfigManager.getConfigFile();
     	initFilters(config);
     	text.onReload();
+    	logins.onReload();
 	}
 
 }
