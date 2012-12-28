@@ -107,9 +107,13 @@ public class BlockPlaceListener extends CheckListener {
         if (fastPlace.isEnabled(player)){
         	if (fastPlace.check(player, block))
                 cancelled = true;
-        	else         // Combined speed:
-                if (Improbable.check(player, 1f, System.currentTimeMillis()))
+        	else{
+        		// Combined speed.
+                if (Improbable.check(player, 0.5f, System.currentTimeMillis())){
                 	cancelled = true;
+                }
+        	}
+
         }
 
         // Second, the no swing check (player doesn't swing his arm when placing a lily pad).
@@ -249,14 +253,18 @@ public class BlockPlaceListener extends CheckListener {
         if (speed.isEnabled(player)){
             final long now = System.currentTimeMillis();
             final Location loc = player.getLocation();
-            if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName()))
-                event.setCancelled(true);
-            if (speed.check(player))
+            if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())){
+            	// Yawrate (checked extra).
+            	event.setCancelled(true);
+            }
+            if (speed.check(player)){
                 // If the check was positive, cancel the event.
                 event.setCancelled(true);
-            else if (Improbable.check(player, 1f, now))
-                // COmbined fighting speed.
+            }
+            else if (Improbable.check(player, 0.6f, now)){
+                // Combined fighting speed.
                 event.setCancelled(true);
+            }
         }
           
     }

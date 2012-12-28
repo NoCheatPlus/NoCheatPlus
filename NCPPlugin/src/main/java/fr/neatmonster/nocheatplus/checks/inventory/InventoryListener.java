@@ -99,7 +99,7 @@ public class InventoryListener  extends CheckListener {
             	    // The check requested the event to be cancelled.
             	    event.setCancelled(true);
             	}
-            	else if (Improbable.check(player, 1f, now)){
+            	else if (Improbable.check(player, 0.6f, now)){
                     // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
                     event.setCancelled(true);
             	}
@@ -155,15 +155,15 @@ public class InventoryListener  extends CheckListener {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
             
-            // Illegal enchantments hotfixes
+            // Illegal enchantment checks.
             try{
                 if (Items.checkIllegalEnchantments(player, event.getCurrentItem())) event.setCancelled(true);
             }
-            catch(final ArrayIndexOutOfBoundsException e){} // Hotfix
+            catch(final ArrayIndexOutOfBoundsException e){} // Hotfix (CB)
             try{
                 if (Items.checkIllegalEnchantments(player, event.getCursor())) event.setCancelled(true);
             }
-            catch(final ArrayIndexOutOfBoundsException e){} // Hotfix
+            catch(final ArrayIndexOutOfBoundsException e){} // Hotfix (CB)
             
             // Fast inventory manipulation check.
             if (fastClick.isEnabled(player)){
@@ -172,9 +172,9 @@ public class InventoryListener  extends CheckListener {
                         // The check requested the event to be cancelled.
                         event.setCancelled(true);
                     }
-                    else if (Improbable.check(player, 1f, System.currentTimeMillis())){
+                    else if (Improbable.check(player, 0.7f, System.currentTimeMillis())){
                         // Combined speed:
-                        event.setCancelled(true);
+//                        event.setCancelled(true);
                     }
                 }
             }
@@ -219,10 +219,6 @@ public class InventoryListener  extends CheckListener {
                 // do it and kick players instead by default.
                 event.setCancelled(true);
         	}
-            else if (Improbable.check(event.getPlayer(), 1f, System.currentTimeMillis())){
-            	// Combined speed
-            	event.setCancelled(true);
-            }
         }
 
 
