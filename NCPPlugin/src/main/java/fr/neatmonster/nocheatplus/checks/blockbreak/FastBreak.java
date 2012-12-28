@@ -59,7 +59,16 @@ public class FastBreak extends Check {
         else
         	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockProperties.getBreakingDuration(id, player));
     	// fastBreakfirstDamage is the first interact on block (!).
-        final long elapsedTime = (data.fastBreakBreakTime > data.fastBreakfirstDamage) ? 0 : now - data.fastBreakfirstDamage;
+        final long elapsedTime;
+        // TODO: Should it be breakingTime instead of 0 for inconsistencies?
+        if (cc.fastBreakStrict){
+        	// Counting interact...break.
+        	elapsedTime = (data.fastBreakBreakTime > data.fastBreakfirstDamage) ? 0 : now - data.fastBreakfirstDamage;
+        }
+        else{
+        	// Counting break...break.
+        	elapsedTime = (data.fastBreakBreakTime > now) ? 0 : now - data.fastBreakBreakTime;
+        }
           
         // Check if the time used time is lower than expected.
 //        if (isInstaBreak){

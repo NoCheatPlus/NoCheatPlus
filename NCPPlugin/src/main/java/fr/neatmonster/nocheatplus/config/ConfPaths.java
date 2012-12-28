@@ -79,6 +79,7 @@ public abstract class ConfPaths {
 
     private static final String BLOCKBREAK_FASTBREAK                     = BLOCKBREAK + "fastbreak.";
     public static final String  BLOCKBREAK_FASTBREAK_CHECK               = BLOCKBREAK_FASTBREAK + "active";
+    public static final String  BLOCKBREAK_FASTBREAK_STRICT				 = BLOCKBREAK_FASTBREAK + "strict";
 	public static final  String BLOCKBREAK_FASTBREAK_DEBUG               = BLOCKBREAK_FASTBREAK + "debug";
     private static final String BLOCKBREAK_FASTBREAK_BUCKETS             = BLOCKBREAK + "buckets.";
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_CONTENTION  = BLOCKBREAK_FASTBREAK_BUCKETS + "contention";

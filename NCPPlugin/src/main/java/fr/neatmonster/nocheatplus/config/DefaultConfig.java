@@ -25,7 +25,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 284;
+	public static final int buildNumber = 299;
 
     /**
      * Instantiates a new default configuration.
@@ -85,6 +85,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_STRICT, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 90);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_GRACE, 2000);
