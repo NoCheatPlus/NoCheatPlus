@@ -363,7 +363,7 @@ public class TickTask implements Runnable {
 		}
 		tickDurations[0] = lastDur;
 		
-		// Lag spikes150 counting. [Subject to adjustments!]
+		// Lag spikes counting. [Subject to adjustments!]
 		if (lastDur > spikeDurations[0]){
 			spikes[0].add(time, 1f);
 			for (int i = 1; i < spikeDurations.length; i++){
