@@ -10,6 +10,9 @@ import org.bukkit.entity.Player;
  */
 public class Combined {
 	
+	/** All hits within this angle range are regarded as stationary. */
+	private static float stationary = 32f;
+	
 	/**
 	 * Check if a penalty is set by changing horizontal facing dierection too often.
 	 * @param player
@@ -51,6 +54,7 @@ public class Combined {
 		// Timeout, world change.
 		if (now - data.lastYawTime > 999 || !worldName.equals(data.lastWorld)){
 			data.lastYaw = yaw;
+			data.sumYaw = 0f;
 			data.lastYawTime = now;
 			data.lastWorld = worldName;
 		}
@@ -66,7 +70,21 @@ public class Combined {
 		data.lastYaw = yaw;
 		data.lastYawTime = now;
 		
-		// TODO: If it should still be a problem, keep another yaw as stationary, add yaw without abs if near.
+		// Skip adding small changes.
+		if (yawDiff < stationary){
+			// This could also be done by keeping a "stationaryYaw" and taking the distance to yaw.
+			data.sumYaw += yawDiff;
+			if (Math.abs(data.sumYaw) < stationary){
+				// Still stationary, keep sum, add nothing.
+				data.yawFreq.update(now);
+				return;
+			}
+			else{
+				// Reset.
+				data.sumYaw = 0f;
+			}
+		}
+		else data.sumYaw = 0f;
 		
 		final float dAbs = Math.abs(yawDiff);
 		final float dNorm = (float) dAbs / (float) (1 + elapsed);	

@@ -62,6 +62,7 @@ public class CombinedData extends ACheckData {
     // Yawrate check.
 	public float lastYaw;
 	public long  lastYawTime;
+	public float sumYaw;
 	public final ActionFrequency yawFreq = new ActionFrequency(3, 333);
 
 	// General penalty time (used for fighting mainly, set by yawrate check).
