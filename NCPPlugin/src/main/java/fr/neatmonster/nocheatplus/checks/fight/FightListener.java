@@ -122,6 +122,7 @@ public class FightListener extends CheckListener {
 			// Improbable yaw changing.
 			if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)) {
 				// (Check or just feed).
+				// TODO: Work into this somehow attacking the same aim and/or similar aim position (not cancel then).
 				cancelled = true;
 			}
 			// Angle check.
