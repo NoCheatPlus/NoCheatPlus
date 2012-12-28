@@ -70,8 +70,10 @@ public class Combined {
 		data.lastYaw = yaw;
 		data.lastYawTime = now;
 		
+		final float dAbs = Math.abs(yawDiff);
+		
 		// Skip adding small changes.
-		if (yawDiff < stationary){
+		if (dAbs < stationary){
 			// This could also be done by keeping a "stationaryYaw" and taking the distance to yaw.
 			data.sumYaw += yawDiff;
 			if (Math.abs(data.sumYaw) < stationary){
@@ -86,7 +88,7 @@ public class Combined {
 		}
 		else data.sumYaw = 0f;
 		
-		final float dAbs = Math.abs(yawDiff);
+		// Normalize yaw-change vs. elapsed time.
 		final float dNorm = (float) dAbs / (float) (1 + elapsed);	
 		
 		data.yawFreq.add(now, dNorm);
