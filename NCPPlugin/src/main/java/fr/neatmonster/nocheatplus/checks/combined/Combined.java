@@ -47,9 +47,9 @@ public class Combined {
 	public static final void feedYawRate(final Player player, float yaw, final long now, final String worldName, final CombinedData data) {
 		// Reset on world change or timeout.
 		
-		// Ensure the yaw is within bounds (TODO: better method, maybe).
-		while (yaw <= -360.0) yaw += 360.0;
-		if (yaw >= 360.0) yaw -= 360.0;
+		// Ensure the yaw is within bounds.
+		if (yaw <= -360f) yaw = -((-yaw) % 360f);
+		else if (yaw >= 360f) yaw = yaw % 360f;
 		
 		// Timeout, world change.
 		if (now - data.lastYawTime > 999 || !worldName.equals(data.lastWorld)){
