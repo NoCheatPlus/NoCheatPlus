@@ -98,7 +98,7 @@ public class MCAccessCB2545 implements MCAccess{
 			// This can not really test stance but height of bounding box.
 			final double dY = Math.abs(box.e - box.b);
 			if (dY > 1.8) return AlmostBoolean.YES; // dY > 1.65D || 
-			if (dY < 0.1D) return AlmostBoolean.YES;
+			if (dY < 0.1D && entityPlayer.length >= 0.1) return AlmostBoolean.YES;
 		}
 		return AlmostBoolean.MAYBE;
 	}
