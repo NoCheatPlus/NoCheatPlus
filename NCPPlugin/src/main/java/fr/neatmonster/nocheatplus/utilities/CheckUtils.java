@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 
 /**
- * Random auxiliary gear, some might have general quality.
+ * Random auxiliary gear, some might have general quality. Contents are likely to get moved to other classes.
  */
 public class CheckUtils {
 
@@ -317,6 +317,23 @@ public class CheckUtils {
 		if (diff < -Math.PI) return diff + 2.0 * Math.PI;
 		else if (diff > Math.PI) return diff - 2.0 * Math.PI;
 		else return diff;
+	}
+	
+	/**
+	 * Yaw (angle in grad) difference. This ensures inputs are interpreted correctly (for 360 degree offsets).
+	 * @param fromYaw
+	 * @param toYaw
+	 * @return Angle difference to get from fromYaw to toYaw. Result is in [-180, 180].
+	 */
+	public static final float yawDiff(float fromYaw, float toYaw){
+		if (fromYaw <= -360f) fromYaw = -((-fromYaw) % 360f);
+		else if (fromYaw >= 360f) fromYaw = fromYaw % 360f;
+		if (toYaw <= -360f) toYaw = -((-toYaw) % 360f);
+		else if (toYaw >= 360f) toYaw = toYaw % 360f;
+		float yawDiff = toYaw - fromYaw;
+		if (yawDiff < -180f) yawDiff += 360f;
+		else if (yawDiff > 180f) yawDiff -= 360f;
+		return yawDiff;
 	}
 	
 	 /**

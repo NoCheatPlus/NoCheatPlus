@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 
 /*
@@ -71,6 +72,7 @@ public class Angle extends Check {
 
         // Browse the locations of the map.
         long previousTime = 0L;
+        // TODO: Don't store locations, but yaws ?
         Location previousLocation = null;
         for (final long time : data.angleHits.descendingKeySet()) {
             final Location location = data.angleHits.get(time);
@@ -82,7 +84,7 @@ public class Angle extends Check {
                 // Calculate the time elapsed between the two hits.
                 deltaTime += previousTime - time;
                 // Calculate the difference of the yaw between the two locations.
-                final float dYaw = (previousLocation.getYaw() - location.getYaw()) % 180;
+                final float dYaw = CheckUtils.yawDiff(previousLocation.getYaw(), location.getYaw());
                 deltaYaw += Math.abs(dYaw);
             }
             // Remember the current time and location.
