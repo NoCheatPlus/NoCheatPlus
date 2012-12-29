@@ -116,9 +116,10 @@ public class Reach extends Check {
                 data.reachLastViolationTime = System.currentTimeMillis();
         }
         else if (lenpRel - distanceLimit * reachMod > 0){
+        	// Silent cancel.
             data.reachLastViolationTime = Math.max(data.reachLastViolationTime, System.currentTimeMillis() - cc.reachPenalty / 2);
             cancel = true;
-            Improbable.check(player, (float) (lenpRel - distanceLimit * reachMod) / 2f, System.currentTimeMillis());
+            Improbable.feed(player, (float) (lenpRel - distanceLimit * reachMod) / 2f, System.currentTimeMillis());
         }
         else{
             // Player passed the check, reward him.

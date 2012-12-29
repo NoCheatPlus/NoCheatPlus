@@ -26,7 +26,17 @@ public class Improbable extends Check {
 	public static final boolean check(final Player player, final float weight, final long now){
 		return instance.checkImprobable(player, weight, now);
 	}
-
+	
+	/**
+	 * Feed the check but no violations processing (convenience method).
+	 * @param player
+	 * @param weight
+	 * @param now
+	 */
+	public static final void feed(final Player player, final float weight, final long now){
+		CombinedData.getData(player).improbableCount.add(now, weight);
+	}
+	
 	////////////////////////////////////
 	// Instance methods.
 	///////////////////////////////////

@@ -108,12 +108,9 @@ public class BlockPlaceListener extends CheckListener {
         	if (fastPlace.check(player, block))
                 cancelled = true;
         	else{
-        		// Combined speed.
-                if (Improbable.check(player, 0.5f, System.currentTimeMillis())){
-                	cancelled = true;
-                }
+        		// Feed the improbable.
+                Improbable.feed(player, 0.5f, System.currentTimeMillis());
         	}
-
         }
 
         // Second, the no swing check (player doesn't swing his arm when placing a lily pad).

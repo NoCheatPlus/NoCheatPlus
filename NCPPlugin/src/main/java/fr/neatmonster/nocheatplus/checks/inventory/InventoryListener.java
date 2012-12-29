@@ -172,10 +172,8 @@ public class InventoryListener  extends CheckListener {
                         // The check requested the event to be cancelled.
                         event.setCancelled(true);
                     }
-                    else if (Improbable.check(player, 0.7f, System.currentTimeMillis())){
-                        // Combined speed:
-//                        event.setCancelled(true);
-                    }
+                    // Feed the improbable.
+                    Improbable.feed(player, 0.7f, System.currentTimeMillis());
                 }
             }
         }

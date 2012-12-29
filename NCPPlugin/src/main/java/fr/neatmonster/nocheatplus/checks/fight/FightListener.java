@@ -110,11 +110,16 @@ public class FightListener extends CheckListener {
 
         // Run through the main checks.
         if (!cancelled && speed.isEnabled(player)){
-        	if (speed.check(player, now))
+        	if (speed.check(player, now)){
         		cancelled = true;
-	        // Combined speed:
-        	else if (Improbable.check(player, 1f, now))
-	        	cancelled = true;
+        		// Still feed the improbable.
+        		Improbable.feed(player, 1f, now);
+        	}
+        	else if (Improbable.check(player, 1f, now)){
+        		// Feed improbable in case of ok-moves too.
+        		// TODO: consider only feeding if attacking with higher average speed (!)
+        		cancelled = true;
+        	}
         }
 
 		if (angle.isEnabled(player)) {

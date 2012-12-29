@@ -74,12 +74,6 @@ public class CombinedListener extends CheckListener {
         event.setCancelled(true);
     }
     
-    @EventHandler(priority=EventPriority.LOW)
-    public void onPlayerToggleSprint(final PlayerToggleSprintEvent event){
-        // Check also in case of cancelled events.
-        if (Improbable.check(event.getPlayer(), 0.35f, System.currentTimeMillis())) event.setCancelled(true);
-    }
-    
     /**
      * A workaround for cancelled PlayerToggleSprintEvents.
      * 
@@ -93,13 +87,15 @@ public class CombinedListener extends CheckListener {
         // and rewards them by reducing their hunger bar as if they were walking instead of sprinting.
         if (event.isCancelled() && event.isSprinting())
             event.setCancelled(false);
+        // Feed the improbable.
+        Improbable.feed(event.getPlayer(), 0.35f, System.currentTimeMillis());
     }
     
-    @EventHandler(priority=EventPriority.LOW)
+    @EventHandler(priority=EventPriority.MONITOR)
     public void onPlayerToggleSneak(final PlayerToggleSneakEvent event){
         // Check also in case of cancelled events.
-    	// TODO: Maybe this is not good to cancel.
-        if (Improbable.check(event.getPlayer(), 0.35f, System.currentTimeMillis())) event.setCancelled(true);
+    	// Feed the improbable.
+        Improbable.feed(event.getPlayer(), 0.35f, System.currentTimeMillis());
     }
     
     @EventHandler(priority=EventPriority.LOWEST)
