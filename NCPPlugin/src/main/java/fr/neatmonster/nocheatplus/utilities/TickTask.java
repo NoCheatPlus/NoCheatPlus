@@ -344,8 +344,11 @@ public class TickTask implements Runnable {
 			LogUtil.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
 			DataManager.clearData(CheckType.ALL);
 		}
-		else{
+		else if (tick > 1){
 			lastDur = time - timeLast;
+		}
+		else{
+			lastDur = 50;
 		}
 		
 		// Update sums of sums of tick durations.
@@ -364,7 +367,7 @@ public class TickTask implements Runnable {
 		tickDurations[0] = lastDur;
 		
 		// Lag spikes counting. [Subject to adjustments!]
-		if (lastDur > spikeDurations[0]){
+		if (lastDur > spikeDurations[0] && tick > 1){
 			spikes[0].add(time, 1f);
 			for (int i = 1; i < spikeDurations.length; i++){
 				if (lastDur > spikeDurations[i]){
