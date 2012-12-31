@@ -29,20 +29,28 @@ public class LagCommand extends NCPCommand {
 			int p = Math.max(0, (int) ((lag - 1.0) * 100.0));
 			builder.append(" " + p + "%[" + CheckUtils.fdec1.format((double) ms / 1200.0) + "s]" );
 		}
-		builder.append("\nLast hour spikes:\n| ");
 		long[] spikeDurations = TickTask.getLagSpikeDurations();
 		int[] spikes = TickTask.getLagSpikes();
+		builder.append("\nLast hour spikes (" + spikes[0] + " total, all > " + spikeDurations[0] + " ms):\n| ");
 		if (spikes[0] > 0){
 			for (int i = 0; i < spikeDurations.length; i++){
 				if (i < spikeDurations.length - 1 && spikes[i] == spikes[i + 1]){
 					// Ignore these, get printed later.
 					continue;
 				}
-				builder.append((spikes[i] > 0 ? (spikes[i]) : "none") + " > " + spikeDurations[i] + " ms | ");
+				if (spikes[i] == 0){
+					builder.append("none |");
+				}
+				else if (i < spikeDurations.length - 1){
+					builder.append((spikes[i] - spikes[i + 1]) + "x" + spikeDurations[i] + "..." + spikeDurations[i + 1] + " | ");
+				}
+				else{
+					builder.append(spikes[i] + "x" + spikeDurations[i] +"... | ");
+				}
 			}
 		}
 		else{
-			builder.append("none > " + spikeDurations[0] +  " ms |");
+			builder.append("none | ");
 		}
 		sender.sendMessage(builder.toString());
 		return true;
