@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
  * M"""""`'"""`YM                   oo                   M""""""'YMM            dP            
@@ -216,4 +217,66 @@ public class MovingData extends ACheckData {
         fromZ = toZ = z;
         sfLastYDist = Double.MAX_VALUE;
     }
+    
+    /**
+     * Convenience method.
+     * @param loc
+     */
+    public void setSetBack(final PlayerLocation loc){
+    	if (setBack == null) setBack = loc.getLocation();
+    	else{
+    		setBack.setWorld(loc.getWorld());
+    		setBack.setX(loc.getX());
+    		setBack.setY(loc.getY());
+    		setBack.setZ(loc.getZ());
+    		setBack.setYaw(loc.getYaw());
+    		setBack.setPitch(loc.getPitch());
+    	}
+    }
+    
+    /**
+     * Convenience method.
+     * @param loc
+     */
+    public void setSetBack(final Location loc){
+    	if (setBack == null) setBack = loc.clone();
+    	else{
+    		setBack.setWorld(loc.getWorld());
+    		setBack.setX(loc.getX());
+    		setBack.setY(loc.getY());
+    		setBack.setZ(loc.getZ());
+    		setBack.setYaw(loc.getYaw());
+    		setBack.setPitch(loc.getPitch());
+    	}
+    }
+    
+    /**
+     * Get the set-back location with yaw and pitch set form ref.
+     * @param ref
+     * @return
+     */
+    public Location getSetBack(final Location ref){
+    	if (setBack == null) return ref.clone();
+    	else{
+    		final Location loc = setBack.clone();
+    		loc.setYaw(ref.getYaw());
+    		loc.setPitch(ref.getPitch());
+    		return loc;
+    	}
+    }
+
+    /**
+     * Get the set-back location with yaw and pitch set from ref.
+     * @param ref
+     * @return
+     */
+	public Location getSetBack(final PlayerLocation ref) {
+    	if (setBack == null) return ref.getLocation();
+    	else{
+    		final Location loc = setBack.clone();
+    		loc.setYaw(ref.getYaw());
+    		loc.setPitch(ref.getPitch());
+    		return loc;
+    	}
+	}
 }
