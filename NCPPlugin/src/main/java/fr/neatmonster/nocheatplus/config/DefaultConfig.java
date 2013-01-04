@@ -25,7 +25,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 299;
+	public static final int buildNumber = 0;
 
     /**
      * Instantiates a new default configuration.
