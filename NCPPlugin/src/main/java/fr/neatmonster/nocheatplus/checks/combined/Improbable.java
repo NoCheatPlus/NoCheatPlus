@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
  * This check  combines different other checks frequency and occurrecnces into one count.
@@ -55,13 +56,19 @@ public class Improbable extends Check {
 		double violation = 0;
 		boolean violated = false;
 		if (shortTerm * 0.8f > cc.improbableLevel / 20.0){
-			violation += shortTerm * 2d;
-			violated = true;
+			final float lag = cc.lag ? TickTask.getLag(data.improbableCount.bucketDuration(), true) : 1f;
+			if (shortTerm / lag > cc.improbableLevel / 20.0){
+				violation += shortTerm * 2d / lag;
+				violated = true;
+			}
 		}
 		final double full = data.improbableCount.score(1.0f);
 		if (full > cc.improbableLevel){
-			violation += full;
-			violated = true;
+			final float lag = cc.lag ? TickTask.getLag(data.improbableCount.bucketDuration() * data.improbableCount.numberOfBuckets(), true) : 1f;
+			if (full / lag > cc.improbableLevel){
+				violation += full / lag;
+				violated = true;
+			}
 		}
 		boolean cancel = false;
 		if (violated){
