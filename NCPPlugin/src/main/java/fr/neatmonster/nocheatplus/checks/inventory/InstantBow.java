@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * M""M                     dP                       dP   M#"""""""'M                      
@@ -61,15 +62,19 @@ public class InstantBow extends Check {
             // TODO: Maybe this can be removed, though TickTask does not reset at the exact moment.
         }
         else {
-            // TODO: Consider: Allow one time but set yawrate penalty time ?
-            final double difference = (expectedPullDuration - pullDuration) / 100D;
+        	// Account for server side lag.
+        	final long correctedPullduration = cc.lag ? (long) (TickTask.getLag(expectedPullDuration, true) * pullDuration) : pullDuration;
+        	if (correctedPullduration < expectedPullDuration){
+                // TODO: Consider: Allow one time but set yawrate penalty time ?
+                final double difference = (expectedPullDuration - pullDuration) / 100D;
 
-            // Player was too fast, increase his violation level.
-            data.instantBowVL += difference;
+                // Player was too fast, increase his violation level.
+                data.instantBowVL += difference;
 
-            // Execute whatever actions are associated with this check and the
-            // violation level and find out if we should cancel the event
-			cancel = executeActions(player, data.instantBowVL, difference, cc.instantBowActions);
+                // Execute whatever actions are associated with this check and the
+                // violation level and find out if we should cancel the event
+    			cancel = executeActions(player, data.instantBowVL, difference, cc.instantBowActions);
+        	}
         }
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
