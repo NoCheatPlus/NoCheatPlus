@@ -11,6 +11,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM""""""""`M                     dP   M#"""""""'M                             dP       
@@ -75,24 +76,31 @@ public class FastBreak extends Check {
 //        	// Ignore those for now.
 //        }
 //        else 
+        
         if (elapsedTime + cc.fastBreakDelay < breakingTime){
     		// lag or cheat or Minecraft.
-    		        		
-    		final long missingTime = breakingTime - elapsedTime;
+        	
+    		// Count in server side lag, if desired.
+            final float lag = cc.lag ? TickTask.getLag(breakingTime, true) : 1f;
+        	
+    		final long missingTime = breakingTime - (long) (lag * elapsedTime);
     		
-    		// Add as penalty
-    		data.fastBreakPenalties.add(now, (float) missingTime);
-    		
-    		// Only raise a violation, if the total penalty score exceeds the contention duration (for lag, delay).
-    		if (data.fastBreakPenalties.score(cc.fastBreakBucketFactor) > cc.fastBreakGrace){
-    			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
-    		    final double vlAdded = (double) missingTime / 1000.0;
-    			data.fastBreakVL += vlAdded;
-    			final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, vlAdded, cc.fastBreakActions);
-    			if (vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + id);
-    			cancel = executeActions(vd);
+    		if (missingTime > 0){
+        		// Add as penalty
+        		data.fastBreakPenalties.add(now, (float) missingTime);
+        		
+
+        		// Only raise a violation, if the total penalty score exceeds the contention duration (for lag, delay).
+        		if (data.fastBreakPenalties.score(cc.fastBreakBucketFactor) > cc.fastBreakGrace){
+        			// TODO: maybe add one absolute penalty time for big amounts to stop breaking until then
+        		    final double vlAdded = (double) missingTime / 1000.0;
+        			data.fastBreakVL += vlAdded;
+        			final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, vlAdded, cc.fastBreakActions);
+        			if (vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + id);
+        			cancel = executeActions(vd);
+        		}
+        		// else: still within contention limits.
     		}
-    		// else: still within contention limits.
     	}
     	else if (breakingTime > cc.fastBreakDelay){
     		// Fast breaking does not decrease violation level.
