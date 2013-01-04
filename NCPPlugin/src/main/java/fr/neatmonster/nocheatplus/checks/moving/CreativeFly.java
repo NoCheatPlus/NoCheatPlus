@@ -122,8 +122,7 @@ public class CreativeFly extends Check {
                 if (executeActions(vd))
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                     // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
-                    return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(),
-                            data.setBack.getZ(), to.getYaw(), to.getPitch());
+                    return data.getSetBack(to);
             } else
                 data.creativeFlyPreviousRefused = true;
         } else
@@ -133,7 +132,7 @@ public class CreativeFly extends Check {
         data.creativeFlyVL *= 0.97D;
 
         // If the event did not get cancelled, define a new setback point.
-        data.setBack = to.getLocation();
+        data.setSetBack(to);
         return null;
     }
 }

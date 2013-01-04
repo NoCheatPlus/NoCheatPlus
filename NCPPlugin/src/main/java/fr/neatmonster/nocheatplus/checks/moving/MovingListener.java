@@ -256,7 +256,7 @@ public class MovingListener extends CheckListener{
 					noFall.checkDamage(player, data, y);
 				}
 				// Teleport.
-				data.teleported = target;
+				data.teleported = target.clone();
 				player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
 			}
 		}

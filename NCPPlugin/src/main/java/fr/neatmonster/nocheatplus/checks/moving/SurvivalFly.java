@@ -338,13 +338,13 @@ public class SurvivalFly extends Check {
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
         if (resetTo){
             // The player has moved onto ground.
-            data.setBack = to.getLocation();
+            data.setSetBack(to);
             data.sfJumpPhase = 0;
             data.clearAccounting();
         }
         else if (resetFrom){
             // The player moved from ground.
-            data.setBack = from.getLocation();
+            data.setSetBack(from);
             data.sfJumpPhase = 1; // TODO: ?
             data.clearAccounting();
         }
@@ -390,7 +390,7 @@ public class SurvivalFly extends Check {
 			// Set the new setBack and reset the jumpPhase.
 			// TODO: Some interpolated position ?
 			// TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
-			if (setBackSafe) data.setBack = from.getLocation();
+			if (setBackSafe) data.setSetBack(from);
 			else{
 				// TODO: This seems dubious !
 				// Consider: 1.0 + ? or max(from.getY(), 1.0 + ...) ?
@@ -484,7 +484,7 @@ public class SurvivalFly extends Check {
 			data.toWasReset = false;
 			data.fromWasReset = false;
 			// Set-back + view direction of to (more smooth).
-			return new Location(player.getWorld(), data.setBack.getX(), data.setBack.getY(), data.setBack.getZ(), to.getYaw(), to.getPitch());
+			return data.getSetBack(to);
 		}
 		else{
 			// Cancelled by other plugin, or no cancel set by configuration.
@@ -629,7 +629,7 @@ public class SurvivalFly extends Check {
 			data.setBack.setYaw(to.getYaw());
 			data.setBack.setPitch(to.getPitch());
 			data.sfLastYDist = Double.MAX_VALUE;
-			return data.setBack;
+			return data.setBack.clone();
 		} else return null;
 	}
 
