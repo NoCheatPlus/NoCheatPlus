@@ -117,6 +117,14 @@ public class PlayerLocation {
 	public Location getLocation() {
 		return new Location(world, x, y, z);
 	}
+	
+	/**
+	 * Get the world!
+	 * @return
+	 */
+	public World getWorld(){
+		return world;
+	}
 
 	/**
 	 * Gets the blockX.
