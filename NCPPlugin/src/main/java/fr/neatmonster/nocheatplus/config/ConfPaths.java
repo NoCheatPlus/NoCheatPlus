@@ -515,6 +515,8 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY_BLOCKS                      =  COMPATIBILITY + "blocks.";
     
     // Sub paths that are used with different path prefixes potentially.
+    public static final String SUB_DEBUG 								 = "debug";
     public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
+    public static final String SUB_LAG       							 = "lag";
 
 }
