@@ -663,17 +663,20 @@ public class MovingListener extends CheckListener{
 
 		// If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
 		final Location to = event.getTo();
+		final Location ref;
 		if (teleported != null && teleported.equals(to)) {
 			// Teleport by NCP.
 			// Prevent cheaters getting rid of flying data (morepackets, other).
 			// TODO: even more strict enforcing ?
 			if (event.isCancelled()) {
 				event.setCancelled(false);
-				event.setTo(teleported);
+				event.setTo(teleported); // ?
 				event.setFrom(teleported);
+				ref = teleported;
 			}
 			else{
 				// Not cancelled but NCP teleport.
+				ref = to;
 			}
 			// TODO: This could be done on MONITOR.
 			data.onSetBack(teleported);
@@ -682,14 +685,15 @@ public class MovingListener extends CheckListener{
 			// TODO: check if to do with cancelled teleports !
 			data.clearMorePacketsData();
 			data.clearFlyData();
-			data.resetPositions(event.isCancelled() ? event.getFrom() : to);
+			ref = event.isCancelled() ? event.getFrom() : to;
+			data.resetPositions(ref);
 		}
 
-
-        // Always drop data from fly checks, as it always loses its validity after teleports. Always!
         // TODO: NoFall might be necessary to be checked here ?
         data.teleported = null;
         
+        // Reset yawrate (experimental: might help preventing cascading improbable with rubberbanding).
+        Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
     }
 
     /**

@@ -125,6 +125,23 @@ public class Combined {
 		}
 		return cancel;
 	}
+	
+	/**
+	 * Reset the yawrate data to yaw and time. 
+	 * @param player
+	 * @param yaw
+	 * @param time
+	 * @param clear If to clear yaws.
+	 */
+	public static final void resetYawRate(final Player player, float yaw, final long time, final boolean clear){
+		if (yaw <= -360f) yaw = -((-yaw) % 360f);
+		else if (yaw >= 360f) yaw = yaw % 360f;
+		final CombinedData data = CombinedData.getData(player);
+		data.lastYaw = yaw;
+		data.lastYawTime = time; // TODO: One might set to some past-time to allow any move at first.
+		data.sumYaw = 0;
+		if (clear) data.yawFreq.clear(time);
+	}
 
 	/**
 	 * Allow to pass a config flag if to check or only to feed.
