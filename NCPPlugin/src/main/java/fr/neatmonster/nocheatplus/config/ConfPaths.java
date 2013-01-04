@@ -54,6 +54,9 @@ public abstract class ConfPaths {
 	private static final String MISCELLANEOUS_NOMOVEDTOOQUICKLY				= MISCELLANEOUS + "nomovedtooquickly.";
 	public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED		= MISCELLANEOUS_NOMOVEDTOOQUICKLY + "enabled";
 	public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY	= MISCELLANEOUS_NOMOVEDTOOQUICKLY + "useproxy";
+	
+	/** TEMP: hidden flag to disable all lag adaption with one flag. */
+	public static final String MISCELLANEOUS_LAG						 	= MISCELLANEOUS + "lag";
 
     @GlobalConfig
     private static final String DATA                                     = "data.";

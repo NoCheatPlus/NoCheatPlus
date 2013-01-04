@@ -24,7 +24,7 @@ public abstract class ACheckConfig implements ICheckConfig {
      */
     public ACheckConfig(final ConfigFile config, final String pathPrefix){
         debug = config.getBoolean(pathPrefix + ConfPaths.SUB_DEBUG, false);
-        lag = config.getBoolean(pathPrefix + ConfPaths.SUB_LAG, true);
+        lag = config.getBoolean(pathPrefix + ConfPaths.SUB_LAG, true) && config.getBoolean(ConfPaths.MISCELLANEOUS_LAG, true);
     }
     
 	@Override
