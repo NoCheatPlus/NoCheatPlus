@@ -186,9 +186,21 @@ public class TickTask implements Runnable {
 	/**
 	 * Get lag percentage for the last ms milliseconds.<br>
 	 * NOTE: Will not be synchronized, still can be called from other threads.
-	 * @return
+	 * @param ms Past milliseconds to cover. A longer period of time may be used, up to two times if ms > lagMaxTicks * 50.
+	 * @return Lag factor (1.0 = 20 tps, 2.0 = 10 tps), excluding the current tick.
 	 */
 	public static final float getLag(final long ms){
+		return getLag(ms, false);
+	}
+	
+	/**
+	 * Get lag percentage for the last ms milliseconds.<br>
+	 * NOTE: Using "exact = true" is meant for checks in the main thread. If called from another thread, exact should be set to false.
+	 * @param ms Past milliseconds to cover. A longer period of time may be used, up to two times if ms > lagMaxTicks * 50.
+	 * @param exact If to include the currently running tick, if possible. Should only be set to true, if called from the main thread (or while the main thread is blocked).
+	 * @return Lag factor (1.0 = 20 tps, 2.0 = 10 tps).
+	 */
+	public static final float getLag(final long ms, final boolean exact){
 		// TODO: Account for freezing (i.e. check timeLast, might be an extra method)!
 		final int tick = TickTask.tick;
 		if (tick == 0) return 1f;
@@ -204,6 +216,16 @@ public class TickTask implements Runnable {
 			if (lagMaxTicks * maxTickSq == totalTicks) maxTickSq -= 1;
 			sum += tickDurationsSq[maxTickSq - 1];
 			covered += lagMaxTicks * 50 * maxTickSq; 
+		}
+		
+		if (exact){
+			// Attempt to count in the current tick.
+			final long passed = System.currentTimeMillis() - timeLast;
+			if (passed > 50){
+				// Only count in in the case of "overtime".
+				covered += 50;
+				sum += passed;
+			}
 		}
 		
 		return (float) sum / (float) covered;
