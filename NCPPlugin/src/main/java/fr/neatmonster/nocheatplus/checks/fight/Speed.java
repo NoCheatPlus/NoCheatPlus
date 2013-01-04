@@ -50,14 +50,24 @@ public class Speed extends Check {
         // Add to frequency.
         data.speedBuckets.add(now, 1f);
         
-        // Medium term (normalized to one second).
-        final float total = data.speedBuckets.score(cc.speedBucketFactor) * 1000f / (float) (cc.speedBucketDur * cc.speedBuckets);
+        // Medium term (normalized to one second), account for server side lag.
+        final long fullTime = cc.speedBucketDur * cc.speedBuckets;
+        final float fullLag = cc.lag ? TickTask.getLag(fullTime, true) : 1f;
+        final float total = data.speedBuckets.score(cc.speedBucketFactor) * 1000f / (fullLag * fullTime);
         
         // Short term.
         final int tick = TickTask.getTick();
         if (tick - data.speedShortTermTick < cc.speedShortTermTicks){
-        	// Within range, add.
-        	data.speedShortTermCount ++;
+        	// Account for server side lag.
+        	if (!cc.lag || TickTask.getLag(50L * (tick - data.speedShortTermTick), true) < 1.5f){
+            	// Within range, add.
+            	data.speedShortTermCount ++;
+        	}
+        	else{
+        		// Too much lag, reset.
+            	data.speedShortTermTick = tick;
+            	data.speedShortTermCount = 1;
+        	}
         }
         else{
         	data.speedShortTermTick = tick;
