@@ -25,21 +25,33 @@ public class Frequency extends Check {
         
         // Full period frequency.
         final float fullScore = data.frequencyBuckets.score(cc.frequencyBucketFactor);
-        final float fullTime = cc.frequencyBuckets * cc.frequencyBucketDur;
+        final long fullTime = cc.frequencyBucketDur * cc.frequencyBuckets;
         
         // Short term arrivals.
         final int tick = TickTask.getTick();
         if (tick - data.frequencyShortTermTick < cc.frequencyShortTermTicks){
-        	// Within range, add.
-        	data.frequencyShortTermCount ++;
+        	// Account for server side lag.
+        	final float stLag = cc.lag ? TickTask.getLag(50L * (tick - data.frequencyShortTermTick), true) : 1f;
+        	if (stLag < 1.5){
+            	// Within range, add.
+            	data.frequencyShortTermCount ++;
+        	}
+        	else{
+        		// Too much lag, reset.
+            	data.frequencyShortTermTick = tick;
+            	data.frequencyShortTermCount = 1;
+        	}
         }
         else{
         	data.frequencyShortTermTick = tick;
         	data.frequencyShortTermCount = 1;
         }
         
+        // Account for server side lag.
+        final float fullLag = cc.lag ? TickTask.getLag(fullTime, true) : 1f;
+        
         // Find if one of both or both are violations:
-        final float fullViolation = (fullScore > fullTime) ? (fullScore - fullTime) : 0;
+        final float fullViolation = (fullScore > fullTime * fullLag) ? (fullScore - fullTime * fullLag) : 0;
         final float shortTermWeight = 50f * cc.frequencyShortTermTicks / (float) cc.frequencyShortTermLimit; 
         final float shortTermViolation = (data.frequencyShortTermCount > cc.frequencyShortTermLimit) 
         		? (data.frequencyShortTermCount - cc.frequencyShortTermLimit) * shortTermWeight : 0; 
@@ -47,6 +59,9 @@ public class Frequency extends Check {
         
         boolean cancel = false;
         if (violation > 0){
+        	
+        	// TODO: account for lag spikes !
+        	
         	final double change = violation / 1000;
         	data.frequencyVL += change;
         	cancel = executeActions(player, data.frequencyVL, change, cc.frequencyActions);
