@@ -49,8 +49,16 @@ public class FastPlace extends Check {
         // Short term arrivals.
         final int tick = TickTask.getTick();
         if (tick - data.fastPlaceShortTermTick < cc.fastPlaceShortTermTicks){
-        	// Within range, add.
-        	data.fastPlaceShortTermCount ++;
+        	// Account for server side lag.
+        	if (!cc.lag || TickTask.getLag(50L * (tick - data.fastPlaceShortTermTick), true) < 1.2){
+        		// Within range, add.
+        		data.fastPlaceShortTermCount ++;
+        	}
+        	else{
+        		// Too much lag, reset.
+            	data.fastPlaceShortTermTick = tick;
+            	data.fastPlaceShortTermCount = 1;
+        	}
         }
         else{
         	data.fastPlaceShortTermTick = tick;
@@ -58,7 +66,19 @@ public class FastPlace extends Check {
         }
         
         // Find if one of both or both are violations:
-        final float fullViolation = fullScore - cc.fastPlaceLimit;
+        final float fullViolation;
+        if (fullScore > cc.fastPlaceLimit){
+        	// Account for server side lag.
+        	if (cc.lag){
+        		fullViolation = fullScore / TickTask.getLag(data.fastPlaceBuckets.bucketDuration() * data.fastPlaceBuckets.numberOfBuckets(), true) - cc.fastPlaceLimit;
+        	}
+        	else{
+        		fullViolation = fullScore - cc.fastPlaceLimit;
+        	}	
+        }
+        else{
+        	fullViolation = 0;
+        }
         final float shortTermViolation = data.fastPlaceShortTermCount - cc.fastPlaceShortTermLimit; 
         final float violation = Math.max(fullViolation, shortTermViolation);
         
