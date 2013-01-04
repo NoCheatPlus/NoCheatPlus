@@ -2,6 +2,8 @@ package fr.neatmonster.nocheatplus.checks.combined;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.utilities.TickTask;
+
 
 /**
  * Static access API for shared use. This is actually not really a check, but access to combined or shared data.
@@ -108,9 +110,39 @@ public class Combined {
 		
 		final CombinedConfig cc = CombinedConfig.getConfig(player);
 		
-		// Angle diff per second
-		final float total = Math.max(data.yawFreq.score(1f), data.yawFreq.bucketScore(0) * 3f);
 		final float threshold = cc.yawRate;
+		
+		// Angle diff per second
+		final float stScore = data.yawFreq.bucketScore(0) * 3f; // TODO: Better have it 2.5 with lower threshold ?
+		final float stViol;
+		if (stScore > threshold){
+			// Account for server side lag.
+			if (!cc.lag || TickTask.getLag(data.yawFreq.bucketDuration(), true) < 1.2){
+				stViol = stScore;
+			}
+			else{
+				stViol = 0;
+			}
+		}
+		else{
+			stViol = 0f;
+		}
+		final float fullScore = data.yawFreq.score(1f);
+		final float fullViol;
+		if (fullScore > threshold){
+			// Account for server side lag.
+			if (cc.lag){
+				fullViol = fullScore / TickTask.getLag(data.yawFreq.bucketDuration() * data.yawFreq.numberOfBuckets(), true);
+			}
+			else{
+				fullViol = fullScore;
+			}
+		}
+		else{
+			fullViol = 0;
+		}
+		final float total = Math.max(stViol, fullViol);
+		
 		boolean cancel = false;
 		if (total > threshold){
 			// Add time 
