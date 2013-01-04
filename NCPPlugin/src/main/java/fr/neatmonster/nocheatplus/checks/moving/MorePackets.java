@@ -67,8 +67,11 @@ public class MorePackets extends Check {
 
         Location newTo = null;
 
-        if (data.morePacketsSetback == null)
-            data.morePacketsSetback = from.getLocation();
+        if (data.morePacketsSetback == null){
+        	// TODO: Check if other set-back is appropriate or if to set on other events.
+        	if (data.setBack != null) data.morePacketsSetback = data.setBack.clone();
+        	else data.morePacketsSetback = from.getLocation();
+        }
 
         // Take a packet from the buffer.
         data.morePacketsBuffer--;

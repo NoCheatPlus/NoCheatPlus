@@ -67,8 +67,10 @@ public class MorePacketsVehicle extends Check {
 
         Location newTo = null;
 
-        if (data.morePacketsVehicleSetback == null)
-            data.morePacketsVehicleSetback = from;
+        if (data.morePacketsVehicleSetback == null){
+        	// TODO: Check if other set-back is appropriate or if to set on other events.
+        	data.morePacketsVehicleSetback = from;
+        }
 
         // Take a packet from the buffer.
         data.morePacketsVehicleBuffer--;
