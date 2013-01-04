@@ -17,6 +17,7 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MP""""""`MM                            oo                   dP MM""""""""`M dP          
@@ -542,7 +543,22 @@ public class SurvivalFly extends Check {
 			}
 			else if (data.verticalFreedom <= 0.001D) {
 				// Here yDistance can be negative and positive (!).
-				if (yDistance != 0D) vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc"));
+				if (yDistance != 0D){
+					final double accAboveLimit = verticalAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc");
+					if (accAboveLimit > vDistanceAboveLimit){
+						// Account for lag.
+						// TODO: 1.1 might be too pessimistic.
+						if (cc.lag && TickTask.getLag(data.vDistCount.bucketDuration() * data.vDistCount.numberOfBuckets(), true) > 1.1){
+							data.vDistCount.clear(now);
+							data.vDistSum.clear(now);
+						}
+						else{
+							// Accept as violation.
+							vDistanceAboveLimit = accAboveLimit;
+						}
+					}
+					
+				}
 			}
 			else{
 				// TODO: Just to exclude source of error, might be redundant.
