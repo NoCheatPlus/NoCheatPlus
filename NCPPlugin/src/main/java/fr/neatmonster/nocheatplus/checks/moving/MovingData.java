@@ -167,7 +167,8 @@ public class MovingData extends ACheckData {
 	public void onSetBack(final Location setBack) {
 		// Reset positions
 		resetPositions(teleported);
-		this.setBack = teleported;
+		// NOTE: Do mind that the reference is used diredctly for set-backs, should stay consistent, though.
+		this.setBack = this.morePacketsSetback = this.morePacketsVehicleSetback = teleported;
 		clearAccounting(); // Might be more safe to do this.
 		// Keep no-fall data.
 		// Fly data: problem is we don't remember the settings for the set back location.
