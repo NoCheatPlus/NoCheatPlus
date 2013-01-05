@@ -622,6 +622,7 @@ public class MovingListener extends CheckListener{
 		data.clearFlyData();
 		data.clearMorePacketsData();
 		data.setBack = event.getRespawnLocation();
+		// TODO: consider data.resetPositions(data.setBack);
 	}
 	
 	/**
@@ -849,6 +850,7 @@ public class MovingListener extends CheckListener{
 		final Player player = event.getPlayer();
 		final MovingData data = MovingData.getData(player);
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
+		data.clearMorePacketsData();
 		if (data.setBack == null){
 			data.setBack = player.getLocation();
 		}

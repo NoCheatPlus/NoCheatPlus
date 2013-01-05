@@ -624,12 +624,10 @@ public class SurvivalFly extends Check {
 		} else data.sfCobwebVL += vDistanceAboveLimit * 100D;
 		if (data.sfCobwebVL < 550) { // Totally random !
 			// Silently set back.
-			if (data.setBack == null) data.setBack = player.getLocation();
+			if (data.setBack == null) data.setSetBack(player.getLocation());
 			data.sfJumpPhase = 0;
-			data.setBack.setYaw(to.getYaw());
-			data.setBack.setPitch(to.getPitch());
 			data.sfLastYDist = Double.MAX_VALUE;
-			return data.setBack.clone();
+			return data.getSetBack(to);
 		} else return null;
 	}
 
