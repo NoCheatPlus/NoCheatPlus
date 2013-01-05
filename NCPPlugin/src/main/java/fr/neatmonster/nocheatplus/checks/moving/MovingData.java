@@ -134,9 +134,9 @@ public class MovingData extends ACheckData {
     
     // Accounting info.
     // TODO: optimize later.
-    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
+//    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
     public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
-    public final ActionFrequency hDistCount = new ActionFrequency(3, 333);
+//    public final ActionFrequency hDistCount = new ActionFrequency(3, 333);
     public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
@@ -180,11 +180,14 @@ public class MovingData extends ACheckData {
 		toWasReset = fromWasReset = false; // TODO: true maybe
 	}
 
+	/**
+	 * Clear accounting data.
+	 */
     public void clearAccounting() {
         final long now = System.currentTimeMillis();
-        hDistSum.clear(now);
+//        hDistSum.clear(now);
         vDistSum.clear(now);
-        hDistCount.clear(now);
+//        hDistCount.clear(now);
         vDistCount.clear(now);
     }
 
@@ -206,11 +209,21 @@ public class MovingData extends ACheckData {
         noFallSkipAirCheck = false;
     }
     
+    /**
+     * Just reset the "last locations" references.
+     * @param loc
+     */
     public void resetPositions(final Location loc){
         if (loc == null) resetPositions(Double.MAX_VALUE, 0, 0);
         else resetPositions(loc.getX(), loc.getY(), loc.getZ());
     }
 
+    /**
+     * Just reset the "last locations" references.
+     * @param x
+     * @param y
+     * @param z
+     */
     public void resetPositions(final double x, final double y, final double z) {
         fromX = toX = x;
         fromY = toY = y;
