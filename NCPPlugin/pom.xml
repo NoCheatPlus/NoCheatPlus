@@ -56,6 +56,11 @@
     	<artifactId>ncpcompatcb2545</artifactId>
     	<version>1.0.0</version>
     </dependency>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcompatcbdev</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
   </dependencies>
   
   <!-- Building -->
@@ -103,6 +108,7 @@
                   <include>fr.neatmonster:ncpcompatcb2511</include>
                   <include>fr.neatmonster:ncpcompatcb2512</include>
                   <include>fr.neatmonster:ncpcompatcb2545</include>
+                  <include>fr.neatmonster:ncpcompatcbdev</include>
 <!--                   <include>fr.neatmonster:ncpplugin</include> -->
 <!--                   <include>fr.neatmonster:nocheatplus-parent</include> -->
                 </includes>

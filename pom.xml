@@ -18,6 +18,7 @@
     <module>NCPCompatCB2512</module>
     <module>NCPPlugin</module>
     <module>NCPCompatCB2545</module>
+    <module>NCPCompatCBDev</module>
   </modules>
 
   <repositories>
