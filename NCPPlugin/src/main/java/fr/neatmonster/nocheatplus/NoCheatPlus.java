@@ -459,16 +459,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         	new InventoryListener(),
         	new MovingListener(),
         	new INotifyReload() {
-			@Override
-			public void onReload() {
-				// Only for reloading, not INeedConfig.
-				BlockProperties.init();
-				final ConfigFile config = ConfigManager.getConfigFile();
-				BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
-				undoCommandChanges();
-				if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
-			}
-		},
+				@Override
+				public void onReload() {
+					// Only for reloading, not INeedConfig.
+					BlockProperties.init();
+					final ConfigFile config = ConfigManager.getConfigFile();
+					BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
+					undoCommandChanges();
+					if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
+				}
+        	},
         }){
         	addComponent(obj);
         }
@@ -556,10 +556,34 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				}
 			}); 
 		}
+		
+		// Care for already online players.
+		final Player[] onlinePlayers = getServer().getOnlinePlayers();
+		// TODO: remap exemptionmanager !
+		// TODO: Disable all checks for these players for one tick !
+		// TODO: Prepare check data for players [problem: permissions]?
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+				postEnable(onlinePlayers);
+			}
+		});
 
 		// Tell the server administrator that we finished loading NoCheatPlus now.
 		LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
 	}
+    
+    /**
+     * Actions to be done after enable of  all plugins. This aims at reloading mainly.
+     */
+    private void postEnable(final Player[] onlinePlayers){
+    	for (final Player player : onlinePlayers){
+    		updatePermStateReceivers(player);
+    	}
+    	// TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
+    }
+    
+    
 
 //    public void onPlayerJoinLow(final PlayerJoinEvent event) {
 //        /*
