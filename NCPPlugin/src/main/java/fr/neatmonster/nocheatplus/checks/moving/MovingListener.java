@@ -374,6 +374,18 @@ public class MovingListener extends CheckListener{
         
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
+          
+        if (cc.debug) {
+			StringBuilder builder = new StringBuilder(250);
+			final Location loc = player.getLocation();
+			builder.append(player.getName());
+			builder.append(" " + from.getWorld().getName() + " " + CheckUtils.fdec3.format(from.getX()) + (from.getX() == loc.getX() ? "" : ("(" + CheckUtils.fdec3.format(loc.getX()) + ")")));
+			builder.append(", " + CheckUtils.fdec3.format(from.getY()) + (from.getY() == loc.getY() ? "" : ("(" + CheckUtils.fdec3.format(loc.getY()) + ")")));
+			builder.append(", " + CheckUtils.fdec3.format(from.getZ()) + (from.getZ() == loc.getZ() ? "" : ("(" + CheckUtils.fdec3.format(loc.getZ()) + ")")));
+			builder.append(" -> " + CheckUtils.fdec3.format(to.getX()) + ", " + CheckUtils.fdec3.format(to.getY()) + ", " + CheckUtils.fdec3.format(to.getZ()));
+			System.out.print(builder.toString());
+		}
+        
 		final MovingData data = MovingData.getData(player);
 		data.noFallAssumeGround = false;
 		data.teleported = null;

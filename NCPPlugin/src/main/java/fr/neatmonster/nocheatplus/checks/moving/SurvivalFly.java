@@ -307,11 +307,9 @@ public class SurvivalFly extends Check {
 		if (cc.debug) {
 			// TODO: also show resetcond (!)
 			StringBuilder builder = new StringBuilder(500);
-			builder.append(player.getName() + " vfreedom: " +  CheckUtils.fdec3.format(data.verticalFreedom) + " (vv=" +  CheckUtils.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
+			builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + "\n");
 			builder.append(player.getName() + " hDist: " + CheckUtils.fdec3.format(hDistance) + " / " +  CheckUtils.fdec3.format(hAllowedDistance) + " , vDist: " +  CheckUtils.fdec3.format(yDistance) + " / " +  CheckUtils.fdec3.format(vAllowedDistance) + "\n");
-			final double plY = player.getLocation().getY();
-			final String plYs = from.getY() == plY ? "" : ("|" +  CheckUtils.fdec3.format(plY));
-			builder.append(player.getName() + " y: " +  CheckUtils.fdec3.format(from.getY()) + plYs + (fromOnGround ? "(onground)" : "") + (data.noFallAssumeGround ? "(assumeonground)" : "") + " -> " +  CheckUtils.fdec3.format(to.getY()) + (toOnGround ? "(onground)" : "") + "\n");
+			builder.append(player.getName() + " vfreedom: " +  CheckUtils.fdec3.format(data.verticalFreedom) + " (vv=" +  CheckUtils.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
 			if (!resetFrom && !resetTo) {
 //				if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
 				if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
