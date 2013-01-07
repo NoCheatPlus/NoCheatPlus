@@ -482,6 +482,9 @@ public class MovingListener extends CheckListener{
 
             // Remember where we send the player to.
             data.teleported = newTo;
+            if (cc.debug){
+            	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + CheckUtils.fdec3.format(newTo.getX()) + ", " + CheckUtils.fdec3.format(newTo.getY()) + ", " + CheckUtils.fdec3.format(newTo.getZ()));
+            }
         }
         
         // Set positions.
