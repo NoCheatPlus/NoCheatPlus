@@ -237,7 +237,9 @@ public class MovingData extends ACheckData {
      * @param loc
      */
     public void setSetBack(final PlayerLocation loc){
-    	if (setBack == null) setBack = loc.getLocation();
+    	if (setBack == null){
+    		setBack = loc.getLocation();
+    	}
     	else{
     		setBack.setWorld(loc.getWorld());
     		setBack.setX(loc.getX());
@@ -253,7 +255,9 @@ public class MovingData extends ACheckData {
      * @param loc
      */
     public void setSetBack(final Location loc){
-    	if (setBack == null) setBack = loc.clone();
+    	if (setBack == null){
+    		setBack = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    	}
     	else{
     		setBack.setWorld(loc.getWorld());
     		setBack.setX(loc.getX());
@@ -270,12 +274,11 @@ public class MovingData extends ACheckData {
      * @return
      */
     public Location getSetBack(final Location ref){
-    	if (setBack == null) return ref.clone();
+    	if (setBack == null){
+    		return new Location(ref.getWorld(), ref.getX(), ref.getY(), ref.getZ(), ref.getYaw(), ref.getPitch());
+    	}
     	else{
-    		final Location loc = setBack.clone();
-    		loc.setYaw(ref.getYaw());
-    		loc.setPitch(ref.getPitch());
-    		return loc;
+    		return new Location(setBack.getWorld(), setBack.getX(), setBack.getY(), setBack.getZ(), ref.getYaw(), ref.getPitch());
     	}
     }
 
@@ -287,10 +290,7 @@ public class MovingData extends ACheckData {
 	public Location getSetBack(final PlayerLocation ref) {
     	if (setBack == null) return ref.getLocation();
     	else{
-    		final Location loc = setBack.clone();
-    		loc.setYaw(ref.getYaw());
-    		loc.setPitch(ref.getPitch());
-    		return loc;
+    		return new Location(setBack.getWorld(), setBack.getX(), setBack.getY(), setBack.getZ(), ref.getYaw(), ref.getPitch());
     	}
 	}
 }

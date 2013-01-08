@@ -69,7 +69,7 @@ public class MorePackets extends Check {
 
         if (data.morePacketsSetback == null){
         	// TODO: Check if other set-back is appropriate or if to set on other events.
-        	if (data.setBack != null) data.morePacketsSetback = data.setBack.clone();
+        	if (data.setBack != null) data.morePacketsSetback = data.getSetBack(to);
         	else data.morePacketsSetback = from.getLocation();
         }
 

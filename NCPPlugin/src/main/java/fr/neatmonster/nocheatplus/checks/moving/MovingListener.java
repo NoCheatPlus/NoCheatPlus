@@ -256,7 +256,7 @@ public class MovingListener extends CheckListener{
 					noFall.checkDamage(player, data, y);
 				}
 				// Teleport.
-				data.teleported = target.clone();
+				data.teleported = new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
 				player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
 			}
 		}
@@ -561,7 +561,7 @@ public class MovingListener extends CheckListener{
         // Fix a common mistake that other developers make (cancelling move events is crazy, rather set the target
         // location to the from location).
         event.setCancelled(false);
-        event.setTo(event.getFrom().clone());
+        event.setTo(event.getFrom()); // TODO: revise this (old!) strategy, cancelled events just teleport to from, basically.
     }
     
     /**
@@ -570,6 +570,7 @@ public class MovingListener extends CheckListener{
      */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = false)
     public final void onPlayerMoveMonitor(final PlayerMoveEvent event){
+    	// TODO: revise: cancelled events.
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
         if (player.isDead()) return;
