@@ -6,6 +6,7 @@ import java.util.List;
 import fr.neatmonster.nocheatplus.compat.cb2511.MCAccessCB2511;
 import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512;
 import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
+import fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev;
 import fr.neatmonster.nocheatplus.utilities.LogUtil;
 
 /**
@@ -21,8 +22,18 @@ public class MCAccessFactory {
 	 */
 	public MCAccess getMCAccess(){
 		final List<Throwable> throwables = new ArrayList<Throwable>();
+		
+		// TEST //
 		try{
-			return new MCAccessCB2511();
+			return new MCAccessCBDev();
+		}
+		catch(Throwable t){
+			throwables.add(t);
+		};
+		// TEST END //
+		
+		try{
+			return new MCAccessCB2545();
 		}
 		catch(Throwable t){
 			throwables.add(t);
@@ -34,12 +45,14 @@ public class MCAccessFactory {
 		catch(Throwable t){
 			throwables.add(t);
 		};
+		
 		try{
-			return new MCAccessCB2545();
+			return new MCAccessCB2511();
 		}
 		catch(Throwable t){
 			throwables.add(t);
 		};
+
 		LogUtil.logSevere("[NoCheatPlus] Could not set up MC version specific access.");
 		for (Throwable t : throwables ){
 			LogUtil.logSevere(t);
