@@ -240,15 +240,13 @@ public class MovingListener extends CheckListener{
 			final MovingConfig cc = MovingConfig.getConfig(player); 
 			Location target = null;
 			final boolean sfCheck = shouldCheckSurvivalFly(player, data, cc);
-			if (sfCheck) target = data.setBack;
+			if (sfCheck) target = data.getSetBack(loc);
 			if (target == null){
 				// TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
 				target = loc;
 			}
 			if (target != null){
 				// Actually this should not possibly be null, this is a block for "future" purpose, feel free to criticize it.
-				target.setPitch(loc.getPitch());
-				target.setYaw(loc.getYaw());
 				if (sfCheck && noFall.isEnabled(player)){
 					// Check if to deal damage.
 					double y = loc.getY();
@@ -256,7 +254,7 @@ public class MovingListener extends CheckListener{
 					noFall.checkDamage(player, data, y);
 				}
 				// Teleport.
-				data.teleported = new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
+				data.teleported = target; // Should be enough. | new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
 				player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
 			}
 		}
@@ -867,12 +865,13 @@ public class MovingListener extends CheckListener{
 		final MovingData data = MovingData.getData(player);
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
+		final Location loc = player.getLocation();
 		if (data.setBack == null){
-			data.setBack = player.getLocation();
+			data.setBack = loc;
 		}
 		if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
 			// TODO: re-think: more fine grained reset?
-			data.resetPositions(data.setBack);
+			data.resetPositions(loc);
 		}
 	}
     
