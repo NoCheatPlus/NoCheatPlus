@@ -61,7 +61,12 @@ public class Passable extends Check {
 		}
 		
 		// Prefer the set-back location from the data.
-		if (data.setBack != null && BlockProperties.isPassable(from.getBlockCache(), data.setBack)) loc = data.getSetBack(to);
+		if (data.hasSetBack()){
+			final Location ref = data.getSetBack(to);
+			if (BlockProperties.isPassable(from.getBlockCache(), ref)){
+				loc = ref;
+			}
+		}
 
 		// TODO: set data.set-back ? or something: still some aji here.
 		

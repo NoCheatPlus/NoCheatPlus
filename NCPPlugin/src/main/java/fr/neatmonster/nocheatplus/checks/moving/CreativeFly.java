@@ -54,13 +54,13 @@ public class CreativeFly extends Check {
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
 
         // If we have no setback, define one now.
-        if (data.setBack == null)
-            data.setBack = from.getLocation();
+        if (!data.hasSetBack())
+           data.setSetBack(from);
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final int maximumHeight = cc.creativeFlyMaxHeight + player.getWorld().getMaxHeight();
         if (to.getY() - data.verticalFreedom > maximumHeight)
-            return new Location(player.getWorld(), data.setBack.getX(), maximumHeight - 10D, data.setBack.getZ(),
+            return new Location(player.getWorld(), data.getSetBackX(), maximumHeight - 10D, data.getSetBackZ(),
                     to.getYaw(), to.getPitch());
 
         // Calculate some distances.

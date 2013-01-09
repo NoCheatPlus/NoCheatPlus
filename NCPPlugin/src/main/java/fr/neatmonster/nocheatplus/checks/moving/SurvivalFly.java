@@ -97,8 +97,8 @@ public class SurvivalFly extends Check {
         final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
         
         // If we don't have any setBack, choose the location the player comes from.
-        if (data.setBack == null)
-            data.setBack = from.getLocation();
+        if (!data.hasSetBack())
+            data.setSetBack(from);
 
 		final boolean resetFrom;
 
@@ -278,7 +278,7 @@ public class SurvivalFly extends Check {
             }
 
             // TODO: This might need max(0, for ydiff)
-			vDistanceAboveLimit = to.getY() - data.setBack.getY() - vAllowedDistance;
+			vDistanceAboveLimit = to.getY() - data.getSetBackY() - vAllowedDistance;
 			
 			if (vDistanceAboveLimit > 0) tags.add("vdist");
 
@@ -364,7 +364,7 @@ public class SurvivalFly extends Check {
 		// Check for "lost touch", for when moving events were not created,
 		// for instance (1/256).
 		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0) {
-			final double setBackYDistance = to.getY() - data.setBack.getY();
+			final double setBackYDistance = to.getY() - data.getSetBackY();
 			if (setBackYDistance > 0D && setBackYDistance <= 1.5D) {
 				// Interpolate from last to-coordinates to the from
 				// coordinates (with some safe-guard).
@@ -392,7 +392,7 @@ public class SurvivalFly extends Check {
 			else{
 				// TODO: This seems dubious !
 				// Consider: 1.0 + ? or max(from.getY(), 1.0 + ...) ?
-				data.setBack.setY(Location.locToBlock(data.setBack.getY())); 
+				data.setSetBackY(Location.locToBlock(data.getSetBackY())); 
 			}
 			// data.ground ?
 			// ? set jumpphase to height / 0.15 ?
@@ -622,7 +622,7 @@ public class SurvivalFly extends Check {
 		} else data.sfCobwebVL += vDistanceAboveLimit * 100D;
 		if (data.sfCobwebVL < 550) { // Totally random !
 			// Silently set back.
-			if (data.setBack == null) data.setSetBack(player.getLocation());
+			if (!data.hasSetBack()) data.setSetBack(player.getLocation()); // ? check moment of call.
 			data.sfJumpPhase = 0;
 			data.sfLastYDist = Double.MAX_VALUE;
 			return data.getSetBack(to);

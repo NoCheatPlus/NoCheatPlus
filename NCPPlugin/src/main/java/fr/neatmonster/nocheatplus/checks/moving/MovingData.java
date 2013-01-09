@@ -68,8 +68,8 @@ public class MovingData extends ACheckData {
     public static void clear(){
     	playersMap.clear();
     }
-
-	// Violation levels.
+    
+    // Violation levels.
     public double         creativeFlyVL            = 0D;
     public double         morePacketsVL            = 0D;
     public double         morePacketsVehicleVL     = 0D;
@@ -98,13 +98,13 @@ public class MovingData extends ACheckData {
     public int            morePacketsBuffer        = 50;
     public long           morePacketsLastTime;
     public int            morePacketsPackets;
-    public Location       morePacketsSetback;
+    private Location      morePacketsSetback;
 
     // Data of the more packets vehicle check.
     public int            morePacketsVehicleBuffer = 50;
     public long           morePacketsVehicleLastTime;
     public int            morePacketsVehiclePackets;
-    public Location       morePacketsVehicleSetback;
+    private Location      morePacketsVehicleSetback;
 
     // Data of the no fall check.
     public float          noFallFallDistance;
@@ -140,8 +140,8 @@ public class MovingData extends ACheckData {
     public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
-    public Location       setBack;
-    public Location       teleported;
+    private Location    setBack;
+    private Location    teleported;
 
 	/**
 	 * Clear the data of the fly checks (not more-packets).
@@ -168,7 +168,10 @@ public class MovingData extends ACheckData {
 		// Reset positions
 		resetPositions(teleported);
 		// NOTE: Do mind that the reference is used directly for set-backs, should stay consistent, though.
-		this.setBack = this.morePacketsSetback = this.morePacketsVehicleSetback = teleported;
+		
+		setSetBack(teleported);
+		this.morePacketsSetback = this.morePacketsVehicleSetback = null; // TODO: or set.
+		
 		clearAccounting(); // Might be more safe to do this.
 		// Keep no-fall data.
 		// Fly data: problem is we don't remember the settings for the set back location.
@@ -241,12 +244,7 @@ public class MovingData extends ACheckData {
     		setBack = loc.getLocation();
     	}
     	else{
-    		setBack.setWorld(loc.getWorld());
-    		setBack.setX(loc.getX());
-    		setBack.setY(loc.getY());
-    		setBack.setZ(loc.getZ());
-    		setBack.setYaw(loc.getYaw());
-    		setBack.setPitch(loc.getPitch());
+    		LocUtil.set(setBack, loc);
     	}
     }
     
@@ -256,41 +254,108 @@ public class MovingData extends ACheckData {
      */
     public void setSetBack(final Location loc){
     	if (setBack == null){
-    		setBack = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    		setBack = LocUtil.clone(loc);
     	}
     	else{
-    		setBack.setWorld(loc.getWorld());
-    		setBack.setX(loc.getX());
-    		setBack.setY(loc.getY());
-    		setBack.setZ(loc.getZ());
-    		setBack.setYaw(loc.getYaw());
-    		setBack.setPitch(loc.getPitch());
+    		LocUtil.set(setBack, loc);
     	}
     }
-    
-    /**
+
+	/**
      * Get the set-back location with yaw and pitch set form ref.
      * @param ref
      * @return
      */
     public Location getSetBack(final Location ref){
-    	if (setBack == null){
-    		return new Location(ref.getWorld(), ref.getX(), ref.getY(), ref.getZ(), ref.getYaw(), ref.getPitch());
-    	}
-    	else{
-    		return new Location(setBack.getWorld(), setBack.getX(), setBack.getY(), setBack.getZ(), ref.getYaw(), ref.getPitch());
-    	}
+    	return LocUtil.clone(setBack, ref);
     }
 
-    /**
+	/**
      * Get the set-back location with yaw and pitch set from ref.
      * @param ref
      * @return
      */
 	public Location getSetBack(final PlayerLocation ref) {
-    	if (setBack == null) return ref.getLocation();
-    	else{
-    		return new Location(setBack.getWorld(), setBack.getX(), setBack.getY(), setBack.getZ(), ref.getYaw(), ref.getPitch());
-    	}
+    	return LocUtil.clone(setBack, ref);
 	}
+
+	public boolean hasSetBack() {
+		return setBack != null;
+	}
+
+	public boolean hasSetBackWorldChanged(final Location loc) {
+		if (setBack == null) return true;
+		else return setBack.getWorld().equals(loc.getWorld());
+	}
+	
+
+	public double getSetBackX() {
+		return setBack.getX();
+	}
+
+	public double getSetBackY() {
+		return setBack.getY();
+	}
+	
+	public double getSetBackZ() {
+		return setBack.getZ();
+	}
+
+	public void setSetBackY(final double y) {
+		setBack.setY(y);
+	}
+	
+	public final Location getTeleported(){
+		// TODO: here a reference might do.
+		return teleported == null ? teleported : LocUtil.clone(teleported);
+	}
+	
+	public final void setTeleported(final Location loc) {
+		teleported = LocUtil.clone(loc); // Always overwrite.
+	}
+
+	public boolean hasMorePacketsSetBack() {
+		return morePacketsSetback != null;
+	}
+
+	public final void setMorePacketsSetBack(final PlayerLocation loc) {
+		if (morePacketsSetback == null) morePacketsSetback = loc.getLocation();
+		else LocUtil.set(morePacketsSetback, loc);
+	}
+	
+	public final void setMorePacketsSetBack(final Location loc) {
+		if (morePacketsSetback == null) morePacketsSetback = LocUtil.clone(loc);
+		else LocUtil.set(morePacketsSetback, loc);
+	}
+
+	public Location getMorePacketsSetBack() {
+		return LocUtil.clone(morePacketsSetback);
+	}
+	
+	public boolean hasMorePacketsVehicleSetBack() {
+		return morePacketsVehicleSetback != null;
+	}
+
+	public final void setMorePacketsVehicleSetBack(final PlayerLocation loc) {
+		if (morePacketsVehicleSetback == null) morePacketsVehicleSetback = loc.getLocation();
+		else LocUtil.set(morePacketsVehicleSetback, loc);
+	}
+	
+	public final void setMorePacketsVehicleSetBack(final Location loc) {
+		if (morePacketsVehicleSetback == null) morePacketsVehicleSetback = LocUtil.clone(loc);
+		else LocUtil.set(morePacketsVehicleSetback, loc);
+	}
+
+	public final Location getMorePacketsVehicleSetBack() {
+		return LocUtil.clone(morePacketsVehicleSetback);
+	}
+
+	public final void resetTeleported() {
+		teleported = null;
+	}
+
+	public final void resetSetBack() {
+		setBack = null;
+	}
+	
 }

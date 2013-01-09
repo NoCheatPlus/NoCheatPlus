@@ -67,10 +67,10 @@ public class MorePackets extends Check {
 
         Location newTo = null;
 
-        if (data.morePacketsSetback == null){
+        if (!data.hasMorePacketsSetBack()){
         	// TODO: Check if other set-back is appropriate or if to set on other events.
-        	if (data.setBack != null) data.morePacketsSetback = data.getSetBack(to);
-        	else data.morePacketsSetback = from.getLocation();
+        	if (data.hasSetBack()) data.setMorePacketsSetBack(data.getSetBack(to));
+        	else data.setMorePacketsSetBack(from);
         }
 
         // Take a packet from the buffer.
@@ -86,8 +86,11 @@ public class MorePackets extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             if (executeActions(player, data.morePacketsVL, -data.morePacketsBuffer,
-                    MovingConfig.getConfig(player).morePacketsActions))
-                newTo = data.teleported = data.morePacketsSetback;
+                    MovingConfig.getConfig(player).morePacketsActions)){
+            	newTo = data.getMorePacketsSetBack(); 
+                data.setTeleported(newTo);
+            }
+                
         }
 
         if (data.morePacketsLastTime + 1000 < time) {
@@ -109,8 +112,7 @@ public class MorePackets extends Check {
             data.morePacketsLastTime = time;
 
             // Set the new "setback" location.
-            if (newTo == null)
-                data.morePacketsSetback = from.getLocation();
+            if (newTo == null) data.setMorePacketsSetBack(from);
         } else if (data.morePacketsLastTime > time)
             // Security check, maybe system time changed.
             data.morePacketsLastTime = time;

@@ -67,9 +67,9 @@ public class MorePacketsVehicle extends Check {
 
         Location newTo = null;
 
-        if (data.morePacketsVehicleSetback == null){
+        if (!data.hasMorePacketsVehicleSetBack()){
         	// TODO: Check if other set-back is appropriate or if to set on other events.
-        	data.morePacketsVehicleSetback = from;
+        	data.setMorePacketsVehicleSetBack(from);
         }
 
         // Take a packet from the buffer.
@@ -85,8 +85,9 @@ public class MorePacketsVehicle extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             if (executeActions(player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer,
-                    MovingConfig.getConfig(player).morePacketsVehicleActions))
-                newTo = data.morePacketsVehicleSetback;
+                    MovingConfig.getConfig(player).morePacketsVehicleActions)){
+            	newTo = data.getMorePacketsVehicleSetBack();
+            }
         }
 
         if (data.morePacketsVehicleLastTime + 1000 < time) {
@@ -109,7 +110,7 @@ public class MorePacketsVehicle extends Check {
 
             // Set the new "setback" location.
             if (newTo == null)
-                data.morePacketsVehicleSetback = from;
+                data.setMorePacketsVehicleSetBack(from);
         } else if (data.morePacketsVehicleLastTime > time)
             // Security check, maybe system time changed.
             data.morePacketsVehicleLastTime = time;

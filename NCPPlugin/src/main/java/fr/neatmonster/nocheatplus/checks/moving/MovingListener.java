@@ -178,7 +178,7 @@ public class MovingListener extends CheckListener{
 		final MovingData data = MovingData.getData(player);
 		if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) return;
 		
-		if (data.setBack == null || blockY + 1D < data.setBack.getY()) return;
+		if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) return;
 		
 		final Location loc = player.getLocation();
 		if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
@@ -188,7 +188,7 @@ public class MovingListener extends CheckListener{
 			// The creative fly and/or survival fly check is enabled, the
 			// block was placed below the player and is
 			// solid, so do what we have to do.
-			data.setBack.setY(blockY + 1D);
+			data.setSetBackY(blockY + 1D);
 			data.sfJumpPhase = 0;
 		}
     }
@@ -250,11 +250,11 @@ public class MovingListener extends CheckListener{
 				if (sfCheck && noFall.isEnabled(player)){
 					// Check if to deal damage.
 					double y = loc.getY();
-					if (data.setBack != null) y = Math.min(y, data.setBack.getY());
+					if (data.hasSetBack()) y = Math.min(y, data.getSetBackY());
 					noFall.checkDamage(player, data, y);
 				}
 				// Teleport.
-				data.teleported = target; // Should be enough. | new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
+				data.setTeleported(target); // Should be enough. | new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
 				player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
 			}
 		}
@@ -285,11 +285,10 @@ public class MovingListener extends CheckListener{
         // Maybe this helps with people teleporting through Multiverse portals having problems?
     	final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
-        data.teleported = null;
         data.clearFlyData();
         data.clearMorePacketsData();
         // TODO: Might omit this if neither check is activated.
-        data.setBack = player.getLocation();
+        data.setSetBack(player.getLocation());
     }
 
     /**
@@ -386,7 +385,7 @@ public class MovingListener extends CheckListener{
         
 		final MovingData data = MovingData.getData(player);
 		data.noFallAssumeGround = false;
-		data.teleported = null;
+		data.resetTeleported();
 		
 		// Check for illegal move and bounding box etc.
 		if (pFrom.isIllegal() || pTo.isIllegal()) {
@@ -479,7 +478,7 @@ public class MovingListener extends CheckListener{
             event.setTo(newTo);
 
             // Remember where we send the player to.
-            data.teleported = newTo;
+            data.setTeleported(newTo);
             if (cc.debug){
             	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + CheckUtils.fdec3.format(newTo.getX()) + ", " + CheckUtils.fdec3.format(newTo.getY()) + ", " + CheckUtils.fdec3.format(newTo.getZ()));
             }
@@ -506,17 +505,18 @@ public class MovingListener extends CheckListener{
 		boolean restored = false;
 		final PlayerLocation pLoc = new PlayerLocation(NoCheatPlus.getMCAccess(), null);
 		// (Mind that we don't set the block cache here).
-		if (!restored && data.setBack != null) {
-			pLoc.set(data.setBack, player);
+		final Location loc = player.getLocation();
+		if (!restored && data.hasSetBack()) {
+			final Location setBack = data.getSetBack(loc); 
+			pLoc.set(setBack, player);
 			if (!pLoc.isIllegal()){
-				event.setFrom(data.setBack);
-				event.setTo(data.setBack);
+				event.setFrom(setBack);
+				event.setTo(setBack);
 				restored = true;
 			}
-			else data.setBack = null;
+			else data.resetSetBack();
 		} 
 		if (!restored){
-			final Location loc = player.getLocation();
 			pLoc.set(loc, player);
 			if (!pLoc.isIllegal()) {
 				event.setFrom(loc);
@@ -635,7 +635,7 @@ public class MovingListener extends CheckListener{
 		final MovingData data = MovingData.getData(player);
 		data.clearFlyData();
 		data.clearMorePacketsData();
-		data.setBack = event.getRespawnLocation();
+		data.setSetBack(event.getRespawnLocation());
 		// TODO: consider data.resetPositions(data.setBack);
 	}
 	
@@ -649,7 +649,7 @@ public class MovingListener extends CheckListener{
 		final MovingData data = MovingData.getData(player);
 		data.clearFlyData();
 		data.clearMorePacketsData();
-		data.setBack = player.getLocation(); // TODO: Monitor this change (!).
+		data.setSetBack(player.getLocation()); // TODO: Monitor this change (!).
 	}
 
     /**
@@ -674,7 +674,7 @@ public class MovingListener extends CheckListener{
 		final Player player = event.getPlayer();
 		final MovingData data = MovingData.getData(player);
 
-		final Location teleported = data.teleported;
+		final Location teleported = data.getTeleported();
 
 		// If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
 		final Location to = event.getTo();
@@ -705,7 +705,7 @@ public class MovingListener extends CheckListener{
 		}
 
         // TODO: NoFall might be necessary to be checked here ?
-        data.teleported = null;
+        data.resetTeleported();
         
         // Reset yawrate (experimental: might help preventing cascading improbable with rubberbanding).
         Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
@@ -835,7 +835,7 @@ public class MovingListener extends CheckListener{
         	if (!pLoc.isOnGround() && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()){
         		// Likely a new style no-fall bypass (damage in mid-air).
         		data.noFallVL += 1.0;
-        		if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions, true) && data.setBack != null){
+        		if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions, true) && data.hasSetBack()){
         			// Cancel the event and restore fall distance.
         			// NoFall data will not be reset 
         			allowReset = false;
@@ -866,8 +866,8 @@ public class MovingListener extends CheckListener{
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
 		final Location loc = player.getLocation();
-		if (data.setBack == null){
-			data.setBack = loc;
+		if (!data.hasSetBack() || data.hasSetBackWorldChanged(loc)){
+			data.setSetBack(loc);
 		}
 		if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
 			// TODO: re-think: more fine grained reset?
