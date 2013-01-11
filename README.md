@@ -23,8 +23,8 @@ Tips
 Links
 ---------
 
-* [Website] (www.nocheatplus.org)
-* [Jenkins] (www.nocheatplus.org:8080)
+* [Website] (http://www.nocheatplus.org/)
+* [Jenkins] (http://www.nocheatplus.org:8080/)
 * [ProjectPage] (http://dev.bukkit.org/server-mods/nocheatplus/)
 * [TicketSupport] (http://dev.bukkit.org/server-mods/nocheatplus/tickets/)
 * [Statistics] (https://mcstats.org/plugin/NoCheatPlus)
