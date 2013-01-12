@@ -5,26 +5,28 @@ NoCheatPlus is an unofficial fork of the famous anti-cheat plugin [NoCheat] (htt
 
 Compiling
 ---------
-NoCheatPlus uses [Maven 3] (http://maven.apache.org/download.cgi) techniques and is compiled for JDK 6. You NEED Maven to compile it!
+NoCheatPlus uses [Maven] (http://maven.apache.org/download.cgi) techniques and is compiled for JDK 6. You NEED at least Mavne 2 to compile it!
+You can compile it with this Maven goal: `mvn clean package`
 
 Installation
 ---------
 * Get [CraftBukkit] (http://wiki.bukkit.org/Setting_up_a_server)
 * Download [NoCheatPlus] (http://nocheatplus.org:8080/job/NoCheatPlus/)
-* Drop the NoCheatPlus.jar intoo your plugins folder
+* Drop the NoCheatPlus.jar in to your plugins folder
 * Start or /reload your CraftBukkit server
 
 Tips
 ---------
 * Be sure that your CraftBukkit and NoCheatPlus versions match together
 * Dont use tabs in the config.yml file
-* For compatibilty with plugins such as mcmmo, citizens and more check out [CompatNoCheatPlus] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
+* For compatibilty with other plugins such as mcmmo, citizens and more check out [CompatNoCheatPlus] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
 
 Links
 ---------
 
 * [Website] (http://www.nocheatplus.org/)
 * [Jenkins] (http://www.nocheatplus.org:8080/)
+* [Lincence] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
 * [ProjectPage] (http://dev.bukkit.org/server-mods/nocheatplus/)
 * [TicketSupport] (http://dev.bukkit.org/server-mods/nocheatplus/tickets/)
 * [Statistics] (https://mcstats.org/plugin/NoCheatPlus)
