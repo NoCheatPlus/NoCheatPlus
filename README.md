@@ -13,13 +13,12 @@ Installation
 Tips
 ---------
 * Be sure that your CraftBukkit and NoCheatPlus versions match together
-* Dont use tabs in the config.yml file
-* For compatibilty with other plugins such as mcmmo, citizens and more check out [CompatNoCheatPlus] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
+* Don't use tabs in the config.yml file
+* For compatibility with other plugins such as mcMMO, citizens and more check out [CompatNoCheatPlus] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
 
-Compiling
+Compiling NoCheatPlus
 ---------
-NoCheatPlus uses [Maven] (http://maven.apache.org/download.cgi) techniques and is compiled for JDK 6. We are suing Maven 3 to compile.
-You can compile it with this Maven goal: `mvn clean package`
+NoCheatPlus is compiled for JDK 6. We use [Maven] (http://maven.apache.org/download.cgi) 3 to handle dependencies. You can compile it with this Maven goal: `mvn clean package`
 
 Links
 ---------
