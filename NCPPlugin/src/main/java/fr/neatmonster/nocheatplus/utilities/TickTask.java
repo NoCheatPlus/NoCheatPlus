@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.defaults.ClearCommand;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
@@ -362,9 +363,12 @@ public class TickTask implements Runnable {
 		
 		// Time running backwards check (not only players can!).
 		if (timeLast > time) {
-			lastDur = 50;
 			LogUtil.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
 			DataManager.clearData(CheckType.ALL);
+			lastDur = 50;
+			for (int i = 0; i < spikeDurations.length; i++){
+				spikes[i].clear(0);
+			}
 		}
 		else if (tick > 1){
 			lastDur = time - timeLast;
