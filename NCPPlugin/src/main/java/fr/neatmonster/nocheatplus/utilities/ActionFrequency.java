@@ -50,16 +50,16 @@ public class ActionFrequency {
 	 */
 	public final void update(final long now) {
 		final long diff = now - time;
-		final int shift = (int) ((float) diff / (float) durBucket);
-		if (shift == 0){
-			// No update.
+		if (diff < durBucket){
+			// No update (first bucket).
 			return; 
 		}
-		else if (shift >= buckets.length || shift < 0){
+		else if (diff >= durBucket * buckets.length || diff < 0){
 			// Clear (beyond range).
 			clear(now);
 			return;
 		}
+		final int shift = (int) ((float) diff / (float) durBucket);
 		// Update buckets.
 		for (int i = 0; i < buckets.length - shift; i++){
 			buckets[buckets.length - (i + 1)] = buckets[buckets.length - (i + 1 + shift)];
