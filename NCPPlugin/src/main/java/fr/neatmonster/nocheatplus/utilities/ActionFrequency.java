@@ -55,7 +55,7 @@ public class ActionFrequency {
 			// No update.
 			return; 
 		}
-		else if (shift >= buckets.length){
+		else if (shift >= buckets.length || shift < 0){
 			// Clear (beyond range).
 			clear(now);
 			return;
