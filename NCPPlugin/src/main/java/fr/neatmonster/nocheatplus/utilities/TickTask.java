@@ -16,7 +16,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
 /**
- * Task to run every tick, to update permissions and execute actions, and maybe later for extended lag measurement.
+ * Task to run every tick, to update permissions and execute actions, and for lag measurement.
  * 
  * <hr>
  * The permissions updates and actions execution is meant for use by the asynchronously run checks, not for normal use.
@@ -76,7 +76,7 @@ public class TickTask implements Runnable {
 	protected static long timeLast = 0;
 	
 	/** Lock flag set on disable. */
-	protected static boolean locked = false;
+	protected static boolean locked = true;
 	
 	static{
 		for (int i = 0; i < spikeDurations.length; i++){
