@@ -849,13 +849,22 @@ public class MovingListener extends CheckListener{
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
         if (cc.debug) System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         // Fall-back check.
-        final int maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance)));
+        final int maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0 : 3);
         if (maxD > damage){
             // TODO: respect dealDamage ?
             event.setDamage(maxD);
             if (cc.debug) System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
         }
-        if (allowReset) data.clearNoFallData();
+        if (allowReset){
+        	// Normal fall damage, reset data.
+        	data.clearNoFallData();
+        }
+        else{
+        	// Minecraft/NCP bug or cheating.
+        	// Cancel the event, apply damage later.
+        	event.setCancelled(true);
+        	// TODO: Add player to hover checks ?.
+        }
         // Entity fall-distance should be reset elsewhere.
     }
     
