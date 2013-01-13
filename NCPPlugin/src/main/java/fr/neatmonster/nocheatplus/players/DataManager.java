@@ -234,6 +234,10 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 				final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
 				if (refType == checkType || APIUtils.isParent(checkType, refType)) rmd.removeAllData();
 			}
+			else if (checkType == CheckType.ALL){
+				// Not sure this is really good, though.
+				rmd.removeAllData();
+			}
 		}
 		ViolationHistory.clear(checkType);
 	}
@@ -281,6 +285,10 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 					if (rmd.removeData(PlayerName) != null) removed = true;
 				}
 			}
+			else if (checkType == CheckType.ALL){
+				// Not sure this is really good, though.
+				if (rmd.removeData(PlayerName) != null) removed = true;
+			}
 		}
 		return removed;
 	}
@@ -321,9 +329,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	 */
 	public void onDisable() {
 		clearData(CheckType.ALL);
-		for (IRemoveData rmd : iRemoveData){
-			if (!(rmd instanceof IHaveCheckType)) rmd.removeAllData();
-		}
+//		for (IRemoveData rmd : iRemoveData){
+//			if (!(rmd instanceof IHaveCheckType)) rmd.removeAllData();
+//		}
 		iRemoveData.clear();
 		clearConfigs();
 		lastLogout.clear();
