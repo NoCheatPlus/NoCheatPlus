@@ -364,9 +364,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // World specific permissions.
 		permStateReceivers.clear();
 
-		// More cleanup.
+		// Data cleanup.
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup DataManager...");
 		dataMan.onDisable();
+		
+		// Exemptions cleanup.
+		NCPExemptionManager.clear();
+		
+		// Hooks:
+		// (Expect external plugins to unregister their hooks on their own.)
+		// (No native hooks present, yet.)
 
 		// Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
 		if (changedCommands != null){
