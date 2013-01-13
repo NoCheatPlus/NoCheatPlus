@@ -339,6 +339,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         TickTask.setLocked(true);
         TickTask.purge();
         TickTask.cancel();
+        // (Keep the tick task locked!)
         
 		// Stop metrics task.
 		if (metrics != null){
@@ -421,6 +422,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
          */
     	
     	// Reset TickTask (just in case).
+    	TickTask.setLocked(true);
+    	TickTask.purge();
+    	TickTask.cancel();
     	TickTask.reset();
     	
         // Read the configuration files.
