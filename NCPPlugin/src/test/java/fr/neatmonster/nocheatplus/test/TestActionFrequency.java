@@ -22,24 +22,20 @@ public class TestActionFrequency {
 	}
 	
 	@Test
-	public void testAddFromZero(){
-		ActionFrequency freq = new ActionFrequency(3, 333);
-		for (int i = 0; i < 999; i++){
-			freq.add(i, 1f);
-			// TODO: maybe test sums here already.
-		}
-		if (freq.score(1f) != 999) fail("Sum should be 999, got instead: " + freq.score(1f));
-		freq.update(999);
-		if (freq.score(1f) != 666f) fail("Sum should be 666, got instead: " + freq.score(1f));
-		freq.update(1332);
-		if (freq.score(1f) != 333f) fail("Sum should be 333, got instead: " + freq.score(1f));
-		freq.update(1665);
-		if (freq.score(1f) != 0f) fail("Sum should be 0, got instead: " + freq.score(1f));
+	public void testAddFromZeroTime(){
+		addFromTime(0);
 	}
 	
 	@Test
-	public void testAddFromTime(){
-		long time = System.currentTimeMillis();
+	public void testAddFromCurrentTime(){
+		addFromTime(System.currentTimeMillis());
+	}
+	
+	/**
+	 * Test adding 1 such that each bucket gets filled with an equal total amount.
+	 * @param time Point of time from which to start.
+	 */
+	public void addFromTime(long time){
 		ActionFrequency freq = new ActionFrequency(3, 333);
 		freq.update(time);
 		for (int i = 0; i < 999; i++){
