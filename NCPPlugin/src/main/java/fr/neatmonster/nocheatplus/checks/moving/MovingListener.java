@@ -534,33 +534,33 @@ public class MovingListener extends CheckListener{
 		CheckUtils.onIllegalMove(player);
 	}
 
-	/**
-     * A workaround for cancelled PlayerMoveEvents.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerMoveHighest(final PlayerMoveEvent event) {
-        /*
-         *  _____  _                         __  __                
-         * |  __ \| |                       |  \/  |               
-         * | |__) | | __ _ _   _  ___ _ __  | \  / | _____   _____ 
-         * |  ___/| |/ _` | | | |/ _ \ '__| | |\/| |/ _ \ \ / / _ \
-         * | |    | | (_| | |_| |  __/ |    | |  | | (_) \ V /  __/
-         * |_|    |_|\__,_|\__, |\___|_|    |_|  |_|\___/ \_/ \___|
-         *                  __/ |                                  
-         *                 |___/                                   
-         */
-        // No typo here. I really only handle cancelled events and ignore others.
-        if (!event.isCancelled() || event.getPlayer().isDead())
-            return;
-
-        // Fix a common mistake that other developers make (cancelling move events is crazy, rather set the target
-        // location to the from location).
-        event.setCancelled(false);
-        event.setTo(event.getFrom()); // TODO: revise this (old!) strategy, cancelled events just teleport to from, basically.
-    }
+//	/**
+//     * A workaround for cancelled PlayerMoveEvents.
+//     * 
+//     * @param event
+//     *            the event
+//     */
+//    @EventHandler(priority = EventPriority.HIGHEST)
+//    public void onPlayerMoveHighest(final PlayerMoveEvent event) {
+//        /*
+//         *  _____  _                         __  __                
+//         * |  __ \| |                       |  \/  |               
+//         * | |__) | | __ _ _   _  ___ _ __  | \  / | _____   _____ 
+//         * |  ___/| |/ _` | | | |/ _ \ '__| | |\/| |/ _ \ \ / / _ \
+//         * | |    | | (_| | |_| |  __/ |    | |  | | (_) \ V /  __/
+//         * |_|    |_|\__,_|\__, |\___|_|    |_|  |_|\___/ \_/ \___|
+//         *                  __/ |                                  
+//         *                 |___/                                   
+//         */
+//        // No typo here. I really only handle cancelled events and ignore others.
+//        if (!event.isCancelled() || event.getPlayer().isDead())
+//            return;
+//
+//        // Fix a common mistake that other developers make (cancelling move events is crazy, rather set the target
+//        // location to the from location).
+//        event.setCancelled(false);
+//        event.setTo(event.getFrom()); // TODO: revise this (old!) strategy, cancelled events just teleport to from, basically.
+//    }
     
     /**
      * Monitor level PlayerMoveEvent.
@@ -571,24 +571,33 @@ public class MovingListener extends CheckListener{
     	// TODO: revise: cancelled events.
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
-        if (player.isDead()) return;
-        final Location to = event.getTo(); // player.getLocation();
-        final String worldName = to.getWorld().getName();
+        if (player.isDead() || player.isSleeping()) return;
         
         // Feed combined check.
         final CombinedData data = CombinedData.getData(player);
         data.lastMoveTime = now;
         
-        // Just add the yaw to the list.
-        Combined.feedYawRate(player, to.getYaw(), now, worldName, data);
-        
         final Location from = event.getFrom();
-        // TODO: Might enforce data.teleported (!).
+        final String fromWorldName = from.getWorld().getName();
         
-        // TODO: maybe even not count vehicles at all ?
-        if (!from.getWorld().equals(to.getWorld()) || player.isInsideVehicle()){
-            MovingData.getData(player).resetPositions(to);
-            return;
+        // Feed yawrate and reset moving data positions if necessary.
+        if (!event.isCancelled()){
+        	final Location to = event.getTo();
+        	final String toWorldName = to.getWorld().getName();
+        	Combined.feedYawRate(player, to.getYaw(), now, toWorldName, data);
+        	// TODO: maybe even not count vehicles at all ?
+            if (player.isInsideVehicle() || !fromWorldName.equals(toWorldName)){
+                MovingData.getData(player).resetPositions(to);
+            }
+            else{
+            	// Slightly redundant at present.
+            	MovingData.getData(player).setTo(to);
+            }
+        }
+        else {
+        	// TODO: teleported + other resetting ?
+        	Combined.feedYawRate(player, from.getYaw(), now, fromWorldName, data);
+            MovingData.getData(player).resetPositions(from);
         }
     }
 

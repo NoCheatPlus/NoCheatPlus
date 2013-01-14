@@ -357,5 +357,15 @@ public class MovingData extends ACheckData {
 	public final void resetSetBack() {
 		setBack = null;
 	}
+
+	/**
+	 * Just set the last "to-coordinates", no world check.
+	 * @param to
+	 */
+	public final void setTo(final Location to) {
+		toX = to.getX();
+		toY = to.getY();
+		toZ = to.getZ();
+	}
 	
 }
