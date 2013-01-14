@@ -46,6 +46,7 @@ import fr.neatmonster.nocheatplus.components.NCPListener;
 import fr.neatmonster.nocheatplus.components.NameSetPermState;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.PermStateReceiver;
+import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -258,10 +259,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				((INeedConfig) obj).onReload();
 			}
 		}
+		if (obj instanceof TickListener){
+			TickTask.addTickListener((TickListener) obj);
+		}
 		if (obj instanceof PermStateReceiver){
 			// No immediate update done.
 			permStateReceivers.add((PermStateReceiver) obj);
 		}
+		// Also add to DataManager, which will pick what it needs.
+		// TODO: This is fishy in principle, something more concise?
 		dataMan.addComponent(obj);
 	}
 	
@@ -304,6 +310,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		}
 		if (obj instanceof PermStateReceiver){
 			permStateReceivers.remove((PermStateReceiver) obj);
+		}
+		if (obj instanceof TickListener){
+			TickTask.removeTickListener((TickListener) obj);
 		}
 		if (obj instanceof INotifyReload) {
 			notifyReload.remove(obj);

@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
 /**
@@ -54,6 +56,9 @@ public class TickTask implements Runnable {
 	/** Actions to execute. */
 	private static final List<ViolationData> delayedActions = new LinkedList<ViolationData>();
 	
+	/** Tick listeners to call every tick. */
+	private static final List<TickListener> tickListeners = new ArrayList<TickListener>();
+	
 	/** Last n tick durations, measured from run to run.*/
 	private static final long[] tickDurations = new long[lagMaxTicks];
 	
@@ -93,7 +98,7 @@ public class TickTask implements Runnable {
 	 * Force executing actions.<br>
 	 * Note: Only call from the main thread!
 	 */
-	public void executeActions() {
+	public static void executeActions() {
 		final List<ViolationData> copyActions = new LinkedList<ViolationData>();
 		synchronized (delayedActions) {
 			if (delayedActions.isEmpty()) return;
@@ -155,6 +160,28 @@ public class TickTask implements Runnable {
 		synchronized (delayedActions) {
 			if (locked) return;
 			delayedActions.add(actions);
+		}
+	}
+	
+	/**
+	 * Add a tick listener. Should be thread safe, though... why?
+	 * @param listener
+	 */
+	public static void addTickListener(TickListener listener){
+		synchronized (tickListeners) {
+			if (locked) return;
+			tickListeners.add(listener);
+		}
+	}
+	
+	/**
+	 * Remove a tick listener. Should be thread safe, though... why?
+	 * @param listener
+	 * @return If previously contained.
+	 */
+	public static boolean removeTickListener(TickListener listener){
+		synchronized (tickListeners) {
+			return tickListeners.remove(listener);
 		}
 	}
 	
@@ -318,7 +345,7 @@ public class TickTask implements Runnable {
 	}
 	
 	/**
-	 * Empty queues (call after setLocked(true)
+	 * Empty queues (better call after setLocked(true)) and tickListeners.
 	 */
 	public static void purge(){
 		synchronized (permissionUpdates) {
@@ -326,6 +353,9 @@ public class TickTask implements Runnable {
 		}
 		synchronized (delayedActions) {
 			delayedActions.clear();
+		}
+		synchronized (tickListeners) {
+			tickListeners.clear();
 		}
 	}
 	
@@ -345,16 +375,42 @@ public class TickTask implements Runnable {
 	}
 	
 	//////////////////////////
-	// Instance methods
+	// Instance methods (meant private).
 	//////////////////////////
+	
+	/**
+	 * 
+	 * Notify all listeners.
+	 * 
+	 */
+	private final void notifyListeners() {
+		final List<TickListener> copyListeners = new ArrayList<TickListener>();
+		synchronized (tickListeners) {
+			// Synchronized to allow concurrent adding (!? why ?!).
+			// (Ignores the locked state while still running.)
+			copyListeners.addAll(tickListeners);
+		}
+		for (final TickListener listener : copyListeners){
+			try{
+				listener.onTick(tick, timeLast);
+			}
+			catch(Throwable t){
+				LogUtil.logSevere("[NoCheatPlus] (TickTask) TickListener generated an exception:");
+				LogUtil.logSevere(t);
+			}
+		}
+	}
 	
 	@Override
 	public void run() {
 		tick ++;
 		
-		// Now sync is forced, for the ability to lock.
+		// Actions.
 		executeActions();
+		// Permissions.
 		updatePermissions();
+		// Listeners.
+		notifyListeners();
 		
 		// Measure time after heavy stuff.
 		final long time = System.currentTimeMillis();
