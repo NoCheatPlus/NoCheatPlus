@@ -725,10 +725,17 @@ public class MovingListener extends CheckListener{
 			if (!event.isCancelled()){
 				// Normal teleport.
 				ref = to;
+				double fallDistance = data.noFallFallDistance;
 				data.clearMorePacketsData();
 				data.clearFlyData();
 				data.resetPositions(to);
 				data.setSetBack(to);
+				// TODO: make this configurable.
+				if (fallDistance - player.getFallDistance() > 0.0){
+					// Reset fall distance.
+					// TODO: This might lead to new compatibility trouble.
+					player.setFallDistance((float) fallDistance);
+				}
 			}
 			else{
 				// Cancelled, not a set back, ignore it, basically.
