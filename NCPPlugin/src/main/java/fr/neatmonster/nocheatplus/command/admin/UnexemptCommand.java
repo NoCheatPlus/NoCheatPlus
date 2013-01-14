@@ -39,6 +39,14 @@ public class UnexemptCommand extends NCPCommand {
 			}
 		}
 		else checkType = CheckType.ALL;
+		if (playerName.equals("*")){
+			// Unexempt all.
+			// TODO: might care to find players only ?
+			NCPExemptionManager.clear();
+			sender.sendMessage(TAG + "Nobody will be exempted from: " + checkType);
+			return true;
+		}
+		// Find player.
 		final Player player = Bukkit.getPlayerExact(playerName);
 		if (player != null) playerName = player.getName();
 		NCPExemptionManager.unexempt(playerName, checkType);
