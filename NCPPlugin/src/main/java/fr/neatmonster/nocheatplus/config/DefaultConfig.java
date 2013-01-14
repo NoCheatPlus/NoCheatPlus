@@ -25,7 +25,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 303;
+	public static final int buildNumber = 314;
 
     /**
      * Instantiates a new default configuration.
@@ -368,6 +368,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.MOVING_NOFALL_CHECK, true);
         set(ConfPaths.MOVING_NOFALL_DEALDAMAGE, true);
+        set(ConfPaths.MOVING_NOFALL_RESETONTP, false);
         set(ConfPaths.MOVING_NOFALL_ACTIONS, "log:nofall:0:5:if cancel vl>30 log:nofall:0:5:icf cancel");
         
         set(ConfPaths.MOVING_PASSABLE_CHECK, true);

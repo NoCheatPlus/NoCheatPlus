@@ -731,10 +731,12 @@ public class MovingListener extends CheckListener{
 				data.resetPositions(to);
 				data.setSetBack(to);
 				// TODO: make this configurable.
-				if (fallDistance - player.getFallDistance() > 0.0){
-					// Reset fall distance.
-					// TODO: This might lead to new compatibility trouble.
-					player.setFallDistance((float) fallDistance);
+				if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0){
+					// Reset fall distance if set so in the config.
+					if (!MovingConfig.getConfig(player).noFallTpReset){
+						// (Set fall distance if set to not reset.)
+						player.setFallDistance((float) fallDistance);
+					}
 				}
 			}
 			else{
