@@ -590,7 +590,7 @@ public class SurvivalFly extends Check {
 			final float sc2 = sum.bucketScore(2);
 			final double diff = sc1 - sc2;
 			if (diff > 0 || value > -1.3 && diff == 0) {
-				if (value < -1.3 && (Math.abs(diff) < Math.abs(value) || sc2 < - 10)){
+				if (value < -1.1 && (Math.abs(diff) < Math.abs(value) || sc2 < - 10)){
 					tags.add(tag+"grace");
 					return 0;
 				}
