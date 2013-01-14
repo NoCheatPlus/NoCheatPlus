@@ -1,7 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -133,9 +135,14 @@ public class MovingListener extends CheckListener{
     
     /**
      * Unused instances.<br>
-     * TODO: Not sure this is needed by contract, might be better due to cascading events in case of actions.
+     * Might be better due to cascading events in case of actions or plugins doing strange things.
      */
     private final List<MoveInfo> parkedInfo = new ArrayList<MoveInfo>(10);
+    
+    /**
+     * Store events by player name, in order to invalidate moving processing on higher priority level in case of teleports.
+     */
+    private final Map<String, PlayerMoveEvent> processingEvents = new HashMap<String, PlayerMoveEvent>();
     
     public MovingListener() {
 		super(CheckType.MOVING);
@@ -342,6 +349,9 @@ public class MovingListener extends CheckListener{
          *                 |___/                                   
          */
 		final Player player = event.getPlayer();
+		
+		// Store the event for monitor level checks.
+		processingEvents.put(player.getName(), event);
 		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()) return;
@@ -571,6 +581,12 @@ public class MovingListener extends CheckListener{
     	// TODO: revise: cancelled events.
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
+        
+        if (processingEvents.remove(player.getName()) == null){
+        	// This means moving data has been reset by a teleport.
+        	return;
+        }
+        
         if (player.isDead() || player.isSleeping()) return;
         
         // Feed combined check.
@@ -706,18 +722,26 @@ public class MovingListener extends CheckListener{
 			data.onSetBack(teleported);
 		} else {
 			// Only if it wasn't NoCheatPlus, drop data from more packets check.
-			// TODO: check if to do with cancelled teleports !
-			data.clearMorePacketsData();
-			data.clearFlyData();
-			ref = event.isCancelled() ? event.getFrom() : to;
-			data.resetPositions(ref);
+			if (!event.isCancelled()){
+				// Normal teleport.
+				ref = to;
+				data.clearMorePacketsData();
+				data.clearFlyData();
+				data.resetPositions(to);
+				data.setSetBack(to);
+			}
+			else{
+				// Cancelled, not a set back, ignore it, basically.
+				// Better reset teleported (compatibility). Might have drawbacks.
+				data.resetTeleported();
+				return;
+			}
+			
 		}
-
-        // TODO: NoFall might be necessary to be checked here ?
-        data.resetTeleported();
-        
-        // Reset yawrate (experimental: might help preventing cascading improbable with rubberbanding).
-        Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
+        // Reset stuff.
+		Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
+		data.resetTeleported();
+		processingEvents.remove(player.getName());
     }
 
     /**
