@@ -496,6 +496,12 @@ public abstract class ConfPaths {
 	public static final String MOVING_SURVIVALFLY_EXTENDED_VACC			= MOVING_SURVIVALFLY_EXTENDED + "vertical-accounting";
 	public static final String MOVING_SURVIVALFLY_VLFREEZE				= MOVING_SURVIVALFLY + "vlfreeze";
 	public static final String MOVING_SURVIVALFLY_ACTIONS				= MOVING_SURVIVALFLY + "actions";
+	
+	private static final String MOVING_SURVIVALFLY_HOVER			    = MOVING_SURVIVALFLY + "hover.";
+	public static final String  MOVING_SURVIVALFLY_HOVER_CHECK			= MOVING_SURVIVALFLY_HOVER + "active";
+	public static final String  MOVING_SURVIVALFLY_HOVER_TICKS			= MOVING_SURVIVALFLY_HOVER + "ticks";
+	public static final String  MOVING_SURVIVALFLY_HOVER_FALLDAMAGE		= MOVING_SURVIVALFLY_HOVER + "falldamage";
+	public static final String  MOVING_SURVIVALFLY_HOVER_SFVIOLATION	= MOVING_SURVIVALFLY_HOVER + "sfviolation";
 
     // Special (to be sorted in or factored out).
     public static final String  MOVING_NOFALL_YONGROUND                  = MOVING_NOFALL + "yonground";

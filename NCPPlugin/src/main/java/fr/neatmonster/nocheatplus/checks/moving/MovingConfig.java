@@ -99,6 +99,11 @@ public class MovingConfig extends ACheckConfig {
     public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
     
+	public final boolean 	sfHoverCheck;
+	public final int 		sfHoverTicks;
+	public final boolean    sfHoverFallDamage;
+	public final double		sfHoverViolation;
+    
     // Special tolerance values:
     public final double     noFallyOnGround;
     public final double     yOnGround;
@@ -150,6 +155,11 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyAccountingV = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
         survivalFlyVLFreeze = data.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
         survivalFlyActions = data.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
+        
+        sfHoverCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK);
+        sfHoverTicks = data.getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS);
+        sfHoverFallDamage = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE);
+        sfHoverViolation = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION);
         
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, 0.3);

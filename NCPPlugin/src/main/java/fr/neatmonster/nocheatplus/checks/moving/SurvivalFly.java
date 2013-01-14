@@ -489,6 +489,40 @@ public class SurvivalFly extends Check {
 			return null;
 		}
 	}
+	
+	protected final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
+		data.survivalFlyVL += cc.sfHoverViolation;
+		
+		// TODO: Extra options for set-back / kick, like vl?
+		data.sfVLTime = System.currentTimeMillis();
+		final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, cc.sfHoverViolation, cc.survivalFlyActions);
+		if (vd.needsParameters()) {
+			vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", loc.getX(), loc.getY(), loc.getZ()));
+			vd.setParameter(ParameterName.LOCATION_TO, "(HOVER)");
+			vd.setParameter(ParameterName.DISTANCE, "0.0(HOVER)");
+			vd.setParameter(ParameterName.TAGS, "hover");
+		}
+		if (executeActions(vd)) {
+			// Set-back or kick.
+			if (data.hasSetBack()){
+				data.clearAccounting();
+				data.sfJumpPhase = 0;
+				data.sfLastYDist = Double.MAX_VALUE;
+				data.toWasReset = false;
+				data.fromWasReset = false;
+				player.teleport(data.getSetBack(loc));
+			}
+			else{
+				// Solve by extra actions ? Special case (probably never happens)?
+				player.kickPlayer("Hovering?");
+			}
+		}
+		else{
+			// Ignore.
+		}
+	}
+	
+	
 
 	/**
 	 * First split-off. Not strictly accounting only, actually.<br>

@@ -2,13 +2,16 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -42,6 +45,10 @@ import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.IData;
+import fr.neatmonster.nocheatplus.components.IHaveCheckType;
+import fr.neatmonster.nocheatplus.components.IRemoveData;
+import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -73,7 +80,7 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  * 
  * @see MovingEvent
  */
-public class MovingListener extends CheckListener{
+public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType{
 
 	private static final class MoveInfo{
 		public final BlockCache cache;
@@ -143,6 +150,8 @@ public class MovingListener extends CheckListener{
      * Store events by player name, in order to invalidate moving processing on higher priority level in case of teleports.
      */
     private final Map<String, PlayerMoveEvent> processingEvents = new HashMap<String, PlayerMoveEvent>();
+    
+    private final Set<String> hoverTicks = new LinkedHashSet<String>(30);
     
     public MovingListener() {
 		super(CheckType.MOVING);
@@ -351,7 +360,8 @@ public class MovingListener extends CheckListener{
 		final Player player = event.getPlayer();
 		
 		// Store the event for monitor level checks.
-		processingEvents.put(player.getName(), event);
+		final String playerName = player.getName();
+		processingEvents.put(playerName, event);
 		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()) return;
@@ -445,6 +455,16 @@ public class MovingListener extends CheckListener{
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
                 // If he is handled by the survival fly check, execute it.
                 newTo = survivalFly.check(player, pFrom, pTo, data, cc);
+                if (newTo == null){
+                	if (cc.sfHoverCheck && !data.toWasReset && !pTo.isOnGround()){
+                		// Start counting ticks.
+                		hoverTicks.add(playerName);
+                		data.sfHoverTicks = 0;
+                	}
+                	else{
+                		data.sfHoverTicks = -1;
+                	}
+                }
 				// Check NoFall if no reset is done.
 				if (cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL)) {
 					if (passableTo != null){
@@ -466,10 +486,15 @@ public class MovingListener extends CheckListener{
         	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY)){
         		// If the player is handled by the creative fly check, execute it.
                 newTo = creativeFly.check(player, pFrom, pTo, data, cc);
+                data.sfHoverTicks = -1;
         	}
-        	else data.clearFlyData();
+        	else{
+        		data.clearFlyData();
+        	}
         }
-        else data.clearFlyData();
+        else{
+        	data.clearFlyData();
+        }
 
 		if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
 			// If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
@@ -751,6 +776,7 @@ public class MovingListener extends CheckListener{
 		Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
 		data.resetTeleported();
 		processingEvents.remove(player.getName());
+		hoverTicks.remove(player.getName());
     }
 
     /**
@@ -924,6 +950,15 @@ public class MovingListener extends CheckListener{
 			// TODO: re-think: more fine grained reset?
 			data.resetPositions(loc);
 		}
+		// Reset hover ticks until a better method is used.
+		if (MovingConfig.getConfig(player).sfHoverCheck){
+			// Start as if hovering already.
+			data.sfHoverTicks = 0;
+			hoverTicks.add(player.getName());
+		}
+		else{
+			data.sfHoverTicks = -1;
+		}
 	}
     
     @EventHandler(priority = EventPriority.MONITOR)
@@ -974,5 +1009,86 @@ public class MovingListener extends CheckListener{
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerToggleSneak(final PlayerToggleSneakEvent event){
 		survivalFly.setReallySneaking(event.getPlayer(), event.isSneaking());
+	}
+
+	@Override
+	public final void onTick(final int tick, final long timeLast) {
+		// Hover checks !
+		if (hoverTicks.isEmpty()) return; // Seldom or not ?
+		final Server server = Bukkit.getServer();
+		final MoveInfo info;
+		if (parkedInfo.isEmpty()) info = new MoveInfo(mcAccess);
+		else info = parkedInfo.remove(parkedInfo.size() - 1);
+		final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
+		for (final String playerName : hoverTicks){
+			final Player player = server.getPlayerExact(playerName);
+			if (player == null || !player.isOnline()){
+				rem.add(playerName);
+				continue;
+			}
+			final MovingData data = MovingData.getData(player);
+			if (data.sfHoverTicks < 0){
+				rem.add(playerName);
+				continue;
+			}
+			if (checkHover(player, data, info)){
+				rem.add(playerName);
+			}
+		}
+		parkedInfo.add(info);
+		hoverTicks.removeAll(rem);
+		rem.clear();
+	}
+
+	private final boolean checkHover(final Player player, final MovingData data, final MoveInfo info) {
+		final MovingConfig cc = MovingConfig.getConfig(player);
+		// Check if enabled at all.
+		if (!cc.sfHoverCheck) return true;
+		// Check if player is on ground.
+		final Location loc = player.getLocation();
+		info.set(player, loc, null, cc.yOnGround);
+		final boolean res;
+		if (info.from.isOnGround() || info.from.isResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()){
+			res = true;
+		}
+		else{
+			data.sfHoverTicks ++;
+			if (data.sfHoverTicks > cc.sfHoverTicks){
+				handleHoverViolation(player, loc, cc, data);
+				// Assume the player might still be hovering.
+				res = false;
+				data.sfHoverTicks = 0;
+			}
+			else res = false;
+		}
+		info.cleanup();
+		return res;
+	}
+
+	private final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
+		// Check nofall damage (!).
+		if (cc.sfHoverFallDamage && noFall.isEnabled(player)){
+			// Consider adding 3/3.5 to fall distance if fall distance > 0?
+			noFall.checkDamage(player, data, loc.getY());
+		}
+		// Delegate violation handling.
+		survivalFly.handleHoverViolation(player, loc, cc, data);
+	}
+
+	@Override
+	public CheckType getCheckType() {
+		// TODO: this is for the hover check only...
+		return CheckType.MOVING_SURVIVALFLY;
+	}
+
+	@Override
+	public IData removeData(String playerName) {
+		hoverTicks.remove(playerName);
+		return null;
+	}
+
+	@Override
+	public void removeAllData() {
+		hoverTicks.clear();
 	}
 }

@@ -25,7 +25,9 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 314;
+	public static final int buildNumber = 315; // TODO: Check jenkins...
+	
+	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
     /**
      * Instantiates a new default configuration.
@@ -387,6 +389,12 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS,
                 "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel vl>1000 log:flylong:0:5:cif cancel cmd:kickfly");
 
+        // sf / hover check.
+        set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true);
+        set(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS, 80);
+        set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true);
+        set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 500);
+        
         /*
          *  dP"8   d8          ,e,                        
          * C8b Y  d88   888,8,  "  888 8e   e88 888  dP"Y 
