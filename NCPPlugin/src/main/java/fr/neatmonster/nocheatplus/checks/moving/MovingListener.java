@@ -776,7 +776,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
 		data.resetTeleported();
 		processingEvents.remove(player.getName());
-		hoverTicks.remove(player.getName());
+		data.sfHoverTicks = -1; // Important against concurrent modification exception.
     }
 
     /**
