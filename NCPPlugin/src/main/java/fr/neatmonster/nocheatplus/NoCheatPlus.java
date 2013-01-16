@@ -55,9 +55,9 @@ import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -522,7 +522,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 for (final CheckType type : CheckType.values())
                     if (type.getParent() != null)
                         checksFailed.addPlotter(new Plotter(type.name()) {
-
                             @Override
                             public int getValue() {
                                 return MetricsData.getFailed(type);
@@ -533,7 +532,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                         19, 20};
                 for (final int ticks : ticksArray)
                     serverTicks.addPlotter(new Plotter(ticks + " tick(s)") {
-
                         @Override
                         public int getValue() {
                             return MetricsData.getTicks(ticks);
