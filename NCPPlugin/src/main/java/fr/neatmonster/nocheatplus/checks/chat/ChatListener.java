@@ -198,7 +198,7 @@ public class ChatListener extends CheckListener implements INotifyReload {
     @EventHandler(
             priority = EventPriority.NORMAL)
     public void onPlayerLogin(final PlayerLoginEvent event) {
-
+    	if (event.getResult() != Result.ALLOWED) return;
         final Player player = event.getPlayer();
         final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);

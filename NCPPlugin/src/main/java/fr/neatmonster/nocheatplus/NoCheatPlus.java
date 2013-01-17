@@ -708,10 +708,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	private Listener getCoreListener() {
 		return new NCPListener() {
 			@SuppressWarnings("unused")
-			@EventHandler(priority = EventPriority.HIGHEST)
+			@EventHandler(priority = EventPriority.NORMAL)
 			public void onPlayerLogin(final PlayerLoginEvent event) {
-				// (HGHEST to give other plugins the possibility to add
-				// permissions or allow the player).
+				// (NORMAL to have chat checks come after this.)
 				if (event.getResult() != Result.ALLOWED) return;
 				final Player player = event.getPlayer();
 				// Check if login is denied:
