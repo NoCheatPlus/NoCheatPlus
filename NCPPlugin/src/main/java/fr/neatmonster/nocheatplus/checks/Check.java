@@ -178,6 +178,7 @@ public abstract class Check {
             if (!type.isEnabled(player) || player.hasPermission(type.getPermission()))
                 return false;
         } catch (final Exception e) {
+        	// TODO: this should be mostly obsolete.
         	LogUtil.logSevere(e);
         }
         return !NCPExemptionManager.isExempted(player, type);

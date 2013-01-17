@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * M""MMMMM""M                            dP       dP                         dP       
@@ -40,6 +40,8 @@ public class Knockback extends Check {
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
+        
+        final long time = System.currentTimeMillis();
 
         // If the item has the knockback enchantment, do not check.
         if (player.getItemInHand().containsEnchantment(Enchantment.KNOCKBACK)
@@ -47,14 +49,15 @@ public class Knockback extends Check {
             return false;
 
         // How long ago has the player started sprinting?
-        if (data.knockbackSprintTime > 0L
-                && System.currentTimeMillis() - data.knockbackSprintTime < cc.knockbackInterval) {
-            final double difference = cc.knockbackInterval - System.currentTimeMillis() + data.knockbackSprintTime;
+        final long usedTime = (time - data.knockbackSprintTime);
+        final long effectiveTime = (long) ((float)  usedTime * (cc.lag ? TickTask.getLag(usedTime): 1f));
+        // Pretty rough: Completely skip on lag.
+        if (data.knockbackSprintTime > 0L && effectiveTime < cc.knockbackInterval) {
+            final double difference = cc.knockbackInterval - time + data.knockbackSprintTime;
 
             // Player failed the check, but this is influenced by lag, so don't do it if there was lag.
-            if (!LagMeasureTask.skipCheck())
-                // Increment the violation level
-                data.knockbackVL += difference;
+            // Increment the violation level
+            data.knockbackVL += difference;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.

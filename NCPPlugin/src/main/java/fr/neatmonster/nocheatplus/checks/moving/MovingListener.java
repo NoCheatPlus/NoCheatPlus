@@ -997,9 +997,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	 * @param cc
 	 * @return
 	 */
-	public final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc){
+	public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc){
 		if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)) return false;
-		else if (!survivalFly.isEnabled(player)) return false;
+		else if (!cc.survivalFlyCheck || NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) || player.hasPermission(Permissions.MOVING_SURVIVALFLY)) return false;
 		else if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight())){
 			return true;
 		}

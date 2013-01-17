@@ -8,7 +8,6 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -81,8 +80,7 @@ public class Speed extends Check {
         // Too many attacks?
         if (max > cc.speedLimit) {
             // If there was lag, don't count it towards violation level.
-            if (!LagMeasureTask.skipCheck())
-                data.speedVL += max - cc.speedLimit;
+            data.speedVL += max - cc.speedLimit;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.

@@ -6,9 +6,12 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM'""""'YMM          oo   dP   oo                   dP 
@@ -49,6 +52,7 @@ public class Critical extends Check {
         final PlayerLocation location = new PlayerLocation(mcAccess, mcAccess.getBlockCache(loc.getWorld()));
         location.set(loc, player);
 		if (location.isIllegal()) {
+			// TODO: This should be impossible !
 			location.cleanup();
 			CheckUtils.onIllegalMove(player);
 			return true;
@@ -59,23 +63,30 @@ public class Critical extends Check {
         if (player.getFallDistance() > 0f && !location.isOnGround() && !location.isOnClimbable() && !location.isInLiquid()
                 && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
             // It was a critical hit, now check if the player has jumped or has sent a packet to mislead the server.
-            if (player.getFallDistance() < cc.criticalFallDistance
-                    || Math.abs(player.getVelocity().getY()) < cc.criticalVelocity) {
-                final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance())
-                        / cc.criticalFallDistance;
-                final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY()))
-                        / cc.criticalVelocity;
-                final double delta = deltaFallDistance > 0D ? deltaFallDistance
-                        : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
+            if (player.getFallDistance() < cc.criticalFallDistance || Math.abs(player.getVelocity().getY()) < cc.criticalVelocity) {
+            	final MovingConfig ccM = MovingConfig.getConfig(player);
+            	final MovingData dataM = MovingData.getData(player);
+            	if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){
+                    final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance())
+                            / cc.criticalFallDistance;
+                    final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY()))
+                            / cc.criticalVelocity;
+                    final double delta = deltaFallDistance > 0D ? deltaFallDistance
+                            : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
 
-                // Player failed the check, but this is influenced by lag so don't do it if there was lag.
-                if (!LagMeasureTask.skipCheck())
-                    // Increment the violation level.
-                    data.criticalVL += delta;
+                    // Player failed the check, but this is influenced by lag so don't do it if there was lag.
+                    if (TickTask.getLag(1000) < 1.5){
+                    	// TODO: 1.5 is a fantasy value.
+                        // Increment the violation level.
+                        data.criticalVL += delta;
+                    }
 
-                // Execute whatever actions are associated with this check and the violation level and find out if we
-                // should cancel the event.
-                cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
+
+                    // Execute whatever actions are associated with this check and the violation level and find out if we
+                    // should cancel the event.
+                    cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
+            	}
+            	
             }
         }
         

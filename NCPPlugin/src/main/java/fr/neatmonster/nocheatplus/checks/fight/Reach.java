@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM"""""""`MM                            dP       
@@ -103,8 +103,10 @@ public class Reach extends Check {
 
         if (violation > 0) {
             // He failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
-            if (!LagMeasureTask.skipCheck())
-                data.reachVL += violation;
+            if (TickTask.getLag(1000) < 1.5f){
+            	// TODO: 1.5 is a fantasy value.
+            	data.reachVL += violation;
+            }
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.

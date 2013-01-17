@@ -55,15 +55,14 @@ import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
+import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
 import fr.neatmonster.nocheatplus.utilities.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.Updates;
@@ -357,10 +356,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			metrics = null;
 		}
         
-        // Stop the lag measuring task.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop LagMeasureTask...");
-        LagMeasureTask.cancel();
-        
         // Just to be sure nothing gets left out.
         if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop all remaining tasks...");
         getServer().getScheduler().cancelTasks(this);
@@ -498,9 +493,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         CommandHandler commandHandler = new CommandHandler(this, notifyReload);
         command.setExecutor(commandHandler);
         // (CommandHandler is TabExecutor.)
-
-        // Set up a task to monitor server lag.
-        LagMeasureTask.start(this);
         
         // Set up the tick task.
         TickTask.start(this);

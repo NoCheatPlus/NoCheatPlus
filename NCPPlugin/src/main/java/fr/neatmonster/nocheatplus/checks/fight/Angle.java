@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LagMeasureTask;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MMP"""""""MM                   dP          
@@ -122,9 +122,11 @@ public class Angle extends Check {
         // Is the violation is superior to the threshold defined in the configuration?
         if (violation > cc.angleThreshold) {
             // Has the server lagged?
-            if (!LagMeasureTask.skipCheck())
+            if (TickTask.getLag(1000) < 1.5f){
+            	// TODO: 1.5 is a fantasy value.
                 // If it hasn't, increment the violation level.
                 data.angleVL += violation;
+            }
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
