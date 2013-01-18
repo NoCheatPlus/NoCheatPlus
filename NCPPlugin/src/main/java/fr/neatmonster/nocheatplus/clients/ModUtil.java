@@ -18,7 +18,11 @@ public class ModUtil {
 	 * @param player
 	 */
 	public static void checkModsMessage(Player player) {
+		// TODO: Somebody test this all !
+		
 	    String message = "";
+	    
+	    // TODO: add feature to check world specific (!).
 	
 	    // Check if we allow all the client mods.
 	    final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);
@@ -28,8 +32,35 @@ public class ModUtil {
 	        message += "§0§0§1§e§f";
 	
 	    // Allow Rei's Minimap's radar.
-	    if (allowAll || player.hasPermission(Permissions.REI_RADAR))
-	        message += "§0§0§2§3§4§5§6§7§e§f";
+	    if (allowAll || player.hasPermission(Permissions.REI_RADAR)){
+	    	// TODO: Does this allow all radar features?
+	    	message += "§0§0§2§3§4§5§6§7§e§f";
+	    }
+	    else{
+	        // Allow Rei's Minimap's player radar
+	        if (allowAll || player.hasPermission(Permissions.REI_RADAR_PLAYER))
+	           message += "§0§0§2§e§f";
+
+	        // Allow Rei's Minimap's animal radar
+	        if (allowAll || player.hasPermission(Permissions.REI_RADAR_ANIMAL))
+	           message += "§0§0§3§e§f";
+
+	        // Allow Rei's Minimap's mob radar
+	        if (allowAll || player.hasPermission(Permissions.REI_RADAR_MOB))
+	           message += "§0§0§4§e§f";
+
+	        // Allow Rei's Minimap's slime radar
+	        if (allowAll || player.hasPermission(Permissions.REI_RADAR_SLIME))
+	           message += "§0§0§5§e§f";
+
+	        // Allow Rei's Minimap's squid radar
+	        if (allowAll || player.hasPermission(Permissions.REI_RADAR_SQUID))
+	           message += "§0§0§6§e§f";
+
+	        // Allow Rei's Minimap's other radar
+	        if (allowAll || player.hasPermission(Permissions.REI_RADAR_OTHER))
+	           message += "§0§0§7§e§f";
+	    }
 	
 	    // If all the client mods are allowed, no need to go any further.
 	    if (allowAll) {
