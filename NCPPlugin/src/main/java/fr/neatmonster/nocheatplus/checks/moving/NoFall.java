@@ -67,6 +67,8 @@ public class NoFall extends Check {
     	final EntityDamageEvent event = new EntityDamageEvent(player, DamageCause.FALL, damage);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()){
+        	// TODO: account for no damage ticks etc.
+        	player.setLastDamageCause(event);
             mcAccess.dealFallDamage(player, event.getDamage());
         }
         // TODO: let this be done by the damage event (!).
