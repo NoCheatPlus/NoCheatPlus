@@ -52,7 +52,9 @@ public class MCAccessFactory {
 		catch(Throwable t){
 			throwables.add(t);
 		};
-
+		LogUtil.logSevere("[NoCheatPlus] Your version of NoCheatPlus does not seem to be compatible with either your Minecraft version or your specific serve-mod.");
+		LogUtil.logSevere("[NoCheatPlus]  Check for updates at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/");
+		LogUtil.logSevere("[NoCheatPlus]  Development builds: http://nocheatplus.org:8080/job/NoCheatPlus/");
 		LogUtil.logSevere("[NoCheatPlus] Could not set up MC version specific access.");
 		for (Throwable t : throwables ){
 			LogUtil.logSevere(t);
