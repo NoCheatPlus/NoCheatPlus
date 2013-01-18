@@ -186,7 +186,7 @@ public class ExecutionHistory {
     }
     
     /**
-     * Access API to check if the aciton would get executed.
+     * Access API to check if the action would get executed.
      * @param violationData
      * @param action
      * @param time
