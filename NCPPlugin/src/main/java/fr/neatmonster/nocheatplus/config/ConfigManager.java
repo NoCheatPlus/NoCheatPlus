@@ -302,4 +302,15 @@ public class ConfigManager {
             worldConfig.regenerateActionLists();
         }
     }
+    
+    /**
+     * Set a property in all configs. Might use with DataManager.clearConfigs if configs might already be in use.
+     * @param path
+     * @param value
+     */
+    public static void setForAllConfigs(String path, Object value){
+    	for (final ConfigFile cfg : worldsMap.values()){
+    		cfg.set(path, value);
+    	}
+    }
 }
