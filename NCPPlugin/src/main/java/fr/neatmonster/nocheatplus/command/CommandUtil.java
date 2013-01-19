@@ -3,11 +3,16 @@ package fr.neatmonster.nocheatplus.command;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.SimpleCommandMap;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -40,8 +45,21 @@ public class CommandUtil {
 			return ((SimpleCommandMap) commandMap).getCommands();
 		}
 		else{
-			// TODO: Find a way to also secure server commands.
-			throw new RuntimeException("Can not handle other than SimpleCommandMap.");
+			final Collection<Command> commands = new LinkedHashSet<Command>(100);
+			for (final Plugin plugin : Bukkit.getPluginManager().getPlugins()){
+				if (plugin instanceof JavaPlugin){
+					final JavaPlugin javaPlugin = (JavaPlugin) plugin;
+					final Map<String, Map<String, Object>> map = javaPlugin.getDescription().getCommands();
+					if (map != null){
+						for (String label : map.keySet()){
+							Command command = javaPlugin.getCommand(label);
+							if (command != null) commands.add(command);
+						}
+					}
+				}
+			}
+			// TODO: Vanilla / CB commands !?
+			return commands;
 		}
 	}
 	
@@ -65,9 +83,14 @@ public class CommandUtil {
 	 * @return
 	 */
 	public static Command getCommand(final String alias) {
-		final CommandMap map = getCommandMap();
 		final String lcAlias = alias.trim().toLowerCase();
-		return map.getCommand(lcAlias);
+		final CommandMap map = getCommandMap();
+		if (map != null){
+			return map.getCommand(lcAlias);
+		} else {
+			// TODO: maybe match versus plugin commands.
+			return null;
+		}
 	}
 
 	/**

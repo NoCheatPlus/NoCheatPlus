@@ -522,7 +522,8 @@ public abstract class ConfPaths {
     // Compatibility section (possibly temporary).
     @GlobalConfig
     public static final String COMPATIBILITY                             = "compatibility.";
-    public static final String COMPATIBILITY_BLOCKS                      =  COMPATIBILITY + "blocks.";
+	public static final String COMPATIBILITY_BUKKITONLY                  = COMPATIBILITY + "bukkitapionly";
+    public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
     
     // Sub paths that are used with different path prefixes potentially.
     public static final String SUB_DEBUG 								 = "debug";
