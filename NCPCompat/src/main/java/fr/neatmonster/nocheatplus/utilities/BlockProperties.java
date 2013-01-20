@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.RootConfPaths;
@@ -277,6 +278,9 @@ public class BlockProperties {
 		try{
 		    initTools(mcAccess);
 		    initBlocks(mcAccess);
+		    if (mcAccess instanceof BlockPropertiesSetup){
+		    	((BlockPropertiesSetup) mcAccess).setupBlockProperties();
+		    }
 		}
 		catch(Throwable t){
 			LogUtil.logSevere(t);

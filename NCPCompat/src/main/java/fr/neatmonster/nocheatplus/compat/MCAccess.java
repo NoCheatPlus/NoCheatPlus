@@ -12,8 +12,9 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
  * Compatibility interface to get properties for Bukkit instances that need access of CraftBukkit or Minecraft classes.<br>
  * NOTE: All methods returning AlmostBoolean must never return null, unless stated otherwise.<br>
  * NOTE: Expect API changes in the near future!<br>
+ * NOTE: If an instance implements BlockPropertiesSetup, the setup method will be called after basic initialization but before configuration is applied.<br>
  * <hr>
- * TODO: Make minimal (do we need WorldServer yet)?
+ * TODO: Make minimal.
  * @author mc_dev
  *
  */
