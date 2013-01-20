@@ -445,24 +445,19 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     	TickTask.cancel();
     	TickTask.reset();
     	
-    	// Reset MCAccess.
-    	mcAccess = null;
-    	
         // Read the configuration files.
         ConfigManager.init(this);
         
         // Setup file logger.
         StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
         
-        // Set up BlockProperties.
-        BlockProperties.init(getMCAccess());
+        final ConfigFile config = ConfigManager.getConfigFile();
+        
+        // Initialize BlockProperties
+		initBlockProperties(config);
         
         // Allow entries to TickTask (just in case).
         TickTask.setLocked(false);
-        
-        // 
-        final ConfigFile config = ConfigManager.getConfigFile();
-        BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS); // Temp probably,
 
 		// List the events listeners and register.
 		manageListeners = config.getBoolean(ConfPaths.MISCELLANEOUS_MANAGELISTENERS);
@@ -483,12 +478,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         		// Only for reloading, not INeedConfig.
 				@Override
 				public void onReload() {
-					// Reset MCAccess.
-			    	mcAccess = null;
-			    	// Reset BlockProperties.
-					BlockProperties.init(getMCAccess());
 					final ConfigFile config = ConfigManager.getConfigFile();
-					BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
+					// Initialize BlockProperties
+					initBlockProperties(config);
 					// Reset Command protection.
 					undoCommandChanges();
 					if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
@@ -603,6 +595,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Tell the server administrator that we finished loading NoCheatPlus now.
 		LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
 	}
+    
+    /**
+     * Reset MCAccess and (re-) initialize BlockProperties, including config.
+     */
+    protected void initBlockProperties(ConfigFile config){
+    	// Reset MCAccess.
+    	mcAccess = null;
+        // Set up BlockProperties.
+        BlockProperties.init(getMCAccess());
+        BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
+    }
     
     /**
      * Actions to be done after enable of  all plugins. This aims at reloading mainly.
