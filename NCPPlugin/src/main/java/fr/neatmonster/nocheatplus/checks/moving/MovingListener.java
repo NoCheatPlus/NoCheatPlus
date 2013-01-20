@@ -1028,6 +1028,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				continue;
 			}
 			final MovingData data = MovingData.getData(player);
+			if (player.isDead() || player.isSleeping()){
+				data.sfHoverTicks = -1;
+			}
 			if (data.sfHoverTicks < 0){
 				rem.add(playerName);
 				continue;
