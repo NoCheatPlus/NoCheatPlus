@@ -9,7 +9,7 @@ import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.actions.types.CommandAction;
 import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /*
  * MMP"""""""MM            dP   oo                   MM""""""""`M                     dP                              

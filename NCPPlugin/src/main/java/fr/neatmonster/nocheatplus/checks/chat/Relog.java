@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 public class Relog extends Check {
 
@@ -36,7 +36,7 @@ public class Relog extends Check {
             if (now - data.relogWarningTime > cc.relogWarningTimeout)
                 data.relogWarnings = 0;
             if (data.relogWarnings < cc.relogWarningNumber) {
-                player.sendMessage(CheckUtils.replaceColors(cc.relogWarningMessage));
+                player.sendMessage(ColorUtil.replaceColors(cc.relogWarningMessage));
                 data.relogWarningTime = now;
                 data.relogWarnings++;
             } else{

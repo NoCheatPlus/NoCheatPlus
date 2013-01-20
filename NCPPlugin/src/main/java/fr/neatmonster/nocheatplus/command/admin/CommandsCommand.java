@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * This command just shows a list of all commands.
@@ -39,7 +39,7 @@ public class CommandsCommand extends NCPCommand {
 		if (cmd != null){
 			all += cmd.getUsage().replace("<command>", "ncp") + "Auxiliary commands (actions):\n";
 		}
-		all += CheckUtils.join(Arrays.asList(moreCommands), "\n");
+		all += StringUtil.join(Arrays.asList(moreCommands), "\n");
 		allCommands = all;
 	}
 

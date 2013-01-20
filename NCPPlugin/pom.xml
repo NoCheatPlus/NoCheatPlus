@@ -34,32 +34,32 @@
   	<dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcommons</artifactId>
-    	<version>1.0.0</version>
+    	<version>static</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompat</artifactId>
-    	<version>1.0.0</version>
+    	<version>static</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2511</artifactId>
-    	<version>1.0.0</version>
+    	<version>static</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2512</artifactId>
-    	<version>1.0.0</version>
+    	<version>static</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2545</artifactId>
-    	<version>1.0.0</version>
+    	<version>static</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcbdev</artifactId>
-    	<version>1.0.0</version>
+    	<version>static</version>
     </dependency>
   </dependencies>
   

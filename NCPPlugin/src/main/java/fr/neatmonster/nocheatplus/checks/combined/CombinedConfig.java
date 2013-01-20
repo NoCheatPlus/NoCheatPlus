@@ -18,9 +18,9 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class CombinedConfig extends ACheckConfig {
 	
@@ -117,7 +117,7 @@ public class CombinedConfig extends ACheckConfig {
             }
         }
         invulnerableModifierDefault = defaultMod;
-	    if (error) LogUtil.logInfo("[NoCheatPlus] Damage causes can be: " + CheckUtils.join(Arrays.asList(DamageCause.values()), ", "));
+	    if (error) LogUtil.logInfo("[NoCheatPlus] Damage causes can be: " + StringUtil.join(Arrays.asList(DamageCause.values()), ", "));
 	    invulnerableTriggerAlways = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_ALWAYS);
 	    invulnerableTriggerFallDistance = config.getBoolean(ConfPaths.COMBINED_INVULNERABLE_TRIGGERS_FALLDISTANCE);
 	    

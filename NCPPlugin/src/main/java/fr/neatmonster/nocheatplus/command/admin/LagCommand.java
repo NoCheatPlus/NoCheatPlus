@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 public class LagCommand extends NCPCommand {
@@ -27,7 +27,7 @@ public class LagCommand extends NCPCommand {
 		for (long ms : new long[]{second, medium, max}){
 			double lag = TickTask.getLag(ms);
 			int p = Math.max(0, (int) ((lag - 1.0) * 100.0));
-			builder.append(" " + p + "%[" + CheckUtils.fdec1.format((double) ms / 1200.0) + "s]" );
+			builder.append(" " + p + "%[" + StringUtil.fdec1.format((double) ms / 1200.0) + "s]" );
 		}
 		long[] spikeDurations = TickTask.getLagSpikeDurations();
 		int[] spikes = TickTask.getLagSpikes();

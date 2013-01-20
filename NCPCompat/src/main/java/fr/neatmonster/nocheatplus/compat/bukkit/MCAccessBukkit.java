@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.compat.bukkit;
 
-import java.util.Collection;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -12,33 +11,15 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 
 public class MCAccessBukkit implements MCAccess{
-	
-	/**
-	 * Get amplifier for a potion effect.
-	 * @param player
-	 * @param type
-	 * @return
-	 */
-	public static double getPotionEffectAmplifier(final Player player, final PotionEffectType type) {
-		if (!player.hasPotionEffect(type)) return Double.MIN_VALUE;
-		final Collection<PotionEffect> effects = player.getActivePotionEffects();
-		double max = Double.MIN_VALUE;
-		for (final PotionEffect effect : effects){
-			if (effect.getType() == type){
-				max = Math.max(max, effect.getAmplifier());
-			}
-		}
-		return max;
-	}
 	
 	/**
 	 * Constructor to let it fail.
@@ -122,12 +103,12 @@ public class MCAccessBukkit implements MCAccess{
 
 	@Override
 	public double getJumpAmplifier(final Player player) {
-		return getPotionEffectAmplifier(player, PotionEffectType.JUMP);
+		return PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.JUMP);
 	}
 
 	@Override
 	public double getFasterMovementAmplifier(final Player player) {
-		return getPotionEffectAmplifier(player, PotionEffectType.SPEED);
+		return PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SPEED);
 	}
 
 	@Override

@@ -7,8 +7,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /*
  * M"""""""`YM          MM""""""""`M          dP dP 
@@ -161,7 +161,7 @@ public class NoFall extends Check {
             data.noFallFallDistance -= yDiff;
         }
         
-        if (cc.debug) System.out.println(player.getName() + " NoFall: mc=" + CheckUtils.fdec3.format(player.getFallDistance()) +" / nf=" + CheckUtils.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + CheckUtils.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
+        if (cc.debug) System.out.println(player.getName() + " NoFall: mc=" + StringUtil.fdec3.format(player.getFallDistance()) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + StringUtil.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
         
     }
     

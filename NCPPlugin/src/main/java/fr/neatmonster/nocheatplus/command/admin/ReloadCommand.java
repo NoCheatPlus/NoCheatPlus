@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.command.admin;
 
+import java.io.File;
 import java.util.Collection;
 
 import org.bukkit.Bukkit;
@@ -14,9 +15,9 @@ import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.logging.StaticLogFile;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 
 public class ReloadCommand extends NCPCommand {
 	
@@ -49,7 +50,9 @@ public class ReloadCommand extends NCPCommand {
         // Do the actual reload.
         ConfigManager.cleanup();
         ConfigManager.init(plugin);
-        DataManager.clearConfigs(); // Here you have to add XConfig.clear() form now on.
+        StaticLogFile.cleanup();
+        StaticLogFile.setupLogger(new File(plugin.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
+        DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
         
         // Tell the plugin to adapt to new config.
         for (final INotifyReload component : notifyReload){
@@ -63,7 +66,7 @@ public class ReloadCommand extends NCPCommand {
         final String info = "[NoCheatPlus] Configuration reloaded.";
         if (!(sender instanceof ConsoleCommandSender)) Bukkit.getLogger().info(info);
         final ConfigFile config = ConfigManager.getConfigFile();
-        if (config.getBoolean(ConfPaths.LOGGING_ACTIVE) && config.getBoolean(ConfPaths.LOGGING_FILE)) CheckUtils.fileLogger.info(info);
+        if (config.getBoolean(ConfPaths.LOGGING_ACTIVE) && config.getBoolean(ConfPaths.LOGGING_FILE)) StaticLogFile.fileLogger.info(info);
     }
 
 }

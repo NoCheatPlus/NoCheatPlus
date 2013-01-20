@@ -50,12 +50,13 @@ import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /*
  * M"""""`'"""`YM                   oo                   
@@ -396,10 +397,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			StringBuilder builder = new StringBuilder(250);
 			final Location loc = player.getLocation();
 			builder.append(player.getName());
-			builder.append(" " + from.getWorld().getName() + " " + CheckUtils.fdec3.format(from.getX()) + (from.getX() == loc.getX() ? "" : ("(" + CheckUtils.fdec3.format(loc.getX()) + ")")));
-			builder.append(", " + CheckUtils.fdec3.format(from.getY()) + (from.getY() == loc.getY() ? "" : ("(" + CheckUtils.fdec3.format(loc.getY()) + ")")));
-			builder.append(", " + CheckUtils.fdec3.format(from.getZ()) + (from.getZ() == loc.getZ() ? "" : ("(" + CheckUtils.fdec3.format(loc.getZ()) + ")")));
-			builder.append(" -> " + CheckUtils.fdec3.format(to.getX()) + ", " + CheckUtils.fdec3.format(to.getY()) + ", " + CheckUtils.fdec3.format(to.getZ()));
+			builder.append(" " + from.getWorld().getName() + " " + StringUtil.fdec3.format(from.getX()) + (from.getX() == loc.getX() ? "" : ("(" + StringUtil.fdec3.format(loc.getX()) + ")")));
+			builder.append(", " + StringUtil.fdec3.format(from.getY()) + (from.getY() == loc.getY() ? "" : ("(" + StringUtil.fdec3.format(loc.getY()) + ")")));
+			builder.append(", " + StringUtil.fdec3.format(from.getZ()) + (from.getZ() == loc.getZ() ? "" : ("(" + StringUtil.fdec3.format(loc.getZ()) + ")")));
+			builder.append(" -> " + StringUtil.fdec3.format(to.getX()) + ", " + StringUtil.fdec3.format(to.getY()) + ", " + StringUtil.fdec3.format(to.getZ()));
 			System.out.print(builder.toString());
 		}
         
@@ -515,7 +516,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Remember where we send the player to.
             data.setTeleported(newTo);
             if (cc.debug){
-            	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + CheckUtils.fdec3.format(newTo.getX()) + ", " + CheckUtils.fdec3.format(newTo.getY()) + ", " + CheckUtils.fdec3.format(newTo.getZ()));
+            	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
             }
         }
         

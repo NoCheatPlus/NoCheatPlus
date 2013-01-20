@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 public class CommandUtil {
 	

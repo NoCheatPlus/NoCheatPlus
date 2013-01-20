@@ -15,8 +15,8 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -308,14 +308,14 @@ public class SurvivalFly extends Check {
 			// TODO: also show resetcond (!)
 			StringBuilder builder = new StringBuilder(500);
 			builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + "\n");
-			builder.append(player.getName() + " hDist: " + CheckUtils.fdec3.format(hDistance) + " / " +  CheckUtils.fdec3.format(hAllowedDistance) + " , vDist: " +  CheckUtils.fdec3.format(yDistance) + " / " +  CheckUtils.fdec3.format(vAllowedDistance) + "\n");
-			builder.append(player.getName() + " vfreedom: " +  CheckUtils.fdec3.format(data.verticalFreedom) + " (vv=" +  CheckUtils.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
+			builder.append(player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "\n");
+			builder.append(player.getName() + " vfreedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vv=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
 			if (!resetFrom && !resetTo) {
 //				if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
 				if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
 			}
 			if (player.isSleeping()) tags.add("sleeping");
-			if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + CheckUtils.join(tags, "+") + "\n");
+			if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + StringUtil.join(tags, "+") + "\n");
 			System.out.print(builder.toString());
 		}
 		
@@ -475,7 +475,7 @@ public class SurvivalFly extends Check {
 			vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
 			vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
 			vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
-			vd.setParameter(ParameterName.TAGS, CheckUtils.join(tags, "+"));
+			vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
 		}
 		if (executeActions(vd)) {
 			data.sfLastYDist = Double.MAX_VALUE;

@@ -5,12 +5,12 @@
   <artifactId>ncpcommons</artifactId>
   <packaging>jar</packaging>
   <name>NCPCommons</name>
-  <version>1.0.0</version>
+  <version>static</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>1.0.1</version>
+    <version>static</version>
   </parent>
 
   <dependencies>

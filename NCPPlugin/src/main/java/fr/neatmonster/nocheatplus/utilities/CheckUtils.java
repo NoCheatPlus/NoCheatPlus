@@ -1,50 +1,17 @@
 package fr.neatmonster.nocheatplus.utilities;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Logger;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /**
  * Random auxiliary gear, some might have general quality. Contents are likely to get moved to other classes.
  */
 public class CheckUtils {
-
-	/** The file logger. */
-	public static Logger fileLogger = null;
-
-	/** Decimal format for "#.###" */
-	public static final DecimalFormat fdec3 = new DecimalFormat();
 	
-	/** Decimal format for "#.#" */
-	public static final DecimalFormat fdec1 = new DecimalFormat();
-
-	static {
-		// 3 digits.
-		DecimalFormatSymbols sym = fdec3.getDecimalFormatSymbols();
-		sym.setDecimalSeparator('.');
-		fdec3.setDecimalFormatSymbols(sym);
-		fdec3.setMaximumFractionDigits(3);
-		fdec3.setMinimumIntegerDigits(1);
-		// 1 digit.
-		sym = fdec1.getDecimalFormatSymbols();
-		sym.setDecimalSeparator('.');
-		fdec1.setDecimalFormatSymbols(sym);
-		fdec1.setMaximumFractionDigits(1);
-		fdec1.setMinimumIntegerDigits(1);
-	}
-
-	/**
+    /**
 	 * Check if a player looks at a target of a specific size, with a specific
 	 * precision value (roughly).
 	 * 
@@ -137,7 +104,7 @@ public class CheckUtils {
 	 *            the second String, must not be null
 	 * @return result distance
 	 */
-	private static int levenshteinDistance(CharSequence s, CharSequence t) {
+	public static int levenshteinDistance(CharSequence s, CharSequence t) {
 		if (s == null || t == null) throw new IllegalArgumentException("Strings must not be null");
 
 		int n = s.length();
@@ -183,107 +150,6 @@ public class CheckUtils {
 		}
 
 		return p[n];
-	}
-
-	/**
-	 * Join parts with link.
-	 * 
-	 * @param input
-	 * @param link
-	 * @return
-	 */
-	public static <O extends Object> String join(final Collection<O> input, final String link)
-	{
-		final StringBuilder builder = new StringBuilder(Math.max(300, input.size() * 10));
-		boolean first = true;
-		for (final Object obj : input) {
-			if (!first) builder.append(link);
-			builder.append(obj.toString());
-			first = false;
-		}
-		return builder.toString();
-	}
-
-	/**
-	 * Convenience method.
-	 * @deprecated Use LogUtil.scheduleLogInfo instead.
-	 * @param parts
-	 * @param link
-	 * @return
-	 */
-	public static <O extends Object> boolean scheduleOutputJoined(final List<O> parts, String link)
-	{
-		return LogUtil.scheduleLogInfo(parts, link);
-	}
-
-	/**
-	 * @deprecated Use instead: scheduleLogInfo
-	 * @param message
-	 * @return
-	 */
-	public static boolean scheduleOutput(final String message) {
-		try {
-			return Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"), new Runnable() {
-				@Override
-				public void run() {
-					Bukkit.getLogger().info(message);
-				}
-			}) != -1;
-		} catch (final Exception exc) {
-			return false;
-		}
-	}
-	
-	/**
-     * Removes the colors of a message.
-     * 
-     * @param text
-     *            the text
-     * @return the string
-     */
-    public static String removeColors(String text) {
-        for (final ChatColor c : ChatColor.values())
-            text = text.replace("&" + c.getChar(), "");
-        return text;
-    }
-
-    /**
-     * Replace colors of a message.
-     * 
-     * @param text
-     *            the text
-     * @return the string
-     */
-    public static String replaceColors(String text) {
-        for (final ChatColor c : ChatColor.values())
-            text = text.replace("&" + c.getChar(), c.toString());
-        return text;
-    }
-
-    /**
-     * @deprecated Use instead: LogUtil.scheduleLogInfo or similar.
-     * @param t
-     */
-	public static void scheduleOutput(final Throwable t) {
-		scheduleOutput(toString(t));
-	}
-	
-	
-	/**
-	 * @deprecated Use instead: LogUtil.logSevere
-	 * @param t
-	 */
-	public static void logSevere(final Throwable t) {
-		LogUtil.logSevere(toString(t));
-	}
-	
-	/**
-	 * @deprecated Use instead: LogUtil.toString
-	 * @param t
-	 * @return
-	 */
-	public static final String toString(final Throwable t){
-		return LogUtil.toString(t);
 	}
 	
 	/**
@@ -334,41 +200,6 @@ public class CheckUtils {
 		if (yawDiff < -180f) yawDiff += 360f;
 		else if (yawDiff > 180f) yawDiff -= 360f;
 		return yawDiff;
-	}
-	
-	 /**
-	  * @deprecated Use instead: LogUtil.logSevere
-	  * @param msg
-	  */
-	public static void logSevere(final String msg) {
-		Bukkit.getLogger().severe((msg));
-	}
-
-	/**
-	 * @deprecated Use instead: LogUtil.logWarning
-	 * @param msg
-	 */
-	public static void logWarning(final String msg) {
-		Bukkit.getLogger().warning((msg));
-	}
-	
-	/**
-	 * @deprecated Use instead: LogUtil.logInfo
-	 * @param msg
-	 */
-	public static void logInfo(final String msg) {
-		Bukkit.getLogger().info((msg));
-	}
-
-	/**
-	 * Get the height from getLocation().getY() to head / above head.<br>
-	 * NOTE: Currently this is pretty much useless, it returns 1.0 most of the time.
-	 * @deprecated This has been moved to MCAccess (compat).
-	 * @param entity
-	 * @return
-	 */
-	public static double getHeight(final Entity entity) {
-		return NoCheatPlus.getMCAccess().getHeight(entity);
 	}
 	
 	public static void onIllegalMove(final Player player){

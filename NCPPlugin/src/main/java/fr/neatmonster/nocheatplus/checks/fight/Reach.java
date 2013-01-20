@@ -13,7 +13,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -151,7 +151,7 @@ public class Reach extends Check {
         else cancelByPenalty = false;
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-            player.sendMessage("NC+: Attack " + (cancel ? (cancelByPenalty ? "(cancel/penalty) ":"(cancel/reach) ") : "") + damaged.getType()+ " height="+ CheckUtils.fdec3.format(height) + " dist=" + CheckUtils.fdec3.format(lenpRel) +" @" + CheckUtils.fdec3.format(reachMod));
+            player.sendMessage("NC+: Attack " + (cancel ? (cancelByPenalty ? "(cancel/penalty) ":"(cancel/reach) ") : "") + damaged.getType()+ " height="+ StringUtil.fdec3.format(height) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(reachMod));
         }
 
         return cancel;

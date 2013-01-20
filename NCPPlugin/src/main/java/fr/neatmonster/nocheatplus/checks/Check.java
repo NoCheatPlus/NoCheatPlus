@@ -11,10 +11,10 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*

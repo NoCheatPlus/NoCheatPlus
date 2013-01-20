@@ -13,7 +13,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class ExemptionsCommand extends NCPCommand {
 
@@ -33,7 +33,7 @@ public class ExemptionsCommand extends NCPCommand {
 			if (NCPExemptionManager.isExempted(playerName, type)) entries.add(type.toString());
 		}
 		if (entries.isEmpty()) sender.sendMessage(TAG + "No exemption entries available for " + playerName +" .");
-		else sender.sendMessage(TAG + "Exemptions for " + playerName + ": " + CheckUtils.join(entries, ", "));
+		else sender.sendMessage(TAG + "Exemptions for " + playerName + ": " + StringUtil.join(entries, ", "));
 		return true;
 	}
 

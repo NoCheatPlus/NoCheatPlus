@@ -5,12 +5,12 @@
   <artifactId>ncpcompat</artifactId>
   <packaging>jar</packaging>
   <name>NCPCompat</name>
-  <version>1.0.0</version>
+  <version>static</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>1.0.1</version>
+    <version>static</version>
   </parent>
 
   <dependencies>
@@ -23,12 +23,11 @@
     <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcommons</artifactId>
-    	<version>1.0.0</version>
-    	<type>jar</type>
+    	<version>static</version>
     </dependency>
   </dependencies>
 
-  <description>API for the compatibility modules. Uses Bukkit.
+  <description>API for the compatibility modules. Uses Bukkit. In fact this is the base of NCP that needs Bukkit but just not much more.
 
 Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 </project>

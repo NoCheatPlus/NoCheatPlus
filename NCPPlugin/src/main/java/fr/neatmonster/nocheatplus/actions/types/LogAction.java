@@ -7,8 +7,9 @@ import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLogFile;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /*
  * M""MMMMMMMM                   MMP"""""""MM            dP   oo                   
@@ -72,9 +73,9 @@ public class LogAction extends ActionWithParameters {
 	public boolean execute(final ViolationData violationData) {
 		if (!violationData.player.hasPermission(violationData.getPermissionSilent())) {
 			final String message = super.getMessage(violationData);
-			if (toChat) NoCheatPlus.sendAdminNotifyMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + CheckUtils.replaceColors(message));
-			if (toConsole) LogUtil.logInfo("[NoCheatPlus] " + CheckUtils.removeColors(message));
-			if (toFile) CheckUtils.fileLogger.info(CheckUtils.removeColors(message));
+			if (toChat) NoCheatPlus.sendAdminNotifyMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + ColorUtil.replaceColors(message));
+			if (toConsole) LogUtil.logInfo("[NoCheatPlus] " + ColorUtil.removeColors(message));
+			if (toFile) StaticLogFile.fileLogger.info(ColorUtil.removeColors(message));
 		}
 		return false;
 	}

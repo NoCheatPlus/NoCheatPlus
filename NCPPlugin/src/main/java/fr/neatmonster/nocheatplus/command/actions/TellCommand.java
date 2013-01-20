@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
  * For warnings etc.
@@ -38,7 +38,7 @@ public class TellCommand extends DelayableCommand {
 
 	private void tell(String name, String message) {
 		Player player = Bukkit.getServer().getPlayerExact(name);
-		if (player != null) player.sendMessage(CheckUtils.replaceColors(message));
+		if (player != null) player.sendMessage(ColorUtil.replaceColors(message));
 	}
 
 }

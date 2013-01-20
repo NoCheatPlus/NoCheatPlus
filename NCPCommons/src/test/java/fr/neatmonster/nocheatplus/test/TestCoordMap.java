@@ -262,8 +262,8 @@ public class TestCoordMap {
 
 		final Random random = new Random(System.nanoTime() - (System.currentTimeMillis() % 2 == 1 ? 37 : 137));
 		
-		final int n = 20000; // Number of coordinates.
-		final int max = 1000; // Coordinate maximum.
+		final int n = 10000; // Number of coordinates.
+		final int max = 800; // Coordinate maximum.
 		
 		int [][] coords = getUniqueRandomCoords(n, max, random);
 		

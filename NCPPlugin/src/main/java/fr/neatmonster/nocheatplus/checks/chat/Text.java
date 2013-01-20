@@ -19,8 +19,10 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Some alternative more or less advanced analysis methods.
@@ -213,7 +215,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 		wWords /= (float) letterCounts.words.length;
 		score += wWords;
 		
-		if (debug && score > 0f) debugParts.add("Simple score: " + CheckUtils.fdec3.format(score));
+		if (debug && score > 0f) debugParts.add("Simple score: " + StringUtil.fdec3.format(score));
 		
 		// Engine:
 		// TODO: more fine grained sync !
@@ -268,7 +270,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 			}
 		}
 		else if (cc.chatWarningCheck && time - data.chatWarningTime > cc.chatWarningTimeout && (100f * accumulated / cc.textFreqNormLevel > cc.chatWarningLevel || 100f * shortTermAccumulated / cc.textFreqShortTermLevel > cc.chatWarningLevel)){
-		    player.sendMessage(CheckUtils.replaceColors(cc.chatWarningMessage));
+		    player.sendMessage(ColorUtil.replaceColors(cc.chatWarningMessage));
             data.chatWarningTime = time;
 		}
 		else {
@@ -285,15 +287,15 @@ public class Text extends AsyncCheck implements INotifyReload{
 			for (String key : keys) {
 				Float s = engMap.get(key);
 				if (s.floatValue() > 0.0f)
-					debugParts.add(key + ":" + CheckUtils.fdec3.format(s));
+					debugParts.add(key + ":" + StringUtil.fdec3.format(s));
 			}
 			if (wEngine > 0.0f)
-				debugParts.add("Engine score (" + (cc.textEngineMaximum?"max":"sum") + "): " + CheckUtils.fdec3.format(wEngine));
+				debugParts.add("Engine score (" + (cc.textEngineMaximum?"max":"sum") + "): " + StringUtil.fdec3.format(wEngine));
 			
-			debugParts.add("Final score: " +  CheckUtils.fdec3.format(score));
-			debugParts.add("Normal: min=" +  CheckUtils.fdec3.format(cc.textFreqNormMin) +", weight=" +  CheckUtils.fdec3.format(cc.textFreqNormWeight) + " => accumulated=" + CheckUtils.fdec3.format(accumulated));
-	        debugParts.add("Short-term: min=" +  CheckUtils.fdec3.format(cc.textFreqShortTermMin) +", weight=" +  CheckUtils.fdec3.format(cc.textFreqShortTermWeight) + " => accumulated=" + CheckUtils.fdec3.format(shortTermAccumulated));
-			debugParts.add("vl: " + CheckUtils.fdec3.format(data.textVL));
+			debugParts.add("Final score: " +  StringUtil.fdec3.format(score));
+			debugParts.add("Normal: min=" +  StringUtil.fdec3.format(cc.textFreqNormMin) +", weight=" +  StringUtil.fdec3.format(cc.textFreqNormWeight) + " => accumulated=" + StringUtil.fdec3.format(accumulated));
+	        debugParts.add("Short-term: min=" +  StringUtil.fdec3.format(cc.textFreqShortTermMin) +", weight=" +  StringUtil.fdec3.format(cc.textFreqShortTermWeight) + " => accumulated=" + StringUtil.fdec3.format(shortTermAccumulated));
+			debugParts.add("vl: " + StringUtil.fdec3.format(data.textVL));
 			LogUtil.scheduleLogInfo(debugParts, " | ");
 			debugParts.clear();
 		}

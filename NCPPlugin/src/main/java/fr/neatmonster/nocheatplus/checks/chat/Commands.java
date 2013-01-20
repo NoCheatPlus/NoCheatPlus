@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -67,7 +67,7 @@ public class Commands extends Check {
                 return true;
         }
         else if (cc.chatWarningCheck && now - data.chatWarningTime > cc.chatWarningTimeout && (100f * nw / cc.commandsLevel > cc.chatWarningLevel || 100f * data.commandsShortTermWeight / cc.commandsShortTermLevel > cc.chatWarningLevel)){
-            player.sendMessage(CheckUtils.replaceColors(cc.chatWarningMessage));
+            player.sendMessage(ColorUtil.replaceColors(cc.chatWarningMessage));
             data.chatWarningTime = now;
         }
         else{

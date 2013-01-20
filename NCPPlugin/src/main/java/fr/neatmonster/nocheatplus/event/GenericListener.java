@@ -14,7 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /**
  * listener registered for one event only. Allows to delegate to other registered listeners.

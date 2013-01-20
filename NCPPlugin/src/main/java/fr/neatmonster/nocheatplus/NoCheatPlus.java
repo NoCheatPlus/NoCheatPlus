@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,6 +56,8 @@ import fr.neatmonster.nocheatplus.config.DefaultConfig;
 import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLogFile;
 import fr.neatmonster.nocheatplus.metrics.Metrics;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Graph;
 import fr.neatmonster.nocheatplus.metrics.Metrics.Plotter;
@@ -64,7 +67,6 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEn
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.Updates;
 
@@ -392,6 +394,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Cleanup the configuration manager.
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup ConfigManager...");
 		ConfigManager.cleanup();
+		
+		// Cleanup file logger.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup file logger...");
+		StaticLogFile.cleanup();
 
 		// Tell the server administrator the we finished unloading NoCheatPlus.
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] All cleanup done.");
@@ -442,6 +448,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Read the configuration files.
         ConfigManager.init(this);
         
+        // Setup file logger.
+        StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
+        
         // Allow entries to TickTask (just in case).
         TickTask.setLocked(false);
         
@@ -478,7 +487,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				@Override
 				public void onReload() {
 					// Only for reloading, not INeedConfig.
-					BlockProperties.init();
+					BlockProperties.init(getMCAccess());
 					final ConfigFile config = ConfigManager.getConfigFile();
 					BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
 					undoCommandChanges();

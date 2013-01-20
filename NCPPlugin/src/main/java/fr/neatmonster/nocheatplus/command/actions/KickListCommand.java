@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class KickListCommand extends NCPCommand {
 
@@ -21,7 +21,7 @@ public class KickListCommand extends NCPCommand {
 		final String[] kicked = NoCheatPlus.getLoginDeniedPlayers();
 		if (kicked.length < 100) Arrays.sort(kicked);
 		sender.sendMessage(TAG + "Temporarily kicked players:");
-		sender.sendMessage(CheckUtils.join(Arrays.asList(kicked), " "));
+		sender.sendMessage(StringUtil.join(Arrays.asList(kicked), " "));
 		return true;
 	}
 

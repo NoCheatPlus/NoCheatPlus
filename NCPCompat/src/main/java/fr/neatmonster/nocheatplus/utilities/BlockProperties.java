@@ -15,11 +15,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.config.RawConfigFile;
+import fr.neatmonster.nocheatplus.config.RootConfPaths;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /**
  * Properties of blocks.
@@ -244,8 +243,8 @@ public class BlockProperties {
 		Material.POTATO,
 	};
 	
-	private static BlockCache blockCache = NoCheatPlus.getMCAccess().getBlockCache(null); 
-	private static final PlayerLocation pLoc = new PlayerLocation(NoCheatPlus.getMCAccess(), null);
+	private static BlockCache blockCache = null; 
+	private static PlayerLocation pLoc = null;
 	
     protected static final long[] blockFlags = new long[maxBlocks];
     
@@ -271,22 +270,20 @@ public class BlockProperties {
     public static final int F_HEIGHT100     = 0x100;
     /** Climbable like ladder and vine (allow to land on without taking damage). */
     public static final int F_CLIMBABLE     = 0x200;
-    
-	static{
-		init();
-	}
 	
-   public static void init() {
-        try{
-            initTools();
-            initBlocks();
-        }
-        catch(Throwable t){
-        	LogUtil.logSevere(t);
-        }
+   public static void init(final MCAccess mcAccess) {
+	    blockCache = mcAccess.getBlockCache(null);
+	    pLoc = new PlayerLocation(mcAccess, null);
+		try{
+		    initTools(mcAccess);
+		    initBlocks(mcAccess);
+		}
+		catch(Throwable t){
+			LogUtil.logSevere(t);
+		}
     }
 	
-	private static void initTools() {
+	private static void initTools(final MCAccess mcAccess) {
 	    tools.clear();
 		tools.put(268, new ToolProps(ToolType.SWORD, MaterialBase.WOOD));
 		tools.put(269, new ToolProps(ToolType.SPADE, MaterialBase.WOOD));
@@ -316,12 +313,11 @@ public class BlockProperties {
 		tools.put(359, new ToolProps(ToolType.SHEARS, MaterialBase.NONE));
 	}
 
-    private static void initBlocks() {
+    private static void initBlocks(final MCAccess mcAccess) {
 		Arrays.fill(blocks, null);
 		///////////////////////////
 		// Initalize block flags
 		///////////////////////////
-		final MCAccess mcAccess = NoCheatPlus.getMCAccess();
 		for (int i = 0; i <maxBlocks; i++){
 			blockFlags[i] = 0;
 
@@ -636,7 +632,8 @@ public class BlockProperties {
 		final World world = location.getWorld();
 		final boolean onGround = isOnGround(player, location) || world.getBlockTypeIdAt(x, y, z) == Material.WATER_LILY.getId();
 		final boolean inWater = isInWater(world.getBlockTypeIdAt(x, y + 1, z));
-		final int haste = player.hasPotionEffect(PotionEffectType.FAST_DIGGING) ? 1 : 0;
+		final int haste = (int) Math.round(PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING));
+		// TODO: haste: int / double !?
 		return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), haste);
 	}
 
@@ -671,6 +668,7 @@ public class BlockProperties {
 	     */
 	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency, int haste) {
 	    final long dur = getBreakingDuration(blockId, blockProps, toolProps, onGround, inWater, aquaAffinity, efficiency);
+	    // TODO: haste ...
 	    return haste > 0 ? ((long) (dur * 0.66)) : dur;
 	}
 
@@ -876,12 +874,12 @@ public class BlockProperties {
 		blockCache.setAccess(location.getWorld());
 		pLoc.setBlockCache(blockCache);
 		pLoc.set(location, player, 0.3);
-		if (pLoc.isIllegal()) {
-			blockCache.cleanup();
-			pLoc.cleanup();
-			CheckUtils.onIllegalMove(player);
-			return false;
-		}
+//		if (pLoc.isIllegal()) {
+//			blockCache.cleanup();
+//			pLoc.cleanup();
+//			CheckUtils.onIllegalMove(player);
+//			return false;
+//		}
 		final boolean onGround = pLoc.isOnGround();
 		blockCache.cleanup();
 		pLoc.cleanup();
@@ -1020,11 +1018,11 @@ public class BlockProperties {
 	 * API access to read extra properties from files.
 	 * @param config
 	 */
-    public static void applyConfig(final ConfigFile config, final String pathPrefix) {
+    public static void applyConfig(final RawConfigFile config, final String pathPrefix) {
         // Ignore passable.
-        for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_IGNOREPASSABLE)){
-            final Integer id = ConfigFile.parseTypeId(input);
-            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
+        for (final String input : config.getStringList(pathPrefix + RootConfPaths.SUB_IGNOREPASSABLE)){
+            final Integer id = RawConfigFile.parseTypeId(input);
+            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + RootConfPaths.SUB_IGNOREPASSABLE + "): " + input);
             else blockFlags[id] |= F_IGN_PASSABLE;
         }
     }

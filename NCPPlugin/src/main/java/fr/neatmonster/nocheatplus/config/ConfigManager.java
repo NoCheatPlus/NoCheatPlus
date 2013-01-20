@@ -1,26 +1,15 @@
 package fr.neatmonster.nocheatplus.config;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /*
  * MM'""""'YMM                   .8888b oo          M"""""`'"""`YM                                                       
@@ -38,63 +27,8 @@ import fr.neatmonster.nocheatplus.utilities.LogUtil;
  */
 public class ConfigManager {
 
-    /**
-     * The formatter that is used to format the log file.
-     */
-    private static class LogFileFormatter extends Formatter {
-
-        /**
-         * Create a new instance of the log file formatter.
-         * 
-         * @return the log file formatter
-         */
-        public static LogFileFormatter newInstance() {
-            return new LogFileFormatter();
-        }
-
-        /** The date formatter. */
-        private final SimpleDateFormat date;
-
-        /**
-         * Instantiates a new log file formatter.
-         */
-        private LogFileFormatter() {
-            date = new SimpleDateFormat("yy.MM.dd HH:mm:ss");
-        }
-
-        /* (non-Javadoc)
-         * @see java.util.logging.Formatter#format(java.util.logging.LogRecord)
-         */
-        @Override
-        public String format(final LogRecord record) {
-            final StringBuilder builder = new StringBuilder();
-            final Throwable ex = record.getThrown();
-
-            builder.append(date.format(record.getMillis()));
-            builder.append(" [");
-            builder.append(record.getLevel().getLocalizedName().toUpperCase());
-            builder.append("] ");
-            builder.append(record.getMessage());
-            builder.append('\n');
-
-            if (ex != null) {
-                final StringWriter writer = new StringWriter();
-                ex.printStackTrace(new PrintWriter(writer));
-                builder.append(writer);
-            }
-
-            return builder.toString();
-        }
-    }
-
     /** The map containing the configuration files per world. */
     private static final Map<String, ConfigFile> worldsMap   = new HashMap<String, ConfigFile>();
-
-    /** The file handler. */
-    private static FileHandler                   fileHandler = null;
-
-    /** The log file. */
-    public static File                           logFile     = null;
     
     public static interface ActionFactoryFactory{
         public ActionFactory newActionFactory(Map<String, Object> library);
@@ -141,11 +75,7 @@ public class ConfigManager {
      * Cleanup.
      */
     public static void cleanup() {
-        fileHandler.flush();
-        fileHandler.close();
-        final Logger logger = Logger.getLogger("NoCheatPlus");
-        logger.removeHandler(fileHandler);
-        fileHandler = null;
+    	
         setActionFactoryFactory(null);
     }
 
@@ -201,7 +131,8 @@ public class ConfigManager {
      * @param plugin
      *            the instance of NoCheatPlus
      */
-    public static synchronized void init(final NoCheatPlus plugin) {
+    public static synchronized void init(final Plugin plugin) {
+    	// (This can lead to minor problems with async checks during reloading.)
     	worldsMap.clear();
         // Try to obtain and parse the global configuration file.
         final File globalFile = new File(plugin.getDataFolder(), "config.yml");
@@ -215,11 +146,11 @@ public class ConfigManager {
                 try {
                     if (globalConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) globalConfig.save(globalFile);
                 } catch (final Exception e) {
-                	Bukkit.getLogger().severe("[NoCheatPlus] Could not save back config.yml (see exception below).");
+                	LogUtil.logSevere("[NoCheatPlus] Could not save back config.yml (see exception below).");
                     LogUtil.logSevere(e);
                 }
             } catch (final Exception e) {
-            	Bukkit.getLogger().severe("[NoCheatPlus] Could not load config.yml (see exception below).  Continue with default settings...");
+            	LogUtil.logSevere("[NoCheatPlus] Could not load config.yml (see exception below).  Continue with default settings...");
             	LogUtil.logSevere(e);
             }
         else {
@@ -229,40 +160,13 @@ public class ConfigManager {
             try {
                 globalConfig.save(globalFile);
             } catch (final Exception e) {
-            	Bukkit.getLogger().severe("[NoCheatPlus] Could not save default config.yml (see exception below).");
             	LogUtil.logSevere(e);
             }
         }
         globalConfig.regenerateActionLists();
         worldsMap.put(null, globalConfig);
 
-        // Setup the file logger.
-        final Logger logger = Logger.getAnonymousLogger();
-        logger.setLevel(Level.INFO);
-        logger.setUseParentHandlers(false);
-        for (final Handler h : logger.getHandlers())
-            logger.removeHandler(h);
-        if (fileHandler != null) {
-            fileHandler.close();
-            logger.removeHandler(fileHandler);
-            fileHandler = null;
-        }
-        logFile = new File(plugin.getDataFolder(), globalConfig.getString(ConfPaths.LOGGING_FILENAME));
-        try {
-            try {
-                logFile.getParentFile().mkdirs();
-            } catch (final Exception e) {
-            	LogUtil.logSevere(e);
-            }
-            fileHandler = new FileHandler(logFile.getCanonicalPath(), true);
-            fileHandler.setLevel(Level.ALL);
-            fileHandler.setFormatter(LogFileFormatter.newInstance());
-            logger.addHandler(fileHandler);
-        } catch (final Exception e) {
-        	LogUtil.logSevere(e);
-        }
-        CheckUtils.fileLogger = logger;
-
+        
         final MemoryConfiguration worldDefaults = PathUtils.getWorldsDefaultConfig(globalConfig); 
         
         // Try to obtain and parse the world-specific configuration files.
@@ -288,12 +192,12 @@ public class ConfigManager {
                 try{
                 	if (worldConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) worldConfig.save(worldFile);
                 } catch (final Exception e){
-                	Bukkit.getLogger().severe("[NoCheatPlus] Couldn't save back world-specific configuration for "
+                	LogUtil.logSevere("[NoCheatPlus] Couldn't save back world-specific configuration for "
                             + worldEntry.getKey() + " (see exception below).");
                 	LogUtil.logSevere(e);
                 }
             } catch (final Exception e) {
-            	Bukkit.getLogger().severe("[NoCheatPlus] Couldn't load world-specific configuration for "
+            	LogUtil.logSevere("[NoCheatPlus] Couldn't load world-specific configuration for "
                         + worldEntry.getKey() + " (see exception below). Continue with global default settings...");
             	LogUtil.logSevere(e);
             }

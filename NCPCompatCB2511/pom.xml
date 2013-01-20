@@ -5,24 +5,19 @@
   <artifactId>ncpcompatcb2511</artifactId>
   <packaging>jar</packaging>
   <name>NCPCompatCB2511</name>
-  <version>1.0.0</version>
+  <version>static</version>
 
   <parent>
     <groupId>fr.neatmonster</groupId>
     <artifactId>nocheatplus-parent</artifactId>
-    <version>1.0.1</version>
+    <version>static</version>
   </parent>
 
   <dependencies>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
-    	<artifactId>ncpcommons</artifactId>
-    	<version>1.0.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompat</artifactId>
-    	<version>1.0.0</version>
+    	<version>static</version>
     </dependency>
     <dependency>
     	<groupId>org.bukkit</groupId>

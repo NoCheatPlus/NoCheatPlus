@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.checks;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 public abstract class AsyncCheck extends Check {
 

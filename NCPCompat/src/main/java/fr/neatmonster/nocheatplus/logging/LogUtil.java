@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Static access methods for logging access (mostly uses the Bukkit logger).
@@ -134,7 +136,7 @@ public class LogUtil {
 	 */
 	public static <O extends Object> boolean scheduleLog(final Level level, final List<O> parts, final String link)
 	{
-		return scheduleLog(level, CheckUtils.join(parts, link));
+		return scheduleLog(level, StringUtil.join(parts, link));
 	}
 
 }

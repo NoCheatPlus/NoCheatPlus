@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.bukkit.ChatColor;
 
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+
 /**
  * A not too fat stats class re-used from other plugins.
  * @author asofold

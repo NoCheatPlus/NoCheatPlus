@@ -10,7 +10,7 @@ import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
 import fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /**
  * Factory class to hide potentially dirty stuff.

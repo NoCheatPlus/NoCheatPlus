@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
  * NOTE: EARLY REFACTORING STATE, MOST METHODS NEED SYNC OVER DATA !
@@ -31,7 +31,7 @@ public class Captcha extends AsyncCheck implements ICaptcha{
             // Yes, clear his data and do not worry anymore about him.
             data.reset();
             data.captchaStarted = false;
-            player.sendMessage(CheckUtils.replaceColors(cc.captchaSuccess));
+            player.sendMessage(ColorUtil.replaceColors(cc.captchaSuccess));
         } else {
         	// Increment his tries number counter.
             data.captchTries++;
@@ -86,7 +86,7 @@ public class Captcha extends AsyncCheck implements ICaptcha{
 
 	@Override
 	public void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
-		player.sendMessage(CheckUtils.replaceColors(cc.captchaQuestion.replace("[captcha]",
+		player.sendMessage(ColorUtil.replaceColors(cc.captchaQuestion.replace("[captcha]",
                 data.captchaGenerated)));
 	}
 

@@ -4,7 +4,7 @@
   <groupId>fr.neatmonster</groupId>
   <artifactId>nocheatplus-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.1</version>
+  <version>static</version>
   <name>NoCheatPlus Parent</name>
   <url>http://nocheatplus.org</url>
   <properties>

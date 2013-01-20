@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class ExemptCommand extends NCPCommand {
 
@@ -34,7 +34,7 @@ public class ExemptCommand extends NCPCommand {
 				checkType = CheckType.valueOf(args[2].toUpperCase().replace('-', '_').replace('.', '_'));
 			} catch (Exception e){
 				sender.sendMessage(TAG + "Could not interpret: " + args[2]);
-				sender.sendMessage(TAG + "Check type should be one of: " + CheckUtils.join(Arrays.asList(CheckType.values()), " | "));
+				sender.sendMessage(TAG + "Check type should be one of: " + StringUtil.join(Arrays.asList(CheckType.values()), " | "));
 				return true;
 			}
 		}

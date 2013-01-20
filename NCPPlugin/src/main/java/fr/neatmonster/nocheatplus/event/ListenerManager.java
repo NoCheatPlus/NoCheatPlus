@@ -16,7 +16,7 @@ import org.bukkit.plugin.Plugin;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry.MethodOrder;
-import fr.neatmonster.nocheatplus.utilities.LogUtil;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /**
  * This class allows to register event-listeners which will all be called form within one event handler per event+priority combination.<br>
