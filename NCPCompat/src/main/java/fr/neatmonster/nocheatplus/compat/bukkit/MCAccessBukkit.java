@@ -29,6 +29,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		// TODO: Add more that might fail if not supported ?
 		Material.AIR.isSolid();
 		Material.AIR.isOccluding();
+		Material.AIR.isTransparent();
 		// TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
 	}
 
@@ -141,7 +142,8 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 
 	@Override
 	public boolean shouldBeZombie(final Player player) {
-		return player.getHealth() <= 0 || player.isDead();
+		// Not sure :) ...
+		return player.getHealth() <= 0 && !player.isDead();
 	}
 
 	@Override
