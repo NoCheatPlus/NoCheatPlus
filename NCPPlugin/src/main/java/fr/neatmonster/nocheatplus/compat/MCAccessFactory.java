@@ -71,12 +71,12 @@ public class MCAccessFactory {
 		try{
 			final String msg;
 			if (bukkitOnly){
-				msg = "[NoCheatPlus] The plugin is configured for Bukkit-API-only access is configured.";
+				msg = "[NoCheatPlus] The plugin is configured for Bukkit-API-only access.";
 			}
 			else{
-				msg = "[NoCheatPlus] Could not set up non-api access for your specific Minecraft or server-mod version.";
+				msg = "[NoCheatPlus] Could not set up native access for your specific Minecraft + server-mod version.";
 			}
-			LogUtil.logSevere("[NoCheatPlus] Some features will likely not function properly, performance might suffer.");
+			LogUtil.logWarning("[NoCheatPlus] Some features will likely not function properly, performance might suffer.");
 			LogUtil.logWarning(msg);
 			for (String uMsg : updateLocs){
 				LogUtil.logWarning(uMsg);
