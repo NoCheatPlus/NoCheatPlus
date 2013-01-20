@@ -688,6 +688,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		data.clearMorePacketsData();
 		data.setSetBack(event.getRespawnLocation());
 		// TODO: consider data.resetPositions(data.setBack);
+		// (Not putting hover in at respawn due to chunk sending.)
+//		final MovingConfig cc = MovingConfig.getConfig(player);
+//		if (cc.sfHoverCheck){
+//			// Assume the player might be hovering.
+//			data.sfHoverTicks = 0;
+//			hoverTicks.add(player.getName());
+//		}
 	}
 	
 	/**
