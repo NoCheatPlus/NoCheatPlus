@@ -445,11 +445,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     	TickTask.cancel();
     	TickTask.reset();
     	
+    	// Reset MCAccess.
+    	mcAccess = null;
+    	
         // Read the configuration files.
         ConfigManager.init(this);
         
         // Setup file logger.
         StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
+        
+        // Set up BlockProperties.
+        BlockProperties.init(getMCAccess());
         
         // Allow entries to TickTask (just in case).
         TickTask.setLocked(false);
@@ -472,6 +478,22 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		addComponent(nameSetPerms);
 		addListener(getCoreListener());
         for (final Object obj : new Object[]{
+            // Put ReloadListener first, because Checks could also listen to it.
+        	new INotifyReload() {
+        		// Only for reloading, not INeedConfig.
+				@Override
+				public void onReload() {
+					// Reset MCAccess.
+			    	mcAccess = null;
+			    	// Reset BlockProperties.
+					BlockProperties.init(getMCAccess());
+					final ConfigFile config = ConfigManager.getConfigFile();
+					BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
+					// Reset Command protection.
+					undoCommandChanges();
+					if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
+				}
+        	},
         	NCPExemptionManager.getListener(),
         	dataMan,
         	new BlockBreakListener(),
@@ -483,17 +505,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         	new FightListener(),
         	new InventoryListener(),
         	new MovingListener(),
-        	new INotifyReload() {
-				@Override
-				public void onReload() {
-					// Only for reloading, not INeedConfig.
-					BlockProperties.init(getMCAccess());
-					final ConfigFile config = ConfigManager.getConfigFile();
-					BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
-					undoCommandChanges();
-					if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
-				}
-        	},
         }){
         	addComponent(obj);
         }

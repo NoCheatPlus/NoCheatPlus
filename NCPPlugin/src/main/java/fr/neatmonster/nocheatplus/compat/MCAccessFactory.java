@@ -76,8 +76,8 @@ public class MCAccessFactory {
 			else{
 				msg = "[NoCheatPlus] Could not set up native access for your specific Minecraft + server-mod version.";
 			}
-			LogUtil.logWarning("[NoCheatPlus] Some features will likely not function properly, performance might suffer.");
 			LogUtil.logWarning(msg);
+			LogUtil.logWarning("[NoCheatPlus] Some features will likely not function properly, performance might suffer.");
 			for (String uMsg : updateLocs){
 				LogUtil.logWarning(uMsg);
 			}

@@ -14,25 +14,29 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 
-public class MCAccessBukkit implements MCAccess{
+public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	
 	/**
 	 * Constructor to let it fail.
 	 */
 	public MCAccessBukkit(){
-		// TODO: ...
+		// TODO: Add more that might fail if not supported ?
+		Material.AIR.isSolid();
+		Material.AIR.isOccluding();
+		// TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
 	}
 
 	@Override
 	public String getMCVersion() {
 		// Bukkit API.
 		// TODO: maybe output something else.
-		return "?";
+		return "1.4.6|1.4.7|?";
 	}
 
 	@Override
@@ -145,6 +149,16 @@ public class MCAccessBukkit implements MCAccess{
 		// TODO: Test / kick ? ...
 		player.setHealth(0);
 		player.damage(1);
+	}
+
+	@Override
+	public void setupBlockProperties() {
+		// TODO Set some generic properties matching what BlockCache.getShape returns.
+		for (Material mat : Material.values()){
+			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()){
+				BlockProperties.setBlockFlags(mat.getId(), BlockProperties.getBLockFlags(mat.getId()) | BlockProperties.F_IGN_PASSABLE);
+			}
+		}
 	}
 	
 }
