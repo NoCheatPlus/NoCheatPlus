@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 import org.bukkit.Material;
 
@@ -472,7 +473,7 @@ public class DefaultConfig extends ConfigFile {
                 Material.PISTON_EXTENSION.name(), 
                 Material.PISTON_MOVING_PIECE.name() // TODO: ?
         ));
-        
+        set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>());
         // Update internal factory based on all the new entries to the "actions" section.
         regenerateActionLists();
     }
