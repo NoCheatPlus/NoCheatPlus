@@ -1029,6 +1029,15 @@ public class BlockProperties {
             if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + RootConfPaths.SUB_IGNOREPASSABLE + "): " + input);
             else blockFlags[id] |= F_IGN_PASSABLE;
         }
+        
+        // Allow instant breaking.
+        for (final String input : config.getStringList(pathPrefix + RootConfPaths.SUB_ALLOWINSTANTBREAK)){
+            final Integer id = RawConfigFile.parseTypeId(input);
+            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + RootConfPaths.SUB_ALLOWINSTANTBREAK + "): " + input);
+            else {
+            	setBlockProps(id, instantType);
+            }
+        }
     }
     
 //    /**

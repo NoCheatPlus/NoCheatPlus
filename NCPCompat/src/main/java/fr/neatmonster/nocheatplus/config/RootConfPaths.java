@@ -10,5 +10,6 @@ public class RootConfPaths {
 	
 	// Sub-paths that are used with different path prefixes potentially.
 	public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
+	public static final String SUB_ALLOWINSTANTBREAK                     = "allowinstantbreak";
 
 }
