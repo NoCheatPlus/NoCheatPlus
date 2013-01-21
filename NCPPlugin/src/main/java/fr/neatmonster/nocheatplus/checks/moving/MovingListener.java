@@ -853,7 +853,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location to = event.getTo();
         if (!from.getWorld().equals(to.getWorld())) return;
 
-        final Player player = (Player) event.getVehicle().getPassenger();
+        final Player player = (Player) passenger;
 
         Location newTo = null;
 
