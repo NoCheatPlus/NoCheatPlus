@@ -13,6 +13,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -365,7 +366,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		processingEvents.put(playerName, event);
 		
 		// Ignore players in vehicles.
-		if (player.isInsideVehicle()) return;
+		if (player.isInsideVehicle()){
+			// Workaround for pigs !
+			final Entity vehicle = player.getVehicle();
+			if (vehicle != null && (vehicle instanceof Pig)){
+				onVehicleMove(new VehicleMoveEvent((Vehicle) vehicle, event.getFrom(), event.getFrom()));
+			}
+			return;
+		}
 		
 		// Ignore dead players.
 		if (player.isDead()) return;
