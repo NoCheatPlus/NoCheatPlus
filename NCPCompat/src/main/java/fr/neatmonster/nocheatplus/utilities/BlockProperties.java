@@ -271,6 +271,11 @@ public class BlockProperties {
     public static final int F_HEIGHT100     = 0x100;
     /** Climbable like ladder and vine (allow to land on without taking damage). */
     public static final int F_CLIMBABLE     = 0x200;
+    
+    /** Penalty factor for block break duration if under water. */
+    protected static float breakPenaltyInWater = 4f;
+    /** Penalty factor for block break duration if not on ground. */
+    protected static float breakPenaltyOffGround = 4f;
 	
    public static void init(final MCAccess mcAccess) {
 	    blockCache = mcAccess.getBlockCache(null);
@@ -740,10 +745,10 @@ public class BlockProperties {
 		// (sword vs web already counted)
 		
 		if (isValidTool || blockProps.tool.toolType == ToolType.NONE){
-		    long mult = 1;
-			if (inWater && !aquaAffinity) 	mult *= 5;
-			if (!onGround) 					mult *= 5;
-			duration *= mult;
+		    float mult = 1f;
+			if (inWater && !aquaAffinity) 	mult *= breakPenaltyInWater;
+			if (!onGround) 					mult *= breakPenaltyOffGround;
+			duration = (long) (mult * duration);
 			
 			// Efficiency level.
 			if (efficiency > 0) {
@@ -752,15 +757,15 @@ public class BlockProperties {
 					// Heck [Cleanup pending]...
 					switch (efficiency) {
 					case 1:
-						return 1500 * mult;
+						return (long) (mult * 1500);
 					case 2:
-						return 750 * mult;
+						return (long) (mult * 750);
 					case 3:
-						return 450 * mult;
+						return (long) (mult * 450);
 					case 4:
-						return 250 * mult;
+						return (long) (mult * 250);
 					case 5:
-						return 150 * mult;
+						return (long) (mult * 150);
 					}
 				}
 				// This seems roughly correct.
@@ -1370,4 +1375,36 @@ public class BlockProperties {
         }
         return flags;
     }
+
+    /**
+     * Penalty factor for block break duration if under water.
+     * @return
+     */
+	public static float getBreakPenaltyInWater() {
+		return breakPenaltyInWater;
+	}
+
+	/**
+	 * Penalty factor for block break duration if under water.
+	 * @param breakPenaltyInWater
+	 */
+	public static void setBreakPenaltyInWater(float breakPenaltyInWater) {
+		BlockProperties.breakPenaltyInWater = breakPenaltyInWater;
+	}
+
+	/**
+	 * Penalty factor for block break duration if not on ground.
+	 * @return
+	 */
+	public static float getBreakPenaltyOffGround() {
+		return breakPenaltyOffGround;
+	}
+
+	/**
+	 * Penalty factor for block break duration if not on ground.
+	 * @param breakPenaltyOffGround
+	 */
+	public static void setBreakPenaltyOffGround(float breakPenaltyOffGround) {
+		BlockProperties.breakPenaltyOffGround = breakPenaltyOffGround;
+	}
 }
