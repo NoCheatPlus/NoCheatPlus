@@ -252,16 +252,12 @@ public class TickTask implements Runnable {
 		
 		if (exact){
 			// Attempt to count in the current tick.
-			final long time = System.currentTimeMillis();
-			if (time > timeLast){
-				final long passed =  time - timeLast;
-				if (passed > 50){
-					// Only count in in the case of "overtime".
-					covered += 50;
-					sum += passed;
-				}
+			final long passed = System.currentTimeMillis() - timeLast;
+			if (passed > 50){
+				// Only count in in the case of "overtime".
+				covered += 50;
+				sum += passed;
 			}
-
 		}
 		
 		return (float) sum / (float) covered;
