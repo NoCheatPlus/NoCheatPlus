@@ -47,9 +47,15 @@ public class Commands extends Check {
             data.commandsShortTermWeight = 1.0;
         }
         else if (tick - data.commandsShortTermTick < cc.commandsShortTermTicks){
-        	// TODO: account for lag.
-            // Add up.
-            data.commandsShortTermWeight += weight;
+        	if (!cc.lag || TickTask.getLag(50L * (tick - data.commandsShortTermTick), true) < 1.3f){
+                // Add up.
+                data.commandsShortTermWeight += weight;
+        	}
+            else{
+                // Reset, too much lag.
+                data.commandsShortTermTick = tick;
+                data.commandsShortTermWeight = 1.0;
+            }
         }
         else{
             // Reset.
