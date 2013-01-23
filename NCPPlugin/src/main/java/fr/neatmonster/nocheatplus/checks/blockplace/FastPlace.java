@@ -48,7 +48,12 @@ public class FastPlace extends Check {
         
         // Short term arrivals.
         final int tick = TickTask.getTick();
-        if (tick - data.fastPlaceShortTermTick < cc.fastPlaceShortTermTicks){
+        if (tick < data.fastPlaceShortTermTick ){
+        	// TickTask got reset.
+        	data.fastPlaceShortTermTick = tick;
+        	data.fastPlaceShortTermCount = 1;
+        }
+        else if (tick - data.fastPlaceShortTermTick < cc.fastPlaceShortTermTicks){
         	// Account for server side lag.
         	if (!cc.lag || TickTask.getLag(50L * (tick - data.fastPlaceShortTermTick), true) < 1.2){
         		// Within range, add.

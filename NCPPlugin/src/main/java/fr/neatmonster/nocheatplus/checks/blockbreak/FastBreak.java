@@ -76,8 +76,10 @@ public class FastBreak extends Check {
 //        	// Ignore those for now.
 //        }
 //        else 
-        
-        if (elapsedTime + cc.fastBreakDelay < breakingTime){
+        if (elapsedTime < 0){
+        	// Ignore it. TODO: ?
+        }
+        else if (elapsedTime + cc.fastBreakDelay < breakingTime){
     		// lag or cheat or Minecraft.
         	
     		// Count in server side lag, if desired.

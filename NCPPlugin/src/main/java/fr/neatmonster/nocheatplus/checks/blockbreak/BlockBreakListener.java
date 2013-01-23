@@ -244,7 +244,8 @@ public class BlockBreakListener extends CheckListener {
         
         final int tick = TickTask.getTick();
         // Skip if already set to the same block without breaking within one tick difference.
-        if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY()){
+        if (tick < data.clickedTick);
+        else if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY()){
         	if (tick - data.clickedTick <= 1 ) return;
         }
         

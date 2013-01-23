@@ -56,7 +56,12 @@ public class Speed extends Check {
         
         // Short term.
         final int tick = TickTask.getTick();
-        if (tick - data.speedShortTermTick < cc.speedShortTermTicks){
+        if (tick < data.speedShortTermTick){
+        	// Tick task got reset.
+        	data.speedShortTermTick = tick;
+        	data.speedShortTermCount = 1;
+        }
+        else if (tick - data.speedShortTermTick < cc.speedShortTermTicks){
         	// Account for server side lag.
         	if (!cc.lag || TickTask.getLag(50L * (tick - data.speedShortTermTick), true) < 1.5f){
             	// Within range, add.

@@ -29,7 +29,12 @@ public class Frequency extends Check {
         
         // Short term arrivals.
         final int tick = TickTask.getTick();
-        if (tick - data.frequencyShortTermTick < cc.frequencyShortTermTicks){
+        if (tick < data.frequencyShortTermTick){
+        	// Tick task got reset.
+        	data.frequencyShortTermTick = tick;
+        	data.frequencyShortTermCount = 1;
+        }
+        else if (tick - data.frequencyShortTermTick < cc.frequencyShortTermTicks){
         	// Account for server side lag.
         	final float stLag = cc.lag ? TickTask.getLag(50L * (tick - data.frequencyShortTermTick), true) : 1f;
         	if (stLag < 1.5){

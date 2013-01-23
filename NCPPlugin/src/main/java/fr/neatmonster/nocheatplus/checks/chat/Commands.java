@@ -41,7 +41,13 @@ public class Commands extends Check {
         final float weight = 1f;
         
         data.commandsWeights.add(now, weight);
-        if (tick - data.commandsShortTermTick < cc.commandsShortTermTicks){
+        if (tick < data.commandsShortTermTick){
+        	// TickTask got reset.
+            data.commandsShortTermTick = tick;
+            data.commandsShortTermWeight = 1.0;
+        }
+        else if (tick - data.commandsShortTermTick < cc.commandsShortTermTicks){
+        	// TODO: account for lag.
             // Add up.
             data.commandsShortTermWeight += weight;
         }
