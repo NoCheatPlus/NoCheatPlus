@@ -230,7 +230,10 @@ public class TickTask implements Runnable {
 	 * @return Lag factor (1.0 = 20 tps, 2.0 = 10 tps).
 	 */
 	public static final float getLag(final long ms, final boolean exact){
-		// TODO: Account for freezing (i.e. check timeLast, might be an extra method)!
+		if (ms < 0){
+			// Account for freezing (i.e. check timeLast, might be an extra method)!
+			return getLag(0, exact);
+		}
 		final int tick = TickTask.tick;
 		if (tick == 0) return 1f;
 		
@@ -249,12 +252,16 @@ public class TickTask implements Runnable {
 		
 		if (exact){
 			// Attempt to count in the current tick.
-			final long passed = System.currentTimeMillis() - timeLast;
-			if (passed > 50){
-				// Only count in in the case of "overtime".
-				covered += 50;
-				sum += passed;
+			final long time = System.currentTimeMillis();
+			if (time > timeLast){
+				final long passed =  time - timeLast;
+				if (passed > 50){
+					// Only count in in the case of "overtime".
+					covered += 50;
+					sum += passed;
+				}
 			}
+
 		}
 		
 		return (float) sum / (float) covered;
