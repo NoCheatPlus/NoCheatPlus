@@ -236,8 +236,8 @@ public class TickTask implements Runnable {
 		}
 		final int tick = TickTask.tick;
 		if (tick == 0) return 1f;
-		
-		final int totalTicks = Math.min(tick, 1 + (int) (ms / 50));
+		final int add = (ms % 50) == 0 ? 0 : 1;
+		final int totalTicks = Math.min(tick, add + (int) (ms / 50));
 		final int maxTick = Math.min(lagMaxTicks, totalTicks);
 		long sum = tickDurations[maxTick - 1];
 		long covered = maxTick * 50;
