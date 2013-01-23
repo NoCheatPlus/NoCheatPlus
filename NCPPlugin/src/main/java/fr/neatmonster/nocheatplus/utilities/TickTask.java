@@ -236,7 +236,8 @@ public class TickTask implements Runnable {
 		}
 		final int tick = TickTask.tick;
 		if (tick == 0) return 1f;
-		final int add = (ms % 50) == 0 ? 0 : 1;
+		final int add = ms > 0 && (ms % 50) == 0 ? 0 : 1;
+		// TODO: Consider: Put "exact" block here, subtract a tick if appropriate? 
 		final int totalTicks = Math.min(tick, add + (int) (ms / 50));
 		final int maxTick = Math.min(lagMaxTicks, totalTicks);
 		long sum = tickDurations[maxTick - 1];
