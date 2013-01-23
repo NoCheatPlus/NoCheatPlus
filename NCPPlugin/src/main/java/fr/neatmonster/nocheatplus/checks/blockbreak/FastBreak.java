@@ -56,9 +56,9 @@ public class FastBreak extends Check {
         final int id = block.getTypeId();
         if (player.getGameMode() == GameMode.CREATIVE)
         	// Modifier defaults to 0, the Frequency check is responsible for those.
-            breakingTime = Math.round((double) cc.fastBreakModCreative / 100D * (double) 100);
+            breakingTime = Math.max(0, Math.round((double) cc.fastBreakModCreative / 100D * (double) 100));
         else
-        	breakingTime = Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockProperties.getBreakingDuration(id, player));
+        	breakingTime = Math.max(0, Math.round((double) cc.fastBreakModSurvival / 100D * (double) BlockProperties.getBreakingDuration(id, player)));
     	// fastBreakfirstDamage is the first interact on block (!).
         final long elapsedTime;
         // TODO: Should it be breakingTime instead of 0 for inconsistencies?
