@@ -67,6 +67,9 @@ public class TickTask implements Runnable {
 	/** Tick durations summed up in packs of n (nxn time covered) */
 	private static final long[] tickDurationsSq = new long[lagMaxTicks];
 	
+	/** Maximally covered time on ms for lag tracking, roughly. */
+	private static final long lagMaxCoveredMs = 50L * (1L + lagMaxTicks * (1L + lagMaxTicks));
+	
 	/** Lag spike durations (min) to keep track of. */
 	private static long[] spikeDurations = new long[]{150, 450, 1000, 5000};
 	
@@ -223,7 +226,7 @@ public class TickTask implements Runnable {
 	}
 	
 	/**
-	 * Get lag percentage for the last ms milliseconds.<br>
+	 * Get lag percentage for the last ms milliseconds, if the specified ms is bigger than the maximally covered duration, the percentage will refer to the maximally covered duration, not the given ms.<br>
 	 * NOTE: Using "exact = true" is meant for checks in the main thread. If called from another thread, exact should be set to false.
 	 * @param ms Past milliseconds to cover. A longer period of time may be used, up to two times if ms > lagMaxTicks * 50.
 	 * @param exact If to include the currently running tick, if possible. Should only be set to true, if called from the main thread (or while the main thread is blocked).
@@ -233,6 +236,9 @@ public class TickTask implements Runnable {
 		if (ms < 0){
 			// Account for freezing (i.e. check timeLast, might be an extra method)!
 			return getLag(0, exact);
+		}
+		else if (ms > lagMaxCoveredMs){
+			return getLag(lagMaxCoveredMs, exact);
 		}
 		final int tick = TickTask.tick;
 		if (tick == 0) return 1f;
