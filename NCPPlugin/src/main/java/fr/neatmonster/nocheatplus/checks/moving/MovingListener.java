@@ -367,7 +367,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()){
-			System.out.println("VEHICLE ");
 			// Workaround for pigs !
 			final Entity vehicle = player.getVehicle();
 			if (vehicle != null && (vehicle instanceof Pig)){
@@ -375,7 +374,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 			return;
 		}
-		System.out.println("NORMAL");
 		// Ignore dead players.
 		if (player.isDead()) return;
 		
