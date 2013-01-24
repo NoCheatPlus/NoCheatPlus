@@ -157,8 +157,11 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	public void setupBlockProperties() {
 		// TODO Set some generic properties matching what BlockCache.getShape returns.
 		for (Material mat : Material.values()){
+			if (!mat.isBlock()) continue;
+			int id = mat.getId();
+			if (id < 0 || id >= 4096) continue;
 			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()){
-				BlockProperties.setBlockFlags(mat.getId(), BlockProperties.getBLockFlags(mat.getId()) | BlockProperties.F_IGN_PASSABLE);
+				BlockProperties.setBlockFlags(id, BlockProperties.getBLockFlags(id) | BlockProperties.F_IGN_PASSABLE);
 			}
 		}
 	}
