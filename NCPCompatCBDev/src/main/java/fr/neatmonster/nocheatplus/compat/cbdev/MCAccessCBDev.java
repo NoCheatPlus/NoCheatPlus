@@ -20,6 +20,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class MCAccessCBDev implements MCAccess{
 	
@@ -28,6 +29,7 @@ public class MCAccessCBDev implements MCAccess{
 	 */
 	public MCAccessCBDev(){
 		getCommandMap();
+		ReflectionUtil.checkMembers("net.minecraft.server.v1_4_R1.", new String[]{"Entity" , "dead"});
 	}
 
 	@Override

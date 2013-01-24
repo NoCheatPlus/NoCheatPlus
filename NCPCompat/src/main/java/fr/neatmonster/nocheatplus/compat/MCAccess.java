@@ -32,6 +32,10 @@ public interface MCAccess {
 	 */
 	public String getServerVersionTag();
 	
+	/**
+	 * Get the servers command map.
+	 * @return MAy rturn null if not supported.
+	 */
 	public CommandMap getCommandMap();
 	
 	/**
