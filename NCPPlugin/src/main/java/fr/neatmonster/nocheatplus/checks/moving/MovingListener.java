@@ -367,6 +367,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()){
+			System.out.println("VEHICLE ");
 			// Workaround for pigs !
 			final Entity vehicle = player.getVehicle();
 			if (vehicle != null && (vehicle instanceof Pig)){
@@ -374,7 +375,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 			return;
 		}
-		
+		System.out.println("NORMAL");
 		// Ignore dead players.
 		if (player.isDead()) return;
 		
@@ -945,9 +946,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         else{
         	// Minecraft/NCP bug or cheating.
-        	// Cancel the event, apply damage later.
-        	event.setCancelled(true);
-        	// TODO: Add player to hover checks ?.
+        	// (Do not cancel the event, otherwise: "moved too quickly exploit".)
+        	if (cc.noFallViolationReset){
+        		data.clearNoFallData();
+        	}
+        	// Add player to hover checks.
+        	if (cc.sfHoverCheck && data.sfHoverTicks < 0){
+        		data.sfHoverTicks = 0;
+        		hoverTicks.add(player.getName());
+        	}
         }
         // Entity fall-distance should be reset elsewhere.
     }

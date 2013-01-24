@@ -79,7 +79,11 @@ public class MovingConfig extends ACheckConfig {
     public final ActionList morePacketsVehicleActions;
 
     public final boolean    noFallCheck;
+    /** Deal damage instead of Minecraft, whenever a player is judged to be on ground. */
     public final boolean    noFallDealDamage;
+    /** Reset data on violation, i.e. a player taking fall damage without being on ground. */
+	public final boolean    noFallViolationReset;
+	/** Reset data on tp. */
 	public final boolean 	noFallTpReset;
     public final ActionList noFallActions;
     
@@ -136,6 +140,7 @@ public class MovingConfig extends ACheckConfig {
 
         noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
         noFallDealDamage = data.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
+        noFallViolationReset = data.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVL);
         noFallTpReset = data.getBoolean(ConfPaths.MOVING_NOFALL_RESETONTP);
         noFallActions = data.getOptimizedActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
         
