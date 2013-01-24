@@ -770,7 +770,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				data.clearFlyData();
 				data.resetPositions(to);
 				data.setSetBack(to);
-				// TODO: make this configurable.
+				// TODO: How to account for plugins that reset the fall distance here?
 				if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0){
 					// Reset fall distance if set so in the config.
 					if (!MovingConfig.getConfig(player).noFallTpReset){
