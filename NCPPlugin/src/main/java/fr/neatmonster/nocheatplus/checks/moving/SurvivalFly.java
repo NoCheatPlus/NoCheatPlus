@@ -510,7 +510,8 @@ public class SurvivalFly extends Check {
 				data.sfLastYDist = Double.MAX_VALUE;
 				data.toWasReset = false;
 				data.fromWasReset = false;
-				player.teleport(data.getSetBack(loc));
+				data.setTeleported(data.getSetBack(loc));
+				player.teleport(data.getTeleported());
 			}
 			else{
 				// Solve by extra actions ? Special case (probably never happens)?
