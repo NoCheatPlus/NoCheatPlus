@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -244,6 +245,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	private boolean manageListeners = true;
 	
 	protected final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
+	
+	/** All registered components.  */
+	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
 
 	protected Metrics metrics = null;
 	
@@ -252,6 +256,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	 */
 	@Override
 	public void addComponent(final Object obj) {
+		allComponents.add(obj);
 		if (obj instanceof Listener) {
 			addListener((Listener) obj);
 		}
@@ -363,6 +368,22 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop all remaining tasks...");
         getServer().getScheduler().cancelTasks(this);
 
+        // Exemptions cleanup.
+        NCPExemptionManager.clear();
+        
+		// Data cleanup.
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup DataManager...");
+		dataMan.onDisable();
+		
+		// Hooks:
+		// (Expect external plugins to unregister their hooks on their own.)
+		// (No native hooks present, yet.)
+     	
+		// Unregister all added components explicitly.
+        for (Object obj : allComponents){
+        	removeComponent(obj);
+        }
+        
         if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup some mappings...");
         // Remove listeners.
         listeners.clear();
@@ -370,17 +391,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         notifyReload.clear();
         // World specific permissions.
 		permStateReceivers.clear();
-
-		// Data cleanup.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup DataManager...");
-		dataMan.onDisable();
-		
-		// Exemptions cleanup.
-		NCPExemptionManager.clear();
-		
-		// Hooks:
-		// (Expect external plugins to unregister their hooks on their own.)
-		// (No native hooks present, yet.)
 
 		// Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
 		if (changedCommands != null){
