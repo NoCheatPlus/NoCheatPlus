@@ -93,6 +93,7 @@ public class GodMode extends Check {
      *            the player
      */
     public void death(final Player player) {
+    	// TODO: Is this still relevant ?
         // First check if the player is really dead (e.g. another plugin could have just fired an artificial event).
         if (player.getHealth() <= 0 && player.isDead())
             try {

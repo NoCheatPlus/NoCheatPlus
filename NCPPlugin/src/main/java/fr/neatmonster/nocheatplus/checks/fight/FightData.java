@@ -79,7 +79,7 @@ public class FightData extends ACheckData {
     public double                  reachVL;
     public double                  speedVL;
     
-    public long                    damageTakenTick;
+    public long                    damageTakenByEntityTick;
     
     // Shared
     

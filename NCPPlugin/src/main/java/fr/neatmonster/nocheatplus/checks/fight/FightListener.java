@@ -92,6 +92,9 @@ public class FightListener extends CheckListener {
         // Check for self hit exploits (mind that projectiles should be excluded)
         if (damaged instanceof Player){
         	final Player damagedPlayer = (Player) damaged;
+        	if (cc.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        		damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
+        	}
         	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc))
         		cancelled = true;
         }
@@ -99,7 +102,7 @@ public class FightListener extends CheckListener {
         if (cc.cancelDead){
         	if (damaged.isDead()) cancelled = true;
         	// Only allow damaging others if taken damage this tick.
-            if (player.isDead() && data.damageTakenTick != TickTask.getTick()){
+            if (player.isDead() && data.damageTakenByEntityTick != TickTask.getTick()){
             	cancelled = true;
             }
         }
@@ -173,13 +176,22 @@ public class FightListener extends CheckListener {
          * |_____|_| |_|\__|_|\__|\__, | |____/ \__,_|_| |_| |_|\__,_|\__, |\___|
          *                        |___/                               |___/      
          */
-        // Filter some unwanted events right now.
+    	
+    	final Entity damaged = event.getEntity();
+    	final boolean damagedIsPlayer = damaged instanceof Player;
+    	final boolean damagedIsDead = damaged.isDead();
+    	if (damagedIsPlayer && !damagedIsDead) {
+            final Player player = (Player) event.getEntity();
+            if (godMode.isEnabled(player) && godMode.check(player))
+                // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
+                player.setNoDamageTicks(0);
+        }
+    	// Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-            final Entity damaged = e.getEntity();
-        	if (damaged instanceof Player){
+        	if (damagedIsPlayer && !damagedIsDead){
         	    // TODO: check once more when to set this (!) in terms of order.
-        		FightData.getData((Player) damaged).damageTakenTick = TickTask.getTick();
+        		FightData.getData((Player) damaged).damageTakenByEntityTick = TickTask.getTick();
         	}
         	final Entity damager = e.getDamager();
             if (damager instanceof Player){
@@ -188,32 +200,6 @@ public class FightListener extends CheckListener {
                 	if (handleNormalDamage(player, damaged)) e.setCancelled(true);
                 }
             }
-        }
-    }
-
-    /**
-     * We listen to EntityDamage events (again) for obvious reasons.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOW)
-    public void onEntityDamage_(final EntityDamageEvent event) {
-        /*
-         *  _____       _   _ _           ____                                   
-         * | ____|_ __ | |_(_) |_ _   _  |  _ \  __ _ _ __ ___   __ _  __ _  ___ 
-         * |  _| | '_ \| __| | __| | | | | | | |/ _` | '_ ` _ \ / _` |/ _` |/ _ \
-         * | |___| | | | |_| | |_| |_| | | |_| | (_| | | | | | | (_| | (_| |  __/
-         * |_____|_| |_|\__|_|\__|\__, | |____/ \__,_|_| |_| |_|\__,_|\__, |\___|
-         *                        |___/                               |___/      
-         */
-        // Filter unwanted events right here.
-        if (event.getEntity() instanceof Player && !event.getEntity().isDead()) {
-            final Player player = (Player) event.getEntity();
-            if (godMode.isEnabled(player) && godMode.check(player))
-                // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
-                player.setNoDamageTicks(0);
         }
     }
 

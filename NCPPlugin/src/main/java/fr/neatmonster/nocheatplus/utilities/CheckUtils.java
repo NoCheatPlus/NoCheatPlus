@@ -7,6 +7,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.Vector;
 
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
@@ -237,6 +238,9 @@ public class CheckUtils {
 		if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation()) < 1.0){
 			// Somewhat check against tp showing something wrong (< 1.0).
 			vehicle.setPassenger(player);
+		}
+		if (MovingConfig.getConfig(player).debug){
+			System.out.println(player.getName() + " vehicle set back: " + location);
 		}
 	}
 }
