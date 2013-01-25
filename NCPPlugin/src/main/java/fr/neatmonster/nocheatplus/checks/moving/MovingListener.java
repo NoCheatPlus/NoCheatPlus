@@ -874,7 +874,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         // Did one of the checks decide we need a new "to"-location?
-        if (newTo != null && data.morePacketsVehicleTaskId != -1){
+        if (newTo != null && data.morePacketsVehicleTaskId == -1){
             // Schedule a delayed task to teleport back the vehicle with the player.
         	// (Only schedule if not already scheduled.)
         	data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
