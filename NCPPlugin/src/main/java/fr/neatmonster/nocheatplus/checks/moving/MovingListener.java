@@ -863,34 +863,44 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Player player = (Player) passenger;
 
         Location newTo = null;
-
-        if (morePacketsVehicle.isEnabled(player))
+        final MovingData data = MovingData.getData(player);
+        if (morePacketsVehicle.isEnabled(player)){
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = morePacketsVehicle.check(player, from, to);
-        else
+        }
+        else{
             // Otherwise we need to clear his data.
-            MovingData.getData(player).clearMorePacketsData();
+            data.clearMorePacketsData();
+        }
 
         // Did one of the checks decide we need a new "to"-location?
-        if (newTo != null)
-            // Yes, so schedule a delayed task to teleport back the vehicle (this event isn't cancellable and we can't
-            // teleport the vehicle within the event).
-        	// TODO: cleanup?
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        if (newTo != null && data.morePacketsVehicleTaskId != -1){
+            // Schedule a delayed task to teleport back the vehicle with the player.
+        	// (Only schedule if not already scheduled.)
+        	data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                 private Vehicle  vehicle;
+                private Player player;
                 private Location location;
 
                 @Override
                 public void run() {
-                    vehicle.teleport(location, TeleportCause.PLUGIN);
+                	data.morePacketsVehicleTaskId = -1;
+                    try{
+                    	CheckUtils.teleport(vehicle, player, location);
+                    }
+                    catch(Throwable t){
+                    	LogUtil.logSevere(t);
+                    }
                 }
 
-                public Runnable set(final Vehicle vehicle, final Location location) {
+                public Runnable set(final Vehicle vehicle, final Player player, final Location location) {
                     this.vehicle = vehicle;
+                    this.player = player;
                     this.location = location;
                     return this;
                 }
-            }.set(vehicle, newTo), 1L);
+            }.set(vehicle, player, newTo), 1L);
+        }
     }
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)

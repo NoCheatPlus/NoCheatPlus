@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -70,10 +71,16 @@ public class MorePacketsVehicle extends Check {
         if (!data.hasMorePacketsVehicleSetBack()){
         	// TODO: Check if other set-back is appropriate or if to set on other events.
         	data.setMorePacketsVehicleSetBack(from);
+        	if (data.morePacketsVehicleTaskId != -1) Bukkit.getScheduler().cancelTask(data.morePacketsVehicleTaskId);
         }
 
         // Take a packet from the buffer.
         data.morePacketsVehicleBuffer--;
+        
+        if (data.morePacketsVehicleTaskId != -1){
+        	// Short version !
+        	return data.getMorePacketsVehicleSetBack();
+        }
 
         // Player used up buffer, he fails the check.
         if (data.morePacketsVehicleBuffer < 0) {

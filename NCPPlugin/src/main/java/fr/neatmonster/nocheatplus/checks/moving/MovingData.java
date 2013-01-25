@@ -105,6 +105,9 @@ public class MovingData extends ACheckData {
     public long           morePacketsVehicleLastTime;
     public int            morePacketsVehiclePackets;
     private Location      morePacketsVehicleSetback;
+    /** Task id of the morepackets set-back task. */ 
+	public int			  morePacketsVehicleTaskId = -1;
+
 
     // Data of the no fall check.
     public float          noFallFallDistance;
@@ -144,7 +147,7 @@ public class MovingData extends ACheckData {
     // Locations shared between all checks.
     private Location    setBack;
     private Location    teleported;
-
+    
 	/**
 	 * Clear the data of the fly checks (not more-packets).
 	 */
