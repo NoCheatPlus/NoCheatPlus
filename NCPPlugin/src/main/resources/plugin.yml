@@ -15,7 +15,8 @@ commands:
         # permissions: nocheatplus.admin.(...)
         usage: |
                Administrative commands overview:
-               /<command> reload: reload NoCheatPlus configuration
+               /<command> version: Show version information.
+               /<command> reload: reload the configuration
                /<command> lag: Lag related info [expect changes] 
                /<command> info (player): Display the violations of a player
                /<command> removeplayer (player) [(check type)]: Remove data
@@ -61,6 +62,8 @@ permissions:
                         description: Allow use of the ncp tempkick command.
                     nocheatplus.admin.unkick:
                         description: Allow use of the ncp unkick command.
+                    nocheatplus.admin.version:
+                        description: Allow use of the ncp version command.
                     nocheatplus.admin.removeplayer:
                         description: Allow use of the ncp removeplayer command.
                     nocheatplus.admin.commands:

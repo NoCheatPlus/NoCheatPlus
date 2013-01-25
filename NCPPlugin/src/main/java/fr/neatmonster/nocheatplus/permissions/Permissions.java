@@ -43,6 +43,7 @@ public class Permissions {
     public static final String  ADMINISTRATION_TELL          = ADMINISTRATION + ".tell";
     public static final String  ADMINISTRATION_TEMPKICK      = ADMINISTRATION + ".tempkick";
 	public static final String  ADMINISTRATION_UNKICK        = ADMINISTRATION + ".unkick";
+	public static final String ADMINISTRATION_VERSION		 = ADMINISTRATION + ".version";
 	
     // Debug permission, for player spam (not in plugin.yml, currently).
 	public static final String  ADMINISTRATION_DEBUG         = ADMINISTRATION + ".debug";

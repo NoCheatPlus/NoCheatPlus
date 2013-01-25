@@ -30,6 +30,7 @@ import fr.neatmonster.nocheatplus.command.admin.ExemptCommand;
 import fr.neatmonster.nocheatplus.command.admin.ExemptionsCommand;
 import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
 import fr.neatmonster.nocheatplus.command.admin.LagCommand;
+import fr.neatmonster.nocheatplus.command.admin.NCPVersionCommand;
 import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
 import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
 import fr.neatmonster.nocheatplus.command.admin.UnexemptCommand;
@@ -110,6 +111,7 @@ public class CommandHandler implements TabExecutor {
         		new KickCommand(plugin),
         		new KickListCommand(plugin),
         		new LagCommand(plugin),
+        		new NCPVersionCommand(plugin),
         		new ReloadCommand(plugin, notifyReload),
         		new RemovePlayerCommand(plugin),
         		new TellCommand(plugin),
