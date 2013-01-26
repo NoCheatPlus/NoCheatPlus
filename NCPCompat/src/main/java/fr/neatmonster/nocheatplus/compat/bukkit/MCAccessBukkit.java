@@ -93,7 +93,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	@Override
 	public double getWidth(final Entity entity) {
 		// TODO
-		return 0.6;
+		return 0.6f;
 	}
 
 	@Override
