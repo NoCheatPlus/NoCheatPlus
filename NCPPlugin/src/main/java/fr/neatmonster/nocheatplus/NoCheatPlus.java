@@ -325,6 +325,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			notifyReload.remove(obj);
 		}
 		dataMan.removeComponent(obj);
+		allComponents.remove(obj);
 	}
     
     /* (non-Javadoc)
@@ -345,7 +346,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Remove listener references.
     	if (verbose){
     		if (listenerManager.hasListenerMethods()) LogUtil.logInfo("[NoCheatPlus] Cleanup ListenerManager...");
-    		else LogUtil.logInfo("[NoCheatPlus] (ListenerManager empty...)");
+    		else LogUtil.logInfo("[NoCheatPlus] (ListenerManager not in use, prevent registering...)");
     	}
 		listenerManager.setRegisterDirectly(false);
 		listenerManager.clear();
@@ -369,6 +370,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         getServer().getScheduler().cancelTasks(this);
 
         // Exemptions cleanup.
+        if (verbose) LogUtil.logInfo("[NoCheatPlus] Reset ExemptionManager...");
         NCPExemptionManager.clear();
         
 		// Data cleanup.
@@ -380,7 +382,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// (No native hooks present, yet.)
      	
 		// Unregister all added components explicitly.
-        for (Object obj : allComponents){
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] Unregister all registered components...");
+        for (Object obj : new ArrayList<Object>(allComponents)){
         	removeComponent(obj);
         }
         
