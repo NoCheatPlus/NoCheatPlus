@@ -84,6 +84,11 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType{
 
+	/**
+	 * Coupling from and to PlayerLocation objects with a block cache for easy storage and reuse.
+	 * @author mc_dev
+	 *
+	 */
 	private static final class MoveInfo{
 		public final BlockCache cache;
         public final PlayerLocation from;
@@ -117,6 +122,76 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             cache.cleanup();
         }
     }
+	
+	/**
+	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
+	 * NOTE: This is not the original amplifier value (use mcAccess for that).
+	 * @param mcPlayer
+	 * @return
+	 */
+	public static final double getJumpAmplifier(final Player player) {
+		final double amplifier = NoCheatPlus.getMCAccess().getJumpAmplifier(player);
+		if (amplifier == Double.MIN_VALUE) return 0D;
+		else return 1D + amplifier;
+	}
+	
+	/**
+	 * Heavier check, but convenient for seldom events (not for use in the player-move check).
+	 * @param player
+	 * @param data
+	 * @param cc
+	 * @return
+	 */
+	public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc){
+		if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)) return false;
+		else if (!cc.survivalFlyCheck || NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) || player.hasPermission(Permissions.MOVING_SURVIVALFLY)) return false;
+		else if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight())){
+			return true;
+		}
+		else return false;
+	}
+	
+	/**
+	 * Handle an illegal move by a player, attempt to restore a valid location.
+	 * @param event
+	 * @param player
+	 * @param data
+	 */
+	public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, final MovingData data)
+	{
+		// This might get extended to a check-like thing.
+		boolean restored = false;
+		final PlayerLocation pLoc = new PlayerLocation(NoCheatPlus.getMCAccess(), null);
+		// (Mind that we don't set the block cache here).
+		final Location loc = player.getLocation();
+		if (!restored && data.hasSetBack()) {
+			final Location setBack = data.getSetBack(loc); 
+			pLoc.set(setBack, player);
+			if (!pLoc.isIllegal()){
+				event.setFrom(setBack);
+				event.setTo(setBack);
+				restored = true;
+			}
+			else data.resetSetBack();
+		} 
+		if (!restored){
+			pLoc.set(loc, player);
+			if (!pLoc.isIllegal()) {
+				event.setFrom(loc);
+				event.setTo(loc);
+				restored = true;
+			}
+		}
+		pLoc.cleanup();
+		if (!restored){
+			 // TODO: correct the location ?
+			NoCheatPlus.denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
+			LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
+		}
+		// TODO: reset the bounding box of the player ?
+		CheckUtils.onIllegalMove(player);
+	}
+	
 
     /** The instance of NoCheatPlus. */
     private final NoCheatPlus        plugin             = (NoCheatPlus) Bukkit.getPluginManager().getPlugin(
@@ -540,42 +615,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
     }
-
-
-	public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, final MovingData data)
-	{
-		// This might get extended to a check-like thing.
-		boolean restored = false;
-		final PlayerLocation pLoc = new PlayerLocation(NoCheatPlus.getMCAccess(), null);
-		// (Mind that we don't set the block cache here).
-		final Location loc = player.getLocation();
-		if (!restored && data.hasSetBack()) {
-			final Location setBack = data.getSetBack(loc); 
-			pLoc.set(setBack, player);
-			if (!pLoc.isIllegal()){
-				event.setFrom(setBack);
-				event.setTo(setBack);
-				restored = true;
-			}
-			else data.resetSetBack();
-		} 
-		if (!restored){
-			pLoc.set(loc, player);
-			if (!pLoc.isIllegal()) {
-				event.setFrom(loc);
-				event.setTo(loc);
-				restored = true;
-			}
-		}
-		pLoc.cleanup();
-		if (!restored){
-			 // TODO: correct the location ?
-			NoCheatPlus.denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
-			LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
-		}
-		// TODO: reset the bounding box of the player ?
-		CheckUtils.onIllegalMove(player);
-	}
 
 //	/**
 //     * A workaround for cancelled PlayerMoveEvents.
@@ -1008,34 +1047,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void onPlayerKick(final PlayerKickEvent event){
         onLeave(event.getPlayer());
     }
-
-	/**
-	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
-	 * NOTE: This is not the original amplifier value (use mcAccess for that).
-	 * @param mcPlayer
-	 * @return
-	 */
-	public static final double getJumpAmplifier(final Player player) {
-		final double amplifier = NoCheatPlus.getMCAccess().getJumpAmplifier(player);
-		if (amplifier == Double.MIN_VALUE) return 0D;
-		else return 1D + amplifier;
-	}
-	
-	/**
-	 * Heavier check, but convenient for seldom events (not for use in the player-move check).
-	 * @param player
-	 * @param data
-	 * @param cc
-	 * @return
-	 */
-	public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc){
-		if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)) return false;
-		else if (!cc.survivalFlyCheck || NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) || player.hasPermission(Permissions.MOVING_SURVIVALFLY)) return false;
-		else if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight())){
-			return true;
-		}
-		else return false;
-	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerToggleSneak(final PlayerToggleSneakEvent event){
