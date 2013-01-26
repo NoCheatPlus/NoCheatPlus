@@ -36,6 +36,8 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
@@ -1042,6 +1044,39 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         noFall.onLeave(player);
         
 	}
+    
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onVehicleExit(final VehicleExitEvent event){
+    	final Entity entity = event.getExited();
+    	if (!(entity instanceof Player)) return;
+    	onPlayerVehicleLeave((Player) entity);
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onVehicleDestroy(final VehicleDestroyEvent event){
+    	final Entity entity = event.getVehicle().getPassenger();
+    	if (!(entity instanceof Player)) return;
+    	onPlayerVehicleLeave((Player) entity);
+    }
+    
+    private final void onPlayerVehicleLeave(final Player player){
+    	final MovingData data = MovingData.getData(player);
+//    	if (data.morePacketsVehicleTaskId != -1){
+//    		// Await set-back.
+//    		// TODO: might still set ordinary set-backs ?
+//    		return;
+//    	}
+    	// Reset survivalfly set-back to prevent the worst damage.
+    	final Location loc = player.getLocation();
+    	if (BlockProperties.isLiquid(loc.getBlock().getTypeId())){
+    		loc.setY(Location.locToBlock(loc.getY()) + 1.25);
+    	}
+    	data.resetPositions(loc);
+    	data.setSetBack(loc);
+    	// Experiment: add some horizontal velocity (fake).
+    	data.horizontalVelocityCounter = 4;
+    	data.horizontalFreedom = 0.6;
+    }
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerKick(final PlayerKickEvent event){
