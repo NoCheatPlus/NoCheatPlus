@@ -1,7 +1,7 @@
 package fr.neatmonster.nocheatplus.components;
 
 /**
- * Can be registered with the TickTask.
+ * Can be registered with the TickTask. Ensure that registered objects get unregistered before the plugin gets enabled again. You can ensure it by using NoCheatPlusAPI to register a TickListener. 
  * @author mc_dev
  *
  */

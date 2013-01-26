@@ -46,6 +46,9 @@ import fr.neatmonster.nocheatplus.hooks.APIUtils;
  * Originally intended as temporary or intermediate design, this might help reorganizing the API at some point.<br>
  * However i could not yet find a pleasing way for generic configuration access for a centralized data management (all in one),
  * so this might just be a workarounds class for coping with the current design, until somehow resolved in another way.
+ * <hr>
+ * ComponentRegistry:
+ * <li>Supported: IRemoveData</li>
  * @author mc_dev
  *
  */
