@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.server.v1_4_R1.AxisAlignedBB;
+import net.minecraft.server.v1_4_R1.EntityBoat;
+import net.minecraft.server.v1_4_R1.EntityMinecart;
 import net.minecraft.server.v1_4_R1.IBlockAccess;
 import net.minecraft.server.v1_4_R1.Material;
 import net.minecraft.server.v1_4_R1.TileEntity;
@@ -13,7 +15,6 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_4_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_4_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
@@ -70,8 +71,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 			Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
 				final net.minecraft.server.v1_4_R1.Entity other = (net.minecraft.server.v1_4_R1.Entity) iterator.next();
-				final EntityType type = other.getBukkitEntity().getType();
-				if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
+				if (!(other instanceof EntityBoat) && !(other instanceof EntityMinecart)) continue;
 				final AxisAlignedBB otherBox = other.boundingBox;
 				if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
 				else {
