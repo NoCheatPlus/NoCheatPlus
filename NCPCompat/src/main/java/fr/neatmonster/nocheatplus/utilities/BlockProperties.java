@@ -724,7 +724,7 @@ public class BlockProperties {
 		// Specialties:
 		if (toolProps.toolType == ToolType.SHEARS){
 			// (Note: shears are not in the block props, anywhere)
-			// Treat these extra (party experimental):
+			// Treat these extra (partly experimental):
 			if (blockId == Material.WEB.getId()){
 				duration = 400;
 				isValidTool = true;
@@ -743,6 +743,11 @@ public class BlockProperties {
 			}
 		}
 		// (sword vs web already counted)
+		else if (blockId == Material.VINE.getId() && toolProps.toolType == ToolType.AXE){
+			isValidTool = true;
+			if (toolProps.materialBase == MaterialBase.WOOD || toolProps.materialBase == MaterialBase.STONE) duration = 100;
+			else duration = 0;
+		}
 		
 		if (isValidTool || blockProps.tool.toolType == ToolType.NONE){
 		    float mult = 1f;
