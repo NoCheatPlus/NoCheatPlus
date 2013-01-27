@@ -266,8 +266,8 @@ public class TickTask implements Runnable {
 				sum += passed;
 			}
 		}
-		
-		return (float) sum / (float) covered;
+		// TODO: Investigate on < 1f.
+		return Math.max(1f, (float) sum / (float) covered);
 	}
 	
 	/**
