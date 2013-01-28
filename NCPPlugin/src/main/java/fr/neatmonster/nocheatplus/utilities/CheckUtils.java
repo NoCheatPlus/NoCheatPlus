@@ -67,8 +67,7 @@ public class CheckUtils {
 	}
 
 	/**
-	 * Calculate the distance between two location, because for Bukkit distance
-	 * is the distance squared and distanceSquared is the distance non-squared.
+	 * Distance of two locations. This is obsolete, since it has been fixed. To ignore world checks it might be "useful".
 	 * 
 	 * @param location1
 	 *            the location1
@@ -76,9 +75,26 @@ public class CheckUtils {
 	 *            the location2
 	 * @return the double
 	 */
-	public static double distance(final Location location1, final Location location2)
+	public static final double distance(final Location location1, final Location location2)
 	{
-		return Math.sqrt(Math.pow(location2.getX() - location1.getX(), 2) + Math.pow(location2.getY() - location1.getY(), 2) + Math.pow(location2.getZ() - location1.getZ(), 2));
+		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	/**
+	 * Distance.
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 * @param x2
+	 * @param y2
+	 * @param z2
+	 * @return
+	 */
+	public static final double distance(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
+		final double dx = Math.abs(x1 - x2);
+		final double dy = Math.abs(y1 - y2);
+		final double dz = Math.abs(z1 - z2);
+		return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
 
 	/**
