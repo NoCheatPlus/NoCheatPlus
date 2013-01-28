@@ -138,6 +138,8 @@ public class CombinedConfig extends ACheckConfig {
 			return improbableCheck;
 		case COMBINED_BEDLEAVE:
 			return bedLeaveCheck;
+		case COMBINED_MUNCHHAUSEN:
+			return munchHausenCheck;
 		}
 		return false;
 	}
