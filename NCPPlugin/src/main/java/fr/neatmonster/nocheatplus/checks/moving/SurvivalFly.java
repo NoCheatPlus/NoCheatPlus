@@ -144,7 +144,7 @@ public class SurvivalFly extends Check {
 		}
 
         // Prevent players from sprinting if they're moving backwards.
-        if (hDistanceAboveLimit <= 0D && sprinting) {
+        if (hDistanceAboveLimit <= 0D && sprinting && data.horizontalFreedom <= 0.001D) {
             final float yaw = from.getYaw();
             if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F || xDistance < 0D && zDistance < 0D
                     && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
