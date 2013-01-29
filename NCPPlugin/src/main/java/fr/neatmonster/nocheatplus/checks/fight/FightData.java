@@ -79,11 +79,14 @@ public class FightData extends ACheckData {
     public double                  reachVL;
     public double                  speedVL;
     
-    public long                    damageTakenByEntityTick;
-    
     // Shared
-    
-    public String lastWorld = "";
+    public String lastWorld			= "";
+    public int lastAttackTick		= 0;
+    public double lastAttackedX		= Integer.MAX_VALUE;
+    public double lastAttackedY;
+    public double lastAttackedZ;
+//    public double lastAttackedDist = 0.0;
+    public long damageTakenByEntityTick;
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
@@ -91,10 +94,18 @@ public class FightData extends ACheckData {
     // Data of the direction check.
     public long                    directionLastViolationTime;
 
-    // Data of the god mode check.
+    // Old god mode check.
     public int                     godModeBuffer;
     public int                     godModeLastAge;
     public long                    godModeLastTime;
+    
+    // New god mode check [in progress].
+	public int					   godModeHealthDecreaseTick 	= 0;
+	public int                     godModeHealth       			= 0;
+    public int                     lastDamageTick 				= 0;
+    public int                     lastNoDamageTicks 			= 0;
+    /** Accumulator. */
+	public int					   godModeAcc 					= 0;
 
     // Data of the knockback check.
     public long                    knockbackSprintTime;

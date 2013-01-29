@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,6 +9,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +20,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -88,7 +91,35 @@ public class FightListener extends CheckListener {
         boolean cancelled = false;
         
         final String worldName = player.getWorld().getName();
+        final int tick = TickTask.getTick();
+        final long now = System.currentTimeMillis();
+        final boolean worldChanged = !worldName.equals(data.lastWorld);
         
+        final Location loc =  player.getLocation();
+        final Location targetLoc = damaged.getLocation();
+//        final double targetDist = CheckUtils.distance(loc, targetLoc);
+        final double targetMove;
+        final int tickAge;
+        final long msAge; // Milliseconds the ticks actually took.
+        final double normalizedMove; // Blocks per second.
+        // TODO: relative distance (player - target)!
+        if (data.lastAttackedX == Integer.MAX_VALUE || tick < data.lastAttackTick || worldChanged || tick - data.lastAttackTick > 20){
+        	// TODO: 20 ?
+        	tickAge = 0;
+        	targetMove = 0.0;
+        	normalizedMove = 0.0;
+        	msAge = 0;
+        }
+        else{
+        	tickAge = tick - data.lastAttackTick;
+        	targetMove = CheckUtils.distance(data.lastAttackedX, data.lastAttackedY, data.lastAttackedZ, targetLoc.getX(), targetLoc.getY(), targetLoc.getZ());
+        	msAge = (long) (50f * TickTask.getLag(50L * tickAge) * (float) tickAge);
+        	normalizedMove = msAge == 0 ? targetMove : targetMove * 1000.0 / (double) msAge;
+        }
+        // TODO: calculate factor for dists: ticks * 50 * lag
+        
+        // TODO: dist < width => skip some checks (direction, ..)
+    	
         // Check for self hit exploits (mind that projectiles should be excluded)
         if (damaged instanceof Player){
         	final Player damagedPlayer = (Player) damaged;
@@ -107,18 +138,16 @@ public class FightListener extends CheckListener {
             }
         }
         
-        final long now = System.currentTimeMillis();
-        
-        final boolean worldChanged = !worldName.equals(data.lastWorld);
+
 
         // Run through the main checks.
         if (!cancelled && speed.isEnabled(player)){
         	if (speed.check(player, now)){
         		cancelled = true;
         		// Still feed the improbable.
-        		Improbable.feed(player, 1f, now);
+        		Improbable.feed(player, 2f, now);
         	}
-        	else if (Improbable.check(player, 1f, now)){
+        	else if (normalizedMove > 2.0 && Improbable.check(player, 1f, now)){
         		// Feed improbable in case of ok-moves too.
         		// TODO: consider only feeding if attacking with higher average speed (!)
         		cancelled = true;
@@ -128,7 +157,7 @@ public class FightListener extends CheckListener {
 		if (angle.isEnabled(player)) {
 			// The "fast turning" checks are checked in any case because they accumulate data.
 			// Improbable yaw changing.
-			if (Combined.checkYawRate(player, player.getLocation().getYaw(), now, worldName, cc.yawRateCheck)) {
+			if (Combined.checkYawRate(player, loc.getYaw(), now, worldName, cc.yawRateCheck)) {
 				// (Check or just feed).
 				// TODO: Work into this somehow attacking the same aim and/or similar aim position (not cancel then).
 				cancelled = true;
@@ -155,7 +184,14 @@ public class FightListener extends CheckListener {
         if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
             cancelled = true;
         
+        // Set values.
         data.lastWorld = worldName;
+    	data.lastAttackTick = tick;
+    	data.lastAttackedX = targetLoc.getX();
+    	data.lastAttackedY = targetLoc.getY();
+    	data.lastAttackedZ = targetLoc.getZ();
+//    	data.lastAttackedDist = targetDist;
+    	
         return cancelled;
     }
 
@@ -165,8 +201,7 @@ public class FightListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityDamage(final EntityDamageEvent event) {
         /*
          *  _____       _   _ _           ____                                   
@@ -182,9 +217,10 @@ public class FightListener extends CheckListener {
     	final boolean damagedIsDead = damaged.isDead();
     	if (damagedIsPlayer && !damagedIsDead) {
             final Player player = (Player) event.getEntity();
-            if (godMode.isEnabled(player) && godMode.check(player))
+            if (godMode.isEnabled(player) && godMode.check(player)){ // , event.getDamage())){
                 // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
                 player.setNoDamageTicks(0);
+            }
         }
     	// Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
@@ -202,6 +238,20 @@ public class FightListener extends CheckListener {
             }
         }
     }
+    
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onEntityDamageMonitor(final EntityDamageEvent event) {
+    	final Entity damaged = event.getEntity();
+    	if (damaged instanceof Player){
+    		final Player player = (Player) damaged;
+    		final FightData data = FightData.getData(player);
+    		final int ndt = player.getNoDamageTicks();
+    		if (data.lastDamageTick == TickTask.getTick() && data.lastNoDamageTicks != ndt){
+    			// Plugin compatibility thing.
+    			data.lastNoDamageTicks = ndt;
+    		}
+    	}
+    }
 
     /**
      * We listen to death events to prevent a very specific method of doing godmode.
@@ -209,8 +259,7 @@ public class FightListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     protected void onEntityDeathEvent(final EntityDeathEvent event) {
         /*
          *  _____       _   _ _           ____             _   _     
@@ -234,8 +283,7 @@ public class FightListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     protected void onPlayerAnimation(final PlayerAnimationEvent event) {
         /*
          *  ____  _                            _          _                 _   _             
@@ -255,8 +303,7 @@ public class FightListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerToggleSprint(final PlayerToggleSprintEvent event) {
         /*
          *  ____  _                         _____                 _        ____             _       _   
@@ -267,5 +314,15 @@ public class FightListener extends CheckListener {
          *                |___/                       |___/ |___/               |_|                     
          */
         if (event.isSprinting()) FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
+    }
+    
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void onEntityRegainHealth(final EntityRegainHealthEvent event){
+    	final Entity entity = event.getEntity();
+    	if (!(entity instanceof Player)) return;
+    	final Player player = (Player) entity;
+    	final FightData data = FightData.getData(player);
+    	// Set health to maximum.
+    	data.godModeHealth = Math.max(data.godModeHealth, player.getHealth() + event.getAmount());
     }
 }
