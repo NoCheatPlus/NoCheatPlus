@@ -2,8 +2,10 @@ package fr.neatmonster.nocheatplus.checks.combined;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -24,8 +26,8 @@ public class Improbable extends Check {
 	 * @param now
 	 * @return
 	 */
-	public static final boolean check(final Player player, final float weight, final long now){
-		return instance.checkImprobable(player, weight, now);
+	public static final boolean check(final Player player, final float weight, final long now, final String tags){
+		return instance.checkImprobable(player, weight, now, tags);
 	}
 	
 	/**
@@ -47,7 +49,7 @@ public class Improbable extends Check {
 		instance = this;
 	}
 
-	private boolean checkImprobable(final Player player, final float weight, final long now) {
+	private boolean checkImprobable(final Player player, final float weight, final long now, final String tags) {
 		if (!isEnabled(player)) return false;
 		final CombinedData data = CombinedData.getData(player);
 		final CombinedConfig cc = CombinedConfig.getConfig(player);
@@ -74,7 +76,9 @@ public class Improbable extends Check {
 		if (violated){
 			// Execute actions
 			data.improbableVL += violation / 10.0;
-			cancel = executeActions(player, data.improbableVL, violation / 10.0, cc.improbableActions);
+			final ViolationData vd = new ViolationData(this, player, data.improbableVL, violation, cc.improbableActions);
+			if (tags != null && !tags.isEmpty()) vd.setParameter(ParameterName.TAGS, tags);
+			cancel = executeActions(vd);
 		}
 		else
 			data.improbableVL *= 0.95;

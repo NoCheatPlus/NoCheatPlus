@@ -147,7 +147,7 @@ public class FightListener extends CheckListener {
         		// Still feed the improbable.
         		Improbable.feed(player, 2f, now);
         	}
-        	else if (normalizedMove > 2.0 && Improbable.check(player, 1f, now)){
+        	else if (normalizedMove > 2.0 && Improbable.check(player, 1f, now, "fight.speed")){
         		// Feed improbable in case of ok-moves too.
         		// TODO: consider only feeding if attacking with higher average speed (!)
         		cancelled = true;

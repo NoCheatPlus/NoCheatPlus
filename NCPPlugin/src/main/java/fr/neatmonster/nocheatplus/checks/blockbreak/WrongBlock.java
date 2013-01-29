@@ -62,7 +62,7 @@ public class WrongBlock extends Check {
         	if (score > cc.wrongBLockLevel){
             	if (executeActions(player, score, 1D, cc.wrongBlockActions))
             		cancel = true;
-            	if (Improbable.check(player, 2.0f, now))
+            	if (Improbable.check(player, 2.0f, now, "blockbreak.wrongblock"))
             		cancel = true;
         	}
         }

@@ -111,7 +111,7 @@ public class Reach extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.reachVL, violation, cc.reachActions);
-            if (Improbable.check(player, (float) violation, System.currentTimeMillis()))
+            if (Improbable.check(player, (float) violation, System.currentTimeMillis(), "fight.reach"))
                 cancel = true;
             if (cancel)
                 // If we should cancel, remember the current time too.

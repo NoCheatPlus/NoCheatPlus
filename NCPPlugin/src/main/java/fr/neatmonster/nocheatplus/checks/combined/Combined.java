@@ -149,7 +149,7 @@ public class Combined {
 			final float amount = ((total - threshold) / threshold * 1000f);
 			data.timeFreeze = Math.max(data.timeFreeze, now + (long) Math.min(Math.max(cc.yawRatePenaltyFactor * amount ,  cc.yawRatePenaltyMin), cc.yawRatePenaltyMax));
 			// TODO: balance (100 ... 200 ) ?
-			if (cc.yawRateImprobable && Improbable.check(player, amount / 100f, now))
+			if (cc.yawRateImprobable && Improbable.check(player, amount / 100f, now, "combined.yawrate"))
 				cancel = true;
 		}
 		if (now < data.timeFreeze){

@@ -99,7 +99,7 @@ public class InventoryListener  extends CheckListener {
             	    // The check requested the event to be cancelled.
             	    event.setCancelled(true);
             	}
-            	else if (Improbable.check(player, 0.6f, now)){
+            	else if (Improbable.check(player, 0.6f, now, "inventory.instantbow")){
                     // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
                     event.setCancelled(true);
             	}

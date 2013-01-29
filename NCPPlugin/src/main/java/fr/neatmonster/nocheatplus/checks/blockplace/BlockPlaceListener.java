@@ -258,7 +258,7 @@ public class BlockPlaceListener extends CheckListener {
                 // If the check was positive, cancel the event.
                 event.setCancelled(true);
             }
-            else if (Improbable.check(player, 0.6f, now)){
+            else if (Improbable.check(player, 0.6f, now, "blockplace.speed")){
                 // Combined fighting speed.
                 event.setCancelled(true);
             }
