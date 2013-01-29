@@ -1108,6 +1108,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		else info = parkedInfo.remove(parkedInfo.size() - 1);
 		final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
 		for (final String playerName : hoverTicks){
+			// TODO: put players into the set (+- one tick would not matter ?)
+			// TODO: might add an online flag to data !
 			final Player player = server.getPlayerExact(playerName);
 			if (player == null || !player.isOnline()){
 				rem.add(playerName);
