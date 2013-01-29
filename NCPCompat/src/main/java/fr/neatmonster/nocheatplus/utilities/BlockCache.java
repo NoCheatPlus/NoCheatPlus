@@ -21,6 +21,8 @@ public abstract class BlockCache {
     /** Cached shape values. */
     private final CoordMap<double[]> boundsMap = new CoordMap<double[]>();
     
+    private int maxBlockY =  255;
+    
     // TODO: switch to nodes with all details on, store a working node ?
     
     // TODO: maybe make very fast access arrays for the ray tracing checks. 
@@ -127,6 +129,14 @@ public abstract class BlockCache {
 		final double[] nBounds = fetchBounds(x, y, z);
 		boundsMap.put(x, y, z, nBounds);
 		return nBounds;
+	}
+	
+	/**
+	 * Get the maximal y coordinate a block can be at (non air).
+	 * @return
+	 */
+	public int getMaxBlockY(){
+		return maxBlockY;
 	}
     
 }
