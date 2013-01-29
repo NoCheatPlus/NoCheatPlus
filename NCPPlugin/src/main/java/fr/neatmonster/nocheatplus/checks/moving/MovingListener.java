@@ -442,9 +442,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final String playerName = player.getName();
 		processingEvents.put(playerName, event);
 		
+		final MovingData data = MovingData.getData(player);
+		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()){
 			// Workaround for pigs !
+			data.sfHoverTicks = -1;
 			final Entity vehicle = player.getVehicle();
 			if (vehicle != null && (vehicle instanceof Pig)){
 				onVehicleMove(new VehicleMoveEvent((Vehicle) vehicle, event.getFrom(), event.getFrom()));
@@ -452,10 +455,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			return;
 		}
 		// Ignore dead players.
-		if (player.isDead()) return;
+		if (player.isDead()){
+			data.sfHoverTicks = -1;
+			return;
+		}
 		
 		// Ignore sleeping players.
 		if (player.isSleeping()){
+			data.sfHoverTicks = -1;
 			// TODO: check (which cb!) System.out.println("-> " + player.isSleepingIgnored());
 			return;
 		}
@@ -464,7 +471,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final Location to = event.getTo();
 		
 		// Ignore changing worlds.
-		if (!from.getWorld().equals(to.getWorld())) return;
+		if (!from.getWorld().equals(to.getWorld())){
+			// Keep hover ticks.
+			return;
+		}
 
         // Use existent locations if possible.
         final MoveInfo moveInfo;
@@ -488,7 +498,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			System.out.print(builder.toString());
 		}
         
-		final MovingData data = MovingData.getData(player);
 		data.noFallAssumeGround = false;
 		data.resetTeleported();
 		
@@ -1091,6 +1100,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@Override
 	public final void onTick(final int tick, final long timeLast) {
 		// Hover checks !
+		// TODO: Change to ordering such that smallest hover time comes first ?
 		if (hoverTicks.isEmpty()) return; // Seldom or not ?
 		final Server server = Bukkit.getServer();
 		final MoveInfo info;
@@ -1106,24 +1116,44 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			final MovingData data = MovingData.getData(player);
 			if (player.isDead() || player.isSleeping() || player.isInsideVehicle()){
 				data.sfHoverTicks = -1;
+				// (Removed below.)
 			}
 			if (data.sfHoverTicks < 0){
 				rem.add(playerName);
 				continue;
 			}
-			if (checkHover(player, data, info)){
+			final MovingConfig cc = MovingConfig.getConfig(player);
+			// Check if enabled at all.
+			if (!cc.sfHoverCheck){
+				rem.add(playerName);
+				data.sfHoverTicks = -1;
+				continue;
+			}
+			// Increase ticks here.
+			data.sfHoverTicks ++;
+			if (data.sfHoverTicks < cc.sfHoverTicks){
+				// Don't do the heavier checking here, let moving checks reset these.
+				continue;
+			}
+			if (checkHover(player, data, cc, info)){
 				rem.add(playerName);
 			}
 		}
+		info.cleanup(); // Just in case.
 		parkedInfo.add(info);
 		hoverTicks.removeAll(rem);
 		rem.clear();
 	}
 
-	private final boolean checkHover(final Player player, final MovingData data, final MoveInfo info) {
-		final MovingConfig cc = MovingConfig.getConfig(player);
-		// Check if enabled at all.
-		if (!cc.sfHoverCheck) return true;
+	/**
+	 * The heavier checking including on.ground etc., check if enabled/valid to check before this. 
+	 * @param player
+	 * @param data
+	 * @param cc
+	 * @param info
+	 * @return
+	 */
+	private final boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final MoveInfo info) {
 		// Check if player is on ground.
 		final Location loc = player.getLocation();
 		info.set(player, loc, null, cc.yOnGround);
@@ -1132,7 +1162,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			res = true;
 		}
 		else{
-			data.sfHoverTicks ++;
 			if (data.sfHoverTicks > cc.sfHoverTicks){
 				handleHoverViolation(player, loc, cc, data);
 				// Assume the player might still be hovering.
