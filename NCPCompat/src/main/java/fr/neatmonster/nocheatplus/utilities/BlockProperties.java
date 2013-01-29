@@ -271,6 +271,10 @@ public class BlockProperties {
     public static final int F_HEIGHT100     = 0x100;
     /** Climbable like ladder and vine (allow to land on without taking damage). */
     public static final int F_CLIMBABLE     = 0x200;
+    /** The block can change shape. This is most likely not 100% accurate... */
+    public static final int F_VARIABLE		= 0x400;
+//    /** The block has full bounds (0..1), inaccurate! */
+//    public static final int F_FULL   		= 0x800;
     
     /** Penalty factor for block break duration if under water. */
     protected static float breakPenaltyInWater = 4f;
@@ -393,6 +397,14 @@ public class BlockProperties {
 				Material.LADDER,
 		}){
 			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
+		}
+		
+		for (final Material mat : new Material[]{
+				Material.FENCE, Material.FENCE_GATE, Material.COBBLE_WALL,
+				Material.NETHER_FENCE,
+				Material.IRON_FENCE, Material.THIN_GLASS,
+		}){
+			blockFlags[mat.getId()] |= F_VARIABLE;
 		}
 		
 		////////////////////////////////
@@ -1265,10 +1277,12 @@ public class BlockProperties {
      * @return
      */
     public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
+    	final int maxBlockY = access.getMaxBlockY();
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	final int iMinY = Location.locToBlock(minY - 0.5626);
-    	final int iMaxY = Location.locToBlock(maxY);
+    	if (iMinY > maxBlockY) return false;
+    	final int iMaxY = Math.min(Location.locToBlock(maxY), maxBlockY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);
         for (int x = iMinX; x <= iMaxX; x++){
@@ -1278,6 +1292,7 @@ public class BlockProperties {
                     if ((blockFlags[id] & F_GROUND) != 0){
                         // Might collide.
                         if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
+                        	if (y >= maxBlockY) return true;
                             final int aboveId = access.getTypeId(x, y + 1, z);
                             final long flags = blockFlags[aboveId];
                             if ((flags & (F_IGN_PASSABLE)) != 0); // Ignore these.
@@ -1285,7 +1300,36 @@ public class BlockProperties {
                                 // Check against spider type hacks.
                                 if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId)){
                                     // TODO: This might be seen as a violation for many block types.
-                                    continue;
+                                	// TODO: More distinction necessary here.
+                            		if ((blockFlags[id] & F_VARIABLE) != 0 || (blockFlags[aboveId] & F_VARIABLE) != 0){
+                                		// TODO: further exclude simple full shape blocks, or confine to itchy block types
+                                		// TODO: make flags for it.
+                                		// Simplistic hot fix attempt for same type + same shape.
+                                		double[] bounds = access.getBounds(x, y, z);
+                                		if (bounds == null) return true;
+                                		double[] aboveBounds = access.getBounds(x, y + 1, z);
+                                		if (aboveBounds == null) return true;
+                                		boolean fullBounds = false;
+                                		for (int i = 0; i < 3; i++){
+                                			if (bounds[i] != 0.0 || bounds[i + 3] != 1.0){
+                                				fullBounds = false;
+                                				break;
+                                			}
+                                		}
+                                		if (fullBounds){
+                                			// The above block may not have full bounds.
+                                			continue;
+                                		}
+                                		// Allow as ground for differing shapes.
+                                		for (int i = 0; i <  6; i++){
+                                			if (bounds[i] != aboveBounds[i]){
+                                				// Simplistic.
+                                				return true;
+                                			}
+                                		}
+                            		}
+                                	// Not regarded as ground.
+                                	continue;
                                 }
                             }
                             return true;
