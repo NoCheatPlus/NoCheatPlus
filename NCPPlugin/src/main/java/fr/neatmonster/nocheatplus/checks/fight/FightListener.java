@@ -97,7 +97,7 @@ public class FightListener extends CheckListener {
         
         final Location loc =  player.getLocation();
         final Location targetLoc = damaged.getLocation();
-//        final double targetDist = CheckUtils.distance(loc, targetLoc);
+//        final double targetDist = CheckUtils.distance(loc, targetLoc); // TODO: Calculate distance as is done in fight.reach !
         final double targetMove;
         final int tickAge;
         final long msAge; // Milliseconds the ticks actually took.
@@ -112,7 +112,8 @@ public class FightListener extends CheckListener {
         }
         else{
         	tickAge = tick - data.lastAttackTick;
-        	targetMove = CheckUtils.distance(data.lastAttackedX, data.lastAttackedY, data.lastAttackedZ, targetLoc.getX(), targetLoc.getY(), targetLoc.getZ());
+        	// TODO: Maybe use 3d distance if dy(normalized) is too big. 
+        	targetMove = CheckUtils.distance(data.lastAttackedX, data.lastAttackedZ, targetLoc.getX(), targetLoc.getZ());
         	msAge = (long) (50f * TickTask.getLag(50L * tickAge) * (float) tickAge);
         	normalizedMove = msAge == 0 ? targetMove : targetMove * 1000.0 / (double) msAge;
         }
