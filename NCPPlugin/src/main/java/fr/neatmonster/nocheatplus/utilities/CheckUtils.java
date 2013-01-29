@@ -67,7 +67,7 @@ public class CheckUtils {
 	}
 
 	/**
-	 * Distance of two locations. This is obsolete, since it has been fixed. To ignore world checks it might be "useful".
+	 * 3D-distance of two locations. This is obsolete, since it has been fixed. To ignore world checks it might be "useful".
 	 * 
 	 * @param location1
 	 *            the location1
@@ -81,7 +81,7 @@ public class CheckUtils {
 	}
 	
 	/**
-	 * Distance.
+	 * 3D-distance.
 	 * @param x1
 	 * @param y1
 	 * @param z1
@@ -95,6 +95,31 @@ public class CheckUtils {
 		final double dy = Math.abs(y1 - y2);
 		final double dz = Math.abs(z1 - z2);
 		return Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+	
+	/**
+	 * 2D-distance in x-z plane.
+	 * @param location1
+	 * @param location2
+	 * @return
+	 */
+	public static final double xzDistance(final Location location1, final Location location2)
+	{
+		return distance(location1.getX(), location1.getZ(), location2.getX(), location2.getZ());
+	}
+	
+	/**
+	 * 2D-distance.
+	 * @param x1
+	 * @param z1
+	 * @param x2
+	 * @param z2
+	 * @return
+	 */
+	public static final double distance(final double x1, final double z1, final double x2, final double z2) {
+		final double dx = Math.abs(x1 - x2);
+		final double dz = Math.abs(z1 - z2);
+		return Math.sqrt(dx * dx + dz * dz);
 	}
 
 	/**
