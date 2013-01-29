@@ -1281,7 +1281,7 @@ public class BlockProperties {
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	final int iMinY = Location.locToBlock(minY - 0.5626);
-    	if (iMinY > maxBlockY) return false;
+    	if (iMinY > maxBlockY + 1) return false;
     	final int iMaxY = Math.min(Location.locToBlock(maxY), maxBlockY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);
