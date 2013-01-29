@@ -115,7 +115,7 @@ public class FightListener extends CheckListener {
         	// TODO: Maybe use 3d distance if dy(normalized) is too big. 
         	targetMove = CheckUtils.distance(data.lastAttackedX, data.lastAttackedZ, targetLoc.getX(), targetLoc.getZ());
         	msAge = (long) (50f * TickTask.getLag(50L * tickAge) * (float) tickAge);
-        	normalizedMove = msAge == 0 ? targetMove : targetMove * 1000.0 / (double) msAge;
+        	normalizedMove = msAge == 0 ? targetMove : targetMove * Math.max(20.0, 1000.0 / (double) msAge);
         }
         // TODO: calculate factor for dists: ticks * 50 * lag
         
