@@ -250,6 +250,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
 
 	protected Metrics metrics = null;
+
+	private int dataManTaskId = -1;
 	
 	/**
 	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
@@ -350,6 +352,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     	}
 		listenerManager.setRegisterDirectly(false);
 		listenerManager.clear();
+		
+		// Stop data-man task.
+		if (dataManTaskId != -1) getServer().getScheduler().cancelTask(dataManTaskId);
         
         // Stop the tickTask.
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop TickTask...");
@@ -523,7 +528,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Set up the tick task.
         TickTask.start(this);
         
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+        this.dataManTaskId  = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			@Override
 			public void run() {
 				dataMan.checkExpiration();
