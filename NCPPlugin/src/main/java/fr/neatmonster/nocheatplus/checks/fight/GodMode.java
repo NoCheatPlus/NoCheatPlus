@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM'"""""`MM                dP M"""""`'"""`YM                dP          
@@ -83,6 +84,132 @@ public class GodMode extends Check {
         }
 
         return cancel;
+    }
+    
+    /**
+     * New style god mode check. Much more sensitive.
+     * @param player
+     * @param damage
+     * @return
+     */
+    public boolean check(final Player player, final int damage){
+    	final FightData data = FightData.getData(player);
+    	
+    	final int tick = TickTask.getTick();
+    	
+    	final int noDamageTicks = Math.max(0, player.getNoDamageTicks());
+    	final int invulnerabilityTicks = mcAccess.getInvulnerableTicks(player);
+    	
+    	// TODO: cleanup this leugique beume...
+    	
+    	boolean legit = false; // Return, reduce vl.
+    	boolean set = false; // Set tick/ndt and return
+    	boolean resetAcc = false; // Reset acc counter.
+    	boolean resetAll = false; // Reset all and return
+    	
+    	// Check difference to expectation:
+    	final int dTick = tick - data.lastDamageTick;
+    	final int dNDT = data.lastNoDamageTicks - noDamageTicks;
+    	final int delta = dTick - dNDT;
+    	
+    	final int health = player.getHealth();
+    	
+    	if (data.godModeHealth > health ){
+    		data.godModeHealthDecreaseTick = tick;
+    		legit = set = resetAcc = true;
+    	}
+    	
+    	// Invulnerable or inconsistent.
+    	// TODO: might check as well if NCP has taken over invulnerable ticks of this player.
+    	if (invulnerabilityTicks > 0 && noDamageTicks != invulnerabilityTicks || tick < data.lastDamageTick){
+    		// (Second criteria is for MCAccessBukkit.)
+    		legit = set = resetAcc = true;
+    	}
+    	
+    	// Reset accumulator.
+    	if (20 + data.godModeAcc < dTick || dTick > 40){
+    		legit = resetAcc = true;
+    		set = true; // TODO
+    	}
+    	
+    	// Check if reduced more than expected or new/count down fully.
+    	// TODO: Mostly workarounds.
+    	if (delta <= 0  || data.lastNoDamageTicks == 0 || dTick > data.lastNoDamageTicks || damage > player.getLastDamage()){
+    		// Not resetting acc.
+    		legit = set = true;
+    	}
+    	
+    	if (noDamageTicks == 10 || dTick == 1 && noDamageTicks < 19){
+    		set = true;
+    		Bukkit.getServer().broadcastMessage("God " + player.getName() + " GRACE");
+    	}
+
+    	if (delta == 1){
+    		// Ignore these, but keep reference value from before.
+    		legit = true;
+    	}
+    	
+    	Bukkit.getServer().broadcastMessage("God " + player.getName() + " delta=" + delta + " dt=" + dTick + " dndt=" + dNDT + " acc=" + data.godModeAcc + " d=" + damage + " ndt=" + noDamageTicks + " h=" + health + " slag=" + TickTask.getLag(dTick));
+    	
+    	// TODO: might check last damage taken as well (really taken with health change)
+    	
+    	// Resetting
+    	data.godModeHealth = health;
+    	
+    	if (resetAcc || resetAll){
+    		data.godModeAcc = 0;
+    	}
+    	if (legit){
+    		data.godModeVL *= 0.97;
+    	}
+    	if (resetAll){
+    		// Reset all.
+    		data.lastNoDamageTicks = 0;
+    		data.lastDamageTick = 0;
+    		return false;
+    	}
+    	else if (set){
+    		// Only set the tick values.
+    		data.lastNoDamageTicks = noDamageTicks;
+    		data.lastDamageTick = tick;
+    		return false;
+    	}
+    	else if (legit){
+    		// Just return;
+    		return false;
+    	}
+    	
+    	if (tick < data.godModeHealthDecreaseTick){
+    		data.godModeHealthDecreaseTick = 0;
+    	}
+    	else{
+    		final int dht = tick - data.godModeHealthDecreaseTick;
+    		if (dht <= 20) return false; 
+    	}
+    	
+    	// TODO: Check for lagging players with keepalive timestamp.
+    	
+    	// Violation probably.
+    	data.godModeAcc += delta;
+    	
+    	boolean cancel = false;
+    	// TODO: bounds
+    	if (data.godModeAcc > 2){
+    		data.godModeVL += delta;
+    		if (executeActions(player, data.godModeVL, delta, FightConfig.getConfig(player).godModeActions)){
+    			cancel = true;
+    		}
+    		else cancel = false;
+    	}
+    	else{
+    		cancel = false;
+    	}
+    	
+    	// Set tick values.
+    	data.lastNoDamageTicks = noDamageTicks;
+		data.lastDamageTick = tick;
+		
+		return cancel;
     }
 
     /**
