@@ -217,4 +217,55 @@ public class ConfigManager {
     		cfg.set(path, value);
     	}
     }
+    
+    /**
+     * Get the maximally found number for the given config path. This does not throw errors. It will return null, if nothing is found or all lookups failed otherwise.
+     * <br>
+     * Note: What happens with things like NaN is unspecified.
+     * @param path Config path.
+     * @return Value or null.
+     */
+    public static Double getMaxNumberForAllConfigs(final String path){
+    	Number max = null;  
+    	for (final ConfigFile config : worldsMap.values()){
+    		try{
+    			final Object obj = config.get(path);
+    			if (obj instanceof Number){
+    				final Number num = (Number) obj;
+    				if (max == null || num.doubleValue() > max.doubleValue()) max = num; 
+    			}
+    		}
+    		catch (Throwable t){
+    			// Holzhammer
+    		}
+    	}
+    	return max.doubleValue();
+    }
+    
+    /**
+     * Get the minimally found number for the given config path. This does not throw errors. It will return null, if nothing is found or all lookups failed otherwise.
+     * <br>
+     * Note: What happens with things like NaN is unspecified.
+     * @param path Config path.
+     * @return Value or null.
+     */
+    public static Double getMinNumberForAllConfigs(final String path){
+    	Number min = null;  
+    	for (final ConfigFile config : worldsMap.values()){
+    		try{
+    			final Object obj = config.get(path);
+    			if (obj instanceof Number){
+    				final Number num = (Number) obj;
+    				if (min == null || num.doubleValue() < min.doubleValue()) min = num; 
+    			}
+    		}
+    		catch (Throwable t){
+    			// Holzhammer
+    		}
+    	}
+    	return min.doubleValue();
+    }
+    
+    // TODO: consider: filter(Max|Min)NumberForAllConfigs(String path, String filerPath, boolean filterPreset)
+    
 }
