@@ -1465,4 +1465,15 @@ public class BlockProperties {
 	public static void setBreakPenaltyOffGround(float breakPenaltyOffGround) {
 		BlockProperties.breakPenaltyOffGround = breakPenaltyOffGround;
 	}
+
+	/**
+	 * Cleanup. Call init() to re-initialize.
+	 */
+	public static void cleanup() {
+		pLoc.cleanup();
+		pLoc = null;
+		blockCache.cleanup();
+		blockCache = null;
+		// TODO: might empty mappings...
+	}
 }

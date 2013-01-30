@@ -392,6 +392,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         	removeComponent(obj);
         }
         
+        // Cleanup BlockProperties.
+        if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup BlockProperties...");
+        BlockProperties.cleanup();
+        
         if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup some mappings...");
         // Remove listeners.
         listeners.clear();
