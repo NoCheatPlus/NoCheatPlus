@@ -6,7 +6,7 @@ import java.util.Collection;
  * This is to bridge the gap between ConfigFile which needs Action and RawConfigFile which has to be available in NCPCompat. <br>
  * Aim is not speed of execution but providing a way of accessing all configs to set properties from within compatibility modules.
  * <br>
- * This might be seen as a refactoring/structuring stage, leading to putting actions to NCPCompat as well.
+ * This might be seen as a refactoring/structuring stage, leading to putting actions to NCPCompat as well. RawConfigFile might get changed.
  * @author mc_dev
  *
  */

@@ -1,7 +1,6 @@
 package fr.neatmonster.nocheatplus.actions;
 
-import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
 
 /*
  * MMP"""""""MM            dP   oo                   
@@ -16,7 +15,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
  * An action gets executed as the result of a failed check. If it 'really' gets executed depends on how many executions
  * have occurred within the last 60 seconds and how much time was between this and the previous execution.
  */
-public abstract class Action {
+public abstract class Action <D extends ActionData, L extends AbstractActionList<D, L>>{
     /**
      * The name of the action, to identify it, e.g. in the configuration file.
      */
@@ -57,7 +56,7 @@ public abstract class Action {
      *            the violation data
      * @return true, if successful
      */
-    public abstract boolean execute(final ViolationData violationData);
+    public abstract boolean execute(final D violationData);
     
     /**
      * Check if parameters are needed at all for faster processing.
@@ -84,7 +83,7 @@ public abstract class Action {
 	 * @param threshold
 	 * @return Can return this (unchanged), null (not to be executed ever) or a new instance (changed, optimized).
 	 */
-	public Action getOptimizedCopy(final ConfigFile config, final Integer threshold) {
+	public Action<D, L> getOptimizedCopy(final ConfigFileWithActions<D, L> config, final Integer threshold) {
 		return this;
 	}
 }

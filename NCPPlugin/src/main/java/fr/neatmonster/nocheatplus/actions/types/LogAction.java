@@ -4,9 +4,10 @@ import org.bukkit.ChatColor;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.Action;
+import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.logging.StaticLogFile;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
@@ -24,7 +25,10 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 /**
  * Print a log message to various locations.
  */
-public class LogAction extends ActionWithParameters {
+public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
+	
+	// TODO: pull down to providers for (console), !chat!, (file) - then move to NCPCompat.
+	
     // Some flags to decide where the log message should show up, based on the configuration file.
     /** Log to chat? */
     public final boolean toChat;
@@ -92,7 +96,7 @@ public class LogAction extends ActionWithParameters {
     }
 
 	@Override
-	public Action getOptimizedCopy(final ConfigFile config, final Integer threshold) {
+	public Action<ViolationData, ActionList> getOptimizedCopy(final ConfigFileWithActions<ViolationData, ActionList> config, final Integer threshold) {
 		if (!config.getBoolean(ConfPaths.LOGGING_ACTIVE)) return null;
 		final boolean toConsole = this.toConsole && config.getBoolean(ConfPaths.LOGGING_CONSOLE);
 		final boolean toFile = this.toFile&& config.getBoolean(ConfPaths.LOGGING_FILE);

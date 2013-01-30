@@ -1,11 +1,13 @@
 package fr.neatmonster.nocheatplus.checks.access;
 
+import fr.neatmonster.nocheatplus.actions.ParameterHolder;
+
 /**
  * Access interface for extended information about violations.
  * @author mc_dev
  *
  */
-public interface IViolationInfo {
+public interface IViolationInfo extends ParameterHolder{
     /**
      * Get the violation level just added by this violation.
      * @return
@@ -21,9 +23,5 @@ public interface IViolationInfo {
      * @return
      */
     boolean hasCancel();
-    /**
-     * Check if any of the actions needs parameters.
-     * @return If true, actions are likely to contian command or logging actions.
-     */
-    boolean needsParameters();
+
     }

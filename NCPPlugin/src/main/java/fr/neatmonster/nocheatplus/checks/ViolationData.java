@@ -5,6 +5,7 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.Action;
+import fr.neatmonster.nocheatplus.actions.ActionData;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
@@ -27,13 +28,13 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  * TODO: Re-think visibility questions.
  * @author asofold
  */
-public class ViolationData implements IViolationInfo{
+public class ViolationData implements IViolationInfo, ActionData{
 
     /** The actions to be executed. */
     public final ActionList actions;
     
     /** The actions applicable for the violation level. */
-    public final Action[] applicableActions;
+    public final Action<ViolationData, ActionList>[] applicableActions;
 
     /** The violation level added. */
     public final double     addedVL;
@@ -87,7 +88,7 @@ public class ViolationData implements IViolationInfo{
      * 
      * @return the actions
      */
-    public Action[] getActions() {
+    public Action<ViolationData, ActionList> [] getActions() {
         return applicableActions;
     }
     
@@ -103,7 +104,7 @@ public class ViolationData implements IViolationInfo{
            // TODO: the time is taken here, which makes sense for delay, but otherwise ?
            final long time = System.currentTimeMillis() / 1000L;
            boolean cancel = false;
-           for (final Action action : getActions())
+           for (final Action<ViolationData, ActionList>  action : getActions())
                if (Check.getHistory(player).executeAction(this, action, time))
                    // The execution history said it really is time to execute the action, find out what it is and do
                    // what is needed.
@@ -123,17 +124,13 @@ public class ViolationData implements IViolationInfo{
 	 */
 	@Override
 	public boolean hasCancel(){
-		for (final Action action : applicableActions){
+		for (final Action<ViolationData, ActionList>  action : applicableActions){
 			if (action instanceof CancelAction) return true;
 		}
 		return false;
 	}
 	
-	/**
-	 * Get the parameters value for this violation.
-	 * @param parameterName
-	 * @return Will always return some string, if not set: "<?PARAMETERNAME>".
-	 */
+	@Override
 	public String getParameter(final ParameterName parameterName){
 		if (parameterName == null) return "<???>";
 		switch (parameterName) {
@@ -151,6 +148,7 @@ public class ViolationData implements IViolationInfo{
 		return(value == null) ? ("<?" + parameterName + ">") : value;
 	}
 	
+	@Override
 	public void setParameter(final ParameterName parameterName, String value){
 		if (parameters != null) parameters.put(parameterName, value);
 	}

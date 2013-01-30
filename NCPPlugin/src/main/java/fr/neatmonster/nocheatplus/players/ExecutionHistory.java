@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.neatmonster.nocheatplus.actions.Action;
+import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
@@ -25,7 +26,8 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
  *                                                    d8888P  
  */
 /**
- * Store amount of action executions for last 60 seconds for various actions.
+ * Store amount of action executions for last 60 seconds for various actions.<br>
+ * TODO: Once away from static access, could put this to generic (Action<D extends ActionData>).
  */
 public class ExecutionHistory {
 
@@ -140,13 +142,13 @@ public class ExecutionHistory {
     }
 
     /** Store data between events (time + action + action-counter). **/
-    private final Map<Action, ExecutionHistoryEntry> entries;
+    private final Map<Action<ViolationData, ActionList>, ExecutionHistoryEntry> entries;
 
     /**
      * Instantiates a new execution history.
      */
     public ExecutionHistory() {
-        entries = new HashMap<Action, ExecutionHistoryEntry>();
+        entries = new HashMap<Action<ViolationData, ActionList>, ExecutionHistoryEntry>();
     }
 
 	/**
@@ -162,7 +164,7 @@ public class ExecutionHistory {
 	 *            a time IN SECONDS
 	 * @return true, if the action is to be executed.
 	 */
-	public boolean executeAction(final ViolationData violationData, final Action action, final long time)
+	public boolean executeAction(final ViolationData violationData, final Action<ViolationData, ActionList> action, final long time)
 	{
 		if (action.executesAlways()) return true;
         ExecutionHistoryEntry entry = entries.get(action);
@@ -192,7 +194,7 @@ public class ExecutionHistory {
      * @param time
      * @return
      */
-	public boolean wouldExecute(final ViolationData violationData, final Action action, final long time)
+	public boolean wouldExecute(final ViolationData violationData, final Action<ViolationData, ActionList> action, final long time)
 	{
 		if (action.executesAlways()) return true;
         ExecutionHistoryEntry entry = entries.get(action);
@@ -214,7 +216,7 @@ public class ExecutionHistory {
      * @param action
      * @return
      */
-    public ExecutionHistoryEntry getEntry(final Action action){
+    public ExecutionHistoryEntry getEntry(final Action<ViolationData, ActionList> action){
         return entries.get(action);
     }
 }

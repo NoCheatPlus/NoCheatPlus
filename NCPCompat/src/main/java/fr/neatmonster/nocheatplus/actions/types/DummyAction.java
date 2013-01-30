@@ -1,8 +1,9 @@
 package fr.neatmonster.nocheatplus.actions.types;
 
+import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.Action;
-import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.actions.ActionData;
+import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
 
 /*
  * M""""""'YMM                                         MMP"""""""MM            dP   oo                   
@@ -18,7 +19,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
  * If an action can't be parsed correctly, at least keep it stored in this form to not lose it when loading/storing the
  * configuration file.
  */
-public class DummyAction extends Action {
+public class DummyAction<D extends ActionData, L extends AbstractActionList<D, L>> extends Action<D, L> {
     /** The original string used for this action definition. */
     protected final String definition;
 
@@ -37,7 +38,7 @@ public class DummyAction extends Action {
      * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
      */
     @Override
-    public boolean execute(final ViolationData violationData) {
+    public boolean execute(final D violationData) {
         return false;
     }
 
@@ -50,7 +51,7 @@ public class DummyAction extends Action {
     }
 
 	@Override
-	public Action getOptimizedCopy(final ConfigFile config, final Integer threshold)
+	public Action<D, L> getOptimizedCopy(final ConfigFileWithActions<D, L> config, final Integer threshold)
 	{
 		// Never execute this.
 		return null;

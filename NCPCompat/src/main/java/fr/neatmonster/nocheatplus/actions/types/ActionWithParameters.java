@@ -2,9 +2,10 @@ package fr.neatmonster.nocheatplus.actions.types;
 
 import java.util.ArrayList;
 
+import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.Action;
+import fr.neatmonster.nocheatplus.actions.ParameterHolder;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
-import fr.neatmonster.nocheatplus.checks.ViolationData;
 
 /*
  * MMP"""""""MM            dP   oo                   M""MMM""MMM""M oo   dP   dP       
@@ -26,7 +27,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 /**
  * Action with parameters is used for the messages (chat, console, log) or the commands.
  */
-public abstract class ActionWithParameters extends Action {
+public abstract class ActionWithParameters<D extends ParameterHolder, L extends AbstractActionList<D, L>> extends Action<D, L> {
 	/** The parts of the message. */
 	protected final ArrayList<Object> messageParts;
 
@@ -64,7 +65,7 @@ public abstract class ActionWithParameters extends Action {
      *            the violation data
      * @return the message
      */
-    protected String getMessage(final ViolationData violationData) {
+    protected String getMessage(final D violationData) { // interface
         // Should be big enough most of the time.
         final StringBuilder log = new StringBuilder(150);
 

@@ -1,14 +1,10 @@
 package fr.neatmonster.nocheatplus.actions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
-import fr.neatmonster.nocheatplus.actions.types.CommandAction;
-import fr.neatmonster.nocheatplus.actions.types.DummyAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /*
@@ -24,8 +20,7 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
 /**
  * Helps with creating Actions out of text string definitions.
  */
-public class ActionFactory {
-    protected static final Map<String, Object> lib = new HashMap<String, Object>();
+public class ActionFactory extends AbstractActionFactory<ViolationData, ActionList> {
 
     /**
      * Instantiates a new action factory.
@@ -34,7 +29,7 @@ public class ActionFactory {
      *            the library
      */
     public ActionFactory(final Map<String, Object> library) {
-        lib.putAll(library);
+        super(library, ActionList.listFactory);
     }
 
     /**
@@ -44,122 +39,24 @@ public class ActionFactory {
      *            the action definition
      * @return the action
      */
-    public Action createAction(String actionDefinition) {
+	public Action<ViolationData, ActionList> createAction(String actionDefinition) {
         actionDefinition = actionDefinition.toLowerCase();
 
         if (actionDefinition.equals("cancel"))
-            return new CancelAction();
+            return new CancelAction<ViolationData, ActionList>();
+        
+        if (actionDefinition.startsWith("cmd:"))
+            return parseCmdAction(actionDefinition.split(":", 2)[1]);
 
         if (actionDefinition.startsWith("log:"))
             return parseLogAction(actionDefinition.split(":", 2)[1]);
 
-        if (actionDefinition.startsWith("cmd:"))
-            return parseCmdAction(actionDefinition.split(":", 2)[1]);
+
 
         throw new IllegalArgumentException("NoCheatPlus doesn't understand action '" + actionDefinition + "' at all");
     }
 
-    /**
-     * Creates a new Action object.
-     * 
-     * @param definition
-     *            the definition
-     * @param permission
-     *            the permission
-     * @return the action list
-     */
-    public ActionList createActionList(final String definition, final String permission) {
-        final ActionList list = new ActionList(permission);
-        
-        // Do check for null, to allow removing default actions, for better robustness.
-        if (definition == null) return list;
 
-        boolean first = true;
-
-        for (String s : definition.split("vl>")) {
-            s = s.trim();
-
-            if (s.length() == 0) {
-                first = false;
-                continue;
-            }
-
-            try {
-                Integer vl;
-                String def;
-                if (first) {
-                    first = false;
-                    vl = 0;
-                    def = s;
-                } else {
-                    final String[] listEntry = s.split("\\s+", 2);
-                    vl = Integer.parseInt(listEntry[0]);
-                    def = listEntry[1];
-                }
-                list.setActions(vl, createActions(def.split("\\s+")));
-            } catch (final Exception e) {
-                LogUtil.logWarning("[NoCheatPlus] Couldn't parse action definition 'vl:" + s + "'.");
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * Creates a new Action object.
-     * 
-     * @param definitions
-     *            the definitions
-     * @return the action[]
-     */
-    public Action[] createActions(final String... definitions) {
-        final List<Action> actions = new ArrayList<Action>();
-
-        for (final String def : definitions) {
-            if (def.length() == 0)
-                continue;
-            try {
-                actions.add(createAction(def));
-            } catch (final IllegalArgumentException e) {
-            	LogUtil.logWarning("[NoCheatPlus] Failed to create action: " + e.getMessage());
-                actions.add(new DummyAction(def));
-            }
-        }
-
-        return actions.toArray(new Action[actions.size()]);
-    }
-
-    /**
-     * Parses the cmd action.
-     * 
-     * @param definition
-     *            the definition
-     * @return the action
-     */
-    protected Action parseCmdAction(final String definition) {
-        final String[] parts = definition.split(":");
-        final String name = parts[0];
-        final Object command = lib.get(parts[0]);
-        int delay = 0;
-        int repeat = 0;
-
-        if (command == null)
-            throw new IllegalArgumentException("NoCheatPlus doesn't know command '" + name
-                    + "'. Have you forgotten to define it?");
-
-        if (parts.length > 1)
-            try {
-                delay = Integer.parseInt(parts[1]);
-                repeat = Integer.parseInt(parts[2]);
-            } catch (final Exception e) {
-            	LogUtil.logWarning("[NoCheatPlus] Couldn't parse details of command '" + definition
-                        + "', will use default values instead.");
-                delay = 0;
-                repeat = 0;
-            }
-
-        return new CommandAction(name, delay, repeat, command.toString());
-    }
 
     /**
      * Parses the log action.
@@ -168,7 +65,7 @@ public class ActionFactory {
      *            the definition
      * @return the action
      */
-    protected Action parseLogAction(final String definition) {
+    protected Action<ViolationData, ActionList> parseLogAction(final String definition) {
         final String[] parts = definition.split(":");
         final String name = parts[0];
         final Object message = lib.get(parts[0]);

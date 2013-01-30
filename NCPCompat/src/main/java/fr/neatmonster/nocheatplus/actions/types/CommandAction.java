@@ -3,7 +3,8 @@ package fr.neatmonster.nocheatplus.actions.types;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandException;
 
-import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.actions.AbstractActionList;
+import fr.neatmonster.nocheatplus.actions.ParameterHolder;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /*
@@ -26,7 +27,7 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
 /**
  * Execute a command by imitating an administrator typing the command directly into the console.
  */
-public class CommandAction extends ActionWithParameters {
+public class CommandAction<D extends ParameterHolder, L extends AbstractActionList<D, L>> extends ActionWithParameters<D, L> {
 
     /**
      * Instantiates a new command action.
@@ -49,7 +50,7 @@ public class CommandAction extends ActionWithParameters {
      * @see fr.neatmonster.nocheatplus.actions.Action#execute(fr.neatmonster.nocheatplus.checks.ViolationData)
      */
     @Override
-    public boolean execute(final ViolationData violationData) {
+    public boolean execute(final D violationData) {
         final String command = super.getMessage(violationData);
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
