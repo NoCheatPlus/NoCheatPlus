@@ -651,7 +651,7 @@ public class BlockProperties {
 		final int y = location.getBlockY();
 		final int z = location.getBlockZ();
 		final World world = location.getWorld();
-		final boolean onGround = isOnGround(player, location) || world.getBlockTypeIdAt(x, y, z) == Material.WATER_LILY.getId();
+		final boolean onGround = isOnGround(player, location, 0.3) || world.getBlockTypeIdAt(x, y, z) == Material.WATER_LILY.getId();
 		final boolean inWater = isInWater(world.getBlockTypeIdAt(x, y + 1, z));
 		final int haste = (int) Math.round(PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING));
 		// TODO: haste: int / double !?
@@ -887,29 +887,38 @@ public class BlockProperties {
 	}
 
 	/**
-	 *  Heavy but ...
-	 * @param world
-	 * @param x
-	 * @param y
-	 * @param z
+	 * Simple checking method, heavy. No isIllegal check.
+	 * @param player
+	 * @param location
+	 * @param yOnGround
 	 * @return
 	 */
-	public static boolean isOnGround(Player player, Location location) {
-//		return blockId != 0 && net.minecraft.server.Block.byId[blockId].//.c();// d();
+	public static boolean isOnGround(final Player player, final Location location, final double yOnGround) {
 		// Bit fat workaround, maybe put the object through from check listener ?
 		blockCache.setAccess(location.getWorld());
 		pLoc.setBlockCache(blockCache);
-		pLoc.set(location, player, 0.3);
-//		if (pLoc.isIllegal()) {
-//			blockCache.cleanup();
-//			pLoc.cleanup();
-//			CheckUtils.onIllegalMove(player);
-//			return false;
-//		}
+		pLoc.set(location, player, yOnGround);
 		final boolean onGround = pLoc.isOnGround();
 		blockCache.cleanup();
 		pLoc.cleanup();
 		return onGround;
+	}
+	
+	/**
+	 * Simple checking method, heavy. No isIllegal check.
+	 * @param player
+	 * @param location
+	 * @param yOnGround
+	 * @return
+	 */
+	public static boolean isOnGroundOrResetCond(final Player player, final Location location, final double yOnGround){
+		blockCache.setAccess(location.getWorld());
+		pLoc.setBlockCache(blockCache);
+		pLoc.set(location, player, yOnGround);
+		final boolean res = pLoc.isOnGround() || pLoc.isResetCond();
+		blockCache.cleanup();
+		pLoc.cleanup();
+		return res;
 	}
 
 	public static final long getBLockFlags(final int id){
