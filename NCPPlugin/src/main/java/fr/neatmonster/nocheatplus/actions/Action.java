@@ -78,7 +78,8 @@ public abstract class Action {
 	}
 
 	/**
-	 * Get an optimized copy, given the config in use. The default implementation returns this instance.
+	 * Get an optimized copy, given the config in use. The default implementation returns this instance.<br>
+	 * TODO: "Copy" does not match this.
 	 * @param config
 	 * @param threshold
 	 * @return Can return this (unchanged), null (not to be executed ever) or a new instance (changed, optimized).
