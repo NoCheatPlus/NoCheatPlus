@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.compat;
 
+import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
+
 /**
  * Provide a setup method for additional BlockProperties initialization.<br>
  * Typically MCAccess can implement it. TODO: An extra factory for Bukkit level.
@@ -9,6 +11,7 @@ package fr.neatmonster.nocheatplus.compat;
 public interface BlockPropertiesSetup {
 	/**
 	 * Additional initialization.
+	 * @param worldConfigProvider Configuration provider if needed.
 	 */
-	public void setupBlockProperties();
+	public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider);
 }

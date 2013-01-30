@@ -650,7 +650,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     protected void initBlockProperties(ConfigFile config){
         // Set up BlockProperties.
-        BlockProperties.init(getMCAccess());
+        BlockProperties.init(getMCAccess(), ConfigManager.getWorldConfigProvider());
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
     }
     

@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.config;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,9 +27,6 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  * The synchronized methods are to ensure that changing the configurations won't lead to trouble for the asynchronous checks.
  */
 public class ConfigManager {
-
-    /** The map containing the configuration files per world. */
-    private static final Map<String, ConfigFile> worldsMap   = new HashMap<String, ConfigFile>();
     
     public static interface ActionFactoryFactory{
         public ActionFactory newActionFactory(Map<String, Object> library);
@@ -40,6 +38,28 @@ public class ConfigManager {
             return new ActionFactory(library);
         }
     };
+    
+    /** The map containing the configuration files per world. */
+    private static final Map<String, ConfigFile> worldsMap   = new HashMap<String, ConfigFile>();
+    
+    private static final WorldConfigProvider<ConfigFile> worldConfigProvider = new WorldConfigProvider<ConfigFile>() {
+		
+		@Override
+		public ConfigFile getDefaultConfig() {
+			return ConfigManager.getConfigFile();
+		}
+		
+		@Override
+		public ConfigFile getConfig(String worldName) {
+			return ConfigManager.getConfigFile(worldName);
+		}
+		
+		@Override
+		public Collection<ConfigFile> getAllConfigs() {
+			return ConfigManager.worldsMap.values();
+		}
+		
+	};
     
     /**
      * Factory method.
@@ -70,6 +90,14 @@ public class ConfigManager {
     public static ActionFactoryFactory getActionFactoryFactory(){
         return actionFactoryFactory;
     }
+    
+    /**
+     * Get the WorldConfigProvider in use.
+     * @return
+     */
+	public static WorldConfigProvider<ConfigFile> getWorldConfigProvider() {
+		return worldConfigProvider;
+	}
 
     /**
      * Cleanup.

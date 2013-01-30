@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
@@ -154,7 +155,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	}
 
 	@Override
-	public void setupBlockProperties() {
+	public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
 		// TODO Set some generic properties matching what BlockCache.getShape returns.
 		for (Material mat : Material.values()){
 			if (!mat.isBlock()) continue;

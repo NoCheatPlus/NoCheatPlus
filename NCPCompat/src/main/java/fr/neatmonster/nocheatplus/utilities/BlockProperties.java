@@ -19,6 +19,7 @@ import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.RootConfPaths;
+import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /**
@@ -281,14 +282,14 @@ public class BlockProperties {
     /** Penalty factor for block break duration if not on ground. */
     protected static float breakPenaltyOffGround = 4f;
 	
-   public static void init(final MCAccess mcAccess) {
+   public static void init(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
 	    blockCache = mcAccess.getBlockCache(null);
 	    pLoc = new PlayerLocation(mcAccess, null);
 		try{
-		    initTools(mcAccess);
-		    initBlocks(mcAccess);
+		    initTools(mcAccess, worldConfigProvider);
+		    initBlocks(mcAccess, worldConfigProvider);
 		    if (mcAccess instanceof BlockPropertiesSetup){
-		    	((BlockPropertiesSetup) mcAccess).setupBlockProperties();
+		    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
 		    }
 		}
 		catch(Throwable t){
@@ -296,7 +297,7 @@ public class BlockProperties {
 		}
     }
 	
-	private static void initTools(final MCAccess mcAccess) {
+	private static void initTools(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
 	    tools.clear();
 		tools.put(268, new ToolProps(ToolType.SWORD, MaterialBase.WOOD));
 		tools.put(269, new ToolProps(ToolType.SPADE, MaterialBase.WOOD));
@@ -326,7 +327,7 @@ public class BlockProperties {
 		tools.put(359, new ToolProps(ToolType.SHEARS, MaterialBase.NONE));
 	}
 
-    private static void initBlocks(final MCAccess mcAccess) {
+    private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
 		Arrays.fill(blocks, null);
 		///////////////////////////
 		// Initalize block flags
