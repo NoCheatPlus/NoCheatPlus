@@ -47,6 +47,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
+import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
@@ -84,7 +85,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * 
  * @see MovingEvent
  */
-public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType{
+public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload{
 
 	/**
 	 * Coupling from and to PlayerLocation objects with a block cache for easy storage and reuse.
@@ -1210,5 +1211,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@Override
 	public void removeAllData() {
 		hoverTicks.clear();
+		parkedInfo.clear();
+	}
+
+	@Override
+	public void onReload() {
+		for (final MoveInfo info : parkedInfo){
+			// Just in case.
+			info.cleanup();
+		}
+		parkedInfo.clear();
 	}
 }
