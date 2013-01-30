@@ -45,6 +45,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
 import fr.neatmonster.nocheatplus.components.NameSetPermState;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
@@ -253,31 +254,40 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
 	private int dataManTaskId = -1;
 	
-	/**
-	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
-	 */
 	@Override
-	public void addComponent(final Object obj) {
-		allComponents.add(obj);
+	public boolean addComponent(final Object obj) {
+		if (allComponents.contains(obj)) return false;
+		boolean added = false;
 		if (obj instanceof Listener) {
 			addListener((Listener) obj);
+			added = true;
 		}
 		if (obj instanceof INotifyReload) {
 			notifyReload.add((INotifyReload) obj);
 			if (obj instanceof INeedConfig) {
 				((INeedConfig) obj).onReload();
 			}
+			added = true;
 		}
 		if (obj instanceof TickListener){
 			TickTask.addTickListener((TickListener) obj);
+			added = true;
 		}
 		if (obj instanceof PermStateReceiver){
 			// No immediate update done.
 			permStateReceivers.add((PermStateReceiver) obj);
+			added = true;
+		}
+		if (obj instanceof MCAccessHolder){
+			// Add to allComponents.
+			((MCAccessHolder) obj).setMCAccess(getMCAccess());
+			added = true;
 		}
 		// Also add to DataManager, which will pick what it needs.
 		// TODO: This is fishy in principle, something more concise?
-		dataMan.addComponent(obj);
+		if (dataMan.addComponent(obj)) added = true;
+		if (added) allComponents.add(obj);
+		return added;
 	}
 	
 	/**
@@ -361,6 +371,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         TickTask.setLocked(true);
         TickTask.purge();
         TickTask.cancel();
+        TickTask.removeAllTickListeners();
         // (Keep the tick task locked!)
         
 		// Stop metrics task.
@@ -502,6 +513,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				public void onReload() {
 					final ConfigFile config = ConfigManager.getConfigFile();
 					// Initialize BlockProperties
+					initMCAccess(config);
 					initBlockProperties(config);
 					// Reset Command protection.
 					undoCommandChanges();
@@ -619,11 +631,24 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	}
     
     /**
-     * Reset MCAccess and (re-) initialize BlockProperties, including config.
+     * Re-setup MCAccess and pass it to MCAccessHolder components.
+     * @param config
+     */
+    protected void initMCAccess(final ConfigFile config) {
+    	// Reset MCAccess.
+    	NoCheatPlus.mcAccess = null;
+    	final MCAccess mcAccess = getMCAccess();
+    	for (final Object obj : this.allComponents){
+    		if (obj instanceof MCAccessHolder){
+    			((MCAccessHolder) obj).setMCAccess(mcAccess);
+    		}
+    	}
+	}
+
+	/**
+     * Initialize BlockProperties, including config.
      */
     protected void initBlockProperties(ConfigFile config){
-    	// Reset MCAccess.
-    	mcAccess = null;
         // Set up BlockProperties.
         BlockProperties.init(getMCAccess());
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);

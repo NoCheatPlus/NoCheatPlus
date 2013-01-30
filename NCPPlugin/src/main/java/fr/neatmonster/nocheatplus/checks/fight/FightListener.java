@@ -41,28 +41,28 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 public class FightListener extends CheckListener {
 
     /** The angle check. */
-    private final Angle       angle       = new Angle();
+    private final Angle       angle       = addCheck(new Angle());
 
     /** The critical check. */
-    private final Critical    critical    = new Critical();
+    private final Critical    critical    = addCheck(new Critical());
 
     /** The direction check. */
-    private final Direction   direction   = new Direction();
+    private final Direction   direction   = addCheck(new Direction());
 
     /** The god mode check. */
-    private final GodMode     godMode     = new GodMode();
+    private final GodMode     godMode     = addCheck(new GodMode());
 
     /** The knockback check. */
-    private final Knockback   knockback   = new Knockback();
+    private final Knockback   knockback   = addCheck(new Knockback());
 
     /** The no swing check. */
-    private final NoSwing     noSwing     = new NoSwing();
+    private final NoSwing     noSwing     = addCheck(new NoSwing());
 
     /** The reach check. */
-    private final Reach       reach       = new Reach();
+    private final Reach       reach       = addCheck(new Reach());
     
     /** The self hit check */
-    private final SelfHit     selfHit     = new SelfHit();
+    private final SelfHit     selfHit     = addCheck(new SelfHit());
 
     /** The speed check. */
     private final Speed       speed       = new Speed();

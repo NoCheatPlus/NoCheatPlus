@@ -35,10 +35,10 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 public class BlockInteractListener extends CheckListener {
 
     /** The direction check. */
-    private final Direction direction = new Direction();
+    private final Direction direction = addCheck(new Direction());
 
     /** The reach check. */
-    private final Reach     reach     = new Reach();
+    private final Reach     reach     = addCheck(new Reach());
     
     public BlockInteractListener(){
     	super(CheckType.BLOCKINTERACT);

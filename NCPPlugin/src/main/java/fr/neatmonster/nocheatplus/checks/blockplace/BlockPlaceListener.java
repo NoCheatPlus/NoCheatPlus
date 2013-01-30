@@ -46,19 +46,19 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 public class BlockPlaceListener extends CheckListener {
 
     /** The direction check. */
-    private final Direction direction = new Direction();
+    private final Direction direction = addCheck(new Direction());
 
     /** The fast place check. */
-    private final FastPlace fastPlace = new FastPlace();
+    private final FastPlace fastPlace = addCheck(new FastPlace());
 
     /** The no swing check. */
-    private final NoSwing   noSwing   = new NoSwing();
+    private final NoSwing   noSwing   = addCheck(new NoSwing());
 
     /** The reach check. */
-    private final Reach     reach     = new Reach();
+    private final Reach     reach     = addCheck(new Reach());
 
     /** The speed check. */
-    private final Speed     speed     = new Speed();
+    private final Speed     speed     = addCheck(new Speed());
     
     public BlockPlaceListener(){
     	super(CheckType.BLOCKPLACE);

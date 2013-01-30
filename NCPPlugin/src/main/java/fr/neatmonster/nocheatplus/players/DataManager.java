@@ -314,9 +314,18 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	
 	
 	@Override
-	public void addComponent(Object obj) {
+	public boolean addComponent(Object obj) {
 		if (obj instanceof IRemoveData) {
-			iRemoveData.add((IRemoveData) obj);
+			if (iRemoveData.contains(obj)){
+				return false;
+			}
+			else{
+				iRemoveData.add((IRemoveData) obj);
+				return true;
+			}
+		}
+		else{
+			return true;
 		}
 	}
 

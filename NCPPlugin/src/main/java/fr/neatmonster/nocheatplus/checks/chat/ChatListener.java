@@ -41,22 +41,22 @@ public class ChatListener extends CheckListener implements INotifyReload {
     // Checks.
     
     /** Captcha handler. */
-    private final Captcha captcha = new Captcha();
+    private final Captcha captcha		= addCheck(new Captcha());
 
     /** The color check. */
-    private final Color    color    = new Color();    
+    private final Color    color    	= addCheck(new Color());    
     
     /** Commands repetition check. */
-    private final Commands commands = new Commands(); 
+    private final Commands commands 	= addCheck(new Commands()); 
     
     /** Logins check (global) */
-    private final Logins logins = new Logins();
+    private final Logins logins 		= addCheck(new Logins());
     
     /** Chat message check. */
-    private final Text text = new Text();
+    private final Text text 			= addCheck(new Text());
    
     /** Relogging check. */
-    private final Relog relog = new Relog();
+    private final Relog relog 			= addCheck(new Relog());
     
     // Auxiliary stuff.
     

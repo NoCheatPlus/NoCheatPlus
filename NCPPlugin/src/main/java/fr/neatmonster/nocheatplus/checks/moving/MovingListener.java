@@ -197,28 +197,28 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	
 
     /** The instance of NoCheatPlus. */
-    private final NoCheatPlus        plugin             = (NoCheatPlus) Bukkit.getPluginManager().getPlugin(
-                                                                "NoCheatPlus");
+    private final NoCheatPlus plugin = (NoCheatPlus) Bukkit.getPluginManager().getPlugin("NoCheatPlus");
+    
     /** The no fall check. **/
     public final NoFall noFall = new NoFall();
     
     /** The creative fly check. */
-    private final CreativeFly        creativeFly        = new CreativeFly();
+    private final CreativeFly        creativeFly        = addCheck(new CreativeFly());
 
     /** The more packets check. */
-    private final MorePackets        morePackets        = new MorePackets();
+    private final MorePackets        morePackets        = addCheck(new MorePackets());
 
     /** The more packets vehicle check. */
-    private final MorePacketsVehicle morePacketsVehicle = new MorePacketsVehicle();
+    private final MorePacketsVehicle morePacketsVehicle = addCheck(new MorePacketsVehicle());
 
     /** The survival fly check. */
-    private final SurvivalFly        survivalFly        = new SurvivalFly();
+    private final SurvivalFly        survivalFly        = addCheck(new SurvivalFly());
     
     /** The Passable (simple no-clip) check.*/
-    private final Passable passable = new Passable();
+    private final Passable passable 					= addCheck(new Passable());
     
 	/** Combined check but handled here (subject to change!) */
-	private final BedLeave bedLeave = new BedLeave();
+	private final BedLeave bedLeave 					= addCheck(new BedLeave());
     
     /**
      * Unused instances.<br>

@@ -50,18 +50,18 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 public class InventoryListener  extends CheckListener {
 
     /** The drop check. */
-    private final Drop       drop       = new Drop();
+    private final Drop       drop       = addCheck(new Drop());
 
     /** The fast click check. */
-    private final FastClick  fastClick  = new FastClick();
+    private final FastClick  fastClick  = addCheck(new FastClick());
 
     /** The instant bow check. */
-    private final InstantBow instantBow = new InstantBow();
+    private final InstantBow instantBow = addCheck(new InstantBow());
 
     /** The instant eat check. */
-    private final InstantEat instantEat = new InstantEat();
+    private final InstantEat instantEat = addCheck(new InstantEat());
     
-    protected final Items items = new Items();
+    protected final Items items 		= addCheck(new Items());
     
     public InventoryListener(){
     	super(CheckType.INVENTORY);

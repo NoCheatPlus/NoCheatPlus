@@ -44,22 +44,22 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 public class BlockBreakListener extends CheckListener {
 
     /** The direction check. */
-    private final Direction direction = new Direction();
+    private final Direction direction = addCheck(new Direction());
 
     /** The fast break check (per block breaking speed). */
-    private final FastBreak fastBreak = new FastBreak();
+    private final FastBreak fastBreak = addCheck(new FastBreak());
     
     /** The frequency check (number of blocks broken) */
-    private final Frequency frequency = new Frequency();
+    private final Frequency frequency = addCheck(new Frequency());
 
     /** The no swing check. */
-    private final NoSwing   noSwing   = new NoSwing();
+    private final NoSwing   noSwing   = addCheck(new NoSwing());
 
     /** The reach check. */
-    private final Reach     reach     = new Reach();
+    private final Reach     reach     = addCheck(new Reach());
     
     /** The wrong block check. */
-    private final WrongBlock wrongBlock = new WrongBlock();
+    private final WrongBlock wrongBlock = addCheck(new WrongBlock());
     
     private boolean isInstaBreak = false;
     

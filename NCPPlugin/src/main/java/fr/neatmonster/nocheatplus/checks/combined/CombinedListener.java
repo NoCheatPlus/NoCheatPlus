@@ -22,13 +22,12 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public class CombinedListener extends CheckListener {
 	
-	protected final Improbable improbable;
+	protected final Improbable improbable 	= addCheck(new Improbable());
 	
-	protected final MunchHausen munchHausen = new MunchHausen();
+	protected final MunchHausen munchHausen = addCheck(new MunchHausen());
 
 	public CombinedListener(){
 		super(CheckType.COMBINED);
-		this.improbable = new Improbable();
 	}
 	
     /**

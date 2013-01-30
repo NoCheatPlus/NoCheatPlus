@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -27,9 +28,9 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * MMMMMMMMMMM                                     
  */
 /**
- * The parent class of all checks.
+ * The parent class of all checks. Don't let this implement Listener without knowing that this might be registered as component with NCP before the check-listeners.
  */
-public abstract class Check {
+public abstract class Check implements MCAccessHolder{
 
     /** The execution histories of each check. */
     protected static Map<String, ExecutionHistory> histories = new HashMap<String, ExecutionHistory>();
@@ -50,7 +51,7 @@ public abstract class Check {
     /** The type. */
     protected final CheckType type;
     
-    protected final MCAccess mcAccess;
+    protected MCAccess mcAccess;
 
     /**
      * Instantiates a new check.
@@ -183,4 +184,15 @@ public abstract class Check {
         }
         return !NCPExemptionManager.isExempted(player, type);
     }
+
+	@Override
+	public void setMCAccess(MCAccess mcAccess) {
+		this.mcAccess = mcAccess;
+	}
+
+	@Override
+	public MCAccess getMCAccess() {
+		return mcAccess;
+	}
+	
 }

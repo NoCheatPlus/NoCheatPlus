@@ -191,6 +191,15 @@ public class TickTask implements Runnable {
 	}
 	
 	/**
+	 * Remove all of them.
+	 */
+	public static void removeAllTickListeners() {
+		synchronized (tickListeners) {
+			tickListeners.clear();
+		}
+	}
+	
+	/**
 	 * Get the tasks tick count. It is increased with every server tick.<br>
 	 * NOTE: Can be called from other threads.
 	 * @return The current tick count.
