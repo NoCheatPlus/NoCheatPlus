@@ -828,6 +828,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 						player.setFallDistance((float) fallDistance);
 					}
 				}
+				if (event.getCause() == TeleportCause.ENDER_PEARL){
+					// Prevent NoFall violations for ender-pearls.
+					data.noFallSkipAirCheck = true;
+				}
 			}
 			else{
 				// Cancelled, not a set back, ignore it, basically.
