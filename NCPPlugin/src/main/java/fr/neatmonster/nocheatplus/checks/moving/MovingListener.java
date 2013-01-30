@@ -1028,6 +1028,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
 		final Location loc = player.getLocation();
+		
+		// TODO: shouldCheckSurvivalFly ?
+		
+		// Correct set-back on world changes.
 		if (!data.hasSetBack() || data.hasSetBackWorldChanged(loc)){
 			data.setSetBack(loc);
 		}
@@ -1035,8 +1039,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// TODO: re-think: more fine grained reset?
 			data.resetPositions(loc);
 		}
+		final MovingConfig cc = MovingConfig.getConfig(player);
 		// Reset hover ticks until a better method is used.
-		if (MovingConfig.getConfig(player).sfHoverCheck){
+		if (cc.sfHoverCheck){
 			// Start as if hovering already.
 			data.sfHoverTicks = 0;
 			hoverTicks.add(player.getName());

@@ -42,7 +42,7 @@ public class SurvivalFly extends Check {
 	public static final double sprintingSpeed 	= 0.35D;
 	
 	public static final double blockingSpeed 	= 0.16D;
-	public static final double swimmingSpeed    = 0.11D;
+	public static final double swimmingSpeed    = 0.115D;
 	public static final double webSpeed         = 0.105D; // TODO: walkingSpeed * 0.15D; <- does not work
 	
 //	public static final double climbSpeed      = sprintingSpeed; // TODO.
