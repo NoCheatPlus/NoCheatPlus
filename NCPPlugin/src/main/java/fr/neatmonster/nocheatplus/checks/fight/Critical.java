@@ -10,8 +10,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
-import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -51,27 +50,21 @@ public class Critical extends Check {
 
         // We'll need the PlayerLocation to know some important stuff.
         final Location loc = player.getLocation();
-        final PlayerLocation location = new PlayerLocation(mcAccess, mcAccess.getBlockCache(loc.getWorld()));
-        location.set(loc, player);
-		if (location.isIllegal()) {
-			// TODO: This should be impossible !
-			location.cleanup();
-			CheckUtils.onIllegalMove(player);
-			return true;
-		}
+		
 		final float mcFallDistance = player.getFallDistance();
+		final MovingConfig mCc = MovingConfig.getConfig(player);
 		if (mcFallDistance > 0.0 && cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
 			final MovingData mData = MovingData.getData(player);
-			final MovingConfig mCc = MovingConfig.getConfig(player);
+			
 			if (MovingListener.shouldCheckSurvivalFly(player, mData, mCc) && CheckType.MOVING_NOFALL.isEnabled(player)){
 				// TODO: Set max y in MovingListener, to be independent of sf/nofall!
-				player.sendMessage("Critical: d=" + mcFallDistance + " y=" + location.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
+				player.sendMessage("Critical: d=" + mcFallDistance + " y=" + loc.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
 			}
 		}
 
         // Check if the hit was a critical hit (positive fall distance, entity in the air, not on ladder, not in liquid
         // and without blindness effect).
-        if (mcFallDistance > 0f && !location.isOnGround() && !location.isResetCond() && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
+        if (mcFallDistance > 0f && !BlockProperties.isOnGroundOrResetCond(player, loc, mCc.yOnGround) && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
             // It was a critical hit, now check if the player has jumped or has sent a packet to mislead the server.
             if (player.getFallDistance() < cc.criticalFallDistance || Math.abs(player.getVelocity().getY()) < cc.criticalVelocity) {
             	final MovingConfig ccM = MovingConfig.getConfig(player);
@@ -99,8 +92,6 @@ public class Critical extends Check {
             	
             }
         }
-        
-        location.cleanup(); // Slightly better for gc.
 
         return cancel;
     }
