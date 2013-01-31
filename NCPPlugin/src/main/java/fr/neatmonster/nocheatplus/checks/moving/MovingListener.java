@@ -888,6 +888,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.horizontalFreedom += newVal;
             data.horizontalVelocityCounter = 30;
         }
+        
+        // Set dirty flag here.
+        data.sfDirty = true;
     }
 
     /**

@@ -201,9 +201,20 @@ public class SurvivalFly extends Check {
 		} else if (hDistance != 0D){
 			data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
 		}
+		
+		// Account for "dirty"-flag (allow less for normal jumping).
+		if (data.sfDirty){
+			if (resetFrom || resetTo){
+				// Not resetting for data.noFallAssumeOnGround, currently.
+				data.sfDirty = false;
+			}
+			else{
+				tags.add("dirty");
+			}
+		}
 
         // Calculate the vertical speed limit based on the current jump phase.
-        double vAllowedDistance, vDistanceAboveLimit;
+        double vAllowedDistance, vDistanceAboveLimit = 0;
         if (from.isInWeb()){
         	// Very simple: force players to descend or stay.
          	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
@@ -274,11 +285,19 @@ public class SurvivalFly extends Check {
             else maxJumpPhase = 6;
             // TODO: consider tags for jumping as well (!).
             if (data.sfJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0){
-            	vAllowedDistance -= Math.max(0, (data.sfJumpPhase - maxJumpPhase) * 0.15D);
+            	// Could use dirty flag here !
+            	if (data.sfDirty || yDistance < 0){
+            		vAllowedDistance -= Math.max(0, (data.sfJumpPhase - maxJumpPhase) * 0.15D);
+            	}
+            	else if (!data.sfDirty){
+            		// Violation (Too high jumping or step).
+            		tags.add("maxphase");
+            		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, 1.0);
+            	}
             }
 
             // TODO: This might need max(0, for ydiff)
-			vDistanceAboveLimit = to.getY() - data.getSetBackY() - vAllowedDistance;
+			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, to.getY() - data.getSetBackY() - vAllowedDistance);
 			
 			if (vDistanceAboveLimit > 0) tags.add("vdist");
 
@@ -300,23 +319,12 @@ public class SurvivalFly extends Check {
 			// "On-air" checks (vertical)
 			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, yDistance, data, cc));
 		}
-		
 
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
 
 		if (cc.debug) {
-			// TODO: also show resetcond (!)
-			StringBuilder builder = new StringBuilder(500);
-			builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + "\n");
-			builder.append(player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "\n");
-			builder.append(player.getName() + " vfreedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vv=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
-			if (!resetFrom && !resetTo) {
-//				if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
-				if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
-			}
-			if (player.isSleeping()) tags.add("sleeping");
-			if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + StringUtil.join(tags, "+") + "\n");
-			System.out.print(builder.toString());
+			// Put in a method for shorter code.
+			outputDebug(player, data, cc, hDistanceAboveLimit, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
 		}
 		
 		data.sfJumpPhase++;
@@ -349,6 +357,23 @@ public class SurvivalFly extends Check {
         data.sfLastYDist = yDistance;
         return null;
     }
+
+	private void outputDebug(final Player player, final MovingData data, final MovingConfig cc, 
+			final double hDistance, final double hAllowedDistance, final double yDistance, final double vAllowedDistance,
+			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
+		// TODO: also show resetcond (!)
+		StringBuilder builder = new StringBuilder(500);
+		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + "\n");
+		builder.append(player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "\n");
+		builder.append(player.getName() + " vfreedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vv=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
+		if (!resetFrom && !resetTo) {
+//			if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
+			if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
+		}
+		if (player.isSleeping()) tags.add("sleeping");
+		if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + StringUtil.join(tags, "+") + "\n");
+		System.out.print(builder.toString());
+	}
 
 	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
 		// Don't set "useWorkaround = x()", to avoid potential trouble with

@@ -125,6 +125,8 @@ public class MovingData extends ACheckData {
 	// Data of the survival fly check.
 	public double 		sfHorizontalBuffer = 0;
 	public int 			sfJumpPhase = 0;
+	/** "Dirty" flag, for receiving velocity and similar while in air. */
+	public boolean      sfDirty = false;
 	/**
 	 * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
 	 */
@@ -162,6 +164,7 @@ public class MovingData extends ACheckData {
 		sfHorizontalBuffer = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = -1;
+		sfDirty = false;
 	}
 
 	/**
@@ -188,6 +191,7 @@ public class MovingData extends ACheckData {
 		sfHorizontalBuffer = Math.min(0, sfHorizontalBuffer);
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = -1;
+		sfDirty = false;
 	}
 
 	/**
@@ -239,6 +243,7 @@ public class MovingData extends ACheckData {
         fromY = toY = y;
         fromZ = toZ = z;
         sfLastYDist = Double.MAX_VALUE;
+        sfDirty = false;
     }
     
     /**
