@@ -98,44 +98,43 @@ public class MovingData extends ACheckData {
     public int            morePacketsBuffer        = 50;
     public long           morePacketsLastTime;
     public int            morePacketsPackets;
-    private Location      morePacketsSetback;
+    private Location      morePacketsSetback = null;
 
     // Data of the more packets vehicle check.
     public int            morePacketsVehicleBuffer = 50;
     public long           morePacketsVehicleLastTime;
     public int            morePacketsVehiclePackets;
-    private Location      morePacketsVehicleSetback;
+    private Location      morePacketsVehicleSetback = null;
     /** Task id of the morepackets set-back task. */ 
 	public int			  morePacketsVehicleTaskId = -1;
 
 
     // Data of the no fall check.
-    public float          noFallFallDistance;
+    public float          noFallFallDistance = 0;
 //    public boolean        noFallOnGround;
 //    public boolean        noFallWasOnGround;
     /** Last y coordinate from when the player was on ground. */
-    public double         noFallMaxY;
+    public double         noFallMaxY = 0;
     /** Indicate that NoFall should assume the player to be on ground. */
-    public boolean noFallAssumeGround;
+    public boolean noFallAssumeGround = false;
     /** Indicate that NoFall is not to use next damage event for checking on-ground properties. */ 
     public boolean noFallSkipAirCheck = false;
     // Passable check.
     public double 	      passableVL;
 
 	// Data of the survival fly check.
-	public double 		sfHorizontalBuffer;
-	public int 			sfJumpPhase;
-	// public double survivalFlyLastFromY;
+	public double 		sfHorizontalBuffer = 0;
+	public int 			sfJumpPhase = 0;
 	/**
 	 * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
 	 */
 	public double		sfLastYDist = Double.MAX_VALUE;
 	/** A value <0 means not hovering at all. */
 	public int 			sfHoverTicks = -1;
-	public int			sfFlyOnIce;
-	public long			sfCobwebTime;
-	public double		sfCobwebVL;
-	public long			sfVLTime;
+	public int			sfFlyOnIce = 0;
+	public long			sfCobwebTime = 0;
+	public double		sfCobwebVL = 0;
+	public long			sfVLTime = 0;
     
     // Accounting info.
     // TODO: optimize later.
@@ -145,8 +144,8 @@ public class MovingData extends ACheckData {
     public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
-    private Location    setBack;
-    private Location    teleported;
+    private Location    setBack = null;
+    private Location    teleported = null;
     
 	/**
 	 * Clear the data of the fly checks (not more-packets).
