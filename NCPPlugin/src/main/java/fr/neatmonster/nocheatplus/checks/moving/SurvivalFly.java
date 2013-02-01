@@ -221,10 +221,13 @@ public class SurvivalFly extends Check {
          	data.jumpAmplifier = 0; // TODO: later maybe fetch.
         	vDistanceAboveLimit = yDistance;
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
-        		// TODO: Seemed fixed at first by CB/MC, but still does occur. 
+        		// TODO: Seemed fixed at first by CB/MC, but still does occur due to jumping. 
         		final Location silentSetBack = hackCobweb(player, data, to, now, vDistanceAboveLimit);
         		if (silentSetBack != null){
-        			if (cc.debug) System.out.println(player.getName()+ " (Cobweb: silent set-back)");
+        			if (cc.debug) {
+        				tags.add("silentsbcobweb");
+        				outputDebug(player, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+        			}
         			return silentSetBack;
         		}
         	}
@@ -327,7 +330,7 @@ public class SurvivalFly extends Check {
 
 		if (cc.debug) {
 			// Put in a method for shorter code.
-			outputDebug(player, data, cc, hDistanceAboveLimit, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+			outputDebug(player, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
 		}
 		
 		data.sfJumpPhase++;
