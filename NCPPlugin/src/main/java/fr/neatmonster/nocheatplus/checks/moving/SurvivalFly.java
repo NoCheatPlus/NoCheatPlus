@@ -219,7 +219,7 @@ public class SurvivalFly extends Check {
         	// Very simple: force players to descend or stay.
          	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
          	data.jumpAmplifier = 0; // TODO: later maybe fetch.
-        	vDistanceAboveLimit = yDistance;
+        	vDistanceAboveLimit = yDistance - vAllowedDistance;
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
         		// TODO: Seemed fixed at first by CB/MC, but still does occur due to jumping. 
         		final Location silentSetBack = hackCobweb(player, data, to, now, vDistanceAboveLimit);
