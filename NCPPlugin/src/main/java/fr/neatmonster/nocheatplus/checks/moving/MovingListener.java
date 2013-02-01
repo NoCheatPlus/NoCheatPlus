@@ -134,7 +134,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	 */
 	public static final double getJumpAmplifier(final Player player) {
 		final double amplifier = NoCheatPlus.getMCAccess().getJumpAmplifier(player);
-		if (amplifier == Double.MIN_VALUE) return 0D;
+		if (amplifier == Double.NEGATIVE_INFINITY) return 0D;
 		else return 1D + amplifier;
 	}
 	
@@ -489,13 +489,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         moveInfo.set(player, from, to, cc.yOnGround);
           
         if (cc.debug) {
-			StringBuilder builder = new StringBuilder(250);
+			final StringBuilder builder = new StringBuilder(250);
 			final Location loc = player.getLocation();
-			builder.append(player.getName());
+			builder.append("\n" + player.getName());
 			builder.append(" " + from.getWorld().getName() + " " + StringUtil.fdec3.format(from.getX()) + (from.getX() == loc.getX() ? "" : ("(" + StringUtil.fdec3.format(loc.getX()) + ")")));
 			builder.append(", " + StringUtil.fdec3.format(from.getY()) + (from.getY() == loc.getY() ? "" : ("(" + StringUtil.fdec3.format(loc.getY()) + ")")));
 			builder.append(", " + StringUtil.fdec3.format(from.getZ()) + (from.getZ() == loc.getZ() ? "" : ("(" + StringUtil.fdec3.format(loc.getZ()) + ")")));
 			builder.append(" -> " + StringUtil.fdec3.format(to.getX()) + ", " + StringUtil.fdec3.format(to.getY()) + ", " + StringUtil.fdec3.format(to.getZ()));
+			final double jump = mcAccess.getJumpAmplifier(player);
+			final double speed = mcAccess.getFasterMovementAmplifier(player);
+			if (speed != Double.NEGATIVE_INFINITY || jump != Double.NEGATIVE_INFINITY){
+				builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("speed=" + speed) : "") + (jump != Double.NEGATIVE_INFINITY ? ("jump=" + jump) : "") + ")");
+			}
 			System.out.print(builder.toString());
 		}
         
@@ -514,8 +519,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
 		// Potion effect "Jump".
 		final double jumpAmplifier = MovingListener.getJumpAmplifier(player);
-		if (jumpAmplifier > 0D && cc.debug) System.out.println(player.getName() + " Jump effect: " + jumpAmplifier);
 		if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
+		// TODO: same for speed (oncemedium is introduced).
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.

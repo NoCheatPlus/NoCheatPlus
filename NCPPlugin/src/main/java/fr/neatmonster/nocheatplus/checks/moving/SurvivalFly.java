@@ -536,7 +536,7 @@ public class SurvivalFly extends Check {
 		
 		// Speed amplifier.
 		final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);
-		if (speedAmplifier != Double.MIN_VALUE) hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
+		if (speedAmplifier != Double.NEGATIVE_INFINITY) hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
 		
 		return hAllowedDistance;
 	}

@@ -91,13 +91,13 @@ public interface MCAccess {
 	/**
 	 * 
 	 * @param player
-	 * @return Double.MIN_VALUE if not present.
+	 * @return Double.NEGATIVE_INFINITY if not present.
 	 */
 	public double getJumpAmplifier(Player player);
 	
 	/**
 	 * 
-	 * @return Double.MIN_VALUE if not present.
+	 * @return Double.NEGATIVE_INFINITY if not present.
 	 */
 	public double getFasterMovementAmplifier(Player player);
 

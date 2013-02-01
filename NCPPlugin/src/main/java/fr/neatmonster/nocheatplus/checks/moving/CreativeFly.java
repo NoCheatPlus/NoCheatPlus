@@ -76,7 +76,7 @@ public class CreativeFly extends Check {
         final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
         final double fSpeed;
         
-        if (speedModifier == Double.MIN_VALUE) fSpeed = 1D;
+        if (speedModifier == Double.NEGATIVE_INFINITY) fSpeed = 1D;
         else fSpeed = 1D + 0.2D * (speedModifier + 1D);
         
         final double limitH = cc.creativeFlyHorizontalSpeed / 100D * HORIZONTAL_SPEED * fSpeed;

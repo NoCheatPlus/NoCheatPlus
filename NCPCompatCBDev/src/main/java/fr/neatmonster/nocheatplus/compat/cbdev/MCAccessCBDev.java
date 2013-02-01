@@ -111,14 +111,14 @@ public class MCAccessCBDev implements MCAccess{
 		final net.minecraft.server.v1_4_R1.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 	
 		if (mcPlayer.hasEffect(MobEffectList.JUMP)) return mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
-		else return Double.MIN_VALUE;
+		else return Double.NEGATIVE_INFINITY;
 	}
 
 	@Override
 	public double getFasterMovementAmplifier(final Player player) {
 		final net.minecraft.server.v1_4_R1.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
-		else return Double.MIN_VALUE;
+		else return Double.NEGATIVE_INFINITY;
 	}
 
 	@Override
