@@ -13,11 +13,10 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
-import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MP""""""`MM                            oo                   dP MM""""""""`M dP          
@@ -411,7 +410,9 @@ public class SurvivalFly extends Check {
 		builder.append(player.getName() + " vfreedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vv=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
 		if (!resetFrom && !resetTo) {
 //			if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
-			if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
+//			if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
+			// TODO: acc: toInformalString()
+			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append(player.getName() + " vacc=" + data.vDistAcc.toInformalString());
 		}
 		if (player.isSleeping()) tags.add("sleeping");
 		if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + StringUtil.join(tags, "+") + "\n");
@@ -665,34 +666,40 @@ public class SurvivalFly extends Check {
 			// Vertical.
 			if (yDirChange && data.sfLastYDist > 0){
 				// Change to descending phase !
-				data.vDistCount.clear(now);
-				data.vDistSum.clear(now);
-				data.vDistCount.add(1f);
-				data.vDistSum.add((float) yDistance);
+//				data.vDistCount.clear(now);
+//				data.vDistSum.clear(now);
+//				data.vDistCount.add(1f);
+//				data.vDistSum.add((float) yDistance);
+				data.vDistAcc.clear();
+				data.vDistAcc.add((float) yDistance);
 			}
 			else if (data.verticalFreedom <= 0.001D) {
 				// Here yDistance can be negative and positive (!).
 				if (yDistance != 0D){
-					final double accAboveLimit = verticalAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc");
+//					final double accAboveLimit = verticalAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc");
+					final double accAboveLimit = verticalAccounting(now, yDistance, data.vDistAcc ,tags, "vacc");
 					if (accAboveLimit > vDistanceAboveLimit){
 						// Account for lag.
 						// TODO: 1.1 might be too pessimistic.
-						if (cc.lag && TickTask.getLag(data.vDistCount.bucketDuration() * data.vDistCount.numberOfBuckets(), true) > 1.1){
-							data.vDistCount.clear(now);
-							data.vDistSum.clear(now);
-						}
-						else{
-							// Accept as violation.
-							vDistanceAboveLimit = accAboveLimit;
-						}
+//						if (cc.lag && TickTask.getLag(data.vDistCount.bucketDuration() * data.vDistCount.numberOfBuckets(), true) > 1.1){
+//							data.vDistCount.clear(now);
+//							data.vDistSum.clear(now);
+//							data.vDistAcc.clear();
+//						}
+//						else{
+//							// Accept as violation.
+//							vDistanceAboveLimit = accAboveLimit;
+//						}
+						vDistanceAboveLimit = accAboveLimit;
 					}
 					
 				}
 			}
 			else{
 				// TODO: Just to exclude source of error, might be redundant.
-				data.vDistCount.clear(now);
-				data.vDistSum.clear(now);
+//				data.vDistCount.clear(now);
+//				data.vDistSum.clear(now);
+				data.vDistAcc.clear();
 			}
 		}
 		return vDistanceAboveLimit;
@@ -711,14 +718,19 @@ public class SurvivalFly extends Check {
 	 * @param tag
 	 * @return absolute difference on violation.;
 	 */
-	private static final double verticalAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
+//	private static final double verticalAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
+	private static final double verticalAccounting(final long now, final double value, final ActionAccumulator acc, final ArrayList<String> tags, String tag)
 	{
-		sum.add(now, (float) value);
-		count.add(now, 1f);
+//		sum.add(now, (float) value);
+//		count.add(now, 1f);
+		acc.add((float) value);
 		// TODO: Add on-eq-return parameter
-		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
-			final float sc1 = sum.bucketScore(1);
-			final float sc2 = sum.bucketScore(2);
+//		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
+		if (acc.bucketScore(2) > 0 && acc.bucketScore(1) > 0) {
+//			final float sc1 = sum.bucketScore(1);
+//			final float sc2 = sum.bucketScore(2);
+			final float sc1 = acc.bucketScore(1);
+			final float sc2 = acc.bucketScore(2);
 			final double diff = sc1 - sc2;
 			if (diff > 0 || value > -1.3 && diff == 0) {
 				if (value < -1.1 && (Math.abs(diff) < Math.abs(value) || sc2 < - 10)){

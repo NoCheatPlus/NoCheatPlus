@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
-import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -146,10 +146,11 @@ public class MovingData extends ACheckData {
     
     // Accounting info.
     // TODO: optimize later.
+//  public final ActionFrequency hDistCount = new ActionFrequency(3, 333);
 //    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
-    public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
-//    public final ActionFrequency hDistCount = new ActionFrequency(3, 333);
-    public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
+	public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 5);
+//    public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
+//    public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
     // Locations shared between all checks.
     private Location    setBack = null;
@@ -230,11 +231,12 @@ public class MovingData extends ACheckData {
 	 * Clear accounting data.
 	 */
     public void clearAccounting() {
-        final long now = System.currentTimeMillis();
+//        final long now = System.currentTimeMillis();
 //        hDistSum.clear(now);
-        vDistSum.clear(now);
 //        hDistCount.clear(now);
-        vDistCount.clear(now);
+//        vDistCount.clear(now);
+//        vDistSum.clear(now);
+        vDistAcc.clear();
     }
 
     /**
