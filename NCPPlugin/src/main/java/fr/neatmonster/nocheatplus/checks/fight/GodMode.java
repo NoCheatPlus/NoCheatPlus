@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -141,7 +142,6 @@ public class GodMode extends Check {
     	
     	if (noDamageTicks == 10 || dTick == 1 && noDamageTicks < 19){
     		set = true;
-    		Bukkit.getServer().broadcastMessage("God " + player.getName() + " GRACE");
     	}
 
     	if (delta == 1){
@@ -149,7 +149,7 @@ public class GodMode extends Check {
     		legit = true;
     	}
     	
-    	Bukkit.getServer().broadcastMessage("God " + player.getName() + " delta=" + delta + " dt=" + dTick + " dndt=" + dNDT + " acc=" + data.godModeAcc + " d=" + damage + " ndt=" + noDamageTicks + " h=" + health + " slag=" + TickTask.getLag(dTick));
+//    	Bukkit.getServer().broadcastMessage("God " + player.getName() + " delta=" + delta + " dt=" + dTick + " dndt=" + dNDT + " acc=" + data.godModeAcc + " d=" + damage + " ndt=" + noDamageTicks + " h=" + health + " slag=" + TickTask.getLag(dTick));
     	
     	// TODO: might check last damage taken as well (really taken with health change)
     	
@@ -187,7 +187,14 @@ public class GodMode extends Check {
     		if (dht <= 20) return false; 
     	}
     	
-    	// TODO: Check for lagging players with keepalive timestamp.
+    	// Check for lag.
+    	// Simplified method: check moving timestamp, because a hit means a move usually.
+    	final long lastMoveTime = CombinedData.getData(player).lastMoveTime;
+    	final long time = System.currentTimeMillis();
+    	if (lastMoveTime > time || time - lastMoveTime > 1100){
+    		// TODO: reset anything in data ?
+    		return false;
+    	}
     	
     	// Violation probably.
     	data.godModeAcc += delta;
@@ -195,6 +202,7 @@ public class GodMode extends Check {
     	boolean cancel = false;
     	// TODO: bounds
     	if (data.godModeAcc > 2){
+    		// TODO: To match with old checks vls / actions, either change actions or apply a factor.
     		data.godModeVL += delta;
     		if (executeActions(player, data.godModeVL, delta, FightConfig.getConfig(player).godModeActions)){
     			cancel = true;
