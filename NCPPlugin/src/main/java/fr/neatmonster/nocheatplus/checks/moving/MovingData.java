@@ -69,6 +69,11 @@ public class MovingData extends ACheckData {
     	playersMap.clear();
     }
     
+    /**
+     * Assume the player has to move on ground or so to lift off. TODO: Test, might be better ground.
+     */
+    private static final MediumLiftOff defaultMediumLiftOff = MediumLiftOff.LIMIT_JUMP;
+    
     // Violation levels.
     public double         creativeFlyVL            = 0D;
     public double         morePacketsVL            = 0D;
@@ -90,6 +95,7 @@ public class MovingData extends ACheckData {
     public double 		  toX = Double.MAX_VALUE, toY, toZ;
     /** To/from was ground or web or assumed to be etc. */
     public boolean		  toWasReset, fromWasReset;
+    public MediumLiftOff  mediumLiftOff = defaultMediumLiftOff;
 
     // Data of the creative check.
     public boolean        creativeFlyPreviousRefused;
@@ -165,6 +171,7 @@ public class MovingData extends ACheckData {
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = -1;
 		sfDirty = false;
+		mediumLiftOff = defaultMediumLiftOff;
 	}
 
 	/**
@@ -192,7 +199,32 @@ public class MovingData extends ACheckData {
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = -1;
 		sfDirty = false;
+		mediumLiftOff = defaultMediumLiftOff;
 	}
+	
+    /**
+     * Just reset the "last locations" references.
+     * @param loc
+     */
+    public void resetPositions(final Location loc){
+        if (loc == null) resetPositions(Double.MAX_VALUE, 0, 0);
+        else resetPositions(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    /**
+     * Just reset the "last locations" references.
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void resetPositions(final double x, final double y, final double z) {
+        fromX = toX = x;
+        fromY = toY = y;
+        fromZ = toZ = z;
+        sfLastYDist = Double.MAX_VALUE;
+        sfDirty = false;
+        mediumLiftOff = defaultMediumLiftOff;
+    }
 
 	/**
 	 * Clear accounting data.
@@ -221,29 +253,6 @@ public class MovingData extends ACheckData {
         noFallFallDistance = 0;
         noFallMaxY = 0D;
         noFallSkipAirCheck = false;
-    }
-    
-    /**
-     * Just reset the "last locations" references.
-     * @param loc
-     */
-    public void resetPositions(final Location loc){
-        if (loc == null) resetPositions(Double.MAX_VALUE, 0, 0);
-        else resetPositions(loc.getX(), loc.getY(), loc.getZ());
-    }
-
-    /**
-     * Just reset the "last locations" references.
-     * @param x
-     * @param y
-     * @param z
-     */
-    public void resetPositions(final double x, final double y, final double z) {
-        fromX = toX = x;
-        fromY = toY = y;
-        fromZ = toZ = z;
-        sfLastYDist = Double.MAX_VALUE;
-        sfDirty = false;
     }
     
     /**

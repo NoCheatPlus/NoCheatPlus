@@ -277,8 +277,11 @@ public class SurvivalFly extends Check {
         else{
         	// Check traveled y-distance, orientation is air + jumping + velocity (as far as it gets).
         	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
-        	final int maxJumpPhase;
-            if (data.jumpAmplifier > 0){
+        	int maxJumpPhase;
+            if (data.mediumLiftOff == MediumLiftOff.LIMIT_JUMP){
+            	maxJumpPhase = 3;
+            }
+            else if (data.jumpAmplifier > 0){
                 vAllowedDistance += 0.5 + data.jumpAmplifier - 1.0;
                 maxJumpPhase = (int) (9 + (data.jumpAmplifier - 1.0) * 6);
             }
@@ -340,6 +343,27 @@ public class SurvivalFly extends Check {
         }
 		
 		//  Set data for normal move or violation without cancel (cancel would have returned above)
+        
+		// Check lift-off medium.
+		// TODO: Web might be NO_JUMP !
+		if (to.isInLiquid() || to.isInWeb()){
+			data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
+		}
+		else if (resetTo){
+			// TODO: This might allow jumping on vines etc., but should do for the moment.
+			data.mediumLiftOff = MediumLiftOff.GROUND;
+		}
+		else if (from.isInLiquid() || from.isInWeb()){
+			data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
+		}
+		else if (resetFrom || data.noFallAssumeGround){
+			// TODO: Where exactly to put noFallAssumeGround ?
+			data.mediumLiftOff = MediumLiftOff.GROUND;
+		}
+		else{
+			// Keep medium.
+			// TODO: Is above stairs ?
+		}
 		
         // Apply reset conditions.
         data.toWasReset = resetTo || data.noFallAssumeGround;
