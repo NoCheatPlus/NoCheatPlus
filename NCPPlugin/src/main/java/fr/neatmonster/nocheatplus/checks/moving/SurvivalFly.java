@@ -298,7 +298,7 @@ public class SurvivalFly extends Check {
             	else if (!data.sfDirty){
             		// Violation (Too high jumping or step).
             		tags.add("maxphase");
-            		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, 1.0);
+            		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.max(yDistance, 0.5));
             	}
             }
 
