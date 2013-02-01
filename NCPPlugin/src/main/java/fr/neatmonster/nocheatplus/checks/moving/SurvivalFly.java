@@ -338,8 +338,10 @@ public class SurvivalFly extends Check {
             // Slowly reduce the level with each event, if violations have not recently happened.
             if (now - data.sfVLTime > cc.survivalFlyVLFreeze) data.survivalFlyVL *= 0.95D;
         }
-        
-        // Violation or not, apply reset conditions (cancel would have returned above).
+		
+		//  Set data for normal move or violation without cancel (cancel would have returned above)
+		
+        // Apply reset conditions.
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
         if (resetTo){
@@ -358,6 +360,20 @@ public class SurvivalFly extends Check {
         return null;
     }
 
+    /**
+     * Syso debug output.
+     * @param player
+     * @param data
+     * @param cc
+     * @param hDistance
+     * @param hAllowedDistance
+     * @param yDistance
+     * @param vAllowedDistance
+     * @param fromOnGround
+     * @param resetFrom
+     * @param toOnGround
+     * @param resetTo
+     */
 	private void outputDebug(final Player player, final MovingData data, final MovingConfig cc, 
 			final double hDistance, final double hAllowedDistance, final double yDistance, final double vAllowedDistance,
 			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
@@ -375,6 +391,16 @@ public class SurvivalFly extends Check {
 		System.out.print(builder.toString());
 	}
 
+	/**
+	 * Check if the player might have been on ground due to moving down and jumping up again, but somehow no event showing him on ground has been fired.
+	 * @param player
+	 * @param from
+	 * @param to
+	 * @param yDistance
+	 * @param data
+	 * @param cc
+	 * @return
+	 */
 	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
 		// Don't set "useWorkaround = x()", to avoid potential trouble with
 		// reordering to come, and similar.
@@ -488,6 +514,17 @@ public class SurvivalFly extends Check {
 		return hAllowedDistance;
 	}
 
+	/**
+	 * Violation handling put here to have less code for the frequent processing of check.
+	 * @param now
+	 * @param result
+	 * @param player
+	 * @param from
+	 * @param to
+	 * @param data
+	 * @param cc
+	 * @return
+	 */
 	private final Location handleViolation(final long now, final double result, final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
 	{
 		// Increment violation level.
@@ -515,6 +552,13 @@ public class SurvivalFly extends Check {
 		}
 	}
 	
+	/**
+	 * Hover violations have to be handled in this check, because they are handled as SurvivalFly violations (needs executeActions).
+	 * @param player
+	 * @param loc
+	 * @param cc
+	 * @param data
+	 */
 	protected final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
 		data.survivalFlyVL += cc.sfHoverViolation;
 		
@@ -689,6 +733,11 @@ public class SurvivalFly extends Check {
 		} else return null;
 	}
 
+	/**
+	 * This is set with PlayerToggleSneak, to be able to distinguish players that are really sneaking from players that are set sneaking by a plugin. 
+	 * @param player
+	 * @param sneaking
+	 */
 	public void setReallySneaking(final Player player, final boolean sneaking) {
 		if (sneaking) reallySneaking.add(player.getName());
 		else reallySneaking.remove(player.getName());
