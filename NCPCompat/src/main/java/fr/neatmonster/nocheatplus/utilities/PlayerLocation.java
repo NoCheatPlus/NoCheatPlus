@@ -395,6 +395,38 @@ public class PlayerLocation {
 	}
 	
 	/**
+	 * Simple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
+	 * @param yOnGround Margin below the player.
+	 * @return
+	 */
+	public boolean isOnGround(final double yOnGround){
+		return isOnGround(yOnGround, 0D, 0D);
+	}
+	
+	
+	/**
+	 * Simple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
+	 * @param yOnGround Margin below the player.
+	 * @param xzMargin
+	 * @param yMargin Extra margin added below and above.
+	 * @return
+	 */
+	public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin) {
+		return BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
+	}
+	
+	/**
+	 * Simple check with custom margins (Boat, Minecart). 
+	 * @param yOnGround Margin below the player.
+	 * @param xzMargin
+	 * @param yMargin Extra margin added below and above.
+	 * @return
+	 */
+	public boolean standsOnEntity(final double yOnGround, final double xzMargin, final double yMargin){
+		return blockCache.standsOnEntity(player, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
+	}
+	
+	/**
 	 * Reset condition for flying checks (sf + nofall): fluids, web, ladder (not on-ground, though).
 	 * @return
 	 */
