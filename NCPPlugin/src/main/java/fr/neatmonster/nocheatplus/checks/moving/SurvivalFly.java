@@ -282,6 +282,7 @@ public class SurvivalFly extends Check {
         	int maxJumpPhase;
             if (data.mediumLiftOff == MediumLiftOff.LIMIT_JUMP){
             	maxJumpPhase = 3;
+            	if (data.sfJumpPhase > 0) tags.add("limitjump");
             }
             else if (data.jumpAmplifier > 0){
                 vAllowedDistance += 0.5 + data.jumpAmplifier - 1.0;
@@ -358,7 +359,15 @@ public class SurvivalFly extends Check {
 			// TODO: This might allow jumping on vines etc., but should do for the moment.
 			data.mediumLiftOff = MediumLiftOff.GROUND;
 		}
-		else if (from.isInLiquid() || from.isInWeb()){
+		else if (from.isInLiquid()){
+			if (to.isNextToSolid(0.15, 0.001)){
+				data.mediumLiftOff = MediumLiftOff.GROUND;
+			}
+			else{
+				data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
+			}
+		}
+		else if (from.isInWeb()){
 			data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
 		}
 		else if (resetFrom || data.noFallAssumeGround){
@@ -414,7 +423,6 @@ public class SurvivalFly extends Check {
 		if (!resetFrom && !resetTo) {
 //			if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
 //			if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
-			// TODO: acc: toInformalString()
 			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append(player.getName() + " vacc=" + data.vDistAcc.toInformalString());
 		}
 		if (player.isSleeping()) tags.add("sleeping");

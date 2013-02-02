@@ -427,6 +427,16 @@ public class PlayerLocation {
 	}
 	
 	/**
+	 * Check if solid blocks hit the box.
+	 * @param xzMargin
+	 * @param yMargin
+	 * @return
+	 */
+	public boolean isNextToSolid(final double xzMargin, final double yMargin){
+		return BlockProperties.collides(blockCache, minX - xzMargin, minY - yMargin, minZ - xzMargin, maxX + xzMargin, maxY + yMargin, maxZ + xzMargin, BlockProperties.F_SOLID);
+	}
+	
+	/**
 	 * Reset condition for flying checks (sf + nofall): fluids, web, ladder (not on-ground, though).
 	 * @return
 	 */
