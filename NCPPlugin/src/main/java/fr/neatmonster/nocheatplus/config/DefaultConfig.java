@@ -381,6 +381,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
 //        set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC, true);
+        set(ConfPaths.MOVING_SURVIVALFLY_FALLDAMAGE, true);
         // The settings aren't enabled by default. Simply write them yourself in the configuration file.
         // set(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);

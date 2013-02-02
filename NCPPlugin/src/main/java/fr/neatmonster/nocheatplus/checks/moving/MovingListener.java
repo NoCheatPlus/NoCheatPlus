@@ -343,7 +343,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 			if (target != null){
 				// Actually this should not possibly be null, this is a block for "future" purpose, feel free to criticize it.
-				if (sfCheck && noFall.isEnabled(player)){
+				if (sfCheck && cc.sfFallDamage && noFall.isEnabled(player)){
 					// Check if to deal damage.
 					double y = loc.getY();
 					if (data.hasSetBack()) y = Math.min(y, data.getSetBackY());
@@ -570,7 +570,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 					if (passableTo != null){
 						// Deal damage if necessary.
 						// Leaving out: player.getLocation().getY()
-						noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
+						if (cc.sfFallDamage) noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
 					}
 					else if (newTo == null) {
 						// NOTE: noFall might set yOnGround for the positions.
@@ -579,7 +579,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 					else{
 						// Deal damage if necessary.
 						// Leaving out: player.getLocation().getY()
-						noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
+						if (cc.sfFallDamage) noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
 					}
 				}
         	}

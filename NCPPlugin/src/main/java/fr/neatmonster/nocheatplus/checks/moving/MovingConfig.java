@@ -100,6 +100,7 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    survivalFlyCobwebHack;
     public final boolean    survivalFlyAccountingH;
     public final boolean    survivalFlyAccountingV;
+    public final boolean    sfFallDamage;
     public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
     
@@ -158,6 +159,7 @@ public class MovingConfig extends ACheckConfig {
         survivalFlyCobwebHack = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
         survivalFlyAccountingH = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
         survivalFlyAccountingV = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
+        sfFallDamage = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_FALLDAMAGE);
         survivalFlyVLFreeze = data.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
         survivalFlyActions = data.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         
