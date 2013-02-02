@@ -85,6 +85,7 @@ public class FightData extends ACheckData {
     public double lastAttackedX		= Integer.MAX_VALUE;
     public double lastAttackedY;
     public double lastAttackedZ;
+	public long regainHealthTime    = 0;
 //    public double lastAttackedDist = 0.0;
     public long damageTakenByEntityTick;
 

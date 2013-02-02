@@ -318,13 +318,16 @@ public class FightListener extends CheckListener {
         if (event.isSprinting()) FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
     }
     
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityRegainHealth(final EntityRegainHealthEvent event){
     	final Entity entity = event.getEntity();
     	if (!(entity instanceof Player)) return;
     	final Player player = (Player) entity;
     	final FightData data = FightData.getData(player);
-    	// Set health to maximum.
+    	// Remember the time.
+    	data.regainHealthTime = System.currentTimeMillis();
+    	// Set god-mode health to maximum.
     	data.godModeHealth = Math.max(data.godModeHealth, player.getHealth() + event.getAmount());
+
     }
 }
