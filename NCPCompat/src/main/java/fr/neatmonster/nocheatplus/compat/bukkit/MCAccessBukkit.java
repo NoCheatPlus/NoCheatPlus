@@ -166,5 +166,11 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 			}
 		}
 	}
+
+	@Override
+	public long getKeepAliveTime(final Player player) {
+		// TODO: Implement if possible.
+		return Long.MIN_VALUE;
+	}
 	
 }

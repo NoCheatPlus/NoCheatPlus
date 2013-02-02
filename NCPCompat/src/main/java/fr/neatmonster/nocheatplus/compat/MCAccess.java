@@ -127,5 +127,12 @@ public interface MCAccess {
 	 * @param i
 	 */
 	public void setDead(Player player, int deathTicks);
+	
+	/**
+	 * Get timestamp of the keep-alive field (not only updated on keep-alive packets).
+	 * @param player The player for which to get the time.
+	 * @return Long.MIN_VALUE if not possible.
+	 */
+	public long getKeepAliveTime(Player player);
 		
 }

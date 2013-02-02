@@ -154,4 +154,10 @@ public class MCAccessCBDev implements MCAccess{
         mcPlayer.dead = true;
 	}
 	
+	@Override
+	public long getKeepAliveTime(final Player player) {
+		// TODO: Implement if possible.
+		return Long.MIN_VALUE;
+	}
+	
 }

@@ -153,5 +153,11 @@ public class MCAccessCB2511 implements MCAccess {
         mcPlayer.deathTicks = deathTicks;
         mcPlayer.dead = true;
 	}
+	
+	@Override
+	public long getKeepAliveTime(final Player player) {
+		// TODO: Implement if possible.
+		return Long.MIN_VALUE;
+	}
 
 }
