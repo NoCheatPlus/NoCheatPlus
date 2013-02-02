@@ -66,7 +66,7 @@ public class Critical extends Check {
         // and without blindness effect).
         if (mcFallDistance > 0f && !BlockProperties.isOnGroundOrResetCond(player, loc, mCc.yOnGround) && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
             // It was a critical hit, now check if the player has jumped or has sent a packet to mislead the server.
-            if (player.getFallDistance() < cc.criticalFallDistance || Math.abs(player.getVelocity().getY()) < cc.criticalVelocity) {
+            if (player.getFallDistance() < cc.criticalFallDistance) { // removed velocity
             	final MovingConfig ccM = MovingConfig.getConfig(player);
             	final MovingData dataM = MovingData.getData(player);
             	if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){

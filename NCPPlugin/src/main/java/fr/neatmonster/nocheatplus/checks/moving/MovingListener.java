@@ -491,7 +491,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (cc.debug) {
 			final StringBuilder builder = new StringBuilder(250);
 			final Location loc = player.getLocation();
-			builder.append("\n" + player.getName());
+			builder.append(player.getName());
 			builder.append(" " + from.getWorld().getName() + " " + StringUtil.fdec3.format(from.getX()) + (from.getX() == loc.getX() ? "" : ("(" + StringUtil.fdec3.format(loc.getX()) + ")")));
 			builder.append(", " + StringUtil.fdec3.format(from.getY()) + (from.getY() == loc.getY() ? "" : ("(" + StringUtil.fdec3.format(loc.getY()) + ")")));
 			builder.append(", " + StringUtil.fdec3.format(from.getZ()) + (from.getZ() == loc.getZ() ? "" : ("(" + StringUtil.fdec3.format(loc.getZ()) + ")")));

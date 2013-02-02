@@ -417,16 +417,16 @@ public class SurvivalFly extends Check {
 			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
 		// TODO: also show resetcond (!)
 		StringBuilder builder = new StringBuilder(500);
-		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + "\n");
-		builder.append(player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "\n");
-		builder.append(player.getName() + " vfreedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vv=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase + "\n");
+		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")));
+		builder.append("\n" + player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " / " +  StringUtil.fdec3.format(vAllowedDistance));
+		builder.append("\n" + player.getName() + " vfreedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vv=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase);
 		if (!resetFrom && !resetTo) {
 //			if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
 //			if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
-			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append(player.getName() + " vacc=" + data.vDistAcc.toInformalString());
+			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append("\n" + player.getName() + " vacc=" + data.vDistAcc.toInformalString());
 		}
 		if (player.isSleeping()) tags.add("sleeping");
-		if (!tags.isEmpty()) builder.append(player.getName() + " tags: " + StringUtil.join(tags, "+") + "\n");
+		if (!tags.isEmpty()) builder.append("\n" + player.getName() + " tags: " + StringUtil.join(tags, "+"));
 		System.out.print(builder.toString());
 	}
 
@@ -458,9 +458,10 @@ public class SurvivalFly extends Check {
 			setBackSafe = true;
 		}
 		// Interpolation check.
-		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0) {
+		// TODO: Check if the set-back distance still has relevance.
+		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance <= 0.5 + 0.2 * data.jumpAmplifier && data.sfLastYDist < 0) {
 			final double setBackYDistance = to.getY() - data.getSetBackY();
-			if (setBackYDistance > 0D && setBackYDistance <= 1.5D) {
+			if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
 				// Interpolate from last to-coordinates to the from
 				// coordinates (with some safe-guard).
 				final double dX = from.getX() - data.fromX;
@@ -471,7 +472,7 @@ public class SurvivalFly extends Check {
 					// Check full bounding box since last from.
 					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
 					final double iY = minY; // TODO ...
-					final double r = from.getWidth() / 2.0;
+					final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
 					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
 						useWorkaround = true;
 						setBackSafe = true;
