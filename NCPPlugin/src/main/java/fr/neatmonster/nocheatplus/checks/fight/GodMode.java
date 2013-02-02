@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -187,12 +187,15 @@ public class GodMode extends Check {
     		if (dht <= 20) return false; 
     	}
     	
-    	// Check for lag.
-    	// Simplified method: check moving timestamp, because a hit means a move usually.
-    	final long lastMoveTime = CombinedData.getData(player).lastMoveTime;
-    	final long time = System.currentTimeMillis();
-    	if (lastMoveTime > time || time - lastMoveTime > 1100){
-    		// TODO: reset anything in data ?
+    	// Check for client side lag.
+    	final long now = System.currentTimeMillis();
+    	final long maxAge = 5000;  // Allows 5 seconds lag max. TODO: Balance, test.
+    	long keepAlive = mcAccess.getKeepAliveTime(player);
+    	if (keepAlive > now || keepAlive == Long.MIN_VALUE){
+    		keepAlive = CheckUtils.guessKeepAliveTime(player, now, maxAge);
+    	}
+    	if (keepAlive != Double.MIN_VALUE && now - keepAlive > 1000 && now - keepAlive < maxAge){
+    		// Assume lag.
     		return false;
     	}
     	

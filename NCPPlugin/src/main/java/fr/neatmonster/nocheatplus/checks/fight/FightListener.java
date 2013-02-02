@@ -327,6 +327,7 @@ public class FightListener extends CheckListener {
     	// Remember the time.
     	data.regainHealthTime = System.currentTimeMillis();
     	// Set god-mode health to maximum.
+    	// TODO: Mind that health regain might half the ndt.
     	data.godModeHealth = Math.max(data.godModeHealth, player.getHealth() + event.getAmount());
 
     }
