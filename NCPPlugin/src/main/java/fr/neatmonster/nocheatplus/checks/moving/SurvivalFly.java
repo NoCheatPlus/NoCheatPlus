@@ -213,7 +213,7 @@ public class SurvivalFly extends Check {
 		}
 
         // Calculate the vertical speed limit based on the current jump phase.
-        double vAllowedDistance, vDistanceAboveLimit = 0;
+        double vAllowedDistance = 0, vDistanceAboveLimit = 0;
         if (from.isInWeb()){
         	// Very simple: force players to descend or stay.
          	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
@@ -291,13 +291,15 @@ public class SurvivalFly extends Check {
             // TODO: consider tags for jumping as well (!).
             if (data.sfJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0){
             	// Could use dirty flag here !
-            	if (data.sfDirty || yDistance < 0){
+            	boolean useDist = data.sfDirty || yDistance < 0 || resetFrom;
+            	if (useDist){
+            		// TODO: (This allows the one tick longer jump (resetTo)).
             		vAllowedDistance -= Math.max(0, (data.sfJumpPhase - maxJumpPhase) * 0.15D);
             	}
             	else if (!data.sfDirty){
             		// Violation (Too high jumping or step).
             		tags.add("maxphase");
-            		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.max(yDistance, 0.5));
+            		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.max(yDistance, 0.15));
             	}
             }
 
@@ -307,6 +309,7 @@ public class SurvivalFly extends Check {
 			if (vDistanceAboveLimit > 0) tags.add("vdist");
 
 			// Simple-step blocker.
+			// TODO: Complex step blocker: distance to set-back + low jump + accounting info
 			if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
 				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
 				tags.add("step");
@@ -440,8 +443,13 @@ public class SurvivalFly extends Check {
 			useWorkaround = true;
 			setBackSafe = true;
 		}
-		// Check for "lost touch", for when moving events were not created,
-		// for instance (1/256).
+		// Check for "lost touch", for when moving events are missing somehow.
+		// Half block step up.
+		if (yDistance > 0 && yDistance <= 0.5 && to.isOnGround() && from.isOnGround(0.5 - Math.abs(yDistance))){
+			useWorkaround = true;
+			setBackSafe = true;
+		}
+		// Interpolation check.
 		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance < 0.5 && data.sfLastYDist < 0) {
 			final double setBackYDistance = to.getY() - data.getSetBackY();
 			if (setBackYDistance > 0D && setBackYDistance <= 1.5D) {
