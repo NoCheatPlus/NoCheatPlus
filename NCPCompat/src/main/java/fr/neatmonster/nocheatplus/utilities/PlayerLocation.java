@@ -369,7 +369,7 @@ public class PlayerLocation {
 	}
 
 	/**
-	 * Checks if the player is on ground.
+	 * Checks if the player is on ground, including entities such as Minecart, Boat.
 	 * 
 	 * @return true, if the player is on ground
 	 */
@@ -377,15 +377,18 @@ public class PlayerLocation {
 		if (onGround == null) {
 			final double d0 = 0; //0.001D;
 			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
-				if (BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY + 0.25, z, blockX, blockY, blockZ, getTypeId())){
+				// TODO: Evaluate 0.25 !!
+				final int id = getTypeIdBelow();
+				if (BlockProperties.isGround(id) && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, blockY - 1, blockZ, id)){
 					onGround = true;
 				}
+				// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
 				else onGround = BlockProperties.isOnGround(blockCache, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
 			}
 			else onGround = false;
 			if (!onGround) {
 				final double d1 = 0.25D;
-				onGround = blockCache.standsOnEntity(player, minX - d1, minY - getyOnGround() - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
+				onGround = blockCache.standsOnEntity(player, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
 			}
 		}
 		return onGround;
