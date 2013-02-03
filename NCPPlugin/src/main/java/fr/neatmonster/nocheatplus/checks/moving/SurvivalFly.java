@@ -264,8 +264,7 @@ public class SurvivalFly extends Check {
             		vAllowedDistance = swimmingSpeed + 0.5;
         		}
         		else{
-            		vAllowedDistance = swimmingSpeed;
-
+            		vAllowedDistance = swimmingSpeed + 0.02;
         		}
         		vDistanceAboveLimit = yDistance - vAllowedDistance;
         		if (vDistanceAboveLimit > 0) tags.add("swimup");
@@ -398,7 +397,7 @@ public class SurvivalFly extends Check {
         // Apply reset conditions.
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
-        if (yDistance < 0 && data.sfLastYDist > 0){
+        if (yDistance <= 0 && data.sfLastYDist > 0){
 //        	data.verticalFreedom = 0;
         	data.verticalVelocityCounter = 0;
         	data.verticalVelocity = 0;
@@ -409,9 +408,11 @@ public class SurvivalFly extends Check {
             data.sfJumpPhase = 0;
             data.clearAccounting();
             // TODO: Experimental: reset velocity.
-            data.verticalVelocityCounter = 0;
-            data.verticalFreedom = 0;
-            data.verticalVelocity = 0;
+            if (toOnGround || Math.abs(yDistance) < 0.18){
+                data.verticalVelocityCounter = 0;
+                data.verticalFreedom = 0;
+                data.verticalVelocity = 0;
+            }
             if (hDistance < sprintingSpeed){
             	data.horizontalFreedom = 0;
             	data.horizontalVelocityCounter = 0;
