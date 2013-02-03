@@ -26,12 +26,11 @@ Links
 ---------
 
 Project
-* [Website (simple!)] (http://www.nocheatplus.org/)
-* [Project on BukkitDev] (http://dev.bukkit.org/server-mods/nocheatplus/)
+* [Project at BukkitDev] (http://dev.bukkit.org/server-mods/nocheatplus/)
 
 Download
 * [BukkitDev (staff approved)] (http://dev.bukkit.org/server-mods/nocheatplus/files/)
-* [Jenkins (development versions)] (http://www.nocheatplus.org:8080/)
+* [Jenkins (development versions)] (http://ci.ecocitycraft.com/)
 
 Support and Documentation
 * [Tickets] (http://dev.bukkit.org/server-mods/nocheatplus/tickets/)
@@ -45,3 +44,6 @@ Miscellaneous
 Developers
 * [License] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
 * [API] (http://dev.bukkit.org/server-mods/nocheatplus/pages/documentation/api/)
+
+Related
+* [CompatNoCheatPlus at BukkitDev] (http://dev.bukkit.org/server-mods/compatnocheatplus/)
