@@ -392,13 +392,20 @@ public class BlockProperties {
         }
 		// Ignore for passable.
 		for (final Material mat : new Material[]{
-				Material.WOOD_PLATE, Material.STONE_PLATE, 
 				Material.WALL_SIGN, Material.SIGN_POST,
-				Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
-				Material.LADDER,
 		}){
-			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
+			blockFlags[mat.getId()] &= ~(F_GROUND | F_SOLID);
 		}
+		// Not ground (!).
+		// Ignore for passable.
+				for (final Material mat : new Material[]{
+						Material.WOOD_PLATE, Material.STONE_PLATE, 
+						Material.WALL_SIGN, Material.SIGN_POST,
+						Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+						Material.LADDER,
+				}){
+					blockFlags[mat.getId()] |= F_IGN_PASSABLE;
+				}
 		
 		for (final Material mat : new Material[]{
 				Material.FENCE, Material.FENCE_GATE, Material.COBBLE_WALL,
