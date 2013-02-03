@@ -148,7 +148,7 @@ public class MovingData extends ACheckData {
     // TODO: optimize later.
 //  public final ActionFrequency hDistCount = new ActionFrequency(3, 333);
 //    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
-	public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 5);
+	public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
 //    public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
 //    public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
