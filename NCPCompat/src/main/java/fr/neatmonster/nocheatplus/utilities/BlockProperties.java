@@ -936,6 +936,30 @@ public class BlockProperties {
 	public static final void setBlockFlags(final int id, final long flags){
 		blockFlags[id] = flags;
 	}
+	
+	/**
+	 * Auxiliary check for if this block is climbable and allows climbing up. Does not account for jumping off ground etc.
+	 * @param cache
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public static final boolean canClimbUp(final BlockCache cache, final int x, final int y, final int z){
+		final int id = cache.getTypeId(x, y, z);
+		if ((blockFlags[id] & F_CLIMBABLE) == 0) return false;
+		if (id == Material.LADDER.getId()) return true;
+		// The direct way is a problem (backwards compatibility to before 1.4.5-R1.0).
+		if ((blockFlags[cache.getTypeId(x + 1, y, z)] & F_SOLID) != 0) return true;
+		if ((blockFlags[cache.getTypeId(x - 1, y, z)] & F_SOLID) != 0) return true;
+		if ((blockFlags[cache.getTypeId(x, y, z + 1)] & F_SOLID) != 0) return true;
+		if ((blockFlags[cache.getTypeId(x, y, z - 1)] & F_SOLID) != 0) return true;
+		return false;
+	}
+	
+	public static final boolean isClimbable(final int id) {
+		return (blockFlags[id] & F_CLIMBABLE) != 0;
+	}
 
 	public static final boolean isStairs(final int id) {
 		return (blockFlags[id] & F_STAIRS) != 0;
@@ -1484,4 +1508,5 @@ public class BlockProperties {
 		blockCache = null;
 		// TODO: might empty mappings...
 	}
+	
 }

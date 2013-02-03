@@ -44,7 +44,7 @@ public class SurvivalFly extends Check {
 	public static final double swimmingSpeed    = 0.115D;
 	public static final double webSpeed         = 0.105D; // TODO: walkingSpeed * 0.15D; <- does not work
 	
-//	public static final double climbSpeed      = sprintingSpeed; // TODO.
+	public static final double climbSpeed      = sprintingSpeed; // TODO.
 	
 	public static final double modIce			= 2.5D;
 	
@@ -232,29 +232,45 @@ public class SurvivalFly extends Check {
         	}
         	if (vDistanceAboveLimit > 0) tags.add("vweb");
         }
-//        else if (data.verticalFreedom <= 0.001 && from.isOnClimbable()){
-//        	// Ladder types.
+        else if (data.verticalFreedom <= 0.001 && from.isOnClimbable()){
+        	// Ladder types.
+        	// TODO: bring in in-medium accounting.
 //        	// TODO: make these extra checks to the jumpphase thing ?
 //        	if (fromOnGround) vAllowedDistance = climbSpeed + 0.3;
 //        	else vAllowedDistance = climbSpeed;
 //        	vDistanceAboveLimit = Math.abs(yDistance) - vAllowedDistance;
 //        	if (vDistanceAboveLimit > 0) tags.add("vclimb");
-//        }
-//        else if (data.verticalFreedom <= 0.001 && from.isInLiquid()){
-//        	// Swimming...
-//        	// TODO: This is more complex, depends on speed of diving into it.
-//        	if (yDistance >= 0){
-//        		// TODO: This is more simple to test.
-//        		if (!to.isInLiquid()){
-//            		vAllowedDistance = swimmingSpeed + 0.3;
-//        		}
-//        		else{
-//            		vAllowedDistance = swimmingSpeed;
-//
-//        		}
-//        		vDistanceAboveLimit = yDistance - vAllowedDistance;
-//        		if (vDistanceAboveLimit > 0) tags.add("swimup");
-//        	}
+        	if (yDistance > climbSpeed){
+        		tags.add("climbspeed");
+        		Math.max(vDistanceAboveLimit, yDistance - climbSpeed);
+        	}
+        	if (yDistance > 0){
+            	if (!fromOnGround && ! toOnGround && !data.noFallAssumeGround){
+            		// Check if player may climb up.
+            		final double jumpHeight = 1.45 + (data.jumpAmplifier > 0 ? (0.5 + data.jumpAmplifier - 1.0) : 0.0);
+            		if (!from.canClimbUp(jumpHeight)){
+            			tags.add("climbup");
+            			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance);
+            		}
+            	}
+        	}
+
+        }
+        else if (data.verticalFreedom <= 0.001 && from.isInLiquid()){
+        	// Swimming...
+        	if (yDistance >= 0){
+        		// TODO: This is more simple to test.
+        		if (!to.isInLiquid()){
+            		vAllowedDistance = swimmingSpeed + 0.5;
+        		}
+        		else{
+            		vAllowedDistance = swimmingSpeed;
+
+        		}
+        		vDistanceAboveLimit = yDistance - vAllowedDistance;
+        		if (vDistanceAboveLimit > 0) tags.add("swimup");
+        	}
+        	// TODO: This is more complex, depends on speed of diving into it.
 //        	else{
 //        		// TODO
 //        		if (-yDistance > swimmingSpeed * modDownStream){
@@ -275,7 +291,7 @@ public class SurvivalFly extends Check {
 //    				vAllowedDistance = Math.abs(yDistance);
 //        		}
 //        	}
-//        }
+        }
         else{
         	// Check traveled y-distance, orientation is air + jumping + velocity (as far as it gets).
         	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;

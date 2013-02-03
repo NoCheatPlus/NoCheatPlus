@@ -342,6 +342,38 @@ public class PlayerLocation {
 		}
 		return onClimbable;
 	}
+	
+	/**
+	 * Check if a player may climb upwards (isOnClimbable returned true, player does not move from/to ground).<br>
+	 * Having checked the other stuff is prerequisite for calling this (!).
+	 * @param jumpHeigth Height the player is allowed to have jumped.
+	 * @return
+	 */
+	public boolean canClimbUp(double jumpHeigth){
+		// TODO: distinguish vines.
+		if (getTypeId() == Material.VINE.getId()){
+			// Check if vine is attached to something solid
+			if (BlockProperties.canClimbUp(blockCache, blockX, blockY, blockZ)){
+				return true;
+			}
+			// Check the block at head height.
+			final int headY = Location.locToBlock(y + player.getEyeHeight());
+			if (headY > blockY){
+				for (int cy = blockY + 1; cy <= headY; cy ++){
+					if (BlockProperties.canClimbUp(blockCache, blockX, cy, blockZ)){
+						return true;
+					}
+				}
+			}
+			// Finally check possible jump height.
+			// TODO: This too is inaccurate.
+			if (isOnGround(jumpHeigth)){
+				return true;
+			}
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Checks if the player is above a ladder or vine.<br>
