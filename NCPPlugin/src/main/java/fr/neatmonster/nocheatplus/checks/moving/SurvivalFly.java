@@ -256,7 +256,7 @@ public class SurvivalFly extends Check {
         	}
 
         }
-        else if (data.verticalFreedom <= 0.001 && from.isInLiquid()){
+        else if (data.verticalFreedom <= 0.001 && from.isInLiquid() && (Math.abs(yDistance) > 0.2 || to.isInLiquid())){
         	// Swimming...
         	if (yDistance >= 0){
         		// TODO: This is more simple to test.
