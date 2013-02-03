@@ -524,8 +524,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
-        if (data.horizontalVelocityCounter > 0D)
-            data.horizontalVelocityCounter--;
+        if (data.horizontalVelocityCounter > 0D){
+        	data.horizontalVelocityCounter--;
+        	data.horizontalFreedom -= 0.09;
+        }
         else if (data.horizontalFreedom > 0.001D)
             data.horizontalFreedom *= 0.90D;
         
@@ -890,7 +892,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
             data.horizontalFreedom += newVal;
-            data.horizontalVelocityCounter = 50; // Math.min(100, (int) Math.round(newVal * 10.0)); // 30;
+            data.horizontalVelocityCounter = Math.min(100, (int) Math.round(newVal * 10.0)); // 30;
         }
         
         // Set dirty flag here.

@@ -411,7 +411,7 @@ public class SurvivalFly extends Check {
             data.sfJumpPhase = 0;
             data.clearAccounting();
             // TODO: Experimental: reset velocity.
-            if (toOnGround || Math.abs(yDistance) < 0.18){
+            if (toOnGround && yDistance < 0 || Math.abs(yDistance) < 0.09){
                 data.verticalVelocityCounter = 0;
                 data.verticalFreedom = 0;
                 data.verticalVelocity = 0;
