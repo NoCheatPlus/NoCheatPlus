@@ -240,14 +240,14 @@ public class SurvivalFly extends Check {
 //        	else vAllowedDistance = climbSpeed;
 //        	vDistanceAboveLimit = Math.abs(yDistance) - vAllowedDistance;
 //        	if (vDistanceAboveLimit > 0) tags.add("vclimb");
-        	if (yDistance > climbSpeed){
+        	final double jumpHeight = 1.45 + (data.jumpAmplifier > 0 ? (0.5 + data.jumpAmplifier - 1.0) : 0.0);
+        	if (yDistance > climbSpeed && !from.isOnGround(jumpHeight)){
         		tags.add("climbspeed");
-        		Math.max(vDistanceAboveLimit, yDistance - climbSpeed);
+        		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance - climbSpeed);
         	}
         	if (yDistance > 0){
             	if (!fromOnGround && ! toOnGround && !data.noFallAssumeGround){
             		// Check if player may climb up.
-            		final double jumpHeight = 1.45 + (data.jumpAmplifier > 0 ? (0.5 + data.jumpAmplifier - 1.0) : 0.0);
             		if (!from.canClimbUp(jumpHeight)){
             			tags.add("climbup");
             			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance);
@@ -403,6 +403,14 @@ public class SurvivalFly extends Check {
             data.setSetBack(to);
             data.sfJumpPhase = 0;
             data.clearAccounting();
+//            // TODO: Experimental: reset velocity.
+//            data.verticalVelocityCounter = 0;
+//            data.verticalFreedom = 0;
+//            data.verticalVelocity = 0;
+//            if (hDistance < sprintingSpeed){
+//            	data.horizontalFreedom = 0;
+//            	data.horizontalVelocityCounter = 0;
+//            }
         }
         else if (resetFrom){
             // The player moved from ground.
