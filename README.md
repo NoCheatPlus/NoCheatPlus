@@ -46,4 +46,4 @@ Developers
 * [API] (http://dev.bukkit.org/server-mods/nocheatplus/pages/documentation/api/)
 
 Related
-* [CompatNoCheatPlus at BukkitDev] (http://dev.bukkit.org/server-mods/compatnocheatplus/)
+* [CompatNoCheatPlus at BukkitDev] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
