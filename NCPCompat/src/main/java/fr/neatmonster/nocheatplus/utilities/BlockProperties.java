@@ -1305,6 +1305,22 @@ public class BlockProperties {
         else return true;
     }
     
+   /**
+    * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
+    * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
+    * @param access
+    * @param minX
+    * @param minY
+    * @param minZ
+    * @param maxX
+    * @param maxY
+    * @param maxZ
+    * @return
+    */
+   public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
+    	return isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 0L);
+    }
+    
     /**
      * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
      * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
@@ -1315,9 +1331,10 @@ public class BlockProperties {
      * @param maxX
      * @param maxY
      * @param maxZ
+     * @param ignoreFlags Blocks with these flags are not counted as ground.
      * @return
      */
-    public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
+    public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long ignoreFlags){
     	final int maxBlockY = access.getMaxBlockY();
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
@@ -1330,14 +1347,14 @@ public class BlockProperties {
             for (int z = iMinZ; z <= iMaxZ; z++){
                 for (int y = iMinY; y <= iMaxY; y++){
                     final int id = access.getTypeId(x, y, z);
-                    if ((blockFlags[id] & F_GROUND) != 0){
+                    if ((blockFlags[id] & F_GROUND) != 0 && (blockFlags[id] & ignoreFlags) == 0){
                         // Might collide.
                         if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
                         	if (y >= maxBlockY) return true;
                             final int aboveId = access.getTypeId(x, y + 1, z);
                             final long flags = blockFlags[aboveId];
-                            if ((flags & (F_IGN_PASSABLE)) != 0); // Ignore these.
-                            else if ((flags & (F_GROUND)) != 0){
+                            if ((flags & F_IGN_PASSABLE) != 0); // Ignore these.
+                            else if ((flags & F_GROUND) != 0 && (flags & ignoreFlags) == 0){
                                 // Check against spider type hacks.
                                 if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId)){
                                     // TODO: This might be seen as a violation for many block types.

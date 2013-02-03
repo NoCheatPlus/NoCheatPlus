@@ -368,6 +368,7 @@ public class PlayerLocation {
 			// Finally check possible jump height.
 			// TODO: This too is inaccurate.
 			if (isOnGround(jumpHeigth)){
+				// Here ladders are ok.
 				return true;
 			}
 			return false;
@@ -415,7 +416,7 @@ public class PlayerLocation {
 					onGround = true;
 				}
 				// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
-				else onGround = BlockProperties.isOnGround(blockCache, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0);
+				else onGround = BlockProperties.isOnGround(blockCache, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0, 0L);
 			}
 			else onGround = false;
 			if (!onGround) {
@@ -432,7 +433,11 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isOnGround(final double yOnGround){
-		return isOnGround(yOnGround, 0D, 0D);
+		return isOnGround(yOnGround, 0D, 0D, 0L);
+	}
+	
+	public boolean isOnGround(final double jumpHeight, final long ignoreFlags) {
+		return isOnGround(yOnGround, 0D, 0D, ignoreFlags);
 	}
 	
 	
@@ -444,7 +449,19 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin) {
-		return BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
+		return BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, 0L);
+	}
+	
+	/**
+	 * Simple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
+	 * @param yOnGround Margin below the player.
+	 * @param xzMargin
+	 * @param yMargin Extra margin added below and above.
+	 * @param ignoreFlags Flags to not regard as ground.
+	 * @return
+	 */
+	public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin, final long ignoreFlags) {
+		return BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, ignoreFlags);
 	}
 	
 	/**

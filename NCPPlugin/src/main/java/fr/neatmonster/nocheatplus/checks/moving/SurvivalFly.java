@@ -241,13 +241,16 @@ public class SurvivalFly extends Check {
 //        	vDistanceAboveLimit = Math.abs(yDistance) - vAllowedDistance;
 //        	if (vDistanceAboveLimit > 0) tags.add("vclimb");
         	final double jumpHeight = 1.45 + (data.jumpAmplifier > 0 ? (0.5 + data.jumpAmplifier - 1.0) : 0.0);
-        	if (yDistance > climbSpeed && !from.isOnGround(jumpHeight)){
+        	// TODO: ladders are ground !
+        	if (yDistance > climbSpeed && !from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE)){
+        		// Ignore ladders. TODO: Check for false positives...
         		tags.add("climbspeed");
         		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance - climbSpeed);
         	}
         	if (yDistance > 0){
             	if (!fromOnGround && ! toOnGround && !data.noFallAssumeGround){
             		// Check if player may climb up.
+            		// (This does exclude ladders.)
             		if (!from.canClimbUp(jumpHeight)){
             			tags.add("climbup");
             			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance);
@@ -503,7 +506,7 @@ public class SurvivalFly extends Check {
 					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
 					final double iY = minY; // TODO ...
 					final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
-					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r)) {
+					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
 						useWorkaround = true;
 						setBackSafe = true;
 					}
