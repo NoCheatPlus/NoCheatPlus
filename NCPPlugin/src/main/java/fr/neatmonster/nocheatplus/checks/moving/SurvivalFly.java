@@ -376,7 +376,7 @@ public class SurvivalFly extends Check {
 			data.mediumLiftOff = MediumLiftOff.GROUND;
 		}
 		else if (from.isInLiquid()){
-			if (to.isNextToSolid(0.15, 0.001)){
+			if (to.isNextToGround(0.15, 0.001)){
 				data.mediumLiftOff = MediumLiftOff.GROUND;
 			}
 			else{
