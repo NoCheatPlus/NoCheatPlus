@@ -776,13 +776,22 @@ public class SurvivalFly extends Check {
 		acc.add((float) value);
 		// TODO: Add on-eq-return parameter
 //		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
-		if (acc.bucketScore(2) > 0 && acc.bucketScore(1) > 0) {
+		final int i1, i2;
+		if (acc.bucketCount(0) == acc.bucketCapacity()){
+			i1 = 0;
+			i2 = 1;
+		}
+		else{
+			i1 = 1;
+			i2 = 2;
+		}
+		if (acc.bucketCount(i1) > 0 && acc.bucketCount(i2) > 0) {
 //			final float sc1 = sum.bucketScore(1);
 //			final float sc2 = sum.bucketScore(2);
-			final float sc1 = acc.bucketScore(1);
-			final float sc2 = acc.bucketScore(2);
+			final float sc1 = acc.bucketScore(i1);
+			final float sc2 = acc.bucketScore(i2);
 			final double diff = sc1 - sc2;
-			if (diff > 0 || value > -1.3 && diff == 0) {
+			if (diff > 0 || value > -1.3 && Math.abs(diff) < 0.09) {
 				if (value < -1.1 && (Math.abs(diff) < Math.abs(value) || sc2 < - 10)){
 					tags.add(tag+"grace");
 					return 0;
