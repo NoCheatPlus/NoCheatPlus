@@ -528,12 +528,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.horizontalVelocityCounter--;
         else if (data.horizontalFreedom > 0.001D)
             data.horizontalFreedom *= 0.90D;
-
-        if (data.verticalVelocity <= 0.1D)
+        
+        if (data.verticalVelocity <= 0.09D)
             data.verticalVelocityCounter--;
-        if (data.verticalVelocityCounter > 0D) {
+        else if (data.verticalVelocityCounter > 0D) {
             data.verticalFreedom += data.verticalVelocity;
-            data.verticalVelocity *= 0.93D;
+            data.verticalVelocity -= 0.09;
         } else if (data.verticalFreedom > 0.001D)
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
@@ -884,14 +884,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (newVal >= 0D) {
             data.verticalVelocity += newVal;
             data.verticalFreedom += data.verticalVelocity;
+            data.verticalVelocityCounter = 1 + Math.min(100, (int) Math.round(newVal * 10.0)); // 50;
         }
-
-        data.verticalVelocityCounter = 50;
 
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
             data.horizontalFreedom += newVal;
-            data.horizontalVelocityCounter = 30;
+            data.horizontalVelocityCounter = 50; // Math.min(100, (int) Math.round(newVal * 8.0)); // 30;
         }
         
         // Set dirty flag here.

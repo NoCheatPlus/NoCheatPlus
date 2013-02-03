@@ -398,19 +398,24 @@ public class SurvivalFly extends Check {
         // Apply reset conditions.
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
+        if (yDistance < 0 && data.sfLastYDist > 0){
+//        	data.verticalFreedom = 0;
+        	data.verticalVelocityCounter = 0;
+        	data.verticalVelocity = 0;
+        }
         if (resetTo){
             // The player has moved onto ground.
             data.setSetBack(to);
             data.sfJumpPhase = 0;
             data.clearAccounting();
-//            // TODO: Experimental: reset velocity.
-//            data.verticalVelocityCounter = 0;
-//            data.verticalFreedom = 0;
-//            data.verticalVelocity = 0;
-//            if (hDistance < sprintingSpeed){
-//            	data.horizontalFreedom = 0;
-//            	data.horizontalVelocityCounter = 0;
-//            }
+            // TODO: Experimental: reset velocity.
+            data.verticalVelocityCounter = 0;
+            data.verticalFreedom = 0;
+            data.verticalVelocity = 0;
+            if (hDistance < sprintingSpeed){
+            	data.horizontalFreedom = 0;
+            	data.horizontalVelocityCounter = 0;
+            }
         }
         else if (resetFrom){
             // The player moved from ground.

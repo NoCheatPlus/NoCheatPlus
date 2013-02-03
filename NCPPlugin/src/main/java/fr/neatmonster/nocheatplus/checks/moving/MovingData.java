@@ -211,6 +211,15 @@ public class MovingData extends ACheckData {
         if (loc == null) resetPositions(Double.MAX_VALUE, 0, 0);
         else resetPositions(loc.getX(), loc.getY(), loc.getZ());
     }
+    
+    /**
+     * Just reset the "last locations" references.
+     * @param loc
+     */
+	public void resetPositions(PlayerLocation loc) {
+		if (loc == null) resetPositions(Double.MAX_VALUE, 0, 0);
+        else resetPositions(loc.getX(), loc.getY(), loc.getZ());
+	}
 
     /**
      * Just reset the "last locations" references.
