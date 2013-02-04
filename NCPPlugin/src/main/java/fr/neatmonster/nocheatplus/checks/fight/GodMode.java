@@ -120,6 +120,8 @@ public class GodMode extends Check {
     		legit = set = resetAcc = true;
     	}
     	
+    	// TODO: Might account for ndt/2 on regain health (!).
+    	
     	// Invulnerable or inconsistent.
     	// TODO: might check as well if NCP has taken over invulnerable ticks of this player.
     	if (invulnerabilityTicks > 0 && noDamageTicks != invulnerabilityTicks || tick < data.lastDamageTick){
@@ -187,14 +189,18 @@ public class GodMode extends Check {
     		if (dht <= 20) return false; 
     	}
     	
+    	final FightConfig cc = FightConfig.getConfig(player); 
+    	
     	// Check for client side lag.
     	final long now = System.currentTimeMillis();
-    	final long maxAge = 5000;  // Allows 5 seconds lag max. TODO: Balance, test.
+    	final long maxAge = cc.godModeLagMaxAge;
     	long keepAlive = mcAccess.getKeepAliveTime(player);
     	if (keepAlive > now || keepAlive == Long.MIN_VALUE){
     		keepAlive = CheckUtils.guessKeepAliveTime(player, now, maxAge);
     	}
-    	if (keepAlive != Double.MIN_VALUE && now - keepAlive > 1000 && now - keepAlive < maxAge){
+    	// TODO: else: still check the other time stamp ?
+    	
+    	if (keepAlive != Double.MIN_VALUE && now - keepAlive > cc.godModeLagMinAge && now - keepAlive < maxAge){
     		// Assume lag.
     		return false;
     	}

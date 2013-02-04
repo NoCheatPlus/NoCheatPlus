@@ -293,6 +293,8 @@ public class DefaultConfig extends ConfigFile {
                 "cancel vl>5 log:fdirection:3:5:f cancel vl>20 log:fdirection:0:5:if cancel vl>50 log:fdirection:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
+        set(ConfPaths.FIGHT_GODMODE_LAGMINAGE, 1100); // TODO: ndt/2 => 500-600.
+        set(ConfPaths.FIGHT_GODMODE_LAGMAXAGE, 5000);
         set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel vl>60 log:godmode:2:5:icf cancel"); // cmd:kickgod");
 
         set(ConfPaths.FIGHT_KNOCKBACK_CHECK, true);

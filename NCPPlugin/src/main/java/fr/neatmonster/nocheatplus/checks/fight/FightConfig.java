@@ -77,6 +77,8 @@ public class FightConfig extends ACheckConfig {
     public final ActionList directionActions;
 
     public final boolean    godModeCheck;
+	public final long 		godModeLagMinAge;
+	public final long 		godModeLagMaxAge;
     public final ActionList godModeActions;
 
     public final boolean    knockbackCheck;
@@ -131,6 +133,8 @@ public class FightConfig extends ACheckConfig {
         directionActions = data.getOptimizedActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
 
         godModeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
+        godModeLagMinAge = data.getLong(ConfPaths.FIGHT_GODMODE_LAGMINAGE);
+        godModeLagMaxAge = data.getLong(ConfPaths.FIGHT_GODMODE_LAGMAXAGE);
         godModeActions = data.getOptimizedActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
 
         knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
