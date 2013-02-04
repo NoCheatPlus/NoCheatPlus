@@ -526,7 +526,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // general data modifications one for each event.
         if (data.horizontalVelocityCounter > 0D){
         	data.horizontalVelocityCounter--;
-        	data.horizontalFreedom -= 0.09;
+        	data.horizontalFreedom = Math.max(0.0, data.horizontalFreedom - 0.09);
         }
         else if (data.horizontalFreedom > 0.001D)
             data.horizontalFreedom *= 0.90D;
@@ -535,7 +535,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.verticalVelocityCounter--;
         else if (data.verticalVelocityCounter > 0D) {
             data.verticalFreedom += data.verticalVelocity;
-            data.verticalVelocity -= 0.09;
+            data.verticalVelocity = Math.max(0.0, data.verticalVelocity -0.09);
         } else if (data.verticalFreedom > 0.001D)
             // Counter has run out, now reduce the vertical freedom over time.
             data.verticalFreedom *= 0.93D;
@@ -897,6 +897,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         // Set dirty flag here.
         data.sfDirty = true;
+        
+        // TODO: clear accounting here ?
     }
 
     /**
