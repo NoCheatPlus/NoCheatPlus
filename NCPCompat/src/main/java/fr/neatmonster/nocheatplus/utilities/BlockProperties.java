@@ -661,9 +661,9 @@ public class BlockProperties {
 		final World world = location.getWorld();
 		final boolean onGround = isOnGround(player, location, 0.3) || world.getBlockTypeIdAt(x, y, z) == Material.WATER_LILY.getId();
 		final boolean inWater = isInWater(world.getBlockTypeIdAt(x, y + 1, z));
-		final int haste = (int) Math.round(PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING));
+		final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
 		// TODO: haste: int / double !?
-		return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), haste);
+		return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), haste == Double.NEGATIVE_INFINITY ? 0 : 1 + (int) haste);
 	}
 
 
@@ -692,13 +692,13 @@ public class BlockProperties {
 	     * @param inWater
 	     * @param aquaAffinity
 	     * @param efficiency
-	     * @param haste Amplifier of haste potion effect (assume >0 for effect there at all).
+	     * @param haste Amplifier of haste potion effect (assume > 0 for effect there at all, so 1 is haste I, 2 is haste II).
 	     * @return
 	     */
 	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency, int haste) {
 	    final long dur = getBreakingDuration(blockId, blockProps, toolProps, onGround, inWater, aquaAffinity, efficiency);
 	    // TODO: haste ...
-	    return haste > 0 ? ((long) (dur * 0.66)) : dur;
+	    return haste > 0 ? (long) (Math.pow(0.8, haste) * dur): dur;
 	}
 
 	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {	

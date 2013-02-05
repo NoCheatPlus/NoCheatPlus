@@ -4,6 +4,7 @@ import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -11,6 +12,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -120,7 +122,8 @@ public class FastBreak extends Check {
         	final int blockId = block.getTypeId();
         	final ItemStack stack = player.getItemInHand();
         	final boolean isValidTool = BlockProperties.isValidTool(blockId, stack);
-        	String msg = (isInstaBreak ? "[Insta]" : "[Normal]") + "[" + blockId + "] "+ elapsedTime + "u / " + breakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")";
+        	final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
+        	String msg = (isInstaBreak ? "[Insta]" : "[Normal]") + "[" + blockId + "] "+ elapsedTime + "u / " + breakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (haste == Double.NEGATIVE_INFINITY ? "" : " haste=" + ((int) haste + 1));
         	player.sendMessage(msg);
 //        	net.minecraft.server.Item mcItem = net.minecraft.server.Item.byId[stack.getTypeId()];
 //        	if (mcItem != null){
