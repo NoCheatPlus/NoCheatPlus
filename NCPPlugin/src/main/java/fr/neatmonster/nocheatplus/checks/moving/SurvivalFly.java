@@ -344,7 +344,7 @@ public class SurvivalFly extends Check {
 		
 		if (!resetFrom && !resetTo){
 			// "On-air" checks (vertical)
-			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, yDistance, data, cc));
+			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, from, to, yDistance, data, cc));
 		}
 
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
@@ -682,7 +682,7 @@ public class SurvivalFly extends Check {
 	 * @param cc
 	 * @return
 	 */
-	private double verticalAccounting(final long now, final double yDistance, final MovingData data, final MovingConfig cc) {
+	private double verticalAccounting(final long now, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
 		double vDistanceAboveLimit = 0;
 		// y direction change detection.
 		// TODO: Consider using accounting for y-change detection.
@@ -727,7 +727,7 @@ public class SurvivalFly extends Check {
 				// Here yDistance can be negative and positive (!).
 				if (yDistance != 0D){
 //					final double accAboveLimit = verticalAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc");
-					final double accAboveLimit = verticalAccounting(now, yDistance, data.vDistAcc ,tags, "vacc");
+					final double accAboveLimit = verticalAccounting(now, from, to, yDistance, data.vDistAcc ,tags, "vacc");
 					if (accAboveLimit > vDistanceAboveLimit){
 						// Account for lag.
 						// TODO: 1.1 might be too pessimistic.
@@ -769,7 +769,7 @@ public class SurvivalFly extends Check {
 	 * @return absolute difference on violation.;
 	 */
 //	private static final double verticalAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
-	private static final double verticalAccounting(final long now, final double value, final ActionAccumulator acc, final ArrayList<String> tags, String tag)
+	private static final double verticalAccounting(final long now,  final PlayerLocation from, final PlayerLocation to, final double value, final ActionAccumulator acc, final ArrayList<String> tags, String tag)
 	{
 //		sum.add(now, (float) value);
 //		count.add(now, 1f);
@@ -777,27 +777,37 @@ public class SurvivalFly extends Check {
 		// TODO: Add on-eq-return parameter
 //		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
 		final int i1, i2;
-		if (acc.bucketCount(0) == acc.bucketCapacity()){
-			i1 = 0;
-			i2 = 1;
-		}
-		else{
-			i1 = 1;
-			i2 = 2;
-		}
+		// TODO: distinguish near-ground moves somehow ?
+//		if (acc.bucketCount(0) == acc.bucketCapacity()){
+//			i1 = 0;
+//			i2 = 1;
+//		}
+//		else{
+		i1 = 1;
+		i2 = 2;
+//		}
 		if (acc.bucketCount(i1) > 0 && acc.bucketCount(i2) > 0) {
 //			final float sc1 = sum.bucketScore(1);
 //			final float sc2 = sum.bucketScore(2);
 			final float sc1 = acc.bucketScore(i1);
 			final float sc2 = acc.bucketScore(i2);
 			final double diff = sc1 - sc2;
-			if (diff > 0 || value > -1.3 && Math.abs(diff) < 0.09) {
-				if (value < -1.1 && (Math.abs(diff) < Math.abs(value) || sc2 < - 10)){
-					tags.add(tag+"grace");
+			final double aDiff = Math.abs(diff);
+			// TODO: Relate this to the fall distance !
+			if (diff > 0 || value > -1.1 && aDiff <= 0.09) { // TODO: sharpen later (force speed gain while falling).
+				// TODO: The last part is a temporary workaround for sprinting down block-stairs (around sc1*sc2).
+				if (value < -1.1 && (aDiff < Math.abs(value) || sc2 < - 10)  
+						|| value < 0 && aDiff < 0.27 && sc1 * sc2 > 0.0 && Math.abs(sc1) > 0.27 && (BlockProperties.isGround(from.getTypeIdBelow()) || BlockProperties.isGround(to.getTypeIdBelow()) || from.isOnGround(0.6, 0.4, 0))){
+					tags.add(tag + "grace");
 					return 0;
 				}
 				tags.add(tag);
-				return diff;
+				if (diff < 0 ){
+					return 1.3 - aDiff;
+				}
+				else{
+					return diff;
+				}
 			}
 		}
 		// TODO: return Float.MAX_VALUE if no violation ?
