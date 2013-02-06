@@ -76,6 +76,7 @@ public class CreativeFly extends Check {
         final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
         final double fSpeed;
         
+        // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
         if (speedModifier == Double.NEGATIVE_INFINITY) fSpeed = 1D;
         else fSpeed = 1D + 0.2D * (speedModifier + 1D);
         
@@ -88,25 +89,29 @@ public class CreativeFly extends Check {
 
         data.bunnyhopDelay--;
 
-        if (resultH > 0 && sprinting)
+        if (resultH > 0 && sprinting){
+        	// TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
             // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
             // again leads to a player moving almost twice as far in that step.
             if (data.bunnyhopDelay <= 0 && resultH < 0.4D) {
                 data.bunnyhopDelay = 9;
                 resultH = 0D;
             }
+        }
 
         resultH *= 100D;
 
         final double limitV = cc.creativeFlyVerticalSpeed / 100D * VERTICAL_SPEED; // * data.jumpAmplifier;
 
         // Super simple, just check distance compared to max distance vertical.
+        // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
         final double resultV = Math.max(0D, yDistance - data.verticalFreedom - limitV) * 100D;
 
         final double result = resultH + resultV;
 
         // The player went to far, either horizontal or vertical.
         if (result > 0D) {
+        	// TODO: Get rid of creativeFlyPreviousRefused.
             if (data.creativeFlyPreviousRefused) {
                 // Increment violation level.
                 data.creativeFlyVL += result;

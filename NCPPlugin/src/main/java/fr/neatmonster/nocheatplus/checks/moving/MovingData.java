@@ -74,29 +74,42 @@ public class MovingData extends ACheckData {
      */
     private static final MediumLiftOff defaultMediumLiftOff = MediumLiftOff.LIMIT_JUMP;
     
-    // Violation levels.
+    // Violation levels -----
     public double         creativeFlyVL            = 0D;
     public double         morePacketsVL            = 0D;
     public double         morePacketsVehicleVL     = 0D;
     public double         noFallVL                 = 0D;
     public double         survivalFlyVL            = 0D;
 
-    // Data shared between the fly checks.
+    // Data shared between the fly checks -----
     public int            bunnyhopDelay;
-    public double         horizontalFreedom;
     public double         jumpAmplifier;
+    
+    // Velocity handling.
+    // TODO: consider resetting these with clearFlyData and onSetBack.
     public double         verticalFreedom;
-    public double         horizontalVelocityCounter;
     public double         verticalVelocity;
     public int            verticalVelocityCounter;
+    public double         horizontalVelocityCounter;
+    public double         horizontalFreedom;
+    
+    // Coordinates.
     /** Last from coordinates. */
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. */
     public double 		  toX = Double.MAX_VALUE, toY, toZ;
+    
+    // sf rather
     /** To/from was ground or web or assumed to be etc. */
     public boolean		  toWasReset, fromWasReset;
     public MediumLiftOff  mediumLiftOff = defaultMediumLiftOff;
+    
+    // Locations shared between all checks.
+    private Location    setBack = null;
+    private Location    teleported = null;
 
+    // Check specific data -----
+    
     // Data of the creative check.
     public boolean        creativeFlyPreviousRefused;
 
@@ -117,8 +130,6 @@ public class MovingData extends ACheckData {
 
     // Data of the no fall check.
     public float          noFallFallDistance = 0;
-//    public boolean        noFallOnGround;
-//    public boolean        noFallWasOnGround;
     /** Last y coordinate from when the player was on ground. */
     public double         noFallMaxY = 0;
     /** Indicate that NoFall should assume the player to be on ground. */
@@ -145,16 +156,8 @@ public class MovingData extends ACheckData {
 	public long			sfVLTime = 0;
     
     // Accounting info.
-    // TODO: optimize later.
-//  public final ActionFrequency hDistCount = new ActionFrequency(3, 333);
-//    public final ActionFrequency hDistSum = new ActionFrequency(3, 333);
 	public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
-//    public final ActionFrequency vDistSum = new ActionFrequency(3, 333);
-//    public final ActionFrequency vDistCount = new ActionFrequency(3, 333);
 
-    // Locations shared between all checks.
-    private Location    setBack = null;
-    private Location    teleported = null;
     
 	/**
 	 * Clear the data of the fly checks (not more-packets).
