@@ -400,7 +400,7 @@ public class SurvivalFly extends Check {
         // Apply reset conditions.
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
-        if (yDistance <= 0 && data.sfLastYDist > 0){
+        if (data.verticalVelocityUsed > cc.velocityGraceTicks && yDistance <= 0 && data.sfLastYDist > 0){
 //        	data.verticalFreedom = 0;
         	data.verticalVelocityCounter = 0;
         	data.verticalVelocity = 0;
@@ -411,14 +411,16 @@ public class SurvivalFly extends Check {
             data.sfJumpPhase = 0;
             data.clearAccounting();
             // TODO: Experimental: reset velocity.
-            if (toOnGround && yDistance < 0 || Math.abs(yDistance) < 0.09){
+            if (data.verticalVelocityUsed > cc.velocityGraceTicks && toOnGround && yDistance < 0){
                 data.verticalVelocityCounter = 0;
                 data.verticalFreedom = 0;
                 data.verticalVelocity = 0;
+                data.verticalVelocityUsed = 0;
             }
-            if (hDistance < sprintingSpeed){
+            if (data.horizontalVelocityUsed > cc.velocityGraceTicks && hDistance < sprintingSpeed){
             	data.horizontalFreedom = 0;
             	data.horizontalVelocityCounter = 0;
+            	data.horizontalVelocityUsed = 0;
             }
         }
         else if (resetFrom){

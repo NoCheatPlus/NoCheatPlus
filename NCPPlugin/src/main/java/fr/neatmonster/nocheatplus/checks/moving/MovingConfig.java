@@ -110,6 +110,8 @@ public class MovingConfig extends ACheckConfig {
 	public final double		sfHoverViolation;
     
     // Special tolerance values:
+	/** This is not strictly ticks, but packets, for now.*/
+	public final int 		velocityGraceTicks;
     public final double     noFallyOnGround;
     public final double     yOnGround;
 	public final double     yStep;
@@ -168,6 +170,7 @@ public class MovingConfig extends ACheckConfig {
         sfHoverFallDamage = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE);
         sfHoverViolation = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION);
         
+        velocityGraceTicks = data.getInt(ConfPaths.MOVING_VELOCITY_GRACETICKS);
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, 0.3);
         // ystep is set to 0.45 by default, for stairs / steps.

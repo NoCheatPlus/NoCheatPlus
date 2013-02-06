@@ -525,20 +525,28 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
         if (data.horizontalVelocityCounter > 0D){
+        	data.horizontalVelocityUsed ++;
         	data.horizontalVelocityCounter--;
         	data.horizontalFreedom = Math.max(0.0, data.horizontalFreedom - 0.09);
         }
-        else if (data.horizontalFreedom > 0.001D)
-            data.horizontalFreedom *= 0.90D;
+        else if (data.horizontalFreedom > 0.001D){
+        	data.horizontalVelocityUsed ++;
+        	data.horizontalFreedom *= 0.90D;
+        }
         
-        if (data.verticalVelocity <= 0.09D)
-            data.verticalVelocityCounter--;
+        if (data.verticalVelocity <= 0.09D){
+        	data.verticalVelocityUsed ++;
+        	data.verticalVelocityCounter--;
+        }
         else if (data.verticalVelocityCounter > 0D) {
+        	data.verticalVelocityUsed ++;
             data.verticalFreedom += data.verticalVelocity;
             data.verticalVelocity = Math.max(0.0, data.verticalVelocity -0.09);
-        } else if (data.verticalFreedom > 0.001D)
+        } else if (data.verticalFreedom > 0.001D){
             // Counter has run out, now reduce the vertical freedom over time.
+        	data.verticalVelocityUsed ++;
             data.verticalFreedom *= 0.93D;
+        }
 
 		Location newTo = null;
 
@@ -884,15 +892,20 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         double newVal = velocity.getY();
         if (newVal >= 0D) {
+        	if (data.verticalFreedom <= 0.001 && data.verticalVelocityCounter >= 0){
+        		data.verticalVelocity = 0;
+        	}
             data.verticalVelocity += newVal;
             data.verticalFreedom += data.verticalVelocity;
-            data.verticalVelocityCounter = Math.min(100, Math.max(data.verticalVelocityCounter, 0) + 1 + (int) Math.round(newVal * 10.0)); // 50;
+            data.verticalVelocityCounter = Math.min(100, Math.max(data.verticalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 50;
+            data.verticalVelocityUsed = 0;
         }
 
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
             data.horizontalFreedom += newVal;
-            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, 0) + 1 + (int) Math.round(newVal * 10.0)); // 30;
+            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 30;
+            data.horizontalVelocityUsed = 0;
         }
         
         // Set dirty flag here.
@@ -1106,9 +1119,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	// Experiment: add some velocity (fake).
     	data.horizontalVelocityCounter = 1;
     	data.horizontalFreedom = 0.75;
+    	data.horizontalVelocityUsed = 0;
     	data.verticalVelocityCounter = 1;
     	data.verticalFreedom = 1.2;
     	data.verticalVelocity = 0.1;
+    	data.verticalVelocityUsed = 0;
     }
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

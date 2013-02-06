@@ -508,6 +508,9 @@ public abstract class ConfPaths {
 	public static final String  MOVING_SURVIVALFLY_HOVER_SFVIOLATION	= MOVING_SURVIVALFLY_HOVER + "sfviolation";
 
     // Special (to be sorted in or factored out).
+	private static final String MOVING_VELOCITY							= MOVING + "velocity.";
+	public static final String  MOVING_VELOCITY_GRACETICKS				= MOVING_VELOCITY + "graceticks";
+
     public static final String  MOVING_NOFALL_YONGROUND                  = MOVING_NOFALL + "yonground";
     public static final String  MOVING_YONGROUND                         = MOVING + "yonground";
 	public static final String  MOVING_SURVIVALFLY_YSTEP                 = MOVING_SURVIVALFLY + "ystep";
@@ -534,5 +537,5 @@ public abstract class ConfPaths {
     public static final String SUB_IGNOREPASSABLE                        = RootConfPaths.SUB_IGNOREPASSABLE;
     public static final String SUB_ALLOWINSTANTBREAK                     = RootConfPaths.SUB_ALLOWINSTANTBREAK;
     public static final String SUB_LAG       							 = "lag";
-
+    
 }

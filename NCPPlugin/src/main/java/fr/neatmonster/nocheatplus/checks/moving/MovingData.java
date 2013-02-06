@@ -87,11 +87,13 @@ public class MovingData extends ACheckData {
     
     // Velocity handling.
     // TODO: consider resetting these with clearFlyData and onSetBack.
+    public int            verticalVelocityCounter;
     public double         verticalFreedom;
     public double         verticalVelocity;
-    public int            verticalVelocityCounter;
-    public double         horizontalVelocityCounter;
+    public int 		      verticalVelocityUsed = 0;	
+    public int            horizontalVelocityCounter;
     public double         horizontalFreedom;
+    public int 			  horizontalVelocityUsed = 0;
     
     // Coordinates.
     /** Last from coordinates. */

@@ -400,6 +400,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 500);
         
+        // Special.
+        set(ConfPaths.MOVING_VELOCITY_GRACETICKS, 20);
+        
         /*
          *  dP"8   d8          ,e,                        
          * C8b Y  d88   888,8,  "  888 8e   e88 888  dP"Y 
