@@ -264,7 +264,7 @@ public class SurvivalFly extends Check {
         	// Swimming...
         	if (yDistance >= 0){
         		// TODO: This is more simple to test.
-        		if (!to.isInLiquid() || toOnGround && yDistance <= 0.5 || data.sfLastYDist - yDistance <= 0.1){
+        		if (!to.isInLiquid() || yDistance <= 0.5 && (toOnGround || data.sfLastYDist - yDistance >= 0.010)){
         			// TODO: Friction in water...
             		vAllowedDistance = swimmingSpeed + 0.5;
         		}
