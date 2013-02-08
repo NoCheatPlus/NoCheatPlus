@@ -51,7 +51,7 @@ public class FastClick extends Check {
                 // Calculate the difference between the limit and the time elapsed.
                 final double difference = 45L - time + data.fastClickLastTime;
                 final InventoryConfig cc = InventoryConfig.getConfig(player);
-                final ViolationData vd = new ViolationData(this, player, data.fastClickVL, difference, cc.fastClickActions);
+                final ViolationData vd = new ViolationData(this, player, data.fastClickVL + difference, difference, cc.fastClickActions);
                 if (TickTask.getLag(150) > 1.7f){
                 	// Don't increase vl here.
                 	cancel = vd.hasCancel();
