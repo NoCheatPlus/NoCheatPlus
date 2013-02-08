@@ -4,6 +4,8 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * MM""""""""`M                     dP   MM'""""'YMM dP oo          dP       
@@ -48,13 +50,19 @@ public class FastClick extends Check {
 
                 // Calculate the difference between the limit and the time elapsed.
                 final double difference = 45L - time + data.fastClickLastTime;
+                final InventoryConfig cc = InventoryConfig.getConfig(player);
+                final ViolationData vd = new ViolationData(this, player, data.fastClickVL, difference, cc.fastClickActions);
+                if (TickTask.getLag(150) > 1.7f){
+                	// Don't increase vl here.
+                	cancel = vd.hasCancel();
+                }
+                else{
+                    // Increment the violation level.
+                    data.fastClickVL += difference;
 
-                // Increment the violation level.
-                data.fastClickVL += difference;
-
-                // Find out if we need to cancel the event.
-                cancel = executeActions(player, data.fastClickVL, difference,
-                        InventoryConfig.getConfig(player).fastClickActions);
+                    // Find out if we need to cancel the event.
+                    cancel = executeActions(vd);	
+                }
             } else
                 data.fastClickLastCancelled = true;
         } else {
