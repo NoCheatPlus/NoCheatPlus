@@ -26,7 +26,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 326;
+	public static final int buildNumber = 384;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -102,7 +102,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKBREAK_FREQUENCY_ACTIONS, "cancel vl>5 log:bbfrequency:3:5:if cancel vl>60 log:bbfrequency:0:5:cif cancel cmd:kickfrequency");
 
         set(ConfPaths.BLOCKBREAK_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "log:noswing:3:2:f cancel vl>2 log:noswing:3:2:if cancel");
+        set(ConfPaths.BLOCKBREAK_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel");
 
         set(ConfPaths.BLOCKBREAK_REACH_CHECK, true);
         set(ConfPaths.BLOCKBREAK_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
@@ -144,7 +144,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
 
         set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, true);
-        set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "log:noswing:3:2:f cancel vl>2 log:noswing:0:2:if cancel");
+        set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel");
 
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, true);
         set(ConfPaths.BLOCKPLACE_SPEED_INTERVAL, 45L);
@@ -302,7 +302,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:knockback:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_NOSWING_CHECK, true);
-        set(ConfPaths.FIGHT_NOSWING_ACTIONS, "log:noswing:0:5:f cancel vl>1 log:noswing:0:5:cif cancel");
+        set(ConfPaths.FIGHT_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel");
 
         set(ConfPaths.FIGHT_REACH_CHECK, true);
         set(ConfPaths.FIGHT_REACH_PENALTY, 500);
