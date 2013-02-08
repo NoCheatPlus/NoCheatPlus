@@ -104,8 +104,9 @@ public class SurvivalFly extends Check {
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) resetFrom = true;
 		else if (lostGround(player, from, to, yDistance, sprinting, data, cc)){
-			resetFrom = true;
 			// TODO: Consider && !resetTo ?
+			// TODO: Confine by max y distance and min xz-distance?
+			resetFrom = true;
 			// Note: if not setting resetFrom, other places have to check assumeGround...
 		}
 		else resetFrom = false;
@@ -495,11 +496,13 @@ public class SurvivalFly extends Check {
 		final double setBackYDistance = to.getY() - data.getSetBackY();
 		
 		// Check for sprinting down blocks etc.
-		if (!useWorkaround && yDistance <= 0.0 && Math.abs(yDistance) <= 0.5 && data.sfLastYDist <= yDistance && data.sfJumpPhase <= 7 && setBackYDistance < 0){
+		if (!useWorkaround && yDistance <= 0.0 && Math.abs(yDistance) <= 0.5 && data.sfLastYDist <= yDistance && data.sfJumpPhase <= 7 && setBackYDistance < 0 && !to.isOnGround()){
+			// TODO: setbackydist: <= - 1.0 or similar
 			// TODO: <= 7 might work with speed II, not sure with above.
 			// TODO: account for speed/sprint
 			// TODO: account for half steps !?
 			if (from.isOnGround(0.6, 0.4, 0, 0L) ){
+				// TODO: further narrow down bounds ?
 				// Temporary "fix".
 				useWorkaround = true;
 				setBackSafe = true;
@@ -507,9 +510,9 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Check for jumping up strange blocks like flower pots on top of other blocks.
-		if (!useWorkaround && yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier){
+		if (!useWorkaround && yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()){
 			// TODO: confine by block types ?
-			if (from.isOnGround(0.6, 0.4, 0, 0L) ){
+			if (from.isOnGround(0.25, 0.4, 0, 0L) ){
 				// Temporary "fix".
 				useWorkaround = true;
 				setBackSafe = true;
@@ -520,7 +523,7 @@ public class SurvivalFly extends Check {
 		// TODO: Check if the set-back distance still has relevance.
 		// TODO: Interpolation might also be necessary between from and to !
 		// TODO: Check use of jumpamplifier.
-		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance <= 0.5 + 0.2 * data.jumpAmplifier && data.sfLastYDist < 0) {
+		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance <= 0.5 + 0.2 * data.jumpAmplifier && data.sfLastYDist < 0 && !to.isOnGround()) {
 			// TODO: Check if last-y-dist or sprinting should be considered.
 			if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
 				// Interpolate from last to-coordinates to the from
