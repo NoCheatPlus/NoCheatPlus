@@ -453,12 +453,15 @@ public class SurvivalFly extends Check {
 			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
 		// TODO: also show resetcond (!)
 		StringBuilder builder = new StringBuilder(500);
-		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")));
+		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
 		builder.append("\n" + player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " / " +  StringUtil.fdec3.format(vAllowedDistance));
-		builder.append("\n" + player.getName() + " vfreedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vv=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/vvc=" + data.verticalVelocityCounter + "), jumpphase: " + data.sfJumpPhase);
+		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
+			builder.append("\n" + player.getName() + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
+		}
+		if (data.horizontalVelocityCounter > 0 || data.horizontalFreedom >= 0.001){
+			builder.append("\n" + player.getName() + " horizontal freedom: " +  StringUtil.fdec3.format(data.horizontalFreedom) + " (counter=" + data.horizontalVelocityCounter +"/used="+data.horizontalVelocityUsed);
+		}
 		if (!resetFrom && !resetTo) {
-//			if (cc.survivalFlyAccountingH && data.hDistCount.bucketScore(1) > 0 && data.hDistCount.bucketScore(2) > 0) builder.append(player.getName() + " hacc=" + data.hDistSum.bucketScore(2) + "->" + data.hDistSum.bucketScore(1) + "\n");
-//			if (cc.survivalFlyAccountingV && data.vDistCount.bucketScore(1) > 0 && data.vDistCount.bucketScore(2) > 0) builder.append(player.getName() + " vacc=" + data.vDistSum.bucketScore(2) + "->" + data.vDistSum.bucketScore(1) + "\n");
 			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append("\n" + player.getName() + " vacc=" + data.vDistAcc.toInformalString());
 		}
 		if (player.isSleeping()) tags.add("sleeping");
