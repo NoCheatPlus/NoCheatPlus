@@ -103,7 +103,7 @@ public class SurvivalFly extends Check {
 
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) resetFrom = true;
-		else if (lostGround(player, from, to, yDistance, data, cc)){
+		else if (lostGround(player, from, to, yDistance, sprinting, data, cc)){
 			resetFrom = true;
 			// TODO: Consider && !resetTo ?
 			// Note: if not setting resetFrom, other places have to check assumeGround...
@@ -475,7 +475,7 @@ public class SurvivalFly extends Check {
 	 * @param cc
 	 * @return
 	 */
-	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
+	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
 		// Don't set "useWorkaround = x()", to avoid potential trouble with
 		// reordering to come, and similar.
 		boolean useWorkaround = false;
@@ -488,27 +488,46 @@ public class SurvivalFly extends Check {
 		}
 		// Check for "lost touch", for when moving events are missing somehow.
 		// Half block step up.
-		if (yDistance > 0 && yDistance <= 0.5 && to.isOnGround() && from.isOnGround(0.5 - Math.abs(yDistance))){
+		if (!useWorkaround && yDistance > 0 && yDistance <= 0.5 && to.isOnGround() && from.isOnGround(0.5 - Math.abs(yDistance))){
 			useWorkaround = true;
 			setBackSafe = true;
 		}
+		final double setBackYDistance = to.getY() - data.getSetBackY();
+		
+		// TODO: Check for sprinting down blocks etc.
+		if (!useWorkaround && yDistance <= 0.0 && Math.abs(yDistance) <= 0.5 && data.sfLastYDist <= yDistance && data.sfJumpPhase <= 7 && setBackYDistance < 0){
+			// TODO: <= 7 might work with speed II, not sure with above.
+			// TODO: account for speed/sprint
+			// TODO: account for half steps !?
+			if (from.isOnGround(0.6, 0.4, 0, 0L) ){
+				// Temporary "fix".
+				useWorkaround = true;
+				setBackSafe = true;
+			}
+		}
+		
 		// Interpolation check.
 		// TODO: Check if the set-back distance still has relevance.
+		// TODO: Interpolation might also be necessary between from and to !
+		// TODO: Check use of jumpamplifier.
 		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance <= 0.5 + 0.2 * data.jumpAmplifier && data.sfLastYDist < 0) {
-			final double setBackYDistance = to.getY() - data.getSetBackY();
+			// TODO: Check if last-y-dist or sprinting should be considered.
 			if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
 				// Interpolate from last to-coordinates to the from
 				// coordinates (with some safe-guard).
 				final double dX = from.getX() - data.fromX;
 				final double dY = from.getY() - data.fromY;
 				final double dZ = from.getZ() - data.fromZ;
-				if (dX * dX + dY * dY + dZ * dZ < 0.5) { // TODO: adjust
-														 // limit maybe.
+				if (dX * dX + dY * dY + dZ * dZ < 0.5) { 
+					// TODO: adjust limit according to ... speed etc ?
 					// Check full bounding box since last from.
 					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
 					final double iY = minY; // TODO ...
 					final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
-					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - cc.yOnGround, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
+					double yMargin = cc.yOnGround;
+					// TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
+					// TODO: check with iY + 0.25 removed.
+					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
 						useWorkaround = true;
 						setBackSafe = true;
 					}
@@ -796,13 +815,17 @@ public class SurvivalFly extends Check {
 			final double diff = sc1 - sc2;
 			final double aDiff = Math.abs(diff);
 			// TODO: Relate this to the fall distance !
-			if (diff > 0 || value > -1.1 && aDiff <= 0.09) { // TODO: sharpen later (force speed gain while falling).
-				// TODO: The last part is a temporary workaround for sprinting down block-stairs (around sc1*sc2).
-				if (value < -1.1 && (aDiff < Math.abs(value) || sc2 < - 10)  
-						|| value < 0 && aDiff < 0.27 && sc1 * sc2 > 0.0 && Math.abs(sc1) > 0.27 && (BlockProperties.isGround(from.getTypeIdBelow()) || BlockProperties.isGround(to.getTypeIdBelow()) || from.isOnGround(0.6, 0.4, 0))){
+			if (diff > 0 || value > -1.1 && aDiff <= 0.07) { // TODO: sharpen later (force speed gain while falling).
+				if (value < -1.1 && (aDiff < Math.abs(value) || sc2 < - 10)){
 					tags.add(tag + "grace");
 					return 0;
 				}
+//				else if (value < 0 && aDiff < 0.27 && sc1 * sc2 > 0.0 && Math.abs(sc1) > 0.27 && (BlockProperties.isGround(from.getTypeIdBelow()) || BlockProperties.isGround(to.getTypeIdBelow()) || from.isOnGround(0.6, 0.4, 0))){
+//					// TODO: This part is a temporary workaround for sprinting down block-stairs (around sc1*sc2).
+//					// TODO: This works partly only.
+//					tags.add(tag + "tempgrace");
+//					return 0;
+//				}
 				tags.add(tag);
 				if (diff < 0 ){
 					return 1.3 - aDiff;
