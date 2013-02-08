@@ -1117,11 +1117,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	data.setSetBack(loc);
     	// Experiment: add some velocity (fake).
     	data.horizontalVelocityCounter = 1;
-    	data.horizontalFreedom = 0.75;
+    	data.horizontalFreedom = 0.9;
     	data.horizontalVelocityUsed = 0;
     	data.verticalVelocityCounter = 1;
     	data.verticalFreedom = 1.2;
-    	data.verticalVelocity = 0.1;
+    	data.verticalVelocity = 0.15;
     	data.verticalVelocityUsed = 0;
     }
 
