@@ -577,12 +577,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
 				// Check NoFall if no reset is done.
 				if (cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL)) {
-					if (passableTo != null){
-						// Deal damage if necessary.
-						// Leaving out: player.getLocation().getY()
-						if (cc.sfFallDamage) noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
-					}
-					else if (newTo == null) {
+					if (newTo == null && passableTo == null){
 						// NOTE: noFall might set yOnGround for the positions.
 						noFall.check(player, pFrom, pTo, data, cc);
 					}
