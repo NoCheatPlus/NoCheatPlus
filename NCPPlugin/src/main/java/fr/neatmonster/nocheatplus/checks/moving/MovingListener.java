@@ -512,16 +512,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
+		// Horizontal velocity.
         if (data.horizontalVelocityCounter > 0D){
         	data.horizontalVelocityUsed ++;
         	data.horizontalVelocityCounter--;
         	data.horizontalFreedom = Math.max(0.0, data.horizontalFreedom - 0.09);
         }
         else if (data.horizontalFreedom > 0.001D){
-        	data.horizontalVelocityUsed ++;
-        	data.horizontalFreedom *= 0.90D;
+        	if (data.verticalVelocityUsed == 1 && data.verticalVelocity > 0.5){
+        		data.horizontalVelocityUsed = 0;
+        		data.horizontalFreedom = 0;
+        	}
+        	else{
+            	data.horizontalVelocityUsed ++;
+            	data.horizontalFreedom *= 0.90D;
+        	}
         }
         
+        // Vertical velocity.
         if (data.verticalVelocity <= 0.09D){
         	data.verticalVelocityUsed ++;
         	data.verticalVelocityCounter--;
@@ -531,9 +539,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.verticalFreedom += data.verticalVelocity;
             data.verticalVelocity = Math.max(0.0, data.verticalVelocity -0.09);
         } else if (data.verticalFreedom > 0.001D){
-            // Counter has run out, now reduce the vertical freedom over time.
-        	data.verticalVelocityUsed ++;
-            data.verticalFreedom *= 0.93D;
+        	if (data.verticalVelocityUsed == 1 && data.verticalVelocity > 1.0){
+        		// Workarounds.
+        		data.verticalVelocityUsed = 0;
+        		data.verticalVelocity = 0;
+        		data.verticalFreedom = 0;
+        	}
+        	else{
+        		 // Counter has run out, now reduce the vertical freedom over time.
+            	data.verticalVelocityUsed ++;
+                data.verticalFreedom *= 0.93D;
+        	}
         }
 
 		Location newTo = null;
