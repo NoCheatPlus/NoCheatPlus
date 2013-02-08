@@ -494,11 +494,21 @@ public class SurvivalFly extends Check {
 		}
 		final double setBackYDistance = to.getY() - data.getSetBackY();
 		
-		// TODO: Check for sprinting down blocks etc.
+		// Check for sprinting down blocks etc.
 		if (!useWorkaround && yDistance <= 0.0 && Math.abs(yDistance) <= 0.5 && data.sfLastYDist <= yDistance && data.sfJumpPhase <= 7 && setBackYDistance < 0){
 			// TODO: <= 7 might work with speed II, not sure with above.
 			// TODO: account for speed/sprint
 			// TODO: account for half steps !?
+			if (from.isOnGround(0.6, 0.4, 0, 0L) ){
+				// Temporary "fix".
+				useWorkaround = true;
+				setBackSafe = true;
+			}
+		}
+		
+		// Check for jumping up strange blocks like flower pots on top of other blocks.
+		if (!useWorkaround && yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier){
+			// TODO: confine by block types ?
 			if (from.isOnGround(0.6, 0.4, 0, 0L) ){
 				// Temporary "fix".
 				useWorkaround = true;
