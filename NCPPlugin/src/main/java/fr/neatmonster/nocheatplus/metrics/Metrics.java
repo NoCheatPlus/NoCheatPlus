@@ -34,6 +34,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.scheduler.BukkitTask;
 
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -432,9 +434,9 @@ public class Metrics {
         } else {
             connection = url.openConnection();
         }
-        // NCP: Set timeouts.
-        connection.setConnectTimeout(8000);
-        connection.setReadTimeout(16000); 
+//        // NCP: Set timeouts.
+//        connection.setConnectTimeout(8000);
+//        connection.setReadTimeout(16000); 
         
         connection.setDoOutput(true);
 
@@ -462,6 +464,7 @@ public class Metrics {
         }
 
         if (response == null || response.startsWith("ERR")) {
+        	LogUtil.scheduleLogWarning("[NoCheatPlus] Metrics error: " + response);
             throw new IOException(response); //Throw the exception
         } else {
             // Is this the first update this hour?
