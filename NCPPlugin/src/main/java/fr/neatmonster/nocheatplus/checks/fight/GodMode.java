@@ -137,12 +137,12 @@ public class GodMode extends Check {
     	
     	// Check if reduced more than expected or new/count down fully.
     	// TODO: Mostly workarounds.
-    	if (delta <= 0  || data.lastNoDamageTicks == 0 || dTick > data.lastNoDamageTicks || damage > player.getLastDamage() || damage == 0){
+    	if (delta <= 0  || data.lastNoDamageTicks <= player.getMaximumNoDamageTicks() / 2 || dTick > data.lastNoDamageTicks || damage > player.getLastDamage() || damage == 0){
     		// Not resetting acc.
     		legit = set = true;
     	}
     	
-    	if (noDamageTicks == 10 || dTick == 1 && noDamageTicks < 19){
+    	if (dTick == 1 && noDamageTicks < 19){
     		set = true;
     	}
 
