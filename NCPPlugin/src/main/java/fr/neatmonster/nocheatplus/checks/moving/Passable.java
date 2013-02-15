@@ -66,6 +66,10 @@ public class Passable extends Check {
 		else if (!from.isSameBlock(lbX, lbY, lbZ)){
 			// Otherwise keep loc as set-back.
 		}
+		else if (to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
+			// Allow the move up if the head is free.
+			return null;
+		}
 		else if (!from.isSameBlock(to)){
 			// Otherwise keep from as set-back.
 			loc = null;
