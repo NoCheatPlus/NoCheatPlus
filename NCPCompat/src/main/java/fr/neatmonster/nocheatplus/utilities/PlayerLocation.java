@@ -218,7 +218,25 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public final boolean isSameBlock(final Location loc) {
-		return x == loc.getBlockX() && z == loc.getBlockZ() && y == loc.getBlockY();
+		return blockX == loc.getBlockX() && blockZ == loc.getBlockZ() && blockY == loc.getBlockY();
+	}
+	
+	/**
+	 * Check if this location is above the given one (blockY + 1).
+	 * @param loc
+	 * @return
+	 */
+	public boolean isBlockAbove(final PlayerLocation loc){
+		return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
+	}
+	
+	/**
+	 * Check if this location is above the given one (blockY + 1).
+	 * @param loc
+	 * @return
+	 */
+	public boolean isBlockAbove(final Location loc){
+		return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
 	}
 
 	/**
