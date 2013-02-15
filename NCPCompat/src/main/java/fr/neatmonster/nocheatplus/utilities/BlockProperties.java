@@ -1415,9 +1415,9 @@ public class BlockProperties {
                                 		// TODO: further exclude simple full shape blocks, or confine to itchy block types
                                 		// TODO: make flags for it.
                                 		// Simplistic hot fix attempt for same type + same shape.
-                                		double[] bounds = access.getBounds(x, y, z);
+                                		final double[] bounds = access.getBounds(x, y, z);
                                 		if (bounds == null) return true;
-                                		double[] aboveBounds = access.getBounds(x, y + 1, z);
+                                		final double[] aboveBounds = access.getBounds(x, y + 1, z);
                                 		if (aboveBounds == null) return true;
                                 		boolean fullBounds = false;
                                 		for (int i = 0; i < 3; i++){
@@ -1437,6 +1437,12 @@ public class BlockProperties {
                                 				return true;
                                 			}
                                 		}
+                            		}
+                            		// Workarounds.
+                            		if (aboveId == Material.CACTUS.getId() && aboveId != id){
+                            			// TODO: This is a rough estimate, assumes sand underneath, further relies on passable.
+                            			// TODO: General workaround for slightly inset blocks which have full bounds for passable.
+                            			return true;
                             		}
                                 	// Not regarded as ground.
                                 	continue;
