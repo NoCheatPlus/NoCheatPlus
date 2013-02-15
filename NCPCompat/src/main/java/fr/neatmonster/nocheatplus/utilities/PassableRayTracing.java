@@ -65,14 +65,14 @@ public class PassableRayTracing extends RayTracing{
 		
 		// TODO: Other problem (forgot)...
 		
-		// Check if is already inside.
-		// TODO: This might be superfluous since below method used.
-		if (oX >= bounds[0] && oX < bounds[3] && oY >= bounds[1] && oY < bounds[4] && oZ >= bounds[2] && oZ < bounds[5]){
-			if (!BlockProperties.isPassableWorkaround(blockCache, blockX, blockY, blockZ, oX, oY, oZ, id, 0, 0, 0, 0)){
-				collides = true;
-				return true;
-			}
-		}
+//		// Check if is already inside.
+//		// TODO: This might be superfluous since below method used.
+//		if (oX >= bounds[0] && oX < bounds[3] && oY >= bounds[1] && oY < bounds[4] && oZ >= bounds[2] && oZ < bounds[5]){
+//			if (!BlockProperties.isPassableWorkaround(blockCache, blockX, blockY, blockZ, oX, oY, oZ, id, 0, 0, 0, 0)){
+//				collides = true;
+//				return true;
+//			}
+//		}
 		// Check extrapolation [all three intervals must be hit].
 		if (dX < 0){
 			if (oX < bounds[0]) return true;
@@ -104,7 +104,9 @@ public class PassableRayTracing extends RayTracing{
 			return true;
 		}
 		// Does collide (most likely).
-		// TODO: This is not entirely accurate, needs further exclusion for smaller solid blocks.
+		// TODO: This is not entirely accurate.
+		// TODO: Moving such that the full move rect overlaps, but no real collision (diagonal moves).
+		// TODO: "Wrong" moves through edges of blocks (not sure, needs reproducing).
 		// (Could allow start-end if passable + check first collision time or some estimate.)
 		collides = true;
 		return true;
