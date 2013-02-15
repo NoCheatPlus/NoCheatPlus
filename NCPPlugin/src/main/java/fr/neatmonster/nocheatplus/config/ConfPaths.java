@@ -483,6 +483,10 @@ public abstract class ConfPaths {
     
     public static final String MOVING_PASSABLE                           = MOVING + "passable.";
 	public static final String MOVING_PASSABLE_CHECK                     = MOVING_PASSABLE + "active";
+	private static final String MOVING_PASSABLE_RAYTRACING				 = MOVING_PASSABLE + "raytracing.";
+	public static final String MOVING_PASSABLE_RAYTRACING_CHECK 		 = MOVING_PASSABLE_RAYTRACING + "active";
+	public static final String MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY= MOVING_PASSABLE_RAYTRACING + "blockchangeonly";
+	public static final String MOVING_PASSABLE_RAYTRACING_VCLIPONLY      = MOVING_PASSABLE_RAYTRACING + "vcliponly";
 	public static final String MOVING_PASSABLE_ACTIONS                   = MOVING_PASSABLE + "actions";
 
 	private static final String MOVING_SURVIVALFLY						= MOVING + "survivalfly.";

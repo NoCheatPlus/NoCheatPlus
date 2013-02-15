@@ -1025,28 +1025,80 @@ public class BlockProperties {
 		final double fy = y - by;
 		final double fz = z - bz;
 //		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
-		if (fx < bounds[0] || fx >= bounds[3] || fy < bounds[1] || fy >= bounds[4] || fz < bounds[2] || fz >= bounds[5]) return true;
-		else{
-			// Workarounds (might get generalized some time).
-			if (isStairs(id)){
-				if ((access.getData(bx, by, bz) & 0x4) != 0){
-					if (fy < 0.5) return true;
-				}
-				else if (fy >= 0.5) return true; 
-			}
-			else if (id == Material.SOUL_SAND.getId() && fy >= 0.875) return true; // 0.125
-			else if (id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()){
-			        if (Math.abs(0.5 - fx) > 0.05 && Math.abs(0.5 - fz) > 0.05) return true;
-			}
-			else if (id == Material.FENCE_GATE.getId() && (access.getData(bx, by, bz) & 0x4)!= 0) return true;
-			else if (id == Material.CAKE_BLOCK.getId() && fy >= 0.4375) return true; // 0.0625 = 0.125 / 2
-			else if (id == Material.CAULDRON.getId()){
-			    if (Math.abs(0.5 - fx) < 0.1 && Math.abs(0.5 - fz) < 0.1 && fy > 0.1) return true;
-			}
-			else if (id == Material.CACTUS.getId() && fy >= 0.9375) return true;
-			// Nothing found.
-			return false;
+		if (fx < bounds[0] || fx >= bounds[3] || fy < bounds[1] || fy >= bounds[4] || fz < bounds[2] || fz >= bounds[5]){
+			return true;
 		}
+		else{
+			// TODO: Check f_itchy if/once exists.
+			return isPassableWorkaround(access, bx, by, bz, fx, fy, fz, id, 0, 0, 0, 0);
+		}
+	}
+	
+	/**
+	 * Assuming the hit-box is hit (...) this checks for special blocks properties such as glass panes and similar.<br>
+	 * Ray-tracing version for passable-workarounds.
+	 * @param access
+	 * @param bx Block-coordinates.
+	 * @param by
+	 * @param bz
+	 * @param fx Offset from block-coordinates in [0..1].
+	 * @param fy
+	 * @param fz
+	 * @param id Type-id of the block.
+	 * @param dX Total ray distance for coordinated (see dT).
+	 * @param dY
+	 * @param dZ
+	 * @param dT Time to cover from given position in [0..1], relating to dX, dY, dZ.
+	 * @return
+	 */
+	public static final boolean isPassableWorkaround(final BlockCache access, final int bx, final int by, final int bz, final double fx, final double fy, final double fz, final int id, final double dX, final double dY, final double dZ, final double dT){
+		final long flags = blockFlags[id];
+		if ((flags & F_STAIRS) != 0){
+			if ((access.getData(bx, by, bz) & 0x4) != 0){
+				if (Math.max(fy, fy + dY * dT) < 0.5) return true;
+			}
+			else if (Math.min(fy, fy + dY * dT) >= 0.5) return true; 
+		}
+		else if (id == Material.SOUL_SAND.getId()){
+			if (Math.min(fy, fy + dY * dT) >= 0.875) return true; // 0.125
+		}
+		else if (id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()){
+			final double dFx = 0.5 - fx;
+			final double dFz = 0.5 - fz;
+			if (Math.abs(dFx) > 0.05 && Math.abs(dFz) > 0.05){
+				// Check moving between quadrants.
+				final double dFx2 = 0.5 - (fx + dX * dT);
+				final double dFz2 = 0.5 - (fz + dZ * dT);
+				if (Math.abs(dFx2) > 0.05 && Math.abs(dFz2) > 0.05){
+					if (dFx * dFx2 > 0.0 && dFz * dFz2 > 0.0){
+						return true;
+					}
+				}
+			}
+		}
+		else if (id == Material.FENCE_GATE.getId()){
+			if ((access.getData(bx, by, bz) & 0x4)!= 0) return true;
+		}
+		else if (id == Material.CAKE_BLOCK.getId()){
+			if (Math.min(fy, fy + dY * dT) >= 0.4375) return true; // 0.0625 = 0.125 / 2
+		}
+		else if (id == Material.CAULDRON.getId()){
+			final double dFx = 0.5 - fx;
+			final double dFz = 0.5 - fz;
+		    if (Math.min(fy, fy + dY * dT) > 0.1 && Math.abs(dFx) < 0.1 && Math.abs(dFz) < 0.1){
+		        // Check for moving through walls or floor.
+				final double dFx2 = 0.5 - (fx + dX * dT);
+				final double dFz2 = 0.5 - (fz + dZ * dT);
+				if (Math.abs(dFx2) < 0.1 && Math.abs(dFz2) < 0.1){
+					return true;
+				}
+		    }
+		}
+		else if (id == Material.CACTUS.getId()){
+			if (Math.min(fy, fy + dY * dT) >= 0.9375) return true;
+		}
+		// Nothing found.
+		return false;
 	}
 
 	/**

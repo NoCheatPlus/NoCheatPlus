@@ -10,9 +10,12 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 public class Passable extends Check {
+	
+	private final PassableRayTracing rayTracing = new PassableRayTracing();
 
 	public Passable() {
 		super(CheckType.MOVING_PASSABLE);
@@ -24,7 +27,19 @@ public class Passable extends Check {
 		
 		// TODO: account for actual bounding box.
 		
-		if (to.isPassable()){
+		boolean toPassable = to.isPassable();
+		// TODO: Config settings, extra flag for further processing.
+		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingVclipOnly || from.getY() > to.getY()) && (!cc.passableRayTracingBlockChangeOnly || from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ())){
+			rayTracing.set(from, to);
+			rayTracing.loop();
+			if (rayTracing.collides()){
+				toPassable = false;
+			}
+			// TODO: If accuracy is set, also check the head position (or bounding box right away).
+			rayTracing.cleanup();
+		}
+		
+		if (toPassable){
 			// Quick return.
 			// (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
 			data.passableVL *= 0.99;
