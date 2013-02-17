@@ -63,11 +63,15 @@ public class BlockInteractListener extends CheckListener {
          */
         final Player player = event.getPlayer();
 
-        if (event.getClickedBlock() == null || event.getAction() != Action.LEFT_CLICK_BLOCK
-                && event.getAction() != Action.RIGHT_CLICK_BLOCK)
-            return;
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK && event.getAction() != Action.RIGHT_CLICK_BLOCK){
+        	return;
+        }
 
         final Block block = event.getClickedBlock();
+        
+        if (block == null){
+        	return;
+        }
 
         boolean cancelled = false;
 
