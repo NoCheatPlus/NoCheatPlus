@@ -385,6 +385,7 @@ public class BlockProperties {
                 Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
                 Material.COCOA, Material.SNOW, Material.BREWING_STAND,
                 Material.PISTON_MOVING_PIECE, Material.PISTON_EXTENSION,
+                Material.STEP,
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
