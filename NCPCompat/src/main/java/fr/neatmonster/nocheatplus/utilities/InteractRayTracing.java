@@ -105,14 +105,23 @@ public class InteractRayTracing extends RayTracing {
 	 */
 	private final boolean allowsWorkaround(final int blockX, final int blockY, final int blockZ) {
 		// TODO: This allows some bypasses for "strange" setups.
+		// TODO: Consider using distance to target as heuristic ? [should not get smaller !?]
+		final int dX = blockX - lastBx;
+		final int dY = blockY - lastBy;
+		final int dZ = blockZ - lastBz;
+		final double dSq = dX * dX + dY * dY + dZ * dZ;
 		for (int i = 0; i < 6; i++){
 			final int[] dir = incr[i];
-			final int rX = lastBx + dir[0];
-			if (Math.abs(blockX - rX) > 1) continue;
-			final int rY = lastBy + dir[1];
-			if (Math.abs(blockY - rY) > 1) continue;
-			final int rZ = lastBz + dir[2];
-			if (Math.abs(blockZ - rZ) > 1) continue;
+			final int rX = blockX + dir[0];
+			if (Math.abs(lastBx - rX) > 1) continue;
+			final int rY = blockY + dir[1];
+			if (Math.abs(lastBy - rY) > 1) continue;
+			final int rZ = blockZ + dir[2];
+			if (Math.abs(lastBz - rZ) > 1) continue;
+			final int dRx = rX - lastBx;
+			final int dRy = rY - lastBy;
+			final int dRz = rZ - lastBz;
+			if (dRx * dRx + dRy * dRy + dRz * dRz <= dSq) continue;
 			if (!doesCollide(rX, rY, rZ)){
 				// NOTE: Don't check "rX == targetBx && rZ == targetBz && rY == targetBy".
 				return true;
