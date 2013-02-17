@@ -47,7 +47,7 @@ public class Visible extends Check {
     	rayTracing.cleanup();
     	
 		if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-        	player.sendMessage("Interact: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " collide=" + rayTracing.collides());
+        	player.sendMessage("Interact visible: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " collide=" + rayTracing.collides());
         }
 		
 		// Actions ?
