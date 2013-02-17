@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -34,33 +35,32 @@ public class Direction extends Check {
      * 
      * @param player
      *            the player
-     * @param location
+     * @param blockLocation
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location location) {
-        final BlockInteractData data = BlockInteractData.getData(player);
+    public boolean check(final Player player, final Location loc, final Block block, final BlockInteractData data, final BlockInteractConfig cc) {
 
         boolean cancel = false;
 
         // How far "off" is the player with his aim. We calculate from the players eye location and view direction to
         // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
-        final double off = CheckUtils.directionCheck(player, location.getX() + 0.5D, location.getY() + 0.5D,
-                location.getZ() + 0.5D, 1D, 1D, 50);
+        final double off = CheckUtils.directionCheck(player, 0.5 + block.getX(), 0.5 + block.getY(), 0.5 + block.getZ(), 1D, 1D, 50);
 
         if (off > 0.1D) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the block...
-            final Vector direction = player.getEyeLocation().getDirection();
-            final Vector blockEyes = location.add(0.5D, 0.5D, 0.5D).subtract(player.getEyeLocation()).toVector();
+            final Vector direction = loc.getDirection();
+            final Vector blockEyes = new Vector(0.5 + block.getX() - loc.getX(), 0.5 + block.getY() - loc.getY() - player.getEyeHeight(), 0.5 + block.getZ() - loc.getZ());
             final double distance = blockEyes.crossProduct(direction).length() / direction.length();
 
             // Add the overall violation level of the check.
             data.directionVL += distance;
+            
+            // TODO: Set distance parameter.
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.directionVL, distance,
-                    BlockInteractConfig.getConfig(player).directionActions);
+            cancel = executeActions(player, data.directionVL, distance, cc.directionActions);
         } else
             // Player did likely nothing wrong, reduce violation counter to reward him.
             data.directionVL *= 0.9D;

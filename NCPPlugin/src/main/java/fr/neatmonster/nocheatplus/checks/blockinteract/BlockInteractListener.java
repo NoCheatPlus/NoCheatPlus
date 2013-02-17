@@ -2,7 +2,6 @@ package fr.neatmonster.nocheatplus.checks.blockinteract;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -12,8 +11,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.InteractRayTracing;
 
 /*
  * M#"""""""'M  dP                   dP       M""M            dP                                         dP   
@@ -66,6 +63,9 @@ public class BlockInteractListener extends CheckListener {
          * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
          *                |___/                                                  
          */
+    	
+    	// TODO: Cancelled events: might still have to check for use of blocks etc? 
+    	
         final Player player = event.getPlayer();
 
         final Action action = event.getAction();
@@ -79,17 +79,26 @@ public class BlockInteractListener extends CheckListener {
         if (block == null){
         	return;
         }
+        
+        final BlockInteractData data = BlockInteractData.getData(player);
+        final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
 
         boolean cancelled = false;
+        
+        final Location loc = player.getLocation();
+        
+        // TODO: fast-interact !
 
         // First the reach check.
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation()))
-            cancelled = true;
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, block, data, cc)){
+        	cancelled = true;
+        }
 
         // Second the direction check
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, block.getLocation()))
-            cancelled = true;
-        
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, block, data, cc)){
+        	cancelled = true;
+        }
+
         // If one of the checks requested to cancel the event, do so.
         if (cancelled) {
         	event.setUseInteractedBlock(Result.DENY);

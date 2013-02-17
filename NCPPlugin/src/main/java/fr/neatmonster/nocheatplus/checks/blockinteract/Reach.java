@@ -1,9 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
-import java.util.Map;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -44,12 +43,11 @@ public class Reach extends Check {
      * 
      * @param player
      *            the player
-     * @param location
+     * @param blockLocation
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location location) {
-        final BlockInteractData data = BlockInteractData.getData(player);
+    public boolean check(final Player player, final Location loc, final Block block, final BlockInteractData data, final BlockInteractConfig cc) {
 
         boolean cancel = false;
 
@@ -57,8 +55,7 @@ public class Reach extends Check {
 
         // Distance is calculated from eye location to center of targeted block. If the player is further away from his
         // target than allowed, the difference will be assigned to "distance".
-        final double distance = CheckUtils.distance(player.getEyeLocation(), location.add(0.5D, 0.5D, 0.5D))
-                - distanceLimit;
+        final double distance = CheckUtils.distance(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), 0.5 + block.getX(), 0.5 + block.getY(), 0.5 + block.getZ()) - distanceLimit;
 
         if (distance > 0) {
             // He failed, increment violation level.
@@ -69,19 +66,14 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, distance, BlockInteractConfig.getConfig(player).reachActions);
+            final ViolationData vd = new ViolationData(this, player, data.reachVL, distance, cc.reachActions);
+            vd.setParameter(ParameterName.REACH_DISTANCE, String.valueOf(Math.round(data.reachDistance)));
+            cancel = executeActions(vd);
         } else
             // Player passed the check, reward him.
             data.reachVL *= 0.9D;
 
         return cancel;
     }
-     
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.REACH_DISTANCE, String.valueOf(Math.round(BlockInteractData.getData(violationData.player).reachDistance)));
-		return parameters;
-	}
 	
 }
