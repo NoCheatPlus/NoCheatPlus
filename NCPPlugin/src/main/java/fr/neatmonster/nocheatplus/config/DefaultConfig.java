@@ -126,7 +126,7 @@ public class DefaultConfig extends ConfigFile {
         
         set(ConfPaths.BLOCKINTERACT_SPEED_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_SPEED_INTERVAL, 2000);
-        set(ConfPaths.BLOCKINTERACT_SPEED_LIMIT, 82);
+        set(ConfPaths.BLOCKINTERACT_SPEED_LIMIT, 60);
         set(ConfPaths.BLOCKINTERACT_SPEED_ACTIONS, "cancel vl>200 log:bspeed:0:2:if cancel vl>1000 cancel log:bspeed:0:2:icf cmd:kickbspeed");
         
         set(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK, true);
