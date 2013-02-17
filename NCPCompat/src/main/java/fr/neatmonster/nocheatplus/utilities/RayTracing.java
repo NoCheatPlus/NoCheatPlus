@@ -34,6 +34,10 @@ public abstract class RayTracing {
 		set(x0, y0, z0, x1, y1, z1);
 	}
 	
+	public RayTracing(){
+		set(0, 0, 0, 0, 0, 0);
+	}
+	
 	public void set(double x0, double y0, double z0, double x1, double y1, double z1){
 //		// TODO: Consider not using end-points at all.
 //		this.x0 = x0;

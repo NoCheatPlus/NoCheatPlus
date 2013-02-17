@@ -5,19 +5,10 @@ public class PassableRayTracing extends RayTracing{
 	protected BlockCache blockCache = null;
 	
 	protected boolean collides = false;
-	
-	/**
-	 * Empty constructor for setting other properties later.
-	 */
-	public PassableRayTracing() {
-		super(0, 0, 0, 0, 0, 0);
-	}
-	
 
 	public BlockCache getBlockCache() {
 		return blockCache;
 	}
-
 
 	public void setBlockCache(BlockCache blockCache) {
 		this.blockCache = blockCache;
