@@ -162,7 +162,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 			int id = mat.getId();
 			if (id < 0 || id >= 4096) continue;
 			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()){
-				BlockProperties.setBlockFlags(id, BlockProperties.getBLockFlags(id) | BlockProperties.F_IGN_PASSABLE);
+				BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | BlockProperties.F_IGN_PASSABLE);
 			}
 		}
 	}

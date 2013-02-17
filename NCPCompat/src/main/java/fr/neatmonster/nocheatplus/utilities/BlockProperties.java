@@ -929,7 +929,16 @@ public class BlockProperties {
 		return res;
 	}
 
+	/**
+	 * @deprecated Typo in method name.
+	 * @param id
+	 * @return
+	 */
 	public static final long getBLockFlags(final int id){
+		return blockFlags[id];
+	}
+	
+	public static final long getBlockFlags(final int id){
 		return blockFlags[id];
 	}
 

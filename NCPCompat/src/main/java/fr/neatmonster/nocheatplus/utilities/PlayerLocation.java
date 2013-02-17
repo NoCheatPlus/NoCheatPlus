@@ -353,7 +353,7 @@ public class PlayerLocation {
 				onClimbable = false;
 				return false;
 			}
-			onClimbable = (BlockProperties.getBLockFlags(getTypeId()) & BlockProperties.F_CLIMBABLE) != 0;
+			onClimbable = (BlockProperties.getBlockFlags(getTypeId()) & BlockProperties.F_CLIMBABLE) != 0;
 			// TODO: maybe use specialized bounding box.
 //			final double d = 0.1d;
 //			onClimbable = BlockProperties.collides(getBlockAccess(), minX - d, minY - d, minZ - d, maxX + d, minY + 1.0, maxZ + d, BlockProperties.F_CLIMBABLE);
@@ -403,7 +403,7 @@ public class PlayerLocation {
 	public boolean isAboveLadder() {
 		if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_CLIMBABLE) == 0 ) return false;
 		// TODO: bounding box ?
-		return (BlockProperties.getBLockFlags(getTypeIdBelow()) & BlockProperties.F_CLIMBABLE) != 0;
+		return (BlockProperties.getBlockFlags(getTypeIdBelow()) & BlockProperties.F_CLIMBABLE) != 0;
 	}
 
 	/**
