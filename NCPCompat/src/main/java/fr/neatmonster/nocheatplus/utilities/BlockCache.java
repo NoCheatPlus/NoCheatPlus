@@ -11,6 +11,20 @@ import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
  *
  */
 public abstract class BlockCache {
+	
+	/**
+	 * Convenience method to check if the bounds as returned by getBounds cover a whole block.
+	 * @param bounds Can be null, must have 6 fields.
+	 * @return
+	 */
+	public static final boolean isFullBounds(final double[] bounds) {
+		if (bounds == null) return false;
+		for (int i = 0; i < 3; i ++){
+			if (bounds[i] > 0.0) return false;
+			if (bounds[i + 3] < 1.0) return false;
+		}
+		return true;
+	}
     
     /** Cached type-ids. */
     private final CoordMap<Integer> idMap = new CoordMap<Integer>();
@@ -129,6 +143,17 @@ public abstract class BlockCache {
 		final double[] nBounds = fetchBounds(x, y, z);
 		boundsMap.put(x, y, z, nBounds);
 		return nBounds;
+	}
+	
+	/**
+	 * Convenience method to check if the bounds for a block cover the full block.
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public boolean isFullBounds(final int x, final int y, final int z){
+		return isFullBounds(getBounds(x, y, z));
 	}
 	
 	/**
