@@ -74,8 +74,9 @@ public class BlockInteractData extends ACheckData {
     }
 
 	// Violation levels.
-    public double directionVL;
-    public double reachVL;
+    public double directionVL	= 0;
+    public double reachVL		= 0;
+    public double visibleVL		= 0;
 
     // Data of the reach check.
     public double reachDistance;

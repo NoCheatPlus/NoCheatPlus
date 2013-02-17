@@ -76,6 +76,9 @@ public class BlockInteractConfig extends ACheckConfig {
 
     public final boolean    reachCheck;
     public final ActionList reachActions;
+    
+    public final boolean    visibleCheck;
+    public final ActionList visibleActions;
 
     /**
      * Instantiates a new block interact configuration.
@@ -91,6 +94,9 @@ public class BlockInteractConfig extends ACheckConfig {
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_REACH_CHECK);
         reachActions = data.getOptimizedActionList(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, Permissions.BLOCKINTERACT_REACH);
+        
+        visibleCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK);
+        visibleActions = data.getOptimizedActionList(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, Permissions.BLOCKINTERACT_VISIBLE);
     }
 
     /* (non-Javadoc)
@@ -103,6 +109,8 @@ public class BlockInteractConfig extends ACheckConfig {
             return directionCheck;
         case BLOCKINTERACT_REACH:
             return reachCheck;
+        case BLOCKINTERACT_VISIBLE:
+        	return visibleCheck;
         default:
             return true;
         }

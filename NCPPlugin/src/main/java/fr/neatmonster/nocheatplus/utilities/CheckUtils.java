@@ -42,6 +42,8 @@ public class CheckUtils {
 	 */
 	public static double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
 	{
+		
+		// TODO: optimize !
 
 		// Get the eye location of the player.
 		final Location eyes = player.getEyeLocation();

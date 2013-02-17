@@ -123,7 +123,10 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.BLOCKINTERACT_REACH_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
-
+        
+        set(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK, true);
+        set(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, "cancel vl>5 log:bvisible:0:2:if cancel");
+        
         /*
          * 888 88b, 888                    888    888 88e  888                          
          * 888 88P' 888  e88 88e   e88'888 888 ee 888 888D 888  ,"Y88b  e88'888  ,e e,  
@@ -425,9 +428,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of his line of sight" + end);
         set(ConfPaths.STRINGS + ".bedleave", start + "sends bed leave packets (was not in bed)" + end);
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
-        set(ConfPaths.STRINGS + ".breach", start
-                + "tried to interact with a block over distance [reachdistance] block(s)" + end);
+        set(ConfPaths.STRINGS + ".breach", start + "exceeds block-interact distance ([reachdistance])" + end);
         set(ConfPaths.STRINGS + ".bwrong", start + "broke another block than clicked" + end);
+        set(ConfPaths.STRINGS + ".bvisible", start + "interacts with a block out of sight" + end);
         set(ConfPaths.STRINGS + ".captcha", "[player] failed captcha repeatedly" + end);
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".commands", start + "issued too many commands" + end);

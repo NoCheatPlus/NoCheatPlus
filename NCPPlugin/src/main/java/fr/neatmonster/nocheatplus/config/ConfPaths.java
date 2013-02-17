@@ -141,6 +141,10 @@ public abstract class ConfPaths {
     private static final String BLOCKINTERACT_REACH                      = BLOCKINTERACT + "reach.";
     public static final String  BLOCKINTERACT_REACH_CHECK                = BLOCKINTERACT_REACH + "active";
     public static final String  BLOCKINTERACT_REACH_ACTIONS              = BLOCKINTERACT_REACH + "actions";
+    
+    private static final String BLOCKINTERACT_VISIBLE					 = BLOCKINTERACT + "visible.";
+	public static final String  BLOCKINTERACT_VISIBLE_CHECK				 = BLOCKINTERACT_VISIBLE + "active";
+	public static final String  BLOCKINTERACT_VISIBLE_ACTIONS			 = BLOCKINTERACT_VISIBLE + "actions";
 
     /*
      * 888 88b, 888                    888    888 88e  888                          

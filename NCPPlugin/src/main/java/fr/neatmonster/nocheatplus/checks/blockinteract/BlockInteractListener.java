@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.blockinteract;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -41,6 +42,9 @@ public class BlockInteractListener extends CheckListener {
 
     /** The reach check. */
     private final Reach     reach     = addCheck(new Reach());
+    
+    /** The Visible check. */
+    private final Visible visible = addCheck(new Visible());
     
     public BlockInteractListener(){
     	super(CheckType.BLOCKINTERACT);
@@ -85,6 +89,7 @@ public class BlockInteractListener extends CheckListener {
 
         boolean cancelled = false;
         
+        final BlockFace face = event.getBlockFace();
         final Location loc = player.getLocation();
         
         // TODO: fast-interact !
@@ -99,6 +104,11 @@ public class BlockInteractListener extends CheckListener {
         	cancelled = true;
         }
 
+        // Ray tracing for freecam use etc.
+        if (!cancelled && visible.isEnabled(player) && visible.check(player, loc, block, face, action, data, cc)){
+        	cancelled = true;
+        }
+        
         // If one of the checks requested to cancel the event, do so.
         if (cancelled) {
         	event.setUseInteractedBlock(Result.DENY);

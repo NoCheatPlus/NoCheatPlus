@@ -103,6 +103,8 @@ permissions:
                                 description: Allow the player to bypass to Direction check.
                             nocheatplus.checks.blockinteract.reach:
                                 description: Allow the player to bypass the Reach check.
+                            nocheatplus.checks.blockinteract.visible:
+                                description: Allow the player to bypass the Visible check.
                     nocheatplus.checks.blockplace:
                         description: Allow the player to bypass all BlockPlace checks.
                         children:
