@@ -37,14 +37,17 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
  */
 public class BlockInteractListener extends CheckListener {
 
-    /** The direction check. */
+    /** The looking-direction check. */
     private final Direction direction = addCheck(new Direction());
 
-    /** The reach check. */
+    /** The reach-distance check. */
     private final Reach     reach     = addCheck(new Reach());
     
-    /** The Visible check. */
+    /** Interact with visible blocks. */
     private final Visible visible = addCheck(new Visible());
+    
+    /** Speed of interaction. */
+    private final Speed speed = addCheck(new Speed());
     
     public BlockInteractListener(){
     	super(CheckType.BLOCKINTERACT);
@@ -92,7 +95,10 @@ public class BlockInteractListener extends CheckListener {
         final BlockFace face = event.getBlockFace();
         final Location loc = player.getLocation();
         
-        // TODO: fast-interact !
+        // Interaction speed.
+        if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)){
+        	cancelled = true;
+        }
 
         // First the reach check.
         if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, block, data, cc)){

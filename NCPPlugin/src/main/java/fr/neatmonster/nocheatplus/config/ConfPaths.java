@@ -142,6 +142,12 @@ public abstract class ConfPaths {
     public static final String  BLOCKINTERACT_REACH_CHECK                = BLOCKINTERACT_REACH + "active";
     public static final String  BLOCKINTERACT_REACH_ACTIONS              = BLOCKINTERACT_REACH + "actions";
     
+    private static final String BLOCKINTERACT_SPEED						 = BLOCKINTERACT + "speed.";
+	public static final String BLOCKINTERACT_SPEED_CHECK				 = BLOCKINTERACT_SPEED + "active";
+	public static final String BLOCKINTERACT_SPEED_INTERVAL				 = BLOCKINTERACT_SPEED + "interval";
+	public static final String BLOCKINTERACT_SPEED_LIMIT				 = BLOCKINTERACT_SPEED + "limit";
+	public static final String BLOCKINTERACT_SPEED_ACTIONS				 = BLOCKINTERACT_SPEED + "actions";
+    
     private static final String BLOCKINTERACT_VISIBLE					 = BLOCKINTERACT + "visible.";
 	public static final String  BLOCKINTERACT_VISIBLE_CHECK				 = BLOCKINTERACT_VISIBLE + "active";
 	public static final String  BLOCKINTERACT_VISIBLE_ACTIONS			 = BLOCKINTERACT_VISIBLE + "actions";

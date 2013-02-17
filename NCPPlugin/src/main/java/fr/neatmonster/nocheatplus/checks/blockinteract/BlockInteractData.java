@@ -76,8 +76,15 @@ public class BlockInteractData extends ACheckData {
 	// Violation levels.
     public double directionVL	= 0;
     public double reachVL		= 0;
+    public double speedVL		= 0;
     public double visibleVL		= 0;
 
     // Data of the reach check.
     public double reachDistance;
+    
+    /** Last reset time. */
+    public long speedTime	= 0;
+    /** Number of interactions since last reset-time. */
+    public int  speedCount	= 0;
+    
 }

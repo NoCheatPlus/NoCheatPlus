@@ -83,6 +83,7 @@ public class Permissions {
     public static final String  BLOCKINTERACT                = CHECKS + ".blockinteract";
     public static final String  BLOCKINTERACT_DIRECTION      = BLOCKINTERACT + ".direction";
     public static final String  BLOCKINTERACT_REACH          = BLOCKINTERACT + ".reach";
+    public static final String  BLOCKINTERACT_SPEED          = BLOCKINTERACT + ".speed";
 	public static final String  BLOCKINTERACT_VISIBLE		 = BLOCKINTERACT + ".visible";
 
     /*

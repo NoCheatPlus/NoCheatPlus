@@ -77,6 +77,11 @@ public class BlockInteractConfig extends ACheckConfig {
     public final boolean    reachCheck;
     public final ActionList reachActions;
     
+    public final boolean    speedCheck;
+    public final long		speedInterval;
+    public final int		speedLimit;
+    public final ActionList speedActions;
+    
     public final boolean    visibleCheck;
     public final ActionList visibleActions;
 
@@ -95,6 +100,11 @@ public class BlockInteractConfig extends ACheckConfig {
         reachCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_REACH_CHECK);
         reachActions = data.getOptimizedActionList(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, Permissions.BLOCKINTERACT_REACH);
         
+        speedCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_SPEED_CHECK);
+        speedInterval = data.getLong(ConfPaths.BLOCKINTERACT_SPEED_INTERVAL);
+        speedLimit = data.getInt(ConfPaths.BLOCKINTERACT_SPEED_LIMIT);
+        speedActions = data.getOptimizedActionList(ConfPaths.BLOCKINTERACT_SPEED_ACTIONS, Permissions.BLOCKINTERACT_SPEED);
+        
         visibleCheck = data.getBoolean(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK);
         visibleActions = data.getOptimizedActionList(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, Permissions.BLOCKINTERACT_VISIBLE);
     }
@@ -105,6 +115,8 @@ public class BlockInteractConfig extends ACheckConfig {
     @Override
     public final boolean isEnabled(final CheckType checkType) {
         switch (checkType) {
+        case BLOCKINTERACT_SPEED:
+        	return speedCheck;
         case BLOCKINTERACT_DIRECTION:
             return directionCheck;
         case BLOCKINTERACT_REACH:

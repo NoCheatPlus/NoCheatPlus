@@ -124,6 +124,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKINTERACT_REACH_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
         
+        set(ConfPaths.BLOCKINTERACT_SPEED_CHECK, true);
+        set(ConfPaths.BLOCKINTERACT_SPEED_INTERVAL, 2000);
+        set(ConfPaths.BLOCKINTERACT_SPEED_LIMIT, 82);
+        set(ConfPaths.BLOCKINTERACT_SPEED_ACTIONS, "cancel vl>200 log:bspeed:0:2:if cancel vl>1000 cancel log:bspeed:0:2:icf cmd:kickbspeed");
+        
         set(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, "cancel vl>5 log:bvisible:0:2:if cancel");
         
@@ -429,8 +434,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bedleave", start + "sends bed leave packets (was not in bed)" + end);
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start + "exceeds block-interact distance ([reachdistance])" + end);
-        set(ConfPaths.STRINGS + ".bwrong", start + "broke another block than clicked" + end);
+        set(ConfPaths.STRINGS + ".bspeed", start + "interacts too fast" + end);
         set(ConfPaths.STRINGS + ".bvisible", start + "interacts with a block out of sight" + end);
+        set(ConfPaths.STRINGS + ".bwrong", start + "broke another block than clicked" + end);
         set(ConfPaths.STRINGS + ".captcha", "[player] failed captcha repeatedly" + end);
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".commands", start + "issued too many commands" + end);
@@ -455,6 +461,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".instanteat", start + "eats food [food] too fast" + end);
         set(ConfPaths.STRINGS + ".kick", "kick [player]");
         set(ConfPaths.STRINGS + ".kickbedleave", "ncp delay ncp kick [player] Go find a bed!");
+        set(ConfPaths.STRINGS + ".kickbspeed", "ncp kick [player] Too fast interaction!");
         set(ConfPaths.STRINGS + ".kickcaptcha", "ncp kick [player] Enter the captcha!");
         set(ConfPaths.STRINGS + ".kickchat1", "ncp tempkick [player] 1 You're still not allowed to spam!");
         set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");
