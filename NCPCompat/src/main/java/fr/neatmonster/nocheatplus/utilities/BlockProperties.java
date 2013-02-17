@@ -276,6 +276,8 @@ public class BlockProperties {
     public static final int F_VARIABLE		= 0x400;
 //    /** The block has full bounds (0..1), inaccurate! */
 //    public static final int F_FULL   		= 0x800;
+    /** Block has full xz-bounds. */
+    public static final int F_XZ100			= 0x800;
     
     /** Penalty factor for block break duration if under water. */
     protected static float breakPenaltyInWater = 4f;
@@ -382,14 +384,22 @@ public class BlockProperties {
                 Material.WATER_LILY, Material.LADDER,
                 Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
                 Material.COCOA, Material.SNOW, Material.BREWING_STAND,
+                Material.PISTON_MOVING_PIECE, Material.PISTON_EXTENSION,
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
         for (final Material mat : new Material[]{
         		Material.ENDER_PORTAL_FRAME, Material.BREWING_STAND,
+        		Material.PISTON_EXTENSION,
         }){
             blockFlags[mat.getId()] |= F_HEIGHT100;
         }
+        for (final Material mat : new Material[]{
+        		Material.PISTON_EXTENSION,
+        }){
+            blockFlags[mat.getId()] |= F_XZ100;
+        }
+        
 		// Ignore for passable.
 		for (final Material mat : new Material[]{
 				Material.WALL_SIGN, Material.SIGN_POST,
@@ -1106,6 +1116,9 @@ public class BlockProperties {
 		else if (id == Material.CACTUS.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.9375) return true;
 		}
+		else if (id == Material.PISTON_EXTENSION.getId()){
+			if (Math.min(fy, fy + dY * dT) >= 0.625) return true;
+		}
 		// Nothing found.
 		return false;
 	}
@@ -1345,19 +1358,34 @@ public class BlockProperties {
         	bmaxX = bmaxY = bmaxZ = 1D;
         }
         else{
-        	bminX = bounds[0]; // block.v(); // minX
-        	bminY = bounds[1]; // block.x(); // minY
-        	bminZ = bounds[2]; // block.z(); // minZ
-        	bmaxX = bounds[3]; //block.w(); // maxX
-            bmaxZ = bounds[5]; //block.A(); // maxZ
+        	if ((flags | F_XZ100) != 0){
+        		bminX = bminZ = 0;
+        		bmaxX = bmaxZ = 1;
+        	}
+        	else{
+        		bminX = bounds[0]; // block.v(); // minX
+            	bminZ = bounds[2]; // block.z(); // minZ
+            	bmaxX = bounds[3]; //block.w(); // maxX
+                bmaxZ = bounds[5]; //block.A(); // maxZ
+        	}
         	if (id == Material.SNOW.getId()){
         		// TODO: remove / solve differently ?
+        		bminY = 0;
         		final int data = (access.getData(x, y, z) & 0xF) % 8;
         		bmaxY = (double) (1 +  data) / 8.0;
         	}
-        	else if (( flags & F_HEIGHT150) != 0) bmaxY = 1.5;
-            else if ((flags & F_HEIGHT100) != 0) bmaxY = 1.0;
-            else bmaxY = bounds[4]; // block.y(); // maxY
+        	else if (( flags & F_HEIGHT150) != 0){
+        		bminY = 0;
+        		bmaxY = 1.5;
+        	}
+            else if ((flags & F_HEIGHT100) != 0){
+            	bminY = 0;
+            	bmaxY = 1.0;
+            }
+            else{
+            	bminY = bounds[1]; // block.x(); // minY
+            	bmaxY = bounds[4]; // block.y(); // maxY
+            }
         }
         if (minX > bmaxX + x || maxX < bminX + x) return false;
         else if (minY > bmaxY + y || maxY < bminY + y) return false;
