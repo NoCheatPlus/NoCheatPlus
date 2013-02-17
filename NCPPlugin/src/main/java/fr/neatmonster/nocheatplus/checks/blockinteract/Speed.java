@@ -31,6 +31,7 @@ public class Speed extends Check {
 			// Lag correction
 			final int correctedCount = (int) ((double) data.speedCount / TickTask.getLag(time - data.speedTime));
 			if (correctedCount > cc.speedLimit){
+				data.speedVL ++;
 				if (executeActions(player, data.speedVL, 1, cc.speedActions)){
 					cancel = true;
 				}
