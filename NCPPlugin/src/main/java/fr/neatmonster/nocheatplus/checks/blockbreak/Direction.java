@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -38,19 +39,19 @@ public class Direction extends Check {
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location location, final BlockBreakData data) {
+    public boolean check(final Player player, final Block block, final BlockBreakData data) {
 
         boolean cancel = false;
 
         // How far "off" is the player with his aim. We calculate from the players eye location and view direction to
         // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
-        final double off = CheckUtils.directionCheck(player, location.getX() + 0.5D, location.getY() + 0.5D,
-                location.getZ() + 0.5D, 1D, 1D, 50);
+        final Location loc = player.getLocation();
+        final Vector direction = loc.getDirection();
+        final double off = CheckUtils.directionCheck(loc, player.getEyeHeight(), direction, block, CheckUtils.DIRECTION_PRECISION);
 
         if (off > 0.1D) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the block...
-            final Vector direction = player.getEyeLocation().getDirection();
-            final Vector blockEyes = location.add(0.5D, 0.5D, 0.5D).subtract(player.getEyeLocation()).toVector();
+            final Vector blockEyes = new Vector(0.5 + block.getX() - loc.getX(), 0.5 + block.getY() - loc.getY() - player.getEyeHeight(), 0.5 + block.getZ() - loc.getZ());
             final double distance = blockEyes.crossProduct(direction).length() / direction.length();
 
             // Add the overall violation level of the check.

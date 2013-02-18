@@ -62,14 +62,13 @@ public class Direction extends Check {
         
         // How far "off" is the player with his aim. We calculate from the players eye location and view direction to
         // the center of the target entity. If the line of sight is more too far off, "off" will be bigger than 0.
-        final double off = CheckUtils.directionCheck(player, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(),
-                width, height, 75);
+        final Location loc = player.getLocation();
+        final Vector direction = player.getEyeLocation().getDirection();
+        final double off = CheckUtils.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, CheckUtils.DIRECTION_PRECISION);
 
         if (off > 0.1) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the entity...
-            final Vector direction = player.getEyeLocation().getDirection();
-            final Vector blockEyes = new Location(player.getWorld(), dLoc.getX(),  dLoc.getY() + height / 2D,
-                    dLoc.getZ()).subtract(player.getEyeLocation()).toVector();
+            final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + height / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
             final double distance = blockEyes.crossProduct(direction).length() / direction.length();
 
             // Add the overall violation level of the check.

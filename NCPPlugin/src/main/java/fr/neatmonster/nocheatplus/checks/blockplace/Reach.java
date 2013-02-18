@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.checks.blockplace;
 import java.util.Map;
 
 import org.bukkit.GameMode;
-import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
@@ -48,7 +48,7 @@ public class Reach extends Check {
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location location) {
+    public boolean check(final Player player, final Block block) {
         final BlockPlaceData data = BlockPlaceData.getData(player);
 
         boolean cancel = false;
@@ -57,8 +57,7 @@ public class Reach extends Check {
 
         // Distance is calculated from eye location to center of targeted block. If the player is further away from his
         // target than allowed, the difference will be assigned to "distance".
-        final double distance = CheckUtils.distance(player.getEyeLocation(), location.add(0.5D, 0.5D, 0.5D))
-                - distanceLimit;
+        final double distance = CheckUtils.distance(player.getEyeLocation(), block) - distanceLimit;
 
         if (distance > 0) {
             // He failed, increment violation level.

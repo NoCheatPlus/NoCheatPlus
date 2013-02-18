@@ -128,11 +128,11 @@ public class BlockBreakListener extends CheckListener {
             cancelled = true;
 
         // Is the block really in reach distance?
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation(), data))
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, block, data))
             cancelled = true;
 
         // Did the player look at the block at all?
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, block.getLocation(), data))
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, data))
             cancelled = true;
         
         // Destroying liquid blocks.

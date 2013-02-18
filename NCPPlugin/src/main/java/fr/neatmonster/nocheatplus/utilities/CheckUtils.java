@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.utilities;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -20,6 +21,9 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  */
 public class CheckUtils {
 	
+	/** Some default precision value for the directionCheck method. */
+	public static final double DIRECTION_PRECISION = 2.6;
+	
     /**
 	 * Check if a player looks at a target of a specific size, with a specific
 	 * precision value (roughly).
@@ -38,34 +42,86 @@ public class CheckUtils {
 	 *            the target height
 	 * @param precision
 	 *            the precision
-	 * @return the double
+	 * @return
 	 */
-	public static double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
+	public static double directionCheck2(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
 	{
+		final Location loc = player.getLocation();
+		final Vector dir = loc.getDirection();
+		return directionCheck(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), dir.getX(), dir.getY(), dir.getZ(), targetX, targetY, targetZ, targetWidth, targetHeight, precision);
+	}
+	
+	/**
+	 * Convenience method.
+	 * @param sourceFoot
+	 * @param eyeHeight
+	 * @param dir
+	 * @param target
+	 * @param precision (width/height are set to 1)
+	 * @return
+	 */
+	public static double directionCheck(final Location sourceFoot, final double eyeHeight, final Vector dir, final Block target, final double precision)
+	{
+		return directionCheck(sourceFoot.getX(), sourceFoot.getY() + eyeHeight, sourceFoot.getZ(), dir.getX(), dir.getY(), dir.getZ(), target.getX(), target.getY(), target.getZ(), 1, 1, precision);
+	}
+	
+	/**
+	 * Convenience method.
+	 * @param sourceFoot
+	 * @param eyeHeight
+	 * @param dir
+	 * @param targetX
+	 * @param targetY
+	 * @param targetZ
+	 * @param targetWidth
+	 * @param targetHeight
+	 * @param precision
+	 * @return
+	 */
+	public static double directionCheck(final Location sourceFoot, final double eyeHeight, final Vector dir, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
+	{
+		return directionCheck(sourceFoot.getX(), sourceFoot.getY() + eyeHeight, sourceFoot.getZ(), dir.getX(), dir.getY(), dir.getZ(), targetX, targetY, targetZ, targetWidth, targetHeight, precision);					
+	}
+	
+	/**
+	 * Check how far the looking direction is off the target.
+	 * @param sourceX Source location of looking direction.
+	 * @param sourceY
+	 * @param sourceZ
+	 * @param dirX Looking direction.
+	 * @param dirY
+	 * @param dirZ
+	 * @param targetX Location that should be looked towards.
+	 * @param targetY
+	 * @param targetZ
+	 * @param targetWidth xz extent
+	 * @param targetHeight y extent
+	 * @param precision
+	 * @return Some offset.
+	 */
+	public static double directionCheck(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
+		{
 		
-		// TODO: optimize !
+		// TODO: rework / standardize.
+		
+		double dirLength = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+		if (dirLength == 0.0) dirLength = 1.0; // ...
 
-		// Get the eye location of the player.
-		final Location eyes = player.getEyeLocation();
-
-		final double factor = Math.sqrt(Math.pow(eyes.getX() - targetX, 2) + Math.pow(eyes.getY() - targetY, 2) + Math.pow(eyes.getZ() - targetZ, 2));
-
-		// Get the view direction of the player.
-		final Vector direction = eyes.getDirection();
-
-		final double x = targetX - eyes.getX();
-		final double y = targetY - eyes.getY();
-		final double z = targetZ - eyes.getZ();
-
-		final double xPrediction = factor * direction.getX();
-		final double yPrediction = factor * direction.getY();
-		final double zPrediction = factor * direction.getZ();
+		final double dX = targetX - sourceX;
+		final double dY = targetY - sourceY;
+		final double dZ = targetZ - sourceZ;
+		
+		final double targetDist = Math.sqrt(dX * dX + dY * dY + dZ * dZ);
+		
+		final double xPrediction = targetDist * dirX / dirLength;
+		final double yPrediction = targetDist * dirY / dirLength;
+		final double zPrediction = targetDist * dirZ / dirLength;
 
 		double off = 0.0D;
 
-		off += Math.max(Math.abs(x - xPrediction) - (targetWidth / 2 + precision), 0.0D);
-		off += Math.max(Math.abs(z - zPrediction) - (targetWidth / 2 + precision), 0.0D);
-		off += Math.max(Math.abs(y - yPrediction) - (targetHeight / 2 + precision), 0.0D);
+		off += Math.max(Math.abs(dX - xPrediction) - (targetWidth / 2 + precision), 0.0D);
+		off += Math.max(Math.abs(dZ - zPrediction) - (targetWidth / 2 + precision), 0.0D);
+		off += Math.max(Math.abs(dY - yPrediction) - (targetHeight / 2 + precision), 0.0D);
 
 		if (off > 1) off = Math.sqrt(off);
 
@@ -84,6 +140,17 @@ public class CheckUtils {
 	public static final double distance(final Location location1, final Location location2)
 	{
 		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	/**
+	 * 3d-distance from location (exact) to block middle.
+	 * @param location
+	 * @param block
+	 * @return
+	 */
+	public static final double distance(final Location location, final Block block)
+	{
+		return distance(location.getX(), location.getY(), location.getZ(), 0.5 + block.getX(), 0.5 + block.getY(), 0.5 + block.getZ());
 	}
 	
 	/**

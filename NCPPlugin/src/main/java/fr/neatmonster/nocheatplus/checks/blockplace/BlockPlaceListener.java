@@ -119,12 +119,11 @@ public class BlockPlaceListener extends CheckListener {
             cancelled = true;
 
         // Third, the reach check.
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block.getLocation()))
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, block))
             cancelled = true;
 
         // Fourth, the direction check.
-        if (!cancelled && direction.isEnabled(player)
-                && direction.check(player, block.getLocation(), blockAgainst.getLocation()))
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, blockAgainst))
             cancelled = true;
 
         // If one of the checks requested to cancel the event, do so.
