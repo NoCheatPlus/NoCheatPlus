@@ -383,6 +383,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_NOFALL_DEALDAMAGE, true);
         set(ConfPaths.MOVING_NOFALL_RESETONVL, false);
         set(ConfPaths.MOVING_NOFALL_RESETONTP, false);
+        set(ConfPaths.MOVING_NOFALL_ANTICRITICALS, true);
         set(ConfPaths.MOVING_NOFALL_ACTIONS, "log:nofall:0:5:if cancel vl>30 log:nofall:0:5:icf cancel");
         
         set(ConfPaths.MOVING_PASSABLE_CHECK, true);

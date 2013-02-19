@@ -85,6 +85,8 @@ public class MovingConfig extends ACheckConfig {
 	public final boolean    noFallViolationReset;
 	/** Reset data on tp. */
 	public final boolean 	noFallTpReset;
+    /** Reset fd to 0  if on ground (dealdamage only). */
+	public final boolean noFallAntiCriticals;
     public final ActionList noFallActions;
     
 	public final boolean    passableCheck;
@@ -149,6 +151,7 @@ public class MovingConfig extends ACheckConfig {
         noFallDealDamage = data.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
         noFallViolationReset = data.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVL);
         noFallTpReset = data.getBoolean(ConfPaths.MOVING_NOFALL_RESETONTP);
+        noFallAntiCriticals = data.getBoolean(ConfPaths.MOVING_NOFALL_ANTICRITICALS);
         noFallActions = data.getOptimizedActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
         
         passableCheck = data.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);

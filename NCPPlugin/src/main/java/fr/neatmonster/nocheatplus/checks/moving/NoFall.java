@@ -154,11 +154,21 @@ public class NoFall extends Check {
         
         // TODO: fall distance might be behind (!)
         // TODO: should be the data.noFallMaxY be counted in ?
-        data.noFallFallDistance = Math.max(player.getFallDistance(), data.noFallFallDistance);
+        final float mcFallDistance = player.getFallDistance(); // Note: it has to be fetched here.
+        data.noFallFallDistance = Math.max(mcFallDistance, data.noFallFallDistance);
         
         // Add y distance.
         if (!toReset && !toOnGround && yDiff < 0){
             data.noFallFallDistance -= yDiff;
+        }
+        else if (cc.noFallDealDamage && cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || data.noFallAssumeGround) && yDiff >= 0)){
+        	// TODO: Only use this if dealdamage is true ?
+        	if (data.noFallFallDistance > 0){
+        		data.noFallFallDistance = 0;
+        	}
+        	if (mcFallDistance > 0){
+        		player.setFallDistance(0);
+    		}
         }
         
         if (cc.debug) System.out.println(player.getName() + " NoFall: mc=" + StringUtil.fdec3.format(player.getFallDistance()) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + StringUtil.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));

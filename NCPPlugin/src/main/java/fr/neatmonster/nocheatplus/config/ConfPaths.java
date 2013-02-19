@@ -489,6 +489,7 @@ public abstract class ConfPaths {
     public static final String  MOVING_NOFALL_DEALDAMAGE                 = MOVING_NOFALL + "dealdamage";
 	public static final String  MOVING_NOFALL_RESETONVL  				 = MOVING_NOFALL + "resetonviolation";
 	public static final String  MOVING_NOFALL_RESETONTP 				 = MOVING_NOFALL + "resetonteleport";
+	public static final String  MOVING_NOFALL_ANTICRITICALS				 = MOVING_NOFALL + "anticriticals";
     public static final String  MOVING_NOFALL_ACTIONS                    = MOVING_NOFALL + "actions";
     
     public static final String MOVING_PASSABLE                           = MOVING + "passable.";
