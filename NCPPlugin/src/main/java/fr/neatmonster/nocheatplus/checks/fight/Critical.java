@@ -58,7 +58,7 @@ public class Critical extends Check {
 			
 			if (MovingListener.shouldCheckSurvivalFly(player, mData, mCc) && CheckType.MOVING_NOFALL.isEnabled(player)){
 				// TODO: Set max y in MovingListener, to be independent of sf/nofall!
-				player.sendMessage("Critical: d=" + mcFallDistance + " y=" + loc.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
+				player.sendMessage("Critical: fd=" + mcFallDistance + "(" + mData.noFallFallDistance +") y=" + loc.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
 			}
 		}
 
