@@ -452,6 +452,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".dropkick", "ncp delay ncp kick [player] Dropping items too fast.");
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
+        set(ConfPaths.STRINGS + ".fastheal", start + "regenerates health faster than usual" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);
         set(ConfPaths.STRINGS + ".flyshort", start + "tried to move unexpectedly" + end);
