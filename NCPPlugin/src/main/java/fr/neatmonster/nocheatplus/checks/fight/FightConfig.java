@@ -75,6 +75,11 @@ public class FightConfig extends ACheckConfig {
     public final boolean    directionCheck;
     public final long       directionPenalty;
     public final ActionList directionActions;
+    
+    public final boolean	fastHealCheck;
+    public final long		fastHealInterval;
+    public final long		fastHealBuffer;
+    public final ActionList fastHealActions;
 
     public final boolean    godModeCheck;
 	public final long 		godModeLagMinAge;
@@ -131,6 +136,11 @@ public class FightConfig extends ACheckConfig {
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
         directionPenalty = data.getLong(ConfPaths.FIGHT_DIRECTION_PENALTY);
         directionActions = data.getOptimizedActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
+        
+        fastHealCheck = data.getBoolean(ConfPaths.FIGHT_FASTHEAL_CHECK);;
+        fastHealInterval = data.getLong(ConfPaths.FIGHT_FASTHEAL_INTERVAL);
+        fastHealBuffer = data.getLong(ConfPaths.FIGHT_FASTHEAL_BUFFER);
+        fastHealActions = data.getOptimizedActionList(ConfPaths.FIGHT_FASTHEAL_ACTIONS, Permissions.FIGHT_FASTHEAL);
 
         godModeCheck = data.getBoolean(ConfPaths.FIGHT_GODMODE_CHECK);
         godModeLagMinAge = data.getLong(ConfPaths.FIGHT_GODMODE_LAGMINAGE);
@@ -191,6 +201,8 @@ public class FightConfig extends ACheckConfig {
             return speedCheck;
         case FIGHT_SELFHIT:
         	return selfHitCheck;
+        case FIGHT_FASTHEAL:
+        	return fastHealCheck;
         default:
             return true;
         }

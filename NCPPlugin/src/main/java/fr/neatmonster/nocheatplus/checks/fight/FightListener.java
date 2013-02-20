@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
@@ -48,6 +49,9 @@ public class FightListener extends CheckListener {
 
     /** The direction check. */
     private final Direction   direction   = addCheck(new Direction());
+    
+    /** Faster health regeneration check. */
+    private final FastHeal fastHeal		  = addCheck(new FastHeal());
 
     /** The god mode check. */
     private final GodMode     godMode     = addCheck(new GodMode());
@@ -223,6 +227,16 @@ public class FightListener extends CheckListener {
                 // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
                 player.setNoDamageTicks(0);
             }
+            if (player.getHealth() == player.getMaxHealth()){
+            	final FightData data = FightData.getData(player);
+            	// TODO: Might use the same FightData instance for GodMode.
+            	if (data.fastHealBuffer < 0){
+            		// Reduce negative buffer with each full health.
+            		data.fastHealBuffer /= 2;
+            	}
+            	// Set reference time.
+            	data.fastHealRefTime = System.currentTimeMillis();
+            }
         }
     	// Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
@@ -318,12 +332,27 @@ public class FightListener extends CheckListener {
         if (event.isSprinting()) FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
     }
     
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onEntityRegainHealthLow(final EntityRegainHealthEvent event){
+    	final Entity entity = event.getEntity();
+    	if (!(entity instanceof Player)) return;
+    	final Player player = (Player) entity;
+    	if (event.getRegainReason() != RegainReason.SATIATED){
+    		return;
+    	}
+    	if (fastHeal.isEnabled(player) && fastHeal.check(player)){
+    		// TODO: Can clients force events with 0-re-gain ?
+    		event.setCancelled(true);
+    	}
+    }
+    
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityRegainHealth(final EntityRegainHealthEvent event){
     	final Entity entity = event.getEntity();
     	if (!(entity instanceof Player)) return;
     	final Player player = (Player) entity;
     	final FightData data = FightData.getData(player);
+    	// Adjust god mode data:
     	// Remember the time.
     	data.regainHealthTime = System.currentTimeMillis();
     	// Set god-mode health to maximum.

@@ -73,6 +73,7 @@ public class FightData extends ACheckData {
     public double                  angleVL;
     public double                  criticalVL;
     public double                  directionVL;
+    public double                  fastHealVL;
     public double                  godModeVL;
     public double                  knockbackVL;
     public double                  noSwingVL;
@@ -85,6 +86,7 @@ public class FightData extends ACheckData {
     public double lastAttackedX		= Integer.MAX_VALUE;
     public double lastAttackedY;
     public double lastAttackedZ;
+    /** Any kind of health regeneration. */
 	public long regainHealthTime    = 0;
 //    public double lastAttackedDist = 0.0;
     public long damageTakenByEntityTick;
@@ -93,7 +95,12 @@ public class FightData extends ACheckData {
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
 
     // Data of the direction check.
-    public long                    directionLastViolationTime;
+    public long                    directionLastViolationTime = 0;
+    
+    // FastHeal
+    public long					   fastHealRefTime = 0;
+    /** Buffer has to be initialized in constructor. */
+    public long					   fastHealBuffer = 0;
 
     // Old god mode check.
     public int                     godModeBuffer;
@@ -129,5 +136,7 @@ public class FightData extends ACheckData {
 	
 	public FightData(final FightConfig cc){
 		speedBuckets = new ActionFrequency(cc.speedBuckets, cc.speedBucketDur);
+		// Start with full fast-heal buffer.
+		fastHealBuffer = cc.fastHealBuffer; 
 	}
 }

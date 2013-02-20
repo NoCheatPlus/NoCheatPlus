@@ -140,6 +140,7 @@ public class Permissions {
     public static final String  FIGHT_ANGLE                  = FIGHT + ".angle";
     public static final String  FIGHT_CRITICAL               = FIGHT + ".critical";
     public static final String  FIGHT_DIRECTION              = FIGHT + ".direction";
+	public static final String  FIGHT_FASTHEAL				 = FIGHT + ".fastheal";
     public static final String  FIGHT_GODMODE                = FIGHT + ".godmode";
     public static final String  FIGHT_KNOCKBACK              = FIGHT + ".knockback";
     public static final String  FIGHT_NOSWING                = FIGHT + ".noswing";

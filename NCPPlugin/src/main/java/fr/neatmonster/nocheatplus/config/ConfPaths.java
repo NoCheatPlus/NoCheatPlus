@@ -376,6 +376,12 @@ public abstract class ConfPaths {
     public static final String  FIGHT_DIRECTION_CHECK                    = FIGHT_DIRECTION + "active";
     public static final String  FIGHT_DIRECTION_PENALTY                  = FIGHT_DIRECTION + "penalty";
     public static final String  FIGHT_DIRECTION_ACTIONS                  = FIGHT_DIRECTION + "actions";
+    
+    private static final String FIGHT_FASTHEAL							 = FIGHT + "fastheal.";
+    public static final String  FIGHT_FASTHEAL_CHECK					 = FIGHT_FASTHEAL + "active";
+	public static final String  FIGHT_FASTHEAL_INTERVAL					 = FIGHT_FASTHEAL + "interval";
+	public static final String  FIGHT_FASTHEAL_BUFFER					 = FIGHT_FASTHEAL + "buffer";
+	public static final String  FIGHT_FASTHEAL_ACTIONS					 = FIGHT_FASTHEAL + "actions";
 
     private static final String FIGHT_GODMODE                            = FIGHT + "godmode.";
     public static final String  FIGHT_GODMODE_CHECK                      = FIGHT_GODMODE + "active";
