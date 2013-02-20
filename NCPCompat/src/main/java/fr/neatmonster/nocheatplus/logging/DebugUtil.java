@@ -45,11 +45,11 @@ public class DebugUtil {
 		}
 
 	public static  void addBlockBelowInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
-		builder.append(tag + " below id= " + loc.getTypeIdBelow() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ())));
+		builder.append(tag + " below id= " + loc.getTypeIdBelow() + "data=" + loc.getData(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ()) + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ())));
 	}
 
 	public static  void addBlockInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
-		builder.append(tag + " id= " + loc.getTypeId() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
+		builder.append(tag + " id= " + loc.getTypeId() + "data=" + loc.getData() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
 	}
 
 }
