@@ -3,6 +3,8 @@ package fr.neatmonster.nocheatplus.utilities;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -49,6 +51,31 @@ public class StringUtil {
 			first = false;
 		}
 		return builder.toString();
+	}
+	
+	/**
+	 * Split input by all characters given (convenience method).
+	 * @param input
+	 * @param chars
+	 * @return
+	 */
+	public static List<String> split(String input, Character... chars){
+		List<String> out = new LinkedList<String>();
+		out.add(input);
+		List<String> queue = new LinkedList<String>();
+		for (final char c : chars){
+			for (final String s : out){
+				final String[] split = s.split("\\u" + (int) c);
+				for (final String _s : split){
+					queue.add(_s);
+				}
+			}
+			List<String> temp = out;
+			out = queue;
+			queue = temp;
+			queue.clear();
+		}
+		return out;
 	}
 	
 }
