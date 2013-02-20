@@ -303,7 +303,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_FASTHEAL_CHECK, true);
         set(ConfPaths.FIGHT_FASTHEAL_INTERVAL, 4000L);
         set(ConfPaths.FIGHT_FASTHEAL_BUFFER, 1000L);
-        set(ConfPaths.FIGHT_FASTHEAL_ACTIONS, "cancel vl>10 cancel log:fastheal:0:10");
+        set(ConfPaths.FIGHT_FASTHEAL_ACTIONS, "cancel vl>10 cancel log:fastheal:0:10:i vl>30 log:fastheal:0:10:if");
         
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
         set(ConfPaths.FIGHT_GODMODE_LAGMINAGE, 1100); // TODO: ndt/2 => 500-600.
