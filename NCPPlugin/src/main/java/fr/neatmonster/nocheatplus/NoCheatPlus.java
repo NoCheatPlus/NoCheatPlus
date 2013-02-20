@@ -601,10 +601,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Is the configuration outdated?
         configOutdated = Updates.isConfigOutdated(DefaultConfig.buildNumber, config);
         
-        // Debug information about unknown blocks.
-        // (Probably removed later.)
-        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false) || config.getBoolean(ConfPaths.BLOCKBREAK, false));
-        
 		if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 				@Override
@@ -652,6 +648,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Set up BlockProperties.
         BlockProperties.init(getMCAccess(), ConfigManager.getWorldConfigProvider());
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
+        // Schedule dumping the blocks properties (to let other plugins override).
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			@Override
+			public void run() {
+		        // Debug information about unknown blocks.
+		        // (Probably removed later.)
+				ConfigFile config = ConfigManager.getConfigFile();
+		        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false) || config.getBoolean(ConfPaths.BLOCKBREAK, false));
+			}
+		});
     }
     
     /**
