@@ -54,6 +54,7 @@ import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import fr.neatmonster.nocheatplus.logging.DebugUtil;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -489,7 +490,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         moveInfo.set(player, from, to, cc.yOnGround);
           
         if (cc.debug) {
-			outputMoveDebug(player, pFrom, pTo);
+			DebugUtil.outputMoveDebug(player, pFrom, pTo, mcAccess);
 		}
         
 		data.noFallAssumeGround = false;
@@ -670,23 +671,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 //        event.setTo(event.getFrom()); // TODO: revise this (old!) strategy, cancelled events just teleport to from, basically.
 //    }
     
-    private void outputMoveDebug(final Player player, final PlayerLocation from, final PlayerLocation to) {
-    	final StringBuilder builder = new StringBuilder(250);
-		final Location loc = player.getLocation();
-		builder.append(player.getName());
-		builder.append(" " + from.getWorld().getName() + " " + StringUtil.fdec3.format(from.getX()) + (from.getX() == loc.getX() ? "" : ("(" + StringUtil.fdec3.format(loc.getX()) + ")")));
-		builder.append(", " + StringUtil.fdec3.format(from.getY()) + (from.getY() == loc.getY() ? "" : ("(" + StringUtil.fdec3.format(loc.getY()) + ")")));
-		builder.append(", " + StringUtil.fdec3.format(from.getZ()) + (from.getZ() == loc.getZ() ? "" : ("(" + StringUtil.fdec3.format(loc.getZ()) + ")")));
-		builder.append(" -> " + StringUtil.fdec3.format(to.getX()) + ", " + StringUtil.fdec3.format(to.getY()) + ", " + StringUtil.fdec3.format(to.getZ()));
-		final double jump = mcAccess.getJumpAmplifier(player);
-		final double speed = mcAccess.getFasterMovementAmplifier(player);
-		if (speed != Double.NEGATIVE_INFINITY || jump != Double.NEGATIVE_INFINITY){
-			builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("speed=" + speed) : "") + (jump != Double.NEGATIVE_INFINITY ? ("jump=" + jump) : "") + ")");
-		}
-		System.out.print(builder.toString());
-	}
-
-	/**
+    /**
      * Monitor level PlayerMoveEvent.
      * @param event
      */
