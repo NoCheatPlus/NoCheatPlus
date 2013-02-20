@@ -1,7 +1,11 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.InputMismatchException;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +133,7 @@ public class BlockProperties {
 	protected static final BlockProps[] blocks = new BlockProps[maxBlocks];
 	
 	/** Map for the tool properties. */
-	protected static Map<Integer, ToolProps> tools = new HashMap<Integer, ToolProps>(50, 0.5f);
+	protected static Map<Integer, ToolProps> tools = new LinkedHashMap<Integer, ToolProps>(50, 0.5f);
 	
 	/** Breaking time for indestructible materials. */
 	public static final long indestructible = Long.MAX_VALUE;
@@ -278,6 +282,32 @@ public class BlockProperties {
 //    public static final int F_FULL   		= 0x800;
     /** Block has full xz-bounds. */
     public static final int F_XZ100			= 0x800;
+    
+    /**
+     * Map flag to names.
+     */
+    private static final Map<Long, String> flagNameMap = new LinkedHashMap<Long, String>();
+    /**
+     * Map flag name to flag, both names starting with F_... and the name without F_.
+     */
+    private static final Map<String, Long> nameFlagMap = new LinkedHashMap<String, Long>();
+    
+    static{
+    	// Use reflection to get a flag -> name mapping and vice versa.
+    	for (Field field : BlockProperties.class.getDeclaredFields()){
+    		String name = field.getName();
+    		if (name.startsWith("F_")){
+    			try {
+    				Long value = field.getLong(BlockProperties.class);
+					flagNameMap.put(value, name.substring(2));
+					nameFlagMap.put(name, value);
+					nameFlagMap.put(name.substring(2), value);
+				} catch (IllegalArgumentException e) {
+				} catch (IllegalAccessException e) {
+				}
+    		}
+    	}
+    }
     
     /** Penalty factor for block break duration if under water. */
     protected static float breakPenaltyInWater = 4f;
@@ -581,6 +611,7 @@ public class BlockProperties {
 			LogUtil.logInfo("[NoCheatPlus] Dump block properties for fastbreak check:");
 			LogUtil.logInfo("--- Present entries -------------------------------");
 		}
+		List<String> tags = new ArrayList<String>();
 		for (int i = 0; i < blocks.length; i++){
 			String mat;
 			try{
@@ -591,11 +622,14 @@ public class BlockProperties {
 			catch(Exception e){
 				mat = "?";
 			}
+			tags.clear();
+			addFlagNames(blockFlags [i], tags);
+			String tagsJoined = tags.isEmpty() ? "" : " / " + StringUtil.join(tags, " ");
 			if (blocks[i] == null){
 				if (mat.equals("?")) continue;
-				missing.add("* MISSING "+i + "(" + mat +") ");
+				missing.add("* MISSING "+i + "(" + mat + tagsJoined + ") ");
 			}
-			else if (all) LogUtil.logInfo(i + ": (" + mat + ") " + blocks[i].toString());
+			else if (all) LogUtil.logInfo(i + ": (" + mat + tagsJoined + ") " + blocks[i].toString());
 		}
 		if (!missing.isEmpty()){
 			Bukkit.getLogger().warning("[NoCheatPlus] The block breaking data is incomplete, default to allow instant breaking:");
@@ -606,6 +640,49 @@ public class BlockProperties {
 		}
 	}
 
+	/**
+	 * Add all flag names for existing default flags to the list.
+	 * @param flags
+	 * @param tags Flag names will be added to this list (not with the "F_"-prefix).
+	 */
+	public static void addFlagNames(final long flags, final Collection<String> tags) {
+		String tag = flagNameMap.get(flags);
+		if (tag != null){
+			tags.add(tag);
+			return;
+		}
+		for (final Long flag : flagNameMap.keySet()){
+			if ((flags & flag) != 0) tags.add(flagNameMap.get(flag));
+		}
+	}
+	
+	/**
+	 * Return a collection containing all names of the flags.
+	 * @param flags
+	 * @return
+	 */
+	public static Collection<String> getFlagNames(final long flags) {
+		final ArrayList<String> tags = new ArrayList<String>(flagNameMap.size());
+		addFlagNames(flags, tags);
+		return tags;
+	}
+	
+	/**
+	 * Convenience method to parse a flag.
+	 * @param input
+	 * @return
+	 */
+	public static long parseFlag(final String input){
+		final String ucInput = input.toUpperCase();
+		final Long flag = nameFlagMap.get(ucInput);
+		if (flag != null) return flag.longValue();
+		try{
+			final Long altFlag = Long.parseLong(input);
+			return altFlag;
+		} catch (NumberFormatException e){}
+		// TODO: This very exception type?
+		throw new InputMismatchException();
+	}
 
 	public static long[] secToMs(final double s1, final double s2, final double s3, final double s4, final double s5, final double s6){
 		return new long[] { (long) (s1 * 1000d), (long) (s2 * 1000d), (long) (s3 * 1000d), (long) (s4 * 1000d), (long) (s5 * 1000d), (long) (s6 * 1000d) };
