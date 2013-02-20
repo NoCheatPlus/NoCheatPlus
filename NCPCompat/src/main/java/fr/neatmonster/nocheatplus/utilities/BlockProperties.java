@@ -9,11 +9,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -671,6 +673,7 @@ public class BlockProperties {
 	 * Convenience method to parse a flag.
 	 * @param input
 	 * @return
+	 * @throws InputMismatchException if failed to parse.
 	 */
 	public static long parseFlag(final String input){
 		final String ucInput = input.toUpperCase();
@@ -1252,6 +1255,48 @@ public class BlockProperties {
             else {
             	setBlockProps(id, instantType);
             }
+        }
+        
+        // Override block flags.
+        ConfigurationSection section = config.getConfigurationSection(pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS);
+        if (section != null){
+        	final Map<String, Object> entries = section.getValues(false);
+        	boolean hasErrors = false;
+        	for (final Entry<String, Object> entry : entries.entrySet()){
+        		final String key = entry.getKey();
+        		final Integer id = RawConfigFile.parseTypeId(key);
+                if (id == null || id < 0 || id >= 4096){
+                	LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS + "): " + key);
+                	continue;
+                }
+                final Object obj = entry.getValue();
+                if (!(obj instanceof String)){
+                	LogUtil.logWarning("[NoCheatplus] Bad flags at " + pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS + " for key: " + key);
+                	hasErrors = true;
+                	continue;
+                }
+                final Collection<String> split = StringUtil.split((String) obj, ' ', ',', '/', '|', ';', '\t');
+                long flags = 0;
+                boolean error = false;
+                for (final String input : split){
+                	if (input.isEmpty()) continue;
+                	try{
+                		flags |= parseFlag(input);
+                	} catch(InputMismatchException e){
+                		LogUtil.logWarning("[NoCheatplus] Bad flag at " + pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS + " for key " + key + " (skip setting flags for this block): " + input);
+                		error = true;
+                		hasErrors = true;
+                		break;
+                	}
+                }
+                if (error){
+                	continue;
+                }
+                blockFlags[id] = flags;
+        	}
+        	if (hasErrors){
+        		LogUtil.logInfo("[NoCheatPlus] Overriding block-flags was not entirely successful, all available flags: \n" + StringUtil.join(flagNameMap.values(), "|"));
+        	}
         }
     }
     
