@@ -64,8 +64,19 @@ public class StringUtil {
 		out.add(input);
 		List<String> queue = new LinkedList<String>();
 		for (final char c : chars){
+			String hex = Integer.toHexString((int) c);
+			switch (hex.length()){
+			case 1:
+				hex = "000" + hex;
+				break;
+			case 2:
+				hex = "00" + hex;
+				break;
+			case 3:
+				hex = "0" + hex;
+			}
 			for (final String s : out){
-				final String[] split = s.split("\\u" + (int) c);
+				final String[] split = s.split("\\u" + hex);
 				for (final String _s : split){
 					queue.add(_s);
 				}
