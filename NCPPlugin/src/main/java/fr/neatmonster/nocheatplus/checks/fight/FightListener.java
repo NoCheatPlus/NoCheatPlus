@@ -69,7 +69,7 @@ public class FightListener extends CheckListener {
     private final SelfHit     selfHit     = addCheck(new SelfHit());
 
     /** The speed check. */
-    private final Speed       speed       = new Speed();
+    private final Speed       speed       = addCheck(new Speed());
     
     public FightListener(){
     	super(CheckType.FIGHT);
