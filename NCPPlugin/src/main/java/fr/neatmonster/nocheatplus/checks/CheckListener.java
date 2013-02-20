@@ -45,7 +45,7 @@ public class CheckListener extends NCPListener implements MCAccessHolder{
 	/**
 	 * Convenience method to add checks as components to NCP.
 	 * @param check
-	 * @return
+	 * @return The given Check instance, for chaining.
 	 */
 	protected <C extends Check>  C addCheck(C check){
 		// Could also set up a map from check type to check, etc.
