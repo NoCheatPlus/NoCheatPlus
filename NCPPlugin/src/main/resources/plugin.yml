@@ -68,6 +68,8 @@ permissions:
                         description: Allow use of the ncp removeplayer command.
                     nocheatplus.admin.commands:
                         description: Allow use of the ncp commands command.
+                    nocheatplus.admin.debug:
+                        description: Allow to receive debug information.
             nocheatplus.bypass:
                 description: Bypass permission other than command permissions.
                 children:
@@ -160,8 +162,8 @@ permissions:
                                 description: Allow the player to bypass the Direction check.
                             nocheatplus.checks.fight.godmode:
                                 description: Allow the player to bypass the GodMode check.
-                            nocheatplus.checks.fight.instantheal:
-                                description: Allow the player to bypass the InstantHeal check.
+                            nocheatplus.checks.fight.fastheal:
+                                description: Allow the player to bypass the FastHeal check.
                             nocheatplus.checks.fight.knockback:
                                 description: Allow the player to bypass the Knockback check.
                             nocheatplus.checks.fight.noswing:
