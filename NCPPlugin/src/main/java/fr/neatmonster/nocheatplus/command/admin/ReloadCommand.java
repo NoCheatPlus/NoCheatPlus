@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.command.CommandHandler.NCPReloadEvent;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
@@ -52,7 +53,14 @@ public class ReloadCommand extends NCPCommand {
         ConfigManager.init(plugin);
         StaticLogFile.cleanup();
         StaticLogFile.setupLogger(new File(plugin.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
+        // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
+        // Remove some checks data.
+        for (final CheckType checkType : new CheckType[]{
+        		CheckType.BLOCKBREAK, CheckType.FIGHT,
+        }){
+        	DataManager.clearData(checkType);
+        }
         
         // Tell the plugin to adapt to new config.
         for (final INotifyReload component : notifyReload){
