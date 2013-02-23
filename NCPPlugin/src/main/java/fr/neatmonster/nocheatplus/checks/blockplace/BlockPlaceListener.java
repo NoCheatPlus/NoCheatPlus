@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
@@ -97,10 +98,10 @@ public class BlockPlaceListener extends CheckListener {
         final int againstId = blockAgainst.getTypeId();
         if (BlockProperties.isLiquid(againstId)){
             if ((mat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getTypeId())) 
-                    && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) cancelled = true;
+                    && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS) && !NCPExemptionManager.isExempted(player, CheckType.BLOCKPLACE_AGAINST)) cancelled = true;
         }
         else if (againstId == Material.AIR.getId()){
-            if (!player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) cancelled = true;
+            if (!player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)  && !NCPExemptionManager.isExempted(player, CheckType.BLOCKPLACE_AGAINST)) cancelled = true;
         }
 
         // First, the fast place check.

@@ -134,6 +134,8 @@ public class BlockPlaceConfig extends ACheckConfig {
             return reachCheck;
         case BLOCKPLACE_SPEED:
             return speedCheck;
+        case BLOCKPLACE_AGAINST:
+        	return true;
         default:
             return true;
         }
