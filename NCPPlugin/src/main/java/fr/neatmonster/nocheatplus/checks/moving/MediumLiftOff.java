@@ -9,7 +9,7 @@ public enum MediumLiftOff {
 	/** Ordinary ground, normal jumping. */
 	GROUND,
 	/** 
-	 * Used for reduced jumping height. Until known better this is used for fluids, cobweb.
+	 * Used for reduced jumping height. Until known better this is used for liquids, cobweb.
 	 */
 	LIMIT_JUMP,
 	

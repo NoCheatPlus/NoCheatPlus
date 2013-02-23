@@ -514,7 +514,7 @@ public class PlayerLocation {
 	}
 	
 	/**
-	 * Reset condition for flying checks (sf + nofall): fluids, web, ladder (not on-ground, though).
+	 * Reset condition for flying checks (sf + nofall): liquids, web, ladder (not on-ground, though).
 	 * @return
 	 */
 	public boolean isResetCond(){

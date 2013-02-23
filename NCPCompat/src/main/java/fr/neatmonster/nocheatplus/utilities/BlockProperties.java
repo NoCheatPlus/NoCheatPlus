@@ -370,7 +370,7 @@ public class BlockProperties {
 			blockFlags[i] = 0;
 
 			if (mcAccess.isBlockLiquid(i).decide()){
-				// TODO: do not set F_GROUND for fluids ?
+				// TODO: do not set F_GROUND for liquids ?
 				blockFlags[i] |= F_LIQUID;
 				if (mcAccess.isBlockSolid(i).decide()) blockFlags[i] |= F_SOLID;
 			}

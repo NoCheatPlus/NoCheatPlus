@@ -114,7 +114,7 @@ public class SurvivalFly extends Check {
 		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, false);
 
 		// Account for flowing liquids (only if needed).
-		// Assume: If in fluids this would be placed right here.
+		// Assume: If in liquids this would be placed right here.
 		if (hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance)) {
 			hAllowedDistance *= modDownStream;
 		}
