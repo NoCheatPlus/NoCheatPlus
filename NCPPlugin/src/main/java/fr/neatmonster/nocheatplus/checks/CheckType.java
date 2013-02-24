@@ -40,6 +40,8 @@ public enum CheckType {
     ALL(Permissions.CHECKS),
 
     BLOCKBREAK(BlockBreakConfig.factory, BlockBreakData.factory, Permissions.BLOCKBREAK),
+    /** This will allow breaking all special blocks, currently only liquid. Later there might be more sub-types. */
+    BLOCKBREAK_BREAK(BLOCKBREAK, Permissions.BLOCKBREAK_BREAK),
     BLOCKBREAK_DIRECTION(BLOCKBREAK, Permissions.BLOCKBREAK_DIRECTION),
     BLOCKBREAK_FASTBREAK(BLOCKBREAK, Permissions.BLOCKBREAK_FASTBREAK),
     BLOCKBREAK_FREQUENCY(BLOCKBREAK, Permissions.BLOCKBREAK_FREQUENCY),

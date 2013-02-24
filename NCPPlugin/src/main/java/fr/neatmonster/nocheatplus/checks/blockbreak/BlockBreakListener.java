@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -136,7 +137,7 @@ public class BlockBreakListener extends CheckListener {
             cancelled = true;
         
         // Destroying liquid blocks.
-        if (!cancelled && BlockProperties.isLiquid(block.getTypeId()) && !player.hasPermission(Permissions.BLOCKBREAK_BREAK_LIQUID)){
+        if (!cancelled && BlockProperties.isLiquid(block.getTypeId()) && !player.hasPermission(Permissions.BLOCKBREAK_BREAK_LIQUID) && !NCPExemptionManager.isExempted(player, CheckType.BLOCKBREAK_BREAK)){
             cancelled = true;
         }
 

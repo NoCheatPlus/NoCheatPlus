@@ -174,6 +174,8 @@ public class BlockBreakConfig extends ACheckConfig {
             return reachCheck;
         case BLOCKBREAK_WRONGBLOCK:
         	return wrongBlockCheck;
+        case BLOCKBREAK_BREAK:
+        	return true;
         default:
             return true;
         }
