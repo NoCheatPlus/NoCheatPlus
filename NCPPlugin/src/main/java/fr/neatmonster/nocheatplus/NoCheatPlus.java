@@ -196,26 +196,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	/**
 	 * Send all players with the nocheatplus.admin.notify permission a message.
-	 * This is likely to be more efficient than iterating over all players and
-	 * checking their permissions. However this only updates permissions with
-	 * login and world changes currently.
+	 * We use Bukkit.broadcast here as the implementation is very efficient and
+	 * does exactly what we want.
 	 * 
 	 * @param message
 	 * @return Number of players messaged.
 	 */
 	public static int sendAdminNotifyMessage(final String message){
-		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
-		if (names == null) return 0;
-		int done = 0;
-		final Server server = Bukkit.getServer();
-		for (final String name : names){
-			final Player player = server.getPlayerExact(name);
-			if (player != null){
-				player.sendMessage(message);
-				done ++;
-			}
-		}
-		return done;
+		return Bukkit.broadcast(message, Permissions.ADMINISTRATION_NOTIFY);
 	}
 
 	/** The event listeners. */
