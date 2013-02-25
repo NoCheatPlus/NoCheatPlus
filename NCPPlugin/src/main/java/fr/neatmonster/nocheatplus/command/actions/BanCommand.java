@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
 
 public class BanCommand extends DelayableCommand {
 
@@ -36,7 +37,7 @@ public class BanCommand extends DelayableCommand {
 	}
 	
 	void ban(CommandSender sender, String name, String reason) {
-		Player player = Bukkit.getPlayerExact(name);
+		Player player = DataManager.getPlayer(name);
 		if (player != null)
 			player.kickPlayer(reason);
 		OfflinePlayer offlinePlayer = Bukkit.getServer().getOfflinePlayer(name);

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -65,6 +66,14 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	 * Later this might hold central player data objects instead of the long only.
 	 */
 	private final Map<String, Long> lastLogout = new LinkedHashMap<String, Long>(50, 0.75f, true);
+	
+	/**
+	 * Keeping track of online players.<br>
+	 * Mappings:
+	 * <li>exact player name -> Player instance</li>
+	 * <li>lower case player name -> Player instance</li>
+	 */
+	protected final Map<String, Player> onlinePlayers = new LinkedHashMap<String, Player>(100);
 	
 	/**
 	 * IRemoveData instances.
@@ -131,7 +140,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	public void onPlayerJoin(final PlayerJoinEvent event){
 	    final Player player = event.getPlayer();
 		lastLogout.remove(player.getName());
-		CombinedData.getData(player).lastJoinTime = System.currentTimeMillis();
+		CombinedData.getData(player).lastJoinTime = System.currentTimeMillis(); 
+		addOnlinePlayer(player);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -152,8 +162,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	    final long now = System.currentTimeMillis();
         lastLogout.put(player.getName(), now);
         CombinedData.getData(player).lastLogoutTime = now;
+        removeOnlinePlayer(player);
     }
-
+	
 	@Override
 	public void onReload() {
 		// present.
@@ -312,6 +323,23 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 		MovingConfig.clear();
 	}
 	
+	/**
+	 * This gets an online player by exact player name or lower-case player name only [subject to change].
+	 * @param playerName
+	 * @return
+	 */
+	public static Player getPlayerExact(final String playerName){
+		return instance.onlinePlayers.get(playerName);
+	}
+	
+	/**
+	 * This gets the online player with the exact name, but transforms the input to lower case.
+	 * @param playerName
+	 * @return
+	 */
+	public static Player getPlayer(final String playerName){
+		return instance.onlinePlayers.get(playerName.toLowerCase());
+	}
 	
 	@Override
 	public boolean addComponent(Object obj) {
@@ -337,6 +365,36 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	}
 	
 	/**
+	 * Initializing with online players.
+	 */
+	public void onEnable(){
+		final Player[] players = Bukkit.getOnlinePlayers();
+		for (final Player player : players){
+			addOnlinePlayer(player);
+		}
+	}
+	
+	/**
+	 * Add mappings for player names variations.
+	 * @param player
+	 */
+	private void addOnlinePlayer(final Player player){
+		final String name = player.getName();
+		onlinePlayers.put(name, player);
+		onlinePlayers.put(name.toLowerCase(), player);
+	}
+	
+	/**
+	 * Remove mappings for player names variations.
+	 * @param player
+	 */
+	private void removeOnlinePlayer(final Player player){
+		final String name = player.getName();
+		onlinePlayers.remove(name);
+		onlinePlayers.remove(name.toLowerCase()); 
+	}
+	
+	/**
 	 * Cleanup method, removes all data and config, but does not call ConfigManager.cleanup.
 	 */
 	public void onDisable() {
@@ -348,10 +406,12 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 		clearConfigs();
 		lastLogout.clear();
 		executionHistories.clear();
+		onlinePlayers.clear();
 	}
 
 	@Override
 	public String getComponentName() {
 		return "NoCheatPlus_DataManager";
 	}
+	
 }

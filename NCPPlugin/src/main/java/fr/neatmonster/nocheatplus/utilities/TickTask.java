@@ -127,7 +127,7 @@ public class TickTask implements Runnable {
 			permissionUpdates.clear();
 		}
 		for (final PermissionUpdateEntry entry : copyPermissions){
-			final Player player = Bukkit.getPlayerExact(entry.playerName);
+			final Player player = DataManager.getPlayer(entry.playerName); // Might use exact name by contract.
 			if (player == null || !player.isOnline()) continue;
 			final String[] perms = entry.checkType.getConfigFactory().getConfig(player).getCachePermissions();
 			if (perms == null) continue;

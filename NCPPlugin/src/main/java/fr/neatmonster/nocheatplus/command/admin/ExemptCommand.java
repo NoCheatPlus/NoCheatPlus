@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.command.admin;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,6 +13,7 @@ import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class ExemptCommand extends NCPCommand {
@@ -40,7 +40,7 @@ public class ExemptCommand extends NCPCommand {
 		}
 		else checkType = CheckType.ALL;
 		
-		final Player player = Bukkit.getPlayerExact(playerName);
+		final Player player = DataManager.getPlayer(playerName);
 		if (player == null){
 			sender.sendMessage(TAG + "Player not online: " + playerName);
 			return true;

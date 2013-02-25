@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.command.admin;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -48,7 +47,7 @@ public class RemovePlayerCommand extends NCPCommand {
 			return true;
 		}
 		
-		final Player player = Bukkit.getPlayerExact(playerName);
+		final Player player = DataManager.getPlayer(playerName);
 		if (player != null) playerName = player.getName();
 		
 		ViolationHistory hist = ViolationHistory.getHistory(playerName, false);

@@ -11,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
@@ -57,6 +56,7 @@ import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.DebugUtil;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
@@ -1141,7 +1141,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// Hover checks !
 		// TODO: Change to ordering such that smallest hover time comes first ?
 		if (hoverTicks.isEmpty()) return; // Seldom or not ?
-		final Server server = Bukkit.getServer();
 		final MoveInfo info;
 		if (parkedInfo.isEmpty()) info = new MoveInfo(mcAccess);
 		else info = parkedInfo.remove(parkedInfo.size() - 1);
@@ -1149,7 +1148,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		for (final String playerName : hoverTicks){
 			// TODO: put players into the set (+- one tick would not matter ?)
 			// TODO: might add an online flag to data !
-			final Player player = server.getPlayerExact(playerName);
+			final Player player = DataManager.getPlayerExact(playerName);
 			if (player == null || !player.isOnline()){
 				rem.add(playerName);
 				continue;

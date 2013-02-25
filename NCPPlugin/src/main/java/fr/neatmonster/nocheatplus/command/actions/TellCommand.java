@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.command.actions;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -8,6 +7,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
@@ -37,7 +37,7 @@ public class TellCommand extends DelayableCommand {
 	}
 
 	private void tell(String name, String message) {
-		Player player = Bukkit.getServer().getPlayerExact(name);
+		Player player = DataManager.getPlayer(name);
 		if (player != null) player.sendMessage(ColorUtil.replaceColors(message));
 	}
 

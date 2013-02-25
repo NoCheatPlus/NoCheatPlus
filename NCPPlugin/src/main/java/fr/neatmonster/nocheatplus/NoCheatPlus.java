@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Server;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -207,9 +206,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
 		if (names == null) return 0;
 		int done = 0;
-		final Server server = Bukkit.getServer();
 		for (final String name : names){
-			final Player player = server.getPlayerExact(name);
+			final Player player = DataManager.getPlayerExact(name);
 			if (player != null){
 				player.sendMessage(message);
 				done ++;
@@ -488,6 +486,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         
         // Initialize BlockProperties
 		initBlockProperties(config);
+		
+		// Initialize data manager.
+		dataMan.onEnable();
         
         // Allow entries to TickTask (just in case).
         TickTask.setLocked(false);

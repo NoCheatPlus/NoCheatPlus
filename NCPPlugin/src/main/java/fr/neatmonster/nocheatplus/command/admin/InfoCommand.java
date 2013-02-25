@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -15,6 +14,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory.ViolationLevel;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
 
 public class InfoCommand extends NCPCommand {
 
@@ -40,7 +40,7 @@ public class InfoCommand extends NCPCommand {
      * @return true, if successful
      */
     private void handleInfoCommand(final CommandSender sender, String playerName) {
-    	final Player player = Bukkit.getPlayerExact(playerName);
+    	final Player player = DataManager.getPlayer(playerName);
     	if (player != null) playerName = player.getName();
     	
     	final ViolationHistory history = ViolationHistory.getHistory(playerName, false);
