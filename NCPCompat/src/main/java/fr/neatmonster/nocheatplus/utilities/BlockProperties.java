@@ -1157,7 +1157,10 @@ public class BlockProperties {
 			if ((access.getData(bx, by, bz) & 0x4) != 0){
 				if (Math.max(fy, fy + dY * dT) < 0.5) return true;
 			}
-			else if (Math.min(fy, fy + dY * dT) >= 0.5) return true; 
+			else{
+				// what with >= 1?
+				if (Math.min(fy, fy + dY * dT) >= 0.5) return true;
+			}
 		}
 		else if (id == Material.SOUL_SAND.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.875) return true; // 0.125
