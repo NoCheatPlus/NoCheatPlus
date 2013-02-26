@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.neatmonster</groupId>
+  <artifactId>ncpbuildbase</artifactId>
+  <packaging>jar</packaging>
+  <name>NCPBuildBase</name>
+  <version>static</version>
+
+  <parent>
+    <groupId>fr.neatmonster</groupId>
+    <artifactId>nocheatplus-parent</artifactId>
+    <version>static</version>
+  </parent>
+
+  <dependencies>
+  	<dependency>
+  		<groupId>junit</groupId>
+  		<artifactId>junit</artifactId>
+  		<version>4.8.2</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.google.code.maven-replacer-plugin</groupId>
+  		<artifactId>maven-replacer-plugin</artifactId>
+  		<version>1.4.1</version>
+  		<type>maven-plugin</type>
+  	</dependency>
+  </dependencies>
+  <description>Very basic dependencies that have to be built before commons, no use of Bukkit.
+
+Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+
+  <build>
+<!--     <defaultGoal>clean package</defaultGoal> -->
+<!--     <directory>../target</directory> Build it one level up, because it is the one we care about -->
+    <plugins>
+        <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>maven-replacer-plugin</artifactId>
+            <version>1.4.1</version>
+            <executions>
+                <execution>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>replace</goal>
+                    </goals>                    
+                </execution>
+            </executions>
+            <configuration>
+                <ignoreMissingFile>true</ignoreMissingFile>
+                <file>src/main/resources/_BuildParameters.properties</file>
+                <outputFile>src/main/resources/BuildParameters.properties</outputFile>
+                <regex>false</regex>
+                <replacements>
+                    <replacement>
+		                <token>@GENERATED_NOTE@</token>
+		                <value>!!! THIS FILE IS AUTO GENERATED, ANY MANUAL CHANGES TO IT WILL GET LOST !!!</value>
+                    </replacement>
+                    <replacement>
+		                <token>@EXTENSIVE_TESTING@</token>
+		                <value>${EXTENSIVE_TESTING}</value>
+                    </replacement>
+                </replacements>                        
+            </configuration>
+        </plugin>
+    </plugins>
+  </build>
+
+</project>

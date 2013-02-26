@@ -221,15 +221,15 @@ public class TestRayTracing {
 			checkConsistency(coords);
 		}
 		
-		int f = BuildParameters.extensiveTesting ? 100 : 1;
+		final boolean e = BuildParameters.extensiveTesting;
 		
 		// Random tests.
-		for (int i = 0; i < 100000 * f; i++){
+		for (int i = 0; i < (e ? 50000000 : 100000); i++){
 			checkConsistency(randomCoords(10.0));
 		}
 		
 		// TODO: make these work.
-		for (int i = 0; i < 1000 * f * f; i++){
+		for (int i = 0; i < (e ? 10000000 : 1000); i++){
 			checkConsistency(randomBlockCoords(6));
 		}
 		

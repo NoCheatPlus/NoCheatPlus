@@ -32,6 +32,11 @@
   	</dependency>
   	<dependency>
     	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpbuildbase</artifactId>
+    	<version>static</version>
+    </dependency>
+  	<dependency>
+    	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcommons</artifactId>
     	<version>static</version>
     </dependency>
@@ -81,7 +86,7 @@
       <resource>
         <targetPath>.</targetPath>
         <filtering>true</filtering>
-        <directory>../NCPCommons/src/main/resources</directory>
+        <directory>../NCPBuildBase/src/main/resources</directory>
         <includes>
           <include>BuildParameters.properties</include>
         </includes>
@@ -110,6 +115,7 @@
             <configuration>
               <artifactSet>
                 <includes>
+				  <include>fr.neatmonster:ncpbuildbase</include>
                   <include>fr.neatmonster:ncpcommons</include>
                   <include>fr.neatmonster:ncpcompat</include>
                   <include>fr.neatmonster:ncpcompatcb2511</include>

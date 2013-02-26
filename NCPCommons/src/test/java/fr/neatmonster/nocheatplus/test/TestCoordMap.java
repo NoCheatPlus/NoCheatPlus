@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
 import fr.neatmonster.nocheatplus.utilities.ds.CoordMap.Entry;
 
@@ -262,7 +263,9 @@ public class TestCoordMap {
 
 		final Random random = new Random(System.nanoTime() - (System.currentTimeMillis() % 2 == 1 ? 37 : 137));
 		
-		final int n = 10000; // Number of coordinates.
+		final boolean e = BuildParameters.extensiveTesting;
+		
+		final int n = e ? 40000 : 6000; // Number of coordinates.
 		final int max = 800; // Coordinate maximum.
 		
 		int [][] coords = getUniqueRandomCoords(n, max, random);

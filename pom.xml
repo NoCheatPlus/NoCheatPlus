@@ -12,6 +12,7 @@
   </properties>
 
   <modules>
+    <module>NCPBuildBase</module>
     <module>NCPCommons</module>
     <module>NCPCompat</module>
     <module>NCPCompatCB2511</module>
