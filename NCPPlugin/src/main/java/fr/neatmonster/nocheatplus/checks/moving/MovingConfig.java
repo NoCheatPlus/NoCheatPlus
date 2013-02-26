@@ -182,7 +182,7 @@ public class MovingConfig extends ACheckConfig {
         
         velocityGraceTicks = data.getInt(ConfPaths.MOVING_VELOCITY_GRACETICKS);
         yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
-        noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, 0.3);
+        noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
         // ystep is set to 0.45 by default, for stairs / steps.
         yStep = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
     }
