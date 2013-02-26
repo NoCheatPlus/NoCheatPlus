@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import fr.neatmonster.nocheatplus.utilities.RayTracing;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 public class TestRayTracing {
 	
@@ -219,13 +220,16 @@ public class TestRayTracing {
 		}){
 			checkConsistency(coords);
 		}
+		
+		int f = BuildParameters.extensiveTesting ? 100 : 1;
+		
 		// Random tests.
-		for (int i = 0; i < 100000; i++){
+		for (int i = 0; i < 100000 * f; i++){
 			checkConsistency(randomCoords(10.0));
 		}
 		
 		// TODO: make these work.
-		for (int i = 0; i < 1000; i++){
+		for (int i = 0; i < 1000 * f * f; i++){
 			checkConsistency(randomBlockCoords(6));
 		}
 		
