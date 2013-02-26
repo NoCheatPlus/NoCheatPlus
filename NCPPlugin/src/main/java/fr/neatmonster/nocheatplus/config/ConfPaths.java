@@ -34,6 +34,7 @@ public abstract class ConfPaths {
     public static final String  LOGGING_FILE                             = LOGGING + "file";
     public static final String  LOGGING_FILENAME                         = LOGGING + "filename";
     public static final String  LOGGING_INGAMECHAT                       = LOGGING + "ingamechat";
+    public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = LOGGING + "usesubscriptions";
 
     /*
      *     e   e     ,e,                        888 888                                                   
@@ -51,10 +52,7 @@ public abstract class ConfPaths {
 	public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS				= MISCELLANEOUS + "reporttometrics";
 	public static final String  MISCELLANEOUS_MANAGELISTENERS				= MISCELLANEOUS + "managelisteners";
-	private static final String MISCELLANEOUS_NOMOVEDTOOQUICKLY				= MISCELLANEOUS + "nomovedtooquickly.";
-	public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED		= MISCELLANEOUS_NOMOVEDTOOQUICKLY + "enabled";
-	public static final String  MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY	= MISCELLANEOUS_NOMOVEDTOOQUICKLY + "useproxy";
-	
+
 	/** TEMP: hidden flag to disable all lag adaption with one flag. */
 	public static final String MISCELLANEOUS_LAG						 	= MISCELLANEOUS + "lag";
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,6 +27,7 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -194,15 +197,28 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	}
 	
 	/**
-	 * Send all players with the nocheatplus.admin.notify permission a message.
-	 * This is likely to be more efficient than iterating over all players and
-	 * checking their permissions. However this only updates permissions with
-	 * login and world changes currently.
+	 * Send all players with the nocheatplus.admin.notify permission a message.<br>
+	 * This will act according to configuration (stored permissions or permission subscriptions).
 	 * 
 	 * @param message
 	 * @return Number of players messaged.
 	 */
 	public static int sendAdminNotifyMessage(final String message){
+		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_USESUBSCRIPTIONS)){
+			// TODO: Might respect console settings, or add extra config section (e.g. notifications).
+			return sendAdminNotifyMessageSubscriptions(message);
+		}
+		else{
+			return sendAdminNotifyMessageStored(message);
+		}
+	}
+	
+	/**
+	 * Send notification to players with stored notify-permission (world changes, login, permissions are not re-checked here). 
+	 * @param message
+	 * @return
+	 */
+	public static int sendAdminNotifyMessageStored(final String message){
 		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
 		if (names == null) return 0;
 		int done = 0;
@@ -214,6 +230,37 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			}
 		}
 		return done;
+	}
+	
+	/**
+	 * Send notification to all CommandSenders found in permission subscriptions for the notify-permission as well as players that have stored permissions (those get re-checked here).
+	 * @param message
+	 * @return
+	 */
+	public static int sendAdminNotifyMessageSubscriptions(final String message){
+		final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.ADMINISTRATION_NOTIFY);
+		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
+		final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
+		for (final Permissible permissible : permissibles){
+			if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
+				final CommandSender sender = (CommandSender) permissible;
+				sender.sendMessage(message);
+				done.add(sender.getName());
+			}
+		}
+		// Fall-back checking for players.
+		if (names != null){
+			for (final String name : names){
+				if (!done.contains(name)){
+					final Player player = DataManager.getPlayerExact(name);
+					if (player != null && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
+						player.sendMessage(message); 
+						done.add(name);
+					}
+				}
+			}
+		}
+		return done.size();
 	}
 
 	/** The event listeners. */

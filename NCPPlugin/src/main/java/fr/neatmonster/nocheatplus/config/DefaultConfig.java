@@ -55,6 +55,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_FILE, true);
         set(ConfPaths.LOGGING_FILENAME, "nocheatplus.log");
         set(ConfPaths.LOGGING_INGAMECHAT, true);
+        
+        // Notifications settings.
+        set(ConfPaths.LOGGING_USESUBSCRIPTIONS, false);
 
         /*
          *     e   e     ,e,                        888 888                                                   
