@@ -14,6 +14,12 @@ public class TestRayTracing {
 	
 	protected static final Random random = new Random(System.nanoTime() + 13391);
 	
+	protected static double maxFactor = 9.0;
+	
+	protected static int maxSteps(double dX, double dY, double dZ){
+		return (int) (maxFactor * (1 + Math.abs(dX) + Math.abs(dY) + Math.abs(dZ)));
+	}
+	
 	public static class CountRayTracing extends RayTracing{
 		public CountRayTracing(double x0, double y0, double z0, double x1, double y1, double z1) {
 			super(x0, y0, z0, x1, y1, z1);
@@ -24,10 +30,15 @@ public class TestRayTracing {
 		protected boolean step(int blockX, int blockY, int blockZ, double oX,
 				double oY, double oZ, double dT) {
 			done ++;
+			if (done > maxSteps(dX, dY, dZ)) {
+				System.out.println("[WARNING] Max steps exceeded: " + maxSteps(dX, dY, dZ));
+				return false; 
+			}
 			return true;
 		}
 
 		public int loopCount() {
+			done = 0;
 			super.loop();
 			return done;
 		}
@@ -37,6 +48,14 @@ public class TestRayTracing {
 		double[] res = new double[6];
 		for (int i = 0; i < 6 ; i++){
 			res[i] = (random.nextDouble() * 2.0 - 1.0 ) * max;
+		}
+		return res;
+	}
+	
+	public static double[] randomBlockCoords(int max){
+		double[] res = new double[6];
+		for (int i = 0; i < 6 ; i++){
+			res[i] = random.nextInt(max * 2 + 1) -  max;
 		}
 		return res;
 	}
@@ -61,6 +80,8 @@ public class TestRayTracing {
 			
 			protected int lbx, lby, lbz;
 			
+			protected double ldt = 0;
+			
 			protected int step = 0;
 			
 			/* (non-Javadoc)
@@ -72,6 +93,8 @@ public class TestRayTracing {
 				lbx = blockX - 1;
 				lby = blockY - 1;
 				lbz = blockZ - 1;
+				ldt = 0;
+				step = 0;
 			}
 			
 			private boolean ignEdge(double offset, double dTotal){
@@ -82,11 +105,21 @@ public class TestRayTracing {
 			protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT) {
 				// TODO: This does not check last step for some occasions where it should.
 				step ++;
+				
+				if (dT < 0.0){
+					doFail("dT < 0 at t = " + StringUtil.fdec3.format(t), coords);
+				}
+				
 				if (dT == 0 && 1.0 - (t + dT) > tol){
 					if (!ignEdge(oX, dX) && !ignEdge(oY, dY) && !ignEdge(oZ, dZ)){
 						doFail("Premature dT = 0 at t = " + StringUtil.fdec3.format(t), coords);
 					}
 				}
+				
+				checkOffset(oX, "x");
+				checkOffset(oY, "y");
+				checkOffset(oZ, "z");
+				
 				// TODO: check with last block coordinates
 				if (lbx == blockX && lby == blockY && lbz == blockZ){
 					if (1.0 - (t + dT) > tol){
@@ -98,29 +131,38 @@ public class TestRayTracing {
 				lbx = blockX;
 				lby = blockY;
 				lbz = blockZ;
-				
+				ldt = dT;
+				if (step > maxSteps(dX, dY, dZ)) doFail("max steps exceeded: " + maxSteps(dX, dY, dZ), coords); 
 				return true;
+			}
+
+			private void checkOffset(double offset, String name) {
+				if (offset < 0.0 || offset > 1.0) doFail("Bad " + name + "-offset: " + offset, coords);
 			}
 
 			@Override
 			public void loop() {
 				super.loop();
-				checkBlockTarget(coords[3], blockX, oX, dX, "x");
-				checkBlockTarget(coords[4], blockY, oY, dY, "y");
-				checkBlockTarget(coords[5], blockZ, oZ, dZ, "z");
+				checkBlockTarget(coords[3], blockX, oX, dX, ldt, "x");
+				checkBlockTarget(coords[4], blockY, oY, dY, ldt, "y");
+				checkBlockTarget(coords[5], blockZ, oZ, dZ, ldt, "z");
 			}
 			
-			private void checkBlockTarget(double target, int current, double offset, double dTotal, String name){
+			private void checkBlockTarget(double target, int current, double offset, double dTotal, double dT, String name){
 				int b = Location.locToBlock(target);
 				if (current != b){
 					// TODO: Might do with or without these ?
 //					if (current == b + 1 && dTotal > 0 && offset == 0) return;
 //					if (current == b - 1 && dTotal < 0 && offset == 1) return;
+					if (Math.abs(dT * dTotal + offset + (double) current - target) <= 0.001){
+						// TODO: Narrow down by edge coordinates or so.
+						return;
+					}
+					System.out.println(target + "|" +  current + "|" + offset + "|" + dT * dTotal);
 					// Failure.
 					doFail("Bad target " + name + "-coordinate: " + current + " instead of " + b, coords);
 				}
-			}
-			
+			}		
 		};
 		rt.loop();
 		return rt;
@@ -134,14 +176,22 @@ public class TestRayTracing {
 	}
 	
 	public static void dump(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double t, double dT) {
-		System.out.println(StringUtil.fdec3.format(t) + " (+" + StringUtil.fdec3.format(dT) + "): " + blockX + ", "+blockY + ", " + blockZ + " / " + StringUtil.fdec3.format(oX) + ", " + StringUtil.fdec3.format(oY)+ ", " + StringUtil.fdec3.format(oZ));
+		String sdt = StringUtil.fdec3.format(dT);
+		if ("0".equals(sdt) && dT > 0) sdt = "0.X";
+		System.out.println(StringUtil.fdec3.format(t) + " (+" + sdt + "): " + blockX + ", "+blockY + ", " + blockZ + " / " + StringUtil.fdec3.format(oX) + ", " + StringUtil.fdec3.format(oY)+ ", " + StringUtil.fdec3.format(oZ));
 	}
 
-	public static RayTracing dumpRawRayTracing(double[] coords) {
+	public static RayTracing dumpRawRayTracing(final double[] coords) {
 		RayTracing rt = new RayTracing(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]) {
+			int done = 0;
 			@Override
 			protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT) {
 				dump(blockX, blockY, blockZ, oX, oY, oZ, t, dT);
+				done ++;
+				if (done > maxSteps(dX, dY, dZ)){
+					System.out.println("[WARNING] Max steps exceeded: " + maxSteps(dX, dY, dZ));
+					return false;
+				}
 				return true;
 			}
 		};
@@ -165,6 +215,7 @@ public class TestRayTracing {
 			new double[]{2.5619753859456917, -5.010424935746547, -7.39326637860553  ,  -4.678643570182639, -2.0000000105642313, -4.634727842675916},
 			new double[]{7.388348424961977, -8.000000029346532, -2.5365675909347507  ,  2.17126848312847, 3.236994108042559, -8.423292642985071},
 			new double[]{7.525633617461991, 2.654408573114717, 3.5119744782127893  ,  9.99999995904821, 9.599753890871172, 6.721727939686946},
+			new double[] {-6.0, -4.0, -3.0  ,  -4.0, -3.0, -2.0},
 		}){
 			checkConsistency(coords);
 		}
@@ -172,6 +223,13 @@ public class TestRayTracing {
 		for (int i = 0; i < 100000; i++){
 			checkConsistency(randomCoords(10.0));
 		}
+		
+		// TODO: make these work.
+		for (int i = 0; i < 1000; i++){
+			checkConsistency(randomBlockCoords(6));
+		}
+		
+		// TODO: Add tests for typical coordinates a with interact, passable.
 	}
 	
 }
