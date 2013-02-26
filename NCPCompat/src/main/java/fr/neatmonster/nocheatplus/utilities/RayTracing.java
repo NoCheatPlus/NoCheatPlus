@@ -103,11 +103,11 @@ public abstract class RayTracing {
 					blockX ++;
 				}
 			}
-			else if (oX >= 1){
+			else if (oX >= 1 && dX > 0.0){
 				oX -= 1;
 				blockX ++;
 			}
-			else if (oX < 0){
+			else if (oX < 0 && dX < 0.0){
 				oX += 1;
 				blockX --;
 			}
@@ -123,11 +123,11 @@ public abstract class RayTracing {
 					blockY ++;
 				}
 			}
-			else if (oY >= 1){
+			else if (oY >= 1 && dY > 0.0){
 				oY -= 1;
 				blockY ++;
 			}
-			else if (oY < 0){
+			else if (oY < 0 && dY < 0.0){
 				oY += 1;
 				blockY --;
 			}
@@ -143,11 +143,11 @@ public abstract class RayTracing {
 					blockZ ++;
 				}
 			}
-			else if (oZ >= 1){
+			else if (oZ >= 1 && dZ > 0.0){
 				oZ -= 1;
 				blockZ ++;
 			}
-			else if (oZ < 0){
+			else if (oZ < 0 && dZ < 0.0){
 				oZ += 1;
 				blockZ --;
 			}
