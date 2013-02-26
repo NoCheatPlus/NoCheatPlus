@@ -37,14 +37,21 @@ public class Visible extends Check {
 	public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, final Action action, final BlockInteractData data, final BlockInteractConfig cc) {
 		
 		// TODO: Might confine what to check for (left/right, target blocks depending on item in hand, container blocks).
-		
-		blockCache.setAccess(loc.getWorld());
-		rayTracing.setBlockCache(blockCache);
-		rayTracing.set(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), 0.5 + block.getX() + 0.6 * face.getModX(), 0.5 + block.getY() + 0.6 * face.getModY(), 0.5 + block.getZ() + 0.6 * face.getModZ());
-		rayTracing.loop();
-		final boolean collides = rayTracing.collides();
-    	blockCache.cleanup();
-    	rayTracing.cleanup();
+		final boolean collides;
+		final double eyeHeight = player.getEyeHeight();
+		if (block.getX() == loc.getBlockX() && block.getZ() == loc.getBlockZ() && block.getY() == Location.locToBlock(loc.getY() + eyeHeight)){
+			// Player is interacting with the block his head is in.
+			collides = false;
+		}
+		else{
+			blockCache.setAccess(loc.getWorld());
+			rayTracing.setBlockCache(blockCache);
+			rayTracing.set(loc.getX(), loc.getY() + eyeHeight, loc.getZ(), 0.5 + block.getX() + 0.6 * face.getModX(), 0.5 + block.getY() + 0.6 * face.getModY(), 0.5 + block.getZ() + 0.6 * face.getModZ());
+			rayTracing.loop();
+			collides = rayTracing.collides();
+	    	blockCache.cleanup();
+	    	rayTracing.cleanup();
+		}
     	
 		if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
         	player.sendMessage("Interact visible: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " collide=" + rayTracing.collides());
