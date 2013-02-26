@@ -828,25 +828,55 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.onSetBack(teleported);
 		} else {
 			// Only if it wasn't NoCheatPlus, drop data from more packets check.
-			if (!event.isCancelled()){
+			if (to != null && !event.isCancelled()){
 				// Normal teleport.
-				ref = to;
-				double fallDistance = data.noFallFallDistance;
-				data.clearMorePacketsData();
-				data.clearFlyData();
-				data.resetPositions(to);
-				data.setSetBack(to);
-				// TODO: How to account for plugins that reset the fall distance here?
-				if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0){
-					// Reset fall distance if set so in the config.
-					if (!MovingConfig.getConfig(player).noFallTpReset){
-						// (Set fall distance if set to not reset.)
-						player.setFallDistance((float) fallDistance);
+				
+				// Detect small distance teleports.
+				boolean smallRange = false;
+				
+				final double margin = 0.1;
+				final Location from = event.getFrom();
+				
+				if (event.getCause() == TeleportCause.UNKNOWN){
+					// Check special small range teleports (moved too quickly).
+					if (from != null && from.getWorld().equals(to.getWorld())){
+						if (CheckUtils.distance(from, to) < margin){
+							smallRange = true;
+						}
+						else if (data.toX != Double.MAX_VALUE && data.hasSetBack()){
+							final Location setBack = data.getSetBack(to);
+							if (CheckUtils.distance(to.getX(), to.getY(), to.getZ(), setBack.getX(), setBack.getY(), setBack.getZ()) < margin){
+								smallRange = true;
+							}
+						}
 					}
 				}
-				if (event.getCause() == TeleportCause.ENDER_PEARL){
-					// Prevent NoFall violations for ender-pearls.
-					data.noFallSkipAirCheck = true;
+				
+				if (smallRange){
+					// Very small range teleport, keep set back etc.
+					ref = to;
+				}
+				else{
+					// "real" teleport
+					ref = to;
+					double fallDistance = data.noFallFallDistance;
+					data.clearMorePacketsData();
+					data.clearFlyData();
+					data.resetPositions(to);
+					data.setSetBack(to);
+					// TODO: How to account for plugins that reset the fall distance here?
+					if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0){
+						// Reset fall distance if set so in the config.
+						if (!MovingConfig.getConfig(player).noFallTpReset){
+							// (Set fall distance if set to not reset.)
+							player.setFallDistance((float) fallDistance);
+						}
+					}
+					if (event.getCause() == TeleportCause.ENDER_PEARL){
+						// Prevent NoFall violations for ender-pearls.
+						data.noFallSkipAirCheck = true;
+					}
+					data.sfHoverTicks = -1; // Important against concurrent modification exception.
 				}
 			}
 			else{
@@ -860,8 +890,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Reset stuff.
 		Combined.resetYawRate(player, ref.getYaw(), System.currentTimeMillis(), true);
 		data.resetTeleported();
+		// Prevent further moving processing for nested events.
 		processingEvents.remove(player.getName());
-		data.sfHoverTicks = -1; // Important against concurrent modification exception.
     }
 
     /**
