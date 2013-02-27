@@ -1098,6 +1098,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// Reset hover ticks until a better method is used.
 		if (cc.sfHoverCheck){
 			// Start as if hovering already.
+			// Could check shouldCheckSurvivalFly(player, data, cc), but this should be more sharp (gets checked on violation).
 			data.sfHoverTicks = 0;
 			hoverTicks.add(player.getName());
 		}
@@ -1233,10 +1234,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		}
 		else{
 			if (data.sfHoverTicks > cc.sfHoverTicks){
-				handleHoverViolation(player, loc, cc, data);
-				// Assume the player might still be hovering.
-				res = false;
-				data.sfHoverTicks = 0;
+				// Re-Check if survivalfly can apply at all.
+				if (shouldCheckSurvivalFly(player, data, cc)){
+					handleHoverViolation(player, loc, cc, data);
+					// Assume the player might still be hovering.
+					res = false;
+					data.sfHoverTicks = 0;
+				}
+				else{
+					// Reset hover ticks and check next period.
+					res = false;
+					data.sfHoverTicks = 0;
+				}
 			}
 			else res = false;
 		}
