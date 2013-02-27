@@ -7,10 +7,12 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.components.IData;
+import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-public class Logins extends Check{
+public class Logins extends Check implements IRemoveData{
     
     /** Per world count (only used if set in config). */
     private final Map<String, ActionFrequency> counts = new HashMap<String, ActionFrequency>();
@@ -44,6 +46,17 @@ public class Logins extends Check{
 	 * Called by ChatL1.istener
 	 */
 	public void onReload() {
+		counts.clear();
+	}
+
+	@Override
+	public IData removeData(final String playerName) {
+		// Ignore
+		return null;
+	}
+
+	@Override
+	public void removeAllData() {
 		counts.clear();
 	}
 
