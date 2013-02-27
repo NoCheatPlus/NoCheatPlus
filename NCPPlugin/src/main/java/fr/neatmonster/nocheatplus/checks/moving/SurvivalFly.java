@@ -103,7 +103,7 @@ public class SurvivalFly extends Check {
 
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) resetFrom = true;
-		else if (lostGround(player, from, to, yDistance, sprinting, data, cc)){
+		else if (lostGround(player, from, to, hDistance, yDistance, sprinting, data, cc)){
 			// TODO: Consider && !resetTo ?
 			// TODO: Confine by max y distance and min xz-distance?
 			resetFrom = true;
@@ -480,27 +480,29 @@ public class SurvivalFly extends Check {
 	 * @param cc
 	 * @return
 	 */
-	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
-		// Don't set "useWorkaround = x()", to avoid potential trouble with
-		// reordering to come, and similar.
-		boolean useWorkaround = false;
-		boolean setBackSafe = false; // Let compiler remove this if necessary.
+	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+		
+		// TODO: fast exclusion returns.
+		// TODO: order checks such that most frequent match comes first.
+		// TODO: re-organize for faster exclusions (hDistance, yDistance).
+		
 		// Check for moving off stairs.
-		if (!useWorkaround && from.isAboveStairs()) {
+		if (from.isAboveStairs()) {
 			// TODO: This needs some safety guards.
-			useWorkaround = true;
-			setBackSafe = true;
+			return applyWorkaround(player, from, true, data);
 		}
 		// Check for "lost touch", for when moving events are missing somehow.
 		// Half block step up.
-		if (!useWorkaround && yDistance > 0 && yDistance <= 0.5 && to.isOnGround() && from.isOnGround(0.5 - Math.abs(yDistance))){
-			useWorkaround = true;
-			setBackSafe = true;
+		if (yDistance >= 0 && yDistance <= 0.5 && hDistance < 0.5 && to.isOnGround()){
+			// TODO: Also confine concerning hDist !
+			if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
+				return applyWorkaround(player, from, true, data);
+			}
 		}
 		final double setBackYDistance = to.getY() - data.getSetBackY();
 		
 		// Check for sprinting down blocks etc.
-		if (!useWorkaround && yDistance <= 0.0 && Math.abs(yDistance) <= 0.5 && data.sfLastYDist <= yDistance && data.sfJumpPhase <= 7 && setBackYDistance < 0 && !to.isOnGround()){
+		if (yDistance <= 0.0 && Math.abs(yDistance) <= 0.5 && data.sfLastYDist <= yDistance && data.sfJumpPhase <= 7 && setBackYDistance < 0 && !to.isOnGround()){
 			// TODO: setbackydist: <= - 1.0 or similar
 			// TODO: <= 7 might work with speed II, not sure with above.
 			// TODO: account for speed/sprint
@@ -508,18 +510,16 @@ public class SurvivalFly extends Check {
 			if (from.isOnGround(0.6, 0.4, 0, 0L) ){
 				// TODO: further narrow down bounds ?
 				// Temporary "fix".
-				useWorkaround = true;
-				setBackSafe = true;
+				return applyWorkaround(player, from, true, data);
 			}
 		}
 		
 		// Check for jumping up strange blocks like flower pots on top of other blocks.
-		if (!useWorkaround && yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()){
+		if (yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()){
 			// TODO: confine by block types ?
 			if (from.isOnGround(0.25, 0.4, 0, 0L) ){
 				// Temporary "fix".
-				useWorkaround = true;
-				setBackSafe = true;
+				return applyWorkaround(player, from, true, data);
 			}
 		}
 		
@@ -527,7 +527,7 @@ public class SurvivalFly extends Check {
 		// TODO: Check if the set-back distance still has relevance.
 		// TODO: Interpolation might also be necessary between from and to !
 		// TODO: Check use of jumpamplifier.
-		if (!useWorkaround && data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance <= 0.5 + 0.2 * data.jumpAmplifier && data.sfLastYDist < 0 && !to.isOnGround()) {
+		if (data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance <= 0.5 + 0.2 * data.jumpAmplifier && data.sfLastYDist < 0 && !to.isOnGround()) {
 			// TODO: Check if last-y-dist or sprinting should be considered.
 			if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
 				// Interpolate from last to-coordinates to the from
@@ -545,33 +545,38 @@ public class SurvivalFly extends Check {
 					// TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
 					// TODO: check with iY + 0.25 removed.
 					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
-						useWorkaround = true;
-						setBackSafe = true;
+						return applyWorkaround(player, from, true, data);
 					}
 				}
 			}
 		}
-		if (useWorkaround) { // !toOnGround && to.isAboveStairs()) {
-			// Set the new setBack and reset the jumpPhase.
-			// TODO: Some interpolated position ?
-			// TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
-			if (setBackSafe) data.setSetBack(from);
-			else{
-				// TODO: This seems dubious !
-				// Consider: 1.0 + ? or max(from.getY(), 1.0 + ...) ?
-				data.setSetBackY(Location.locToBlock(data.getSetBackY())); 
-			}
-			// data.ground ?
-			// ? set jumpphase to height / 0.15 ?
-			data.sfJumpPhase = 0;
-			data.jumpAmplifier = mcAccess.getJumpAmplifier(player);
-			data.clearAccounting();
-			// Tell NoFall that we assume the player to have been on ground somehow.
-			data.noFallAssumeGround = true;
-			tags.add("lostground");
-			return true; 
+		// Nothing found.
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @return true.
+	 */
+	private boolean applyWorkaround(final Player player, final PlayerLocation from, final boolean setBackSafe, final MovingData data){
+		// Set the new setBack and reset the jumpPhase.
+		// TODO: Some interpolated position ?
+		// TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
+		if (setBackSafe) data.setSetBack(from);
+		else{
+			// TODO: This seems dubious !
+			// Consider: 1.0 + ? or max(from.getY(), 1.0 + ...) ?
+			data.setSetBackY(Location.locToBlock(data.getSetBackY())); 
 		}
-		else return false;
+		// data.ground ?
+		// ? set jumpphase to height / 0.15 ?
+		data.sfJumpPhase = 0;
+		data.jumpAmplifier = mcAccess.getJumpAmplifier(player);
+		data.clearAccounting();
+		// Tell NoFall that we assume the player to have been on ground somehow.
+		data.noFallAssumeGround = true;
+		tags.add("lostground");
+		return true;
 	}
 
 	/**
