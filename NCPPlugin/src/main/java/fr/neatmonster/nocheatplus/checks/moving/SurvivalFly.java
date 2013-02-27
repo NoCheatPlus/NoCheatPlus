@@ -373,15 +373,22 @@ public class SurvivalFly extends Check {
         
 		// Check lift-off medium.
 		// TODO: Web might be NO_JUMP !
+		// TODO: isNextToGround(0.15, 0.4) allows a little much (yMargin), but reduces false positives.
 		if (to.isInLiquid() || to.isInWeb()){
-			data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
+			if (to.isInLiquid() && to.isNextToGround(0.15, 0.4)){
+				// Consent with ground.
+				data.mediumLiftOff = MediumLiftOff.GROUND;
+			}
+			else{
+				data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
+			}
 		}
 		else if (resetTo){
 			// TODO: This might allow jumping on vines etc., but should do for the moment.
 			data.mediumLiftOff = MediumLiftOff.GROUND;
 		}
 		else if (from.isInLiquid()){
-			if (to.isNextToGround(0.15, 0.001)){
+			if (to.isNextToGround(0.15, 0.4)){
 				data.mediumLiftOff = MediumLiftOff.GROUND;
 			}
 			else{
