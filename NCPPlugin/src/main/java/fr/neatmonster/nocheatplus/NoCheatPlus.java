@@ -754,6 +754,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     private void postEnable(final Player[] onlinePlayers){
     	for (final Player player : onlinePlayers){
     		updatePermStateReceivers(player);
+    		NCPExemptionManager.registerPlayer(player);
     	}
     	// TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
     }
