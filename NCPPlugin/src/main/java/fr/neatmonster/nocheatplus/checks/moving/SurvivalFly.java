@@ -298,6 +298,7 @@ public class SurvivalFly extends Check {
         }
         else{
         	// Check traveled y-distance, orientation is air + jumping + velocity (as far as it gets).
+        	// TODO: Can it be easily transformed to a more accurate max. absolute height? 
         	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
         	int maxJumpPhase;
             if (data.mediumLiftOff == MediumLiftOff.LIMIT_JUMP){
