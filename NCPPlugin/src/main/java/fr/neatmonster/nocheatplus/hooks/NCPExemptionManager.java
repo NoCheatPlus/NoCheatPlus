@@ -3,6 +3,8 @@ package fr.neatmonster.nocheatplus.hooks;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +18,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.NCPListener;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /*
  * M"""""""`YM MM'""""'YMM MM"""""""`YM MM""""""""`M                                         dP   oo                   
@@ -45,7 +49,7 @@ public class NCPExemptionManager {
     /** A map associating a check type with the entity ids of its exempted players. */
     private static final Map<CheckType, Set<Integer>> exempted          = new HashMap<CheckType, Set<Integer>>();
 
-    /** A map associating the registred player with their entity id. */
+    /** A map associating the registered player with their entity id. */
     private static final Map<String, Integer>         registeredPlayers = new HashMap<String, Integer>();
 
     static {
@@ -297,6 +301,35 @@ public class NCPExemptionManager {
     public static final void unexempt(final String playerName, final CheckType checkType) {
     	final Integer entityId = registeredPlayers.get(playerName);
     	if (entityId != null) unexempt(entityId, checkType);
+    }
+    
+    /**
+     * Check Entity-id mappings, for internal use.
+     * @param onlinePlayers
+     */
+    public static void checkConsistency(final Player[] onlinePlayers){
+    	int wrong = 0;
+    	for (int i = 0; i < onlinePlayers.length; i++){
+    		final Player player = onlinePlayers[i];
+    		final int id = player.getEntityId();
+    		final String name = player.getName();
+    		final Integer presentId = registeredPlayers.get(name);
+    		if (presentId == null){
+    			// TODO: Could complain.
+    		}
+    		else if (id != presentId.intValue()){
+    			wrong ++;
+    			registerPlayer(player);
+    		}
+    		// TODO: Consider also checking if numbers don't match.
+    	}
+    	if (wrong != 0){
+    		final List<String> details = new LinkedList<String>();
+    		if (wrong != 0){
+    			details.add("wrong entity-ids (" + + wrong + ")");
+    		}
+    		LogUtil.logWarning("[NoCheatPlus] ExemptionManager inconsistencies: " + StringUtil.join(details, " | "));
+    	}
     }
 
 }

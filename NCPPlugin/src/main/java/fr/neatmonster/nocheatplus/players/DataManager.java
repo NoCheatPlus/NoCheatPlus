@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -34,6 +36,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
+import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
@@ -41,6 +44,8 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Central access point for a lot of functionality for managing data, especially removing data for cleanup.<br>
@@ -53,7 +58,7 @@ import fr.neatmonster.nocheatplus.hooks.APIUtils;
  * @author mc_dev
  *
  */
-public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry, ComponentWithName{
+public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry, ComponentWithName, ConsistencyChecker{
 	
 	protected static DataManager instance = null;
 	
@@ -412,6 +417,49 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	@Override
 	public String getComponentName() {
 		return "NoCheatPlus_DataManager";
+	}
+
+	@Override
+	public void checkConsistency(final Player[] onlinePlayers) {
+		// Check online player tracking consistency.
+		int missing = 0;
+		int changed = 0;
+		int expectedSize = 0;
+		for (int i = 0; i < onlinePlayers.length; i++){
+			final Player player = onlinePlayers[i];
+			final String name = player.getName();
+//			if (player.isOnline()){
+				expectedSize += 1 + (name.equals(name.toLowerCase()) ? 0 : 1);
+				if (!this.onlinePlayers.containsKey(name)){
+					missing ++;
+					// TODO: Add the player [problem: messy NPC plugins?]?
+				}
+				if (player != this.onlinePlayers.get(name)){
+					changed ++;
+					// Update the reference.
+					addOnlinePlayer(player);
+//				}
+			}
+		}
+		
+		// TODO: Consider checking lastLogout for too long gone players.
+		
+		final int storedSize = this.onlinePlayers.size();
+		if (missing != 0 || changed != 0 || expectedSize != storedSize){
+			final List<String> details = new LinkedList<String>();
+			if (missing != 0){
+				details.add("missing online players (" + missing + ")");
+			}
+			if (expectedSize != storedSize){
+				// TODO: Consider checking for not online players and remove them.
+				details.add("wrong number of online players (" + storedSize + " instead of " + expectedSize + ")");
+			}
+			if (changed != 0){
+				details.add("changed player instances (" + changed + ")");
+			}
+			
+			LogUtil.logWarning("[NoCheatPlus] DataMan inconsistencies: " + StringUtil.join(details, " | "));
+		}
 	}
 	
 }

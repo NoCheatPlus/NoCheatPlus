@@ -30,6 +30,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
@@ -46,6 +47,7 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
+import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
@@ -263,13 +265,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		return done.size();
 	}
 
-	/** The event listeners. */
-    private final List<Listener> listeners       = new ArrayList<Listener>();
-    
-    /** Components that need notification on reloading.
-     * (Kept here, for if during runtime some might get added.)*/
-    private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
-
     /** Is the configuration outdated? */
     private boolean              configOutdated  = false;
 
@@ -278,6 +273,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     
     /** Player data future stuff. */
     protected final DataManager dataMan = new DataManager();
+    
+	private int dataManTaskId = -1;
+	
+	protected Metrics metrics = null;
     
 	/**
 	 * Commands that were changed for protecting them against tab complete or
@@ -290,14 +289,27 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	private boolean manageListeners = true;
 	
+	/** The event listeners. */
+    private final List<Listener> listeners       = new ArrayList<Listener>();
+    
+    /** Components that need notification on reloading.
+     * (Kept here, for if during runtime some might get added.)*/
+    private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
+	
+	/** Permission states stored on a per-world basis, updated with join/quit/kick.  */
 	protected final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
+	
+	/** Components that check consistency. */
+	protected final List<ConsistencyChecker> consistencyCheckers = new ArrayList<ConsistencyChecker>();
+	
+	/** Index at which to continue. */
+	protected int consistencyCheckerIndex = 0;
+	
+	protected int consistencyCheckerTaskId = -1;
 	
 	/** All registered components.  */
 	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
 
-	protected Metrics metrics = null;
-
-	private int dataManTaskId = -1;
 	
 	@Override
 	public boolean addComponent(final Object obj) {
@@ -324,13 +336,18 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			added = true;
 		}
 		if (obj instanceof MCAccessHolder){
-			// Add to allComponents.
+			// These will get notified in initMcAccess (iterates over allComponents).
 			((MCAccessHolder) obj).setMCAccess(getMCAccess());
+			added = true;
+		}
+		if (obj instanceof ConsistencyChecker){
+			consistencyCheckers.add((ConsistencyChecker) obj);
 			added = true;
 		}
 		// Also add to DataManager, which will pick what it needs.
 		// TODO: This is fishy in principle, something more concise?
 		if (dataMan.addComponent(obj)) added = true;
+		// Add to allComponents if in fact added.
 		if (added) allComponents.add(obj);
 		return added;
 	}
@@ -381,6 +398,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		if (obj instanceof INotifyReload) {
 			notifyReload.remove(obj);
 		}
+		if (obj instanceof ConsistencyChecker){
+			consistencyCheckers.remove(obj);
+		}
 		dataMan.removeComponent(obj);
 		allComponents.remove(obj);
 	}
@@ -408,8 +428,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		listenerManager.setRegisterDirectly(false);
 		listenerManager.clear();
 		
+		BukkitScheduler sched = getServer().getScheduler();
+		
 		// Stop data-man task.
-		if (dataManTaskId != -1) getServer().getScheduler().cancelTask(dataManTaskId);
+		if (dataManTaskId != -1){
+			sched.cancelTask(dataManTaskId);
+			dataManTaskId = -1;
+		}
         
         // Stop the tickTask.
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop TickTask...");
@@ -425,10 +450,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			metrics.cancel();
 			metrics = null;
 		}
+		
+		// Stop consistency checking task.
+		if (consistencyCheckerTaskId != -1){
+			sched.cancelTask(consistencyCheckerTaskId);
+		}
         
         // Just to be sure nothing gets left out.
         if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop all remaining tasks...");
-        getServer().getScheduler().cancelTasks(this);
+        sched.cancelTasks(this);
 
         // Exemptions cleanup.
         if (verbose) LogUtil.logInfo("[NoCheatPlus] Reset ExemptionManager...");
@@ -566,9 +596,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 					// Reset Command protection.
 					undoCommandChanges();
 					if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
+					scheduleConsistencyCheckers();
 				}
         	},
         	NCPExemptionManager.getListener(),
+        	new ConsistencyChecker() {
+				@Override
+				public void checkConsistency(final Player[] onlinePlayers) {
+					NCPExemptionManager.checkConsistency(onlinePlayers);
+				}
+			},
         	dataMan,
         	new BlockInteractListener(),
         	new BlockBreakListener(),
@@ -598,6 +635,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				dataMan.checkExpiration();
 			}
 		}, 1207, 1207);
+        
+        // Set up consistency checking.
+        scheduleConsistencyCheckers();
 
         
         // Setup the graphs, plotters and start Metrics.
@@ -718,25 +758,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     	// TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
     }
     
-    
-
-//    public void onPlayerJoinLow(final PlayerJoinEvent event) {
-//        /*
-//         *  ____  _                             _       _       
-//         * |  _ \| | __ _ _   _  ___ _ __      | | ___ (_)_ __  
-//         * | |_) | |/ _` | | | |/ _ \ '__|  _  | |/ _ \| | '_ \ 
-//         * |  __/| | (_| | |_| |  __/ |    | |_| | (_) | | | | |
-//         * |_|   |_|\__,_|\__, |\___|_|     \___/ \___/|_|_| |_|
-//         *                |___/                                 
-//         */
-//        // Change the NetServerHandler of the player if requested in the configuration.
-//        final ConfigFile configFile = ConfigManager.getConfigFile();
-//        if (configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false))
-//            NCPNetServerHandler.changeNetServerHandler(event.getPlayer(),
-//                    configFile.getBoolean(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false));
-//    }
-
-    
     /**
 	 * Quick solution to hide the listener methods, expect refactoring.
 	 * @return
@@ -820,6 +841,73 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				}
 				pr.setPermission(name, permission, state);
 			}
+		}
+	}
+	
+	protected void scheduleConsistencyCheckers(){
+		BukkitScheduler sched = getServer().getScheduler();
+		if (consistencyCheckerTaskId != -1){
+			sched.cancelTask(consistencyCheckerTaskId);
+		}
+		ConfigFile config = ConfigManager.getConfigFile();
+		if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true)) return;
+		// Schedule task in seconds.
+		final long delay = 20L * config.getInt(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 1, 3600, 10);
+		consistencyCheckerTaskId = sched.scheduleSyncRepeatingTask(this, new Runnable() {
+			@Override
+			public void run() {
+				runConsistencyChecks();
+			}
+		}, delay, delay );
+	}
+	
+	/**
+	 * Run consistency checks for at most the configured duration. If not finished, a task will be scheduled to continue.
+	 */
+	protected void runConsistencyChecks(){
+		final long tStart = System.currentTimeMillis();
+		final ConfigFile config = ConfigManager.getConfigFile();
+		if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK) || consistencyCheckers.isEmpty()){
+			consistencyCheckerIndex = 0;
+			return;
+		}
+		final long tEnd = tStart + config.getLong(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 1, 50, 2);
+		if (consistencyCheckerIndex >= consistencyCheckers.size()) consistencyCheckerIndex = 0;
+		final Player[] onlinePlayers = getServer().getOnlinePlayers();
+		// Loop
+		while (consistencyCheckerIndex < consistencyCheckers.size()){
+			final ConsistencyChecker checker = consistencyCheckers.get(consistencyCheckerIndex);
+			try{
+				checker.checkConsistency(onlinePlayers);
+			}
+			catch (Throwable t){
+				LogUtil.logSevere("[NoCheatPlus] ConsistencyChecker(" + checker.getClass().getName() + ") encountered an exception:");
+				LogUtil.logSevere(t);
+			}
+			consistencyCheckerIndex ++; // Do not remove :).
+			final long now = System.currentTimeMillis();
+			if (now < tStart || now >= tEnd){
+				break;
+			}
+		}
+		// (The index might be bigger than size by now.)
+		
+		final boolean debug = config.getBoolean(ConfPaths.LOGGING_DEBUG);
+		
+		// If not finished, schedule further checks.
+		if (consistencyCheckerIndex < consistencyCheckers.size()){
+			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+				@Override
+				public void run() {
+					runConsistencyChecks();
+				}
+			});
+			if (debug){
+				LogUtil.logInfo("[NoCheatPlus] Re-scheduled consistency-checks.");
+			}
+		}
+		else if (debug){
+			LogUtil.logInfo("[NoCheatPlus] Consistency-checks run.");
 		}
 	}
 

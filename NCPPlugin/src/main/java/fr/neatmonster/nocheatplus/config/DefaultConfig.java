@@ -76,9 +76,14 @@ public class DefaultConfig extends ConfigFile {
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false);
         
-        
+        // Data settings.
+        // Expired offline players data.
         set(ConfPaths.DATA_EXPIRATION_DURATION, 0);
         set(ConfPaths.DATA_EXPIRATION_HISTORY, false);
+        // Consistency checking.
+        set(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true);
+        set(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 10);
+        set(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 2);
 
         /*
          * 888 88b, 888                    888    888 88b,                        888    

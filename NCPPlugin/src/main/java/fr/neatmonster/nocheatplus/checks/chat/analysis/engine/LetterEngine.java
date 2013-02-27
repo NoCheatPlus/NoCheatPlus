@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.entity.Player;
+
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.ChatData;
@@ -16,6 +18,7 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.Similar
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordPrefixes.WordPrefixesSettings;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
+import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
@@ -29,7 +32,7 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  * @author mc_dev
  *
  */
-public class LetterEngine implements IRemoveData, IHaveCheckType{
+public class LetterEngine implements IRemoveData, IHaveCheckType, ConsistencyChecker{
 	
 	/** Global processors */
 	protected final List<WordProcessor> processors = new ArrayList<WordProcessor>();
@@ -121,5 +124,18 @@ public class LetterEngine implements IRemoveData, IHaveCheckType{
 	@Override
 	public final CheckType getCheckType() {
 		return CheckType.CHAT_TEXT;
+	}
+
+	@Override
+	public void checkConsistency(final Player[] onlinePlayers) {
+		// Use consistency checking to release some memory.
+		final long now = System.currentTimeMillis();
+		if (now < dataMap.lastAccess){
+			dataMap.clear();
+			return;
+		}
+		if (now - dataMap.lastAccess > dataMap.durExpire){
+			dataMap.expire(now - dataMap.durExpire);
+		}
 	}
 }
