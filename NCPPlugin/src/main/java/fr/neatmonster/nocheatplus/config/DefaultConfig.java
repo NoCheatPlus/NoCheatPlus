@@ -26,7 +26,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 384;
+	public static final int buildNumber = 414;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -78,7 +78,8 @@ public class DefaultConfig extends ConfigFile {
         
         // Data settings.
         // Expired offline players data.
-        set(ConfPaths.DATA_EXPIRATION_DURATION, 0);
+        set(ConfPaths.DATA_EXPIRATION_ACTIVE, false);
+        set(ConfPaths.DATA_EXPIRATION_DURATION, 60);
         set(ConfPaths.DATA_EXPIRATION_HISTORY, false);
         // Consistency checking.
         set(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true);

@@ -91,9 +91,12 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	 */
 	protected final Map<CheckType, Map<String, ExecutionHistory>> executionHistories = new HashMap<CheckType, Map<String,ExecutionHistory>>();
 	
+	/** Flag if data expiration is active at all. */
+	protected boolean doExpireData = false;
+	
 	/** 
 	 * Duration in milliseconds for expiration of logged off players data. 
-	 * Disabled with 0, in the config minutes are used as unit.
+	 * In the config minutes are used as unit.
 	 */
 	protected long durExpireData = 0;
 	
@@ -114,7 +117,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	 * Currently only "dumb" full removal is performed. Later it is thinkable to remove "as much as reasonable".
 	 */
 	public void checkExpiration(){
-		if (durExpireData <= 0) return;
+		if (!doExpireData || durExpireData <= 0) return;
 		final long now = System.currentTimeMillis();
 		final Set<CheckDataFactory> factories = new LinkedHashSet<CheckDataFactory>();
 		final Set<Entry<String, Long>> entries = lastLogout.entrySet();
@@ -181,7 +184,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	 */
 	private void adjustSettings() {
 		final ConfigFile config = ConfigManager.getConfigFile();
-		durExpireData = config.getLong(ConfPaths.DATA_EXPIRATION_DURATION) * 60000L; // in minutes
+		doExpireData = config.getBoolean(ConfPaths.DATA_EXPIRATION_ACTIVE);
+		durExpireData = config.getLong(ConfPaths.DATA_EXPIRATION_DURATION, 1, 1000000, 60) * 60000L; // in minutes
 		deleteData = config.getBoolean(ConfPaths.DATA_EXPIRATION_DATA, true); // hidden.
 		deleteHistory = config.getBoolean(ConfPaths.DATA_EXPIRATION_HISTORY);
 	}

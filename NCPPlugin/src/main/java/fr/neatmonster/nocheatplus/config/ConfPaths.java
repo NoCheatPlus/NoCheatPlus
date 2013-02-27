@@ -61,6 +61,7 @@ public abstract class ConfPaths {
     private static final String DATA                                     = "data.";
     // Expired data removal.
     private static final String DATA_EXPIRATION                          = DATA + "expiration.";
+    public static final String  DATA_EXPIRATION_ACTIVE                   = DATA_EXPIRATION + "active";
 	public static final String  DATA_EXPIRATION_DURATION                 = DATA_EXPIRATION + "duration";
 	public static final String  DATA_EXPIRATION_DATA                     = DATA_EXPIRATION + "data";
 	public static final String  DATA_EXPIRATION_HISTORY                  = DATA_EXPIRATION + "history";
