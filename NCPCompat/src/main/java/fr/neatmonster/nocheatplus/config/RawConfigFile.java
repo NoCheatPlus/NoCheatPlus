@@ -9,7 +9,7 @@ import org.yaml.snakeyaml.DumperOptions;
 public class RawConfigFile  extends YamlConfiguration{
 	
     /**
-     * Return double within given bounds, with preset. Mainly used for hidden settings.
+     * Return a double value within given bounds, with preset.
      * 
      * @param data
      * @param path
@@ -20,6 +20,40 @@ public class RawConfigFile  extends YamlConfiguration{
      */
     public double getDouble(final String path, final double min, final double max, final double preset){
     	final double value = getDouble(path, preset);
+    	if (value < min) return min;
+    	else if (value > max) return max;
+        else return value;
+    }
+    
+    /**
+     * Return a long value within given bounds, with preset.
+     * 
+     * @param data
+     * @param path
+     * @param min
+     * @param max
+     * @param preset
+     * @return
+     */
+    public long getLong(final String path, final long min, final long max, final long preset){
+    	final long value = getLong(path, preset);
+    	if (value < min) return min;
+    	else if (value > max) return max;
+        else return value;
+    }
+    
+    /**
+     * Return an int value within given bounds, with preset.
+     * 
+     * @param data
+     * @param path
+     * @param min
+     * @param max
+     * @param preset
+     * @return
+     */
+    public long getInt(final String path, final int min, final int max, final int preset){
+    	final int value = getInt(path, preset);
     	if (value < min) return min;
     	else if (value > max) return max;
         else return value;
