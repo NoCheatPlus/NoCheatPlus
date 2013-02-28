@@ -130,11 +130,11 @@ public class LetterEngine implements IRemoveData, IHaveCheckType, ConsistencyChe
 	public void checkConsistency(final Player[] onlinePlayers) {
 		// Use consistency checking to release some memory.
 		final long now = System.currentTimeMillis();
-		if (now < dataMap.lastAccess){
+		if (now < dataMap.lastExpired){
 			dataMap.clear();
 			return;
 		}
-		if (now - dataMap.lastAccess > dataMap.durExpire){
+		if (now - dataMap.lastExpired > dataMap.durExpire){
 			dataMap.expire(now - dataMap.durExpire);
 		}
 	}
