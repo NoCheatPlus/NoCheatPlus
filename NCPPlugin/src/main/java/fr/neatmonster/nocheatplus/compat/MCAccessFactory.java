@@ -44,6 +44,7 @@ public class MCAccessFactory {
 //			};
 //			// TEST END //
 			
+			// 1.4.7
 			try{
 				return new MCAccessCB2602();
 			}
@@ -51,6 +52,7 @@ public class MCAccessFactory {
 				throwables.add(t);
 			};
 			
+			// 1.4.6
 			try{
 				return new MCAccessCB2545();
 			}
@@ -58,6 +60,7 @@ public class MCAccessFactory {
 				throwables.add(t);
 			};
 			
+			// 1.4.5-R1.0
 			try{
 				return new MCAccessCB2512();
 			}
@@ -65,6 +68,7 @@ public class MCAccessFactory {
 				throwables.add(t);
 			};
 			
+			// 1.4.2 ... 1.4.5 (up to CB2511).
 			try{
 				return new MCAccessCB2511();
 			}
@@ -73,7 +77,7 @@ public class MCAccessFactory {
 			};
 		}
 		
-		// Try to set up api-only access.
+		// Try to set up api-only access (ca. 1.4.7).
 		try{
 			final String msg;
 			if (bukkitOnly){
@@ -94,6 +98,7 @@ public class MCAccessFactory {
 		};
 		
 		// All went wrong.
+		// TODO: Fall-back solution (disable plugin, disable checks).
 		LogUtil.logSevere("[NoCheatPlus] Your version of NoCheatPlus does not seem to provide support for either your Minecraft version or your specific server-mod.");
 		for (String msg : updateLocs){
 			LogUtil.logSevere(msg);

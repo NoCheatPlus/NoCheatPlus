@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.neatmonster</groupId>
+  <artifactId>ncpcompatbukkit</artifactId>
+  <packaging>jar</packaging>
+  <name>NCPCompatBukkit</name>
+  <version>static</version>
+
+  <parent>
+    <groupId>fr.neatmonster</groupId>
+    <artifactId>nocheatplus-parent</artifactId>
+    <version>static</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcompat</artifactId>
+    	<version>static</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.bukkit</groupId>
+    	<artifactId>bukkit</artifactId>
+    	<version>LATEST</version>
+    </dependency>
+  </dependencies>
+
+  <description>Compatibility for using the Bukkit API only.
+
+Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+</project>
