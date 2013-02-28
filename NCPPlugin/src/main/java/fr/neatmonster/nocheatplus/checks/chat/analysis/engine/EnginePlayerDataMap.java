@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.chat.analysis.engine;
 
+import java.util.Collection;
+
 import fr.neatmonster.nocheatplus.checks.chat.ChatConfig;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.processors.WordProcessor;
 import fr.neatmonster.nocheatplus.utilities.ds.ManagedMap;
@@ -13,7 +15,11 @@ public class EnginePlayerDataMap extends ManagedMap<String, EnginePlayerData> {
 
 	protected long durExpire;
 	
+	/** Timestamp of last time get was called.*/
 	protected long lastAccess = System.currentTimeMillis();
+	
+	/** Timestamp of last time an entry was removed. */
+	protected long lastExpired = lastAccess;
 
 	public EnginePlayerDataMap(long durExpire, int defaultCapacity, float loadFactor) {
 		super(defaultCapacity, loadFactor);
@@ -33,7 +39,11 @@ public class EnginePlayerDataMap extends ManagedMap<String, EnginePlayerData> {
 			put(key, data);
 		}
 		final long ts = System.currentTimeMillis();
-		if (ts - lastAccess > durExpire) expire(ts - durExpire);
+		if (ts < lastExpired){
+			lastExpired = ts;
+			// might clear map or update all entries.
+		}
+		else if (ts - lastExpired > durExpire) expire(ts - durExpire);
 		lastAccess = ts;
 		return data;
 	}
@@ -46,5 +56,17 @@ public class EnginePlayerDataMap extends ManagedMap<String, EnginePlayerData> {
 		}
 		super.clear();
 	}
+
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.utilities.ds.ManagedMap#expire(long)
+	 */
+	@Override
+	public Collection<String> expire(long ts) {
+		final Collection<String> rem = super.expire(ts);
+		if (!rem.isEmpty()) lastExpired = System.currentTimeMillis();
+		return rem;
+	}
+	
+	
 
 }
