@@ -221,7 +221,7 @@ public class TestRayTracing {
 			checkConsistency(coords);
 		}
 		
-		final boolean e = BuildParameters.extensiveTesting;
+		final boolean e = BuildParameters.testLevel > 0;
 		
 		// Random tests.
 		for (int i = 0; i < (e ? 50000000 : 100000); i++){

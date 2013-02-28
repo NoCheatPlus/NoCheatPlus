@@ -263,7 +263,7 @@ public class TestCoordMap {
 
 		final Random random = new Random(System.nanoTime() - (System.currentTimeMillis() % 2 == 1 ? 37 : 137));
 		
-		final boolean e = BuildParameters.extensiveTesting;
+		final boolean e = BuildParameters.testLevel > 0;
 		
 		final int n = e ? 40000 : 6000; // Number of coordinates.
 		final int max = 800; // Coordinate maximum.

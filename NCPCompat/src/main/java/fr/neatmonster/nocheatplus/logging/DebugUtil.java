@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /**
  * Some auxiliary specialized static-access methods.
@@ -37,19 +38,23 @@ public class DebugUtil {
 				builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("speed=" + speed) : "") + (jump != Double.NEGATIVE_INFINITY ? ("jump=" + jump) : "") + ")");
 			}
 			
-	//		// TEMP: Dump block shapes:
-	//		addBlockBelowInfo(builder, from, "\nfrom");
-	//		addBlockBelowInfo(builder, to, "\nto");
-			
+			if (BuildParameters.debugLevel > 0){
+				if (from.getTypeId() != 0) addBlockInfo(builder, from, "\nfrom");
+				if (from.getTypeIdBelow() != 0) addBlockBelowInfo(builder, from, "\nfrom");
+				if (!from.isOnGround() && from.isOnGround(0.5)) builder.append(" (ground within 0.5)");
+				if (to.getTypeId() != 0) addBlockInfo(builder, to, "\nto");
+				if (to.getTypeIdBelow() != 0) addBlockBelowInfo(builder, to, "\nto");
+				if (!to.isOnGround() && to.isOnGround(0.5)) builder.append(" (ground within 0.5)"); 
+			}
 			System.out.print(builder.toString());
 		}
 
 	public static  void addBlockBelowInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
-		builder.append(tag + " below id= " + loc.getTypeIdBelow() + "data=" + loc.getData(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ()) + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ())));
+		builder.append(tag + " below id= " + loc.getTypeIdBelow() + " data=" + loc.getData(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ()) + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY() - 1, loc.getBlockZ())));
 	}
 
 	public static  void addBlockInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
-		builder.append(tag + " id= " + loc.getTypeId() + "data=" + loc.getData() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
+		builder.append(tag + " id= " + loc.getTypeId() + " data=" + loc.getData() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
 	}
 
 }

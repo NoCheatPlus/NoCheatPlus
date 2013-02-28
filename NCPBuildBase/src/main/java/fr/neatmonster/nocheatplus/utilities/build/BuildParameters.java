@@ -43,11 +43,20 @@ public class BuildParameters {
 		else return ResourceUtil.getBoolean(input, preset);
 	}
 	
+	public static Integer getInteger(String path, Integer preset){
+		String input = fileContents.get(path);
+		if (input == null) return preset;
+		else return ResourceUtil.getInteger(input, preset);
+	}
+	
 	//////////////////////
 	// Public members.
 	//////////////////////
 	
-	/** Extend testing amount. */
-	public static final boolean extensiveTesting = getBoolean("EXTENSIVE_TESTING", false);
+	/** Test level: more testing for higher levels. */
+	public static final int testLevel = getInteger("TEST_LEVEL", 0);
+	
+	/** Debug level: more debug output for higher levels. */
+	public static final int debugLevel = getInteger("DEBUG_LEVEL", 0);
 	
 }

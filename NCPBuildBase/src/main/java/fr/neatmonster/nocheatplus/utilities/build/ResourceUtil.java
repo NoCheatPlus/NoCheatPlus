@@ -10,14 +10,6 @@ import java.util.Map;
 
 public class ResourceUtil {
 	
-	public static Boolean getBoolean(String input, Boolean preset){
-		if (input == null) return preset;
-		input = input.trim().toLowerCase();
-		if (input.matches("1|true|yes")) return true;
-		else if (input.matches("0|false|no")) return false;
-		else return preset;
-	}
-	
 	/**
 	 * Might have a newline at the end.<br>
 	 * TODO: Move to other utility.
@@ -83,5 +75,24 @@ public class ResourceUtil {
 				map.put(parts[0].trim(), parts[1].trim());
 			}
 		}
+	}
+	
+	public static Boolean getBoolean(String input, Boolean preset){
+		if (input == null) return preset;
+		input = input.trim().toLowerCase();
+		if (input.matches("1|true|yes")) return true;
+		else if (input.matches("0|false|no")) return false;
+		else return preset;
+	}
+	
+	
+	public static Integer getInteger(String input, Integer preset) {
+		if (input == null) return preset;
+		try{
+			return Integer.parseInt(input);
+		}
+		catch (NumberFormatException e) {
+		}
+		return preset;
 	}
 }

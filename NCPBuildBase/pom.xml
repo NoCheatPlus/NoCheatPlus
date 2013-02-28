@@ -57,8 +57,12 @@ Version updating is done for NCPPlugin mainly, expect the other poms version to 
 		                <value>!!! THIS FILE IS AUTO GENERATED, ANY MANUAL CHANGES TO IT WILL GET LOST !!!</value>
                     </replacement>
                     <replacement>
-		                <token>@EXTENSIVE_TESTING@</token>
-		                <value>${EXTENSIVE_TESTING}</value>
+		                <token>@TEST_LEVEL@</token>
+		                <value>${TEST_LEVEL}</value>
+                    </replacement>
+					<replacement>
+		                <token>@DEBUG_LEVEL@</token>
+		                <value>${DEBUG_LEVEL}</value>
                     </replacement>
                 </replacements>                        
             </configuration>
