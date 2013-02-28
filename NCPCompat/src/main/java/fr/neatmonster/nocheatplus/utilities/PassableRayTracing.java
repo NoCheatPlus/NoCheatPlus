@@ -89,6 +89,9 @@ public class PassableRayTracing extends RayTracing{
 			if (oZ >= bounds[5]) return true;
 			else if (oZ + dZ * dT < bounds[2]) return true;
 		}
+		
+		// TODO: Heuristic workaround for certain situations [might be better outside of this, probably a simplified version ofr the normal case]?
+		
 		// Check for workarounds.
 		// TODO: check f_itchy once exists.
 		if (BlockProperties.isPassableWorkaround(blockCache, blockX, blockY, blockZ, oX, oY, oZ, id, dX, dY, dZ, dT)){
@@ -100,7 +103,7 @@ public class PassableRayTracing extends RayTracing{
 		// TODO: "Wrong" moves through edges of blocks (not sure, needs reproducing).
 		// (Could allow start-end if passable + check first collision time or some estimate.)
 		collides = true;
-		return true;
+		return false;
 	}
 
 }
