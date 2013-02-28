@@ -49,12 +49,14 @@ public class EnginePlayerDataMap extends ManagedMap<String, EnginePlayerData> {
 	}
 	
 	public void clear(){
-		for (ValueWrap wrap : map.values()){
+		final long time = System.currentTimeMillis();
+		for (final ValueWrap wrap : map.values()){
 			for (final WordProcessor processor : wrap.value.processors){
 				processor.clear();
 			}
 		}
 		super.clear();
+		lastAccess = lastExpired = time;
 	}
 
 	/* (non-Javadoc)
