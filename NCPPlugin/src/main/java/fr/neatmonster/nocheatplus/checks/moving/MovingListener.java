@@ -1034,7 +1034,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	// NOTE: No isIllegal check here.
         	final PlayerLocation pLoc = moveInfo.from;
         	moveInfo.from.collectBlockFlags(cc.noFallyOnGround);
-        	if (!pLoc.isOnGround() && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()){
+        	// Be sure not to lose that block.
+        	data.noFallFallDistance += 1.0;
+        	if (!pLoc.isOnGround(1.0) && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()){
         		// Likely a new style no-fall bypass (damage in mid-air).
         		data.noFallVL += 1.0;
         		if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions, true) && data.hasSetBack()){
@@ -1042,6 +1044,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         			// NoFall data will not be reset 
         			allowReset = false;
         		}
+        	}
+        	else{
+        		// Legitimate damage: clear accounting data.
+        		data.vDistAcc.clear();
+        		// TODO: Also reset other properties.
+        		// TODO: Also reset in other cases (moved too quickly)?
         	}
         	moveInfo.cleanup();
         	parkedInfo.add(moveInfo);

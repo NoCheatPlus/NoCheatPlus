@@ -111,6 +111,8 @@ public class SurvivalFly extends Check {
 		}
 		else resetFrom = false;
 
+		// TODO: Account for lift-off medium / if in air [i.e. account for medium + friction]?
+		// (Might set some margin for buffering if cutting down hAllowedDistance.)
 		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, false);
 
 		// Account for flowing liquids (only if needed).
@@ -347,7 +349,7 @@ public class SurvivalFly extends Check {
 		
 		if (!resetFrom && !resetTo){
 			// "On-air" checks (vertical)
-			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, from, to, yDistance, data, cc));
+			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, verticalAccounting(now, from, to, hDistance, yDistance, data, cc));
 		}
 
         final double result = (Math.max(hDistanceAboveLimit, 0D) + Math.max(vDistanceAboveLimit, 0D)) * 100D;
@@ -495,69 +497,98 @@ public class SurvivalFly extends Check {
 		// TODO: re-organize for faster exclusions (hDistance, yDistance).
 		
 		// Check for moving off stairs.
+		// TODO: more strict conditions ?
 		if (from.isAboveStairs()) {
 			// TODO: This needs some safety guards.
+			// TODO: At least test putting this after yDistance > 0.5 check.
 			return applyWorkaround(player, from, true, data);
 		}
-		// Check for "lost touch", for when moving events are missing somehow.
-		// Half block step up.
-		if (yDistance >= 0 && yDistance <= 0.5 && hDistance < 0.5 && to.isOnGround()){
-			// TODO: Also confine concerning hDist !
-			if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
-				return applyWorkaround(player, from, true, data);
-			}
+		
+		
+		if (yDistance > 0.5 + 0.2 * data.jumpAmplifier){
+			// All following checks are ruled out by this.
+			// (This should rarely ever happen, except for velocity and pistons.)
+			return false;
 		}
+		
 		final double setBackYDistance = to.getY() - data.getSetBackY();
 		
-		// Check for sprinting down blocks etc.
-		if (yDistance <= 0.0 && Math.abs(yDistance) <= 0.5 && data.sfLastYDist <= yDistance && data.sfJumpPhase <= 7 && setBackYDistance < 0 && !to.isOnGround()){
-			// TODO: setbackydist: <= - 1.0 or similar
-			// TODO: <= 7 might work with speed II, not sure with above.
-			// TODO: account for speed/sprint
-			// TODO: account for half steps !?
-			if (from.isOnGround(0.6, 0.4, 0, 0L) ){
-				// TODO: further narrow down bounds ?
-				// Temporary "fix".
-				return applyWorkaround(player, from, true, data);
-			}
-		}
-		
-		// Check for jumping up strange blocks like flower pots on top of other blocks.
-		if (yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()){
-			// TODO: confine by block types ?
-			if (from.isOnGround(0.25, 0.4, 0, 0L) ){
-				// Temporary "fix".
-				return applyWorkaround(player, from, true, data);
-			}
-		}
-		
-		// Interpolation check.
-		// TODO: Check if the set-back distance still has relevance.
-		// TODO: Interpolation might also be necessary between from and to !
-		// TODO: Check use of jumpamplifier.
-		if (data.fromX != Double.MAX_VALUE && yDistance > 0 && yDistance <= 0.5 + 0.2 * data.jumpAmplifier && data.sfLastYDist < 0 && !to.isOnGround()) {
-			// TODO: Check if last-y-dist or sprinting should be considered.
-			if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
-				// Interpolate from last to-coordinates to the from
-				// coordinates (with some safe-guard).
-				final double dX = from.getX() - data.fromX;
-				final double dY = from.getY() - data.fromY;
-				final double dZ = from.getZ() - data.fromZ;
-				if (dX * dX + dY * dY + dZ * dZ < 0.5) { 
-					// TODO: adjust limit according to ... speed etc ?
-					// Check full bounding box since last from.
-					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
-					final double iY = minY; // TODO ...
-					final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
-					double yMargin = cc.yOnGround;
-					// TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
-					// TODO: check with iY + 0.25 removed.
-					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
+		if (yDistance <= 0){
+			if (data.sfJumpPhase <= 7){
+				// Check for sprinting down blocks etc.
+				if (yDistance >= -0.5 && data.sfLastYDist <= yDistance && setBackYDistance < 0 && !to.isOnGround()){
+					// TODO: setbackydist: <= - 1.0 or similar
+					// TODO: <= 7 might work with speed II, not sure with above.
+					// TODO: account for speed/sprint
+					// TODO: account for half steps !?
+					if (from.isOnGround(0.6, 0.4, 0, 0L) ){
+						// TODO: further narrow down bounds ?
+						// Temporary "fix".
+						return applyWorkaround(player, from, true, data);
+					}
+				}
+				
+				// Check for jumping up strange blocks like flower pots on top of other blocks.
+				if (yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()){
+					// TODO: confine by block types ?
+					if (from.isOnGround(0.25, 0.4, 0, 0L) ){
+						// Temporary "fix".
 						return applyWorkaround(player, from, true, data);
 					}
 				}
 			}
+			// Lost ground while falling onto/over edges of blocks.
+			if (yDistance < 0 && yDistance >= -0.5 && hDistance <= 0.5 && data.sfLastYDist < 0 && yDistance > data.sfLastYDist){
+				// TODO: yDistance >= -0.15 might be possible.
+				// TODO: yDistance <= 0 might be better.
+				// Also clear accounting data.
+				if (to.isOnGround(0.5) || from.isOnGround(0.5)){
+					return applyWorkaround(player, from, true, data);
+				}
+			}
 		}
+		
+		if (yDistance >= 0){
+			// Half block step up.
+			if (yDistance <= 0.5 && hDistance < 0.5 && to.isOnGround()){
+				// TODO: Also confine concerning hDist !
+				if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
+					return applyWorkaround(player, from, true, data);
+				}
+			}
+			
+			// Interpolation check.
+			// TODO: Check if still needed !
+			// TODO: Check if the set-back distance still has relevance.
+			// TODO: Interpolation might also be necessary between from and to !
+			// TODO: Check use of jumpamplifier.
+			// TODO: Might check fall distance.
+			if (data.fromX != Double.MAX_VALUE && yDistance > 0 && data.sfLastYDist < 0 && !to.isOnGround()) {
+				// TODO: Check if last-y-dist or sprinting should be considered.
+				if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
+					// Interpolate from last to-coordinates to the from
+					// coordinates (with some safe-guard).
+					final double dX = from.getX() - data.fromX;
+					final double dY = from.getY() - data.fromY;
+					final double dZ = from.getZ() - data.fromZ;
+					if (dX * dX + dY * dY + dZ * dZ < 0.5) { 
+						// TODO: adjust limit according to ... speed etc ?
+						// Check full bounding box since last from.
+						final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
+						final double iY = minY; // TODO ...
+						final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
+						double yMargin = cc.yOnGround;
+						// TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
+						// TODO: check with iY + 0.25 removed.
+						if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
+							return applyWorkaround(player, from, true, data);
+						}
+					}
+				}
+			}
+		}
+		
+		
 		// Nothing found.
 		return false;
 	}
@@ -733,7 +764,7 @@ public class SurvivalFly extends Check {
 	 * @param cc
 	 * @return
 	 */
-	private double verticalAccounting(final long now, final PlayerLocation from, final PlayerLocation to, final double yDistance, final MovingData data, final MovingConfig cc) {
+	private double verticalAccounting(final long now, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final MovingData data, final MovingConfig cc) {
 		double vDistanceAboveLimit = 0;
 		// y direction change detection.
 		// TODO: Consider using accounting for y-change detection.
@@ -767,39 +798,20 @@ public class SurvivalFly extends Check {
 			// Vertical.
 			if (yDirChange && data.sfLastYDist > 0){
 				// Change to descending phase !
-//				data.vDistCount.clear(now);
-//				data.vDistSum.clear(now);
-//				data.vDistCount.add(1f);
-//				data.vDistSum.add((float) yDistance);
 				data.vDistAcc.clear();
 				data.vDistAcc.add((float) yDistance);
 			}
 			else if (data.verticalFreedom <= 0.001D) {
 				// Here yDistance can be negative and positive (!).
 				if (yDistance != 0D){
-//					final double accAboveLimit = verticalAccounting(now, yDistance, data.vDistSum, data.vDistCount ,tags, "vacc");
 					final double accAboveLimit = verticalAccounting(now, from, to, yDistance, data.vDistAcc ,tags, "vacc");
 					if (accAboveLimit > vDistanceAboveLimit){
-						// Account for lag.
-						// TODO: 1.1 might be too pessimistic.
-//						if (cc.lag && TickTask.getLag(data.vDistCount.bucketDuration() * data.vDistCount.numberOfBuckets(), true) > 1.1){
-//							data.vDistCount.clear(now);
-//							data.vDistSum.clear(now);
-//							data.vDistAcc.clear();
-//						}
-//						else{
-//							// Accept as violation.
-//							vDistanceAboveLimit = accAboveLimit;
-//						}
 						vDistanceAboveLimit = accAboveLimit;
 					}
-					
 				}
 			}
 			else{
 				// TODO: Just to exclude source of error, might be redundant.
-//				data.vDistCount.clear(now);
-//				data.vDistSum.clear(now);
 				data.vDistAcc.clear();
 			}
 		}
@@ -812,7 +824,7 @@ public class SurvivalFly extends Check {
 	 * bucket 2, 0 is ignored. [Vertical accounting.]
 	 * 
 	 * @param now
-	 * @param value
+	 * @param yDistance
 	 * @param sum
 	 * @param count
 	 * @param tags
@@ -820,11 +832,11 @@ public class SurvivalFly extends Check {
 	 * @return absolute difference on violation.;
 	 */
 //	private static final double verticalAccounting(final long now, final double value, final ActionFrequency sum, final ActionFrequency count, final ArrayList<String> tags, String tag)
-	private static final double verticalAccounting(final long now,  final PlayerLocation from, final PlayerLocation to, final double value, final ActionAccumulator acc, final ArrayList<String> tags, String tag)
+	private static final double verticalAccounting(final long now,  final PlayerLocation from, final PlayerLocation to, final double yDistance, final ActionAccumulator acc, final ArrayList<String> tags, final String tag)
 	{
 //		sum.add(now, (float) value);
 //		count.add(now, 1f);
-		acc.add((float) value);
+		acc.add((float) yDistance);
 		// TODO: Add on-eq-return parameter
 //		if (count.bucketScore(2) > 0 && count.bucketScore(1) > 0) {
 		final int i1, i2;
@@ -845,8 +857,9 @@ public class SurvivalFly extends Check {
 			final double diff = sc1 - sc2;
 			final double aDiff = Math.abs(diff);
 			// TODO: Relate this to the fall distance !
-			if (diff > 0 || value > -1.1 && aDiff <= 0.07) { // TODO: sharpen later (force speed gain while falling).
-				if (value < -1.1 && (aDiff < Math.abs(value) || sc2 < - 10)){
+			if (diff > 0 || yDistance > -1.1 && aDiff <= 0.07) { // TODO: sharpen later (force speed gain while falling).
+				if (yDistance < -1.1 && (aDiff < Math.abs(yDistance) || sc2 < - 10)){
+					// High falling speeds are somewhat ok.
 					tags.add(tag + "grace");
 					return 0;
 				}
