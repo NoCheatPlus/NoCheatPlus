@@ -228,7 +228,7 @@ public class SurvivalFly extends Check {
         		if (silentSetBack != null){
         			if (cc.debug) {
         				tags.add("silentsbcobweb");
-        				outputDebug(player, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+        				outputDebug(player, to, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
         			}
         			return silentSetBack;
         		}
@@ -356,7 +356,7 @@ public class SurvivalFly extends Check {
 
 		if (cc.debug) {
 			// Put in a method for shorter code.
-			outputDebug(player, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+			outputDebug(player, to, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
 		}
 		
 		data.sfJumpPhase++;
@@ -459,13 +459,13 @@ public class SurvivalFly extends Check {
      * @param toOnGround
      * @param resetTo
      */
-	private void outputDebug(final Player player, final MovingData data, final MovingConfig cc, 
+	private void outputDebug(final Player player, final PlayerLocation to, final MovingData data, final MovingConfig cc, 
 			final double hDistance, final double hAllowedDistance, final double yDistance, final double vAllowedDistance,
 			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
 		// TODO: also show resetcond (!)
 		StringBuilder builder = new StringBuilder(500);
 		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
-		builder.append("\n" + player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " / " +  StringUtil.fdec3.format(vAllowedDistance));
+		builder.append("\n" + player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + ")");
 		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
 			builder.append("\n" + player.getName() + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
 		}
