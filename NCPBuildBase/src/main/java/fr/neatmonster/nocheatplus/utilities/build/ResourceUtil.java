@@ -66,7 +66,7 @@ public class ResourceUtil {
 		final String[] split = input.split("\n");
 		for (final String line : split){
 			final String trimmed = line.trim();
-			if (trimmed.startsWith("#")) continue;
+			if (trimmed.isEmpty() || trimmed.startsWith("#")) continue;
 			final String[] parts = line.split("=", 2);
 			if (parts.length == 1){
 				map.put(parts[0].trim(), "");
