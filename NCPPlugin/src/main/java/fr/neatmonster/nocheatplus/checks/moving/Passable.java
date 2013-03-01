@@ -19,6 +19,7 @@ public class Passable extends Check {
 
 	public Passable() {
 		super(CheckType.MOVING_PASSABLE);
+		rayTracing.setMaxSteps(60); // TODO: Configurable ?
 	}
 
 	public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
@@ -32,7 +33,7 @@ public class Passable extends Check {
 		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingVclipOnly || from.getY() > to.getY()) && (!cc.passableRayTracingBlockChangeOnly || from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ())){
 			rayTracing.set(from, to);
 			rayTracing.loop();
-			if (rayTracing.collides()){
+			if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()){
 				toPassable = false;
 			}
 			// TODO: If accuracy is set, also check the head position (or bounding box right away).

@@ -22,6 +22,7 @@ public class Visible extends Check {
 	public Visible() {
 		super(CheckType.BLOCKINTERACT_VISIBLE);
 		blockCache = mcAccess.getBlockCache(null);
+		rayTracing.setMaxSteps(60); // TODO: Configurable ?
 	}
 	
 	/* (non-Javadoc)
@@ -48,7 +49,7 @@ public class Visible extends Check {
 			rayTracing.setBlockCache(blockCache);
 			rayTracing.set(loc.getX(), loc.getY() + eyeHeight, loc.getZ(), 0.5 + block.getX() + 0.6 * face.getModX(), 0.5 + block.getY() + 0.6 * face.getModY(), 0.5 + block.getZ() + 0.6 * face.getModZ());
 			rayTracing.loop();
-			collides = rayTracing.collides();
+			collides = rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps();
 	    	blockCache.cleanup();
 	    	rayTracing.cleanup();
 		}
