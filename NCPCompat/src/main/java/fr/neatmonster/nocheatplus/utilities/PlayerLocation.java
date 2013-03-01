@@ -79,6 +79,12 @@ public class PlayerLocation {
 
 	/** Is the player on the ground? */
 	private Boolean onGround = null;
+	
+	// TODO: Check if onGround can be completely replaced by onGroundMinY and notOnGroundMaxY.
+	/** Minimal yOnGround for which the player is on ground. No extra xz/y margin.*/
+	private double onGroundMinY = Double.MAX_VALUE;
+	/** Maximal yOnGround for which the player is not on ground. No extra xz/y margin.*/
+	private double notOnGroundMaxY = Double.MIN_VALUE;
 
 	/** Is the player on ice? */
 	private Boolean onIce = null;
@@ -426,20 +432,29 @@ public class PlayerLocation {
 	 */
 	public boolean isOnGround() {
 		if (onGround == null) {
-			final double d0 = 0; //0.001D;
-			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
-				final int id = getTypeIdBelow();
-				if (BlockProperties.isGround(id) && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, blockY - 1, blockZ, id)){
-					onGround = true;
+			// Check cached values and simplifications.
+			if (notOnGroundMaxY >= yOnGround) onGround = false;
+			else if (onGroundMinY <= yOnGround) onGround = true;
+			else{
+				if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
+					final int id = getTypeIdBelow();
+					if (BlockProperties.isGround(id) && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, blockY - 1, blockZ, id)){
+						onGround = true;
+					}
+					else{
+						// Full on-ground check (blocks).
+						// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
+						onGround = BlockProperties.isOnGround(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, 0L);
+					}
 				}
-				// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
-				else onGround = BlockProperties.isOnGround(blockCache, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY, maxZ + d0, 0L);
+				else onGround = false;
 			}
-			else onGround = false;
 			if (!onGround) {
 				final double d1 = 0.25D;
 				onGround = blockCache.standsOnEntity(player, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
 			}
+			if (onGround) onGroundMinY = Math.min(onGroundMinY, yOnGround);
+			else notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround); 
 		}
 		return onGround;
 	}
@@ -450,10 +465,22 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isOnGround(final double yOnGround){
-		return isOnGround(yOnGround, 0D, 0D, 0L);
+		if (notOnGroundMaxY >= yOnGround) return false;
+		else if (onGroundMinY <= yOnGround) return true;
+		return  isOnGround(yOnGround, 0D, 0D, 0L);
 	}
 	
-	public boolean isOnGround(final double jumpHeight, final long ignoreFlags) {
+	/**
+	 * SSimple block-on-ground check for given margin (no entities). Meant for checking bigger margin than the normal yOnGround.
+	 * @param yOnGround
+	 * @param ignoreFlags Flags to not regard as ground.
+	 * @return
+	 */
+	public boolean isOnGround(final double yOnGround, final long ignoreFlags) {
+		if (ignoreFlags == 0){
+			if (notOnGroundMaxY >= yOnGround) return false;
+			else if (onGroundMinY <= yOnGround) return true;
+		}
 		return isOnGround(yOnGround, 0D, 0D, ignoreFlags);
 	}
 	
@@ -466,7 +493,11 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin) {
-		return BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, 0L);
+		if (xzMargin >= 0 && onGroundMinY <= yOnGround) return true;
+		if (xzMargin <= 0 && yMargin == 0){
+			if (notOnGroundMaxY >= yOnGround) return false;
+		}
+		return isOnGround(yOnGround, xzMargin, yMargin, 0);
 	}
 	
 	/**
@@ -478,7 +509,22 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin, final long ignoreFlags) {
-		return BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, ignoreFlags);
+		if (ignoreFlags == 0){
+			if (xzMargin >= 0 && onGroundMinY <= yOnGround) return true;
+			if (xzMargin <= 0 && yMargin == 0){
+				if (notOnGroundMaxY >= yOnGround) return false;
+			}
+		}
+		final boolean onGround = BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, ignoreFlags);
+		if (ignoreFlags == 0){
+			if (onGround){
+				if (xzMargin <= 0 && yMargin == 0) onGroundMinY = Math.min(onGroundMinY, yOnGround);
+			}
+			else{
+				if (xzMargin >= 0) notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
+			}
+		}
+		return onGround;
 	}
 	
 	/**
@@ -499,6 +545,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isNextToSolid(final double xzMargin, final double yMargin){
+		// TODO: Adjust to check block flags ?
 		return BlockProperties.collides(blockCache, minX - xzMargin, minY - yMargin, minZ - xzMargin, maxX + xzMargin, maxY + yMargin, maxZ + xzMargin, BlockProperties.F_SOLID);
 	}
 	
@@ -509,6 +556,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isNextToGround(final double xzMargin, final double yMargin){
+		// TODO: Adjust to check block flags ?
 		return BlockProperties.collides(blockCache, minX - xzMargin, minY - yMargin, minZ - xzMargin, maxX + xzMargin, maxY + yMargin, maxZ + xzMargin, BlockProperties.F_GROUND);
 	}
 	
@@ -674,6 +722,8 @@ public class PlayerLocation {
 		// Reset cached values.
 		typeId = typeIdBelow = data = null;
 		aboveStairs = inLava = inWater = inWeb = onGround = onIce = onClimbable = passable = null;
+		onGroundMinY = Double.MAX_VALUE;
+		notOnGroundMaxY = Double.MIN_VALUE;
 		blockFlags = null;
 
 		// TODO: Consider blockCache.setAccess? <- currently rather not, because
