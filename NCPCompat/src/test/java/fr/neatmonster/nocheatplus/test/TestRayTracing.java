@@ -25,23 +25,14 @@ public class TestRayTracing {
 		public CountRayTracing(double x0, double y0, double z0, double x1, double y1, double z1) {
 			super(x0, y0, z0, x1, y1, z1);
 		}
-
-		protected int done = 0;
 		@Override
 		protected boolean step(int blockX, int blockY, int blockZ, double oX,
 				double oY, double oZ, double dT) {
-			done ++;
-			if (done > maxSteps(dX, dY, dZ)) {
+			if (step > maxSteps(dX, dY, dZ)) {
 				System.out.println("[WARNING] Max steps exceeded: " + maxSteps(dX, dY, dZ));
 				return false; 
 			}
 			return true;
-		}
-
-		public int loopCount() {
-			done = 0;
-			super.loop();
-			return done;
 		}
 	}
 	
@@ -171,7 +162,8 @@ public class TestRayTracing {
 	
 	public static RayTracing checkNumberOfSteps(double[] coords, int steps) {
 		CountRayTracing crt = new CountRayTracing(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
-		int done = crt.loopCount();
+		crt.loop();
+		int done = crt.getStepsDone();
 		if (done != steps) doFail("Wrong number of steps: " + done + " instead of " + steps, coords);
 		return crt;
 	}
@@ -184,12 +176,10 @@ public class TestRayTracing {
 
 	public static RayTracing dumpRawRayTracing(final double[] coords) {
 		RayTracing rt = new RayTracing(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]) {
-			int done = 0;
 			@Override
 			protected boolean step(int blockX, int blockY, int blockZ, double oX, double oY, double oZ, double dT) {
 				dump(blockX, blockY, blockZ, oX, oY, oZ, t, dT);
-				done ++;
-				if (done > maxSteps(dX, dY, dZ)){
+				if (step > maxSteps(dX, dY, dZ)){
 					System.out.println("[WARNING] Max steps exceeded: " + maxSteps(dX, dY, dZ));
 					return false;
 				}

@@ -30,6 +30,12 @@ public abstract class RayTracing {
 	/** Tolerance for time, for checking the abort condition: 1.0 - t <= tol . */
 	protected double tol = 0.0;
 	
+	/** Counting the number of steps. Step is incremented before calling step(), and is 0 after set(...).  Checking this from within step means to get the current step number, checking after loop gets the number of steps done. */
+	protected int step = 0;
+	
+	/** Maximum steps that will be done. */
+	private int maxSteps = Integer.MAX_VALUE;
+	
 	public RayTracing(double x0, double y0, double z0, double x1, double y1, double z1){
 		set(x0, y0, z0, x1, y1, z1);
 	}
@@ -38,15 +44,22 @@ public abstract class RayTracing {
 		set(0, 0, 0, 0, 0, 0);
 	}
 	
+	/**
+	 * After this calling loop is possible.
+	 * @param x0
+	 * @param y0
+	 * @param z0
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 */
 	public void set(double x0, double y0, double z0, double x1, double y1, double z1){
-//		// TODO: Consider not using end-points at all.
 //		this.x0 = x0;
 //		this.y0 = y0;
 //		this.z0 = z0;
 //		this.x1 = x1;
 //		this.y1 = y1;
 //		this.z1 = z1;
-//		// Set the "runtime" info.
 //		d = CheckUtils.distance(x0, y0, z0, x1, y1, z1);
 		dX = x1 - x0;
 		dY = y1 - y0;
@@ -58,6 +71,7 @@ public abstract class RayTracing {
 		oY = (double) (y0 - blockY);
 		oZ = (double) (z0 - blockZ);
 		t = 0.0;
+		step = 0;
 	}
 	
 	private static final double tDiff(final double dTotal, final double offset){
@@ -89,6 +103,7 @@ public abstract class RayTracing {
 			tMin = Math.min(tX,  Math.min(tY, tZ));
 			if (tMin == Double.MAX_VALUE || t + tMin > 1.0) tMin = 1.0 - t;
 			// Call step with appropriate arguments.
+			step ++;
 			if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin)) break; // || tMin == 0) break;
 			if (t + tMin >= 1.0 - tol) break;
 			// Advance (add to t etc.).
@@ -167,12 +182,39 @@ public abstract class RayTracing {
 				changed = true;
 			}
 			t += tMin;
-			if (!changed){
+			if (!changed || step >= maxSteps){
 				break;
 			}
 		}
 	}
 	
+	/**
+	 * This is for external use. The field step will be incremented before
+	 * step(...) is called, thus checking it from within step means to get the
+	 * current step number, checking after loop gets the number of steps done.
+	 * 
+	 * @return
+	 */
+	public int getStepsDone(){
+		return step;
+	}
+	
+	/**
+	 * Get the maximal number of steps that loop will do.
+	 * @return
+	 */
+	public int getMaxSteps() {
+		return maxSteps;
+	}
+
+	/**
+	 * Set the maximal number of steps that loop will do.
+	 * @return
+	 */
+	public void setMaxSteps(int maxSteps) {
+		this.maxSteps = maxSteps;
+	}
+
 	/**
 	 * One step in the loop.
 	 * @return If to continue loop.
