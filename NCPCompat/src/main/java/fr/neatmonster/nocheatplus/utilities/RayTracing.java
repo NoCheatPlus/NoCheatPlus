@@ -80,6 +80,7 @@ public abstract class RayTracing {
 		
 		// Time to block edge.
 		double tX, tY, tZ, tMin;
+		boolean changed;
 		while (1.0 - t > tol){
 			// Determine smallest time to block edge.
 			tX = tDiff(dX, oX);
@@ -91,25 +92,31 @@ public abstract class RayTracing {
 			if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin)) break; // || tMin == 0) break;
 			if (t + tMin >= 1.0 - tol) break;
 			// Advance (add to t etc.).
+			changed = false;
+			// TODO: Some not handled cases would mean errors.
 			// x
 			oX += tMin * dX;
 			if (tX == tMin){
 				if (dX < 0){
 					oX = 1;
 					blockX --;
+					changed = true;
 				}
 				else if (dX > 0){
 					oX = 0;
 					blockX ++;
+					changed = true;
 				}
 			}
 			else if (oX >= 1 && dX > 0.0){
 				oX -= 1;
 				blockX ++;
+				changed = true;
 			}
 			else if (oX < 0 && dX < 0.0){
 				oX += 1;
 				blockX --;
+				changed = true;
 			}
 			// y
 			oY += tMin * dY;
@@ -117,19 +124,23 @@ public abstract class RayTracing {
 				if (dY < 0){
 					oY = 1;
 					blockY --;
+					changed = true;
 				}
 				else if (dY > 0){
 					oY = 0;
 					blockY ++;
+					changed = true;
 				}
 			}
 			else if (oY >= 1 && dY > 0.0){
 				oY -= 1;
 				blockY ++;
+				changed = true;
 			}
 			else if (oY < 0 && dY < 0.0){
 				oY += 1;
 				blockY --;
+				changed = true;
 			}
 			// z
 			oZ += tMin * dZ;
@@ -137,21 +148,28 @@ public abstract class RayTracing {
 				if (dZ < 0){
 					oZ = 1;
 					blockZ --;
+					changed = true;
 				}
 				else if (dZ > 0){
 					oZ = 0;
 					blockZ ++;
+					changed = true;
 				}
 			}
 			else if (oZ >= 1 && dZ > 0.0){
 				oZ -= 1;
 				blockZ ++;
+				changed = true;
 			}
 			else if (oZ < 0 && dZ < 0.0){
 				oZ += 1;
 				blockZ --;
+				changed = true;
 			}
 			t += tMin;
+			if (!changed){
+				break;
+			}
 		}
 	}
 	
