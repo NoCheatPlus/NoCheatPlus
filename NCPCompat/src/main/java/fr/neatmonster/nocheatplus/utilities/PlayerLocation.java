@@ -428,13 +428,12 @@ public class PlayerLocation {
 		if (onGround == null) {
 			final double d0 = 0; //0.001D;
 			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
-				// TODO: Evaluate 0.25 !!
 				final int id = getTypeIdBelow();
 				if (BlockProperties.isGround(id) && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, blockY - 1, blockZ, id)){
 					onGround = true;
 				}
 				// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
-				else onGround = BlockProperties.isOnGround(blockCache, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY + 0.25, maxZ + d0, 0L);
+				else onGround = BlockProperties.isOnGround(blockCache, minX - d0, minY - yOnGround, minZ - d0, maxX + d0, minY, maxZ + d0, 0L);
 			}
 			else onGround = false;
 			if (!onGround) {
