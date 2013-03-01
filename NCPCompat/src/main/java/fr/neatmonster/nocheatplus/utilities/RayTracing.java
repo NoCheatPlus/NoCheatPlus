@@ -98,7 +98,7 @@ public abstract class RayTracing {
 					oX = 1;
 					blockX --;
 				}
-				else{
+				else if (dX > 0){
 					oX = 0;
 					blockX ++;
 				}
@@ -118,7 +118,7 @@ public abstract class RayTracing {
 					oY = 1;
 					blockY --;
 				}
-				else{
+				else if (dY > 0){
 					oY = 0;
 					blockY ++;
 				}
@@ -138,7 +138,7 @@ public abstract class RayTracing {
 					oZ = 1;
 					blockZ --;
 				}
-				else{
+				else if (dZ > 0){
 					oZ = 0;
 					blockZ ++;
 				}
