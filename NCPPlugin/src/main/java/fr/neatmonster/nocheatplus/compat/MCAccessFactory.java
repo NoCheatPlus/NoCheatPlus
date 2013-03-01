@@ -21,7 +21,8 @@ public class MCAccessFactory {
 	
 	private final String[] updateLocs = new String[]{
 		"[NoCheatPlus]  Check for updates at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/",
-		"[NoCheatPlus]  Development builds: http://nocheatplus.org:8080/job/NoCheatPlus/",
+		"[NoCheatPlus]  Development builds: http://ci.ecocitycraft.com/job/NoCheatPlus/",
+//		"[NoCheatPlus]  Development builds: http://nocheatplus.org:8080/job/NoCheatPlus/",
 	};
 	
 	/**
@@ -87,11 +88,12 @@ public class MCAccessFactory {
 				msg = "[NoCheatPlus] Could not set up native access for your specific Minecraft + server-mod version.";
 			}
 			LogUtil.logWarning(msg);
-			LogUtil.logWarning("[NoCheatPlus] Some features will likely not function properly, performance might suffer.");
+			final MCAccess mcAccess = new MCAccessBukkit();
+			LogUtil.logWarning("[NoCheatPlus] API-only MCAccess: Some features will likely not function properly, performance might suffer.");
 			for (String uMsg : updateLocs){
 				LogUtil.logWarning(uMsg);
 			}
-			return new MCAccessBukkit();
+			return mcAccess;
 		}
 		catch(Throwable t){
 			throwables.add(t);
