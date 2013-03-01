@@ -31,9 +31,28 @@ public class BuildParameters {
 	// Auxiliary methods.
 	/////////////////////
 	
+	/**
+	 * This gets the raw mapping value, might be something like "${...}" in case the parameter has not been present during building.
+	 * @param path
+	 * @param preset
+	 * @return
+	 */
+	public static String getMappingValue(String path, String preset){
+		String input = fileContents.get(path);
+		if (input == null) return preset;
+		else return input;
+	}
+	
+	/**
+	 * Get a string mapping value, excluding missing maven build parameters like '${...}'.
+	 * @param path
+	 * @param preset
+	 * @return
+	 */
 	public static String getString(String path, String preset){
 		String input = fileContents.get(path);
 		if (input == null) return preset;
+		else if (input.startsWith("${") && input.endsWith("}")) return preset;
 		else return input;
 	}
 	
