@@ -592,14 +592,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         		// Only for reloading, not INeedConfig.
 				@Override
 				public void onReload() {
-					final ConfigFile config = ConfigManager.getConfigFile();
-					// Initialize BlockProperties
-					initMCAccess(config);
-					initBlockProperties(config);
-					// Reset Command protection.
-					undoCommandChanges();
-					if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
-					scheduleConsistencyCheckers();
+					processReload();
 				}
         	},
         	NCPExemptionManager.getListener(),
@@ -716,6 +709,23 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Tell the server administrator that we finished loading NoCheatPlus now.
 		LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
 	}
+    
+    /**
+     * All action done on reload.
+     */
+    protected void processReload(){
+    	final ConfigFile config = ConfigManager.getConfigFile();
+    	// TODO: Process registered ComponentFactory instances.
+		// Set up MCAccess.
+		initMCAccess(config);
+		// Initialize BlockProperties
+		initBlockProperties(config);
+		// Reset Command protection.
+		undoCommandChanges();
+		if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
+		// (Re-) schedule consistency checking.
+		scheduleConsistencyCheckers();
+    }
     
     /**
      * Re-setup MCAccess and pass it to MCAccessHolder components.
