@@ -313,6 +313,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	@Override
 	public boolean addComponent(final Object obj) {
+		
+		// TODO: Allow to add ComponentFactory + contract (renew with reload etc.)?
+		
 		if (allComponents.contains(obj)) return false;
 		boolean added = false;
 		if (obj instanceof Listener) {

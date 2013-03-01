@@ -316,15 +316,22 @@ public class BlockProperties {
     /** Penalty factor for block break duration if not on ground. */
     protected static float breakPenaltyOffGround = 4f;
 	
-   public static void init(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+    /**
+     * Initialize blocks and tools properties. This can be called at any time during runtime.
+     * @param mcAccess If mcAccess implements BlockPropertiesSetup, mcAccess.setupBlockProperties will be called directly after basic initialization but before the configuration is applied.
+     * @param worldConfigProvider
+     */
+    public static void init(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
 	    blockCache = mcAccess.getBlockCache(null);
 	    pLoc = new PlayerLocation(mcAccess, null);
 		try{
 		    initTools(mcAccess, worldConfigProvider);
 		    initBlocks(mcAccess, worldConfigProvider);
+		    // TODO: try-catch over this one.
 		    if (mcAccess instanceof BlockPropertiesSetup){
 		    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
 		    }
+		    // TODO: Add registry for further BlockPropertiesSetup instances.
 		}
 		catch(Throwable t){
 			LogUtil.logSevere(t);
