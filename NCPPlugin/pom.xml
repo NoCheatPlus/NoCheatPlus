@@ -87,10 +87,17 @@
       <resource>
         <targetPath>.</targetPath>
         <filtering>true</filtering>
+        <directory>..</directory>
+        <includes>
+          <include>LICENSE.txt</include>
+        </includes>
+      </resource>
+      <resource>
+        <targetPath>.</targetPath>
+        <filtering>true</filtering>
         <directory>src/main/resources</directory>
         <includes>
           <include>plugin.yml</include>
-          <include>LICENSE.txt</include>
         </includes>
       </resource>
     </resources>
