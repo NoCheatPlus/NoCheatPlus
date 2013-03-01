@@ -103,6 +103,7 @@ public class SurvivalFly extends Check {
 
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) resetFrom = true;
+		// TODO: Extra workarounds for toOnGround ?
 		else if (lostGround(player, from, to, hDistance, yDistance, sprinting, data, cc)){
 			// TODO: Consider && !resetTo ?
 			// TODO: Confine by max y distance and min xz-distance?
@@ -538,8 +539,8 @@ public class SurvivalFly extends Check {
 				}
 			}
 			// Lost ground while falling onto/over edges of blocks.
-			if (yDistance < 0 && yDistance >= -0.5 && hDistance <= 0.5 && data.sfLastYDist < 0 && yDistance > data.sfLastYDist){
-				// TODO: yDistance >= -0.15 might be possible.
+			if (yDistance < 0 && yDistance >= -0.5 && hDistance <= 0.5 && data.sfLastYDist < 0 && yDistance > data.sfLastYDist && !to.isOnGround()){
+				// TODO: Should this be an extra lost-ground(to) check, setting toOnGround  [for no-fall no difference]?
 				// TODO: yDistance <= 0 might be better.
 				// Also clear accounting data.
 				if (to.isOnGround(0.5) || from.isOnGround(0.5)){
