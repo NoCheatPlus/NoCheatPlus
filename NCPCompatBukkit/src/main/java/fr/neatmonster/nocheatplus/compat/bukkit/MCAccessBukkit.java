@@ -1,6 +1,9 @@
 package fr.neatmonster.nocheatplus.compat.bukkit;
 
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
@@ -156,11 +159,19 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 
 	@Override
 	public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
-		// TODO Set some generic properties matching what BlockCache.getShape returns.
+		// TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
+		final Set<Integer> fullBlocks = new HashSet<Integer>();
+		for (final Material mat : new Material[]{
+				Material.GLASS, Material.ICE, Material.LEAVES,
+				Material.COMMAND, Material.BEACON,
+				Material.PISTON_BASE,
+		}){
+			fullBlocks.add(mat.getId());
+		}
 		for (Material mat : Material.values()){
 			if (!mat.isBlock()) continue;
 			int id = mat.getId();
-			if (id < 0 || id >= 4096) continue;
+			if (id < 0 || id >= 4096 || fullBlocks.contains(id)) continue;
 			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()){
 				BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | BlockProperties.F_IGN_PASSABLE);
 			}
