@@ -21,6 +21,14 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  */
 public class CheckUtils {
 	
+	/** Used for internal calculations, no passing on, beware of nested calls. */
+	private static final Vector vec1 = new Vector();
+	/** Used for internal calculations, no passing on, beware of nested calls. */
+	private static final Vector vec2 = new Vector();
+	
+	/** Multiply to get grad from rad. */
+	public static final double fRadToGrad = 360.0 / (2.0 * Math.PI);
+	
 	/** Some default precision value for the directionCheck method. */
 	public static final double DIRECTION_PRECISION = 2.6;
 	
@@ -102,6 +110,9 @@ public class CheckUtils {
 	public static double directionCheck(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
 		{
 		
+//		// TODO: Here we have 0.x vs. 2.x, sometimes !
+//		System.out.println("COMBINED: " + combinedDirectionCheck(sourceX, sourceY, sourceZ, dirX, dirY, dirZ, targetX, targetY, targetZ, targetWidth, targetHeight, precision, 60));
+		
 		// TODO: rework / standardize.
 		
 		double dirLength = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
@@ -122,6 +133,53 @@ public class CheckUtils {
 		off += Math.max(Math.abs(dX - xPrediction) - (targetWidth / 2 + precision), 0.0D);
 		off += Math.max(Math.abs(dZ - zPrediction) - (targetWidth / 2 + precision), 0.0D);
 		off += Math.max(Math.abs(dY - yPrediction) - (targetHeight / 2 + precision), 0.0D);
+
+		if (off > 1) off = Math.sqrt(off);
+
+		return off;
+	}
+	
+	/**
+	 * Combine directionCheck with angle, in order to prevent low-distance abuse.
+	 * @param sourceX
+	 * @param sourceY
+	 * @param sourceZ
+	 * @param dirX
+	 * @param dirY
+	 * @param dirZ
+	 * @param targetX
+	 * @param targetY
+	 * @param targetZ
+	 * @param targetWidth
+	 * @param targetHeight
+	 * @param blockPrecision
+	 * @param anglePrecision Precision in grad.
+	 * @return
+	 */
+	public static double combinedDirectionCheck(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double blockPrecision, final double anglePrecision)
+	{
+		double dirLength = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+		if (dirLength == 0.0) dirLength = 1.0; // ...
+
+		final double dX = targetX - sourceX;
+		final double dY = targetY - sourceY;
+		final double dZ = targetZ - sourceZ;
+		
+		final double targetDist = Math.sqrt(dX * dX + dY * dY + dZ * dZ);
+		
+		if (targetDist > Math.max(targetHeight, targetWidth) / 2.0 && angle(sourceX, sourceY, sourceZ, dirX, dirY, dirZ, targetX, targetY, targetZ) * fRadToGrad > anglePrecision){
+			return targetDist - Math.max(targetHeight, targetWidth) / 2.0;
+		}
+		
+		final double xPrediction = targetDist * dirX / dirLength;
+		final double yPrediction = targetDist * dirY / dirLength;
+		final double zPrediction = targetDist * dirZ / dirLength;
+
+		double off = 0.0D;
+
+		off += Math.max(Math.abs(dX - xPrediction) - (targetWidth / 2 + blockPrecision), 0.0D);
+		off += Math.max(Math.abs(dZ - zPrediction) - (targetWidth / 2 + blockPrecision), 0.0D);
+		off += Math.max(Math.abs(dY - yPrediction) - (targetHeight / 2 + blockPrecision), 0.0D);
 
 		if (off > 1) off = Math.sqrt(off);
 
@@ -269,6 +327,36 @@ public class CheckUtils {
 		}
 
 		return p[n];
+	}
+	
+	/**
+	 * Positive angle between vector from source to target and the vector for the given direction [0...PI].
+	 * @param sourceX
+	 * @param sourceY
+	 * @param sourceZ
+	 * @param dirX
+	 * @param dirY
+	 * @param dirZ
+	 * @param targetX
+	 * @param targetY
+	 * @param targetZ
+	 * @return  Positive angle between vector from source to target and the vector for the given direction [0...PI].
+	 */
+	public static float angle(final double sourceX, final double sourceY, final double sourceZ, final double dirX, final double dirY, final double dirZ, final double targetX, final double targetY, final double targetZ) {
+		double dirLength = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+		if (dirLength == 0.0) dirLength = 1.0; // ...
+		
+		final double dX = targetX - sourceX;
+		final double dY = targetY - sourceY;
+		final double dZ = targetZ - sourceZ;
+		
+		vec1.setX(dX);
+		vec1.setY(dY);
+		vec1.setZ(dZ);
+		vec2.setX(dirX);
+		vec2.setY(dirY);
+		vec2.setZ(dirZ);
+		return vec2.angle(vec1);
 	}
 	
 	/**
