@@ -44,7 +44,7 @@ public class CheckUtils {
 	 *            the precision
 	 * @return
 	 */
-	public static double directionCheck2(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
+	public static double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
 	{
 		final Location loc = player.getLocation();
 		final Vector dir = loc.getDirection();
