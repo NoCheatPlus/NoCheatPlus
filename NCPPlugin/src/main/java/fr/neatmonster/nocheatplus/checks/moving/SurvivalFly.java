@@ -558,10 +558,10 @@ public class SurvivalFly extends Check {
 			}
 			
 			// Interpolation check.
-			// TODO: Check if still needed !
+			// TODO: Check if still needed [most expensive...]!
 			// TODO: Check if the set-back distance still has relevance.
 			// TODO: Interpolation might also be necessary between from and to !
-			// TODO: Check use of jumpamplifier.
+			// TODO: Check use of jump-amplifier.
 			// TODO: Might check fall distance.
 			if (data.fromX != Double.MAX_VALUE && yDistance > 0 && data.sfLastYDist < 0 && !to.isOnGround()) {
 				// TODO: Check if last-y-dist or sprinting should be considered.
