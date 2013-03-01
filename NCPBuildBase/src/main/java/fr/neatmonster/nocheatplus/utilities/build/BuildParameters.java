@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Experimental support for build parameters.
+ * Support for parameters present or set at building time. They are read from BuildParameters.properties
  * @author mc_dev
  *
  */
@@ -72,10 +72,16 @@ public class BuildParameters {
 	// Public members.
 	//////////////////////
 	
-	/** Test level: more testing for higher levels. */
+	/** Timestamp from build (maven). "?" if not present. */
+	public static final String buildTimeString = getString("BUILD_TIMESTAMP", "?");
+	
+	/** The build number as given by Jenkins. Integer.MIN_VALUE if not present. */
+	public static final int buildNumber = getInteger("BUILD_NUMBER", Integer.MIN_VALUE);
+	
+	/** Test level: more testing for higher levels. Defaults to 0. */
 	public static final int testLevel = getInteger("TEST_LEVEL", 0);
 	
-	/** Debug level: more debug output for higher levels. */
+	/** Debug level: more debug output for higher levels. Defaults to 0. */
 	public static final int debugLevel = getInteger("DEBUG_LEVEL", 0);
 	
 }

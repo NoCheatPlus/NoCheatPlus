@@ -30,6 +30,11 @@
 
 Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 
+  <properties>
+    <maven.build.timestamp.format>yyyy_MM_dd-HH_mm</maven.build.timestamp.format>
+    <buildTimestamp>${maven.build.timestamp}</buildTimestamp>
+  </properties>
+
   <build>
     <resources>
       <resource>
