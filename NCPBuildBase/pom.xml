@@ -31,43 +31,16 @@
 Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 
   <build>
-<!--     <defaultGoal>clean package</defaultGoal> -->
-<!--     <directory>../target</directory> Build it one level up, because it is the one we care about -->
-    <plugins>
-        <plugin>
-            <groupId>com.google.code.maven-replacer-plugin</groupId>
-            <artifactId>maven-replacer-plugin</artifactId>
-            <version>1.4.1</version>
-            <executions>
-                <execution>
-                    <phase>validate</phase>
-                    <goals>
-                        <goal>replace</goal>
-                    </goals>                    
-                </execution>
-            </executions>
-            <configuration>
-                <ignoreMissingFile>true</ignoreMissingFile>
-                <file>src/main/resources/_BuildParameters.properties</file>
-                <outputFile>src/main/resources/BuildParameters.properties</outputFile>
-                <regex>false</regex>
-                <replacements>
-                    <replacement>
-		                <token>@GENERATED_NOTE@</token>
-		                <value>!!! THIS FILE IS AUTO GENERATED, ANY MANUAL CHANGES TO IT WILL GET LOST !!!</value>
-                    </replacement>
-                    <replacement>
-		                <token>@TEST_LEVEL@</token>
-		                <value>${TEST_LEVEL}</value>
-                    </replacement>
-					<replacement>
-		                <token>@DEBUG_LEVEL@</token>
-		                <value>${DEBUG_LEVEL}</value>
-                    </replacement>
-                </replacements>                        
-            </configuration>
-        </plugin>
-    </plugins>
+    <resources>
+      <resource>
+        <targetPath>.</targetPath>
+        <filtering>true</filtering>
+        <directory>../NCPBuildBase/src/main/resources</directory>
+        <includes>
+          <include>BuildParameters.properties</include>
+        </includes>
+      </resource>
+    </resources>
   </build>
 
 </project>
