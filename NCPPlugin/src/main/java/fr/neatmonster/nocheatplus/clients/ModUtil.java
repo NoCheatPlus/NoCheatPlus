@@ -27,6 +27,10 @@ public class ModUtil {
 	    // Check if we allow all the client mods.
 	    final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);
 	
+	    // Disable Zombe's noclip.
+	    if (allowAll || player.hasPermission(Permissions.ZOMBE_NOCLIP))
+	        message += "§f §f §4 §0 §9 §6";
+	    
 	    // Allow Rei's Minimap's cave mode.
 	    if (allowAll || player.hasPermission(Permissions.REI_CAVE))
 	        message += "§0§0§1§e§f";
@@ -72,10 +76,6 @@ public class ModUtil {
 	    // Disable Zombe's fly mod.
 	    if (!player.hasPermission(Permissions.ZOMBE_FLY))
 	        message += "§f §f §1 §0 §2 §4";
-	
-	    // Disable Zombe's noclip.
-	    if (!player.hasPermission(Permissions.ZOMBE_NOCLIP))
-	        message += "§f §f §4 §0 §9 §6";
 	
 	    // Disable Zombe's cheat.
 	    if (!player.hasPermission(Permissions.ZOMBE_CHEAT))
