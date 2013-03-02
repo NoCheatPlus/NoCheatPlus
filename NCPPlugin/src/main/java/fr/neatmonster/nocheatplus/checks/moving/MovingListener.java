@@ -478,23 +478,21 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			return;
 		}
 
-        // Use existent locations if possible.
+        // Set up data / caching.
         final MoveInfo moveInfo;
         final PlayerLocation pFrom, pTo;
         if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
         else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
         pFrom = moveInfo.from;
         pTo = moveInfo.to;
-        
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
-          
+		data.noFallAssumeGround = false;
+		data.resetTeleported();
+        // Debug.
         if (cc.debug) {
 			DebugUtil.outputMoveDebug(player, pFrom, pTo, mcAccess);
 		}
-        
-		data.noFallAssumeGround = false;
-		data.resetTeleported();
 		
 		// Check for illegal move and bounding box etc.
 		if (pFrom.isIllegal() || pTo.isIllegal()) {
@@ -513,6 +511,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
+		// TODO: Rework to queued velocity entries: activation + invalidation
 		// Horizontal velocity.
         if (data.horizontalVelocityCounter > 0D){
         	data.horizontalVelocityUsed ++;
@@ -529,7 +528,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             	data.horizontalFreedom *= 0.90D;
         	}
         }
-        
         // Vertical velocity.
         if (data.verticalVelocity <= 0.09D){
         	data.verticalVelocityUsed ++;
@@ -552,78 +550,104 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 data.verticalFreedom *= 0.93D;
         	}
         }
-
+        
 		Location newTo = null;
 
-		final Location passableTo;
-		// Check passable in any case (!)
-		if (cc.passableCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
+		// Check passable first to prevent set-back override.
+		// TODO: Redesign to set set-backs later (queue + invalidate).
+		if (newTo == null && cc.passableCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
 			// Passable is checked first to get the original set-back locations from the other checks, if needed. 
-			passableTo = passable.check(player, pFrom, pTo, data, cc);
+			newTo = passable.check(player, pFrom, pTo, data, cc);
 		}
-		else passableTo = null;
-        
-        // Optimized checking, giving creativefly permission precedence over survivalfly.
-        if (!player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
-        	// Either survivalfly or speed check.
-        	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
-        			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
-                // If he is handled by the survival fly check, execute it.
-                newTo = survivalFly.check(player, pFrom, pTo, data, cc);
-                if (newTo == null){
-                	if (cc.sfHoverCheck && !data.toWasReset && !pTo.isOnGround()){
-                		// Start counting ticks.
-                		hoverTicks.add(playerName);
-                		data.sfHoverTicks = 0;
-                	}
-                	else{
-                		data.sfHoverTicks = -1;
-                	}
-                }
-				// Check NoFall if no reset is done.
-				if (cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL)) {
-					if (newTo == null && passableTo == null){
-						// NOTE: noFall might set yOnGround for the positions.
-						noFall.check(player, pFrom, pTo, data, cc);
-					}
-					else{
-						// Deal damage if necessary.
-						// Leaving out: player.getLocation().getY()
-						if (cc.sfFallDamage) noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
-					}
-				}
-        	}
-        	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY)){
-        		// If the player is handled by the creative fly check, execute it.
-                newTo = creativeFly.check(player, pFrom, pTo, data, cc);
-                data.sfHoverTicks = -1;
-        	}
-        	else{
-        		data.clearFlyData();
-        	}
+		
+		// Check which fly check to check.
+        final boolean checkCf;
+        final boolean checkSf;
+        if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
+        	checkCf = checkSf = false;
         }
         else{
-        	data.clearFlyData();
-        }
+        	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
+        			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
+        		checkCf = false;
+        		checkSf = true;
+        	}
+        	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY)){
+            	checkCf = true;
+            	checkSf = false;
+        	}
+        	else{
+        		checkCf = checkSf = false;
+        	}
 
+        }
+        
+    	// Flying checks.
+    	if (checkSf){
+            // SurvivalFly
+    		if (newTo == null){
+    			// Only check if passable has not already set back.
+    			newTo = survivalFly.check(player, pFrom, pTo, data, cc);
+    		}
+    		final boolean checkNf = cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL);
+            if (newTo == null){
+            	// Hover.
+            	// TODO: Could reset for from-on-ground as well, for not too big moves.
+            	if (cc.sfHoverCheck && !data.toWasReset && !pTo.isOnGround()){
+            		// Start counting ticks.
+            		hoverTicks.add(playerName);
+            		data.sfHoverTicks = 0;
+            	}
+            	else{
+            		data.sfHoverTicks = -1;
+            	}
+            	// NoFall.
+            	if (checkNf){
+            		noFall.check(player, pFrom, pTo, data, cc);
+            	}
+            }
+            else{
+            	if (checkNf && cc.sfFallDamage){
+            		noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
+            	}
+            }
+    	}
+    	else if (checkCf){
+    		// CreativeFly
+            newTo = creativeFly.check(player, pFrom, pTo, data, cc);
+            data.sfHoverTicks = -1;
+    	}
+    	else{
+    		// No fly :).
+    		data.clearFlyData();
+    	}
+		
+		// Morepackets.
 		if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
 			// If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
+			// TODO: Still feed morepackets even if cancelled.
 			newTo = morePackets.check(player, pFrom, pTo, data, cc);
 		} else {
 			// Otherwise we need to clear his data.
 			data.clearMorePacketsData();
 		}
-		
-		// Prefer the location returned by passable.
-		if (passableTo != null) newTo = passableTo;
 
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null) {
-            // Yes, so set it.
+        	// Reset some data.
+        	data.clearAccounting();
+			data.sfJumpPhase = 0;
+			data.sfLastYDist = Double.MAX_VALUE;
+			data.toWasReset = false;
+			data.fromWasReset = false;
+			// TODO: data.sfHoverTicks ?
+			
+            // Set new to-location.
             event.setTo(newTo);
 
             // Remember where we send the player to.
             data.setTeleported(newTo);
+            // Debug.
             if (cc.debug){
             	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
             }

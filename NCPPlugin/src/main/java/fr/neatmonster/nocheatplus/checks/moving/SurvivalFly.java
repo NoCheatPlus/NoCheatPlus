@@ -691,8 +691,6 @@ public class SurvivalFly extends Check {
 		// Increment violation level.
 		data.survivalFlyVL += result;
 		data.sfVLTime = now;
-		data.clearAccounting();
-		data.sfJumpPhase = 0;
 		final ViolationData vd = new ViolationData(this, player, data.survivalFlyVL, result, cc.survivalFlyActions);
 		if (vd.needsParameters()) {
 			vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
@@ -700,14 +698,14 @@ public class SurvivalFly extends Check {
 			vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
 			vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
 		}
+		// Some resetting is done in MovingListener.
 		if (executeActions(vd)) {
-			data.sfLastYDist = Double.MAX_VALUE;
-			data.toWasReset = false;
-			data.fromWasReset = false;
 			// Set-back + view direction of to (more smooth).
 			return data.getSetBack(to);
 		}
 		else{
+			data.clearAccounting();
+			data.sfJumpPhase = 0;
 			// Cancelled by other plugin, or no cancel set by configuration.
 			return null;
 		}
