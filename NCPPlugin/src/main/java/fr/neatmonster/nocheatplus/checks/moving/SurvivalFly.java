@@ -505,10 +505,14 @@ public class SurvivalFly extends Check {
 			return applyWorkaround(player, from, true, data);
 		}
 		
-		
-		if (yDistance > 0.5 + 0.2 * data.jumpAmplifier){
+		if (yDistance > 0.52 + 0.2 * data.jumpAmplifier){
+			// TODO: 0.52 instead of 0.5 - not sure if this helps with sprinting.
 			// All following checks are ruled out by this.
 			// (This should rarely ever happen, except for velocity and pistons.)
+			return false;
+		}
+		else if (yDistance < -0.5){
+			// Too fast falling.
 			return false;
 		}
 		
@@ -517,7 +521,7 @@ public class SurvivalFly extends Check {
 		if (yDistance <= 0){
 			if (data.sfJumpPhase <= 7){
 				// Check for sprinting down blocks etc.
-				if (yDistance >= -0.5 && data.sfLastYDist <= yDistance && setBackYDistance < 0 && !to.isOnGround()){
+				if (data.sfLastYDist <= yDistance && setBackYDistance < 0 && !to.isOnGround()){
 					// TODO: setbackydist: <= - 1.0 or similar
 					// TODO: <= 7 might work with speed II, not sure with above.
 					// TODO: account for speed/sprint
@@ -539,7 +543,7 @@ public class SurvivalFly extends Check {
 				}
 			}
 			// Lost ground while falling onto/over edges of blocks.
-			if (yDistance < 0 && yDistance >= -0.5 && hDistance <= 0.5 && data.sfLastYDist < 0 && yDistance > data.sfLastYDist && !to.isOnGround()){
+			if (yDistance < 0 && hDistance <= 0.5 && data.sfLastYDist < 0 && yDistance > data.sfLastYDist && !to.isOnGround()){
 				// TODO: Should this be an extra lost-ground(to) check, setting toOnGround  [for no-fall no difference]?
 				// TODO: yDistance <= 0 might be better.
 				// Also clear accounting data.
