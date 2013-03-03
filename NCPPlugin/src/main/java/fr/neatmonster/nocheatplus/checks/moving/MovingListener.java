@@ -1278,7 +1278,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final boolean res;
 		if (info.from.isOnGround() || info.from.isResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()){
 			res = true;
-			// TODO: data.sfHoverTicks = -1 || 0;
+			data.sfHoverTicks = 0;
 		}
 		else{
 			if (data.sfHoverTicks > cc.sfHoverTicks){
