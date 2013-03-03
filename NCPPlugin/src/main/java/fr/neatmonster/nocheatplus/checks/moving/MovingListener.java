@@ -1121,16 +1121,25 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		data.clearMorePacketsData();
 		final Location loc = player.getLocation();
 		
-		// TODO: shouldCheckSurvivalFly ?
-		
 		// Correct set-back on world changes.
-		if (!data.hasSetBack() || data.hasSetBackWorldChanged(loc)){
+		if (!data.hasSetBack()){
 			data.setSetBack(loc);
+		}
+		else if (data.hasSetBackWorldChanged(loc)){
+			data.setSetBack(loc);
+			data.clearFlyData();
 		}
 		if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
 			// TODO: re-think: more fine grained reset?
 			data.resetPositions(loc);
 		}
+		
+		// More resetting.
+		data.vDistAcc.clear();
+		data.toWasReset = false;
+		data.fromWasReset = false;
+		
+		// Hover.
 		final MovingConfig cc = MovingConfig.getConfig(player);
 		// Reset hover ticks until a better method is used.
 		if (cc.sfHoverCheck){
