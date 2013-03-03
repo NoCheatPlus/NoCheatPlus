@@ -112,6 +112,7 @@ public class MovingConfig extends ACheckConfig {
     
 	public final boolean 	sfHoverCheck;
 	public final int 		sfHoverTicks;
+	public final int		sfHoverLoginTicks;
 	public final boolean    sfHoverFallDamage;
 	public final double		sfHoverViolation;
     
@@ -125,66 +126,67 @@ public class MovingConfig extends ACheckConfig {
     /**
      * Instantiates a new moving configuration.
      * 
-     * @param data
+     * @param config
      *            the data
      */
-    public MovingConfig(final ConfigFile data) {
-        super(data, ConfPaths.MOVING);
+    public MovingConfig(final ConfigFile config) {
+        super(config, ConfPaths.MOVING);
     	
-    	ignoreCreative = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE);
-    	ignoreAllowFlight = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);
+    	ignoreCreative = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE);
+    	ignoreAllowFlight = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);
     	
-        creativeFlyCheck = data.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
-        creativeFlyHorizontalSpeed = data.getInt(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED);
-        creativeFlyMaxHeight = data.getInt(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT);
-        creativeFlyVerticalSpeed = data.getInt(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED);
-        creativeFlyActions = data.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
+        creativeFlyCheck = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
+        creativeFlyHorizontalSpeed = config.getInt(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED);
+        creativeFlyMaxHeight = config.getInt(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT);
+        creativeFlyVerticalSpeed = config.getInt(ConfPaths.MOVING_CREATIVEFLY_VERTICALSPEED);
+        creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
-        morePacketsCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
-        morePacketsActions = data.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
+        morePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
+        morePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
 
-        morePacketsVehicleCheck = data.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
-        morePacketsVehicleActions = data.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
+        morePacketsVehicleCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
+        morePacketsVehicleActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETSVEHICLE_ACTIONS,
                 Permissions.MOVING_MOREPACKETS);
 
-        noFallCheck = data.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
-        noFallDealDamage = data.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
-        noFallViolationReset = data.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVL);
-        noFallTpReset = data.getBoolean(ConfPaths.MOVING_NOFALL_RESETONTP);
-        noFallAntiCriticals = data.getBoolean(ConfPaths.MOVING_NOFALL_ANTICRITICALS);
-        noFallActions = data.getOptimizedActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
+        noFallCheck = config.getBoolean(ConfPaths.MOVING_NOFALL_CHECK);
+        noFallDealDamage = config.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
+        noFallViolationReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVL);
+        noFallTpReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONTP);
+        noFallAntiCriticals = config.getBoolean(ConfPaths.MOVING_NOFALL_ANTICRITICALS);
+        noFallActions = config.getOptimizedActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
         
-        passableCheck = data.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
-    	passableRayTracingCheck = data.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK);
-    	passableRayTracingBlockChangeOnly = data.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY);
-    	passableRayTracingVclipOnly = data.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_VCLIPONLY);
-        passableActions = data.getOptimizedActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
+        passableCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
+    	passableRayTracingCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK);
+    	passableRayTracingBlockChangeOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY);
+    	passableRayTracingVclipOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_VCLIPONLY);
+        passableActions = config.getOptimizedActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
 
-        survivalFlyCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
+        survivalFlyCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
         // Default values are specified here because this settings aren't showed by default into the configuration file.
-        survivalFlyBlockingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
-        survivalFlySneakingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
-        survivalFlySpeedingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SPEEDINGSPEED, 200);
-        survivalFlySprintingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
-        survivalFlySwimmingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
-        survivalFlyWalkingSpeed = data.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
-        survivalFlyCobwebHack = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
-        survivalFlyAccountingH = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
-        survivalFlyAccountingV = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
-        sfFallDamage = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_FALLDAMAGE);
-        survivalFlyVLFreeze = data.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
-        survivalFlyActions = data.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
+        survivalFlyBlockingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_BLOCKINGSPEED, 100);
+        survivalFlySneakingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_SNEAKINGSPEED, 100);
+        survivalFlySpeedingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_SPEEDINGSPEED, 200);
+        survivalFlySprintingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
+        survivalFlySwimmingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
+        survivalFlyWalkingSpeed = config.getInt(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
+        survivalFlyCobwebHack = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_COBWEBHACK, true);
+        survivalFlyAccountingH = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);
+        survivalFlyAccountingV = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_VACC);
+        sfFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_FALLDAMAGE);
+        survivalFlyVLFreeze = config.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
+        survivalFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
         
-        sfHoverCheck = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK);
-        sfHoverTicks = data.getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS);
-        sfHoverFallDamage = data.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE);
-        sfHoverViolation = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION);
+        sfHoverCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK);
+        sfHoverTicks = config.getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS);
+        sfHoverLoginTicks = Math.max(0, config.getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_LOGINTICKS));
+        sfHoverFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE);
+        sfHoverViolation = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION);
         
-        velocityGraceTicks = data.getInt(ConfPaths.MOVING_VELOCITY_GRACETICKS);
-        yOnGround = data.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
-        noFallyOnGround = data.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
+        velocityGraceTicks = config.getInt(ConfPaths.MOVING_VELOCITY_GRACETICKS);
+        yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
+        noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
         // ystep is set to 0.45 by default, for stairs / steps.
-        yStep = data.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
+        yStep = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
     }
     
 

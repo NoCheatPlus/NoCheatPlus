@@ -1132,9 +1132,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// Start as if hovering already.
 			// Could check shouldCheckSurvivalFly(player, data, cc), but this should be more sharp (gets checked on violation).
 			data.sfHoverTicks = 0;
+			data.sfHoverLoginTicks = cc.sfHoverLoginTicks;
 			hoverTicks.add(player.getName());
 		}
 		else{
+			data.sfHoverLoginTicks = 0;
 			data.sfHoverTicks = -1;
 		}
 	}
@@ -1222,7 +1224,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				// (Removed below.)
 			}
 			if (data.sfHoverTicks < 0){
+				data.sfHoverLoginTicks = 0;
 				rem.add(playerName);
+				continue;
+			}
+			else if (data.sfHoverLoginTicks > 0){
+				// Additional "grace period".
+				data.sfHoverLoginTicks --;
 				continue;
 			}
 			final MovingConfig cc = MovingConfig.getConfig(player);

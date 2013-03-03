@@ -531,6 +531,7 @@ public abstract class ConfPaths {
 	private static final String MOVING_SURVIVALFLY_HOVER			    = MOVING_SURVIVALFLY + "hover.";
 	public static final String  MOVING_SURVIVALFLY_HOVER_CHECK			= MOVING_SURVIVALFLY_HOVER + "active";
 	public static final String  MOVING_SURVIVALFLY_HOVER_TICKS			= MOVING_SURVIVALFLY_HOVER + "ticks";
+	public static final String  MOVING_SURVIVALFLY_HOVER_LOGINTICKS		= MOVING_SURVIVALFLY_HOVER + "loginticks";
 	public static final String  MOVING_SURVIVALFLY_HOVER_FALLDAMAGE		= MOVING_SURVIVALFLY_HOVER + "falldamage";
 	public static final String  MOVING_SURVIVALFLY_HOVER_SFVIOLATION	= MOVING_SURVIVALFLY_HOVER + "sfviolation";
 

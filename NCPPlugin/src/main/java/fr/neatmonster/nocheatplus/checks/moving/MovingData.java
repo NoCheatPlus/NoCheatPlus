@@ -150,8 +150,10 @@ public class MovingData extends ACheckData {
 	 * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
 	 */
 	public double		sfLastYDist = Double.MAX_VALUE;
-	/** A value <0 means not hovering at all. */
+	/** Counting while the player is not on ground and not moving. A value <0 means not hovering at all. */
 	public int 			sfHoverTicks = -1;
+	/** First count these down before incrementing sfHoverTicks. Set on join, if configured so. */
+	public int 			sfHoverLoginTicks = 0;
 	public int			sfFlyOnIce = 0;
 	public long			sfCobwebTime = 0;
 	public double		sfCobwebVL = 0;
@@ -175,7 +177,7 @@ public class MovingData extends ACheckData {
 		clearNoFallData();
 		sfHorizontalBuffer = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
-		sfHoverTicks = -1;
+		sfHoverTicks = sfHoverLoginTicks = -1;
 		sfDirty = false;
 		mediumLiftOff = defaultMediumLiftOff;
 	}
