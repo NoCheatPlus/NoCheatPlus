@@ -50,8 +50,11 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
+import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.components.TickListener;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.DebugUtil;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -86,7 +89,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * 
  * @see MovingEvent
  */
-public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload{
+public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig{
 
 	/**
 	 * Coupling from and to PlayerLocation objects with a block cache for easy storage and reuse.
@@ -233,6 +236,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private final Map<String, PlayerMoveEvent> processingEvents = new HashMap<String, PlayerMoveEvent>();
     
     private final Set<String> hoverTicks = new LinkedHashSet<String>(30);
+    
+    private int hoverTicksStep = 5;
     
     public MovingListener() {
 		super(CheckType.MOVING);
@@ -1204,8 +1209,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@Override
 	public final void onTick(final int tick, final long timeLast) {
 		// Hover checks !
-		// TODO: Change to ordering such that smallest hover time comes first ?
-		if (hoverTicks.isEmpty()) return; // Seldom or not ?
+		if (tick % hoverTicksStep != 0){
+			// Only check every so and so ticks.
+			return;
+		}
 		final MoveInfo info;
 		if (parkedInfo.isEmpty()) info = new MoveInfo(mcAccess);
 		else info = parkedInfo.remove(parkedInfo.size() - 1);
@@ -1241,7 +1248,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				continue;
 			}
 			// Increase ticks here.
-			data.sfHoverTicks ++;
+			data.sfHoverTicks += hoverTicksStep;
 			if (data.sfHoverTicks < cc.sfHoverTicks){
 				// Don't do the heavier checking here, let moving checks reset these.
 				continue;
@@ -1271,6 +1278,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final boolean res;
 		if (info.from.isOnGround() || info.from.isResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()){
 			res = true;
+			// TODO: data.sfHoverTicks = -1 || 0;
 		}
 		else{
 			if (data.sfHoverTicks > cc.sfHoverTicks){
@@ -1328,5 +1336,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			info.cleanup();
 		}
 		parkedInfo.clear();
+		hoverTicksStep = Math.max(1, ConfigManager.getConfigFile().getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP));
 	}
 }

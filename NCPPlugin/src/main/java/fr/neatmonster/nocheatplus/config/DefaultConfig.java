@@ -422,6 +422,7 @@ public class DefaultConfig extends ConfigFile {
 
         // sf / hover check.
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true);
+        set(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP, 5);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS, 80);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_LOGINTICKS, 0);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true);
