@@ -124,17 +124,34 @@ public class SurvivalFly extends Check {
 		
         // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
-
-		// Tag for simple speed violation (medium), might get overridden.
 		if (hDistanceAboveLimit > 0){
-			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) !
-			hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, true);
-			hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
-			if (hAllowedDistance > 0){
-				tags.add("hspeed");
+			// Check extra buffer (!).
+			final double extraUsed;
+			if (data.sfHBufExtra > 0){
+				extraUsed = 0.11;
+				hDistanceAboveLimit = Math.max(0.0, hDistanceAboveLimit - extraUsed);
+				data.sfHBufExtra --;
+				tags.add("hbufextra");
+				if (data.sfHBufExtra < 3 && to.isOnGround() || to.isResetCond()){
+					data.sfHBufExtra = 0;
+				}
+			}
+			else{
+				extraUsed = 0.0;
+			}
+			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding).
+			if (hDistanceAboveLimit > 0){
+				hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, true);
+				hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom - extraUsed;
+				if (hAllowedDistance > 0){
+					// (Horizontal buffer might still get used.)
+					tags.add("hspeed");
+				}
 			}
 		}
-		
+		else{
+			data.sfHBufExtra = 0;
+		}
 		///////
 		// Note: here the normal speed checks must be  finished.
 		//////
@@ -473,9 +490,11 @@ public class SurvivalFly extends Check {
 			final double hDistance, final double hAllowedDistance, final double yDistance, final double vAllowedDistance,
 			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
 		// TODO: also show resetcond (!)
-		StringBuilder builder = new StringBuilder(500);
+		final StringBuilder builder = new StringBuilder(500);
+		final String hBuf = (data.sfHorizontalBuffer < 1.0 ? ((" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer))) : "");
+		final String hBufExtra = (data.sfHBufExtra > 0 ? (" hbufextra=" + data.sfHBufExtra) : "");
 		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
-		builder.append("\n" + player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + (data.sfHorizontalBuffer < 1.0 ? (" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer)) : "") + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + ")");
+		builder.append("\n" + player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + hBufExtra + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + ")");
 		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
 			builder.append("\n" + player.getName() + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
 		}

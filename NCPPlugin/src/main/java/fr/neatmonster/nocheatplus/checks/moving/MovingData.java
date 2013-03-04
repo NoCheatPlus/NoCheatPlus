@@ -143,6 +143,8 @@ public class MovingData extends ACheckData {
 
 	// Data of the survival fly check.
 	public double 		sfHorizontalBuffer = 0;
+	/** Times to add extra horizontal buffer if necessary. */
+	public int			sfHBufExtra = 0;
 	public int 			sfJumpPhase = 0;
 	/** "Dirty" flag, for receiving velocity and similar while in air. */
 	public boolean      sfDirty = false;
@@ -161,7 +163,6 @@ public class MovingData extends ACheckData {
     
     // Accounting info.
 	public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
-
     
 	/**
 	 * Clear the data of the fly checks (not more-packets).
@@ -176,6 +177,7 @@ public class MovingData extends ACheckData {
 		clearAccounting();
 		clearNoFallData();
 		sfHorizontalBuffer = 0;
+		sfHBufExtra = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = sfHoverLoginTicks = -1;
 		sfDirty = false;
@@ -204,6 +206,7 @@ public class MovingData extends ACheckData {
 		// Keep bunny-hop delay (?)
 		// keep jump phase.
 		sfHorizontalBuffer = Math.min(0, sfHorizontalBuffer);
+		sfHBufExtra = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = -1;
 		sfDirty = false;
@@ -241,17 +244,13 @@ public class MovingData extends ACheckData {
         sfLastYDist = Double.MAX_VALUE;
         sfDirty = false;
         mediumLiftOff = defaultMediumLiftOff;
+        // TODO: other buffers ?
     }
 
 	/**
 	 * Clear accounting data.
 	 */
     public void clearAccounting() {
-//        final long now = System.currentTimeMillis();
-//        hDistSum.clear(now);
-//        hDistCount.clear(now);
-//        vDistCount.clear(now);
-//        vDistSum.clear(now);
         vDistAcc.clear();
     }
 
@@ -267,7 +266,6 @@ public class MovingData extends ACheckData {
      * Clear the data of the new fall check.
      */
     public void clearNoFallData() {
-//        noFallOnGround = noFallWasOnGround = true;
         noFallFallDistance = 0;
         noFallMaxY = 0D;
         noFallSkipAirCheck = false;

@@ -20,6 +20,9 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -196,6 +199,23 @@ public class FightListener extends CheckListener {
     	data.lastAttackedY = targetLoc.getY();
     	data.lastAttackedZ = targetLoc.getZ();
 //    	data.lastAttackedDist = targetDist;
+    	
+    	// Velocity freedom adaption.
+    	if (!cancelled && player.isSprinting() && CheckUtils.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 3.0){
+    		// Add "mini" freedom.
+    		final MovingData mData = MovingData.getData(player);
+    		// TODO: Check distance of other entity.
+    		if (mData.fromX != Double.MAX_VALUE){
+    			final double hDist = CheckUtils.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ) ;
+    			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5 && MovingListener.shouldCheckSurvivalFly(player, mData, MovingConfig.getConfig(player))){
+    				// Allow extra consumption with buffer.
+    				mData.sfHBufExtra = 7;
+    				if (cc.debug){
+    					System.out.println(player.getName() + " attacks, hDist to last from: " + hDist + " | targetdist=" + CheckUtils.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
+    				}
+    			}
+    		}
+    	}
     	
         return cancelled;
     }
