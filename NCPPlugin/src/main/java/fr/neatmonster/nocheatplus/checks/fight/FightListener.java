@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /*
  * MM""""""""`M oo          dP         dP   M""MMMMMMMM oo            dP                                       
@@ -210,7 +211,7 @@ public class FightListener extends CheckListener {
     			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5 && MovingListener.shouldCheckSurvivalFly(player, mData, MovingConfig.getConfig(player))){
     				// Allow extra consumption with buffer.
     				mData.sfHBufExtra = 7;
-    				if (cc.debug){
+    				if (cc.debug && BuildParameters.debugLevel > 0){
     					System.out.println(player.getName() + " attacks, hDist to last from: " + hDist + " | targetdist=" + CheckUtils.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
     				}
     			}
