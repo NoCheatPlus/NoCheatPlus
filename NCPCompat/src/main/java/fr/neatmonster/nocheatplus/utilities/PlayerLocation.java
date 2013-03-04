@@ -431,30 +431,39 @@ public class PlayerLocation {
 	 * @return true, if the player is on ground
 	 */
 	public boolean isOnGround() {
-		if (onGround == null) {
-			// Check cached values and simplifications.
-			if (notOnGroundMaxY >= yOnGround) onGround = false;
-			else if (onGroundMinY <= yOnGround) onGround = true;
-			else{
-				if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
-					final int id = getTypeIdBelow();
-					if (BlockProperties.isGround(id) && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, blockY - 1, blockZ, id)){
-						onGround = true;
-					}
-					else{
-						// Full on-ground check (blocks).
-						// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
-						onGround = BlockProperties.isOnGround(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, 0L);
-					}
-				}
-				else onGround = false;
+		if (onGround != null){
+			return onGround;
+		}
+		// Check cached values and simplifications.
+		if (notOnGroundMaxY >= yOnGround) onGround = false;
+		else if (onGroundMinY <= yOnGround) onGround = true;
+		else{
+			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
+//					// TODO: Consider dropping this shortcut.
+//					final int id = getTypeIdBelow();
+//					final long flags = BlockProperties.getBlockFlags(id);
+//					if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0){
+//						final double[] bounds = blockCache.getBounds(blockX, blockY -1, blockZ);
+//						if (BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, blockY - 1, blockZ, id, bounds, flags)){
+//							// TODO: passable vs maxY ?
+//							if (!BlockProperties.isPassableWorkaround(blockCache, blockX, blockY - 1, blockZ, id, minX, minY, minZ, maxX, minY, maxZ)){
+//								onGround = true;
+//							}
+//						}
+//					}
+//					if (onGround == null){
+					// Full on-ground check (blocks).
+					// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
+					onGround = BlockProperties.isOnGround(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, 0L);
+//					}
 			}
-			if (!onGround) {
-				final double d1 = 0.25D;
-				onGround = blockCache.standsOnEntity(player, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
-			}
-			if (onGround) onGroundMinY = Math.min(onGroundMinY, yOnGround);
-			else notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround); 
+			else onGround = false;
+		}
+		if (onGround) onGroundMinY = Math.min(onGroundMinY, yOnGround);
+		else{
+			notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
+			final double d1 = 0.25D;
+			onGround = blockCache.standsOnEntity(player, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
 		}
 		return onGround;
 	}
@@ -676,7 +685,7 @@ public class PlayerLocation {
 	 * @param player
 	 *            the player
 	 */
-	public void set(final Location location, final Player player, final double yFreedom)
+	public void set(final Location location, final Player player, final double yOnGround)
 	{
 
 		// Entity reference.
@@ -726,10 +735,7 @@ public class PlayerLocation {
 		notOnGroundMaxY = Double.MIN_VALUE;
 		blockFlags = null;
 
-		// TODO: Consider blockCache.setAccess? <- currently rather not, because
-		// it might be anything.
-
-		this.setyOnGround(yFreedom);
+		this.yOnGround = yOnGround;
 	}
 	
 	/**
