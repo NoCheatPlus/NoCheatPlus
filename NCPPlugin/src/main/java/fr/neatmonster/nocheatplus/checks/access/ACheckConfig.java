@@ -23,7 +23,9 @@ public abstract class ACheckConfig implements ICheckConfig {
      * @param pathPrefix Path prefix for the check section (example for use: prefix+"debug").
      */
     public ACheckConfig(final ConfigFile config, final String pathPrefix){
-        debug = config.getBoolean(pathPrefix + ConfPaths.SUB_DEBUG, false);
+    	// TODO: Path prefix construction is somewhat inconsistent with debug hierarchy ?
+        debug = config.getBoolean(pathPrefix + ConfPaths.SUB_DEBUG, config.getBoolean(ConfPaths.CHECKS_DEBUG, false));
+        // TODO: Use lag flag where appropriate and document it (or get rid of it).
         lag = config.getBoolean(pathPrefix + ConfPaths.SUB_LAG, true) && config.getBoolean(ConfPaths.MISCELLANEOUS_LAG, true);
     }
     

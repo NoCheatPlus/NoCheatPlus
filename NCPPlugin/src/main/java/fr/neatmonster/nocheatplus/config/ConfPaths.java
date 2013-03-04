@@ -14,6 +14,12 @@ package fr.neatmonster.nocheatplus.config;
  */
 public abstract class ConfPaths {
 	
+    // Sub-paths that are used with different path prefixes potentially.
+    public static final String SUB_DEBUG 								 = "debug";
+    public static final String SUB_IGNOREPASSABLE                        = RootConfPaths.SUB_IGNOREPASSABLE;
+    public static final String SUB_ALLOWINSTANTBREAK                     = RootConfPaths.SUB_ALLOWINSTANTBREAK;
+    public static final String SUB_LAG       							 = "lag";
+	
 	// General:
 	public static final String SAVEBACKCONFIG                            = "savebackconfig";
 
@@ -72,7 +78,8 @@ public abstract class ConfPaths {
 	public static final  String DATA_CONSISTENCYCHECKS_MAXTIME			 = DATA_CONSISTENCYCHECKS + "maxtime";
     
     private static final String CHECKS                                   = "checks.";
-
+    /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
+	public static final  String CHECKS_DEBUG							 = CHECKS + SUB_DEBUG;
     /*
      * 888 88b, 888                    888    888 88b,                        888    
      * 888 88P' 888  e88 88e   e88'888 888 ee 888 88P' 888,8,  ,e e,   ,"Y88b 888 ee 
@@ -561,11 +568,5 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY                             = "compatibility.";
 	public static final String COMPATIBILITY_BUKKITONLY                  = COMPATIBILITY + "bukkitapionly";
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
-    
-    // Sub-paths that are used with different path prefixes potentially.
-    public static final String SUB_DEBUG 								 = "debug";
-    public static final String SUB_IGNOREPASSABLE                        = RootConfPaths.SUB_IGNOREPASSABLE;
-    public static final String SUB_ALLOWINSTANTBREAK                     = RootConfPaths.SUB_ALLOWINSTANTBREAK;
-    public static final String SUB_LAG       							 = "lag";
     
 }
