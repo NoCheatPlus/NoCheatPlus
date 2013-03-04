@@ -673,6 +673,8 @@ public class SurvivalFly extends Check {
 		// TODO: maybe re-model ice stuff (check what is really needed).
 		if (from.isOnIce() || to.isOnIce()) data.sfFlyOnIce = 20;
 		else if (data.sfFlyOnIce > 0) data.sfFlyOnIce--;
+		
+		final boolean sfDirty = data.sfDirty;
 
 		if (from.isInWeb()) {
 			data.sfFlyOnIce = 0;
@@ -684,8 +686,8 @@ public class SurvivalFly extends Check {
 			// TODO: too many false positives with just checking from ?
 			// TODO: Sneaking and blocking applies to when in water !
 			hAllowedDistance = swimmingSpeed * cc.survivalFlySwimmingSpeed / 100D;
-		} else if (player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) hAllowedDistance = sneakingSpeed * cc.survivalFlySneakingSpeed / 100D;
-		else if (player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) hAllowedDistance = blockingSpeed * cc.survivalFlyBlockingSpeed / 100D;
+		} else if (!sfDirty && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) hAllowedDistance = sneakingSpeed * cc.survivalFlySneakingSpeed / 100D;
+		else if (!sfDirty && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) hAllowedDistance = blockingSpeed * cc.survivalFlyBlockingSpeed / 100D;
 		else {
 			if (!sprinting) hAllowedDistance = walkingSpeed * cc.survivalFlyWalkingSpeed / 100D;
 			else hAllowedDistance = sprintingSpeed * cc.survivalFlySprintingSpeed / 100D;
