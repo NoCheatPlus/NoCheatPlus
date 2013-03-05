@@ -1504,8 +1504,8 @@ public class BlockProperties {
     * @param y
     * @param z
     * @param id
-    * @param bounds Not null
-    * @param flags
+    * @param bounds Not null: bounds of the block at x, y, z.
+    * @param flags Block flags for the block at x, y, z.
     * @return
     */
    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags){
@@ -1595,60 +1595,91 @@ public class BlockProperties {
         for (int x = iMinX; x <= iMaxX; x++){
             for (int z = iMinZ; z <= iMaxZ; z++){
                 for (int y = iMinY; y <= iMaxY; y++){
+                	
+                	// TODO: Remember the state of the last block below instead of checking the block above.
+                	
                     final int id = access.getTypeId(x, y, z);
                     final long flags = blockFlags[id];
-                    if ((flags & F_GROUND) != 0 && (flags & ignoreFlags) == 0){
-                        // Might collide.
-                    	final double[] bounds = access.getBounds(x, y, z);
-                        if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)){
-                        	if (y >= maxBlockY) return true;
-                            final int aboveId = access.getTypeId(x, y + 1, z);
-                            final long aboveFlags = blockFlags[aboveId];
-                            if ((flags & F_IGN_PASSABLE) != 0); // Ignore these.
-                            else if ((aboveFlags & F_GROUND) != 0 && (aboveFlags & ignoreFlags) == 0){
-                                // Check against spider type hacks.
-                            	final double[] aboveBounds = access.getBounds(x, y + 1, z);
-                            	if (aboveBounds == null) return true;
-                                if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)){
-                                    // TODO: This might be seen as a violation for many block types.
-                                	// TODO: More distinction necessary here.
-                            		if ((flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0){
-                                		// TODO: further exclude simple full shape blocks, or confine to itchy block types
-                                		// TODO: make flags for it.
-                                		// Simplistic hot fix attempt for same type + same shape.
-                                		if (bounds == null) return true;
-                                		boolean fullBounds = false;
-                                		for (int i = 0; i < 3; i++){
-                                			if (bounds[i] != 0.0 || bounds[i + 3] != 1.0){
-                                				fullBounds = false;
-                                				break;
-                                			}
-                                		}
-                                		if (fullBounds){
-                                			// The above block may not have full bounds.
-                                			continue;
-                                		}
-                                		// Allow as ground for differing shapes.
-                                		for (int i = 0; i <  6; i++){
-                                			if (bounds[i] != aboveBounds[i]){
-                                				// Simplistic.
-                                				return true;
-                                			}
-                                		}
-                            		}
-                            		// Workarounds.
-                            		if (aboveId == Material.CACTUS.getId() && aboveId != id){
-                            			// TODO: This is a rough estimate, assumes sand underneath, further relies on passable.
-                            			// TODO: General workaround for slightly inset blocks which have full bounds for passable.
-                            			return true;
-                            		}
-                                	// Not regarded as ground.
-                                	continue;
-                                }
-                            }
-                            return true;
-                        }
+                    
+                    if ((flags & F_GROUND) == 0 || (flags & ignoreFlags) != 0){
+                    	continue;
                     }
+                    	
+                    	
+                    // Might collide.
+                	final double[] bounds = access.getBounds(x, y, z);
+                    if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)){
+                    	continue;
+                    }
+                    
+                    // TODO: Check passable workaround without checking ignore flag.
+                    
+                    // TODO: Shortcut: if bounds[4] > fx return true (careful with fences) ?
+                    
+                    // Check if the block above allows 
+                	if (y >= maxBlockY){
+                		// Only air above.
+                		return true;
+                	}
+                    final int aboveId = access.getTypeId(x, y + 1, z);
+                    final long aboveFlags = blockFlags[aboveId];
+                    if ((flags & F_IGN_PASSABLE) != 0){
+                    	// Ignore these.
+                    	// TODO: Should this always apply ?
+                    	return true;
+                    }
+                    
+                    if ((aboveFlags & F_GROUND) == 0 || (aboveFlags & ignoreFlags) != 0){
+                    	return true;
+                    }
+                    
+                	// TODO: Might also check for liquid.
+                    
+                    // TODO: check if it is the same id (walls!) and similar.
+                
+                    // Check against spider type hacks.
+                	final double[] aboveBounds = access.getBounds(x, y + 1, z);
+                	if (aboveBounds == null) return true;
+                	
+                    if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)){
+                    	return true;
+                    }
+                    // TODO: Check passable workaround without checking ignore flag.
+                    
+                    // TODO: This might be seen as a violation for many block types.
+                	// TODO: More distinction necessary here.
+            		if ((flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0){
+                		// TODO: further exclude simple full shape blocks, or confine to itchy block types
+                		// TODO: make flags for it.
+                		// Simplistic hot fix attempt for same type + same shape.
+                		if (bounds == null) return true;
+                		boolean fullBounds = false;
+                		for (int i = 0; i < 3; i++){
+                			if (bounds[i] != 0.0 || bounds[i + 3] != 1.0){
+                				fullBounds = false;
+                				break;
+                			}
+                		}
+                		if (fullBounds){
+                			// The above block may not have full bounds.
+                			continue;
+                		}
+                		// Allow as ground for differing shapes.
+                		for (int i = 0; i <  6; i++){
+                			if (bounds[i] != aboveBounds[i]){
+                				// Simplistic.
+                				return true;
+                			}
+                		}
+            		}
+            		// Workarounds.
+            		if (aboveId == Material.CACTUS.getId() && aboveId != id){
+            			// TODO: This is a rough estimate, assumes sand underneath, further relies on passable.
+            			// TODO: General workaround for slightly inset blocks which have full bounds for passable.
+            			return true;
+            		}
+                	// Not regarded as ground.
+                	continue;
                 }
             }
         }
