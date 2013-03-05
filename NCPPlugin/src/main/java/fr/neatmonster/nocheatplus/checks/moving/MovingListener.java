@@ -496,7 +496,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		data.resetTeleported();
         // Debug.
         if (cc.debug) {
-			DebugUtil.outputMoveDebug(player, pFrom, pTo, mcAccess);
+			DebugUtil.outputMoveDebug(player, pFrom, pTo, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
 		}
 		
 		// Check for illegal move and bounding box etc.
@@ -506,8 +506,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			parkedInfo.add(moveInfo);
 			return;
 		}
-        pFrom.collectBlockFlags(cc.noFallyOnGround);
-        pTo.collectBlockFlags(cc.noFallyOnGround);
+		final double maxYNoFall = Math.max(cc.noFallyOnGround, cc.yOnGround);
+        pFrom.collectBlockFlags(maxYNoFall);
+        pTo.collectBlockFlags(maxYNoFall);
         
 		// Potion effect "Jump".
 		final double jumpAmplifier = MovingListener.getJumpAmplifier(player);
