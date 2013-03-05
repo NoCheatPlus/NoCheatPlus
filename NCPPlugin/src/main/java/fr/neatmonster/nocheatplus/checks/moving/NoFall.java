@@ -96,6 +96,11 @@ public class NoFall extends Check {
 		
 		final double oldNFDist = data.noFallFallDistance;
 		
+		// Reset-cond is not touched by yOnGround.
+		// TODO: Distinguish water depth vs. fall distance ?
+		final boolean fromReset = from.isResetCond();
+		final boolean toReset = to.isResetCond();
+		
 		// Adapt yOnGround if necessary (sf uses another setting).
 		if (yDiff < 0 && cc.yOnGround < cc.noFallyOnGround) {
 			// In fact this is somewhat heuristic, but it seems to work well.
@@ -104,12 +109,9 @@ public class NoFall extends Check {
 			adjustYonGround(from, to , cc.noFallyOnGround);
 		}
         
-        // TODO: Distinguish water depth vs. fall distance!
-        
         final boolean fromOnGround = from.isOnGround();
-        final boolean fromReset = from.isResetCond();
         final boolean toOnGround = to.isOnGround();
-        final boolean toReset = to.isResetCond();
+        
         
         // TODO: early returns (...) 
         
@@ -182,13 +184,11 @@ public class NoFall extends Check {
      * @param cc
      */
     private void adjustYonGround(final PlayerLocation from, final PlayerLocation to, final double yOnGround) {
-    	if (!from.isResetCond() && !from.isOnGround()){
+    	if (!from.isOnGround()){
     		from.setyOnGround(yOnGround);
-    		from.collectBlockFlags(yOnGround);
     	}
-		if (!to.isResetCond() && !to.isOnGround()){
+		if (!to.isOnGround()){
 			to.setyOnGround(yOnGround);
-			to.collectBlockFlags(yOnGround);
 		}
 	}
 
