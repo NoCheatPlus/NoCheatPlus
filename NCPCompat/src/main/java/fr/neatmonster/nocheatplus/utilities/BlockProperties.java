@@ -1394,7 +1394,10 @@ public class BlockProperties {
                     final int id = access.getTypeId(x, y, z);
                     if ((blockFlags[id] & flags) != 0){
                         // Might collide.
-                        if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)) return true;
+                    	final double[] bounds = access.getBounds(x, y, z);
+                    	if (bounds != null){
+                    		if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)) return true;
+                    	}
                     }
                 }
             }
@@ -1456,8 +1459,11 @@ public class BlockProperties {
             for (int z = iMinZ; z <= iMaxZ; z++){
                 for (int y = iMinY; y <= iMaxY; y++){
                     if (id == access.getTypeId(x, y, z)){
-                    	if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
-                    		return true;
+                    	final double[] bounds = access.getBounds(x, y, z);
+                    	if (bounds != null){
+                        	if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, blockFlags[id])){
+                        		return true;
+                        	}
                     	}
                     }
                 }
@@ -1482,6 +1488,27 @@ public class BlockProperties {
     	final double[] bounds = access.getBounds(x,y,z);
         if (bounds == null) return false; // TODO: policy ?
         final long flags = blockFlags[id];
+        return collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags);
+    }
+        
+   /**
+    * Check if the bounds collide with the block for the given type id at the given position.
+    * @param access
+    * @param minX
+    * @param minY
+    * @param minZ
+    * @param maxX
+    * @param maxY
+    * @param maxZ
+    * @param x
+    * @param y
+    * @param z
+    * @param id
+    * @param bounds Not null
+    * @param flags
+    * @return
+    */
+   public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags){
         final double bminX, bminZ, bminY;
         final double bmaxX, bmaxY, bmaxZ;
         if ((flags & F_STAIRS) != 0){ // TODO: make this a full block flag ?
@@ -1569,26 +1596,27 @@ public class BlockProperties {
             for (int z = iMinZ; z <= iMaxZ; z++){
                 for (int y = iMinY; y <= iMaxY; y++){
                     final int id = access.getTypeId(x, y, z);
-                    if ((blockFlags[id] & F_GROUND) != 0 && (blockFlags[id] & ignoreFlags) == 0){
+                    final long flags = blockFlags[id];
+                    if ((flags & F_GROUND) != 0 && (flags & ignoreFlags) == 0){
                         // Might collide.
-                        if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id)){
+                    	final double[] bounds = access.getBounds(x, y, z);
+                        if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)){
                         	if (y >= maxBlockY) return true;
                             final int aboveId = access.getTypeId(x, y + 1, z);
-                            final long flags = blockFlags[aboveId];
+                            final long aboveFlags = blockFlags[aboveId];
                             if ((flags & F_IGN_PASSABLE) != 0); // Ignore these.
-                            else if ((flags & F_GROUND) != 0 && (flags & ignoreFlags) == 0){
+                            else if ((aboveFlags & F_GROUND) != 0 && (aboveFlags & ignoreFlags) == 0){
                                 // Check against spider type hacks.
-                                if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId)){
+                            	final double[] aboveBounds = access.getBounds(x, y + 1, z);
+                            	if (aboveBounds == null) return true;
+                                if (collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)){
                                     // TODO: This might be seen as a violation for many block types.
                                 	// TODO: More distinction necessary here.
-                            		if ((blockFlags[id] & F_VARIABLE) != 0 || (blockFlags[aboveId] & F_VARIABLE) != 0){
+                            		if ((flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0){
                                 		// TODO: further exclude simple full shape blocks, or confine to itchy block types
                                 		// TODO: make flags for it.
                                 		// Simplistic hot fix attempt for same type + same shape.
-                                		final double[] bounds = access.getBounds(x, y, z);
                                 		if (bounds == null) return true;
-                                		final double[] aboveBounds = access.getBounds(x, y + 1, z);
-                                		if (aboveBounds == null) return true;
                                 		boolean fullBounds = false;
                                 		for (int i = 0; i < 3; i++){
                                 			if (bounds[i] != 0.0 || bounds[i + 3] != 1.0){

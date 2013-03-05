@@ -438,24 +438,26 @@ public class PlayerLocation {
 		if (notOnGroundMaxY >= yOnGround) onGround = false;
 		else if (onGroundMinY <= yOnGround) onGround = true;
 		else{
+			// Shortcut check (currently needed for being stuck + sf).
 			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
-//					// TODO: Consider dropping this shortcut.
-//					final int id = getTypeIdBelow();
-//					final long flags = BlockProperties.getBlockFlags(id);
-//					if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0){
-//						final double[] bounds = blockCache.getBounds(blockX, blockY -1, blockZ);
-//						if (BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, blockY - 1, blockZ, id, bounds, flags)){
-//							// TODO: passable vs maxY ?
-//							if (!BlockProperties.isPassableWorkaround(blockCache, blockX, blockY - 1, blockZ, id, minX, minY, minZ, maxX, minY, maxZ)){
-//								onGround = true;
-//							}
-//						}
-//					}
-//					if (onGround == null){
+				// TODO: Consider dropping this shortcut.
+				final int bY = Location.locToBlock(y - yOnGround);
+				final int id = bY == blockY ? getTypeId() : (bY == blockY -1 ? getTypeIdBelow() : blockCache.getTypeId(blockX,  bY, blockZ));
+				final long flags = BlockProperties.getBlockFlags(id);
+				if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0){
+					final double[] bounds = blockCache.getBounds(blockX, bY, blockZ);
+					if (BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, id, bounds, flags)){
+						// TODO: passable vs maxY ?
+						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)){
+							onGround = true;
+						}
+					}
+				}
+				if (onGround == null){
 					// Full on-ground check (blocks).
 					// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
 					onGround = BlockProperties.isOnGround(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, 0L);
-//					}
+				}
 			}
 			else onGround = false;
 		}
