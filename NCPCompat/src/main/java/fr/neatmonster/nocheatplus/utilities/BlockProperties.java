@@ -1635,7 +1635,12 @@ public class BlockProperties {
                     
                 	// TODO: Might also check for liquid.
                     
-                    // TODO: check if it is the same id (walls!) and similar.
+                    final boolean variable = (flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0;
+                    // Check if it is the same id (walls!) and similar.
+                    if (!variable && id == aboveId){
+                    	// Exclude stone walls "quickly".
+                    	return false;
+                    }
                 
                     // Check against spider type hacks.
                 	final double[] aboveBounds = access.getBounds(x, y + 1, z);
@@ -1648,7 +1653,7 @@ public class BlockProperties {
                     
                     // TODO: This might be seen as a violation for many block types.
                 	// TODO: More distinction necessary here.
-            		if ((flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0){
+            		if (variable){
                 		// TODO: further exclude simple full shape blocks, or confine to itchy block types
                 		// TODO: make flags for it.
                 		// Simplistic hot fix attempt for same type + same shape.
@@ -1673,7 +1678,7 @@ public class BlockProperties {
                 		}
             		}
             		// Workarounds.
-            		if (aboveId == Material.CACTUS.getId() && aboveId != id){
+            		if (aboveId != id && aboveId == Material.CACTUS.getId()){
             			// TODO: This is a rough estimate, assumes sand underneath, further relies on passable.
             			// TODO: General workaround for slightly inset blocks which have full bounds for passable.
             			return true;
