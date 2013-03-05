@@ -1666,7 +1666,8 @@ public class BlockProperties {
                 	// TODO: More distinction necessary here.
             		if (variable){
             			// Simplistic hot fix attempt for same type + same shape.
-                		if (isFullBounds(bounds) || isSameShape(bounds, aboveBounds)){
+            			// TODO: Needs passable workaround check.
+                		if (isFullBounds(aboveBounds) || isSameShape(bounds, aboveBounds)){
                 			// TODO: Test with cactus.
                 			continue;
                 		}
