@@ -143,7 +143,7 @@ public class SurvivalFly extends Check {
 			if (hDistanceAboveLimit > 0){
 				hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, true);
 				hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom - extraUsed;
-				if (hAllowedDistance > 0){
+				if (hAllowedDistance > 0){ // TODO: Fix !
 					// (Horizontal buffer might still get used.)
 					tags.add("hspeed");
 				}
@@ -403,21 +403,32 @@ public class SurvivalFly extends Check {
 		// Check lift-off medium.
 		// TODO: Web might be NO_JUMP !
 		// TODO: isNextToGround(0.15, 0.4) allows a little much (yMargin), but reduces false positives.
-		if (to.isInLiquid() || to.isInWeb()){
-			if (to.isInLiquid() && to.isNextToGround(0.15, 0.4)){
-				// Consent with ground.
+		// TODO: nextToGround: Shortcut with block-flags ?
+		
+		if (to.isInLiquid()){
+			if (fromOnGround && !toOnGround && data.mediumLiftOff == MediumLiftOff.GROUND && data.sfJumpPhase <= 1  && !from.isInLiquid()){
 				data.mediumLiftOff = MediumLiftOff.GROUND;
 			}
+			else if (to.isNextToGround(0.15, 0.4)){
+				// Consent with ground.
+				data.mediumLiftOff = MediumLiftOff.GROUND;
+			} 
 			else{
 				data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
 			}
+		}
+		else if (to.isInWeb()){
+			data.mediumLiftOff = MediumLiftOff.LIMIT_JUMP;
 		}
 		else if (resetTo){
 			// TODO: This might allow jumping on vines etc., but should do for the moment.
 			data.mediumLiftOff = MediumLiftOff.GROUND;
 		}
 		else if (from.isInLiquid()){
-			if (to.isNextToGround(0.15, 0.4)){
+			if (!resetTo && data.mediumLiftOff == MediumLiftOff.GROUND && data.sfJumpPhase <= 1){
+				data.mediumLiftOff = MediumLiftOff.GROUND;
+			}
+			else if (to.isNextToGround(0.15, 0.4)){
 				data.mediumLiftOff = MediumLiftOff.GROUND;
 			}
 			else{
