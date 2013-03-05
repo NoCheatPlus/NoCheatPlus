@@ -1598,6 +1598,7 @@ public class BlockProperties {
                 for (int y = iMinY; y <= iMaxY; y++){
                 	
                 	// TODO: Remember the state of the last block below instead of checking the block above.
+                	// TODO: Alternatively optimize: block-above-check: use loop up to iMaxY...
                 	
                     final int id = access.getTypeId(x, y, z);
                     final long flags = blockFlags[id];
@@ -1616,6 +1617,7 @@ public class BlockProperties {
                     	continue;
                     }
                     
+                    // TODO: Make this one work (passable workaround).
 //                    // Check if the block can be passed through with the bounding box (disregard the ignore flag).
 //                    if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)){
 //                    	// Spider !
@@ -1648,7 +1650,7 @@ public class BlockProperties {
                     // Check if it is the same id (walls!) and similar.
                     if (!variable && id == aboveId){
                     	// Exclude stone walls "quickly".
-                    	return false;
+                    	continue;
                     }
                 
                     // Check against spider type hacks.
