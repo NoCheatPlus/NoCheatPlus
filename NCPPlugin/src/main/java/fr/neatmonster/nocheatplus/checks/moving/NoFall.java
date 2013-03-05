@@ -77,7 +77,7 @@ public class NoFall extends Check {
 	}
 
 	/**
-     * Checks a player.
+     * Checks a player. Expects from and to using cc.yOnGround.
      * 
      * @param player
      *            the player
@@ -97,11 +97,11 @@ public class NoFall extends Check {
 		final double oldNFDist = data.noFallFallDistance;
 		
 		// Adapt yOnGround if necessary (sf uses another setting).
-		if (yDiff < 0) {
+		if (yDiff < 0 && cc.yOnGround < cc.noFallyOnGround) {
 			// In fact this is somewhat heuristic, but it seems to work well.
 			// Missing on-ground seems to happen with running down pyramids rather.
-			if (from.getyOnGround() != cc.noFallyOnGround && fromY - from.getBlockY() < cc.noFallyOnGround) from.setyOnGround(cc.noFallyOnGround);
-			if (to.getyOnGround() != cc.noFallyOnGround && toY - to.getBlockY() < cc.noFallyOnGround) to.setyOnGround(cc.noFallyOnGround);
+			// TODO: Should be obsolete.
+			adjustYonGround(from, to , cc.noFallyOnGround);
 		}
         
         // TODO: Distinguish water depth vs. fall distance!
@@ -176,6 +176,23 @@ public class NoFall extends Check {
     }
     
     /**
+     * Set yOnGround for from and to, if needed, should be obsolete.
+     * @param from
+     * @param to
+     * @param cc
+     */
+    private void adjustYonGround(final PlayerLocation from, final PlayerLocation to, final double yOnGround) {
+    	if (!from.isResetCond() && !from.isOnGround()){
+    		from.setyOnGround(yOnGround);
+    		from.collectBlockFlags(yOnGround);
+    	}
+		if (!to.isResetCond() && !to.isOnGround()){
+			to.setyOnGround(yOnGround);
+			to.collectBlockFlags(yOnGround);
+		}
+	}
+
+	/**
      * Quit or kick: adjust fall distance if necessary.
      * @param player
      */
