@@ -584,9 +584,14 @@ public class PlayerLocation {
 		return yOnGround;
 	}
 
+	/**
+	 * This resets onGround and blockFlags.
+	 * @param yOnGround
+	 */
 	public void setyOnGround(final double yOnGround) {
 		this.yOnGround = yOnGround;
 		this.onGround = null;
+		blockFlags = null;
 	}
 
 	/**
@@ -777,6 +782,14 @@ public class PlayerLocation {
 	 */
 	public Long getBlockFlags() {
 		return blockFlags;
+	}
+	
+	/**
+	 * Set the block flags which are usually collected on base of bounding box, yOnGround and other considerations, such as 1.5 high blocks.
+	 * @param blockFlags
+	 */
+	public void setBlockFlags(Long blockFlags){
+		this.blockFlags = blockFlags;
 	}
 
 }
