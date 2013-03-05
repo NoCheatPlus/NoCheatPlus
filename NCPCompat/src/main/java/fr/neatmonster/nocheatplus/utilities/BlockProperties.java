@@ -1667,6 +1667,7 @@ public class BlockProperties {
             		if (variable){
             			// Simplistic hot fix attempt for same type + same shape.
                 		if (isFullBounds(bounds) || isSameShape(bounds, aboveBounds)){
+                			// TODO: Test with cactus.
                 			continue;
                 		}
                 		else{
@@ -1714,10 +1715,10 @@ public class BlockProperties {
 		for (int i = 0; i <  6; i++){
 			if (bounds1[i] != bounds2[i]){
 				// Simplistic.
-				return true;
+				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	/**
