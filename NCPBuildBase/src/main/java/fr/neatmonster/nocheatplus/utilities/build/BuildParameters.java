@@ -78,10 +78,24 @@ public class BuildParameters {
 	/** The build number as given by Jenkins. Integer.MIN_VALUE if not present. */
 	public static final int buildNumber = getInteger("BUILD_NUMBER", Integer.MIN_VALUE);
 	
-	/** Test level: more testing for higher levels. Defaults to 0. */
+	/**
+	 * Test level: more testing for higher levels. Defaults to 0.
+	 * <hr>
+	 * Currently only 0 and 1 are used, later there might be more levels and some general policy for level setup (concerning rough time needed on some reference hardware, console output etc.).<br>
+	 * Compare to debugLevel. 
+	 * 
+	 */
 	public static final int testLevel = getInteger("TEST_LEVEL", 0);
 	
-	/** Debug level: more debug output for higher levels. Defaults to 0. */
+	/**
+	 * Debug level: more debug output for higher levels. Defaults to 0.
+	 * <hr>
+	 * Currently only 0 and 1 are used, however at some point this will follow some guidelines (to be documented here):<br>
+	 * <li>0 is meant for few output, just enough for user debug reports or simple testing. </li>
+	 * <li>There are major levels every 100 units (100, 200, ....)</li>
+	 * <li>Consequently minor levels are between major levels to distinguish minor differences like flags</li>
+	 * 
+	 */
 	public static final int debugLevel = getInteger("DEBUG_LEVEL", 0);
 	
 }
