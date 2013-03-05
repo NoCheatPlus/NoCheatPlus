@@ -670,8 +670,9 @@ public class BlockProperties {
 	 * @param flags
 	 * @return
 	 */
-	public static Collection<String> getFlagNames(final long flags) {
+	public static Collection<String> getFlagNames(final Long flags) {
 		final ArrayList<String> tags = new ArrayList<String>(flagNameMap.size());
+		if (flags == null) return tags;
 		addFlagNames(flags, tags);
 		return tags;
 	}
@@ -1615,7 +1616,12 @@ public class BlockProperties {
                     	continue;
                     }
                     
-                    // TODO: Check passable workaround without checking ignore flag.
+//                    // Check if the block can be passed through with the bounding box (disregard the ignore flag).
+//                    if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)){
+//                    	// Spider !
+//                    	System.out.println("*** Continue: passable workaround");
+//                    	continue;
+//                    }
                     
                     // TODO: Shortcut: if bounds[4] > fx return true (careful with fences) ?
                     
@@ -1626,7 +1632,7 @@ public class BlockProperties {
                 	}
                     final int aboveId = access.getTypeId(x, y + 1, z);
                     final long aboveFlags = blockFlags[aboveId];
-                    if ((flags & aboveFlags & F_IGN_PASSABLE) != 0){
+                    if ((aboveFlags & F_IGN_PASSABLE) != 0){ // flags & 
                     	// Ignore these (Note for above block check before ground property).
                     	// TODO: Should this always apply ?
                     	return true;

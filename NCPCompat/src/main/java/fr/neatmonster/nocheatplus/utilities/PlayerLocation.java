@@ -770,5 +770,13 @@ public class PlayerLocation {
 		// if (Math.abs(box.a) > 3.2E7D || Math.abs(box.b) > 3.2E7D || Math.abs(box.c) > 3.2E7D || Math.abs(box.d) > 3.2E7D || Math.abs(box.e) > 3.2E7D || Math.abs(box.f) > 3.2E7D) return true;
 		else return false;
 	}
+	
+	/**
+	 * Get the collected block-flags. This will return null if collectBlockFlags has not been called.
+	 * @return
+	 */
+	public Long getBlockFlags() {
+		return blockFlags;
+	}
 
 }
