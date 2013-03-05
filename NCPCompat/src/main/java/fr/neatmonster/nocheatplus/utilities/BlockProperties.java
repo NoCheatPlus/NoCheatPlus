@@ -1603,8 +1603,7 @@ public class BlockProperties {
                     
                     if ((flags & F_GROUND) == 0 || (flags & ignoreFlags) != 0){
                     	continue;
-                    }
-                    	
+                    } 	
                     	
                     // Might collide.
                 	final double[] bounds = access.getBounds(x, y, z);
@@ -1627,13 +1626,13 @@ public class BlockProperties {
                 	}
                     final int aboveId = access.getTypeId(x, y + 1, z);
                     final long aboveFlags = blockFlags[aboveId];
-                    if ((flags & F_IGN_PASSABLE) != 0){
-                    	// Ignore these.
+                    if ((flags & aboveFlags & F_IGN_PASSABLE) != 0){
+                    	// Ignore these (Note for above block check before ground property).
                     	// TODO: Should this always apply ?
                     	return true;
                     }
                     
-                    if ((aboveFlags & F_GROUND) == 0 || (aboveFlags & ignoreFlags) != 0){
+                    if ((aboveFlags & F_GROUND) == 0 || (aboveFlags & F_LIQUID) != 0 || (aboveFlags & ignoreFlags) != 0){
                     	return true;
                     }
                     
