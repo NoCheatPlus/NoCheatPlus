@@ -1608,6 +1608,10 @@ public class BlockProperties {
                     	
                     // Might collide.
                 	final double[] bounds = access.getBounds(x, y, z);
+                	if (bounds == null){
+                		// TODO: Safety check, uncertain.
+                		return true;
+                	}
                     if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)){
                     	continue;
                     }
@@ -1654,27 +1658,12 @@ public class BlockProperties {
                     // TODO: This might be seen as a violation for many block types.
                 	// TODO: More distinction necessary here.
             		if (variable){
-                		// TODO: further exclude simple full shape blocks, or confine to itchy block types
-                		// TODO: make flags for it.
-                		// Simplistic hot fix attempt for same type + same shape.
-                		if (bounds == null) return true;
-                		boolean fullBounds = false;
-                		for (int i = 0; i < 3; i++){
-                			if (bounds[i] != 0.0 || bounds[i + 3] != 1.0){
-                				fullBounds = false;
-                				break;
-                			}
-                		}
-                		if (fullBounds){
-                			// The above block may not have full bounds.
+            			// Simplistic hot fix attempt for same type + same shape.
+                		if (isFullBounds(bounds) || isSameShape(bounds, aboveBounds)){
                 			continue;
                 		}
-                		// Allow as ground for differing shapes.
-                		for (int i = 0; i <  6; i++){
-                			if (bounds[i] != aboveBounds[i]){
-                				// Simplistic.
-                				return true;
-                			}
+                		else{
+                			return true;
                 		}
             		}
             		// Workarounds.
@@ -1692,6 +1681,39 @@ public class BlockProperties {
     }
 
     /**
+     * All dimensions 0 ... 1, no null checks.
+     * @param bounds Block bounds: minX, minY, minZ, maxX, maxY, maxZ
+     * @return
+     */
+    public static final boolean isFullBounds(final double[] bounds) {
+		for (int i = 0; i < 3; i++){
+			if (bounds[i] != 0.0 || bounds[i + 3] != 1.0){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+     * Check if the bounds are the same. No null checks.
+     * @param bounds1
+     * @param bounds2
+     * @return Block bounds: minX, minY, minZ, maxX, maxY, maxZ
+     */
+    public static final boolean isSameShape(final double[] bounds1, final double[] bounds2) {
+    	// TODO: further exclude simple full shape blocks, or confine to itchy block types
+		// TODO: make flags for it.
+		// Allow as ground for differing shapes.
+		for (int i = 0; i <  6; i++){
+			if (bounds1[i] != bounds2[i]){
+				// Simplistic.
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
      * Check if a move determined by xDistance and zDistance is leading down stream.
      * @param access
      * @param x
