@@ -444,11 +444,13 @@ public class PlayerLocation {
 				final int bY = Location.locToBlock(y - yOnGround);
 				final int id = bY == blockY ? getTypeId() : (bY == blockY -1 ? getTypeIdBelow() : blockCache.getTypeId(blockX,  bY, blockZ));
 				final long flags = BlockProperties.getBlockFlags(id);
+				// TODO: Might remove check for variable ?
 				if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0){
 					final double[] bounds = blockCache.getBounds(blockX, bY, blockZ);
 					// Check collision if not inside of the block. [Might be a problem for cauldron or similar + something solid above.]
 					// TODO: Might need more refinement.
 					if (bounds != null && y - bY >= bounds[4] && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, id, bounds, flags)){
+						// TODO: BlockHeight is needed for fences, use right away (above)?
 						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)
 								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getBlockHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) < y - bY){
 							onGround = true;

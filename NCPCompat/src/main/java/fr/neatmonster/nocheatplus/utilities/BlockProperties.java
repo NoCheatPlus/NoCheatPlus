@@ -1715,15 +1715,15 @@ public class BlockProperties {
                     	}
                     }
                     
-                    // Don't check above the top block for some cases.
-                    if (y == iMaxY){
+                    // Don't count as ground if a block contains the foot.
+//                    if (y == iMaxY){
                     	// TODO: This could be a check before looping.
 //                         if (maxY - y < ((flags & F_HEIGHT150) == 0 ? bounds[4] : 1.5)){
                         	 if (getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
                         		 continue; 
                         	 }
 //                         }
-                    }
+//                    }
 
                     
 //                    return true;
