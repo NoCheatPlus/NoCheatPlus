@@ -88,6 +88,9 @@ public abstract class ConfPaths {
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 88P' 888     "YeeP" "88 888 888 8b 
      */
     public static final String  BLOCKBREAK                               = CHECKS + "blockbreak.";
+    
+	public static final String  BLOCKBREAK_DEBUG						 = BLOCKBREAK + "debug";
+    
 
     private static final String BLOCKBREAK_DIRECTION                     = BLOCKBREAK + "direction.";
     public static final String  BLOCKBREAK_DIRECTION_CHECK               = BLOCKBREAK_DIRECTION + "active";

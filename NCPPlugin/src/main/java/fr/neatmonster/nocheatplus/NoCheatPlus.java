@@ -756,7 +756,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		        // Debug information about unknown blocks.
 		        // (Probably removed later.)
 				ConfigFile config = ConfigManager.getConfigFile();
-		        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, false) || config.getBoolean(ConfPaths.BLOCKBREAK, false));
+		        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, config.getBoolean(ConfPaths.BLOCKBREAK_DEBUG, config.getBoolean(ConfPaths.CHECKS_DEBUG, false))));
 			}
 		});
     }
