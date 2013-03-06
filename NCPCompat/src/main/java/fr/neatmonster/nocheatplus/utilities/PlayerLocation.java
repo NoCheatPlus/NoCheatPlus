@@ -450,7 +450,7 @@ public class PlayerLocation {
 					// TODO: Might need more refinement.
 					if (bounds != null && y - bY >= bounds[4] && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, id, bounds, flags)){
 						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)
-								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getBlockHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) > y - bY){
+								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getBlockHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) < y - bY){
 							onGround = true;
 						}
 					}
