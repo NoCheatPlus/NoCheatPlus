@@ -447,10 +447,10 @@ public class PlayerLocation {
 				if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0){
 					final double[] bounds = blockCache.getBounds(blockX, bY, blockZ);
 					// Check collision if not inside of the block. [Might be a problem for cauldron or similar + something solid above.]
+					// TODO: Might need more refinement.
 					if (bounds != null && y - bY >= bounds[4] && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, id, bounds, flags)){
-						// TODO: passable vs maxY ?
-						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)){
-							// TODO: Might have to exclude on base of maxY, for case of being inside of blocks doors etc. 
+						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)
+								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getBlockHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) > y - bY){
 							onGround = true;
 						}
 					}

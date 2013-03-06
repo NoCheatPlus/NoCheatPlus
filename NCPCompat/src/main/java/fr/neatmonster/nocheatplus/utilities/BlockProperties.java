@@ -257,33 +257,36 @@ public class BlockProperties {
     protected static final long[] blockFlags = new long[maxBlocks];
     
     /** Flag position for stairs. */
-    public static final int F_STAIRS 		= 0x1;
-    public static final int F_LIQUID 		= 0x2;
+    public static final long F_STAIRS 		 = 0x1;
+    public static final long F_LIQUID 		 = 0x2;
     // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
     /** Minecraft isSolid result. Used for setting ground flag - Subject to change / rename.*/
-    public static final int F_SOLID 		= 0x4;
+    public static final long F_SOLID 		 = 0x4;
     /** Compatibility flag: regard this block as passable always. */
-    public static final int F_IGN_PASSABLE 	= 0x8;
-    public static final int F_WATER         = 0x10;
-    public static final int F_LAVA          = 0x20;
+    public static final long F_IGN_PASSABLE	 = 0x8;
+    public static final long F_WATER         = 0x10;
+    public static final long F_LAVA          = 0x20;
     /** Override bounding box: 1.5 blocks high, like fences.<br>
      *  NOTE: This might have relevance for passable later.
      */
-    public static final int F_HEIGHT150     = 0x40;
+    public static final long F_HEIGHT150     = 0x40;
     /** The player can stand on these, sneaking or not. */
-    public static final int F_GROUND        = 0x80; // TODO: 
+    public static final long F_GROUND        = 0x80; // TODO: 
     /** Override bounding box: 1 block height.<br>
      * NOTE: This should later be ignored by passable, rather.
      */
-    public static final int F_HEIGHT100     = 0x100;
+    public static final long F_HEIGHT100	= 0x100;
     /** Climbable like ladder and vine (allow to land on without taking damage). */
-    public static final int F_CLIMBABLE     = 0x200;
+    public static final long F_CLIMBABLE	= 0x200;
     /** The block can change shape. This is most likely not 100% accurate... */
-    public static final int F_VARIABLE		= 0x400;
+    public static final long F_VARIABLE		= 0x400;
 //    /** The block has full bounds (0..1), inaccurate! */
 //    public static final int F_FULL   		= 0x800;
     /** Block has full xz-bounds. */
-    public static final int F_XZ100			= 0x800;
+    public static final long F_XZ100		= 0x800;
+    
+    /** This flag indicates that even though a passable workaround, everything above passable height is still ground. */
+    public static final long F_GROUND_HEIGHT	= 0x1000; 
     
     /**
      * Map flag to names.
@@ -452,7 +455,7 @@ public class BlockProperties {
 						Material.WOOD_PLATE, Material.STONE_PLATE, 
 						Material.WALL_SIGN, Material.SIGN_POST,
 						Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
-						Material.LADDER,
+						Material.LADDER, Material.CAKE_BLOCK,
 				}){
 					blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 				}
@@ -463,6 +466,14 @@ public class BlockProperties {
 				Material.IRON_FENCE, Material.THIN_GLASS,
 		}){
 			blockFlags[mat.getId()] |= F_VARIABLE;
+		}
+		// Flexible ground (height):
+		for (final Material mat : new Material[]{
+				Material.PISTON_EXTENSION, Material.ANVIL,
+				Material.SKULL, Material.FLOWER_POT,
+				Material.CAKE_BLOCK, Material.DRAGON_EGG,
+		}){
+			blockFlags[mat.getId()] |= F_GROUND_HEIGHT;
 		}
 		
 		////////////////////////////////
@@ -1211,8 +1222,80 @@ public class BlockProperties {
 		else if (id == Material.PISTON_EXTENSION.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.625) return true;
 		}
+		else if (id == Material.ANVIL.getId()){
+			// Allow slight inset.
+			if (Math.max(fy, fy + dY * dT) >= 1.0 ){
+				// TODO: inconsistent, needs checking data.
+				// TODO: should be in data.
+				return false;
+			}
+			final double low = 0.176;
+			final double high = 0.824;
+			// TODO: Only one of x/z applies, depending on data value [problem: direction update].
+			final double xEnd = fx + dX * dT;
+			if (xEnd <= low && fx <= low) return true;
+			else if (xEnd >= high && fx >= high) return true;
+			final double zEnd = fz + dZ * dT;
+			if (zEnd <= low && fz <= low) return true;
+			else if (zEnd >= high && fz >= high) return true;
+		}
 		// Nothing found.
 		return false;
+	}
+	
+	/**
+	 * Reference block height for on-ground judgment: player must be at this or greater height to stand on this block.<br>
+	 * This might return 0 or somewhat arbitrary values for some blocks that don't have full bounds (!), might return 0 for blocks with the F_GROUND_HEIGHT flag, unless they are treated individually here.
+	 * @param access
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param id
+	 * @param bounds
+	 * @param flags
+	 * @return
+	 */
+    public static double getBlockHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
+    	if ((flags & F_STAIRS) != 0){
+			if ((access.getData(x, y, z) & 0x4) != 0){
+				return 1.0;
+			}
+			else{
+				// what with >= 1?
+				return 0.5;
+			}
+		}
+		else if (id == Material.SOUL_SAND.getId()){
+			return 0.875;
+		}
+//		else if (id == Material.CAKE_BLOCK.getId()){
+//			return 0.4375;
+//		}
+		else if (id == Material.CAULDRON.getId()){
+			// TODO: Set F_GROUND_HEIGHT ?
+			return 0;
+		}
+		else if (id == Material.PISTON_EXTENSION.getId()){
+			return 0.625;
+		}
+		else if (id == Material.SNOW.getId()){
+    		final int data = (access.getData(x, y, z) & 0xF) % 8;
+    		if (data < 3) return 0;
+    		else return 0.5;
+    	}
+    	// Height 100 is ignored (!).
+		else if ((flags & F_HEIGHT150) != 0){
+    		return 1.5;
+    	}
+		else if ((flags & F_GROUND_HEIGHT) != 0){
+			// All blocks that are not treated individually are ground all through.
+			// TODO: Experimental workaround.
+			return 0;
+		}
+		else{
+			// Nothing found.
+			return bounds[4];
+		}
 	}
 
 	/**
@@ -1533,9 +1616,10 @@ public class BlockProperties {
         		// TODO: remove / solve differently ?
         		bminY = 0;
         		final int data = (access.getData(x, y, z) & 0xF) % 8;
-        		bmaxY = (double) (1 +  data) / 8.0;
+//        		bmaxY = (double) (1 +  data) / 8.0;
+        		bmaxY = data < 3 ? 0 : 0.5;
         	}
-        	else if (( flags & F_HEIGHT150) != 0){
+        	else if ((flags & F_HEIGHT150) != 0){
         		bminY = 0;
         		bmaxY = 1.5;
         	}
@@ -1585,6 +1669,7 @@ public class BlockProperties {
      * @return
      */
     public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long ignoreFlags){
+    	// TODO: Consider to add extra parameter xzMargin.
     	final int maxBlockY = access.getMaxBlockY();
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
@@ -1595,14 +1680,14 @@ public class BlockProperties {
     	final int iMaxZ = Location.locToBlock(maxZ);
         for (int x = iMinX; x <= iMaxX; x++){
             for (int z = iMinZ; z <= iMaxZ; z++){
-                for (int y = iMinY; y <= iMaxY; y++){
+                for (int y = iMaxY; y >= iMinY; y --){
                 	
                 	// TODO: Remember the state of the last block below instead of checking the block above.
                 	// TODO: Alternatively optimize: block-above-check: use loop up to iMaxY...
                 	
                     final int id = access.getTypeId(x, y, z);
                     final long flags = blockFlags[id];
-                    
+                                      
                     if ((flags & F_GROUND) == 0 || (flags & ignoreFlags) != 0){
                     	continue;
                     } 	
@@ -1618,23 +1703,39 @@ public class BlockProperties {
                     }
                     
                     // TODO: Make this one work (passable workaround).
-//                    // Check if the block can be passed through with the bounding box (disregard the ignore flag).
-//                    if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)){
-//                    	// Spider !
-//                    	System.out.println("*** Continue: passable workaround");
-//                    	continue;
-//                    }
+                    // Check if the block can be passed through with the bounding box (disregard the ignore flag).
+                    if (isPassableWorkaround(access, x, y, z, minX - x, minY - y, minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)){
+                    	// Spider !
+                    	// Not nice but...
+                    	// TODO: GROUND_HEIGHT: would have to check passable workaround again ?
+                    	if ((flags & F_GROUND_HEIGHT) == 0 ||  getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
+                        	continue;
+                    	}
+                    }
                     
-                    // TODO: Shortcut: if bounds[4] > fx return true (careful with fences) ?
+                    // Don't check above the top block for some cases.
+                    if (y == iMaxY){
+                    	// TODO: This could be a check before looping.
+//                         if (maxY - y < ((flags & F_HEIGHT150) == 0 ? bounds[4] : 1.5)){
+                        	 if (getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
+                        		 continue; 
+                        	 }
+//                         }
+                    }
+
                     
-                    // Check if the block above allows 
+//                    return true;
+                    
+                    // Check if the block above allows this to be ground. 
+                    
                 	if (y >= maxBlockY){
                 		// Only air above.
                 		return true;
                 	}
+                	
                     final int aboveId = access.getTypeId(x, y + 1, z);
                     final long aboveFlags = blockFlags[aboveId];
-                    if ((aboveFlags & F_IGN_PASSABLE) != 0){ // flags & 
+                    if ((aboveFlags & F_IGN_PASSABLE) != 0){
                     	// Ignore these (Note for above block check before ground property).
                     	// TODO: Should this always apply ?
                     	return true;
@@ -1643,9 +1744,7 @@ public class BlockProperties {
                     if ((aboveFlags & F_GROUND) == 0 || (aboveFlags & F_LIQUID) != 0 || (aboveFlags & ignoreFlags) != 0){
                     	return true;
                     }
-                    
-                	// TODO: Might also check for liquid.
-                    
+
                     final boolean variable = (flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0;
                     // Check if it is the same id (walls!) and similar.
                     if (!variable && id == aboveId){
@@ -1655,12 +1754,18 @@ public class BlockProperties {
                 
                     // Check against spider type hacks.
                 	final double[] aboveBounds = access.getBounds(x, y + 1, z);
-                	if (aboveBounds == null) return true;
+                	if (aboveBounds == null){
+                		return true;
+                	}
                 	
                     if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)){
                     	return true;
                     }
-                    // TODO: Check passable workaround without checking ignore flag.
+                    // Check passable workaround without checking ignore flag.
+                    if (isPassableWorkaround(access, x, y + 1, z, minX - x, minY - (y + 1), minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)){
+                    	return true;
+                    }
+
                     
                     // TODO: This might be seen as a violation for many block types.
                 	// TODO: More distinction necessary here.
@@ -1689,7 +1794,7 @@ public class BlockProperties {
         return false;
     }
 
-    /**
+	/**
      * All dimensions 0 ... 1, no null checks.
      * @param bounds Block bounds: minX, minY, minZ, maxX, maxY, maxZ
      * @return
