@@ -456,6 +456,7 @@ public class BlockProperties {
 						Material.WALL_SIGN, Material.SIGN_POST,
 						Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
 						Material.LADDER, Material.CAKE_BLOCK,
+						Material.COCOA,
 				}){
 					blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 				}
@@ -472,6 +473,7 @@ public class BlockProperties {
 				Material.PISTON_EXTENSION, Material.ANVIL,
 				Material.SKULL, Material.FLOWER_POT,
 				Material.CAKE_BLOCK, Material.DRAGON_EGG,
+				Material.COCOA,
 		}){
 			blockFlags[mat.getId()] |= F_GROUND_HEIGHT;
 		}
