@@ -1125,6 +1125,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// Correct set-back on world changes.
 		if (!data.hasSetBack()){
+			// TODO: Might consider something else like with respawn. Check if it is passable ?
 			data.setSetBack(loc);
 		}
 		else if (data.hasSetBackWorldChanged(loc)){
