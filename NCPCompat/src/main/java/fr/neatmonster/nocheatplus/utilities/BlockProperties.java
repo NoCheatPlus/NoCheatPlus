@@ -464,11 +464,16 @@ public class BlockProperties {
 		
 		// Ignore for passable.
 		for (final Material mat : new Material[]{
+				// More strictly needed.
 				Material.WOOD_PLATE, Material.STONE_PLATE, 
 				Material.WALL_SIGN, Material.SIGN_POST,
 				Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
-				Material.LADDER, Material.CAKE_BLOCK,
-				Material.COCOA,
+				// Compatibility.
+				Material.LADDER, 
+				// Somewhat needed (xz-bounds vary, not critical to pass through).
+				Material.CAKE_BLOCK,
+				// Workarounds.
+//				Material.COCOA,
 		}){
 			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 		}
@@ -478,16 +483,23 @@ public class BlockProperties {
 				Material.FENCE, Material.FENCE_GATE, Material.COBBLE_WALL,
 				Material.NETHER_FENCE,
 				Material.IRON_FENCE, Material.THIN_GLASS,
+				
 		}){
 			blockFlags[mat.getId()] |= F_VARIABLE;
 		}
+		// ? Extra flag for COCOA, ANVIL: depends on data value (other issue)
 		
 		// Flexible ground (height):
 		for (final Material mat : new Material[]{
-				Material.PISTON_EXTENSION, Material.ANVIL,
-				Material.SKULL, Material.FLOWER_POT,
-				Material.CAKE_BLOCK, Material.DRAGON_EGG,
-				Material.COCOA,
+				// Strictly needed.
+				Material.PISTON_EXTENSION, 
+				// XZ-bounds issues.
+				Material.CAKE_BLOCK
+				// Already worked around with isPassableWorkaround (kept for dev-reference).
+//				Material.ANVIL,
+//				Material.SKULL, Material.FLOWER_POT,
+//				Material.DRAGON_EGG,
+//				Material.COCOA,
 		}){
 			blockFlags[mat.getId()] |= F_GROUND_HEIGHT;
 		}
@@ -1171,7 +1183,7 @@ public class BlockProperties {
 	}
 	
 	/**
-	 * Assuming the hit-box is hit (...) this checks for special blocks properties such as glass panes and similar.<br>
+	 * Requires the hit-box of the block is hit (...): this checks for special blocks properties such as glass panes and similar.<br>
 	 * Ray-tracing version for passable-workarounds.
 	 * @param access
 	 * @param bx Block-coordinates.
@@ -1188,6 +1200,7 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static final boolean isPassableWorkaround(final BlockCache access, final int bx, final int by, final int bz, final double fx, final double fy, final double fz, final int id, final double dX, final double dY, final double dZ, final double dT){
+		// Note: Since this is only called if the bounding box collides, out-of-bounds checks should not be necessary.
 		final long flags = blockFlags[id];
 		if ((flags & F_STAIRS) != 0){
 			if ((access.getData(bx, by, bz) & 0x4) != 0){
@@ -1234,18 +1247,15 @@ public class BlockProperties {
 		    }
 		}
 		else if (id == Material.CACTUS.getId()){
-			if (Math.min(fy, fy + dY * dT) >= 0.9375) return true;
-			final double low = 0.238;
-			final double high = 0.762;
-			final double xEnd = fx + dX * dT;
-			if (xEnd <= low && fx <= low) return true;
-			else if (xEnd >= high && fx >= high) return true;
-			final double zEnd = fz + dZ * dT;
-			if (zEnd <= low && fz <= low) return true;
-			else if (zEnd >= high && fz >= high) return true;
+			if (Math.min(fy, fy + dY * dT) >= 0.9375){
+				return true;
+			}
+			return collidesCenter(fx, fz, dX, dZ, dT, 0.07);
 		}
 		else if (id == Material.PISTON_EXTENSION.getId()){
-			if (Math.min(fy, fy + dY * dT) >= 0.625) return true;
+			if (Math.min(fy, fy + dY * dT) >= 0.625){
+				return true;
+			}
 		}
 		else if (id == Material.ANVIL.getId()){
 			// Allow slight inset.
@@ -1254,22 +1264,40 @@ public class BlockProperties {
 				// TODO: should be in data.
 				return false;
 			}
-			final double low = 0.176;
-			final double high = 0.824;
 			// TODO: Only one of x/z applies, depending on data value [problem: direction update].
-			final double xEnd = fx + dX * dT;
-			if (xEnd <= low && fx <= low) return true;
-			else if (xEnd >= high && fx >= high) return true;
-			final double zEnd = fz + dZ * dT;
-			if (zEnd <= low && fz <= low) return true;
-			else if (zEnd >= high && fz >= high) return true;
+			// TODO: 0.176 !? [Mind 0.3 for bonding box ...]
+			return collidesCenter(fx, fz, dX, dZ, dT, 0.0625);
 		}
 		// Nothing found.
 		return false;
 	}
 	
 	/**
+	 * Collision for x-z ray / bounds. (not really exact)
+	 * @param fx
+	 * @param fz
+	 * @param dX
+	 * @param dZ
+	 * @param dT
+	 * @return
+	 */
+	public static final boolean collidesCenter(final double fx, final double fz, final double dX, final double dZ, final double dT, final double inset){
+		final double low = inset;
+		final double high = 1.0 - inset;
+		final double xEnd = fx + dX * dT;
+		if (xEnd <= low && fx <= low) return true;
+		else if (xEnd >= high && fx >= high) return true;
+		final double zEnd = fz + dZ * dT;
+		if (zEnd <= low && fz <= low) return true;
+		else if (zEnd >= high && fz >= high) return true;
+		return false;
+	}
+	
+	/**
 	 * Reference block height for on-ground judgment: player must be at this or greater height to stand on this block.<br>
+	 * <br>
+	 * TODO: Check naming convention, might change to something with max ... volatile!
+	 * <br>
 	 * This might return 0 or somewhat arbitrary values for some blocks that don't have full bounds (!), might return 0 for blocks with the F_GROUND_HEIGHT flag, unless they are treated individually here.
 	 * @param access
 	 * @param x
@@ -1280,7 +1308,8 @@ public class BlockProperties {
 	 * @param flags
 	 * @return
 	 */
-    public static double getBlockHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
+    public static double getGroundMinHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
+    	// TODO: Check which ones are really needed !
     	if ((flags & F_STAIRS) != 0){
 			if ((access.getData(x, y, z) & 0x4) != 0){
 				return 1.0;
@@ -1297,7 +1326,7 @@ public class BlockProperties {
 //			return 0.4375;
 //		}
 		else if (id == Material.CAULDRON.getId()){
-			// TODO: Set F_GROUND_HEIGHT ?
+			// TODO: slightly over 0.
 			return 0;
 		}
 		else if (id == Material.PISTON_EXTENSION.getId()){
@@ -1736,8 +1765,10 @@ public class BlockProperties {
                     	// Spider !
                     	// Not nice but...
                     	// TODO: GROUND_HEIGHT: would have to check passable workaround again ?
-                    	// height >= ?
-                    	if ((flags & F_GROUND_HEIGHT) == 0 ||  getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
+                    	// TODO: height >= ?
+                    	// TODO: Another concept is needed for the stand-on-passable !
+                    	// TODO: Add getMinGroundHeight, getMaxGroundHeight.
+                    	if ((flags & F_GROUND_HEIGHT) == 0 ||  getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y){
                     		// Don't break, though could for some cases (?), since a block below still can be ground.
                         	continue;
                     	}
@@ -1745,7 +1776,7 @@ public class BlockProperties {
                     
                     // Don't count as ground if a block contains the foot.
                     // height >= ?
-					if (getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
+					if (getGroundMinHeight(access, x, y, z, id, bounds, flags) > maxY - y){
 						// Within block, this x and z is no candidate for ground.
 						if (isFullBounds(bounds)){
 							break;
@@ -1767,11 +1798,13 @@ public class BlockProperties {
                 		return true;
                 	}
                 	
-                	// TODO: This can be a problem with glass panes etc.
-//                	if (y != iMaxY){
-//                		// Ground found and the block above is passable, no need to check above.
-//                		return true;
-//                	}
+                	boolean variable = (flags & F_VARIABLE) != 0;
+                	
+                	// TODO: Keep an eye on this one for exploits.
+                	if (y != iMaxY && !variable){
+                		// Ground found and the block above is passable, no need to check above.
+                		return true;
+                	}
                 	
                     final int aboveId = access.getTypeId(x, y + 1, z);
                     final long aboveFlags = blockFlags[aboveId];
@@ -1785,7 +1818,7 @@ public class BlockProperties {
                     	return true;
                     }
 
-                    final boolean variable = (flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0;
+                    variable |= (aboveFlags & F_VARIABLE) != 0;
                     // Check if it is the same id (walls!) and similar.
                     if (!variable && id == aboveId){
                     	// Exclude stone walls "quickly", can not stand on.
@@ -1803,6 +1836,7 @@ public class BlockProperties {
                 		return true;
                 	}
                 	
+                	// TODO: 1.49 might be obsolete !
                     if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)){
                     	return true;
                     }
