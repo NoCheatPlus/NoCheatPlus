@@ -1220,6 +1220,14 @@ public class BlockProperties {
 		}
 		else if (id == Material.CACTUS.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.9375) return true;
+			final double low = 0.238;
+			final double high = 0.762;
+			final double xEnd = fx + dX * dT;
+			if (xEnd <= low && fx <= low) return true;
+			else if (xEnd >= high && fx >= high) return true;
+			final double zEnd = fz + dZ * dT;
+			if (zEnd <= low && fz <= low) return true;
+			else if (zEnd >= high && fz >= high) return true;
 		}
 		else if (id == Material.PISTON_EXTENSION.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.625) return true;
@@ -1661,11 +1669,11 @@ public class BlockProperties {
      * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
      * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
      * @param access
-     * @param minX
+     * @param minX Bounding box coordinates...
      * @param minY
      * @param minZ
      * @param maxX
-     * @param maxY
+     * @param maxY Meant to be the foot-position.
      * @param maxZ
      * @param ignoreFlags Blocks with these flags are not counted as ground.
      * @return
@@ -1711,6 +1719,7 @@ public class BlockProperties {
                     	// Not nice but...
                     	// TODO: GROUND_HEIGHT: would have to check passable workaround again ?
                     	if ((flags & F_GROUND_HEIGHT) == 0 ||  getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
+                    		// Don't break, though could for some cases (?), since a block below still can be ground.
                         	continue;
                     	}
                     }
@@ -1720,7 +1729,13 @@ public class BlockProperties {
                     	// TODO: This could be a check before looping.
 //                         if (maxY - y < ((flags & F_HEIGHT150) == 0 ? bounds[4] : 1.5)){
                         	 if (getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
-                        		 continue; 
+                        		 // Within block, this x and z is no candidate for ground.
+                        		 if (isFullBounds(bounds)){
+                        			 break;
+                        		 }
+                        		 else{
+                        			 continue; 
+                        		 }
                         	 }
 //                         }
 //                    }
@@ -1732,6 +1747,11 @@ public class BlockProperties {
                     
                 	if (y >= maxBlockY){
                 		// Only air above.
+                		return true;
+                	}
+                	
+                	if (y != iMaxY){
+                		// Ground found and the block above is passable, no need to check above.
                 		return true;
                 	}
                 	
@@ -1750,8 +1770,13 @@ public class BlockProperties {
                     final boolean variable = (flags & F_VARIABLE) != 0 || (aboveFlags & F_VARIABLE) != 0;
                     // Check if it is the same id (walls!) and similar.
                     if (!variable && id == aboveId){
-                    	// Exclude stone walls "quickly".
-                    	continue;
+                    	// Exclude stone walls "quickly", can not stand on.
+                    	if (isFullBounds(bounds)){
+                    		break;
+                    	}
+                    	else{
+                    		continue;
+                    	}
                     }
                 
                     // Check against spider type hacks.
@@ -1763,32 +1788,35 @@ public class BlockProperties {
                     if (!collidesBlock(access, minX, minY, minZ, maxX, Math.max(maxY, 1.49 + y), maxZ, x, y + 1, z, aboveId, aboveBounds, aboveFlags)){
                     	return true;
                     }
+                    
                     // Check passable workaround without checking ignore flag.
                     if (isPassableWorkaround(access, x, y + 1, z, minX - x, minY - (y + 1), minZ - z, id, maxX - minX, maxY - minY, maxZ - minZ, 1.0)){
                     	return true;
                     }
-
                     
+                    if (isFullBounds(aboveBounds)){
+                    	// Can not be ground at this x - z position.
+                    	break;
+                    }
+                    
+                    // TODO: Is this variable workaround still necessary ?
                     // TODO: This might be seen as a violation for many block types.
                 	// TODO: More distinction necessary here.
             		if (variable){
             			// Simplistic hot fix attempt for same type + same shape.
             			// TODO: Needs passable workaround check.
-                		if (isFullBounds(aboveBounds) || isSameShape(bounds, aboveBounds)){
+                		if (isSameShape(bounds, aboveBounds)){
+                			// Can not stand on (rough heuristics).
                 			// TODO: Test with cactus.
-                			continue;
+                			break;
+                			// continue;
                 		}
                 		else{
                 			return true;
                 		}
             		}
-            		// Workarounds.
-            		if (aboveId != id && aboveId == Material.CACTUS.getId()){
-            			// TODO: This is a rough estimate, assumes sand underneath, further relies on passable.
-            			// TODO: General workaround for slightly inset blocks which have full bounds for passable.
-            			return true;
-            		}
-                	// Not regarded as ground.
+            		
+                	// Not regarded as ground, 
                 	continue;
                 }
             }
