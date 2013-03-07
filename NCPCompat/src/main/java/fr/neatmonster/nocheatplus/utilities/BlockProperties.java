@@ -376,6 +376,8 @@ public class BlockProperties {
 		///////////////////////////
 		// Initalize block flags
 		///////////////////////////
+		
+		// Generic initialization.
 		for (int i = 0; i <maxBlocks; i++){
 			blockFlags[i] = 0;
 
@@ -396,32 +398,38 @@ public class BlockProperties {
 				Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS }) {
 			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100 | F_GROUND; // Set ground too, to be sure.
 		}
+		
 		// WATER.
 		for (final Material mat : new Material[]{
 				Material.STATIONARY_WATER, Material.WATER,
 		}) {
 			blockFlags[mat.getId()] |= F_LIQUID | F_WATER;
 		}
+		
 		// LAVA.
         for (final Material mat : new Material[]{
                 Material.LAVA, Material.STATIONARY_LAVA,
         }) {
             blockFlags[mat.getId()] |= F_LIQUID | F_LAVA;
         }
-        // Fence types (150% height).
+        
+        // 1.5 block high.
         for (final Material mat : new Material[]{
                 Material.FENCE, Material.FENCE_GATE,
                 Material.NETHER_FENCE,
         }){
             blockFlags[mat.getId()] |= F_HEIGHT150;
         }
+        
         // Climbable
         for (final Material mat : new Material[]{
                 Material.VINE, Material.LADDER,
         }){
             blockFlags[mat.getId()] |= F_CLIMBABLE;
         }
+        
         // Workarounds.
+        // Ground (can stand on).
         for (final Material mat : new Material[]{
                 Material.WATER_LILY, Material.LADDER,
                 Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
@@ -431,36 +439,41 @@ public class BlockProperties {
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
+        
+        // Full block height.
         for (final Material mat : new Material[]{
         		Material.ENDER_PORTAL_FRAME, Material.BREWING_STAND,
         		Material.PISTON_EXTENSION,
         }){
             blockFlags[mat.getId()] |= F_HEIGHT100;
         }
+        
+        // Full xz-bounds.
         for (final Material mat : new Material[]{
         		Material.PISTON_EXTENSION,
         }){
             blockFlags[mat.getId()] |= F_XZ100;
         }
         
-		// Ignore for passable.
+		// Not ground (!).
 		for (final Material mat : new Material[]{
 				Material.WALL_SIGN, Material.SIGN_POST,
 		}){
 			blockFlags[mat.getId()] &= ~(F_GROUND | F_SOLID);
 		}
-		// Not ground (!).
-		// Ignore for passable.
-				for (final Material mat : new Material[]{
-						Material.WOOD_PLATE, Material.STONE_PLATE, 
-						Material.WALL_SIGN, Material.SIGN_POST,
-						Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
-						Material.LADDER, Material.CAKE_BLOCK,
-						Material.COCOA,
-				}){
-					blockFlags[mat.getId()] |= F_IGN_PASSABLE;
-				}
 		
+		// Ignore for passable.
+		for (final Material mat : new Material[]{
+				Material.WOOD_PLATE, Material.STONE_PLATE, 
+				Material.WALL_SIGN, Material.SIGN_POST,
+				Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+				Material.LADDER, Material.CAKE_BLOCK,
+				Material.COCOA,
+		}){
+			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
+		}
+		
+		// Blocks changing depending on neighbor blocks.
 		for (final Material mat : new Material[]{
 				Material.FENCE, Material.FENCE_GATE, Material.COBBLE_WALL,
 				Material.NETHER_FENCE,
@@ -468,6 +481,7 @@ public class BlockProperties {
 		}){
 			blockFlags[mat.getId()] |= F_VARIABLE;
 		}
+		
 		// Flexible ground (height):
 		for (final Material mat : new Material[]{
 				Material.PISTON_EXTENSION, Material.ANVIL,
@@ -479,7 +493,7 @@ public class BlockProperties {
 		}
 		
 		////////////////////////////////
-		// Set block props.
+		// Set block break properties.
 		////////////////////////////////
 		// Instantly breakable.
 		for (final Material mat : instantMat){
@@ -607,6 +621,7 @@ public class BlockProperties {
 		blocks[Material.OBSIDIAN.getId()] = new BlockProps(diamondPickaxe, 50, secToMs(250, 250, 250, 250, 9.4, 250));
 		
 		// More 1.4 (not insta).
+		// TODO: Either move all to an extra setup class, or integrate above.
 		blocks[Material.BEACON.getId()] = new BlockProps(noTool, 25f, secToMs(4.45)); // TODO
 		blocks[Material.COBBLE_WALL.getId()] = brickType;
 		blockFlags[Material.COBBLE_WALL.getId()] |= F_HEIGHT150;
@@ -1673,7 +1688,7 @@ public class BlockProperties {
      * @param minY
      * @param minZ
      * @param maxX
-     * @param maxY Meant to be the foot-position.
+     * @param maxY Meant to be the foot-level.
      * @param maxZ
      * @param ignoreFlags Blocks with these flags are not counted as ground.
      * @return
@@ -1690,6 +1705,9 @@ public class BlockProperties {
     	final int iMaxZ = Location.locToBlock(maxZ);
         for (int x = iMinX; x <= iMaxX; x++){
             for (int z = iMinZ; z <= iMaxZ; z++){
+            	
+            	// TODO: Might move above block check right here.
+            	
                 for (int y = iMaxY; y >= iMinY; y --){
                 	
                 	// TODO: Remember the state of the last block below instead of checking the block above.
@@ -1700,7 +1718,7 @@ public class BlockProperties {
                                       
                     if ((flags & F_GROUND) == 0 || (flags & ignoreFlags) != 0){
                     	continue;
-                    } 	
+                    }
                     	
                     // Might collide.
                 	final double[] bounds = access.getBounds(x, y, z);
@@ -1718,6 +1736,7 @@ public class BlockProperties {
                     	// Spider !
                     	// Not nice but...
                     	// TODO: GROUND_HEIGHT: would have to check passable workaround again ?
+                    	// height >= ?
                     	if ((flags & F_GROUND_HEIGHT) == 0 ||  getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
                     		// Don't break, though could for some cases (?), since a block below still can be ground.
                         	continue;
@@ -1725,24 +1744,22 @@ public class BlockProperties {
                     }
                     
                     // Don't count as ground if a block contains the foot.
-//                    if (y == iMaxY){
-                    	// TODO: This could be a check before looping.
-//                         if (maxY - y < ((flags & F_HEIGHT150) == 0 ? bounds[4] : 1.5)){
-                        	 if (getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
-                        		 // Within block, this x and z is no candidate for ground.
-                        		 if (isFullBounds(bounds)){
-                        			 break;
-                        		 }
-                        		 else{
-                        			 continue; 
-                        		 }
-                        	 }
-//                         }
-//                    }
-
-                    
-//                    return true;
-                    
+                    // height >= ?
+					if (getBlockHeight(access, x, y, z, id, bounds, flags) > maxY - y){
+						// Within block, this x and z is no candidate for ground.
+						if (isFullBounds(bounds)){
+							break;
+						}
+						else{
+							continue; 
+						}
+					}
+					
+					if (maxY - y < 1.0){
+						// No need to check the block above (half slabs, stairs).
+						return true;
+					}
+					
                     // Check if the block above allows this to be ground. 
                     
                 	if (y >= maxBlockY){
@@ -1750,10 +1767,11 @@ public class BlockProperties {
                 		return true;
                 	}
                 	
-                	if (y != iMaxY){
-                		// Ground found and the block above is passable, no need to check above.
-                		return true;
-                	}
+                	// TODO: This can be a problem with glass panes etc.
+//                	if (y != iMaxY){
+//                		// Ground found and the block above is passable, no need to check above.
+//                		return true;
+//                	}
                 	
                     final int aboveId = access.getTypeId(x, y + 1, z);
                     final long aboveFlags = blockFlags[aboveId];
