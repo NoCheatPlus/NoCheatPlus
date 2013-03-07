@@ -261,7 +261,7 @@ public class SurvivalFly extends Check {
 //        	else vAllowedDistance = climbSpeed;
 //        	vDistanceAboveLimit = Math.abs(yDistance) - vAllowedDistance;
 //        	if (vDistanceAboveLimit > 0) tags.add("vclimb");
-        	final double jumpHeight = 1.45 + (data.jumpAmplifier > 0 ? (0.5 + data.jumpAmplifier - 1.0) : 0.0);
+        	final double jumpHeight = 1.35 + (data.jumpAmplifier > 0 ? (0.6 + data.jumpAmplifier - 1.0) : 0.0);
         	// TODO: ladders are ground !
         	if (yDistance > climbSpeed && !from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE)){
         		// Ignore ladders. TODO: Check for false positives...
@@ -319,14 +319,14 @@ public class SurvivalFly extends Check {
         else{
         	// Check traveled y-distance, orientation is air + jumping + velocity (as far as it gets).
         	// TODO: Can it be easily transformed to a more accurate max. absolute height? 
-        	vAllowedDistance = (!(fromOnGround || data.noFallAssumeGround) && !toOnGround ? 1.45D : 1.35D) + data.verticalFreedom;
+        	vAllowedDistance = 1.35D + data.verticalFreedom;
         	int maxJumpPhase;
             if (data.mediumLiftOff == MediumLiftOff.LIMIT_JUMP){
             	maxJumpPhase = 3;
             	if (data.sfJumpPhase > 0) tags.add("limitjump");
             }
             else if (data.jumpAmplifier > 0){
-                vAllowedDistance += 0.5 + data.jumpAmplifier - 1.0;
+                vAllowedDistance += 0.6 + data.jumpAmplifier - 1.0;
                 maxJumpPhase = (int) (9 + (data.jumpAmplifier - 1.0) * 6);
             }
             else maxJumpPhase = 6;
@@ -594,8 +594,7 @@ public class SurvivalFly extends Check {
 		
 		if (yDistance >= 0){
 			// Half block step up.
-			if (yDistance <= 0.5 && hDistance < 0.5 && to.isOnGround()){
-				// TODO: Also confine concerning hDist !
+			if (yDistance <= 0.5 && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.1 * data.jumpAmplifier && to.isOnGround()){
 				if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
 					return applyWorkaround(player, from, true, data);
 				}
