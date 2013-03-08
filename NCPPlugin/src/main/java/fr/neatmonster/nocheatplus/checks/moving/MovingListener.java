@@ -25,17 +25,15 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
@@ -52,6 +50,7 @@ import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
+import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -89,7 +88,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * 
  * @see MovingEvent
  */
-public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig{
+public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
 
 	/**
 	 * Coupling from and to PlayerLocation objects with a block cache for easy storage and reuse.
@@ -948,13 +947,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
          */
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
+        // Ignore velocity if inside of vehicles.
+        if (player.isInsideVehicle()){
+        	data.removeAllVelocity();
+        	return;
+        }
+        
+        data.removeInvalidVelocity();
         final MovingConfig cc = MovingConfig.getConfig(player);
         
         final Vector velocity = event.getVelocity();
         
         if (cc.debug) System.out.println(event.getPlayer().getName() + " new velocity: " + velocity);
-        
-        // TODO: Check for vehicles ?
         
         double newVal = velocity.getY();
         if (newVal >= 0D) {
@@ -970,7 +974,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
         	final Velocity vel = new Velocity(newVal, cc.velocityActivationCounter, 1 + (int) Math.round(newVal * 10.0));
-        	data.removeInvalidVelocity();
         	data.addHorizontalVelocity(vel);
 //            data.horizontalFreedom += newVal;
 //            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 30;
@@ -1123,9 +1126,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Entity fall-distance should be reset elsewhere.
     }
     
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerJoin(final PlayerJoinEvent event) {
-		final Player player = event.getPlayer();
+	@Override
+	public void playerJoins(final Player player) {
 		final MovingData data = MovingData.getData(player);
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
@@ -1165,18 +1167,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.sfHoverLoginTicks = 0;
 			data.sfHoverTicks = -1;
 		}
+
 	}
-    
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(final PlayerQuitEvent event){
-    	onLeave(event.getPlayer());
-        
-    }
-    
-    private void onLeave(final Player player) {
+
+	@Override
+	public void playerLeaves(final Player player) {
     	survivalFly.setReallySneaking(player, false);
         noFall.onLeave(player);
         final MovingData data = MovingData.getData(player);
+        // TODO: Add a method for ordinary presence-change resetting (use in join + leave).
         data.removeAllVelocity();
 	}
     
@@ -1192,6 +1191,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	final Entity entity = event.getVehicle().getPassenger();
     	if (!(entity instanceof Player)) return;
     	onPlayerVehicleLeave((Player) entity);
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public final void onPlayerVehicleEnter(final VehicleEnterEvent event){
+    	final Entity entity = event.getEntered();
+    	if (!(entity instanceof Player)){
+    		return;
+    	}
+    	final Player player = (Player) entity;
+    	final MovingData data = MovingData.getData(player);
+    	data.removeAllVelocity();
+    	// TODO: more resetting, visible check ?
     }
     
     private final void onPlayerVehicleLeave(final Player player){
@@ -1218,11 +1229,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	data.verticalFreedom = 1.2;
     	data.verticalVelocity = 0.15;
     	data.verticalVelocityUsed = 0;
-    }
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerKick(final PlayerKickEvent event){
-        onLeave(event.getPlayer());
     }
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1362,4 +1368,5 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		parkedInfo.clear();
 		hoverTicksStep = Math.max(1, ConfigManager.getConfigFile().getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP));
 	}
+
 }

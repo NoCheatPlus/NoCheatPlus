@@ -7,7 +7,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
@@ -15,6 +14,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -36,7 +36,7 @@ import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
  * 
  * @see ChatEvent
  */
-public class ChatListener extends CheckListener implements INotifyReload {
+public class ChatListener extends CheckListener implements INotifyReload, JoinLeaveListener {
     
     // Checks.
     
@@ -220,12 +220,19 @@ public class ChatListener extends CheckListener implements INotifyReload {
         	event.disallow(Result.KICK_OTHER, cc.loginsKickMessage);
         }
     }
-    
-    @EventHandler(
-            priority = EventPriority.MONITOR)
-    public void onPlayerJoin(final PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
-        final ChatConfig cc = ChatConfig.getConfig(player);
+
+	@Override
+	public void onReload() {
+		// Read some things from the global config file.
+    	ConfigFile config = ConfigManager.getConfigFile();
+    	initFilters(config);
+    	text.onReload();
+    	logins.onReload();
+	}
+
+	@Override
+	public void playerJoins(final Player player) { 
+		final ChatConfig cc = ChatConfig.getConfig(player);
         final ChatData data = ChatData.getData(player);
         synchronized (data) {
             if (captcha.isEnabled(player) && captcha.shouldCheckCaptcha(cc, data)){
@@ -235,15 +242,10 @@ public class ChatListener extends CheckListener implements INotifyReload {
                 captcha.sendNewCaptcha(player, cc, data);
             }
         }
-    }
+	}
 
 	@Override
-	public void onReload() {
-		// Read some things from the global config file.
-    	ConfigFile config = ConfigManager.getConfigFile();
-    	initFilters(config);
-    	text.onReload();
-    	logins.onReload();
+	public void playerLeaves(final Player player) {
 	}
 
 }
