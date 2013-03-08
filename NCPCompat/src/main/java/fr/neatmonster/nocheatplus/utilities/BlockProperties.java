@@ -1736,6 +1736,7 @@ public class BlockProperties {
             for (int z = iMinZ; z <= iMaxZ; z++){
             	
             	// TODO: Might move above block check right here.
+            	// TODO: Given workaround fixes, could go for the much-simplified-top-down-loop once more.
             	
                 for (int y = iMaxY; y >= iMinY; y --){
                 	
@@ -1744,7 +1745,10 @@ public class BlockProperties {
                 	
                     final int id = access.getTypeId(x, y, z);
                     final long flags = blockFlags[id];
-                                      
+                    
+                    
+                    // TODO: LIQUID could be a quick return as well.
+                    // (IGN_PASSABLE might still allow standing on.)
                     if ((flags & F_GROUND) == 0 || (flags & ignoreFlags) != 0){
                     	continue;
                     }
@@ -1805,6 +1809,8 @@ public class BlockProperties {
                 		// Ground found and the block above is passable, no need to check above.
                 		return true;
                 	}
+                	// TODO: Else if variable : continue ?
+                	// TODO: Highest block is always the foot position, even if just below 1.0, a return true would be ok?
                 	
                     final int aboveId = access.getTypeId(x, y + 1, z);
                     final long aboveFlags = blockFlags[aboveId];
@@ -1851,7 +1857,7 @@ public class BlockProperties {
                     	break;
                     }
                     
-                    // TODO: Is this variable workaround still necessary ?
+                    // TODO: Is this variable workaround still necessary ? Has this not been tested above already (passable workaround!)
                     // TODO: This might be seen as a violation for many block types.
                 	// TODO: More distinction necessary here.
             		if (variable){
