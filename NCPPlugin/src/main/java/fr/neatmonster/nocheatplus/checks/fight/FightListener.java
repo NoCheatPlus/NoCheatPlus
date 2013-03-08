@@ -155,7 +155,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	if (speed.check(player, now)){
         		cancelled = true;
         		// Still feed the improbable.
-        		Improbable.feed(player, 2f, now);
+        		if (data.speedVL > 50){
+        			Improbable.check(player, 2f, now, "fight.speed");
+        		}
+        		else{
+        			Improbable.feed(player, 2f, now);
+        		}
         	}
         	else if (normalizedMove > 2.0 && Improbable.check(player, 1f, now, "fight.speed")){
         		// Feed improbable in case of ok-moves too.
