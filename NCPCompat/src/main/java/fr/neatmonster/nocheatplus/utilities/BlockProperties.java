@@ -1310,7 +1310,16 @@ public class BlockProperties {
 	 */
     public static double getGroundMinHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
     	// TODO: Check which ones are really needed !
-    	if ((flags & F_STAIRS) != 0){
+    	if (id == Material.SNOW.getId()){
+    		final int data = (access.getData(x, y, z) & 0xF) % 8;
+    		if (data < 3) return 0;
+    		else return 0.5;
+    	}
+    	// Height 100 is ignored (!).
+		else if ((flags & F_HEIGHT150) != 0){
+    		return 1.5;
+    	}
+    	else if ((flags & F_STAIRS) != 0){
 			if ((access.getData(x, y, z) & 0x4) != 0){
 				return 1.0;
 			}
@@ -1329,18 +1338,12 @@ public class BlockProperties {
 			// TODO: slightly over 0.
 			return 0;
 		}
+		else if (id == Material.CACTUS.getId()){
+			return 0.9375;
+		}
 		else if (id == Material.PISTON_EXTENSION.getId()){
 			return 0.625;
 		}
-		else if (id == Material.SNOW.getId()){
-    		final int data = (access.getData(x, y, z) & 0xF) % 8;
-    		if (data < 3) return 0;
-    		else return 0.5;
-    	}
-    	// Height 100 is ignored (!).
-		else if ((flags & F_HEIGHT150) != 0){
-    		return 1.5;
-    	}
 		else if ((flags & F_GROUND_HEIGHT) != 0){
 			// All blocks that are not treated individually are ground all through.
 			// TODO: Experimental workaround.
