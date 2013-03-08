@@ -23,6 +23,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
+import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -43,7 +44,7 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  * 
  * @see FightEvent
  */
-public class FightListener extends CheckListener {
+public class FightListener extends CheckListener implements JoinLeaveListener{
 
     /** The angle check. */
     private final Angle       angle       = addCheck(new Angle());
@@ -379,6 +380,15 @@ public class FightListener extends CheckListener {
     	// Set god-mode health to maximum.
     	// TODO: Mind that health regain might half the ndt.
     	data.godModeHealth = Math.max(data.godModeHealth, player.getHealth() + event.getAmount());
-
     }
+
+	@Override
+	public void playerJoins(final Player player) {
+	}
+
+	@Override
+	public void playerLeaves(final Player player) {
+		final FightData data = FightData.getData(player);
+		data.angleHits.clear();
+	}
 }
