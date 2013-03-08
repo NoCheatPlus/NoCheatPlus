@@ -111,17 +111,19 @@ public class Reach extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             cancel = executeActions(player, data.reachVL, violation, cc.reachActions);
-            if (Improbable.check(player, (float) violation, System.currentTimeMillis(), "fight.reach"))
-                cancel = true;
-            if (cancel)
+            if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), "fight.reach")){
+            	cancel = true;
+            }
+            if (cancel){
                 // If we should cancel, remember the current time too.
                 data.reachLastViolationTime = System.currentTimeMillis();
+            }
         }
         else if (lenpRel - distanceLimit * reachMod > 0){
         	// Silent cancel.
             data.reachLastViolationTime = Math.max(data.reachLastViolationTime, System.currentTimeMillis() - cc.reachPenalty / 2);
             cancel = true;
-            Improbable.feed(player, (float) (lenpRel - distanceLimit * reachMod) / 2f, System.currentTimeMillis());
+            Improbable.feed(player, (float) (lenpRel - distanceLimit * reachMod) / 4f, System.currentTimeMillis());
         }
         else{
             // Player passed the check, reward him.
@@ -129,7 +131,9 @@ public class Reach extends Check {
             
         }
         
-        if (!cc.reachReduce) data.reachMod = 1d;
+        if (!cc.reachReduce){
+        	data.reachMod = 1d;
+        }
         else if (lenpRel > distanceLimit - DYNAMIC_RANGE){
         	data.reachMod = Math.max(distanceMin, data.reachMod - DYNAMIC_STEP);
         }
@@ -148,7 +152,9 @@ public class Reach extends Check {
             cancelByPenalty = !cancel;
             cancel = true;
         }
-        else cancelByPenalty = false;
+        else{
+        	cancelByPenalty = false;
+        }
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
             player.sendMessage("NC+: Attack " + (cancel ? (cancelByPenalty ? "(cancel/penalty) ":"(cancel/reach) ") : "") + damaged.getType()+ " height="+ StringUtil.fdec3.format(height) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(reachMod));
