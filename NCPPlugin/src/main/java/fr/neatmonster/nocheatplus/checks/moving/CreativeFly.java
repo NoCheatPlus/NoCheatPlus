@@ -83,7 +83,23 @@ public class CreativeFly extends Check {
         final double limitH = cc.creativeFlyHorizontalSpeed / 100D * HORIZONTAL_SPEED * fSpeed;
 
         // Finally, determine how far the player went beyond the set limits.
-        double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
+//        double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
+        double resultH = Math.max(0.0D, hDistance - limitH);
+        
+        // Check velocity.
+		if (resultH > 0){
+			double hFreedom = data.getHorizontalFreedom();
+			if (hFreedom < resultH){
+				// Use queued velocity if possible.
+				hFreedom += data.useHorizontalVelocity(resultH - hFreedom);
+			}
+			if (hFreedom > 0.0){
+				resultH = Math.max(0.0, resultH - hFreedom);
+			}
+		}
+		else{
+			data.hVelActive.clear(); // TODO: test/check !
+		}
 
         final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
 

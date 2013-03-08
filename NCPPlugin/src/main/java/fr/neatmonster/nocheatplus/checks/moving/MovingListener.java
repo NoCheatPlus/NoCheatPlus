@@ -455,6 +455,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		if (player.isInsideVehicle()){
 			// Workaround for pigs !
 			data.sfHoverTicks = -1;
+			data.removeAllVelocity();
 			final Entity vehicle = player.getVehicle();
 			if (vehicle != null && (vehicle instanceof Pig)){
 				onVehicleMove(new VehicleMoveEvent((Vehicle) vehicle, event.getFrom(), event.getFrom()));
@@ -518,22 +519,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
 		// TODO: Rework to queued velocity entries: activation + invalidation
-		// Horizontal velocity.
-        if (data.horizontalVelocityCounter > 0D){
-        	data.horizontalVelocityUsed ++;
-        	data.horizontalVelocityCounter--;
-        	data.horizontalFreedom = Math.max(0.0, data.horizontalFreedom - 0.09);
-        }
-        else if (data.horizontalFreedom > 0.001D){
-        	if (data.verticalVelocityUsed == 1 && data.verticalVelocity > 0.5){
-        		data.horizontalVelocityUsed = 0;
-        		data.horizontalFreedom = 0;
-        	}
-        	else{
-            	data.horizontalVelocityUsed ++;
-            	data.horizontalFreedom *= 0.90D;
-        	}
-        }
+		data.removeInvalidVelocity();
+		data.velocityTick();
+//		// Horizontal velocity.
+//        if (data.horizontalVelocityCounter > 0D){
+//        	data.horizontalVelocityUsed ++;
+//        	data.horizontalVelocityCounter--;
+//        	data.horizontalFreedom = Math.max(0.0, data.horizontalFreedom - 0.09);
+//        }
+//        else if (data.horizontalFreedom > 0.001D){
+//        	if (data.verticalVelocityUsed == 1 && data.verticalVelocity > 0.5){
+//        		data.horizontalVelocityUsed = 0;
+//        		data.horizontalFreedom = 0;
+//        	}
+//        	else{
+//            	data.horizontalVelocityUsed ++;
+//            	data.horizontalFreedom *= 0.90D;
+//        	}
+//        }
         // Vertical velocity.
         if (data.verticalVelocity <= 0.09D){
         	data.verticalVelocityUsed ++;
@@ -951,6 +954,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         if (cc.debug) System.out.println(event.getPlayer().getName() + " new velocity: " + velocity);
         
+        // TODO: Check for vehicles ?
+        
         double newVal = velocity.getY();
         if (newVal >= 0D) {
         	if (data.verticalFreedom <= 0.001 && data.verticalVelocityCounter >= 0){
@@ -964,9 +969,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
-            data.horizontalFreedom += newVal;
-            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 30;
-            data.horizontalVelocityUsed = 0;
+        	final Velocity vel = new Velocity(newVal, cc.velocityActivationCounter, 1 + (int) Math.round(newVal * 10.0));
+        	data.removeInvalidVelocity();
+        	data.addHorizontalVelocity(vel);
+//            data.horizontalFreedom += newVal;
+//            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 30;
+//            data.horizontalVelocityUsed = 0;
         }
         
         // Set dirty flag here.
@@ -1121,6 +1129,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final MovingData data = MovingData.getData(player);
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
+		data.removeAllVelocity();
 		final Location loc = player.getLocation();
 		
 		// Correct set-back on world changes.
@@ -1167,7 +1176,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private void onLeave(final Player player) {
     	survivalFly.setReallySneaking(player, false);
         noFall.onLeave(player);
-        
+        final MovingData data = MovingData.getData(player);
+        data.removeAllVelocity();
 	}
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1199,9 +1209,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	data.resetPositions(loc);
     	data.setSetBack(loc);
     	// Experiment: add some velocity (fake).
-    	data.horizontalVelocityCounter = 1;
-    	data.horizontalFreedom = 0.9;
-    	data.horizontalVelocityUsed = 0;
+//    	data.horizontalVelocityCounter = 1;
+//    	data.horizontalFreedom = 0.9;
+//    	data.horizontalVelocityUsed = 0;
+    	data.removeAllVelocity();
+    	data.addHorizontalVelocity(new Velocity(0.9, 1, 1));
     	data.verticalVelocityCounter = 1;
     	data.verticalFreedom = 1.2;
     	data.verticalVelocity = 0.15;

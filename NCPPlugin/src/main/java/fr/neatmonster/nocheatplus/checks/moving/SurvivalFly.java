@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -123,7 +124,8 @@ public class SurvivalFly extends Check {
 		}
 		
         // Judge if horizontal speed is above limit.
-        double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
+//        double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
+        double hDistanceAboveLimit = hDistance - hAllowedDistance;
 		if (hDistanceAboveLimit > 0){
 			// Check extra buffer (!).
 			final double extraUsed;
@@ -139,10 +141,33 @@ public class SurvivalFly extends Check {
 			else{
 				extraUsed = 0.0;
 			}
-			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding).
+			// Check velocity.
+			double hFreedom; // Horizontal freedom if used (!).
+			if (hDistanceAboveLimit > 0){
+				hFreedom = data.getHorizontalFreedom();
+				if (hFreedom < hDistanceAboveLimit){
+					// Use queued velocity if possible.
+					hFreedom += data.useHorizontalVelocity(hDistanceAboveLimit - hFreedom);
+				}
+				if (hFreedom > 0.0){
+					hDistanceAboveLimit = Math.max(0.0, hDistanceAboveLimit - hFreedom);
+				}
+			}
+			else{
+				data.hVelActive.clear(); // TODO: test/check !
+				hFreedom = 0;
+			}
+			// TODO: Use velocity already here ?
+			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
 			if (hDistanceAboveLimit > 0){
 				hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, true);
-				hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom - extraUsed;
+//				hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom - extraUsed;
+				if (hFreedom > 0){
+					hDistanceAboveLimit = hDistance - hAllowedDistance - extraUsed - hFreedom;
+				}
+				else{
+					hDistanceAboveLimit = hDistance - hAllowedDistance - extraUsed;
+				}
 				if (hAllowedDistance > 0){ // TODO: Fix !
 					// (Horizontal buffer might still get used.)
 					tags.add("hspeed");
@@ -150,6 +175,7 @@ public class SurvivalFly extends Check {
 			}
 		}
 		else{
+			data.hVelActive.clear(); // TODO: test/check !
 			data.sfHBufExtra = 0;
 		}
 		///////
@@ -164,7 +190,8 @@ public class SurvivalFly extends Check {
 		}
 
         // Prevent players from sprinting if they're moving backwards.
-        if (hDistanceAboveLimit <= 0D && sprinting && data.horizontalFreedom <= 0.001D) {
+//        if (hDistanceAboveLimit <= 0D && sprinting && data.horizontalFreedom <= 0.001D) {
+        if (hDistanceAboveLimit <= 0D && sprinting && data.hVelActive.isEmpty()) {
             final float yaw = from.getYaw();
             if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F || xDistance < 0D && zDistance < 0D
                     && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
@@ -467,11 +494,6 @@ public class SurvivalFly extends Check {
                 data.verticalVelocity = 0;
                 data.verticalVelocityUsed = 0;
             }
-            if (data.horizontalVelocityUsed > cc.velocityGraceTicks && hDistance < sprintingSpeed){
-            	data.horizontalFreedom = 0;
-            	data.horizontalVelocityCounter = 0;
-            	data.horizontalVelocityUsed = 0;
-            }
         }
         else if (resetFrom){
             // The player moved from ground.
@@ -479,6 +501,18 @@ public class SurvivalFly extends Check {
             data.sfJumpPhase = 1; // TODO: ?
             data.clearAccounting();
         }
+        
+        // Check removal of active horizontal velocity.
+        if (hDistance <= hAllowedDistance){ // TODO: Check conditions etc.
+        	// Invalidate used horizontal velocity.
+        	data.hVelActive.clear();
+//          if (data.horizontalVelocityUsed > cc.velocityGraceTicks){
+//        	data.horizontalFreedom = 0;
+//        	data.horizontalVelocityCounter = 0;
+//        	data.horizontalVelocityUsed = 0;
+//        }
+        }
+        
         data.sfLastYDist = yDistance;
         return null;
     }
@@ -500,24 +534,38 @@ public class SurvivalFly extends Check {
 	private void outputDebug(final Player player, final PlayerLocation to, final MovingData data, final MovingConfig cc, 
 			final double hDistance, final double hAllowedDistance, final double yDistance, final double vAllowedDistance,
 			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
-		// TODO: also show resetcond (!)
+		// TODO: Show player name once (!)
 		final StringBuilder builder = new StringBuilder(500);
 		final String hBuf = (data.sfHorizontalBuffer < 1.0 ? ((" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer))) : "");
 		final String hBufExtra = (data.sfHBufExtra > 0 ? (" hbufextra=" + data.sfHBufExtra) : "");
-		builder.append(player.getName() + " ground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
-		builder.append("\n" + player.getName() + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + hBufExtra + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + ")");
+		builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
+		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + hBufExtra + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + ")");
 		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
-			builder.append("\n" + player.getName() + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
+			builder.append("\n" + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
 		}
-		if (data.horizontalVelocityCounter > 0 || data.horizontalFreedom >= 0.001){
-			builder.append("\n" + player.getName() + " horizontal freedom: " +  StringUtil.fdec3.format(data.horizontalFreedom) + " (counter=" + data.horizontalVelocityCounter +"/used="+data.horizontalVelocityUsed);
+//		if (data.horizontalVelocityCounter > 0 || data.horizontalFreedom >= 0.001){
+//			builder.append("\n" + player.getName() + " horizontal freedom: " +  StringUtil.fdec3.format(data.horizontalFreedom) + " (counter=" + data.horizontalVelocityCounter +"/used="+data.horizontalVelocityUsed);
+//		}
+		if (!data.hVelActive.isEmpty()){
+			builder.append("\n" + " horizontal velocity (active):");
+			addVeloctiy(builder, data.hVelActive);
+		}
+		if (!data.hVelQueued.isEmpty()){
+			builder.append("\n" + " horizontal velocity (queued):");
+			addVeloctiy(builder, data.hVelQueued);
 		}
 		if (!resetFrom && !resetTo) {
-			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append("\n" + player.getName() + " vacc=" + data.vDistAcc.toInformalString());
+			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append("\n" + " vacc=" + data.vDistAcc.toInformalString());
 		}
 		if (player.isSleeping()) tags.add("sleeping");
-		if (!tags.isEmpty()) builder.append("\n" + player.getName() + " tags: " + StringUtil.join(tags, "+"));
+		if (!tags.isEmpty()) builder.append("\n" + " tags: " + StringUtil.join(tags, "+"));
 		System.out.print(builder.toString());
+	}
+
+	private void addVeloctiy(final StringBuilder builder, final List<Velocity> entries) {
+		for (final Velocity vel: entries){
+			 builder.append(" value=" + vel.value + " counter=" +  vel.actCount);
+		}
 	}
 
 	/**

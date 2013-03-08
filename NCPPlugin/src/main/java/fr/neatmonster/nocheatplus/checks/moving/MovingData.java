@@ -1,6 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
@@ -90,10 +93,14 @@ public class MovingData extends ACheckData {
     public int            verticalVelocityCounter;
     public double         verticalFreedom;
     public double         verticalVelocity;
-    public int 		      verticalVelocityUsed = 0;	
-    public int            horizontalVelocityCounter;
-    public double         horizontalFreedom;
-    public int 			  horizontalVelocityUsed = 0;
+    public int 		      verticalVelocityUsed = 0;
+    /** Active velocity entries (horizontal distance). */
+    public final List<Velocity> hVelActive = new LinkedList<Velocity>();
+    /** Queued velocity entries (horizontal distance). */
+    public final List<Velocity> hVelQueued = new LinkedList<Velocity>(); 
+//    public int            horizontalVelocityCounter;
+//    public double         horizontalFreedom;
+//    public int 			  horizontalVelocityUsed = 0;
     
     // Coordinates.
     /** Last from coordinates. */
@@ -176,6 +183,7 @@ public class MovingData extends ACheckData {
 		fromX = toX = Double.MAX_VALUE;
 		clearAccounting();
 		clearNoFallData();
+		removeAllVelocity();
 		sfHorizontalBuffer = 0;
 		sfHBufExtra = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
@@ -211,6 +219,7 @@ public class MovingData extends ACheckData {
 		sfHoverTicks = -1;
 		sfDirty = false;
 		mediumLiftOff = defaultMediumLiftOff;
+		removeAllVelocity();
 	}
 	
     /**
@@ -402,6 +411,99 @@ public class MovingData extends ACheckData {
 		toX = to.getX();
 		toY = to.getY();
 		toZ = to.getZ();
+	}
+
+	/**
+	 * Add horizontal velocity (distance). <br>
+	 * Since velocity is seldom an access method should be better. Flying players are expensive anyway, so this should not matter too much.
+	 * @param vel
+	 */
+	public void addHorizontalVelocity(final Velocity vel) {
+		// TODO: Might merge entries !
+		hVelQueued.add(vel);
+	}
+	
+	/**
+	 * Currently only applies to horizontal velocity.
+	 */
+	public void removeAllVelocity(){
+		hVelActive.clear();
+		hVelQueued.clear();
+	}
+
+	/**
+	 * Remove all velocity entries that are invalid. Checks both active and queued.
+	 * <br>(This does not catch invalidation by speed / direction changing.)
+	 */
+	public void removeInvalidVelocity() {
+		// TODO: Also merge entries here, or just on adding?
+		Iterator<Velocity> it;
+		// Active.
+		it = hVelActive.iterator();
+		while (it.hasNext()){
+			final Velocity vel = it.next();
+			// TODO: 0.001 can be stretched somewhere else, most likely...
+			if (vel.valCount <= 0 || vel.value <= 0.001) it.remove();
+		}
+		// Queued.
+		it = hVelQueued.iterator();
+		while (it.hasNext()){
+			final Velocity vel = it.next();
+			if (vel.actCount <= 0) it.remove();
+		}
+	}
+	
+	/**
+	 * Called for moving events, increase age of velocity.
+	 */
+	public void velocityTick(){
+		// Increase counts for active.
+		for (final Velocity vel : hVelActive){
+			vel.actCount --;
+			vel.sum += vel.value;
+			vel.value *= 0.9; // TODO: Actual friction.
+		}
+		// Increase counts for queued.
+		final Iterator<Velocity> it = hVelQueued.iterator();
+		while (it.hasNext()){
+			it.next().actCount --;
+		}
+	}
+
+	/**
+	 * Get effective amount of all used velocity.
+	 * @return
+	 */
+	public double getHorizontalFreedom() {
+		// TODO: model/calculate it as accurate as possible...
+		double f = 0;
+		for (final Velocity vel : hVelActive){
+			f += vel.value;
+		}
+		return f;
+	}
+
+	/**
+	 * Use all queued velocity until at least amount is matched.
+	 * Amount is the horizontal distance that is to be covered by velocity (active has already been checked).
+	 * <br>
+	 * If the modeling changes (max instead of sum or similar), then this will be affected.
+	 * @param amount The amount used.
+	 * @return
+	 */
+	public double useHorizontalVelocity(final double amount) {
+		final Iterator<Velocity> it = hVelQueued.iterator();
+		double used = 0;
+		while (it.hasNext()){
+			final Velocity vel = it.next();
+			used += vel.value;
+			hVelActive.add(vel);
+			it.remove();
+			if (used >= amount){
+				break;
+			}
+		}
+		return used;
 	}
 	
 }
