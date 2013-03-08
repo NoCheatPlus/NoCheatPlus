@@ -49,6 +49,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
 import fr.neatmonster.nocheatplus.components.NameSetPermState;
@@ -307,6 +308,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	protected int consistencyCheckerTaskId = -1;
 	
+	/** Listeners for players joining and leaving (monitor level) */
+	protected final List<JoinLeaveListener> joinLeaveListeners = new ArrayList<JoinLeaveListener>();
+	
 	/** All registered components.  */
 	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
 
@@ -345,6 +349,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		}
 		if (obj instanceof ConsistencyChecker){
 			consistencyCheckers.add((ConsistencyChecker) obj);
+			added = true;
+		}
+		if (obj instanceof JoinLeaveListener){
+			joinLeaveListeners.add((JoinLeaveListener) obj);
 			added = true;
 		}
 		// Also add to DataManager, which will pick what it needs.
@@ -403,6 +411,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		}
 		if (obj instanceof ConsistencyChecker){
 			consistencyCheckers.remove(obj);
+		}
+		if (obj instanceof JoinLeaveListener){
+			joinLeaveListeners.remove((JoinLeaveListener) obj);
 		}
 		dataMan.removeComponent(obj);
 		allComponents.remove(obj);
@@ -798,21 +809,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerJoin(final PlayerJoinEvent event) {
-				final Player player = event.getPlayer();
-
-				updatePermStateReceivers(player);
-				
-				if (nameSetPerms.hasPermission(player.getName(), Permissions.ADMINISTRATION_NOTIFY)){
-					// Login notifications...
-					
-					// Update available.
-					if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
-					
-					// Outdated config.
-					if (configOutdated) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!");
-
-				}
-				ModUtil.checkModsMessage(player);
+				onJoin(event.getPlayer());
 			}
 
 			@SuppressWarnings("unused")
@@ -837,9 +834,43 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		};
 	}
 	
+	protected void onJoin(final Player player){
+		updatePermStateReceivers(player);
+		
+		if (nameSetPerms.hasPermission(player.getName(), Permissions.ADMINISTRATION_NOTIFY)){
+			// Login notifications...
+			
+			// Update available.
+			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
+			
+			// Outdated config.
+			if (configOutdated) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!");
+
+		}
+		ModUtil.checkModsMessage(player);
+		for (final JoinLeaveListener jlListener : joinLeaveListeners){
+			try{
+				jlListener.playerJoins(player);
+			}
+			catch(Throwable t){
+				LogUtil.logSevere("[NoCheatPlus] JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (join): " + t.getClass().getSimpleName());
+				LogUtil.logSevere(t);
+			}
+		}
+	}
+	
 	protected void onLeave(final Player player) {
 		for (final PermStateReceiver pr : permStateReceivers) {
 			pr.removePlayer(player.getName());
+		}
+		for (final JoinLeaveListener jlListener : joinLeaveListeners){
+			try{
+				jlListener.playerLeaves(player);
+			}
+			catch(Throwable t){
+				LogUtil.logSevere("[NoCheatPlus] JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (leave): " + t.getClass().getSimpleName());
+				LogUtil.logSevere(t);
+			}
 		}
 	}
 	
