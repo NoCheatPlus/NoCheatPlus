@@ -64,7 +64,15 @@ public class Direction extends Check {
         // the center of the target entity. If the line of sight is more too far off, "off" will be bigger than 0.
         final Location loc = player.getLocation();
         final Vector direction = player.getEyeLocation().getDirection();
-        final double off = CheckUtils.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, CheckUtils.DIRECTION_PRECISION);
+        
+        final double off;
+        if (cc.directionStrict){
+        	off = CheckUtils.combinedDirectionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, CheckUtils.DIRECTION_PRECISION, 80.0);
+        }
+        else{
+        	// Also take into account the angle.
+        	off = CheckUtils.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, CheckUtils.DIRECTION_PRECISION);
+        }
 
         if (off > 0.1) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the entity...

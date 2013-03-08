@@ -305,6 +305,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_CRITICAL_ACTIONS, "cancel vl>50 log:critical:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_DIRECTION_CHECK, true);
+        set(ConfPaths.FIGHT_DIRECTION_STRICT, true);
         set(ConfPaths.FIGHT_DIRECTION_PENALTY, 500L);
         set(ConfPaths.FIGHT_DIRECTION_ACTIONS,
                 "cancel vl>5 log:fdirection:3:5:f cancel vl>20 log:fdirection:0:5:if cancel vl>50 log:fdirection:0:5:cif cancel");

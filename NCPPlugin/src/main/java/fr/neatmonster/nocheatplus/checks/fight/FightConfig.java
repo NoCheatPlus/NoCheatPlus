@@ -73,6 +73,7 @@ public class FightConfig extends ACheckConfig {
     public final ActionList criticalActions;
 
     public final boolean    directionCheck;
+	public final boolean	directionStrict;
     public final long       directionPenalty;
     public final ActionList directionActions;
     
@@ -134,6 +135,7 @@ public class FightConfig extends ACheckConfig {
         criticalActions = data.getOptimizedActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
 
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
+        directionStrict = data.getBoolean(ConfPaths.FIGHT_DIRECTION_STRICT);
         directionPenalty = data.getLong(ConfPaths.FIGHT_DIRECTION_PENALTY);
         directionActions = data.getOptimizedActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
         

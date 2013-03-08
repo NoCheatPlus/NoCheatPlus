@@ -390,6 +390,7 @@ public abstract class ConfPaths {
 
     private static final String FIGHT_DIRECTION                          = FIGHT + "direction.";
     public static final String  FIGHT_DIRECTION_CHECK                    = FIGHT_DIRECTION + "active";
+	public static final String  FIGHT_DIRECTION_STRICT					 = FIGHT_DIRECTION + "strict";
     public static final String  FIGHT_DIRECTION_PENALTY                  = FIGHT_DIRECTION + "penalty";
     public static final String  FIGHT_DIRECTION_ACTIONS                  = FIGHT_DIRECTION + "actions";
     
