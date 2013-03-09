@@ -33,6 +33,13 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
  */
 public class PlayerLocation {
 	
+	/**
+	 * This is only for x+ and z+, since those provide trouble with falling through narrow places.
+	 * <br>
+	 * TODO: Check for closest value to 0.X (1 digit), dynamically ?
+	 */
+	private static final double xzInset = 0.0000001;
+	
 	// Final members //
 	private final MCAccess mcAccess;
 	
@@ -731,9 +738,9 @@ public class PlayerLocation {
 		minX = x - dxz;
 		minY = y;
 		minZ = z - dxz;
-		maxX = x + dxz;
+		maxX = x + dxz - xzInset;
 		maxY = y + player.getEyeHeight();
-		maxZ = z + dxz;
+		maxZ = z + dxz - xzInset;
 		// TODO: With current bounding box the stance is never checked.
 
 		// Set world / block access.
