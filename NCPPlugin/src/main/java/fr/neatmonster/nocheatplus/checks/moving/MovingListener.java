@@ -560,13 +560,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	}
         }
         
+        // The players location.
+		// TODO: Change to getLocation(moveInfo.loc) once 1.4.5 support is dropped.
+		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation() : null;
+		
 		Location newTo = null;
 
 		// Check passable first to prevent set-back override.
 		// TODO: Redesign to set set-backs later (queue + invalidate).
 		if (newTo == null && cc.passableCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
 			// Passable is checked first to get the original set-back locations from the other checks, if needed. 
-			newTo = passable.check(player, pFrom, pTo, data, cc);
+			newTo = passable.check(player, loc, pFrom, pTo, data, cc);
 		}
 		
 		// Check which fly check to check.
@@ -612,12 +616,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             	}
             	// NoFall.
             	if (checkNf){
-            		noFall.check(player, pFrom, pTo, data, cc);
+            		noFall.check(player, loc, pFrom, pTo, data, cc);
             	}
             }
             else{
             	if (checkNf && cc.sfFallDamage){
-            		noFall.checkDamage(player, data, Math.min(from.getY(), to.getY()));
+            		noFall.checkDamage(player, data, Math.min(Math.min(from.getY(), to.getY()), loc.getY()));
             	}
             }
     	}
@@ -652,6 +656,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// TODO: data.sfHoverTicks ?
 			
             // Set new to-location.
+			// TODO: Clone here for the case of using loc with loc = player.getLocation(moveInfo.loc).
             event.setTo(newTo);
 
             // Remember where we send the player to.

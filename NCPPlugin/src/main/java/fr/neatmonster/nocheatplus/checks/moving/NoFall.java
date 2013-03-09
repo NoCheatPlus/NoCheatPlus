@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -86,7 +87,7 @@ public class NoFall extends Check {
      * @param to
      *            the to
      */
-    public void check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    public void check(final Player player, final Location loc, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
     	
     	final double fromY = from.getY();
     	final double toY = to.getY();
@@ -115,7 +116,7 @@ public class NoFall extends Check {
         
         // TODO: early returns (...) 
         
-        final double pY =  player.getLocation().getY();
+        final double pY =  loc.getY();
         final double minY = Math.min(fromY, Math.min(toY, pY));
         
         if (fromReset){

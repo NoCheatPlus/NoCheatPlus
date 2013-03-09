@@ -22,7 +22,7 @@ public class Passable extends Check {
 		rayTracing.setMaxSteps(60); // TODO: Configurable ?
 	}
 
-	public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
+	public Location check(final Player player, Location loc, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
 	{
 		// Simple check (only from, to, player.getLocation).
 		
@@ -51,7 +51,7 @@ public class Passable extends Check {
 
 		// Check the players location if different from others.
 		// (It provides a better set-back for some exploits.)
-		Location loc = player.getLocation();
+//		Location loc = player.getLocation();
 		final int lbX = loc.getBlockX();
 		final int lbY = loc.getBlockY();
 		final int lbZ = loc.getBlockZ();
