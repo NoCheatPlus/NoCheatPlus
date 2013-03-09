@@ -589,7 +589,7 @@ public class SurvivalFly extends Check {
 		if (from.isAboveStairs()) {
 			// TODO: This needs some safety guards.
 			// TODO: At least test putting this after yDistance > 0.5 check.
-			return applyWorkaround(player, from, true, data);
+			return applyWorkaround(player, from, true, data, "stairs");
 		}
 		
 		if (yDistance > 0.52 + 0.2 * data.jumpAmplifier){
@@ -616,7 +616,7 @@ public class SurvivalFly extends Check {
 					if (from.isOnGround(0.6, 0.4, 0, 0L) ){
 						// TODO: further narrow down bounds ?
 						// Temporary "fix".
-						return applyWorkaround(player, from, true, data);
+						return applyWorkaround(player, from, true, data, "pyramid");
 					}
 				}
 				
@@ -625,7 +625,7 @@ public class SurvivalFly extends Check {
 					// TODO: confine by block types ?
 					if (from.isOnGround(0.25, 0.4, 0, 0L) ){
 						// Temporary "fix".
-						return applyWorkaround(player, from, true, data);
+						return applyWorkaround(player, from, true, data, "ministep");
 					}
 				}
 			}
@@ -635,7 +635,7 @@ public class SurvivalFly extends Check {
 				// TODO: yDistance <= 0 might be better.
 				// Also clear accounting data.
 				if (to.isOnGround(0.5) || from.isOnGround(0.5)){
-					return applyWorkaround(player, from, true, data);
+					return applyWorkaround(player, from, true, data, "edge");
 				}
 			}
 		}
@@ -644,7 +644,7 @@ public class SurvivalFly extends Check {
 			// Half block step up.
 			if (yDistance <= 0.5 && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.1 * data.jumpAmplifier && to.isOnGround()){
 				if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
-					return applyWorkaround(player, from, true, data);
+					return applyWorkaround(player, from, true, data, "step");
 				}
 			}
 			
@@ -672,7 +672,7 @@ public class SurvivalFly extends Check {
 						// TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
 						// TODO: check with iY + 0.25 removed.
 						if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
-							return applyWorkaround(player, from, true, data);
+							return applyWorkaround(player, from, true, data, "interpolate");
 						}
 					}
 				}
@@ -688,16 +688,17 @@ public class SurvivalFly extends Check {
 	 * 
 	 * @return true.
 	 */
-	private boolean applyWorkaround(final Player player, final PlayerLocation from, final boolean setBackSafe, final MovingData data){
+	private boolean applyWorkaround(final Player player, final PlayerLocation from, final boolean setBackSafe, final MovingData data, final String tag){
 		// Set the new setBack and reset the jumpPhase.
 		// TODO: Some interpolated position ?
 		// TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
-		if (setBackSafe) data.setSetBack(from);
-		else{
-			// TODO: This seems dubious !
-			// Consider: 1.0 + ? or max(from.getY(), 1.0 + ...) ?
-			data.setSetBackY(Location.locToBlock(data.getSetBackY())); 
+		if (setBackSafe){
+			data.setSetBack(from);
 		}
+		else{
+			// Keep Set-back.
+		}
+		
 		// data.ground ?
 		// ? set jumpphase to height / 0.15 ?
 		data.sfJumpPhase = 0;
@@ -705,7 +706,7 @@ public class SurvivalFly extends Check {
 		data.clearAccounting();
 		// Tell NoFall that we assume the player to have been on ground somehow.
 		data.noFallAssumeGround = true;
-		tags.add("lostground");
+		tags.add("lostground_" + tag);
 		return true;
 	}
 
