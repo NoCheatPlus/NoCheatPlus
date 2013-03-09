@@ -27,13 +27,13 @@ public abstract class BlockCache {
 	}
     
     /** Cached type-ids. */
-    private final CoordMap<Integer> idMap = new CoordMap<Integer>();
+    private final CoordMap<Integer> idMap = new CoordMap<Integer>(23);
     
     /** Cached data values. */
-    private final CoordMap<Integer> dataMap = new CoordMap<Integer>();
+    private final CoordMap<Integer> dataMap = new CoordMap<Integer>(23);
     
     /** Cached shape values. */
-    private final CoordMap<double[]> boundsMap = new CoordMap<double[]>();
+    private final CoordMap<double[]> boundsMap = new CoordMap<double[]>(23);
     
     private int maxBlockY =  255;
     
