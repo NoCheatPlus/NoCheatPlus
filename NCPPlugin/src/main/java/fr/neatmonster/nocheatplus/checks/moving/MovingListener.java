@@ -64,6 +64,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /*
  * M"""""`'"""`YM                   oo                   
@@ -837,7 +838,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
          */
 		final Player player = event.getPlayer();
 		final MovingData data = MovingData.getData(player);
-
 		final Location teleported = data.getTeleported();
 
 		// If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
@@ -860,6 +860,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// TODO: This could be done on MONITOR.
 			data.onSetBack(teleported);
 		} else {
+			final MovingConfig cc = MovingConfig.getConfig(player);
 			// Only if it wasn't NoCheatPlus, drop data from more packets check.
 			if (to != null && !event.isCancelled()){
 				// Normal teleport.
@@ -867,7 +868,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				// Detect small distance teleports.
 				boolean smallRange = false;
 				
-				final double margin = 0.1;
+				final double margin = 0.67;
 				final Location from = event.getFrom();
 				
 				if (event.getCause() == TeleportCause.UNKNOWN){
@@ -900,7 +901,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 					// TODO: How to account for plugins that reset the fall distance here?
 					if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0){
 						// Reset fall distance if set so in the config.
-						if (!MovingConfig.getConfig(player).noFallTpReset){
+						if (!cc.noFallTpReset){
 							// (Set fall distance if set to not reset.)
 							player.setFallDistance((float) fallDistance);
 						}
@@ -911,11 +912,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 					}
 					data.sfHoverTicks = -1; // Important against concurrent modification exception.
 				}
+				
+				if (cc.debug && BuildParameters.debugLevel > 0){
+					System.out.println(player.getName() + " TP" + (smallRange ? " (small-range)" : "") + ": " + to);
+				}
 			}
 			else{
 				// Cancelled, not a set back, ignore it, basically.
 				// Better reset teleported (compatibility). Might have drawbacks.
 				data.resetTeleported();
+				if (cc.debug && BuildParameters.debugLevel > 0){
+					System.out.println(player.getName() + " TP (cancelled): " + to);
+				}
 				return;
 			}
 			
