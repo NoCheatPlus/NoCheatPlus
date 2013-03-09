@@ -33,13 +33,6 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
  */
 public class PlayerLocation {
 	
-	/**
-	 * This is only for x+ and z+, since those provide trouble with falling through narrow places.
-	 * <br>
-	 * TODO: Check for closest value to 0.X (1 digit), dynamically ?
-	 */
-	private static final double xzInset = 0.0000001;
-	
 	// Final members //
 	private final MCAccess mcAccess;
 	
@@ -720,27 +713,15 @@ public class PlayerLocation {
 		pitch = location.getPitch();
 
 		// Set bounding box.
-//		final double dX = x - entityPlayer.locX;
-//		final double dY = y - entityPlayer.locY;
-//		final double dZ = z - entityPlayer.locZ;
-//		minX = x - entityPlayer.boundingBox.a + dX;
-//		minY = y - entityPlayer.boundingBox.b + dY;
-//		minZ = z - entityPlayer.boundingBox.c + dZ;
-//		maxX = x + entityPlayer.boundingBox.d + dX;
-//		maxY = y + entityPlayer.boundingBox.e + dY;
-//		maxZ = z + entityPlayer.boundingBox.f + dZ;
-//		// TODO: inset, outset ?
+		// TODO: inset, outset ?
 		this.width = mcAccess.getWidth(player);
-		final double dxz = this.width / 2;
-//		final double dX = (entityPlayer.boundingBox.d - entityPlayer.boundingBox.a) / 2D;
-//		final double dY = entityPlayer.boundingBox.e - entityPlayer.boundingBox.b;
-//		final double dZ = (entityPlayer.boundingBox.f - entityPlayer.boundingBox.c) / 2D;
+		final double dxz = Math.round(this.width * 500.0) / 1000.0;// 0.3; // this.width / 2;
 		minX = x - dxz;
 		minY = y;
 		minZ = z - dxz;
-		maxX = x + dxz - xzInset;
+		maxX = x + dxz;// - xzInset;
 		maxY = y + player.getEyeHeight();
-		maxZ = z + dxz - xzInset;
+		maxZ = z + dxz;// - xzInset;
 		// TODO: With current bounding box the stance is never checked.
 
 		// Set world / block access.
