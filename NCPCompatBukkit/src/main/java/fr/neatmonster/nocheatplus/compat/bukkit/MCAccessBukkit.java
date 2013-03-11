@@ -168,13 +168,27 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		}){
 			fullBlocks.add(mat.getId());
 		}
-		for (Material mat : Material.values()){
+		for (final Material mat : Material.values()){
 			if (!mat.isBlock()) continue;
-			int id = mat.getId();
+			final int id = mat.getId();
 			if (id < 0 || id >= 4096 || fullBlocks.contains(id)) continue;
 			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()){
-				BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | BlockProperties.F_IGN_PASSABLE);
+				// Uncertain bounding-box, allow passing through.
+				long flags = BlockProperties.F_IGN_PASSABLE;
+				if ((BlockProperties.isSolid(id) || BlockProperties.isGround(id)) && !BlockProperties.isLiquid(id)){
+					// Block can be ground, so allow standing on any height.
+					flags |= BlockProperties.F_GROUND_HEIGHT;
+				}
+				BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
 			}
+		}
+		// Blocks that are reported to be full and solid, but which are not.
+		for (final Material mat : new Material[]{
+				Material.ENDER_PORTAL_FRAME,
+		}){
+			final int id = mat.getId();
+			final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
+			BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
 		}
 	}
 
