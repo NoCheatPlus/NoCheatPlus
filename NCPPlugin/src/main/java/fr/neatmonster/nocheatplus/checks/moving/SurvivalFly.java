@@ -310,17 +310,24 @@ public class SurvivalFly extends Check {
         else if (data.verticalFreedom <= 0.001 && from.isInLiquid() && (Math.abs(yDistance) > 0.2 || to.isInLiquid())){
         	// Swimming...
         	if (yDistance >= 0){
-        		// TODO: This is more simple to test.
-        		// TODO: mediumLiftOff: refine conditions (general) , to should be near water level.
-        		if (data.mediumLiftOff == MediumLiftOff.GROUND && !BlockProperties.isLiquid(from.getTypeIdAbove()) && yDistance < 0.5 || !to.isInLiquid() || yDistance <= 0.5 && (toOnGround || data.sfLastYDist - yDistance >= 0.010)){
-        			// TODO: Friction in water...
-            		vAllowedDistance = swimmingSpeed + 0.5;
-        		}
-        		else{
-            		vAllowedDistance = swimmingSpeed + 0.02;
-        		}
+        		// This is more simple to test.
+        		// TODO: Friction in water...
+        		vAllowedDistance = swimmingSpeed + 0.02;
         		vDistanceAboveLimit = yDistance - vAllowedDistance;
-        		if (vDistanceAboveLimit > 0) tags.add("swimup");
+        		if (vDistanceAboveLimit > 0){
+        			// Check workarounds.
+        			if (yDistance <= 0.5){
+        				// TODO: mediumLiftOff: refine conditions (general) , to should be near water level.
+        				if (data.mediumLiftOff == MediumLiftOff.GROUND && !BlockProperties.isLiquid(from.getTypeIdAbove()) || !to.isInLiquid() ||  (toOnGround || data.sfLastYDist - yDistance >= 0.010 || to.isAboveStairs())){
+                    		vAllowedDistance = swimmingSpeed + 0.5;
+                    		vDistanceAboveLimit = yDistance - vAllowedDistance;
+        				}
+            		}
+        			
+        			if (vDistanceAboveLimit > 0){
+        				tags.add("swimup");
+        			}
+        		}
         	}
         	// TODO: This is more complex, depends on speed of diving into it.
 //        	else{
@@ -382,6 +389,8 @@ public class SurvivalFly extends Check {
             		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.max(yDistance, 0.15));
             	}
             }
+            
+            // TODO: Velocity handling here [concept: set vdistAbove.. almost always]?
 
             // TODO: This might need max(0, for ydiff)
 			vDistanceAboveLimit = Math.max(vDistanceAboveLimit, to.getY() - data.getSetBackY() - vAllowedDistance);
