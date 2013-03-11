@@ -1706,8 +1706,6 @@ public class BlockProperties {
             	else{
             		bmaxY = 1.0;
             	}
-            	
-            	System.out.println("*** WATER: " + bmaxY);
             } 
             else{
             	bminY = bounds[1]; // minY
