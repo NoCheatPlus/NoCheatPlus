@@ -294,10 +294,12 @@ public class PlayerLocation {
 				inLava = false;
 				return false;
 			}
-			final double dX = -0.10000000149011612D;
-			final double dY = -0.40000000596046448D;
-			final double dZ = dX;
-			inLava = BlockProperties.collides(blockCache, minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_LAVA);
+			// TODO: ...
+//			final double dX = -0.10000000149011612D;
+//			final double dY = -0.40000000596046448D;
+//			final double dZ = dX;
+//			inLava = BlockProperties.collides(blockCache, minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_LAVA);
+			inLava = BlockProperties.collides(blockCache, minX, minY, minZ, maxX, maxY, maxZ, BlockProperties.F_LAVA);
 		}
 		return inLava;
 	}
@@ -313,10 +315,13 @@ public class PlayerLocation {
 				inWater = false;
 				return false;
 			}
-			final double dX = -0.001D;
-			final double dY = -0.40000000596046448D - 0.001D;
-			final double dZ = -0.001D;
-			inWater = BlockProperties.collides(blockCache, minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_WATER);
+			// TODO: ...
+//			final double dX = -0.001D;
+//			final double dY = -0.40000000596046448D - 0.001D;
+//			final double dZ = dX;
+//			inWater = BlockProperties.collides(blockCache, minX - dX, minY - dY, minZ - dZ, maxX + dX, maxY + dY, maxZ + dZ, BlockProperties.F_WATER);
+			inWater = BlockProperties.collides(blockCache, minX, minY, minZ, maxX, maxY, maxZ, BlockProperties.F_WATER);
+
 		}
 		return inWater;
 	}
@@ -329,7 +334,8 @@ public class PlayerLocation {
 	public boolean isInLiquid() {
 		// TODO: optimize (check liquid first and only if liquid check further)
 		if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_LIQUID) == 0 ) return false;
-		return isInLava() || isInWater();
+		// TODO: This should check for F_LIQUID too, Use a method that returns all found flags (!).
+		return isInWater() || isInLava();
 	}
 
 	/**
@@ -599,8 +605,8 @@ public class PlayerLocation {
 	}
 
 	/**
-	 * Simple at the spot passability test, no bounding boxes.
-	 * 
+	 * Test if the foot location is passable (not the bounding box).
+	 * <br>The result is cached.
 	 * @return
 	 */
 	public boolean isPassable() {
@@ -713,15 +719,14 @@ public class PlayerLocation {
 		pitch = location.getPitch();
 
 		// Set bounding box.
-		// TODO: inset, outset ?
 		this.width = mcAccess.getWidth(player);
-		final double dxz = Math.round(this.width * 500.0) / 1000.0;// 0.3; // this.width / 2;
+		final double dxz = Math.round(this.width * 500.0) / 1000.0; // this.width / 2; // 0.3;
 		minX = x - dxz;
 		minY = y;
 		minZ = z - dxz;
-		maxX = x + dxz;// - xzInset;
+		maxX = x + dxz;
 		maxY = y + player.getEyeHeight();
-		maxZ = z + dxz;// - xzInset;
+		maxZ = z + dxz;
 		// TODO: With current bounding box the stance is never checked.
 
 		// Set world / block access.
@@ -782,6 +787,14 @@ public class PlayerLocation {
 	 */
 	public void setBlockFlags(Long blockFlags){
 		this.blockFlags = blockFlags;
+	}
+
+	/**
+	 * Not cached.
+	 * @return
+	 */
+	public int getTypeIdAbove() {
+		return blockCache.getTypeId(blockX, blockY + 1,  blockZ);
 	}
 
 }

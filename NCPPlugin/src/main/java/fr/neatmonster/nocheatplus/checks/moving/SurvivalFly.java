@@ -296,7 +296,7 @@ public class SurvivalFly extends Check {
         		vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance - climbSpeed);
         	}
         	if (yDistance > 0){
-            	if (!fromOnGround && ! toOnGround && !data.noFallAssumeGround){
+            	if (!fromOnGround && !toOnGround && !data.noFallAssumeGround){
             		// Check if player may climb up.
             		// (This does exclude ladders.)
             		if (!from.canClimbUp(jumpHeight)){
@@ -311,7 +311,8 @@ public class SurvivalFly extends Check {
         	// Swimming...
         	if (yDistance >= 0){
         		// TODO: This is more simple to test.
-        		if (!to.isInLiquid() || yDistance <= 0.5 && (toOnGround || data.sfLastYDist - yDistance >= 0.010)){
+        		// TODO: mediumLiftOff: refine conditions (general) , to should be near water level.
+        		if (data.mediumLiftOff == MediumLiftOff.GROUND && !BlockProperties.isLiquid(from.getTypeIdAbove()) && yDistance < 0.5 || !to.isInLiquid() || yDistance <= 0.5 && (toOnGround || data.sfLastYDist - yDistance >= 0.010)){
         			// TODO: Friction in water...
             		vAllowedDistance = swimmingSpeed + 0.5;
         		}
@@ -349,6 +350,7 @@ public class SurvivalFly extends Check {
         	vAllowedDistance = 1.35D + data.verticalFreedom;
         	int maxJumpPhase;
             if (data.mediumLiftOff == MediumLiftOff.LIMIT_JUMP){
+            	// TODO: In normal water this is 0. Could set higher for special cases only (needs efficient data + flags collection?).
             	maxJumpPhase = 3;
             	if (data.sfJumpPhase > 0) tags.add("limitjump");
             }

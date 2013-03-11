@@ -288,6 +288,13 @@ public class BlockProperties {
     /** This flag indicates that even though a passable workaround, everything above passable height is still ground. */
     public static final long F_GROUND_HEIGHT	= 0x1000; 
     
+    /** 
+     * The height is assumed to decrease from 1.0 with increasing data value from 0 to 0x7, with 0x7 being the lowest.
+     * (repeating till 0x15)). 0x8 means falling/full block. This is meant to model flowing water/lava. <br>
+     * However the hit-box for collision checks  will be set to 0.5 height or 1.0 height only.
+     */
+    public static final long F_HEIGHT_8_INV		= 0x2000;
+    
     /**
      * Map flag to names.
      */
@@ -396,21 +403,21 @@ public class BlockProperties {
 		for (final Material mat : new Material[] { Material.NETHER_BRICK_STAIRS, Material.COBBLESTONE_STAIRS, 
 				Material.SMOOTH_STAIRS, Material.BRICK_STAIRS, Material.SANDSTONE_STAIRS, Material.WOOD_STAIRS, 
 				Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS }) {
-			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100 | F_GROUND; // Set ground too, to be sure.
+			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100 | F_XZ100 | F_GROUND; // Set ground too, to be sure.
 		}
 		
 		// WATER.
 		for (final Material mat : new Material[]{
 				Material.STATIONARY_WATER, Material.WATER,
 		}) {
-			blockFlags[mat.getId()] |= F_LIQUID | F_WATER;
+			blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8_INV | F_WATER;
 		}
 		
 		// LAVA.
         for (final Material mat : new Material[]{
                 Material.LAVA, Material.STATIONARY_LAVA,
         }) {
-            blockFlags[mat.getId()] |= F_LIQUID | F_LAVA;
+            blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8_INV | F_LAVA;
         }
         
         // 1.5 block high.
@@ -442,7 +449,8 @@ public class BlockProperties {
         
         // Full block height.
         for (final Material mat : new Material[]{
-        		Material.ENDER_PORTAL_FRAME, Material.BREWING_STAND,
+//        		Material.ENDER_PORTAL_FRAME,
+        		Material.BREWING_STAND,
         		Material.PISTON_EXTENSION,
         }){
             blockFlags[mat.getId()] |= F_HEIGHT100;
@@ -459,6 +467,7 @@ public class BlockProperties {
 		for (final Material mat : new Material[]{
 				Material.WALL_SIGN, Material.SIGN_POST,
 		}){
+			// TODO: Might keep solid since it is meant to be related to block shapes rather ("original mc value").
 			blockFlags[mat.getId()] &= ~(F_GROUND | F_SOLID);
 		}
 		
@@ -468,6 +477,7 @@ public class BlockProperties {
 				Material.WOOD_PLATE, Material.STONE_PLATE, 
 				Material.WALL_SIGN, Material.SIGN_POST,
 				Material.DIODE_BLOCK_ON, Material.DIODE_BLOCK_OFF,
+				Material.BREWING_STAND,
 				// Compatibility.
 				Material.LADDER, 
 				// Somewhat needed (xz-bounds vary, not critical to pass through).
@@ -491,8 +501,9 @@ public class BlockProperties {
 		
 		// Flexible ground (height):
 		for (final Material mat : new Material[]{
-				// Strictly needed.
-				Material.PISTON_EXTENSION, 
+				// Strictly needed (multiple boxes otherwise).
+				Material.PISTON_EXTENSION,
+				Material.BREWING_STAND,
 				// XZ-bounds issues.
 				Material.CAKE_BLOCK
 				// Already worked around with isPassableWorkaround (kept for dev-reference).
@@ -1149,7 +1160,7 @@ public class BlockProperties {
 	}
 	
 	/**
-	 * Test if a position can be passed through.<br>
+	 * Test if a position can be passed through (collidesBlock + passable test).<br>
 	 * NOTE: This is experimental.
 	 * @param world
 	 * @param x
@@ -1166,20 +1177,22 @@ public class BlockProperties {
 		final int by = Location.locToBlock(y);
 		final int bz = Location.locToBlock(z);
 		final double[] bounds = access.getBounds(bx, by, bz);
-		
 		if (bounds == null) return true;
+		if (!collidesBlock(access, x, y, z, x, y, z, bx, by, bz, id, bounds, blockFlags[id])){
+			return true;
+		}
 		
 		final double fx = x - bx;
 		final double fy = y - by;
 		final double fz = z - bz;
 //		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
-		if (fx < bounds[0] || fx >= bounds[3] || fy < bounds[1] || fy >= bounds[4] || fz < bounds[2] || fz >= bounds[5]){
-			return true;
-		}
-		else{
+//		if (fx < bounds[0] || fx >= bounds[3] || fy < bounds[1] || fy >= bounds[4] || fz < bounds[2] || fz >= bounds[5]){
+//			return true;
+//		}
+//		else{
 			// TODO: Check f_itchy if/once exists.
-			return isPassableWorkaround(access, bx, by, bz, fx, fy, fz, id, 0, 0, 0, 0);
-		}
+		return isPassableWorkaround(access, bx, by, bz, fx, fy, fz, id, 0, 0, 0, 0);
+//		}
 	}
 	
 	/**
@@ -1250,23 +1263,12 @@ public class BlockProperties {
 			if (Math.min(fy, fy + dY * dT) >= 0.9375){
 				return true;
 			}
-			return collidesCenter(fx, fz, dX, dZ, dT, 0.07);
+			return !collidesCenter(fx, fz, dX, dZ, dT, 0.0625);
 		}
 		else if (id == Material.PISTON_EXTENSION.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.625){
 				return true;
 			}
-		}
-		else if (id == Material.ANVIL.getId()){
-			// Allow slight inset.
-			if (Math.max(fy, fy + dY * dT) >= 1.0 ){
-				// TODO: inconsistent, needs checking data.
-				// TODO: should be in data.
-				return false;
-			}
-			// TODO: Only one of x/z applies, depending on data value [problem: direction update].
-			// TODO: 0.176 !? [Mind 0.3 for bonding box ...]
-			return collidesCenter(fx, fz, dX, dZ, dT, 0.0625);
 		}
 		// Nothing found.
 		return false;
@@ -1285,12 +1287,12 @@ public class BlockProperties {
 		final double low = inset;
 		final double high = 1.0 - inset;
 		final double xEnd = fx + dX * dT;
-		if (xEnd <= low && fx <= low) return true;
-		else if (xEnd >= high && fx >= high) return true;
+		if (xEnd < low && fx < low) return false;
+		else if (xEnd >= high && fx >= high) return false;
 		final double zEnd = fz + dZ * dT;
-		if (zEnd <= low && fz <= low) return true;
-		else if (zEnd >= high && fz >= high) return true;
-		return false;
+		if (zEnd < low && fz < low) return false;
+		else if (zEnd >= high && fz >= high) return false;
+		return true;
 	}
 	
 	/**
@@ -1451,16 +1453,6 @@ public class BlockProperties {
         }
     }
     
-//    /**
-//     * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
-//     * @param box
-//     * @param flags Block flags (@see fr.neatmonster.nocheatplus.utilities.BlockProperties). 
-//     * @return If any block has the flags.
-//     */
-//    public static final boolean hasAnyFlags(final BlockCache access, final AxisAlignedBB box, final long flags){
-//        return hasAnyFlags(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
-//    }
-    
     /**
      * Test if the bounding box overlaps with a block of given flags (does not check the blocks bounding box).
      * @param minX
@@ -1499,16 +1491,6 @@ public class BlockProperties {
         return false;
     }
     
-//    /**
-//     * Test if the box collide with any block that matches the flags somehow.
-//     * @param box
-//     * @param flags
-//     * @return
-//     */
-//    public static final boolean collides(final BlockCache access, final AxisAlignedBB box, final long flags){
-//        return collides(access, box.a, box.b, box.c, box.d, box.e, box.f, flags);
-//    }
-    
     /**
      * Test if the box collide with any block that matches the flags somehow.
      * @param minX
@@ -1517,14 +1499,14 @@ public class BlockProperties {
      * @param maxX
      * @param maxY
      * @param maxZ
-     * @param flags
+     * @param flags The flags to match.
      * @return
      */
     public static final boolean collides(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final long flags){
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	// At least find fences etc. if searched for.
-    	// TODO: this is a bit difficult ...
+    	// TODO: F_HEIGHT150 could also be ground etc., more consequent might be to always use or flag it.
     	final int iMinY = Location.locToBlock(minY - ((flags & F_HEIGHT150) != 0 ? 0.5625 : 0));
     	final int iMaxY = Location.locToBlock(maxY);
     	final int iMinZ = Location.locToBlock(minZ);
@@ -1533,11 +1515,14 @@ public class BlockProperties {
             for (int z = iMinZ; z <= iMaxZ; z++){
                 for (int y = iMinY; y <= iMaxY; y++){
                     final int id = access.getTypeId(x, y, z);
-                    if ((blockFlags[id] & flags) != 0){
+                    final long cFlags = blockFlags[id];
+                    if ((cFlags & flags) != 0){
                         // Might collide.
                     	final double[] bounds = access.getBounds(x, y, z);
                     	if (bounds != null){
-                    		if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, flags)) return true;
+                    		if (collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, x, y, z, id, bounds, cFlags)){
+                    			return true;
+                    		}
                     	}
                     }
                 }
@@ -1615,6 +1600,7 @@ public class BlockProperties {
     
     /**
      * Check if the bounds collide with the block for the given type id at the given position.
+     * <br> Delegates: This method signature is not used internally anymore.
      * @param access
      * @param minX
      * @param minY
@@ -1652,6 +1638,7 @@ public class BlockProperties {
    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags){
         final double bminX, bminZ, bminY;
         final double bmaxX, bmaxY, bmaxZ;
+        // TODO: Consider a quick shortcut checks flags == F_NORMAL_GROUND
         if ((flags & F_STAIRS) != 0){ // TODO: make this a full block flag ?
         	// Mainly for on ground style checks, would not go too well with passable.
         	// TODO: change this to something like F_FULLBOX probably.
@@ -1659,7 +1646,8 @@ public class BlockProperties {
         	bmaxX = bmaxY = bmaxZ = 1D;
         }
         else{
-        	if ((flags | F_XZ100) != 0){
+        	// xz-bounds
+        	if ((flags & F_XZ100) != 0){
         		bminX = bminZ = 0;
         		bmaxX = bmaxZ = 1;
         	}
@@ -1669,6 +1657,7 @@ public class BlockProperties {
             	bmaxX = bounds[3]; //block.w(); // maxX
                 bmaxZ = bounds[5]; //block.A(); // maxZ
         	}
+        	// y-bounds
         	if (id == Material.SNOW.getId()){
         		// TODO: remove / solve differently ?
         		bminY = 0;
@@ -1684,15 +1673,34 @@ public class BlockProperties {
             	bminY = 0;
             	bmaxY = 1.0;
             }
+            else if ((flags & F_HEIGHT_8_INV) != 0){
+            	bminY = 0;
+            	final int data = access.getData(x, y, z);
+            	if ((data & 0x8) == 0){
+            		// This box works for jumping over flowing water.
+//            		bmaxY = (0.8 - (double) ((data & 0xF) % 8) / 9.8);
+            		final int data8 = (data & 0xF) % 8;
+            		if (data8 > 4){
+            			bmaxY = 0.5;
+            		}
+            		else{
+            			bmaxY = 1.0; // - (double) data8 / 9.0;
+            		}
+            	}
+            	else{
+            		bmaxY = 1.0;
+            	}
+            	
+            	System.out.println("*** WATER: " + bmaxY);
+            } 
             else{
-            	bminY = bounds[1]; // block.x(); // minY
-            	bmaxY = bounds[4]; // block.y(); // maxY
+            	bminY = bounds[1]; // minY
+            	bmaxY = bounds[4]; // maxY
             }
         }
-        if (minX > bmaxX + x || maxX < bminX + x) return false;
-        else if (minY > bmaxY + y || maxY < bminY + y) return false;
-        else if (minZ > bmaxZ + z || maxZ < bminZ + z) return false;
-
+        if (minX >= bmaxX + x || maxX < bminX + x) return false;
+        else if (minY >= bmaxY + y || maxY < bminY + y) return false;
+        else if (minZ >= bmaxZ + z || maxZ < bminZ + z) return false;
         else return true;
     }
     
