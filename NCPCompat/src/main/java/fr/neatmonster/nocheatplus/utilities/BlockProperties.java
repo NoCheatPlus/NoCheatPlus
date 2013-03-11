@@ -1248,15 +1248,10 @@ public class BlockProperties {
 			if (Math.min(fy, fy + dY * dT) >= 0.4375) return true; // 0.0625 = 0.125 / 2
 		}
 		else if (id == Material.CAULDRON.getId()){
-			final double dFx = 0.5 - fx;
-			final double dFz = 0.5 - fz;
-		    if (Math.min(fy, fy + dY * dT) > 0.1 && Math.abs(dFx) < 0.1 && Math.abs(dFz) < 0.1){
+		    if (Math.min(fy, fy + dY * dT) >= 0.3125){
 		        // Check for moving through walls or floor.
-				final double dFx2 = 0.5 - (fx + dX * dT);
-				final double dFz2 = 0.5 - (fz + dZ * dT);
-				if (Math.abs(dFx2) < 0.1 && Math.abs(dFz2) < 0.1){
-					return true;
-				}
+		    	// TODO: Maybe this is too exact...
+			    return isInsideCenter(fx, fz, dX, dZ, dT, 0.125);
 		    }
 		}
 		else if (id == Material.CACTUS.getId()){
@@ -1275,13 +1270,13 @@ public class BlockProperties {
 	}
 	
 	/**
-	 * Collision for x-z ray / bounds. (not really exact)
+	 * Collision for x-z ray / bounds. Use this to check if a box is really outside.
 	 * @param fx
 	 * @param fz
 	 * @param dX
 	 * @param dZ
 	 * @param dT
-	 * @return
+	 * @return False if no collision with the center bounds.
 	 */
 	public static final boolean collidesCenter(final double fx, final double fz, final double dX, final double dZ, final double dT, final double inset){
 		final double low = inset;
@@ -1292,6 +1287,27 @@ public class BlockProperties {
 		final double zEnd = fz + dZ * dT;
 		if (zEnd < low && fz < low) return false;
 		else if (zEnd >= high && fz >= high) return false;
+		return true;
+	}
+	
+	/**
+	 * Collision for x-z ray / bounds. Use this to check if a box is really inside.
+	 * @param fx
+	 * @param fz
+	 * @param dX
+	 * @param dZ
+	 * @param dT
+	 * @return True if the box is really inside of the center bounds.
+	 */
+	public static final boolean isInsideCenter(final double fx, final double fz, final double dX, final double dZ, final double dT, final double inset){
+		final double low = inset;
+		final double high = 1.0 - inset;
+		final double xEnd = fx + dX * dT;
+		if (xEnd < low || fx < low) return false;
+		else if (xEnd >= high || fx >= high) return false;
+		final double zEnd = fz + dZ * dT;
+		if (zEnd < low || fz < low) return false;
+		else if (zEnd >= high || fz >= high) return false;
 		return true;
 	}
 	
@@ -1338,7 +1354,7 @@ public class BlockProperties {
 //		}
 		else if (id == Material.CAULDRON.getId()){
 			// TODO: slightly over 0.
-			return 0;
+			return 0.3125;
 		}
 		else if (id == Material.CACTUS.getId()){
 			return 0.9375;
