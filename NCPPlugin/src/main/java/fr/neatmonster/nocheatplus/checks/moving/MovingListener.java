@@ -974,7 +974,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (cc.debug) System.out.println(event.getPlayer().getName() + " new velocity: " + velocity);
         
         double newVal = velocity.getY();
+        boolean used = false;
         if (newVal >= 0D) {
+            used = true;
         	if (data.verticalFreedom <= 0.001 && data.verticalVelocityCounter >= 0){
         		data.verticalVelocity = 0;
         	}
@@ -986,6 +988,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
+        	used = true;
         	final Velocity vel = new Velocity(newVal, cc.velocityActivationCounter, 1 + (int) Math.round(newVal * 10.0));
         	data.addHorizontalVelocity(vel);
 //            data.horizontalFreedom += newVal;
@@ -994,7 +997,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         
         // Set dirty flag here.
-        data.sfDirty = true;
+        if (used){
+        	data.sfDirty = true;
+        }
         
         // TODO: clear accounting here ?
     }
