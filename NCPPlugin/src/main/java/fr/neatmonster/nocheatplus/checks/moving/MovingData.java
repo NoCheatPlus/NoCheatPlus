@@ -13,7 +13,6 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /*
@@ -31,7 +30,7 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class MovingData extends ACheckData {
 	
-	private static final long IGNORE_SETBACK_Y = BlockProperties.F_SOLID | BlockProperties.F_GROUND | BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID;
+//	private static final long IGNORE_SETBACK_Y = BlockProperties.F_SOLID | BlockProperties.F_GROUND | BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID;
 
 	/** The factory creating data. */
 	public static final CheckDataFactory factory = new CheckDataFactory() {
@@ -294,23 +293,7 @@ public class MovingData extends ACheckData {
     	else{
     		LocUtil.set(setBack, loc);
     	}
-    	final int id = loc.getTypeId();
-    	if (id == 0){
-    		// Shortcut.
-    	}
-    	else{
-    		// Check some block flags.
-    		// TODO: This might be a problem with workarounds [check which can be removed.].
-    		final long flags = BlockProperties.getBlockFlags(id);
-    		if ((flags & IGNORE_SETBACK_Y) != 0){
-    			// Ignore these.
-    			return;
-    		}
-    		else{
-    			// Set set-back-y to block coordinate.
-    			setBack.setY(loc.getBlockY());
-    		}
-    	}
+    	// TODO: Consider adjusting the set-back-y here. Problem: Need to take into account for bounding box (collect max-ground-height needed).
     }
     
     /**
