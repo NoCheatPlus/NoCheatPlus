@@ -622,7 +622,7 @@ public class SurvivalFly extends Check {
 		final double setBackYDistance = to.getY() - data.getSetBackY();
 		
 		// Half block step up.
-		if (yDistance <= 0.5 && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.1 * data.jumpAmplifier && to.isOnGround()){
+		if (yDistance <= 0.5 && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.2 * data.jumpAmplifier && to.isOnGround()){
 			if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
 				return applyLostGround(player, from, true, data, "step");
 			}
@@ -644,7 +644,6 @@ public class SurvivalFly extends Check {
 				final double dY = from.getY() - data.fromY;
 				final double dZ = from.getZ() - data.fromZ;
 				if (dX * dX + dY * dY + dZ * dZ < 0.5) { 
-//					System.out.println("*** check lostground: INTERPOLATION");
 					// TODO: adjust limit according to ... speed etc ?
 					// Check full bounding box since last from.
 					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
@@ -714,7 +713,8 @@ public class SurvivalFly extends Check {
 			// TODO: Should this be an extra lost-ground(to) check, setting toOnGround  [for no-fall no difference]?
 			// TODO: yDistance <= 0 might be better.
 			// Also clear accounting data.
-			if (to.isOnGround(0.5) || from.isOnGround(0.5)){
+//			if (to.isOnGround(0.5) || from.isOnGround(0.5)){
+			if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))){
 				return applyLostGround(player, from, true, data, "edge");
 			}
 //			else data.stats.addStats(data.stats.getId("sfLostGround_" + "edge", true), 0);
@@ -748,7 +748,7 @@ public class SurvivalFly extends Check {
 			// TODO: stairs ?
 			// TODO: Can it be safe to only check to with raised margin ? [in fact should be checked from higher yMin down]
 			// TODO: Interpolation method (from to)?
-			if (from.isOnGround(0.5) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))){
+			if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))){
 				// (Usually yDistance should be -0.078)
 				return applyLostGround(player, from, true, data, "fastedge");
 			}
@@ -780,7 +780,7 @@ public class SurvivalFly extends Check {
 		// data.ground ?
 		// ? set jumpphase to height / 0.15 ?
 		data.sfJumpPhase = 0;
-		data.jumpAmplifier = mcAccess.getJumpAmplifier(player);
+		data.jumpAmplifier = MovingListener.getJumpAmplifier(player);
 		data.clearAccounting();
 		// Tell NoFall that we assume the player to have been on ground somehow.
 		data.noFallAssumeGround = true;
