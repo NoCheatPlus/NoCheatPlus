@@ -277,7 +277,8 @@ public class PlayerLocation {
 				return false;
 			}
 			// TODO: Distinguish based on actual height off .0 ?
-			final double diff = 0.001;
+			// TODO: diff still needed ?
+			final double diff = 0; // 0.001;
 			aboveStairs = BlockProperties.collides(blockCache, minX - diff, minY - 1.0, minZ - diff, maxX + diff, minY + 0.25, maxZ + diff, BlockProperties.F_STAIRS);
 		}
 		return aboveStairs;
@@ -425,6 +426,7 @@ public class PlayerLocation {
 	 */
 	public boolean isInWeb() {
 		if (inWeb == null) {
+			// TODO: inset still needed ?
 			final double inset = 0.001d;
 			inWeb = BlockProperties.collidesId(blockCache, minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB.getId());
 		}
@@ -459,11 +461,13 @@ public class PlayerLocation {
 						// TODO: BlockHeight is needed for fences, use right away (above)?
 						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)
 								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getGroundMinHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) <= y - bY){
+//							System.out.println("*** onground SHORTCUT");
 							onGround = true;
 						}
 					}
 				}
 				if (onGround == null){
+//					System.out.println("*** fetch onground std");
 					// Full on-ground check (blocks).
 					// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
 					onGround = BlockProperties.isOnGround(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, 0L);
@@ -473,6 +477,8 @@ public class PlayerLocation {
 		}
 		if (onGround) onGroundMinY = Math.min(onGroundMinY, yOnGround);
 		else{
+//			System.out.println("*** onground check entities");
+			// TODO: further confine this ?
 			notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
 			final double d1 = 0.25D;
 			onGround = blockCache.standsOnEntity(player, minX - d1, minY - yOnGround - d1, minZ - d1, maxX + d1, minY + 0.25 + d1, maxZ + d1);
@@ -536,6 +542,7 @@ public class PlayerLocation {
 				if (notOnGroundMaxY >= yOnGround) return false;
 			}
 		}
+//		System.out.println("*** Fetch on-ground: yOnGround=" + yOnGround + " xzM=" + xzMargin + " yM=" + yMargin + " ign=" + ignoreFlags);
 		final boolean onGround = BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, ignoreFlags);
 		if (ignoreFlags == 0){
 			if (onGround){
@@ -748,7 +755,13 @@ public class PlayerLocation {
 	 * @param maxYonGround
 	 */
 	public void collectBlockFlags(double maxYonGround){
-		blockFlags = BlockProperties.collectFlagsSimple(blockCache, minX - 0.001, minY - Math.max(Math.max(1.0, yOnGround), maxYonGround), minZ - 0.001, maxX + 0.001, maxY + .25, maxZ + .001);
+		maxYonGround = Math.max(yOnGround, maxYonGround);
+		// TODO: Clearly refine this for 1.5 high blocks.
+		// TODO: Check which checks need blocks below.
+		final double yExtra = 0.6; // y - blockY - maxYonGround > 0.5 ? 0.5 : 1.0;
+		// TODO: xz margin still needed ?
+		final double xzM = 0; //0.001;
+		blockFlags = BlockProperties.collectFlagsSimple(blockCache, minX - xzM, minY - yExtra - maxYonGround, minZ - xzM, maxX + xzM, Math.max(maxY, minY + 1.5), maxZ + xzM);
 	}
 
 	/**
