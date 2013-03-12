@@ -486,30 +486,28 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Set up data / caching.
         final MoveInfo moveInfo;
-        final PlayerLocation pFrom, pTo;
         if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
         else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
-        pFrom = moveInfo.from;
-        pTo = moveInfo.to;
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
 		data.noFallAssumeGround = false;
 		data.resetTeleported();
         // Debug.
         if (cc.debug) {
-			DebugUtil.outputMoveDebug(player, pFrom, pTo, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
+			DebugUtil.outputMoveDebug(player, moveInfo.from, moveInfo.to, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
 		}
-		
 		// Check for illegal move and bounding box etc.
-		if (pFrom.isIllegal() || pTo.isIllegal()) {
+		if (moveInfo.from.isIllegal() || moveInfo.to.isIllegal()) {
 			handleIllegalMove(event, player, data);
 			moveInfo.cleanup();
 			parkedInfo.add(moveInfo);
 			return;
 		}
-		final double maxYNoFall = Math.max(cc.noFallyOnGround, cc.yOnGround);
-        pFrom.collectBlockFlags(maxYNoFall);
-        pTo.collectBlockFlags(maxYNoFall);
+		// Prepare locations for use.
+		// TODO: Block flags might not be needed if neither sf nor passable get checked.
+		final PlayerLocation pFrom, pTo;
+        pFrom = moveInfo.from;
+        pTo = moveInfo.to;
         
 		// Potion effect "Jump".
 		final double jumpAmplifier = MovingListener.getJumpAmplifier(player);
@@ -598,6 +596,22 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	// Flying checks.
     	if (checkSf){
             // SurvivalFly
+    		
+    		// Collect block flags.
+    		// TODO: Could further differentiate if really needed to (newTo / NoFall).
+    		final double maxYNoFall = Math.max(cc.noFallyOnGround, cc.yOnGround);
+            pFrom.collectBlockFlags(maxYNoFall);
+            if (pFrom.isSamePos(pTo)){
+            	// TODO: Could consider pTo = pFrom, set pitch / yaw elsewhere.
+            	// Sets all properties, but only once.
+            	pTo.prepare(pFrom);
+            }
+            else{
+            	// Might collect block flags for small distances with the containing bounds for both. 
+            	pTo.collectBlockFlags(maxYNoFall);
+            }
+            
+            // Actual check.
     		if (newTo == null){
     			// Only check if passable has not already set back.
     			newTo = survivalFly.check(player, pFrom, pTo, data, cc);

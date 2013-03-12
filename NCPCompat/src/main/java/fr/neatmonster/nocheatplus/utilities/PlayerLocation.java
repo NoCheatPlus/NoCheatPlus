@@ -810,4 +810,24 @@ public class PlayerLocation {
 		return blockCache.getTypeId(blockX, blockY + 1,  blockZ);
 	}
 
+	/**
+	 * Set cached info according to other.<br>
+	 * Minimal optimizations: take block flags directly, on-ground max/min bounds, only set stairs if not on ground and not reset-condition.
+	 * @param other
+	 */
+	public void prepare(final PlayerLocation other) {
+		this.onGround = other.isOnGround();
+		this.inWater = other.isInWater();
+		this.inLava = other.isInLava();
+		this.inWeb = other.isInWeb();
+		this.onClimbable = other.isOnClimbable();
+		if (!onGround && !isResetCond()) this.aboveStairs = other.isAboveStairs();
+		this.onIce = other.isOnIce();
+		this.typeId = other.getTypeId();
+		this.typeIdBelow = other.getTypeIdBelow();
+		this.notOnGroundMaxY = other.notOnGroundMaxY;
+		this.onGroundMinY = other.onGroundMinY;
+		this.blockFlags = other.blockFlags; //  Assume set.
+	}
+
 }

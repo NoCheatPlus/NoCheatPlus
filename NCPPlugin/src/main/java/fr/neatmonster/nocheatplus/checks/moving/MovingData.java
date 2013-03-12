@@ -172,6 +172,9 @@ public class MovingData extends ACheckData {
     
     // Accounting info.
 	public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
+	
+	
+//	public final Stats stats = new Stats(); // Test.
     
 	/**
 	 * Clear the data of the fly checks (not more-packets).
