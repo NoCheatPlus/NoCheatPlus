@@ -70,10 +70,13 @@ public class DebugUtil {
 			final double jump = mcAccess.getJumpAmplifier(player);
 			final double speed = mcAccess.getFasterMovementAmplifier(player);
 			if (speed != Double.NEGATIVE_INFINITY || jump != Double.NEGATIVE_INFINITY){
-				builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("speed=" + speed) : "") + (jump != Double.NEGATIVE_INFINITY ? ("jump=" + jump) : "") + ")");
+				builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("speed=" + (speed + 1)) : "") + (jump != Double.NEGATIVE_INFINITY ? ("jump=" + (jump + 1)) : "") + ")");
 			}
-			
+			// Print basic info first in order
+			System.out.print(builder.toString());
+			// Extended info.
 			if (BuildParameters.debugLevel > 0){
+				builder.setLength(0);
 				// Note: the block flags are for normal on-ground checking, not with yOnGrond set to 0.5.
 				from.collectBlockFlags(maxYOnGround);
 				if (from.getBlockFlags() != 0) builder.append("\nfrom flags: " + StringUtil.join(BlockProperties.getFlagNames(from.getBlockFlags()), "+"));
@@ -84,9 +87,10 @@ public class DebugUtil {
 				if (to.getBlockFlags() != 0) builder.append("\nto flags: " + StringUtil.join(BlockProperties.getFlagNames(to.getBlockFlags()), "+"));
 				if (to.getTypeId() != 0) addBlockInfo(builder, to, "\nto");
 				if (to.getTypeIdBelow() != 0) addBlockBelowInfo(builder, to, "\nto");
-				if (!to.isOnGround() && to.isOnGround(0.5)) builder.append(" (ground within 0.5)"); 
+				if (!to.isOnGround() && to.isOnGround(0.5)) builder.append(" (ground within 0.5)");
+				System.out.print(builder.toString());
 			}
-			System.out.print(builder.toString());
+			
 		}
 
 	public static  void addBlockBelowInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
