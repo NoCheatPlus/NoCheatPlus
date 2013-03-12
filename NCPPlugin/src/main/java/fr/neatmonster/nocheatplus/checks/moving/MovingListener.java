@@ -1096,7 +1096,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	moveInfo.from.collectBlockFlags(cc.noFallyOnGround);
         	// Be sure not to lose that block.
         	data.noFallFallDistance += 1.0;
-        	if (!pLoc.isOnGround(1.0) && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()){
+        	if (!pLoc.isOnGround(1.0, 0.3, 0.1) && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()){
         		// Likely a new style no-fall bypass (damage in mid-air).
         		data.noFallVL += 1.0;
         		if (noFall.executeActions(player, data.noFallVL, 1.0, cc.noFallActions, true) && data.hasSetBack()){
