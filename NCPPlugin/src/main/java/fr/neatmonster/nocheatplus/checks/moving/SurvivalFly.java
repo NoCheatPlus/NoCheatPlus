@@ -105,13 +105,45 @@ public class SurvivalFly extends Check {
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) resetFrom = true;
 		// TODO: Extra workarounds for toOnGround ?
-		else if (lostGround(player, from, to, hDistance, yDistance, sprinting, data, cc)){
-			// TODO: Consider && !resetTo ?
-			// TODO: Confine by max y distance and min xz-distance?
-			resetFrom = true;
+		else{
+			// TODO: Consider if (!resetTo) ?
+			// Check lost-ground workarounds.
+			boolean lostGround = false; // Just used for better overview.
+			
+			// TODO: Move more conditions here (!)
+			// TODO: Confine by max y distance and max/min xz-distance?
+			if (yDistance >= -0.5 && yDistance <= 0.52 + data.jumpAmplifier * 0.2){
+				// "Mild" Ascending / descending.
+				// Stairs.
+				// TODO: More safety guards.
+				if (from.isAboveStairs()) {
+					applyLostGround(player, from, true, data, "stairs");
+					lostGround = true;
+				}
+				// Descending.
+				if (!lostGround && yDistance <= 0){
+					if (lostGroundDescend(player, from, to, hDistance, yDistance, sprinting, data, cc)){
+						lostGround = true;	
+					}
+				}
+				//Ascending
+				if (!lostGround && yDistance >= 0){
+					if (lostGroundAscend(player, from, to, hDistance, yDistance, sprinting, data, cc)){
+						lostGround = true;
+					}
+				}
+			}
+			else if (yDistance < -0.5){
+				// Clearly descending.
+				if (hDistance <= 0.5){
+					if (lostGroundFastDescend(player, from, to, hDistance, yDistance, sprinting, data, cc)){
+						lostGround = true;
+					}
+				}
+			}
+			resetFrom = lostGround;
 			// Note: if not setting resetFrom, other places have to check assumeGround...
 		}
-		else resetFrom = false;
 
 		// TODO: Account for lift-off medium / if in air [i.e. account for medium + friction]?
 		// (Might set some margin for buffering if cutting down hAllowedDistance.)
@@ -119,6 +151,7 @@ public class SurvivalFly extends Check {
 
 		// Account for flowing liquids (only if needed).
 		// Assume: If in liquids this would be placed right here.
+		// TODO: Consider data.mediumLiftOff != ...GROUND
 		if (hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance)) {
 			hAllowedDistance *= modDownStream;
 		}
@@ -216,22 +249,7 @@ public class SurvivalFly extends Check {
 			}
 		}
 		
-
 		final boolean resetTo = toOnGround || to.isResetCond();
-		
-//		if (cc.survivalFlyAccountingH && !resetFrom && !resetTo) {
-//			// Currently only for "air" phases.
-//			// Horizontal.
-//			if (data.horizontalFreedom <= 0.001D) {
-//				// This only checks general speed decrease once velocity is smoked up.
-//				// TODO: account for bunny-hop
-//				if (hDistance != 0.0) hDistanceAboveLimit = Math.max(hDistanceAboveLimit, doAccounting(now, hDistance, data.hDistSum, data.hDistCount, tags, "hacc"));
-//			} else {
-//				// TODO: Just to exclude source of error, might be redundant.
-//				data.hDistCount.clear(now);
-//				data.hDistSum.clear(now);
-//			}
-//		}
 
 		// Horizontal buffer.
 		if (hDistanceAboveLimit > 0D && data.sfHorizontalBuffer != 0D) {
@@ -578,128 +596,166 @@ public class SurvivalFly extends Check {
 			 builder.append(" value=" + vel.value + " counter=" +  vel.actCount);
 		}
 	}
-
+	
 	/**
-	 * Check if the player might have been on ground due to moving down and jumping up again, but somehow no event showing him on ground has been fired.
+	 * Check if a ground-touch has been lost due to event-sending-frequency or other reasons.<br>
+	 * This is for ascending only (yDistance >= 0).
 	 * @param player
 	 * @param from
 	 * @param to
+	 * @param hDistance
 	 * @param yDistance
+	 * @param sprinting
 	 * @param data
 	 * @param cc
 	 * @return
 	 */
-	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
-		
-		// TODO: fast exclusion returns.
-		// TODO: order checks such that most frequent match comes first.
+	private boolean lostGroundAscend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
 		// TODO: re-organize for faster exclusions (hDistance, yDistance).
-		
-		// Check for moving off stairs.
 		// TODO: more strict conditions ?
-		if (from.isAboveStairs()) {
-			// TODO: This needs some safety guards.
-			// TODO: At least test putting this after yDistance > 0.5 check.
-			return applyWorkaround(player, from, true, data, "stairs");
-		}
-		
-		if (yDistance > 0.52 + 0.2 * data.jumpAmplifier){
-			// TODO: 0.52 instead of 0.5 - not sure if this helps with sprinting.
-			// All following checks are ruled out by this.
-			// (This should rarely ever happen, except for velocity and pistons.)
-			return false;
-		}
-		else if (yDistance < -0.5){
-			// Too fast falling.
-			return false;
-		}
 		
 		final double setBackYDistance = to.getY() - data.getSetBackY();
 		
-		if (yDistance <= 0){
-			if (data.sfJumpPhase <= 7){
-				// Check for sprinting down blocks etc.
-				if (data.sfLastYDist <= yDistance && setBackYDistance < 0 && !to.isOnGround()){
-					// TODO: setbackydist: <= - 1.0 or similar
-					// TODO: <= 7 might work with speed II, not sure with above.
-					// TODO: account for speed/sprint
-					// TODO: account for half steps !?
-					if (from.isOnGround(0.6, 0.4, 0, 0L) ){
-						// TODO: further narrow down bounds ?
-						// Temporary "fix".
-						return applyWorkaround(player, from, true, data, "pyramid");
-					}
-				}
-				
-				// Check for jumping up strange blocks like flower pots on top of other blocks.
-				if (yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()){
-					// TODO: confine by block types ?
-					if (from.isOnGround(0.25, 0.4, 0, 0L) ){
-						// Temporary "fix".
-						return applyWorkaround(player, from, true, data, "ministep");
-					}
-				}
-			}
-			// Lost ground while falling onto/over edges of blocks.
-			if (yDistance < 0 && hDistance <= 0.5 && data.sfLastYDist < 0 && yDistance > data.sfLastYDist && !to.isOnGround()){
-				// TODO: Should this be an extra lost-ground(to) check, setting toOnGround  [for no-fall no difference]?
-				// TODO: yDistance <= 0 might be better.
-				// Also clear accounting data.
-				if (to.isOnGround(0.5) || from.isOnGround(0.5)){
-					return applyWorkaround(player, from, true, data, "edge");
-				}
+		// Half block step up.
+		if (yDistance <= 0.5 && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.1 * data.jumpAmplifier && to.isOnGround()){
+			if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
+				return applyLostGround(player, from, true, data, "step");
 			}
 		}
 		
-		if (yDistance >= 0){
-			// Half block step up.
-			if (yDistance <= 0.5 && hDistance < 0.5 && setBackYDistance <= 1.3 + 0.1 * data.jumpAmplifier && to.isOnGround()){
-				if (data.sfLastYDist < 0 || from.isOnGround(0.5 - Math.abs(yDistance))){
-					return applyWorkaround(player, from, true, data, "step");
-				}
-			}
-			
-			// Interpolation check.
-			// TODO: Check if still needed [most expensive...]!
-			// TODO: Check if the set-back distance still has relevance.
-			// TODO: Interpolation might also be necessary between from and to !
-			// TODO: Check use of jump-amplifier.
-			// TODO: Might check fall distance.
-			if (data.fromX != Double.MAX_VALUE && yDistance > 0 && data.sfLastYDist < 0 && !to.isOnGround()) {
-				// TODO: Check if last-y-dist or sprinting should be considered.
-				if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
-					// Interpolate from last to-coordinates to the from
-					// coordinates (with some safe-guard).
-					final double dX = from.getX() - data.fromX;
-					final double dY = from.getY() - data.fromY;
-					final double dZ = from.getZ() - data.fromZ;
-					if (dX * dX + dY * dY + dZ * dZ < 0.5) { 
-						// TODO: adjust limit according to ... speed etc ?
-						// Check full bounding box since last from.
-						final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
-						final double iY = minY; // TODO ...
-						final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
-						double yMargin = cc.yOnGround;
-						// TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
-						// TODO: check with iY + 0.25 removed.
-						if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
-							return applyWorkaround(player, from, true, data, "interpolate");
-						}
+		// Interpolation check.
+		// (Still needed, unless a faster workaround is found.)
+		// TODO: Check if the set-back distance still has relevance.
+		// TODO: Check use of jump-amplifier.
+		// TODO: Might check fall distance.
+		//  && data.sfJumpPhase > 3 <- Seems to be a problem with cake on a block + jump over both mini edges (...).
+		if (data.fromX != Double.MAX_VALUE && yDistance > 0 && data.sfLastYDist < 0 && !to.isOnGround()) {
+			// TODO: Check if last-y-dist or sprinting should be considered.
+			if (setBackYDistance > 0D && setBackYDistance <= 1.5D + 0.2 * data.jumpAmplifier || setBackYDistance < 0 && Math.abs(setBackYDistance) < 3.0) {
+				// Interpolate from last to-coordinates to the from
+				// coordinates (with some safe-guard).
+				final double dX = from.getX() - data.fromX;
+				final double dY = from.getY() - data.fromY;
+				final double dZ = from.getZ() - data.fromZ;
+				if (dX * dX + dY * dY + dZ * dZ < 0.5) { 
+//					System.out.println("*** check lostground: INTERPOLATION");
+					// TODO: adjust limit according to ... speed etc ?
+					// Check full bounding box since last from.
+					final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
+					final double iY = minY; // TODO ...
+					final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
+					double yMargin = cc.yOnGround;
+					// TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
+					// TODO: check with iY + 0.25 removed.
+					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
+						return applyLostGround(player, from, true, data, "interpolate");
 					}
 				}
 			}
 		}
-		
 		
 		// Nothing found.
 		return false;
 	}
 	
 	/**
-	 * 
-	 * @return true.
+	 * Check if a ground-touch has been lost due to event-sending-frequency or other reasons.<br>
+	 * This is for descending "mildly" only (-0.5 <= yDistance <= 0).
+	 * @param player
+	 * @param from
+	 * @param to
+	 * @param hDistance
+	 * @param yDistance
+	 * @param sprinting
+	 * @param data
+	 * @param cc
+	 * @return
 	 */
-	private boolean applyWorkaround(final Player player, final PlayerLocation from, final boolean setBackSafe, final MovingData data, final String tag){
+	private boolean lostGroundDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+		// TODO: re-organize for faster exclusions (hDistance, yDistance).
+		// TODO: more strict conditions 
+		
+		final double setBackYDistance = to.getY() - data.getSetBackY();
+		
+		if (data.sfJumpPhase <= 7){
+			// Check for sprinting down blocks etc.
+			if (data.sfLastYDist <= yDistance && setBackYDistance < 0 && !to.isOnGround()){
+				// TODO: setbackydist: <= - 1.0 or similar
+				// TODO: <= 7 might work with speed II, not sure with above.
+				// TODO: account for speed/sprint
+				// TODO: account for half steps !?
+				if (from.isOnGround(0.6, 0.4, 0, 0L) ){
+					// TODO: further narrow down bounds ?
+					// Temporary "fix".
+					return applyLostGround(player, from, true, data, "pyramid");
+				}
+			}
+			
+			// Check for jumping up strange blocks like flower pots on top of other blocks.
+			if (yDistance == 0 && data.sfLastYDist > 0 && data.sfLastYDist < 0.25 && data.sfJumpPhase <= 6 + data.jumpAmplifier * 3 && setBackYDistance > 1.0 && setBackYDistance < 1.5 + 0.2 * data.jumpAmplifier && !to.isOnGround()){
+				// TODO: confine by block types ?
+				if (from.isOnGround(0.25, 0.4, 0, 0L) ){
+					// Temporary "fix".
+					return applyLostGround(player, from, true, data, "ministep");
+				}
+			}
+		}
+		// Lost ground while falling onto/over edges of blocks.
+		if (yDistance < 0 && hDistance <= 0.5 && data.sfLastYDist < 0 && yDistance > data.sfLastYDist && !to.isOnGround()){
+			// TODO: Should this be an extra lost-ground(to) check, setting toOnGround  [for no-fall no difference]?
+			// TODO: yDistance <= 0 might be better.
+			// Also clear accounting data.
+			if (to.isOnGround(0.5) || from.isOnGround(0.5)){
+				return applyLostGround(player, from, true, data, "edge");
+			}
+		}
+		
+		// Nothing found.
+		return false;
+	}
+	
+	/**
+	 * Check if a ground-touch has been lost due to event-sending-frequency or other reasons.<br>
+	 * This is for fast descending only (yDistance < -0.5).
+	 * @param player
+	 * @param from
+	 * @param to
+	 * @param hDistance
+	 * @param yDistance
+	 * @param sprinting
+	 * @param data
+	 * @param cc
+	 * @return
+	 */
+	private boolean lostGroundFastDescend(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+		// TODO: re-organize for faster exclusions (hDistance, yDistance).
+		// TODO: more strict conditions 
+		// Lost ground while falling onto/over edges of blocks.
+		if (yDistance > data.sfLastYDist && !to.isOnGround()){
+			// TODO: Should this be an extra lost-ground(to) check, setting toOnGround  [for no-fall no difference]?
+			// TODO: yDistance <= 0 might be better.
+			// Also clear accounting data.
+			// TODO: stairs ?
+			// TODO: Can it be safe to only check to with raised margin ? [in fact should be checked from higher yMin down]
+			// TODO: Interpolation method (from to)?
+			if (from.isOnGround(0.5) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))){
+				// (Usually yDistance should be -0.078)
+				return applyLostGround(player, from, true, data, "fastedge");
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Apply lost-ground workaround, 
+	 * @param player
+	 * @param from
+	 * @param setBackSafe If to use from as set-back (if set to false: currently nothing changed).
+	 * @param data
+	 * @param tag Tag extra to "lostground"
+	 * @return Always true.
+	 */
+	private boolean applyLostGround(final Player player, final PlayerLocation from, final boolean setBackSafe, final MovingData data, final String tag){
 		// Set the new setBack and reset the jumpPhase.
 		// TODO: Some interpolated position ?
 		// TODO: (Task list: sharpen when this is used, might remove isAboveStairs!)
