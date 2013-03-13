@@ -337,11 +337,16 @@ public class BlockProperties {
 		try{
 		    initTools(mcAccess, worldConfigProvider);
 		    initBlocks(mcAccess, worldConfigProvider);
-		    // TODO: try-catch over this one.
+		    // Allow mcAccess to setup block properties.
 		    if (mcAccess instanceof BlockPropertiesSetup){
-		    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
+			    try{
+			    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
+			    }
+			    catch(Throwable t){
+			    	LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
+			    	LogUtil.logSevere(t);
+			    }
 		    }
-		    // TODO: Add registry for further BlockPropertiesSetup instances.
 		}
 		catch(Throwable t){
 			LogUtil.logSevere(t);
@@ -735,7 +740,7 @@ public class BlockProperties {
 	 * @throws InputMismatchException if failed to parse.
 	 */
 	public static long parseFlag(final String input){
-		final String ucInput = input.toUpperCase();
+		final String ucInput = input.trim().toUpperCase();
 		final Long flag = nameFlagMap.get(ucInput);
 		if (flag != null) return flag.longValue();
 		try{
@@ -1444,10 +1449,11 @@ public class BlockProperties {
                 	hasErrors = true;
                 	continue;
                 }
-                final Collection<String> split = StringUtil.split((String) obj, ' ', ',', '/', '|', ';', '\t');
+                final Collection<String> split = StringUtil.split((String) obj, ' ', ',', '/', '|', '+', ';', '\t');
                 long flags = 0;
                 boolean error = false;
-                for (final String input : split){
+                for (String input : split){
+                	input = input.trim();
                 	if (input.isEmpty()) continue;
                 	try{
                 		flags |= parseFlag(input);
@@ -1757,6 +1763,7 @@ public class BlockProperties {
     	final int iMaxY = Math.min(Location.locToBlock(maxY), maxBlockY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);
+//    	System.out.println("*** isOnGround check size: " + ((iMaxX - iMinX + 1) * (iMaxY - iMinY + 1) * (iMaxZ - iMinZ + 1)));
         for (int x = iMinX; x <= iMaxX; x++){
             for (int z = iMinZ; z <= iMaxZ; z++){
             	
@@ -2013,6 +2020,7 @@ public class BlockProperties {
     	final int iMaxY = Location.locToBlock(maxY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);
+//    	System.out.println("*** collect flags check size: " + ((iMaxX - iMinX + 1) * (iMaxY - iMinY + 1) * (iMaxZ - iMinZ + 1)));
     	long flags = 0;
         for (int x = iMinX; x <= iMaxX; x++){
             for (int z = iMinZ; z <= iMaxZ; z++){
