@@ -38,7 +38,7 @@ public class BlockCacheBukkit extends BlockCache{
 		// minX, minY, minZ, maxX, maxY, maxZ
 		// TODO: Want to maintain a list with manual entries or at least half / full blocks ?
 		// Always return full bounds, needs extra adaption to BlockProperties (!).
-		return new double[]{0f, 0f, 0f, 1f, 1f, 1f};
+		return new double[]{0D, 0D, 0D, 1D, 1D, 1D};
 	}
 	
 	@Override
