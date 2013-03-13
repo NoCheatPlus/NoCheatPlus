@@ -147,17 +147,13 @@ public class SurvivalFly extends Check {
 			resetFrom = lostGround;
 			// Note: if not setting resetFrom, other places have to check assumeGround...
 		}
+		
+		// Set flag for swimming with the flowing direction of liquid.
+		final boolean downStream = hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance);
 
 		// TODO: Account for lift-off medium / if in air [i.e. account for medium + friction]?
 		// (Might set some margin for buffering if cutting down hAllowedDistance.)
-		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, false);
-
-		// Account for flowing liquids (only if needed).
-		// Assume: If in liquids this would be placed right here.
-		// TODO: Consider data.mediumLiftOff != ...GROUND
-		if (hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance)) {
-			hAllowedDistance *= modDownStream;
-		}
+		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, data, cc, false);
 		
         // Judge if horizontal speed is above limit.
 //        double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
@@ -196,7 +192,7 @@ public class SurvivalFly extends Check {
 			// TODO: Use velocity already here ?
 			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
 			if (hDistanceAboveLimit > 0){
-				hAllowedDistance = getAllowedhDist(player, from, to, sprinting, hDistance, data, cc, true);
+				hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, data, cc, true);
 //				hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom - extraUsed;
 				if (hFreedom > 0){
 					hDistanceAboveLimit = hDistance - hAllowedDistance - extraUsed - hFreedom;
@@ -801,7 +797,7 @@ public class SurvivalFly extends Check {
 	 * @param cc
 	 * @return
 	 */
-	private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final double hDistance, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+	private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final boolean downStream, final double hDistance, final MovingData data, final MovingConfig cc, boolean checkPermissions)
 	{
 		if (checkPermissions) tags.add("permchecks");
 		// TODO: re-arrange for fastest checks first (check vs. allowed distance
@@ -837,6 +833,13 @@ public class SurvivalFly extends Check {
 
 		// If the player is on ice, give him an higher maximum speed.
 		if (data.sfFlyOnIce > 0) hAllowedDistance *= modIce;
+		
+		// Account for flowing liquids (only if needed).
+		// Assume: If in liquids this would be placed right here.
+		// TODO: Consider data.mediumLiftOff != ...GROUND
+		if (downStream) {
+			hAllowedDistance *= modDownStream;
+		}
 		
 		if (hDistance <= hAllowedDistance) return hAllowedDistance;
 		
