@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Minecart;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
@@ -46,7 +47,7 @@ public class BlockCacheBukkit extends BlockCache{
 			// TODO: Probably check other ids too before doing this ?
 			for (final Entity other : entity.getNearbyEntities(2.0, 2.0, 2.0)){
 				final EntityType type = other.getType();
-				if (type != EntityType.BOAT && type != EntityType.MINECART) continue;
+				if (type != EntityType.BOAT && !(other instanceof Minecart)) continue;
 				final Location loc = entity.getLocation();
 				if (Math.abs(loc.getY() - minY) < 0.6){
 					// TODO: A "better" estimate is possible, though some more tolerance would be good. 
