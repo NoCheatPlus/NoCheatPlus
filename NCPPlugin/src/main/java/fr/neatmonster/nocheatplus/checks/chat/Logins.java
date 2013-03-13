@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 public class Logins extends Check implements IRemoveData{
     
-    /** Per world count (only used if set in config). */
+    /** Per world count (if set in the config, only "" is used). */
     private final Map<String, ActionFrequency> counts = new HashMap<String, ActionFrequency>();
 
 	public Logins() {
@@ -38,12 +38,12 @@ public class Logins extends Check implements IRemoveData{
         final ActionFrequency freq = getActionFrequency(player.getWorld().getName(), 6, durBucket, cc.loginsPerWorldCount);
         freq.update(now);
         final boolean cancel = freq.score(1f) > cc.loginsLimit; // TODO: >= ...  This will be 1 after the first login (!).
-        if (!cancel) freq.add(now, 1f);
+        if (!cancel) freq.add(1f);
         return cancel;
     }
 
 	/**
-	 * Called by ChatL1.istener
+	 * Called by ChatListener
 	 */
 	public void onReload() {
 		counts.clear();
