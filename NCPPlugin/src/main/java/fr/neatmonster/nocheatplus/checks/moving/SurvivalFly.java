@@ -749,7 +749,7 @@ public class SurvivalFly extends Check {
 			// TODO: stairs ?
 			// TODO: Can it be safe to only check to with raised margin ? [in fact should be checked from higher yMin down]
 			// TODO: Interpolation method (from to)?
-			if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))){
+			if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.3, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))){
 				// (Usually yDistance should be -0.078)
 				return applyLostGround(player, from, true, data, "fastedge");
 			}
