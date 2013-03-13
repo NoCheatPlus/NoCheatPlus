@@ -253,13 +253,13 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 			factory.removeAllData();
 		}
 		for (final IRemoveData rmd : instance.iRemoveData){
-			if (rmd instanceof IHaveCheckType){
-				final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
-				if (refType == checkType || APIUtils.isParent(checkType, refType)) rmd.removeAllData();
-			}
-			else if (checkType == CheckType.ALL){
+			if (checkType == CheckType.ALL){
 				// Not sure this is really good, though.
 				rmd.removeAllData();
+			}
+			else if (rmd instanceof IHaveCheckType){
+				final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
+				if (refType == checkType || APIUtils.isParent(checkType, refType)) rmd.removeAllData();
 			}
 		}
 		ViolationHistory.clear(checkType);
@@ -302,15 +302,15 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	public static boolean clearComponentData(final CheckType checkType, final String PlayerName){
 		boolean removed = false;
 		for (final IRemoveData rmd : instance.iRemoveData){
-			if (rmd instanceof IHaveCheckType){
+			if (checkType == CheckType.ALL){
+				// Not sure this is really good, though.
+				if (rmd.removeData(PlayerName) != null) removed = true;
+			}
+			else if (rmd instanceof IHaveCheckType){
 				final CheckType refType = ((IHaveCheckType) rmd).getCheckType();
 				if (refType == checkType || APIUtils.isParent(checkType, refType)){
 					if (rmd.removeData(PlayerName) != null) removed = true;
 				}
-			}
-			else if (checkType == CheckType.ALL){
-				// Not sure this is really good, though.
-				if (rmd.removeData(PlayerName) != null) removed = true;
 			}
 		}
 		return removed;
