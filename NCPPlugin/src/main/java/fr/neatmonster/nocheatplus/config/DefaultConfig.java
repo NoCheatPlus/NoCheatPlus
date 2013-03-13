@@ -328,8 +328,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel");
 
         set(ConfPaths.FIGHT_REACH_CHECK, true);
+        set(ConfPaths.FIGHT_REACH_SURVIVALDISTANCE, 4.4);
         set(ConfPaths.FIGHT_REACH_PENALTY, 500);
         set(ConfPaths.FIGHT_REACH_REDUCE, true);
+        set(ConfPaths.FIGHT_REACH_REDUCEDISTANCE, 0.9);
+        set(ConfPaths.FIGHT_REACH_REDUCESTEP, 0.15);
         set(ConfPaths.FIGHT_REACH_ACTIONS, "cancel vl>10 log:freach:2:5:if cancel");
         
         set(ConfPaths.FIGHT_SELFHIT_CHECK, true);

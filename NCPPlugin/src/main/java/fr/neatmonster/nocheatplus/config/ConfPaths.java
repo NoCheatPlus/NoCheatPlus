@@ -417,9 +417,12 @@ public abstract class ConfPaths {
 
     private static final String FIGHT_REACH                              = FIGHT + "reach.";
     public static final String  FIGHT_REACH_CHECK                        = FIGHT_REACH + "active";
+	public static final String  FIGHT_REACH_SURVIVALDISTANCE			 = FIGHT_REACH + "survivaldistance";
     public static final String  FIGHT_REACH_PENALTY                      = FIGHT_REACH + "penalty";
 	public static final String  FIGHT_REACH_PRECISION                    = FIGHT_REACH + "precision";
 	public static final String  FIGHT_REACH_REDUCE                       = FIGHT_REACH + "reduce";
+	public static final String  FIGHT_REACH_REDUCEDISTANCE				 = FIGHT_REACH + "reducedistance";
+	public static final String  FIGHT_REACH_REDUCESTEP					 = FIGHT_REACH + "reducestep";
     public static final String  FIGHT_REACH_ACTIONS                      = FIGHT_REACH + "actions";
     
     public static final String FIGHT_SELFHIT                             = FIGHT + "selfhit.";

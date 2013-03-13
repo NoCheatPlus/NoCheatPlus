@@ -32,15 +32,6 @@ public class Reach extends Check {
 
     /** The maximum distance allowed to interact with an entity in creative mode. */
     public static final double CREATIVE_DISTANCE = 6D;
-
-    /** The maximum distance allowed to interact with an entity in survival mode. */
-    public static final double SURVIVAL_DISTANCE = 4.25D;
-    
-    /** Amount which can be reduced by reach adaption. */
-    public static final double DYNAMIC_RANGE = 0.75;
-    
-    /** Adaption amount for dynamic range. */
-    public static final double DYNAMIC_STEP = DYNAMIC_RANGE / 3.0;
     
     /** Additum for distance, based on entity. */
     private static double getDistMod(final Entity damaged) {
@@ -74,6 +65,13 @@ public class Reach extends Check {
         final FightData data = FightData.getData(player);
 
         boolean cancel = false;
+        
+        // The maximum distance allowed to interact with an entity in survival mode.
+        final double SURVIVAL_DISTANCE = cc.reachSurvivalDistance; // 4.4D;
+        // Amount which can be reduced by reach adaption.
+        final double DYNAMIC_RANGE = cc.reachReduceDistance; // 0.9
+        // Adaption amount for dynamic range.
+        final double DYNAMIC_STEP = cc.reachReduceStep / SURVIVAL_DISTANCE; // 0.15
 
         final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE + getDistMod(damaged);
         final double distanceMin = (distanceLimit - DYNAMIC_RANGE) / distanceLimit;
@@ -145,8 +143,9 @@ public class Reach extends Check {
         if (data.reachLastViolationTime + cc.reachPenalty > System.currentTimeMillis()) {
             // A safeguard to avoid people getting stuck in penalty time indefinitely in case the system time of the
             // server gets changed.
-            if (data.reachLastViolationTime > System.currentTimeMillis())
-                data.reachLastViolationTime = 0;
+            if (data.reachLastViolationTime > System.currentTimeMillis()){
+            	data.reachLastViolationTime = 0;
+            }
 
             // He is in penalty time, therefore request cancelling of the event.
             cancelByPenalty = !cancel;

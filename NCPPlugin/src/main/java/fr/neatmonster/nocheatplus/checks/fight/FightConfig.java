@@ -98,6 +98,10 @@ public class FightConfig extends ACheckConfig {
     public final long       reachPenalty;
     public final boolean    reachPrecision;
 	public final boolean    reachReduce;
+	public final double		reachSurvivalDistance;
+	public final double		reachReduceDistance;
+	public final double		reachReduceStep;
+
     public final ActionList reachActions;
     
     public final boolean    selfHitCheck;
@@ -116,7 +120,7 @@ public class FightConfig extends ACheckConfig {
     // Special flags:
 	public final boolean    yawRateCheck;
 	public final boolean    cancelDead;
-
+	
     /**
      * Instantiates a new fight configuration.
      * 
@@ -157,9 +161,12 @@ public class FightConfig extends ACheckConfig {
         noSwingActions = data.getOptimizedActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.FIGHT_REACH_CHECK);
+        reachSurvivalDistance = data.getDouble(ConfPaths.FIGHT_REACH_SURVIVALDISTANCE, 3.5, 6.0, 4.4);
         reachPenalty = data.getLong(ConfPaths.FIGHT_REACH_PENALTY);
         reachPrecision = data.getBoolean(ConfPaths.FIGHT_REACH_PRECISION);
         reachReduce = data.getBoolean(ConfPaths.FIGHT_REACH_REDUCE);
+        reachReduceDistance = data.getDouble(ConfPaths.FIGHT_REACH_REDUCEDISTANCE, 0, reachSurvivalDistance, 0.9);
+        reachReduceStep = data.getDouble(ConfPaths.FIGHT_REACH_REDUCESTEP, 0, reachReduceDistance, 0.15);
         reachActions = data.getOptimizedActionList(ConfPaths.FIGHT_REACH_ACTIONS, Permissions.FIGHT_REACH);
 
         selfHitCheck = data.getBoolean(ConfPaths.FIGHT_SELFHIT_CHECK);
