@@ -451,13 +451,19 @@ public class MovingData extends ACheckData {
 			final Velocity vel = it.next();
 			// TODO: 0.001 can be stretched somewhere else, most likely...
 			// TODO: Somehow use tick here too (actCount, valCount)?
-			if (vel.valCount <= 0 || vel.value <= 0.001) it.remove();
+			if (vel.valCount <= 0 || vel.value <= 0.001){
+//				System.out.prsintln("Invalidate active: " + vel);
+				it.remove();
+			}
 		}
 		// Queued.
 		it = hVelQueued.iterator();
 		while (it.hasNext()){
 			final Velocity vel = it.next();
-			if (vel.actCount <= 0 || vel.tick < tick) it.remove();
+			if (vel.actCount <= 0 || vel.tick < tick){
+//				System.out.println("Invalidate queued: " + vel);
+				it.remove();
+			}
 		}
 	}
 	
@@ -466,10 +472,12 @@ public class MovingData extends ACheckData {
 	 */
 	public void velocityTick(){
 		// Decrease counts for active.
+		// TODO: Consider removing already invalidated here.
 		for (final Velocity vel : hVelActive){
 			vel.valCount --;
 			vel.sum += vel.value;
-			vel.value *= 0.9; // TODO: Actual friction.
+			vel.value *= 0.93; // TODO: Actual friction.
+			// (Altered entries should be kept, since they get used right away.)
 		}
 		// Decrease counts for queued.
 		final Iterator<Velocity> it = hVelQueued.iterator();

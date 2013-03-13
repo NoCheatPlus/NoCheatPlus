@@ -158,6 +158,7 @@ public class SurvivalFly extends Check {
         // Judge if horizontal speed is above limit.
 //        double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
         double hDistanceAboveLimit = hDistance - hAllowedDistance;
+        double hFreedom = 0; // Horizontal velocity used (!).
 		if (hDistanceAboveLimit > 0){
 			// Check extra buffer (!).
 			final double extraUsed;
@@ -174,7 +175,6 @@ public class SurvivalFly extends Check {
 				extraUsed = 0.0;
 			}
 			// Check velocity.
-			double hFreedom; // Horizontal freedom if used (!).
 			if (hDistanceAboveLimit > 0){
 				hFreedom = data.getHorizontalFreedom();
 				if (hFreedom < hDistanceAboveLimit){
@@ -186,6 +186,7 @@ public class SurvivalFly extends Check {
 				}
 			}
 			else{
+//				System.out.println("*** Invalidate velocity on not used (extra)");
 				data.hVelActive.clear(); // TODO: test/check !
 				hFreedom = 0;
 			}
@@ -207,6 +208,7 @@ public class SurvivalFly extends Check {
 			}
 		}
 		else{
+//			System.out.println("*** Invalidate velocity on not used (normal)");
 			data.hVelActive.clear(); // TODO: test/check !
 			data.sfHBufExtra = 0;
 		}
@@ -290,7 +292,7 @@ public class SurvivalFly extends Check {
         		if (silentSetBack != null){
         			if (cc.debug) {
         				tags.add("silentsbcobweb");
-        				outputDebug(player, to, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+        				outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
         			}
         			return silentSetBack;
         		}
@@ -438,7 +440,7 @@ public class SurvivalFly extends Check {
 
 		if (cc.debug) {
 			// Put in a method for shorter code.
-			outputDebug(player, to, data, cc, hDistance, hAllowedDistance, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
+			outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
 		}
 		
 		data.sfJumpPhase++;
@@ -533,6 +535,7 @@ public class SurvivalFly extends Check {
         // Check removal of active horizontal velocity.
         if (hDistance <= hAllowedDistance){ // TODO: Check conditions etc.
         	// Invalidate used horizontal velocity.
+//        	System.out.println("*** INVALIDATE ON SPEED");
         	data.hVelActive.clear();
 //          if (data.horizontalVelocityUsed > cc.velocityGraceTicks){
 //        	data.horizontalFreedom = 0;
@@ -560,14 +563,15 @@ public class SurvivalFly extends Check {
      * @param resetTo
      */
 	private void outputDebug(final Player player, final PlayerLocation to, final MovingData data, final MovingConfig cc, 
-			final double hDistance, final double hAllowedDistance, final double yDistance, final double vAllowedDistance,
+			final double hDistance, final double hAllowedDistance, final double hFreedom, final double yDistance, final double vAllowedDistance,
 			final boolean fromOnGround, final boolean resetFrom, final boolean toOnGround, final boolean resetTo) {
 		// TODO: Show player name once (!)
 		final StringBuilder builder = new StringBuilder(500);
 		final String hBuf = (data.sfHorizontalBuffer < 1.0 ? ((" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer))) : "");
 		final String hBufExtra = (data.sfHBufExtra > 0 ? (" hbufextra=" + data.sfHBufExtra) : "");
+		final String hVelUsed = hFreedom > 0 ? " hVelUsed=" + StringUtil.fdec3.format(hFreedom) : "";
 		builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
-		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + hBufExtra + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
+		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + hBufExtra + hVelUsed + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
 		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
 			builder.append("\n" + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
 		}
@@ -594,7 +598,8 @@ public class SurvivalFly extends Check {
 
 	private void addVeloctiy(final StringBuilder builder, final List<Velocity> entries) {
 		for (final Velocity vel: entries){
-			 builder.append(" value=" + vel.value + " counter=" +  vel.actCount);
+			 builder.append(" ");
+			 builder.append(vel);
 		}
 	}
 	

@@ -69,4 +69,8 @@ public class Velocity {
 		this.valCount = valCount;
 	}
 	
+	public String toString(){
+		return "Velocity(tick=" + tick + " sum=" + sum + " value=" + value + " valid=" + valCount + " activate=" + actCount + ")";
+	}
+	
 }

@@ -1006,7 +1006,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
         	used = true;
-        	final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, 1 + (int) Math.round(newVal * 10.0));
+        	final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
         	data.addHorizontalVelocity(vel);
 //            data.horizontalFreedom += newVal;
 //            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 30;
