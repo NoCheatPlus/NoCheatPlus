@@ -71,6 +71,7 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		
 		// 78 Snow
 		addFlags(78, BlockProperties.F_HEIGHT_8_INC);
+		removeFlags(78, BlockProperties.F_HEIGHT_8SIM_INC);
 		
 	}
 	
@@ -85,6 +86,10 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 	
 	public static void addFlags(int id, long flags){
 		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
+	}
+	
+	public static void removeFlags(int id, long flags){
+		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) & ~flags);
 	}
 
 }
