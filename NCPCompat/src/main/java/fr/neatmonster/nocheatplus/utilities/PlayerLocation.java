@@ -617,7 +617,10 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isPassable() {
-		if (passable == null) passable = BlockProperties.isPassable(blockCache, x, y, z, getTypeId());
+		if (passable == null){
+			passable = BlockProperties.isPassable(blockCache, x, y, z, getTypeId());
+//			passable = BlockProperties.isPassableExact(blockCache, x, y, z, getTypeId());
+		}
 		return passable;
 	}
 

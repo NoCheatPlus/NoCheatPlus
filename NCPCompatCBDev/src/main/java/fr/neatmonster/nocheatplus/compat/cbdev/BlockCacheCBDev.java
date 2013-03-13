@@ -68,7 +68,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 			@SuppressWarnings("rawtypes")
 			final List list = world.getEntities(mcEntity, box);
 			@SuppressWarnings("rawtypes")
-			Iterator iterator = list.iterator();
+			final Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
 				final net.minecraft.server.v1_4_R1.Entity other = (net.minecraft.server.v1_4_R1.Entity) iterator.next();
 				if (!(other instanceof EntityBoat) && !(other instanceof EntityMinecart)) continue;

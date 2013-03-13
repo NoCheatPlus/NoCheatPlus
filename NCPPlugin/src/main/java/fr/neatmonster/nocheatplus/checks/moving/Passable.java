@@ -61,6 +61,7 @@ public class Passable extends Check {
 			// From should be the set-back.
 			loc = null;
 		} else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
+//		} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
 			// (Mind that this can be the case on the same block theoretically.)
 			// Keep loc as set-back.
 		}
@@ -68,6 +69,7 @@ public class Passable extends Check {
 			// Otherwise keep loc as set-back.
 		}
 		else if (to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
+//		else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
 			// Allow the move up if the head is free.
 			return null;
 		}
@@ -84,6 +86,7 @@ public class Passable extends Check {
 		if (data.hasSetBack()){
 			final Location ref = data.getSetBack(to);
 			if (BlockProperties.isPassable(from.getBlockCache(), ref)){
+//			if (BlockProperties.isPassableExact(from.getBlockCache(), ref)){
 				loc = ref;
 			}
 		}

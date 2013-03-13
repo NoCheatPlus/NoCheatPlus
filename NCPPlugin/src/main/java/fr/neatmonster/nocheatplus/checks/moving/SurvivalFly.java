@@ -409,6 +409,14 @@ public class SurvivalFly extends Check {
             	}
             }
             
+//            // Check maximal absolute distance (jumping).
+//            if (!data.sfDirty && yDistance > 0.57 + data.jumpAmplifier * 0.2 && !toOnGround && from.isPassable()){
+//            	// TODO: Side conditions... from.isPassable is checked because of pistons.
+//            	// TODO: Pistons don't work.
+//            	vDistanceAboveLimit = Math.max(vDistanceAboveLimit, yDistance - 0.53 + data.jumpAmplifier * 0.2);
+//            	tags.add("fastascend");
+//            }
+            
             // TODO: Velocity handling here [concept: set vdistAbove.. almost always]?
 
             // TODO: This might need max(0, for ydiff)

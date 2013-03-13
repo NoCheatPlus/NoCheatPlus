@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.blocks.BlocksMC1_5;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.RootConfPaths;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -347,6 +348,20 @@ public class BlockProperties {
 			    	LogUtil.logSevere(t);
 			    }
 		    }
+		    // Extra hand picked setups.
+		    // TODO: Add registry for further BlockPropertiesSetup instances.
+		    try{
+		    	BlockPropertiesSetup bpSetup = new BlocksMC1_5();
+		    	try{
+		    		bpSetup.setupBlockProperties(worldConfigProvider);
+		    		LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.5 blocks.");
+		    	}
+		    	catch(Throwable t){
+			    	LogUtil.logSevere("[NoCheatPlus] BlocksMC1_5.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
+			    	LogUtil.logSevere(t);
+			    }
+		    }
+		    catch(Throwable t){}
 		}
 		catch(Throwable t){
 			LogUtil.logSevere(t);
@@ -1165,7 +1180,7 @@ public class BlockProperties {
 	}
 	
 	/**
-	 * Test if a position can be passed through (collidesBlock + passable test).<br>
+	 * Test if a position can be passed through (collidesBlock + passable test, no fences yet).<br>
 	 * NOTE: This is experimental.
 	 * @param world
 	 * @param x
@@ -1176,29 +1191,87 @@ public class BlockProperties {
 	 */
 	public static final boolean isPassable(final BlockCache access, final double x, final double y, final double z, final int id){
 		// Simple exclusion check first.
-		if (isPassable(id)) return true;
+		if (isPassable(id)){
+			return true;
+		}
 		// Check if the position is inside of a bounding box.
 		final int bx = Location.locToBlock(x);
 		final int by = Location.locToBlock(y);
 		final int bz = Location.locToBlock(z);
 		final double[] bounds = access.getBounds(bx, by, bz);
-		if (bounds == null) return true;
-		if (!collidesBlock(access, x, y, z, x, y, z, bx, by, bz, id, bounds, blockFlags[id])){
+		if (bounds == null || !collidesBlock(access, x, y, z, x, y, z, bx, by, bz, id, bounds, blockFlags[id])){
 			return true;
 		}
 		
 		final double fx = x - bx;
 		final double fy = y - by;
 		final double fz = z - bz;
-//		if (fx < block.minX || fx >= block.maxX || fy < block.minY || fy >= block.maxY || fz < block.minZ || fz >= block.maxZ) return true;
-//		if (fx < bounds[0] || fx >= bounds[3] || fy < bounds[1] || fy >= bounds[4] || fz < bounds[2] || fz >= bounds[5]){
-//			return true;
-//		}
-//		else{
-			// TODO: Check f_itchy if/once exists.
-		return isPassableWorkaround(access, bx, by, bz, fx, fy, fz, id, 0, 0, 0, 0);
-//		}
+		// TODO: Check f_itchy if/once exists.
+		// Check workarounds (blocks with bigger collision box but passable on some spots).
+		if (!isPassableWorkaround(access, bx, by, bz, fx, fy, fz, id, 0, 0, 0, 0)){
+			// Not passable.
+			return false;
+		}
+		return true;
 	}
+	
+	/**
+	 * Checking the block below to account for fences and such. This must be called extra to isPassable(...).
+	 * @param access
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param id
+	 * @return
+	 */
+	public static final boolean isPassableH150(final BlockCache access, final double x, final double y, final double z){
+		// Check for fences.
+		final int by = Location.locToBlock(y) - 1;
+		final double fy = y - by;
+		if (fy >= 1.5){
+			return true;
+		}
+		final int bx = Location.locToBlock(x);
+		final int bz = Location.locToBlock(z);
+		final int belowId = access.getTypeId(bx, by, bz);
+		final long belowFlags = blockFlags[belowId]; 
+		if ((belowFlags & F_HEIGHT150) == 0 || isPassable(belowId)){
+			return true;
+		}
+		final double[] belowBounds = access.getBounds(bx, by, bz);
+		if (belowBounds == null){
+			return true;
+		}
+		if (!collidesBlock(access, x, y, z, x, y, z, bx, by, bz, belowId, belowBounds, belowFlags)){
+			return true;
+		}
+		final double fx = x - bx;
+		final double fz = z - bz;
+		return isPassableWorkaround(access, bx, by, bz, fx, fy, fz, belowId, 0, 0, 0, 0);
+	}
+	
+	/**
+	 * Check if passable, including blocks with height 1.5.
+	 * @param access
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public static final boolean isPassableExact(final BlockCache access, final double x, final double y, final double z, final int id){
+		return isPassable(access, x, y, z, id) && isPassableH150(access, x, y, z);
+	}
+	
+	/**
+	 * Check if passable, including blocks with height 1.5.
+	 * @param access
+	 * @param loc
+	 * @return
+	 */
+	public static final boolean isPassableExact(final BlockCache access, final Location loc){
+		return isPassableExact(access, loc.getX(), loc.getY(), loc.getZ(), access.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+	}
+
 	
 	/**
 	 * Requires the hit-box of the block is hit (...): this checks for special blocks properties such as glass panes and similar.<br>
