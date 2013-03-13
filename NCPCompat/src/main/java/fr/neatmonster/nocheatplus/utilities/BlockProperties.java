@@ -297,6 +297,20 @@ public class BlockProperties {
     public static final long F_HEIGHT_8SIM_DEC		= 0x2000;
     
     /**
+     * The height is assumed to increase with data value up to 0x7, repeating up to 0x15.<br>
+     * However the hit-box for collision checks  will be set to 0.5 height or 1.0 height only,<br>
+     * as with the 1.4.x snow levels.
+     */
+    public static final long F_HEIGHT_8SIM_INC		= 0x4000;
+    
+    
+    /**
+     * The height increases with data value (8 heights).<br>
+     * This is for MC 1.5 snow levels.
+     */
+    public static final long F_HEIGHT_8_INC			= 0x8000;
+    
+    /**
      * Map flag to names.
      */
     private static final Map<Long, String> flagNameMap = new LinkedHashMap<Long, String>();
@@ -439,6 +453,9 @@ public class BlockProperties {
         }) {
             blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8SIM_DEC | F_LAVA;
         }
+        
+        // Snow (1.4.x)
+        blockFlags[Material.SNOW.getId()] |= F_HEIGHT_8SIM_INC;
         
         // 1.5 block high.
         for (final Material mat : new Material[]{
@@ -1406,7 +1423,7 @@ public class BlockProperties {
 	 */
     public static double getGroundMinHeight(final BlockCache access, final int x, final int y, final int z, final int id, final double[] bounds, final long flags) {
     	// TODO: Check which ones are really needed !
-    	if (id == Material.SNOW.getId()){
+    	if ((flags & F_HEIGHT_8SIM_INC) != 0){
     		final int data = (access.getData(x, y, z) & 0xF) % 8;
     		if (data < 3) return 0;
     		else return 0.5;
@@ -1757,7 +1774,7 @@ public class BlockProperties {
                 bmaxZ = bounds[5]; //block.A(); // maxZ
         	}
         	// y-bounds
-        	if (id == Material.SNOW.getId()){
+        	if ((flags & F_HEIGHT_8SIM_INC) != 0){
         		// TODO: remove / solve differently ?
         		bminY = 0;
         		final int data = (access.getData(x, y, z) & 0xF) % 8;
