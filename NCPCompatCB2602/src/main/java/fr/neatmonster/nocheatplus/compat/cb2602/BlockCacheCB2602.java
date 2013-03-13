@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.minecraft.server.v1_4_R1.AxisAlignedBB;
 import net.minecraft.server.v1_4_R1.EntityBoat;
-import net.minecraft.server.v1_4_R1.EntityMinecart;
 import net.minecraft.server.v1_4_R1.IBlockAccess;
 import net.minecraft.server.v1_4_R1.Material;
 import net.minecraft.server.v1_4_R1.TileEntity;
@@ -71,7 +70,9 @@ public class BlockCacheCB2602 extends BlockCache implements IBlockAccess{
 			Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
 				final net.minecraft.server.v1_4_R1.Entity other = (net.minecraft.server.v1_4_R1.Entity) iterator.next();
-				if (!(other instanceof EntityBoat) && !(other instanceof EntityMinecart)) continue;
+				if (!(other instanceof EntityBoat)){ // && !(other instanceof EntityMinecart)) continue;
+					continue;
+				}
 				final AxisAlignedBB otherBox = other.boundingBox;
 				if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
 				else {
