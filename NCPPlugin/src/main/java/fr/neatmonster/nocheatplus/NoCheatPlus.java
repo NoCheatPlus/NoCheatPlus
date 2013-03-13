@@ -145,6 +145,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     	return System.currentTimeMillis() <= time;
     }
     
+    /**
+     * Remove all players from the allow login set.
+     * @return Number of players that had actually been denied to login.
+     */
+    public static int allowLoginAll(){
+    	int denied = 0;
+    	final long now = System.currentTimeMillis();
+    	for (final String playerName : denyLoginNames.keySet()){
+    		final Long time = denyLoginNames.get(playerName);
+        	if (time != null && time > now) denied ++;
+    	}
+    	denyLoginNames.clear();
+    	return denied;
+    }
+    
 	/**
 	 * Deny the player to login. This will also remove expired entries.
 	 * @param playerName
