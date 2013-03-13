@@ -1428,6 +1428,10 @@ public class BlockProperties {
     		if (data < 3) return 0;
     		else return 0.5;
     	}
+    	else if ((flags & F_HEIGHT_8_INC) != 0){
+    		final int data = (access.getData(x, y, z) & 0xF) % 8;
+    		return 0.125 * (double) data;
+    	}
     	// Height 100 is ignored (!).
 		else if ((flags & F_HEIGHT150) != 0){
     		return 1.5;
@@ -1780,6 +1784,11 @@ public class BlockProperties {
         		final int data = (access.getData(x, y, z) & 0xF) % 8;
 //        		bmaxY = (double) (1 +  data) / 8.0;
         		bmaxY = data < 3 ? 0 : 0.5;
+        	}
+        	else if ((flags & F_HEIGHT_8_INC) != 0){
+        		bminY = 0;
+        		final int data = (access.getData(x, y, z) & 0xF) % 8;
+        		bmaxY = 0.125 * data;
         	}
         	else if ((flags & F_HEIGHT150) != 0){
         		bminY = 0;

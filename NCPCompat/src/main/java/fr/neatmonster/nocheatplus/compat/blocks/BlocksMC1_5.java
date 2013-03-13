@@ -28,6 +28,10 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		
 		// TODO: This is guessing !
 		
+		/////////////////////
+		// New blocks
+		////////////////////
+		
 		// 146 Trapped Chest
 		setFlagsAs(146, Material.CHEST);
 		BlockProperties.setBlockProps(146, BlockProperties.getBlockProps(Material.CHEST.getId()));
@@ -60,6 +64,13 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		
 		// 157 Activator Rail
 		setFlagsAs(157, Material.DETECTOR_RAIL);
+		
+		/////////////////////
+		// Changed blocks
+		////////////////////
+		
+		// 78 Snow
+		addFlags(78, BlockProperties.F_HEIGHT_8_INC);
 		
 	}
 	
