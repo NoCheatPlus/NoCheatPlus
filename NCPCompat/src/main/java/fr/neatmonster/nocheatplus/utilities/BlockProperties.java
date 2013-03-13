@@ -1455,6 +1455,10 @@ public class BlockProperties {
                 for (String input : split){
                 	input = input.trim();
                 	if (input.isEmpty()) continue;
+                	else if (input.equalsIgnoreCase("default")){
+                		flags |= blockFlags[id];
+                		continue;
+                	}
                 	try{
                 		flags |= parseFlag(input);
                 	} catch(InputMismatchException e){
