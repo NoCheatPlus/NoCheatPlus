@@ -85,6 +85,15 @@ public class BlockCacheCB2511 extends BlockCache implements IBlockAccess{
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.utilities.BlockCache#cleanup()
+	 */
+	@Override
+	public void cleanup() {
+		super.cleanup();
+		world = null;
+	}
+	
 	@Override
 	public Material getMaterial(final int x, final int y, final int z) {
 		return world.getMaterial(x, y, z);

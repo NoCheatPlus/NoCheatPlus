@@ -62,5 +62,14 @@ public class BlockCacheBukkit extends BlockCache{
 		}
 		return false;
 	}
+
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.utilities.BlockCache#cleanup()
+	 */
+	@Override
+	public void cleanup() {
+		super.cleanup();
+		world = null;
+	}
     
 }
