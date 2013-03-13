@@ -467,7 +467,7 @@ public class MovingData extends ACheckData {
 	public void velocityTick(){
 		// Decrease counts for active.
 		for (final Velocity vel : hVelActive){
-			vel.actCount --;
+			vel.valCount --;
 			vel.sum += vel.value;
 			vel.value *= 0.9; // TODO: Actual friction.
 		}
