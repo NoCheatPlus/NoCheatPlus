@@ -50,8 +50,8 @@ public class MovingData extends ACheckData {
 		}
 	};
 
-    /** The map containing the data per players. */
     private static Map<String, MovingData> playersMap = new HashMap<String, MovingData>();
+    /** The map containing the data per players. */
 
     /**
      * Gets the data of a specified player.
@@ -440,8 +440,9 @@ public class MovingData extends ACheckData {
 	/**
 	 * Remove all velocity entries that are invalid. Checks both active and queued.
 	 * <br>(This does not catch invalidation by speed / direction changing.)
+	 * @param tick All velocity added before this tick gets removed.
 	 */
-	public void removeInvalidVelocity() {
+	public void removeInvalidVelocity(final int tick) {
 		// TODO: Also merge entries here, or just on adding?
 		Iterator<Velocity> it;
 		// Active.
@@ -449,13 +450,14 @@ public class MovingData extends ACheckData {
 		while (it.hasNext()){
 			final Velocity vel = it.next();
 			// TODO: 0.001 can be stretched somewhere else, most likely...
+			// TODO: Somehow use tick here too (actCount, valCount)?
 			if (vel.valCount <= 0 || vel.value <= 0.001) it.remove();
 		}
 		// Queued.
 		it = hVelQueued.iterator();
 		while (it.hasNext()){
 			final Velocity vel = it.next();
-			if (vel.actCount <= 0) it.remove();
+			if (vel.actCount <= 0 || vel.tick < tick) it.remove();
 		}
 	}
 	
@@ -463,13 +465,13 @@ public class MovingData extends ACheckData {
 	 * Called for moving events, increase age of velocity.
 	 */
 	public void velocityTick(){
-		// Increase counts for active.
+		// Decrease counts for active.
 		for (final Velocity vel : hVelActive){
 			vel.actCount --;
 			vel.sum += vel.value;
 			vel.value *= 0.9; // TODO: Actual friction.
 		}
-		// Increase counts for queued.
+		// Decrease counts for queued.
 		final Iterator<Velocity> it = hVelQueued.iterator();
 		while (it.hasNext()){
 			it.next().actCount --;
@@ -509,6 +511,7 @@ public class MovingData extends ACheckData {
 				break;
 			}
 		}
+		// TODO: Add to sum.
 		return used;
 	}
 	

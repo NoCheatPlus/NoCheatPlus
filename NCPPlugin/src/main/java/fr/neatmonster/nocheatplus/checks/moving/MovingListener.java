@@ -64,6 +64,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /*
@@ -517,7 +518,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
 		// TODO: Rework to queued velocity entries: activation + invalidation
-		data.removeInvalidVelocity();
+		data.removeInvalidVelocity(TickTask.getTick() - cc.velocityActivationTicks);
 		data.velocityTick();
 //		// Horizontal velocity.
 //        if (data.horizontalVelocityCounter > 0D){
@@ -979,9 +980,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	data.removeAllVelocity();
         	return;
         }
-        
-        data.removeInvalidVelocity();
         final MovingConfig cc = MovingConfig.getConfig(player);
+        
+        final int tick = TickTask.getTick();
+        data.removeInvalidVelocity(tick  - cc.velocityActivationTicks);
+        
         
         final Vector velocity = event.getVelocity();
         
@@ -1003,7 +1006,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
         if (newVal > 0D) {
         	used = true;
-        	final Velocity vel = new Velocity(newVal, cc.velocityActivationCounter, 1 + (int) Math.round(newVal * 10.0));
+        	final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, 1 + (int) Math.round(newVal * 10.0));
         	data.addHorizontalVelocity(vel);
 //            data.horizontalFreedom += newVal;
 //            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 30;

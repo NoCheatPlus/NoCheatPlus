@@ -552,6 +552,7 @@ public abstract class ConfPaths {
 	private static final String MOVING_VELOCITY							= MOVING + "velocity.";
 	public static final String  MOVING_VELOCITY_GRACETICKS				= MOVING_VELOCITY + "graceticks";
 	public static final String  MOVING_VELOCITY_ACTIVATIONCOUNTER		= MOVING_VELOCITY + "activationcounter";
+	public static final String  MOVING_VELOCITY_ACTIVATIONTICKS			= MOVING_VELOCITY + "activationticks";
 
     public static final String  MOVING_NOFALL_YONGROUND                  = MOVING_NOFALL + "yonground";
     public static final String  MOVING_YONGROUND                         = MOVING + "yonground";

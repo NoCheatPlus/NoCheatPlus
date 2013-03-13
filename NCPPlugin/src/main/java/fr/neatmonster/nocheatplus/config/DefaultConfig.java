@@ -432,6 +432,7 @@ public class DefaultConfig extends ConfigFile {
         // Special.
         set(ConfPaths.MOVING_VELOCITY_GRACETICKS, 20);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER, 80);
+        set(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS, 140);
         
         /*
          *  dP"8   d8          ,e,                        
