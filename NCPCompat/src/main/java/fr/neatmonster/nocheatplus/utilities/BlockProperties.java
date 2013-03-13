@@ -294,7 +294,7 @@ public class BlockProperties {
      * (repeating till 0x15)). 0x8 means falling/full block. This is meant to model flowing water/lava. <br>
      * However the hit-box for collision checks  will be set to 0.5 height or 1.0 height only.
      */
-    public static final long F_HEIGHT_8_INV		= 0x2000;
+    public static final long F_HEIGHT_8SIM_DEC		= 0x2000;
     
     /**
      * Map flag to names.
@@ -430,14 +430,14 @@ public class BlockProperties {
 		for (final Material mat : new Material[]{
 				Material.STATIONARY_WATER, Material.WATER,
 		}) {
-			blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8_INV | F_WATER;
+			blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8SIM_DEC | F_WATER;
 		}
 		
 		// LAVA.
         for (final Material mat : new Material[]{
                 Material.LAVA, Material.STATIONARY_LAVA,
         }) {
-            blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8_INV | F_LAVA;
+            blockFlags[mat.getId()] |= F_LIQUID | F_HEIGHT_8SIM_DEC | F_LAVA;
         }
         
         // 1.5 block high.
@@ -1772,7 +1772,7 @@ public class BlockProperties {
             	bminY = 0;
             	bmaxY = 1.0;
             }
-            else if ((flags & F_HEIGHT_8_INV) != 0){
+            else if ((flags & F_HEIGHT_8SIM_DEC) != 0){
             	bminY = 0;
             	final int data = access.getData(x, y, z);
             	if ((data & 0x8) == 0){

@@ -47,9 +47,11 @@ public class BlockCacheBukkit extends BlockCache{
 			// TODO: Probably check other ids too before doing this ?
 			for (final Entity other : entity.getNearbyEntities(2.0, 2.0, 2.0)){
 				final EntityType type = other.getType();
-				if (type != EntityType.BOAT && !(other instanceof Minecart)) continue;
+				if (type != EntityType.BOAT){ //  && !(other instanceof Minecart)) 
+					continue; 
+				}
 				final Location loc = entity.getLocation();
-				if (Math.abs(loc.getY() - minY) < 0.6){
+				if (Math.abs(loc.getY() - minY) < 0.7){
 					// TODO: A "better" estimate is possible, though some more tolerance would be good. 
 					return true; 
 				}
