@@ -2177,5 +2177,75 @@ public class BlockProperties {
 		blockCache = null;
 		// TODO: might empty mappings...
 	}
+
+	/**
+	 * 
+	 * @param access
+	 * @param blockX Block location.
+	 * @param blockY
+	 * @param blockZ
+	 * @param oX Origin / offset from block location.
+	 * @param oY
+	 * @param oZ
+	 * @param dX Direction (multiplied by dT to get end point of move).
+	 * @param dY
+	 * @param dZ
+	 * @param dT 
+	 * @return
+	 */
+	public static final boolean isPassableRay(final BlockCache access, final int blockX, final int blockY, final int blockZ, final double oX, final double oY, final double oZ, final double dX, final double dY, final double dZ, final double dT) {
+		final int id = access.getTypeId(blockX, blockY, blockZ);
+		if (BlockProperties.isPassable(id)) return true;
+		double[] bounds = access.getBounds(blockX, blockY, blockZ);
+		if (bounds == null) return true;
+		
+		// Simplified check: Only collision of bounds of the full move is checked.
+		final double minX, maxX;
+		if (dX < 0){
+			minX = dX * dT + oX + blockX;
+			maxX = oX + blockX;
+		}
+		else{
+			maxX = dX * dT + oX + blockX;
+			minX = oX + blockX;
+		}
+		final double minY, maxY;
+		if (dY < 0){
+			minY = dY * dT + oY + blockY;
+			maxY = oY + blockY;
+		}
+		else{
+			maxY = dY * dT + oY + blockY;
+			minY = oY + blockY;
+		}
+		final double minZ, maxZ;
+		if (dX < 0){
+			minZ = dZ * dT + oZ + blockZ;
+			maxZ = oZ + blockZ;
+		}
+		else{
+			maxZ = dZ * dT + oZ + blockZ;
+			minZ = oZ + blockZ;
+		}
+		if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, id, bounds, blockFlags[id])){
+			// TODO: Might check for fence too, here.
+			return true;
+		}
+		
+		// TODO: Actual ray-collision checking?
+		// TODO: Heuristic workaround for certain situations [might be better outside of this, probably a simplified version ofr the normal case]?
+		
+		// Check for workarounds.
+		// TODO: check f_itchy once exists.
+		if (BlockProperties.isPassableWorkaround(access, blockX, blockY, blockZ, oX, oY, oZ, id, dX, dY, dZ, dT)){
+			return true;
+		}
+		// Does collide (most likely).
+		// TODO: This is not entirely accurate.
+		// TODO: Moving such that the full move rect overlaps, but no real collision (diagonal moves).
+		// TODO: "Wrong" moves through edges of blocks (not sure, needs reproducing).
+		// (Could allow start-end if passable + check first collision time or some estimate.)
+		return false;
+	}
 	
 }
