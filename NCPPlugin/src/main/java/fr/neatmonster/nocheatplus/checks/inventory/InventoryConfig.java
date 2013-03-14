@@ -80,6 +80,8 @@ public class InventoryConfig extends ACheckConfig {
 
 	public final boolean    fastClickCheck;
     public final boolean    fastClickSpareCreative;
+	public final float		fastClickShortTermLimit;
+	public final float		fastClickNormalLimit;
 	public final ActionList fastClickActions;
 
 	public final boolean    instantBowCheck;
@@ -108,6 +110,8 @@ public class InventoryConfig extends ACheckConfig {
 
 		fastClickCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_CHECK);
 		fastClickSpareCreative = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_SPARECREATIVE);
+		fastClickShortTermLimit = (float) data.getDouble(ConfPaths.INVENTORY_FASTCLICK_LIMIT_SHORTTERM);
+		fastClickNormalLimit = (float) data.getDouble(ConfPaths.INVENTORY_FASTCLICK_LIMIT_NORMAL);
 		fastClickActions = data.getOptimizedActionList(
 				ConfPaths.INVENTORY_FASTCLICK_ACTIONS,
 				Permissions.INVENTORY_FASTCLICK);

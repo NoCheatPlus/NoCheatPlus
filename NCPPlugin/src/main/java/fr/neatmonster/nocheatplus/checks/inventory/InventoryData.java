@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*
  * M""M                                       dP                              M""""""'YMM            dP            
@@ -72,14 +73,17 @@ public class InventoryData extends ACheckData {
     public double   fastClickVL;
     public double   instantBowVL;
     public double   instantEatVL;
+    
+    // General.
+    public long     lastClickTime = 0;;
 
     // Data of the drop check.
     public int      dropCount;
     public long     dropLastTime;
 
     // Data of the fast click check.
-    public boolean  fastClickLastCancelled;
-    public long     fastClickLastTime;
+//    public boolean  fastClickLastCancelled;
+    public final ActionFrequency fastClickFreq = new ActionFrequency(5, 200L);
 
     // Data of the instant bow check.
     public long     instantBowInteract;

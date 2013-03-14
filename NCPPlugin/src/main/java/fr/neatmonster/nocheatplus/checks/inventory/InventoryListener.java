@@ -153,6 +153,7 @@ public class InventoryListener  extends CheckListener {
          *                                         |___/                       
          */
         if (event.getWhoClicked() instanceof Player) {
+        	final long now = System.currentTimeMillis();
             final Player player = (Player) event.getWhoClicked();
             
             // Illegal enchantment checks.
@@ -165,10 +166,14 @@ public class InventoryListener  extends CheckListener {
             }
             catch(final ArrayIndexOutOfBoundsException e){} // Hotfix (CB)
             
+            final InventoryData data = InventoryData.getData(player);
+            
             // Fast inventory manipulation check.
             if (fastClick.isEnabled(player)){
-                if (player.getGameMode() != GameMode.CREATIVE || !InventoryConfig.getConfig(player).fastClickSpareCreative){
-                    if (fastClick.check(player)){
+                
+                final InventoryConfig cc = InventoryConfig.getConfig(player);
+                if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative){
+                    if (fastClick.check(player, now, data, cc)){
                         // The check requested the event to be cancelled.
                         event.setCancelled(true);
                     }
@@ -176,6 +181,7 @@ public class InventoryListener  extends CheckListener {
                     Improbable.feed(player, 0.7f, System.currentTimeMillis());
                 }
             }
+            data.lastClickTime = now;
         }
     }
 

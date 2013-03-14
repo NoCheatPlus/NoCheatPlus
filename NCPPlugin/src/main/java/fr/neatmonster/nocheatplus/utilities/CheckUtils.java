@@ -476,7 +476,7 @@ public class CheckUtils {
 		ref = Math.max(ref, CombinedData.getData(player).lastMoveTime);
 		// Inventory.
 		final InventoryData iData = InventoryData.getData(player);
-		ref = Math.max(ref, iData.fastClickLastTime);
+		ref = Math.max(ref, iData.lastClickTime);
 		ref = Math.max(ref, iData.instantEatInteract);
 		// BlcokBreak/interact.
 		final BlockBreakData bbData = BlockBreakData.getData(player);
