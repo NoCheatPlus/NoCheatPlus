@@ -1,6 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -79,10 +81,36 @@ public class FastClick extends Check {
 //        return cancel;
 //    }
     
-    public boolean check(final Player player, final long now, final InventoryData data, final InventoryConfig cc) {
+    public boolean check(final Player player, final long now, final int slot, final ItemStack cursor, final ItemStack clicked, final InventoryData data, final InventoryConfig cc) {
     	// Take time once.
+    	
+    	final float amount;
+    	
+    	if (cursor != null && cc.fastClickTweaks1_5){
+    		final Material mat = cursor.getType();
+    		final int size = cursor.getAmount();
+    		if (mat != data.fastClickLastMat || mat == Material.AIR || size != data.fastClickLastAmount || clicked == null){
+    			amount = 1f;
+    		}
+    		else{
+    			final Material cMat = clicked.getType();
+    			if (cMat == Material.AIR || cMat == mat){
+    				amount = Math.min(cc.fastClickNormalLimit , cc.fastClickShortTermLimit) / (float) size * 0.75f;
+    			}
+    			else{
+    				amount = 1f;
+    			}
+    		}
+        	data.fastClickLastMat = mat;
+        	data.fastClickLastAmount = size;
+    	}
+    	else{
+        	data.fastClickLastMat = null;
+        	data.fastClickLastAmount = 0;
+    		amount = 1f;
+    	}
         
-        data.fastClickFreq.add(now, 1f);
+        data.fastClickFreq.add(now, amount);
         
         float shortTerm = data.fastClickFreq.bucketScore(0);
         if (shortTerm > cc.fastClickShortTermLimit){
@@ -103,12 +131,13 @@ public class FastClick extends Check {
         boolean cancel = false;
         
         if (violation > 0){
+        	data.fastClickVL += violation;
         	final ViolationData vd = new ViolationData(this, player, data.fastClickVL + violation, violation, cc.fastClickActions);
         	cancel = executeActions(vd);
         }
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-        	player.sendMessage("FastClick: " + ((int) data.fastClickFreq.bucketScore(0)) + " / " + ((int) data.fastClickFreq.score(1f)));
+        	player.sendMessage("FastClick: " + data.fastClickFreq.bucketScore(0) + " / " + data.fastClickFreq.score(1f));
         }
         
         return cancel;

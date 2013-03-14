@@ -161,18 +161,22 @@ public class InventoryListener  extends CheckListener {
         		return;
         	}
             final Player player = (Player) entity;
-        	if (event.getSlot() == InventoryView.OUTSIDE){
+            final int slot = event.getSlot();
+        	if (slot == InventoryView.OUTSIDE){
         		InventoryData.getData(player).lastClickTime = now;
         		return;
         	}
+        	
+        	final ItemStack cursor = event.getCursor();
+        	final ItemStack clicked = event.getCurrentItem();
             
             // Illegal enchantment checks.
             try{
-                if (Items.checkIllegalEnchantments(player, event.getCurrentItem())) event.setCancelled(true);
+                if (Items.checkIllegalEnchantments(player, clicked)) event.setCancelled(true);
             }
             catch(final ArrayIndexOutOfBoundsException e){} // Hotfix (CB)
             try{
-                if (Items.checkIllegalEnchantments(player, event.getCursor())) event.setCancelled(true);
+                if (Items.checkIllegalEnchantments(player, cursor)) event.setCancelled(true);
             }
             catch(final ArrayIndexOutOfBoundsException e){} // Hotfix (CB)
             
@@ -182,7 +186,7 @@ public class InventoryListener  extends CheckListener {
             if (fastClick.isEnabled(player)){
                 final InventoryConfig cc = InventoryConfig.getConfig(player);
                 if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative){
-                    if (fastClick.check(player, now, data, cc)){
+                    if (fastClick.check(player, now, slot, cursor, clicked, data, cc)){
                         // The check requested the event to be cancelled.
                         event.setCancelled(true);
                     }

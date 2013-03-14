@@ -75,7 +75,7 @@ public class InventoryData extends ACheckData {
     public double   instantEatVL;
     
     // General.
-    public long     lastClickTime = 0;;
+    public long     lastClickTime = 0;
 
     // Data of the drop check.
     public int      dropCount;
@@ -84,6 +84,8 @@ public class InventoryData extends ACheckData {
     // Data of the fast click check.
 //    public boolean  fastClickLastCancelled;
     public final ActionFrequency fastClickFreq = new ActionFrequency(5, 200L);
+	public Material fastClickLastMat = null;
+	public int fastClickLastAmount = 0;
 
     // Data of the instant bow check.
     public long     instantBowInteract;
@@ -92,4 +94,5 @@ public class InventoryData extends ACheckData {
     // Data of the instant eat check.
     public Material instantEatFood;
     public long     instantEatInteract;
+
 }
