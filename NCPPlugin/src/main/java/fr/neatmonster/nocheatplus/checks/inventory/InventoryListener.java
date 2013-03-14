@@ -162,7 +162,7 @@ public class InventoryListener  extends CheckListener {
         	}
             final Player player = (Player) entity;
             final int slot = event.getSlot();
-        	if (slot == InventoryView.OUTSIDE){
+        	if (slot == InventoryView.OUTSIDE || slot < 0){
         		InventoryData.getData(player).lastClickTime = now;
         		return;
         	}
