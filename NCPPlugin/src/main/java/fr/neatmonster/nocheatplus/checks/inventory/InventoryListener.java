@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.inventory;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -154,7 +156,15 @@ public class InventoryListener  extends CheckListener {
          */
         if (event.getWhoClicked() instanceof Player) {
         	final long now = System.currentTimeMillis();
-            final Player player = (Player) event.getWhoClicked();
+        	final HumanEntity entity = event.getWhoClicked();
+        	if (!(entity instanceof Player)){
+        		return;
+        	}
+            final Player player = (Player) entity;
+        	if (event.getSlot() == InventoryView.OUTSIDE){
+        		InventoryData.getData(player).lastClickTime = now;
+        		return;
+        	}
             
             // Illegal enchantment checks.
             try{
@@ -170,7 +180,6 @@ public class InventoryListener  extends CheckListener {
             
             // Fast inventory manipulation check.
             if (fastClick.isEnabled(player)){
-                
                 final InventoryConfig cc = InventoryConfig.getConfig(player);
                 if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative){
                     if (fastClick.check(player, now, data, cc)){
