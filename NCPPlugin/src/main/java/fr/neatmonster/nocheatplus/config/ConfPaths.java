@@ -18,6 +18,7 @@ public abstract class ConfPaths {
     public static final String SUB_DEBUG 								 = "debug";
     public static final String SUB_IGNOREPASSABLE                        = RootConfPaths.SUB_IGNOREPASSABLE;
     public static final String SUB_ALLOWINSTANTBREAK                     = RootConfPaths.SUB_ALLOWINSTANTBREAK;
+    public static final String SUB_OVERRIDEFLAGS						 = RootConfPaths.SUB_OVERRIDEFLAGS;
     public static final String SUB_LAG       							 = "lag";
 	
 	// General:
