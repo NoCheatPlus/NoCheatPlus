@@ -256,7 +256,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param event
      *            the event
      */
-    @EventHandler(
+    @SuppressWarnings("deprecation")
+	@EventHandler(
             ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockPlace(final BlockPlaceEvent event) {
         /*
