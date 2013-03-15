@@ -76,6 +76,7 @@ public interface MCAccess {
 	 * // TODO: Replace by independent method.
 	 * TODO: Find description of this and use block properties from here, as well as a speaking method name.<br>
 	 * Assumption: This is something like "can stand on this type of block".
+	 * @deprecated Will be replaced by direct calls to BlockProperties soon.
 	 * @param id
 	 * @return
 	 */
