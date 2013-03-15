@@ -721,7 +721,7 @@ public class BlockProperties {
 			}
 			tags.clear();
 			addFlagNames(blockFlags [i], tags);
-			String tagsJoined = tags.isEmpty() ? "" : " / " + StringUtil.join(tags, " ");
+			String tagsJoined = tags.isEmpty() ? "" : " / " + StringUtil.join(tags, "+");
 			if (blocks[i] == null){
 				if (mat.equals("?")) continue;
 				missing.add("* MISSING "+i + "(" + mat + tagsJoined + ") ");
