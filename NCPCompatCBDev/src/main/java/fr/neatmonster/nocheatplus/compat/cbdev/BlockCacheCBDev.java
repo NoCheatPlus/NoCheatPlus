@@ -73,6 +73,10 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 				if (!(other instanceof EntityBoat)){ // && !(other instanceof EntityMinecart)) continue;
 					continue;
 				}
+				if (minY >= other.locY && minY - other.locY <= 0.7){
+					return true;
+				}
+				// Still check this for some reason.
 				final AxisAlignedBB otherBox = other.boundingBox;
 				if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
 				else {
