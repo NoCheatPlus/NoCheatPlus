@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
 import org.bukkit.Location;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,6 +15,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -87,7 +89,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      *            The EntityDamageByEntityEvent
      * @return 
      */
-    private boolean handleNormalDamage(final Player player, final Entity damaged) {
+    private boolean handleNormalDamage(final Player player, final Entity damaged, int damage) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
         
@@ -136,8 +138,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	if (cc.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
         		damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
         	}
-        	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc))
+        	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc)) {
         		cancelled = true;
+        	}
         }
         
         if (cc.cancelDead){
@@ -148,7 +151,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
         
-
+        if (data.thornsId == damaged.getEntityId() && damage <= 4 && tick == data.damageTakenByEntityTick){
+        	// Don't handle further, but do respect selfhit/canceldead.
+        	data.thornsId = Integer.MIN_VALUE;
+        	System.out.println("*** SKIP THORNS: " + player.getName());
+        	return cancelled;
+        }
+        else {
+        	data.thornsId = Integer.MIN_VALUE;
+        }
 
         // Run through the main checks.
         if (!cancelled && speed.isEnabled(player)){
@@ -226,6 +237,23 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	
         return cancelled;
     }
+    
+    /**
+     * Check if a player might return some damage due to the "thorns" enchantment.
+     * @param player
+     * @return
+     */
+    public static final boolean hasThorns(final Player player){
+    	final PlayerInventory inv = player.getInventory();
+    	final ItemStack[] contents = inv.getArmorContents();
+    	for (int i = 0; i < contents.length; i++){
+    		final ItemStack stack = contents[i];
+    		if (stack != null && stack.getEnchantmentLevel(Enchantment.THORNS) > 0){
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 
     /**
      * We listen to EntityDamage events for obvious reasons.
@@ -245,38 +273,48 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
          */
     	
     	final Entity damaged = event.getEntity();
-    	final boolean damagedIsPlayer = damaged instanceof Player;
+    	final Player damagedPlayer = damaged instanceof Player ? (Player) damaged : null;
+    	final FightData damagedData = damagedPlayer == null ? null : FightData.getData(damagedPlayer);
     	final boolean damagedIsDead = damaged.isDead();
-    	if (damagedIsPlayer && !damagedIsDead) {
-            final Player player = (Player) event.getEntity();
+    	if (damagedPlayer != null && !damagedIsDead) {
 //            if (godMode.isEnabled(player) && godMode.check(player)){
-            if (!player.isDead() && godMode.isEnabled(player) && godMode.check(player, event.getDamage())){
+            if (!damagedPlayer.isDead() && godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, event.getDamage(), damagedData)){
                 // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
-                player.setNoDamageTicks(0);
+            	damagedPlayer.setNoDamageTicks(0);
             }
-            if (player.getHealth() == player.getMaxHealth()){
-            	final FightData data = FightData.getData(player);
+            if (damagedPlayer.getHealth() == damagedPlayer.getMaxHealth()){
             	// TODO: Might use the same FightData instance for GodMode.
-            	if (data.fastHealBuffer < 0){
+            	if (damagedData.fastHealBuffer < 0){
             		// Reduce negative buffer with each full health.
-            		data.fastHealBuffer /= 2;
+            		damagedData.fastHealBuffer /= 2;
             	}
             	// Set reference time.
-            	data.fastHealRefTime = System.currentTimeMillis();
+            	damagedData.fastHealRefTime = System.currentTimeMillis();
             }
         }
     	// Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
-        	if (damagedIsPlayer && !damagedIsDead){
+            final Entity damager = e.getDamager();
+        	if (damagedPlayer != null && !damagedIsDead){
         	    // TODO: check once more when to set this (!) in terms of order.
-        		FightData.getData((Player) damaged).damageTakenByEntityTick = TickTask.getTick();
+        		FightData.getData(damagedPlayer).damageTakenByEntityTick = TickTask.getTick();
+                if (hasThorns(damagedPlayer)){
+            		// TODO: Cleanup here.
+                	// Remember the id of the attacker to allow counter damage.
+                	damagedData.thornsId = damager.getEntityId();
+            	}
+                else{
+                	damagedData.thornsId = Integer.MIN_VALUE;
+                }
         	}
-        	final Entity damager = e.getDamager();
             if (damager instanceof Player){
                 final Player player = (Player) damager;
                 if (e.getCause() == DamageCause.ENTITY_ATTACK){
-                	if (handleNormalDamage(player, damaged)) e.setCancelled(true);
+                	
+                	if (handleNormalDamage(player, damaged, e.getDamage())){
+                		e.setCancelled(true);
+                	}
                 }
             }
         }

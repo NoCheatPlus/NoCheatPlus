@@ -93,9 +93,7 @@ public class GodMode extends Check {
      * @param damage
      * @return
      */
-    public boolean check(final Player player, final int damage){
-    	final FightData data = FightData.getData(player);
-    	
+    public boolean check(final Player player, final int damage, final FightData data){
     	final int tick = TickTask.getTick();
     	
     	final int noDamageTicks = Math.max(0, player.getNoDamageTicks());

@@ -86,6 +86,10 @@ public class FightData extends ACheckData {
     public double lastAttackedX		= Integer.MAX_VALUE;
     public double lastAttackedY;
     public double lastAttackedZ;
+    
+    /** The entity id  which might get counter-attacked. */
+    public int thornsId = Integer.MIN_VALUE;
+    
     /** Any kind of health regeneration. */
 	public long regainHealthTime    = 0;
 //    public double lastAttackedDist = 0.0;
