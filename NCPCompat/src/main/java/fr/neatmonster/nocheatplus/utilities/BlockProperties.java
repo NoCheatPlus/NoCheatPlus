@@ -287,7 +287,10 @@ public class BlockProperties {
     public static final long F_XZ100		= 0x800;
     
     /** This flag indicates that even though a passable workaround, everything above passable height is still ground. */
-    public static final long F_GROUND_HEIGHT	= 0x1000; 
+    public static final long F_GROUND_HEIGHT	= 0x1000;
+    
+    /** All rail types a minecart can move on. */
+    public static final long F_RAILS		= 0x2000;
     
     /** 
      * The height is assumed to decrease from 1.0 with increasing data value from 0 to 0x7, with 0x7 being the lowest.
@@ -438,6 +441,13 @@ public class BlockProperties {
 				Material.SMOOTH_STAIRS, Material.BRICK_STAIRS, Material.SANDSTONE_STAIRS, Material.WOOD_STAIRS, 
 				Material.SPRUCE_WOOD_STAIRS, Material.BIRCH_WOOD_STAIRS, Material.JUNGLE_WOOD_STAIRS }) {
 			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100 | F_XZ100 | F_GROUND; // Set ground too, to be sure.
+		}
+		
+		// Rails
+		for (final Material mat : new Material[] { 
+				Material.RAILS, Material.DETECTOR_RAIL, Material.POWERED_RAIL,
+		}) {
+			blockFlags[mat.getId()] |= F_RAILS;
 		}
 		
 		// WATER.
@@ -1194,6 +1204,15 @@ public class BlockProperties {
 	    final long flags = blockFlags[id];
 		if ((flags & (F_LIQUID | F_IGN_PASSABLE)) != 0) return true;
 		else return (flags & F_SOLID) == 0;
+	}
+	
+	/**
+	 * All rail types a minecart can move on.
+	 * @param id
+	 * @return
+	 */
+	public static final boolean isRails(final int id){
+		return (blockFlags[id] & F_RAILS) != 0; 
 	}
 	
 	/**
