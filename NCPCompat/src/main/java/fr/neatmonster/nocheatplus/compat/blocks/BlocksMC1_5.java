@@ -14,6 +14,20 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
  */
 public class BlocksMC1_5 implements BlockPropertiesSetup {
 	
+	/**
+	 * TODO: Move somewhere.
+	 * @param newId
+	 * @param mat
+	 */
+	public static void setPropsAs(int newId, Material mat){
+		BlockProperties.setBlockProps(newId, BlockProperties.getBlockProps(mat.getId()));
+	}
+	
+	public static void setAs(int newId, Material mat){
+		BlockFlags.setFlagsAs(newId, mat);
+		setPropsAs(newId, mat);
+	}
+	
 	public BlocksMC1_5(){
 		// Test if materials exist.
 		if (Material.getMaterial(152) == null){
@@ -24,47 +38,58 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 	@Override
 	public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
 		
-		// TODO: Block flag info ...
-		// TODO: Tool and breaking time infos...
-		
-		// TODO: This is guessing !
-		
 		/////////////////////
 		// New blocks
 		////////////////////
 		
 		// 146 Trapped Chest
-		BlockFlags.setFlagsAs(146, Material.CHEST);
-		BlockProperties.setBlockProps(146, BlockProperties.getBlockProps(Material.CHEST.getId()));
+		setAs(146, Material.CHEST);
 		
 		// 147 Weighted Pressure Plate (Light)
+//		BlockFlags.addFlags(147, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+		setAs(147, Material.STONE_PLATE);
+
 		// 148 Weighted Pressure Plate (Heavy)
-		BlockFlags.addFlags(147, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-		BlockFlags.addFlags(148, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+//		BlockFlags.addFlags(148, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+		setAs(148, Material.STONE_PLATE);
 		
 		// 149 Redstone Comparator (inactive)
+//		BlockFlags.addFlags(149, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+		setAs(149, Material.DIODE_BLOCK_OFF);
+		
 		// 150 Redstone Comparator (active)
-		BlockFlags.addFlags(149, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-		BlockFlags.addFlags(150, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+//		BlockFlags.addFlags(150, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+		setAs(150, Material.DIODE_BLOCK_ON);
 		
 		// 151 Daylight Sensor
-		BlockFlags.addFlags(151, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+//		BlockFlags.addFlags(151, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
+		setAs(151, Material.HUGE_MUSHROOM_1);
 		
 		// 152 Block of Redstone
+		setAs(152, Material.ENCHANTMENT_TABLE);
+		
 		// 153 Nether Quartz Ore
-		// 155 Block of Quartz
+		setAs(153, Material.COAL_ORE);
 		
 		// 154 Hopper
-		BlockFlags.addFlags(144, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT);
+		setAs(154, Material.COAL_ORE);
+		// TODO: Needs workaround. [workaround-flag + different purpose flag sets ?]
+		BlockFlags.addFlags(154, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT);
 		
-		// 158 Dropper
-		BlockFlags.setFlagsAs(158, Material.DISPENSER);
-
+		// 155 Block of Quartz
+		setAs(155, Material.SANDSTONE);
+		
 		// 156 Quartz Stairs
-		BlockFlags.setFlagsAs(156, Material.COBBLESTONE_STAIRS);
+//		BlockFlags.setFlagsAs(156, Material.COBBLESTONE_STAIRS);
+		setAs(156, Material.SANDSTONE);
 		
 		// 157 Activator Rail
-		BlockFlags.setFlagsAs(157, Material.DETECTOR_RAIL);
+		setAs(157, Material.DETECTOR_RAIL);
+		
+		// 158 Dropper
+//		BlockFlags.setFlagsAs(158, Material.DISPENSER);
+		setAs(158, Material.DISPENSER);
+		
 		
 		/////////////////////
 		// Changed blocks
