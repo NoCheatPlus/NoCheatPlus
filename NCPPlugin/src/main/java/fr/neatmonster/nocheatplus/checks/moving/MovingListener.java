@@ -520,9 +520,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				LogUtil.logWarning("[NoCheatPlus] VehicleExitEvent missing for: " + player.getName());
 			}
 			onPlayerVehicleLeave(player);
-			if (BlockProperties.isRails(pFrom.getTypeId())){
-				data.clearNoFallData();
-			}
+//			if (BlockProperties.isRails(pFrom.getTypeId())){
+			// Always clear no fall data, let Minecraft do fall damage.
+			data.noFallSkipAirCheck = true; // Might allow one time cheat.
+			data.clearNoFallData();
+//			}
 		}
         
 		// Potion effect "Jump".
@@ -1128,6 +1130,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	moveInfo.from.collectBlockFlags(cc.noFallyOnGround);
         	// Be sure not to lose that block.
         	data.noFallFallDistance += 1.0;
+        	// TODO: Accound for liquid too?
         	if (!pLoc.isOnGround(1.0, 0.3, 0.1) && !pLoc.isResetCond() && !pLoc.isAboveLadder() && !pLoc.isAboveStairs()){
         		// Likely a new style no-fall bypass (damage in mid-air).
         		data.noFallVL += 1.0;
