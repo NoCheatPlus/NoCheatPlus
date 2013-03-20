@@ -289,9 +289,6 @@ public class BlockProperties {
     /** This flag indicates that even though a passable workaround, everything above passable height is still ground. */
     public static final long F_GROUND_HEIGHT	= 0x1000;
     
-    /** All rail types a minecart can move on. */
-    public static final long F_RAILS		= 0x2000;
-    
     /** 
      * The height is assumed to decrease from 1.0 with increasing data value from 0 to 0x7, with 0x7 being the lowest.
      * (repeating till 0x15)). 0x8 means falling/full block. This is meant to model flowing water/lava. <br>
@@ -312,6 +309,9 @@ public class BlockProperties {
      * This is for MC 1.5 snow levels.
      */
     public static final long F_HEIGHT_8_INC			= 0x8000;
+    
+    /** All rail types a minecart can move on. */
+    public static final long F_RAILS		= 0x10000;
     
     /**
      * Map flag to names.
