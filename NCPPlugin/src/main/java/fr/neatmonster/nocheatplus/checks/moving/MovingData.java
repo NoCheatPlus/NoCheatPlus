@@ -174,6 +174,11 @@ public class MovingData extends ACheckData {
 	public final ActionAccumulator vDistAcc = new ActionAccumulator(3, 3);
 	
 	
+	// HOT FIX
+	/** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
+	public boolean wasInVehicle = false;
+	
+	
 //	public final Stats stats = new Stats(); // Test.
     
 	/**

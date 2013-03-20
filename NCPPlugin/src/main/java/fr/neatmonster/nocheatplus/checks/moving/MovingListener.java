@@ -456,6 +456,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()){
 			// Workaround for pigs !
+			data.wasInVehicle = true;
 			data.sfHoverTicks = -1;
 			data.removeAllVelocity();
 			final Entity vehicle = player.getVehicle();
@@ -464,6 +465,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 			return;
 		}
+		
 		// Ignore dead players.
 		if (player.isDead()){
 			data.sfHoverTicks = -1;
@@ -505,11 +507,23 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			parkedInfo.add(moveInfo);
 			return;
 		}
+		
 		// Prepare locations for use.
 		// TODO: Block flags might not be needed if neither sf nor passable get checked.
 		final PlayerLocation pFrom, pTo;
         pFrom = moveInfo.from;
         pTo = moveInfo.to;
+        
+		// HOT FIX - for VehicleLeaveEvent missing.
+		if (data.wasInVehicle){
+			if (cc.debug){
+				LogUtil.logWarning("[NoCheatPlus] VehicleExitEvent missing for: " + player.getName());
+			}
+			onPlayerVehicleLeave(player);
+			if (BlockProperties.isRails(pFrom.getTypeId())){
+				data.clearNoFallData();
+			}
+		}
         
 		// Potion effect "Jump".
 		final double jumpAmplifier = MovingListener.getJumpAmplifier(player);
@@ -1220,6 +1234,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	final Entity entity = event.getExited();
     	if (!(entity instanceof Player)) return;
     	onPlayerVehicleLeave((Player) entity);
+//    	System.out.println("Vehicle: " + event.getVehicle().getLocation());
+//    	System.out.println("Player: " + entity.getLocation());
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1243,6 +1259,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     
     private final void onPlayerVehicleLeave(final Player player){
     	final MovingData data = MovingData.getData(player);
+    	data.wasInVehicle = false;
 //    	if (data.morePacketsVehicleTaskId != -1){
 //    		// Await set-back.
 //    		// TODO: might still set ordinary set-backs ?
@@ -1342,6 +1359,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final Location loc = player.getLocation();
 		info.set(player, loc, null, cc.yOnGround);
 		final boolean res;
+		// TODO: Collect flags, more margin ?
 		if (info.from.isOnGround() || info.from.isResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()){
 			res = true;
 			data.sfHoverTicks = 0;
