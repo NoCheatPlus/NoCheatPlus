@@ -683,7 +683,7 @@ public class BlockProperties {
 				Material.IRON_FENCE, Material.ENCHANTMENT_TABLE, 
 				Material.EMERALD_BLOCK,
 		}){
-			blocks[mat.getId()] = ironDoorType; 
+			blocks[mat.getId()] = ironDoorType;
 		}
 		blocks[Material.IRON_BLOCK.getId()] = new BlockProps(stonePickaxe, 5, secToMs(25, 25, 1.9, 1.25, 0.95, 25));
 		blocks[Material.DIAMOND_BLOCK.getId()] = new BlockProps(ironPickaxe, 5, secToMs(25, 25, 25, 1.25, 0.95, 25));
@@ -994,11 +994,27 @@ public class BlockProperties {
 				for (int i = 0; i < efficiency; i++){
 					duration /= 1.33; // Matches well with obsidian.
 				}
+				// Formula from MC wiki.
+				// TODO: Formula from mc wiki does not match well (too fast for obsidian).
+//				duration /= (1.0 + 0.5 * efficiency);
+				
 				// More Workarounds:
+				// TODO: Consider checking a generic workaround (based on duration, assuming some dig packets lost, proportional to duration etc.).
 	            if (toolProps.materialBase == MaterialBase.WOOD){
-				    if (blockId == Material.LOG.getId()) duration -= efficiency >= 4 ? 250 : 400;
+	            	if (toolProps.toolType == ToolType.PICKAXE && (blockProps == ironDoorType || blockProps == dispenserType)){
+				    	 // Special correction.
+	            		// TODO: Uncomfortable: hide this in the blocks by some flags / other type of workarounds !
+	            		if (blockProps == dispenserType){
+	            			duration = (long) (duration / 1.5 - (efficiency - 1) * 60);
+	            		}
+	            		else if (blockProps == ironDoorType){
+	            			duration = (long) (duration / 1.5 - (efficiency - 1) * 100);
+	            		}
+	            	}
+	            	else if (blockId == Material.LOG.getId()) duration -= efficiency >= 4 ? 250 : 400;
 				    else if (blockProps.tool.toolType == toolProps.toolType) duration -= 250;
 				    else duration -= efficiency * 30;
+				    
                 }
 				else if (toolProps.materialBase == MaterialBase.STONE){
 				    if (blockId == Material.LOG.getId()) duration -= 100;
