@@ -1358,18 +1358,10 @@ public class BlockProperties {
 			if (Math.min(fy, fy + dY * dT) >= 0.875) return true; // 0.125
 		}
 		else if (id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()){
-			final double dFx = 0.5 - fx;
-			final double dFz = 0.5 - fz;
-			if (Math.abs(dFx) > 0.05 && Math.abs(dFz) > 0.05){
-				// Check moving between quadrants.
-				final double dFx2 = 0.5 - (fx + dX * dT);
-				final double dFz2 = 0.5 - (fz + dZ * dT);
-				if (Math.abs(dFx2) > 0.05 && Math.abs(dFz2) > 0.05){
-					if (dFx * dFx2 > 0.0 && dFz * dFz2 > 0.0){
-						return true;
-					}
-				}
-			}
+			if (!collidesFence(fx, fz, dX, dZ, dT, 0.05)) return true;
+		}
+		else if (id == Material.FENCE.getId() || id == Material.NETHER_FENCE.getId()){
+			if (!collidesFence(fx, fz, dX, dZ, dT, 0.425)) return true;
 		}
 		else if (id == Material.FENCE_GATE.getId()){
 			if ((access.getData(bx, by, bz) & 0x4)!= 0) return true;
@@ -1399,6 +1391,32 @@ public class BlockProperties {
 		return false;
 	}
 	
+	/**
+	 * XZ-collision check for (bounds / pseudo-ray) with fence type blocks (fences, glass panes), margin configurable.
+	 * @param fx
+	 * @param fz
+	 * @param dX
+	 * @param dZ
+	 * @param dT
+	 * @param d Distance to the fence middle to keep (see code of isPassableworkaround for reference).
+	 * @return
+	 */
+	public static boolean collidesFence(final double fx, final double fz, final double dX, final double dZ, final double dT, final double d) {
+		final double dFx = 0.5 - fx;
+		final double dFz = 0.5 - fz;
+		if (Math.abs(dFx) > 0.05 && Math.abs(dFz) > d){
+			// Check moving between quadrants.
+			final double dFx2 = 0.5 - (fx + dX * dT);
+			final double dFz2 = 0.5 - (fz + dZ * dT);
+			if (Math.abs(dFx2) > 0.05 && Math.abs(dFz2) > d){
+				if (dFx * dFx2 > 0.0 && dFz * dFz2 > 0.0){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * Collision for x-z ray / bounds. Use this to check if a box is really outside.
 	 * @param fx
