@@ -355,18 +355,7 @@ public class BlockProperties {
 		try{
 		    initTools(mcAccess, worldConfigProvider);
 		    initBlocks(mcAccess, worldConfigProvider);
-		    // Allow mcAccess to setup block properties.
-		    if (mcAccess instanceof BlockPropertiesSetup){
-			    try{
-			    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
-			    }
-			    catch(Throwable t){
-			    	LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
-			    	LogUtil.logSevere(t);
-			    }
-		    }
 		    // Extra hand picked setups.
-		    // TODO: Add registry for further BlockPropertiesSetup instances.
 		    try{
 		    	BlockPropertiesSetup bpSetup = new BlocksMC1_5();
 		    	try{
@@ -379,6 +368,17 @@ public class BlockProperties {
 			    }
 		    }
 		    catch(Throwable t){}
+		    // Allow mcAccess to setup block properties.
+		    if (mcAccess instanceof BlockPropertiesSetup){
+			    try{
+			    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
+			    }
+			    catch(Throwable t){
+			    	LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
+			    	LogUtil.logSevere(t);
+			    }
+		    }
+		    // TODO: Add registry for further BlockPropertiesSetup instances.
 		}
 		catch(Throwable t){
 			LogUtil.logSevere(t);
