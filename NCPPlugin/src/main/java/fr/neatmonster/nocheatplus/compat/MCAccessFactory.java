@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512;
 import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
 import fr.neatmonster.nocheatplus.compat.cb2602.MCAccessCB2602;
 import fr.neatmonster.nocheatplus.compat.cb2645.MCAccessCB2645;
+import fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -37,16 +38,16 @@ public class MCAccessFactory {
 		// Try to set up native access.
 		if (!bukkitOnly){
 			
-//			// TEST //
-//			// Only add as long as no stable module has been added.
-//			// 1.5.1
-//			try{
-//				return new MCAccessCBDev();
-//			}
-//			catch(Throwable t){
-//				throwables.add(t);
-//			};
-//			// TEST END //
+			// TEST //
+			// Only add as long as no stable module has been added.
+			// 1.5.1
+			try{
+				return new MCAccessCBDev();
+			}
+			catch(Throwable t){
+				throwables.add(t);
+			};
+			// TEST END //
 			
 			// 1.5
 			try{
