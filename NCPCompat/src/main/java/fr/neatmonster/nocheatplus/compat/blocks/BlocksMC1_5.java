@@ -80,8 +80,9 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		setAs(155, Material.SANDSTONE);
 		
 		// 156 Quartz Stairs
-//		BlockFlags.setFlagsAs(156, Material.COBBLESTONE_STAIRS);
 		setAs(156, Material.SANDSTONE);
+		// Still set flags as stairs.
+		BlockFlags.setFlagsAs(156, Material.COBBLESTONE_STAIRS);
 		
 		// 157 Activator Rail
 		setAs(157, Material.DETECTOR_RAIL);
