@@ -23,6 +23,7 @@
     <module>NCPPlugin</module>
     <module>NCPCompatCB2545</module>
     <module>NCPCompatCB2602</module>
+    <module>NCPCompatCB2645</module>
     <module>NCPCompatCBDev</module>
   </modules>
 
