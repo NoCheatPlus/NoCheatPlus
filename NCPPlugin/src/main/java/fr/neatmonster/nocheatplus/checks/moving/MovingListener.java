@@ -1188,13 +1188,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final Location loc = player.getLocation();
 		
 		// Correct set-back on world changes.
-		if (!data.hasSetBack()){
+		if (loc == null){
+			// Bug on server side ?
+			data.clearFlyData();
+		}
+		else if (!data.hasSetBack()){
 			// TODO: Might consider something else like with respawn. Check if it is passable ?
 			data.setSetBack(loc);
 		}
 		else if (data.hasSetBackWorldChanged(loc)){
-			data.setSetBack(loc);
 			data.clearFlyData();
+			data.setSetBack(loc);
 		}
 		if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE){
 			// TODO: re-think: more fine grained reset?
