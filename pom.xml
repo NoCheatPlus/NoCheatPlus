@@ -24,6 +24,7 @@
     <module>NCPCompatCB2545</module>
     <module>NCPCompatCB2602</module>
     <module>NCPCompatCB2645</module>
+    <module>NCPCompatCB2691</module>
     <module>NCPCompatCBDev</module>
   </modules>
 

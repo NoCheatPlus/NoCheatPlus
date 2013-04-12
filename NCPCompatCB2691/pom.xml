@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcompatcbdev</artifactId>
+  <artifactId>ncpcompatcb2691</artifactId>
   <packaging>jar</packaging>
-  <name>NCPCompatCBDev</name>
+  <name>NCPCompatCB2691</name>
   <version>static</version>
 
   <parent>
@@ -22,11 +22,11 @@
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>craftbukkit</artifactId>
-    	<version>1.5.1-R0.2-SNAPSHOT</version>
+    	<version>1.5.1-R0.1</version>
     </dependency>
   </dependencies>
 
-  <description>Compatibility for the developement version (latest).
+  <description>Compatibility for CB2691 (1.5.1-R0.1 beta release).
 
 Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 </project>
