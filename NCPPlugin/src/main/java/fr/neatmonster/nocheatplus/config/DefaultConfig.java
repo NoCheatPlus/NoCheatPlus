@@ -26,7 +26,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 414;
+	public static final int buildNumber = 490;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -249,10 +249,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.CHAT_RELOG_ACTIONS, "log:relog:0:10:cf cancel vl>20 log:relog:0:10:cf cancel cmd:tempkick5");
         // Logins
         set(ConfPaths.CHAT_LOGINS_CHECK, true);
-        set(ConfPaths.CHAT_LOGINS_STARTUPDELAY, 300);
+        set(ConfPaths.CHAT_LOGINS_STARTUPDELAY, 600);
         set(ConfPaths.CHAT_LOGINS_PERWORLDCOUNT, false);
         set(ConfPaths.CHAT_LOGINS_SECONDS, 10);
-        set(ConfPaths.CHAT_LOGINS_LIMIT, 6);
+        set(ConfPaths.CHAT_LOGINS_LIMIT, 10);
         set(ConfPaths.CHAT_LOGINS_KICKMESSAGE, "Too many people logging in, retry soon.");
         
         /*
