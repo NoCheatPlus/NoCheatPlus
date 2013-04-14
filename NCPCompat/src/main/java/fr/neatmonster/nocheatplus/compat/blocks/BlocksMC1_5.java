@@ -98,6 +98,8 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		BlockFlags.addFlags(78, BlockProperties.F_HEIGHT_8_INC);
 		BlockFlags.removeFlags(78, BlockProperties.F_HEIGHT_8SIM_INC);
 		
+		// 95 Locked chest
+		BlockProperties.setBlockProps(95, BlockProperties.instantType);
 	}
 
 }
