@@ -175,7 +175,9 @@ public class TickTask implements Runnable {
 	public static void addTickListener(TickListener listener){
 		synchronized (tickListeners) {
 			if (locked) return;
-			tickListeners.add(listener);
+			if (!tickListeners.contains(listener)){
+				tickListeners.add(listener);
+			}
 		}
 	}
 	
