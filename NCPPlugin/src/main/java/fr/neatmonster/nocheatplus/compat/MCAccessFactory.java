@@ -28,12 +28,22 @@ public class MCAccessFactory {
 	};
 	
 	/**
+	 * Get a new MCAccess instance using the config value for ConfPaths.COMPATIBILITY_BUKKITONLY.
+	 * @return MCAccess instance.
 	 * @throws RuntimeException if no access can be set.
-	 * @return
 	 */
 	public MCAccess getMCAccess(){
+		return getMCAccess(ConfigManager.getConfigFile().getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY));
+	}
+	
+	/**
+	 * Get a new MCAccess instance.
+	 * @param bukkitOnly Set to true to force using an API-only module.
+	 * @return
+	 * @throws RuntimeException if no access can be set.
+	 */
+	public MCAccess getMCAccess(final boolean bukkitOnly){
 		final List<Throwable> throwables = new ArrayList<Throwable>();
-		final boolean bukkitOnly = ConfigManager.getConfigFile().getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY);
 		
 		// Try to set up native access.
 		if (!bukkitOnly){
