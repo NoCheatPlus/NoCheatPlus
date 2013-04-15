@@ -339,6 +339,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	/** All registered components.  */
 	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
 	
+	/** Tick listener that is only needed sometimes (component registration). */
+	protected final TickListener onDemandTickListener = new TickListener() {
+		@Override
+		public void onTick(int tick, long timeLast) {
+			processQueuedSubComponentHolders();
+			TickTask.removeTickListener(this);
+		}
+	};
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> Collection<ComponentRegistry<T>> getComponentRegistries(final Class<ComponentRegistry<T>> clazz) {
@@ -432,8 +441,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			added = true;
 		}
 		
+		// Components holding more components to register later.
 		if (obj instanceof IHoldSubComponents){
 			subComponentholders.add((IHoldSubComponents) obj);
+			TickTask.addTickListener(onDemandTickListener);
 			added = true; // Convention.
 		}
 		
