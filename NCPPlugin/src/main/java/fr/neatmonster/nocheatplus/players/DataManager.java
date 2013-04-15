@@ -58,7 +58,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author mc_dev
  *
  */
-public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry, ComponentWithName, ConsistencyChecker{
+public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker{
 	
 	protected static DataManager instance = null;
 	
@@ -351,26 +351,19 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	}
 	
 	@Override
-	public boolean addComponent(Object obj) {
-		if (obj instanceof IRemoveData) {
-			if (iRemoveData.contains(obj)){
-				return false;
-			}
-			else{
-				iRemoveData.add((IRemoveData) obj);
-				return true;
-			}
+	public boolean addComponent(IRemoveData obj) {
+		if (iRemoveData.contains(obj)){
+			return false;
 		}
 		else{
+			iRemoveData.add((IRemoveData) obj);
 			return true;
 		}
 	}
 
 	@Override
-	public void removeComponent(Object obj) {
-		if (obj instanceof IRemoveData) {
-			iRemoveData.remove((IRemoveData) obj);
-		}
+	public void removeComponent(IRemoveData obj) {
+		iRemoveData.remove((IRemoveData) obj);
 	}
 	
 	/**

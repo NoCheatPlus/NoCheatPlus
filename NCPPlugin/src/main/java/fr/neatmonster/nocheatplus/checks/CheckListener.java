@@ -1,7 +1,13 @@
 package fr.neatmonster.nocheatplus.checks;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
 
@@ -11,11 +17,14 @@ import fr.neatmonster.nocheatplus.components.NCPListener;
  * @author mc_dev
  *
  */
-public class CheckListener extends NCPListener implements MCAccessHolder{
+public class CheckListener extends NCPListener implements MCAccessHolder, IHoldSubComponents{
 	
 	/** Check group / type which this listener is for. */
 	protected final CheckType checkType;
 	protected MCAccess mcAccess;
+	
+	/** */
+	protected final List<Object> queuedComponents = new LinkedList<Object>();
 	
 	public CheckListener(){
 		this(null);
@@ -43,13 +52,22 @@ public class CheckListener extends NCPListener implements MCAccessHolder{
 	}
 	
 	/**
-	 * Convenience method to add checks as components to NCP.
+	 * Convenience method to add checks as components to NCP with a delay (IHoldSubComponent).
+	 * This should not be used after having added the check to the ComponentRegistry (NCP-API).
 	 * @param check
 	 * @return The given Check instance, for chaining.
 	 */
 	protected <C extends Check>  C addCheck(C check){
 		// Could also set up a map from check type to check, etc.
-		NoCheatPlus.getAPI().addComponent(check);
+		queuedComponents.add(check);
 		return check;
 	}
+
+	@Override
+	public Collection<Object> getSubComponents() {
+		final List<Object> res = new ArrayList<Object>(this.queuedComponents);
+		this.queuedComponents.clear();
+		return res;
+	}
+	
 }

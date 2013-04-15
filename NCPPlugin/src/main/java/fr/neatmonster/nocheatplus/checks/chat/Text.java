@@ -31,7 +31,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class Text extends AsyncCheck implements INotifyReload{
 
-	private LetterEngine engine;
+	private LetterEngine engine = null;
 	
 	/** Not really cancelled but above threshold for actions. */
 	private String lastCancelledMessage = "";

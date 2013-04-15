@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,8 +47,10 @@ import fr.neatmonster.nocheatplus.command.CommandHandler;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
+import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
+import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
@@ -74,6 +77,7 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEn
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.Updates;
 
@@ -326,16 +330,59 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	/** Listeners for players joining and leaving (monitor level) */
 	protected final List<JoinLeaveListener> joinLeaveListeners = new ArrayList<JoinLeaveListener>();
 	
+	/** Sub component registries. */
+	protected final List<ComponentRegistry<?>> subRegistries = new ArrayList<ComponentRegistry<?>>();
+	
+	/** Queued sub component holders, emptied on the next tick usually. */
+	protected final List<IHoldSubComponents> subComponentholders = new ArrayList<IHoldSubComponents>(20);
+	
 	/** All registered components.  */
 	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
-
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> Collection<ComponentRegistry<T>> getComponentRegistries(final Class<ComponentRegistry<T>> clazz) {
+		final List<ComponentRegistry<T>> result = new LinkedList<ComponentRegistry<T>>();
+		for (final ComponentRegistry<?> registry : subRegistries){
+			if (clazz.isAssignableFrom(registry.getClass())){
+				try{
+					result.add((ComponentRegistry<T>) registry);
+				}
+				catch(Throwable t){
+					// Ignore.
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Convenience method to add components according to implemented interfaces,
+     * like Listener, INotifyReload, INeedConfig.<br>
+     * For the NoCheatPlus instance this must be done after the configuration has been initialized.
+     * This will also register ComponentRegistry instances if given.
+	 */
 	@Override
 	public boolean addComponent(final Object obj) {
+		return addComponent(obj, true);
+	}
+	
+	/**
+	 * Convenience method to add components according to implemented interfaces,
+     * like Listener, INotifyReload, INeedConfig.<br>
+     * For the NoCheatPlus instance this must be done after the configuration has been initialized.
+     * @param allowComponentRegistry Only registers ComponentRegistry instances if this is set to true. 
+	 */
+	@Override
+	public boolean addComponent(final Object obj, final boolean allowComponentRegistry) {
 		
 		// TODO: Allow to add ComponentFactory + contract (renew with reload etc.)?
+		if (obj == this) throw new IllegalArgumentException("Can not register NoCheatPlus with itself.");
 		
-		if (allComponents.contains(obj)) return false;
+		if (allComponents.contains(obj)){
+			// All added components are in here.
+			return false;
+		}
 		boolean added = false;
 		if (obj instanceof Listener) {
 			addListener((Listener) obj);
@@ -370,9 +417,26 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			joinLeaveListeners.add((JoinLeaveListener) obj);
 			added = true;
 		}
-		// Also add to DataManager, which will pick what it needs.
-		// TODO: This is fishy in principle, something more concise?
-		if (dataMan.addComponent(obj)) added = true;
+		
+		// Add to sub registries.
+		for (final ComponentRegistry<?> registry : subRegistries){
+			final Object res = ReflectionUtil.invokeGenericMethodOneArg(registry, "addComponent", obj);
+			if (res != null && (res instanceof Boolean) && ((Boolean) res).booleanValue()){
+				added = true;
+			}
+		}
+		
+		// Add ComponentRegistry instances after adding to sub registries to prevent adding it to itself.
+		if (allowComponentRegistry && (obj instanceof ComponentRegistry<?>)){
+			subRegistries.add((ComponentRegistry<?>) obj);
+			added = true;
+		}
+		
+		if (obj instanceof IHoldSubComponents){
+			subComponentholders.add((IHoldSubComponents) obj);
+			added = true; // Convention.
+		}
+		
 		// Add to allComponents if in fact added.
 		if (added) allComponents.add(obj);
 		return added;
@@ -382,7 +446,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
 	 * @param listener
 	 */
-	protected void addListener(final Listener listener) {
+	private void addListener(final Listener listener) {
+		// private: Use addComponent.
 		if (manageListeners){
 			String tag = "NoCheatPlus";
 			if (listener instanceof ComponentWithName){
@@ -430,7 +495,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		if (obj instanceof JoinLeaveListener){
 			joinLeaveListeners.remove((JoinLeaveListener) obj);
 		}
-		dataMan.removeComponent(obj);
+		
+		// Remove sub registries.
+		if (obj instanceof ComponentRegistry<?>){
+			subRegistries.remove(obj);
+		}
+		// Remove from present registries, order prevents to remove from itself.
+		for (final ComponentRegistry<?> registry : subRegistries){
+			ReflectionUtil.invokeGenericMethodOneArg(registry, "removeComponent", obj);
+		}
+
 		allComponents.remove(obj);
 	}
     
@@ -503,8 +577,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      	
 		// Unregister all added components explicitly.
 		if (verbose) LogUtil.logInfo("[NoCheatPlus] Unregister all registered components...");
-        for (Object obj : new ArrayList<Object>(allComponents)){
-        	removeComponent(obj);
+		final ArrayList<Object> allComponents = new ArrayList<Object>(this.allComponents);
+        for (int i = allComponents.size() - 1; i >= 0; i--){
+        	removeComponent(allComponents.get(i));
         }
         
         // Cleanup BlockProperties.
@@ -518,6 +593,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         notifyReload.clear();
         // World specific permissions.
 		permStateReceivers.clear();
+		// Sub registries.
+		subRegistries.clear();
+		// Just in case: clear the subComponentHolders.
+		subComponentholders.clear();
 
 		// Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
 		if (changedCommands != null){
@@ -610,25 +689,35 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			listenerManager.setRegisterDirectly(false);
 			listenerManager.clear();
 		}
-		addComponent(nameSetPerms);
-		addListener(getCoreListener());
+		// Add the "low level" system components first.
+		for (final Object obj : new Object[]{
+				nameSetPerms,
+				getCoreListener(),
+				// Put ReloadListener first, because Checks could also listen to it.
+	        	new INotifyReload() {
+	        		// Only for reloading, not INeedConfig.
+					@Override
+					public void onReload() {
+						processReload();
+					}
+	        	},
+	        	NCPExemptionManager.getListener(),
+	        	new ConsistencyChecker() {
+					@Override
+					public void checkConsistency(final Player[] onlinePlayers) {
+						NCPExemptionManager.checkConsistency(onlinePlayers);
+					}
+				},
+	        	dataMan,
+		}){
+			addComponent(obj);
+		}
+		
+		// Register sub-components (!).
+        processQueuedSubComponentHolders();
+        
+		// Register "highe level" components (check listeners).
         for (final Object obj : new Object[]{
-            // Put ReloadListener first, because Checks could also listen to it.
-        	new INotifyReload() {
-        		// Only for reloading, not INeedConfig.
-				@Override
-				public void onReload() {
-					processReload();
-				}
-        	},
-        	NCPExemptionManager.getListener(),
-        	new ConsistencyChecker() {
-				@Override
-				public void checkConsistency(final Player[] onlinePlayers) {
-					NCPExemptionManager.checkConsistency(onlinePlayers);
-				}
-			},
-        	dataMan,
         	new BlockInteractListener(),
         	new BlockBreakListener(),
         	new BlockPlaceListener(),
@@ -641,6 +730,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }){
         	addComponent(obj);
         }
+        
+        // Register sub-components (!).
+        processQueuedSubComponentHolders();
         
         // Register the commands handler.
         PluginCommand command = getCommand("nocheatplus");
@@ -735,6 +827,20 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Tell the server administrator that we finished loading NoCheatPlus now.
 		LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
 	}
+    
+    /**
+     * Empties and registers the subComponentHolders list.
+     */
+    protected void processQueuedSubComponentHolders(){
+    	if (subComponentholders.isEmpty()) return;
+    	final List<IHoldSubComponents> copied = new ArrayList<IHoldSubComponents>(subComponentholders);
+    	subComponentholders.clear();
+    	for (final IHoldSubComponents holder : copied){
+    		for (final Object component : holder.getSubComponents()){
+    			addComponent(component);
+    		}
+    	}
+    }
     
     /**
      * All action done on reload.

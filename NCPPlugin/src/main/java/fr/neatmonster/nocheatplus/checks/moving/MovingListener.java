@@ -205,7 +205,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private final NoCheatPlus plugin = (NoCheatPlus) Bukkit.getPluginManager().getPlugin("NoCheatPlus");
     
     /** The no fall check. **/
-    public final NoFall noFall = new NoFall();
+    public final NoFall 			noFall 				= addCheck(new NoFall());
     
     /** The creative fly check. */
     private final CreativeFly        creativeFly        = addCheck(new CreativeFly());
