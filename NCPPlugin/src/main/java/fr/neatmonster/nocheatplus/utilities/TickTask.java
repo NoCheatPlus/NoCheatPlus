@@ -59,7 +59,7 @@ public class TickTask implements Runnable {
 	private static final List<ViolationData> delayedActions = new LinkedList<ViolationData>();
 	
 	/** Tick listeners to call every tick. */
-	private static final List<TickListener> tickListeners = new ArrayList<TickListener>();
+	private static final Set<TickListener> tickListeners = new LinkedHashSet<TickListener>();
 	
 	/** Last n tick durations, measured from run to run.*/
 	private static final long[] tickDurations = new long[lagMaxTicks];
@@ -169,34 +169,69 @@ public class TickTask implements Runnable {
 	}
 	
 	/**
-	 * Add a tick listener. Should be thread safe, though... why?
+	 * Add a tick listener. Can be called during processing, but will take effect on the next tick.<br>
+	 * NOTES:
+	 * <li>Thread safe.</li>
+	 * <li>Does not work if the TickTask is locked.</li>
+	 * <li>For OnDemandTickListenerS, setRegistered(true) will get called if not locked.</li>
 	 * @param listener
 	 */
 	public static void addTickListener(TickListener listener){
 		synchronized (tickListeners) {
-			if (locked) return;
+			if (locked) return; // TODO: Boolean return value ?
 			if (!tickListeners.contains(listener)){
 				tickListeners.add(listener);
+			}
+			if (listener instanceof OnDemandTickListener){
+				((OnDemandTickListener) listener).setRegistered(true);
 			}
 		}
 	}
 	
 	/**
-	 * Remove a tick listener. Should be thread safe, though... why?
+	 * Remove a tick listener. Can be called during processing, but will take effect on the next tick.<br>
+	 * NOTES:
+	 * <li>Thread safe.</li>
+	 * <li>Always works.</li>
+	 * <li>For OnDemandTickListenerS, setRegistered(false) will get called.</li>
 	 * @param listener
 	 * @return If previously contained.
 	 */
 	public static boolean removeTickListener(TickListener listener){
 		synchronized (tickListeners) {
+			if (listener instanceof OnDemandTickListener){
+				((OnDemandTickListener) listener).setRegistered(false);
+			}
 			return tickListeners.remove(listener);
 		}
 	}
 	
 	/**
-	 * Remove all of them.
+	 * Remove all of them.<br>
+	 * Notes:
+	 * <li>Thread safe.</li>
+	 * <li>Always works.</li>
+	 * <li>For OnDemandTickListenerS, setRegistered(false) will get called.</li>
 	 */
 	public static void removeAllTickListeners() {
 		synchronized (tickListeners) {
+			// Gracefully set OnDemandTickListeners to unregistered.
+			for (final TickListener listener : tickListeners){
+				if (listener instanceof OnDemandTickListener){
+					try{
+						final OnDemandTickListener odtl = (OnDemandTickListener) listener;
+						if (odtl.isRegistered()){ // Could use the flag, but this is better.
+							odtl.setRegistered(false);
+						}
+					}
+					catch(Throwable t){
+						// Unlikely.
+						LogUtil.logWarning("[NoCheatPlus] Failed to set OnDemandTickListener to unregistered state: " + t.getClass().getSimpleName());
+						LogUtil.logWarning(t);
+					}
+				}
+			}
+			// Clean listeners.
 			tickListeners.clear();
 		}
 	}
@@ -403,15 +438,20 @@ public class TickTask implements Runnable {
 	
 	/**
 	 * 
-	 * Notify all listeners.
+	 * Notify all listeners. A copy of the listeners under lock, then processed without lock. Theoretically listeners can get processed though they have already been unregistered.
 	 * 
 	 */
 	private final void notifyListeners() {
-		final List<TickListener> copyListeners = new ArrayList<TickListener>();
+		final List<TickListener> copyListeners;
 		synchronized (tickListeners) {
-			// Synchronized to allow concurrent adding (!? why ?!).
+			// Synchronized to allow concurrent adding and removal.
 			// (Ignores the locked state while still running.)
-			copyListeners.addAll(tickListeners);
+			// TODO: Policy for locked state. Though locking should only happen during onDisable, so before / after the task is run anyway.
+			if (tickListeners.isEmpty()){
+				// Future purpose.
+				return;
+			}
+			copyListeners = new ArrayList<TickListener>(tickListeners);
 		}
 		for (final TickListener listener : copyListeners){
 			try{

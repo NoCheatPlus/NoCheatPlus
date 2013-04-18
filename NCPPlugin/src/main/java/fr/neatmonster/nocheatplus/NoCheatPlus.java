@@ -77,6 +77,7 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEn
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.Updates;
@@ -340,11 +341,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
 	
 	/** Tick listener that is only needed sometimes (component registration). */
-	protected final TickListener onDemandTickListener = new TickListener() {
+	protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
 		@Override
-		public void onTick(int tick, long timeLast) {
+		public boolean delegateTick(final int tick, final long timeLast) {
 			processQueuedSubComponentHolders();
-			TickTask.removeTickListener(this);
+			return false;
 		}
 	};
 	
@@ -444,7 +445,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Components holding more components to register later.
 		if (obj instanceof IHoldSubComponents){
 			subComponentholders.add((IHoldSubComponents) obj);
-			TickTask.addTickListener(onDemandTickListener);
+			onDemandTickListener.register();
 			added = true; // Convention.
 		}
 		
