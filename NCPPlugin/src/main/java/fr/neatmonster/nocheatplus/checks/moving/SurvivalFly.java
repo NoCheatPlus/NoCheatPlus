@@ -525,6 +525,7 @@ public class SurvivalFly extends Check {
             data.setSetBack(to);
             data.sfJumpPhase = 0;
             data.clearAccounting();
+            data.sfLowJump = false;
             // TODO: Experimental: reset velocity.
             if (data.verticalVelocityUsed > cc.velocityGraceTicks && toOnGround && yDistance < 0){
                 data.verticalVelocityCounter = 0;
@@ -538,6 +539,7 @@ public class SurvivalFly extends Check {
             data.setSetBack(from);
             data.sfJumpPhase = 1; // TODO: ?
             data.clearAccounting();
+            data.sfLowJump = false;
         }
         
         // Check removal of active horizontal velocity.
@@ -976,6 +978,32 @@ public class SurvivalFly extends Check {
 			else{
 				// Decrease
 				tags.add("ychdec");
+				// Detect low jumping.
+				if (!data.sfDirty && data.mediumLiftOff == MediumLiftOff.GROUND){
+					final double setBackYDistance = to.getY() - data.getSetBackY();
+					if (setBackYDistance > 0.0){
+						// Only count it if the player has actually been jumping (higher than setback).
+						final Player player = from.getPlayer();
+						// Estimate of minimal jump height.
+						double estimate = 1.15;
+						if (data.jumpAmplifier > 0){
+							// TODO: Could skip this.
+							estimate += 0.5 * MovingListener.getJumpAmplifier(player);
+						}
+						if (setBackYDistance < estimate){
+							// Low jump, further check if there might have been a reason for low jumping.
+							final long flags = BlockProperties.F_GROUND | BlockProperties.F_SOLID;
+							if ((BlockProperties.getBlockFlags(from.getTypeIdAbove()) & flags) == 0){
+								// Check block above that too (if high enough).
+								final int refY = Location.locToBlock(from.getY() + 0.5);
+								if (refY == from.getBlockY() || (BlockProperties.getBlockFlags(from.getTypeId(from.getBlockX(), refY, from.getBlockZ())) & flags) == 0){
+									tags.add("lowjump");
+									data.sfLowJump = true;
+								}
+							}
+						}
+					}
+				} // (Low jump.)
 			}
 		}
 		

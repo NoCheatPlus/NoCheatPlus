@@ -459,6 +459,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.wasInVehicle = true;
 			data.sfHoverTicks = -1;
 			data.removeAllVelocity();
+			data.sfLowJump = false;
 			final Entity vehicle = player.getVehicle();
 			if (vehicle != null && (vehicle instanceof Pig)){
 				onVehicleMove(new VehicleMoveEvent((Vehicle) vehicle, event.getFrom(), event.getFrom()));
@@ -523,6 +524,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 //			if (BlockProperties.isRails(pFrom.getTypeId())){
 			// Always clear no fall data, let Minecraft do fall damage.
 			data.noFallSkipAirCheck = true; // Might allow one time cheat.
+			data.sfLowJump = false;
 			data.clearNoFallData();
 //			}
 		}
@@ -661,6 +663,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     		// CreativeFly
             newTo = creativeFly.check(player, pFrom, pTo, data, cc);
             data.sfHoverTicks = -1;
+            data.sfLowJump = false;
     	}
     	else{
     		// No fly :).

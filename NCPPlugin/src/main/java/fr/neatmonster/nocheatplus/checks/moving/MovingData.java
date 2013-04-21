@@ -157,6 +157,10 @@ public class MovingData extends ACheckData {
 	public int 			sfJumpPhase = 0;
 	/** "Dirty" flag, for receiving velocity and similar while in air. */
 	public boolean      sfDirty = false;
+	
+	/** Indicate low jumping descending phase (likely cheating). */
+	public boolean sfLowJump = false;
+	
 	/**
 	 * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
 	 */
@@ -199,6 +203,7 @@ public class MovingData extends ACheckData {
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = sfHoverLoginTicks = -1;
 		sfDirty = false;
+		sfLowJump = false;
 		mediumLiftOff = defaultMediumLiftOff;
 	}
 
@@ -228,6 +233,7 @@ public class MovingData extends ACheckData {
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = -1;
 		sfDirty = false;
+		sfLowJump = false;
 		mediumLiftOff = defaultMediumLiftOff;
 		removeAllVelocity();
 	}
@@ -262,6 +268,7 @@ public class MovingData extends ACheckData {
         fromZ = toZ = z;
         sfLastYDist = Double.MAX_VALUE;
         sfDirty = false;
+        sfLowJump = false;
         mediumLiftOff = defaultMediumLiftOff;
         // TODO: other buffers ?
     }

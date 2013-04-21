@@ -114,6 +114,10 @@ public class PlayerLocation {
 		this.mcAccess = mcAccess;
 		this.blockCache = blockCache;
 	}
+	
+	public Player getPlayer() {
+		return player;
+	}
 
 	/**
 	 * Gets the location.
