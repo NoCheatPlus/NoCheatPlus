@@ -191,13 +191,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 		}
 		pLoc.cleanup();
-		if (!restored){
+		if (!restored && MovingConfig.getConfig(player).tempKickIllegal){
 			 // TODO: correct the location ?
 			NoCheatPlus.denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
 			LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
 		}
 		// TODO: reset the bounding box of the player ?
-		CheckUtils.onIllegalMove(player);
+		CheckUtils.kickIllegalMove(player);
 	}
 	
 

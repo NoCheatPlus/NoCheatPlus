@@ -565,6 +565,9 @@ public abstract class ConfPaths {
     public static final String  MOVING_NOFALL_YONGROUND                  = MOVING_NOFALL + "yonground";
     public static final String  MOVING_YONGROUND                         = MOVING + "yonground";
 	public static final String  MOVING_SURVIVALFLY_YSTEP                 = MOVING_SURVIVALFLY + "ystep";
+	
+	// General.
+	public static final String MOVING_TEMPKICKILLEGAL					 = MOVING + "tempkickillegal";
 
     /*
      *  dP"8   d8          ,e,                        

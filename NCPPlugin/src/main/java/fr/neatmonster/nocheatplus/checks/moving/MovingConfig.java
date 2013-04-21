@@ -124,6 +124,9 @@ public class MovingConfig extends ACheckConfig {
     public final double     noFallyOnGround;
     public final double     yOnGround;
 	public final double     yStep;
+	
+	// General things.
+	public final boolean tempKickIllegal;
 
     /**
      * Instantiates a new moving configuration.
@@ -191,6 +194,8 @@ public class MovingConfig extends ACheckConfig {
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
         // ystep is set to 0.45 by default, for stairs / steps.
         yStep = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
+        
+        tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
     }
     
 

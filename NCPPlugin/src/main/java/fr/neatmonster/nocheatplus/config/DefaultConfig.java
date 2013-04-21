@@ -440,6 +440,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER, 80);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS, 140);
         
+        // General.
+        set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
+        
         /*
          *  dP"8   d8          ,e,                        
          * C8b Y  d88   888,8,  "  888 8e   e88 888  dP"Y 

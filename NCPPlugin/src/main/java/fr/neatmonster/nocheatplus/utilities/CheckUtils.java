@@ -419,7 +419,11 @@ public class CheckUtils {
 		return yawDiff;
 	}
 	
-	public static void onIllegalMove(final Player player){
+	/**
+	 * Kick and log.
+	 * @param player
+	 */
+	public static void kickIllegalMove(final Player player){
 		player.kickPlayer("Illegal move.");
 		LogUtil.logWarning("[NCP] Disconnect " + player.getName() + " due to illegal move!");
 	}
