@@ -29,63 +29,6 @@ public class GodMode extends Check {
     public GodMode() {
         super(CheckType.FIGHT_GODMODE);
     }
-
-    /**
-     * Checks a player.
-     * 
-     * @param player
-     *            the player
-     * @return true, if successful
-     */
-    public boolean check(final Player player) {
-        final FightData data = FightData.getData(player);
-
-        boolean cancel = false;
-
-        // Check at most once a second.
-        if (data.godModeLastTime < System.currentTimeMillis() - 1000L) {
-            data.godModeLastTime = System.currentTimeMillis();
-
-            final int age = player.getTicksLived();
-
-            // How much older did he get?
-            final int ageDelta = Math.max(0, age - data.godModeLastAge);
-
-            if (player.getNoDamageTicks() > 0 && ageDelta < 15) {
-                // He is invulnerable and didn't age fast enough, that costs some points.
-                data.godModeBuffer -= 15 - ageDelta;
-
-                // Still points left?
-                if (data.godModeBuffer <= 0) {
-                    // No, that means we can increase his violation level.
-                    data.godModeVL -= data.godModeBuffer;
-
-                    // Execute whatever actions are associated with this check and the violation level and find out if
-                    // we should cancel the event.
-                    cancel = executeActions(player, data.godModeVL, -data.godModeBuffer,
-                            FightConfig.getConfig(player).godModeActions);
-                }
-            } else {
-                // Give some new points, once a second.
-                data.godModeBuffer += 15;
-
-                // Decrease the violation level.
-                data.godModeVL *= 0.95;
-            }
-
-            if (data.godModeBuffer < 0)
-                // Can't have less than 0!
-                data.godModeBuffer = 0;
-            else if (data.godModeBuffer > 30)
-                // And 30 is enough for simple lag situations.
-                data.godModeBuffer = 30;
-
-            // Start age counting from a new time.
-            data.godModeLastAge = age;
-        }
-
-        return cancel;
-    }
     
     /**
      * New style god mode check. Much more sensitive.

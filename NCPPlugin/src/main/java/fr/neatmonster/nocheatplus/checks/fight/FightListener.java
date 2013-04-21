@@ -276,7 +276,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	final FightData damagedData = damagedPlayer == null ? null : FightData.getData(damagedPlayer);
     	final boolean damagedIsDead = damaged.isDead();
     	if (damagedPlayer != null && !damagedIsDead) {
-//            if (godMode.isEnabled(player) && godMode.check(player)){
             if (!damagedPlayer.isDead() && godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, event.getDamage(), damagedData)){
                 // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
             	damagedPlayer.setNoDamageTicks(0);

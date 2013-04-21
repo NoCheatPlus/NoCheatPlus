@@ -160,6 +160,7 @@ public class MovingData extends ACheckData {
 	
 	/** Indicate low jumping descending phase (likely cheating). */
 	public boolean sfLowJump = false;
+	public boolean sfNoLowJump = false; // Hacks.
 	
 	/**
 	 * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".

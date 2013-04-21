@@ -1008,7 +1008,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         final Vector velocity = event.getVelocity();
         
-        if (cc.debug) System.out.println(event.getPlayer().getName() + " new velocity: " + velocity);
+        if (cc.debug){
+        	System.out.println(event.getPlayer().getName() + " new velocity: " + velocity);
+        }
         
         double newVal = velocity.getY();
         boolean used = false;
@@ -1036,6 +1038,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Set dirty flag here.
         if (used){
         	data.sfDirty = true;
+        	data.sfNoLowJump = true;
         }
         
         // TODO: clear accounting here ?
@@ -1070,6 +1073,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         Location newTo = null;
         final MovingData data = MovingData.getData(player);
+        data.sfNoLowJump = true;
+        
         if (morePacketsVehicle.isEnabled(player)){
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = morePacketsVehicle.check(player, from, to);

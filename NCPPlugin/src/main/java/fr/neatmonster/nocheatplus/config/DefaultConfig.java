@@ -470,7 +470,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".commands", start + "issued too many commands" + end);
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
-        set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping" + end);
+        set(ConfPaths.STRINGS + ".critical", start + "tried to do a critical hit but wasn't technically jumping [tags]" + end);
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".dropkick", "ncp delay ncp kick [player] Dropping items too fast.");
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);

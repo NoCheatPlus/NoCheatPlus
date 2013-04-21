@@ -1,11 +1,16 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
@@ -73,23 +78,33 @@ public class Critical extends Check {
         	if (dataM.sfLowJump || player.getFallDistance() < cc.criticalFallDistance && !BlockProperties.isOnGroundOrResetCond(player, loc, mCc.yOnGround)){
         		final MovingConfig ccM = MovingConfig.getConfig(player);
             	if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){
-                    final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance())
-                            / cc.criticalFallDistance;
-                    final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY()))
-                            / cc.criticalVelocity;
-                    final double delta = deltaFallDistance > 0D ? deltaFallDistance
-                            : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
-
+                    final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance()) / cc.criticalFallDistance;
+                    final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY())) / cc.criticalVelocity;
+                    double delta = deltaFallDistance > 0D ? deltaFallDistance : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
+                    
+                    final List<String> tags = new ArrayList<String>();
+                    
                     // Player failed the check, but this is influenced by lag so don't do it if there was lag.
                     if (TickTask.getLag(1000) < 1.5){
                     	// TODO: 1.5 is a fantasy value.
                         // Increment the violation level.
                         data.criticalVL += delta;
                     }
+                    else{
+                    	tags.add("lag");
+                    	delta = 0;
+                    }
                     
                     // Execute whatever actions are associated with this check and the violation level and find out if we
                     // should cancel the event.
-                    cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);	
+                    final ViolationData vd = new ViolationData(this, player, data.criticalVL, delta, cc.criticalActions);
+                    if (vd.needsParameters()){
+                    	if (dataM.sfLowJump){
+                    		tags.add("sf_lowjump");
+                    	}
+                    	vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
+                    }
+                    cancel = executeActions(vd);	
             	}
             }
         }

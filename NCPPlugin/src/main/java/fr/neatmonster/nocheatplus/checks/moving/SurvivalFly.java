@@ -282,6 +282,7 @@ public class SurvivalFly extends Check {
         // Calculate the vertical speed limit based on the current jump phase.
         double vAllowedDistance = 0, vDistanceAboveLimit = 0;
         if (from.isInWeb()){
+        	data.sfNoLowJump = true;
         	// Very simple: force players to descend or stay.
          	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
          	data.jumpAmplifier = 0; // TODO: later maybe fetch.
@@ -301,6 +302,7 @@ public class SurvivalFly extends Check {
         }
         else if (data.verticalFreedom <= 0.001 && from.isOnClimbable()){
         	// Ladder types.
+        	data.sfNoLowJump = true;
         	// TODO: bring in in-medium accounting.
 //        	// TODO: make these extra checks to the jumpphase thing ?
 //        	if (fromOnGround) vAllowedDistance = climbSpeed + 0.3;
@@ -328,6 +330,7 @@ public class SurvivalFly extends Check {
         }
         else if (data.verticalFreedom <= 0.001 && from.isInLiquid() && (Math.abs(yDistance) > 0.2 || to.isInLiquid())){
         	// Swimming...
+        	data.sfNoLowJump = true;
         	if (yDistance >= 0){
         		// This is more simple to test.
         		// TODO: Friction in water...
@@ -378,6 +381,7 @@ public class SurvivalFly extends Check {
             if (data.mediumLiftOff == MediumLiftOff.LIMIT_JUMP){
             	// TODO: In normal water this is 0. Could set higher for special cases only (needs efficient data + flags collection?).
             	maxJumpPhase = 3;
+            	data.sfNoLowJump = true;
             	if (data.sfJumpPhase > 0) tags.add("limitjump");
             }
             else if (data.jumpAmplifier > 0){
@@ -526,6 +530,7 @@ public class SurvivalFly extends Check {
             data.sfJumpPhase = 0;
             data.clearAccounting();
             data.sfLowJump = false;
+            data.sfNoLowJump = false;
             // TODO: Experimental: reset velocity.
             if (data.verticalVelocityUsed > cc.velocityGraceTicks && toOnGround && yDistance < 0){
                 data.verticalVelocityCounter = 0;
@@ -540,6 +545,7 @@ public class SurvivalFly extends Check {
             data.sfJumpPhase = 1; // TODO: ?
             data.clearAccounting();
             data.sfLowJump = false;
+            // not resetting nolow...
         }
         
         // Check removal of active horizontal velocity.
@@ -979,7 +985,7 @@ public class SurvivalFly extends Check {
 				// Decrease
 				tags.add("ychdec");
 				// Detect low jumping.
-				if (!data.sfDirty && data.mediumLiftOff == MediumLiftOff.GROUND){
+				if (!data.sfNoLowJump && !data.sfDirty && data.mediumLiftOff == MediumLiftOff.GROUND){
 					final double setBackYDistance = to.getY() - data.getSetBackY();
 					if (setBackYDistance > 0.0){
 						// Only count it if the player has actually been jumping (higher than setback).
