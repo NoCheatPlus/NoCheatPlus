@@ -766,6 +766,23 @@ public class PlayerLocation {
 		final double xzM = 0; //0.001;
 		blockFlags = BlockProperties.collectFlagsSimple(blockCache, minX - xzM, minY - yExtra - maxYonGround, minZ - xzM, maxX + xzM, Math.max(maxY, minY + 1.5), maxZ + xzM);
 	}
+	
+	/**
+	 * Check chunks within 1 block distance for if they are loaded and load unloaded chunks.
+	 * @return Number of chunks loaded.
+	 */
+	public int ensureChunksLoaded() {
+		return ensureChunksLoaded(1.0);
+	}
+	
+	/**
+	 * Check chunks within xzMargin radius for if they are loaded and load unloaded chunks.
+	 * @param xzMargin
+	 * @return Number of chunks loaded.
+	 */
+	public int ensureChunksLoaded(final double xzMargin) {
+		return BlockCache.ensureChunksLoaded(world, x, z, xzMargin);
+	}
 
 	/**
 	 * Set some references to null.

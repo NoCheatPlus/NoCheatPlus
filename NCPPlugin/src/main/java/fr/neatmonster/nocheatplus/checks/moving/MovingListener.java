@@ -1224,7 +1224,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.sfHoverLoginTicks = 0;
 			data.sfHoverTicks = -1;
 		}
-
+		
+//		// Check loaded chunks.
+//		if (cc.loadChunksOnJoin){
+//			final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
+//			if (loaded > 0 && BuildParameters.debugLevel > 0){
+//				// DEBUG
+//				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+//			}
+//		}
+		
 	}
 
 	@Override
@@ -1367,6 +1376,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		info.set(player, loc, null, cc.yOnGround);
 		final boolean res;
 		// TODO: Collect flags, more margin ?
+		final int loaded = info.from.ensureChunksLoaded();
+		if (loaded > 0 && BuildParameters.debugLevel > 0){
+			// DEBUG
+			LogUtil.logInfo("[NoCheatPlus] Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
+		}
 		if (info.from.isOnGround() || info.from.isResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()){
 			res = true;
 			data.sfHoverTicks = 0;

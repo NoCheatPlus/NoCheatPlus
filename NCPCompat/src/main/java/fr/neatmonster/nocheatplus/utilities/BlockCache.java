@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
@@ -24,6 +25,32 @@ public abstract class BlockCache {
 			if (bounds[i + 3] < 1.0) return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Check if chunks are loaded and load all not yet loaded chunks, using normal world coordinates.<br>
+	 * NOTE: Not sure where to put this. Method does not use any caching.
+	 * @param world
+	 * @param x
+	 * @param z
+	 * @param xzMargin
+	 * @return Number of loaded chunks.
+	 */
+	public static int ensureChunksLoaded(final World world, final double x, final double z, final double xzMargin) {
+		int loaded = 0;
+		final int minX = Location.locToBlock(x - xzMargin) / 16;
+		final int maxX = Location.locToBlock(x + xzMargin) / 16;
+		final int minZ = Location.locToBlock(z - xzMargin) / 16;
+		final int maxZ = Location.locToBlock(z + xzMargin) / 16;
+		for (int cx = minX; cx <= maxX; cx ++){
+			for (int cz = minZ; cz <= maxZ; cz ++){
+				if (!world.isChunkLoaded(cx * 16, cz * 16)){
+					world.loadChunk(cx * 16, cz * 16);
+					loaded ++;
+				}
+			}
+		}
+		return loaded;
 	}
     
     /** Cached type-ids. */
