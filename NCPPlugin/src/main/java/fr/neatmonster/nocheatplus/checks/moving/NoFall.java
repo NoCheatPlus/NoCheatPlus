@@ -164,17 +164,24 @@ public class NoFall extends Check {
         if (!toReset && !toOnGround && yDiff < 0){
             data.noFallFallDistance -= yDiff;
         }
-        else if (cc.noFallDealDamage && cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || data.noFallAssumeGround) && yDiff >= 0)){
-        	// TODO: Only use this if dealdamage is true ?
-        	if (data.noFallFallDistance > 0){
-        		data.noFallFallDistance = 0;
+        else if (cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || data.noFallAssumeGround) && yDiff >= 0)){
+        	final double max = Math.max(data.noFallFallDistance, mcFallDistance);
+        	if (max > 0.0 && max < 0.75){ // (Ensure this does not conflict with deal-damage set to false.) 
+                if (cc.debug){
+                	System.out.println(player.getName() + " NoFall: Reset fall distance (anticriticals): mc=" + StringUtil.fdec3.format(mcFallDistance) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) );
+                }
+            	if (data.noFallFallDistance > 0){
+            		data.noFallFallDistance = 0;
+            	}
+            	if (mcFallDistance > 0){
+            		player.setFallDistance(0);
+        		}
         	}
-        	if (mcFallDistance > 0){
-        		player.setFallDistance(0);
-    		}
         }
         
-        if (cc.debug) System.out.println(player.getName() + " NoFall: mc=" + StringUtil.fdec3.format(player.getFallDistance()) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + StringUtil.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
+        if (cc.debug){
+        	System.out.println(player.getName() + " NoFall: mc=" + StringUtil.fdec3.format(mcFallDistance) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + StringUtil.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
+        }
         
     }
     

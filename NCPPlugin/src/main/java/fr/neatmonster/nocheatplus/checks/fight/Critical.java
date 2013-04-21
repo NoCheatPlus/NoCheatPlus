@@ -64,32 +64,30 @@ public class Critical extends Check {
 
         // Check if the hit was a critical hit (positive fall distance, entity in the air, not on ladder, not in liquid
         // and without blindness effect).
-        if (mcFallDistance > 0f && !BlockProperties.isOnGroundOrResetCond(player, loc, mCc.yOnGround) && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
-            // It was a critical hit, now check if the player has jumped or has sent a packet to mislead the server.
-            if (player.getFallDistance() < cc.criticalFallDistance) { // removed velocity
-            	final MovingConfig ccM = MovingConfig.getConfig(player);
-            	final MovingData dataM = MovingData.getData(player);
-            	if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){
-                    final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance())
-                            / cc.criticalFallDistance;
-                    final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY()))
-                            / cc.criticalVelocity;
-                    final double delta = deltaFallDistance > 0D ? deltaFallDistance
-                            : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
+		
+		// TODO: Skip the on-ground check somehow?
+		// TODO: Implement low jump penalty.
+        if (mcFallDistance > 0f && player.getFallDistance() < cc.criticalFallDistance &&!BlockProperties.isOnGroundOrResetCond(player, loc, mCc.yOnGround) && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
+        	final MovingConfig ccM = MovingConfig.getConfig(player);
+        	final MovingData dataM = MovingData.getData(player);
+        	if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){
+                final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance())
+                        / cc.criticalFallDistance;
+                final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY()))
+                        / cc.criticalVelocity;
+                final double delta = deltaFallDistance > 0D ? deltaFallDistance
+                        : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
 
-                    // Player failed the check, but this is influenced by lag so don't do it if there was lag.
-                    if (TickTask.getLag(1000) < 1.5){
-                    	// TODO: 1.5 is a fantasy value.
-                        // Increment the violation level.
-                        data.criticalVL += delta;
-                    }
-
-
-                    // Execute whatever actions are associated with this check and the violation level and find out if we
-                    // should cancel the event.
-                    cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
-            	}
-            	
+                // Player failed the check, but this is influenced by lag so don't do it if there was lag.
+                if (TickTask.getLag(1000) < 1.5){
+                	// TODO: 1.5 is a fantasy value.
+                    // Increment the violation level.
+                    data.criticalVL += delta;
+                }
+                
+                // Execute whatever actions are associated with this check and the violation level and find out if we
+                // should cancel the event.
+                cancel = executeActions(player, data.criticalVL, delta, cc.criticalActions);
             }
         }
 
