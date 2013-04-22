@@ -35,12 +35,12 @@ public class Direction extends Check {
      * 
      * @param player
      *            the player
+     * @param data 
      * @param location
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block placed, final Block against) {
-        final BlockPlaceData data = BlockPlaceData.getData(player);
+    public boolean check(final Player player, final Block placed, final Block against, final BlockPlaceData data) {
 
         boolean cancel = false;
 

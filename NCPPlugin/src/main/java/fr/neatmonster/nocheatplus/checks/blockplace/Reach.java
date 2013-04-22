@@ -44,12 +44,12 @@ public class Reach extends Check {
      * 
      * @param player
      *            the player
+     * @param data2 
      * @param location
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block) {
-        final BlockPlaceData data = BlockPlaceData.getData(player);
+    public boolean check(final Player player, final Block block, final BlockPlaceData data) {
 
         boolean cancel = false;
 

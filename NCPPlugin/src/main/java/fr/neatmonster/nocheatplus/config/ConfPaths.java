@@ -177,6 +177,10 @@ public abstract class ConfPaths {
      * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
      */
     public static final String  BLOCKPLACE                               = CHECKS + "blockplace.";
+    
+    private static final String BLOCKPLACE_AUTOSIGN						 = BLOCKPLACE + "autosign.";
+	public static final String BLOCKPLACE_AUTOSIGN_CHECK				 = BLOCKPLACE_AUTOSIGN + "active";
+	public static final String BLOCKPLACE_AUTOSIGN_ACTIONS				 = BLOCKPLACE_AUTOSIGN + "actions";
 
     private static final String BLOCKPLACE_DIRECTION                     = BLOCKPLACE + "direction.";
     public static final String  BLOCKPLACE_DIRECTION_CHECK               = BLOCKPLACE_DIRECTION + "active";

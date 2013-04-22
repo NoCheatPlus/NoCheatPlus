@@ -148,6 +148,10 @@ public class DefaultConfig extends ConfigFile {
          * 888 88b, 888 Y888 888P Y888   , 888 b  888      888 ,ee 888 Y888   , 888   , 
          * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
          */
+        
+        set(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, "cancel vl>10 log:bautosign:0:3:if cancel");
+        
         set(ConfPaths.BLOCKPLACE_DIRECTION_CHECK, true);
         set(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, "cancel vl>10 log:bdirection:0:3:if cancel");
 
@@ -458,6 +462,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".angle", start + "tried to hit multiple entities at the same time" + end);
         set(ConfPaths.STRINGS + ".ban", "ban [player]");
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
+        set(ConfPaths.STRINGS + ".bautosign", start + "failed autosign with [tags]" + end);
         set(ConfPaths.STRINGS + ".bbfrequency", start + "tried to break too many blocks within time frame" + end);
         set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of his line of sight" + end);
         set(ConfPaths.STRINGS + ".bedleave", start + "sends bed leave packets (was not in bed)" + end);

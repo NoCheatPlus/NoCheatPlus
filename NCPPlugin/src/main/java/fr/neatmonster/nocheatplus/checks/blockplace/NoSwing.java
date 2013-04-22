@@ -32,10 +32,10 @@ public class NoSwing extends Check {
      * 
      * @param player
      *            the player
+     * @param data 
      * @return true, if successful
      */
-    public boolean check(final Player player) {
-        final BlockPlaceData data = BlockPlaceData.getData(player);
+    public boolean check(final Player player, final BlockPlaceData data) {
 
         boolean cancel = false;
 

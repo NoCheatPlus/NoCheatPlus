@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -45,6 +46,30 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
  * @see BlockPlaceEvent
  */
 public class BlockPlaceListener extends CheckListener {
+	
+	private static final int p1 = 73856093;
+	private static final int p2 = 19349663;
+	private static final int p3 = 83492791;
+
+	private static final int getHash(final int x, final int y, final int z) {
+		return p1 * x ^ p2 * y ^ p3 * z;
+	}
+	
+	public static int getCoordHash(final Block block){
+		return getHash(block.getX(), block.getY(), block.getZ());
+	}
+	
+	public static int getBlockPlaceHash(final Block block, final Material mat){
+		int hash = getCoordHash(block);
+		if (mat != null){
+			hash |= mat.name().hashCode();
+		}
+		hash |= block.getWorld().getName().hashCode();
+		return hash;
+	}
+	
+	/** AutoSign. */
+	private final AutoSign autoSign = addCheck(new AutoSign());
 
     /** The direction check. */
     private final Direction direction = addCheck(new Direction());
@@ -103,6 +128,14 @@ public class BlockPlaceListener extends CheckListener {
         else if (againstId == Material.AIR.getId()){
             if (!player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)  && !NCPExemptionManager.isExempted(player, CheckType.BLOCKPLACE_AGAINST)) cancelled = true;
         }
+        
+        final BlockPlaceData data = BlockPlaceData.getData(player);
+        
+        if (mat == Material.SIGN_POST || mat == Material.WALL_SIGN){
+        	data.autoSignPlacedTime = System.currentTimeMillis();
+        	// Always hash as sign post for improved compatibility with Lockette etc.
+        	data.autoSignPlacedHash = getBlockPlaceHash(block, Material.SIGN_POST);
+        }
 
         // First, the fast place check.
         if (fastPlace.isEnabled(player)){
@@ -116,20 +149,39 @@ public class BlockPlaceListener extends CheckListener {
 
         // Second, the no swing check (player doesn't swing his arm when placing a lily pad).
         if (!cancelled && mat != Material.WATER_LILY && noSwing.isEnabled(player)
-                && noSwing.check(player))
+                && noSwing.check(player, data))
             cancelled = true;
 
         // Third, the reach check.
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block))
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, block, data))
             cancelled = true;
 
         // Fourth, the direction check.
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, blockAgainst))
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, blockAgainst, data))
             cancelled = true;
 
         // If one of the checks requested to cancel the event, do so.
         if (cancelled)
             event.setCancelled(cancelled);
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onSignChange(final SignChangeEvent event){
+    	if (event.getClass() != SignChangeEvent.class){
+    		// Built in plugin compatibility.
+    		// TODO: Don't understand why two consecutive events editing the same block are a problem.
+    		return;
+    	}
+    	final Player player = event.getPlayer();
+    	final Block block = event.getBlock();
+    	final String[] lines = event.getLines();
+    	if (block == null || lines == null || player == null){
+    		// Somewhat defensive.
+    		return;
+    	}
+    	if (autoSign.isEnabled(player) && autoSign.check(player, block, lines)){
+    		event.setCancelled(true);
+    	}
     }
 
     /**

@@ -75,12 +75,17 @@ public class BlockPlaceData extends ACheckData {
     }
 
 	// Violation levels.
-    public double  directionVL;
-    public double  fastPlaceVL;
-    public double  noSwingVL;
-    public double  reachVL;
-    public double  speedVL;
-
+	public double autoSignVL = 0;
+	public double directionVL = 0;
+	public double fastPlaceVL = 0;
+	public double noSwingVL = 0;
+	public double reachVL = 0;
+	public double speedVL = 0;
+    
+    // AutoSign.
+    public long autoSignPlacedTime = 0;
+    public long autoSignPlacedHash = 0;
+    
     // Data of the fast place check.
     public final ActionFrequency fastPlaceBuckets	= new ActionFrequency(2, 1000);
     public int fastPlaceShortTermTick				= 0;

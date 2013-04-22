@@ -95,6 +95,7 @@ public class Permissions {
      */
     public static final String  BLOCKPLACE                   = CHECKS + ".blockplace";
     public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
+	public static final String  BLOCKPLACE_AUTOSIGN			 = BLOCKPLACE + ".autosign";
     public static final String  BLOCKPLACE_AGAINST_AIR       = BLOCKPLACE_AGAINST + ".air";
 	public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
     public static final String  BLOCKPLACE_BOATSANYWHERE     = BLOCKPLACE + ".boatsanywhere";

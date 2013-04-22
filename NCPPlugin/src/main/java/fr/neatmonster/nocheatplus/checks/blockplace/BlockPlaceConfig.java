@@ -70,6 +70,9 @@ public class BlockPlaceConfig extends ACheckConfig {
                     new BlockPlaceConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
         return worldsMap.get(player.getWorld().getName());
     }
+    
+    public final boolean    autoSignCheck;
+    public final ActionList autoSignActions;
 
     public final boolean    directionCheck;
     public final ActionList directionActions;
@@ -98,6 +101,11 @@ public class BlockPlaceConfig extends ACheckConfig {
      */
     public BlockPlaceConfig(final ConfigFile data) {
         super(data, ConfPaths.BLOCKPLACE);
+        
+        autoSignCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK);
+        autoSignActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, Permissions.BLOCKPLACE_AUTOSIGN);
+
+        
         directionCheck = data.getBoolean(ConfPaths.BLOCKPLACE_DIRECTION_CHECK);
         directionActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_DIRECTION_ACTIONS, Permissions.BLOCKPLACE_DIRECTION);
 
@@ -136,6 +144,8 @@ public class BlockPlaceConfig extends ACheckConfig {
             return speedCheck;
         case BLOCKPLACE_AGAINST:
         	return true;
+        case BLOCKPLACE_AUTOSIGN:
+        	return autoSignCheck;
         default:
             return true;
         }
