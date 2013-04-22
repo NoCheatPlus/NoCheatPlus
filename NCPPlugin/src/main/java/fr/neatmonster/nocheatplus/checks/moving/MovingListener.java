@@ -45,7 +45,6 @@ import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
@@ -59,7 +58,6 @@ import fr.neatmonster.nocheatplus.logging.DebugUtil;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
-import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -92,45 +90,6 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  */
 public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
 
-	/**
-	 * Coupling from and to PlayerLocation objects with a block cache for easy storage and reuse.
-	 * @author mc_dev
-	 *
-	 */
-	private static final class MoveInfo{
-		public final BlockCache cache;
-        public final PlayerLocation from;
-        public final PlayerLocation to;
-        
-        public MoveInfo(final MCAccess mcAccess){
-        	cache = mcAccess.getBlockCache(null);
-        	from = new PlayerLocation(mcAccess, null);
-        	to = new PlayerLocation(mcAccess, null);
-        }
-        
-        /**
-         * Demands at least setting from.
-         * @param player
-         * @param from
-         * @param to
-         * @param yOnGround
-         */
-        public final void set(final Player player, final Location from, final Location to, final double yOnGround){
-            this.from.set(from, player, yOnGround);
-            this.cache.setAccess(from.getWorld());
-            this.from.setBlockCache(cache);
-            if (to != null){
-                this.to.set(to, player, yOnGround);
-                this.to.setBlockCache(cache);
-            }
-        }
-        public final void cleanup(){
-            from.cleanup();
-            to.cleanup();
-            cache.cleanup();
-        }
-    }
-	
 	/**
 	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
 	 * NOTE: This is not the original amplifier value (use mcAccess for that).
@@ -907,11 +866,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				
 				// Detect small distance teleports.
 				boolean smallRange = false;
+				boolean cancel = false;
+//				boolean pass = false;
 				
 				final double margin = 0.67;
 				final Location from = event.getFrom();
 				
-				if (event.getCause() == TeleportCause.UNKNOWN){
+				
+				final TeleportCause cause = event.getCause();
+				if (cause == TeleportCause.UNKNOWN){
 					// Check special small range teleports (moved too quickly).
 					if (from != null && from.getWorld().equals(to.getWorld())){
 						if (CheckUtils.distance(from, to) < margin){
@@ -925,10 +888,46 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 						}
 					}
 				}
+				else if (cause == TeleportCause.ENDER_PEARL){
+					if (!BlockProperties.isPassable(to)){ // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)){
+						// Not check on-ground: Check the second throw.
+						cancel = true;
+					}
+					else{
+//						pass = true;
+					}
+				}
 				
-				if (smallRange){
+//				if (pass){
+//					ref = to;
+//				}
+//				else 
+				if (cancel){
+					// Cancel!
+					if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)){
+						ref = data.getSetBack(to);
+						event.setTo(ref);
+					}
+					else{
+						ref = from;
+						event.setCancelled(true);
+					}
+				}
+				else if (smallRange){
 					// Very small range teleport, keep set back etc.
 					ref = to;
+//					if (data.hasSetBack() && !data.hasSetBackWorldChanged(to)){
+//						final Location setBack = data.getSetBack(from);
+//						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+//							@Override
+//							public void run() {
+//								if (!data.hasSetBackWorldChanged(setBack)){ // && data.isSetBack(setBack)){
+//									player.sendMessage("SETBACK FROM MC DERP.");
+//									player.teleport(setBack);
+//								}
+//							}
+//						});
+//					}
 				}
 				else{
 					// "real" teleport
@@ -954,7 +953,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				}
 				
 				if (cc.debug && BuildParameters.debugLevel > 0){
-					System.out.println(player.getName() + " TP" + (smallRange ? " (small-range)" : "") + ": " + to);
+					System.out.println(player.getName() + " TP" + (smallRange ? " (small-range)" : "") + (cancel ? " (cancelled)" : "") +  ": " + to);
 				}
 			}
 			else{
@@ -1160,13 +1159,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final float fallDistance = player.getFallDistance();
         final int damage = event.getDamage();
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
-        if (cc.debug) System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
+        if (cc.debug){
+        	System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
+        }
         // Fall-back check.
         final int maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0 : 3);
         if (maxD > damage){
             // TODO: respect dealDamage ?
             event.setDamage(maxD);
-            if (cc.debug) System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
+            if (cc.debug){
+            	System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
+            }
         }
         if (allowReset){
         	// Normal fall damage, reset data.
@@ -1258,8 +1261,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	final Entity entity = event.getExited();
     	if (!(entity instanceof Player)) return;
     	onPlayerVehicleLeave((Player) entity);
-//    	System.out.println("Vehicle: " + event.getVehicle().getLocation());
-//    	System.out.println("Player: " + entity.getLocation());
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

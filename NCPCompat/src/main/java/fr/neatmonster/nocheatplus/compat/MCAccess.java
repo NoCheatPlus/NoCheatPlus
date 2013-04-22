@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.compat;
 
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Entity;
@@ -135,5 +136,12 @@ public interface MCAccess {
 	 * @return Long.MIN_VALUE if not possible.
 	 */
 	public long getKeepAliveTime(Player player);
+	
+	/**
+	 * Usually sand and gravel. Not for fastest access.
+	 * @param type
+	 * @return
+	 */
+	public boolean hasGravity(Material type);
 		
 }

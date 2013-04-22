@@ -198,4 +198,20 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		return Long.MIN_VALUE;
 	}
 	
+	@Override
+	public boolean hasGravity(final Material mat) {
+		try{
+			return mat.hasGravity();
+		}
+		catch(Throwable t){
+			switch(mat){
+			case SAND:
+			case GRAVEL:
+				return true;
+			default:
+				return false;
+			}
+		}
+	}
+	
 }

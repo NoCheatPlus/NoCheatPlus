@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.blockinteract;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -9,9 +10,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /*
  * M#"""""""'M  dP                   dP       M""M            dP                                         dP   
@@ -60,7 +63,7 @@ public class BlockInteractListener extends CheckListener {
      *            the event
      */
     @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+            ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
         /*
          *  ____  _                         ___       _                      _   
@@ -71,19 +74,31 @@ public class BlockInteractListener extends CheckListener {
          *                |___/                                                  
          */
     	
-    	// TODO: Cancelled events: might still have to check for use of blocks etc? 
-    	
-        final Player player = event.getPlayer();
-
-        final Action action = event.getAction();
-        
-        if (action != Action.LEFT_CLICK_BLOCK && action != Action.RIGHT_CLICK_BLOCK){
-        	return;
-        }
-
-        final Block block = event.getClickedBlock();
+    	// TODO: Re-arrange for interact spam, possibly move ender pearl stuff to a method.
+    	final Action action = event.getAction();
+    	final Block block = event.getClickedBlock();
         
         if (block == null){
+        	return;
+        }
+    	final Player player = event.getPlayer();
+        
+        switch(action){
+        case LEFT_CLICK_BLOCK:
+        	break;
+        case RIGHT_CLICK_BLOCK:
+        	final ItemStack stack = player.getItemInHand();
+    		if (stack != null && stack.getTypeId() == Material.ENDER_PEARL.getId()){
+    			if (!BlockProperties.isPassable(block.getTypeId())){
+    				event.setUseItemInHand(Result.DENY);
+    			}
+    		}
+        	break;
+    	default:
+    		return;
+        }
+        
+        if (event.isCancelled()){
         	return;
         }
         

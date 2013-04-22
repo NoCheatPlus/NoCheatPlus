@@ -4,7 +4,10 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
@@ -19,6 +22,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -275,11 +279,14 @@ public class BlockPlaceListener extends CheckListener {
          *               |__/                                                            
          */
         // The shooter needs to be a player.
-        if (!(event.getEntity().getShooter() instanceof Player))
+    	final Projectile entity = event.getEntity();
+    	final Entity shooter = entity.getShooter();
+        if (!(shooter instanceof Player))
             return;
 
         // And the projectile must be one the following:
-        switch (event.getEntityType()) {
+        EntityType type = event.getEntityType();
+        switch (type) {
         case ENDER_PEARL:
             break;
         case ENDER_SIGNAL:
@@ -296,25 +303,56 @@ public class BlockPlaceListener extends CheckListener {
             return;
         }
 
-        final Player player = (Player) event.getEntity().getShooter();
+        final Player player = (Player) shooter;
 
         // Do the actual check...
+        boolean cancel = false;
         if (speed.isEnabled(player)){
             final long now = System.currentTimeMillis();
             final Location loc = player.getLocation();
             if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())){
             	// Yawrate (checked extra).
-            	event.setCancelled(true);
+            	cancel = true;
             }
             if (speed.check(player)){
                 // If the check was positive, cancel the event.
-                event.setCancelled(true);
+            	cancel = true;
             }
             else if (Improbable.check(player, 0.6f, now, "blockplace.speed")){
                 // Combined fighting speed.
-                event.setCancelled(true);
+            	cancel = true;
             }
         }
-          
+        
+        // Ender pearl glitch (ab-) use.
+        if (!cancel && type == EntityType.ENDER_PEARL){
+        	if (!BlockProperties.isPassable(entity.getLocation())){
+        		// Launch into a block.
+        		// TODO: This might be a general check later.       		
+        		cancel = true;
+        	}
+        	else{
+            	if (!BlockProperties.isPassable(player.getEyeLocation(), entity.getLocation())){
+            		// Something between player 
+            		// TODO: This might be a general check later.
+            		cancel = true;
+            	}
+            	else{
+            		final Material mat = player.getLocation().getBlock().getType();
+            		final long flags = BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID | BlockProperties.F_IGN_PASSABLE;
+            		if (mat != Material.AIR && (BlockProperties.getBlockFlags(mat.getId()) & flags) == 0 && !mcAccess.hasGravity(mat)){
+            			// Still fails on piston traps etc.
+            			if (!BlockProperties.isPassable(player.getLocation(), entity.getLocation()) && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), MovingConfig.getConfig(player).yOnGround)){
+            				cancel = true;
+            			}
+            		}
+            	}
+        	}
+        }
+         
+        // Cancelled ?
+        if (cancel){
+        	event.setCancelled(true);
+        }
     }
 }

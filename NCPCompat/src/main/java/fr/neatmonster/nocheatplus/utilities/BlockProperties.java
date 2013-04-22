@@ -1547,6 +1547,24 @@ public class BlockProperties {
 	}
 	
 	/**
+	 * Normal ray tracing.
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public static final boolean isPassable(final Location from, final Location to){
+		blockCache.setAccess(from.getWorld());
+    	PassableRayTracing rt = new PassableRayTracing();
+    	rt.setBlockCache(blockCache);
+    	rt.set(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
+    	rt.loop();
+    	final boolean collides = rt.collides();
+    	blockCache.cleanup();
+    	rt.cleanup();
+    	return !collides;
+	}
+	
+	/**
 	 * Convenience method to allow using an already fetched or prepared IBlockAccess.
 	 * @param access
 	 * @param loc

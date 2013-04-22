@@ -8,6 +8,7 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.MobEffectList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.CraftServer;
@@ -159,6 +160,17 @@ public class MCAccessCB2511 implements MCAccess {
 	public long getKeepAliveTime(final Player player) {
 		// TODO: Implement if possible.
 		return Long.MIN_VALUE;
+	}
+	
+	@Override
+	public boolean hasGravity(final Material mat) {
+		switch(mat){
+		case SAND:
+		case GRAVEL:
+			return true;
+		default:
+			return false;
+		}
 	}
 
 }

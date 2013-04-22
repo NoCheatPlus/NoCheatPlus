@@ -535,5 +535,20 @@ public class MovingData extends ACheckData {
 		// TODO: Add to sum.
 		return used;
 	}
+
+	/**
+	 * Test if the location is the same, ignoring pitch and yaw.
+	 * @param loc
+	 * @return
+	 */
+	public boolean isSetBack(final Location loc) {
+		if (loc == null || setBack == null){
+			return false;
+		}
+		if (!loc.getWorld().getName().equals(setBack.getWorld().getName())){
+			return false;
+		}
+		return loc.getX() == setBack.getX() && loc.getY() == setBack.getY() && loc.getZ() == setBack.getZ();
+	}
 	
 }
