@@ -95,9 +95,9 @@ public class Permissions {
      */
     public static final String  BLOCKPLACE                   = CHECKS + ".blockplace";
     public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
-	public static final String  BLOCKPLACE_AUTOSIGN			 = BLOCKPLACE + ".autosign";
     public static final String  BLOCKPLACE_AGAINST_AIR       = BLOCKPLACE_AGAINST + ".air";
 	public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
+	public static final String  BLOCKPLACE_AUTOSIGN			 = BLOCKPLACE + ".autosign";
     public static final String  BLOCKPLACE_BOATSANYWHERE     = BLOCKPLACE + ".boatsanywhere";
     public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
     public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";
@@ -116,9 +116,10 @@ public class Permissions {
     public static final String  CHAT_CAPTCHA                 = CHAT + ".captcha";
     public static final String  CHAT_COLOR                   = CHAT + ".color";
     public static final String  CHAT_COMMANDS                = CHAT + ".commands";
-    public static final String  CHAT_TEXT                    = CHAT + ".text";
     public static final String  CHAT_LOGINS                  = CHAT + ".logins";
     public static final String  CHAT_RELOG                   = CHAT + ".relog";
+    public static final String  CHAT_TEXT                    = CHAT + ".text";
+
     
     /*
      * Combined !

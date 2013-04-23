@@ -120,6 +120,8 @@ permissions:
                                         description: Allow the player to place blocks against liquids.
                                     nocheatplus.checks.blockplace.against.air:
                                         description: Allow the player to place blocks against air.
+                            nocheatplus.checks.blockplace.autosign:
+                                description: Allow bypassing the autosign check.
                             nocheatplus.checks.blockplace.boatsanywhere:
                                 description: Allow the player to place boats on the ground.
                             nocheatplus.checks.blockplace.direction:
@@ -135,23 +137,27 @@ permissions:
                     nocheatplus.checks.chat:
                         description: Allow the player to bypass all Chat checks.
                         children:
-                            nocheatplus.checks.chat.color:
-                                description: Allow the player to bypass the Color check.
-                            nocheatplus.checks.chat.text:
-                                description: Allow the player to bypass the text check.
-                            nocheatplus.checks.chat.commands:
-                                description: Allow the player to bypass the commands check.
                             nocheatplus.checks.chat.captcha:
                                 description: Allow the player to bypass the captcha check (currently the text/commands violation handling would replace it!).
-                            nocheatplus.checks.chat.relog:
-                                description: Allow the player to bypass the relog check.
-                            nocheatplus.checks.chat.logins:
+                            nocheatplus.checks.chat.color:
+                                description: Allow the player to bypass the Color check.
+                            nocheatplus.checks.chat.commands:
+                                description: Allow the player to bypass the commands check.
+                           nocheatplus.checks.chat.logins:
                                 description: Allow the player to bypass the logins check.
+                           nocheatplus.checks.chat.relog:
+                                description: Allow the player to bypass the relog check.
+                           nocheatplus.checks.chat.text:
+                                description: Allow the player to bypass the text check.
                     nocheatplus.checks.combined:
                         description: Allow the player to bypass all combined checks.
                         children:
+                             nocheatplus.checks.combined.bedleave:
+                                 description: Allow to bypass the bedleave check (fly, god).
                              nocheatplus.checks.combined.improbable:
                                  description: Allow the player to bypass the Improbable check.
+                             nocheatplus.checks.combined.munchhausen:
+                                 description: Allow flying with fishing rods! The check is deactivated by default, though.
                     nocheatplus.checks.fight:
                         description: Allow the player to bypass all Fight checks.
                         children:
@@ -161,10 +167,10 @@ permissions:
                                 description: Allow the player to bypass the Critical check.
                             nocheatplus.checks.fight.direction:
                                 description: Allow the player to bypass the Direction check.
-                            nocheatplus.checks.fight.godmode:
-                                description: Allow the player to bypass the GodMode check.
                             nocheatplus.checks.fight.fastheal:
                                 description: Allow the player to bypass the FastHeal check.
+                            nocheatplus.checks.fight.godmode:
+                                description: Allow the player to bypass the GodMode check.
                             nocheatplus.checks.fight.knockback:
                                 description: Allow the player to bypass the Knockback check.
                             nocheatplus.checks.fight.noswing:
@@ -199,6 +205,8 @@ permissions:
                                 description: Allow the player to bypass the MorePacketsVehicle check.
                             nocheatplus.checks.moving.nofall:
                                 description: Allow the player to bypass the NoFall check.
+                            nocheatplus.checks.moving.passable:
+                                description: Allow bypassing the passable check.
                             nocheatplus.checks.moving.survivalfly:
                                 description: Allow the player to bypass the SurvivalFly check.
                                 children:
