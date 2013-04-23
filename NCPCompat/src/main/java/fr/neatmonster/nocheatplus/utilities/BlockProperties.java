@@ -14,7 +14,6 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -852,12 +851,38 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final ItemStack helmet, final Player player, final Location location){
-		final int x = location.getBlockX();
-		final int y = location.getBlockY();
-		final int z = location.getBlockZ();
-		final World world = location.getWorld();
-		final boolean onGround = isOnGround(player, location, 0.3) || world.getBlockTypeIdAt(x, y, z) == Material.WATER_LILY.getId();
-		final boolean inWater = isInWater(world.getBlockTypeIdAt(x, y + 1, z));
+		blockCache.setAccess(location.getWorld());
+		pLoc.setBlockCache(blockCache);
+		pLoc.set(location, player, 0.3);
+		// On ground.
+		final boolean onGround = pLoc.isOnGround();
+		// Head in water.
+		final int bx = pLoc.getBlockX();
+		final int bz = pLoc.getBlockZ();
+		final double y = pLoc.getY() + player.getEyeHeight();
+		final int by = Location.locToBlock(y);
+		final int headId = blockCache.getTypeId(bx, by, bz);
+		final long headFlags = blockFlags[headId];
+		final boolean inWater;
+		if ((headFlags & F_WATER) == 0){
+			inWater = false;
+		}
+		else{
+			// Check real bounding box collision.
+			// (Not sure which to use here.)
+			final int data8 = (blockCache.getData(bx, by, bz) & 0xF) % 8;
+			final double level;
+			if ((data8 & 8) != 0){
+				level = 1.0;
+			}
+			else{
+				level = 1.0 - 0.125 * (1.0 + data8);
+			}
+			inWater = y - by < level;
+		}
+		blockCache.cleanup();
+		pLoc.cleanup();
+		// Haste (faster digging).
 		final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
 		// TODO: haste: int / double !?
 		return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), haste == Double.NEGATIVE_INFINITY ? 0 : 1 + (int) haste);
@@ -1100,6 +1125,11 @@ public class BlockProperties {
 		BlockProperties.defaultBlockProps = blockProps;
 	}
 	
+	/**
+	 * @deprecated Checks for lava and water and only stationary. Long outdated. Subject to removal.
+	 * @param blockId
+	 * @return
+	 */
 	public static boolean isInWater(final int blockId) {
 		if (blockId == Material.STATIONARY_WATER.getId() || blockId == Material.STATIONARY_LAVA.getId()) return true;
 		// TODO: count in water height ?
@@ -1790,7 +1820,7 @@ public class BlockProperties {
     }
     
     /**
-     * Check if the bounds collide with the block for the given type id at the given position.
+     * Check if the bounds collide with the block that has the given type id at the given position.
      * <br> Delegates: This method signature is not used internally anymore.
      * @param access
      * @param minX
@@ -1877,6 +1907,7 @@ public class BlockProperties {
 //            		bmaxY = (0.8 - (double) ((data & 0xF) % 8) / 9.8);
             		final int data8 = (data & 0xF) % 8;
             		if (data8 > 4){
+            			// TODO: With block breaking and data8 == 7 this would be too high.
             			bmaxY = 0.5;
             		}
             		else{
