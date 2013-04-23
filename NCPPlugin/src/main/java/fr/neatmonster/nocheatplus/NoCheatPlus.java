@@ -980,7 +980,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			if (configOutdated) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!");
 
 		}
-		ModUtil.checkModsMessage(player);
+		ModUtil.motdOnJoin(player);
 		for (final JoinLeaveListener jlListener : joinLeaveListeners){
 			try{
 				jlListener.playerJoins(player);
