@@ -878,7 +878,7 @@ public class BlockProperties {
 			else{
 				level = 1.0 - 0.125 * (1.0 + data8);
 			}
-			inWater = y - by < level;
+			inWater = y - by < level; // <= ? ...
 		}
 		blockCache.cleanup();
 		pLoc.cleanup();
