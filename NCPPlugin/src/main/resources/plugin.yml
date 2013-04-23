@@ -143,11 +143,11 @@ permissions:
                                 description: Allow the player to bypass the Color check.
                             nocheatplus.checks.chat.commands:
                                 description: Allow the player to bypass the commands check.
-                           nocheatplus.checks.chat.logins:
+                            nocheatplus.checks.chat.logins:
                                 description: Allow the player to bypass the logins check.
-                           nocheatplus.checks.chat.relog:
+                            nocheatplus.checks.chat.relog:
                                 description: Allow the player to bypass the relog check.
-                           nocheatplus.checks.chat.text:
+                            nocheatplus.checks.chat.text:
                                 description: Allow the player to bypass the text check.
                     nocheatplus.checks.combined:
                         description: Allow the player to bypass all combined checks.
