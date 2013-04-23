@@ -17,6 +17,8 @@ public class CJBMOTD extends ClientMOTD {
 		
 		// TODO: Is there a compact version (just one prefix)?
 		
+		// TODO: Fly and xray removed ?
+		
 	    // Disable CJB's fly mod.
 	    if (!player.hasPermission(Permissions.CJB_FLY)){
 	    	cjb += "§3 §9 §2 §0 §0 §1";
