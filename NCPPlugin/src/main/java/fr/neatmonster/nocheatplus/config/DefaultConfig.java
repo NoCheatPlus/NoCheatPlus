@@ -446,6 +446,7 @@ public class DefaultConfig extends ConfigFile {
         
         // General.
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
+        set(ConfPaths.MOVING_LOADCHUNKS_JOIN, true);
         
         /*
          *  dP"8   d8          ,e,                        

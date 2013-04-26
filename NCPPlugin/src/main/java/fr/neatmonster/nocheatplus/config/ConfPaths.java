@@ -571,8 +571,10 @@ public abstract class ConfPaths {
 	public static final String  MOVING_SURVIVALFLY_YSTEP                 = MOVING_SURVIVALFLY + "ystep";
 	
 	// General.
-	public static final String MOVING_TEMPKICKILLEGAL					 = MOVING + "tempkickillegal";
-
+	public static final String  MOVING_TEMPKICKILLEGAL					 = MOVING + "tempkickillegal";
+	private static final String MOVING_LOADCHUNKS						 = MOVING + "loadchunks.";
+	public static final String  MOVING_LOADCHUNKS_JOIN					 = MOVING_LOADCHUNKS + "join";
+	
     /*
      *  dP"8   d8          ,e,                        
      * C8b Y  d88   888,8,  "  888 8e   e88 888  dP"Y 

@@ -58,6 +58,7 @@ import fr.neatmonster.nocheatplus.logging.DebugUtil;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -1236,14 +1237,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.sfHoverTicks = -1;
 		}
 		
-//		// Check loaded chunks.
-//		if (cc.loadChunksOnJoin){
-//			final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
-//			if (loaded > 0 && BuildParameters.debugLevel > 0){
-//				// DEBUG
-//				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
-//			}
-//		}
+		// Check loaded chunks.
+		if (cc.loadChunksOnJoin){
+			final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
+			if (loaded > 0 && BuildParameters.debugLevel > 0){
+				// DEBUG
+				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+			}
+		}
 		
 	}
 

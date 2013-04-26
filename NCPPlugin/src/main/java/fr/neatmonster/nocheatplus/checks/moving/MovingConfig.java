@@ -127,6 +127,7 @@ public class MovingConfig extends ACheckConfig {
 	
 	// General things.
 	public final boolean tempKickIllegal;
+	public final boolean loadChunksOnJoin;
 
     /**
      * Instantiates a new moving configuration.
@@ -196,6 +197,7 @@ public class MovingConfig extends ACheckConfig {
         yStep = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
         
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
+        loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);
     }
     
 
