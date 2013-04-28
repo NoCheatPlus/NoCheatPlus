@@ -546,9 +546,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
 		// Check passable first to prevent set-back override.
 		// TODO: Redesign to set set-backs later (queue + invalidate).
+		boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
 		if (newTo == null && cc.passableCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
 			// Passable is checked first to get the original set-back locations from the other checks, if needed. 
 			newTo = passable.check(player, loc, pFrom, pTo, data, cc);
+			if (newTo != null){
+				// Check if to skip the nofall check.
+				mightSkipNoFall = true;
+			}
 		}
 		
 		// Check which fly check to check.
@@ -615,7 +620,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             else{
             	if (checkNf && cc.sfFallDamage){
-            		noFall.checkDamage(player, data, Math.min(Math.min(from.getY(), to.getY()), loc.getY()));
+            		if (mightSkipNoFall){
+            			// Check if to really skip.
+            			if (!pFrom.isOnGround() && !pFrom.isResetCond()){
+            				mightSkipNoFall = false;
+            			}
+            		}
+            		if (!mightSkipNoFall){
+            			noFall.checkDamage(player, data, Math.min(Math.min(from.getY(), to.getY()), loc.getY()));
+            		}
             	}
             }
     	}
