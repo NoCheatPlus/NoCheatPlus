@@ -1253,7 +1253,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// Check loaded chunks.
 		if (cc.loadChunksOnJoin){
 			final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
-			if (loaded > 0 && BuildParameters.debugLevel > 0){
+			if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0){
 				// DEBUG
 				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
 			}
@@ -1400,7 +1400,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final boolean res;
 		// TODO: Collect flags, more margin ?
 		final int loaded = info.from.ensureChunksLoaded();
-		if (loaded > 0 && BuildParameters.debugLevel > 0){
+		if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0){
 			// DEBUG
 			LogUtil.logInfo("[NoCheatPlus] Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
 		}
