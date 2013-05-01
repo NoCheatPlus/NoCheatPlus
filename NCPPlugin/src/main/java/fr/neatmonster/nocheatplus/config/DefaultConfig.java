@@ -443,6 +443,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_VELOCITY_GRACETICKS, 20);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER, 80);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS, 140);
+        set(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION, true);
         
         // General.
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);

@@ -121,6 +121,7 @@ public class MovingConfig extends ACheckConfig {
 	public final int 		velocityGraceTicks;
 	public final int		velocityActivationCounter;
 	public final int		velocityActivationTicks;
+	public final boolean	velocityStrictInvalidation;
     public final double     noFallyOnGround;
     public final double     yOnGround;
 	public final double     yStep;
@@ -191,6 +192,7 @@ public class MovingConfig extends ACheckConfig {
         velocityGraceTicks = config.getInt(ConfPaths.MOVING_VELOCITY_GRACETICKS);
         velocityActivationCounter = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER);
         velocityActivationTicks = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS);
+        velocityStrictInvalidation = config.getBoolean(ConfPaths.MOVING_VELOCITY_STRICTINVALIDATION);
         yOnGround = config.getDouble(ConfPaths.MOVING_YONGROUND, 0.001, 2.0, 0.0626); // sqrt(1/256), see: NetServerHandler.
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
         // ystep is set to 0.45 by default, for stairs / steps.

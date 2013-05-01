@@ -549,7 +549,8 @@ public class SurvivalFly extends Check {
         }
         
         // Check removal of active horizontal velocity.
-        if (hDistance <= hAllowedDistance){ // TODO: Check conditions etc.
+        if (hDistance <= (cc.velocityStrictInvalidation ? hAllowedDistance : hAllowedDistance / 2.0)){
+        	// TODO: Should there be other side conditions?
         	// Invalidate used horizontal velocity.
 //        	System.out.println("*** INVALIDATE ON SPEED");
         	data.hVelActive.clear();
