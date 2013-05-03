@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -326,7 +327,11 @@ public class BlockPlaceListener extends CheckListener {
         
         // Ender pearl glitch (ab-) use.
         if (!cancel && type == EntityType.ENDER_PEARL){
-        	if (!BlockProperties.isPassable(entity.getLocation())){
+        	if (!CombinedConfig.getConfig(player).enderPearlCheck){
+        		// Do nothing !
+        		// TODO: Might have further flags?
+        	}
+        	else if (!BlockProperties.isPassable(entity.getLocation())){
         		// Launch into a block.
         		// TODO: This might be a general check later.       		
         		cancel = true;

@@ -34,7 +34,7 @@ public class CombinedConfig extends ACheckConfig {
 
 	private static final Map<String, CombinedConfig> worldsMap = new HashMap<String, CombinedConfig>();
 
-	protected static CombinedConfig getConfig(final Player player) {
+	public static CombinedConfig getConfig(final Player player) {
 		final String worldName = player.getWorld().getName();
 		CombinedConfig cc = worldsMap.get(worldName);
 		if (cc == null){
@@ -48,6 +48,10 @@ public class CombinedConfig extends ACheckConfig {
 	// Bedleave check.
 	public final boolean        bedLeaveCheck;
 	public final ActionList     bedLeaveActions;
+	
+	// Ender pearl
+	public final boolean enderPearlCheck;
+	public final boolean enderPearlPreventClickBlock;
 
 	// Improbable check
 	/** Do mind that this flag is not used by all components. */
@@ -80,6 +84,9 @@ public class CombinedConfig extends ACheckConfig {
 		bedLeaveCheck = config.getBoolean(ConfPaths.COMBINED_BEDLEAVE_CHECK);
 		bedLeaveActions = config.getOptimizedActionList(ConfPaths.COMBINED_BEDLEAVE_ACTIONS, Permissions.COMBINED_BEDLEAVE);
 
+		enderPearlCheck = config.getBoolean(ConfPaths.COMBINED_ENDERPEARL_CHECK);
+		enderPearlPreventClickBlock = config.getBoolean(ConfPaths.COMBINED_ENDERPEARL_PREVENTCLICKBLOCK);
+		
 		improbableCheck = config.getBoolean(ConfPaths.COMBINED_IMPROBABLE_CHECK);
 		improbableLevel = (float) config.getDouble(ConfPaths.COMBINED_IMPROBABLE_LEVEL);
 		improbableActions = config.getOptimizedActionList(ConfPaths.COMBINED_IMPROBABLE_ACTIONS, Permissions.COMBINED_IMPROBABLE);

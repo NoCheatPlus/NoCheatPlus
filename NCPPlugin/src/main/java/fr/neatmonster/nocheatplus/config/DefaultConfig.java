@@ -266,6 +266,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMBINED_BEDLEAVE_CHECK, true);
         set(ConfPaths.COMBINED_BEDLEAVE_ACTIONS, "cancel log:bedleave:0:5:if cmd:kickbedleave");
         
+        set(ConfPaths.COMBINED_ENDERPEARL_CHECK, true);
+        set(ConfPaths.COMBINED_ENDERPEARL_PREVENTCLICKBLOCK, true);
+        
         set(ConfPaths.COMBINED_IMPROBABLE_CHECK , true);
         set(ConfPaths.COMBINED_IMPROBABLE_LEVEL, 300);
 //        set(ConfPaths.COMBINED_IMPROBABLE_FASTBREAK_CHECK, false);

@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /*
@@ -90,7 +91,10 @@ public class BlockInteractListener extends CheckListener {
         	final ItemStack stack = player.getItemInHand();
     		if (stack != null && stack.getTypeId() == Material.ENDER_PEARL.getId()){
     			if (!BlockProperties.isPassable(block.getTypeId())){
-    				event.setUseItemInHand(Result.DENY);
+    				final CombinedConfig ccc = CombinedConfig.getConfig(player);
+    				if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock){
+    					event.setUseItemInHand(Result.DENY);
+    				}
     			}
     		}
         	break;

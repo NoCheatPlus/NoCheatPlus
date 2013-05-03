@@ -338,6 +338,10 @@ public abstract class ConfPaths {
     public static final String  COMBINED_BEDLEAVE_CHECK					 = COMBINED_BEDLEAVE + "active";
 	public static final String  COMBINED_BEDLEAVE_ACTIONS				 = COMBINED_BEDLEAVE + "actions";
 	
+	private static final String COMBINED_ENDERPEARL						 = COMBINED + "enderpearl.";
+	public static final String  COMBINED_ENDERPEARL_CHECK				 = COMBINED_ENDERPEARL + "active";
+	public static final String  COMBINED_ENDERPEARL_PREVENTCLICKBLOCK	 = COMBINED_ENDERPEARL + "preventclickblock";
+	
     private static final String COMBINED_IMPROBABLE                      = COMBINED + "improbable.";
 	public static final String  COMBINED_IMPROBABLE_CHECK                = COMBINED_IMPROBABLE + "active";
 	public static final String  COMBINED_IMPROBABLE_LEVEL                = COMBINED_IMPROBABLE + "level";

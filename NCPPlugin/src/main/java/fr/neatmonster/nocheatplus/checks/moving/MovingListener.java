@@ -43,6 +43,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.components.IData;
@@ -903,7 +904,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 					}
 				}
 				else if (cause == TeleportCause.ENDER_PEARL){
-					if (!BlockProperties.isPassable(to)){ // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)){
+					if (CombinedConfig.getConfig(player). enderPearlCheck && !BlockProperties.isPassable(to)){ // || !BlockProperties.isOnGroundOrResetCond(player, to, 1.0)){
 						// Not check on-ground: Check the second throw.
 						cancel = true;
 					}
