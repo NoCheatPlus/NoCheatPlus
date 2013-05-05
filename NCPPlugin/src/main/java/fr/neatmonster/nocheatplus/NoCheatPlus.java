@@ -289,8 +289,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** Is the configuration outdated? */
     private boolean              configOutdated  = false;
 
-    /** Is a new update available? */
-    private boolean              updateAvailable = false;
+//    /** Is a new update available? */
+//    private boolean              updateAvailable = false;
     
     /** Player data future stuff. */
     protected final DataManager dataMan = new DataManager();
@@ -973,8 +973,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		if (nameSetPerms.hasPermission(player.getName(), Permissions.ADMINISTRATION_NOTIFY)){
 			// Login notifications...
 			
-			// Update available.
-			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
+//			// Update available.
+//			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 			
 			// Outdated config.
 			if (configOutdated) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!");
