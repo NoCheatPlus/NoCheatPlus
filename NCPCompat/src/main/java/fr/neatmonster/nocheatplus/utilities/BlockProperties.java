@@ -442,6 +442,13 @@ public class BlockProperties {
 			blockFlags[mat.getId()] |= F_STAIRS | F_HEIGHT100 | F_XZ100 | F_GROUND | F_GROUND_HEIGHT; // Set ground too, to be sure.
 		}
 		
+		// Step
+		for (final Material mat : new Material[]{
+				Material.STEP, Material.WOOD_STEP,
+        }){
+            blockFlags[mat.getId()] |= F_GROUND | F_XZ100;
+        }
+		
 		// Rails
 		for (final Material mat : new Material[] { 
 				Material.RAILS, Material.DETECTOR_RAIL, Material.POWERED_RAIL,
@@ -488,7 +495,7 @@ public class BlockProperties {
                 Material.DIODE_BLOCK_OFF, Material.DIODE_BLOCK_ON,
                 Material.COCOA, Material.SNOW, Material.BREWING_STAND,
                 Material.PISTON_MOVING_PIECE, Material.PISTON_EXTENSION,
-                Material.STEP,
+                Material.STEP, Material.WOOD_STEP,
         }){
             blockFlags[mat.getId()] |= F_GROUND;
         }
