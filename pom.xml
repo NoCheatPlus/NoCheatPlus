@@ -6,7 +6,7 @@
   <packaging>pom</packaging>
   <version>static</version>
   <name>NoCheatPlus Parent</name>
-  <url>http://nocheatplus.org</url>
+  <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyy_MM_dd-HH_mm</maven.build.timestamp.format>
