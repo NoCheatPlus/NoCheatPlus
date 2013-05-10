@@ -196,6 +196,12 @@ public class BlockProperties {
 	
 	public static final BlockProps diamondType = new BlockProps(ironPickaxe, 3, diamondTimes);
 	
+	public static final BlockProps goldBlockType = new BlockProps(woodPickaxe, 3, secToMs(15, 7.5, 3.75, 0.7, 0.55, 1.2));
+	
+	public static final BlockProps ironBlockType = new BlockProps(woodPickaxe, 5, secToMs(25, 12.5, 2.0, 1.25, 0.95, 2.0));
+	
+	public static final BlockProps diamondBlockType = new BlockProps(woodPickaxe, 5, secToMs(25, 12.5, 6.0, 1.25, 0.95, 2.0));
+
 	public static final BlockProps hugeMushroomType = new BlockProps(woodAxe, 0.2f, secToMs(0.3, 0.15, 0.1, 0.05, 0.05, 0.05));
 	
 	public static final BlockProps leafType = new BlockProps(noTool, 0.2f, leafTimes);
@@ -681,11 +687,11 @@ public class BlockProperties {
 		for (Material mat : new Material[]{
 				Material.REDSTONE_ORE, Material.GLOWING_REDSTONE_ORE,
 				Material.EMERALD_ORE, Material.GOLD_ORE, Material.DIAMOND_ORE,
-				Material.GOLD_BLOCK,
 				
 		}){
 			blocks[mat.getId()] =  diamondType;
 		}
+		blocks[Material.GOLD_BLOCK.getId()] =  goldBlockType;
 		blocks[Material.FURNACE.getId()] = dispenserType;
 		blocks[Material.BURNING_FURNACE.getId()] = dispenserType;
 		blocks[Material.DISPENSER.getId()] = dispenserType;
@@ -698,8 +704,8 @@ public class BlockProperties {
 		}){
 			blocks[mat.getId()] = ironDoorType;
 		}
-		blocks[Material.IRON_BLOCK.getId()] = new BlockProps(stonePickaxe, 5, secToMs(25, 25, 1.9, 1.25, 0.95, 25));
-		blocks[Material.DIAMOND_BLOCK.getId()] = new BlockProps(ironPickaxe, 5, secToMs(25, 25, 25, 1.25, 0.95, 25));
+		blocks[Material.IRON_BLOCK.getId()] = ironBlockType;
+		blocks[Material.DIAMOND_BLOCK.getId()] = diamondBlockType;
 		blocks[Material.ENDER_CHEST.getId()] = new BlockProps(woodPickaxe, 22.5f);
 		blocks[Material.OBSIDIAN.getId()] = new BlockProps(diamondPickaxe, 50, secToMs(250, 250, 250, 250, 9.4, 250));
 		
