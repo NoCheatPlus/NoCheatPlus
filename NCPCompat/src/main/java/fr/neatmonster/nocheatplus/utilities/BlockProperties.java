@@ -575,14 +575,21 @@ public class BlockProperties {
 		for (final Material mat : instantMat){
 			blocks[mat.getId()] = instantType;
 		}
-		blocks[Material.SNOW.getId()] = new BlockProps(getToolProps(Material.WOOD_SPADE), 0.1f, secToMs(0.5, 0.1, 0.05, 0.05, 0.05, 0.05));
+		// TODO: Bed is special.
+		// Leaf type
 		for (Material mat : new Material[]{ 
-				Material.VINE, Material.LEAVES, Material.COCOA, Material.BED_BLOCK}){
+				Material.LEAVES, Material.BED_BLOCK}){
 			blocks[mat.getId()] = leafType;
 		}
+		// Huge mushroom type (...)
+		for (Material mat : new Material[]{ 
+				Material.HUGE_MUSHROOM_1, Material.HUGE_MUSHROOM_2,
+				Material.VINE, Material.COCOA}){
+			blocks[mat.getId()] = hugeMushroomType;
+		}
+		
+		blocks[Material.SNOW.getId()] = new BlockProps(getToolProps(Material.WOOD_SPADE), 0.1f, secToMs(0.5, 0.1, 0.05, 0.05, 0.05, 0.05));
 		blocks[Material.SNOW_BLOCK.getId()] = new BlockProps(getToolProps(Material.WOOD_SPADE), 0.1f, secToMs(1, 0.15, 0.1, 0.05, 0.05, 0.05));
-		blocks[Material.HUGE_MUSHROOM_1.getId()] = hugeMushroomType;
-		blocks[Material.HUGE_MUSHROOM_2.getId()] = hugeMushroomType;
 		for (Material mat : new Material[]{ 
 				Material.REDSTONE_LAMP_ON, Material.REDSTONE_LAMP_OFF,
 				Material.GLOWSTONE, Material.GLASS,
