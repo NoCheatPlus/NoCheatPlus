@@ -104,14 +104,14 @@ public class TickTask implements Runnable {
 	 * Note: Only call from the main thread!
 	 */
 	public static void executeActions() {
-		final List<ViolationData> copyActions = new LinkedList<ViolationData>();
+		final List<ViolationData> copyActions;
 		synchronized (delayedActions) {
 			if (delayedActions.isEmpty()) return;
-			copyActions.addAll(delayedActions);
+			copyActions = new ArrayList<ViolationData>(delayedActions);
 			delayedActions.clear();
 		}
-		for (final ViolationData violationData : copyActions){
-			violationData.executeActions();
+		for (int i = 0; i < copyActions.size(); i++){
+			copyActions.get(i).executeActions();
 		}
 	}
 	
@@ -120,22 +120,23 @@ public class TickTask implements Runnable {
 	 * Note: Only call from the main thread!
 	 */
 	public static void updatePermissions() {
-		final List<PermissionUpdateEntry> copyPermissions = new LinkedList<PermissionUpdateEntry>();
+		final List<PermissionUpdateEntry> copyPermissions;
 		synchronized (permissionUpdates) {
 			if (permissionUpdates.isEmpty()) return;
-			copyPermissions.addAll(permissionUpdates);
+			copyPermissions = new ArrayList<PermissionUpdateEntry>(permissionUpdates);
 			permissionUpdates.clear();
 		}
-		for (final PermissionUpdateEntry entry : copyPermissions){
+		for (int i = 0; i < copyPermissions.size(); i++){
+			final PermissionUpdateEntry entry = copyPermissions.get(i);
 			final Player player = DataManager.getPlayer(entry.playerName); // Might use exact name by contract.
 			if (player == null || !player.isOnline()) continue;
 			final String[] perms = entry.checkType.getConfigFactory().getConfig(player).getCachePermissions();
 			if (perms == null) continue;
 			final ICheckData data = entry.checkType.getDataFactory().getData(player);
-			for (final String permission : perms){
+			for (int j = 0; j < perms.length; j ++){
+				final String permission = perms[j];
 				data.setCachedPermission(permission, player.hasPermission(permission));
-			}	
-			
+			}
 		}
 	}
 	
@@ -453,7 +454,8 @@ public class TickTask implements Runnable {
 			}
 			copyListeners = new ArrayList<TickListener>(tickListeners);
 		}
-		for (final TickListener listener : copyListeners){
+		for (int i = 0; i < tickListeners.size(); i++){
+			final TickListener listener = copyListeners.get(i);
 			try{
 				listener.onTick(tick, timeLast);
 			}
