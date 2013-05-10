@@ -454,7 +454,7 @@ public class TickTask implements Runnable {
 			}
 			copyListeners = new ArrayList<TickListener>(tickListeners);
 		}
-		for (int i = 0; i < tickListeners.size(); i++){
+		for (int i = 0; i < copyListeners.size(); i++){
 			final TickListener listener = copyListeners.get(i);
 			try{
 				listener.onTick(tick, timeLast);
