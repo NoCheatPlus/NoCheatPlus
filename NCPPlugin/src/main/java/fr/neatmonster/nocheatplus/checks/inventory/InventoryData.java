@@ -84,8 +84,9 @@ public class InventoryData extends ACheckData {
     // Data of the fast click check.
 //    public boolean  fastClickLastCancelled;
     public final ActionFrequency fastClickFreq = new ActionFrequency(5, 200L);
-	public Material fastClickLastMat = null;
-	public int fastClickLastAmount = 0;
+	public Material fastClickLastCursor = null;
+	public Material fastClickLastClicked = null;
+	public int fastClickLastCursorAmount = 0;
 
     // Data of the instant bow check.
     public long     instantBowInteract;

@@ -2,12 +2,14 @@ package fr.neatmonster.nocheatplus.checks.inventory;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
@@ -81,32 +83,34 @@ public class FastClick extends Check {
 //        return cancel;
 //    }
     
-    public boolean check(final Player player, final long now, final int slot, final ItemStack cursor, final ItemStack clicked, final InventoryData data, final InventoryConfig cc) {
+    public boolean check(final Player player, final long now, final InventoryView view, final int slot, final ItemStack cursor, final ItemStack clicked, final boolean isShiftClick, final InventoryData data, final InventoryConfig cc) {
     	// Take time once.
     	
     	final float amount;
     	
     	if (cursor != null && cc.fastClickTweaks1_5){
-    		final Material mat = cursor.getType();
-    		final int size = cursor.getAmount();
-    		if (mat != data.fastClickLastMat || mat == Material.AIR || size != data.fastClickLastAmount || clicked == null){
+    		final Material cursorMat = cursor.getType();
+    		final int cursorAmount = Math.max(1, cursor.getAmount());
+    		final Material clickedMat = clicked == null ? Material.AIR : clicked.getType();
+    		if (cursorMat != data.fastClickLastCursor && (!isShiftClick || clicked == null || clicked.getType() != data.fastClickLastClicked) || cursorMat == Material.AIR || cursorAmount != data.fastClickLastCursorAmount){
     			amount = 1f;
     		}
     		else{
-    			final Material cMat = clicked.getType();
-    			if (cMat == Material.AIR || cMat == mat){
-    				amount = Math.min(cc.fastClickNormalLimit , cc.fastClickShortTermLimit) / (float) size * 0.75f;
+    			if (clickedMat == Material.AIR || clickedMat == cursorMat || isShiftClick && clickedMat == data.fastClickLastClicked ){
+    				amount = Math.min(cc.fastClickNormalLimit , cc.fastClickShortTermLimit) / (float) (isShiftClick && clickedMat != Material.AIR ? (1.0 + Math.max(cursorAmount, InventoryUtil.getStackCount(view, clicked))) : cursorAmount)  * 0.75f;
     			}
     			else{
     				amount = 1f;
     			}
     		}
-        	data.fastClickLastMat = mat;
-        	data.fastClickLastAmount = size;
+        	data.fastClickLastCursor = cursorMat;
+        	data.fastClickLastClicked = clickedMat;
+        	data.fastClickLastCursorAmount = cursorAmount;
     	}
     	else{
-        	data.fastClickLastMat = null;
-        	data.fastClickLastAmount = 0;
+        	data.fastClickLastCursor = null;
+        	data.fastClickLastClicked = null;
+        	data.fastClickLastCursorAmount = 0;
     		amount = 1f;
     	}
         
@@ -137,7 +141,7 @@ public class FastClick extends Check {
         }
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-        	player.sendMessage("FastClick: " + data.fastClickFreq.bucketScore(0) + " / " + data.fastClickFreq.score(1f));
+        	player.sendMessage("FastClick: " + data.fastClickFreq.bucketScore(0) + " | " + data.fastClickFreq.score(1f) + " | cursor=" + cursor + " | clicked=" + clicked);
         }
         
         return cancel;

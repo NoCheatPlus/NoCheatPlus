@@ -186,7 +186,7 @@ public class InventoryListener  extends CheckListener {
             if (fastClick.isEnabled(player)){
                 final InventoryConfig cc = InventoryConfig.getConfig(player);
                 if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative){
-                    if (fastClick.check(player, now, slot, cursor, clicked, data, cc)){
+                    if (fastClick.check(player, now, event.getView(), slot, cursor, clicked, event.isShiftClick(), data, cc)){
                         // The check requested the event to be cancelled.
                         event.setCancelled(true);
                     }
