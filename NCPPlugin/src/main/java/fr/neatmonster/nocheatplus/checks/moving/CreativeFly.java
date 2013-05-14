@@ -51,7 +51,7 @@ public class CreativeFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
 
         // If we have no setback, define one now.
         if (!data.hasSetBack())
@@ -101,7 +101,7 @@ public class CreativeFly extends Check {
 			data.hVelActive.clear(); // TODO: test/check !
 		}
 
-        final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
+        final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
 
         data.bunnyhopDelay--;
 

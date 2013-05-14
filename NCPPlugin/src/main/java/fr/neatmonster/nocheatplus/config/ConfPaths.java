@@ -579,6 +579,7 @@ public abstract class ConfPaths {
 	public static final String  MOVING_TEMPKICKILLEGAL					 = MOVING + "tempkickillegal";
 	private static final String MOVING_LOADCHUNKS						 = MOVING + "loadchunks.";
 	public static final String  MOVING_LOADCHUNKS_JOIN					 = MOVING_LOADCHUNKS + "join";
+	public static final String  MOVING_SPRINTINGGRACE					 = MOVING + "sprintinggrace";
 	
     /*
      *  dP"8   d8          ,e,                        

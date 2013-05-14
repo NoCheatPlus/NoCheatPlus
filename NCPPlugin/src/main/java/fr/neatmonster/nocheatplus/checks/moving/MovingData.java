@@ -89,6 +89,8 @@ public class MovingData extends ACheckData {
     // Data shared between the fly checks -----
     public int            bunnyhopDelay;
     public double         jumpAmplifier;
+    /** Last time the player was actually sprinting. */
+    public long			  timeSprinting = 0;
     
     // Velocity handling.
     // TODO: consider resetting these with clearFlyData and onSetBack.

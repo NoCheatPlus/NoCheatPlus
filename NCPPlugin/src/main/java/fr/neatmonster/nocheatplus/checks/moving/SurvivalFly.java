@@ -78,12 +78,13 @@ public class SurvivalFly extends Check {
      *            the to
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
-        final long now = System.currentTimeMillis();
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
         // A player is considered sprinting if the flag is set and if he has enough food level.
-        final boolean sprinting = player.isSprinting() && player.getFoodLevel() > 5;
-        
+        final boolean sprinting = now <= data.timeSprinting + cc.sprintingGrace;
+        if (sprinting && now != data.timeSprinting){
+        	tags.add("sprintgrace");
+        }
         // Set some flags:
         final boolean fromOnGround = from.isOnGround();
         final boolean toOnGround = to.isOnGround();

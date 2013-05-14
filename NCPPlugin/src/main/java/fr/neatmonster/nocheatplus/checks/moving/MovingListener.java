@@ -31,6 +31,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -470,6 +471,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			return;
 		}
 		
+		final long time = System.currentTimeMillis(); // TODO: pass to checks to use one reference time (set in data)?
+		if (player.isSprinting() && player.getFoodLevel() > 5){
+			data.timeSprinting = time;
+		}
+		else if (time < data.timeSprinting){
+			data.timeSprinting = 0;
+		}
+		
 		// Prepare locations for use.
 		// TODO: Block flags might not be needed if neither sf nor passable get checked.
 		final PlayerLocation pFrom, pTo;
@@ -600,7 +609,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
     		if (newTo == null){
     			// Only check if passable has not already set back.
-    			newTo = survivalFly.check(player, pFrom, pTo, data, cc);
+    			newTo = survivalFly.check(player, pFrom, pTo, data, cc, time);
     		}
     		final boolean checkNf = cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL);
             if (newTo == null){
@@ -635,7 +644,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	}
     	else if (checkCf){
     		// CreativeFly
-            newTo = creativeFly.check(player, pFrom, pTo, data, cc);
+            newTo = creativeFly.check(player, pFrom, pTo, data, cc, time);
             data.sfHoverTicks = -1;
             data.sfLowJump = false;
     	}
@@ -1327,6 +1336,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerToggleSneak(final PlayerToggleSneakEvent event){
 		survivalFly.setReallySneaking(event.getPlayer(), event.isSneaking());
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerToggleSprint(final PlayerToggleSprintEvent event){
+		if (!event.isSprinting()){
+			MovingData.getData(event.getPlayer()).timeSprinting = 0;
+		}
 	}
 
 	@Override
