@@ -34,6 +34,7 @@ import fr.neatmonster.nocheatplus.command.admin.NCPVersionCommand;
 import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
 import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
 import fr.neatmonster.nocheatplus.command.admin.UnexemptCommand;
+import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 

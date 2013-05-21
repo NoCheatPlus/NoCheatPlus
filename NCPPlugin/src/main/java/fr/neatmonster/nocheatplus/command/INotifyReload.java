@@ -1,10 +1,10 @@
 package fr.neatmonster.nocheatplus.command;
 
 /**
- * Interface for a component that needs to be notified about a reload.
+ * @deprecated Use instead: fr.neatmonster.nocheatplus.components.INotifyReload
  * @author mc_dev
  *
  */
-public interface INotifyReload {
-	public void onReload();
+public interface INotifyReload extends fr.neatmonster.nocheatplus.components.INotifyReload {
+
 }

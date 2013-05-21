@@ -9,8 +9,8 @@ import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
@@ -380,7 +380,7 @@ public class TickTask implements Runnable {
 	// Public methods for internal use.
 	////////////////////////////////////////
 	
-	public static int start(final NoCheatPlus plugin){
+	public static int start(final Plugin plugin){
 		cancel();
 		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
 		if (taskId != -1) timeStart = System.currentTimeMillis();

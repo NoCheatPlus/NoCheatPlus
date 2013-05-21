@@ -439,7 +439,7 @@ public class SurvivalFly extends Check {
 
 		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
 			// Some reset condition.
-			data.jumpAmplifier = MovingListener.getJumpAmplifier(player);
+			data.jumpAmplifier = getJumpAmplifier(player);
 		}
 		
 		// TODO: on ground -> on ground improvements
@@ -802,7 +802,7 @@ public class SurvivalFly extends Check {
 		// data.ground ?
 		// ? set jumpphase to height / 0.15 ?
 		data.sfJumpPhase = 0;
-		data.jumpAmplifier = MovingListener.getJumpAmplifier(player);
+		data.jumpAmplifier = getJumpAmplifier(player);
 		data.clearAccounting();
 		// Tell NoFall that we assume the player to have been on ground somehow.
 		data.noFallAssumeGround = true;
@@ -999,7 +999,7 @@ public class SurvivalFly extends Check {
 						double estimate = 1.15;
 						if (data.jumpAmplifier > 0){
 							// TODO: Could skip this.
-							estimate += 0.5 * MovingListener.getJumpAmplifier(player);
+							estimate += 0.5 * getJumpAmplifier(player);
 						}
 						if (setBackYDistance < estimate){
 							// Low jump, further check if there might have been a reason for low jumping.
@@ -1143,6 +1143,19 @@ public class SurvivalFly extends Check {
 	public void setReallySneaking(final Player player, final boolean sneaking) {
 		if (sneaking) reallySneaking.add(player.getName());
 		else reallySneaking.remove(player.getName());
+	}
+	
+	
+	/**
+	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
+	 * NOTE: This is not the original amplifier value (use mcAccess for that).
+	 * @param mcPlayer
+	 * @return
+	 */
+	protected final double getJumpAmplifier(final Player player) {
+		final double amplifier = mcAccess.getJumpAmplifier(player);
+		if (amplifier == Double.NEGATIVE_INFINITY) return 0D;
+		else return 1D + amplifier;
 	}
 	
 }

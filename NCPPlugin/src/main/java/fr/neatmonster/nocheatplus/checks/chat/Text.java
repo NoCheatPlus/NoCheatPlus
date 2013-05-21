@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -16,7 +16,8 @@ import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.LetterEngine;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
-import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.components.INotifyReload;
+import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -66,13 +67,14 @@ public class Text extends AsyncCheck implements INotifyReload{
 	
 	private void init() {
 		// Set some things from the global config.
-		ConfigFile config = ConfigManager.getConfigFile();
+		final ConfigFile config = ConfigManager.getConfigFile();
+		final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
 		if (engine != null){
 			engine.clear();
-			NoCheatPlus.getAPI().removeComponent(engine);
+			api.removeComponent(engine);
 		}
 		engine = new LetterEngine(config);
-		NoCheatPlus.getAPI().addComponent(engine);
+		api.addComponent(engine);
 	}
 
 	@Override

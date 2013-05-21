@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -61,7 +61,7 @@ public abstract class Check implements MCAccessHolder{
      */
     public Check(final CheckType type) {
         this.type = type;
-        mcAccess = NoCheatPlus.getMCAccess();
+        mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
         ViolationHistory.checkTypeMap.put(getClass().getName(), type);
         DataManager.registerExecutionHistory(type, histories);
     }

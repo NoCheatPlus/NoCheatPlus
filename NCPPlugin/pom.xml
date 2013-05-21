@@ -47,6 +47,11 @@
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcore</artifactId>
+    	<version>static</version>
+    </dependency>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatbukkit</artifactId>
     	<version>static</version>
     </dependency>
@@ -137,6 +142,7 @@
 				  <include>fr.neatmonster:ncpbuildbase</include>
                   <include>fr.neatmonster:ncpcommons</include>
                   <include>fr.neatmonster:ncpcompat</include>
+                  <include>fr.neatmonster:ncpcore</include>
                   <include>fr.neatmonster:ncpcompatbukkit</include>
                   <include>fr.neatmonster:ncpcompatcb2511</include>
                   <include>fr.neatmonster:ncpcompatcb2512</include>

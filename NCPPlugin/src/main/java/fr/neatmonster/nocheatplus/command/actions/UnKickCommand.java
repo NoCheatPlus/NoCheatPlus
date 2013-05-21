@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.command.actions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -18,9 +19,9 @@ public class UnKickCommand extends NCPCommand {
 			String label, String[] args) {
 		if (args.length != 2) return false;
 		if (args[1].trim().equals("*")){
-			sender.sendMessage(TAG + "Removed " + NoCheatPlus.allowLoginAll() + " players from the 'deny-login' list.");
+			sender.sendMessage(TAG + "Removed " + NCPAPIProvider.getNoCheatPlusAPI().allowLoginAll() + " players from the 'deny-login' list.");
 		}
-		else if (NoCheatPlus.allowLogin(args[1])){
+		else if (NCPAPIProvider.getNoCheatPlusAPI().allowLogin(args[1])){
 			sender.sendMessage(TAG + "Allow to login again: " + args[1].trim());
 		}
 		else{

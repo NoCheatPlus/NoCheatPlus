@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.NCPCommand;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -18,7 +19,7 @@ public class NCPVersionCommand extends NCPCommand{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
-		MCAccess mc = NoCheatPlus.getMCAccess();
+		final MCAccess mc = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
 		sender.sendMessage(new String[]{
 				"---- Version information ----",
 				"#### Server ####",

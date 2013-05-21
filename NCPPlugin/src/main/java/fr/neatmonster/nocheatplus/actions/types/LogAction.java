@@ -2,7 +2,7 @@ package fr.neatmonster.nocheatplus.actions.types;
 
 import org.bukkit.ChatColor;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
@@ -77,7 +77,7 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
 	public boolean execute(final ViolationData violationData) {
 		if (!violationData.player.hasPermission(violationData.getPermissionSilent())) {
 			final String message = super.getMessage(violationData);
-			if (toChat) NoCheatPlus.sendAdminNotifyMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + ColorUtil.replaceColors(message));
+			if (toChat) NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + ColorUtil.replaceColors(message));
 			if (toConsole) LogUtil.logInfo("[NoCheatPlus] " + ColorUtil.removeColors(message));
 			if (toFile) StaticLogFile.fileLogger.info(ColorUtil.removeColors(message));
 		}

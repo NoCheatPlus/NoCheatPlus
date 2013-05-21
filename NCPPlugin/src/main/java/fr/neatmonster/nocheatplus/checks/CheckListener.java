@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
@@ -32,7 +32,7 @@ public class CheckListener extends NCPListener implements MCAccessHolder, IHoldS
 
 	public CheckListener(CheckType checkType){
 		this.checkType = checkType; 
-		this.mcAccess = NoCheatPlus.getMCAccess();
+		this.mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
 	}
 	
 	@Override

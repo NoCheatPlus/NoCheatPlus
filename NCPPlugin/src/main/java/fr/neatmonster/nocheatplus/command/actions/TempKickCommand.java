@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.command.DelayableCommand;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -48,7 +49,7 @@ public class TempKickCommand extends DelayableCommand {
 	
 	protected void tempKick(CommandSender sender, String name, long duration, String reason){
 		Player player = DataManager.getPlayer(name);
-		NoCheatPlus.denyLogin(name, duration);
+		NCPAPIProvider.getNoCheatPlusAPI().denyLogin(name, duration);
 		if (player == null) return;
 		player.kickPlayer(reason);
 		LogUtil.logInfo("[NoCheatPlus] (" + sender.getName() + ") Kicked " + player.getName() + " for " + duration/60000 +" minutes: " + reason);

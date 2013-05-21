@@ -39,6 +39,7 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.util.Vector;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -46,10 +47,10 @@ import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
-import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.TickListener;
@@ -94,18 +95,6 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  * @see MovingEvent
  */
 public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
-
-	/**
-	 * Determine "some jump amplifier": 1 is jump boost, 2 is jump boost II. <br>
-	 * NOTE: This is not the original amplifier value (use mcAccess for that).
-	 * @param mcPlayer
-	 * @return
-	 */
-	public static final double getJumpAmplifier(final Player player) {
-		final double amplifier = NoCheatPlus.getMCAccess().getJumpAmplifier(player);
-		if (amplifier == Double.NEGATIVE_INFINITY) return 0D;
-		else return 1D + amplifier;
-	}
 	
 	/**
 	 * Heavier check, but convenient for seldom events (not for use in the player-move check).
@@ -133,7 +122,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	{
 		// This might get extended to a check-like thing.
 		boolean restored = false;
-		final PlayerLocation pLoc = new PlayerLocation(NoCheatPlus.getMCAccess(), null);
+		final PlayerLocation pLoc = new PlayerLocation(NCPAPIProvider.getNoCheatPlusAPI().getMCAccess(), null);
 		// (Mind that we don't set the block cache here).
 		final Location loc = player.getLocation();
 		if (!restored && data.hasSetBack()) {
@@ -157,7 +146,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		pLoc.cleanup();
 		if (!restored && MovingConfig.getConfig(player).tempKickIllegal){
 			 // TODO: correct the location ?
-			NoCheatPlus.denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
+			NCPAPIProvider.getNoCheatPlusAPI().denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
 			LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
 		}
 		// TODO: reset the bounding box of the player ?
@@ -502,7 +491,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		}
         
 		// Potion effect "Jump".
-		final double jumpAmplifier = MovingListener.getJumpAmplifier(player);
+		final double jumpAmplifier = survivalFly.getJumpAmplifier(player);
 		if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
 		// TODO: same for speed (oncemedium is introduced).
 
