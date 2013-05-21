@@ -41,7 +41,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	public String getMCVersion() {
 		// Bukkit API.
 		// TODO: maybe output something else.
-		return "1.4.6|1.4.7|?";
+		return "1.4.6|1.4.7|1.5.0|1.5.1|1.5.2|?";
 	}
 
 	@Override
