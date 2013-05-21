@@ -7,7 +7,7 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /*
  * M""""""'YMM oo                              dP   oo                   
@@ -67,11 +67,11 @@ public class Direction extends Check {
         
         final double off;
         if (cc.directionStrict){
-        	off = CheckUtils.combinedDirectionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, CheckUtils.DIRECTION_PRECISION, 80.0);
+        	off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION, 80.0);
         }
         else{
         	// Also take into account the angle.
-        	off = CheckUtils.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, CheckUtils.DIRECTION_PRECISION);
+        	off = TrigUtil.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION);
         }
 
         if (off > 0.1) {

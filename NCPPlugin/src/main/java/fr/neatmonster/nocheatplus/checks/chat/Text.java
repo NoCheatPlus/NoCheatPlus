@@ -20,7 +20,6 @@ import fr.neatmonster.nocheatplus.command.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -159,21 +158,21 @@ public class Text extends AsyncCheck implements INotifyReload{
 		final long timeout = 8000; // TODO: maybe set dynamically in data.
 		// Repetition of last message.
         if (cc.textMsgRepeatSelf != 0f && time - data.chatLastTime < timeout){
-            if (CheckUtils.isSimilar(lcMessage, data.chatLastMessage, 0.8f)){
+            if (StringUtil.isSimilar(lcMessage, data.chatLastMessage, 0.8f)){
                 final float timeWeight = (float) (timeout - (time - data.chatLastTime)) / (float) timeout; 
                 score += cc.textMsgRepeatSelf * timeWeight;
             }
         }
         // Repetition of last global message.
         if (cc.textMsgRepeatGlobal != 0f && time - lastGlobalTime < timeout){
-            if (CheckUtils.isSimilar(lcMessage, lastGlobalMessage, 0.8f)){
+            if (StringUtil.isSimilar(lcMessage, lastGlobalMessage, 0.8f)){
                 final float timeWeight = (float) (timeout - (time - lastGlobalTime)) / (float) timeout; 
                 score += cc.textMsgRepeatGlobal * timeWeight;
             }
         }
         // Repetition of last cancelled message.
 		if (cc.textMsgRepeatCancel != 0f && time - lastCancelledTime < timeout){
-		    if (CheckUtils.isSimilar(lcMessage, lastCancelledMessage, 0.8f)){
+		    if (StringUtil.isSimilar(lcMessage, lastCancelledMessage, 0.8f)){
 		        final float timeWeight = (float) (timeout - (time - lastCancelledTime)) / (float) timeout; 
 		        score += cc.textMsgRepeatCancel * timeWeight;
 		    }

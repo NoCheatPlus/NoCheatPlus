@@ -7,7 +7,7 @@ import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /*
  * M""""""'YMM oo                              dP   oo                   
@@ -46,7 +46,7 @@ public class Direction extends Check {
         // How far "off" is the player with his aim. We calculate from the players eye location and view direction to
         // the center of the target block. If the line of sight is more too far off, "off" will be bigger than 0.
         final Vector direction = loc.getDirection();
-        final double off = CheckUtils.directionCheck(loc, player.getEyeHeight(), direction, block, CheckUtils.DIRECTION_PRECISION);
+        final double off = TrigUtil.directionCheck(loc, player.getEyeHeight(), direction, block, TrigUtil.DIRECTION_PRECISION);
 
         if (off > 0.1D) {
             // Player failed the check. Let's try to guess how far he was from looking directly to the block...

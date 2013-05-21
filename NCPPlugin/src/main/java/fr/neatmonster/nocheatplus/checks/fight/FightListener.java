@@ -27,8 +27,8 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /*
@@ -124,7 +124,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         else{
         	tickAge = tick - data.lastAttackTick;
         	// TODO: Maybe use 3d distance if dy(normalized) is too big. 
-        	targetMove = CheckUtils.distance(data.lastAttackedX, data.lastAttackedZ, targetLoc.getX(), targetLoc.getZ());
+        	targetMove = TrigUtil.distance(data.lastAttackedX, data.lastAttackedZ, targetLoc.getX(), targetLoc.getZ());
         	msAge = (long) (50f * TickTask.getLag(50L * tickAge) * (float) tickAge);
         	normalizedMove = msAge == 0 ? targetMove : targetMove * Math.min(20.0, 1000.0 / (double) msAge);
         }
@@ -218,17 +218,17 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 //    	data.lastAttackedDist = targetDist;
     	
     	// Velocity freedom adaption.
-    	if (!cancelled && player.isSprinting() && CheckUtils.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 3.0){
+    	if (!cancelled && player.isSprinting() && TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 3.0){
     		// Add "mini" freedom.
     		final MovingData mData = MovingData.getData(player);
     		// TODO: Check distance of other entity.
     		if (mData.fromX != Double.MAX_VALUE){
-    			final double hDist = CheckUtils.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ) ;
+    			final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ) ;
     			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5 && MovingListener.shouldCheckSurvivalFly(player, mData, MovingConfig.getConfig(player))){
     				// Allow extra consumption with buffer.
     				mData.sfHBufExtra = 7;
     				if (cc.debug && BuildParameters.debugLevel > 0){
-    					System.out.println(player.getName() + " attacks, hDist to last from: " + hDist + " | targetdist=" + CheckUtils.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
+    					System.out.println(player.getName() + " attacks, hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
     				}
     			}
     		}

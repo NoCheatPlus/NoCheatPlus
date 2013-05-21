@@ -10,7 +10,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /*
  * MM"""""""`MM                            dP       
@@ -57,7 +57,7 @@ public class Reach extends Check {
 
         // Distance is calculated from eye location to center of targeted block. If the player is further away from his
         // target than allowed, the difference will be assigned to "distance".
-        final double distance = CheckUtils.distance(player.getEyeLocation(), block) - distanceLimit;
+        final double distance = TrigUtil.distance(player.getEyeLocation(), block) - distanceLimit;
 
         if (distance > 0) {
             // He failed, increment violation level.

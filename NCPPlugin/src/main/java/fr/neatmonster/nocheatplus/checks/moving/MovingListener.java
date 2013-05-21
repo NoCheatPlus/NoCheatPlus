@@ -65,7 +65,9 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /*
@@ -901,12 +903,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				if (cause == TeleportCause.UNKNOWN){
 					// Check special small range teleports (moved too quickly).
 					if (from != null && from.getWorld().equals(to.getWorld())){
-						if (CheckUtils.distance(from, to) < margin){
+						if (TrigUtil.distance(from, to) < margin){
 							smallRange = true;
 						}
 						else if (data.toX != Double.MAX_VALUE && data.hasSetBack()){
 							final Location setBack = data.getSetBack(to);
-							if (CheckUtils.distance(to.getX(), to.getY(), to.getZ(), setBack.getX(), setBack.getY(), setBack.getZ()) < margin){
+							if (TrigUtil.distance(to.getX(), to.getY(), to.getZ(), setBack.getX(), setBack.getY(), setBack.getZ()) < margin){
 								smallRange = true;
 							}
 						}
@@ -1120,7 +1122,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 public void run() {
                 	data.morePacketsVehicleTaskId = -1;
                     try{
-                    	CheckUtils.teleport(vehicle, player, location);
+                		MovingData.getData(player).setTeleported(location);
+                    	TeleportUtil.teleport(vehicle, player, location, MovingConfig.getConfig(player).debug);
                     }
                     catch(Throwable t){
                     	LogUtil.logSevere(t);
