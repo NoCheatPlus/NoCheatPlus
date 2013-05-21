@@ -1,8 +1,8 @@
-package fr.neatmonster.nocheatplus.compat.blocks;
+package fr.neatmonster.nocheatplus.compat.blocks.init.vanilla;
 
 import org.bukkit.Material;
 
-import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.BlockFlags;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;

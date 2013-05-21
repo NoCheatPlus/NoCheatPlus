@@ -20,9 +20,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.compat.blocks.BlocksMC1_5;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
+import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.BlocksMC1_5;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.RootConfPaths;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -37,6 +37,12 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  *
  */
 public class BlockProperties {
+	
+	/**
+	 * @deprecated Will be replaced by a generic way to define tools.
+	 * @author mc_dev
+	 *
+	 */
 	public static enum ToolType{
 		NONE,
 		SWORD,
@@ -46,6 +52,12 @@ public class BlockProperties {
 		PICKAXE,
 //		HOE,
 	}
+	
+	/**
+	 * @deprecated Will be replaced by a generic way to define tools.
+	 * @author mc_dev
+	 *
+	 */
 	public static enum MaterialBase{
 		NONE(0, 1f),
 		WOOD(1, 2f),
@@ -67,7 +79,12 @@ public class BlockProperties {
 			throw new IllegalArgumentException("Bad id: " + id);
 		}
 	}
-	/** Properties of a tool. */
+	
+	/**
+	 * Properties of a tool.
+	 * 
+	 * @deprecated Will be replaced by a generic way to define tools.
+	 */
 	public static class ToolProps{
 		public final ToolType toolType;
 		public final MaterialBase materialBase;
@@ -83,7 +100,12 @@ public class BlockProperties {
 			if (materialBase == null) throw new IllegalArgumentException("MaterialBase must not be null");
 		}
 	}
-	/** Properties of a block. */
+	
+	/**
+	 * Properties of a block.
+	 * 
+	 * @deprecated Will be replaced by a generic way to define tools.
+	 */
 	public static class BlockProps{
 		public final ToolProps tool;
 		public final long[] breakingTimes;
