@@ -608,6 +608,9 @@ public class SurvivalFly extends Check {
 			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append("\n" + " vacc=" + data.vDistAcc.toInformalString());
 		}
 		if (player.isSleeping()) tags.add("sleeping");
+		if (player.getFoodLevel() <= 5 && player.isSprinting()){
+			tags.add("lowfoodsprint");
+		}
 		if (!tags.isEmpty()) builder.append("\n" + " tags: " + StringUtil.join(tags, "+"));
 		builder.append("\n");
 //		builder.append(data.stats.getStatsStr(false));
