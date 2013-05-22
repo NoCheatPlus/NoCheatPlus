@@ -33,6 +33,15 @@
           <include>LICENSE.txt</include>
         </includes>
       </resource>
+      <!-- plugin.yml here to fill in the correct content. -->
+      <resource>
+        <targetPath>.</targetPath>
+        <filtering>true</filtering>
+        <directory>../NCPPlugin/src/main/resources</directory>
+        <includes>
+          <include>plugin.yml</include>
+        </includes>
+      </resource>
     </resources>
     <plugins>
       <plugin>

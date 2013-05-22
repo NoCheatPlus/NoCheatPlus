@@ -84,19 +84,6 @@
     	<version>static</version>
     </dependency>
   </dependencies>
-  
-  <build>
-    <resources>
-      <resource>
-        <targetPath>.</targetPath>
-        <filtering>true</filtering>
-        <directory>../NCPPlugin/src/main/resources</directory>
-        <includes>
-          <include>plugin.yml</include>
-        </includes>
-      </resource>
-    </resources>
-  </build>
 
   <!-- Properties -->
   <properties>
