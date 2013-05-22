@@ -19,12 +19,6 @@
   		<artifactId>junit</artifactId>
   		<version>4.8.2</version>
   	</dependency>
-  	<dependency>
-  		<groupId>com.google.code.maven-replacer-plugin</groupId>
-  		<artifactId>maven-replacer-plugin</artifactId>
-  		<version>1.4.1</version>
-  		<type>maven-plugin</type>
-  	</dependency>
   </dependencies>
   <description>Very basic dependencies that have to be built before commons, no use of Bukkit.
 
