@@ -45,6 +45,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.CommandHandler;
+import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
@@ -77,11 +78,11 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.updates.Updates;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
-import fr.neatmonster.nocheatplus.utilities.Updates;
 
 /*
  * M"""""""`YM          MM'""""'YMM dP                           dP   MM"""""""`YM dP                   
@@ -682,6 +683,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			listenerManager.setRegisterDirectly(false);
 			listenerManager.clear();
 		}
+		
 		// Add the "low level" system components first.
 		for (final Object obj : new Object[]{
 				nameSetPerms,
@@ -704,10 +706,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	        	dataMan,
 		}){
 			addComponent(obj);
+			// Register sub-components (allow later added to use registries, if any).
+            processQueuedSubComponentHolders();
 		}
-		
-		// Register sub-components (!).
-        processQueuedSubComponentHolders();
         
 		// Register "higher level" components (check listeners).
         for (final Object obj : new Object[]{
@@ -722,10 +723,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         	new MovingListener(),
         }){
         	addComponent(obj);
+            // Register sub-components (allow later added to use registries, if any).
+            processQueuedSubComponentHolders();
         }
         
-        // Register sub-components (!).
-        processQueuedSubComponentHolders();
+        // Register optional default components.
+        final DefaultComponentFactory dcf = new DefaultComponentFactory();
+        for (final Object obj : dcf.getAvailableComponentsOnEnable()){
+        	addComponent(obj);
+        	// Register sub-components to enable registries for optional components.
+            processQueuedSubComponentHolders();
+        }
         
         // Register the commands handler.
         PluginCommand command = getCommand("nocheatplus");

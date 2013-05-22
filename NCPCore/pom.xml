@@ -21,12 +21,12 @@
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
-    	<artifactId>ncpcompat</artifactId>
+    	<artifactId>ncpcommons</artifactId>
     	<version>static</version>
     </dependency>
   </dependencies>
 
-  <description>Core components and checks implementations. This contains about everything, just not the component/compat factories and not the plugin itself. NCPCore allows to add more modules/components that use check-specific classes to be added in the factories on NCPPlugin level. Later checks might be put between this and the plugin, some component setup might be put to compat or between compat and this.
+  <description>Core components and checks implementations. This contains about everything, just not the component/compat factories and not the plugin itself. NCPCore allows to add more modules/components that use check-specific classes to be added in the factories on NCPPlugin level.
 
 Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 </project>
