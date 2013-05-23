@@ -180,7 +180,7 @@ public class NoFall extends Check {
         }
         
         if (cc.debug){
-        	System.out.println(player.getName() + " NoFall: mc=" + StringUtil.fdec3.format(mcFallDistance) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + StringUtil.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : ""));
+        	System.out.println(player.getName() + " NoFall: mc=" + StringUtil.fdec3.format(mcFallDistance) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + StringUtil.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : "") + " | ymax=" + StringUtil.fdec3.format(data.noFallMaxY));
         }
         
     }
