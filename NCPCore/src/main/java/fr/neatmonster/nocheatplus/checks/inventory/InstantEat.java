@@ -74,7 +74,7 @@ public class InstantEat extends Check {
         }
         
         data.instantEatInteract = 0;
-
+        data.instantEatFood = null;
         return cancel;
     }
 

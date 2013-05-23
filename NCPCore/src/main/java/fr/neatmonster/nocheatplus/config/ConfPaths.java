@@ -481,6 +481,13 @@ public abstract class ConfPaths {
 	public static final String  INVENTORY_FASTCLICK_LIMIT_SHORTTERM		 = INVENTORY_FASTCLICK_LIMIT + "shortterm";
 	public static final String  INVENTORY_FASTCLICK_LIMIT_NORMAL		 = INVENTORY_FASTCLICK_LIMIT + "normal";
     public static final String  INVENTORY_FASTCLICK_ACTIONS              = INVENTORY_FASTCLICK + "actions";
+    
+    private static final String INVENTORY_FASTCONSUME					 = INVENTORY + "fastconsume.";
+	public static final String  INVENTORY_FASTCONSUME_CHECK				 = INVENTORY_FASTCONSUME + "active";
+	public static final String  INVENTORY_FASTCONSUME_DURATION			 = INVENTORY_FASTCONSUME + "duration";
+	public static final String  INVENTORY_FASTCONSUME_WHITELIST			 = INVENTORY_FASTCONSUME + "whitelist";
+	public static final String  INVENTORY_FASTCONSUME_ITEMS				 = INVENTORY_FASTCONSUME + "items";
+	public static final String  INVENTORY_FASTCONSUME_ACTIONS			 = INVENTORY_FASTCONSUME + "actions";
 
     private static final String INVENTORY_INSTANTBOW                     = INVENTORY + "instantbow.";
     public static final String  INVENTORY_INSTANTBOW_CHECK               = INVENTORY_INSTANTBOW + "active";

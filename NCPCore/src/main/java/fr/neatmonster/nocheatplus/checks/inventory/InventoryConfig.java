@@ -1,7 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.inventory;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
 
@@ -84,6 +86,12 @@ public class InventoryConfig extends ACheckConfig {
 	public final float		fastClickShortTermLimit;
 	public final float		fastClickNormalLimit;
 	public final ActionList fastClickActions;
+	
+	public final boolean    fastConsumeCheck;
+	public final long		fastConsumeDuration;
+	public final boolean    fastConsumeWhitelist;
+	public final Set<Integer> fastConsumeItems = new HashSet<Integer>();
+	public final ActionList fastConsumeActions;
 
 	public final boolean    instantBowCheck;
 	public final boolean 	instantBowStrict;
@@ -106,29 +114,28 @@ public class InventoryConfig extends ACheckConfig {
 		dropCheck = data.getBoolean(ConfPaths.INVENTORY_DROP_CHECK);
 		dropLimit = data.getInt(ConfPaths.INVENTORY_DROP_LIMIT);
 		dropTimeFrame = data.getLong(ConfPaths.INVENTORY_DROP_TIMEFRAME);
-		dropActions = data.getOptimizedActionList(ConfPaths.INVENTORY_DROP_ACTIONS,
-				Permissions.INVENTORY_DROP);
+		dropActions = data.getOptimizedActionList(ConfPaths.INVENTORY_DROP_ACTIONS, Permissions.INVENTORY_DROP);
 
 		fastClickCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_CHECK);
 		fastClickSpareCreative = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_SPARECREATIVE);
 		fastClickTweaks1_5 = data.getBoolean(ConfPaths.INVENTORY_FASTCLICK_TWEAKS1_5);
 		fastClickShortTermLimit = (float) data.getDouble(ConfPaths.INVENTORY_FASTCLICK_LIMIT_SHORTTERM);
 		fastClickNormalLimit = (float) data.getDouble(ConfPaths.INVENTORY_FASTCLICK_LIMIT_NORMAL);
-		fastClickActions = data.getOptimizedActionList(
-				ConfPaths.INVENTORY_FASTCLICK_ACTIONS,
-				Permissions.INVENTORY_FASTCLICK);
+		fastClickActions = data.getOptimizedActionList(ConfPaths.INVENTORY_FASTCLICK_ACTIONS, Permissions.INVENTORY_FASTCLICK);
+		
+		fastConsumeCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCONSUME_CHECK);
+		fastConsumeDuration = (long) (1000.0 * data.getDouble(ConfPaths.INVENTORY_FASTCONSUME_DURATION));
+		fastConsumeWhitelist = data.getBoolean(ConfPaths.INVENTORY_FASTCONSUME_WHITELIST);
+		data.readMaterialFromList(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, fastConsumeItems);
+		fastConsumeActions = data.getOptimizedActionList(ConfPaths.INVENTORY_FASTCONSUME_ACTIONS, Permissions.INVENTORY_FASTCONSUME);
 
 		instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
 		instantBowStrict = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_STRICT);
 		instantBowDelay = data.getInt(ConfPaths.INVENTORY_INSTANTBOW_DELAY);
-		instantBowActions = data.getOptimizedActionList(
-				ConfPaths.INVENTORY_INSTANTBOW_ACTIONS,
-				Permissions.INVENTORY_INSTANTBOW);
+		instantBowActions = data.getOptimizedActionList(ConfPaths.INVENTORY_INSTANTBOW_ACTIONS, Permissions.INVENTORY_INSTANTBOW);
 
 		instantEatCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTEAT_CHECK);
-		instantEatActions = data.getOptimizedActionList(
-				ConfPaths.INVENTORY_INSTANTEAT_ACTIONS,
-				Permissions.INVENTORY_INSTANTEAT);
+		instantEatActions = data.getOptimizedActionList(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, Permissions.INVENTORY_INSTANTEAT);
 		
 		itemsCheck = data.getBoolean(ConfPaths.INVENTORY_ITEMS_CHECK);
 	}
@@ -143,16 +150,18 @@ public class InventoryConfig extends ACheckConfig {
 	@Override
 	public final boolean isEnabled(final CheckType checkType) {
 		switch (checkType) {
-		case INVENTORY_DROP:
-			return dropCheck;
 		case INVENTORY_FASTCLICK:
 			return fastClickCheck;
+		case INVENTORY_ITEMS:
+		    return itemsCheck;
+		case INVENTORY_DROP:
+			return dropCheck;
 		case INVENTORY_INSTANTBOW:
 			return instantBowCheck;
 		case INVENTORY_INSTANTEAT:
 			return instantEatCheck;
-		case INVENTORY_ITEMS:
-		    return itemsCheck;
+		case INVENTORY_FASTCONSUME:
+			return fastConsumeCheck;
 		default:
 			return true;
 		}

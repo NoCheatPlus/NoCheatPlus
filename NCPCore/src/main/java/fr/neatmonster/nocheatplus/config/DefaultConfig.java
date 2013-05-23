@@ -380,6 +380,12 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_INSTANTEAT_CHECK, true);
         set(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, "log:instanteat:2:5:if cancel");
         
+        set(ConfPaths.INVENTORY_FASTCONSUME_CHECK, true);
+        set(ConfPaths.INVENTORY_FASTCONSUME_DURATION, 0.7);
+        set(ConfPaths.INVENTORY_FASTCONSUME_WHITELIST, false);
+        set(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, new LinkedList<String>());
+        set(ConfPaths.INVENTORY_FASTCONSUME_ACTIONS, "log:fastconsume:2:5:if cancel");
+        
         set(ConfPaths.INVENTORY_ITEMS_CHECK, true);
 
         /*
@@ -486,6 +492,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".dropkick", "ncp delay ncp kick [player] Dropping items too fast.");
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);
         set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
+        set(ConfPaths.STRINGS + ".fastconsume", start + "consumes [food] [tags] too fast" + end);
         set(ConfPaths.STRINGS + ".fastheal", start + "regenerates health faster than usual" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);
         set(ConfPaths.STRINGS + ".fdirection", start + "tried to hit an entity out of line of sight" + end);

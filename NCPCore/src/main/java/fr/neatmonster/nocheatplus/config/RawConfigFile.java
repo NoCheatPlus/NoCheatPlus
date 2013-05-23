@@ -1,12 +1,40 @@
 package fr.neatmonster.nocheatplus.config;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.yaml.snakeyaml.DumperOptions;
 
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+
 public class RawConfigFile  extends YamlConfiguration{
+	
+    /**
+     * Attempt to get an int id from a string.<br>
+     * Will return out of range numbers, attempts to parse materials.
+     * @param content
+     * @return
+     */
+    public static Integer parseTypeId(String content) {
+        content = content.trim().toUpperCase();
+        try{
+            return Integer.parseInt(content);
+        }
+        catch(NumberFormatException e){}
+        try{
+            Material mat = Material.matchMaterial(content.replace(' ', '_').replace('-', '_').replace('.', '_'));
+            if (mat != null) return mat.getId();
+        }
+        catch (Exception e) {}
+        return null;
+    }
+    
+    ////////////////
+    // Not static.
+    ////////////////
 	
     /**
      * Return a double value within given bounds, with preset.
@@ -85,26 +113,25 @@ public class RawConfigFile  extends YamlConfiguration{
         int id = getInt(path, Integer.MAX_VALUE);
         return id == Integer.MAX_VALUE ? preset : id;
     }
-
+    
     /**
-     * Attempt to get an int id from a string.<br>
-     * Will return out of range numbers, attempts to parse materials.
-     * @param content
-     * @return
+     * Outputs warnings to console.
+     * @param path
+     * @param target Collection to fill ids into.
      */
-    public static Integer parseTypeId(String content) {
-        content = content.trim().toUpperCase();
-        try{
-            return Integer.parseInt(content);
-        }
-        catch(NumberFormatException e){}
-        try{
-            Material mat = Material.matchMaterial(content.replace(' ', '_').replace('-', '_').replace('.', '_'));
-            if (mat != null) return mat.getId();
-        }
-        catch (Exception e) {}
-        return null;
-    }
+	public void readMaterialFromList(final String path, final Collection<Integer> target) {
+		final List<String> content = getStringList(path);
+		if (content == null || content.isEmpty()) return;
+		for (final String entry : content){
+			final Integer id = parseTypeId(entry);
+			if (id == null){
+				LogUtil.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+			}
+			else{
+				target.add(id);
+			}
+		}
+	}
     
     /* (non-Javadoc)
      * @see org.bukkit.configuration.file.YamlConfiguration#saveToString()

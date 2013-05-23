@@ -130,10 +130,9 @@ public class InventoryListener  extends CheckListener {
         // Only if a player ate food.
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
-            if (instantEat.isEnabled(player) && instantEat.check(player, event.getFoodLevel()))
-                event.setCancelled(true);
-            // Forget the food material, as the info is no longer needed.
-            InventoryData.getData(player).instantEatFood = null;
+            if (instantEat.isEnabled(player) && instantEat.check(player, event.getFoodLevel())){
+            	event.setCancelled(true);
+            }
         }
     }
 
@@ -275,7 +274,7 @@ public class InventoryListener  extends CheckListener {
                 // It was a bow, the player starts to pull the string, remember this time.
                 data.instantBowInteract = (data.instantBowInteract > 0 && now - data.instantBowInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantBowInteract) : System.currentTimeMillis();
             }
-            else if (type.isEdible()) {
+            else if (type.isEdible() || type == Material.POTION) {
                 final long now = System.currentTimeMillis();
                 // It was food, the player starts to eat some food, remember this time and the type of food.
                 data.instantEatFood = type;

@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
+
 /**
  * Default factory for add-in components which might only be available under certain circumstances.
  * 
@@ -18,7 +21,18 @@ public class DefaultComponentFactory {
 	public Collection<Object> getAvailableComponentsOnEnable(){
 		final List<Object> available = new LinkedList<Object>();
 		
-		// Add components here (try-catch).
+		//////////////////////////////////////
+		// Add components (try-catch).
+		//////////////////////////////////////
+		
+		// Check: inventory.fastconsume.
+		try{
+			FastConsume.testAvailability();
+			available.add(new FastConsume());
+		}
+		catch (Throwable t){
+			LogUtil.logInfo("[NoCheatPlus] Inventory checks: FastConsume is not available.");
+		}
 		
 		return available;
 	}
