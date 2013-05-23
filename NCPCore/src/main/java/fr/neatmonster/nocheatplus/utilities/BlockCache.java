@@ -44,8 +44,8 @@ public abstract class BlockCache {
 		final int maxZ = Location.locToBlock(z + xzMargin) / 16;
 		for (int cx = minX; cx <= maxX; cx ++){
 			for (int cz = minZ; cz <= maxZ; cz ++){
-				if (!world.isChunkLoaded(cx * 16, cz * 16)){
-					world.loadChunk(cx * 16, cz * 16);
+				if (!world.isChunkLoaded(cx, cz)){
+					world.loadChunk(cx, cz);
 					loaded ++;
 				}
 			}
