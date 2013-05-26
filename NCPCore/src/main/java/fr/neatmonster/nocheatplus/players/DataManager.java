@@ -62,6 +62,13 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	
 	protected static DataManager instance = null;
 	
+	//////////////////
+	// Not static.
+	//////////////////
+	
+	/** PlayerData storage. */
+	protected final Map<String, PlayerData> playerData = new LinkedHashMap<String, PlayerData>(100);
+	
 	/*
 	 * 
 	 */
@@ -137,6 +144,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 					factory.removeData(playerName);
 				}
 				clearComponentData(CheckType.ALL, playerName);
+				playerData.remove(playerName.toLowerCase()); // TODO
 			}
 			if (deleteData || deleteHistory) removeExecutionHistory(CheckType.ALL, playerName);
 			if (deleteHistory) ViolationHistory.removeHistory(playerName);
@@ -263,6 +271,9 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 			}
 		}
 		ViolationHistory.clear(checkType);
+		if (checkType == CheckType.ALL){
+			instance.playerData.clear(); // TODO
+		}
 	}
 	
     /**
@@ -287,6 +298,10 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 		// Remove data.
 		for (final CheckDataFactory otherFactory : factories){
 			if (otherFactory.removeData(playerName) != null) had = true;
+		}
+		
+		if (checkType == CheckType.ALL){
+			instance.playerData.remove(playerName.toLowerCase());
 		}
 		
 		return had;
@@ -456,6 +471,26 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 			}
 			
 			LogUtil.logWarning("[NoCheatPlus] DataMan inconsistencies: " + StringUtil.join(details, " | "));
+		}
+	}
+	
+	/**
+	 * 
+	 * @param playerName
+	 * @param create
+	 * @return
+	 */
+	public static PlayerData getPlayerData(final String playerName, final boolean create){
+		final String lcName = playerName.toLowerCase(); // TODO: Store by both lower case and exact case (also store the Player reference).
+		final PlayerData data = instance.playerData.get(lcName);
+		if (data != null) return data;
+		else if (!create){
+			return null;
+		}
+		else{
+			final PlayerData newData = new PlayerData(lcName);
+			instance.playerData.put(lcName, newData);
+			return newData;
 		}
 	}
 	

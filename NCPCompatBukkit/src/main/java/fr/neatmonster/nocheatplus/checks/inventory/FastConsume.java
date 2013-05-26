@@ -15,6 +15,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -46,6 +47,7 @@ public class FastConsume extends Check implements Listener{
 		final InventoryData data = InventoryData.getData(player);
 		if (check(player, event.getItem(), data)){
 			event.setCancelled(true);
+			DataManager.getPlayerData(player.getName(), true).task.updateInventory();
 		}
 		data.instantEatInteract = 0;
 		data.instantEatFood = null;
