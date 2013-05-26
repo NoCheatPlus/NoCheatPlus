@@ -1899,7 +1899,7 @@ public class BlockProperties {
     * @return
     */
    public static final boolean collidesBlock(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final int x, final int y, final int z, final int id, final double[] bounds, final long flags){
-        final double bminX, bminZ, bminY;
+	    final double bminX, bminZ, bminY;
         final double bmaxX, bmaxY, bmaxZ;
         // TODO: Consider a quick shortcut checks flags == F_NORMAL_GROUND
         if ((flags & F_STAIRS) != 0){ // TODO: make this a full block flag ?
@@ -1969,9 +1969,39 @@ public class BlockProperties {
         else if (minY >= bmaxY + y || maxY < bminY + y) return false;
         else if (minZ >= bmaxZ + z || maxZ < bminZ + z) return false;
         else return true;
-    }
-    
+   }
+   
    /**
+    * Attempt to return the exact outside bounds, corrected by flags and other.
+	* @deprecated Not yet for real (only used in certain checks/contexts).
+    * @param access
+    * @param x
+    * @param y
+    * @param z
+    * @return
+    */
+   public static double[] getCorrectedBounds(final BlockCache access, final int x, final int y, final int z) {
+		return getCorrectedBounds(x, y, z, access.getTypeId(x, y, z), access.getBounds(x, y, z));
+	}
+    
+	/**
+	 * Attempt to return the exact outside bounds, corrected by flags and other.
+	 * @deprecated Not yet for real (only used in certain checks/contexts).
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param typeId
+	 * @param bounds
+	 * @return
+	 */
+   public static double[] getCorrectedBounds(final int x, final int y, final int z, final int id, final double[] bounds) {
+		if (bounds == null) return null;
+		//final long flags = blockFlags[id];
+		// TODO: IMPLEMENT !
+		return null;
+	}
+
+/**
     * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>
     * NOTE: This does not return true if stuck, to check for that use collidesBlock for the players location.
     * @param access
@@ -1985,7 +2015,7 @@ public class BlockProperties {
     */
    public static final boolean isOnGround(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ){
     	return isOnGround(access, minX, minY, minZ, maxX, maxY, maxZ, 0L);
-    }
+   }
     
     /**
      * Similar to collides(... , F_GROUND), but also checks the block above (against spider).<br>

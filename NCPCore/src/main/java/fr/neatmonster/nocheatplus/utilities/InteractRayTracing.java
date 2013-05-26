@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.utilities;
 import org.bukkit.Location;
 
 /**
- * Rough ray-tracing for interaction with something.
+ * Rough ray-tracing for interaction with something. This does not do any smart end-point guessing.
  * @author mc_dev
  *
  */

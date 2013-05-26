@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.utilities;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
@@ -126,6 +127,26 @@ public abstract class BlockCache {
         dataMap.clear();
         boundsMap.clear();
     }
+    
+    /**
+     * (convenience method, uses cache).
+     * @param eX
+     * @param eY
+     * @param eZ
+     * @return
+     */
+	public int getTypeId(double x, double y, double z) {
+		return getTypeId(Location.locToBlock(x), Location.locToBlock(y), Location.locToBlock(z));
+	}
+	
+	/**
+	 * (convenience method, uses cache).
+	 * @param block
+	 * @return
+	 */
+	public int getTypeId(final Block block) {
+		return getTypeId(block.getX(), block.getY(), block.getZ());
+	}
     
     /**
      * Get type id with cache access.
