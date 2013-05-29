@@ -85,6 +85,8 @@ public class MovingConfig extends ACheckConfig {
 	public final boolean    noFallViolationReset;
 	/** Reset data on tp. */
 	public final boolean 	noFallTpReset;
+	/** Reset if in vehicle. */
+	public final boolean noFallVehicleReset;
     /** Reset fd to 0  if on ground (dealdamage only). */
 	public final boolean noFallAntiCriticals;
     public final ActionList noFallActions;
@@ -160,6 +162,7 @@ public class MovingConfig extends ACheckConfig {
         noFallDealDamage = config.getBoolean(ConfPaths.MOVING_NOFALL_DEALDAMAGE);
         noFallViolationReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVL);
         noFallTpReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONTP);
+        noFallVehicleReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVEHICLE);
         noFallAntiCriticals = config.getBoolean(ConfPaths.MOVING_NOFALL_ANTICRITICALS);
         noFallActions = config.getOptimizedActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
         

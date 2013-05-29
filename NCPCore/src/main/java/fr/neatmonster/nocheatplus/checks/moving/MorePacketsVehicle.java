@@ -58,13 +58,13 @@ public class MorePacketsVehicle extends Check {
      *            the from
      * @param to
      *            the to
+     * @param cc 
+     * @param data 
      * @return the location
      */
-    public Location check(final Player player, final Location from, final Location to) {
+    public Location check(final Player player, final Location from, final Location to, final MovingData data, final MovingConfig cc) {
     	// Take time once, first:
     	final long time = System.currentTimeMillis();
-    	
-        final MovingData data = MovingData.getData(player);
 
         Location newTo = null;
 
@@ -91,8 +91,7 @@ public class MorePacketsVehicle extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer,
-                    MovingConfig.getConfig(player).morePacketsVehicleActions)){
+            if (executeActions(player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer, cc.morePacketsVehicleActions)){
             	newTo = data.getMorePacketsVehicleSetBack();
             }
         }

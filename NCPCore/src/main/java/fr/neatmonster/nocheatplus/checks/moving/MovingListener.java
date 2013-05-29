@@ -1089,9 +1089,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MovingData data = MovingData.getData(player);
         data.sfNoLowJump = true;
         
+        final MovingConfig cc = MovingConfig.getConfig(player);
+        if (cc.noFallVehicleReset){
+            // Reset noFall data.
+    		data.noFallSkipAirCheck = true; // Might allow one time cheat.
+    		data.sfLowJump = false;
+    		data.clearNoFallData();
+        }
+        
         if (morePacketsVehicle.isEnabled(player)){
             // If the player is handled by the more packets vehicle check, execute it.
-            newTo = morePacketsVehicle.check(player, from, to);
+            newTo = morePacketsVehicle.check(player, from, to, data, cc);
         }
         else{
             // Otherwise we need to clear his data.
