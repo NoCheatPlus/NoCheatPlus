@@ -65,8 +65,13 @@ public class NoFall extends Check {
     }
     
     private final void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
-    	// TODO: Only set for big differences.
-    	player.setFallDistance(Math.max(player.getFallDistance(), Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY))));
+    	final float noFallFallDistance = Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY));
+    	if (noFallFallDistance >= 3.0){
+    		final float fallDistance = player.getFallDistance();
+    		if (noFallFallDistance - fallDistance >= 0.5f || noFallFallDistance >= 3.5f && noFallFallDistance < 3.5f){
+    			player.setFallDistance(noFallFallDistance);
+    		}
+    	}
         data.clearNoFallData();
 	}
 
