@@ -47,7 +47,7 @@ public class NoFall extends Check {
      * @param data
      * @param y
      */
-    private final void handleOnGround(final Player player, final MovingData data, final double y, final MovingConfig cc, final boolean reallyOnGround) {
+    private final void handleOnGround(final Player player, final double y, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
 //        final int pD = getDamage(mcPlayer.fallDistance);
 //        final int nfD = getDamage(data.noFallFallDistance);
 //        final int yD = getDamage((float) (data.noFallMaxY - y));
@@ -63,6 +63,13 @@ public class NoFall extends Check {
         }
         else data.clearNoFallData();
     }
+    
+    private final void adjustFallDistance(final Player player, final double minY, final boolean reallyOnGround, final MovingData data, final MovingConfig cc) {
+    	// TODO: Only set for big differences.
+    	player.setFallDistance(Math.max(player.getFallDistance(), Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY))));
+        data.clearNoFallData();
+	}
+
 
     private void dealFallDamage(final Player player, final int damage) {
     	final EntityDamageEvent event = new EntityDamageEvent(player, DamageCause.FALL, damage);
@@ -125,11 +132,8 @@ public class NoFall extends Check {
         }
         else if (fromOnGround || data.noFallAssumeGround){
             // Check if to deal damage (fall back damage check).
-            if (cc.noFallDealDamage) handleOnGround(player, data, minY, cc, true);
-            else{
-                player.setFallDistance(Math.max(player.getFallDistance(), Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY))));
-                data.clearNoFallData();
-            }
+            if (cc.noFallDealDamage) handleOnGround(player, minY, true, data, cc);
+            else adjustFallDistance(player, minY, true, data, cc);
         }
         else if (toReset){
             // Just reset.
@@ -141,11 +145,8 @@ public class NoFall extends Check {
             	// In this case the player has traveled further: add the difference.
             	data.noFallFallDistance -= yDiff;
             }
-            if (cc.noFallDealDamage) handleOnGround(player, data, minY, cc, true);
-            else{
-                player.setFallDistance(Math.max(player.getFallDistance(), Math.max(data.noFallFallDistance, (float) (data.noFallMaxY - minY))));
-                data.clearNoFallData();
-            }
+            if (cc.noFallDealDamage) handleOnGround(player, minY, true, data, cc);
+            else adjustFallDistance(player, minY, true, data, cc);
         }
         else{
             // Ensure fall distance is correct, or "anyway"?
@@ -185,7 +186,7 @@ public class NoFall extends Check {
         
     }
     
-    /**
+	/**
      * Set yOnGround for from and to, if needed, should be obsolete.
      * @param from
      * @param to
@@ -224,7 +225,7 @@ public class NoFall extends Check {
 	public void checkDamage(final Player player, final MovingData data, final double y) {
 		final MovingConfig cc = MovingConfig.getConfig(player);
 		// Deal damage.
-		handleOnGround(player, data, y, cc, false);
+		handleOnGround(player, y, false, data, cc);
 	}
 	
 }
