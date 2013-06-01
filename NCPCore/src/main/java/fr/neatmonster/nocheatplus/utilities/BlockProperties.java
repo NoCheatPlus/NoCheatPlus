@@ -1997,8 +1997,9 @@ public class BlockProperties {
    public static double[] getCorrectedBounds(final int x, final int y, final int z, final int id, final double[] bounds) {
 		if (bounds == null) return null;
 		//final long flags = blockFlags[id];
-		// TODO: IMPLEMENT !
-		return null;
+		// TODO: Consider to change to adaptBounds and to store the adapted bounds already.
+		// TODO: IMPLEMENT special bounds.
+		return bounds;
 	}
 
 /**

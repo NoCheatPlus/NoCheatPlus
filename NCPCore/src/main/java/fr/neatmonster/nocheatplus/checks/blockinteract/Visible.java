@@ -16,10 +16,8 @@ import fr.neatmonster.nocheatplus.utilities.InteractRayTracing;
 
 public class Visible extends Check {
 	
-	/**
-	 * Factor for the block-face mod.
-	 */
-	private static final double fModFull = 0.6;
+	/** Offset from bounds to estimate some reference end position for ray-tracing. */
+	private static final double offset = 0.0001;
 	
 	private BlockCache blockCache;
 	
@@ -43,7 +41,7 @@ public class Visible extends Check {
 	
 	private static final double getEnd(final double[] bounds, final int index, final int mod){
 		if (bounds == null){
-			return 0.5 + fModFull * mod;
+			return 0.5 + 0.5 * mod + offset;
 		}
 		if (mod == 0){
 			// TODO: Middle or middle of block ?
@@ -51,11 +49,11 @@ public class Visible extends Check {
 		}
 		else if (mod == 1){
 			// TODO: Slightly outside or dependent on exact position (inside, exact edge, outside)?
-			return bounds[index + 3];
+			return Math.min(1.0, bounds[index + 3]) + offset;
 		}
 		else if (mod == -1){
 			// TODO: Slightly outside or dependent on exact position (inside, exact edge, outside)?
-			return bounds[index];
+			return Math.max(0.0, bounds[index]) - offset;
 		}
 		else{
 			throw new IllegalArgumentException("BlockFace.getModX|Y|Z must be 0, 1 or -1.");
@@ -67,6 +65,8 @@ public class Visible extends Check {
 		// TODO: Might confine what to check for (left/right, target blocks depending on item in hand, container blocks).
 		final boolean collides;
 		final double eyeHeight = player.getEyeHeight();
+		// TODO: Consider checking which faces can possibly be touched at all (!).
+		// TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
 		if (block.getX() == loc.getBlockX() && block.getZ() == loc.getBlockZ() && block.getY() == Location.locToBlock(loc.getY() + eyeHeight)){
 			// Player is interacting with the block his head is in.
 			collides = false;
@@ -75,6 +75,7 @@ public class Visible extends Check {
 			blockCache.setAccess(loc.getWorld());
 			
 			// Guess some end-coordinates.
+			// TODO: More "smart" corrections towards edges based on isPassable result, optimized. Might also use looking direction (test how accurate).
 			@SuppressWarnings("deprecation")
 			final double[] bounds = BlockProperties.getCorrectedBounds(blockCache, block.getX(), block.getY(), block.getZ());
 			final int modX = face.getModX();
@@ -84,6 +85,7 @@ public class Visible extends Check {
 			final double eY = (double) block.getY() + getEnd(bounds, 1, modY);
 			final double eZ = (double) block.getZ() + getEnd(bounds, 2, modZ);
 			
+			// TODO: Check if it is the same block first (also)
 			if (BlockProperties.isPassable(blockCache, eX, eY, eZ, blockCache.getTypeId(eX, eY, eZ))){
 				// Perform ray-tracing.
 				rayTracing.setBlockCache(blockCache);

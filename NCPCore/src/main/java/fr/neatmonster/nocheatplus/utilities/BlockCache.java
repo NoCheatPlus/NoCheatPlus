@@ -179,11 +179,11 @@ public abstract class BlockCache {
 	}
 	
 	/**
-	 * Get block bounds
+	 * Get block bounds - <b>Do not change these in-place, because the returned array is cached internally.</b>
 	 * @param x
 	 * @param y
 	 * @param z
-	 * @return Array of floats (minX, minY, minZ, maxX, maxY, maxZ), may be null theoretically.
+	 * @return Array of floats (minX, minY, minZ, maxX, maxY, maxZ), may be null theoretically. Do not change these in place, because they might get cached.
 	 */
 	public double[] getBounds(final int x, final int y, final int z){
 		final double[] pBounds = boundsMap.get(x, y, z);
