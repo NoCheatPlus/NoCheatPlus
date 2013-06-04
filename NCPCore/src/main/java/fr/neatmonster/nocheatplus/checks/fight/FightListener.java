@@ -13,6 +13,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -430,6 +431,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 	@Override
 	public void playerLeaves(final Player player) {
 		final FightData data = FightData.getData(player);
+		data.angleHits.clear();
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event){
+		final FightData data = FightData.getData(event.getPlayer());
 		data.angleHits.clear();
 	}
 }
