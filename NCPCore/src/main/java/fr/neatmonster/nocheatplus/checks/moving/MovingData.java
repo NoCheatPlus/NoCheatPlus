@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
@@ -29,6 +30,11 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  * Player specific data for the moving checks.
  */
 public class MovingData extends ACheckData {
+	
+    /**
+     * Assume the player has to move on ground or so to lift off. TODO: Test, might be better ground.
+     */
+    private static final MediumLiftOff defaultMediumLiftOff = MediumLiftOff.LIMIT_JUMP;
 	
 //	private static final long IGNORE_SETBACK_Y = BlockProperties.F_SOLID | BlockProperties.F_GROUND | BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID;
 
@@ -75,9 +81,19 @@ public class MovingData extends ACheckData {
     }
     
     /**
-     * Assume the player has to move on ground or so to lift off. TODO: Test, might be better ground.
+     * Clear data related to the given world.
+     * @param world The world that gets unloaded.
      */
-    private static final MediumLiftOff defaultMediumLiftOff = MediumLiftOff.LIMIT_JUMP;
+    public static void onWorldUnload(final World world){
+    	final String worldName = world.getName();
+    	for (final MovingData data : playersMap.values()){
+    		data.onWorldUnload(worldName);
+    	}
+    }
+    
+    /////////////////
+    // Not static.
+    /////////////////
     
     // Violation levels -----
     public double         creativeFlyVL            = 0D;
@@ -551,6 +567,31 @@ public class MovingData extends ACheckData {
 			return false;
 		}
 		return loc.getX() == setBack.getX() && loc.getY() == setBack.getY() && loc.getZ() == setBack.getZ();
+	}
+
+	/**
+	 * Called when a player leaves the server.
+	 */
+	public void onPlayerLeave() {
+		removeAllVelocity();
+	}
+	
+	/**
+	 * Clean up data related to worlds with the given name (not case-sensitive).
+	 * @param worldName
+	 */
+	public void onWorldUnload(final String worldName){
+		// TODO: Unlink world references.
+		if (teleported != null && worldName.equalsIgnoreCase(teleported.getWorld().getName())){
+			resetTeleported();
+		}
+		if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())){
+			clearFlyData();
+		}
+		if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || morePacketsVehicleSetback != null && worldName.equalsIgnoreCase(morePacketsVehicleSetback.getWorld().getName())){
+			clearMorePacketsData();
+			clearNoFallData(); // just in case.
+		}
 	}
 	
 }

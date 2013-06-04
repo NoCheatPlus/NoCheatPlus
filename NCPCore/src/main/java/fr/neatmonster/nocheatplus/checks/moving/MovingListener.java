@@ -37,6 +37,7 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
@@ -1277,7 +1278,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         noFall.onLeave(player);
         final MovingData data = MovingData.getData(player);
         // TODO: Add a method for ordinary presence-change resetting (use in join + leave).
-        data.removeAllVelocity();
+        data.onPlayerLeave();
+	}
+	
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onWorldunload(final WorldUnloadEvent event){
+		// TODO: Consider removing the world-related data anyway (even if the event is cancelled).
+		MovingData.onWorldUnload(event.getWorld());
 	}
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
