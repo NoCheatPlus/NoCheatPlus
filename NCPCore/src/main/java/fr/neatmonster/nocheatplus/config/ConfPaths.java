@@ -77,7 +77,13 @@ public abstract class ConfPaths {
 	public static final  String DATA_CONSISTENCYCHECKS_CHECK			 = DATA_CONSISTENCYCHECKS + "active";
 	public static final  String DATA_CONSISTENCYCHECKS_INTERVAL			 = DATA_CONSISTENCYCHECKS + "interval";
 	public static final  String DATA_CONSISTENCYCHECKS_MAXTIME			 = DATA_CONSISTENCYCHECKS + "maxtime";
-    
+	/**
+	 * This might not might not be used by checks. <br>
+	 * Used by: DataMan/Player-instances
+	 * 
+	 */
+	public static final  String DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS  = DATA_CONSISTENCYCHECKS + "suppresswarnings";
+	
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
 	public static final  String CHECKS_DEBUG							 = CHECKS + SUB_DEBUG;

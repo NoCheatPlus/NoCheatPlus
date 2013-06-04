@@ -85,6 +85,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true);
         set(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 10);
         set(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 2);
+        set(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS, false);
 
         /*
          * 888 88b, 888                    888    888 88b,                        888    

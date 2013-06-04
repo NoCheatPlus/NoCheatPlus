@@ -66,6 +66,8 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	// Not static.
 	//////////////////
 	
+	private int foundInconsistencies = 0;
+	
 	/** PlayerData storage. */
 	protected final Map<String, PlayerData> playerData = new LinkedHashMap<String, PlayerData>(100);
 	
@@ -416,14 +418,16 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	 */
 	public void onDisable() {
 		clearData(CheckType.ALL);
-//		for (IRemoveData rmd : iRemoveData){
-//			if (!(rmd instanceof IHaveCheckType)) rmd.removeAllData();
-//		}
 		iRemoveData.clear();
 		clearConfigs();
 		lastLogout.clear();
 		executionHistories.clear();
 		onlinePlayers.clear();
+		// Finally alert (summary) if inconsistencies found.
+		if (foundInconsistencies > 0){
+			LogUtil.logWarning("[NoCheatPlus] DataMan found " + foundInconsistencies + " inconsistencies, activate consistencychecks to get more details during runtime, if desired.");
+			foundInconsistencies = 0;
+ 		}
 	}
 
 	@Override
@@ -458,19 +462,22 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 		
 		final int storedSize = this.onlinePlayers.size();
 		if (missing != 0 || changed != 0 || expectedSize != storedSize){
-			final List<String> details = new LinkedList<String>();
-			if (missing != 0){
-				details.add("missing online players (" + missing + ")");
+			foundInconsistencies ++;
+			if (ConfigManager.getConfigFile().getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS)){
+				final List<String> details = new LinkedList<String>();
+				if (missing != 0){
+					details.add("missing online players (" + missing + ")");
+				}
+				if (expectedSize != storedSize){
+					// TODO: Consider checking for not online players and remove them.
+					details.add("wrong number of online players (" + storedSize + " instead of " + expectedSize + ")");
+				}
+				if (changed != 0){
+					details.add("changed player instances (" + changed + ")");
+				}
+				
+				LogUtil.logWarning("[NoCheatPlus] DataMan inconsistencies: " + StringUtil.join(details, " | "));
 			}
-			if (expectedSize != storedSize){
-				// TODO: Consider checking for not online players and remove them.
-				details.add("wrong number of online players (" + storedSize + " instead of " + expectedSize + ")");
-			}
-			if (changed != 0){
-				details.add("changed player instances (" + changed + ")");
-			}
-			
-			LogUtil.logWarning("[NoCheatPlus] DataMan inconsistencies: " + StringUtil.join(details, " | "));
 		}
 	}
 	
