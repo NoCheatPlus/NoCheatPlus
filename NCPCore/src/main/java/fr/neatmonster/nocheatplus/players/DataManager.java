@@ -425,7 +425,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 		onlinePlayers.clear();
 		// Finally alert (summary) if inconsistencies found.
 		if (foundInconsistencies > 0){
-			LogUtil.logWarning("[NoCheatPlus] DataMan found " + foundInconsistencies + " inconsistencies, activate consistencychecks to get more details during runtime, if desired.");
+			LogUtil.logWarning("[NoCheatPlus] DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
 			foundInconsistencies = 0;
  		}
 	}
