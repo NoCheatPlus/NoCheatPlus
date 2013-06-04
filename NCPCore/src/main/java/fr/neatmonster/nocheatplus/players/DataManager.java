@@ -463,7 +463,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 		final int storedSize = this.onlinePlayers.size();
 		if (missing != 0 || changed != 0 || expectedSize != storedSize){
 			foundInconsistencies ++;
-			if (ConfigManager.getConfigFile().getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS)){
+			if (!ConfigManager.getConfigFile().getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS)){
 				final List<String> details = new LinkedList<String>();
 				if (missing != 0){
 					details.add("missing online players (" + missing + ")");
