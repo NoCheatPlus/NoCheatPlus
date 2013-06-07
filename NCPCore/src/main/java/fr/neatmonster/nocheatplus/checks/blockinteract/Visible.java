@@ -62,7 +62,7 @@ public class Visible extends Check {
 
 	public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, final Action action, final BlockInteractData data, final BlockInteractConfig cc) {
 		// TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
-		// TODO: Might confine what to check for (left/right, target blocks depending on item in hand, container blocks).
+		// TODO: Might confine what to check for (left/right-click, target blocks depending on item in hand, container blocks).
 		final boolean collides;
 		final int blockX = block.getX();
 		final int blockY = block.getY();
@@ -130,21 +130,7 @@ public class Visible extends Check {
 		// Ignore passable if the estimate is on the clicked block.
 		final boolean skipPassable = blockX == bEstX && blockY == bEstY && blockZ == bEstZ;
 		
-		
-		
-		// TODO: More "smart" corrections towards edges based on isPassable result, optimized. Might also use looking direction (test how accurate).
-		// TODO: Consider checking alternate positions for mod = 0 directions, functional design, full-try (ray tracing) parameter, enum rseults?
-
-		
-		// TODO: Same block: Might still want to check alternate positions, but skip the passable check.
-		// TODO: Loop over thinkable positions (!).
-		
-		// TODO: Check altered positions for mod? == 0 altered.
-		// TODO: USe method with a bitmap input + output, specifying which modifications to check ?
-		// TODO: Might use recursion but set mod? to 1 for further recursion.
-		
-		
-		
+		// TODO: Might also use looking direction (test how accurate).
 		return checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ, estId, bounds, modX, modY, modZ, skipPassable);
 		
 	}
@@ -176,6 +162,7 @@ public class Visible extends Check {
 		}
 		// Note: Center of bounds is used for mod == 0.
 		// TODO: Could "sort" positions by setting signum of d by which is closer to the player.
+		// TODO: Could consider slightly in-set positions.
 		if (modX == 0){
 			// TODO: Might ensure to check if it is the same block?
 			final double d = (bounds[3] - bounds[0]) / 2.0;
