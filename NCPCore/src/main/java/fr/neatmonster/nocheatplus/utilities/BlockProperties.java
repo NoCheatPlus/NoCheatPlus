@@ -1978,7 +1978,7 @@ public class BlockProperties {
     * @param x
     * @param y
     * @param z
-    * @return
+    * @return If changed, a copy is returned, otherwise the original bounds returned by the BlockCache instance.
     */
    public static double[] getCorrectedBounds(final BlockCache access, final int x, final int y, final int z) {
 		return getCorrectedBounds(x, y, z, access.getTypeId(x, y, z), access.getBounds(x, y, z));
@@ -1992,13 +1992,13 @@ public class BlockProperties {
 	 * @param z
 	 * @param typeId
 	 * @param bounds
-	 * @return
+	 * @return If changed, a copy is returned, otherwise the original array as given.
 	 */
    public static double[] getCorrectedBounds(final int x, final int y, final int z, final int id, final double[] bounds) {
 		if (bounds == null) return null;
 		//final long flags = blockFlags[id];
 		// TODO: Consider to change to adaptBounds and to store the adapted bounds already.
-		// TODO: IMPLEMENT special bounds.
+		// TODO: IMPLEMENT special bounds, at least: Step + stairs (dy=0.5 for both) + snow.
 		return bounds;
 	}
 
