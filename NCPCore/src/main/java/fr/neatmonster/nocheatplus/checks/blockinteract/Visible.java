@@ -44,7 +44,7 @@ public class Visible extends Check {
 			return 0.5 + 0.5 * mod + offset;
 		}
 		if (mod == 0){
-			// TODO: Middle or middle of block ?
+			// Middle.
 			return (bounds[index] + bounds[index + 3]) / 2.0;
 		}
 		else if (mod == 1){
@@ -61,47 +61,38 @@ public class Visible extends Check {
 	}
 
 	public boolean check(final Player player, final Location loc, final Block block, final BlockFace face, final Action action, final BlockInteractData data, final BlockInteractConfig cc) {
-		
+		// TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
 		// TODO: Might confine what to check for (left/right, target blocks depending on item in hand, container blocks).
 		final boolean collides;
-		final double eyeHeight = player.getEyeHeight();
-		// TODO: Consider checking which faces can possibly be touched at all (!).
-		// TODO: This check might make parts of interact/blockbreak/... + direction (+?) obsolete.
-		if (block.getX() == loc.getBlockX() && block.getZ() == loc.getBlockZ() && block.getY() == Location.locToBlock(loc.getY() + eyeHeight)){
+		final int blockX = block.getX();
+		final int blockY = block.getY();
+		final int blockZ = block.getZ();
+		final double eyeX = loc.getX();
+		final double eyeY = loc.getY() + player.getEyeHeight();
+		final double eyeZ = loc.getZ();
+		
+		// TODO: Add tags for fail_passable, fail_raytracing, (fail_face).
+		// TODO: Reachable face check ?
+		
+		if (blockX == Location.locToBlock(eyeX) && blockZ == Location.locToBlock(eyeZ) && block.getY() == Location.locToBlock(eyeY)){
 			// Player is interacting with the block his head is in.
+			// TODO: Should the reachable-face-check be done here too (if it is added at all)?
 			collides = false;
 		}
 		else{
+			// Initialize.
 			blockCache.setAccess(loc.getWorld());
+			rayTracing.setBlockCache(blockCache);
 			
-			// Guess some end-coordinates.
-			// TODO: More "smart" corrections towards edges based on isPassable result, optimized. Might also use looking direction (test how accurate).
-			@SuppressWarnings("deprecation")
-			final double[] bounds = BlockProperties.getCorrectedBounds(blockCache, block.getX(), block.getY(), block.getZ());
-			final int modX = face.getModX();
-			final int modY = face.getModY();
-			final int modZ = face.getModZ();
-			final double eX = (double) block.getX() + getEnd(bounds, 0, modX);
-			final double eY = (double) block.getY() + getEnd(bounds, 1, modY);
-			final double eZ = (double) block.getZ() + getEnd(bounds, 2, modZ);
+			collides = checkRayTracing(eyeX, eyeY, eyeZ, blockX, blockY, blockZ, face);
 			
-			// TODO: Check if it is the same block first (also)
-			if (BlockProperties.isPassable(blockCache, eX, eY, eZ, blockCache.getTypeId(eX, eY, eZ))){
-				// Perform ray-tracing.
-				rayTracing.setBlockCache(blockCache);
-				rayTracing.set(loc.getX(), loc.getY() + eyeHeight, loc.getZ(), eX, eY, eZ);
-				rayTracing.loop();
-				collides = rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps();
-		    	rayTracing.cleanup();
-			}
-			else{
-				// Not passable = not possible.
-				collides = true;
-			}
+			// Cleanup.
+			rayTracing.cleanup();
 	    	blockCache.cleanup();
 		}
     	
 		if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+			// TODO: Tags
         	player.sendMessage("Interact visible: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " collide=" + rayTracing.collides());
         }
 		
@@ -118,6 +109,114 @@ public class Visible extends Check {
 		}
 		
 		return cancel;
+	}
+	
+	private boolean checkRayTracing(final double eyeX, final double eyeY, final double eyeZ, final int blockX, final int blockY, final int blockZ, final BlockFace face){
+		
+		// Estimated target-middle-position (does it for most cases).
+		@SuppressWarnings("deprecation")
+		final double[] bounds = BlockProperties.getCorrectedBounds(blockCache, blockX, blockY, blockZ);
+		final int modX = face.getModX();
+		final int modY = face.getModY();
+		final int modZ = face.getModZ();
+		final double estX = (double) blockX + getEnd(bounds, 0, modX);
+		final double estY = (double) blockY + getEnd(bounds, 1, modY);
+	    final double estZ = (double) blockZ + getEnd(bounds, 2, modZ);
+	    final int bEstX = Location.locToBlock(estX);
+	    final int bEstY = Location.locToBlock(estY);
+	    final int bEstZ = Location.locToBlock(estZ);
+	    final int estId = blockCache.getTypeId(bEstX, bEstY, bEstZ);
+	    
+		// Ignore passable if the estimate is on the clicked block.
+		final boolean skipPassable = blockX == bEstX && blockY == bEstY && blockZ == bEstZ;
+		
+		
+		
+		// TODO: More "smart" corrections towards edges based on isPassable result, optimized. Might also use looking direction (test how accurate).
+		// TODO: Consider checking alternate positions for mod = 0 directions, functional design, full-try (ray tracing) parameter, enum rseults?
+
+		
+		// TODO: Same block: Might still want to check alternate positions, but skip the passable check.
+		// TODO: Loop over thinkable positions (!).
+		
+		// TODO: Check altered positions for mod? == 0 altered.
+		// TODO: USe method with a bitmap input + output, specifying which modifications to check ?
+		// TODO: Might use recursion but set mod? to 1 for further recursion.
+		
+		
+		
+		return checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ, estId, bounds, modX, modY, modZ, skipPassable);
+		
+	}
+
+	/**
+	 * Recursively check alternate positions.
+	 * @param eyeX
+	 * @param eyeY
+	 * @param eyeZ
+	 * @param estX
+	 * @param estY
+	 * @param estZ
+	 * @param estId
+	 * @param modX
+	 * @param modY
+	 * @param modZ
+	 * @param skipPassable
+	 * @return
+	 */
+	private boolean checkCollision(final double eyeX, final double eyeY, final double eyeZ, final double estX, final double estY, final double estZ, final int estId, final double[] bounds, final int modX, final int modY, final int modZ, final boolean skipPassable) {
+		// Check current position.
+		if (skipPassable || BlockProperties.isPassable(blockCache, estX, estY, estZ, estId)){
+			// Perform ray-tracing.
+			rayTracing.set(eyeX, eyeY, eyeZ, estX, estY, estZ);
+			rayTracing.loop();
+			if (!rayTracing.collides() && rayTracing.getStepsDone() < rayTracing.getMaxSteps()){
+				return false;
+			}
+		}
+		// Note: Center of bounds is used for mod == 0.
+		// TODO: Could "sort" positions by setting signum of d by which is closer to the player.
+		if (modX == 0){
+			// TODO: Might ensure to check if it is the same block?
+			final double d = (bounds[3] - bounds[0]) / 2.0;
+			if (d >= 0.05){
+				// Recursion with adapted x position (if differs enough from bounds.
+				if (!checkCollision(eyeX, eyeY, eyeZ, estX - d, estY, estZ, estId, bounds, 1, modY, modZ, skipPassable)){
+					return false;
+				}
+				if (!checkCollision(eyeX, eyeY, eyeZ, estX + d, estY, estZ, estId, bounds, 1, modY, modZ, skipPassable)){
+					return false;
+				}
+			}
+		}
+		if (modZ == 0){
+			// TODO: Might ensure to check if it is the same block?
+			final double d = (bounds[5] - bounds[2]) / 2.0;
+			if (d >= 0.05){
+				// Recursion with adapted x position (if differs enough from bounds.
+				if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ - d, estId, bounds, 1, modY, 1, skipPassable)){
+					return false;
+				}
+				if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ + d, estId, bounds, 1, modY, 1, skipPassable)){
+					return false;
+				}
+			}
+		}
+		if (modY == 0){
+			// TODO: Might ensure to check if it is the same block?
+			final double d = (bounds[4] - bounds[1]) / 2.0;
+			if (d >= 0.05){
+				// Recursion with adapted x position (if differs enough from bounds.
+				if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY - d, estZ, estId, bounds, 1, 1, 1, skipPassable)){
+					return false;
+				}
+				if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY + d, estZ, estId, bounds, 1, 1, 1, skipPassable)){
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 
 }
