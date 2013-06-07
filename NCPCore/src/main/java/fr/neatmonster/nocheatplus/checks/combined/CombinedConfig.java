@@ -141,14 +141,15 @@ public class CombinedConfig extends ACheckConfig {
 	@Override
 	public boolean isEnabled(final CheckType checkType) {
 		switch(checkType){
-		case COMBINED_IMPROBABLE:
-			return improbableCheck;
-		case COMBINED_BEDLEAVE:
-			return bedLeaveCheck;
-		case COMBINED_MUNCHHAUSEN:
-			return munchHausenCheck;
+			case COMBINED_IMPROBABLE:
+				return improbableCheck;
+			case COMBINED_BEDLEAVE:
+				return bedLeaveCheck;
+			case COMBINED_MUNCHHAUSEN:
+				return munchHausenCheck;
+			default:
+				return false;
 		}
-		return false;
 	}
 
 	public static void clear() {

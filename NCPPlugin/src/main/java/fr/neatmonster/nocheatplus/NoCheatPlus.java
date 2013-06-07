@@ -948,7 +948,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	 */
 	private Listener getCoreListener() {
 		return new NCPListener() {
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.NORMAL)
 			public void onPlayerLogin(final PlayerLoginEvent event) {
 				// (NORMAL to have chat checks come after this.)
@@ -965,13 +964,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				}
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerJoin(final PlayerJoinEvent event) {
 				onJoin(event.getPlayer());
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
 			{
@@ -979,13 +976,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				updatePermStateReceivers(player);
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 			public void onPlayerKick(final PlayerKickEvent event) {
 				onLeave(event.getPlayer());
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerQuitMonitor(final PlayerQuitEvent event) {
 				onLeave(event.getPlayer());

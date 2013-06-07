@@ -125,19 +125,16 @@ public class NCPExemptionManager {
 	 */
 	public static Listener getListener() {
 		return new NCPListener() {
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.LOWEST)
 			public void onPlayerJoin(final PlayerJoinEvent event) {
 				NCPExemptionManager.registerPlayer(event.getPlayer());
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerQuit(final PlayerQuitEvent event) {
 				NCPExemptionManager.tryToRemove(event.getPlayer());
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 			public void onPlayerKick(final PlayerKickEvent event) {
 				NCPExemptionManager.tryToRemove(event.getPlayer());

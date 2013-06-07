@@ -79,13 +79,14 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		final Material mat = Material.getMaterial(id); 
 		if (mat == null) return AlmostBoolean.MAYBE;
 		switch (mat) {
-		case STATIONARY_LAVA:
-		case STATIONARY_WATER:
-		case WATER:
-		case LAVA:
-			return AlmostBoolean.YES;
+			case STATIONARY_LAVA:
+			case STATIONARY_WATER:
+			case WATER:
+			case LAVA:
+				return AlmostBoolean.YES;
+			default:
+				return AlmostBoolean.NO;
 		}
-		return AlmostBoolean.NO;
 	}
 
 	@Override
