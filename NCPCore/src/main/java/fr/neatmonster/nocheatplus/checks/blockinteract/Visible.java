@@ -41,7 +41,7 @@ public class Visible extends Check {
 	
 	private static final double getEnd(final double[] bounds, final int index, final int mod){
 		if (bounds == null){
-			return 0.5 + 0.5 * mod + offset;
+			return 0.5 + (0.5 + offset) * mod;
 		}
 		if (mod == 0){
 			// Middle.
@@ -165,7 +165,7 @@ public class Visible extends Check {
 		// TODO: Could consider slightly in-set positions.
 		if (modX == 0){
 			// TODO: Might ensure to check if it is the same block?
-			final double d = (bounds[3] - bounds[0]) / 2.0;
+			final double d = bounds == null ? 0.5 : (bounds[3] - bounds[0]) / 2.0;
 			if (d >= 0.05){
 				// Recursion with adapted x position (if differs enough from bounds.
 				if (!checkCollision(eyeX, eyeY, eyeZ, estX - d, estY, estZ, estId, bounds, 1, modY, modZ, skipPassable)){
@@ -178,7 +178,7 @@ public class Visible extends Check {
 		}
 		if (modZ == 0){
 			// TODO: Might ensure to check if it is the same block?
-			final double d = (bounds[5] - bounds[2]) / 2.0;
+			final double d = bounds == null ? 0.5 : (bounds[5] - bounds[2]) / 2.0;
 			if (d >= 0.05){
 				// Recursion with adapted x position (if differs enough from bounds.
 				if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY, estZ - d, estId, bounds, 1, modY, 1, skipPassable)){
@@ -191,7 +191,7 @@ public class Visible extends Check {
 		}
 		if (modY == 0){
 			// TODO: Might ensure to check if it is the same block?
-			final double d = (bounds[4] - bounds[1]) / 2.0;
+			final double d = bounds == null ? 0.5 : (bounds[4] - bounds[1]) / 2.0;
 			if (d >= 0.05){
 				// Recursion with adapted x position (if differs enough from bounds.
 				if (!checkCollision(eyeX, eyeY, eyeZ, estX, estY - d, estZ, estId, bounds, 1, 1, 1, skipPassable)){
