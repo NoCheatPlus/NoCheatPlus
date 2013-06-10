@@ -98,9 +98,9 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
 	@Override
 	public Action<ViolationData, ActionList> getOptimizedCopy(final ConfigFileWithActions<ViolationData, ActionList> config, final Integer threshold) {
 		if (!config.getBoolean(ConfPaths.LOGGING_ACTIVE)) return null;
-		final boolean toConsole = this.toConsole && config.getBoolean(ConfPaths.LOGGING_CONSOLE);
-		final boolean toFile = this.toFile&& config.getBoolean(ConfPaths.LOGGING_FILE);
-		final boolean toChat= this.toChat&& config.getBoolean(ConfPaths.LOGGING_INGAMECHAT);
+		final boolean toConsole = this.toConsole && config.getBoolean(ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE);
+		final boolean toFile = this.toFile&& config.getBoolean(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE);
+		final boolean toChat= this.toChat&& config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE);
 		if (!toChat && ! toConsole && !toFile) return null;
 		return new LogAction(name, delay, repeat, toChat, toConsole, toFile, message);
 	}

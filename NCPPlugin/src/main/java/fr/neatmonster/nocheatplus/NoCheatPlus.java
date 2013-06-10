@@ -259,7 +259,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
     @Override
 	public int sendAdminNotifyMessage(final String message){
-		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_USESUBSCRIPTIONS)){
+		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)){
 			// TODO: Might respect console settings, or add extra config section (e.g. notifications).
 			return sendAdminNotifyMessageSubscriptions(message);
 		}
@@ -656,7 +656,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         ConfigManager.init(this);
         
         // Setup file logger.
-        StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
+        StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
         
         final ConfigFile config = ConfigManager.getConfigFile();
         

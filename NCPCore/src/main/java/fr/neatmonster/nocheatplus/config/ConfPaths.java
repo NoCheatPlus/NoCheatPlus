@@ -37,11 +37,28 @@ public abstract class ConfPaths {
 	@GlobalConfig
     private static final String LOGGING                                  = "logging.";
     public static final String  LOGGING_ACTIVE                           = LOGGING + "active";
-    public static final String  LOGGING_CONSOLE                          = LOGGING + "console";
     public static final String  LOGGING_DEBUG                            = LOGGING + "debug";
+    
+    private static final String LOGGING_BACKEND							 = LOGGING + "backend.";
+    private static final String LOGGING_BACKEND_CONSOLE					 = LOGGING_BACKEND + "console.";
+    public static final String  LOGGING_BACKEND_CONSOLE_ACTIVE           = LOGGING_BACKEND_CONSOLE + "active";
+    private static final String LOGGING_BACKEND_FILE					 = LOGGING_BACKEND + "file.";
+    public static final String  LOGGING_BACKEND_FILE_ACTIVE	        	 = LOGGING_BACKEND_FILE + "active";
+    public static final String  LOGGING_BACKEND_FILE_FILENAME	         = LOGGING_BACKEND_FILE + "filename";
+    private static final String LOGGING_BACKEND_INGAMECHAT				 = LOGGING_BACKEND + "ingamechat.";
+    public static final String  LOGGING_BACKEND_INGAMECHAT_ACTIVE      	 = LOGGING_BACKEND_INGAMECHAT + "active";
+    public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
+
+    // Deprecated.
+    @Moved(newPath=LOGGING_BACKEND_CONSOLE_ACTIVE)
+    public static final String  LOGGING_CONSOLE                          = LOGGING + "console";
+    @Moved(newPath=LOGGING_BACKEND_FILE_ACTIVE)
     public static final String  LOGGING_FILE                             = LOGGING + "file";
+    @Moved(newPath=LOGGING_BACKEND_FILE_FILENAME)
     public static final String  LOGGING_FILENAME                         = LOGGING + "filename";
+    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_ACTIVE)
     public static final String  LOGGING_INGAMECHAT                       = LOGGING + "ingamechat";
+    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
     public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = LOGGING + "usesubscriptions";
 
     /*

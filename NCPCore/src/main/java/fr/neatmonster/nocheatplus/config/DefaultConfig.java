@@ -51,13 +51,13 @@ public class DefaultConfig extends ConfigFile {
          */
         set(ConfPaths.LOGGING_ACTIVE, true);
         set(ConfPaths.LOGGING_DEBUG, false);
-        set(ConfPaths.LOGGING_CONSOLE, true);
-        set(ConfPaths.LOGGING_FILE, true);
-        set(ConfPaths.LOGGING_FILENAME, "nocheatplus.log");
-        set(ConfPaths.LOGGING_INGAMECHAT, true);
+        set(ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE, true);
+        set(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE, true);
+        set(ConfPaths.LOGGING_BACKEND_FILE_FILENAME, "nocheatplus.log");
+        set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE, true);
         
         // Notifications settings.
-        set(ConfPaths.LOGGING_USESUBSCRIPTIONS, false);
+        set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS, false);
 
         /*
          *     e   e     ,e,                        888 888                                                   

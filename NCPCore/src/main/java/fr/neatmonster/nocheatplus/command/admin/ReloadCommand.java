@@ -52,7 +52,7 @@ public class ReloadCommand extends NCPCommand {
         ConfigManager.cleanup();
         ConfigManager.init(plugin);
         StaticLogFile.cleanup();
-        StaticLogFile.setupLogger(new File(plugin.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
+        StaticLogFile.setupLogger(new File(plugin.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
         // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
         // Remove some checks data.
@@ -74,7 +74,7 @@ public class ReloadCommand extends NCPCommand {
         final String info = "[NoCheatPlus] Configuration reloaded.";
         if (!(sender instanceof ConsoleCommandSender)) Bukkit.getLogger().info(info);
         final ConfigFile config = ConfigManager.getConfigFile();
-        if (config.getBoolean(ConfPaths.LOGGING_ACTIVE) && config.getBoolean(ConfPaths.LOGGING_FILE)) StaticLogFile.fileLogger.info(info);
+        if (config.getBoolean(ConfPaths.LOGGING_ACTIVE) && config.getBoolean(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE)) StaticLogFile.fileLogger.info(info);
     }
 
 }
