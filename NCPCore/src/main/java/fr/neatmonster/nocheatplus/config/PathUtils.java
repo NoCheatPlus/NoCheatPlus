@@ -21,6 +21,9 @@ import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
 public class PathUtils {
 	
+	private static final Set<String> deprecatedFields = new LinkedHashSet<String>();
+	private static final SimpleCharPrefixTree deprecatedPrefixes = new SimpleCharPrefixTree();
+	
 	/** Field names of ConfPaths. */
 	private static final Set<String> globalOnlyFields = new HashSet<String>();
 	
@@ -54,10 +57,23 @@ public class PathUtils {
     				}
     			}
     		}
+    		if (field.isAnnotationPresent(Deprecated.class)){
+    			deprecatedFields.add(name);
+    			addDeprecated(field);
+    		}
     	}
     }
     
-    private static void addGlobalOnlyPath(final Field field) {
+    private static void addDeprecated(final Field field) {
+    	try {
+			final String path = field.get(null).toString();
+			deprecatedPrefixes.feed(path);
+		} catch (IllegalArgumentException e) {
+		} catch (IllegalAccessException e) {
+		}
+	}
+
+	private static void addGlobalOnlyPath(final Field field) {
     	try {
 			final String path = field.get(null).toString();
 			globalOnlyPaths.add(path);
@@ -79,6 +95,51 @@ public class PathUtils {
     		if (paths.hasPrefix(path)) 
     			log.warning("[NoCheatPlus] Config path '" + path + "'" + msgPrefix);
     	}
+    }
+    
+    /**
+     * Run all warning checks (GlobalConfig, deprecated, ...).
+     * @param file
+     * @param configName
+     */
+    public static void warnPaths(File file, String configName, boolean isWorldConfig){
+    	final ConfigFile config = new ConfigFile();
+    	try {
+			config.load(file);
+			if (isWorldConfig){
+				warnGlobalOnlyPaths(config, configName);
+			}
+			warnDeprecatedPaths(config, configName);
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		} catch (InvalidConfigurationException e) {
+		}
+    }
+    
+    /**
+     * Warn about paths that are deprecated (not in use).
+     * @param config
+     * @param paths
+     * @param configName
+     */
+    public static void warnDeprecatedPaths(ConfigFile config, String configName){
+    	warnPaths(config, deprecatedPrefixes, " (" + configName + ") is not in use anymore.");
+    }
+    
+    /**
+     * Warn about paths that are deprecated (not in use).
+     * @param file
+     * @param configName
+     */
+    public static void warnDeprecatedPaths(File file, String configName){
+    	final ConfigFile config = new ConfigFile();
+    	try {
+			config.load(file);
+			warnDeprecatedPaths(config, configName);
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+		} catch (InvalidConfigurationException e) {
+		}
     }
     
     /**

@@ -164,6 +164,7 @@ public class ConfigManager {
     	worldsMap.clear();
         // Try to obtain and parse the global configuration file.
         final File globalFile = new File(plugin.getDataFolder(), "config.yml");
+        PathUtils.warnPaths(globalFile, "global config", false);
         final ConfigFile globalConfig = new ConfigFile();
         globalConfig.setDefaults(new DefaultConfig());
         globalConfig.options().copyDefaults(true);
@@ -210,7 +211,7 @@ public class ConfigManager {
                 }
         for (final Entry<String, File> worldEntry : worldFiles.entrySet()) {
             final File worldFile = worldEntry.getValue();
-            PathUtils.warnGlobalOnlyPaths(worldFile, worldEntry.getKey());
+            PathUtils.warnPaths(worldFile, worldEntry.getKey(), true);
             final ConfigFile worldConfig = new ConfigFile();
             worldConfig.setDefaults(worldDefaults);
             worldConfig.options().copyDefaults(true);

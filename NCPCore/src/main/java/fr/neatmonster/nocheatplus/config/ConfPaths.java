@@ -15,6 +15,7 @@ package fr.neatmonster.nocheatplus.config;
 public abstract class ConfPaths {
 	
     // Sub-paths that are used with different path prefixes potentially.
+	// TODO: These might better be in another class.
     public static final String SUB_DEBUG 								 = "debug";
     public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
 	public static final String SUB_ALLOWINSTANTBREAK                     = "allowinstantbreak";
