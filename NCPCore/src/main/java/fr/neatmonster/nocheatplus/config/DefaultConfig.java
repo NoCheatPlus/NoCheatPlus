@@ -52,9 +52,12 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_ACTIVE, true);
         set(ConfPaths.LOGGING_DEBUG, false);
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE, true);
+        set(ConfPaths.LOGGING_BACKEND_CONSOLE_PREFIX, "[NoCheatPlus] ");
         set(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE, true);
+        set(ConfPaths.LOGGING_BACKEND_FILE_PREFIX, "");
         set(ConfPaths.LOGGING_BACKEND_FILE_FILENAME, "nocheatplus.log");
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE, true);
+        set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX, "&cNCP: &f");
         
         // Notifications settings.
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS, false);

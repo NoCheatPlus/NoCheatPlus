@@ -42,12 +42,15 @@ public abstract class ConfPaths {
     private static final String LOGGING_BACKEND							 = LOGGING + "backend.";
     private static final String LOGGING_BACKEND_CONSOLE					 = LOGGING_BACKEND + "console.";
     public static final String  LOGGING_BACKEND_CONSOLE_ACTIVE           = LOGGING_BACKEND_CONSOLE + "active";
+    public static final String  LOGGING_BACKEND_CONSOLE_PREFIX			 = LOGGING_BACKEND_CONSOLE + "prefix";
     private static final String LOGGING_BACKEND_FILE					 = LOGGING_BACKEND + "file.";
     public static final String  LOGGING_BACKEND_FILE_ACTIVE	        	 = LOGGING_BACKEND_FILE + "active";
     public static final String  LOGGING_BACKEND_FILE_FILENAME	         = LOGGING_BACKEND_FILE + "filename";
+    public static final String  LOGGING_BACKEND_FILE_PREFIX				 = LOGGING_BACKEND_FILE + "prefix";
     private static final String LOGGING_BACKEND_INGAMECHAT				 = LOGGING_BACKEND + "ingamechat.";
     public static final String  LOGGING_BACKEND_INGAMECHAT_ACTIVE      	 = LOGGING_BACKEND_INGAMECHAT + "active";
     public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
+    public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX		 = LOGGING_BACKEND_INGAMECHAT + "prefix";
 
     // Deprecated.
     @Moved(newPath=LOGGING_BACKEND_CONSOLE_ACTIVE)
