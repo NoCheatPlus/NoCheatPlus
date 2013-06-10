@@ -16,9 +16,9 @@ public abstract class ConfPaths {
 	
     // Sub-paths that are used with different path prefixes potentially.
     public static final String SUB_DEBUG 								 = "debug";
-    public static final String SUB_IGNOREPASSABLE                        = RootConfPaths.SUB_IGNOREPASSABLE;
-    public static final String SUB_ALLOWINSTANTBREAK                     = RootConfPaths.SUB_ALLOWINSTANTBREAK;
-    public static final String SUB_OVERRIDEFLAGS						 = RootConfPaths.SUB_OVERRIDEFLAGS;
+    public static final String SUB_IGNOREPASSABLE                        = "ignorepassable";
+	public static final String SUB_ALLOWINSTANTBREAK                     = "allowinstantbreak";
+	public static final String SUB_OVERRIDEFLAGS					 	 = "overrideflags";
     public static final String SUB_LAG       							 = "lag";
 	
 	// General:

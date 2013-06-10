@@ -24,7 +24,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.BlocksMC1_5;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
-import fr.neatmonster.nocheatplus.config.RootConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
@@ -1653,23 +1653,23 @@ public class BlockProperties {
 	 */
     public static void applyConfig(final RawConfigFile config, final String pathPrefix) {
         // Ignore passable.
-        for (final String input : config.getStringList(pathPrefix + RootConfPaths.SUB_IGNOREPASSABLE)){
+        for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_IGNOREPASSABLE)){
             final Integer id = RawConfigFile.parseTypeId(input);
-            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + RootConfPaths.SUB_IGNOREPASSABLE + "): " + input);
+            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
             else blockFlags[id] |= F_IGN_PASSABLE;
         }
         
         // Allow instant breaking.
-        for (final String input : config.getStringList(pathPrefix + RootConfPaths.SUB_ALLOWINSTANTBREAK)){
+        for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK)){
             final Integer id = RawConfigFile.parseTypeId(input);
-            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + RootConfPaths.SUB_ALLOWINSTANTBREAK + "): " + input);
+            if (id == null || id < 0 || id >= 4096) LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK + "): " + input);
             else {
             	setBlockProps(id, instantType);
             }
         }
         
         // Override block flags.
-        ConfigurationSection section = config.getConfigurationSection(pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS);
+        ConfigurationSection section = config.getConfigurationSection(pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS);
         if (section != null){
         	final Map<String, Object> entries = section.getValues(false);
         	boolean hasErrors = false;
@@ -1677,12 +1677,12 @@ public class BlockProperties {
         		final String key = entry.getKey();
         		final Integer id = RawConfigFile.parseTypeId(key);
                 if (id == null || id < 0 || id >= 4096){
-                	LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS + "): " + key);
+                	LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + "): " + key);
                 	continue;
                 }
                 final Object obj = entry.getValue();
                 if (!(obj instanceof String)){
-                	LogUtil.logWarning("[NoCheatplus] Bad flags at " + pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS + " for key: " + key);
+                	LogUtil.logWarning("[NoCheatplus] Bad flags at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key: " + key);
                 	hasErrors = true;
                 	continue;
                 }
@@ -1699,7 +1699,7 @@ public class BlockProperties {
                 	try{
                 		flags |= parseFlag(input);
                 	} catch(InputMismatchException e){
-                		LogUtil.logWarning("[NoCheatplus] Bad flag at " + pathPrefix + RootConfPaths.SUB_OVERRIDEFLAGS + " for key " + key + " (skip setting flags for this block): " + input);
+                		LogUtil.logWarning("[NoCheatplus] Bad flag at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key " + key + " (skip setting flags for this block): " + input);
                 		error = true;
                 		hasErrors = true;
                 		break;
