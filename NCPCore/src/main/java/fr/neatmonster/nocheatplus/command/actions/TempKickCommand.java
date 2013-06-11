@@ -6,7 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.command.DelayableCommand;
+import fr.neatmonster.nocheatplus.command.AbstractCommand;
+import fr.neatmonster.nocheatplus.command.actions.delay.DelayableCommand;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
@@ -35,7 +36,7 @@ public class TempKickCommand extends DelayableCommand {
 		if (duration <= 0) return false;
 		final long finalDuration = duration * base;
 		final String reason;
-		if (alteredArgs.length > 3) reason = join(alteredArgs, 3);
+		if (alteredArgs.length > 3) reason = AbstractCommand.join(alteredArgs, 3);
 		else reason = "";
 		schedule(new Runnable() {
 			@Override

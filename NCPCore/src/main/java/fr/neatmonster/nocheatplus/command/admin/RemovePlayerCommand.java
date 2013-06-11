@@ -11,12 +11,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-public class RemovePlayerCommand extends NCPCommand {
+public class RemovePlayerCommand extends BaseCommand {
 
 	public RemovePlayerCommand(JavaPlugin plugin) {
 		super(plugin, "removeplayer", Permissions.ADMINISTRATION_REMOVEPLAYER, new String[]{

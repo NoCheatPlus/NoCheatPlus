@@ -5,7 +5,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.neatmonster.nocheatplus.command.DelayableCommand;
+import fr.neatmonster.nocheatplus.command.AbstractCommand;
+import fr.neatmonster.nocheatplus.command.actions.delay.DelayableCommand;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
@@ -23,7 +24,7 @@ public class KickCommand extends DelayableCommand {
 		if (alteredArgs.length < 2) return false;
 		final String name = alteredArgs[1];
 		final String reason;
-		if (alteredArgs.length > 2) reason = join(alteredArgs, 2);
+		if (alteredArgs.length > 2) reason = AbstractCommand.join(alteredArgs, 2);
 		else reason = "";
 		schedule(new Runnable() {
 			@Override

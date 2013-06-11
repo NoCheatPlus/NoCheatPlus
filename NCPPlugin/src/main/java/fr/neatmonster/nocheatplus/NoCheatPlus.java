@@ -44,7 +44,7 @@ import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
-import fr.neatmonster.nocheatplus.command.CommandHandler;
+import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
 import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
@@ -762,7 +762,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         
         // Register the commands handler.
         PluginCommand command = getCommand("nocheatplus");
-        CommandHandler commandHandler = new CommandHandler(this, notifyReload);
+        NoCheatPlusCommand commandHandler = new NoCheatPlusCommand(this, notifyReload);
         command.setExecutor(commandHandler);
         // (CommandHandler is TabExecutor.)
         

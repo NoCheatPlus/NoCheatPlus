@@ -7,11 +7,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-public class KickListCommand extends NCPCommand {
+public class KickListCommand extends BaseCommand {
 
 	public KickListCommand(JavaPlugin plugin) {
 		super(plugin, "kicklist", Permissions.ADMINISTRATION_KICKLIST);

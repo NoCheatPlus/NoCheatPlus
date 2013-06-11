@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.command.actions;
+package fr.neatmonster.nocheatplus.command.actions.delay;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.neatmonster.nocheatplus.command.DelayableCommand;
+import fr.neatmonster.nocheatplus.command.AbstractCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /**
@@ -24,7 +24,7 @@ public class DelayCommand extends DelayableCommand {
 	public boolean execute(CommandSender sender, Command command, String label,
 			String[] alteredArgs, long delay) {
 		if (alteredArgs.length < 2) return false;
-		final String cmd = join(alteredArgs, 1);
+		final String cmd = AbstractCommand.join(alteredArgs, 1);
 		schedule(new Runnable() {
 			@Override
 			public void run() {

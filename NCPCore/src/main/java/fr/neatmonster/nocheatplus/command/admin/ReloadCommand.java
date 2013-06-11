@@ -10,8 +10,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.command.CommandHandler.NCPReloadEvent;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand.NCPReloadEvent;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -20,7 +20,7 @@ import fr.neatmonster.nocheatplus.logging.StaticLogFile;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
-public class ReloadCommand extends NCPCommand {
+public class ReloadCommand extends BaseCommand {
 	
 	/** Components that need to be notified on reload */
 	private final Collection<INotifyReload> notifyReload;
@@ -50,9 +50,9 @@ public class ReloadCommand extends NCPCommand {
 
         // Do the actual reload.
         ConfigManager.cleanup();
-        ConfigManager.init(plugin);
+        ConfigManager.init(access);
         StaticLogFile.cleanup();
-        StaticLogFile.setupLogger(new File(plugin.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
+        StaticLogFile.setupLogger(new File(access.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
         // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
         // Remove some checks data.

@@ -5,7 +5,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.neatmonster.nocheatplus.command.DelayableCommand;
+import fr.neatmonster.nocheatplus.command.AbstractCommand;
+import fr.neatmonster.nocheatplus.command.actions.delay.DelayableCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
@@ -26,7 +27,7 @@ public class TellCommand extends DelayableCommand {
 			final String[] alteredArgs, long delay) {
 		if (alteredArgs.length < 3) return false;
 		final String name = alteredArgs[1].trim();
-		final String message = join(alteredArgs, 2);
+		final String message = AbstractCommand.join(alteredArgs, 2);
 		schedule(new Runnable() {
 			@Override
 			public void run() {

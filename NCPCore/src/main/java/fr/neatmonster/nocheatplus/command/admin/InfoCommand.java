@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.command.admin;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -12,11 +13,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory.ViolationLevel;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
-public class InfoCommand extends NCPCommand {
+public class InfoCommand extends BaseCommand {
 
 	public InfoCommand(JavaPlugin plugin) {
 		super(plugin, "info", Permissions.ADMINISTRATION_INFO);
@@ -70,5 +71,14 @@ public class InfoCommand extends NCPCommand {
             sender.sendMessage(TAG + "Displaying " + playerName + "'s violations... nothing to display.");
         
     }
+
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.command.AbstractCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		// Fill in players.
+		return null;
+	}
 	
 }

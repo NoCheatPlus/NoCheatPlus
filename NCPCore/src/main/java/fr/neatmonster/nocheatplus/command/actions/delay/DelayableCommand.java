@@ -1,16 +1,20 @@
-package fr.neatmonster.nocheatplus.command;
+package fr.neatmonster.nocheatplus.command.actions.delay;
+
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import fr.neatmonster.nocheatplus.command.BaseCommand;
+
 /**
  * A command that allows to specify a delay for running.
  * @author mc_dev
  *
  */
-public abstract class DelayableCommand extends NCPCommand {
+public abstract class DelayableCommand extends BaseCommand {
 	
 	/**
 	 * Parse an argument for a delay in ticks. The delay is specified with "delay=...".
@@ -146,9 +150,19 @@ public abstract class DelayableCommand extends NCPCommand {
 		if (delay < 0) 
 			runnable.run();
 		else if (delay == 0)
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, runnable);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(access, runnable);
 		else 
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, runnable, delay);
+			Bukkit.getScheduler().scheduleSyncDelayedTask(access, runnable, delay);
+	}
+	
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.command.AbstractCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		// Fill in players.
+		// TODO: Add altered signature for alteredArgs ?
+		return null;
 	}
 
 }

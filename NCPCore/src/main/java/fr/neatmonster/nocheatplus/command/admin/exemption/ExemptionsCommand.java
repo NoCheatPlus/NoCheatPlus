@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.command.admin;
+package fr.neatmonster.nocheatplus.command.admin.exemption;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-public class ExemptionsCommand extends NCPCommand {
+public class ExemptionsCommand extends BaseCommand {
 
 	public ExemptionsCommand(JavaPlugin plugin) {
 		super(plugin, "exemptions", Permissions.ADMINISTRATION_EXEMPTIONS, new String[]{"exe"});
@@ -35,6 +35,15 @@ public class ExemptionsCommand extends NCPCommand {
 		if (entries.isEmpty()) sender.sendMessage(TAG + "No exemption entries available for " + playerName +" .");
 		else sender.sendMessage(TAG + "Exemptions for " + playerName + ": " + StringUtil.join(entries, ", "));
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.command.AbstractCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		// Fill in players.
+		return null;
 	}
 
 }

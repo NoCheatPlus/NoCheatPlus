@@ -6,11 +6,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
-public class NCPVersionCommand extends NCPCommand{
+public class NCPVersionCommand extends BaseCommand{
 
 	public NCPVersionCommand(JavaPlugin plugin) {
 		super(plugin, "version", Permissions.ADMINISTRATION_VERSION, new String[]{"versions", "ver"});
@@ -25,7 +25,7 @@ public class NCPVersionCommand extends NCPCommand{
 				"#### Server ####",
 				Bukkit.getServer().getVersion(),
 				"#### NoCheatPlus ####",
-				"Plugin: " + plugin.getDescription().getVersion(),
+				"Plugin: " + access.getDescription().getVersion(),
 				"MCAccess: " + mc.getMCVersion() + " / " + mc.getServerVersionTag(),
 
 				});
