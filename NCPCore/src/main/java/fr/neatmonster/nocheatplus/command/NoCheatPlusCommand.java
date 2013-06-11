@@ -134,17 +134,26 @@ public class NoCheatPlusCommand extends BaseCommand{
 
         final boolean protectPlugins = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
         
-        if (args.length > 0){
-        	AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());
-        	if (subCommand != null && sender.hasPermission(subCommand.permission)){
-        		// Sender has permission to run the command.
-        		return subCommand.onCommand(sender, command, commandLabel, args);
+        // Bit crude workaround.
+        // TODO: Replace this by checking a permission set as child permission of each and every child command.
+        boolean hasSomePermission = false;
+        for (AbstractCommand<?> cmd : subCommands.values()){
+        	if (sender.hasPermission(cmd.permission)){
+        		hasSomePermission = true;
         	}
         }
         
-        // Bit crude workaround. TODO: Add chuld permission to commands permissions and check that one.
-        for (AbstractCommand<?> cmd : subCommands.values()){
-        	if (sender.hasPermission(cmd.permission)) return false;
+        if (hasSomePermission){
+        	// Check sub-commands.
+            if (args.length > 0){
+            	AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());
+            	if (subCommand != null && sender.hasPermission(subCommand.permission)){
+            		// Sender has permission to run the command.
+            		return subCommand.onCommand(sender, command, commandLabel, args);
+            	}
+            }
+        	// No sub command worked, print usage.
+        	return false;
         }
         
         if (protectPlugins){
