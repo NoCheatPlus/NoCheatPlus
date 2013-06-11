@@ -78,6 +78,7 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.updates.Updates;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
@@ -98,6 +99,9 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
+	private static final String MSG_CONFIG_OUTDATED = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!";
+	private static final String MSG_NOTIFY_OFF = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are turned " + ChatColor.RED + "OFF" + ChatColor.WHITE + ".";
+
 	//////////////////
 	// Static API
 	//////////////////
@@ -154,6 +158,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** Components that need notification on reloading.
      * (Kept here, for if during runtime some might get added.)*/
     private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
+    
+    /** If to use subscriptions or not. */
+    protected boolean useSubscriptions = false;
 	
 	/** Permission states stored on a per-world basis, updated with join/quit/kick.  */
 	protected final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
@@ -259,7 +266,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
     @Override
 	public int sendAdminNotifyMessage(final String message){
-		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)){
+		if (useSubscriptions){
 			// TODO: Might respect console settings, or add extra config section (e.g. notifications).
 			return sendAdminNotifyMessageSubscriptions(message);
 		}
@@ -267,6 +274,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			return sendAdminNotifyMessageStored(message);
 		}
 	}
+    
+    private final boolean hasTurnedOffNotifications(final String playerName){
+    	final PlayerData data = DataManager.getPlayerData(playerName, false);
+    	return data != null && data.getNotifyOff();
+    }
 	
 	/**
 	 * Send notification to players with stored notify-permission (world changes, login, permissions are not re-checked here). 
@@ -278,6 +290,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		if (names == null) return 0;
 		int done = 0;
 		for (final String name : names){
+			if (hasTurnedOffNotifications(name)){
+				// Has turned off notifications.
+				continue;
+			}
 			final Player player = DataManager.getPlayerExact(name);
 			if (player != null){
 				player.sendMessage(message);
@@ -299,6 +315,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		for (final Permissible permissible : permissibles){
 			if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
 				final CommandSender sender = (CommandSender) permissible;
+				if ((sender instanceof Player) && hasTurnedOffNotifications(((Player) sender).getName())){
+					continue;
+				}
+
 				sender.sendMessage(message);
 				done.add(sender.getName());
 			}
@@ -309,6 +329,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				if (!done.contains(name)){
 					final Player player = DataManager.getPlayerExact(name);
 					if (player != null && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
+						if (hasTurnedOffNotifications(player.getName())){
+							continue;
+						}
 						player.sendMessage(message); 
 						done.add(name);
 					}
@@ -660,6 +683,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         
         final ConfigFile config = ConfigManager.getConfigFile();
         
+        useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
+        
         // Initialize MCAccess.
         initMCAccess(config);
         
@@ -858,6 +883,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
 		// (Re-) schedule consistency checking.
 		scheduleConsistencyCheckers();
+		// Cache some things.
+		useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
     }
     
 	@Override
@@ -990,16 +1017,18 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	protected void onJoin(final Player player){
 		updatePermStateReceivers(player);
-		
-		if (nameSetPerms.hasPermission(player.getName(), Permissions.ADMINISTRATION_NOTIFY)){
+		final String playerName = player.getName();
+		if (nameSetPerms.hasPermission(playerName, Permissions.ADMINISTRATION_NOTIFY)){
 			// Login notifications...
 			
 //			// Update available.
 //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 			
 			// Outdated config.
-			if (configOutdated) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!");
-
+			if (configOutdated) player.sendMessage(MSG_CONFIG_OUTDATED);
+			if (hasTurnedOffNotifications(playerName)){
+				player.sendMessage(MSG_NOTIFY_OFF);
+			}
 		}
 		ModUtil.motdOnJoin(player);
 		for (final JoinLeaveListener jlListener : joinLeaveListeners){
