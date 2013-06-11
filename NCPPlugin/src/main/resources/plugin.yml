@@ -16,25 +16,26 @@ commands:
         # permissions: nocheatplus.admin.(...)
         usage: |
                Administrative commands overview:
-               /<command> version: Show version information.
-               /<command> reload: reload the configuration
-               /<command> lag: Lag related info [expect changes] 
-               /<command> info (player): Display the violations of a player
-               /<command> removeplayer (player) [(check type)]: Remove data
-               /<command> exemptions (player) [(check type)]: Show exemptions
-               /<command> exempt (player) [(check type)]: Exempt the player
-               /<command> unexempt (player) [(check type)]: Unexempt the player
-               /<command> commands: List all commands, more than shown here
+               /<command> info (player): Violation summary for a player.
+               /<command> notify on|off: In-game notifications per player.
+               /<command> removeplayer (player) [(check type)]: Remove data.
+               /<command> reload: Reload the configuration.
+               /<command> lag: Lag-related info.
+               /<command> version: Version information.
+               /<command> exemptions (player) [(check type)]: Show exemptions.
+               /<command> exempt (player) [(check type)]: Exempt a player.
+               /<command> unexempt (player) [(check type)]: Unexempt a player.
+               /<command> commands: List all commands, more than shown here.
 
 permissions:
     nocheatplus:
-        description: Allow the player to bypass all checks and give him all administation permissions.
+        description: Allow the player to bypass all checks and give him all administration permissions.
         children:
             nocheatplus.admin:
-                description: Give the player all administation rights.
+                description: Give the player all administration rights.
                 children:
                     nocheatplus.admin.notify:
-                        description: Allow the player to see the alerts in the ingame chat.
+                        description: Allow the player to see the alerts in the in-game chat.
                     nocheatplus.admin.plugins:
                         description: Allow the player to see the list of all plugins (/plugins).
                     nocheatplus.admin.reload:

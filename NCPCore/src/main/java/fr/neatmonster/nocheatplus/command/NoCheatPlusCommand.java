@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.ExemptCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.ExemptionsCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.UnexemptCommand;
+import fr.neatmonster.nocheatplus.command.admin.notify.NotifyCommand;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -48,7 +49,7 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
  * MMMMMMMMMMMM                                                 
  */
 /**
- * This the class handling all the commands.
+ * The /nocheatplus or /ncp command handler, delegates to sub commands.
  */
 public class NoCheatPlusCommand extends BaseCommand{
 
@@ -100,6 +101,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         		new KickListCommand(plugin),
         		new LagCommand(plugin),
         		new NCPVersionCommand(plugin),
+        		new NotifyCommand(plugin),
         		new ReloadCommand(plugin, notifyReload),
         		new RemovePlayerCommand(plugin),
         		new TellCommand(plugin),
