@@ -16,16 +16,17 @@
   <modules>
     <module>NCPBuildBase</module>
     <module>NCPCommons</module>
-    <module>NCPCompat</module>
+    <module>NCPCore</module>
     <module>NCPCompatBukkit</module>
     <module>NCPCompatCB2511</module>
     <module>NCPCompatCB2512</module>
-    <module>NCPPlugin</module>
     <module>NCPCompatCB2545</module>
     <module>NCPCompatCB2602</module>
     <module>NCPCompatCB2645</module>
     <module>NCPCompatCB2691</module>
     <module>NCPCompatCBDev</module>
+    <module>NCPPlugin</module>
+    <module>NoCheatPlus</module>
   </modules>
 
   <repositories>
@@ -36,7 +37,7 @@
     </repository>
   </repositories>
 
-  <description>The pom design has been taken from mbax (GitHub, TODO: link).
+  <description>The initial pom design had been taken from mbax (GitHub, TODO: link).
 
 TODO: Switch it to an assembly pom + consider using one bukkit version only  for compilation? [Downside: the compat part should be the minimal bukkit version supported, though then the plugin would be taken out, so... do it!]
 

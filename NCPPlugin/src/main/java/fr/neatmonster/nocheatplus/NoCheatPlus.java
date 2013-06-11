@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,7 +45,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.CommandHandler;
-import fr.neatmonster.nocheatplus.command.INotifyReload;
+import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
@@ -52,6 +53,7 @@ import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
 import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
+import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.components.NCPListener;
@@ -76,11 +78,11 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.updates.Updates;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
-import fr.neatmonster.nocheatplus.utilities.Updates;
 
 /*
  * M"""""""`YM          MM'""""'YMM dP                           dP   MM"""""""`YM dP                   
@@ -96,195 +98,31 @@ import fr.neatmonster.nocheatplus.utilities.Updates;
  */
 public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
-	/** Lower case player name to milliseconds point of time of release */
-	private static final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
-	
-	/** Names of players with a certain permission. */
-	protected static final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.ADMINISTRATION_NOTIFY);
-	
-	/** MCAccess instance. */
-	protected static MCAccess mcAccess = null;
+	//////////////////
+	// Static API
+	//////////////////
 	
 	/**
-	 * Get the wrapper for accessing Minecraft properties.
-	 * @return
-	 */
-	public static MCAccess getMCAccess(){
-		if (mcAccess == null) initMCAccess();
-		return mcAccess;
-	}
-	
-	private static void initMCAccess() {
-		synchronized (NoCheatPlus.class) {
-			if (mcAccess != null) return;
-			mcAccess = new MCAccessFactory().getMCAccess();
-		}
-		LogUtil.logInfo("[NoCheatPlus] McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
-	}
-
-	/**
-	 * Remove expired entries.
-	 */
-    private static void checkDenyLoginsNames() {
-		final long ts = System.currentTimeMillis();
-		final List<String> rem = new LinkedList<String>();
-		synchronized (denyLoginNames) {
-			for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
-				if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
-			}
-			for (final String name : rem){
-				denyLoginNames.remove(name);
-			}
-		}
-	}
-    
-    /**
-     * Allow login (remove from deny login map).
-     * @param playerName
-     * @return If player was denied to login.
-     */
-    public static boolean allowLogin(String playerName){
-    	playerName = playerName.trim().toLowerCase();
-    	final Long time = denyLoginNames.remove(playerName);
-    	if (time == null) return false;
-    	return System.currentTimeMillis() <= time;
-    }
-    
-    /**
-     * Remove all players from the allow login set.
-     * @return Number of players that had actually been denied to login.
-     */
-    public static int allowLoginAll(){
-    	int denied = 0;
-    	final long now = System.currentTimeMillis();
-    	for (final String playerName : denyLoginNames.keySet()){
-    		final Long time = denyLoginNames.get(playerName);
-        	if (time != null && time > now) denied ++;
-    	}
-    	denyLoginNames.clear();
-    	return denied;
-    }
-    
-	/**
-	 * Deny the player to login. This will also remove expired entries.
-	 * @param playerName
-	 * @param duration Duration from now on, in milliseconds.
-	 */
-	public static void denyLogin(String playerName, long duration){
-		final long ts = System.currentTimeMillis() + duration;
-		playerName = playerName.trim().toLowerCase();
-		synchronized (denyLoginNames) {
-			final Long oldTs = denyLoginNames.get(playerName);
-			if (oldTs != null && ts < oldTs.longValue()) return;
-			denyLoginNames.put(playerName, ts);
-			// TODO: later maybe save these ?
-		}
-		checkDenyLoginsNames();
-	}
-	
-	/**
-	 * Check if player is denied to login right now. 
-	 * @param playerName
-	 * @return
-	 */
-	public static boolean isLoginDenied(String playerName){
-		return isLoginDenied(playerName, System.currentTimeMillis());
-	}
-	
-	public static String[] getLoginDeniedPlayers() {
-		checkDenyLoginsNames();
-		String[] kicked = new String[denyLoginNames.size()];
-		denyLoginNames.keySet().toArray(kicked);
-		return kicked;
-	}
-
-	/**
-	 * Check if a player is denied to login at a certain point of time.
-	 * @param playerName
-	 * @param currentTimeMillis
-	 * @return
-	 */
-	public static boolean isLoginDenied(String playerName, long time) {
-		playerName = playerName.trim().toLowerCase();
-		final Long oldTs = denyLoginNames.get(playerName);
-		if (oldTs == null) return false; 
-		else return time < oldTs.longValue();
-	}
-	
-	/**
-	 * Convenience method, delegates to 
+	 * Convenience method.
+	 * @deprecated Use fr.neatmonster.nocheatplus.utilities.NCPAPIProvider.getNoCheatPlusAPI() instead, this method might get removed.
 	 * @return
 	 */
 	public static NoCheatPlusAPI getAPI() {
-		return (NoCheatPlusAPI) Bukkit.getPluginManager().getPlugin("NoCheatPlus");
+		return NCPAPIProvider.getNoCheatPlusAPI();
 	}
 	
-	/**
-	 * Send all players with the nocheatplus.admin.notify permission a message.<br>
-	 * This will act according to configuration (stored permissions or permission subscriptions).
-	 * 
-	 * @param message
-	 * @return Number of players messaged.
-	 */
-	public static int sendAdminNotifyMessage(final String message){
-		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_USESUBSCRIPTIONS)){
-			// TODO: Might respect console settings, or add extra config section (e.g. notifications).
-			return sendAdminNotifyMessageSubscriptions(message);
-		}
-		else{
-			return sendAdminNotifyMessageStored(message);
-		}
-	}
+	//////////////////
+	// Not static.
+	//////////////////
 	
-	/**
-	 * Send notification to players with stored notify-permission (world changes, login, permissions are not re-checked here). 
-	 * @param message
-	 * @return
-	 */
-	public static int sendAdminNotifyMessageStored(final String message){
-		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
-		if (names == null) return 0;
-		int done = 0;
-		for (final String name : names){
-			final Player player = DataManager.getPlayerExact(name);
-			if (player != null){
-				player.sendMessage(message);
-				done ++;
-			}
-		}
-		return done;
-	}
+	/** Names of players with a certain permission. */
+	protected final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.ADMINISTRATION_NOTIFY);
 	
-	/**
-	 * Send notification to all CommandSenders found in permission subscriptions for the notify-permission as well as players that have stored permissions (those get re-checked here).
-	 * @param message
-	 * @return
-	 */
-	public static int sendAdminNotifyMessageSubscriptions(final String message){
-		final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.ADMINISTRATION_NOTIFY);
-		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
-		final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
-		for (final Permissible permissible : permissibles){
-			if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
-				final CommandSender sender = (CommandSender) permissible;
-				sender.sendMessage(message);
-				done.add(sender.getName());
-			}
-		}
-		// Fall-back checking for players.
-		if (names != null){
-			for (final String name : names){
-				if (!done.contains(name)){
-					final Player player = DataManager.getPlayerExact(name);
-					if (player != null && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
-						player.sendMessage(message); 
-						done.add(name);
-					}
-				}
-			}
-		}
-		return done.size();
-	}
+	/** Lower case player name to milliseconds point of time of release */
+	private final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
+	
+	/** MCAccess instance. */
+	protected MCAccess mcAccess = null;
 
     /** Is the configuration outdated? */
     private boolean              configOutdated  = false;
@@ -348,6 +186,137 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			return false;
 		}
 	};
+
+	/**
+	 * Remove expired entries.
+	 */
+    private void checkDenyLoginsNames() {
+		final long ts = System.currentTimeMillis();
+		final List<String> rem = new LinkedList<String>();
+		synchronized (denyLoginNames) {
+			for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
+				if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
+			}
+			for (final String name : rem){
+				denyLoginNames.remove(name);
+			}
+		}
+	}
+    
+    @Override
+    public boolean allowLogin(String playerName){
+    	playerName = playerName.trim().toLowerCase();
+    	final Long time = denyLoginNames.remove(playerName);
+    	if (time == null) return false;
+    	return System.currentTimeMillis() <= time;
+    }
+    
+    @Override
+    public int allowLoginAll(){
+    	int denied = 0;
+    	final long now = System.currentTimeMillis();
+    	for (final String playerName : denyLoginNames.keySet()){
+    		final Long time = denyLoginNames.get(playerName);
+        	if (time != null && time > now) denied ++;
+    	}
+    	denyLoginNames.clear();
+    	return denied;
+    }
+    
+    @Override
+	public void denyLogin(String playerName, long duration){
+		final long ts = System.currentTimeMillis() + duration;
+		playerName = playerName.trim().toLowerCase();
+		synchronized (denyLoginNames) {
+			final Long oldTs = denyLoginNames.get(playerName);
+			if (oldTs != null && ts < oldTs.longValue()) return;
+			denyLoginNames.put(playerName, ts);
+			// TODO: later maybe save these ?
+		}
+		checkDenyLoginsNames();
+	}
+	
+    @Override
+	public boolean isLoginDenied(String playerName){
+		return isLoginDenied(playerName, System.currentTimeMillis());
+	}
+	
+    @Override
+	public String[] getLoginDeniedPlayers() {
+		checkDenyLoginsNames();
+		String[] kicked = new String[denyLoginNames.size()];
+		denyLoginNames.keySet().toArray(kicked);
+		return kicked;
+	}
+
+    @Override
+	public boolean isLoginDenied(String playerName, long time) {
+		playerName = playerName.trim().toLowerCase();
+		final Long oldTs = denyLoginNames.get(playerName);
+		if (oldTs == null) return false; 
+		else return time < oldTs.longValue();
+	}
+	
+    @Override
+	public int sendAdminNotifyMessage(final String message){
+		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)){
+			// TODO: Might respect console settings, or add extra config section (e.g. notifications).
+			return sendAdminNotifyMessageSubscriptions(message);
+		}
+		else{
+			return sendAdminNotifyMessageStored(message);
+		}
+	}
+	
+	/**
+	 * Send notification to players with stored notify-permission (world changes, login, permissions are not re-checked here). 
+	 * @param message
+	 * @return
+	 */
+	public int sendAdminNotifyMessageStored(final String message){
+		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
+		if (names == null) return 0;
+		int done = 0;
+		for (final String name : names){
+			final Player player = DataManager.getPlayerExact(name);
+			if (player != null){
+				player.sendMessage(message);
+				done ++;
+			}
+		}
+		return done;
+	}
+	
+	/**
+	 * Send notification to all CommandSenders found in permission subscriptions for the notify-permission as well as players that have stored permissions (those get re-checked here).
+	 * @param message
+	 * @return
+	 */
+	public int sendAdminNotifyMessageSubscriptions(final String message){
+		final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.ADMINISTRATION_NOTIFY);
+		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
+		final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
+		for (final Permissible permissible : permissibles){
+			if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
+				final CommandSender sender = (CommandSender) permissible;
+				sender.sendMessage(message);
+				done.add(sender.getName());
+			}
+		}
+		// Fall-back checking for players.
+		if (names != null){
+			for (final String name : names){
+				if (!done.contains(name)){
+					final Player player = DataManager.getPlayerExact(name);
+					if (player != null && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
+						player.sendMessage(message); 
+						done.add(name);
+					}
+				}
+			}
+		}
+		return done.size();
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -652,6 +621,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				Arrays.asList("plugins", "version", "icanhasbukkit"), "nocheatplus.feature.command", false);
 		if (this.changedCommands == null) this.changedCommands = changedCommands;
 		else this.changedCommands.addAll(changedCommands);
+	}	
+
+	/* (non-Javadoc)
+	 * @see org.bukkit.plugin.java.JavaPlugin#onLoad()
+	 */
+	@Override
+	public void onLoad() {
+		NCPAPIProvider.setNoCheatPlusAPI(this);
+		// TODO: Can not set to null in onDisable...
+		super.onLoad(); // TODO: Check what this does / order.
 	}
 
 	/* (non-Javadoc)
@@ -677,11 +656,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         ConfigManager.init(this);
         
         // Setup file logger.
-        StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_FILENAME)));
+        StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
         
         final ConfigFile config = ConfigManager.getConfigFile();
         
-        // Initialize BlockProperties
+        // Initialize MCAccess.
+        initMCAccess(config);
+        
+        // Initialize BlockProperties.
 		initBlockProperties(config);
 		
 		// Initialize data manager.
@@ -701,6 +683,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			listenerManager.setRegisterDirectly(false);
 			listenerManager.clear();
 		}
+		
 		// Add the "low level" system components first.
 		for (final Object obj : new Object[]{
 				nameSetPerms,
@@ -723,12 +706,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	        	dataMan,
 		}){
 			addComponent(obj);
+			// Register sub-components (allow later added to use registries, if any).
+            processQueuedSubComponentHolders();
 		}
-		
-		// Register sub-components (!).
-        processQueuedSubComponentHolders();
         
-		// Register "highe level" components (check listeners).
+		// Register "higher level" components (check listeners).
         for (final Object obj : new Object[]{
         	new BlockInteractListener(),
         	new BlockBreakListener(),
@@ -741,10 +723,17 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         	new MovingListener(),
         }){
         	addComponent(obj);
+            // Register sub-components (allow later added to use registries, if any).
+            processQueuedSubComponentHolders();
         }
         
-        // Register sub-components (!).
-        processQueuedSubComponentHolders();
+        // Register optional default components.
+        final DefaultComponentFactory dcf = new DefaultComponentFactory();
+        for (final Object obj : dcf.getAvailableComponentsOnEnable()){
+        	addComponent(obj);
+        	// Register sub-components to enable registries for optional components.
+            processQueuedSubComponentHolders();
+        }
         
         // Register the commands handler.
         PluginCommand command = getCommand("nocheatplus");
@@ -871,20 +860,57 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		scheduleConsistencyCheckers();
     }
     
+	@Override
+	public MCAccess getMCAccess(){
+		if (mcAccess == null) initMCAccess();
+		return mcAccess;
+	}
+	
+	/**
+	 * Fall-back method to initialize from factory, only if not yet set. Uses the BukkitScheduler to ensure this works if called from async checks.
+	 */
+	private void initMCAccess() {
+		getServer().getScheduler().callSyncMethod(this, new Callable<MCAccess>() {
+			@Override
+			public MCAccess call() throws Exception {
+				if (mcAccess != null) return mcAccess;
+				return initMCAccess(ConfigManager.getConfigFile());
+			}
+		});
+	}
+    
     /**
-     * Re-setup MCAccess and pass it to MCAccessHolder components.
+     * Re-setup MCAccess from internal factory and pass it to MCAccessHolder components, only call from the main thread.
      * @param config
      */
-    protected void initMCAccess(final ConfigFile config) {
+    public MCAccess initMCAccess(final ConfigFile config) {
     	// Reset MCAccess.
-    	NoCheatPlus.mcAccess = null;
-    	final MCAccess mcAccess = getMCAccess();
+    	// TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
+    	final MCAccess mcAccess = new MCAccessFactory().getMCAccess(config.getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY));
+    	setMCAccess(mcAccess);
+    	return mcAccess;
+	}
+    
+    /**
+     * Set and propagate to registered MCAccessHolder instances.
+     */
+    @Override
+    public void setMCAccess(final MCAccess mcAccess){
+    	// Just sets it and propagates it.
+    	// TODO: Might fire a NCPSetMCAccessEvent (include getting and setting)!
+    	this.mcAccess = mcAccess;
     	for (final Object obj : this.allComponents){
     		if (obj instanceof MCAccessHolder){
-    			((MCAccessHolder) obj).setMCAccess(mcAccess);
+    			try{
+    				((MCAccessHolder) obj).setMCAccess(mcAccess);
+    			} catch(Throwable t){
+    				LogUtil.logSevere("[NoCheatPlus] MCAccessHolder(" + obj.getClass().getName() + ") failed to set MCAccess: " + t.getClass().getSimpleName());
+    				LogUtil.logSevere(t);
+    			}
     		}
     	}
-	}
+		LogUtil.logInfo("[NoCheatPlus] McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
+    }
 
 	/**
      * Initialize BlockProperties, including config.
@@ -922,7 +948,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	 */
 	private Listener getCoreListener() {
 		return new NCPListener() {
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.NORMAL)
 			public void onPlayerLogin(final PlayerLoginEvent event) {
 				// (NORMAL to have chat checks come after this.)
@@ -939,13 +964,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				}
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerJoin(final PlayerJoinEvent event) {
 				onJoin(event.getPlayer());
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
 			{
@@ -953,13 +976,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				updatePermStateReceivers(player);
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 			public void onPlayerKick(final PlayerKickEvent event) {
 				onLeave(event.getPlayer());
 			}
 
-			@SuppressWarnings("unused")
 			@EventHandler(priority = EventPriority.MONITOR)
 			public void onPlayerQuitMonitor(final PlayerQuitEvent event) {
 				onLeave(event.getPlayer());

@@ -109,7 +109,7 @@ public class MCAccessFactory {
 			};
 		}
 		
-		// Try to set up api-only access (ca. 1.4.7).
+		// Try to set up api-only access (since 1.4.6).
 		try{
 			final String msg;
 			if (bukkitOnly){

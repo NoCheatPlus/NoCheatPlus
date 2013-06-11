@@ -88,5 +88,81 @@ public class StringUtil {
 		}
 		return out;
 	}
+
+	/**
+	 * Return if the two Strings are similar based on the given threshold.
+	 * 
+	 * @param s
+	 *            the first String, must not be null
+	 * @param t
+	 *            the second String, must not be null
+	 * @param threshold
+	 *            the minimum value of the correlation coefficient
+	 * @return result true if the two Strings are similar, false otherwise
+	 */
+	public static boolean isSimilar(final String s, final String t, final float threshold)
+	{
+		return 1.0f - (float) levenshteinDistance(s, t) / Math.max(1.0, Math.max(s.length(), t.length())) > threshold;
+	}
+
+	/**
+	 * Find the Levenshtein distance between two Strings.
+	 * 
+	 * This is the number of changes needed to change one String into another,
+	 * where each change is a single character modification (deletion, insertion or substitution).
+	 * 
+	 * @param s
+	 *            the first String, must not be null
+	 * @param t
+	 *            the second String, must not be null
+	 * @return result distance
+	 */
+	public static int levenshteinDistance(CharSequence s, CharSequence t) {
+		if (s == null || t == null) throw new IllegalArgumentException("Strings must not be null");
+	
+		int n = s.length();
+		int m = t.length();
+	
+		if (n == 0) return m;
+		else if (m == 0) return n;
+	
+		if (n > m) {
+			final CharSequence tmp = s;
+			s = t;
+			t = tmp;
+			n = m;
+			m = t.length();
+		}
+	
+		int p[] = new int[n + 1];
+		int d[] = new int[n + 1];
+		int _d[];
+	
+		int i;
+		int j;
+	
+		char t_j;
+	
+		int cost;
+	
+		for (i = 0; i <= n; i++)
+			p[i] = i;
+	
+		for (j = 1; j <= m; j++) {
+			t_j = t.charAt(j - 1);
+			d[0] = j;
+	
+			for (i = 1; i <= n; i++) {
+				cost = s.charAt(i - 1) == t_j ? 0 : 1;
+				d[i] = Math.min(Math.min(d[i - 1] + 1, p[i] + 1), p[i - 1] + cost);
+			}
+	
+			_d = p;
+			p = d;
+			d = _d;
+		}
+	
+		return p[n];
+	}
 	
 }

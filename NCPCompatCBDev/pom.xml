@@ -16,7 +16,7 @@
   <dependencies>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
-    	<artifactId>ncpcompat</artifactId>
+    	<artifactId>ncpcore</artifactId>
     	<version>static</version>
     </dependency>
     <dependency>
@@ -26,7 +26,7 @@
     </dependency>
   </dependencies>
 
-  <description>Compatibility for the developement version (latest).
+  <description>Compatibility for the development version (latest of the supported Minecraft versions).
 
 Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
 </project>

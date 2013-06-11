@@ -188,6 +188,8 @@ permissions:
                                 description: Allow the player to bypass the Drop check.
                             nocheatplus.checks.inventory.fastclick:
                                 description: Allow the player to bypass the FastClick check.
+                            nocheatplus.checks.inventory.fastconsume:
+                                description: Allow to bypass the FastConsume check.
                             nocheatplus.checks.inventory.instantbow:
                                 description: Allow the player to bypass the InstantBow check.
                             nocheatplus.checks.inventory.instanteat:

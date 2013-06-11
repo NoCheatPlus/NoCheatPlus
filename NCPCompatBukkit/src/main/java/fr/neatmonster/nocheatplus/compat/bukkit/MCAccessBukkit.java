@@ -17,8 +17,8 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
-import fr.neatmonster.nocheatplus.compat.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -41,7 +41,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	public String getMCVersion() {
 		// Bukkit API.
 		// TODO: maybe output something else.
-		return "1.4.6|1.4.7|?";
+		return "1.4.6|1.4.7|1.5.0|1.5.1|1.5.2|?";
 	}
 
 	@Override
@@ -79,13 +79,14 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		final Material mat = Material.getMaterial(id); 
 		if (mat == null) return AlmostBoolean.MAYBE;
 		switch (mat) {
-		case STATIONARY_LAVA:
-		case STATIONARY_WATER:
-		case WATER:
-		case LAVA:
-			return AlmostBoolean.YES;
+			case STATIONARY_LAVA:
+			case STATIONARY_WATER:
+			case WATER:
+			case LAVA:
+				return AlmostBoolean.YES;
+			default:
+				return AlmostBoolean.NO;
 		}
-		return AlmostBoolean.NO;
 	}
 
 	@Override

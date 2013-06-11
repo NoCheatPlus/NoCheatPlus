@@ -1,0 +1,169 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <!-- Informations -->
+  <artifactId>nocheatplus</artifactId>
+  <name>NoCheatPlus</name>
+  <version>3.9.3-DEV</version>
+  <description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
+  <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
+  
+  <packaging>jar</packaging>
+  
+  <dependencies>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpplugin</artifactId>
+    	<version>static</version>
+    </dependency>
+  </dependencies>
+  
+  <!-- Building -->
+  
+  <build>
+    <defaultGoal>clean package</defaultGoal>
+    <directory>../target</directory> <!-- Build it one level up, because it is the one we care about -->
+    <finalName>NoCheatPlus</finalName>
+    <resources>
+      <resource>
+        <targetPath>.</targetPath>
+        <filtering>true</filtering>
+        <directory>..</directory>
+        <includes>
+          <include>LICENSE.txt</include>
+        </includes>
+      </resource>
+      <!-- plugin.yml here to fill in the correct content. -->
+      <resource>
+        <targetPath>.</targetPath>
+        <filtering>true</filtering>
+        <directory>../NCPPlugin/src/main/resources</directory>
+        <includes>
+          <include>plugin.yml</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+				  <include>fr.neatmonster:ncpbuildbase</include>
+                  <include>fr.neatmonster:ncpcommons</include>
+                  <include>fr.neatmonster:ncpcore</include>
+                  <include>fr.neatmonster:ncpcompatbukkit</include>
+                  <include>fr.neatmonster:ncpcompatcb2511</include>
+                  <include>fr.neatmonster:ncpcompatcb2512</include>
+                  <include>fr.neatmonster:ncpcompatcb2545</include>
+                  <include>fr.neatmonster:ncpcompatcb2602</include>
+                  <include>fr.neatmonster:ncpcompatcb2645</include>
+                  <include>fr.neatmonster:ncpcompatcb2691</include>
+                  <include>fr.neatmonster:ncpcompatcbdev</include>
+                  <include>fr.neatmonster:ncpplugin</include>
+<!--                   <include>fr.neatmonster:nocheatplus-parent</include> -->
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  
+<!--   <build>
+      <defaultGoal>clean package</defaultGoal>
+      <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+      <resources>
+          <resource>
+              <targetPath>.</targetPath>
+              <filtering>true</filtering>
+              <directory>${basedir}/src/main/resources</directory>
+              <includes>
+                  <include>plugin.yml</include>
+                  <include>LICENSE.txt</include>
+              </includes>
+          </resource>
+      </resources>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>2.5.1</version>
+              <configuration>
+                  <source>1.6</source>
+                  <target>1.6</target>
+              </configuration>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>2.4</version>
+              <configuration>
+                  <finalName>NoCheatPlus</finalName>
+                  <archive>
+                      <addMavenDescriptor>false</addMavenDescriptor>
+                      <pomPropertiesFile>false</pomPropertiesFile>
+                      <manifest>
+                          <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+                          <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+                      </manifest>
+                  </archive>
+              </configuration>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <version>1.7</version>
+                <executions>
+                  <execution>
+                      <id>deploy-build</id>
+                      <phase>install</phase>
+                      <configuration>
+                          <target if="deploy">
+                              <property file="password.properties" prefix="password"/>
+                              <scp todir="root:${password.value}@nocheatplus.org:/home/Minecraft/plugins/" file="target/NoCheatPlus.jar" sftp="yes" trust="yes" failonerror="no"/>
+                              <sshexec host="nocheatplus.org" username="root" password="${password.value}" command="tmux send &quot;reload&quot; C-m" trust="yes" failonerror="no"/>
+                          </target>
+                      </configuration>
+                      <goals>
+                          <goal>run</goal>
+                      </goals>
+                  </execution>
+              </executions>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant-jsch</artifactId>
+                    <version>1.8.4</version>
+                </dependency>
+            </dependencies>
+        </plugin>
+    </plugins>
+</build> -->
+
+  <!-- Properties -->
+  <properties>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <groupId>fr.neatmonster</groupId>
+</project>
