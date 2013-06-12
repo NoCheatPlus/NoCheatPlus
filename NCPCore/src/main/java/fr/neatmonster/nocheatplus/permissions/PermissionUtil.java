@@ -125,4 +125,28 @@ public class PermissionUtil {
 		}
 		return changed;
 	}
+
+	/**
+	 * Set a permission as child for all the other permissions given in a Collection.
+	 * @param permissions Not expected to exist.
+	 * @param childPermissionName
+	 */
+	public static void addChildPermission(final Collection<String> permissions, final String childPermissionName, final PermissionDefault permissionDefault) {
+		final PluginManager pm = Bukkit.getPluginManager();
+		Permission childPermission = pm.getPermission(childPermissionName);
+		if (childPermission == null){
+			childPermission = new Permission(childPermissionName, "auto-generated child permission (NoCheatPlus)", permissionDefault);
+			pm.addPermission(childPermission);
+		}
+		for (final String permissionName : permissions){
+			Permission permission = pm.getPermission(permissionName);
+			if (permission == null){
+				permission = new Permission(permissionName, "auto-generated permission (NoCheatPlus)", permissionDefault);
+				pm.addPermission(permission);
+			}
+			if (!permission.getChildren().containsKey(childPermissionName)){
+				childPermission.addParent(permission, true);
+			}
+		}
+	}
 }

@@ -51,6 +51,11 @@ public class Permissions {
     // Bypasses held extra from command permissions.
     private final static String BYPASS                       = NOCHEATPLUS + ".bypass";
     public static final  String BYPASS_DENY_LOGIN            = BYPASS + "denylogin";
+    
+    private static final String FEATURE						 = "feature";
+    
+    public static final String  FEATURE_COMMAND				 = FEATURE + ".command";
+    public static final String  FEATURE_COMMAND_NOCHEATPLUS  = FEATURE_COMMAND + ".nocheatplus";
 
  
     // Permissions for the individual checks.

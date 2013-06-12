@@ -30,6 +30,7 @@ import fr.neatmonster.nocheatplus.command.admin.notify.NotifyCommand;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 
 /*
  * MM'""""'YMM                                                        dP 
@@ -113,6 +114,18 @@ public class NoCheatPlusCommand extends BaseCommand{
         	rootLabels.add(cmd.label);
         }
     }
+    
+    /**
+     * Retrieve a collection with all sub-command permissions.
+     * @return
+     */
+    public Collection<String> getAllSubCommandPermissions(){
+    	final Set<String> set = new LinkedHashSet<String>(rootLabels.size());
+    	for (final String label : rootLabels){
+    		set.add(subCommands.get(label).permission);
+    	}
+    	return set;
+    }
 
     /* (non-Javadoc)
      * @see org.bukkit.command.CommandExecutor#onCommand(org.bukkit.command.CommandSender, org.bukkit.command.Command,
@@ -128,22 +141,13 @@ public class NoCheatPlusCommand extends BaseCommand{
          * | |__| (_) | | | | | | | | | | | (_| | | | | (_| |
          *  \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|
          */
-        // Not our command, how did it get here?
-        if (!command.getName().equalsIgnoreCase("nocheatplus"))
-            return false;
-
-        final boolean protectPlugins = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
-        
-        // Bit crude workaround.
-        // TODO: Replace this by checking a permission set as child permission of each and every child command.
-        boolean hasSomePermission = false;
-        for (AbstractCommand<?> cmd : subCommands.values()){
-        	if (sender.hasPermission(cmd.permission)){
-        		hasSomePermission = true;
-        	}
+    	
+        if (!command.getName().equalsIgnoreCase("nocheatplus")){
+        	// Not our command, how did it get here?
+        	return false;
         }
         
-        if (hasSomePermission){
+        if (sender.hasPermission(Permissions.FEATURE_COMMAND_NOCHEATPLUS)){
         	// Check sub-commands.
             if (args.length > 0){
             	AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());
@@ -156,13 +160,14 @@ public class NoCheatPlusCommand extends BaseCommand{
         	return false;
         }
         
-        if (protectPlugins){
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)){
         	// Prevent the NCP usage printout:
         	sender.sendMessage("Unknown command. Type \"help\" for help.");
         	return true; 
         }
-        else
-            return false;
+        else{
+        	return false;
+        }
     }
 
 //	/**

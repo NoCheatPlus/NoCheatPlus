@@ -30,6 +30,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -641,10 +642,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	protected void setupCommandProtection() {
 		final List<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
-				Arrays.asList("plugins", "version", "icanhasbukkit"), "nocheatplus.feature.command", false);
+				Arrays.asList("plugins", "version", "icanhasbukkit"), Permissions.FEATURE_COMMAND, false);
 		if (this.changedCommands == null) this.changedCommands = changedCommands;
 		else this.changedCommands.addAll(changedCommands);
-	}	
+	}
 
 	/* (non-Javadoc)
 	 * @see org.bukkit.plugin.java.JavaPlugin#onLoad()
@@ -761,8 +762,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         
         // Register the commands handler.
-        PluginCommand command = getCommand("nocheatplus");
-        NoCheatPlusCommand commandHandler = new NoCheatPlusCommand(this, notifyReload);
+        final PluginCommand command = getCommand("nocheatplus");
+        final NoCheatPlusCommand commandHandler = new NoCheatPlusCommand(this, notifyReload);
         command.setExecutor(commandHandler);
         // (CommandHandler is TabExecutor.)
         
@@ -846,7 +847,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
 			public void run() {
-				postEnable(onlinePlayers);
+				postEnable(onlinePlayers,
+					new Runnable() {
+						@Override
+						public void run() {
+					        // Set child permissions for commands for faster checking.
+					        PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FEATURE_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
+						}
+					}
+					);
 			}
 		});
 
@@ -961,7 +970,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * Actions to be done after enable of  all plugins. This aims at reloading mainly.
      */
-    private void postEnable(final Player[] onlinePlayers){
+    private void postEnable(final Player[] onlinePlayers, Runnable... runnables){
+    	for (final Runnable runnable : runnables){
+    		try{
+    			runnable.run();
+    		}
+    		catch(Throwable t){
+    			LogUtil.logSevere("[NoCheatPlus] Encountered a problem during post-enable: " + t.getClass().getSimpleName());
+    			LogUtil.logSevere(t);
+    		}
+    	}
     	for (final Player player : onlinePlayers){
     		updatePermStateReceivers(player);
     		NCPExemptionManager.registerPlayer(player);
