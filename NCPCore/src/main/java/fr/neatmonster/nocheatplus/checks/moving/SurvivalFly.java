@@ -431,9 +431,12 @@ public class SurvivalFly extends Check {
 
 			// Simple-step blocker.
 			// TODO: Complex step blocker: distance to set-back + low jump + accounting info
-			if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)) {
-				vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
-				tags.add("step");
+			if ((fromOnGround || data.noFallAssumeGround) && toOnGround && Math.abs(yDistance - 1D) <= cc.yStep && vDistanceAboveLimit <= 0D) {
+				// Preconditions checked, further check jump effect and permission.
+				if (yDistance > 0.52 + data.jumpAmplifier * 0.2 && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_STEP)){
+					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
+					tags.add("step");
+				}
 			}
 		}
 
