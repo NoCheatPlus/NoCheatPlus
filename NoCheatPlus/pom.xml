@@ -4,7 +4,7 @@
   <!-- Informations -->
   <artifactId>nocheatplus</artifactId>
   <name>NoCheatPlus</name>
-  <version>3.9.3-RC</version>
+  <version>3.9.4-DEV</version>
   <description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
   <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
   
