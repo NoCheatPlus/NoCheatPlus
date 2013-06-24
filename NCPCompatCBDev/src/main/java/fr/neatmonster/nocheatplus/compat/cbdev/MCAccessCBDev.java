@@ -160,13 +160,8 @@ public class MCAccessCBDev implements MCAccess{
 	
 	@Override
 	public boolean hasGravity(final Material mat) {
-		switch(mat){
-		case SAND:
-		case GRAVEL:
-			return true;
-		default:
-			return false;
-		}
+		// TODO: Test/check.
+		return mat.hasGravity();
 	}
 	
 }
