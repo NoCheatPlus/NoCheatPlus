@@ -529,6 +529,9 @@ public abstract class ConfPaths {
     private static final String INVENTORY_ITEMS                          = INVENTORY + ".items";
     public static final String  INVENTORY_ITEMS_CHECK                    = INVENTORY_ITEMS + ".active";
 
+    @GlobalConfig
+    public static final String  INVENTORY_ENSURECLOSE					 = INVENTORY + ".ensureclose";
+    
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
