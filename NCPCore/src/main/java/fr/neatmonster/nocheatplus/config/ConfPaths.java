@@ -94,6 +94,7 @@ public abstract class ConfPaths {
 	
 	private static final String PROTECT									 = "protection.";
 	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
+	@GlobalConfig
 	private static final String PROTECT_PLUGINS_HIDE					 = PROTECT_PLUGINS + "hide.";
 	public static  final String PROTECT_PLUGINS_HIDE_ACTIVE				 = PROTECT_PLUGINS_HIDE + "active";
 	private static final String PROTECT_PLUGINS_HIDE_MSG				 = PROTECT_PLUGINS_HIDE + "messages.";
