@@ -37,7 +37,7 @@ public class TestColorUtil {
 		for (ChatColor color : ChatColor.values()){
 			char c = color.getChar();
 			for (String[] pattern : generic){
-				pattern[0] = pattern[0].replace('/', c);
+				items.add(new String[]{ pattern[0].replace('/', c), pattern[1]});
 			}
 		}
 		int i = 0;
