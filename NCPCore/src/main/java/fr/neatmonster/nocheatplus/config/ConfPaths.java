@@ -96,8 +96,9 @@ public abstract class ConfPaths {
 	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
 	private static final String PROTECT_PLUGINS_HIDE					 = PROTECT_PLUGINS + "hide.";
 	public static  final String PROTECT_PLUGINS_HIDE_ACTIVE				 = PROTECT_PLUGINS_HIDE + "active";
-	
-	// HiddenCommandMessage + PermissionMessage
+	private static final String PROTECT_PLUGINS_HIDE_MSG				 = PROTECT_PLUGINS_HIDE + "messages.";
+	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND		 = PROTECT_PLUGINS_HIDE_MSG + "unknowncommand";
+	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION	 = PROTECT_PLUGINS_HIDE_MSG + "nopermission";
 
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */

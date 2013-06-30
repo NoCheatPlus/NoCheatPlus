@@ -89,7 +89,9 @@ public class DefaultConfig extends ConfigFile {
         
         // Protection features.
         set(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE, true);
-
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND, "Unknown command. Type \"help\" for help.");
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION, "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
+        
         /*
          * 888 88b, 888                    888    888 88b,                        888    
          * 888 88P' 888  e88 88e   e88'888 888 ee 888 88P' 888,8,  ,e e,   ,"Y88b 888 ee 

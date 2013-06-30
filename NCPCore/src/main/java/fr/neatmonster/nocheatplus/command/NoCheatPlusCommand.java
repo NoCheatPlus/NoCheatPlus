@@ -29,8 +29,10 @@ import fr.neatmonster.nocheatplus.command.admin.exemption.UnexemptCommand;
 import fr.neatmonster.nocheatplus.command.admin.notify.NotifyCommand;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /*
  * MM'""""'YMM                                                        dP 
@@ -160,9 +162,11 @@ public class NoCheatPlusCommand extends BaseCommand{
         	return false;
         }
         
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)){
+        final ConfigFile config = ConfigManager.getConfigFile();
+        if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)){
         	// Prevent the NCP usage printout:
-        	sender.sendMessage("Unknown command. Type \"help\" for help.");
+        	// TODO: GetColoredString
+        	sender.sendMessage(ColorUtil.replaceColors(config.getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND)));
         	return true; 
         }
         else{

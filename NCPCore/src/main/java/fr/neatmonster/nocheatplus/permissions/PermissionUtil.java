@@ -13,6 +13,8 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 
 import fr.neatmonster.nocheatplus.command.CommandUtil;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 
 public class PermissionUtil {
 	
@@ -68,7 +70,7 @@ public class PermissionUtil {
 	}
 	
 	/**
-	 * 
+	 * Set up the command protection with the "unknown command" message for the permission message (attempt to hide the command).
 	 * @param permissionBase
 	 * @param ignoredCommands
 	 * @param invertIgnored
@@ -76,6 +78,19 @@ public class PermissionUtil {
 	 * @return
 	 */
 	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops){
+		return protectCommands(permissionBase, ignoredCommands, invertIgnored, ops, ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND));
+	}
+	
+	/**
+	 * Set up the command protection with the given permission message.
+	 * @param permissionBase
+	 * @param ignoredCommands
+	 * @param invertIgnored
+	 * @param ops
+	 * @param permissionMessage
+	 * @return
+	 */
+	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops, String permissionMessage){
 		Set<String> checked = new HashSet<String>();
 		for (String label : ignoredCommands){
 			checked.add(CommandUtil.getCommandLabel(label, false));
@@ -121,7 +136,7 @@ public class PermissionUtil {
 			else changed.add(new CommandProtectionEntry(command, lcLabel, null, null, command.getPermissionMessage()));
 			// Change 
 			cmdPerm.setDefault(ops ? PermissionDefault.OP : PermissionDefault.FALSE);
-			command.setPermissionMessage("Unknown command. Type \"help\" for help.");
+			command.setPermissionMessage(permissionMessage);
 		}
 		return changed;
 	}
