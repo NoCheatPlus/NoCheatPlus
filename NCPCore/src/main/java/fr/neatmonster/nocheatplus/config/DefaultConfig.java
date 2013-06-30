@@ -58,8 +58,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_BACKEND_FILE_FILENAME, "nocheatplus.log");
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE, true);
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX, "&cNCP: &f");
-        
-        // Notifications settings.
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS, false);
 
         /*
@@ -71,7 +69,6 @@ public class DefaultConfig extends ConfigFile {
          */
         set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
         set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
-        set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
         set(ConfPaths.MISCELLANEOUS_MANAGELISTENERS, false);
 //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
         set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
@@ -89,6 +86,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 10);
         set(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 2);
         set(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS, false);
+        
+        // Protection features.
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE, true);
 
         /*
          * 888 88b, 888                    888    888 88b,                        888    

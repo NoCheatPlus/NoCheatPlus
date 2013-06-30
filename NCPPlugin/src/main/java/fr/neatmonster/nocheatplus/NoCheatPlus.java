@@ -830,7 +830,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Is the configuration outdated?
         configOutdated = Updates.isConfigOutdated(DefaultConfig.buildNumber, config);
         
-		if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) {
+		if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 				@Override
 				public void run() {
@@ -889,7 +889,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		initBlockProperties(config);
 		// Reset Command protection.
 		undoCommandChanges();
-		if (config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)) setupCommandProtection();
+		if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) setupCommandProtection();
 		// (Re-) schedule consistency checking.
 		scheduleConsistencyCheckers();
 		// Cache some things.

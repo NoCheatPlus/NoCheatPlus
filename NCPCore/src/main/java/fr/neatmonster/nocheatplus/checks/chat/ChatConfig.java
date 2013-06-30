@@ -227,7 +227,8 @@ public class ChatConfig extends AsyncCheckConfig {
 
         opInConsoleOnly = config.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
 
-        protectPlugins = config.getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS);
+        // Get this one from the global config.
+        protectPlugins = ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE);
     }
 
     /* (non-Javadoc)

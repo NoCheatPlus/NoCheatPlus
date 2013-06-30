@@ -52,18 +52,6 @@ public abstract class ConfPaths {
     public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
     public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX		 = LOGGING_BACKEND_INGAMECHAT + "prefix";
 
-    // Deprecated.
-    @Moved(newPath=LOGGING_BACKEND_CONSOLE_ACTIVE)
-    public static final String  LOGGING_CONSOLE                          = LOGGING + "console";
-    @Moved(newPath=LOGGING_BACKEND_FILE_ACTIVE)
-    public static final String  LOGGING_FILE                             = LOGGING + "file";
-    @Moved(newPath=LOGGING_BACKEND_FILE_FILENAME)
-    public static final String  LOGGING_FILENAME                         = LOGGING + "filename";
-    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_ACTIVE)
-    public static final String  LOGGING_INGAMECHAT                       = LOGGING + "ingamechat";
-    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
-    public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = LOGGING + "usesubscriptions";
-
     /*
      *     e   e     ,e,                        888 888                                                   
      *    d8b d8b     "   dP"Y  e88'888  ,e e,  888 888  ,"Y88b 888 8e   ,e e,   e88 88e  8888 8888  dP"Y 
@@ -75,7 +63,6 @@ public abstract class ConfPaths {
 	private static final String MISCELLANEOUS = "miscellaneous.";
 	public static final String  MISCELLANEOUS_ALLOWCLIENTMODS				= MISCELLANEOUS + "allowclientmods";
 	public static final String  MISCELLANEOUS_OPINCONSOLEONLY				= MISCELLANEOUS + "opinconsoleonly";
-	public static final String  MISCELLANEOUS_PROTECTPLUGINS				= MISCELLANEOUS + "protectplugins";
 	public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
 	public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS				= MISCELLANEOUS + "reporttometrics";
@@ -105,6 +92,13 @@ public abstract class ConfPaths {
 	 */
 	public static final  String DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS  = DATA_CONSISTENCYCHECKS + "suppresswarnings";
 	
+	private static final String PROTECT									 = "protection.";
+	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
+	private static final String PROTECT_PLUGINS_HIDE					 = PROTECT_PLUGINS + "hide.";
+	public static  final String PROTECT_PLUGINS_HIDE_ACTIVE				 = PROTECT_PLUGINS_HIDE + "active";
+	
+	// HiddenCommandMessage + PermissionMessage
+
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
 	public static final  String CHECKS_DEBUG							 = CHECKS + SUB_DEBUG;
@@ -635,5 +629,20 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY                             = "compatibility.";
 	public static final String COMPATIBILITY_BUKKITONLY                  = COMPATIBILITY + "bukkitapionly";
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
+    
+    // Deprecated (don't use fields from above).
+    @Moved(newPath=LOGGING_BACKEND_CONSOLE_ACTIVE)
+    public static final String  LOGGING_CONSOLE                          = "logging.console";
+    @Moved(newPath=LOGGING_BACKEND_FILE_ACTIVE)
+    public static final String  LOGGING_FILE                             = "logging.file";
+    @Moved(newPath=LOGGING_BACKEND_FILE_FILENAME)
+    public static final String  LOGGING_FILENAME                         = "logging.filename";
+    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_ACTIVE)
+    public static final String  LOGGING_INGAMECHAT                       = "logging.ingamechat";
+    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
+    public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = "logging.usesubscriptions";
+	@Moved(newPath=PROTECT_PLUGINS_HIDE_ACTIVE)
+	public static final String  MISCELLANEOUS_PROTECTPLUGINS			 = "miscellaneous.protectplugins";
+
     
 }

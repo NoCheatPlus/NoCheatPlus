@@ -154,6 +154,7 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
 		// Protect some commands to prevent players for seeing which plugins are installed.
 		if (cc.protectPlugins) {
 			// TODO: Use a prefix map  and generalize this.
+			// TODO: Configurable message.
 			if ((commandLabel.equals("plugins") || commandLabel.equals("version") || commandLabel.equals("icanhasbukkit")) && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
 				player.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
 				event.setCancelled(true);

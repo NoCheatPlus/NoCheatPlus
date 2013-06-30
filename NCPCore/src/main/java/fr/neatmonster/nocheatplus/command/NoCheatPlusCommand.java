@@ -160,7 +160,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         	return false;
         }
         
-        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS)){
+        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)){
         	// Prevent the NCP usage printout:
         	sender.sendMessage("Unknown command. Type \"help\" for help.");
         	return true; 
