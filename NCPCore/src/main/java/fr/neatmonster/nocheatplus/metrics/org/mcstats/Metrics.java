@@ -245,7 +245,7 @@ public class Metrics {
                     }
                 }
             }, 0, PING_INTERVAL * 1200);
-            if (task.getTaskId() == -1){
+            if (task == null || task.getTaskId() == -1){
             	// NCP: Just in case.
             	task = null;
             	return false;
@@ -327,8 +327,10 @@ public class Metrics {
      */
     public void cancel(){
         synchronized (optOutLock) {
-        	task.cancel();
-        	task = null;
+        	if (task != null){
+            	task.cancel();
+            	task = null;
+        	}
         }
     }
 
