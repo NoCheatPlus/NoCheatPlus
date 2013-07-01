@@ -3,7 +3,9 @@ package fr.neatmonster.nocheatplus.compat.blocks.init.vanilla;
 import org.bukkit.Material;
 
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
+import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
+import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.BlockFlags;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
@@ -14,25 +16,9 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
  */
 public class BlocksMC1_5 implements BlockPropertiesSetup {
 	
-	/**
-	 * TODO: Move somewhere.
-	 * @param newId
-	 * @param mat
-	 */
-	public static void setPropsAs(int newId, Material mat){
-		BlockProperties.setBlockProps(newId, BlockProperties.getBlockProps(mat.getId()));
-	}
-	
-	public static void setAs(int newId, Material mat){
-		BlockFlags.setFlagsAs(newId, mat);
-		setPropsAs(newId, mat);
-	}
-	
 	public BlocksMC1_5(){
 		// Test if materials exist.
-		if (Material.getMaterial(152) == null){
-			throw new RuntimeException("Material for 1.5 does not exist.");
-		}
+		BlockInit.assertMaterialNameMatch(152, "redstone", "block");
 	}
 
 	@Override
@@ -43,51 +29,51 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		////////////////////
 		
 		// 146 Trapped Chest
-		setAs(146, Material.CHEST);
+		BlockInit.setAs(146, Material.CHEST);
 		
 		// 147 Weighted Pressure Plate (Light)
 //		BlockFlags.addFlags(147, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-		setAs(147, Material.STONE_PLATE);
+		BlockInit.setAs(147, Material.STONE_PLATE);
 
 		// 148 Weighted Pressure Plate (Heavy)
 //		BlockFlags.addFlags(148, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-		setAs(148, Material.STONE_PLATE);
+		BlockInit.setAs(148, Material.STONE_PLATE);
 		
 		// 149 Redstone Comparator (inactive)
 //		BlockFlags.addFlags(149, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-		setAs(149, Material.DIODE_BLOCK_OFF);
+		BlockInit.setAs(149, Material.DIODE_BLOCK_OFF);
 		
 		// 150 Redstone Comparator (active)
 //		BlockFlags.addFlags(150, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-		setAs(150, Material.DIODE_BLOCK_ON);
+		BlockInit.setAs(150, Material.DIODE_BLOCK_ON);
 		
 		// 151 Daylight Sensor
 //		BlockFlags.addFlags(151, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND | BlockProperties.F_GROUND_HEIGHT);
-		setAs(151, Material.HUGE_MUSHROOM_1);
+		BlockInit.setAs(151, Material.HUGE_MUSHROOM_1);
 		
 		// 152 Block of Redstone
-		setAs(152, Material.ENCHANTMENT_TABLE);
+		BlockInit.setAs(152, Material.ENCHANTMENT_TABLE);
 		
 		// 153 Nether Quartz Ore
-		setAs(153, Material.COAL_ORE);
+		BlockInit.setAs(153, Material.COAL_ORE);
 		
 		// 154 Hopper
-		setAs(154, Material.COAL_ORE);
+		BlockInit.setAs(154, Material.COAL_ORE);
 		// TODO: Needs workaround. [workaround-flag + different purpose flag sets ?]
 		BlockFlags.addFlags(154, BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT);
 		
 		// 155 Block of Quartz
-		setAs(155, Material.SANDSTONE);
+		BlockInit.setAs(155, Material.SANDSTONE);
 		
 		// 156 Quartz Stairs
-		setAs(156, Material.SANDSTONE_STAIRS);
+		BlockInit.setAs(156, Material.SANDSTONE_STAIRS);
 		
 		// 157 Activator Rail
-		setAs(157, Material.DETECTOR_RAIL);
+		BlockInit.setAs(157, Material.DETECTOR_RAIL);
 		
 		// 158 Dropper
 //		BlockFlags.setFlagsAs(158, Material.DISPENSER);
-		setAs(158, Material.DISPENSER);
+		BlockInit.setAs(158, Material.DISPENSER);
 		
 		
 		/////////////////////
@@ -100,6 +86,8 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		
 		// 95 Locked chest
 		BlockProperties.setBlockProps(95, BlockProperties.instantType);
+		
+		LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.5 blocks.");
 	}
 
 }

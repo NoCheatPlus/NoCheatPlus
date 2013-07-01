@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.BlocksMC1_5;
+import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -384,24 +385,19 @@ public class BlockProperties {
 		    initBlocks(mcAccess, worldConfigProvider);
 		    // Extra hand picked setups.
 		    try{
-		    	BlockPropertiesSetup bpSetup = new BlocksMC1_5();
-		    	try{
-		    		bpSetup.setupBlockProperties(worldConfigProvider);
-		    		LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.5 blocks.");
-		    	}
-		    	catch(Throwable t){
-			    	LogUtil.logSevere("[NoCheatPlus] BlocksMC1_5.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
-			    	LogUtil.logSevere(t);
-			    }
+		    	new VanillaBlocksFactory().setupBlockProperties(worldConfigProvider);
 		    }
-		    catch(Throwable t){}
+		    catch(Throwable t){
+		    	LogUtil.logSevere("[NoCheatPlus] Could not initialize vanilla blocks: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+		    	LogUtil.logSevere(t);
+		    }
 		    // Allow mcAccess to setup block properties.
 		    if (mcAccess instanceof BlockPropertiesSetup){
 			    try{
 			    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
 			    }
 			    catch(Throwable t){
-			    	LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
+			    	LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
 			    	LogUtil.logSevere(t);
 			    }
 		    }
