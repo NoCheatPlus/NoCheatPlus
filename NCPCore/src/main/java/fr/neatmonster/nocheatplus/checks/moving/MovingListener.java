@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +13,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Pig;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -193,6 +194,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private final Set<String> hoverTicks = new LinkedHashSet<String>(30);
     
     private int hoverTicksStep = 5;
+    
+    private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
     
     public MovingListener() {
 		super(CheckType.MOVING);
@@ -409,14 +412,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()){
-			// Workaround for pigs !
+			// Workaround for pigs and other!
+			
+			// (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
+			
+			final Entity vehicle = CheckUtils.getLastNonPlayerVehicle(player);
 			data.wasInVehicle = true;
 			data.sfHoverTicks = -1;
 			data.removeAllVelocity();
 			data.sfLowJump = false;
-			final Entity vehicle = player.getVehicle();
-			if (vehicle != null && (vehicle instanceof Pig)){
-				onVehicleMove(new VehicleMoveEvent((Vehicle) vehicle, event.getFrom(), event.getFrom()));
+			if (vehicle != null && !normalVehicles.contains(vehicle.getType())){
+				// (Auto detection of missing events, might fire one time too many per plugin run.)
+				onVehicleMove(vehicle, event.getFrom(), event.getFrom(), true);
 			}
 			return;
 		}
@@ -1068,23 +1075,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onVehicleMove(final VehicleMoveEvent event) {
-        /*
-         * __     __   _     _      _        __  __                
-         * \ \   / /__| |__ (_) ___| | ___  |  \/  | _____   _____ 
-         *  \ \ / / _ \ '_ \| |/ __| |/ _ \ | |\/| |/ _ \ \ / / _ \
-         *   \ V /  __/ | | | | (__| |  __/ | |  | | (_) \ V /  __/
-         *    \_/ \___|_| |_|_|\___|_|\___| |_|  |_|\___/ \_/ \___|
-         */
     	final Vehicle vehicle = event.getVehicle();
-    	final Entity passenger = vehicle.getPassenger();
-        // Don't care if a player isn't inside the vehicle, for movements that are very high distance or to another
-        // world (such that it is very likely the event data was modified by another plugin before we got it).
-        if (passenger == null || !(passenger instanceof Player)) return;
-        final Location from = event.getFrom();
-        final Location to = event.getTo();
+    	final EntityType entityType = vehicle.getType();
+    	if (!normalVehicles.contains(entityType)){
+    		// A little extra sweep to check for debug flags.
+    		normalVehicles.add(entityType);
+    		if (MovingConfig.getConfig(vehicle.getWorld().getName()).debug){
+    			System.out.println("[NoCheatPlus] VehicleMoveEvent fired for: " + entityType);
+    		}
+    	}
+    	// TODO: Might account for the case of a player letting the vehicle move but not himself (do mind latency).
+    	// Mind that players could be riding horses inside of minecarts etc.
+    	if (vehicle.getVehicle() != null){
+    		// Do ignore events for vehicles inside of other vehicles.
+    		return;
+    	}
+    	onVehicleMove(vehicle, event.getFrom(), event.getTo(), false);
+    }
+    
+    	
+    public void onVehicleMove(final Entity vehicle, final Location from, final Location to, final boolean fake) {	
+    	// (No re-check for vehicles that have vehicles, pre condition is that this has already been checked.)
+    	final Player player = CheckUtils.getFirstPlayerPassenger(vehicle);
+        if (player == null){
+        	return;
+        }
         if (!from.getWorld().equals(to.getWorld())) return;
-
-        final Player player = (Player) passenger;
 
         Location newTo = null;
         final MovingData data = MovingData.getData(player);
@@ -1112,7 +1128,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Schedule a delayed task to teleport back the vehicle with the player.
         	// (Only schedule if not already scheduled.)
         	data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                private Vehicle  vehicle;
+                private Entity  vehicle;
                 private Player player;
                 private Location location;
 
@@ -1128,7 +1144,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     }
                 }
 
-                public Runnable set(final Vehicle vehicle, final Player player, final Location location) {
+                public Runnable set(final Entity vehicle, final Player player, final Location location) {
                     this.vehicle = vehicle;
                     this.player = player;
                     this.location = location;
@@ -1136,6 +1152,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
             }.set(vehicle, player, newTo), 1L);
         }
+        // TODO: Log this one too if debug set.
     }
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)

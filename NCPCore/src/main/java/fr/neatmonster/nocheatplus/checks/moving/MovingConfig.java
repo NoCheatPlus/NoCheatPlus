@@ -49,17 +49,30 @@ public class MovingConfig extends ACheckConfig {
     }
 
     /**
-     * Gets the configuration for a specified player.
+     * Gets the configuration for a specified player .
+     * <br>NOTE: Currently only per-world configs are implemented. This method might or might not get removed some day.
      * 
      * @param player
      *            the player
      * @return the configuration
      */
     public static MovingConfig getConfig(final Player player) {
-        if (!worldsMap.containsKey(player.getWorld().getName()))
-            worldsMap.put(player.getWorld().getName(),
-                    new MovingConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
-        return worldsMap.get(player.getWorld().getName());
+        return getConfig(player.getWorld().getName());
+    }
+    
+    /**
+     * Get a per-world config.
+     * @param worldName Exact case world name.
+     * @return
+     */
+    public static MovingConfig getConfig(final String worldName) {
+    	final MovingConfig cc = worldsMap.get(worldName); 
+        if (cc != null){
+        	return cc;
+        }
+        final MovingConfig ccNew = new MovingConfig(ConfigManager.getConfigFile(worldName));
+        worldsMap.put(worldName, ccNew);
+        return ccNew;
     }
 
     

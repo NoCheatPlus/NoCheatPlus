@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.utilities;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 public class TeleportUtil {
@@ -14,7 +13,7 @@ public class TeleportUtil {
 	 * @param player
 	 * @param location
 	 */
-	public static void teleport(final Vehicle vehicle, final Player player, final Location location, final boolean debug) {
+	public static void teleport(final Entity vehicle, final Player player, final Location location, final boolean debug) {
 		// TODO: This handling could conflict with WorldGuard region flags.
 		final Entity passenger = vehicle.getPassenger();
 		final boolean vehicleTeleported;
