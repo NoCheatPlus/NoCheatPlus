@@ -1,19 +1,19 @@
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
-import net.minecraft.server.v1_5_R3.AxisAlignedBB;
-import net.minecraft.server.v1_5_R3.Block;
-import net.minecraft.server.v1_5_R3.DamageSource;
-import net.minecraft.server.v1_5_R3.EntityComplexPart;
-import net.minecraft.server.v1_5_R3.EntityPlayer;
-import net.minecraft.server.v1_5_R3.MobEffectList;
+import net.minecraft.server.v1_6_R1.AxisAlignedBB;
+import net.minecraft.server.v1_6_R1.Block;
+import net.minecraft.server.v1_6_R1.DamageSource;
+import net.minecraft.server.v1_6_R1.EntityComplexPart;
+import net.minecraft.server.v1_6_R1.EntityPlayer;
+import net.minecraft.server.v1_6_R1.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.v1_5_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_5_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_6_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_6_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_6_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -31,18 +31,18 @@ public class MCAccessCBDev implements MCAccess{
 	 */
 	public MCAccessCBDev(){
 		getCommandMap();
-		ReflectionUtil.checkMembers("net.minecraft.server.v1_5_R3.", new String[]{"Entity" , "dead"});
+		ReflectionUtil.checkMembers("net.minecraft.server.v1_6_R1.", new String[]{"Entity" , "dead"});
 	}
 
 	@Override
 	public String getMCVersion() {
-		// 1_5_R3
-		return "1.5.2";
+		// 1_6_R1
+		return "1.6.1";
 	}
 
 	@Override
 	public String getServerVersionTag() {
-		return "CB2763-DEV";
+		return "CB2794-DEV";
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public double getHeight(final Entity entity) {
-		final net.minecraft.server.v1_5_R3.Entity mcEntity = ((CraftEntity) entity).getHandle();
+		final net.minecraft.server.v1_6_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
 		final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.height, mcEntity.boundingBox.e - mcEntity.boundingBox.b));
 		if (entity instanceof LivingEntity) {
 			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
@@ -106,7 +106,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public double getJumpAmplifier(final Player player) {
-		final net.minecraft.server.v1_5_R3.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_6_R1.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 	
 		if (mcPlayer.hasEffect(MobEffectList.JUMP)) return mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
 		else return Double.NEGATIVE_INFINITY;
@@ -114,7 +114,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public double getFasterMovementAmplifier(final Player player) {
-		final net.minecraft.server.v1_5_R3.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_6_R1.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
 		else return Double.NEGATIVE_INFINITY;
 	}
@@ -141,13 +141,13 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public boolean shouldBeZombie(final Player player) {
-		final net.minecraft.server.v1_5_R3.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_6_R1.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		return !mcPlayer.dead && mcPlayer.getHealth() <= 0 ;
 	}
 
 	@Override
 	public void setDead(final Player player, final int deathTicks) {
-		final net.minecraft.server.v1_5_R3.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final net.minecraft.server.v1_6_R1.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         mcPlayer.deathTicks = deathTicks;
         mcPlayer.dead = true;
 	}
