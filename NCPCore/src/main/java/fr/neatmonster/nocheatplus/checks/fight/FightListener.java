@@ -90,7 +90,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      *            The EntityDamageByEntityEvent
      * @return 
      */
-    private boolean handleNormalDamage(final Player player, final Entity damaged, int damage) {
+    private boolean handleNormalDamage(final Player player, final Entity damaged, double damage) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
         

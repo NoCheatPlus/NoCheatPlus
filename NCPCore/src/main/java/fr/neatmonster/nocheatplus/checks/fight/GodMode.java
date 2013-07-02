@@ -35,7 +35,7 @@ public class GodMode extends Check {
      * @param damage
      * @return
      */
-    public boolean check(final Player player, final int damage, final FightData data){
+    public boolean check(final Player player, final double damage, final FightData data){
     	final int tick = TickTask.getTick();
     	
     	final int noDamageTicks = Math.max(0, player.getNoDamageTicks());
@@ -53,7 +53,9 @@ public class GodMode extends Check {
     	final int dNDT = data.lastNoDamageTicks - noDamageTicks;
     	final int delta = dTick - dNDT;
     	
-    	final int health = player.getHealth();
+    	final double health = player.getHealth();
+    	
+    	// TODO: Adjust to double values.
     	
     	if (data.godModeHealth > health ){
     		data.godModeHealthDecreaseTick = tick;

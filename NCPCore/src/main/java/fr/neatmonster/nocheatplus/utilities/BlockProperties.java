@@ -22,10 +22,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
-import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.BlocksMC1_5;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
-import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 

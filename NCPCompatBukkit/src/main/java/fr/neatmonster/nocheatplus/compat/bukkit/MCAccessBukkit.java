@@ -41,7 +41,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	public String getMCVersion() {
 		// Bukkit API.
 		// TODO: maybe output something else.
-		return "1.4.6|1.4.7|1.5.0|1.5.1|1.5.2|?";
+		return "1.4.6|1.4.7|1.5.0|1.5.1|1.5.2|1.6.1|?";
 	}
 
 	@Override
@@ -127,6 +127,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		return player.getNoDamageTicks();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void setInvulnerableTicks(final Player player, final int ticks) {
 		// TODO: Ahhh...

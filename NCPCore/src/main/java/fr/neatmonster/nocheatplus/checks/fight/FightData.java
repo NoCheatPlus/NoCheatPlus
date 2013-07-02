@@ -113,7 +113,7 @@ public class FightData extends ACheckData {
     
     // New god mode check [in progress].
 	public int					   godModeHealthDecreaseTick 	= 0;
-	public int                     godModeHealth       			= 0;
+	public double                  godModeHealth       			= 0.0;
     public int                     lastDamageTick 				= 0;
     public int                     lastNoDamageTicks 			= 0;
     /** Accumulator. */

@@ -1182,16 +1182,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	parkedInfo.add(moveInfo);
         }
         final float fallDistance = player.getFallDistance();
-        final int damage = event.getDamage();
+        final double damage = event.getDamage();
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
         if (cc.debug){
         	System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         }
         // Fall-back check.
-        final int maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0 : 3);
+        final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0 : 3);
         if (maxD > damage){
             // TODO: respect dealDamage ?
-            event.setDamage(maxD);
+            event.setDamage((int) Math.round(maxD)); // TODO: Byte code compatibility !?
             if (cc.debug){
             	System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
             }

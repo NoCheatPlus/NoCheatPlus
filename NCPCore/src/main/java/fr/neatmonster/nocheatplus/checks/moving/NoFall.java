@@ -37,8 +37,8 @@ public class NoFall extends Check {
      * @param fallDistance
      * @return
      */
-    protected static final int getDamage(final float fallDistance){
-        return (int) Math.round(fallDistance - 3.0);
+    protected static final double getDamage(final float fallDistance){
+        return fallDistance - 3.0;
     }
     
     /**
@@ -52,7 +52,7 @@ public class NoFall extends Check {
 //        final int nfD = getDamage(data.noFallFallDistance);
 //        final int yD = getDamage((float) (data.noFallMaxY - y));
 //        final int maxD = Math.max(Math.max(pD, nfD), yD);
-        final int maxD = getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
+        final double maxD = getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
         if (maxD > 0){
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
@@ -76,13 +76,15 @@ public class NoFall extends Check {
 	}
 
 
-    private void dealFallDamage(final Player player, final int damage) {
-    	final EntityDamageEvent event = new EntityDamageEvent(player, DamageCause.FALL, damage);
+    private void dealFallDamage(final Player player, final double damage) {
+    	@SuppressWarnings("deprecation")
+    	// TODO: Byte code compatibility ?
+		final EntityDamageEvent event = new EntityDamageEvent(player, DamageCause.FALL, (int) Math.round(damage));
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()){
         	// TODO: account for no damage ticks etc.
         	player.setLastDamageCause(event);
-            mcAccess.dealFallDamage(player, event.getDamage());
+            mcAccess.dealFallDamage(player, (int) Math.round(event.getDamage())); // TODO: Adjust signature to double (!).
         }
         // TODO: let this be done by the damage event (!).
 //        data.clearNoFallData(); // -> currently done in the damage eventhandling method.
