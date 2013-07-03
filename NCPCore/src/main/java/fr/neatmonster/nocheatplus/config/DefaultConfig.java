@@ -67,7 +67,6 @@ public class DefaultConfig extends ConfigFile {
          *  d8b Y8b Y8b  888  Y88D Y888   , 888   , 888 888 ,ee 888 888 888 888   , Y888 888P Y888 888P  Y88D 
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
-        set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
         set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_MANAGELISTENERS, false);
 //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
@@ -88,9 +87,13 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS, false);
         
         // Protection features.
+        // Hide plugins.
         set(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE, true);
         set(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND, "Unknown command. Type \"help\" for help.");
         set(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION, "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
+        // Client motd.
+        set(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE, true);
+        set(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL, false);
         
         /*
          * 888 88b, 888                    888    888 88b,                        888    

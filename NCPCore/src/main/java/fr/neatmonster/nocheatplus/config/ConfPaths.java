@@ -61,7 +61,6 @@ public abstract class ConfPaths {
      */
 	@GlobalConfig
 	private static final String MISCELLANEOUS = "miscellaneous.";
-	public static final String  MISCELLANEOUS_ALLOWCLIENTMODS				= MISCELLANEOUS + "allowclientmods";
 	public static final String  MISCELLANEOUS_OPINCONSOLEONLY				= MISCELLANEOUS + "opinconsoleonly";
 	public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
 	public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
@@ -93,6 +92,13 @@ public abstract class ConfPaths {
 	public static final  String DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS  = DATA_CONSISTENCYCHECKS + "suppresswarnings";
 	
 	private static final String PROTECT									 = "protection.";
+	// Clients settings.
+	private static final String PROTECT_CLIENTS							 = PROTECT + "clients.";
+	@GlobalConfig
+	private static final String PROTECT_CLIENTS_MOTD					 = PROTECT_CLIENTS + "motd.";
+	public static final String  PROTECT_CLIENTS_MOTD_ACTIVE				 = PROTECT_CLIENTS_MOTD + "active";
+	public static final String  PROTECT_CLIENTS_MOTD_ALLOWALL			 = PROTECT_CLIENTS_MOTD + "allowall";
+	// Plugins settings.
 	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
 	@GlobalConfig
 	private static final String PROTECT_PLUGINS_HIDE					 = PROTECT_PLUGINS + "hide.";
@@ -633,18 +639,19 @@ public abstract class ConfPaths {
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
     
     // Deprecated (don't use fields from above).
-    @Moved(newPath=LOGGING_BACKEND_CONSOLE_ACTIVE)
+    @Moved(newPath = LOGGING_BACKEND_CONSOLE_ACTIVE)
     public static final String  LOGGING_CONSOLE                          = "logging.console";
-    @Moved(newPath=LOGGING_BACKEND_FILE_ACTIVE)
+    @Moved(newPath = LOGGING_BACKEND_FILE_ACTIVE)
     public static final String  LOGGING_FILE                             = "logging.file";
-    @Moved(newPath=LOGGING_BACKEND_FILE_FILENAME)
+    @Moved(newPath = LOGGING_BACKEND_FILE_FILENAME)
     public static final String  LOGGING_FILENAME                         = "logging.filename";
-    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_ACTIVE)
+    @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_ACTIVE)
     public static final String  LOGGING_INGAMECHAT                       = "logging.ingamechat";
-    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
+    @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
     public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = "logging.usesubscriptions";
-	@Moved(newPath=PROTECT_PLUGINS_HIDE_ACTIVE)
+	@Moved(newPath = PROTECT_PLUGINS_HIDE_ACTIVE)
 	public static final String  MISCELLANEOUS_PROTECTPLUGINS			 = "miscellaneous.protectplugins";
-
+	@Moved(newPath = PROTECT_CLIENTS_MOTD_ALLOWALL)
+	public static final String  MISCELLANEOUS_ALLOWCLIENTMODS			 = "miscellaneous.allowclientmods";
     
 }
