@@ -67,7 +67,7 @@ public class CheckUtils {
 			if (passenger instanceof Player){
 				return (Player) passenger;
 			}
-			passenger = entity.getPassenger();
+			passenger = passenger.getPassenger();
 		}
 		return null;
 	}
