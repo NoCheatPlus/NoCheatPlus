@@ -75,20 +75,48 @@ public class ReflectionUtil {
 		}
 	}
 	
-	public static Object invokeMethodVoid(final Object obj, final String methodName){
-		// TODO: ? provide a variation with boolean for general first or specialized first
-		// TODO: copy and paste: bad!
+	/**
+	 * 
+	 * @param obj
+	 * @param methodName
+	 * @param returnTypePreference This is  comparison with ==, no isAssignableForm. TODO: really ?
+	 * @return
+	 */
+	public static Object invokeMethodVoid(final Object obj, final String methodName, final Class<?> ...  returnTypePreference){
 		// TODO: Isn't there a one-line-call for this ??
 		final Class<?> objClass = obj.getClass();
+		
 		// Collect methods that might work.
 		Method methodFound = null;
+		int returnTypeIndex = returnTypePreference.length; // This can be 0 for no preferences given.
 		for (final Method method : objClass.getDeclaredMethods()){
 			if (method.getName().equals(methodName)){
 				final Class<?>[] parameterTypes = method.getParameterTypes();
-				if (parameterTypes.length == 1 ){
-					// Override the found method if none found yet and assignment is possible, or if it has a specialized argument of an already found one.
-					if (methodFound != null && methodFound.getParameterTypes()[0].isAssignableFrom(parameterTypes[0])){
+				if (parameterTypes.length == 0){
+					// Override the found method if none found yet or if the return type matches the preferred policy.
+					final Class<?> returnType = method.getReturnType();
+					if (methodFound == null){
 						methodFound = method;
+						for (int i = 0; i < returnTypeIndex; i++){
+							if (returnTypePreference[i] == returnType){
+								returnTypeIndex = i;
+								break;
+							}
+						}
+					}
+					else{
+						// Check if the return type is preferred over previously found ones.
+						for (int i = 0; i < returnTypeIndex; i++){
+							if (returnTypePreference[i] == returnType){
+								methodFound = method;
+								returnTypeIndex = i;
+								break;
+							}
+						}
+					}
+					if (returnTypeIndex == 0){
+						// "Quick" return.
+						break;
 					}
 				}
 			}

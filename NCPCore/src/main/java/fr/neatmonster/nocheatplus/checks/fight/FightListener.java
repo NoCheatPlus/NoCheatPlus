@@ -425,6 +425,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	// Set god-mode health to maximum.
     	// TODO: Mind that health regain might half the ndt.
     	double health = 0.0;
+    	// TODO: Put workarounds to some HealthAPI utility class with proper arguments and return type.
     	try{
     		// Changed order.
     		health = event.getAmount() + player.getHealth();
@@ -435,11 +436,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     			LogUtil.logWarning("[NoCheatPlus] Health API incompatibility detected.");
     		}
     		// Reflection fall-back (might fall back to int methods, at present).
-    		final Object o1 = ReflectionUtil.invokeMethodVoid(event, "getAmount");
+    		final Object o1 = ReflectionUtil.invokeMethodVoid(event, "getAmount", double.class, int.class);
     		if (o1 instanceof Number){
     			health += ((Number) o1).doubleValue();
     		}
-    		final Object o2 = ReflectionUtil.invokeMethodVoid(player, "getHealth");
+    		final Object o2 = ReflectionUtil.invokeMethodVoid(player, "getHealth", double.class, int.class);
     		if (o2 instanceof Number){
     			health += ((Number) o2).doubleValue();
     		}
@@ -453,7 +454,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     			LogUtil.logWarning("[NoCheatPlus] Health API incompatibility detected.");
     		}
     		// Reflection fall-back (might fall back to int methods, at present).
-    		final Object o1 = ReflectionUtil.invokeMethodVoid(player, "getMaxHealth");
+    		final Object o1 = ReflectionUtil.invokeMethodVoid(player, "getMaxHealth", double.class, int.class);
     		if (o1 instanceof Number){
     			health = Math.min(health, ((Number) o1).doubleValue());
     		}
