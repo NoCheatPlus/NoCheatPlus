@@ -278,7 +278,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	final FightData damagedData = damagedPlayer == null ? null : FightData.getData(damagedPlayer);
     	final boolean damagedIsDead = damaged.isDead();
     	if (damagedPlayer != null && !damagedIsDead) {
-            if (!damagedPlayer.isDead() && godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, event.getDamage(), damagedData)){
+            if (!damagedPlayer.isDead() && godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, BridgeHealth.getDamage(event), damagedData)){
                 // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
             	damagedPlayer.setNoDamageTicks(0);
             }
@@ -312,7 +312,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 final Player player = (Player) damager;
                 if (e.getCause() == DamageCause.ENTITY_ATTACK){
                 	
-                	if (handleNormalDamage(player, damaged, e.getDamage())){
+                	if (handleNormalDamage(player, damaged, BridgeHealth.getDamage(e))){
                 		e.setCancelled(true);
                 	}
                 }

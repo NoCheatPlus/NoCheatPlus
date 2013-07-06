@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -62,6 +63,21 @@ public class BridgeHealth {
 		}
 		catch(AbstractMethodError e){
 			return getDoubleOrInt(event, "getAmount", e);
+		}
+	}
+	
+	/**
+	 * Get the damage from an EntityDamageEvent.
+	 * @param event
+	 * @return
+	 * @throws RuntimeException, in case of an AbstractMethodError without success on recovery attempts.
+	 */
+	public static double getDamage(final EntityDamageEvent event){
+		try{
+			return event.getDamage();
+		}
+		catch(AbstractMethodError e){
+			return getDoubleOrInt(event, "getDamage", e);
 		}
 	}
 	

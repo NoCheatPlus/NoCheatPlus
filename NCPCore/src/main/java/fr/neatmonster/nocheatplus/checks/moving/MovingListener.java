@@ -49,6 +49,7 @@ import fr.neatmonster.nocheatplus.checks.combined.BedLeave;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
@@ -1199,7 +1200,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	parkedInfo.add(moveInfo);
         }
         final float fallDistance = player.getFallDistance();
-        final double damage = event.getDamage();
+        final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
         if (cc.debug){
         	System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
