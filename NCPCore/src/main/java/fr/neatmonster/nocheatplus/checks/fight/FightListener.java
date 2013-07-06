@@ -427,7 +427,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	double health = 0.0;
     	try{
     		// Changed order.
-    		health = event.getAmount() + player.getHealth(); // TODO: maxHealth !
+    		health = event.getAmount() + player.getHealth();
     	}
     	catch(AbstractMethodError e){
     		if (!fail){
@@ -445,7 +445,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     		}
     	}
     	try{
-    		health = Math.max(health, player.getMaxHealth());
+    		health = Math.min(health, player.getMaxHealth());
     	}
     	catch(AbstractMethodError e){
     		if (!fail){
