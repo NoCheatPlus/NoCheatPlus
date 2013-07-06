@@ -27,10 +27,10 @@ public class ReflectionUtil {
 	}
 	
 	/**
-	 * Dirty method. Does try.catch and return null for method invocation.
+	 * Dirty method to call a declared method with a generic parameter type. Does try.catch and return null insome cases for method invocation. Purpose for this is generic factory registration, having methods with type Object alongside methods with more specialized types.
 	 * @param obj
 	 * @param methodName
-	 * @param arg
+	 * @param arg Argument or invoke the method with.
 	 * @return
 	 */
 	public static Object invokeGenericMethodOneArg(final Object obj, final String methodName, final Object arg){
@@ -76,20 +76,21 @@ public class ReflectionUtil {
 	}
 	
 	/**
-	 * 
+	 * Invoke a method without arguments, get the method matching the return types best, i.e. first type is preferred. At present a result is returned, even if the return type does not match at all.
 	 * @param obj
 	 * @param methodName
-	 * @param returnTypePreference This is  comparison with ==, no isAssignableForm. TODO: really ?
+	 * @param returnTypePreference Most preferred return type first, might return null, might return a method with a completely different return type, comparison with ==, no isAssignableForm. TODO: really ?
 	 * @return
 	 */
-	public static Object invokeMethodVoid(final Object obj, final String methodName, final Class<?> ...  returnTypePreference){
+	public static Object invokeMethodNoArgs(final Object obj, final String methodName, final Class<?> ...  returnTypePreference){
 		// TODO: Isn't there a one-line-call for this ??
 		final Class<?> objClass = obj.getClass();
 		
 		// Collect methods that might work.
 		Method methodFound = null;
 		int returnTypeIndex = returnTypePreference.length; // This can be 0 for no preferences given.
-		for (final Method method : objClass.getDeclaredMethods()){
+		// TODO: Does there exist an optimized method for getting all by name?
+		for (final Method method : objClass.getMethods()){
 			if (method.getName().equals(methodName)){
 				final Class<?>[] parameterTypes = method.getParameterTypes();
 				if (parameterTypes.length == 0){

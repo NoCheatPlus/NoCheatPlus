@@ -26,10 +26,9 @@ import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -412,7 +411,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	}
     }
     
-    private boolean fail = false;
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityRegainHealth(final EntityRegainHealthEvent event){
     	final Entity entity = event.getEntity();
@@ -424,41 +422,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	data.regainHealthTime = System.currentTimeMillis();
     	// Set god-mode health to maximum.
     	// TODO: Mind that health regain might half the ndt.
-    	double health = 0.0;
-    	// TODO: Put workarounds to some HealthAPI utility class with proper arguments and return type.
-    	try{
-    		// Changed order.
-    		health = event.getAmount() + player.getHealth();
-    	}
-    	catch(AbstractMethodError e){
-    		if (!fail){
-    			fail = true;
-    			LogUtil.logWarning("[NoCheatPlus] Health API incompatibility detected.");
-    		}
-    		// Reflection fall-back (might fall back to int methods, at present).
-    		final Object o1 = ReflectionUtil.invokeMethodVoid(event, "getAmount", double.class, int.class);
-    		if (o1 instanceof Number){
-    			health += ((Number) o1).doubleValue();
-    		}
-    		final Object o2 = ReflectionUtil.invokeMethodVoid(player, "getHealth", double.class, int.class);
-    		if (o2 instanceof Number){
-    			health += ((Number) o2).doubleValue();
-    		}
-    	}
-    	try{
-    		health = Math.min(health, player.getMaxHealth());
-    	}
-    	catch(AbstractMethodError e){
-    		if (!fail){
-    			fail = true;
-    			LogUtil.logWarning("[NoCheatPlus] Health API incompatibility detected.");
-    		}
-    		// Reflection fall-back (might fall back to int methods, at present).
-    		final Object o1 = ReflectionUtil.invokeMethodVoid(player, "getMaxHealth", double.class, int.class);
-    		if (o1 instanceof Number){
-    			health = Math.min(health, ((Number) o1).doubleValue());
-    		}
-    	}
+    	final double health = Math.min(BridgeHealth.getHealth(player) + BridgeHealth.getAmount(event), BridgeHealth.getMaxHealth(player));
     	data.godModeHealth = Math.max(data.godModeHealth, health);
     }
 
