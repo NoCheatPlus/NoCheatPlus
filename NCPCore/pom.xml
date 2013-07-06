@@ -17,7 +17,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.4.7-R1.0</version>
+      <version>1.5.2-R1.0</version>
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
@@ -28,5 +28,6 @@
 
   <description>Core components and checks implementations. This contains about everything, just not the component/compat factories and not the plugin itself. NCPCore allows to add more modules/components that use check-specific classes to be added in the factories on NCPPlugin level.
 
-Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+Version updating is done for the NoCheatPlus sub-module.
+</description>
 </project>

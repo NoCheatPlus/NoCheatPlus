@@ -40,7 +40,11 @@
 
   <description>The initial pom design had been taken from mbax (GitHub, TODO: link).
 
-TODO: Switch it to an assembly pom + consider using one bukkit version only  for compilation? [Downside: the compat part should be the minimal bukkit version supported, though then the plugin would be taken out, so... do it!]
+Version updating is done for the NoCheatPlus sub-module.
 
-Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+The naming of the native compatibility modules mostly follows NCPCompat + shortcut of server mod name + earliest build/version that the module would run with (though it should be compiled with the latest available build rather, latest build also can be used, if it is the first module depicting an API incompatibility transition).
+
+NCPCompatBukkit provides compatibility for the Bukkit-API only (no native module available), aiming at keeping NCP up for a new MC version for if no native module is available . Tendency is to use the latest Bukkit version rather, but since it is used for some &quot;unknown mods&quot; as well, it is not compiled with the latest Bukkit version always.
+
+TODO: Better place for descriptions like this?</description>
 </project>

@@ -80,7 +80,9 @@
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
-  <description>Mainly contains the plugin class and the factories.</description>
+  <description>Mainly contains the plugin class and the factories.
+
+Version updating is done for the NoCheatPlus sub-module.</description>
   <parent>
   	<groupId>fr.neatmonster</groupId>
   	<artifactId>nocheatplus-parent</artifactId>

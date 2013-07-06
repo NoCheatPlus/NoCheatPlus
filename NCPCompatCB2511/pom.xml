@@ -28,5 +28,5 @@
 
   <description>Compatibility up to CB2512 (i.e. 1.4.5-R0.2).
 
-Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+Version updating is done for the NoCheatPlus sub-module.</description>
 </project>
