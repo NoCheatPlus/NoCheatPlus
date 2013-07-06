@@ -27,7 +27,7 @@ public class ReflectionUtil {
 	}
 	
 	/**
-	 * Dirty method. Does try.catch and return null for method invokation.
+	 * Dirty method. Does try.catch and return null for method invocation.
 	 * @param obj
 	 * @param methodName
 	 * @param arg
@@ -62,6 +62,40 @@ public class ReflectionUtil {
 		else if (methodFound != null && methodFound.getParameterTypes()[0].isAssignableFrom(argClass)){
 			try{
 				final Object res = methodFound.invoke(obj, arg);
+				return res;
+			}
+			catch (Throwable t){
+				// TODO: Throw something !?
+				return null;
+			}
+		}
+		else{
+			// TODO: Throw something !?
+			return null;
+		}
+	}
+	
+	public static Object invokeMethodVoid(final Object obj, final String methodName){
+		// TODO: ? provide a variation with boolean for general first or specialized first
+		// TODO: copy and paste: bad!
+		// TODO: Isn't there a one-line-call for this ??
+		final Class<?> objClass = obj.getClass();
+		// Collect methods that might work.
+		Method methodFound = null;
+		for (final Method method : objClass.getDeclaredMethods()){
+			if (method.getName().equals(methodName)){
+				final Class<?>[] parameterTypes = method.getParameterTypes();
+				if (parameterTypes.length == 1 ){
+					// Override the found method if none found yet and assignment is possible, or if it has a specialized argument of an already found one.
+					if (methodFound != null && methodFound.getParameterTypes()[0].isAssignableFrom(parameterTypes[0])){
+						methodFound = method;
+					}
+				}
+			}
+		}
+		if (methodFound != null){
+			try{
+				final Object res = methodFound.invoke(obj);
 				return res;
 			}
 			catch (Throwable t){

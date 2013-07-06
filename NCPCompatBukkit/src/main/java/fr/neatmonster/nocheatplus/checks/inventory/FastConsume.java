@@ -19,7 +19,8 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
- * Quick replacement for InstantEat, partly reusing InstantEat data.
+ * Quick replacement for InstantEat, partly reusing InstantEat data.<br>
+ * This check is added by fr.neatmonster.nocheatplus.compat.DefaultComponentFactory.
  * @author mc_dev
  *
  */
