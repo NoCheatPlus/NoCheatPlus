@@ -477,7 +477,7 @@ public class TickTask implements Runnable {
 		// Metrics
 		if (tick > 0 && (tick % 20) == 0){
 			// Count every second.
-			final int ticks = Math.min(20, (int) (1000f / (50f * getLag(1000, true)))); 
+			final int ticks = Math.min(20, (int) Math.round((1000f / (50f * getLag(1000, true)))));
 			MetricsData.addTicks(ticks);
 		}
 		

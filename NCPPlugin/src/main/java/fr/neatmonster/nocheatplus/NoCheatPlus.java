@@ -869,15 +869,15 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                         }
                     });
             final Graph serverTicks = metrics.createGraph("Server Ticks");
-            final int[] ticksArray = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-                    19, 20};
-            for (final int ticks : ticksArray)
+            for (int i = 0; i <= 20; i++){
+            	final int ticks = i;
                 serverTicks.addPlotter(new Plotter(ticks + " tick(s)") {
                     @Override
                     public int getValue() {
                         return MetricsData.getTicks(ticks);
                     }
                 });
+            }
             metrics.start();
         } catch (final Exception e) {
         	LogUtil.logWarning("[NoCheatPlus] Failed to initialize metrics:");
