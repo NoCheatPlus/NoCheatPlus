@@ -123,8 +123,8 @@ public class MCAccessCB2763 implements MCAccess{
 	}
 
 	@Override
-	public void dealFallDamage(final Player player, final int damage) {
-		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, damage);
+	public void dealFallDamage(final Player player, final double damage) {
+		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, (int) Math.round(damage));
 	}
 
 	@Override

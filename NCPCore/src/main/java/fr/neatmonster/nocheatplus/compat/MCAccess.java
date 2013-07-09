@@ -96,7 +96,7 @@ public interface MCAccess {
 
 	public void setInvulnerableTicks(Player player, int ticks);
 
-	public void dealFallDamage(Player player, int damage);
+	public void dealFallDamage(Player player, double damage);
 
 	/**
 	 * This may well be removed, if possible to check with Bukkit.

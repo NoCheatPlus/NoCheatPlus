@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -77,14 +78,13 @@ public class NoFall extends Check {
 
 
     private void dealFallDamage(final Player player, final double damage) {
-    	@SuppressWarnings("deprecation")
     	// TODO: Byte code compatibility ?
-		final EntityDamageEvent event = new EntityDamageEvent(player, DamageCause.FALL, (int) Math.round(damage));
+		final EntityDamageEvent event = BridgeHealth.getEntityDamageEvent(player, DamageCause.FALL, damage);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()){
         	// TODO: account for no damage ticks etc.
         	player.setLastDamageCause(event);
-            mcAccess.dealFallDamage(player, (int) Math.round(event.getDamage())); // TODO: Adjust signature to double (!).
+            mcAccess.dealFallDamage(player, BridgeHealth.getDamage(event));
         }
         // TODO: let this be done by the damage event (!).
 //        data.clearNoFallData(); // -> currently done in the damage eventhandling method.

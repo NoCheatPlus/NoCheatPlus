@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
@@ -130,9 +131,9 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	}
 
 	@Override
-	public void dealFallDamage(final Player player, final int damage) {
+	public void dealFallDamage(final Player player, final double damage) {
 		// TODO: account for armor, other.
-		player.damage(damage);
+		player.damage((int) Math.round(damage));
 	}
 
 	@Override
@@ -143,7 +144,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	@Override
 	public boolean shouldBeZombie(final Player player) {
 		// Not sure :) ...
-		return player.getHealth() <= 0 && !player.isDead();
+		return BridgeHealth.getHealth(player) <= 0.0 && !player.isDead();
 	}
 
 	@Override
