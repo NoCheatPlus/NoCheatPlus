@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 public interface MCAccess {
 	
 	/**
-	 * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5".
+	 * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5", to indicate multiple sub-versions supported use "1.5.x", use "?" to indicate general future support.
 	 * @return
 	 */
 	public String getMCVersion();
@@ -35,7 +35,7 @@ public interface MCAccess {
 	
 	/**
 	 * Get the servers command map.
-	 * @return MAy rturn null if not supported.
+	 * @return May return null if not supported.
 	 */
 	public CommandMap getCommandMap();
 	
