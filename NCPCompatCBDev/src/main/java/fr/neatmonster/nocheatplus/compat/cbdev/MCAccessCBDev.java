@@ -42,7 +42,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public String getServerVersionTag() {
-		return "CB2794-DEV";
+		return "CB2808-DEV";
 	}
 
 	@Override
