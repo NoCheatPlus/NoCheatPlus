@@ -90,12 +90,6 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	}
 
 	@Override
-	public boolean Block_i(final int id) {
-		// TODO: This is inaccurate (would be something like "can suffocate"), however it is used for piling upwards and might about do.
-		return BlockProperties.isGround(id) || BlockProperties.isSolid(id);
-	}
-
-	@Override
 	public double getWidth(final Entity entity) {
 		// TODO
 		return 0.6f;

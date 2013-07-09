@@ -214,7 +214,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param event
      *            the event
      */
-    @SuppressWarnings("deprecation")
 	@EventHandler(
             ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockPlace(final BlockPlaceEvent event) {
@@ -246,7 +245,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
 				&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
 				&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
-				&& (mcAccess.Block_i(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
+				&& (canJumpOffTop(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
 			// The creative fly and/or survival fly check is enabled, the
 			// block was placed below the player and is
 			// solid, so do what we have to do.
@@ -254,6 +253,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.sfJumpPhase = 0;
 		}
     }
+    
+    /**
+     * Used for a workaround that resets the set-back for the case of jumping on just placed blocks.
+     * @param id
+     * @return
+     */
+	private final boolean canJumpOffTop(final int id){
+		// TODO: Test if this can be removed!
+		return BlockProperties.isGround(id) || BlockProperties.isSolid(id);
+	}
 
     /**
      * We listen to this event to prevent player from flying by sending bed leaving packets.

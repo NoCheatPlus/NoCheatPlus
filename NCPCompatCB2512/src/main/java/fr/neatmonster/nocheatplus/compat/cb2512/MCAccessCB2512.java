@@ -77,17 +77,6 @@ public class MCAccessCB2512 implements MCAccess{
 	}
 
 	@Override
-	public boolean Block_i(final int id) {
-		try{
-			return Block.i(id);
-		}
-		catch(Throwable t){
-			// Minecraft default value.
-			return true;
-		}
-	}
-
-	@Override
 	public double getWidth(final Entity entity) {
 		return ((CraftEntity) entity).getHandle().width;
 	}

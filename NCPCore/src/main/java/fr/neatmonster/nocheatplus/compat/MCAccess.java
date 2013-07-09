@@ -71,17 +71,6 @@ public interface MCAccess {
 	 * @return
 	 */
 	public AlmostBoolean isBlockLiquid(int id);
-	
-	/**
-	 * Hiding the API access here.<br>
-	 * // TODO: Replace by independent method.
-	 * TODO: Find description of this and use block properties from here, as well as a speaking method name.<br>
-	 * Assumption: This is something like "can stand on this type of block".
-	 * @deprecated Will be replaced by direct calls to BlockProperties soon.
-	 * @param id
-	 * @return
-	 */
-	public boolean Block_i(int id);
 
 	/**
 	 * Does only check y bounds, returns false if dead. this is half a check as auxiliary means for PlayerLocation.isIllegal.
