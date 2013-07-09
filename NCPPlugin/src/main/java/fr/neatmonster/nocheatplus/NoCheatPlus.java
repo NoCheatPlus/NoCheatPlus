@@ -782,39 +782,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         
         // Setup the graphs, plotters and start Metrics.
-        if (config.getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {
-            MetricsData.initialize();
-            try {
-                this.metrics = new Metrics(this);
-                final Graph checksFailed = metrics.createGraph("Checks Failed");
-                for (final CheckType type : CheckType.values())
-                    if (type.getParent() != null)
-                        checksFailed.addPlotter(new Plotter(type.name()) {
-                            @Override
-                            public int getValue() {
-                                return MetricsData.getFailed(type);
-                            }
-                        });
-                final Graph serverTicks = metrics.createGraph("Server Ticks");
-                final int[] ticksArray = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-                        19, 20};
-                for (final int ticks : ticksArray)
-                    serverTicks.addPlotter(new Plotter(ticks + " tick(s)") {
-                        @Override
-                        public int getValue() {
-                            return MetricsData.getTicks(ticks);
-                        }
-                    });
-                metrics.start();
-            } catch (final Exception e) {
-            	LogUtil.logWarning("[NoCheatPlus] Failed to initialize metrics:");
-            	LogUtil.logWarning(e);
-            	if (metrics != null){
-            		metrics.cancel();
-            		metrics = null;
-            	}
-            }
-        }
+        setMetrics();
 
 //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
 //            // Is a new update available?
@@ -864,6 +832,64 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	}
     
     /**
+     * Start or cancel metrics according to settings.
+     */
+    private void setMetrics() {
+    	final ConfigFile config = ConfigManager.getConfigFile();
+        if (config.getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {
+        	if (metrics != null){
+        		// Assume reload during runtime, ignore.
+        		return;
+        	}
+        	else{
+        		// Really start metrics.
+        		startMetrics();
+        	}
+        }
+        else{
+        	// Stop metrics, if present.
+        	if (metrics != null){
+        		metrics.cancel();
+        		metrics = null;
+        	}
+        }
+	}
+
+	private void startMetrics() {
+		MetricsData.initialize();
+        try {
+            this.metrics = new Metrics(this);
+            final Graph checksFailed = metrics.createGraph("Checks Failed");
+            for (final CheckType type : CheckType.values())
+                if (type.getParent() != null)
+                    checksFailed.addPlotter(new Plotter(type.name()) {
+                        @Override
+                        public int getValue() {
+                            return MetricsData.getFailed(type);
+                        }
+                    });
+            final Graph serverTicks = metrics.createGraph("Server Ticks");
+            final int[] ticksArray = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                    19, 20};
+            for (final int ticks : ticksArray)
+                serverTicks.addPlotter(new Plotter(ticks + " tick(s)") {
+                    @Override
+                    public int getValue() {
+                        return MetricsData.getTicks(ticks);
+                    }
+                });
+            metrics.start();
+        } catch (final Exception e) {
+        	LogUtil.logWarning("[NoCheatPlus] Failed to initialize metrics:");
+        	LogUtil.logWarning(e);
+        	if (metrics != null){
+        		metrics.cancel();
+        		metrics = null;
+        	}
+        }
+	}
+
+	/**
      * Empties and registers the subComponentHolders list.
      */
     protected void processQueuedSubComponentHolders(){
@@ -894,6 +920,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		scheduleConsistencyCheckers();
 		// Cache some things.
 		useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
+		
+		setMetrics();
     }
     
 	@Override
