@@ -19,16 +19,6 @@
   </dependencies>
   
   <!-- Building -->
-  <distributionManagement>
-        <repository>
-            <id>md_5-releases</id>
-            <url>http://repo.md-5.net/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>md_5-snapshots</id>
-            <url>http://repo.md-5.net/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
   <build>
     <defaultGoal>clean package</defaultGoal>
     <directory>../target</directory> <!-- Build it one level up, because it is the one we care about -->
