@@ -195,20 +195,22 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         if (!cancelled && critical.isEnabled(player) && critical.check(player))
             cancelled = true;
-
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, damaged))
-            cancelled = true;
-
+        
         if (!cancelled && knockback.isEnabled(player) && knockback.check(player))
             cancelled = true;
-
+        
         if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player))
             cancelled = true;
-
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, damaged))
-            cancelled = true;
-
+        
         if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))
+            cancelled = true;
+        
+        // TODO: Order of the last two [might put first] ?
+        
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, damaged))
+        	cancelled = true;
+        
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, damaged))
             cancelled = true;
         
         // Set values.
