@@ -268,6 +268,26 @@ public class PlayerLocation {
 	public boolean isSamePos(final Location loc) {
 		return x == loc.getX() && z == loc.getZ() && y == loc.getY();
 	}
+	
+	/**
+	 * Manhattan distance, see Trigutil.
+	 * @param other
+	 * @return
+	 */
+	public int manhattan(final PlayerLocation other){
+		// TODO: Consider using direct field access from other methods as well.
+		return TrigUtil.manhattan(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
+	}
+	
+	/**
+	 * Maximum block distance comparing dx, dy, dz.
+	 * @param other
+	 * @return
+	 */
+	public int maxBlockDist(final PlayerLocation other){
+		// TODO: Consider using direct field access from other methods as well.
+		return TrigUtil.maxDistance(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
+	}
 
 	/**
 	 * Checks if the player is above stairs.

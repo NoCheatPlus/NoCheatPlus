@@ -26,19 +26,36 @@ public class Passable extends Check {
 	{
 		// Simple check (only from, to, player.getLocation).
 		
-		// TODO: account for actual bounding box.
+		// TODO: Future: Account for the players bounding box? [test very-strict setting for at least the end points...]
 		String tags = "";
-		
+		// Block distances (sum, max) for from-to (not for loc!).
+		final int manhattan = from.manhattan(to);
 		boolean toPassable = to.isPassable();
-		// TODO: Config settings, extra flag for further processing.
-		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingVclipOnly || from.getY() > to.getY()) && (!cc.passableRayTracingBlockChangeOnly || from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ())){
+		// General condition check for using ray-tracing.
+		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingVclipOnly || from.getY() > to.getY()) && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)){
 			rayTracing.set(from, to);
 			rayTracing.loop();
 			if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()){
-				toPassable = false;
-				tags = "raytracing";
+				final int maxBlockDist = manhattan <= 1 ? manhattan : from.maxBlockDist(to);
+				if (maxBlockDist <= 1 && rayTracing.getStepsDone() == 1 && !from.isPassable()){
+					// Redo ray-tracing for moving out of blocks.
+					rayTracing.set(from, to);
+					rayTracing.setIgnorefirst();
+					rayTracing.loop();
+					if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()){
+						toPassable = false;
+						tags = "raytracing_2x_";
+					}
+					else if (cc.debug){
+						System.out.println(player.getName() + " passable: allow moving out of a block.");
+					}
+				}
+				else{
+					toPassable = false;
+					tags = "raytracing_";
+				}
 			}
-			// TODO: If accuracy is set, also check the head position (or bounding box right away).
+			// TODO: Future: If accuracy is demanded, also check the head position (or bounding box right away).
 			rayTracing.cleanup();
 		}
 		
@@ -53,7 +70,6 @@ public class Passable extends Check {
 
 		// Check the players location if different from others.
 		// (It provides a better set-back for some exploits.)
-//		Location loc = player.getLocation();
 		final int lbX = loc.getBlockX();
 		final int lbY = loc.getBlockY();
 		final int lbZ = loc.getBlockZ();
@@ -62,25 +78,27 @@ public class Passable extends Check {
 		if (from.isPassable()){
 			// From should be the set-back.
 			loc = null;
-			tags = "into";
+			tags += "into";
 		} else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
+			tags += "into_shift";
+		}
 //		} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
 			// (Mind that this can be the case on the same block theoretically.)
 			// Keep loc as set-back.
-		}
+//		}
 		else if (!from.isSameBlock(lbX, lbY, lbZ)){
 			// Otherwise keep loc as set-back.
-			tags = "cross_shift";
+			tags += "cross_shift";
 		}
-		else if (to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
+		else if (manhattan == 1 && to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
 //		else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
 			// Allow the move up if the head is free.
 			return null;
 		}
-		else if (!from.isSameBlock(to)){
+		else if (manhattan > 0){
 			// Otherwise keep from as set-back.
 			loc = null;
-			tags = "cross";
+			tags += "cross";
 		}
 		else{
 			// All blocks are the same, allow the move.

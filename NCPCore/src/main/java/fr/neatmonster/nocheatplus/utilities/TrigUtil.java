@@ -331,5 +331,33 @@ public class TrigUtil {
 		else if (yawDiff > 180f) yawDiff -= 360f;
 		return yawDiff;
 	}
+	
+	/**
+	 * Manhattan distance (steps along the sides of an orthogonal grid).
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 * @param x2
+	 * @param y2
+	 * @param z2
+	 * @return
+	 */
+	public static int manhattan(final int x1, final int y1, final int  z1, final int x2, final int y2, final int z2){
+		return Math.abs(x1 - x2) + Math.abs(y1 - y2) + Math.abs(z1 - z2);
+	}
+	
+	/**
+	 * Maximum distance comparing dx, dy, dz.
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 * @param x2
+	 * @param y2
+	 * @param z2
+	 * @return
+	 */
+	public static int maxDistance(final int x1, final int y1, final int  z1, final int x2, final int y2, final int z2){
+		return Math.max(Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)), Math.abs(z1 - z2));
+	}
 
 }
