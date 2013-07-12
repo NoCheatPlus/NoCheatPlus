@@ -285,7 +285,14 @@ public class SurvivalFly extends Check {
         if (from.isInWeb()){
         	data.sfNoLowJump = true;
         	// Very simple: force players to descend or stay.
-         	vAllowedDistance = from.isOnGround() ? 0.1D : 0;
+        	if (toOnGround && yDistance > 0.0 && yDistance <= 0.5){
+        		// Step up. Note: Does not take into account jump effect on purpose.
+        		vAllowedDistance = yDistance;
+        		tags.add("web_step");
+        	}
+        	else{
+        		vAllowedDistance = from.isOnGround() ? 0.1D : 0;
+        	}
          	data.jumpAmplifier = 0; // TODO: later maybe fetch.
         	vDistanceAboveLimit = yDistance - vAllowedDistance;
         	if (cc.survivalFlyCobwebHack && vDistanceAboveLimit > 0 && hDistanceAboveLimit <= 0){
