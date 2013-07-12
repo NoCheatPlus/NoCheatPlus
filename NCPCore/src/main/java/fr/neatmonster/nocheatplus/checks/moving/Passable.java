@@ -27,6 +27,7 @@ public class Passable extends Check {
 		// Simple check (only from, to, player.getLocation).
 		
 		// TODO: account for actual bounding box.
+		String tags = "";
 		
 		boolean toPassable = to.isPassable();
 		// TODO: Config settings, extra flag for further processing.
@@ -35,6 +36,7 @@ public class Passable extends Check {
 			rayTracing.loop();
 			if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()){
 				toPassable = false;
+				tags = "raytracing";
 			}
 			// TODO: If accuracy is set, also check the head position (or bounding box right away).
 			rayTracing.cleanup();
@@ -60,6 +62,7 @@ public class Passable extends Check {
 		if (from.isPassable()){
 			// From should be the set-back.
 			loc = null;
+			tags = "into";
 		} else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
 //		} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
 			// (Mind that this can be the case on the same block theoretically.)
@@ -67,6 +70,7 @@ public class Passable extends Check {
 		}
 		else if (!from.isSameBlock(lbX, lbY, lbZ)){
 			// Otherwise keep loc as set-back.
+			tags = "cross_shift";
 		}
 		else if (to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
 //		else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
@@ -76,6 +80,7 @@ public class Passable extends Check {
 		else if (!from.isSameBlock(to)){
 			// Otherwise keep from as set-back.
 			loc = null;
+			tags = "cross";
 		}
 		else{
 			// All blocks are the same, allow the move.
@@ -96,7 +101,12 @@ public class Passable extends Check {
 		// Return the reset position.
 		data.passableVL += 1d;
 		final ViolationData vd = new ViolationData(this, player, data.passableVL, 1, cc.passableActions);
-		if (cc.debug || vd.needsParameters()) vd.setParameter(ParameterName.BLOCK_ID, "" + to.getTypeId());
+		if (cc.debug || vd.needsParameters()){
+			vd.setParameter(ParameterName.BLOCK_ID, "" + to.getTypeId());
+			if (!tags.isEmpty()){
+				vd.setParameter(ParameterName.TAGS, tags);
+			}
+		}
 		if (executeActions(vd)) {
 			// TODO: Consider another set back position for this, also keeping track of players moving around in blocks.
 			final Location newTo;
