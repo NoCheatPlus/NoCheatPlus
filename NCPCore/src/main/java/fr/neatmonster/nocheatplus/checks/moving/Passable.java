@@ -59,6 +59,7 @@ public class Passable extends Check {
 			rayTracing.cleanup();
 		}
 		
+		// TODO: Checking order: If loc is not the same as from, a quick return here might not be wanted.
 		if (toPassable){
 			// Quick return.
 			// (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
@@ -76,6 +77,14 @@ public class Passable extends Check {
 		// First check if the player is moving from a passable location.
 		// If not, the move might still be allowed, if moving inside of the same block, or from and to have head position passable.
 		if (from.isPassable()){
+			// Put one workaround for 1.5 high blocks here:
+			if (from.isBlockAbove(to) && (BlockProperties.getBlockFlags(to.getTypeId()) & BlockProperties.F_HEIGHT150) != 0){
+				// Check if the move went from inside of the block.
+				if (BlockProperties.collidesBlock(to.getBlockCache(), from.getX(), from.getY(), from.getZ(), from.getX(), from.getY(), from.getZ(), to.getBlockX(), to.getBlockY(), to.getBlockZ(), to.getTypeId())){
+					// Allow moving inside of 1.5 high blocks.
+					return null;
+				}
+			}
 			// From should be the set-back.
 			loc = null;
 			tags += "into";
