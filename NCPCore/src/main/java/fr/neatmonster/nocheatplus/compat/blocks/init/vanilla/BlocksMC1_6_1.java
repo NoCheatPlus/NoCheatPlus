@@ -36,7 +36,7 @@ public class BlocksMC1_6_1 implements BlockPropertiesSetup{
 		
 		// Carpet
 		BlockProperties.setBlockProps(171, new BlockProps(BlockProperties.noTool, 0.1f, BlockProperties.secToMs(0.15)));
-		BlockProperties.setBlockFlags(171, BlockProperties.F_IGN_PASSABLE);
+		BlockProperties.setBlockFlags(171, BlockProperties.F_GROUND|BlockProperties.F_IGN_PASSABLE|BlockProperties.F_GROUND_HEIGHT);
 		
 		LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.6.1 blocks.");
 	}
