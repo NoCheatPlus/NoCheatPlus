@@ -27,6 +27,31 @@ public class ReflectionUtil {
 	}
 	
 	/**
+	 * Check for the given names if the method returns the desired type of result (exact check).
+	 * @param methodNames
+	 * @param returnType
+	 */
+	public static void checkMethodReturnTypesNoArgs(Class<?> objClass, String[] methodNames, Class<?> returnType){
+		// TODO: Add check: boolean isStatic.
+		try {
+			for (String methodName : methodNames){
+				Method m = objClass.getMethod(methodName);
+				if (m.getParameterTypes().length != 0){
+					throw new RuntimeException("Expect method without arguments for " + objClass.getName() + "." + methodName);
+				}
+				if (m.getReturnType() != returnType){
+					throw new RuntimeException("Wrong return type for: " + objClass.getName() + "." + methodName);
+				}
+			}
+		} catch (SecurityException e) {
+			// Let this one pass.
+			//throw new RuntimeException(e);
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
+		}
+	}
+	
+	/**
 	 * Dirty method to call a declared method with a generic parameter type. Does try.catch and return null insome cases for method invocation. Purpose for this is generic factory registration, having methods with type Object alongside methods with more specialized types.
 	 * @param obj
 	 * @param methodName

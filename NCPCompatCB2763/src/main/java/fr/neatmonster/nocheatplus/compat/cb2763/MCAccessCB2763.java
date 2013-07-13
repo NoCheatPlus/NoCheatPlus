@@ -31,6 +31,8 @@ public class MCAccessCB2763 implements MCAccess{
 	public MCAccessCB2763(){
 		getCommandMap();
 		ReflectionUtil.checkMembers("net.minecraft.server.v1_5_R3.", new String[]{"Entity" , "dead"});
+		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_5_R3.Block.class, 
+				new String[]{"u", "v", "w", "x", "y", "z"}, double.class);
 	}
 
 	@Override
