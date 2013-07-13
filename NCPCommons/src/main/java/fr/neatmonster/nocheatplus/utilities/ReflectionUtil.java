@@ -5,10 +5,10 @@ import java.lang.reflect.Method;
 public class ReflectionUtil {
 	
 	/**
-	 * Convenience method to check if members exist and fail if not.
+	 * Convenience method to check if members exist and fail if not. This checks getField(...) == null.
 	 * @param prefix
 	 * @param specs
-	 * @throws RuntimeException
+	 * @throws RuntimeException If any member is not present.
 	 */
 	public static void checkMembers(String prefix, String[]... specs){
 		try {
@@ -30,6 +30,7 @@ public class ReflectionUtil {
 	 * Check for the given names if the method returns the desired type of result (exact check).
 	 * @param methodNames
 	 * @param returnType
+	 * @throws RuntimeException If one method is not existing or not matching return type or has arguments.
 	 */
 	public static void checkMethodReturnTypesNoArgs(Class<?> objClass, String[] methodNames, Class<?> returnType){
 		// TODO: Add check: boolean isStatic.
@@ -52,11 +53,11 @@ public class ReflectionUtil {
 	}
 	
 	/**
-	 * Dirty method to call a declared method with a generic parameter type. Does try.catch and return null insome cases for method invocation. Purpose for this is generic factory registration, having methods with type Object alongside methods with more specialized types.
+	 * Dirty method to call a declared method with a generic parameter type. Does try+catch for method invocation and should not throw anything for the normal case. Purpose for this is generic factory registration, having methods with type Object alongside methods with more specialized types.
 	 * @param obj
 	 * @param methodName
 	 * @param arg Argument or invoke the method with.
-	 * @return
+	 * @return null in case of errors (can not be distinguished).
 	 */
 	public static Object invokeGenericMethodOneArg(final Object obj, final String methodName, final Object arg){
 		// TODO: Isn't there a one-line-call for this ??
