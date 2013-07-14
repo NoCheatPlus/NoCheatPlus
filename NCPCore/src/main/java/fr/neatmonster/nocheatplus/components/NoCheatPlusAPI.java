@@ -35,6 +35,13 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
 	 */
 	public int sendAdminNotifyMessage(final String message);
 	
+	/**
+	 * Thread-safe method to send a message to a player in a scheduled task. The scheduling preserves order of messages.
+	 * @param playerName
+	 * @param message
+	 */
+	public void sendMessageOnTick(final String playerName, final String message);
+	
 
 	/**
      * Allow login (remove from deny login map).

@@ -79,6 +79,7 @@ import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEn
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.PlayerData;
+import fr.neatmonster.nocheatplus.players.PlayerMessageSender;
 import fr.neatmonster.nocheatplus.updates.Updates;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
@@ -192,6 +193,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			return false;
 		}
 	};
+	
+	/** Access point for thread safe message queuing. */
+	private final PlayerMessageSender playerMessageSender  = new PlayerMessageSender();
 
 	/**
 	 * Remove expired entries.
@@ -340,6 +344,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		return done.size();
 	}
 	
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.components.NoCheatPlusAPI#sendMessageDelayed(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void sendMessageOnTick(final String playerName, final String message) {
+		playerMessageSender.sendMessageThreadSafe(playerName, message);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> Collection<ComponentRegistry<T>> getComponentRegistries(final Class<ComponentRegistry<T>> clazz) {
@@ -1082,11 +1094,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			// Inconsistent config version.
 			if (configProblems != null && ConfigManager.getConfigFile().getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
 				// Could use custom prefix from logging, however ncp should be mentioned then.
-				data.task.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
+				sendMessageOnTick(playerName, ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
 			}
 			// Message if notify is turned off.
 			if (data.getNotifyOff()) {
-				data.task.sendMessage(MSG_NOTIFY_OFF);
+				sendMessageOnTick(playerName, MSG_NOTIFY_OFF);
 			}
 		}
 		// JoinLeaveListenerS: Do update comment in NoCheatPlusAPI with changing event priority.

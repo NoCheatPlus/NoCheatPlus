@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -272,13 +271,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 			}
 		}
 		else if (cc.chatWarningCheck && time - data.chatWarningTime > cc.chatWarningTimeout && (100f * accumulated / cc.textFreqNormLevel > cc.chatWarningLevel || 100f * shortTermAccumulated / cc.textFreqShortTermLevel > cc.chatWarningLevel)){
-			// TODO: In case this gets used more often, use the player tasks, at least once PlayerData can be used for async calls.
-		    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"), new Runnable(){
-				@Override
-				public void run() {
-					player.sendMessage(ColorUtil.replaceColors(cc.chatWarningMessage));
-				};
-		    });
+			NCPAPIProvider.getNoCheatPlusAPI().sendMessageOnTick(player.getName(), ColorUtil.replaceColors(cc.chatWarningMessage));
             data.chatWarningTime = time;
 		}
 		else {

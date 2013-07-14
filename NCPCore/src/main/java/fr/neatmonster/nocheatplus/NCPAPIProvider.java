@@ -11,7 +11,7 @@ public class NCPAPIProvider {
 	private static NoCheatPlusAPI noCheatPlusAPI = null;
 	
 	/**
-	 * Get the registered API instance. This will work after the plugin has loaded (onLoad).
+	 * Get the registered API instance. This will work after the plugin has loaded (onLoad), asynchronous calls should be possible, however calls after plugin disable or before it is loaded should fail.
 	 */
 	public static NoCheatPlusAPI getNoCheatPlusAPI(){
 		return noCheatPlusAPI;
