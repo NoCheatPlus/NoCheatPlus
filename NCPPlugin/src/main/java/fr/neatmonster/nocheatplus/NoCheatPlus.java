@@ -65,7 +65,6 @@ import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.config.DefaultConfig;
 import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
@@ -100,7 +99,6 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
-	private static final String MSG_CONFIG_OUTDATED = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Your configuration might be outdated.\n" + "Some settings could have changed, you should regenerate it!";
 	private static final String MSG_NOTIFY_OFF = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are turned " + ChatColor.RED + "OFF" + ChatColor.WHITE + ".";
 
 	//////////////////
@@ -129,8 +127,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	/** MCAccess instance. */
 	protected MCAccess mcAccess = null;
 
-    /** Is the configuration outdated? */
-    private boolean              configOutdated  = false;
+    /** Configuration problems (likely put to ConfigManager later). */
+    protected String configProblems = null;
 
 //    /** Is a new update available? */
 //    private boolean              updateAvailable = false;
@@ -795,8 +793,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 //			});
 //        }
 
-        // Is the configuration outdated?
-        configOutdated = Updates.isConfigOutdated(DefaultConfig.buildNumber, config);
+        // Is the version the configuration was created with consistent with the current one?
+        configProblems = Updates.isConfigUpToDate(config);
+        if (configProblems != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)){
+        	// Could use custom prefix from logging, however ncp should be mentioned then.
+        	LogUtil.logWarning("[NoCheatPlus] " + configProblems);
+        }
         
 		if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -908,6 +910,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     protected void processReload(){
     	final ConfigFile config = ConfigManager.getConfigFile();
+    	configProblems = Updates.isConfigUpToDate(config);
     	// TODO: Process registered ComponentFactory instances.
 		// Set up MCAccess.
 		initMCAccess(config);
@@ -1037,7 +1040,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				}
 			}
 
-			@EventHandler(priority = EventPriority.MONITOR)
+			@EventHandler(priority = EventPriority.MONITOR) // TODO: Should this be lower priority ?
 			public void onPlayerJoin(final PlayerJoinEvent event) {
 				onJoin(event.getPlayer());
 			}
@@ -1070,9 +1073,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 //			// Update available.
 //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 			
-			// Outdated config.
-			if (configOutdated) player.sendMessage(MSG_CONFIG_OUTDATED);
-			if (hasTurnedOffNotifications(playerName)){
+			// Inconsistent config version.
+			if (configProblems != null && ConfigManager.getConfigFile().getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
+				// Could use custom prefix from logging, however ncp should be mentioned then.
+				player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
+			}
+			// Message if notify is turned off.
+			if (hasTurnedOffNotifications(playerName)) {
 				player.sendMessage(MSG_NOTIFY_OFF);
 			}
 		}

@@ -37,8 +37,13 @@ public class DefaultConfig extends ConfigFile {
         super();
         
         
-        // General:
+        // General.
         set(ConfPaths.SAVEBACKCONFIG, true);
+        
+        // Config version.
+        set(ConfPaths.CONFIGVERSION_NOTIFY, true);
+//        not set(ConfPaths.CONFIGVERSION_CREATED, -1);
+//        not set(ConfPaths.CONFIGVERSION_SAVED, -1);
 
         /*
          * 888                                 ,e,                  

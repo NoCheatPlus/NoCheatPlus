@@ -22,8 +22,17 @@ public abstract class ConfPaths {
 	public static final String SUB_OVERRIDEFLAGS					 	 = "overrideflags";
     public static final String SUB_LAG       							 = "lag";
 	
-	// General:
+	// General.
 	public static final String SAVEBACKCONFIG                            = "savebackconfig";
+	
+	// Configuration version.
+	@GlobalConfig // TODO: Per file versions should also be supported. Better with per-path comparison?
+	public static final String CONFIGVERSION							 = "configversion.";
+	public static final String CONFIGVERSION_NOTIFY						 = CONFIGVERSION + "notify";
+	/** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with first save. */
+	public static final String CONFIGVERSION_CREATED					 = CONFIGVERSION + "created";
+	/** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with each save. */
+	public static final String CONFIGVERSION_SAVED						 = CONFIGVERSION + "saved";
 
     /*
      * 888                                 ,e,                  
