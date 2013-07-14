@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import java.util.Map;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -148,12 +146,6 @@ public class Passable extends Check {
 			// No cancel action set.
 			return null;
 		}
-	}
-
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData)
-	{
-		return super.getParameterMap(violationData);
 	}
 
 }
