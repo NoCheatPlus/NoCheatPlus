@@ -32,8 +32,8 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  * Properties of blocks.
  * 
  * Likely to be added:
- * - reading properties from files.
- * - reading the default properties from a file too.
+ * - reading (all) properties from files.
+ * - reading (all) the default properties from a file too.
  *
  */
 public class BlockProperties {

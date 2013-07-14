@@ -25,13 +25,14 @@ public class Passable extends Check {
 	public Location check(final Player player, Location loc, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc)
 	{
 		// Simple check (only from, to, player.getLocation).
-		
+		// TODO: if (!from.isSameCoords(loc)){...check passable for loc -> from !?... + sf etc too?}
 		// TODO: Future: Account for the players bounding box? [test very-strict setting for at least the end points...]
 		String tags = "";
 		// Block distances (sum, max) for from-to (not for loc!).
 		final int manhattan = from.manhattan(to);
 		boolean toPassable = to.isPassable();
 		// General condition check for using ray-tracing.
+		// TODO: consider in case of flying: sf does not cover moving up.
 		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingVclipOnly || from.getY() > to.getY()) && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)){
 			rayTracing.set(from, to);
 			rayTracing.loop();

@@ -3,12 +3,13 @@ package fr.neatmonster.nocheatplus.utilities;
 import org.bukkit.ChatColor;
 
 /**
- * More and less color.
+ * More and less color. Methods couls also in StringUtil, but that is in NCPCommons without Bukkit dependency.
  * @author mc_dev
  *
  */
 public class ColorUtil {
 	
+	/** Needs updating from Bukkit implementation (ChatColor) */
 	private static final String allColorChars = "0123456789AaBbCcDdEeFfKkLlMmNnOoRr";
 
 	/**

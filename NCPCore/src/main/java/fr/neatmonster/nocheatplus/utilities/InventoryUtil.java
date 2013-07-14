@@ -4,6 +4,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Auxiliary/convenience methods for inventories.
+ * @author mc_dev
+ *
+ */
 public class InventoryUtil {
 	
 	/**
@@ -24,7 +29,7 @@ public class InventoryUtil {
 	}
 
 	/**
-	 * Count slots with type-id and data (enchantments are ignored at present).
+	 * Count slots with type-id and data (enchantments and other meta data are ignored at present).
 	 * @param inventory
 	 * @param reference
 	 * @return
