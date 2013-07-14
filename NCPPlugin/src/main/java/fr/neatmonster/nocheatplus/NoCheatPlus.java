@@ -1039,13 +1039,20 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 					event.setKickMessage("You are temporarily denied to join this server.");
 				}
 			}
-
-			@EventHandler(priority = EventPriority.MONITOR) // TODO: Should this be lower priority ?
-			public void onPlayerJoin(final PlayerJoinEvent event) {
-				onJoin(event.getPlayer());
+			
+			@EventHandler(priority = EventPriority.LOWEST) // Do update comment in NoCheatPlusAPI with changing.
+			public void onPlayerJoinLowest(final PlayerJoinEvent event) {
+				final Player player = event.getPlayer();
+				updatePermStateReceivers(player);
 			}
 
-			@EventHandler(priority = EventPriority.MONITOR)
+			@EventHandler(priority = EventPriority.LOW)
+			public void onPlayerJoinLow(final PlayerJoinEvent event) {
+				// LOWEST is for DataMan and CombinedListener.
+				onJoinLow(event.getPlayer());
+			}
+
+			@EventHandler(priority = EventPriority.LOWEST)
 			public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
 			{
 				final Player player = event.getPlayer();
@@ -1058,32 +1065,31 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			}
 
 			@EventHandler(priority = EventPriority.MONITOR)
-			public void onPlayerQuitMonitor(final PlayerQuitEvent event) {
+			public void onPlayerQuit(final PlayerQuitEvent event) {
 				onLeave(event.getPlayer());
 			}
 		};
 	}
 	
-	protected void onJoin(final Player player){
-		updatePermStateReceivers(player);
+	protected void onJoinLow(final Player player){
 		final String playerName = player.getName();
 		if (nameSetPerms.hasPermission(playerName, Permissions.ADMINISTRATION_NOTIFY)){
 			// Login notifications...
-			
+			final PlayerData data = DataManager.getPlayerData(playerName, true);
 //			// Update available.
 //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 			
 			// Inconsistent config version.
 			if (configProblems != null && ConfigManager.getConfigFile().getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
 				// Could use custom prefix from logging, however ncp should be mentioned then.
-				player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
+				data.task.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
 			}
 			// Message if notify is turned off.
-			if (hasTurnedOffNotifications(playerName)) {
-				player.sendMessage(MSG_NOTIFY_OFF);
+			if (data.getNotifyOff()) {
+				data.task.sendMessage(MSG_NOTIFY_OFF);
 			}
 		}
-		ModUtil.motdOnJoin(player);
+		// JoinLeaveListenerS: Do update comment in NoCheatPlusAPI with changing event priority.
 		for (final JoinLeaveListener jlListener : joinLeaveListeners){
 			try{
 				jlListener.playerJoins(player);
@@ -1093,6 +1099,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 				LogUtil.logSevere(t);
 			}
 		}
+		// Mod message (left on low instead of lowest to allow some permissions plugins compatibility).
+		ModUtil.motdOnJoin(player);
 	}
 	
 	protected void onLeave(final Player player) {
