@@ -9,6 +9,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
@@ -38,7 +40,7 @@ public class BridgeHealth {
 			final String tag = obj.getClass().getName() + "." + methodName;
 			if (failures.add(tag)){
 				// New entry.
-				LogUtil.logWarning("[NoCheatPlus] API incompatibility detected: " + tag);
+				checkLogEntry(tag);
 			}
 		}
 		final Object o1 = ReflectionUtil.invokeMethodNoArgs(obj, methodName, double.class, int.class);
@@ -183,14 +185,20 @@ public class BridgeHealth {
 		if (reason != null){
 			final String tag = obj.getClass().getName() + "." + methodName;
 			if (failures.add(tag)){
-				// New entry.
-				LogUtil.logWarning("[NoCheatPlus] API incompatibility detected: " + tag);
+				checkLogEntry(tag);
 			}
 		}
 		try {
 			obj.getClass().getMethod(methodName, int.class).invoke(obj, value);
 		} catch (Throwable t) {
 			throw new RuntimeException("Could not invoke " + methodName + " with one argument (int) on: " + obj.getClass().getName(), reason);
+		}
+	}
+
+	private static void checkLogEntry(final String tag) {
+		// New entry.
+		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG)){
+			LogUtil.logWarning("[NoCheatPlus] API incompatibility detected: " + tag);
 		}
 	}
 	
