@@ -109,7 +109,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc){
 		if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)) return false;
 		else if (!cc.survivalFlyCheck || NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) || player.hasPermission(Permissions.MOVING_SURVIVALFLY)) return false;
-		else if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight())){
+		else if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && !player.isFlying() && (cc.ignoreAllowFlight || !player.getAllowFlight())){
 			return true;
 		}
 		else return false;
@@ -583,7 +583,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	checkCf = checkSf = false;
         }
         else{
-        	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
+        	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && !player.isFlying() && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
         			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
         		checkCf = false;
         		checkSf = true;
