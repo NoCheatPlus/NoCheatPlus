@@ -69,12 +69,16 @@ public class DebugUtil {
 			}
 			final double jump = mcAccess.getJumpAmplifier(player);
 			final double speed = mcAccess.getFasterMovementAmplifier(player);
-			try{
-				// TODO: Check backwards compatibility (1.4.2). Remove try-catch
-				if (BuildParameters.debugLevel > 0){
-					builder.append(" (walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
+			if (BuildParameters.debugLevel > 0){
+				try{
+					// TODO: Check backwards compatibility (1.4.2). Remove try-catch
+					
+						builder.append("\n(walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
+				} catch (Throwable t){}
+				if (player.isSprinting()){
+					builder.append("(sprinting)");
 				}
-			} catch (Throwable t){}
+			}
 			if (speed != Double.NEGATIVE_INFINITY || jump != Double.NEGATIVE_INFINITY){
 				builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("e_speed=" + (speed + 1)) : "") + (jump != Double.NEGATIVE_INFINITY ? ("e_jump=" + (jump + 1)) : "") + ")");
 			}
