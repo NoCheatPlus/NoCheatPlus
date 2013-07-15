@@ -207,6 +207,8 @@ permissions:
                         children:
                             nocheatplus.checks.moving.creativefly:
                                 description: Allow the player to bypass the CreativeFly check.
+                                children:
+                                    nocheatplus.checks.moving.survivalfly: true
                             nocheatplus.checks.moving.morepackets:
                                 description: Allow the player to bypass the MorePackets check.
                             nocheatplus.checks.moving.morepacketsvehicle:

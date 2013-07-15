@@ -100,19 +100,15 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
 	
 	/**
-	 * Heavier check, but convenient for seldom events (not for use in the player-move check).
+	 * Check if the player is to be checked by the survivalfly check.
 	 * @param player
 	 * @param data
 	 * @param cc
 	 * @return
 	 */
 	public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc){
-		if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)) return false;
-		else if (!cc.survivalFlyCheck || NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) || player.hasPermission(Permissions.MOVING_SURVIVALFLY)) return false;
-		else if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && !player.isFlying() && (cc.ignoreAllowFlight || !player.getAllowFlight())){
-			return true;
-		}
-		else return false;
+		return cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY) &&
+		(cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && !player.isFlying() && (cc.ignoreAllowFlight || !player.getAllowFlight());
 	}
 	
 	/**
@@ -518,22 +514,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// TODO: Rework to queued velocity entries: activation + invalidation
 		data.removeInvalidVelocity(TickTask.getTick() - cc.velocityActivationTicks);
 		data.velocityTick();
-//		// Horizontal velocity.
-//        if (data.horizontalVelocityCounter > 0D){
-//        	data.horizontalVelocityUsed ++;
-//        	data.horizontalVelocityCounter--;
-//        	data.horizontalFreedom = Math.max(0.0, data.horizontalFreedom - 0.09);
-//        }
-//        else if (data.horizontalFreedom > 0.001D){
-//        	if (data.verticalVelocityUsed == 1 && data.verticalVelocity > 0.5){
-//        		data.horizontalVelocityUsed = 0;
-//        		data.horizontalFreedom = 0;
-//        	}
-//        	else{
-//            	data.horizontalVelocityUsed ++;
-//            	data.horizontalFreedom *= 0.90D;
-//        	}
-//        }
         // Vertical velocity.
         if (data.verticalVelocity <= 0.09D){
         	data.verticalVelocityUsed ++;
@@ -575,28 +555,20 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 		}
 		
-		// Check which fly check to check.
+		// Check which fly check to use.
         final boolean checkCf;
         final boolean checkSf;
-        if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
-        	// TODO: Handle this by setting sf perm as child!
-        	checkCf = checkSf = false;
-        }
-        else{
-        	if ((cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && !player.isFlying() && (cc.ignoreAllowFlight || !player.getAllowFlight()) 
-        			&& cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY)){
-        		checkCf = false;
-        		checkSf = true;
-        	}
-        	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY)){
-            	checkCf = true;
-            	checkSf = false;
-        	}
-        	else{
-        		checkCf = checkSf = false;
-        	}
-
-        }
+    	if (shouldCheckSurvivalFly(player, data, cc)){
+    		checkCf = false;
+    		checkSf = true;
+    	}
+    	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY) && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
+        	checkCf = true;
+        	checkSf = false;
+    	}
+    	else{
+    		checkCf = checkSf = false;
+    	}
         
     	// Flying checks.
     	if (checkSf){
