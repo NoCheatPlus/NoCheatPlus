@@ -112,7 +112,7 @@ public class SurvivalFly extends Check {
 		
 		// TODO: Formula, might get from listener.
 		// TODO: Use in lostground.
-		final double walkSpeed = SurvivalFly.walkSpeed;
+		final double walkSpeed = SurvivalFly.walkSpeed * ((double) player.getWalkSpeed() / 0.2);
 		
 		
 		// "Lost ground" workaround.
