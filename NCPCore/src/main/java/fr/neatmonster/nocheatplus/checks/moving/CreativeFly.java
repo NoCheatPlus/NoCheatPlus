@@ -74,11 +74,18 @@ public class CreativeFly extends Check {
         // If the player is affected by potion of swiftness.
         
         final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
-        final double fSpeed;
+        double fSpeed;
         
         // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
         if (speedModifier == Double.NEGATIVE_INFINITY) fSpeed = 1D;
         else fSpeed = 1D + 0.2D * (speedModifier + 1D);
+        
+        if (player.isFlying()){
+        	fSpeed *= player.getFlySpeed() / 0.1;
+        }
+        else {
+        	fSpeed *= player.getWalkSpeed() / 0.2;
+        }
         
         final double limitH = cc.creativeFlyHorizontalSpeed / 100D * HORIZONTAL_SPEED * fSpeed;
 
