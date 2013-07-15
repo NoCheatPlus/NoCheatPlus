@@ -12,7 +12,6 @@ import org.bukkit.entity.ComplexLivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffectType;
 
@@ -122,18 +121,19 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		return player.getNoDamageTicks();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void setInvulnerableTicks(final Player player, final int ticks) {
-		// TODO: Ahhh...
-		player.setLastDamageCause(new EntityDamageEvent(player, DamageCause.CUSTOM, 500));
+		// TODO: Not really.
+		player.setLastDamageCause(BridgeHealth.getEntityDamageEvent(player, DamageCause.CUSTOM, 500.0));
 		player.setNoDamageTicks(ticks);
 	}
 
 	@Override
 	public void dealFallDamage(final Player player, final double damage) {
-		// TODO: account for armor, other.
-		player.damage((int) Math.round(damage));
+		// TODO: Document in knowledge base.
+		// TODO: Account for armor, other.
+		// TODO: use setLastDamageCause here ?
+		BridgeHealth.damage(player, damage);
 	}
 
 	@Override
@@ -150,8 +150,9 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	@Override
 	public void setDead(final Player player, final int deathTicks) {
 		// TODO: Test / kick ? ...
-		player.setHealth(0);
-		player.damage(1);
+		BridgeHealth.setHealth(player, 0.0);
+		// TODO: Might try stuff like setNoDamageTicks.
+		BridgeHealth.damage(player, 1.0);
 	}
 
 	@Override
@@ -201,6 +202,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 			return mat.hasGravity();
 		}
 		catch(Throwable t){
+			// Backwards compatibility.
 			switch(mat){
 			case SAND:
 			case GRAVEL:

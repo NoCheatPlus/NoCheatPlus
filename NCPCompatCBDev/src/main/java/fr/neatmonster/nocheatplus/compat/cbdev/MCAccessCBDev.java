@@ -127,7 +127,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public void dealFallDamage(final Player player, final double damage) {
-		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, (int) Math.round(damage));
+		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, (float) damage);
 	}
 
 	@Override
@@ -138,7 +138,7 @@ public class MCAccessCBDev implements MCAccess{
 	@Override
 	public boolean shouldBeZombie(final Player player) {
 		final net.minecraft.server.v1_6_R2.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-		return !mcPlayer.dead && mcPlayer.getHealth() <= 0 ;
+		return !mcPlayer.dead && mcPlayer.getHealth() <= 0.0f ;
 	}
 
 	@Override

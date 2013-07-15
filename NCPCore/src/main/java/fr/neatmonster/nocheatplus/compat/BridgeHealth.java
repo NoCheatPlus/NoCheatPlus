@@ -165,6 +165,21 @@ public class BridgeHealth {
 		}
 	}
 	
+	/**
+	 * Damage an entity (LivingEntity).
+	 * @param entity
+	 * @param damage
+	 * @throws RuntimeException, in case of an IncompatibleClassChangeError without success on recovery attempts.
+	 */
+	public static void damage(final LivingEntity entity, final double damage){
+		try{
+			entity.damage(damage);
+		}
+		catch(IncompatibleClassChangeError e){
+			invokeVoid(entity, "damage", (int) Math.round(damage), e);
+		}
+	}
+	
 	@SuppressWarnings("deprecation")
 	public static EntityDamageEvent getEntityDamageEvent(final Entity entity, final DamageCause damageCause, final double damage){
 		try{

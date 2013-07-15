@@ -113,9 +113,12 @@ public interface MCAccess {
 	public boolean shouldBeZombie(Player player);
 
 	/**
-	 * Set flag + death ticks.
+	 * Ensure the player is really taken out: Set flag + death ticks.
+	 * 
+	 * TODO: Check if still necessary + make knowledge-base entries for what to check.
+	 * 
 	 * @param player
-	 * @param i
+	 * @param deathTicks
 	 */
 	public void setDead(Player player, int deathTicks);
 	

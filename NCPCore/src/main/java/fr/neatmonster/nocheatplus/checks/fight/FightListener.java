@@ -153,8 +153,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
         }
         
-        if (damage <= 4 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){
+        if (damage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){
         	// Don't handle further, but do respect selfhit/canceldead.
+        	// TODO: Remove soon.
         	data.thornsId = Integer.MIN_VALUE;
         	return cancelled;
         }

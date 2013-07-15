@@ -1217,7 +1217,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         }
         // Fall-back check.
-        final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0 : 3);
+        final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : 3.0);
         if (maxD > damage){
             // TODO: respect dealDamage ?
             BridgeHealth.setDamage(event, maxD);

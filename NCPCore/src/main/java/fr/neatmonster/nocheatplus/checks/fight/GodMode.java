@@ -80,7 +80,7 @@ public class GodMode extends Check {
     	
     	// Check if reduced more than expected or new/count down fully.
     	// TODO: Mostly workarounds.
-    	if (delta <= 0  || data.lastNoDamageTicks <= player.getMaximumNoDamageTicks() / 2 || dTick > data.lastNoDamageTicks || damage > BridgeHealth.getLastDamage(player)|| damage == 0){
+    	if (delta <= 0  || data.lastNoDamageTicks <= player.getMaximumNoDamageTicks() / 2 || dTick > data.lastNoDamageTicks || damage > BridgeHealth.getLastDamage(player)|| damage == 0.0){
     		// Not resetting acc.
     		legit = set = true;
     	}
@@ -182,7 +182,7 @@ public class GodMode extends Check {
     public void death(final Player player) {
     	// TODO: Is this still relevant ?
         // First check if the player is really dead (e.g. another plugin could have just fired an artificial event).
-        if (BridgeHealth.getHealth(player) <= 0 && player.isDead()){
+        if (BridgeHealth.getHealth(player) <= 0.0 && player.isDead()){
         	try {
                 // Schedule a task to be executed in roughly 1.5 seconds.
             	// TODO: Get plugin otherwise !?
