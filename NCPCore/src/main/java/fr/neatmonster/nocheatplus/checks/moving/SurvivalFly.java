@@ -36,21 +36,26 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  */
 public class SurvivalFly extends Check {
 	
-	// Mostly horizontal speeds
-	public static final double sneakingSpeed 	= 0.13D;
-	public static final double walkingSpeed 	= 0.22D;
-	public static final double sprintingSpeed 	= 0.35D;
+	// Horizontal speeds/modifiers.
+	public static final double walkSpeed 		= 0.22D;
 	
-	public static final double blockingSpeed 	= 0.16D;
-	public static final double swimmingSpeed    = 0.115D;
-	public static final double webSpeed         = 0.105D; // TODO: walkingSpeed * 0.15D; <- does not work
+	public static final double modSneak	 		= 0.13D / walkSpeed;
+	public static final double modSprint	 	= 0.35D / walkSpeed; // TODO: without bunny  0.29 / ...
 	
-	public static final double climbSpeed      = sprintingSpeed; // TODO.
+	public static final double modBlock		 	= 0.16D / walkSpeed;
+	public static final double modSwim		    = 0.115D / walkSpeed;
+	
+	public static final double modWeb	        = 0.105D / walkSpeed; // TODO: walkingSpeed * 0.15D; <- does not work
 	
 	public static final double modIce			= 2.5D;
 	
 	/** Faster moving down stream (water mainly). */
-	public static final double modDownStream      = 0.19 / swimmingSpeed;
+	public static final double modDownStream      = 0.19 / (walkSpeed * modSwim);
+	
+	// Vertical speeds/modifiers. 
+	public static final double climbSpeed		= walkSpeed * modSprint; // TODO.
+	
+	// Other.
 	/** Bunny-hop delay. */
 	private static final int   bunnyHopMax = 9;
 
@@ -104,7 +109,12 @@ public class SurvivalFly extends Check {
 		final boolean resetFrom;
 		
 //		data.stats.addStats(data.stats.getId("sfCheck", true), 1);
-
+		
+		// TODO: Formula, might get from listener.
+		// TODO: Use in lostground.
+		final double walkSpeed = SurvivalFly.walkSpeed;
+		
+		
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) resetFrom = true;
 		// TODO: Extra workarounds for toOnGround ?
@@ -150,11 +160,11 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Set flag for swimming with the flowing direction of liquid.
-		final boolean downStream = hDistance > swimmingSpeed && from.isInLiquid() && from.isDownStream(xDistance, zDistance);
+		final boolean downStream = hDistance > walkSpeed * modSwim && from.isInLiquid() && from.isDownStream(xDistance, zDistance);
 
 		// TODO: Account for lift-off medium / if in air [i.e. account for medium + friction]?
 		// (Might set some margin for buffering if cutting down hAllowedDistance.)
-		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, data, cc, false);
+		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, false);
 		
         // Judge if horizontal speed is above limit.
 //        double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
@@ -194,7 +204,7 @@ public class SurvivalFly extends Check {
 			// TODO: Use velocity already here ?
 			// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
 			if (hDistanceAboveLimit > 0){
-				hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, data, cc, true);
+				hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, true);
 //				hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom - extraUsed;
 				if (hFreedom > 0){
 					hDistanceAboveLimit = hDistance - hAllowedDistance - extraUsed - hFreedom;
@@ -342,14 +352,14 @@ public class SurvivalFly extends Check {
         	if (yDistance >= 0){
         		// This is more simple to test.
         		// TODO: Friction in water...
-        		vAllowedDistance = swimmingSpeed + 0.02;
+        		vAllowedDistance = walkSpeed * modSwim + 0.02;
         		vDistanceAboveLimit = yDistance - vAllowedDistance;
         		if (vDistanceAboveLimit > 0){
         			// Check workarounds.
         			if (yDistance <= 0.5){
         				// TODO: mediumLiftOff: refine conditions (general) , to should be near water level.
         				if (data.mediumLiftOff == MediumLiftOff.GROUND && !BlockProperties.isLiquid(from.getTypeIdAbove()) || !to.isInLiquid() ||  (toOnGround || data.sfLastYDist - yDistance >= 0.010 || to.isAboveStairs())){
-                    		vAllowedDistance = swimmingSpeed + 0.5;
+                    		vAllowedDistance = walkSpeed * modSwim + 0.5;
                     		vDistanceAboveLimit = yDistance - vAllowedDistance;
         				}
             		}
@@ -833,16 +843,25 @@ public class SurvivalFly extends Check {
 	 * @param cc
 	 * @return
 	 */
-	private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final boolean downStream, final double hDistance, final MovingData data, final MovingConfig cc, boolean checkPermissions)
+	private double getAllowedhDist(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean sprinting, final boolean downStream, final double hDistance, final double walkSpeed, final MovingData data, final MovingConfig cc, boolean checkPermissions)
 	{
-		if (checkPermissions) tags.add("permchecks");
+		if (checkPermissions){
+			tags.add("permchecks");
+		}
+		// TODO: Cleanup pending for what is applied when (check again).
 		// TODO: re-arrange for fastest checks first (check vs. allowed distance
 		// multiple times if necessary.
 		double hAllowedDistance = 0D;
+		// TODO: Set up walkingSpeed locally here.
+		
 		// Player on ice? Give him higher max speed.
 		// TODO: maybe re-model ice stuff (check what is really needed).
-		if (from.isOnIce() || to.isOnIce()) data.sfFlyOnIce = 20;
-		else if (data.sfFlyOnIce > 0) data.sfFlyOnIce--;
+		if (from.isOnIce() || to.isOnIce()) {
+			data.sfFlyOnIce = 20;
+		}
+		else if (data.sfFlyOnIce > 0) {
+			data.sfFlyOnIce--;
+		}
 		
 		final boolean sfDirty = data.sfDirty;
 
@@ -850,25 +869,37 @@ public class SurvivalFly extends Check {
 			data.sfFlyOnIce = 0;
 			// TODO: if (from.isOnIce()) <- makes it even slower !
 			// Does include sprinting by now (would need other accounting methods).
-			hAllowedDistance = webSpeed * cc.survivalFlyWalkingSpeed / 100D;
+			hAllowedDistance = modWeb * walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
 		} else if (from.isInLiquid() && to.isInLiquid()) {
 			// Check all liquids (lava might demand even slower speed though).
 			// TODO: too many false positives with just checking from ?
 			// TODO: Sneaking and blocking applies to when in water !
-			hAllowedDistance = swimmingSpeed * cc.survivalFlySwimmingSpeed / 100D;
-		} else if (!sfDirty && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) hAllowedDistance = sneakingSpeed * cc.survivalFlySneakingSpeed / 100D;
-		else if (!sfDirty && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) hAllowedDistance = blockingSpeed * cc.survivalFlyBlockingSpeed / 100D;
+			hAllowedDistance = modSwim * walkSpeed * cc.survivalFlySwimmingSpeed / 100D;
+		} else if (!sfDirty && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
+			hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
+		}
+		else if (!sfDirty && player.isBlocking() && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING))) {
+			hAllowedDistance = modBlock * walkSpeed * cc.survivalFlyBlockingSpeed / 100D;
+		}
 		else {
-			if (!sprinting) hAllowedDistance = walkingSpeed * cc.survivalFlyWalkingSpeed / 100D;
-			else hAllowedDistance = sprintingSpeed * cc.survivalFlySprintingSpeed / 100D;
+			if (!sprinting) {
+				hAllowedDistance = walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
+			}
+			else {
+				hAllowedDistance = walkSpeed * modSprint * cc.survivalFlySprintingSpeed / 100D;
+			}
 
 			// Speeding bypass permission (can be combined with other bypasses).
 			// TODO: How exactly to bring it on finally.
-			if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
+			if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
+				hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
+			}
 		}
 
 		// If the player is on ice, give him an higher maximum speed.
-		if (data.sfFlyOnIce > 0) hAllowedDistance *= modIce;
+		if (data.sfFlyOnIce > 0) {
+			hAllowedDistance *= modIce;
+		}
 		
 		// Account for flowing liquids (only if needed).
 		// Assume: If in liquids this would be placed right here.
@@ -881,7 +912,9 @@ public class SurvivalFly extends Check {
 		
 		// Speed amplifier.
 		final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);
-		if (speedAmplifier != Double.NEGATIVE_INFINITY) hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
+		if (speedAmplifier != Double.NEGATIVE_INFINITY) {
+			hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
+		}
 		
 		return hAllowedDistance;
 	}

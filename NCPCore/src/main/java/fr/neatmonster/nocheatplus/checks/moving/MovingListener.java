@@ -579,6 +579,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final boolean checkCf;
         final boolean checkSf;
         if (player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
+        	// TODO: Handle this by setting sf perm as child!
         	checkCf = checkSf = false;
         }
         else{
