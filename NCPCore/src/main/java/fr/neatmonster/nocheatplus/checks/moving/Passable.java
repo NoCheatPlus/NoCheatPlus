@@ -55,9 +55,9 @@ public class Passable extends Check {
 					toPassable = false;
 					tags = "raytracing_";
 				}
-				// TODO: Future: If accuracy is demanded, also check the head position (or bounding box right away).
-				rayTracing.cleanup();
 			}
+			// TODO: Future: If accuracy is demanded, also check the head position (or bounding box right away).
+			rayTracing.cleanup();
 		}
 		
 		// TODO: Checking order: If loc is not the same as from, a quick return here might not be wanted.
