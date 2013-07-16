@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.logging;
 import java.util.Arrays;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
@@ -17,20 +18,88 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  *
  */
 public class DebugUtil {
+	
+	public static boolean isSamePos(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2){
+		return x1 == x2 && y1 == y2 && z1 == z2;
+	}
+	
+	public static boolean isSamePos(final Location loc1, final Location loc2){
+		return isSamePos(loc1.getX(), loc1.getY(), loc1.getZ(), loc2.getX(), loc2.getY(), loc2.getZ());
+	}
+	
+	public static void addLocation(final double x, final double y, final double z, final StringBuilder builder){
+		builder.append(x + ", " + y + ", " + z);
+	}
+	
+	public static void addLocation(final Location loc, final StringBuilder builder){
+		addLocation(loc.getX(), loc.getY(), loc.getZ(), builder);
+	}
+	
+	public static void addLocation(final PlayerLocation loc, final StringBuilder builder){
+		addLocation(loc.getX(), loc.getY(), loc.getZ(), builder);
+	}
+	
+	public static void addFormattedLocation(final double x, final double y, final double z, final StringBuilder builder){
+		builder.append(StringUtil.fdec3.format(x) + ", " + StringUtil.fdec3.format(y) + ", " + StringUtil.fdec3.format(z));
+	}
+	
+	public static void addFormattedLocation(final Location loc, final StringBuilder builder){
+		addFormattedLocation(loc.getX(), loc.getY(), loc.getZ(), builder);
+	}
+	
+	public static void addFormattedLocation(final PlayerLocation loc, final StringBuilder builder){
+		addFormattedLocation(loc.getX(), loc.getY(), loc.getZ(), builder);
+	}
+
+	
+	/**
+	 * With line break between from and to.
+	 * @param fromX
+	 * @param fromY
+	 * @param fromZ
+	 * @param toX
+	 * @param toY
+	 * @param toZ
+	 * @param builder
+	 */
+	public static void addMove(final double fromX, final double fromY, final double fromZ, final double toX, final double toY, final double toZ, final StringBuilder builder){
+		builder.append("from: ");
+		addLocation(fromX, fromY, fromZ, builder);
+		builder.append("\nto: ");
+		addLocation(toX, toY, toZ, builder);
+	}
+	
+	/**
+	 * No line breaks, max. 3 digits after comma.
+	 * @param fromX
+	 * @param fromY
+	 * @param fromZ
+	 * @param toX
+	 * @param toY
+	 * @param toZ
+	 * @param builder
+	 */
+	public static void addFormattedMove(final double fromX, final double fromY, final double fromZ, final double toX, final double toY, final double toZ, final StringBuilder builder){
+		addFormattedLocation(fromX, fromY, fromZ, builder);
+		builder.append(" -> ");
+		addFormattedLocation(toX, toY, toZ, builder);
+	}
 
 	/**
 	 * 3 decimal digits after comma (StringUtil.fdec3). No leading new line.
 	 * @param from
 	 * @param to
-	 * @param loc Reference location for from, usually Player.getLocation().
+	 * @param loc Reference location for from, usually Player.getLocation(). May be null.
 	 * @param builder
 	 * @return
 	 */
 	public static void addFormattedMove(final PlayerLocation from, final PlayerLocation to, final Location loc, final StringBuilder builder){
-		builder.append(StringUtil.fdec3.format(from.getX()) + (from.getX() == loc.getX() ? "" : ("(" + StringUtil.fdec3.format(loc.getX()) + ")")));
-		builder.append(", " + StringUtil.fdec3.format(from.getY()) + (from.getY() == loc.getY() ? "" : ("(" + StringUtil.fdec3.format(loc.getY()) + ")")));
-		builder.append(", " + StringUtil.fdec3.format(from.getZ()) + (from.getZ() == loc.getZ() ? "" : ("(" + StringUtil.fdec3.format(loc.getZ()) + ")")));
-		builder.append(" -> " + StringUtil.fdec3.format(to.getX()) + ", " + StringUtil.fdec3.format(to.getY()) + ", " + StringUtil.fdec3.format(to.getZ()));
+		if (loc != null && !from.isSamePos(loc)){
+			builder.append("(");
+			addFormattedLocation(loc, builder);
+			builder.append(") ");
+		}
+		addFormattedMove(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ(), builder);	
 	}
 	
 	/**
@@ -41,10 +110,44 @@ public class DebugUtil {
 	 * @param builder
 	 */
 	public static void addMove(final PlayerLocation from, final PlayerLocation to, final Location loc, final StringBuilder builder){
-		builder.append("from: " + from.getX() + (from.getX() == loc.getX() ? "" : ("(" + loc.getX() + ")")));
-		builder.append(", " + from.getY() + (from.getY() == loc.getY() ? "" : ("(" + loc.getY() + ")")));
-		builder.append(", " + from.getZ() + (from.getZ() == loc.getZ() ? "" : ("(" + loc.getZ() + ")")));
-		builder.append("\nto: " + to.getX() + ", " + to.getY() + ", " + to.getZ());
+		if (loc != null && !from.isSamePos(loc)){
+			builder.append("Location: ");
+			addLocation(loc, builder);
+			builder.append("\n");
+		}
+		addMove(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ(), builder);	
+	}
+	
+	/**
+	 * 3 decimal digits after comma (StringUtil.fdec3). No leading new line.
+	 * @param from
+	 * @param to
+	 * @param loc Reference location for from, usually Player.getLocation().
+	 * @param builder
+	 * @return
+	 */
+	public static void addFormattedMove(final Location from, final Location to, final Location loc, final StringBuilder builder){
+		if (loc != null && !isSamePos(from, loc)){
+			builder.append("(");
+			addFormattedLocation(loc, builder);
+			builder.append(") ");
+		}
+		addFormattedMove(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ(), builder);		}
+	
+	/**
+	 * Add exact coordinates, multiple lines. No leading new line.
+	 * @param from
+	 * @param to
+	 * @param loc Reference location for from, usually Player.getLocation().
+	 * @param builder
+	 */
+	public static void addMove(final Location from, final Location to, final Location loc, final StringBuilder builder){
+		if (loc != null && !isSamePos(from, loc)){
+			builder.append("Location: ");
+			addLocation(loc, builder);
+			builder.append("\n");
+		}
+		addMove(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ(), builder);
 	}
 
 	/**
@@ -109,6 +212,36 @@ public class DebugUtil {
 
 	public static  void addBlockInfo(final StringBuilder builder, final PlayerLocation loc, final String tag) {
 		builder.append(tag + " id=" + loc.getTypeId() + " data=" + loc.getData() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
+	}
+
+	public static void outputDebugVehicleMove(final Player player, final Entity vehicle, final Location from, final Location to, final boolean fake) {
+		// TODO: log move + player name, vehicle type, if vehicle matches the players vehicle / inconsistencies.
+		final StringBuilder builder = new StringBuilder(250);
+		final Location vLoc = vehicle.getLocation();
+		final Location loc = player.getLocation();
+		// TODO: Differentiate debug levels (needs setting up some policy + document in BuildParamteres)?
+		// TODO: Might use more appropriate methods (distinct "player location: ...")
+		final Entity actualVehicle = player.getVehicle();
+		final boolean wrongVehicle = actualVehicle == null || actualVehicle.getEntityId() != vehicle.getEntityId();
+		if (BuildParameters.debugLevel > 0) {
+			builder.append("\n-------------- VEHICLE MOVE " + (fake ? "(fake)" : "") + "--------------\n");
+			builder.append(player.getName() + " " + from.getWorld().getName() + ":\n");
+			addMove(from, to, null, builder);
+			builder.append("\n Vehicle: ");
+			addLocation(vLoc, builder);
+			builder.append("\n Player: ");
+			addLocation(loc, builder);
+		}
+		else {
+			builder.append(player.getName() + " " + from.getWorld().getName() + "veh." + (fake ? "(fake)" : "") + " ");
+			addFormattedMove(from, to, null, builder);
+			builder.append("\n Vehicle: ");
+			addFormattedLocation(vLoc, builder);
+			builder.append(" Player: ");
+			addFormattedLocation(loc, builder);
+		}
+		builder.append("\n Vehicle type: " + vehicle.getType() + (wrongVehicle ? (actualVehicle == null ? " (exited?)" : " actual: " + actualVehicle.getType()) : ""));
+		System.out.print(builder.toString());
 	}
 
 }

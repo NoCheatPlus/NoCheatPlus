@@ -71,7 +71,10 @@ public class MorePacketsVehicle extends Check {
         if (!data.hasMorePacketsVehicleSetBack()){
         	// TODO: Check if other set-back is appropriate or if to set on other events.
         	data.setMorePacketsVehicleSetBack(from);
-        	if (data.morePacketsVehicleTaskId != -1) Bukkit.getScheduler().cancelTask(data.morePacketsVehicleTaskId);
+        	if (data.morePacketsVehicleTaskId != -1) {
+        		// TODO: Set back outdated or not?
+        		Bukkit.getScheduler().cancelTask(data.morePacketsVehicleTaskId);
+        	}
         }
 
         // Take a packet from the buffer.

@@ -15,7 +15,7 @@ public class TeleportUtil {
 	 */
 	public static void teleport(final Entity vehicle, final Player player, final Location location, final boolean debug) {
 		// TODO: This handling could conflict with WorldGuard region flags.
-		// TODO: Account for nested passengers.
+		// TODO: Account for nested passengers and inconsistencies.
 		final Entity passenger = vehicle.getPassenger();
 		final boolean vehicleTeleported;
 		final boolean playerIsPassenger = player.equals(passenger);

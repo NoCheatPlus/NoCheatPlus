@@ -69,7 +69,6 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
-import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -418,10 +417,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()){
-			// Workaround for pigs and other!
-			
+			// Workaround for pigs and other (1.5.x and before)!
+			// Note that with 1.6 not even PlayerMove fires for horses and pigs.
 			// (isInsideVehicle is the faster check without object creation, do re-check though, if it changes to only check for Vehicle instances.)
-			
 			final Entity vehicle = CheckUtils.getLastNonPlayerVehicle(player);
 			data.wasInVehicle = true;
 			data.sfHoverTicks = -1;
@@ -1099,6 +1097,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     		data.clearNoFallData();
         }
         
+        if (cc.debug) {
+        	// Log move.
+        	DebugUtil.outputDebugVehicleMove(player, vehicle, from, to, fake);
+        }
+        
         if (morePacketsVehicle.isEnabled(player)){
             // If the player is handled by the more packets vehicle check, execute it.
             newTo = morePacketsVehicle.check(player, from, to, data, cc);
@@ -1107,37 +1110,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Otherwise we need to clear his data.
             data.clearMorePacketsData();
         }
-
-        // Did one of the checks decide we need a new "to"-location?
+        
+        // Schedule a set-back?
         if (newTo != null && data.morePacketsVehicleTaskId == -1){
             // Schedule a delayed task to teleport back the vehicle with the player.
         	// (Only schedule if not already scheduled.)
-        	data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                private Entity  vehicle;
-                private Player player;
-                private Location location;
-
-                @Override
-                public void run() {
-                	data.morePacketsVehicleTaskId = -1;
-                    try{
-                		MovingData.getData(player).setTeleported(location);
-                    	TeleportUtil.teleport(vehicle, player, location, MovingConfig.getConfig(player).debug);
-                    }
-                    catch(Throwable t){
-                    	LogUtil.logSevere(t);
-                    }
-                }
-
-                public Runnable set(final Entity vehicle, final Player player, final Location location) {
-                    this.vehicle = vehicle;
-                    this.player = player;
-                    this.location = location;
-                    return this;
-                }
-            }.set(vehicle, player, newTo), 1L);
+        	// TODO: Might log debug if skipping.
+            // TODO: Problem: scheduling allows a lot of things to happen until the task is run. Thus control about some things might be necessary.
+        	// TODO: Reset on world changes or not?
+        	data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, cc.debug));
         }
-        // TODO: Log this one too if debug set.
     }
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)

@@ -11,7 +11,7 @@ public class LocUtil {
 	 * @param loc
 	 * @return
 	 */
-	static final Location clone(final Location loc){
+	public static final Location clone(final Location loc){
 		return new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
 	}
 
@@ -22,7 +22,7 @@ public class LocUtil {
 	 * @param pitch
 	 * @return
 	 */
-	static final Location clone(final Location loc, final float yaw, final float pitch){
+	public static final Location clone(final Location loc, final float yaw, final float pitch){
 		return new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), yaw, pitch);
 	}
 
@@ -32,7 +32,7 @@ public class LocUtil {
 	 * @param ref
 	 * @return
 	 */
-	static final Location clone(final Location setBack, final Location ref) {
+	public static final Location clone(final Location setBack, final Location ref) {
 		if (setBack == null){
 			return clone(ref);
 		}
@@ -41,7 +41,7 @@ public class LocUtil {
 		}
 	}
 
-	static final Location clone(final Location setBack, final PlayerLocation ref) {
+	public static final Location clone(final Location setBack, final PlayerLocation ref) {
 		if (setBack == null) return ref.getLocation();
 		else{
 			return clone(setBack, ref.getYaw(), ref.getPitch());
@@ -53,7 +53,7 @@ public class LocUtil {
 	 * @param setBack
 	 * @param loc
 	 */
-	static final void set(final Location setBack, final Location loc) {
+	public static final void set(final Location setBack, final Location loc) {
 		setBack.setWorld(loc.getWorld());
 		setBack.setX(loc.getX());
 		setBack.setY(loc.getY());
@@ -62,7 +62,7 @@ public class LocUtil {
 		setBack.setPitch(loc.getPitch());
 	}
 
-	static final void set(final Location setBack, final PlayerLocation loc) {
+	public static final void set(final Location setBack, final PlayerLocation loc) {
 		setBack.setWorld(loc.getWorld());
 		setBack.setX(loc.getX());
 		setBack.setY(loc.getY());
