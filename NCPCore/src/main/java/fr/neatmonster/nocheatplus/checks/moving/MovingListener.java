@@ -942,12 +942,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 					final MediumLiftOff oldMLO = data.mediumLiftOff; // Remember for workarounds.
 					data.clearMorePacketsData();
 					data.clearFlyData();
+					data.resetPositions(to);
 					if (TrigUtil.maxDistance(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ())  <= 12.0) {
 						// TODO: Might happen with bigger distances (mainly ender pearl thrown at others).
 						// Keep old MediumLiftOff.
 						data.mediumLiftOff = oldMLO;
 					}
-					data.resetPositions(to);
 					data.setSetBack(to);
 					// TODO: How to account for plugins that reset the fall distance here?
 					if (fallDistance > 1.0 && fallDistance - player.getFallDistance() > 0.0){
