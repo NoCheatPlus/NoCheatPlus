@@ -167,8 +167,24 @@ public class SurvivalFly extends Check {
 		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, false);
 		
         // Judge if horizontal speed is above limit.
-//        double hDistanceAboveLimit = hDistance - hAllowedDistance - data.horizontalFreedom;
         double hDistanceAboveLimit = hDistance - hAllowedDistance;
+        
+        // Prevent players from sprinting if they're moving backwards.
+        if (sprinting) {
+        	// TODO: Find more ways to confine conditions.
+			final float yaw = from.getYaw();
+			if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F
+					|| xDistance < 0D && zDistance < 0D && yaw > 270F && yaw < 360F 
+					|| xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F 
+					|| xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F) {
+				// (Might have to account for speeding permissions.)
+				if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+					hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+					tags.add("sprintback"); // Might add it anyway.
+				}
+			}
+        }
+        
         double hFreedom = 0; // Horizontal velocity used (!).
 		if (hDistanceAboveLimit > 0){
 			// Check extra buffer (!).
@@ -233,22 +249,6 @@ public class SurvivalFly extends Check {
 			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
 			tags.add("waterwalk");
 		}
-
-        // Prevent players from sprinting if they're moving backwards.
-//        if (hDistanceAboveLimit <= 0D && sprinting && data.horizontalFreedom <= 0.001D) {
-        if (hDistanceAboveLimit <= 0D && hDistance > walkSpeed && sprinting && data.hVelActive.isEmpty()) {
-            final float yaw = from.getYaw();
-            if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F || xDistance < 0D && zDistance < 0D
-                    && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
-                    || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F){
-            	// Assumes permission check to be the heaviest (might be mistaken).
-            	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)){
-            		// TODO: This should actually trigger use of horizontal velocity and extra buffers (even better: per axis per direction).
-            		hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-            		tags.add("sprintback"); // Might add it anyway.
-            	}
-            }
-        }
 
 		data.bunnyhopDelay--;
 		// "Bunny-hop".
