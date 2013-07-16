@@ -48,7 +48,7 @@ public class BridgeHealth {
 			return ((Number) o1).doubleValue();
 		}
 		else{
-			String message = "Expect method " + methodName + " in " + obj.getClass() + " with return type double or int.";
+			String message = "Expect method " + methodName + " in " + obj.getClass() + " with return type double or int, returned instead: " + ((o1 == null ? "null" : o1.getClass().getName()));
 			if (reason == null){
 				throw new RuntimeException(message);
 			}
