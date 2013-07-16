@@ -236,13 +236,14 @@ public class SurvivalFly extends Check {
 
         // Prevent players from sprinting if they're moving backwards.
 //        if (hDistanceAboveLimit <= 0D && sprinting && data.horizontalFreedom <= 0.001D) {
-        if (hDistanceAboveLimit <= 0D && sprinting && data.hVelActive.isEmpty()) {
+        if (hDistanceAboveLimit <= 0D && hDistance > walkSpeed && sprinting && data.hVelActive.isEmpty()) {
             final float yaw = from.getYaw();
             if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F || xDistance < 0D && zDistance < 0D
                     && yaw > 270F && yaw < 360F || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F
                     || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F){
             	// Assumes permission check to be the heaviest (might be mistaken).
             	if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)){
+            		// TODO: This should actually trigger use of horizontal velocity and extra buffers (even better: per axis per direction).
             		hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
             		tags.add("sprintback"); // Might add it anyway.
             	}
