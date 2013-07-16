@@ -13,7 +13,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /**
- * Some auxiliary specialized static-access methods.
+ * Some auxiliary static-access methods.
  * @author mc_dev
  *
  */
@@ -151,7 +151,7 @@ public class DebugUtil {
 	}
 
 	/**
-	 * 
+	 * Output information specific to player-move events.
 	 * @param player
 	 * @param from
 	 * @param to
@@ -214,13 +214,20 @@ public class DebugUtil {
 		builder.append(tag + " id=" + loc.getTypeId() + " data=" + loc.getData() + " shape=" + Arrays.toString(loc.getBlockCache().getBounds(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
 	}
 
+	/**
+	 * Intended for vehicle-move events.
+	 * 
+	 * @param player
+	 * @param vehicle
+	 * @param from
+	 * @param to
+	 * @param fake true if the event was not fired by an external source (just gets noted).
+	 */
 	public static void outputDebugVehicleMove(final Player player, final Entity vehicle, final Location from, final Location to, final boolean fake) {
-		// TODO: log move + player name, vehicle type, if vehicle matches the players vehicle / inconsistencies.
 		final StringBuilder builder = new StringBuilder(250);
 		final Location vLoc = vehicle.getLocation();
 		final Location loc = player.getLocation();
 		// TODO: Differentiate debug levels (needs setting up some policy + document in BuildParamteres)?
-		// TODO: Might use more appropriate methods (distinct "player location: ...")
 		final Entity actualVehicle = player.getVehicle();
 		final boolean wrongVehicle = actualVehicle == null || actualVehicle.getEntityId() != vehicle.getEntityId();
 		if (BuildParameters.debugLevel > 0) {
