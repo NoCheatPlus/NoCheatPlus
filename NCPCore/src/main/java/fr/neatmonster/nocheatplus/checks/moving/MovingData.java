@@ -503,11 +503,12 @@ public class MovingData extends ACheckData {
 	 */
 	public void velocityTick(){
 		// Decrease counts for active.
+		// TODO: Actual friction. Could pass as an argument (special value for not to be used).
 		// TODO: Consider removing already invalidated here.
 		for (final Velocity vel : hVelActive){
 			vel.valCount --;
 			vel.sum += vel.value;
-			vel.value *= 0.93; // TODO: Actual friction.
+			vel.value *= 0.93; // vel.frictionFactor;
 			// (Altered entries should be kept, since they get used right away.)
 		}
 		// Decrease counts for queued.

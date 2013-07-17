@@ -175,8 +175,7 @@ public class DebugUtil {
 			if (BuildParameters.debugLevel > 0){
 				try{
 					// TODO: Check backwards compatibility (1.4.2). Remove try-catch
-					
-						builder.append("\n(walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
+					builder.append("\n(walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
 				} catch (Throwable t){}
 				if (player.isSprinting()){
 					builder.append("(sprinting)");

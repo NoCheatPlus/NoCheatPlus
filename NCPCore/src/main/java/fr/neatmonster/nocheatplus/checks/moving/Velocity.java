@@ -10,16 +10,21 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public class Velocity {
 	
+//	private static final double defaultFrictionFactor = 0.93;
+	
 	/** Tick at which velocity got added. */
 	public final int tick;
 	
 	/** The amount of velocity, decreasing with use. */
 	public double value;
+	
+//	/** Factor for decrease of value */
+//	public double frictionFactor = defaultFrictionFactor;
+	
 	/** "Some sum" for general purpose. 
 	 * <li> For vertical entries this is used to alter the allowed y-distance to the set-back point. </li>
 	 */
 	public double sum;
-	
 	
 	///////////////////////////
 	// Activation conditions.
