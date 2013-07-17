@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 public class ConfigFile extends ConfigFileWithActions<ViolationData, ActionList> {
     
     @Override
-    public void regenerateActionLists() {
+    public void setActionFactory() {
         factory = ConfigManager.getActionFactory(((MemorySection) this.get(ConfPaths.STRINGS)).getValues(false));
     }
     

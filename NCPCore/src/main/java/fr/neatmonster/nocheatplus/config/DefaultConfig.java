@@ -561,7 +561,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>());
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + ".snow", "default");
         
-        // Update internal factory based on all the new entries to the "actions" section.
-        regenerateActionLists();
+//        // Update internal factory based on all the new entries to the "actions" section.
+//        setActionFactory();
     }
 }

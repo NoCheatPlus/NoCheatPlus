@@ -72,6 +72,12 @@ public class ConfigManager {
     
     /**
      * Set the factory to get actions from.
+     * This will reset all ActionFactories to null (lazy initialization),
+     *  call setAllActionFactories to ensure action factories are ready. 
+     *  To be on the safe side also call DataManager.clearConfigs().
+     *  <hr>
+     *  To Hook into NCP for setting the factories, you should register a INotifyReload instance
+     *  with the NoCheatPlusAPI using the annotation SetupOrder with a higher negative value (-1000).
      * @param factory
      */
     public static void setActionFactoryFactory(ActionFactoryFactory factory){
@@ -85,14 +91,24 @@ public class ConfigManager {
                     return new ActionFactory(library);
                 }
         	};
-        }   
+        }
+        // Use lazy resetting.
         for (final ConfigFile config : worldsMap.values()){
-            config.regenerateActionLists();
+            config.setActionFactory(null);
         }
     }
     
     public static ActionFactoryFactory getActionFactoryFactory(){
         return actionFactoryFactory;
+    }
+    
+    /**
+     * Force setting up all configs action factories.
+     */
+    public static void setAllActionFactories(){
+    	for (final ConfigFile config : worldsMap.values()){
+    		config.setActionFactory();
+    	}
     }
     
     /**
@@ -209,7 +225,7 @@ public class ConfigManager {
             	LogUtil.logSevere(e);
             }
         }
-        globalConfig.regenerateActionLists();
+//        globalConfig.setActionFactory();
         worldsMap.put(null, globalConfig);
 
         
@@ -249,7 +265,7 @@ public class ConfigManager {
             }
             worldConfig.setDefaults(globalConfig);
             worldConfig.options().copyDefaults(true);
-            worldConfig.regenerateActionLists();
+//            worldConfig.setActionFactory();
         }
     }
     
