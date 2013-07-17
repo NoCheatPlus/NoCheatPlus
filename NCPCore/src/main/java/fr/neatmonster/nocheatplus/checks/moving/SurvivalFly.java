@@ -335,12 +335,6 @@ public class SurvivalFly extends Check {
 				}
 			}
 		}
-
-		if (data.noFallAssumeGround || fromOnGround || toOnGround) {
-			// Some reset condition.
-			// TODO: Where to put this !?
-			data.jumpAmplifier = getJumpAmplifier(player);
-		}
 		
 		// TODO: on ground -> on ground improvements
 		
@@ -365,7 +359,9 @@ public class SurvivalFly extends Check {
 		}
         else{
             // Slowly reduce the level with each event, if violations have not recently happened.
-            if (now - data.sfVLTime > cc.survivalFlyVLFreeze) data.survivalFlyVL *= 0.95D;
+            if (now - data.sfVLTime > cc.survivalFlyVLFreeze) {
+            	data.survivalFlyVL *= 0.95D;
+            }
         }
 		
 		//  Set data for normal move or violation without cancel (cancel would have returned above)

@@ -512,8 +512,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
 		// Potion effect "Jump".
 		final double jumpAmplifier = survivalFly.getJumpAmplifier(player);
-		if (jumpAmplifier > data.jumpAmplifier) data.jumpAmplifier = jumpAmplifier;
-		// TODO: same for speed (oncemedium is introduced).
+		if (jumpAmplifier > data.jumpAmplifier) {
+			data.jumpAmplifier = jumpAmplifier;
+		}
+		// TODO: same for speed (once medium is introduced).
 
         // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
         // general data modifications one for each event.
@@ -652,6 +654,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// Otherwise we need to clear his data.
 			data.clearMorePacketsData();
 		}
+		
+		// Reset jump amplifier if needed.
+		if ((checkSf || checkCf) && jumpAmplifier != data.jumpAmplifier){
+			if (data.noFallAssumeGround || pFrom.isOnGround() || pTo.isOnGround()){
+				data.jumpAmplifier = jumpAmplifier;
+			}
+		}
 
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null) {
@@ -676,7 +685,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         
         // Set positions.
-        // TODO: Should these be set on monitor ?
+        // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
         data.fromX = from.getX();
         data.fromY = from.getY();
         data.fromZ = from.getZ();
