@@ -232,7 +232,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5 && MovingListener.shouldCheckSurvivalFly(player, mData, MovingConfig.getConfig(player))){
     				// Allow extra consumption with buffer.
     				// TODO: Add to normal buffer or add velocity entry.
-//    				mData.sfHBufExtra = 7;
+    				mData.sfHBufExtra = 7;
     				if (cc.debug && BuildParameters.debugLevel > 0){
     					System.out.println(player.getName() + " attacks, hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
     				}
