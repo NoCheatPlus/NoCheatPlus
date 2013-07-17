@@ -86,7 +86,7 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
      * @param prefixFile
      * @param message
      */
-    private LogAction(final String name, final int delay, final int repeat, final String prefixChat,
+    protected LogAction(final String name, final int delay, final int repeat, final String prefixChat,
             final String prefixConsole, final String prefixFile, final String message) {
         super(name, delay, repeat, message);
         this.prefixChat = prefixChat;
