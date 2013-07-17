@@ -171,6 +171,7 @@ public class SurvivalFly extends Check {
         
         // Prevent players from sprinting if they're moving backwards.
         if (sprinting) {
+        	// TODO: Check if still necessary with timeSprinting change.
         	// TODO: Find more ways to confine conditions.
 			final float yaw = from.getYaw();
 			if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F

@@ -474,11 +474,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			return;
 		}
 		
-		final long time = System.currentTimeMillis(); // TODO: pass to checks to use one reference time (set in data)?
-		if (player.isSprinting() && player.getFoodLevel() > 5){
-			data.timeSprinting = time;
+		final long time = System.currentTimeMillis();
+		if (player.isSprinting()){
+			// 
+			if (player.getFoodLevel() > 5){
+				data.timeSprinting = time;
+			}
+			else if (time < data.timeSprinting){
+				data.timeSprinting = 0;
+			}
+			// else: keep sprinting time.
 		}
-		else if (time < data.timeSprinting){
+		else{
+			// Reset if not actually sprinting.
 			data.timeSprinting = 0;
 		}
 		
