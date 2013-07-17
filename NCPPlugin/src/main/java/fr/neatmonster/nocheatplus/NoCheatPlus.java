@@ -62,6 +62,7 @@ import fr.neatmonster.nocheatplus.components.NameSetPermState;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.components.PermStateReceiver;
 import fr.neatmonster.nocheatplus.components.TickListener;
+import fr.neatmonster.nocheatplus.components.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -101,7 +102,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	private static final String MSG_NOTIFY_OFF = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are turned " + ChatColor.RED + "OFF" + ChatColor.WHITE + ".";
-
+	
 	//////////////////
 	// Static API
 	//////////////////
@@ -720,18 +721,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			listenerManager.clear();
 		}
 		
+		@SetupOrder(priority = - 100)
+		class ReloadHook implements INotifyReload{
+			@Override
+			public void onReload() {
+				// Only for reloading, not INeedConfig.
+				processReload();
+			}
+		}
+		
 		// Add the "low level" system components first.
 		for (final Object obj : new Object[]{
 				nameSetPerms,
 				getCoreListener(),
 				// Put ReloadListener first, because Checks could also listen to it.
-	        	new INotifyReload() {
-	        		// Only for reloading, not INeedConfig.
-					@Override
-					public void onReload() {
-						processReload();
-					}
-	        	},
+				new ReloadHook(),
 	        	NCPExemptionManager.getListener(),
 	        	new ConsistencyChecker() {
 					@Override

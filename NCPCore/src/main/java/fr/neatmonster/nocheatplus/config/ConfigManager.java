@@ -77,7 +77,7 @@ public class ConfigManager {
      *  To be on the safe side also call DataManager.clearConfigs().
      *  <hr>
      *  To Hook into NCP for setting the factories, you should register a INotifyReload instance
-     *  with the NoCheatPlusAPI using the annotation SetupOrder with a higher negative value (-1000).
+     *  with the NoCheatPlusAPI using the annotation SetupOrder with a higher negative value (-1000, see INotifyReload javadoc).
      * @param factory
      */
     public static void setActionFactoryFactory(ActionFactoryFactory factory){

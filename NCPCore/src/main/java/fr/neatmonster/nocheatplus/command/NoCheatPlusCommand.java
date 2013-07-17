@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.command;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.command.Command;
@@ -90,7 +91,7 @@ public class NoCheatPlusCommand extends BaseCommand{
      * @param plugin
      *            the instance of NoCheatPlus
      */
-    public NoCheatPlusCommand(final JavaPlugin plugin, final Collection<INotifyReload> notifyReload) {
+    public NoCheatPlusCommand(final JavaPlugin plugin, final List<INotifyReload> notifyReload) {
     	super(plugin, "nocheatplus", null, new String[]{"ncp"});
         // Register sub commands:
         for (BaseCommand cmd : new BaseCommand[]{

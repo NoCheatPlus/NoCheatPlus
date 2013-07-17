@@ -40,6 +40,7 @@ import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
+import fr.neatmonster.nocheatplus.components.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -58,6 +59,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author mc_dev
  *
  */
+@SetupOrder(priority = -80)
 public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker{
 	
 	protected static DataManager instance = null;
