@@ -75,6 +75,9 @@ public class BuildParameters {
 	/** Timestamp from build (maven). "?" if not present. */
 	public static final String buildTimeString = getString("BUILD_TIMESTAMP", "?");
 	
+	/** Indicate something about where this was built. */
+	public static final String buildSeries = getString("BUILD_SERIES", "UNKNOWN");
+	
 	/** The build number as given by Jenkins. Integer.MIN_VALUE if not present. */
 	public static final int buildNumber = getInteger("BUILD_NUMBER", Integer.MIN_VALUE);
 	

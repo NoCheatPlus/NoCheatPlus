@@ -164,6 +164,8 @@
   <!-- Properties -->
   <properties>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <BUILD_NUMBER>?</BUILD_NUMBER>
+  <BUILD_SERIES>UNKNOWN</BUILD_SERIES>
   </properties>
   
   <groupId>fr.neatmonster</groupId>
