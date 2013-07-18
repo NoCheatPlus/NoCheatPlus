@@ -604,6 +604,7 @@ public class SurvivalFly extends Check {
 	 * 
 	 * @param now
 	 * @param yDistance
+	 * @param jumpPhase Counter for events in-air.
 	 * @param sum
 	 * @param count
 	 * @param tags
@@ -639,7 +640,7 @@ public class SurvivalFly extends Check {
 					tags.add(tag + "grace");
 					return 0.0;
 				}
-				tags.add(tag);
+				tags.add(tag); // Specific tags?
 				if (diff < 0.0 ){
 					// Note: aDiff should be <= 0.07 here.
 					// TODO: Does this high violation make sense?
@@ -647,6 +648,15 @@ public class SurvivalFly extends Check {
 				}
 				else{
 					return diff;
+				}
+			}
+			else {
+				// Check for too small change of speed.
+				if (aDiff < 0.065){ // Minimum amount to be gained.
+					// TODO: Conditions are fast mock-up, aiming at glide hacks mostly.
+					// TODO: Potential fp: "slow falling" during chunk load/render, missing lost ground.
+					tags.add(tag); // + descend?
+					return 0.07 - diff;
 				}
 			}
 		}
