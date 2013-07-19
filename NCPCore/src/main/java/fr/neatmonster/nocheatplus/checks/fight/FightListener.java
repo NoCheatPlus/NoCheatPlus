@@ -224,6 +224,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	
     	// Velocity freedom adaption.
     	if (!cancelled && player.isSprinting() && TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 3.0){
+    		// TODO: Refine conditions by jumpphase / on ground and similar
     		// Add "mini" freedom.
     		final MovingData mData = MovingData.getData(player);
     		// TODO: Check distance of other entity.
