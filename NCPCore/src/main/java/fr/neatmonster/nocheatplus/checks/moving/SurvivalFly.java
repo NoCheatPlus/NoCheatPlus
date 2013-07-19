@@ -149,28 +149,9 @@ public class SurvivalFly extends Check {
         // Judge if horizontal speed is above limit.
         double hDistanceAboveLimit = hDistance - hAllowedDistance;
         
-        // Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
-        if (sprinting) {
-        	// TODO: Check if still necessary to check here with timeSprinting change (...).
-        	// TODO: Find more ways to confine conditions.
-			final float yaw = from.getYaw();
-			if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F
-					|| xDistance < 0D && zDistance < 0D && yaw > 270F && yaw < 360F 
-					|| xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F 
-					|| xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F) {
-				// (Might have to account for speeding permissions.)
-				if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
-					// Expect full distance to be covered by buffers/velocity.
-					// TODO: Should this exclusively allow velocity (someone calculate margin)?
-					// TODO: Check if moving below is ok now (since sprinting flag was fixed).
-					hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-					tags.add("sprintback"); // Might add it anyway.
-				}
-			}
-        }
+        data.bunnyhopDelay--; // TODO: Design to do the changing at the bottom?
         
-        data.bunnyhopDelay--;
-        
+        // Velocity, buffers and after failure checks.
         final double hFreedom;
 		if (hDistanceAboveLimit > 0){
 			// TODO: Move more of the workarounds (buffer, bunny, ...) into this method.
@@ -197,6 +178,26 @@ public class SurvivalFly extends Check {
 			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
 			tags.add("waterwalk");
 		}
+		
+		// Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
+        if (sprinting) {
+        	// TODO: Check if still necessary to check here with timeSprinting change (...).
+        	// TODO: Find more ways to confine conditions.
+			final float yaw = from.getYaw();
+			if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F
+					|| xDistance < 0D && zDistance < 0D && yaw > 270F && yaw < 360F 
+					|| xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F 
+					|| xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F) {
+				// (Might have to account for speeding permissions.)
+				if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+					// Expect full distance to be covered by buffers/velocity.
+					// TODO: Should this exclusively allow velocity (someone calculate margin)?
+					// TODO: Check if moving below is ok now (since sprinting flag was fixed).
+					hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+					tags.add("sprintback"); // Might add it anyway.
+				}
+			}
+        }
 		
 		//////////////////////////
 		// Vertical move.
