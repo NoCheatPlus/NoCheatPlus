@@ -105,16 +105,41 @@ public class SurvivalFly extends Check {
         final boolean resetTo = toOnGround || to.isResetCond();
 		final boolean resetFrom;
 		
-		// A player is considered sprinting if the flag is set and if he has enough food level.
-        final boolean sprinting = now <= data.timeSprinting + cc.sprintingGrace;
-        if (sprinting && now != data.timeSprinting){
-        	tags.add("sprintgrace");
-        }
-        
-        // Use the player-specific walk speed.
+		// Use the player-specific walk speed.
         // TODO: Might get from listener.
      	// TODO: Use in lostground?
      	final double walkSpeed = SurvivalFly.walkSpeed * ((double) player.getWalkSpeed() / 0.2);
+		
+		// Determine if the player is actually sprinting.
+        final boolean sprinting;
+        if (data.lostSprintCount > 0) {
+        	// Sprint got toggled off, though the client is still (legitimately) moving at sprinting speed.
+        	if (resetTo && (fromOnGround || from.isResetCond()) || hDistance <= walkSpeed){
+        		// Invalidate.
+        		data.lostSprintCount = 0;
+        		// TODO: Check fp with this very one.
+        		tags.add("invalidate_lostsprint");
+        		sprinting = false;
+        	}
+        	else{
+        		tags.add("lostsprint");
+            	sprinting = true;
+            	if (data.lostSprintCount < 3 && to.isOnGround() || to.isResetCond()){
+            		data.lostSprintCount = 0;
+            	}
+            	else{
+            		data.lostSprintCount --;
+            	}
+        	}
+        }
+        else if (now <= data.timeSprinting + cc.sprintingGrace) {
+        	// Within grace period for hunger level being too low for sprinting on server side (latency).
+        	tags.add("sprintgrace");
+        	sprinting = true;
+        }
+        else{
+        	sprinting = false;
+        }
         
         /////////////////////////////////
         // Mixed checks (lost ground).
@@ -162,7 +187,6 @@ public class SurvivalFly extends Check {
 		}
 		else{
 			data.hVelActive.clear();
-			data.sfHBufExtra = 0; // TODO: Doesn't this render it ineffective !?
 			hFreedom = 0.0;
 			if (hDistance != 0D){
 				// TODO: Confine conditions further ?
@@ -180,7 +204,8 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
-        if (sprinting) {
+        if (sprinting && data.lostSprintCount == 0) {
+        	// (Ignore if lost sprint is active, in order to forestall false positives.)
         	// TODO: Check if still necessary to check here with timeSprinting change (...).
         	// TODO: Find more ways to confine conditions.
 			final float yaw = from.getYaw();
@@ -762,23 +787,6 @@ public class SurvivalFly extends Check {
      * @return hAllowedDistance, hDistanceAboveLimit, hFreedom
      */
     private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, final double hDistance, double hDistanceAboveLimit, final boolean sprinting, final boolean downStream, final MovingData data, final MovingConfig cc) {
-    	
-    	// Extra buffer.
-    	// Used for attacking+bunny.
-    	// TODO: rather switch to velocity entry with max-use-amount: problem: unique + special invalidation.
-		final double extraUsed;
-		if (data.sfHBufExtra > 0){
-			extraUsed = 0.11;
-			hDistanceAboveLimit = Math.max(0.0, hDistanceAboveLimit - extraUsed);
-			data.sfHBufExtra --;
-			tags.add("hbufextra");
-			if (data.sfHBufExtra < 3 && to.isOnGround() || to.isResetCond()){
-				data.sfHBufExtra = 0;
-			}
-		}
-		else{
-			extraUsed = 0.0;
-		}
 		
 		// Check velocity.
 		double hFreedom = 0.0; // Horizontal velocity used (!).
@@ -802,11 +810,9 @@ public class SurvivalFly extends Check {
 		// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
 		if (hDistanceAboveLimit > 0.0){
 			hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, true);
+			hDistanceAboveLimit = hDistance - hAllowedDistance;
 			if (hFreedom > 0.0){
-				hDistanceAboveLimit = hDistance - hAllowedDistance - extraUsed - hFreedom;
-			}
-			else{
-				hDistanceAboveLimit = hDistance - hAllowedDistance - extraUsed;
+				hDistanceAboveLimit -= hFreedom;
 			}
 			if (hAllowedDistance > 0.0){ // TODO: Fix !
 				// (Horizontal buffer might still get used.)
@@ -1313,10 +1319,10 @@ public class SurvivalFly extends Check {
 		// TODO: Show player name once (!)
 		final StringBuilder builder = new StringBuilder(500);
 		final String hBuf = (data.sfHorizontalBuffer < 1.0 ? ((" hbuf=" + StringUtil.fdec3.format(data.sfHorizontalBuffer))) : "");
-		final String hBufExtra = (data.sfHBufExtra > 0 ? (" hbufextra=" + data.sfHBufExtra) : "");
+		final String lostSprint = (data.lostSprintCount > 0 ? (" lostSprint=" + data.lostSprintCount) : "");
 		final String hVelUsed = hFreedom > 0 ? " hVelUsed=" + StringUtil.fdec3.format(hFreedom) : "";
 		builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
-		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + hBufExtra + hVelUsed + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
+		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
 		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
 			builder.append("\n" + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
 		}

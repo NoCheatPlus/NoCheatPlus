@@ -222,20 +222,24 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	data.lastAttackedZ = targetLoc.getZ();
 //    	data.lastAttackedDist = targetDist;
     	
-    	// Velocity freedom adaption.
-    	if (!cancelled && player.isSprinting() && TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 3.0){
-    		// TODO: Refine conditions by jumpphase / on ground and similar
-    		// Add "mini" freedom.
+    	// Care for the "lost sprint problem": sprint resets, client moves as if still...
+    	if (!cancelled && player.isSprinting() && TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 4.5){
+    		// TODO: Refine/more conditions.
+    		// TODO: For pvp make use of "player was there" heuristic later on.
     		final MovingData mData = MovingData.getData(player);
     		// TODO: Check distance of other entity.
     		if (mData.fromX != Double.MAX_VALUE){
-    			final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ) ;
-    			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5 && MovingListener.shouldCheckSurvivalFly(player, mData, MovingConfig.getConfig(player))){
-    				// Allow extra consumption with buffer.
-    				// TODO: Add to normal buffer or add velocity entry.
-    				mData.sfHBufExtra = 7;
-    				if (cc.debug && BuildParameters.debugLevel > 0){
-    					System.out.println(player.getName() + " attacks, hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
+    			// TODO: What would mData.lostSprintCount > 0  mean here?
+    			final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ);
+    			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5){
+    				final MovingConfig mc = MovingConfig.getConfig(player);
+    				// Check if fly checks is an issue at all, re-check "real sprinting".
+    				if (now <= mData.timeSprinting + mc.sprintingGrace && MovingListener.shouldCheckSurvivalFly(player, mData, mc)){
+    					// Judge as "lost sprint" problem.
+        				mData.lostSprintCount = 7;
+        				if (cc.debug && BuildParameters.debugLevel > 0){
+        					System.out.println(player.getName() + " (lostsprint) hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
+        				}
     				}
     			}
     		}

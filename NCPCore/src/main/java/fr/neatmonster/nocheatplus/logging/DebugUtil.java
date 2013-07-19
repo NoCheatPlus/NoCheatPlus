@@ -180,6 +180,9 @@ public class DebugUtil {
 				if (player.isSprinting()){
 					builder.append("(sprinting)");
 				}
+				if (player.isSneaking()){
+					builder.append("(sneaking)");
+				}
 			}
 			if (speed != Double.NEGATIVE_INFINITY || jump != Double.NEGATIVE_INFINITY){
 				builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("e_speed=" + (speed + 1)) : "") + (jump != Double.NEGATIVE_INFINITY ? ("e_jump=" + (jump + 1)) : "") + ")");
