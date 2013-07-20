@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
 /*
  * MP""""""`MM                            oo                   dP MM""""""""`M dP          
@@ -40,7 +41,7 @@ public class SurvivalFly extends Check {
 	public static final double walkSpeed 		= 0.22D;
 	
 	public static final double modSneak	 		= 0.13D / walkSpeed;
-	public static final double modSprint	 	= 0.35D / walkSpeed; // TODO: without bunny  0.29 / ...
+	public static final double modSprint	 	= 0.35D / walkSpeed; // TODO: without bunny  0.29 / ... // practical is 0.35
 	
 	public static final double modBlock		 	= 0.16D / walkSpeed;
 	public static final double modSwim		    = 0.115D / walkSpeed;
@@ -461,6 +462,7 @@ public class SurvivalFly extends Check {
 //        }
         }
         // Adjust data.
+        data.sfLastHDist = hDistance;
         data.sfLastYDist = yDistance;
         data.toWasReset = resetTo || data.noFallAssumeGround;
         data.fromWasReset = resetFrom || data.noFallAssumeGround;
@@ -827,11 +829,16 @@ public class SurvivalFly extends Check {
 		if (hDistanceAboveLimit > 0 && sprinting){
 			// Try to treat it as a the "bunny-hop" problem.
 			// TODO: sharpen the pre-conditions such that counter can be removed (add buffer ?)
-			if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D  && (data.sfJumpPhase == 0 || data.sfJumpPhase == 1 && data.noFallAssumeGround)) {
-				// TODO: Speed effect affects hDistanceAboveLimit?
-				data.bunnyhopDelay = bunnyHopMax;
-				hDistanceAboveLimit = 0D; // TODO: maybe relate buffer use to this + sprinting ?
-				tags.add("bunny"); // TODO: Which here...
+			if (data.bunnyhopDelay <= 0) {
+				if (hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D  && (data.sfJumpPhase == 0 || data.sfJumpPhase == 1 && data.noFallAssumeGround)) {
+					// TODO: Speed effect affects hDistanceAboveLimit?
+					data.bunnyhopDelay = bunnyHopMax;
+					hDistanceAboveLimit = 0D; // TODO: maybe relate buffer use to this + sprinting ?
+					tags.add("bunny"); // TODO: Which here...
+				}
+			}
+			else {
+				// Might demand 0.05 decrease of speed.
 			}
 		}
 		
@@ -1230,13 +1237,9 @@ public class SurvivalFly extends Check {
 		if (executeActions(vd)) {
 			// Set-back or kick.
 			if (data.hasSetBack()){
-				data.clearAccounting();
-				data.sfJumpPhase = 0;
-				data.sfLastYDist = Double.MAX_VALUE;
-				data.toWasReset = false;
-				data.fromWasReset = false;
-				data.setTeleported(data.getSetBack(loc));
-				player.teleport(data.getTeleported());
+				final Location newTo = data.getSetBack(loc);
+				data.prepareSetBack(newTo);
+				player.teleport(newTo);
 			}
 			else{
 				// Solve by extra actions ? Special case (probably never happens)?
@@ -1272,7 +1275,7 @@ public class SurvivalFly extends Check {
 			// Silently set back.
 			if (!data.hasSetBack()) data.setSetBack(player.getLocation()); // ? check moment of call.
 			data.sfJumpPhase = 0;
-			data.sfLastYDist = Double.MAX_VALUE;
+			data.sfLastYDist = data.sfLastHDist = Double.MAX_VALUE;
 			return true;
 		} else {
 			return false;
@@ -1325,7 +1328,8 @@ public class SurvivalFly extends Check {
 		final String lostSprint = (data.lostSprintCount > 0 ? (" lostSprint=" + data.lostSprintCount) : "");
 		final String hVelUsed = hFreedom > 0 ? " hVelUsed=" + StringUtil.fdec3.format(hFreedom) : "";
 		builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
-		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
+		final String dHDist = (BuildParameters.debugLevel > 0 && data.sfLastHDist != Double.MAX_VALUE && Math.abs(data.sfLastHDist - hDistance) > 0.005) ? ("(" + (hDistance > data.sfLastHDist ? "+" : "") + StringUtil.fdec3.format(hDistance - data.sfLastHDist) + ")") : "";
+		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + dHDist + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
 		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
 			builder.append("\n" + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
 		}

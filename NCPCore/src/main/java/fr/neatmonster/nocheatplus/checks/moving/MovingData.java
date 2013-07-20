@@ -184,6 +184,7 @@ public class MovingData extends ACheckData {
 	 * Last valid y distance covered by a move. Integer.MAX_VALUE indicates "not set".
 	 */
 	public double		sfLastYDist = Double.MAX_VALUE;
+	public double		sfLastHDist = Double.MAX_VALUE;
 	/** Counting while the player is not on ground and not moving. A value <0 means not hovering at all. */
 	public int 			sfHoverTicks = -1;
 	/** First count these down before incrementing sfHoverTicks. Set on join, if configured so. */
@@ -212,7 +213,7 @@ public class MovingData extends ACheckData {
 		sfJumpPhase = 0;
 		jumpAmplifier = 0;
 		setBack = null;
-		sfLastYDist = Double.MAX_VALUE;
+		sfLastYDist = sfLastHDist = Double.MAX_VALUE;
 		fromX = toX = Double.MAX_VALUE;
 		clearAccounting();
 		clearNoFallData();
@@ -227,7 +228,7 @@ public class MovingData extends ACheckData {
 	}
 
 	/**
-	 * Mildly reset the flying data without losing any important information.
+	 * Teleport event: Mildly reset the flying data without losing any important information.
 	 * 
 	 * @param setBack
 	 */
@@ -255,6 +256,20 @@ public class MovingData extends ACheckData {
 		sfLowJump = false;
 		mediumLiftOff = defaultMediumLiftOff;
 		removeAllVelocity();
+	}
+	
+	/**
+	 * Move event: Mildly reset some data, prepare setting a new to-Location.
+	 */
+	public void prepareSetBack(final Location loc){
+		clearAccounting();
+		sfJumpPhase = 0;
+		sfLastYDist = sfLastHDist = Double.MAX_VALUE;
+		toWasReset = false;
+		fromWasReset = false;
+		// Remember where we send the player to.
+        setTeleported(loc);
+		// TODO: sfHoverTicks ?
 	}
 	
     /**
@@ -285,7 +300,7 @@ public class MovingData extends ACheckData {
         fromX = toX = x;
         fromY = toY = y;
         fromZ = toZ = z;
-        sfLastYDist = Double.MAX_VALUE;
+        sfLastYDist = sfLastHDist = Double.MAX_VALUE;
         sfDirty = false;
         sfLowJump = false;
         mediumLiftOff = defaultMediumLiftOff;
@@ -387,11 +402,19 @@ public class MovingData extends ACheckData {
 		setBack.setY(y);
 	}
 	
+	/**
+	 * Return a copy of the teleported-to Location.
+	 * @return
+	 */
 	public final Location getTeleported(){
 		// TODO: here a reference might do.
 		return teleported == null ? teleported : LocUtil.clone(teleported);
 	}
 	
+	/**
+	 * Set teleport-to location to recognize NCP set-backs. This copies the coordinates and world.
+	 * @param loc
+	 */
 	public final void setTeleported(final Location loc) {
 		teleported = LocUtil.clone(loc); // Always overwrite.
 	}
@@ -499,9 +522,10 @@ public class MovingData extends ACheckData {
 	}
 	
 	/**
-	 * Called for moving events, increase age of velocity.
+	 * Called for moving events, increase age of velocity, decrease amounts, check which entries are invalid. Both horizontal and vertical.
 	 */
 	public void velocityTick(){
+		// Horizontal velocity (intermediate concept).
 		// Decrease counts for active.
 		// TODO: Actual friction. Could pass as an argument (special value for not to be used).
 		// TODO: Consider removing already invalidated here.
@@ -516,6 +540,29 @@ public class MovingData extends ACheckData {
 		while (it.hasNext()){
 			it.next().actCount --;
 		}
+		
+		// Vertical velocity (old concept).
+        if (verticalVelocity <= 0.09D){
+        	verticalVelocityUsed ++;
+        	verticalVelocityCounter--;
+        }
+        else if (verticalVelocityCounter > 0D) {
+        	verticalVelocityUsed ++;
+            verticalFreedom += verticalVelocity;
+            verticalVelocity = Math.max(0.0, verticalVelocity -0.09);
+        } else if (verticalFreedom > 0.001D){
+        	if (verticalVelocityUsed == 1 && verticalVelocity > 1.0){
+        		// Workarounds.
+        		verticalVelocityUsed = 0;
+        		verticalVelocity = 0;
+        		verticalFreedom = 0;
+        	}
+        	else{
+        		 // Counter has run out, now reduce the vertical freedom over time.
+            	verticalVelocityUsed ++;
+                verticalFreedom *= 0.93D;
+        	}
+        }
 	}
 
 	/**

@@ -517,33 +517,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		}
 		// TODO: same for speed (once medium is introduced).
 
-        // Just try to estimate velocities over time. Not very precise, but works good enough most of the time. Do
-        // general data modifications one for each event.
-		// TODO: Rework to queued velocity entries: activation + invalidation
+        // Velocity tick (decrease + invalidation).
+		// TODO: Rework to generic (?) queued velocity entries: activation + invalidation
 		data.removeInvalidVelocity(TickTask.getTick() - cc.velocityActivationTicks);
 		data.velocityTick();
-        // Vertical velocity.
-        if (data.verticalVelocity <= 0.09D){
-        	data.verticalVelocityUsed ++;
-        	data.verticalVelocityCounter--;
-        }
-        else if (data.verticalVelocityCounter > 0D) {
-        	data.verticalVelocityUsed ++;
-            data.verticalFreedom += data.verticalVelocity;
-            data.verticalVelocity = Math.max(0.0, data.verticalVelocity -0.09);
-        } else if (data.verticalFreedom > 0.001D){
-        	if (data.verticalVelocityUsed == 1 && data.verticalVelocity > 1.0){
-        		// Workarounds.
-        		data.verticalVelocityUsed = 0;
-        		data.verticalVelocity = 0;
-        		data.verticalFreedom = 0;
-        	}
-        	else{
-        		 // Counter has run out, now reduce the vertical freedom over time.
-            	data.verticalVelocityUsed ++;
-                data.verticalFreedom *= 0.93D;
-        	}
-        }
         
         // The players location.
 		// TODO: Change to getLocation(moveInfo.loc) once 1.4.5 support is dropped.
@@ -665,19 +642,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null) {
         	// Reset some data.
-        	data.clearAccounting();
-			data.sfJumpPhase = 0;
-			data.sfLastYDist = Double.MAX_VALUE;
-			data.toWasReset = false;
-			data.fromWasReset = false;
-			// TODO: data.sfHoverTicks ?
+        	data.prepareSetBack(newTo);
 			
             // Set new to-location.
 			// TODO: Clone here for the case of using loc with loc = player.getLocation(moveInfo.loc).
+			// TODO: Actually should be a newly created location already (data.getSetBack).
             event.setTo(newTo);
-
-            // Remember where we send the player to.
-            data.setTeleported(newTo);
+            
             // Debug.
             if (cc.debug){
             	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
