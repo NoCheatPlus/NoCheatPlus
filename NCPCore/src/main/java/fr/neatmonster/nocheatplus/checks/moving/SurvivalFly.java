@@ -149,13 +149,15 @@ public class SurvivalFly extends Check {
 		
 		
 		// "Lost ground" workaround.
-		if (fromOnGround || from.isResetCond()) resetFrom = true;
+		if (fromOnGround || from.isResetCond()) {
+			resetFrom = true;
+		}
 		// TODO: Extra workarounds for toOnGround ?
 		else{
 			// TODO: More refined conditions possible ?
 			// TODO: Consider if (!resetTo) ?
 			// Check lost-ground workarounds.
-			resetFrom = checkLostGround(player, from, to, hDistance, yDistance, sprinting, data, cc);
+			resetFrom = lostGround(player, from, to, hDistance, yDistance, sprinting, data, cc);
 //			data.stats.addStats(data.stats.getId("sfLostGround", true), resetFrom ? 1 : 0);
 			// Note: if not setting resetFrom, other places have to check assumeGround...
 		}
@@ -565,7 +567,7 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return If touching the ground was lost.
      */
-	private boolean checkLostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
+	private boolean lostGround(final Player player, final PlayerLocation from, final PlayerLocation to, final double hDistance, final double yDistance, final boolean sprinting, final MovingData data, final MovingConfig cc) {
 		// TODO: Confine by max y distance and max/min xz-distance?
 		if (yDistance >= -0.5 && yDistance <= 0.52 + data.jumpAmplifier * 0.2){
 			// "Mild" Ascending / descending.
@@ -623,12 +625,13 @@ public class SurvivalFly extends Check {
 			// Currently only for "air" phases.
 			// Vertical.
 			if (yDirChange && data.sfLastYDist > 0){
-				// Change to descending phase !
+				// Change to descending phase.
 				data.vDistAcc.clear();
+				// Allow adding 0.
 				data.vDistAcc.add((float) yDistance);
 			}
 			else if (data.verticalFreedom <= 0.001D) {
-				// Here yDistance can be negative and positive (!).
+				// Here yDistance can be negative and positive.
 				if (yDistance != 0D){
 					data.vDistAcc.add((float) yDistance);
 					final double accAboveLimit = verticalAccounting(yDistance, data.vDistAcc ,tags, "vacc");
@@ -720,7 +723,7 @@ public class SurvivalFly extends Check {
 	 * @return vDistanceAboveLimit
 	 */
 	private double yDirChange(final PlayerLocation from, final PlayerLocation to, final double yDistance, double vDistanceAboveLimit, final MovingData data) {
-		// TODO: account for velocity,
+		// TODO: Does this account for velocity in a sufficient way?
 		if (yDistance > 0){
 			// Increase
 			if (data.toWasReset){
