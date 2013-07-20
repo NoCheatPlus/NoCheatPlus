@@ -41,7 +41,7 @@ public class SurvivalFly extends Check {
 	public static final double walkSpeed 		= 0.22D;
 	
 	public static final double modSneak	 		= 0.13D / walkSpeed;
-	public static final double modSprint	 	= 0.35D / walkSpeed; // TODO: without bunny  0.29 / ... // practical is 0.35
+	public static final double modSprint	 	= 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
 	
 	public static final double modBlock		 	= 0.16D / walkSpeed;
 	public static final double modSwim		    = 0.115D / walkSpeed;
@@ -135,7 +135,9 @@ public class SurvivalFly extends Check {
         }
         else if (now <= data.timeSprinting + cc.sprintingGrace) {
         	// Within grace period for hunger level being too low for sprinting on server side (latency).
-        	tags.add("sprintgrace");
+        	if (now != data.timeSprinting) {
+        		tags.add("sprintgrace");
+        	}
         	sprinting = true;
         }
         else{
@@ -183,7 +185,7 @@ public class SurvivalFly extends Check {
         final double hFreedom;
 		if (hDistanceAboveLimit > 0){
 			// TODO: Move more of the workarounds (buffer, bunny, ...) into this method.
-			final double[] res = hDistAfterFailure(player, from, to, hAllowedDistance, hDistance, hDistanceAboveLimit, sprinting, downStream, data, cc);
+			final double[] res = hDistAfterFailure(player, from, to, hAllowedDistance, hDistance, hDistanceAboveLimit, yDistance, sprinting, downStream, data, cc);
 			hAllowedDistance = res[0];
 			hDistanceAboveLimit = res[1];
 			hFreedom = res[2];
@@ -791,24 +793,23 @@ public class SurvivalFly extends Check {
      * @param cc
      * @return hAllowedDistance, hDistanceAboveLimit, hFreedom
      */
-    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, final double hDistance, double hDistanceAboveLimit, final boolean sprinting, final boolean downStream, final MovingData data, final MovingConfig cc) {
+    private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, final double hDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final boolean downStream, final MovingData data, final MovingConfig cc) {
 		
+    	// TODO: Check bunny first ?
+    	// TODO: check hdist first ?
+    	
 		// Check velocity.
 		double hFreedom = 0.0; // Horizontal velocity used (!).
-		if (hDistanceAboveLimit > 0.0){
-			hFreedom = data.getHorizontalFreedom();
-			if (hFreedom < hDistanceAboveLimit){
-				// Use queued velocity if possible.
-				hFreedom += data.useHorizontalVelocity(hDistanceAboveLimit - hFreedom);
-			}
-			if (hFreedom > 0.0){
-				hDistanceAboveLimit = Math.max(0.0, hDistanceAboveLimit - hFreedom);
-			}
+		// (hDistanceAboveLimit > 0.0)
+		hFreedom = data.getHorizontalFreedom();
+		if (hFreedom < hDistanceAboveLimit){
+			// Use queued velocity if possible.
+			hFreedom += data.useHorizontalVelocity(hDistanceAboveLimit - hFreedom);
 		}
-		else{
-			data.hVelActive.clear();
-			hFreedom = 0.0;
+		if (hFreedom > 0.0){
+			hDistanceAboveLimit = Math.max(0.0, hDistanceAboveLimit - hFreedom);
 		}
+
 		
 		// TODO: Checking order with bunny/normal-buffer ?
 		
@@ -827,18 +828,35 @@ public class SurvivalFly extends Check {
 		
 		// "Bunny-hop".
 		if (hDistanceAboveLimit > 0 && sprinting){
-			// Try to treat it as a the "bunny-hop" problem.
+			// Check if the "bunny-hop" case applies.
 			// TODO: sharpen the pre-conditions such that counter can be removed (add buffer ?)
+			final double someThreshold = hAllowedDistance / 3.3;
 			if (data.bunnyhopDelay <= 0) {
-				if (hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D  && (data.sfJumpPhase == 0 || data.sfJumpPhase == 1 && data.noFallAssumeGround)) {
+				// Roughly twice the sprinting speed is reached.
+				if (hDistanceAboveLimit > 0.05D && hDistanceAboveLimit <= hAllowedDistance + someThreshold
+						&& yDistance >= 0.4 // TODO: Jump effect might allow more strictness. 
+						// TODO: Expected minimum gain dependent on last speed (!).
+						&& (data.sfLastHDist == Double.MAX_VALUE || hDistance - data.sfLastHDist >= someThreshold )
+						&& (data.sfJumpPhase == 0 || data.sfJumpPhase == 1 && data.noFallAssumeGround)) {
 					// TODO: Speed effect affects hDistanceAboveLimit?
+					// TODO: Might want to check assumeonground or from on ground (!).
 					data.bunnyhopDelay = bunnyHopMax;
 					hDistanceAboveLimit = 0D; // TODO: maybe relate buffer use to this + sprinting ?
-					tags.add("bunny"); // TODO: Which here...
+					tags.add("bunnyhop"); // TODO: Which here...
 				}
 			}
 			else {
-				// Might demand 0.05 decrease of speed.
+				// Increase buffer if hDistance is decreasing properly.
+				if (data.sfLastHDist != Double.MAX_VALUE){
+					// Speed must decrease by "a lot" at first, then by some minimal amount per event.
+					if (data.sfLastHDist - hDistance >= data.sfLastHDist / 100.0 && hDistanceAboveLimit <= someThreshold){
+						// Increase buffer by the needed amount.
+						final double amount = hDistance - hAllowedDistance;
+						// TODO: Might use min(hAllowedDistance and some maximal thing like sprinting speed?)
+						data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer) + amount; // Cheat !
+						tags.add("bunnyfly");
+					}
+				}
 			}
 		}
 		
@@ -1328,7 +1346,7 @@ public class SurvivalFly extends Check {
 		final String lostSprint = (data.lostSprintCount > 0 ? (" lostSprint=" + data.lostSprintCount) : "");
 		final String hVelUsed = hFreedom > 0 ? " hVelUsed=" + StringUtil.fdec3.format(hFreedom) : "";
 		builder.append(player.getName() + " SurvivalFly\nground: " + (data.noFallAssumeGround ? "(assumeonground) " : "") + (fromOnGround ? "onground -> " : (resetFrom ? "resetcond -> " : "--- -> ")) + (toOnGround ? "onground" : (resetTo ? "resetcond" : "---")) + ", jumpphase: " + data.sfJumpPhase);
-		final String dHDist = (BuildParameters.debugLevel > 0 && data.sfLastHDist != Double.MAX_VALUE && Math.abs(data.sfLastHDist - hDistance) > 0.005) ? ("(" + (hDistance > data.sfLastHDist ? "+" : "") + StringUtil.fdec3.format(hDistance - data.sfLastHDist) + ")") : "";
+		final String dHDist = (BuildParameters.debugLevel > 0 && data.sfLastHDist != Double.MAX_VALUE && Math.abs(data.sfLastHDist - hDistance) > 0.0005) ? ("(" + (hDistance > data.sfLastHDist ? "+" : "") + StringUtil.fdec3.format(hDistance - data.sfLastHDist) + ")") : "";
 		builder.append("\n" + " hDist: " + StringUtil.fdec3.format(hDistance) + dHDist + " / " +  StringUtil.fdec3.format(hAllowedDistance) + hBuf + lostSprint + hVelUsed + " , vDist: " +  StringUtil.fdec3.format(yDistance) + " (" + StringUtil.fdec3.format(to.getY() - data.getSetBackY()) + " / " +  StringUtil.fdec3.format(vAllowedDistance) + "), sby=" + (data.hasSetBack() ? data.getSetBackY() : "?"));
 		if (data.verticalVelocityCounter > 0 || data.verticalFreedom >= 0.001){
 			builder.append("\n" + " vertical freedom: " +  StringUtil.fdec3.format(data.verticalFreedom) + " (vel=" +  StringUtil.fdec3.format(data.verticalVelocity) + "/counter=" + data.verticalVelocityCounter +"/used="+data.verticalVelocityUsed);
