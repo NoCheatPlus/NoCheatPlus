@@ -203,7 +203,10 @@ public class SurvivalFly extends Check {
 		// Prevent players from walking on a liquid in a too simple way.
 		// TODO: Find something more effective against more smart methods (limitjump helps already).
 		// TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
-		if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && BlockProperties.isLiquid(to.getTypeId()) && !toOnGround && to.getY() % 1D < 0.8D) {
+		// TODO: Complete re-modeling.
+		if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && data.sfLastYDist == 0D && !toOnGround && !fromOnGround && BlockProperties.isLiquid(to.getTypeId())) {
+			// TODO: Relative hdistance.
+			// TODO: Might check actual bounds, might implement + use BlockProperties.getCorrectedBounds.
 			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
 			tags.add("waterwalk");
 		}
