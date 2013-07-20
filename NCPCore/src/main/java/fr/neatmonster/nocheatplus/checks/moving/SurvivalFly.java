@@ -731,7 +731,7 @@ public class SurvivalFly extends Check {
 			}
 			else {
 				// Moving upwards after falling without having touched the ground.
-				if (data.verticalFreedom <= 0.001 && data.bunnyhopDelay < 9 && !(data.fromWasReset && data.sfLastYDist == 0D)){
+				if (data.verticalFreedom <= 0.001 && data.bunnyhopDelay < 9 && !(data.fromWasReset && data.sfLastYDist == 0D)) {
 					// TODO: adjust limit for bunny-hop.
 					vDistanceAboveLimit = Math.max(vDistanceAboveLimit, Math.abs(yDistance));
 					tags.add("ychincfly");
@@ -827,7 +827,7 @@ public class SurvivalFly extends Check {
 		if (hDistanceAboveLimit > 0 && sprinting){
 			// Try to treat it as a the "bunny-hop" problem.
 			// TODO: sharpen the pre-conditions such that counter can be removed (add buffer ?)
-			if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D) {
+			if (data.bunnyhopDelay <= 0 && hDistanceAboveLimit > 0.05D && hDistanceAboveLimit < 0.28D  && (data.sfJumpPhase == 0 || data.sfJumpPhase == 1 && data.noFallAssumeGround)) {
 				// TODO: Speed effect affects hDistanceAboveLimit?
 				data.bunnyhopDelay = bunnyHopMax;
 				hDistanceAboveLimit = 0D; // TODO: maybe relate buffer use to this + sprinting ?
