@@ -169,7 +169,7 @@ public class MovingData extends ACheckData {
     public double 	      passableVL;
 
 	// Data of the survival fly check.
-	public double 		sfHorizontalBuffer = 0.0;
+	public double 		sfHorizontalBuffer = SurvivalFly.hBufMax / 2.0;
 	/** Event-counter to cover up for sprinting resetting server side only. Set in the FighListener. */
 	public int			lostSprintCount = 0;
 	public int 			sfJumpPhase = 0;
@@ -189,7 +189,7 @@ public class MovingData extends ACheckData {
 	public int 			sfHoverTicks = -1;
 	/** First count these down before incrementing sfHoverTicks. Set on join, if configured so. */
 	public int 			sfHoverLoginTicks = 0;
-	public int			sfFlyOnIce = 0;
+	public int			sfOnIce = 0;
 	public long			sfCobwebTime = 0;
 	public double		sfCobwebVL = 0;
 	public long			sfVLTime = 0;
