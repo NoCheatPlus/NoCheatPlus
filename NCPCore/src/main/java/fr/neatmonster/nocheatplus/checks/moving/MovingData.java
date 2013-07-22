@@ -169,7 +169,7 @@ public class MovingData extends ACheckData {
     public double 	      passableVL;
 
 	// Data of the survival fly check.
-	public double 		sfHorizontalBuffer = 0;
+	public double 		sfHorizontalBuffer = 0.0;
 	/** Event-counter to cover up for sprinting resetting server side only. Set in the FighListener. */
 	public int			lostSprintCount = 0;
 	public int 			sfJumpPhase = 0;
@@ -218,7 +218,7 @@ public class MovingData extends ACheckData {
 		clearAccounting();
 		clearNoFallData();
 		removeAllVelocity();
-		sfHorizontalBuffer = 0;
+		sfHorizontalBuffer = 0.0;
 		lostSprintCount = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = sfHoverLoginTicks = -1;
@@ -248,7 +248,7 @@ public class MovingData extends ACheckData {
 		// Keep jump amplifier
 		// Keep bunny-hop delay (?)
 		// keep jump phase.
-		sfHorizontalBuffer = Math.min(0, sfHorizontalBuffer);
+		sfHorizontalBuffer = 0.0;
 		lostSprintCount = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
 		sfHoverTicks = -1;

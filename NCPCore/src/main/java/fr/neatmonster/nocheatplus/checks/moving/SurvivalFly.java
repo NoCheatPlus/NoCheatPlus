@@ -51,7 +51,10 @@ public class SurvivalFly extends Check {
 	public static final double modIce			= 2.5D;
 	
 	/** Faster moving down stream (water mainly). */
-	public static final double modDownStream      = 0.19 / (walkSpeed * modSwim);
+	public static final double modDownStream	= 0.19 / (walkSpeed * modSwim);
+	
+	/** Maximal horizontal buffer. It can be higher, but normal resetting should keep this limit. */
+	public static final double hBufMax			= 1.0;
 	
 	// Vertical speeds/modifiers. 
 	public static final double climbSpeed		= walkSpeed * modSprint; // TODO.
@@ -115,6 +118,7 @@ public class SurvivalFly extends Check {
         final boolean sprinting;
         if (data.lostSprintCount > 0) {
         	// Sprint got toggled off, though the client is still (legitimately) moving at sprinting speed.
+        	// NOTE: This could extend the "sprinting grace" period, theoretically, until on ground.
         	if (resetTo && (fromOnGround || from.isResetCond()) || hDistance <= walkSpeed){
         		// Invalidate.
         		data.lostSprintCount = 0;
@@ -193,10 +197,8 @@ public class SurvivalFly extends Check {
 		else{
 			data.hVelActive.clear();
 			hFreedom = 0.0;
-			if (hDistance != 0D){
-				// TODO: Confine conditions further ?
-				// TODO: Code duplication: hDistAfterFailure
-				data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
+			if (data.sfHorizontalBuffer < hBufMax && hDistance > 0.0){
+				hBufRegain(hDistance, hDistanceAboveLimit, data);
 			}
 		}
 		
@@ -206,7 +208,7 @@ public class SurvivalFly extends Check {
 		// TODO: Complete re-modeling.
 		if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && data.sfLastYDist == 0D && !toOnGround && !fromOnGround && BlockProperties.isLiquid(to.getTypeId())) {
 			// TODO: Relative hdistance.
-			// TODO: Might check actual bounds, might implement + use BlockProperties.getCorrectedBounds.
+			// TODO: Might check actual bounds (collidesBlock). Might implement + use BlockProperties.getCorrectedBounds or getSomeHeight.
 			hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
 			tags.add("waterwalk");
 		}
@@ -798,8 +800,7 @@ public class SurvivalFly extends Check {
      */
     private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, double hAllowedDistance, final double hDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final boolean downStream, final MovingData data, final MovingConfig cc) {
 		
-    	// TODO: Check bunny first ?
-    	// TODO: check hdist first ?
+    	// TODO: Not entirely sure about this checking order.
     	
 		// Check velocity.
 		double hFreedom = 0.0; // Horizontal velocity used (!).
@@ -810,22 +811,17 @@ public class SurvivalFly extends Check {
 			hFreedom += data.useHorizontalVelocity(hDistanceAboveLimit - hFreedom);
 		}
 		if (hFreedom > 0.0){
+			tags.add("hvel");
 			hDistanceAboveLimit = Math.max(0.0, hDistanceAboveLimit - hFreedom);
 		}
-
-		
-		// TODO: Checking order with bunny/normal-buffer ?
 		
 		// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
 		if (hDistanceAboveLimit > 0.0){
 			hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, true);
 			hDistanceAboveLimit = hDistance - hAllowedDistance;
 			if (hFreedom > 0.0){
+				// Duplicates above, due to re-checking the allowed distance.
 				hDistanceAboveLimit -= hFreedom;
-			}
-			if (hAllowedDistance > 0.0){ // TODO: Fix !
-				// (Horizontal buffer might still get used.)
-				tags.add("hspeed");
 			}
 		}
 		
@@ -856,7 +852,7 @@ public class SurvivalFly extends Check {
 						// Increase buffer by the needed amount.
 						final double amount = hDistance - hAllowedDistance;
 						// TODO: Might use min(hAllowedDistance and some maximal thing like sprinting speed?)
-						data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer) + amount; // Cheat !
+						data.sfHorizontalBuffer = Math.min(hBufMax, data.sfHorizontalBuffer) + amount; // Cheat !
 						tags.add("bunnyfly");
 					}
 				}
@@ -864,28 +860,39 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Horizontal buffer.
-		if (hDistanceAboveLimit > 0D && data.sfHorizontalBuffer != 0D) {
-			if (data.sfHorizontalBuffer > 0D) {
+		if (hDistanceAboveLimit > 0.0) {
+			// Handle buffer only if moving too far.
+			if (data.sfHorizontalBuffer > 0.0) {
+				// Consume buffer.
 				tags.add("hbufuse");
+				final double amount = Math.min(data.sfHorizontalBuffer, hDistanceAboveLimit);
+				hDistanceAboveLimit -= amount;
+				// Ensure we never end up below zero.
+				data.sfHorizontalBuffer = Math.max(0.0, data.sfHorizontalBuffer - amount);
 			}
-			else {
-				tags.add("hbufpen");
-			}
-			// Try to consume the "buffer".
-			hDistanceAboveLimit -= data.sfHorizontalBuffer;
-			data.sfHorizontalBuffer = 0D;
-
-			// Put back the "over-consumed" buffer.
-			if (hDistanceAboveLimit < 0D) {
-				data.sfHorizontalBuffer = -hDistanceAboveLimit;
-			}
-		} else if (hDistance != 0D){
-			// TODO: Code duplication (see check).
-			data.sfHorizontalBuffer = Math.min(1D, data.sfHorizontalBuffer - hDistanceAboveLimit);
+			// else: No consumption.
+		} else if (data.sfHorizontalBuffer < hBufMax && hDistance > 0.0) {
+			hBufRegain(hDistance, hDistanceAboveLimit, data);
 		}
 		
+		// Add the hspeed tag on violation.
+		if (hDistanceAboveLimit > 0.0){
+			tags.add("hspeed");
+		}
 		return new double[]{hAllowedDistance, hDistanceAboveLimit, hFreedom};
 	}
+    
+    /**
+     * Legitimate move: increase horizontal buffer somehow.
+     * @param hDistance
+     * @param hDistanceAboveLimit
+     * @param data
+     */
+    private void hBufRegain(final double hDistance, final double hDistanceAboveLimit, final MovingData data){
+    	// TODO: Consider different concepts (full resetting with harder conditions | maximum regain amount).
+    	// TODO: Confine general conditions for buffer regain further ?
+    	data.sfHorizontalBuffer = Math.min(hBufMax, data.sfHorizontalBuffer - hDistanceAboveLimit);
+    }
     
     /**
      * Inside liquids vertical speed checking.

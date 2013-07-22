@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
+import fr.neatmonster.nocheatplus.checks.moving.SurvivalFly;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -231,7 +232,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     		if (mData.fromX != Double.MAX_VALUE){
     			// TODO: What would mData.lostSprintCount > 0  mean here?
     			final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ);
-    			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5){
+    			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5 * SurvivalFly.hBufMax) {
+    				// TODO: Might remove checking sfHorizontalBuffer.
     				final MovingConfig mc = MovingConfig.getConfig(player);
     				// Check if fly checks is an issue at all, re-check "real sprinting".
     				if (now <= mData.timeSprinting + mc.sprintingGrace && MovingListener.shouldCheckSurvivalFly(player, mData, mc)){
