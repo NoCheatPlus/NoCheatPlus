@@ -197,9 +197,6 @@ public class SurvivalFly extends Check {
 		else{
 			data.hVelActive.clear();
 			hFreedom = 0.0;
-			if (data.sfHorizontalBuffer < hBufMax && hDistance > 0.0){
-				hBufRegain(hDistance, hDistanceAboveLimit, data);
-			}
 		}
 		
 		// Prevent players from walking on a liquid in a too simple way.
@@ -233,6 +230,11 @@ public class SurvivalFly extends Check {
 				}
 			}
         }
+        
+		// Finally check horizontal buffer regain.
+		if (hDistanceAboveLimit < 0.0  && hDistance > 0.0 && data.sfHorizontalBuffer < hBufMax) {
+			hBufRegain(hDistance, hDistanceAboveLimit, data);
+		}
 		
 		//////////////////////////
 		// Vertical move.
@@ -840,7 +842,7 @@ public class SurvivalFly extends Check {
 					// TODO: Speed effect affects hDistanceAboveLimit?
 					// TODO: Might want to check assumeonground or from on ground (!).
 					data.bunnyhopDelay = bunnyHopMax;
-					hDistanceAboveLimit = 0D; // TODO: maybe relate buffer use to this + sprinting ?
+					hDistanceAboveLimit = 0D;
 					tags.add("bunnyhop"); // TODO: Which here...
 				}
 			}
@@ -849,10 +851,9 @@ public class SurvivalFly extends Check {
 				if (data.sfLastHDist != Double.MAX_VALUE){
 					// Speed must decrease by "a lot" at first, then by some minimal amount per event.
 					if (data.sfLastHDist - hDistance >= data.sfLastHDist / 100.0 && hDistanceAboveLimit <= someThreshold){
-						// Increase buffer by the needed amount.
-						final double amount = hDistance - hAllowedDistance;
-						// TODO: Might use min(hAllowedDistance and some maximal thing like sprinting speed?)
-						data.sfHorizontalBuffer = Math.min(hBufMax, data.sfHorizontalBuffer) + amount; // Cheat !
+						// TODO: Confine further (max. amount)?
+						// Allow the move.
+						hDistanceAboveLimit = 0.0;
 						tags.add("bunnyfly");
 					}
 				}
@@ -860,19 +861,14 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Horizontal buffer.
-		if (hDistanceAboveLimit > 0.0) {
+		if (hDistanceAboveLimit > 0.0 && data.sfHorizontalBuffer > 0.0) {
 			// Handle buffer only if moving too far.
-			if (data.sfHorizontalBuffer > 0.0) {
-				// Consume buffer.
-				tags.add("hbufuse");
-				final double amount = Math.min(data.sfHorizontalBuffer, hDistanceAboveLimit);
-				hDistanceAboveLimit -= amount;
-				// Ensure we never end up below zero.
-				data.sfHorizontalBuffer = Math.max(0.0, data.sfHorizontalBuffer - amount);
-			}
-			// else: No consumption.
-		} else if (data.sfHorizontalBuffer < hBufMax && hDistance > 0.0) {
-			hBufRegain(hDistance, hDistanceAboveLimit, data);
+			// Consume buffer.
+			tags.add("hbufuse");
+			final double amount = Math.min(data.sfHorizontalBuffer, hDistanceAboveLimit);
+			hDistanceAboveLimit -= amount;
+			// Ensure we never end up below zero.
+			data.sfHorizontalBuffer = Math.max(0.0, data.sfHorizontalBuffer - amount);
 		}
 		
 		// Add the hspeed tag on violation.
