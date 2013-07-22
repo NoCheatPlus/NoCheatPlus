@@ -23,6 +23,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
+import fr.neatmonster.nocheatplus.checks.moving.MediumLiftOff;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
@@ -225,14 +226,13 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	
     	// Care for the "lost sprint problem": sprint resets, client moves as if still...
     	if (!cancelled && player.isSprinting() && TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 4.5){
-    		// TODO: Refine/more conditions.
-    		// TODO: For pvp make use of "player was there" heuristic later on.
+    		// TODO: Reduce distance by width of other entity [make an auxiliary method, use same value for reach].
+    		// TODO: For pvp: make use of "player was there" heuristic later on.
     		final MovingData mData = MovingData.getData(player);
-    		// TODO: Check distance of other entity.
-    		if (mData.fromX != Double.MAX_VALUE){
+    		if (mData.fromX != Double.MAX_VALUE && mData.sfHorizontalBuffer > 0.5 * SurvivalFly.hBufMax && mData.mediumLiftOff != MediumLiftOff.LIMIT_JUMP){
     			// TODO: What would mData.lostSprintCount > 0  mean here?
     			final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ);
-    			if (hDist >= 0.23 && mData.sfHorizontalBuffer > 0.5 * SurvivalFly.hBufMax) {
+    			if (hDist >= 0.23) {
     				// TODO: Might remove checking sfHorizontalBuffer.
     				final MovingConfig mc = MovingConfig.getConfig(player);
     				// Check if fly checks is an issue at all, re-check "real sprinting".
