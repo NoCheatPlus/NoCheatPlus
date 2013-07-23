@@ -27,7 +27,6 @@ import fr.neatmonster.nocheatplus.checks.moving.MediumLiftOff;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
-import fr.neatmonster.nocheatplus.checks.moving.SurvivalFly;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -229,11 +228,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     		// TODO: Reduce distance by width of other entity [make an auxiliary method, use same value for reach].
     		// TODO: For pvp: make use of "player was there" heuristic later on.
     		final MovingData mData = MovingData.getData(player);
-    		if (mData.fromX != Double.MAX_VALUE && mData.sfHorizontalBuffer > 0.5 * SurvivalFly.hBufMax && mData.mediumLiftOff != MediumLiftOff.LIMIT_JUMP){
+    		if (mData.fromX != Double.MAX_VALUE && mData.mediumLiftOff != MediumLiftOff.LIMIT_JUMP){
     			// TODO: What would mData.lostSprintCount > 0  mean here?
+    			// TODO: Confine further.
     			final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ);
     			if (hDist >= 0.23) {
-    				// TODO: Might remove checking sfHorizontalBuffer.
+    				// TODO: Might need to check hDist relative to speed / modifiers.
     				final MovingConfig mc = MovingConfig.getConfig(player);
     				// Check if fly checks is an issue at all, re-check "real sprinting".
     				if (now <= mData.timeSprinting + mc.sprintingGrace && MovingListener.shouldCheckSurvivalFly(player, mData, mc)){
