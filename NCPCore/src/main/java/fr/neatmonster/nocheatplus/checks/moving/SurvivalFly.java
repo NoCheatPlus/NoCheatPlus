@@ -192,27 +192,17 @@ public class SurvivalFly extends Check {
 			data.sfOnIce--;
 		}
 		
-		// Get the allowed distance, first determine if to check permissions already here.
-		final boolean permChecksDone;
-		if (hDistance > walkSpeed * modSprint) {
-			// Simple heuristic.
-			// Might check other stuff (really sneaking).
-			permChecksDone = true;
-			tags.add("permchecks");
-		}
-		else {
-			permChecksDone = false;
-		}
-		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, permChecksDone);
+		// Get the allowed distance.
+		double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, false);
 		
         // Judge if horizontal speed is above limit.
-        double hDistanceAboveLimit = hDistance - hAllowedDistance;     
+        double hDistanceAboveLimit = hDistance - hAllowedDistance;
         
         // Velocity, buffers and after failure checks.
         final double hFreedom;
 		if (hDistanceAboveLimit > 0){
 			// TODO: Move more of the workarounds (buffer, bunny, ...) into this method.
-			final double[] res = hDistAfterFailure(player, from, to, walkSpeed, hAllowedDistance, hDistance, hDistanceAboveLimit, yDistance, sprinting, downStream, data, cc, permChecksDone);
+			final double[] res = hDistAfterFailure(player, from, to, walkSpeed, hAllowedDistance, hDistance, hDistanceAboveLimit, yDistance, sprinting, downStream, data, cc, false);
 			hAllowedDistance = res[0];
 			hDistanceAboveLimit = res[1];
 			hFreedom = res[2];
@@ -827,73 +817,42 @@ public class SurvivalFly extends Check {
     private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, final double walkSpeed, double hAllowedDistance, final double hDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final boolean downStream, final MovingData data, final MovingConfig cc, final boolean skipPermChecks) {
 		
     	// TODO: Still not entirely sure about this checking order.
-    	// TODO: Return on 0 over dist.
-    	// TODO: Bunny hop: check here with simplified pre-conditions, if not matching re-check below.
+    	// TODO: Would quick returns make sense for hDistanceAfterFailure == 0.0?
+    	
+    	// Test bunny early, because it applies often and destroys as little as possible.
+    	hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, data);
     	
 		// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
-    	if (!skipPermChecks){
+    	if (hDistanceAboveLimit > 0.0 && !skipPermChecks) {
         	// TODO: Most cases these will not apply. Consider redesign to do these last or checking right away and skip here on some conditions.
     		hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, true);
     		hDistanceAboveLimit = hDistance - hAllowedDistance;
-    		tags.add("permchecks(recheck)");
+    		tags.add("permchecks");
     	}
 		
 		// Check velocity.
 		double hFreedom = 0.0; // Horizontal velocity used.
-		if (hDistanceAboveLimit > 0.0){
+		if (hDistanceAboveLimit > 0.0) {
 			// (hDistanceAboveLimit > 0.0)
 			hFreedom = data.getHorizontalFreedom();
-			if (hFreedom < hDistanceAboveLimit){
+			if (hFreedom < hDistanceAboveLimit) {
 				// Use queued velocity if possible.
 				hFreedom += data.useHorizontalVelocity(hDistanceAboveLimit - hFreedom);
 			}
-			if (hFreedom > 0.0){
+			if (hFreedom > 0.0) {
 				tags.add("hvel");
 				hDistanceAboveLimit = Math.max(0.0, hDistanceAboveLimit - hFreedom);
 			}
 		}
 		
-		// "Bunny-hop".
-		if (hDistanceAboveLimit > 0){
-			// Check "bunny fly" here, to not fall over sprint resetting on the way.
-	    	final double someThreshold = hAllowedDistance / 3.3;
-	    	if (data.bunnyhopDelay > 0 && hDistance > walkSpeed * modSprint){
-				// Increase buffer if hDistance is decreasing properly.
-				if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist - hDistance >= data.sfLastHDist / 110.0 && hDistanceAboveLimit <= someThreshold){
-					// Speed must decrease by "a lot" at first, then by some minimal amount per event.
-					// TODO: 100.0, 110.0, ...
-					if (!(data.toWasReset && from.isOnGround() && to.isOnGround())){
-						// TODO: Confine further (max. amount)?
-						// Allow the move.
-						hDistanceAboveLimit = 0.0;
-						if (data.bunnyhopDelay <= 1 && !to.isOnGround() && !to.isResetCond()){
-							data.bunnyhopDelay ++;
-							tags.add("bunnyfly(keep)");
-						} else {
-							tags.add("bunnyfly");
-						}
-					}
-				}
-			}
-	    	else if (sprinting){
-	    		// Check activation of bunny hop,
-				// Roughly twice the sprinting speed is reached.
-				if (hDistanceAboveLimit > 0.05D && hDistanceAboveLimit <= hAllowedDistance + someThreshold 
-						&& yDistance >= 0.4 && data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP
-						&& (data.sfLastHDist == Double.MAX_VALUE || hDistance - data.sfLastHDist >= someThreshold )
-						&& (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase == 1 && data.noFallAssumeGround)
-						&& !from.isResetCond() && !to.isResetCond()) {
-					// TODO: Jump effect might allow more strictness. 
-					// TODO: Expected minimum gain depends on last speed (!).
-					// TODO: Speed effect affects hDistanceAboveLimit?
-					data.bunnyhopDelay = bunnyHopMax;
-					hDistanceAboveLimit = 0D;
-					tags.add("bunnyhop"); // TODO: Which here...
-				}
-			}
+		// After failure bunny (2nd).
+		if (hDistanceAboveLimit > 0) {
+			// (Could distinguish tags from above call).
+			hDistanceAboveLimit = bunnyHop(from, to, hDistance, hAllowedDistance, hDistanceAboveLimit, yDistance, sprinting, data);
 		}
 		
 		// Horizontal buffer.
+		// TODO: Consider to confine use to "not in air" and similar.
 		if (hDistanceAboveLimit > 0.0 && data.sfHorizontalBuffer > 0.0) {
 			// Handle buffer only if moving too far.
 			// Consume buffer.
@@ -905,11 +864,64 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Add the hspeed tag on violation.
-		if (hDistanceAboveLimit > 0.0){
+		if (hDistanceAboveLimit > 0.0) {
 			tags.add("hspeed");
 		}
 		return new double[]{hAllowedDistance, hDistanceAboveLimit, hFreedom};
 	}
+    
+    /**
+     * Test bunny hop / bunny fly. Does modify data only if 0.0 is returned.
+     * @param from
+     * @param to
+     * @param hDistance
+     * @param hAllowedDistance
+     * @param hDistanceAboveLimit
+     * @param yDistance
+     * @param sprinting
+     * @param data
+     * @return hDistanceAboveLimit
+     */
+    private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data){
+    	// Check "bunny fly" here, to not fall over sprint resetting on the way.
+    	final double someThreshold = hAllowedDistance / 3.3;
+    	if (data.bunnyhopDelay > 0 && hDistance > walkSpeed * modSprint){
+			// Increase buffer if hDistance is decreasing properly.
+			if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist - hDistance >= data.sfLastHDist / 130.0 && hDistanceAboveLimit <= someThreshold){
+				// Speed must decrease by "a lot" at first, then by some minimal amount per event.
+				// TODO: 100.0, 110.0, ... might allow to confine buffer to low jump phase.
+				if (!(data.toWasReset && from.isOnGround() && to.isOnGround())){
+					// TODO: Confine further (max. amount)?
+					// Allow the move.
+					hDistanceAboveLimit = 0.0;
+					if (data.bunnyhopDelay <= 1 && !to.isOnGround() && !to.isResetCond()){
+						data.bunnyhopDelay ++;
+						tags.add("bunnyfly(keep)");
+					} else {
+						tags.add("bunnyfly");
+					}
+				}
+			}
+		}
+    	else if (sprinting){
+    		// Check activation of bunny hop,
+			// Roughly twice the sprinting speed is reached.
+    		// TODO: Allow slightly higher speed on lost ground.
+			if (hDistanceAboveLimit > 0.05D && hDistanceAboveLimit <= hAllowedDistance + someThreshold 
+					&& yDistance >= 0.4 && data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP
+					&& (data.sfLastHDist == Double.MAX_VALUE || hDistance - data.sfLastHDist >= someThreshold )
+					&& (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
+					&& !from.isResetCond() && !to.isResetCond()) {
+				// TODO: Jump effect might allow more strictness. 
+				// TODO: Expected minimum gain depends on last speed (!).
+				// TODO: Speed effect affects hDistanceAboveLimit?
+				data.bunnyhopDelay = bunnyHopMax;
+				hDistanceAboveLimit = 0D;
+				tags.add("bunnyhop"); // TODO: Which here...
+			}
+		}
+    	return hDistanceAboveLimit;
+    }
     
     /**
      * Legitimate move: increase horizontal buffer somehow.
@@ -918,8 +930,13 @@ public class SurvivalFly extends Check {
      * @param data
      */
     private void hBufRegain(final double hDistance, final double hDistanceAboveLimit, final MovingData data){
-    	// TODO: Consider different concepts (full resetting with harder conditions | maximum regain amount).
-    	// TODO: Confine general conditions for buffer regain further ?
+    	/*
+    	 * TODO: Consider different concepts: 
+    	 * 			- full resetting with harder conditions.
+    	 * 			- maximum regain amount.
+    	 * 			- reset or regain only every x blocks h distance.
+    	 */
+    	// TODO: Confine general conditions for buffer regain further (regain in air, whatever)?
     	data.sfHorizontalBuffer = Math.min(hBufMax, data.sfHorizontalBuffer - hDistanceAboveLimit);
     }
     
