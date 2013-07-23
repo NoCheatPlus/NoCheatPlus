@@ -182,7 +182,7 @@ public class SurvivalFly extends Check {
 		final boolean downStream = hDistance > walkSpeed * modSwim && from.isInLiquid() && from.isDownStream(xDistance, zDistance);
 		
 		// Handle ice.
-		// TODO: Maybe re-model ice stuff (test out what is really needed, e.g. modifier + reset on ground).
+		// TODO: Re-model ice stuff and other (e.g. general thing: ground-modifier + reset conditions).
 		if (from.isOnIce() || to.isOnIce()) {
 			data.sfOnIce = 20;
 		}
@@ -827,6 +827,8 @@ public class SurvivalFly extends Check {
     private double[] hDistAfterFailure(final Player player, final PlayerLocation from, final PlayerLocation to, final double walkSpeed, double hAllowedDistance, final double hDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final boolean downStream, final MovingData data, final MovingConfig cc, final boolean skipPermChecks) {
 		
     	// TODO: Still not entirely sure about this checking order.
+    	// TODO: Return on 0 over dist.
+    	// TODO: Bunny hop: check here with simplified pre-conditions, if not matching re-check below.
     	
 		// After failure permission checks ( + speed modifier + sneaking + blocking + speeding) and velocity (!).
     	if (!skipPermChecks){

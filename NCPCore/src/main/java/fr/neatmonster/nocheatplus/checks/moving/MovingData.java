@@ -169,7 +169,7 @@ public class MovingData extends ACheckData {
     public double 	      passableVL;
 
 	// Data of the survival fly check.
-	public double 		sfHorizontalBuffer = SurvivalFly.hBufMax / 2.0;
+	public double 		sfHorizontalBuffer = 0.0; // ineffective: SurvivalFly.hBufMax / 2.0;
 	/** Event-counter to cover up for sprinting resetting server side only. Set in the FighListener. */
 	public int			lostSprintCount = 0;
 	public int 			sfJumpPhase = 0;
@@ -566,7 +566,7 @@ public class MovingData extends ACheckData {
 	}
 
 	/**
-	 * Get effective amount of all used velocity.
+	 * Get effective amount of all used velocity. Non-destructive.
 	 * @return
 	 */
 	public double getHorizontalFreedom() {
