@@ -1284,9 +1284,8 @@ public class SurvivalFly extends Check {
 			return data.getSetBack(to);
 		}
 		else{
-			// (Removed resetting for testing).
-//			data.clearAccounting();
-//			data.sfJumpPhase = 0;
+			data.clearAccounting();
+			data.sfJumpPhase = 0;
 			// Cancelled by other plugin, or no cancel set by configuration.
 			return null;
 		}
