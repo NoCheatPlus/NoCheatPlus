@@ -38,7 +38,7 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 public class SurvivalFly extends Check {
 	
 	// Horizontal speeds/modifiers.
-	public static final double walkSpeed 		= 0.22D;
+	public static final double walkSpeed 		= 0.221D;
 	
 	public static final double modSneak	 		= 0.13D / walkSpeed;
 	public static final double modSprint	 	= 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
@@ -62,6 +62,8 @@ public class SurvivalFly extends Check {
 	// Other.
 	/** Bunny-hop delay. */
 	private static final int   bunnyHopMax = 10;
+	/** Divisor vs. last hDist for minimum slow down. */
+	private static final double bunnyDivFriction = 130.0;
 
 	/** To join some tags with moving check violations. */
 	private final ArrayList<String> tags = new ArrayList<String>(15);
@@ -885,16 +887,17 @@ public class SurvivalFly extends Check {
     private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data){
     	// Check "bunny fly" here, to not fall over sprint resetting on the way.
     	final double someThreshold = hAllowedDistance / 3.3;
-    	if (data.bunnyhopDelay > 0 && hDistance > walkSpeed * modSprint){
+    	if (data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint){
 			// Increase buffer if hDistance is decreasing properly.
-			if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist - hDistance >= data.sfLastHDist / 130.0 && hDistanceAboveLimit <= someThreshold){
+			if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist - hDistance >= data.sfLastHDist / bunnyDivFriction && hDistanceAboveLimit <= someThreshold){
 				// Speed must decrease by "a lot" at first, then by some minimal amount per event.
 				// TODO: 100.0, 110.0, ... might allow to confine buffer to low jump phase.
 				if (!(data.toWasReset && from.isOnGround() && to.isOnGround())){
 					// TODO: Confine further (max. amount)?
 					// Allow the move.
 					hDistanceAboveLimit = 0.0;
-					if (data.bunnyhopDelay <= 1 && !to.isOnGround() && !to.isResetCond()){
+					if (data.bunnyhopDelay == 1 && !to.isOnGround() && !to.isResetCond()){
+						// ... one move between toonground and liftoff remains for hbuf ...
 						data.bunnyhopDelay ++;
 						tags.add("bunnyfly(keep)");
 					} else {
@@ -903,12 +906,12 @@ public class SurvivalFly extends Check {
 				}
 			}
 		}
-    	else if (sprinting){
+    	else if (hDistance >= walkSpeed) { // if (sprinting){
     		// Check activation of bunny hop,
 			// Roughly twice the sprinting speed is reached.
     		// TODO: Allow slightly higher speed on lost ground.
-			if (hDistanceAboveLimit > 0.05D && hDistanceAboveLimit <= hAllowedDistance + someThreshold 
-					&& yDistance >= 0.4 && data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP
+			if (hDistanceAboveLimit > (sprinting ? 0.005 : 0.0016) && hDistanceAboveLimit <= hAllowedDistance + someThreshold 
+					&& data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
 					&& (data.sfLastHDist == Double.MAX_VALUE || hDistance - data.sfLastHDist >= someThreshold )
 					&& (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
 					&& !from.isResetCond() && !to.isResetCond()) {
