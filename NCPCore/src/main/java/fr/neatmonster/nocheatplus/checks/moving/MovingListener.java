@@ -1304,12 +1304,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	if (BlockProperties.isLiquid(loc.getBlock().getTypeId())){
     		loc.setY(Location.locToBlock(loc.getY()) + 1.25);
     	}
+    	final Entity vehicle = player.getVehicle();
+    	final EntityType vehicleType = vehicle == null ? null : vehicle.getType();
+    	if (vehicleType != null && !normalVehicles.contains(vehicleType) || MovingConfig.getConfig(player).noFallVehicleReset){
+    		data.noFallSkipAirCheck = true; // Might allow one time cheat.
+    		data.clearNoFallData();
+    	}
     	data.resetPositions(loc);
     	data.setSetBack(loc);
-    	// Experiment: add some velocity (fake).
-//    	data.horizontalVelocityCounter = 1;
-//    	data.horizontalFreedom = 0.9;
-//    	data.horizontalVelocityUsed = 0;
+    	// Give some freedom to allow the "exiting move".
     	data.removeAllVelocity();
     	data.addHorizontalVelocity(new Velocity(0.9, 1, 1));
     	data.verticalVelocityCounter = 1;
