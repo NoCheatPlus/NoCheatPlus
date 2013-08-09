@@ -118,9 +118,6 @@ public class MovingData extends ACheckData {
     public final List<Velocity> hVelActive = new LinkedList<Velocity>();
     /** Queued velocity entries (horizontal distance). */
     public final List<Velocity> hVelQueued = new LinkedList<Velocity>(); 
-//    public int            horizontalVelocityCounter;
-//    public double         horizontalFreedom;
-//    public int 			  horizontalVelocityUsed = 0;
     
     // Coordinates.
     /** Last from coordinates. */
@@ -201,9 +198,6 @@ public class MovingData extends ACheckData {
 	// HOT FIX
 	/** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
 	public boolean wasInVehicle = false;
-	
-	
-//	public final Stats stats = new Stats(); // Test.
     
 	/**
 	 * Clear the data of the fly checks (not more-packets).
@@ -546,10 +540,11 @@ public class MovingData extends ACheckData {
         	verticalVelocityUsed ++;
         	verticalVelocityCounter--;
         }
-        else if (verticalVelocityCounter > 0D) {
+        else if (verticalVelocityCounter > 0) {
         	verticalVelocityUsed ++;
             verticalFreedom += verticalVelocity;
             verticalVelocity = Math.max(0.0, verticalVelocity -0.09);
+            // TODO: Consider using up counter ? / better use velocity entries / even better use x,y,z entries right away .
         } else if (verticalFreedom > 0.001D){
         	if (verticalVelocityUsed == 1 && verticalVelocity > 1.0){
         		// Workarounds.
