@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 public class UnexemptCommand extends BaseCommand {
 
 	public UnexemptCommand(JavaPlugin plugin) {
-		super(plugin, "unexempt", Permissions.ADMINISTRATION_UNEXEMPT);
+		super(plugin, "unexempt", Permissions.COMMAND_UNEXEMPT);
 	}
 
 	@Override

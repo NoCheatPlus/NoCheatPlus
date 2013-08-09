@@ -31,57 +31,7 @@ permissions:
     nocheatplus:
         description: Allow the player to bypass all checks and give him all administration permissions.
         children:
-            nocheatplus.admin:
-                description: Give the player all administration rights.
-                children:
-                    nocheatplus.admin.notify:
-                        description: Allow the player to see the alerts in the in-game chat.
-                    nocheatplus.admin.plugins:
-                        description: Allow the player to see the list of all plugins (/plugins).
-                    nocheatplus.admin.reload:
-                        description: Allow the player to reload NoCheatPlus configuration.
-                    nocheatplus.admin.info:
-                        description: Allow to see violation info about a player.
-                    nocheatplus.admin.exemptions:
-                        description: Allow to see exemptions for a player.
-                    nocheatplus.admin.exempt:
-                        description: Allow to add exemptions for a player.
-                    nocheatplus.admin.unexempt:
-                        description: Allow to remove exemptions from  a player.
-                    nocheatplus.admin.ban:
-                        description: Allow use of the ncp ban command.
-                    nocheatplus.admin.kick:
-                        description: Allow use of the ncp kick command.
-                    nocheatplus.admin.kicklist:
-                        description: Allow use of the ncp kicklist command.
-                    nocheatplus.admin.lag:
-                        description: Allow use of the ncp lag command.
-                    nocheatplus.admin.tell:
-                        description: Allow use of the ncp tell command.
-                    nocheatplus.admin.delay:
-                        description: Allow use of the ncp delay command.
-                    nocheatplus.admin.tempkick:
-                        description: Allow use of the ncp tempkick command.
-                    nocheatplus.admin.unkick:
-                        description: Allow use of the ncp unkick command.
-                    nocheatplus.admin.version:
-                        description: Allow use of the ncp version command.
-                    nocheatplus.admin.removeplayer:
-                        description: Allow use of the ncp removeplayer command.
-                    nocheatplus.admin.commands:
-                        description: Allow use of the ncp commands command.
-                    nocheatplus.admin.debug:
-                        description: Allow to receive debug information.
-            nocheatplus.bypass:
-                description: Bypass permission other than command permissions.
-                children:
-                    nocheatplus.bypass.denylogin:
-                        description: Bypass the login denial, such as exists with the ncp tempkick command.
-            nocheatplus.feature.command:
-                description: Allows use of all commands protected by the command protection, like the ncp root command. Does not give functionality but allow seeing usage and tab-completion of the command. In future there can be many children not listed in this config.
-                children:
-                    nocheatplus.feature.command.nocheatplus:
-                        description: Filter permission to allow using sub commands of the /nocheatplus command. This permission should not be necessary to ever be given to any player unless the permission plugin is incompatible with aspects of super-perms.
+            
             nocheatplus.checks:
                 description: Allow the player to bypass all checks.
                 children:
@@ -230,6 +180,7 @@ permissions:
                                         description: Allow the player to sprint backwards.
                                     nocheatplus.checks.moving.survivalfly.step:
                                         description: Allow the player to use the 'step' functionality of his client.
+            
             nocheatplus.mods:
                 description: Allow the player to use all the client mods.
                 children:
@@ -295,3 +246,189 @@ permissions:
                                 description: Allow the player to use Zombe's fly mod.
                             nocheatplus.mods.zombe.noclip:
                                 description: Allow the player to use Zombe's noclip.
+            
+            nocheatplus.notify:
+                description: Receive notifications about violations in-game.
+            
+            nocheatplus.feature.command:
+                # TODO: Adapt permission to new config section for this feature.
+                description: Allows use of all commands protected by the command protection, like the ncp root command. Does not give functionality but allow seeing usage and tab-completion of the command. In future there can be many children not listed in this config.
+                children:
+                    nocheatplus.feature.command.nocheatplus:
+                        description: Filter permission to allow using sub commands of the /nocheatplus command. This permission should not be necessary to ever be given to any player unless the permission plugin is incompatible with aspects of super-perms.
+            
+            nocheatplus.command:
+                description: "All command permissions, do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
+                children:
+                    nocheatplus.command.notify:
+                        description: Allow toggling notifications.
+                        children:
+                            nocheatplus.notify: true
+                    nocheatplus.command.reload:
+                        description: Allow the player to reload NoCheatPlus configuration.
+                    nocheatplus.command.info:
+                        description: Allow to see violation info about a player.
+                    nocheatplus.command.exemptions:
+                        description: Allow to see exemptions for a player.
+                    nocheatplus.command.exempt:
+                        description: Allow to add exemptions for a player.
+                    nocheatplus.command.unexempt:
+                        description: Allow to remove exemptions from  a player.
+                    nocheatplus.command.ban:
+                        description: Allow use of the ncp ban command.
+                    nocheatplus.command.kick:
+                        description: Allow use of the ncp kick command.
+                    nocheatplus.command.kicklist:
+                        description: Allow use of the ncp kicklist command.
+                    nocheatplus.command.lag:
+                        description: Allow use of the ncp lag command.
+                    nocheatplus.command.tell:
+                        description: Allow use of the ncp tell command.
+                    nocheatplus.command.delay:
+                        description: Allow use of the ncp delay command.
+                    nocheatplus.command.tempkick:
+                        description: Allow use of the ncp tempkick command.
+                    nocheatplus.command.unkick:
+                        description: Allow use of the ncp unkick command.
+                    nocheatplus.command.version:
+                        description: Allow use of the ncp version command.
+                    nocheatplus.command.removeplayer:
+                        description: Allow use of the ncp removeplayer command.
+                    nocheatplus.command.commands:
+                        description: Allow use of the ncp commands command.
+            
+            
+            nocheatplus.bypass:
+                description: Bypass permission other than command permissions.
+                children:
+                    nocheatplus.bypass.denylogin:
+                        description: Bypass the login denial, such as exists with the ncp tempkick command.
+                        
+            nocheatplus.admin:
+                description: "Give the player all administration rights (does not exclude from checks), do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
+                children:
+                    nocheatplus.admin.debug:
+                        description: Receive debugging information (or cause console logs on other occasions).
+                    
+                    nocheatplus.bypass.denylogin: true
+                    
+                    nocheatplus.admin.plugins:
+                        description: Allow the player to see the list of all plugins (/plugins).
+                    
+                    nocheatplus.command: true
+                    
+                    # Left in for compatibility reasons:
+                    nocheatplus.admin.notify:
+                        description: DEPRECATED, use nocheatplus.command.notify and/or nocheatplus.notify instead.
+                        children:
+                            nocheatplus.command.notify: true
+                    nocheatplus.admin.reload:
+                        description: DEPRECATED, use nocheatplus.command.reload instead.
+                        children:
+                            nocheatplus.command.reload: true
+                    nocheatplus.admin.info:
+                        description: DEPRECATED, use nocheatplus.command.info instead.
+                        children:
+                            nocheatplus.command.info: true
+                    nocheatplus.admin.exemptions:
+                        description: DEPRECATED, use nocheatplus.command.exemptions instead.
+                        children:
+                            nocheatplus.command.exemptions: true
+                    nocheatplus.admin.exempt:
+                        description: DEPRECATED, use nocheatplus.command.exempt instead.
+                        children:
+                            nocheatplus.command.exempt: true
+                    nocheatplus.admin.unexempt:
+                        description: DEPRECATED, use nocheatplus.command.unexempt instead.
+                        children:
+                            nocheatplus.command.unexempt: true
+                    nocheatplus.admin.ban:
+                        description: DEPRECATED, use nocheatplus.command.ban instead.
+                        children:
+                            nocheatplus.command.ban: true
+                    nocheatplus.admin.kick:
+                        description: DEPRECATED, use nocheatplus.command.kick instead.
+                        children:
+                            nocheatplus.command.kick: true
+                    nocheatplus.admin.kicklist:
+                        description: DEPRECATED, use nocheatplus.command.kicklist instead.
+                        children:
+                            nocheatplus.command.kicklist: true
+                    nocheatplus.admin.lag:
+                        description: DEPRECATED, use nocheatplus.command.lag instead.
+                        children:
+                            nocheatplus.command.lag: true
+                    nocheatplus.admin.tell:
+                        description: DEPRECATED, use nocheatplus.command.tell instead.
+                        children:
+                            nocheatplus.command.tell: true
+                    nocheatplus.admin.delay:
+                        description: DEPRECATED, use nocheatplus.command.delay instead.
+                        children:
+                            nocheatplus.command.delay: true
+                    nocheatplus.admin.tempkick:
+                        description: DEPRECATED, use nocheatplus.command.tempkick instead.
+                        children:
+                            nocheatplus.command.tempkick: true
+                    nocheatplus.admin.unkick:
+                        description: DEPRECATED, use nocheatplus.command.unkick instead.
+                        children:
+                            nocheatplus.command.unkick: true
+                    nocheatplus.admin.version:
+                        description: DEPRECATED, use nocheatplus.command.version instead.
+                        children:
+                            nocheatplus.command.version: true
+                    nocheatplus.admin.removeplayer:
+                        description: DEPRECATED, use nocheatplus.command.removeplayer instead.
+                        children:
+                            nocheatplus.command.removeplayer: true
+                    nocheatplus.admin.commands:
+                        description: DEPRECATED, use nocheatplus.command.commands instead.
+                        children:
+                            nocheatplus.command.commands: true
+            
+            nocheatplus.shortcut:
+                description: 'Shortcut permissions designed to be somewhat "safe" to give (see children permissions).'
+                children:
+                    nocheatplus.shortcut.info:
+                        description: Info commands about players.
+                        children:
+                            nocheatplus.command.notify: true
+                            nocheatplus.command.info: true
+                            nocheatplus.command.exemptions: true
+                            nocheatplus.command.kicklist: true
+                            # TODO: commands perm.
+                            nocheatplus.command.commands: true
+                            # TODO: Put lag here ?
+                    nocheatplus.shortcut.monitor:
+                        description: All monitoring commands such as player and system info (including plugins).
+                        children:
+                            nocheatplus.shortcut.info: true
+                            nocheatplus.command.version: true
+                            nocheatplus.command.lag: true
+                            nocheatplus.admin.plugins: true
+                            nocheatplus.feature.command: true
+                    nocheatplus.shortcut.safeadmin:
+                        description: 'Permissions for "safe" administration, excluding rather critical operations like reload and action commands like ban/delay (arbitrary console commands!). Fit for "heavy" mods, include temp-kicking and exemptions, does bypass login-denial.'
+                        children:
+                            nocheatplus.shortcut.monitor: true
+                            nocheatplus.command.tempkick: true
+                            nocheatplus.command.kick: true
+                            nocheatplus.command.unkick: true
+                            nocheatplus.command.exempt: true
+                            nocheatplus.command.unexempt: true
+                            nocheatplus.command.removeplayer: true
+                            nocheatplus.bypass.denylogin: true
+                    # TODO: Consider other shortcuts too: checks [so ]
+            
+            nocheatplus.tester:
+                description: Monitoring and debugging permissions, including removing data and exemption handling for oneself.
+                children:
+                    # TODO: Might just inherit from shortcut.info.
+                    nocheatplus.shortcut.monitor: true
+                    nocheatplus.admin.debug: true
+                    nocheatplus.command.exempt.self: true
+                    nocheatplus.command.unexempt.self: true
+                    nocheatplus.command.removeplayer.self: true
+            
+            

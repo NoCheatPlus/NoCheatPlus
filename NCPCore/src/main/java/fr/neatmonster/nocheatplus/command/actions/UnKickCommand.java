@@ -13,7 +13,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 public class UnKickCommand extends BaseCommand {
 
 	public UnKickCommand(JavaPlugin plugin) {
-		super(plugin, "unkick", Permissions.ADMINISTRATION_UNKICK);
+		super(plugin, "unkick", Permissions.COMMAND_UNKICK);
 	}
 
 	@Override

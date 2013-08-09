@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 public class RemovePlayerCommand extends BaseCommand {
 
 	public RemovePlayerCommand(JavaPlugin plugin) {
-		super(plugin, "removeplayer", Permissions.ADMINISTRATION_REMOVEPLAYER, new String[]{
+		super(plugin, "removeplayer", Permissions.COMMAND_REMOVEPLAYER, new String[]{
 			"remove",	
 		});
 	}

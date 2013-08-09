@@ -20,7 +20,7 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 public class InfoCommand extends BaseCommand {
 
 	public InfoCommand(JavaPlugin plugin) {
-		super(plugin, "info", Permissions.ADMINISTRATION_INFO);
+		super(plugin, "info", Permissions.COMMAND_INFO);
 	}
 
 	@Override

@@ -18,7 +18,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 public class ExemptionsCommand extends BaseCommand {
 
 	public ExemptionsCommand(JavaPlugin plugin) {
-		super(plugin, "exemptions", Permissions.ADMINISTRATION_EXEMPTIONS, new String[]{"exe"});
+		super(plugin, "exemptions", Permissions.COMMAND_EXEMPTIONS, new String[]{"exe"});
 	}
 
 	@Override

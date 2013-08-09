@@ -18,7 +18,7 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 public class BanCommand extends BaseCommand {
 
 	public BanCommand(JavaPlugin plugin) {
-		super(plugin, "ban", Permissions.ADMINISTRATION_BAN);
+		super(plugin, "ban", Permissions.COMMAND_BAN);
 	}
 
 	@Override

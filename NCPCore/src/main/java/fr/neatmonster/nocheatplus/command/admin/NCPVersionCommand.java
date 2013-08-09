@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 public class NCPVersionCommand extends BaseCommand{
 
 	public NCPVersionCommand(JavaPlugin plugin) {
-		super(plugin, "version", Permissions.ADMINISTRATION_VERSION, new String[]{"versions", "ver"});
+		super(plugin, "version", Permissions.COMMAND_VERSION, new String[]{"versions", "ver"});
 	}
 
 	@Override

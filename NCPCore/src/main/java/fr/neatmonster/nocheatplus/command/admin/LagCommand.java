@@ -12,7 +12,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 public class LagCommand extends BaseCommand {
 
 	public LagCommand(JavaPlugin plugin) {
-		super(plugin, "lag", Permissions.ADMINISTRATION_LAG);
+		super(plugin, "lag", Permissions.COMMAND_LAG);
 	}
 
 	@Override

@@ -17,7 +17,7 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 public class TempKickCommand extends BaseCommand {
 
 	public TempKickCommand(JavaPlugin plugin) {
-		super(plugin, "tempkick", Permissions.ADMINISTRATION_TEMPKICK, 
+		super(plugin, "tempkick", Permissions.COMMAND_TEMPKICK, 
 				new String[]{"tkick", "tempban", "tban",});
 	}
 

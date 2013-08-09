@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 public class ExemptCommand extends BaseCommand {
 
 	public ExemptCommand(JavaPlugin plugin) {
-		super(plugin, "exempt", Permissions.ADMINISTRATION_EXEMPT);
+		super(plugin, "exempt", Permissions.COMMAND_EXEMPT);
 	}
 
 	@Override

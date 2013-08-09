@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 public class TellCommand extends BaseCommand {
 
 	public TellCommand(JavaPlugin plugin) {
-		super(plugin, "tell", Permissions.ADMINISTRATION_TELL);
+		super(plugin, "tell", Permissions.COMMAND_TELL);
 	}
 
 	@Override

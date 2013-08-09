@@ -121,7 +121,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	//////////////////
 	
 	/** Names of players with a certain permission. */
-	protected final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.ADMINISTRATION_NOTIFY);
+	protected final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.NOTIFY);
 	
 	/** Lower case player name to milliseconds point of time of release */
 	private final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
@@ -290,7 +290,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	 * @return
 	 */
 	public int sendAdminNotifyMessageStored(final String message){
-		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
+		final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
 		if (names == null) return 0;
 		int done = 0;
 		for (final String name : names){
@@ -313,11 +313,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	 * @return
 	 */
 	public int sendAdminNotifyMessageSubscriptions(final String message){
-		final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.ADMINISTRATION_NOTIFY);
-		final Set<String> names = nameSetPerms.getPlayers(Permissions.ADMINISTRATION_NOTIFY);
+		final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.NOTIFY);
+		final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
 		final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
 		for (final Permissible permissible : permissibles){
-			if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
+			if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.NOTIFY)){
 				final CommandSender sender = (CommandSender) permissible;
 				if ((sender instanceof Player) && hasTurnedOffNotifications(((Player) sender).getName())){
 					continue;
@@ -332,7 +332,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			for (final String name : names){
 				if (!done.contains(name)){
 					final Player player = DataManager.getPlayerExact(name);
-					if (player != null && player.hasPermission(Permissions.ADMINISTRATION_NOTIFY)){
+					if (player != null && player.hasPermission(Permissions.NOTIFY)){
 						if (hasTurnedOffNotifications(player.getName())){
 							continue;
 						}
@@ -1089,7 +1089,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	protected void onJoinLow(final Player player){
 		final String playerName = player.getName();
-		if (nameSetPerms.hasPermission(playerName, Permissions.ADMINISTRATION_NOTIFY)){
+		if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY)){
 			// Login notifications...
 			final PlayerData data = DataManager.getPlayerData(playerName, true);
 //			// Update available.

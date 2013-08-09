@@ -30,7 +30,7 @@ public class CommandsCommand extends BaseCommand {
 	final String allCommands;
 
 	public CommandsCommand(JavaPlugin plugin) {
-		super(plugin, "commands", Permissions.ADMINISTRATION_COMMANDS, new String[]{"cmds"});
+		super(plugin, "commands", Permissions.COMMAND_COMMANDS, new String[]{"cmds"});
 		for (int i = 0; i < moreCommands.length; i++){
 			moreCommands[i] = moreCommands[i].replace("<command>", "ncp");
 		}

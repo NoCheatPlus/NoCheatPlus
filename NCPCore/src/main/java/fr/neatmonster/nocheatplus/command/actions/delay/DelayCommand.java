@@ -17,7 +17,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 public class DelayCommand extends DelayableCommand {
 
 	public DelayCommand(JavaPlugin plugin){
-		super(plugin, "delay", Permissions.ADMINISTRATION_DELAY, 1, 0, true);
+		super(plugin, "delay", Permissions.COMMAND_DELAY, 1, 0, true);
 	}
 	
 	@Override

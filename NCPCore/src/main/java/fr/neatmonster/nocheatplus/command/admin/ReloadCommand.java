@@ -28,7 +28,7 @@ public class ReloadCommand extends BaseCommand {
 	private final List<INotifyReload> notifyReload;
 
 	public ReloadCommand(JavaPlugin plugin, List<INotifyReload> notifyReload) {
-		super(plugin, "reload", Permissions.ADMINISTRATION_RELOAD);
+		super(plugin, "reload", Permissions.COMMAND_RELOAD);
 		this.notifyReload = notifyReload;
 	}
 

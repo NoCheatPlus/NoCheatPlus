@@ -16,7 +16,7 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 public class KickCommand extends BaseCommand {
 
 	public KickCommand(JavaPlugin plugin) {
-		super(plugin, "kick", Permissions.ADMINISTRATION_KICK);
+		super(plugin, "kick", Permissions.COMMAND_KICK);
 	}
 
 	@Override

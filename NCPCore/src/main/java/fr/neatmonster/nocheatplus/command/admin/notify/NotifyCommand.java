@@ -13,7 +13,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 public class NotifyCommand extends BaseCommand {
 
 	public NotifyCommand(JavaPlugin plugin) {
-		super(plugin, "notify", Permissions.ADMINISTRATION_NOTIFY, new String[]{"alert", "alerts"});
+		super(plugin, "notify", Permissions.COMMAND_NOTIFY, new String[]{"alert", "alerts"});
 		addSubCommands(
 			new NotifyOffCommand(plugin),
 			new NotifyOnCommand(plugin)
