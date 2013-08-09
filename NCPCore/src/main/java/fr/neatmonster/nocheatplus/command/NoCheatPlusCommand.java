@@ -150,7 +150,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         	return false;
         }
         
-        if (sender.hasPermission(Permissions.FEATURE_COMMAND_NOCHEATPLUS)){
+        if (sender.hasPermission(Permissions.FILTER_COMMAND_NOCHEATPLUS)){
         	// Check sub-commands.
             if (args.length > 0){
             	AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());

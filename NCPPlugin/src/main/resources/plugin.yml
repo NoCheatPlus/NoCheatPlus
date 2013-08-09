@@ -250,12 +250,11 @@ permissions:
             nocheatplus.notify:
                 description: Receive notifications about violations in-game.
             
-            nocheatplus.feature.command:
-                # TODO: Adapt permission to new config section for this feature.
+            nocheatplus.filter.command:
                 description: Allows use of all commands protected by the command protection, like the ncp root command. Does not give functionality but allow seeing usage and tab-completion of the command. In future there can be many children not listed in this config.
                 children:
-                    nocheatplus.feature.command.nocheatplus:
-                        description: Filter permission to allow using sub commands of the /nocheatplus command. This permission should not be necessary to ever be given to any player unless the permission plugin is incompatible with aspects of super-perms.
+                    nocheatplus.filter.command.nocheatplus:
+                        description: Filter permission to allow using sub commands of the /nocheatplus command. This permission should not be necessary to ever be given to any player unless the permission plugin is incompatible with certain aspects of super-perms.
             
             nocheatplus.command:
                 description: "All command permissions, do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."

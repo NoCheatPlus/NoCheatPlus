@@ -32,9 +32,9 @@ public class Permissions {
     private final static String BYPASS                       = NOCHEATPLUS + ".bypass";
     public static final  String BYPASS_DENY_LOGIN            = BYPASS + "denylogin";
     
-    private static final String FEATURE						 = NOCHEATPLUS + ".feature";
-    public static final String  FEATURE_COMMAND				 = FEATURE + ".command";
-    public static final String  FEATURE_COMMAND_NOCHEATPLUS  = FEATURE_COMMAND + ".nocheatplus";
+    private static final String FILTER						 = NOCHEATPLUS + ".filter";
+    public static final String  FILTER_COMMAND				 = FILTER + ".command";
+    public static final String  FILTER_COMMAND_NOCHEATPLUS   = FILTER_COMMAND + ".nocheatplus";
     
     // Notifications (in-game).
     public static final String  NOTIFY       				 = NOCHEATPLUS + ".notify";

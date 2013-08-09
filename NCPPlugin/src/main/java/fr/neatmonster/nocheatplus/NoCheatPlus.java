@@ -653,7 +653,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	protected void setupCommandProtection() {
 		final List<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
-				Arrays.asList("plugins", "version", "icanhasbukkit"), Permissions.FEATURE_COMMAND, false);
+				Arrays.asList("plugins", "version", "icanhasbukkit"), Permissions.FILTER_COMMAND, false);
 		if (this.changedCommands == null) this.changedCommands = changedCommands;
 		else this.changedCommands.addAll(changedCommands);
 	}
@@ -838,7 +838,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 						@Override
 						public void run() {
 					        // Set child permissions for commands for faster checking.
-					        PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FEATURE_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
+					        PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FILTER_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
 						}
 					}
 					);
