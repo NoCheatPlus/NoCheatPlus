@@ -15,6 +15,7 @@ import org.bukkit.plugin.PluginManager;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 public class PermissionUtil {
 	
@@ -78,7 +79,7 @@ public class PermissionUtil {
 	 * @return
 	 */
 	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops){
-		return protectCommands(permissionBase, ignoredCommands, invertIgnored, ops, ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND));
+		return protectCommands(permissionBase, ignoredCommands, invertIgnored, ops, ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND)));
 	}
 	
 	/**

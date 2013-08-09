@@ -31,7 +31,7 @@ permissions:
     nocheatplus:
         description: Allow the player to bypass all checks and give him all administration permissions.
         children:
-            
+            # Check bypass permissions:
             nocheatplus.checks:
                 description: Allow the player to bypass all checks.
                 children:
@@ -256,6 +256,7 @@ permissions:
                     nocheatplus.filter.command.nocheatplus:
                         description: Filter permission to allow using sub commands of the /nocheatplus command. This permission should not be necessary to ever be given to any player unless the permission plugin is incompatible with certain aspects of super-perms.
             
+            # Command permissions:
             nocheatplus.command:
                 description: "All command permissions, do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
                 children:
@@ -296,24 +297,76 @@ permissions:
                     nocheatplus.command.commands:
                         description: Allow use of the ncp commands command.
             
-            
+            # Bypass permissions (other than checks):
             nocheatplus.bypass:
-                description: Bypass permission other than command permissions.
+                description: Bypass other features than checks.
                 children:
                     nocheatplus.bypass.denylogin:
                         description: Bypass the login denial, such as exists with the ncp tempkick command.
-                        
+            
+            # Various shortcuts:
+            nocheatplus.shortcut:
+                description: 'Shortcut permissions designed to be somewhat "safe" to give (see children permissions).'
+                children:
+                    nocheatplus.shortcut.info:
+                        description: Info commands about players.
+                        children:
+                            nocheatplus.command.notify: true
+                            nocheatplus.command.info: true
+                            nocheatplus.command.exemptions: true
+                            nocheatplus.command.kicklist: true
+                            # TODO: commands perm.
+                            nocheatplus.command.commands: true
+                            # TODO: Put lag here ?
+                    nocheatplus.shortcut.monitor:
+                        description: All monitoring commands such as player and system info (including plugins).
+                        children:
+                            nocheatplus.shortcut.info: true
+                            nocheatplus.command.version: true
+                            nocheatplus.command.lag: true
+                            nocheatplus.admin.plugins: true
+                            nocheatplus.feature.command: true
+                    nocheatplus.shortcut.safeadmin:
+                        description: 'Permissions for "safe" administration, excluding rather critical operations like reload and action commands like ban/delay (arbitrary console commands!). Fit for "heavy" mods, include temp-kicking and exemptions, does bypass login-denial.'
+                        children:
+                            nocheatplus.shortcut.monitor: true
+                            nocheatplus.command.tempkick: true
+                            nocheatplus.command.kick: true
+                            nocheatplus.command.unkick: true
+                            nocheatplus.command.exempt: true
+                            nocheatplus.command.unexempt: true
+                            nocheatplus.command.removeplayer: true
+                            nocheatplus.filter.command: true
+                            nocheatplus.bypass.denylogin: true
+                    nocheatplus.shortcut.bypass:
+                        description: Bypass everything that can be bypassed.
+                        children:
+                            nocheatplus.checks
+                            nocheatplus.bypass
+                            nocheatplus.filter.commands
+                            nocheatplus.mods
+                      
+            # Shortcut: convenient testing.
+            nocheatplus.tester:
+                description: Monitoring and debugging permissions, including removing data and exemption handling for oneself.
+                children:
+                    # TODO: Might just inherit from shortcut.info.
+                    nocheatplus.shortcut.monitor: true
+                    nocheatplus.admin.debug: true
+                    nocheatplus.command.exempt.self: true
+                    nocheatplus.command.unexempt.self: true
+                    nocheatplus.command.removeplayer.self: true
+            
+            # Shortcut: full administrator without check-bypass-permissions:
             nocheatplus.admin:
                 description: "Give the player all administration rights (does not exclude from checks), do not give lightly - if in doubt use shortcut permissions for moderators (nocheatplus.shortcut.monitor|safeadmin ...)."
                 children:
+                    # TODO: move debug permission (debug.XYZ?).
                     nocheatplus.admin.debug:
                         description: Receive debugging information (or cause console logs on other occasions).
                     
                     nocheatplus.bypass.denylogin: true
-                    
-                    nocheatplus.admin.plugins:
-                        description: Allow the player to see the list of all plugins (/plugins).
-                    
+                    nocheatplus.filter.command: true
                     nocheatplus.command: true
                     
                     # Left in for compatibility reasons:
@@ -385,49 +438,4 @@ permissions:
                         description: DEPRECATED, use nocheatplus.command.commands instead.
                         children:
                             nocheatplus.command.commands: true
-            
-            nocheatplus.shortcut:
-                description: 'Shortcut permissions designed to be somewhat "safe" to give (see children permissions).'
-                children:
-                    nocheatplus.shortcut.info:
-                        description: Info commands about players.
-                        children:
-                            nocheatplus.command.notify: true
-                            nocheatplus.command.info: true
-                            nocheatplus.command.exemptions: true
-                            nocheatplus.command.kicklist: true
-                            # TODO: commands perm.
-                            nocheatplus.command.commands: true
-                            # TODO: Put lag here ?
-                    nocheatplus.shortcut.monitor:
-                        description: All monitoring commands such as player and system info (including plugins).
-                        children:
-                            nocheatplus.shortcut.info: true
-                            nocheatplus.command.version: true
-                            nocheatplus.command.lag: true
-                            nocheatplus.admin.plugins: true
-                            nocheatplus.feature.command: true
-                    nocheatplus.shortcut.safeadmin:
-                        description: 'Permissions for "safe" administration, excluding rather critical operations like reload and action commands like ban/delay (arbitrary console commands!). Fit for "heavy" mods, include temp-kicking and exemptions, does bypass login-denial.'
-                        children:
-                            nocheatplus.shortcut.monitor: true
-                            nocheatplus.command.tempkick: true
-                            nocheatplus.command.kick: true
-                            nocheatplus.command.unkick: true
-                            nocheatplus.command.exempt: true
-                            nocheatplus.command.unexempt: true
-                            nocheatplus.command.removeplayer: true
-                            nocheatplus.bypass.denylogin: true
-                    # TODO: Consider other shortcuts too: checks [so ]
-            
-            nocheatplus.tester:
-                description: Monitoring and debugging permissions, including removing data and exemption handling for oneself.
-                children:
-                    # TODO: Might just inherit from shortcut.info.
-                    nocheatplus.shortcut.monitor: true
-                    nocheatplus.admin.debug: true
-                    nocheatplus.command.exempt.self: true
-                    nocheatplus.command.unexempt.self: true
-                    nocheatplus.command.removeplayer.self: true
-            
             

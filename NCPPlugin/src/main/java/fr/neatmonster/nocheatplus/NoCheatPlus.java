@@ -83,6 +83,7 @@ import fr.neatmonster.nocheatplus.players.PlayerData;
 import fr.neatmonster.nocheatplus.players.PlayerMessageSender;
 import fr.neatmonster.nocheatplus.updates.Updates;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -653,7 +654,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	protected void setupCommandProtection() {
 		final List<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
-				Arrays.asList("plugins", "version", "icanhasbukkit"), Permissions.FILTER_COMMAND, false);
+				Permissions.FILTER_COMMAND, Arrays.asList("plugins", "version", "icanhasbukkit"),  
+				true, false, ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION)));
 		if (this.changedCommands == null) this.changedCommands = changedCommands;
 		else this.changedCommands.addAll(changedCommands);
 	}

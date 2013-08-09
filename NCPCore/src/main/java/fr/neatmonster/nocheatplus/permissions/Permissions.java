@@ -23,8 +23,6 @@ public class Permissions {
      * d8888888b Y8b  "88 888 888 888 888 888 888 888 888 d,dP   888   888    "88 888  888   888  "88 88"  888 888 
      */
     private static final String ADMINISTRATION               = NOCHEATPLUS + ".admin";
-	// See plugins.
-	public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
     // Debug permission, for player spam (not in plugin.yml, currently).
 	public static final String  ADMINISTRATION_DEBUG         = ADMINISTRATION + ".debug";
 	

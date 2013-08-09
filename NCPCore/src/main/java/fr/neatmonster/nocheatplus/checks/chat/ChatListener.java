@@ -18,7 +18,6 @@ import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
@@ -150,17 +149,6 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
 		final String commandLabel = CommandUtil.getCommandLabel(alias, false);
 
 		final ChatConfig cc = ChatConfig.getConfig(player);
-		
-		// Protect some commands to prevent players for seeing which plugins are installed.
-		if (cc.protectPlugins) {
-			// TODO: Use a prefix map  and generalize this.
-			// TODO: Configurable message.
-			if ((commandLabel.equals("plugins") || commandLabel.equals("version") || commandLabel.equals("icanhasbukkit")) && !player.hasPermission(Permissions.ADMINISTRATION_PLUGINS)) {
-				player.sendMessage(cc.noCommandPermMessage);
-				event.setCancelled(true);
-				return;
-			}
-		}
 
 		// Prevent /op and /deop commands from being used by players.
 		if (cc.opInConsoleOnly && (commandLabel.equals("op") || commandLabel.equals("deop"))) {
