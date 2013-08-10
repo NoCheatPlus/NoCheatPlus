@@ -723,7 +723,7 @@ public class SurvivalFly extends Check {
 					return 1.3 - aDiff;
 				}
 				else{
-					return diff;
+					return Math.max(0.07, diff); // Ensure violation > 0.0 (!).
 				}
 			}
 			else {
