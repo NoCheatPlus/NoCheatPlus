@@ -341,10 +341,10 @@ permissions:
                     nocheatplus.shortcut.bypass:
                         description: Bypass everything that can be bypassed.
                         children:
-                            nocheatplus.checks
-                            nocheatplus.bypass
-                            nocheatplus.filter.commands
-                            nocheatplus.mods
+                            nocheatplus.checks: true
+                            nocheatplus.bypass: true
+                            nocheatplus.filter.commands: true
+                            nocheatplus.mods: true
                       
             # Shortcut: convenient testing.
             nocheatplus.tester:
