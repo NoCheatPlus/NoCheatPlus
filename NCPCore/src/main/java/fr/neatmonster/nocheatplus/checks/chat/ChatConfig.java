@@ -15,7 +15,6 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /*
  * MM'""""'YMM dP                  dP   MM'""""'YMM                   .8888b oo          
@@ -132,9 +131,6 @@ public class ChatConfig extends AsyncCheckConfig {
 
     public final boolean      opInConsoleOnly;
 
-    public final boolean      protectPlugins;
-    public final String		  noCommandPermMessage;
-
     
     public final boolean      relogCheck;
     public final String       relogKickMessage;
@@ -229,10 +225,6 @@ public class ChatConfig extends AsyncCheckConfig {
 
         opInConsoleOnly = config.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
 
-        // Get this one from the global config.
-        final ConfigFile globalConfig = ConfigManager.getConfigFile();
-        protectPlugins = globalConfig.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE);
-        noCommandPermMessage = ColorUtil.replaceColors(globalConfig.getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION));
     }
 
     /* (non-Javadoc)

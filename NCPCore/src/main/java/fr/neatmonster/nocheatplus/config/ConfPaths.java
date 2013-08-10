@@ -112,9 +112,12 @@ public abstract class ConfPaths {
 	@GlobalConfig
 	private static final String PROTECT_PLUGINS_HIDE					 = PROTECT_PLUGINS + "hide.";
 	public static  final String PROTECT_PLUGINS_HIDE_ACTIVE				 = PROTECT_PLUGINS_HIDE + "active";
-	private static final String PROTECT_PLUGINS_HIDE_MSG				 = PROTECT_PLUGINS_HIDE + "messages.";
-	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND		 = PROTECT_PLUGINS_HIDE_MSG + "unknowncommand";
-	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION	 = PROTECT_PLUGINS_HIDE_MSG + "nopermission";
+	private static final String PROTECT_PLUGINS_HIDE_NOCOMMAND			 = PROTECT_PLUGINS_HIDE + "unknowncommand.";
+	public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG		 = PROTECT_PLUGINS_HIDE_NOCOMMAND + "message";
+	public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS		 = PROTECT_PLUGINS_HIDE_NOCOMMAND + "commands";
+	private static final String PROTECT_PLUGINS_HIDE_NOPERMISSION		 = PROTECT_PLUGINS_HIDE + "nopermission.";
+	public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "message";
+	public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "commands";
 
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
@@ -662,5 +665,8 @@ public abstract class ConfPaths {
 	public static final String  MISCELLANEOUS_PROTECTPLUGINS			 = "miscellaneous.protectplugins";
 	@Moved(newPath = PROTECT_CLIENTS_MOTD_ALLOWALL)
 	public static final String  MISCELLANEOUS_ALLOWCLIENTMODS			 = "miscellaneous.allowclientmods";
-    
+	@Moved(newPath = PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)
+	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND		 = "protection.plugins.hide.messages.unknowncommand";
+	@Moved(newPath = PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG)
+	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION	 = "protection.plugins.hide.messages.nopermission";
 }

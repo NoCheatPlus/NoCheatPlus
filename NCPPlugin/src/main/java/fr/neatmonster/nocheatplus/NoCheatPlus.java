@@ -2,7 +2,6 @@ package fr.neatmonster.nocheatplus;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -653,9 +652,25 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	}
 	
 	protected void setupCommandProtection() {
-		final List<CommandProtectionEntry> changedCommands = PermissionUtil.protectCommands(
-				Permissions.FILTER_COMMAND, Arrays.asList("plugins", "version", "icanhasbukkit"),  
-				true, false, ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION)));
+		// TODO: Might re-check with plugins enabling during runtime (!).
+		final List<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
+		// Read lists and messages from config.
+		final ConfigFile config = ConfigManager.getConfigFile();
+		// (Might add options to invert selection.)
+		// "No permission".
+		// TODO: Could/should set permission message to null here (server default), might use keyword "default".
+		final List<String> noPerm = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS);
+		if (noPerm != null && !noPerm.isEmpty()){
+			final String noPermMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG));
+			changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noPerm,  true, false, noPermMsg));
+		}
+		// "Unknown command", override the other option.
+		final List<String> noCommand = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS);
+		if (noCommand != null && !noCommand.isEmpty()){
+			final String noCommandMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG));
+			changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
+		}
+		// Add to changes history for undoing.
 		if (this.changedCommands == null) this.changedCommands = changedCommands;
 		else this.changedCommands.addAll(changedCommands);
 	}
