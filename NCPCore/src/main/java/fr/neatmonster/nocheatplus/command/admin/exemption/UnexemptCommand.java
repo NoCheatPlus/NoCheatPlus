@@ -61,5 +61,13 @@ public class UnexemptCommand extends BaseCommand {
 		if (args.length == 3) return CommandUtil.getCheckTypeTabMatches(args[2]);
 		return null;
 	}
+	
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.command.AbstractCommand#testPermission(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
+	@Override
+	public boolean testPermission(CommandSender sender, Command command, String alias, String[] args) {
+		return super.testPermission(sender, command, alias, args) || args.length >= 2 && args[1].trim().equalsIgnoreCase(sender.getName()) && sender.hasPermission(permission + ".self");
+	}
 
 }
