@@ -4,6 +4,7 @@ package fr.neatmonster.nocheatplus.compat.bukkit;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
@@ -23,6 +24,7 @@ import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	
@@ -51,7 +53,12 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 
 	@Override
 	public CommandMap getCommandMap() {
-		return null;
+		try{
+			return (CommandMap) ReflectionUtil.invokeMethodNoArgs(Bukkit.getServer(), "getCommandMap");
+		} catch (Throwable t){
+			// Nasty.
+			return null;
+		}
 	}
 
 	@Override
