@@ -94,8 +94,8 @@ public class DefaultConfig extends ConfigFile {
         // Protection features.
         // Hide plugins.
         set(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE, true);
-        set(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND, "Unknown command. Type \"help\" for help.");
         set(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION, "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND, "Unknown command. Type \"/help\" for help.");
         // Client motd.
         set(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE, true);
         set(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL, false);
