@@ -115,7 +115,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
 		if (len == subCommandIndex || len == subCommandIndex + 1){
 			String arg = len == subCommandIndex ? "" : args[subCommandIndex].trim().toLowerCase();
 			for (AbstractCommand<?> cmd : subCommands.values()){
-				if (cmd.label.startsWith(arg) && (cmd.permission == null || sender.hasPermission(cmd.permission))){
+				if (cmd.label.startsWith(arg) && cmd.testPermission(sender, command, alias, args)){
 					// Only completes the label (!).
 					choices.add(cmd.label);
 				}
@@ -124,7 +124,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
 		else if (len > subCommandIndex + 1){
 			String arg = args[subCommandIndex].trim().toLowerCase();
 			AbstractCommand<?> subCommand = subCommands.get(arg);
-			if (subCommand != null && (subCommand.permission == null || sender.hasPermission(subCommand.permission))){
+			if (subCommand != null && subCommand.testPermission(sender, command, alias, args)){
 				return subCommand.onTabComplete(sender, command, alias, args);
 			}
 		}
@@ -142,7 +142,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
 			String arg = args[subCommandIndex].trim().toLowerCase();
 			AbstractCommand<?> subCommand = subCommands.get(arg);
 			if (subCommand != null){
-				if (subCommand.permission != null && !sender.hasPermission(subCommand.permission)){
+				if (!subCommand.testPermission(sender, command, alias, args)){
 					sender.sendMessage(ChatColor.DARK_RED + "You don't have permission.");
 					return true;
 				}
@@ -151,6 +151,16 @@ public abstract class AbstractCommand<A> implements TabExecutor{
 		}
 		// Usage.
 		return false;
+	}
+	
+	/**
+	 * Test if the CommandSender has the permission necessary to run THIS command (not meant for checking sub-command permissions recursively).
+	 * <br>Override for more complex specialized permissions.
+	 * @param sender
+	 * @return
+	 */
+	public boolean testPermission(CommandSender sender, Command command, String alias, String args[]){
+		return permission == null || sender.hasPermission(permission);
 	}
 
 }

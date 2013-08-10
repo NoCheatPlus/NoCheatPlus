@@ -154,7 +154,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         	// Check sub-commands.
             if (args.length > 0){
             	AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());
-            	if (subCommand != null && sender.hasPermission(subCommand.permission)){
+            	if (subCommand.testPermission(sender, command, commandLabel, args)){
             		// Sender has permission to run the command.
             		return subCommand.onCommand(sender, command, commandLabel, args);
             	}
@@ -214,7 +214,7 @@ public class NoCheatPlusCommand extends BaseCommand{
 //			}
 //			else{
 //				final NCPCommand cmd = commands.get(subLabel);
-//				if (cmd != null && sender.hasPermission(cmd.permission)){
+//				if (cmd.testPermission...){
 //					// Delegate the tab-completion.
 //					return cmd.onTabComplete(sender, command, alias, args);
 //				}

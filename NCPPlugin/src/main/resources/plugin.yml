@@ -348,14 +348,14 @@ permissions:
                       
             # Shortcut: convenient testing.
             nocheatplus.tester:
-                description: Monitoring and debugging permissions, including removing data and exemption handling for oneself.
+                description: Monitoring and debugging permissions, including removing data and exemption.
                 children:
-                    # TODO: Might just inherit from shortcut.info.
+                    # TODO: Might just inherit from shortcut.info, might implement exempt.self etc.
                     nocheatplus.shortcut.monitor: true
                     nocheatplus.admin.debug: true
-                    nocheatplus.command.exempt.self: true
-                    nocheatplus.command.unexempt.self: true
-                    nocheatplus.command.removeplayer.self: true
+                    nocheatplus.command.exempt: true
+                    nocheatplus.command.unexempt: true
+                    nocheatplus.command.removeplayer: true
             
             # Shortcut: full administrator without check-bypass-permissions:
             nocheatplus.admin:
