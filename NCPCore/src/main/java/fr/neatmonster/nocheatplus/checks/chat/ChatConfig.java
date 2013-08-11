@@ -129,7 +129,7 @@ public class ChatConfig extends AsyncCheckConfig {
     public final String       loginsKickMessage;
     public final long         loginsStartupDelay;
 
-    public final boolean      opInConsoleOnly;
+    public final boolean      consoleOnlyCheck;
 
     
     public final boolean      relogCheck;
@@ -223,7 +223,7 @@ public class ChatConfig extends AsyncCheckConfig {
         relogWarningTimeout = config.getLong(ConfPaths.CHAT_RELOG_WARNING_TIMEOUT);
         relogActions = config.getOptimizedActionList(ConfPaths.CHAT_RELOG_ACTIONS, Permissions.CHAT_RELOG);
 
-        opInConsoleOnly = config.getBoolean(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY);
+        consoleOnlyCheck = config.getBoolean(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_ACTIVE);
 
     }
 

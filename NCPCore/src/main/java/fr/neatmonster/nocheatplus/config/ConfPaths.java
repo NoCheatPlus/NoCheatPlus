@@ -70,7 +70,6 @@ public abstract class ConfPaths {
      */
 	@GlobalConfig
 	private static final String MISCELLANEOUS = "miscellaneous.";
-	public static final String  MISCELLANEOUS_OPINCONSOLEONLY				= MISCELLANEOUS + "opinconsoleonly";
 	public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
 	public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS				= MISCELLANEOUS + "reporttometrics";
@@ -107,6 +106,12 @@ public abstract class ConfPaths {
 	private static final String PROTECT_CLIENTS_MOTD					 = PROTECT_CLIENTS + "motd.";
 	public static final String  PROTECT_CLIENTS_MOTD_ACTIVE				 = PROTECT_CLIENTS_MOTD + "active";
 	public static final String  PROTECT_CLIENTS_MOTD_ALLOWALL			 = PROTECT_CLIENTS_MOTD + "allowall";
+	// Other commands settings
+	@GlobalConfig
+	private static final String PROTECT_COMMANDS						 = PROTECT + "commands.";
+	private static final String PROTECT_COMMANDS_CONSOLEONLY			 = PROTECT_COMMANDS + "consoleonly.";
+	public  static final String PROTECT_COMMANDS_CONSOLEONLY_ACTIVE		 = PROTECT_COMMANDS_CONSOLEONLY + "active";
+	public  static final String PROTECT_COMMANDS_CONSOLEONLY_CMDS		 = PROTECT_COMMANDS_CONSOLEONLY + "commands";
 	// Plugins settings.
 	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
 	@GlobalConfig
@@ -118,7 +123,8 @@ public abstract class ConfPaths {
 	private static final String PROTECT_PLUGINS_HIDE_NOPERMISSION		 = PROTECT_PLUGINS_HIDE + "nopermission.";
 	public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "message";
 	public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "commands";
-
+	
+	// Checks!
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
 	public static final  String CHECKS_DEBUG							 = CHECKS + SUB_DEBUG;
@@ -669,4 +675,6 @@ public abstract class ConfPaths {
 	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND		 = "protection.plugins.hide.messages.unknowncommand";
 	@Moved(newPath = PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG)
 	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION	 = "protection.plugins.hide.messages.nopermission";
+	@Moved(newPath = PROTECT_COMMANDS_CONSOLEONLY_ACTIVE)
+	public static final String  MISCELLANEOUS_OPINCONSOLEONLY			 = "miscellaneous.opinconsoleonly";
 }

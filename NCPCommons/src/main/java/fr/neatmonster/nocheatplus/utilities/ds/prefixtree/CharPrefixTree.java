@@ -106,6 +106,20 @@ public class CharPrefixTree<N extends CharNode<N>, L extends CharLookupEntry<N>>
 		return false;
 	}
 	
+	/**
+	 * Test hasPrefixWords for each given argument.
+	 * @param inputs
+	 * @return true if hasPrefixWords returns ture for any of the inputs, false otherwise.
+	 */
+	public boolean hasAnyPrefixWords(final String... inputs){
+		for (int i = 0; i < inputs.length; i++){
+			if (hasPrefixWords(inputs[i])){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean isPrefix(final char[] chars){
 		return isPrefix(toCharacterList(chars));
 	}

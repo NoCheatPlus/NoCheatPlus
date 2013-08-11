@@ -72,7 +72,6 @@ public class DefaultConfig extends ConfigFile {
          *  d8b Y8b Y8b  888  Y88D Y888   , 888   , 888 888 ,ee 888 888 888 888   , Y888 888P Y888 888P  Y88D 
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
-        set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
         set(ConfPaths.MISCELLANEOUS_MANAGELISTENERS, false);
 //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
         set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
@@ -98,6 +97,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS, Arrays.asList("plugins", "version", "icanhasbukkit"));
         set(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG, "Unknown command. Type \"/help\" for help.");
         set(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS, new LinkedList<String>());
+        // Commands (other).
+        set(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_ACTIVE, false);
+        set(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_CMDS, Arrays.asList("op", "deop"));
         // Client motd.
         set(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE, true);
         set(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL, false);
@@ -202,7 +204,7 @@ public class DefaultConfig extends ConfigFile {
         
         set(ConfPaths.CHAT_COMMANDS_CHECK, true);
         set(ConfPaths.CHAT_COMMANDS_EXCLUSIONS, new ArrayList<String>());
-        set(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT, Arrays.asList("/me"));
+        set(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT, Arrays.asList("me"));
         set(ConfPaths.CHAT_COMMANDS_LEVEL, 10);
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS, 18);
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL, 3);

@@ -1,6 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
+import java.util.Collection;
+
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -63,7 +66,10 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     private final SimpleCharPrefixTree commandExclusions = new SimpleCharPrefixTree();
     
     /** Commands to be handled as chat. */
-    private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree(); 
+    private final SimpleCharPrefixTree chatCommands = new SimpleCharPrefixTree();
+    
+    /** Commands not to be executed in-game.  */
+    private final SimpleCharPrefixTree consoleOnlyCommands = new SimpleCharPrefixTree(); 
     
     public ChatListener(){
     	super(CheckType.CHAT);
@@ -72,11 +78,35 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
     	// (text inits in constructor.)
     }
     
+    /**
+     * Clear tree and feed lower case. Add versions with "/" if missing.
+     * @param tree
+     * @param inputs
+     */
+    private void feedCommands(SimpleCharPrefixTree tree, Collection<String> inputs){
+    	tree.clear();
+    	tree.feedAll(inputs, false, true);
+    	for (String input : inputs){
+    		if (!input.trim().startsWith("/")){
+    			tree.feed("/" + input.trim().toLowerCase());
+    		}
+    	}
+    }
+    
+    /**
+     * Read string list from config and call feedCommands(tree, list).
+     * @param tree
+     * @param config
+     * @param configPath
+     */
+    private void feedCommands(SimpleCharPrefixTree tree, ConfigFile config, String configPath){
+    	feedCommands(tree, config.getStringList(configPath));
+    }
+    
 	private void initFilters(ConfigFile config) {
-		commandExclusions.clear();
-    	commandExclusions.feedAll(config.getStringList(ConfPaths.CHAT_COMMANDS_EXCLUSIONS), false, true);
-    	chatCommands.clear();
-    	chatCommands.feedAll(config.getStringList(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT), false, true);
+		feedCommands(consoleOnlyCommands, config, ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_CMDS);
+		feedCommands(chatCommands, config, ConfPaths.CHAT_COMMANDS_HANDLEASCHAT);
+		feedCommands(commandExclusions, config, ConfPaths.CHAT_COMMANDS_EXCLUSIONS);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR)
@@ -142,43 +172,54 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         
         // Tell TickTask to update cached permissions.
         TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
-        
-        // Trim is necessary because the server accepts leading spaces with commands.
-        String lcMessage = event.getMessage().trim().toLowerCase();
-		final String alias = lcMessage.split(" ")[0].substring(1);
-		final String commandLabel = CommandUtil.getCommandLabel(alias, false);
 
 		final ChatConfig cc = ChatConfig.getConfig(player);
-
-		// Prevent /op and /deop commands from being used by players.
-		if (cc.opInConsoleOnly && (commandLabel.equals("op") || commandLabel.equals("deop"))) {
-			player.sendMessage(ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
-			event.setCancelled(true);
-			return;
-		}
-
-        // First the color check.
-        if (color.isEnabled(player)) event.setMessage(color.check(player, event.getMessage(), true));
+		
+        // Checks that replace parts of the message (color).
+        if (color.isEnabled(player)){
+        	event.setMessage(color.check(player, event.getMessage(), true));
+        }
         
-        // Reset lcMessage (might be canged by color check).
-        lcMessage = event.getMessage().trim().toLowerCase();
-        final boolean handleAsChat = chatCommands.hasPrefixWords(lcMessage);
+     // Trim is necessary because the server accepts leading spaces with commands.
+        final String message = event.getMessage();
+        final String lcMessage = message.trim().toLowerCase();
+        final String[] split = lcMessage.split(" ", 2);
+        final String alias = split[0].substring(1);
+		final Command command = CommandUtil.getCommand(alias);
+		final String lcAltMessage;
+		if (command != null){
+			lcAltMessage = "/" + command.getLabel().toLowerCase() + (split.length > 1 ? (" " + split[1]) : "");
+		}
+		else{
+			lcAltMessage = lcMessage;
+		}
+        
+        // Prevent /op and /deop commands from being used by players.
+ 		if (cc.consoleOnlyCheck && consoleOnlyCommands.hasAnyPrefixWords(lcMessage, lcAltMessage)) {
+ 			if (command == null || command.testPermission(player)){
+ 	 			player.sendMessage(ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
+ 			}
+ 			event.setCancelled(true);
+ 			return;
+ 		}
 
-        // Then the no pwnage check.
+        // Handle as chat or command.
+ 		final boolean handleAsChat = chatCommands.hasAnyPrefixWords(lcMessage, lcAltMessage);
         if (handleAsChat){
             // Treat as chat.
-            if (text.isEnabled(player) && text.check(player, event.getMessage(), captcha, true))
+        	// TODO: At least cut off the command (!).
+            if (text.isEnabled(player) && text.check(player, message, captcha, true))
                 event.setCancelled(true);
         }
-        else if (!commandExclusions.hasPrefixWords(lcMessage)){
+        else if (!commandExclusions.hasAnyPrefixWords(lcMessage, lcAltMessage)){
             // Treat as command.
-            if (commands.isEnabled(player) && commands.check(player, event.getMessage(), captcha))
+            if (commands.isEnabled(player) && commands.check(player, message, captcha))
                 event.setCancelled(true);
         }
 
     }
 
-    /**
+	/**
      * We listen to this type of events to prevent spambots from login to the server.
      * 
      * @param event
