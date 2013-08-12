@@ -72,7 +72,6 @@ public class DefaultConfig extends ConfigFile {
          *  d8b Y8b Y8b  888  Y88D Y888   , 888   , 888 888 ,ee 888 888 888 888   , Y888 888P Y888 888P  Y88D 
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
-        set(ConfPaths.MISCELLANEOUS_MANAGELISTENERS, false);
 //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
         set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
 
@@ -488,6 +487,7 @@ public class DefaultConfig extends ConfigFile {
          *                                   ,  88P       
          *                                  "8",P"        
          */
+        // TODO: An extra file might suit these.
         final String start = "[player] failed [check]: ";
         final String end = ". VL [violations].";
         final String tell = "ncp tell [player] ";
@@ -553,7 +553,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tellchatnormal", tell + "&cNCP: &eToo many messages, slow down...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
-
+        
+        // Compatibility settings.
+        set(ConfPaths.COMPATIBILITY_MANAGELISTENERS, false);
         set(ConfPaths.COMPATIBILITY_BUKKITONLY, false);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, Arrays.asList(
                 Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),

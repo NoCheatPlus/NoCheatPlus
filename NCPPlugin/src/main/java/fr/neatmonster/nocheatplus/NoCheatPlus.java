@@ -727,7 +727,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         TickTask.setLocked(false);
 
 		// List the events listeners and register.
-		manageListeners = config.getBoolean(ConfPaths.MISCELLANEOUS_MANAGELISTENERS);
+		manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
 		if (manageListeners) {
 			listenerManager.setRegisterDirectly(true);
 			listenerManager.registerAllWithBukkit();

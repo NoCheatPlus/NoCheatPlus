@@ -70,10 +70,10 @@ public abstract class ConfPaths {
      */
 	@GlobalConfig
 	private static final String MISCELLANEOUS = "miscellaneous.";
-	public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
-	public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
+	//public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
+	//public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS				= MISCELLANEOUS + "reporttometrics";
-	public static final String  MISCELLANEOUS_MANAGELISTENERS				= MISCELLANEOUS + "managelisteners";
+	
 
 	/** TEMP: hidden flag to disable all lag adaption with one flag. */
 	public static final String MISCELLANEOUS_LAG						 	= MISCELLANEOUS + "lag";
@@ -653,6 +653,7 @@ public abstract class ConfPaths {
     // Compatibility section (possibly temporary).
     @GlobalConfig
     public static final String COMPATIBILITY                             = "compatibility.";
+    public static final String COMPATIBILITY_MANAGELISTENERS			 = COMPATIBILITY + "managelisteners";
 	public static final String COMPATIBILITY_BUKKITONLY                  = COMPATIBILITY + "bukkitapionly";
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
     
@@ -677,4 +678,6 @@ public abstract class ConfPaths {
 	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION	 = "protection.plugins.hide.messages.nopermission";
 	@Moved(newPath = PROTECT_COMMANDS_CONSOLEONLY_ACTIVE)
 	public static final String  MISCELLANEOUS_OPINCONSOLEONLY			 = "miscellaneous.opinconsoleonly";
+	@Moved(newPath = COMPATIBILITY_MANAGELISTENERS)
+	public static final String  MISCELLANEOUS_MANAGELISTENERS			 = "miscellaneous.managelisteners";
 }
