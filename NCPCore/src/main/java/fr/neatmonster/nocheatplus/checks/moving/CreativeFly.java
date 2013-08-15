@@ -81,10 +81,10 @@ public class CreativeFly extends Check {
         else fSpeed = 1D + 0.2D * (speedModifier + 1D);
         
         if (player.isFlying()){
-        	fSpeed *= player.getFlySpeed() / 0.1;
+        	fSpeed *= data.flySpeed / 0.1;
         }
         else {
-        	fSpeed *= player.getWalkSpeed() / 0.2;
+        	fSpeed *= data.walkSpeed / 0.2;
         }
         
         final double limitH = cc.creativeFlyHorizontalSpeed / 100D * HORIZONTAL_SPEED * fSpeed;

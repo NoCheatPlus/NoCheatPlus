@@ -519,7 +519,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Velocity tick (decrease + invalidation).
 		// TODO: Rework to generic (?) queued velocity entries: activation + invalidation
-		data.removeInvalidVelocity(TickTask.getTick() - cc.velocityActivationTicks);
+		final int tick = TickTask.getTick();
+		data.removeInvalidVelocity(tick - cc.velocityActivationTicks);
 		data.velocityTick();
         
         // The players location.
@@ -546,10 +547,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	if (shouldCheckSurvivalFly(player, data, cc)){
     		checkCf = false;
     		checkSf = true;
+    		data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
+    		
     	}
     	else if (cc.creativeFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_CREATIVEFLY) && !player.hasPermission(Permissions.MOVING_CREATIVEFLY)){
         	checkCf = true;
         	checkSf = false;
+        	data.adjustFlySpeed(player.getFlySpeed(), tick, cc.speedGrace);
+        	data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
     	}
     	else{
     		checkCf = checkSf = false;

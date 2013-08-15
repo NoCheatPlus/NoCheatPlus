@@ -145,6 +145,7 @@ public class MovingConfig extends ACheckConfig {
 	public final boolean tempKickIllegal;
 	public final boolean loadChunksOnJoin;
 	public final long sprintingGrace;
+	public final int speedGrace;
 
     /**
      * Instantiates a new moving configuration.
@@ -218,6 +219,7 @@ public class MovingConfig extends ACheckConfig {
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
         loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);
         sprintingGrace = Math.max(0L, (long) (config.getDouble(ConfPaths.MOVING_SPRINTINGGRACE) * 1000.0)); // Config: seconds.
+        speedGrace = Math.max(0, (int) Math.round(config.getDouble(ConfPaths.MOVING_SPEEDGRACE) * 20.0)); // Config: seconds
     }
     
 

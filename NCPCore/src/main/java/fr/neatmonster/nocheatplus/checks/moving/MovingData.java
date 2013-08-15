@@ -108,6 +108,11 @@ public class MovingData extends ACheckData {
     /** Last time the player was actually sprinting. */
     public long			  timeSprinting = 0;
     
+    /** Tick at which walk/fly speeds got changed last time. */
+    public int speedTick = 0;
+    public float walkSpeed = 0.0f;
+    public float flySpeed = 0.0f;
+    
     // Velocity handling.
     // TODO: consider resetting these with clearFlyData and onSetBack.
     public int            verticalVelocityCounter;
@@ -634,6 +639,34 @@ public class MovingData extends ACheckData {
 		if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || morePacketsVehicleSetback != null && worldName.equalsIgnoreCase(morePacketsVehicleSetback.getWorld().getName())){
 			clearMorePacketsData();
 			clearNoFallData(); // just in case.
+		}
+	}
+	
+	public void adjustWalkSpeed(final float walkSpeed, final int tick, final int speedGrace) {
+		if (walkSpeed > this.walkSpeed) {
+			this.walkSpeed = walkSpeed;
+			this.speedTick = tick;
+		} else if (walkSpeed < this.walkSpeed){
+			if (tick - this.speedTick > speedGrace) {
+				this.walkSpeed = walkSpeed;
+				this.speedTick = tick;
+			}
+		} else {
+			this.speedTick = tick;
+		}
+	}
+	
+	public void adjustFlySpeed(final float flySpeed, final int tick, final int speedGrace) {
+		if (flySpeed > this.flySpeed) {
+			this.flySpeed = flySpeed;
+			this.speedTick = tick;
+		} else if (flySpeed < this.flySpeed){
+			if (tick - this.speedTick > speedGrace) {
+				this.flySpeed = flySpeed;
+				this.speedTick = tick;
+			}
+		} else {
+			this.speedTick = tick;
 		}
 	}
 	
