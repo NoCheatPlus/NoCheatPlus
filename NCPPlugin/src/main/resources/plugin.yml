@@ -22,7 +22,7 @@ commands:
                /<command> reload: Reload the configuration.
                /<command> lag: Lag-related info.
                /<command> version: Version information.
-               /<command> exemptions (player) [(check type)]: Show exemptions.
+               /<command> exemptions (player): Show exemptions.
                /<command> exempt (player) [(check type)]: Exempt a player.
                /<command> unexempt (player) [(check type)]: Unexempt a player.
                /<command> commands: List all commands, more than shown here.
