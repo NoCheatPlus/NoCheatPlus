@@ -20,7 +20,7 @@ public class ColorUtil {
 	 * @return Either the object reference itself, or a copy with color definitions removed.
 	 */
 	public static String removeColors(final String text) {
-		if (text.length() <= 1) return text;
+		if (text == null || text.length() <= 1) return text;
 		final char[] chars = text.toCharArray();
 		// First find a begin index at all.
 		// TODO: Consider removing the normal color char as well (!).
@@ -62,7 +62,7 @@ public class ColorUtil {
 	 * @return the string
 	 */
 	public static String replaceColors(final String text) {
-	    return ChatColor.translateAlternateColorCodes('&', text);
+	    return text == null ? null : ChatColor.translateAlternateColorCodes('&', text);
 	}
 
 }
