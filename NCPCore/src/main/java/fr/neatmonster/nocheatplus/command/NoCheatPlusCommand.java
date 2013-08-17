@@ -167,7 +167,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)){
         	// Prevent the NCP usage printout:
         	// TODO: GetColoredString
-        	sender.sendMessage(ColorUtil.replaceColors(config.getString(ConfPaths.PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND)));
+        	sender.sendMessage(ColorUtil.replaceColors(config.getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)));
         	return true; 
         }
         else{
