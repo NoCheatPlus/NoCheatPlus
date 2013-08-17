@@ -154,7 +154,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         	// Check sub-commands.
             if (args.length > 0){
             	AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());
-            	if (subCommand.testPermission(sender, command, commandLabel, args)){
+            	if (subCommand != null && subCommand.testPermission(sender, command, commandLabel, args)){
             		// Sender has permission to run the command.
             		return subCommand.onCommand(sender, command, commandLabel, args);
             	}
