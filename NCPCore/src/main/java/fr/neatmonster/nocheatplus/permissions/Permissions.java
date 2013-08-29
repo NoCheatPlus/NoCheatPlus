@@ -57,6 +57,8 @@ public class Permissions {
     public static final String  COMMAND_TEMPKICK      	= COMMAND + ".tempkick";
 	public static final String  COMMAND_UNKICK        	= COMMAND + ".unkick";
 	public static final String  COMMAND_VERSION		  	= COMMAND + ".version";
+	
+	public static final String COMMAND_INSPECT			= COMMAND + ".inspect";
 
  
     // Permissions for the individual checks.

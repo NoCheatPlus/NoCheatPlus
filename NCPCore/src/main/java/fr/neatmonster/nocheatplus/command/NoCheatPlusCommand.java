@@ -20,6 +20,7 @@ import fr.neatmonster.nocheatplus.command.actions.UnKickCommand;
 import fr.neatmonster.nocheatplus.command.actions.delay.DelayCommand;
 import fr.neatmonster.nocheatplus.command.admin.CommandsCommand;
 import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
+import fr.neatmonster.nocheatplus.command.admin.InspectCommand;
 import fr.neatmonster.nocheatplus.command.admin.LagCommand;
 import fr.neatmonster.nocheatplus.command.admin.NCPVersionCommand;
 import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
@@ -101,6 +102,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         		new ExemptCommand(plugin),
         		new ExemptionsCommand(plugin),
         		new InfoCommand(plugin),
+        		new InspectCommand(plugin),
         		new KickCommand(plugin),
         		new KickListCommand(plugin),
         		new LagCommand(plugin),
