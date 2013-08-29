@@ -386,7 +386,7 @@ public class SurvivalFly extends Check {
             // Finally check horizontal buffer regain.
     		if (hDistanceAboveLimit < 0.0  && result <= 0.0 && hDistance > 0.0 && data.sfHorizontalBuffer < hBufMax) {
     			// TODO: max min other conditions ?
-    			hBufRegain(hDistance, Math.min(0.1, Math.abs(hDistanceAboveLimit)), data);
+    			hBufRegain(hDistance, Math.min(0.2, Math.abs(hDistanceAboveLimit)), data);
     		}
         }
 		
