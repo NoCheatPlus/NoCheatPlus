@@ -245,11 +245,6 @@ public class SurvivalFly extends Check {
 				}
 			}
         }
-        
-		// Finally check horizontal buffer regain.
-		if (hDistanceAboveLimit < 0.0  && hDistance > 0.0 && data.sfHorizontalBuffer < hBufMax) {
-			hBufRegain(hDistance, hDistanceAboveLimit, data);
-		}
 		
 		//////////////////////////
 		// Vertical move.
@@ -387,6 +382,12 @@ public class SurvivalFly extends Check {
             if (now - data.sfVLTime > cc.survivalFlyVLFreeze) {
             	data.survivalFlyVL *= 0.95D;
             }
+            
+            // Finally check horizontal buffer regain.
+    		if (hDistanceAboveLimit < 0.0  && result <= 0.0 && hDistance > 0.0 && data.sfHorizontalBuffer < hBufMax) {
+    			// TODO: max min other conditions ?
+    			hBufRegain(hDistance, Math.min(0.1, Math.abs(hDistanceAboveLimit)), data);
+    		}
         }
 		
 		//  Set data for normal move or violation without cancel (cancel would have returned above)
@@ -929,10 +930,10 @@ public class SurvivalFly extends Check {
     /**
      * Legitimate move: increase horizontal buffer somehow.
      * @param hDistance
-     * @param hDistanceAboveLimit
+     * @param amount Positive amount.
      * @param data
      */
-    private void hBufRegain(final double hDistance, final double hDistanceAboveLimit, final MovingData data){
+    private void hBufRegain(final double hDistance, final double amount, final MovingData data){
     	/*
     	 * TODO: Consider different concepts: 
     	 * 			- full resetting with harder conditions.
@@ -940,7 +941,7 @@ public class SurvivalFly extends Check {
     	 * 			- reset or regain only every x blocks h distance.
     	 */
     	// TODO: Confine general conditions for buffer regain further (regain in air, whatever)?
-    	data.sfHorizontalBuffer = Math.min(hBufMax, data.sfHorizontalBuffer - hDistanceAboveLimit);
+    	data.sfHorizontalBuffer = Math.min(hBufMax, data.sfHorizontalBuffer + amount);
     }
     
     /**
