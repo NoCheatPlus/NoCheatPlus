@@ -1082,8 +1082,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (player == null){
         	return;
         }
+        if (vehicle.isDead() || !vehicle.isValid()) {
+        	onPlayerVehicleLeave(player);
+        	return;
+        }
         if (!from.getWorld().equals(to.getWorld())) return;
-
+        
         Location newTo = null;
         final MovingData data = MovingData.getData(player);
         data.sfNoLowJump = true;
