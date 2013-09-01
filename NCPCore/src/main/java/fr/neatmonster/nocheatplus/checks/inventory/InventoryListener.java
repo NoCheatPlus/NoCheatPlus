@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.inventory;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -21,6 +20,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -29,8 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /*
  * M""M                                       dP                              
@@ -327,60 +326,29 @@ public class InventoryListener  extends CheckListener {
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event){
-    	if (shouldEnsureCloseInventories()){
-    		closePlayerInventoryRecursively(event.getPlayer());
+    	if (InventoryUtil.shouldEnsureCloseInventories()){
+    		InventoryUtil.closePlayerInventoryRecursively(event.getPlayer());
     	}
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerPortal(final PlayerPortalEvent event){
-    	if (shouldEnsureCloseInventories()){
-    		closePlayerInventoryRecursively(event.getPlayer());
+    	if (InventoryUtil.shouldEnsureCloseInventories()){
+    		InventoryUtil.closePlayerInventoryRecursively(event.getPlayer());
     	}
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityPortal(final EntityPortalEnterEvent event){
-    	if (shouldEnsureCloseInventories()){
-    		closePlayerInventoryRecursively(event.getEntity());
+    	if (InventoryUtil.shouldEnsureCloseInventories()){
+    		InventoryUtil.closePlayerInventoryRecursively(event.getEntity());
     	}
     }
     
-    /**
-     * Test if global config has set the flag.
-     * @return
-     */
-    public static boolean shouldEnsureCloseInventories(){
-    	return ConfigManager.getConfigFile().getBoolean(ConfPaths.INVENTORY_ENSURECLOSE, true);
-    }
-    
-    /**
-     * Search for players / passengers.
-     * @param entity
-     */
-    public static void closePlayerInventoryRecursively(Entity entity){
-    	// Find a player.
-    	while (entity != null){
-    		if (entity instanceof Player){
-    			closeInventory((Player) entity);
-    		}
-    		final Entity passenger = entity.getPassenger();
-    		if (entity.equals(passenger)){
-    			// Just in case :9.
-    			break;
-    		}
-    		else{
-    			entity = passenger;
-    		}
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerTeleport(final PlayerTeleportEvent event){
+    	if (InventoryUtil.shouldEnsureCloseInventories()){
+    		InventoryUtil.closePlayerInventoryRecursively(event.getPlayer());
     	}
-    }
-    
-    /**
-     * Close one players inventory, if open.
-     * @param player
-     */
-    public static void closeInventory(final Player player){
-    	// TODO: Better check if any !?.
-    	player.closeInventory();
     }
 }

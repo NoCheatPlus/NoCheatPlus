@@ -1,8 +1,14 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 
 /**
  * Auxiliary/convenience methods for inventories.
@@ -61,6 +67,46 @@ public class InventoryUtil {
 	 */
 	public static int getStackCount(final InventoryView view, final ItemStack reference) {
 		return getStackCount(view.getBottomInventory(), reference) + getStackCount(view.getTopInventory(), reference);
+	}
+
+	/**
+	 * Test if global config has the flag set.
+	 * @return
+	 */
+	public static boolean shouldEnsureCloseInventories(){
+		return ConfigManager.getConfigFile().getBoolean(ConfPaths.INVENTORY_ENSURECLOSE, true);
+	}
+
+	/**
+	 * Search for players / passengers.
+	 * @param entity
+	 */
+	public static void closePlayerInventoryRecursively(Entity entity){
+		// Find a player.
+		while (entity != null){
+			if (entity instanceof Player){
+				closeOpenInventory((Player) entity);
+			}
+			final Entity passenger = entity.getPassenger();
+			if (entity.equals(passenger)){
+				// Just in case :9.
+				break;
+			}
+			else{
+				entity = passenger;
+			}
+		}
+	}
+
+	/**
+	 * Close one players inventory, if open. This ignores InventoryType.CRAFTING.
+	 * @param player
+	 */
+	public static void closeOpenInventory(final Player player){
+		final InventoryView view = player.getOpenInventory();
+		if (view != null && view.getType() != InventoryType.CRAFTING) {
+				player.closeInventory();
+		}
 	}
 
 }
