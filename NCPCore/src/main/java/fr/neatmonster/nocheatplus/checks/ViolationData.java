@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
@@ -49,7 +50,9 @@ public class ViolationData implements IViolationInfo, ActionData{
     public final double     vL;
     
     /** Filled in parameters. */
-    private final Map<ParameterName, String> parameters;
+    private Map<ParameterName, String> parameters;
+    
+    private boolean needsParameters = false;
 
     /**
      * Instantiates a new violation data.
@@ -81,6 +84,7 @@ public class ViolationData implements IViolationInfo, ActionData{
         	}
         }
         parameters = needsParameters ? check.getParameterMap(this) : null;
+        this.needsParameters = needsParameters;
     }
 
     /**
@@ -150,15 +154,23 @@ public class ViolationData implements IViolationInfo, ActionData{
 	
 	@Override
 	public void setParameter(final ParameterName parameterName, String value){
-		if (parameters != null) parameters.put(parameterName, value);
+		if (parameters == null) {
+			parameters = new HashMap<ParameterName, String>();
+		}
+		parameters.put(parameterName, value);
 	}
 
 	@Override
     public boolean needsParameters() {
-        return parameters != null;
+        return needsParameters;
     }
 
-    @Override
+	@Override
+	public boolean hasParameters() {
+		return parameters != null && !parameters.isEmpty();
+	}
+
+	@Override
     public double getAddedVl() {
         return addedVL;
     }
