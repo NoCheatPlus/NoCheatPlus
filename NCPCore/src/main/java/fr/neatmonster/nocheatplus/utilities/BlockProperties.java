@@ -2371,7 +2371,7 @@ public class BlockProperties {
 		
 		// Simplified check: Only collision of bounds of the full move is checked.
 		final double minX, maxX;
-		if (dX < 0){
+		if (dX < 0.0){
 			minX = dX * dT + oX + blockX;
 			maxX = oX + blockX;
 		}
@@ -2380,7 +2380,7 @@ public class BlockProperties {
 			minX = oX + blockX;
 		}
 		final double minY, maxY;
-		if (dY < 0){
+		if (dY < 0.0){
 			minY = dY * dT + oY + blockY;
 			maxY = oY + blockY;
 		}
@@ -2389,7 +2389,7 @@ public class BlockProperties {
 			minY = oY + blockY;
 		}
 		final double minZ, maxZ;
-		if (dX < 0){
+		if (dZ < 0.0){
 			minZ = dZ * dT + oZ + blockZ;
 			maxZ = oZ + blockZ;
 		}
