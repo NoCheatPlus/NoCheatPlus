@@ -40,10 +40,7 @@ public class Passable extends Check {
 				final int maxBlockDist = manhattan <= 1 ? manhattan : from.maxBlockDist(to);
 				if (maxBlockDist <= 1 && rayTracing.getStepsDone() == 1 && !from.isPassable()){
 					// Redo ray-tracing for moving out of blocks.
-					rayTracing.set(from, to);
-					rayTracing.setIgnorefirst();
-					rayTracing.loop();
-					if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()){
+					if (collidesIgnoreFirst(from, to)){
 						toPassable = false;
 						tags = "raytracing_2x_";
 					}
@@ -52,8 +49,10 @@ public class Passable extends Check {
 					}
 				}
 				else{
-					toPassable = false;
-					tags = "raytracing_";
+					if (!allowsSplitMove(from, to, manhattan)) {
+						toPassable = false;
+						tags = "raytracing_";
+					}
 				}
 			}
 			// TODO: Future: If accuracy is demanded, also check the head position (or bounding box right away).
@@ -66,8 +65,13 @@ public class Passable extends Check {
 			// (Might consider if vl>=1: only decrease if from and loc are passable too, though micro...)
 			data.passableVL *= 0.99;
 			return null;
+		} else {
+			return potentialViolation(player, loc, from, to, manhattan, tags, data, cc);
 		}
 		
+	}
+	
+	private Location potentialViolation(final Player player, Location loc, final PlayerLocation from, final PlayerLocation to, final int manhattan, String tags, final MovingData data, final MovingConfig cc) {
 		// Moving into a block, possibly a violation.
 
 		// Check the players location if different from others.
@@ -92,16 +96,16 @@ public class Passable extends Check {
 		} else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
 			tags += "into_shift";
 		}
-//		} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
+//				} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))){
 			// (Mind that this can be the case on the same block theoretically.)
 			// Keep loc as set-back.
-//		}
+//				}
 		else if (!from.isSameBlock(lbX, lbY, lbZ)){
 			// Otherwise keep loc as set-back.
 			tags += "cross_shift";
 		}
 		else if (manhattan == 1 && to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
-//		else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
+//				else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))){
 			// Allow the move up if the head is free.
 			return null;
 		}
@@ -119,7 +123,7 @@ public class Passable extends Check {
 		if (data.hasSetBack()){
 			final Location ref = data.getSetBack(to);
 			if (BlockProperties.isPassable(from.getBlockCache(), ref)){
-//			if (BlockProperties.isPassableExact(from.getBlockCache(), ref)){
+//					if (BlockProperties.isPassableExact(from.getBlockCache(), ref)){
 				loc = ref;
 			}
 		}
@@ -148,6 +152,60 @@ public class Passable extends Check {
 			// No cancel action set.
 			return null;
 		}
+	}
+	
+	/**
+	 * Test collision with ignoring the first block.
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	private boolean collidesIgnoreFirst(PlayerLocation from, PlayerLocation to) {
+		rayTracing.set(from, to);
+		rayTracing.setIgnorefirst();
+		rayTracing.loop();
+		return rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps();
+	}
+
+	/**
+	 * Test the move split into y-move and horizontal move, provided some pre-conditions are met.
+	 * @param from
+	 * @param to
+	 * @param manhattan
+	 * @return
+	 */
+	private boolean allowsSplitMove(final PlayerLocation from, final PlayerLocation to, int manhattan) {
+		final double yDiff = to.getY() - from.getY() ;
+		if (manhattan <= 3 && yDiff > 0.0 && Math.abs(yDiff)  < 1.0){
+			// Workaround for client-side calculations not being possible (y vs. horizontal move).
+			// TODO: Alternative: Test if "real" ray-tracing would fix it (might not!).
+			if (yDiff > 0.0) {
+				// y first.
+				rayTracing.set(from.getX(), from.getY(), from.getZ(), from.getX(), to.getY(), from.getZ());
+				rayTracing.loop();
+				if (!rayTracing.collides()) {
+					// horizontal second.
+					rayTracing.set(from.getX(), to.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
+					rayTracing.loop();
+					if (!rayTracing.collides()) {
+						return true;
+					}
+				}
+			} else {
+				// horizontal first.
+				rayTracing.set(from.getX(), from.getY(), from.getZ(), to.getX(), from.getY(), to.getZ());
+				rayTracing.loop();
+				if (!rayTracing.collides()) {
+					// y second.
+					rayTracing.set(to.getX(), from.getY(), to.getZ(), to.getX(), to.getY(), to.getZ());
+					rayTracing.loop();
+					if (!rayTracing.collides()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 }
