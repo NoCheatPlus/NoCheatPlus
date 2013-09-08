@@ -54,7 +54,7 @@ public class NoFall extends Check {
 //        final int yD = getDamage((float) (data.noFallMaxY - y));
 //        final int maxD = Math.max(Math.max(pD, nfD), yD);
         final double maxD = getDamage(Math.max((float) (data.noFallMaxY - y), Math.max(data.noFallFallDistance, player.getFallDistance())));
-        if (maxD > 0){
+        if (maxD >= 1.0){
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
             if (cc.debug) System.out.println(player.getName() + " NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
