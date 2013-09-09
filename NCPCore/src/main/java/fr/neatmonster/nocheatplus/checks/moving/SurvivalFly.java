@@ -212,6 +212,9 @@ public class SurvivalFly extends Check {
 		else{
 			data.hVelActive.clear();
 			hFreedom = 0.0;
+			if (resetFrom && data.bunnyhopDelay <= 6) {
+				data.bunnyhopDelay = 0;
+			}
 		}
 		
 		// Prevent players from walking on a liquid in a too simple way.
@@ -888,26 +891,32 @@ public class SurvivalFly extends Check {
     private double bunnyHop(final PlayerLocation from, final PlayerLocation to, final double hDistance, final double hAllowedDistance, double hDistanceAboveLimit, final double yDistance, final boolean sprinting, final MovingData data){
     	// Check "bunny fly" here, to not fall over sprint resetting on the way.
     	final double someThreshold = hAllowedDistance / 3.3;
+    	boolean allowHop = true;
     	if (data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint){
+    		allowHop = false; // Magic!
 			// Increase buffer if hDistance is decreasing properly.
 			if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist - hDistance >= data.sfLastHDist / bunnyDivFriction && hDistanceAboveLimit <= someThreshold){
 				// Speed must decrease by "a lot" at first, then by some minimal amount per event.
 				// TODO: 100.0, 110.0, ... might allow to confine buffer to low jump phase.
-				if (!(data.toWasReset && from.isOnGround() && to.isOnGround())){
-					// TODO: Confine further (max. amount)?
-					// Allow the move.
-					hDistanceAboveLimit = 0.0;
-					if (data.bunnyhopDelay == 1 && !to.isOnGround() && !to.isResetCond()){
-						// ... one move between toonground and liftoff remains for hbuf ...
-						data.bunnyhopDelay ++;
-						tags.add("bunnyfly(keep)");
-					} else {
-						tags.add("bunnyfly");
-					}
+				//if (!(data.toWasReset && from.isOnGround() && to.isOnGround())){ // FISHY
+				// TODO: Confine further (max. amount)?
+				// Allow the move.
+				hDistanceAboveLimit = 0.0;
+				if (data.bunnyhopDelay == 1 && !to.isOnGround() && !to.isResetCond()){
+					// ... one move between toonground and liftoff remains for hbuf ...
+					data.bunnyhopDelay ++;
+					tags.add("bunnyfly(keep)");
+				} else {
+					tags.add("bunnyfly(" + data.bunnyhopDelay +")");
 				}
+				//}
+			}
+			if (data.bunnyhopDelay <= 6 && (from.isOnGround() || data.noFallAssumeGround)) {
+				allowHop = true;
 			}
 		}
-    	else if (hDistance >= walkSpeed) { // if (sprinting){
+    	// Check hop:
+    	if (allowHop && hDistance >= walkSpeed) { // if (sprinting){
     		// Check activation of bunny hop,
 			// Roughly twice the sprinting speed is reached.
     		// TODO: Allow slightly higher speed on lost ground.
