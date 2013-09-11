@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcore</artifactId>
+  <artifactId>ncpcompatcb2808</artifactId>
   <packaging>jar</packaging>
-  <name>NCPCore</name>
+  <name>NCPCompatCB2808</name>
   <version>static</version>
 
   <parent>
@@ -15,19 +15,23 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.6.2-R1.0</version>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcore</artifactId>
+    	<version>static</version>
     </dependency>
     <dependency>
-    	<groupId>fr.neatmonster</groupId>
-    	<artifactId>ncpcommons</artifactId>
-    	<version>static</version>
+    	<groupId>org.bukkit</groupId>
+    	<artifactId>craftbukkit</artifactId>
+    	<version>1.6.2-R1.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.bukkit</groupId>
+    	<artifactId>bukkit</artifactId>
+    	<version>1.6.2-R1.0</version>
     </dependency>
   </dependencies>
 
-  <description>Core components and checks implementations. This contains about everything, just not the component/compat factories and not the plugin itself. NCPCore allows to add more modules/components that use check-specific classes to be added in the factories on NCPPlugin level.
+  <description>Compatibility for CB2808 (MC 1.6.2).
 
-Version updating is done for the NoCheatPlus sub-module.
-</description>
+Version updating is done for the NoCheatPlus sub-module.</description>
 </project>
