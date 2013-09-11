@@ -452,7 +452,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 					missing ++;
 					// TODO: Add the player [problem: messy NPC plugins?]?
 				}
-				if (player != this.onlinePlayers.get(name)){
+				if (!player.equals(this.onlinePlayers.get(name))){
 					changed ++;
 					// Update the reference.
 					addOnlinePlayer(player);
