@@ -810,7 +810,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         
         // Set up consistency checking.
         scheduleConsistencyCheckers();
-
         
         // Setup the graphs, plotters and start Metrics.
         setMetrics();
@@ -832,20 +831,11 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         	// Could use custom prefix from logging, however ncp should be mentioned then.
         	LogUtil.logWarning("[NoCheatPlus] " + configProblems);
         }
-        
-		if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-				@Override
-				public void run() {
-					setupCommandProtection();
-				}
-			}); 
-		}
 		
 		// Care for already online players.
 		final Player[] onlinePlayers = getServer().getOnlinePlayers();
-		// TODO: remap exemptionmanager !
-		// TODO: Disable all checks for these players for one tick !
+		// TODO: re-map ExemptionManager !
+		// TODO: Disable all checks for these players for one tick ?
 		// TODO: Prepare check data for players [problem: permissions]?
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			@Override
@@ -857,6 +847,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 					        // Set child permissions for commands for faster checking.
 					        PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FILTER_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
 						}
+					},
+					new Runnable() {
+						@Override
+						public void run() {
+							if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
+								setupCommandProtection();
+							}
+						}
 					}
 					);
 			}
@@ -865,6 +863,28 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		// Tell the server administrator that we finished loading NoCheatPlus now.
 		LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
 	}
+    
+    /**
+     * Actions to be done after enable of  all plugins. This aims at reloading mainly.
+     */
+    private void postEnable(final Player[] onlinePlayers, Runnable... runnables){
+    	LogUtil.logInfo("[NoCheatPlus] Post-enable running...");
+    	for (final Runnable runnable : runnables){
+    		try{
+    			runnable.run();
+    		}
+    		catch(Throwable t){
+    			LogUtil.logSevere("[NoCheatPlus] Encountered a problem during post-enable: " + t.getClass().getSimpleName());
+    			LogUtil.logSevere(t);
+    		}
+    	}
+    	for (final Player player : onlinePlayers){
+    		updatePermStateReceivers(player);
+    		NCPExemptionManager.registerPlayer(player);
+    	}
+    	// TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
+    	LogUtil.logInfo("[NoCheatPlus] Post-enable finished.");
+    }
     
     /**
      * Start or cancel metrics according to settings.
@@ -1029,26 +1049,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, config.getBoolean(ConfPaths.BLOCKBREAK_DEBUG, config.getBoolean(ConfPaths.CHECKS_DEBUG, false))));
 			}
 		});
-    }
-    
-    /**
-     * Actions to be done after enable of  all plugins. This aims at reloading mainly.
-     */
-    private void postEnable(final Player[] onlinePlayers, Runnable... runnables){
-    	for (final Runnable runnable : runnables){
-    		try{
-    			runnable.run();
-    		}
-    		catch(Throwable t){
-    			LogUtil.logSevere("[NoCheatPlus] Encountered a problem during post-enable: " + t.getClass().getSimpleName());
-    			LogUtil.logSevere(t);
-    		}
-    	}
-    	for (final Player player : onlinePlayers){
-    		updatePermStateReceivers(player);
-    		NCPExemptionManager.registerPlayer(player);
-    	}
-    	// TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
     }
     
     /**
