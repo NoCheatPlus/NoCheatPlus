@@ -250,7 +250,7 @@ public class MovingData extends ACheckData {
 		sfHorizontalBuffer = 0.0;
 		lostSprintCount = 0;
 		toWasReset = fromWasReset = false; // TODO: true maybe
-		sfHoverTicks = -1;
+		sfHoverTicks = -1; // 0 ?
 		sfDirty = false;
 		sfLowJump = false;
 		mediumLiftOff = defaultMediumLiftOff;
