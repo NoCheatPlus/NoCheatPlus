@@ -128,9 +128,9 @@ public class CreativeFly extends Check {
 
         // Super simple, just check distance compared to max distance vertical.
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
-        final double resultV = Math.max(0D, yDistance - data.verticalFreedom - limitV) * 100D;
+        final double resultV = (yDistance - data.verticalFreedom - limitV) * 100D;
 
-        final double result = resultH + resultV;
+        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
 
         // The player went to far, either horizontal or vertical.
         if (result > 0D) {
