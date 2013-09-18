@@ -34,6 +34,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.scheduler.BukkitTask;
 
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 import java.io.BufferedReader;
@@ -504,7 +506,9 @@ public class Metrics {
             } else if (response.startsWith("7")) {
                 response = response.substring(response.startsWith("7,") ? 2 : 1);
             }
-            LogUtil.scheduleLogWarning("[NoCheatPlus] Metrics error: " + response); // NCP: Log response.
+            if (debug || ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG)) { // NCP: Log response.
+            	LogUtil.scheduleLogWarning("[NoCheatPlus] Metrics error: " + response);
+            }
             throw new IOException(response);
         } else {
             // Is this the first update this hour?
