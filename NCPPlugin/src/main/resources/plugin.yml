@@ -317,7 +317,6 @@ permissions:
                             nocheatplus.command.info: true
                             nocheatplus.command.exemptions: true
                             nocheatplus.command.kicklist: true
-                            # TODO: commands perm.
                             nocheatplus.command.commands: true
                             # TODO: Put lag here ?
                     nocheatplus.shortcut.monitor:
@@ -326,8 +325,9 @@ permissions:
                             nocheatplus.shortcut.info: true
                             nocheatplus.command.version: true
                             nocheatplus.command.lag: true
-                            nocheatplus.admin.plugins: true
-                            nocheatplus.feature.command: true
+                            # TODO: All commands !?
+                            nocheatplus.filter.command: true
+                            # TODO: inspect ?
                     nocheatplus.shortcut.safeadmin:
                         description: 'Permissions for "safe" administration, excluding rather critical operations like reload and action commands like ban/delay (arbitrary console commands!). Fit for "heavy" mods, include temp-kicking and exemptions, does bypass login-denial.'
                         children:
@@ -340,13 +340,17 @@ permissions:
                             nocheatplus.command.removeplayer: true
                             nocheatplus.filter.command: true
                             nocheatplus.bypass.denylogin: true
+                            # TODO: inspect ?
                     nocheatplus.shortcut.bypass:
                         description: Bypass everything that can be bypassed.
                         children:
-                            nocheatplus.checks: true
                             nocheatplus.bypass: true
-                            nocheatplus.filter.commands: true
-                            nocheatplus.mods: true
+                            nocheatplus.filter.command: true
+                            nocheatplus.shortcut.cheater:
+                                description: Allow use of all cheating, excludes bypassing temp-kick and command protection and similar.
+                                children:
+                                    nocheatplus.checks: true
+                                    nocheatplus.mods: true
                       
             # Shortcut: convenient testing.
             nocheatplus.tester:
