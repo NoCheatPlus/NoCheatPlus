@@ -51,6 +51,7 @@ import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
+import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.components.IHoldSubComponents;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
@@ -182,6 +183,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	/** Queued sub component holders, emptied on the next tick usually. */
 	protected final List<IHoldSubComponents> subComponentholders = new ArrayList<IHoldSubComponents>(20);
+	
+	private final List<DisableListener> disableListeners = new ArrayList<DisableListener>();
 	
 	/** All registered components.  */
 	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
@@ -431,6 +434,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			joinLeaveListeners.add((JoinLeaveListener) obj);
 			added = true;
 		}
+		if (obj instanceof DisableListener) {
+			disableListeners.add((DisableListener) obj);
+			added = true;
+		}
 		
 		// Add to sub registries.
 		for (final ComponentRegistry<?> registry : subRegistries){
@@ -511,6 +518,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		if (obj instanceof JoinLeaveListener){
 			joinLeaveListeners.remove((JoinLeaveListener) obj);
 		}
+		if (obj instanceof DisableListener) {
+			disableListeners.remove(obj);
+		}
 		
 		// Remove sub registries.
 		if (obj instanceof ComponentRegistry<?>){
@@ -584,8 +594,16 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         NCPExemptionManager.clear();
         
 		// Data cleanup.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup DataManager...");
-		dataMan.onDisable();
+		if (verbose) LogUtil.logInfo("[NoCheatPlus] onDisable calls (include DataManager cleanup)...");
+		for (final DisableListener dl : disableListeners) {
+			try {
+				dl.onDisable();
+			} catch (Throwable t) {
+				// bad :)
+				LogUtil.logSevere("DisableListener (" + dl.getClass().getName() + "): " + t.getClass().getSimpleName() + " / " + t.getMessage());
+				LogUtil.logSevere(t);
+			}
+		}
 		
 		// Hooks:
 		// (Expect external plugins to unregister their hooks on their own.)
@@ -721,6 +739,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		initBlockProperties(config);
 		
 		// Initialize data manager.
+		disableListeners.add(0, dataMan);
 		dataMan.onEnable();
         
         // Allow entries to TickTask (just in case).
