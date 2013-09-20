@@ -546,11 +546,14 @@ public abstract class ConfPaths {
     public static final String  INVENTORY_INSTANTEAT_CHECK               = INVENTORY_INSTANTEAT + "active";
     public static final String  INVENTORY_INSTANTEAT_ACTIONS             = INVENTORY_INSTANTEAT + "actions";
     
-    private static final String INVENTORY_ITEMS                          = INVENTORY + ".items";
-    public static final String  INVENTORY_ITEMS_CHECK                    = INVENTORY_ITEMS + ".active";
-
-    @GlobalConfig
-    public static final String  INVENTORY_ENSURECLOSE					 = INVENTORY + ".ensureclose";
+    private static final String INVENTORY_ITEMS                          = INVENTORY + "items.";
+    public static final String  INVENTORY_ITEMS_CHECK                    = INVENTORY_ITEMS + "active";
+    
+    private static final String INVENTORY_OPEN							 = INVENTORY + "open.";
+    public static final  String INVENTORY_OPEN_CHECK					 = INVENTORY_OPEN + "active";
+    // TODO: close and cancelother on open-section-level are temporary.
+    public static final  String INVENTORY_OPEN_CLOSE					 = INVENTORY_OPEN + "close";
+    public static final  String INVENTORY_OPEN_CANCELOTHER				 = INVENTORY_OPEN + "cancelother";
     
     /*
      *     e   e                         ,e,                  
@@ -681,4 +684,6 @@ public abstract class ConfPaths {
 	public static final String  MISCELLANEOUS_OPINCONSOLEONLY			 = "miscellaneous.opinconsoleonly";
 	@Moved(newPath = COMPATIBILITY_MANAGELISTENERS)
 	public static final String  MISCELLANEOUS_MANAGELISTENERS			 = "miscellaneous.managelisteners";
+	@Moved(newPath = INVENTORY_OPEN_CHECK)
+	public static final String  INVENTORY_ENSURECLOSE					 = "inventory.ensureclose";
 }

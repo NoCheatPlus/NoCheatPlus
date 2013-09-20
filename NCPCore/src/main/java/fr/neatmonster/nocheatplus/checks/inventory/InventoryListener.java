@@ -70,6 +70,8 @@ public class InventoryListener  extends CheckListener {
     
     protected final Items items 		= addCheck(new Items());
     
+    private final Open open 			= addCheck(new Open());
+    
     public InventoryListener(){
     	super(CheckType.INVENTORY);
     }
@@ -326,29 +328,49 @@ public class InventoryListener  extends CheckListener {
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event){
-    	if (InventoryUtil.shouldEnsureCloseInventories()){
-    		InventoryUtil.closePlayerInventoryRecursively(event.getPlayer());
-    	}
+    	open.check(event.getPlayer());
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerPortal(final PlayerPortalEvent event){
-    	if (InventoryUtil.shouldEnsureCloseInventories()){
-    		InventoryUtil.closePlayerInventoryRecursively(event.getPlayer());
-    	}
+    	// Note: ignore cancelother setting.
+    	open.check(event.getPlayer());
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onEntityPortal(final EntityPortalEnterEvent event){
-    	if (InventoryUtil.shouldEnsureCloseInventories()){
-    		InventoryUtil.closePlayerInventoryRecursively(event.getEntity());
+    	final Player player = InventoryUtil.getPlayerPassengerRecursively(event.getEntity());
+    	if (player != null) {
+    		// Note: ignore cancelother setting.
+        	open.check(player);
     	}
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerTeleport(final PlayerTeleportEvent event){
-    	if (InventoryUtil.shouldEnsureCloseInventories()){
-    		InventoryUtil.closePlayerInventoryRecursively(event.getPlayer());
-    	}
+    	// Note: ignore cancelother setting.
+    	open.check(event.getPlayer());
     }
+    
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    public void onVehicleDestroy(final VehicleDestroyEvent event) {
+//    	final Entity entity = event.getVehicle();
+//    	if (entity instanceof InventoryHolder) { // Fail on 1.4 ?
+//    		checkInventoryHolder((InventoryHolder) entity);
+//    	}
+//    }
+//    
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    public void onBlockBreak(final BlockBreakEvent event) {
+//    	final Block block = event.getBlock();
+//    	if (block == null) {
+//    		return;
+//    	}
+//    	// TODO: + explosions !? + entity change block + ...
+//    }
+//
+//	private void checkInventoryHolder(InventoryHolder entity) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 }

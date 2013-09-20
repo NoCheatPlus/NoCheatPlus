@@ -405,7 +405,9 @@ public class DefaultConfig extends ConfigFile {
         
         set(ConfPaths.INVENTORY_ITEMS_CHECK, true);
         
-        set(ConfPaths.INVENTORY_ENSURECLOSE, true);
+        set(ConfPaths.INVENTORY_OPEN_CHECK, true);
+        set(ConfPaths.INVENTORY_OPEN_CLOSE, true);
+        set(ConfPaths.INVENTORY_OPEN_CANCELOTHER, true);
 
         /*
          *     e   e                         ,e,                  

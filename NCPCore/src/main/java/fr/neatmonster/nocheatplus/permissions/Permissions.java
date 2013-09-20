@@ -174,6 +174,7 @@ public class Permissions {
     public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
     public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
     public static final String  INVENTORY_ITEMS              = INVENTORY + ".items";
+	public static final String  INVENTORY_OPEN				 = INVENTORY + ".open";
 
     /*
      *     e   e                         ,e,                  
