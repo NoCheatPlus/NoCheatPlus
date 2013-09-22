@@ -16,7 +16,6 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
 /**
@@ -474,12 +473,6 @@ public class TickTask implements Runnable {
 		updatePermissions();
 		// Listeners.
 		notifyListeners();
-		// Metrics
-		if (tick > 0 && (tick % 20) == 0){
-			// Count every second.
-			final int ticks = Math.min(20, (int) Math.round((1000f / (50f * getLag(1000, true)))));
-			MetricsData.addTicks(ticks);
-		}
 		
 		// Measure time after heavy stuff.
 		final long time = System.currentTimeMillis();

@@ -72,8 +72,6 @@ public abstract class ConfPaths {
 	private static final String MISCELLANEOUS = "miscellaneous.";
 	//public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
 	//public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
-	public static final String  MISCELLANEOUS_REPORTTOMETRICS				= MISCELLANEOUS + "reporttometrics";
-	
 
 	/** TEMP: hidden flag to disable all lag adaption with one flag. */
 	public static final String MISCELLANEOUS_LAG						 	= MISCELLANEOUS + "lag";
@@ -686,4 +684,7 @@ public abstract class ConfPaths {
 	public static final String  MISCELLANEOUS_MANAGELISTENERS			 = "miscellaneous.managelisteners";
 	@Moved(newPath = INVENTORY_OPEN_CHECK)
 	public static final String  INVENTORY_ENSURECLOSE					 = "inventory.ensureclose";
+	@Deprecated
+	public static final String  MISCELLANEOUS_REPORTTOMETRICS			 = "miscellaneous.reporttometrics";
+	
 }

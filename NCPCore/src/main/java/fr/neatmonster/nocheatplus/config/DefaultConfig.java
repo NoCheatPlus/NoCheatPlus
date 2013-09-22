@@ -73,7 +73,7 @@ public class DefaultConfig extends ConfigFile {
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
 //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
-        set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
+//        set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
 
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false);

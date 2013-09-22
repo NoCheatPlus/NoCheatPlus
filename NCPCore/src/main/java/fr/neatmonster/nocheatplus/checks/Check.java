@@ -13,7 +13,6 @@ import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -129,9 +128,6 @@ public abstract class Check implements MCAccessHolder{
         if (NCPHookManager.shouldCancelVLProcessing(violationData))
             // One of the hooks has decided to cancel the VL processing, return false.
             return false;
-        
-        // Add this failed check to the Metrics data (async!).
-        MetricsData.addFailed(violationData.check.type);
    
         final boolean hasCancel = violationData.hasCancel(); 
     	

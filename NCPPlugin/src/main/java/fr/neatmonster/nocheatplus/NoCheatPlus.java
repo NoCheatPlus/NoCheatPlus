@@ -34,7 +34,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
@@ -71,10 +70,6 @@ import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.logging.StaticLogFile;
-import fr.neatmonster.nocheatplus.metrics.Metrics;
-import fr.neatmonster.nocheatplus.metrics.MetricsData;
-import fr.neatmonster.nocheatplus.metrics.org.mcstats.Metrics.Graph;
-import fr.neatmonster.nocheatplus.metrics.org.mcstats.Metrics.Plotter;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil;
 import fr.neatmonster.nocheatplus.permissions.PermissionUtil.CommandProtectionEntry;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -140,8 +135,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     protected final DataManager dataMan = new DataManager();
     
 	private int dataManTaskId = -1;
-	
-	protected Metrics metrics = null;
     
 	/**
 	 * Commands that were changed for protecting them against tab complete or
@@ -572,13 +565,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         TickTask.cancel();
         TickTask.removeAllTickListeners();
         // (Keep the tick task locked!)
-        
-		// Stop metrics task.
-		if (metrics != null){
-			if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop Metrics...");
-			metrics.cancel();
-			metrics = null;
-		}
 		
 		// Stop consistency checking task.
 		if (consistencyCheckerTaskId != -1){
@@ -829,9 +815,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         
         // Set up consistency checking.
         scheduleConsistencyCheckers();
-        
-        // Setup the graphs, plotters and start Metrics.
-        setMetrics();
 
 //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
 //            // Is a new update available?
@@ -904,64 +887,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     	// TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
     	LogUtil.logInfo("[NoCheatPlus] Post-enable finished.");
     }
-    
-    /**
-     * Start or cancel metrics according to settings.
-     */
-    private void setMetrics() {
-    	final ConfigFile config = ConfigManager.getConfigFile();
-        if (config.getBoolean(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS)) {
-        	if (metrics != null){
-        		// Assume reload during runtime, ignore.
-        		return;
-        	}
-        	else{
-        		// Really start metrics.
-        		startMetrics();
-        	}
-        }
-        else{
-        	// Stop metrics, if present.
-        	if (metrics != null){
-        		metrics.cancel();
-        		metrics = null;
-        	}
-        }
-	}
-
-	private void startMetrics() {
-		MetricsData.initialize();
-        try {
-            this.metrics = new Metrics(this);
-            final Graph checksFailed = metrics.createGraph("Checks Failed");
-            for (final CheckType type : CheckType.values())
-                if (type.getParent() != null)
-                    checksFailed.addPlotter(new Plotter(type.name()) {
-                        @Override
-                        public int getValue() {
-                            return MetricsData.getFailed(type);
-                        }
-                    });
-            final Graph serverTicks = metrics.createGraph("Server Ticks");
-            for (int i = 0; i <= 20; i++){
-            	final int ticks = i;
-                serverTicks.addPlotter(new Plotter(ticks + " tick(s)") {
-                    @Override
-                    public int getValue() {
-                        return MetricsData.getTicks(ticks);
-                    }
-                });
-            }
-            metrics.start();
-        } catch (final Exception e) {
-        	LogUtil.logWarning("[NoCheatPlus] Failed to initialize metrics:");
-        	LogUtil.logWarning(e);
-        	if (metrics != null){
-        		metrics.cancel();
-        		metrics = null;
-        	}
-        }
-	}
 
 	/**
      * Empties and registers the subComponentHolders list.
@@ -995,8 +920,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		scheduleConsistencyCheckers();
 		// Cache some things.
 		useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
-		
-		setMetrics();
     }
     
 	@Override
