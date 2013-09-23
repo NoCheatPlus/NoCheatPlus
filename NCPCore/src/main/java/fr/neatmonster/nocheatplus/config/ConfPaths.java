@@ -683,7 +683,7 @@ public abstract class ConfPaths {
 	@Moved(newPath = COMPATIBILITY_MANAGELISTENERS)
 	public static final String  MISCELLANEOUS_MANAGELISTENERS			 = "miscellaneous.managelisteners";
 	@Moved(newPath = INVENTORY_OPEN_CHECK)
-	public static final String  INVENTORY_ENSURECLOSE					 = "inventory.ensureclose";
+	public static final String  INVENTORY_ENSURECLOSE					 = "checks.inventory.ensureclose";
 	@Deprecated
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS			 = "miscellaneous.reporttometrics";
 	
