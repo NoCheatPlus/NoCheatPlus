@@ -293,7 +293,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
             	damagedPlayer.setNoDamageTicks(0);
             }
-            if (BridgeHealth.getHealth(damagedPlayer) == BridgeHealth.getMaxHealth(damagedPlayer)){
+            if (BridgeHealth.getHealth(damagedPlayer) >= BridgeHealth.getMaxHealth(damagedPlayer)){
             	// TODO: Might use the same FightData instance for GodMode.
             	if (damagedData.fastHealBuffer < 0){
             		// Reduce negative buffer with each full health.

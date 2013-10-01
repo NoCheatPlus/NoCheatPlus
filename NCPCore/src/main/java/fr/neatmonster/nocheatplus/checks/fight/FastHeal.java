@@ -26,6 +26,7 @@ public class FastHeal extends Check {
 			// Reset.
 			data.fastHealVL *= 0.96;
 			// Only add a predefined amount to the buffer.
+			// TODO: Confine regain-conditions further? (e.g. if vl < 0.1)
 			data.fastHealBuffer = Math.min(cc.fastHealBuffer, data.fastHealBuffer + 50L);
 		}
 		else{
