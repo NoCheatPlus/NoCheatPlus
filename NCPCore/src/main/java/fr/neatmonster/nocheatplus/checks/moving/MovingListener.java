@@ -425,9 +425,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.sfHoverTicks = -1;
 			data.removeAllVelocity();
 			data.sfLowJump = false;
-			if (vehicle != null && !normalVehicles.contains(vehicle.getType())){
+			if (vehicle != null){
+				final Location vLoc = vehicle.getLocation();
 				// (Auto detection of missing events, might fire one time too many per plugin run.)
-				onVehicleMove(vehicle, event.getFrom(), event.getFrom(), true);
+				if (!normalVehicles.contains(vehicle.getType())) {
+					onVehicleMove(vehicle, vLoc, vLoc, true);
+				}
 			}
 			return;
 		}
