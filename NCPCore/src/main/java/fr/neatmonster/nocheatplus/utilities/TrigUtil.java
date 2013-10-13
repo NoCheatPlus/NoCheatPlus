@@ -192,9 +192,37 @@ public class TrigUtil {
 	 *            the location1
 	 * @param location2
 	 *            the location2
-	 * @return the double
+	 * @return The distance between the locations.
 	 */
 	public static final double distance(final Location location1, final Location location2)
+	{
+		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	/**
+	 * 3D-distance of two locations.
+	 * 
+	 * @param location1
+	 *            the location1
+	 * @param location2
+	 *            the location2
+	 * @return The distance between the locations.
+	 */
+	public static final double distance(final PlayerLocation location1, final Location location2)
+	{
+		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	/**
+	 * 3D-distance of two locations.
+	 * 
+	 * @param location1
+	 *            the location1
+	 * @param location2
+	 *            the location2
+	 * @return The distance between the locations.
+	 */
+	public static final double distance(final PlayerLocation location1, final PlayerLocation location2)
 	{
 		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
 	}
