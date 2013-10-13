@@ -50,7 +50,7 @@ public class InspectCommand extends BaseCommand {
 			} else {
 				final StringBuilder builder = new StringBuilder(256);
 				builder.append(player.getName() + c1);
-				builder.append(" (" + (player.isOnline() ? "online" : "offline") + (player.isDead() ? ",dead" : "") + (player.isValid() ? "" : ",invalid") + (player.isInsideVehicle() ? (",vehicle=" + player.getVehicle().getType()) : "")+ "):");
+				builder.append(" (" + (player.isOnline() ? "online" : "offline") + (player.isDead() ? ",dead" : "") + (player.isValid() ? "" : ",invalid") + (player.isInsideVehicle() ? (",vehicle=" + player.getVehicle().getType() + "@" + locString(player.getVehicle().getLocation())) : "")+ "):");
 				// TODO: isValid, isDead,  isInsideVehicle ...
 				// Health.
 				builder.append(" health=" + f1.format(player.getHealth()) + "/" + f1.format(player.getMaxHealth()));
@@ -81,11 +81,15 @@ public class InspectCommand extends BaseCommand {
 				// TODO: is..sneaking,sprinting,blocking,
 				// Finally the block location.
 				final Location loc = player.getLocation();
-				builder.append(" pos=" + loc.getWorld().getName() + "/" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ());
+				builder.append(" pos=" + locString(loc));
 				sender.sendMessage(builder.toString());
 			}
 		}
 		return true;
+	}
+	
+	private final String locString(Location loc) {
+		return loc.getWorld().getName() + "/" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ();
 	}
 
 	/* (non-Javadoc)
