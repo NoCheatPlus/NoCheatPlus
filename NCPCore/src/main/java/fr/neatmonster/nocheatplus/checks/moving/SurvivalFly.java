@@ -37,6 +37,9 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  */
 public class SurvivalFly extends Check {
 	
+	// Tags
+	private static final String DOUBLE_BUNNY = "doublebunny";
+	
 	// Horizontal speeds/modifiers.
 	public static final double walkSpeed 		= 0.221D;
 	
@@ -894,6 +897,16 @@ public class SurvivalFly extends Check {
     	boolean allowHop = true;
     	if (data.bunnyhopDelay > 0 && hDistance > walkSpeed) { // * modSprint){
     		allowHop = false; // Magic!
+    		
+    		// 2x horizontal speed increase detection.
+    		if (hDistance - data.sfLastHDist >= walkSpeed * 0.5 && data.bunnyhopDelay == bunnyHopMax - 1) {
+    			if (data.sfLastYDist == 0.0 && (data.fromWasReset || data.toWasReset) && yDistance >= 0.4) {
+    				// TODO: Confine to last was hop (according to so far input on this topic).
+    				tags.add(DOUBLE_BUNNY);
+    				allowHop = true; // ?, how to mix in with below...
+    			}
+    		}
+    		
 			// Increase buffer if hDistance is decreasing properly.
 			if (data.sfLastHDist != Double.MAX_VALUE && data.sfLastHDist - hDistance >= data.sfLastHDist / bunnyDivFriction && hDistanceAboveLimit <= someThreshold){
 				// Speed must decrease by "a lot" at first, then by some minimal amount per event.
@@ -920,11 +933,13 @@ public class SurvivalFly extends Check {
     		// Check activation of bunny hop,
 			// Roughly twice the sprinting speed is reached.
     		// TODO: Allow slightly higher speed on lost ground.
-			if (hDistanceAboveLimit > (sprinting ? 0.005 : 0.0016) && hDistanceAboveLimit <= hAllowedDistance + someThreshold 
-					&& data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
-					&& (data.sfLastHDist == Double.MAX_VALUE || hDistance - data.sfLastHDist >= someThreshold )
-					&& (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
-					&& !from.isResetCond() && !to.isResetCond()) {
+			if (hDistanceAboveLimit > (sprinting ? 0.005 : 0.0016) && hDistanceAboveLimit <= hAllowedDistance + someThreshold
+					&& (data.mediumLiftOff != MediumLiftOff.LIMIT_JUMP // && yDistance >= 0.4 
+						&& (data.sfLastHDist == Double.MAX_VALUE || hDistance - data.sfLastHDist >= someThreshold )
+						&& (data.sfJumpPhase == 0 && from.isOnGround() || data.sfJumpPhase <= 1 && data.noFallAssumeGround)
+						&& !from.isResetCond() && !to.isResetCond()
+						|| tags.contains(DOUBLE_BUNNY))
+					) {
 				// TODO: Jump effect might allow more strictness. 
 				// TODO: Expected minimum gain depends on last speed (!).
 				// TODO: Speed effect affects hDistanceAboveLimit?
