@@ -254,6 +254,28 @@ public class TrigUtil {
 		final double dz = Math.abs(z1 - z2);
 		return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
+	
+	public static final double distanceSquared(final Location location1, final Location location2)
+	{
+		return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	public static final double distanceSquared(final PlayerLocation location1, final PlayerLocation location2)
+	{
+		return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	public static final double distanceSquared(final PlayerLocation location1, final Location location2)
+	{
+		return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	public static final double distanceSquared(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
+		final double dx = Math.abs(x1 - x2);
+		final double dy = Math.abs(y1 - y2);
+		final double dz = Math.abs(z1 - z2);
+		return dx * dx + dy * dy + dz * dz;
+	}
 
 	/**
 	 * 2D-distance in x-z plane.

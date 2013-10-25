@@ -203,6 +203,7 @@ public class MovingData extends ACheckData {
 	// HOT FIX
 	/** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
 	public boolean wasInVehicle = false;
+	public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT;
     
 	/**
 	 * Clear the data of the fly checks (not more-packets).
@@ -224,6 +225,7 @@ public class MovingData extends ACheckData {
 		sfDirty = false;
 		sfLowJump = false;
 		mediumLiftOff = defaultMediumLiftOff;
+		vehicleConsistency = MoveConsistency.INCONSISTENT;
 	}
 
 	/**
@@ -255,6 +257,7 @@ public class MovingData extends ACheckData {
 		sfLowJump = false;
 		mediumLiftOff = defaultMediumLiftOff;
 		removeAllVelocity();
+		vehicleConsistency = MoveConsistency.INCONSISTENT; // Not entirely sure here.
 	}
 	
 	/**
@@ -304,6 +307,7 @@ public class MovingData extends ACheckData {
         sfLowJump = false;
         mediumLiftOff = defaultMediumLiftOff;
         // TODO: other buffers ?
+        // No reset of vehicleConsistency.
     }
 
 	/**

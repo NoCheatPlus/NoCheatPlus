@@ -37,5 +37,19 @@ public class TeleportUtil {
 			System.out.println(player.getName() + " vehicle set back: " + location);
 		}
 	}
+	
+	/**
+	 * Force mounting the vehicle including teleportation.
+	 * @param passenger
+	 * @param vehicle
+	 */
+	public static void forceMount(Entity passenger, Entity vehicle) {
+		if (vehicle.getPassenger() != null) {
+			vehicle.eject();
+		}
+		if (passenger.teleport(vehicle) && !vehicle.isDead() && vehicle.isValid()) {
+			vehicle.setPassenger(passenger);
+		}
+	}
 
 }

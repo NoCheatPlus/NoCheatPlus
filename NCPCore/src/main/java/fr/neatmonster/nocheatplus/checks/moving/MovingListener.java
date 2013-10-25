@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -254,7 +255,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param id
      * @return
      */
-	private final boolean canJumpOffTop(final int id){
+	private static boolean canJumpOffTop(final int id){
 		// TODO: Test if this can be removed!
 		return BlockProperties.isGround(id) || BlockProperties.isSolid(id);
 	}
@@ -504,7 +505,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			if (cc.debug){
 				LogUtil.logWarning("[NoCheatPlus] VehicleExitEvent missing for: " + player.getName());
 			}
-			onPlayerVehicleLeave(player);
+			onPlayerVehicleLeave(player, null);
 //			if (BlockProperties.isRails(pFrom.getTypeId())){
 			// Always clear no fall data, let Minecraft do fall damage.
 			data.noFallSkipAirCheck = true; // Might allow one time cheat.
@@ -710,7 +711,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param event
      */
     @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = false)
-    public final void onPlayerMoveMonitor(final PlayerMoveEvent event){
+    public void onPlayerMoveMonitor(final PlayerMoveEvent event){
     	// TODO: revise: cancelled events.
         final long now = System.currentTimeMillis();
         final Player player = event.getPlayer();
@@ -1086,13 +1087,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	return;
         }
         if (vehicle.isDead() || !vehicle.isValid()) {
-        	onPlayerVehicleLeave(player);
+        	onPlayerVehicleLeave(player, vehicle);
         	return;
         }
         if (!from.getWorld().equals(to.getWorld())) return;
         
-        Location newTo = null;
         final MovingData data = MovingData.getData(player);
+        data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation());
+        switch (data.vehicleConsistency) {
+        	case FROM:
+        	case TO:
+        		data.resetPositions(player.getLocation()); // TODO: Drop MC 1.4!
+        		break;
+        	case INCONSISTENT:
+        		// TODO: Any exploits exist? -> TeleportUtil.forceMount(player, vehicle)
+        		break;
+        }
+        
+        Location newTo = null;
         data.sfNoLowJump = true;
         
         final MovingConfig cc = MovingConfig.getConfig(player);
@@ -1281,18 +1293,37 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void onVehicleExit(final VehicleExitEvent event){
     	final Entity entity = event.getExited();
     	if (!(entity instanceof Player)) return;
-    	onPlayerVehicleLeave((Player) entity);
+    	onPlayerVehicleLeave((Player) entity, event.getVehicle());
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onVehicleDestroyLowest(final VehicleDestroyEvent event){
+    	// Prevent destroying ones own vehicle.
+    	final Entity attacker = event.getAttacker();
+    	if (!(attacker instanceof Player)) {
+    		return;
+    	}
+    	final Vehicle vehicle = event.getVehicle();
+    	if (!attacker.equals(vehicle.getPassenger())) {
+    		return;
+    	}
+    	final Player player = (Player) attacker;
+    	if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) {
+    		return;
+    	}
+    	event.setCancelled(true);
+    	player.sendMessage(ChatColor.DARK_RED + "Destroying your own vehicle is disabled.");
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onVehicleDestroy(final VehicleDestroyEvent event){
     	final Entity entity = event.getVehicle().getPassenger();
     	if (!(entity instanceof Player)) return;
-    	onPlayerVehicleLeave((Player) entity);
+    	onPlayerVehicleLeave((Player) entity, event.getVehicle());
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public final void onPlayerVehicleEnter(final VehicleEnterEvent event){
+    public void onPlayerVehicleEnter(final VehicleEnterEvent event){
     	final Entity entity = event.getEntered();
     	if (!(entity instanceof Player)){
     		return;
@@ -1300,10 +1331,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	final Player player = (Player) entity;
     	final MovingData data = MovingData.getData(player);
     	data.removeAllVelocity();
+    	// Event should have a vehicle, in case check this last.
+    	data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation());
     	// TODO: more resetting, visible check ?
     }
     
-    private final void onPlayerVehicleLeave(final Player player){
+    /**
+     * Call on leaving or just having left a vehicle.
+     * @param player
+     * @param vehicle May be null in case of "not possible to determine".
+     */
+    private void onPlayerVehicleLeave(final Player player, final Entity vehicle){
     	final MovingData data = MovingData.getData(player);
     	data.wasInVehicle = false;
 //    	if (data.morePacketsVehicleTaskId != -1){
@@ -1311,16 +1349,45 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 //    		// TODO: might still set ordinary set-backs ?
 //    		return;
 //    	}
-    	// Reset survivalfly set-back to prevent the worst damage.
-    	final Location loc = player.getLocation();
+    	
+    	final MovingConfig cc = MovingConfig.getConfig(player);
+    	// TODO: Loc can be inconsistent, determine which to use ! 
+    	final Location pLoc = player.getLocation();
+    	Location loc = pLoc; // The location to use as set-back.
+    	//  TODO: Which vehicle to use ?
+    	// final Entity vehicle = player.getVehicle();
+    	if (vehicle != null) {
+    		final Location vLoc = vehicle.getLocation();
+    		// Workaround for some entities/animals that don't fire VehicleMoveEventS.
+    		if (!normalVehicles.contains(vehicle.getType()) || cc.noFallVehicleReset){
+        		data.noFallSkipAirCheck = true; // Might allow one time cheat.
+        		data.clearNoFallData();
+        	}
+    		// Check consistency with vehicle location.
+    		if (MoveConsistency.getConsistency(vLoc, null, pLoc) == MoveConsistency.INCONSISTENT) {
+    			// TODO: Consider teleporting the player (...)
+    			// TODO: What with the case of vehicle moved to another world !?
+    			loc = vLoc; // 
+    			if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
+    				final Location oldLoc = new Location(pLoc.getWorld(), data.toX, data.toY, data.toZ);
+    				if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
+    					loc = oldLoc;
+    				}
+    			}
+    			
+    		}
+    		if (cc.debug) {
+    			System.out.println(player.getName() + " vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
+    		}
+    	}
+    	
+    	// Adjust loc if in liquid (meant for boats !?).
     	if (BlockProperties.isLiquid(loc.getBlock().getTypeId())){
     		loc.setY(Location.locToBlock(loc.getY()) + 1.25);
     	}
-    	final Entity vehicle = player.getVehicle();
-    	final EntityType vehicleType = vehicle == null ? null : vehicle.getType();
-    	if (vehicleType != null && !normalVehicles.contains(vehicleType) || MovingConfig.getConfig(player).noFallVehicleReset){
-    		data.noFallSkipAirCheck = true; // Might allow one time cheat.
-    		data.clearNoFallData();
+    	
+    	if (cc.debug) {
+    		System.out.println(player.getName() + " vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
     	}
     	data.resetPositions(loc);
     	data.setSetBack(loc);
@@ -1346,7 +1413,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	}
 
 	@Override
-	public final void onTick(final int tick, final long timeLast) {
+	public void onTick(final int tick, final long timeLast) {
 		// Hover checks !
 		if (tick % hoverTicksStep != 0){
 			// Only check every so and so ticks.
@@ -1410,7 +1477,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	 * @param info
 	 * @return
 	 */
-	private final boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final MoveInfo info) {
+	private boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final MoveInfo info) {
 		// Check if player is on ground.
 		final Location loc = player.getLocation();
 		info.set(player, loc, null, cc.yOnGround);
@@ -1446,7 +1513,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		return res;
 	}
 
-	private final void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
+	private void handleHoverViolation(final Player player, final Location loc, final MovingConfig cc, final MovingData data) {
 		// Check nofall damage (!).
 		if (cc.sfHoverFallDamage && noFall.isEnabled(player)){
 			// Consider adding 3/3.5 to fall distance if fall distance > 0?

@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class Passable extends Check {
 	
@@ -119,12 +120,21 @@ public class Passable extends Check {
 			return null;
 		}
 		
+		// Discard inconsistent locations.
+		// TODO: Might get rid of using the in-between loc - needs use-case checking.
+		if (loc != null && (TrigUtil.distance(from,  to) > 0.75 || TrigUtil.distance(from, loc) > 0.125)) {
+			loc = null;
+		}
+		
 		// Prefer the set-back location from the data.
 		if (data.hasSetBack()){
 			final Location ref = data.getSetBack(to);
-			if (BlockProperties.isPassable(from.getBlockCache(), ref)){
+			if (BlockProperties.isPassable(from.getBlockCache(), ref) || TrigUtil.distance(from, loc) > 0.13){
 //					if (BlockProperties.isPassableExact(from.getBlockCache(), ref)){
 				loc = ref;
+				if (cc.debug) {
+					System.out.println(player.getName() + " Using set-back location for passable.");
+				}
 			}
 		}
 
@@ -142,8 +152,16 @@ public class Passable extends Check {
 		if (executeActions(vd)) {
 			// TODO: Consider another set back position for this, also keeping track of players moving around in blocks.
 			final Location newTo;
-			if (loc != null) newTo = loc;
-			else newTo = from.getLocation();
+			if (loc != null) {
+				newTo = loc;
+			}
+			else {
+				// TODO: Consider logging this one.
+				newTo = from.getLocation();
+				if (cc.debug) {
+					System.out.println(player.getName() + " Using from location for passable.");
+				}
+			}
 			newTo.setYaw(to.getYaw());
 			newTo.setPitch(to.getPitch());
 			return newTo;
