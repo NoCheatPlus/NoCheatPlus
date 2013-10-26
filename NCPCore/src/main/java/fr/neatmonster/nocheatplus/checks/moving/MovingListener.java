@@ -416,6 +416,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		final MovingData data = MovingData.getData(player);
 		
+		// TODO: Check illegal moves here anyway (!).
+		
 		// Ignore players in vehicles.
 		if (player.isInsideVehicle()){
 			// Workaround for pigs and other (1.5.x and before)!
@@ -431,6 +433,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				// (Auto detection of missing events, might fire one time too many per plugin run.)
 				if (!normalVehicles.contains(vehicle.getType())) {
 					onVehicleMove(vehicle, vLoc, vLoc, true);
+				} else {
+					data.vehicleConsistency = MoveConsistency.getConsistency(event.getFrom(), event.getTo(), vLoc);
+					// TODO: Consider TeleportUtil.forceMount or similar.
 				}
 			}
 			return;
