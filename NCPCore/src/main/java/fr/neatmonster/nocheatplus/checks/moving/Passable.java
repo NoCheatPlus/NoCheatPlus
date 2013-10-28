@@ -129,7 +129,7 @@ public class Passable extends Check {
 		// Prefer the set-back location from the data.
 		if (data.hasSetBack()){
 			final Location ref = data.getSetBack(to);
-			if (BlockProperties.isPassable(from.getBlockCache(), ref) || TrigUtil.distance(from, loc) > 0.13){
+			if (BlockProperties.isPassable(from.getBlockCache(), ref) || loc != null && TrigUtil.distance(from, loc) > 0.13){
 //					if (BlockProperties.isPassableExact(from.getBlockCache(), ref)){
 				loc = ref;
 				if (cc.debug) {
