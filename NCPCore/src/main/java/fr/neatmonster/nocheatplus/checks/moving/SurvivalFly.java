@@ -693,15 +693,15 @@ public class SurvivalFly extends Check {
 	 * @param count
 	 * @param tags
 	 * @param tag
-	 * @return absolute difference on violation.
+	 * @return A violation value > 0.001, to be interpreted like a moving violation.
 	 */
 	private static final double verticalAccounting(final double yDistance, final ActionAccumulator acc, final ArrayList<String> tags, final String tag)
 	{
-		// TODO: Add on-eq-return parameter <- still?
 		// TODO: distinguish near-ground moves somehow ?
 		// Determine which buckets to check:
+		// TODO: One state is checked 3 times vs. different yDiff !?
 		final int i1, i2;
-		// TODO: use 1st vs. 2nd whenever possible (!) (logics might need idstinguish falling from other ?...).
+		// TODO: use 1st vs. 2nd whenever possible (!) (logics might need to distinguish falling from other ?...).
 //		if (acc.bucketCount(0) == acc.bucketCapacity() &&){
 //			i1 = 0;
 //			i2 = 1;
@@ -710,41 +710,33 @@ public class SurvivalFly extends Check {
 		i1 = 1;
 		i2 = 2;
 //		}
-		// TODO: Do count int first bucket on some occasions.
+		// TODO: One move earlier: count first vs. second once first is full.
+		// TODO: Can all three be related if first one is full ?
 		if (acc.bucketCount(i1) > 0 && acc.bucketCount(i2) > 0) {
 			final float sc1 = acc.bucketScore(i1);
 			final float sc2 = acc.bucketScore(i2);
 			final double diff = sc1 - sc2;
 			final double aDiff = Math.abs(diff);
 			// TODO: Relate this to the fall distance !
-			// TODO: sharpen later (force speed gain while falling).
-			if (diff > 0.0 || yDistance > -1.1 && aDiff <= 0.07) {
-				if (yDistance < -1.1 && (aDiff < Math.abs(yDistance) || sc2 < - 10.0f)){
+			// TODO: sharpen later.
+			if (diff >= 0.0 || yDistance > -1.05 && aDiff < 0.0625) {
+				// TODO: check vs. sc1 !
+				if (yDistance <= -1.05 && sc2 < -10.0 && sc1 < -10.0) { // (aDiff < Math.abs(yDistance) || sc2 < - 10.0f)){
 					// High falling speeds may pass.
+					// TODO:  high falling speeds may pass within some bounds (!).
 					tags.add(tag + "grace");
 					return 0.0;
 				}
 				tags.add(tag); // Specific tags?
 				if (diff < 0.0 ){
-					// Note: aDiff should be <= 0.07 here.
-					// TODO: Does this high violation make sense?
-					return 1.3 - aDiff;
+					// Note: aDiff should be < 0.0625 here.
+					return Math.max(Math.abs(-0.0625 - diff), 0.001);
 				}
 				else{
-					return Math.max(0.07, diff); // Ensure violation > 0.0 (!).
-				}
-			}
-			else {
-				// Check for too small change of speed.
-				if (aDiff < 0.065){ // Minimum amount to be gained.
-					// TODO: Conditions are fast mock-up, aiming at glide hacks mostly.
-					// TODO: Potential fp: "slow falling" during chunk load/render, missing lost ground.
-					tags.add(tag); // + descend?
-					return 0.07 - diff;
+					return 0.0625 + diff;
 				}
 			}
 		}
-		// TODO: return Float.MAX_VALUE if no violation ?
 		return 0.0;
 	}
 	
