@@ -33,6 +33,8 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
 
 /*
  * MM""""""""`M oo          dP         dP   M""MMMMMMMM oo            dP                                       
@@ -266,6 +268,24 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	}
     	return false;
     }
+    
+    /**
+     * Listen for when a player ignites TNT
+     * @param event
+     * @return
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    public void onTNTPrime(final ExplosionPrimeEvent event) {
+        Entity e = event.getEntity();
+        if ( e instanceof TNTPrimed) {
+            TNTPrimed tnt = (TNTPrimed) e;
+            Entity entity = tnt.getSource();
+            if( entity instanceof Player) {
+                final FightData data = FightData.getData(((Player)entity));
+                data.lastTNTTick = TickTask.getTick();
+            }
+        }
+    }
 
     /**
      * We listen to EntityDamage events for obvious reasons.
@@ -322,7 +342,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (damager instanceof Player){
                 final Player player = (Player) damager;
                 if (e.getCause() == DamageCause.ENTITY_ATTACK){
-                	
+                        // Prevent false TNT flags by not processing damage on this tick
+                	if ( FightData.getData(player).lastTNTTick == TickTask.getTick()) return;
                 	if (handleNormalDamage(player, damaged, BridgeHealth.getDamage(e))){
                 		e.setCancelled(true);
                 	}
