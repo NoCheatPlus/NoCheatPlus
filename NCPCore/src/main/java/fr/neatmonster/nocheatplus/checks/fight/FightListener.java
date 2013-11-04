@@ -270,7 +270,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     }
     
     /**
-     * Listen for when a player ignites TNT
+     * Listen for when a player ignites TNT (hack to prevent TNT false positives)
      * @param event
      * @return
      */
