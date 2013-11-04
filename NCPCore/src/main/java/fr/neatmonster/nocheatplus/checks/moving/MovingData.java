@@ -76,7 +76,7 @@ public class MovingData extends ACheckData {
 		return playersMap.remove(playerName);
 	}
     
-    public static void clear(){
+    public static void clear() {
     	playersMap.clear();
     }
     
@@ -84,9 +84,9 @@ public class MovingData extends ACheckData {
      * Clear data related to the given world.
      * @param world The world that gets unloaded.
      */
-    public static void onWorldUnload(final World world){
+    public static void onWorldUnload(final World world) {
     	final String worldName = world.getName();
-    	for (final MovingData data : playersMap.values()){
+    	for (final MovingData data : playersMap.values()) {
     		data.onWorldUnload(worldName);
     	}
     }
@@ -263,7 +263,7 @@ public class MovingData extends ACheckData {
 	/**
 	 * Move event: Mildly reset some data, prepare setting a new to-Location.
 	 */
-	public void prepareSetBack(final Location loc){
+	public void prepareSetBack(final Location loc) {
 		clearAccounting();
 		sfJumpPhase = 0;
 		sfLastYDist = sfLastHDist = Double.MAX_VALUE;
@@ -278,7 +278,7 @@ public class MovingData extends ACheckData {
      * Just reset the "last locations" references.
      * @param loc
      */
-    public void resetPositions(final Location loc){
+    public void resetPositions(final Location loc) {
         if (loc == null) resetPositions(Double.MAX_VALUE, 0, 0);
         else resetPositions(loc.getX(), loc.getY(), loc.getZ());
     }
@@ -323,6 +323,7 @@ public class MovingData extends ACheckData {
     public void clearMorePacketsData() {
         morePacketsSetback = null;
         morePacketsVehicleSetback = null;
+        // TODO: Also reset other data ?
     }
 
     /**
@@ -338,8 +339,8 @@ public class MovingData extends ACheckData {
      * Set the set-back location, this will also adjust the y-coordinate for some block types (at least air).
      * @param loc
      */
-    public void setSetBack(final PlayerLocation loc){
-    	if (setBack == null){
+    public void setSetBack(final PlayerLocation loc) {
+    	if (setBack == null) {
     		setBack = loc.getLocation();
     	}
     	else{
@@ -352,8 +353,8 @@ public class MovingData extends ACheckData {
      * Convenience method.
      * @param loc
      */
-    public void setSetBack(final Location loc){
-    	if (setBack == null){
+    public void setSetBack(final Location loc) {
+    	if (setBack == null) {
     		setBack = LocUtil.clone(loc);
     	}
     	else{
@@ -366,7 +367,7 @@ public class MovingData extends ACheckData {
      * @param ref
      * @return
      */
-    public Location getSetBack(final Location ref){
+    public Location getSetBack(final Location ref) {
     	return LocUtil.clone(setBack, ref);
     }
 
@@ -409,7 +410,7 @@ public class MovingData extends ACheckData {
 	 * Return a copy of the teleported-to Location.
 	 * @return
 	 */
-	public final Location getTeleported(){
+	public final Location getTeleported() {
 		// TODO: here a reference might do.
 		return teleported == null ? teleported : LocUtil.clone(teleported);
 	}
@@ -489,7 +490,7 @@ public class MovingData extends ACheckData {
 	/**
 	 * Currently only applies to horizontal velocity.
 	 */
-	public void removeAllVelocity(){
+	public void removeAllVelocity() {
 		hVelActive.clear();
 		hVelQueued.clear();
 	}
@@ -504,20 +505,20 @@ public class MovingData extends ACheckData {
 		Iterator<Velocity> it;
 		// Active.
 		it = hVelActive.iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			final Velocity vel = it.next();
 			// TODO: 0.001 can be stretched somewhere else, most likely...
 			// TODO: Somehow use tick here too (actCount, valCount)?
-			if (vel.valCount <= 0 || vel.value <= 0.001){
+			if (vel.valCount <= 0 || vel.value <= 0.001) {
 //				System.out.prsintln("Invalidate active: " + vel);
 				it.remove();
 			}
 		}
 		// Queued.
 		it = hVelQueued.iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			final Velocity vel = it.next();
-			if (vel.actCount <= 0 || vel.tick < tick){
+			if (vel.actCount <= 0 || vel.tick < tick) {
 //				System.out.println("Invalidate queued: " + vel);
 				it.remove();
 			}
@@ -527,12 +528,12 @@ public class MovingData extends ACheckData {
 	/**
 	 * Called for moving events, increase age of velocity, decrease amounts, check which entries are invalid. Both horizontal and vertical.
 	 */
-	public void velocityTick(){
+	public void velocityTick() {
 		// Horizontal velocity (intermediate concept).
 		// Decrease counts for active.
 		// TODO: Actual friction. Could pass as an argument (special value for not to be used).
 		// TODO: Consider removing already invalidated here.
-		for (final Velocity vel : hVelActive){
+		for (final Velocity vel : hVelActive) {
 			vel.valCount --;
 			vel.sum += vel.value;
 			vel.value *= 0.93; // vel.frictionFactor;
@@ -540,12 +541,12 @@ public class MovingData extends ACheckData {
 		}
 		// Decrease counts for queued.
 		final Iterator<Velocity> it = hVelQueued.iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			it.next().actCount --;
 		}
 		
 		// Vertical velocity (old concept).
-        if (verticalVelocity <= 0.09D){
+        if (verticalVelocity <= 0.09D) {
         	verticalVelocityUsed ++;
         	verticalVelocityCounter--;
         }
@@ -554,8 +555,8 @@ public class MovingData extends ACheckData {
             verticalFreedom += verticalVelocity;
             verticalVelocity = Math.max(0.0, verticalVelocity -0.09);
             // TODO: Consider using up counter ? / better use velocity entries / even better use x,y,z entries right away .
-        } else if (verticalFreedom > 0.001D){
-        	if (verticalVelocityUsed == 1 && verticalVelocity > 1.0){
+        } else if (verticalFreedom > 0.001D) {
+        	if (verticalVelocityUsed == 1 && verticalVelocity > 1.0) {
         		// Workarounds.
         		verticalVelocityUsed = 0;
         		verticalVelocity = 0;
@@ -576,7 +577,7 @@ public class MovingData extends ACheckData {
 	public double getHorizontalFreedom() {
 		// TODO: model/calculate it as accurate as possible...
 		double f = 0;
-		for (final Velocity vel : hVelActive){
+		for (final Velocity vel : hVelActive) {
 			f += vel.value;
 		}
 		return f;
@@ -593,12 +594,12 @@ public class MovingData extends ACheckData {
 	public double useHorizontalVelocity(final double amount) {
 		final Iterator<Velocity> it = hVelQueued.iterator();
 		double used = 0;
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			final Velocity vel = it.next();
 			used += vel.value;
 			hVelActive.add(vel);
 			it.remove();
-			if (used >= amount){
+			if (used >= amount) {
 				break;
 			}
 		}
@@ -612,10 +613,10 @@ public class MovingData extends ACheckData {
 	 * @return
 	 */
 	public boolean isSetBack(final Location loc) {
-		if (loc == null || setBack == null){
+		if (loc == null || setBack == null) {
 			return false;
 		}
-		if (!loc.getWorld().getName().equals(setBack.getWorld().getName())){
+		if (!loc.getWorld().getName().equals(setBack.getWorld().getName())) {
 			return false;
 		}
 		return loc.getX() == setBack.getX() && loc.getY() == setBack.getY() && loc.getZ() == setBack.getZ();
@@ -632,15 +633,15 @@ public class MovingData extends ACheckData {
 	 * Clean up data related to worlds with the given name (not case-sensitive).
 	 * @param worldName
 	 */
-	public void onWorldUnload(final String worldName){
+	public void onWorldUnload(final String worldName) {
 		// TODO: Unlink world references.
-		if (teleported != null && worldName.equalsIgnoreCase(teleported.getWorld().getName())){
+		if (teleported != null && worldName.equalsIgnoreCase(teleported.getWorld().getName())) {
 			resetTeleported();
 		}
-		if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())){
+		if (setBack != null && worldName.equalsIgnoreCase(setBack.getWorld().getName())) {
 			clearFlyData();
 		}
-		if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || morePacketsVehicleSetback != null && worldName.equalsIgnoreCase(morePacketsVehicleSetback.getWorld().getName())){
+		if (morePacketsSetback != null && worldName.equalsIgnoreCase(morePacketsSetback.getWorld().getName()) || morePacketsVehicleSetback != null && worldName.equalsIgnoreCase(morePacketsVehicleSetback.getWorld().getName())) {
 			clearMorePacketsData();
 			clearNoFallData(); // just in case.
 		}
@@ -650,7 +651,7 @@ public class MovingData extends ACheckData {
 		if (walkSpeed > this.walkSpeed) {
 			this.walkSpeed = walkSpeed;
 			this.speedTick = tick;
-		} else if (walkSpeed < this.walkSpeed){
+		} else if (walkSpeed < this.walkSpeed) {
 			if (tick - this.speedTick > speedGrace) {
 				this.walkSpeed = walkSpeed;
 				this.speedTick = tick;
@@ -664,7 +665,7 @@ public class MovingData extends ACheckData {
 		if (flySpeed > this.flySpeed) {
 			this.flySpeed = flySpeed;
 			this.speedTick = tick;
-		} else if (flySpeed < this.flySpeed){
+		} else if (flySpeed < this.flySpeed) {
 			if (tick - this.speedTick > speedGrace) {
 				this.flySpeed = flySpeed;
 				this.speedTick = tick;
