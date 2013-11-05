@@ -136,7 +136,9 @@ public class FightData extends ACheckData {
     public final ActionFrequency   speedBuckets;
 	public int                     speedShortTermCount;
 	public int                     speedShortTermTick;
-	                   
+        
+    // Last TNT exploded
+    public long                    lastTNTTick = 0;                   
 	
 	public FightData(final FightConfig cc){
 		speedBuckets = new ActionFrequency(cc.speedBuckets, cc.speedBucketDur);
