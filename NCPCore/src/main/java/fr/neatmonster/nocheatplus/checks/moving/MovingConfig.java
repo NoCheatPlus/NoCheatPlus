@@ -146,6 +146,8 @@ public class MovingConfig extends ACheckConfig {
 	public final boolean loadChunksOnJoin;
 	public final long sprintingGrace;
 	public final int speedGrace;
+	public final boolean vehicleEnforceLocation;
+	public final boolean vehiclePreventDestroyOwn;
 
     /**
      * Instantiates a new moving configuration.
@@ -220,6 +222,9 @@ public class MovingConfig extends ACheckConfig {
         loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);
         sprintingGrace = Math.max(0L, (long) (config.getDouble(ConfPaths.MOVING_SPRINTINGGRACE) * 1000.0)); // Config: seconds.
         speedGrace = Math.max(0, (int) Math.round(config.getDouble(ConfPaths.MOVING_SPEEDGRACE) * 20.0)); // Config: seconds
+        
+        vehicleEnforceLocation = config.getBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION);
+        vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN);
     }
     
 

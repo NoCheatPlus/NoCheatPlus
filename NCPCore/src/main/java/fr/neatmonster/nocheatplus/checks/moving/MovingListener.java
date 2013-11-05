@@ -694,7 +694,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				data.vehicleConsistency = MoveConsistency.getConsistency(from, to, vLoc);
 				// TODO: Consider TeleportUtil.forceMount or similar.
 				if (data.vehicleConsistency == MoveConsistency.INCONSISTENT) {
-					return vLoc;
+					if (MovingConfig.getConfig(player).vehicleEnforceLocation) {
+						return vLoc;
+					} else {
+						return null;
+					}
 				} else {
 					data.resetPositions(vLoc);
 					return null;
@@ -1325,19 +1329,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void onVehicleDestroyLowest(final VehicleDestroyEvent event) {
     	// Prevent destroying ones own vehicle.
     	final Entity attacker = event.getAttacker();
-    	if (!(attacker instanceof Player)) {
-    		return;
+    	if (attacker instanceof Player && attacker.equals(event.getVehicle().getPassenger())) {
+    		final Player player = (Player) attacker;
+        	if (survivalFly.isEnabled(player) || creativeFly.isEnabled(player)) {
+        		if (MovingConfig.getConfig(player).vehiclePreventDestroyOwn) {
+            		event.setCancelled(true);
+                	player.sendMessage(ChatColor.DARK_RED + "Destroying your own vehicle is disabled.");
+        		}
+        	}
     	}
-    	final Vehicle vehicle = event.getVehicle();
-    	if (!attacker.equals(vehicle.getPassenger())) {
-    		return;
-    	}
-    	final Player player = (Player) attacker;
-    	if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) {
-    		return;
-    	}
-    	event.setCancelled(true);
-    	player.sendMessage(ChatColor.DARK_RED + "Destroying your own vehicle is disabled.");
     }
     
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

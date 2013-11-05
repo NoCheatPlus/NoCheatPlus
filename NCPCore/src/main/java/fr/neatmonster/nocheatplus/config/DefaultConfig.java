@@ -469,7 +469,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 500);
         
-        // Special.
+        // Vehicles.
+        set(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN, true);
+        set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, true);
+        
+        // Velocity.
         set(ConfPaths.MOVING_VELOCITY_GRACETICKS, 20);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER, 80);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS, 140);

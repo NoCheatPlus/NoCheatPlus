@@ -641,6 +641,10 @@ public abstract class ConfPaths {
 	public static final String  MOVING_SPRINTINGGRACE					 = MOVING + "sprintinggrace";
 	public static final String  MOVING_SPEEDGRACE					 	 = MOVING + "speedgrace";
 	
+	private static final String MOVING_VEHICLES							 = MOVING + "vehicles.";
+	public static final String  MOVING_VEHICLES_ENFORCELOCATION			 = MOVING_VEHICLES + "enforcelocation";
+	public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN		 = MOVING_VEHICLES + "preventdestroyown";
+	
     /*
      *  dP"8   d8          ,e,                        
      * C8b Y  d88   888,8,  "  888 8e   e88 888  dP"Y 
