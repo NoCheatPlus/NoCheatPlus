@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -92,9 +93,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      *            The EntityDamageByEntityEvent
      * @return 
      */
-    private boolean handleNormalDamage(final Player player, final Entity damaged, final double damage, final int tick) {
+    private boolean handleNormalDamage(final Player player, final Entity damaged, final double damage, final int tick, final FightData data) {
         final FightConfig cc = FightConfig.getConfig(player);
-        final FightData data = FightData.getData(player);
         
         // Hotfix attempt for enchanted books.
         // TODO: maybe a generaluzed version for the future...
@@ -306,9 +306,10 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
             final Entity damager = e.getDamager();
+            final int tick = TickTask.getTick();
         	if (damagedPlayer != null && !damagedIsDead){
         	    // TODO: check once more when to set this (!) in terms of order.
-        		FightData.getData(damagedPlayer).damageTakenByEntityTick = TickTask.getTick();
+        		FightData.getData(damagedPlayer).damageTakenByEntityTick = tick;
                 if (hasThorns(damagedPlayer)){
             		// TODO: Cleanup here.
                 	// Remember the id of the attacker to allow counter damage.
@@ -318,28 +319,35 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 	damagedData.thornsId = Integer.MIN_VALUE;
                 }
         	}
-            if (damager instanceof Player){
-                final Player player = (Player) damager;
-                final DamageCause damageCause = event.getCause();
+        	final DamageCause damageCause = event.getCause();
+        	final Player player = damager instanceof Player ? (Player) damager : null;
+        	Player attacker = player;
+        	if (damager instanceof TNTPrimed) {
+        		final Entity source = ((TNTPrimed) damager).getSource();
+        		if (source instanceof Player) {
+        			attacker = (Player) source;
+        		}
+        	}
+        	if (attacker != null && (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION)) {
+				final FightData data = FightData.getData(attacker);
+            	data.lastExplosionEntityId = damaged.getEntityId();
+    			data.lastExplosionDamageTick = tick;
+    			return;
+    		}
+            if (player != null){
                 final double damage = BridgeHealth.getDamage(e);
-                final int tick = TickTask.getTick();
-                if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
-                	if (damagedData != null) {
-                    	damagedData.lastExplosionDamagePlayer = player.getName();
-            			damagedData.lastExplosionDamageTick = tick;
-            			damagedData.lastExplosionDamage = BridgeHealth.getDamage(event);
-                	}
-        		} else if (e.getCause() == DamageCause.ENTITY_ATTACK){
-        			if (damagedData != null) {
-        				// TODO: Might/should skip the damage comparison, though checking on lowest priority.
-                    	if (damage == damagedData.lastExplosionDamage && player.getName().equals(damagedData.lastExplosionDamagePlayer) && tick == damagedData.lastExplosionDamageTick) {
-                    		damagedData.lastExplosionDamage = Double.MAX_VALUE;
-                    		damagedData.lastExplosionDamageTick = -1;
-                    		damagedData.lastExplosionDamagePlayer = null;
-                    		return;
-                    	}
-        			}
-                	if (handleNormalDamage(player, damaged, damage, tick)){
+                final FightData data = FightData.getData(player);
+                // NOTE: Pigs don't have data.
+	        	if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
+                	data.lastExplosionEntityId = damaged.getEntityId();
+        			data.lastExplosionDamageTick = tick;
+	    		}
+                if (damageCause == DamageCause.ENTITY_ATTACK){
+    				// TODO: Might/should skip the damage comparison, though checking on lowest priority.
+                	if (damaged.getEntityId() == data.lastExplosionEntityId && tick == data.lastExplosionDamageTick) {
+                		data.lastExplosionDamageTick = -1;
+                		data.lastExplosionEntityId = Integer.MAX_VALUE;
+                	} else if (handleNormalDamage(player, damaged, damage, tick, data)){
                 		e.setCancelled(true);
                 	}
                 }

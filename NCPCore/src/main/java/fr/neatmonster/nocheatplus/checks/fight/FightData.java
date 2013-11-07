@@ -138,12 +138,10 @@ public class FightData extends ACheckData {
 	public int                     speedShortTermTick;
 	
 	// TNT workaround: Allow ENTITY_ATTACK if these attributes match.
-	/** Amount of damage dealt by the last explosion. */
-	public double					lastExplosionDamage = Double.MAX_VALUE;
 	/** Tick the last explosion damage was dealt at. */
-	public int						lastExplosionDamageTick   = -1 ;
-	/** Last explosion damage causing player (damager). */
-	public String					lastExplosionDamagePlayer = null;
+	public int						lastExplosionDamageTick	= -1 ;
+	/** Last explosion damaged entity (id). */
+	public int						lastExplosionEntityId	= Integer.MAX_VALUE;
 	                   
 	
 	public FightData(final FightConfig cc){
