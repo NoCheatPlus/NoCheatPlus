@@ -92,7 +92,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      *            The EntityDamageByEntityEvent
      * @return 
      */
-    private boolean handleNormalDamage(final Player player, final Entity damaged, double damage) {
+    private boolean handleNormalDamage(final Player player, final Entity damaged, final double damage, final int tick) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
         
@@ -105,7 +105,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         boolean cancelled = false;
         
         final String worldName = player.getWorld().getName();
-        final int tick = TickTask.getTick();
         final long now = System.currentTimeMillis();
         final boolean worldChanged = !worldName.equals(data.lastWorld);
         
@@ -321,9 +320,26 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	}
             if (damager instanceof Player){
                 final Player player = (Player) damager;
-                if (e.getCause() == DamageCause.ENTITY_ATTACK){
-                	
-                	if (handleNormalDamage(player, damaged, BridgeHealth.getDamage(e))){
+                final DamageCause damageCause = event.getCause();
+                final double damage = BridgeHealth.getDamage(e);
+                final int tick = TickTask.getTick();
+                if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
+                	if (damagedData != null) {
+                    	damagedData.lastExplosionDamagePlayer = player.getName();
+            			damagedData.lastExplosionDamageTick = tick;
+            			damagedData.lastExplosionDamage = BridgeHealth.getDamage(event);
+                	}
+        		} else if (e.getCause() == DamageCause.ENTITY_ATTACK){
+        			if (damagedData != null) {
+        				// TODO: Might/should skip the damage comparison, though checking on lowest priority.
+                    	if (damage == damagedData.lastExplosionDamage && player.getName().equals(damagedData.lastExplosionDamagePlayer) && tick == damagedData.lastExplosionDamageTick) {
+                    		damagedData.lastExplosionDamage = Double.MAX_VALUE;
+                    		damagedData.lastExplosionDamageTick = -1;
+                    		damagedData.lastExplosionDamagePlayer = null;
+                    		return;
+                    	}
+        			}
+                	if (handleNormalDamage(player, damaged, damage, tick)){
                 		e.setCancelled(true);
                 	}
                 }
