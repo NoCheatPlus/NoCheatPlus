@@ -146,7 +146,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
         
         if (cc.cancelDead){
-        	if (damaged.isDead()) cancelled = true;
+        	if (damaged.isDead()) {
+        		cancelled = true;
+        	}
         	// Only allow damaging others if taken damage this tick.
             if (player.isDead() && data.damageTakenByEntityTick != TickTask.getTick()){
             	cancelled = true;
@@ -302,6 +304,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             	damagedData.fastHealRefTime = System.currentTimeMillis();
             }
         }
+//    	System.out.println(event.getCause());
     	// Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
@@ -329,6 +332,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         		}
         	}
         	if (attacker != null && (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION)) {
+        		// NOTE: Pigs don't have data.
 				final FightData data = FightData.getData(attacker);
             	data.lastExplosionEntityId = damaged.getEntityId();
     			data.lastExplosionDamageTick = tick;
@@ -337,11 +341,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (player != null){
                 final double damage = BridgeHealth.getDamage(e);
                 final FightData data = FightData.getData(player);
-                // NOTE: Pigs don't have data.
-	        	if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
-                	data.lastExplosionEntityId = damaged.getEntityId();
-        			data.lastExplosionDamageTick = tick;
-	    		}
                 if (damageCause == DamageCause.ENTITY_ATTACK){
     				// TODO: Might/should skip the damage comparison, though checking on lowest priority.
                 	if (damaged.getEntityId() == data.lastExplosionEntityId && tick == data.lastExplosionDamageTick) {
