@@ -742,10 +742,10 @@ public class BlockProperties {
 				Material.AIR, Material.ENDER_PORTAL, Material.ENDER_PORTAL_FRAME,
 				Material.PORTAL, Material.LAVA, Material.WATER, Material.BEDROCK,
 				Material.STATIONARY_LAVA, Material.STATIONARY_WATER,
-				Material.LOCKED_CHEST, 
 		}){
 			blocks[mat.getId()] = indestructibleType; 
 		}
+		blocks[95] = indestructibleType; // Locked chest (prevent crash with 1.7).
 	}
 	
 	public static void dumpBlocks(boolean all) {
