@@ -340,6 +340,9 @@ public class BlockProperties {
     /** All rail types a minecart can move on. */
     public static final long F_RAILS		= 0x10000;
     
+    /** ICE */
+    public static final long F_ICE 			= 0x20000;
+    
     /**
      * Map flag to names.
      */
@@ -538,6 +541,9 @@ public class BlockProperties {
         }){
             blockFlags[mat.getId()] |= F_XZ100;
         }
+        
+	    // ICE
+        blockFlags[Material.ICE.getId()] |= F_ICE;
         
 		// Not ground (!).
 		for (final Material mat : new Material[]{
@@ -1257,6 +1263,10 @@ public class BlockProperties {
 
 	public static final boolean isLiquid(final int id) {
 		return (blockFlags[id] & F_LIQUID) != 0;
+	}
+	
+	public static final boolean isIce(final int id) {
+		return (blockFlags[id] & F_ICE) != 0;
 	}
 	
 	/**

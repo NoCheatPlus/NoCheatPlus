@@ -167,6 +167,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		// TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
 		final Set<Integer> fullBlocks = new HashSet<Integer>();
 		for (final Material mat : new Material[]{
+				// TODO: Ice !? / Packed ice !?
 				Material.GLASS, Material.GLOWSTONE, Material.ICE, Material.LEAVES,
 				Material.COMMAND, Material.BEACON,
 				Material.PISTON_BASE,
