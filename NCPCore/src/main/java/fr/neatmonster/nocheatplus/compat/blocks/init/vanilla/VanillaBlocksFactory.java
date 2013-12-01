@@ -16,6 +16,7 @@ public class VanillaBlocksFactory implements BlockPropertiesSetup{
 		try{
 			setups.add(new BlocksMC1_5());
 			setups.add(new BlocksMC1_6_1());
+			setups.add(new BlocksMC1_7_2());
 		}
 		catch(Throwable t){}
 		for (final BlockPropertiesSetup setup : setups){
