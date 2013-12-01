@@ -138,6 +138,7 @@ public class FightData extends ACheckData {
 	public int                     speedShortTermTick;
 	
 	// TNT workaround: Allow ENTITY_ATTACK if these attributes match.
+	// Discussion at: https://github.com/NoCheatPlus/NoCheatPlus/pull/17 (@Iceee)
 	/** Tick the last explosion damage was dealt at. */
 	public int						lastExplosionDamageTick	= -1 ;
 	/** Last explosion damaged entity (id). */
