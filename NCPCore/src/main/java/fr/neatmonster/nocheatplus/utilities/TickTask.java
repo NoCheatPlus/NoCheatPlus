@@ -480,7 +480,7 @@ public class TickTask implements Runnable {
 		
 		// Time running backwards check (not only players can!).
 		if (timeLast > time) {
-			LogUtil.logSevere("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
+			LogUtil.logWarning("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
 			DataManager.clearData(CheckType.ALL);
 			lastDur = 50;
 			for (int i = 0; i < spikeDurations.length; i++){
