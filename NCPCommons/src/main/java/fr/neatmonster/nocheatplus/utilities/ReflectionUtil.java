@@ -34,6 +34,7 @@ public class ReflectionUtil {
 	 */
 	public static void checkMethodReturnTypesNoArgs(Class<?> objClass, String[] methodNames, Class<?> returnType){
 		// TODO: Add check: boolean isStatic.
+		// TODO: Overloading !?
 		try {
 			for (String methodName : methodNames){
 				Method m = objClass.getMethod(methodName);
