@@ -271,7 +271,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 			}
 		}
 		else if (cc.chatWarningCheck && time - data.chatWarningTime > cc.chatWarningTimeout && (100f * accumulated / cc.textFreqNormLevel > cc.chatWarningLevel || 100f * shortTermAccumulated / cc.textFreqShortTermLevel > cc.chatWarningLevel)){
-		    player.sendMessage(ColorUtil.replaceColors(cc.chatWarningMessage));
+			NCPAPIProvider.getNoCheatPlusAPI().sendMessageOnTick(player.getName(), ColorUtil.replaceColors(cc.chatWarningMessage));
             data.chatWarningTime = time;
 		}
 		else {

@@ -36,10 +36,12 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
+import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
+import fr.neatmonster.nocheatplus.components.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -58,7 +60,8 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author mc_dev
  *
  */
-public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker{
+@SetupOrder(priority = -80)
+public class DataManager implements Listener, INotifyReload, INeedConfig, ComponentRegistry<IRemoveData>, ComponentWithName, ConsistencyChecker, DisableListener{
 	
 	protected static DataManager instance = null;
 	
@@ -416,6 +419,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	/**
 	 * Cleanup method, removes all data and config, but does not call ConfigManager.cleanup.
 	 */
+	@Override
 	public void onDisable() {
 		clearData(CheckType.ALL);
 		iRemoveData.clear();

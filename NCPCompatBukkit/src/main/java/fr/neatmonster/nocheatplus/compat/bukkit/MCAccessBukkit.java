@@ -4,6 +4,7 @@ package fr.neatmonster.nocheatplus.compat.bukkit;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
@@ -12,17 +13,18 @@ import org.bukkit.entity.ComplexLivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
+import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	
@@ -41,7 +43,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	public String getMCVersion() {
 		// Bukkit API.
 		// TODO: maybe output something else.
-		return "1.4.6|1.4.7|1.5.0|1.5.1|1.5.2|?";
+		return "1.4.6|1.4.7|1.5.x|1.6.1|1.6.2|?";
 	}
 
 	@Override
@@ -51,7 +53,12 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 
 	@Override
 	public CommandMap getCommandMap() {
-		return null;
+		try{
+			return (CommandMap) ReflectionUtil.invokeMethodNoArgs(Bukkit.getServer(), "getCommandMap");
+		} catch (Throwable t){
+			// Nasty.
+			return null;
+		}
 	}
 
 	@Override
@@ -90,12 +97,6 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	}
 
 	@Override
-	public boolean Block_i(final int id) {
-		// TODO: This is inaccurate (would be something like "can suffocate"), however it is used for piling upwards and might about do.
-		return BlockProperties.isGround(id) || BlockProperties.isSolid(id);
-	}
-
-	@Override
 	public double getWidth(final Entity entity) {
 		// TODO
 		return 0.6f;
@@ -129,15 +130,17 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 
 	@Override
 	public void setInvulnerableTicks(final Player player, final int ticks) {
-		// TODO: Ahhh...
-		player.setLastDamageCause(new EntityDamageEvent(player, DamageCause.CUSTOM, 500));
+		// TODO: Not really.
+		player.setLastDamageCause(BridgeHealth.getEntityDamageEvent(player, DamageCause.CUSTOM, 500.0));
 		player.setNoDamageTicks(ticks);
 	}
 
 	@Override
-	public void dealFallDamage(final Player player, final int damage) {
-		// TODO: account for armor, other.
-		player.damage(damage);
+	public void dealFallDamage(final Player player, final double damage) {
+		// TODO: Document in knowledge base.
+		// TODO: Account for armor, other.
+		// TODO: use setLastDamageCause here ?
+		BridgeHealth.damage(player, damage);
 	}
 
 	@Override
@@ -148,14 +151,15 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	@Override
 	public boolean shouldBeZombie(final Player player) {
 		// Not sure :) ...
-		return player.getHealth() <= 0 && !player.isDead();
+		return BridgeHealth.getHealth(player) <= 0.0 && !player.isDead();
 	}
 
 	@Override
 	public void setDead(final Player player, final int deathTicks) {
 		// TODO: Test / kick ? ...
-		player.setHealth(0);
-		player.damage(1);
+		BridgeHealth.setHealth(player, 0.0);
+		// TODO: Might try stuff like setNoDamageTicks.
+		BridgeHealth.damage(player, 1.0);
 	}
 
 	@Override
@@ -163,6 +167,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		// TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
 		final Set<Integer> fullBlocks = new HashSet<Integer>();
 		for (final Material mat : new Material[]{
+				// TODO: Ice !? / Packed ice !?
 				Material.GLASS, Material.GLOWSTONE, Material.ICE, Material.LEAVES,
 				Material.COMMAND, Material.BEACON,
 				Material.PISTON_BASE,
@@ -205,6 +210,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 			return mat.hasGravity();
 		}
 		catch(Throwable t){
+			// Backwards compatibility.
 			switch(mat){
 			case SAND:
 			case GRAVEL:

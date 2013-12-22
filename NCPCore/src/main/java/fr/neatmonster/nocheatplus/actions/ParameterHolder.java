@@ -15,7 +15,7 @@ public interface ParameterHolder extends ActionData{
 	public String getParameter(final ParameterName parameterName);
 	
 	/**
-	 * This might not set any parameters, if needsParameters() returns false.
+	 * This will set the parameter, even if needsParameters() returns false.
 	 * @param parameterName
 	 * @param value
 	 */
@@ -23,7 +23,13 @@ public interface ParameterHolder extends ActionData{
 	
     /**
      * Check if any of the actions needs parameters.
-     * @return If true, actions are likely to contian command or logging actions.
+     * @return If true, actions are likely to contain command or logging actions.
      */
-    boolean needsParameters();
+    public boolean needsParameters();
+    
+    /**
+     * Check if any parameters are set (in case of special settings NCP might add parameters for debugging purposes.).
+     * @return
+     */
+    public boolean hasParameters();
 }

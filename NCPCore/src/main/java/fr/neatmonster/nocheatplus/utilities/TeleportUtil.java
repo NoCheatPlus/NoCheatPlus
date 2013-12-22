@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.utilities;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Vehicle;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 public class TeleportUtil {
@@ -14,8 +13,9 @@ public class TeleportUtil {
 	 * @param player
 	 * @param location
 	 */
-	public static void teleport(final Vehicle vehicle, final Player player, final Location location, final boolean debug) {
+	public static void teleport(final Entity vehicle, final Player player, final Location location, final boolean debug) {
 		// TODO: This handling could conflict with WorldGuard region flags.
+		// TODO: Account for nested passengers and inconsistencies.
 		final Entity passenger = vehicle.getPassenger();
 		final boolean vehicleTeleported;
 		final boolean playerIsPassenger = player.equals(passenger);
@@ -35,6 +35,20 @@ public class TeleportUtil {
 		}
 		if (debug){
 			System.out.println(player.getName() + " vehicle set back: " + location);
+		}
+	}
+	
+	/**
+	 * Force mounting the vehicle including teleportation.
+	 * @param passenger
+	 * @param vehicle
+	 */
+	public static void forceMount(Entity passenger, Entity vehicle) {
+		if (vehicle.getPassenger() != null) {
+			vehicle.eject();
+		}
+		if (passenger.teleport(vehicle) && !vehicle.isDead() && vehicle.isValid()) {
+			vehicle.setPassenger(passenger);
 		}
 	}
 

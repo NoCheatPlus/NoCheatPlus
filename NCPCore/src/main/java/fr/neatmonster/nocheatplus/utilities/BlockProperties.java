@@ -22,9 +22,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
-import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.BlocksMC1_5;
-import fr.neatmonster.nocheatplus.config.RawConfigFile;
+import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
@@ -32,8 +32,8 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  * Properties of blocks.
  * 
  * Likely to be added:
- * - reading properties from files.
- * - reading the default properties from a file too.
+ * - reading (all) properties from files.
+ * - reading (all) the default properties from a file too.
  *
  */
 public class BlockProperties {
@@ -340,6 +340,9 @@ public class BlockProperties {
     /** All rail types a minecart can move on. */
     public static final long F_RAILS		= 0x10000;
     
+    /** ICE */
+    public static final long F_ICE 			= 0x20000;
+    
     /**
      * Map flag to names.
      */
@@ -384,24 +387,19 @@ public class BlockProperties {
 		    initBlocks(mcAccess, worldConfigProvider);
 		    // Extra hand picked setups.
 		    try{
-		    	BlockPropertiesSetup bpSetup = new BlocksMC1_5();
-		    	try{
-		    		bpSetup.setupBlockProperties(worldConfigProvider);
-		    		LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.5 blocks.");
-		    	}
-		    	catch(Throwable t){
-			    	LogUtil.logSevere("[NoCheatPlus] BlocksMC1_5.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
-			    	LogUtil.logSevere(t);
-			    }
+		    	new VanillaBlocksFactory().setupBlockProperties(worldConfigProvider);
 		    }
-		    catch(Throwable t){}
+		    catch(Throwable t){
+		    	LogUtil.logSevere("[NoCheatPlus] Could not initialize vanilla blocks: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+		    	LogUtil.logSevere(t);
+		    }
 		    // Allow mcAccess to setup block properties.
 		    if (mcAccess instanceof BlockPropertiesSetup){
 			    try{
 			    	((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
 			    }
 			    catch(Throwable t){
-			    	LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties could not execute properly: " + t.getClass().getSimpleName());
+			    	LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
 			    	LogUtil.logSevere(t);
 			    }
 		    }
@@ -543,6 +541,9 @@ public class BlockProperties {
         }){
             blockFlags[mat.getId()] |= F_XZ100;
         }
+        
+	    // ICE
+        blockFlags[Material.ICE.getId()] |= F_ICE;
         
 		// Not ground (!).
 		for (final Material mat : new Material[]{
@@ -747,10 +748,10 @@ public class BlockProperties {
 				Material.AIR, Material.ENDER_PORTAL, Material.ENDER_PORTAL_FRAME,
 				Material.PORTAL, Material.LAVA, Material.WATER, Material.BEDROCK,
 				Material.STATIONARY_LAVA, Material.STATIONARY_WATER,
-				Material.LOCKED_CHEST, 
 		}){
 			blocks[mat.getId()] = indestructibleType; 
 		}
+		blocks[95] = indestructibleType; // Locked chest (prevent crash with 1.7).
 	}
 	
 	public static void dumpBlocks(boolean all) {
@@ -1262,6 +1263,10 @@ public class BlockProperties {
 
 	public static final boolean isLiquid(final int id) {
 		return (blockFlags[id] & F_LIQUID) != 0;
+	}
+	
+	public static final boolean isIce(final int id) {
+		return (blockFlags[id] & F_ICE) != 0;
 	}
 	
 	/**
@@ -2376,7 +2381,7 @@ public class BlockProperties {
 		
 		// Simplified check: Only collision of bounds of the full move is checked.
 		final double minX, maxX;
-		if (dX < 0){
+		if (dX < 0.0){
 			minX = dX * dT + oX + blockX;
 			maxX = oX + blockX;
 		}
@@ -2385,7 +2390,7 @@ public class BlockProperties {
 			minX = oX + blockX;
 		}
 		final double minY, maxY;
-		if (dY < 0){
+		if (dY < 0.0){
 			minY = dY * dT + oY + blockY;
 			maxY = oY + blockY;
 		}
@@ -2394,7 +2399,7 @@ public class BlockProperties {
 			minY = oY + blockY;
 		}
 		final double minZ, maxZ;
-		if (dX < 0){
+		if (dZ < 0.0){
 			minZ = dZ * dT + oZ + blockZ;
 			maxZ = oZ + blockZ;
 		}

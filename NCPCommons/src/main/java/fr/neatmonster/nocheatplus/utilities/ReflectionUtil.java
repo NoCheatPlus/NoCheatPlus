@@ -5,10 +5,10 @@ import java.lang.reflect.Method;
 public class ReflectionUtil {
 	
 	/**
-	 * Convenience method to check if members exist and fail if not.
+	 * Convenience method to check if members exist and fail if not. This checks getField(...) == null.
 	 * @param prefix
 	 * @param specs
-	 * @throws RuntimeException
+	 * @throws RuntimeException If any member is not present.
 	 */
 	public static void checkMembers(String prefix, String[]... specs){
 		try {
@@ -27,11 +27,38 @@ public class ReflectionUtil {
 	}
 	
 	/**
-	 * Dirty method. Does try.catch and return null for method invokation.
+	 * Check for the given names if the method returns the desired type of result (exact check).
+	 * @param methodNames
+	 * @param returnType
+	 * @throws RuntimeException If one method is not existing or not matching return type or has arguments.
+	 */
+	public static void checkMethodReturnTypesNoArgs(Class<?> objClass, String[] methodNames, Class<?> returnType){
+		// TODO: Add check: boolean isStatic.
+		// TODO: Overloading !?
+		try {
+			for (String methodName : methodNames){
+				Method m = objClass.getMethod(methodName);
+				if (m.getParameterTypes().length != 0){
+					throw new RuntimeException("Expect method without arguments for " + objClass.getName() + "." + methodName);
+				}
+				if (m.getReturnType() != returnType){
+					throw new RuntimeException("Wrong return type for: " + objClass.getName() + "." + methodName);
+				}
+			}
+		} catch (SecurityException e) {
+			// Let this one pass.
+			//throw new RuntimeException(e);
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
+		}
+	}
+	
+	/**
+	 * Dirty method to call a declared method with a generic parameter type. Does try+catch for method invocation and should not throw anything for the normal case. Purpose for this is generic factory registration, having methods with type Object alongside methods with more specialized types.
 	 * @param obj
 	 * @param methodName
-	 * @param arg
-	 * @return
+	 * @param arg Argument or invoke the method with.
+	 * @return null in case of errors (can not be distinguished).
 	 */
 	public static Object invokeGenericMethodOneArg(final Object obj, final String methodName, final Object arg){
 		// TODO: Isn't there a one-line-call for this ??
@@ -73,6 +100,110 @@ public class ReflectionUtil {
 			// TODO: Throw something !?
 			return null;
 		}
+	}
+	
+	/**
+	 * Invoke a method without arguments, get the method matching the return types best, i.e. first type is preferred. At present a result is returned, even if the return type does not match at all.
+	 * @param obj
+	 * @param methodName
+	 * @param returnTypePreference Most preferred return type first, might return null, might return a method with a completely different return type, comparison with ==, no isAssignableForm. TODO: really ?
+	 * @return
+	 */
+	public static Object invokeMethodNoArgs(final Object obj, final String methodName, final Class<?> ...  returnTypePreference){
+		// TODO: Isn't there a one-line-call for this ??
+		final Class<?> objClass = obj.getClass();
+		// Try to get it directly first.
+		Method methodFound = getMethodNoArgs(objClass, methodName, returnTypePreference);
+		if (methodFound == null){
+			// Fall-back to seek it.
+			methodFound = seekMethodNoArgs(objClass, methodName, returnTypePreference);
+		}
+		// Invoke if found.
+		if (methodFound != null){
+			try{
+				final Object res = methodFound.invoke(obj);
+				return res;
+			}
+			catch (Throwable t){
+				// TODO: Throw something !?
+				return null;
+			}
+		}
+		else{
+			// TODO: Throw something !?
+			return null;
+		}
+	}
+
+	/**
+	 * Direct getMethod attempt.
+	 * @param objClass
+	 * @param methodName
+	 * @param returnTypePreference
+	 * @return
+	 */
+	public static Method getMethodNoArgs(final Class<?> objClass, final String methodName, final Class<?>[] returnTypePreference) {
+		try {
+			final Method methodFound = objClass.getMethod(methodName);
+			if (methodFound != null) {
+				final Class<?> returnType = methodFound.getReturnType();
+				for (int i = 0; i < returnTypePreference.length; i++){
+					if (returnType == returnTypePreference[i]){
+						return methodFound;
+					}
+				}
+			}
+		} catch (SecurityException e) {
+		} catch (NoSuchMethodException e) {
+		}
+		return null;
+	}
+	
+	/**
+	 * Iterate over all methods, attempt to return best matching return type (earliest in array).
+	 * @param objClass
+	 * @param methodName
+	 * @param returnTypePreference
+	 * @return
+	 */
+	public static Method seekMethodNoArgs(final Class<?> objClass, final String methodName, final Class<?>[] returnTypePreference) {
+		// Collect methods that might work.
+		Method methodFound = null;
+		int returnTypeIndex = returnTypePreference.length; // This can be 0 for no preferences given.
+		// TODO: Does there exist an optimized method for getting all by name?
+		for (final Method method : objClass.getMethods()){
+			if (method.getName().equals(methodName)){
+				final Class<?>[] parameterTypes = method.getParameterTypes();
+				if (parameterTypes.length == 0){
+					// Override the found method if none found yet or if the return type matches the preferred policy.
+					final Class<?> returnType = method.getReturnType();
+					if (methodFound == null){
+						methodFound = method;
+						for (int i = 0; i < returnTypeIndex; i++){
+							if (returnTypePreference[i] == returnType){
+								returnTypeIndex = i;
+								break;
+							}
+						}
+					}
+					else{
+						// Check if the return type is preferred over previously found ones.
+						for (int i = 0; i < returnTypeIndex; i++){
+							if (returnTypePreference[i] == returnType){
+								methodFound = method;
+								returnTypeIndex = i;
+								break;
+							}
+						}
+					}
+					if (returnTypeIndex == 0){
+						// "Quick" return.
+						break;
+					}
+				}
+			}
+		}
+		return methodFound;
 	}
 	
 }

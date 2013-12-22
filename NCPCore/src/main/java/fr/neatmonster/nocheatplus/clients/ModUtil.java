@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.clients.motd.ReiMOTD;
 import fr.neatmonster.nocheatplus.clients.motd.SmartMovingMOTD;
 import fr.neatmonster.nocheatplus.clients.motd.ZombeMOTD;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 
 /**
@@ -31,12 +32,16 @@ public class ModUtil {
 	 * @param player
 	 */
 	public static void motdOnJoin(final Player player) {
-		
+		final ConfigFile config = ConfigManager.getConfigFile(); 
+		if (!config.getBoolean(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE)){
+			// No message is to be sent.
+			return;
+		}
 		// TODO: Somebody test this all !
 	    // TODO: add feature to check world specific (!).
 	
 	    // Check if we allow all the client mods.
-	    final boolean allowAll = ConfigManager.getConfigFile().getBoolean(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS);
+	    final boolean allowAll = config.getBoolean(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL);
 	    
 	    String message = "";
 	    for (int i = 0; i < motdS.length; i++){

@@ -268,6 +268,26 @@ public class PlayerLocation {
 	public boolean isSamePos(final Location loc) {
 		return x == loc.getX() && z == loc.getZ() && y == loc.getY();
 	}
+	
+	/**
+	 * Manhattan distance, see Trigutil.
+	 * @param other
+	 * @return
+	 */
+	public int manhattan(final PlayerLocation other){
+		// TODO: Consider using direct field access from other methods as well.
+		return TrigUtil.manhattan(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
+	}
+	
+	/**
+	 * Maximum block distance comparing dx, dy, dz.
+	 * @param other
+	 * @return
+	 */
+	public int maxBlockDist(final PlayerLocation other){
+		// TODO: Consider using direct field access from other methods as well.
+		return TrigUtil.maxDistance(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
+	}
 
 	/**
 	 * Checks if the player is above stairs.
@@ -352,8 +372,19 @@ public class PlayerLocation {
 		if (onIce == null) {
 			// TODO: Use a box here too ?
 			// TODO: check if player is really sneaking (refactor from survivalfly to static access in Combined ?)!
-			if (player.isSneaking() || player.isBlocking()) onIce = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ) == Material.ICE.getId();
-			else onIce = getTypeIdBelow().intValue() == Material.ICE.getId();
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_ICE) == 0) {
+				// TODO: check onGroundMinY !?
+				onIce = false;
+			} else {
+				final int id;
+				if (player.isSneaking() || player.isBlocking()) {
+					id = getTypeId(blockX, Location.locToBlock(minY - 0.1D), blockZ);
+				}
+				else {
+					id = getTypeIdBelow().intValue();
+				}
+				onIce = BlockProperties.isIce(id);
+			}
 		}
 		return onIce;
 	}

@@ -97,6 +97,7 @@ public class Direction extends Check {
         if (data.directionLastViolationTime + cc.directionPenalty > System.currentTimeMillis()) {
             // A safeguard to avoid people getting stuck in penalty time indefinitely in case the system time of the
             // server gets changed.
+        	// TODO: Change this to a general attack penalty time.
             if (data.directionLastViolationTime > System.currentTimeMillis())
                 data.directionLastViolationTime = 0;
 

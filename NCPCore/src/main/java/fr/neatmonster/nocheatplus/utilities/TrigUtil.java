@@ -192,9 +192,37 @@ public class TrigUtil {
 	 *            the location1
 	 * @param location2
 	 *            the location2
-	 * @return the double
+	 * @return The distance between the locations.
 	 */
 	public static final double distance(final Location location1, final Location location2)
+	{
+		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	/**
+	 * 3D-distance of two locations.
+	 * 
+	 * @param location1
+	 *            the location1
+	 * @param location2
+	 *            the location2
+	 * @return The distance between the locations.
+	 */
+	public static final double distance(final PlayerLocation location1, final Location location2)
+	{
+		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	/**
+	 * 3D-distance of two locations.
+	 * 
+	 * @param location1
+	 *            the location1
+	 * @param location2
+	 *            the location2
+	 * @return The distance between the locations.
+	 */
+	public static final double distance(final PlayerLocation location1, final PlayerLocation location2)
 	{
 		return distance(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
 	}
@@ -225,6 +253,28 @@ public class TrigUtil {
 		final double dy = Math.abs(y1 - y2);
 		final double dz = Math.abs(z1 - z2);
 		return Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+	
+	public static final double distanceSquared(final Location location1, final Location location2)
+	{
+		return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	public static final double distanceSquared(final PlayerLocation location1, final PlayerLocation location2)
+	{
+		return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	public static final double distanceSquared(final PlayerLocation location1, final Location location2)
+	{
+		return distanceSquared(location1.getX(), location1.getY(), location1.getZ(), location2.getX(), location2.getY(), location2.getZ());
+	}
+	
+	public static final double distanceSquared(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
+		final double dx = Math.abs(x1 - x2);
+		final double dy = Math.abs(y1 - y2);
+		final double dz = Math.abs(z1 - z2);
+		return dx * dx + dy * dy + dz * dz;
 	}
 
 	/**
@@ -330,6 +380,48 @@ public class TrigUtil {
 		if (yawDiff < -180f) yawDiff += 360f;
 		else if (yawDiff > 180f) yawDiff -= 360f;
 		return yawDiff;
+	}
+	
+	/**
+	 * Manhattan distance (steps along the sides of an orthogonal grid).
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 * @param x2
+	 * @param y2
+	 * @param z2
+	 * @return
+	 */
+	public static int manhattan(final int x1, final int y1, final int  z1, final int x2, final int y2, final int z2){
+		return Math.abs(x1 - x2) + Math.abs(y1 - y2) + Math.abs(z1 - z2);
+	}
+	
+	/**
+	 * Maximum distance comparing dx, dy, dz.
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 * @param x2
+	 * @param y2
+	 * @param z2
+	 * @return
+	 */
+	public static int maxDistance(final int x1, final int y1, final int  z1, final int x2, final int y2, final int z2){
+		return Math.max(Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)), Math.abs(z1 - z2));
+	}
+
+	/**
+	 * Maximum distance comparing dx, dy, dz.
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 * @param x2
+	 * @param y2
+	 * @param z2
+	 * @return
+	 */
+	public static double maxDistance(final double x1, final double y1, final double  z1, final double x2, final double y2, final double z2){
+		return Math.max(Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)), Math.abs(z1 - z2));
 	}
 
 }

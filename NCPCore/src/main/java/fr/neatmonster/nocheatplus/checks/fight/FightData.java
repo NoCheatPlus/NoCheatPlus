@@ -113,7 +113,7 @@ public class FightData extends ACheckData {
     
     // New god mode check [in progress].
 	public int					   godModeHealthDecreaseTick 	= 0;
-	public int                     godModeHealth       			= 0;
+	public double                  godModeHealth       			= 0.0;
     public int                     lastDamageTick 				= 0;
     public int                     lastNoDamageTicks 			= 0;
     /** Accumulator. */
@@ -136,6 +136,13 @@ public class FightData extends ACheckData {
     public final ActionFrequency   speedBuckets;
 	public int                     speedShortTermCount;
 	public int                     speedShortTermTick;
+	
+	// TNT workaround: Allow ENTITY_ATTACK if these attributes match.
+	// Discussion at: https://github.com/NoCheatPlus/NoCheatPlus/pull/17 (@Iceee)
+	/** Tick the last explosion damage was dealt at. */
+	public int						lastExplosionDamageTick	= -1 ;
+	/** Last explosion damaged entity (id). */
+	public int						lastExplosionEntityId	= Integer.MAX_VALUE;
 	                   
 	
 	public FightData(final FightConfig cc){

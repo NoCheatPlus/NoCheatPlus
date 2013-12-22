@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /*
  * MM'""""'YMM                              dP   oo                   MM""""""""`M dP          
@@ -74,11 +75,18 @@ public class CreativeFly extends Check {
         // If the player is affected by potion of swiftness.
         
         final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
-        final double fSpeed;
+        double fSpeed;
         
         // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
         if (speedModifier == Double.NEGATIVE_INFINITY) fSpeed = 1D;
         else fSpeed = 1D + 0.2D * (speedModifier + 1D);
+        
+        if (player.isFlying()){
+        	fSpeed *= data.flySpeed / 0.1;
+        }
+        else {
+        	fSpeed *= data.walkSpeed / 0.2;
+        }
         
         final double limitH = cc.creativeFlyHorizontalSpeed / 100D * HORIZONTAL_SPEED * fSpeed;
 
@@ -121,9 +129,9 @@ public class CreativeFly extends Check {
 
         // Super simple, just check distance compared to max distance vertical.
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
-        final double resultV = Math.max(0D, yDistance - data.verticalFreedom - limitV) * 100D;
+        final double resultV = (yDistance - data.verticalFreedom - limitV) * 100D;
 
-        final double result = resultH + resultV;
+        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
 
         // The player went to far, either horizontal or vertical.
         if (result > 0D) {
@@ -138,7 +146,7 @@ public class CreativeFly extends Check {
                 if (vd.needsParameters()){
                     vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
                     vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
-                    vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", to.getLocation().distance(from.getLocation())));
+                    vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from,  to)));
                 }
                 if (executeActions(vd))
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"

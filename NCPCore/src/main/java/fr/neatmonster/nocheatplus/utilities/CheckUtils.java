@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
@@ -53,5 +54,37 @@ public class CheckUtils {
 			return Long.MIN_VALUE;
 		}
 		return ref;
+	}
+
+	/**
+	 * Check getPassenger recursively until a player is found, return that one or null.
+	 * @param entity
+	 * @return
+	 */
+	public static Player getFirstPlayerPassenger(final Entity entity) {
+		Entity passenger = entity.getPassenger();
+		while (passenger != null){
+			if (passenger instanceof Player){
+				return (Player) passenger;
+			}
+			passenger = passenger.getPassenger();
+		}
+		return null;
+	}
+
+	/**
+	 * Check recursively for vehicles, returns null if players are vehicles, otherwise the lowest vehicle (that has no vehicle).
+	 * @param entity
+	 * @return
+	 */
+	public static Entity getLastNonPlayerVehicle(final Entity entity) {
+		Entity vehicle = entity.getVehicle();
+		while (vehicle != null){
+			if (vehicle instanceof Player){
+				return null;
+			}
+			vehicle = vehicle.getVehicle();
+		}
+		return vehicle;
 	}
 }

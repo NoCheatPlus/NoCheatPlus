@@ -1,7 +1,8 @@
 package fr.neatmonster.nocheatplus.command.admin;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -10,9 +11,10 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.command.CommandHandler.NCPReloadEvent;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
+import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand.NCPReloadEvent;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
+import fr.neatmonster.nocheatplus.components.order.Order;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -20,13 +22,13 @@ import fr.neatmonster.nocheatplus.logging.StaticLogFile;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
-public class ReloadCommand extends NCPCommand {
+public class ReloadCommand extends BaseCommand {
 	
 	/** Components that need to be notified on reload */
-	private final Collection<INotifyReload> notifyReload;
+	private final List<INotifyReload> notifyReload;
 
-	public ReloadCommand(JavaPlugin plugin, Collection<INotifyReload> notifyReload) {
-		super(plugin, "reload", Permissions.ADMINISTRATION_RELOAD);
+	public ReloadCommand(JavaPlugin plugin, List<INotifyReload> notifyReload) {
+		super(plugin, "reload", Permissions.COMMAND_RELOAD);
 		this.notifyReload = notifyReload;
 	}
 
@@ -50,9 +52,9 @@ public class ReloadCommand extends NCPCommand {
 
         // Do the actual reload.
         ConfigManager.cleanup();
-        ConfigManager.init(plugin);
+        ConfigManager.init(access);
         StaticLogFile.cleanup();
-        StaticLogFile.setupLogger(new File(plugin.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
+        StaticLogFile.setupLogger(new File(access.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
         // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
         // Remove some checks data.
@@ -62,7 +64,8 @@ public class ReloadCommand extends NCPCommand {
         	DataManager.clearData(checkType);
         }
         
-        // Tell the plugin to adapt to new config.
+        // Tell the registered listeners to adapt to new config, first sort them (!).
+        Collections.sort(notifyReload, Order.cmpSetupOrder);
         for (final INotifyReload component : notifyReload){
         	component.onReload();
         }

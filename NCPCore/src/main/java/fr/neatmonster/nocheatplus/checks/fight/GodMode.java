@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -35,7 +36,7 @@ public class GodMode extends Check {
      * @param damage
      * @return
      */
-    public boolean check(final Player player, final int damage, final FightData data){
+    public boolean check(final Player player, final double damage, final FightData data){
     	final int tick = TickTask.getTick();
     	
     	final int noDamageTicks = Math.max(0, player.getNoDamageTicks());
@@ -53,7 +54,9 @@ public class GodMode extends Check {
     	final int dNDT = data.lastNoDamageTicks - noDamageTicks;
     	final int delta = dTick - dNDT;
     	
-    	final int health = player.getHealth();
+    	final double health = BridgeHealth.getHealth(player);
+    	
+    	// TODO: Adjust to double values.
     	
     	if (data.godModeHealth > health ){
     		data.godModeHealthDecreaseTick = tick;
@@ -77,7 +80,7 @@ public class GodMode extends Check {
     	
     	// Check if reduced more than expected or new/count down fully.
     	// TODO: Mostly workarounds.
-    	if (delta <= 0  || data.lastNoDamageTicks <= player.getMaximumNoDamageTicks() / 2 || dTick > data.lastNoDamageTicks || damage > player.getLastDamage() || damage == 0){
+    	if (delta <= 0  || data.lastNoDamageTicks <= player.getMaximumNoDamageTicks() / 2 || dTick > data.lastNoDamageTicks || damage > BridgeHealth.getLastDamage(player)|| damage == 0.0){
     		// Not resetting acc.
     		legit = set = true;
     	}
@@ -179,8 +182,8 @@ public class GodMode extends Check {
     public void death(final Player player) {
     	// TODO: Is this still relevant ?
         // First check if the player is really dead (e.g. another plugin could have just fired an artificial event).
-        if (player.getHealth() <= 0 && player.isDead())
-            try {
+        if (BridgeHealth.getHealth(player) <= 0.0 && player.isDead()){
+        	try {
                 // Schedule a task to be executed in roughly 1.5 seconds.
             	// TODO: Get plugin otherwise !?
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"), new Runnable() {
@@ -196,5 +199,6 @@ public class GodMode extends Check {
                     }
                 }, 30);
             } catch (final Exception e) {}
+        }
     }
 }

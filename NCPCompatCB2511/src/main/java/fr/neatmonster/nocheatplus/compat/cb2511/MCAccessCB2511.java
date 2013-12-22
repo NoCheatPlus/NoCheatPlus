@@ -33,6 +33,8 @@ public class MCAccessCB2511 implements MCAccess {
 		getCommandMap();
 		ReflectionUtil.checkMembers("net.minecraft.server.", new String[]{"Entity" , "dead"});
 		ReflectionUtil.checkMembers("net.minecraft.server.", new String[]{"EntityPlayer" , "netServerHandler"});
+		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.Block.class, 
+				new String[]{"v", "w", "x", "y", "z", "A"}, double.class);
 	}
 
 	@Override
@@ -76,17 +78,6 @@ public class MCAccessCB2511 implements MCAccess {
 		final Block block = Block.byId[id];
 		if (block == null || block.material == null) return AlmostBoolean.MAYBE;
 		else return AlmostBoolean.match(block.material.isLiquid());
-	}
-
-	@Override
-	public boolean Block_i(final int id) {
-		try{
-			return Block.i(id);
-		}
-		catch(Throwable t){
-			// Minecraft default value.
-			return true;
-		}
 	}
 
 	@Override
@@ -134,8 +125,8 @@ public class MCAccessCB2511 implements MCAccess {
 	}
 
 	@Override
-	public void dealFallDamage(final Player player, final int damage) {
-		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, damage);
+	public void dealFallDamage(final Player player, final double damage) {
+		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, (int) Math.round(damage));
 	}
 
 	@Override

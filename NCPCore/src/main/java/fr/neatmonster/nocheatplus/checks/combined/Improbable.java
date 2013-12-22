@@ -6,6 +6,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -15,7 +16,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * @author mc_dev
  *
  */
-public class Improbable extends Check {
+public class Improbable extends Check implements DisableListener{
 
 	private static Improbable instance = null;
 	
@@ -83,6 +84,11 @@ public class Improbable extends Check {
 		else
 			data.improbableVL *= 0.95;
 		return cancel;
+	}
+
+	@Override
+	public void onDisable() {
+		instance = null;
 	}
 
 }

@@ -4,7 +4,7 @@
   <!-- Informations -->
   <artifactId>nocheatplus</artifactId>
   <name>NoCheatPlus</name>
-  <version>3.9.3-DEV</version>
+  <version>3.10.7-BETA</version>
   <description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
   <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
   
@@ -19,7 +19,6 @@
   </dependencies>
   
   <!-- Building -->
-  
   <build>
     <defaultGoal>clean package</defaultGoal>
     <directory>../target</directory> <!-- Build it one level up, because it is the one we care about -->
@@ -76,6 +75,10 @@
                   <include>fr.neatmonster:ncpcompatcb2602</include>
                   <include>fr.neatmonster:ncpcompatcb2645</include>
                   <include>fr.neatmonster:ncpcompatcb2691</include>
+                  <include>fr.neatmonster:ncpcompatcb2763</include>
+                  <include>fr.neatmonster:ncpcompatcb2794</include>
+                  <include>fr.neatmonster:ncpcompatcb2808</include>
+                  <include>fr.neatmonster:ncpcompatcb2882</include>
                   <include>fr.neatmonster:ncpcompatcbdev</include>
                   <include>fr.neatmonster:ncpplugin</include>
 <!--                   <include>fr.neatmonster:nocheatplus-parent</include> -->
@@ -163,6 +166,8 @@
   <!-- Properties -->
   <properties>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <BUILD_NUMBER>?</BUILD_NUMBER>
+  <BUILD_SERIES>?</BUILD_SERIES>
   </properties>
   
   <groupId>fr.neatmonster</groupId>

@@ -1,9 +1,17 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Auxiliary/convenience methods for inventories.
+ * @author mc_dev
+ *
+ */
 public class InventoryUtil {
 	
 	/**
@@ -24,7 +32,7 @@ public class InventoryUtil {
 	}
 
 	/**
-	 * Count slots with type-id and data (enchantments are ignored at present).
+	 * Count slots with type-id and data (enchantments and other meta data are ignored at present).
 	 * @param inventory
 	 * @param reference
 	 * @return
@@ -56,6 +64,67 @@ public class InventoryUtil {
 	 */
 	public static int getStackCount(final InventoryView view, final ItemStack reference) {
 		return getStackCount(view.getBottomInventory(), reference) + getStackCount(view.getTopInventory(), reference);
+	}
+	
+	/**
+	 * Search for players / passengers (broken by name: closes the inventory of first player found including entity and passengers recursively).
+	 * @param entity
+	 */
+	public static boolean closePlayerInventoryRecursively(Entity entity){
+		// Find a player.
+		final Player player = getPlayerPassengerRecursively(entity);
+		if (player != null && closeOpenInventory((Player) entity)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Get a player from an entity. This will return the first player found amongst the entity itself and passengers checked recursively.
+	 * @param entity
+	 * @return
+	 */
+	public static Player getPlayerPassengerRecursively(Entity entity) {
+		while (entity != null){
+			if (entity instanceof Player){
+				// Scrap the case of players riding players for the moment.
+				return (Player) entity;
+			}
+			final Entity passenger = entity.getPassenger();
+			if (entity.equals(passenger)){
+				// Just in case :9.
+				break;
+			}
+			else{
+				entity = passenger;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Close one players inventory, if open. This might ignore InventoryType.CRAFTING (see: hasInventoryOpen).
+	 * @param player
+	 * @return If closed.
+	 */
+	public static boolean closeOpenInventory(final Player player){
+		if (hasInventoryOpen(player)) {
+			player.closeInventory();
+			return true;
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 * Check if the players inventory is open. This might ignore InventoryType.CRAFTING.
+	 * @param player
+	 * @return
+	 */
+	public static boolean hasInventoryOpen(final Player player) {
+		final InventoryView view = player.getOpenInventory();
+		return view != null && view.getType() != InventoryType.CRAFTING;
 	}
 
 }

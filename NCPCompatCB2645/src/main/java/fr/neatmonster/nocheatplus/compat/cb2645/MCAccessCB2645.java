@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
-import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class MCAccessCB2645 implements MCAccess{
@@ -32,6 +31,8 @@ public class MCAccessCB2645 implements MCAccess{
 	public MCAccessCB2645(){
 		getCommandMap();
 		ReflectionUtil.checkMembers("net.minecraft.server.v1_5_R1.", new String[]{"Entity" , "dead"});
+		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_5_R1.Block.class, 
+				new String[]{"u", "v", "w", "x", "y", "z"}, double.class);
 	}
 
 	@Override
@@ -76,12 +77,6 @@ public class MCAccessCB2645 implements MCAccess{
 		final Block block = Block.byId[id];
 		if (block == null || block.material == null) return AlmostBoolean.MAYBE;
 		else return AlmostBoolean.match(block.material.isLiquid());
-	}
-
-	@Override
-	public boolean Block_i(final int id) {
-		// TODO: This is inaccurate (would be something like "can suffocate"), however it is used for piling upwards and might about do.
-		return BlockProperties.isGround(id) || BlockProperties.isSolid(id);
 	}
 
 	@Override
@@ -130,8 +125,8 @@ public class MCAccessCB2645 implements MCAccess{
 	}
 
 	@Override
-	public void dealFallDamage(final Player player, final int damage) {
-		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, damage);
+	public void dealFallDamage(final Player player, final double damage) {
+		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, (int) Math.round(damage));
 	}
 
 	@Override

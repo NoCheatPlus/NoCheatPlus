@@ -323,7 +323,7 @@ public class NCPExemptionManager {
     	if (wrong != 0){
     		final List<String> details = new LinkedList<String>();
     		if (wrong != 0){
-    			details.add("wrong entity-ids (" + + wrong + ")");
+    			details.add("wrong entity-ids (" + wrong + ")");
     		}
     		LogUtil.logWarning("[NoCheatPlus] ExemptionManager inconsistencies: " + StringUtil.join(details, " | "));
     	}

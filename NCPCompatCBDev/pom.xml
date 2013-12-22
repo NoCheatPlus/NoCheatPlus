@@ -22,11 +22,16 @@
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>craftbukkit</artifactId>
-    	<version>1.5.2-R0.1</version>
+    	<version>1.7.2-R0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.bukkit</groupId>
+    	<artifactId>bukkit</artifactId>
+    	<version>1.7.2-R0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
   <description>Compatibility for the development version (latest of the supported Minecraft versions).
 
-Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+Version updating is done for the NoCheatPlus sub-module.</description>
 </project>

@@ -13,6 +13,9 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 
 import fr.neatmonster.nocheatplus.command.CommandUtil;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 public class PermissionUtil {
 	
@@ -68,7 +71,7 @@ public class PermissionUtil {
 	}
 	
 	/**
-	 * 
+	 * Set up the command protection with the "unknown command" message for the permission message (attempt to hide the command).
 	 * @param permissionBase
 	 * @param ignoredCommands
 	 * @param invertIgnored
@@ -76,6 +79,19 @@ public class PermissionUtil {
 	 * @return
 	 */
 	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops){
+		return protectCommands(permissionBase, ignoredCommands, invertIgnored, ops, ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)));
+	}
+	
+	/**
+	 * Set up the command protection with the given permission message.
+	 * @param permissionBase
+	 * @param ignoredCommands
+	 * @param invertIgnored
+	 * @param ops
+	 * @param permissionMessage
+	 * @return
+	 */
+	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops, String permissionMessage){
 		Set<String> checked = new HashSet<String>();
 		for (String label : ignoredCommands){
 			checked.add(CommandUtil.getCommandLabel(label, false));
@@ -121,8 +137,32 @@ public class PermissionUtil {
 			else changed.add(new CommandProtectionEntry(command, lcLabel, null, null, command.getPermissionMessage()));
 			// Change 
 			cmdPerm.setDefault(ops ? PermissionDefault.OP : PermissionDefault.FALSE);
-			command.setPermissionMessage("Unknown command. Type \"help\" for help.");
+			command.setPermissionMessage(permissionMessage);
 		}
 		return changed;
+	}
+
+	/**
+	 * Set a permission as child for all the other permissions given in a Collection.
+	 * @param permissions Not expected to exist.
+	 * @param childPermissionName
+	 */
+	public static void addChildPermission(final Collection<String> permissions, final String childPermissionName, final PermissionDefault permissionDefault) {
+		final PluginManager pm = Bukkit.getPluginManager();
+		Permission childPermission = pm.getPermission(childPermissionName);
+		if (childPermission == null){
+			childPermission = new Permission(childPermissionName, "auto-generated child permission (NoCheatPlus)", permissionDefault);
+			pm.addPermission(childPermission);
+		}
+		for (final String permissionName : permissions){
+			Permission permission = pm.getPermission(permissionName);
+			if (permission == null){
+				permission = new Permission(permissionName, "auto-generated permission (NoCheatPlus)", permissionDefault);
+				pm.addPermission(permission);
+			}
+			if (!permission.getChildren().containsKey(childPermissionName)){
+				childPermission.addParent(permission, true);
+			}
+		}
 	}
 }

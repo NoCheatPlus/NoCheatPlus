@@ -4,9 +4,10 @@ package fr.neatmonster.nocheatplus.components;
 
 /**
  * ComponentRegistry: 
- * <li>Supported components: Listener, TickListener, PermStateReceiver, INotifyReload, INeedConfig, IRemoveData, MCAccessHolder, ConsistencyChecker, JoinLeaveListener</li>
+ * <li>Supported components: Listener, TickListener, PermStateReceiver, INotifyReload, INeedConfig, IRemoveData, MCAccessHolder, ConsistencyChecker, JoinLeaveListener, DisableListener</li>
  * <li>ComponentRegistry instances will be registered as sub registries unless you use the addComponent(Object, boolean) method appropriately. </li>
  * <li>IHoldSubComponents instances will be registered in the next tick (scheduled task), those added within onEnable will get registered after looping in onEnable.</li>
+ * <li>JoinLeaveListeners are called on EventPriority.LOW.</li>
  * <li>Registering components should be done during onEnable or any time while the plugin is enabled, all components will be unregistered in onDisable.</li>
  * <li>References to all components will be held until onDisable is finished.</li> 
  * <li>Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)</li>
@@ -33,6 +34,13 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
 	 * @return Number of players messaged.
 	 */
 	public int sendAdminNotifyMessage(final String message);
+	
+	/**
+	 * Thread-safe method to send a message to a player in a scheduled task. The scheduling preserves order of messages.
+	 * @param playerName
+	 * @param message
+	 */
+	public void sendMessageOnTick(final String playerName, final String message);
 	
 
 	/**

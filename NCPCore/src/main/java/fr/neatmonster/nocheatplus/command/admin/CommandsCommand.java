@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
@@ -15,7 +15,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author mc_dev
  *
  */
-public class CommandsCommand extends NCPCommand {
+public class CommandsCommand extends BaseCommand {
 	
 	final String[] moreCommands = new String[]{
 	        "/<command> ban [delay=(ticks)] (player) [(reason)...]: ban player",
@@ -30,7 +30,7 @@ public class CommandsCommand extends NCPCommand {
 	final String allCommands;
 
 	public CommandsCommand(JavaPlugin plugin) {
-		super(plugin, "commands", Permissions.ADMINISTRATION_COMMANDS, new String[]{"cmds"});
+		super(plugin, "commands", Permissions.COMMAND_COMMANDS, new String[]{"cmds"});
 		for (int i = 0; i < moreCommands.length; i++){
 			moreCommands[i] = moreCommands[i].replace("<command>", "ncp");
 		}

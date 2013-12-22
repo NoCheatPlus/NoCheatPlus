@@ -23,34 +23,42 @@ public class Permissions {
      * d8888888b Y8b  "88 888 888 888 888 888 888 888 888 d,dP   888   888    "88 888  888   888  "88 88"  888 888 
      */
     private static final String ADMINISTRATION               = NOCHEATPLUS + ".admin";
-
-    public static final String  ADMINISTRATION_BAN           = ADMINISTRATION + ".ban";
-	public static final String  ADMINISTRATION_DELAY         = ADMINISTRATION + ".delay";
-	
-	public static final String  ADMINISTRATION_EXEMPT        = ADMINISTRATION + ".exempt";
-	public static final String  ADMINISTRATION_UNEXEMPT      = ADMINISTRATION + ".unexempt";
-	public static final String  ADMINISTRATION_EXEMPTIONS    = ADMINISTRATION + ".exemptions";
-	
-    public static final String  ADMINISTRATION_INFO          = ADMINISTRATION + ".info";
-    public static final String  ADMINISTRATION_COMMANDS      = ADMINISTRATION + ".commands";
-    public static final String  ADMINISTRATION_KICK          = ADMINISTRATION + ".kick";
-	public static final String  ADMINISTRATION_KICKLIST      = ADMINISTRATION + ".kicklist";
-	public static final String  ADMINISTRATION_LAG 			 = ADMINISTRATION + ".lag";
-    public static final String  ADMINISTRATION_NOTIFY        = ADMINISTRATION + ".notify";
-    public static final String  ADMINISTRATION_PLUGINS       = ADMINISTRATION + ".plugins";
-    public static final String  ADMINISTRATION_RELOAD        = ADMINISTRATION + ".reload";
-	public static final String  ADMINISTRATION_REMOVEPLAYER  = ADMINISTRATION + ".removeplayer";
-    public static final String  ADMINISTRATION_TELL          = ADMINISTRATION + ".tell";
-    public static final String  ADMINISTRATION_TEMPKICK      = ADMINISTRATION + ".tempkick";
-	public static final String  ADMINISTRATION_UNKICK        = ADMINISTRATION + ".unkick";
-	public static final String ADMINISTRATION_VERSION		 = ADMINISTRATION + ".version";
-	
     // Debug permission, for player spam (not in plugin.yml, currently).
 	public static final String  ADMINISTRATION_DEBUG         = ADMINISTRATION + ".debug";
 	
     // Bypasses held extra from command permissions.
     private final static String BYPASS                       = NOCHEATPLUS + ".bypass";
     public static final  String BYPASS_DENY_LOGIN            = BYPASS + "denylogin";
+    
+    private static final String FILTER						 = NOCHEATPLUS + ".filter";
+    public static final String  FILTER_COMMAND				 = FILTER + ".command";
+    public static final String  FILTER_COMMAND_NOCHEATPLUS   = FILTER_COMMAND + ".nocheatplus";
+    
+    // Notifications (in-game).
+    public static final String  NOTIFY       				 = NOCHEATPLUS + ".notify";
+    
+    // Command permissions.
+    public static final String  COMMAND					= NOCHEATPLUS + ".command";
+    public static final String  COMMAND_BAN				= COMMAND + ".ban";
+	public static final String  COMMAND_DELAY			= COMMAND + ".delay";
+	
+	public static final String  COMMAND_EXEMPT        	= COMMAND + ".exempt";
+	public static final String  COMMAND_UNEXEMPT      	= COMMAND + ".unexempt";
+	public static final String  COMMAND_EXEMPTIONS    	= COMMAND + ".exemptions";
+	public static final String  COMMAND_NOTIFY       	= COMMAND + ".notify";
+    public static final String  COMMAND_INFO          	= COMMAND + ".info";
+    public static final String  COMMAND_COMMANDS      	= COMMAND + ".commands";
+    public static final String  COMMAND_KICK        	= COMMAND + ".kick";
+	public static final String  COMMAND_KICKLIST    	= COMMAND + ".kicklist";
+	public static final String  COMMAND_LAG 			= COMMAND + ".lag";
+    public static final String  COMMAND_RELOAD        	= COMMAND + ".reload";
+	public static final String  COMMAND_REMOVEPLAYER  	= COMMAND + ".removeplayer";
+    public static final String  COMMAND_TELL          	= COMMAND + ".tell";
+    public static final String  COMMAND_TEMPKICK      	= COMMAND + ".tempkick";
+	public static final String  COMMAND_UNKICK        	= COMMAND + ".unkick";
+	public static final String  COMMAND_VERSION		  	= COMMAND + ".version";
+	
+	public static final String COMMAND_INSPECT			= COMMAND + ".inspect";
 
  
     // Permissions for the individual checks.
@@ -166,6 +174,7 @@ public class Permissions {
     public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
     public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
     public static final String  INVENTORY_ITEMS              = INVENTORY + ".items";
+	public static final String  INVENTORY_OPEN				 = INVENTORY + ".open";
 
     /*
      *     e   e                         ,e,                  

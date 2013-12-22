@@ -26,7 +26,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 490;
+	public static final int buildNumber = 632;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -37,8 +37,13 @@ public class DefaultConfig extends ConfigFile {
         super();
         
         
-        // General:
+        // General.
         set(ConfPaths.SAVEBACKCONFIG, true);
+        
+        // Config version.
+        set(ConfPaths.CONFIGVERSION_NOTIFY, true);
+//        not set(ConfPaths.CONFIGVERSION_CREATED, -1);
+//        not set(ConfPaths.CONFIGVERSION_SAVED, -1);
 
         /*
          * 888                                 ,e,                  
@@ -58,8 +63,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.LOGGING_BACKEND_FILE_FILENAME, "nocheatplus.log");
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE, true);
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX, "&cNCP: &f");
-        
-        // Notifications settings.
         set(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS, false);
 
         /*
@@ -69,12 +72,8 @@ public class DefaultConfig extends ConfigFile {
          *  d8b Y8b Y8b  888  Y88D Y888   , 888   , 888 888 ,ee 888 888 888 888   , Y888 888P Y888 888P  Y88D 
          * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
          */
-        set(ConfPaths.MISCELLANEOUS_ALLOWCLIENTMODS, false);
-        set(ConfPaths.MISCELLANEOUS_OPINCONSOLEONLY, false);
-        set(ConfPaths.MISCELLANEOUS_PROTECTPLUGINS, true);
-        set(ConfPaths.MISCELLANEOUS_MANAGELISTENERS, false);
 //        set(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES, true);
-        set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
+//        set(ConfPaths.MISCELLANEOUS_REPORTTOMETRICS, true);
 
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_ENABLED, false);
 //        set(ConfPaths.MISCELLANEOUS_NOMOVEDTOOQUICKLY_USEPROXY, false);
@@ -89,7 +88,21 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 10);
         set(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 2);
         set(ConfPaths.DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS, false);
-
+        
+        // Protection features.
+        // Hide plugins.
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE, true);
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG, "&cI'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS, Arrays.asList("plugins", "version", "icanhasbukkit"));
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG, "Unknown command. Type \"/help\" for help.");
+        set(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS, new LinkedList<String>());
+        // Commands (other).
+        set(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_ACTIVE, false);
+        set(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_CMDS, Arrays.asList("op", "deop"));
+        // Client motd.
+        set(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE, true);
+        set(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL, false);
+        
         /*
          * 888 88b, 888                    888    888 88b,                        888    
          * 888 88P' 888  e88 88e   e88'888 888 ee 888 88P' 888,8,  ,e e,   ,"Y88b 888 ee 
@@ -190,7 +203,7 @@ public class DefaultConfig extends ConfigFile {
         
         set(ConfPaths.CHAT_COMMANDS_CHECK, true);
         set(ConfPaths.CHAT_COMMANDS_EXCLUSIONS, new ArrayList<String>());
-        set(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT, Arrays.asList("/me"));
+        set(ConfPaths.CHAT_COMMANDS_HANDLEASCHAT, Arrays.asList("me"));
         set(ConfPaths.CHAT_COMMANDS_LEVEL, 10);
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_TICKS, 18);
         set(ConfPaths.CHAT_COMMANDS_SHORTTERM_LEVEL, 3);
@@ -324,7 +337,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_FASTHEAL_CHECK, true);
         set(ConfPaths.FIGHT_FASTHEAL_INTERVAL, 4000L);
         set(ConfPaths.FIGHT_FASTHEAL_BUFFER, 1000L);
-        set(ConfPaths.FIGHT_FASTHEAL_ACTIONS, "cancel vl>10 cancel log:fastheal:0:10:i vl>30 log:fastheal:0:10:if");
+        set(ConfPaths.FIGHT_FASTHEAL_ACTIONS, "cancel vl>10 cancel log:fastheal:0:10:i vl>30 cancel log:fastheal:0:10:if");
         
         set(ConfPaths.FIGHT_GODMODE_CHECK, true);
         set(ConfPaths.FIGHT_GODMODE_LAGMINAGE, 1100); // TODO: ndt/2 => 500-600.
@@ -391,6 +404,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_FASTCONSUME_ACTIONS, "log:fastconsume:2:5:if cancel");
         
         set(ConfPaths.INVENTORY_ITEMS_CHECK, true);
+        
+        set(ConfPaths.INVENTORY_OPEN_CHECK, true);
+        set(ConfPaths.INVENTORY_OPEN_CLOSE, true);
+        set(ConfPaths.INVENTORY_OPEN_CANCELOTHER, true);
 
         /*
          *     e   e                         ,e,                  
@@ -442,8 +459,7 @@ public class DefaultConfig extends ConfigFile {
         // set(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
-        set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS,
-                "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel vl>1000 log:flylong:0:5:cif cancel cmd:kickfly");
+        set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, "log:flyshort:3:10:f cancel vl>100 log:flyshort:0:10:if cancel vl>400 log:flylong:0:5:cif cancel vl>1000 log:flylong:0:5:cif cancel cmd:kickfly");
 
         // sf / hover check.
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true);
@@ -453,7 +469,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 500);
         
-        // Special.
+        // Vehicles.
+        set(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN, true);
+        set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, true);
+        
+        // Velocity.
         set(ConfPaths.MOVING_VELOCITY_GRACETICKS, 20);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER, 80);
         set(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS, 140);
@@ -463,6 +483,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
         set(ConfPaths.MOVING_LOADCHUNKS_JOIN, true);
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);
+        set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
         
         /*
          *  dP"8   d8          ,e,                        
@@ -473,6 +494,7 @@ public class DefaultConfig extends ConfigFile {
          *                                   ,  88P       
          *                                  "8",P"        
          */
+        // TODO: An extra file might suit these.
         final String start = "[player] failed [check]: ";
         final String end = ". VL [violations].";
         final String tell = "ncp tell [player] ";
@@ -538,7 +560,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".tellchatnormal", tell + "&cNCP: &eToo many messages, slow down...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
         set(ConfPaths.STRINGS + ".tempkick5", "ncp tempkick [player] 5 You have five minutes to think about it!");
-
+        
+        // Compatibility settings.
+        set(ConfPaths.COMPATIBILITY_MANAGELISTENERS, false);
         set(ConfPaths.COMPATIBILITY_BUKKITONLY, false);
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_IGNOREPASSABLE, Arrays.asList(
                 Material.WOODEN_DOOR.name(), Material.IRON_DOOR_BLOCK.name(),
@@ -549,7 +573,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_ALLOWINSTANTBREAK, new LinkedList<String>());
         set(ConfPaths.COMPATIBILITY_BLOCKS + ConfPaths.SUB_OVERRIDEFLAGS + ".snow", "default");
         
-        // Update internal factory based on all the new entries to the "actions" section.
-        regenerateActionLists();
+//        // Update internal factory based on all the new entries to the "actions" section.
+//        setActionFactory();
     }
 }

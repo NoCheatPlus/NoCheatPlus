@@ -10,6 +10,10 @@ import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
 import fr.neatmonster.nocheatplus.compat.cb2602.MCAccessCB2602;
 import fr.neatmonster.nocheatplus.compat.cb2645.MCAccessCB2645;
 import fr.neatmonster.nocheatplus.compat.cb2691.MCAccessCB2691;
+import fr.neatmonster.nocheatplus.compat.cb2763.MCAccessCB2763;
+import fr.neatmonster.nocheatplus.compat.cb2794.MCAccessCB2794;
+import fr.neatmonster.nocheatplus.compat.cb2808.MCAccessCB2808;
+import fr.neatmonster.nocheatplus.compat.cb2882.MCAccessCB2882;
 import fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -49,16 +53,48 @@ public class MCAccessFactory {
 		// Try to set up native access.
 		if (!bukkitOnly){
 			
-			// TEST //
+			// TEMP //
 			// Only add as long as no stable module has been added.
-			// 1.5.2
+			// 1.7.2
 			try{
 				return new MCAccessCBDev();
 			}
 			catch(Throwable t){
 				throwables.add(t);
 			};
-			// TEST END //
+			// TEMP END //
+			
+			// 1.6.4
+			try{
+				return new MCAccessCB2882();
+			}
+			catch(Throwable t){
+				throwables.add(t);
+			};
+			
+			// 1.6.2
+			try{
+				return new MCAccessCB2808();
+			}
+			catch(Throwable t){
+				throwables.add(t);
+			};
+			
+			// 1.6.1
+			try{
+				return new MCAccessCB2794();
+			}
+			catch(Throwable t){
+				throwables.add(t);
+			};
+						
+			// 1.5.2
+			try{
+				return new MCAccessCB2763();
+			}
+			catch(Throwable t){
+				throwables.add(t);
+			};
 			
 			// 1.5.1 (cb beta)
 			try{

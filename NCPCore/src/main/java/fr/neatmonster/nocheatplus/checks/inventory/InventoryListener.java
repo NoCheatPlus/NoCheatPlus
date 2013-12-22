@@ -9,14 +9,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -25,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /*
  * M""M                                       dP                              
@@ -64,6 +69,8 @@ public class InventoryListener  extends CheckListener {
     private final InstantEat instantEat = addCheck(new InstantEat());
     
     protected final Items items 		= addCheck(new Items());
+    
+    private final Open open 			= addCheck(new Open());
     
     public InventoryListener(){
     	super(CheckType.INVENTORY);
@@ -318,4 +325,52 @@ public class InventoryListener  extends CheckListener {
         Items.checkIllegalEnchantments(player, inv.getItem(event.getNewSlot()));
         Items.checkIllegalEnchantments(player, inv.getItem(event.getPreviousSlot()));
     }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerChangedWorld(final PlayerChangedWorldEvent event){
+    	open.check(event.getPlayer());
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerPortal(final PlayerPortalEvent event){
+    	// Note: ignore cancelother setting.
+    	open.check(event.getPlayer());
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onEntityPortal(final EntityPortalEnterEvent event){
+    	final Player player = InventoryUtil.getPlayerPassengerRecursively(event.getEntity());
+    	if (player != null) {
+    		// Note: ignore cancelother setting.
+        	open.check(player);
+    	}
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerTeleport(final PlayerTeleportEvent event){
+    	// Note: ignore cancelother setting.
+    	open.check(event.getPlayer());
+    }
+    
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    public void onVehicleDestroy(final VehicleDestroyEvent event) {
+//    	final Entity entity = event.getVehicle();
+//    	if (entity instanceof InventoryHolder) { // Fail on 1.4 ?
+//    		checkInventoryHolder((InventoryHolder) entity);
+//    	}
+//    }
+//    
+//    @EventHandler(priority = EventPriority.MONITOR)
+//    public void onBlockBreak(final BlockBreakEvent event) {
+//    	final Block block = event.getBlock();
+//    	if (block == null) {
+//    		return;
+//    	}
+//    	// TODO: + explosions !? + entity change block + ...
+//    }
+//
+//	private void checkInventoryHolder(InventoryHolder entity) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 }

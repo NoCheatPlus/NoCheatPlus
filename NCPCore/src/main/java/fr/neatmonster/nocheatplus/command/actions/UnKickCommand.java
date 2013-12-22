@@ -1,17 +1,19 @@
 package fr.neatmonster.nocheatplus.command.actions;
 
+import java.util.List;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.command.NCPCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
-public class UnKickCommand extends NCPCommand {
+public class UnKickCommand extends BaseCommand {
 
 	public UnKickCommand(JavaPlugin plugin) {
-		super(plugin, "unkick", Permissions.ADMINISTRATION_UNKICK);
+		super(plugin, "unkick", Permissions.COMMAND_UNKICK);
 	}
 
 	@Override
@@ -28,6 +30,15 @@ public class UnKickCommand extends NCPCommand {
 			sender.sendMessage(TAG + "Was not denied to login: " + args[1].trim());
 		}
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.command.AbstractCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command,
+			String alias, String[] args) {
+		return null;
 	}
 
 }

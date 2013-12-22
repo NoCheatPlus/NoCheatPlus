@@ -22,8 +22,17 @@ public abstract class ConfPaths {
 	public static final String SUB_OVERRIDEFLAGS					 	 = "overrideflags";
     public static final String SUB_LAG       							 = "lag";
 	
-	// General:
+	// General.
 	public static final String SAVEBACKCONFIG                            = "savebackconfig";
+	
+	// Configuration version.
+	@GlobalConfig // TODO: Per file versions should also be supported. Better with per-path comparison?
+	public static final String CONFIGVERSION							 = "configversion.";
+	public static final String CONFIGVERSION_NOTIFY						 = CONFIGVERSION + "notify";
+	/** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with first save. */
+	public static final String CONFIGVERSION_CREATED					 = CONFIGVERSION + "created";
+	/** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with each save. */
+	public static final String CONFIGVERSION_SAVED						 = CONFIGVERSION + "saved";
 
     /*
      * 888                                 ,e,                  
@@ -52,18 +61,6 @@ public abstract class ConfPaths {
     public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
     public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX		 = LOGGING_BACKEND_INGAMECHAT + "prefix";
 
-    // Deprecated.
-    @Moved(newPath=LOGGING_BACKEND_CONSOLE_ACTIVE)
-    public static final String  LOGGING_CONSOLE                          = LOGGING + "console";
-    @Moved(newPath=LOGGING_BACKEND_FILE_ACTIVE)
-    public static final String  LOGGING_FILE                             = LOGGING + "file";
-    @Moved(newPath=LOGGING_BACKEND_FILE_FILENAME)
-    public static final String  LOGGING_FILENAME                         = LOGGING + "filename";
-    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_ACTIVE)
-    public static final String  LOGGING_INGAMECHAT                       = LOGGING + "ingamechat";
-    @Moved(newPath=LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
-    public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = LOGGING + "usesubscriptions";
-
     /*
      *     e   e     ,e,                        888 888                                                   
      *    d8b d8b     "   dP"Y  e88'888  ,e e,  888 888  ,"Y88b 888 8e   ,e e,   e88 88e  8888 8888  dP"Y 
@@ -73,13 +70,8 @@ public abstract class ConfPaths {
      */
 	@GlobalConfig
 	private static final String MISCELLANEOUS = "miscellaneous.";
-	public static final String  MISCELLANEOUS_ALLOWCLIENTMODS				= MISCELLANEOUS + "allowclientmods";
-	public static final String  MISCELLANEOUS_OPINCONSOLEONLY				= MISCELLANEOUS + "opinconsoleonly";
-	public static final String  MISCELLANEOUS_PROTECTPLUGINS				= MISCELLANEOUS + "protectplugins";
-	public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
-	public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
-	public static final String  MISCELLANEOUS_REPORTTOMETRICS				= MISCELLANEOUS + "reporttometrics";
-	public static final String  MISCELLANEOUS_MANAGELISTENERS				= MISCELLANEOUS + "managelisteners";
+	//public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
+	//public static final String  MISCELLANEOUS_UPDATETIMEOUT					= MISCELLANEOUS + "updatetimeout";
 
 	/** TEMP: hidden flag to disable all lag adaption with one flag. */
 	public static final String MISCELLANEOUS_LAG						 	= MISCELLANEOUS + "lag";
@@ -105,6 +97,32 @@ public abstract class ConfPaths {
 	 */
 	public static final  String DATA_CONSISTENCYCHECKS_SUPPRESSWARNINGS  = DATA_CONSISTENCYCHECKS + "suppresswarnings";
 	
+	private static final String PROTECT									 = "protection.";
+	// Clients settings.
+	private static final String PROTECT_CLIENTS							 = PROTECT + "clients.";
+	@GlobalConfig
+	private static final String PROTECT_CLIENTS_MOTD					 = PROTECT_CLIENTS + "motd.";
+	public static final String  PROTECT_CLIENTS_MOTD_ACTIVE				 = PROTECT_CLIENTS_MOTD + "active";
+	public static final String  PROTECT_CLIENTS_MOTD_ALLOWALL			 = PROTECT_CLIENTS_MOTD + "allowall";
+	// Other commands settings
+	@GlobalConfig
+	private static final String PROTECT_COMMANDS						 = PROTECT + "commands.";
+	private static final String PROTECT_COMMANDS_CONSOLEONLY			 = PROTECT_COMMANDS + "consoleonly.";
+	public  static final String PROTECT_COMMANDS_CONSOLEONLY_ACTIVE		 = PROTECT_COMMANDS_CONSOLEONLY + "active";
+	public  static final String PROTECT_COMMANDS_CONSOLEONLY_CMDS		 = PROTECT_COMMANDS_CONSOLEONLY + "commands";
+	// Plugins settings.
+	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
+	@GlobalConfig
+	private static final String PROTECT_PLUGINS_HIDE					 = PROTECT_PLUGINS + "hide.";
+	public static  final String PROTECT_PLUGINS_HIDE_ACTIVE				 = PROTECT_PLUGINS_HIDE + "active";
+	private static final String PROTECT_PLUGINS_HIDE_NOCOMMAND			 = PROTECT_PLUGINS_HIDE + "unknowncommand.";
+	public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG		 = PROTECT_PLUGINS_HIDE_NOCOMMAND + "message";
+	public static  final String PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS		 = PROTECT_PLUGINS_HIDE_NOCOMMAND + "commands";
+	private static final String PROTECT_PLUGINS_HIDE_NOPERMISSION		 = PROTECT_PLUGINS_HIDE + "nopermission.";
+	public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "message";
+	public static  final String PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS	 = PROTECT_PLUGINS_HIDE_NOPERMISSION + "commands";
+	
+	// Checks!
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
 	public static final  String CHECKS_DEBUG							 = CHECKS + SUB_DEBUG;
@@ -526,9 +544,15 @@ public abstract class ConfPaths {
     public static final String  INVENTORY_INSTANTEAT_CHECK               = INVENTORY_INSTANTEAT + "active";
     public static final String  INVENTORY_INSTANTEAT_ACTIONS             = INVENTORY_INSTANTEAT + "actions";
     
-    private static final String INVENTORY_ITEMS                          = INVENTORY + ".items";
-    public static final String  INVENTORY_ITEMS_CHECK                    = INVENTORY_ITEMS + ".active";
-
+    private static final String INVENTORY_ITEMS                          = INVENTORY + "items.";
+    public static final String  INVENTORY_ITEMS_CHECK                    = INVENTORY_ITEMS + "active";
+    
+    private static final String INVENTORY_OPEN							 = INVENTORY + "open.";
+    public static final  String INVENTORY_OPEN_CHECK					 = INVENTORY_OPEN + "active";
+    // TODO: close and cancelother on open-section-level are temporary.
+    public static final  String INVENTORY_OPEN_CLOSE					 = INVENTORY_OPEN + "close";
+    public static final  String INVENTORY_OPEN_CANCELOTHER				 = INVENTORY_OPEN + "cancelother";
+    
     /*
      *     e   e                         ,e,                  
      *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
@@ -615,6 +639,11 @@ public abstract class ConfPaths {
 	private static final String MOVING_LOADCHUNKS						 = MOVING + "loadchunks.";
 	public static final String  MOVING_LOADCHUNKS_JOIN					 = MOVING_LOADCHUNKS + "join";
 	public static final String  MOVING_SPRINTINGGRACE					 = MOVING + "sprintinggrace";
+	public static final String  MOVING_SPEEDGRACE					 	 = MOVING + "speedgrace";
+	
+	private static final String MOVING_VEHICLES							 = MOVING + "vehicles.";
+	public static final String  MOVING_VEHICLES_ENFORCELOCATION			 = MOVING_VEHICLES + "enforcelocation";
+	public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN		 = MOVING_VEHICLES + "preventdestroyown";
 	
     /*
      *  dP"8   d8          ,e,                        
@@ -630,7 +659,36 @@ public abstract class ConfPaths {
     // Compatibility section (possibly temporary).
     @GlobalConfig
     public static final String COMPATIBILITY                             = "compatibility.";
+    public static final String COMPATIBILITY_MANAGELISTENERS			 = COMPATIBILITY + "managelisteners";
 	public static final String COMPATIBILITY_BUKKITONLY                  = COMPATIBILITY + "bukkitapionly";
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";
     
+    // Deprecated (don't use fields from above).
+    @Moved(newPath = LOGGING_BACKEND_CONSOLE_ACTIVE)
+    public static final String  LOGGING_CONSOLE                          = "logging.console";
+    @Moved(newPath = LOGGING_BACKEND_FILE_ACTIVE)
+    public static final String  LOGGING_FILE                             = "logging.file";
+    @Moved(newPath = LOGGING_BACKEND_FILE_FILENAME)
+    public static final String  LOGGING_FILENAME                         = "logging.filename";
+    @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_ACTIVE)
+    public static final String  LOGGING_INGAMECHAT                       = "logging.ingamechat";
+    @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
+    public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = "logging.usesubscriptions";
+	@Moved(newPath = PROTECT_PLUGINS_HIDE_ACTIVE)
+	public static final String  MISCELLANEOUS_PROTECTPLUGINS			 = "miscellaneous.protectplugins";
+	@Moved(newPath = PROTECT_CLIENTS_MOTD_ALLOWALL)
+	public static final String  MISCELLANEOUS_ALLOWCLIENTMODS			 = "miscellaneous.allowclientmods";
+	@Moved(newPath = PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)
+	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND		 = "protection.plugins.hide.messages.unknowncommand";
+	@Moved(newPath = PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG)
+	public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION	 = "protection.plugins.hide.messages.nopermission";
+	@Moved(newPath = PROTECT_COMMANDS_CONSOLEONLY_ACTIVE)
+	public static final String  MISCELLANEOUS_OPINCONSOLEONLY			 = "miscellaneous.opinconsoleonly";
+	@Moved(newPath = COMPATIBILITY_MANAGELISTENERS)
+	public static final String  MISCELLANEOUS_MANAGELISTENERS			 = "miscellaneous.managelisteners";
+	@Moved(newPath = INVENTORY_OPEN_CHECK)
+	public static final String  INVENTORY_ENSURECLOSE					 = "checks.inventory.ensureclose";
+	@Deprecated
+	public static final String  MISCELLANEOUS_REPORTTOMETRICS			 = "miscellaneous.reporttometrics";
+	
 }

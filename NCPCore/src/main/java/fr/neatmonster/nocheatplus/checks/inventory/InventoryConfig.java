@@ -103,6 +103,10 @@ public class InventoryConfig extends ACheckConfig {
 
     public final boolean    itemsCheck;
     
+    public final boolean    openCheck;
+    public final boolean	openClose;
+    public final boolean	openCancelOther;
+    
 	/**
 	 * Instantiates a new inventory configuration.
 	 * 
@@ -138,6 +142,10 @@ public class InventoryConfig extends ACheckConfig {
 		instantEatActions = data.getOptimizedActionList(ConfPaths.INVENTORY_INSTANTEAT_ACTIONS, Permissions.INVENTORY_INSTANTEAT);
 		
 		itemsCheck = data.getBoolean(ConfPaths.INVENTORY_ITEMS_CHECK);
+		
+		openCheck = data.getBoolean(ConfPaths.INVENTORY_OPEN_CHECK);
+		openClose = data.getBoolean(ConfPaths.INVENTORY_OPEN_CLOSE);
+		openCancelOther = data.getBoolean(ConfPaths.INVENTORY_OPEN_CANCELOTHER);
 	}
 
 	/*
@@ -154,6 +162,8 @@ public class InventoryConfig extends ACheckConfig {
 			return fastClickCheck;
 		case INVENTORY_ITEMS:
 		    return itemsCheck;
+		case INVENTORY_OPEN:
+			return openCheck;
 		case INVENTORY_DROP:
 			return dropCheck;
 		case INVENTORY_INSTANTBOW:

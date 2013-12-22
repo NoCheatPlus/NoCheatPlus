@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
 public interface MCAccess {
 	
 	/**
-	 * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5".
+	 * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5", to indicate multiple sub-versions supported use "1.5.x", use "?" to indicate general future support.
 	 * @return
 	 */
 	public String getMCVersion();
@@ -35,7 +35,7 @@ public interface MCAccess {
 	
 	/**
 	 * Get the servers command map.
-	 * @return MAy rturn null if not supported.
+	 * @return May return null if not supported.
 	 */
 	public CommandMap getCommandMap();
 	
@@ -71,17 +71,6 @@ public interface MCAccess {
 	 * @return
 	 */
 	public AlmostBoolean isBlockLiquid(int id);
-	
-	/**
-	 * Hiding the API access here.<br>
-	 * // TODO: Replace by independent method.
-	 * TODO: Find description of this and use block properties from here, as well as a speaking method name.<br>
-	 * Assumption: This is something like "can stand on this type of block".
-	 * @deprecated Will be replaced by direct calls to BlockProperties soon.
-	 * @param id
-	 * @return
-	 */
-	public boolean Block_i(int id);
 
 	/**
 	 * Does only check y bounds, returns false if dead. this is half a check as auxiliary means for PlayerLocation.isIllegal.
@@ -107,7 +96,7 @@ public interface MCAccess {
 
 	public void setInvulnerableTicks(Player player, int ticks);
 
-	public void dealFallDamage(Player player, int damage);
+	public void dealFallDamage(Player player, double damage);
 
 	/**
 	 * This may well be removed, if possible to check with Bukkit.
@@ -124,9 +113,12 @@ public interface MCAccess {
 	public boolean shouldBeZombie(Player player);
 
 	/**
-	 * Set flag + death ticks.
+	 * Ensure the player is really taken out: Set flag + death ticks.
+	 * 
+	 * TODO: Check if still necessary + make knowledge-base entries for what to check.
+	 * 
 	 * @param player
-	 * @param i
+	 * @param deathTicks
 	 */
 	public void setDead(Player player, int deathTicks);
 	

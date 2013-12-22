@@ -22,7 +22,7 @@
   </dependencies>
   <description>Very basic dependencies that have to be built before commons, no use of Bukkit.
 
-Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+Version updating is done for the NoCheatPlus sub-module.</description>
 
   <build>
     <resources>

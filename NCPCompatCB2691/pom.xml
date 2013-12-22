@@ -28,5 +28,5 @@
 
   <description>Compatibility for CB2691 (1.5.1-R0.1 beta release).
 
-Version updating is done for NCPPlugin mainly, expect the other poms version to change randomly rather.</description>
+Version updating is done for the NoCheatPlus sub-module.</description>
 </project>

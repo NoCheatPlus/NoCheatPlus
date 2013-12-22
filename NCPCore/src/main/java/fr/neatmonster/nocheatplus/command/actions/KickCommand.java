@@ -1,36 +1,33 @@
 package fr.neatmonster.nocheatplus.command.actions;
 
+import java.util.List;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.neatmonster.nocheatplus.command.DelayableCommand;
+import fr.neatmonster.nocheatplus.command.AbstractCommand;
+import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
-public class KickCommand extends DelayableCommand {
+public class KickCommand extends BaseCommand {
 
 	public KickCommand(JavaPlugin plugin) {
-		super(plugin, "kick", Permissions.ADMINISTRATION_KICK);
+		super(plugin, "kick", Permissions.COMMAND_KICK);
 	}
 
 	@Override
-	public boolean execute(final CommandSender sender, Command command, String label,
-			String[] alteredArgs, long delay) {
+	public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
 		// Args contains "kick" as first arg.
-		if (alteredArgs.length < 2) return false;
-		final String name = alteredArgs[1];
+		if (args.length < 2) return false;
+		final String name = args[1];
 		final String reason;
-		if (alteredArgs.length > 2) reason = join(alteredArgs, 2);
+		if (args.length > 2) reason = AbstractCommand.join(args, 2);
 		else reason = "";
-		schedule(new Runnable() {
-			@Override
-			public void run() {
-				kick(sender, name, reason);
-			}
-		}, delay);
+		kick(sender, name, reason);
 		return true;
 	}
 	
@@ -41,4 +38,13 @@ public class KickCommand extends DelayableCommand {
 		LogUtil.logInfo("[NoCheatPlus] (" + sender.getName() + ") Kicked " + player.getName() + " : " + reason);
 	}
 
+	/* (non-Javadoc)
+	 * @see fr.neatmonster.nocheatplus.command.AbstractCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 */
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command,
+			String alias, String[] args) {
+		return null;
+	}
+	
 }
