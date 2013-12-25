@@ -1,7 +1,7 @@
-![NoCheatPlus](https://dl.dropbox.com/u/34835222/NoCheatPlus_doughnut.png)
+![NoCheatPlus](http://dev.bukkit.org/media/images/48/981/NoCheatPlus_ChristmasED.png)
 ===========
 
-NoCheatPlus is an unofficial fork of the famous anti-cheat plugin [NoCheat] (http://dev.bukkit.org/server-mods/nocheat/) created by [Evenprime] (https://github.com/Evenprime). NoCheatPlus attempts to enforce "vanilla Minecraft" mechanics, as well as preventing players from abusing weaknesses in Minecraft or its protocol, making your server more safe. Organized in different sections, various checks are performed to test players doing, covering a wide range including flying and speeding, fighting hacks, fast block breaking and nukers, inventory hacks, chat spam and other types of malicious behaviour. For a more complete list have a look at the always outdated [Features Page] (http://dev.bukkit.org/server-mods/nocheatplus/pages/documentation/features/).
+NoCheatPlus is an unofficial fork of the famous anti-cheat plugin [NoCheat] (http://dev.bukkit.org/server-mods/nocheat/) created by [Evenprime] (https://github.com/Evenprime). NoCheatPlus attempts to enforce "vanilla Minecraft" mechanics, as well as preventing players from abusing weaknesses in Minecraft or its protocol, making your server more safe. Organized in different sections, various checks are performed to test players doing, covering a wide range including flying and speeding, fighting hacks, fast block breaking and nukers, inventory hacks, chat spam and other types of malicious behaviour. For a more complete list have a look at the always outdated [Features Page] (https://github.com/asofold/NCPDocs/blob/master/Features.creole).
 
 Installation
 ---------
@@ -34,16 +34,13 @@ Download
 
 Support and Documentation
 * [Tickets] (http://dev.bukkit.org/server-mods/nocheatplus/tickets/)
-* [Configuration] (http://dev.bukkit.org/server-mods/nocheatplus/pages/documentation/configuration/)
-* [Permissions] (http://dev.bukkit.org/server-mods/nocheatplus/pages/documentation/permissions/)
-* [Commands] (http://dev.bukkit.org/server-mods/nocheatplus/pages/documentation/commands/)
-
-Miscellaneous
-* [Statistics] (https://mcstats.org/plugin/NoCheatPlus)
+* [Configuration] (https://github.com/asofold/NCPDocs/tree/master/wiki/configuration)
+* [Permissions] (https://github.com/asofold/NCPDocs/blob/master/wiki/permissions/permissions.creole)
+* [Commands] (https://github.com/asofold/NCPDocs/blob/master/wiki/Commands.creole)
 
 Developers
 * [License] (https://github.com/NoCheatPlus/NoCheatPlus/blob/master/LICENSE.txt)
-* [API] (http://dev.bukkit.org/server-mods/nocheatplus/pages/documentation/api/)
+* [API] (https://github.com/asofold/NCPDocs/blob/master/wiki/development/api.creole)
 
 Related
 * [CompatNoCheatPlus at BukkitDev] (http://dev.bukkit.org/server-mods/compatnocheatplus-cncp/)
