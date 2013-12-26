@@ -13,9 +13,9 @@ MMMMMMMMMMX;,;::;;,::;;OMMMMMMMMMM
 MMMMMMMMMMd;;::::;:::;;:OMMMMMMMMM
 MMMMMMMMMNo;;::::::::;;:KMMMMMMMMM
 MMMMMMMMMx,,;:::;;;:::;;;KMMMMMMMM				      Happy Holidays
-MMMMMMMMk:;:::::;;;::::;;cWMMMMMMM					    and
+MMMMMMMMk:;:::::;;;::::;;cWMMMMMMM						    and
 MMMMMMMx,,;:;;;::::::::;;;oWMMMMMM				      A Happy New Year
-MMMMMWKl;;::;,,:::;;;:;,,;cKMMMMMM					  To all!
+MMMMMWKl;;::;,,:::;;;:;,,;cKMMMMMM						  To all!
 MMMMX;,;:::::;:::;;;;::;;:;;dKMMMM
 MMMNl;;:::;;;::::::::::::::;,cNMMM
 MMM0c;::::;;;::::;;;::::;;;:;lNMMM
