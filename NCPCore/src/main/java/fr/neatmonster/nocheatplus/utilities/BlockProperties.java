@@ -343,6 +343,9 @@ public class BlockProperties {
     /** ICE */
     public static final long F_ICE 			= 0x20000;
     
+    /** LEAVES */
+    public static final long F_LEAVES 			= 0x40000;
+    
     /**
      * Map flag to names.
      */
@@ -610,6 +613,7 @@ public class BlockProperties {
 				Material.LEAVES, Material.BED_BLOCK}){
 			blocks[mat.getId()] = leafType;
 		}
+		blockFlags[Material.LEAVES.getId()] |= F_LEAVES;
 		// Huge mushroom type (...)
 		for (Material mat : new Material[]{ 
 				Material.HUGE_MUSHROOM_1, Material.HUGE_MUSHROOM_2,
@@ -969,7 +973,7 @@ public class BlockProperties {
 	public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {	
 		if (efficiency > 0){
 			// Workaround until something better is found..
-			if (blockId == Material.LEAVES.getId() || blockProps == glassType){
+			if (isLeaves(blockId) || blockProps == glassType){
 				/*
 				 * TODO: Some might be dealt with by insta break, by now, 
 				 * still getting exact durations would be nice to have, for expected breaking times and 
@@ -1018,7 +1022,7 @@ public class BlockProperties {
 				duration = 240;
 				isValidTool = true;
 			}
-			else if (blockId == Material.LEAVES.getId()){
+			else if (isLeaves(blockId)){
 				duration = 20;
 				isValidTool = true;
 			}
@@ -1267,6 +1271,10 @@ public class BlockProperties {
 	
 	public static final boolean isIce(final int id) {
 		return (blockFlags[id] & F_ICE) != 0;
+	}
+	
+	public static final boolean isLeaves(final int id) {
+		return (blockFlags[id] & F_LEAVES) != 0;
 	}
 	
 	/**
