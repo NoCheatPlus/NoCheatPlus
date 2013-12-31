@@ -29,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /*
@@ -54,7 +55,7 @@ import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
  * 
  * @see InventoryEvent
  */
-public class InventoryListener  extends CheckListener {
+public class InventoryListener  extends CheckListener implements JoinLeaveListener{
 
     /** The drop check. */
     private final Drop       drop       = addCheck(new Drop());
@@ -351,6 +352,16 @@ public class InventoryListener  extends CheckListener {
     	// Note: ignore cancelother setting.
     	open.check(event.getPlayer());
     }
+
+	@Override
+	public void playerJoins(Player player) {
+		// Ignore
+	}
+
+	@Override
+	public void playerLeaves(Player player) {
+		open.check(player);
+	}
     
 //    @EventHandler(priority = EventPriority.MONITOR)
 //    public void onVehicleDestroy(final VehicleDestroyEvent event) {
