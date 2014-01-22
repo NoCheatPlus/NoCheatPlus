@@ -53,12 +53,12 @@ public class Reach extends Check {
 
         final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE;
 
-        // Distance is calculated from eye location to center of targeted block. If the player is further away from his
+        // Distance is calculated from eye location to center of targeted block. If the player is further away from their
         // target than allowed, the difference will be assigned to "distance".
         final double distance = TrigUtil.distance(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), 0.5 + block.getX(), 0.5 + block.getY(), 0.5 + block.getZ()) - distanceLimit;
 
         if (distance > 0) {
-            // He failed, increment violation level.
+            // They failed, increment violation level.
             data.reachVL += distance;
 
             // Remember how much further than allowed he tried to reach for logging, if necessary.
@@ -70,7 +70,7 @@ public class Reach extends Check {
             vd.setParameter(ParameterName.REACH_DISTANCE, String.valueOf(Math.round(data.reachDistance)));
             cancel = executeActions(vd);
         } else
-            // Player passed the check, reward him.
+            // Player passed the check, reward them.
             data.reachVL *= 0.9D;
 
         return cancel;

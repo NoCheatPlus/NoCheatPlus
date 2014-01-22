@@ -18,7 +18,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * MMMM                                                   M#########M                      
  */
 /**
- * The InstantBow check will find out if a player pulled the string of his bow too fast.
+ * The InstantBow check will find out if a player pulled the string of their bow too fast.
  */
 public class InstantBow extends Check {
     
@@ -54,7 +54,7 @@ public class InstantBow extends Check {
         final long pullDuration = now - (cc.instantBowStrict ? data.instantBowInteract : data.instantBowShoot);
 
         if ((!cc.instantBowStrict || data.instantBowInteract > 0) && pullDuration >= expectedPullDuration){
-            // The player was slow enough, reward him by lowering his violation level.
+            // The player was slow enough, reward them by lowering their violation level.
             data.instantBowVL *= 0.9D;
         }
         else if (data.instantBowInteract > now){
@@ -68,7 +68,7 @@ public class InstantBow extends Check {
                 // TODO: Consider: Allow one time but set yawrate penalty time ?
                 final double difference = (expectedPullDuration - pullDuration) / 100D;
 
-                // Player was too fast, increase his violation level.
+                // Player was too fast, increase their violation level.
                 data.instantBowVL += difference;
 
                 // Execute whatever actions are associated with this check and the

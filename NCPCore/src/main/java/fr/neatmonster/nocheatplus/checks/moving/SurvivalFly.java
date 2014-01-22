@@ -573,7 +573,7 @@ public class SurvivalFly extends Check {
 			return hAllowedDistance;
 		}
 		
-		// If the player is on ice, give him an higher maximum speed.
+		// If the player is on ice, give them a higher maximum speed.
 		if (data.sfOnIce > 0) {
 			hAllowedDistance *= modIce;
 		}

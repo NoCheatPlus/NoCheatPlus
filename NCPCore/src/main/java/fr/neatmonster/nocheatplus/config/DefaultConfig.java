@@ -503,7 +503,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".ban-ip", "ban-ip [ip]");
         set(ConfPaths.STRINGS + ".bautosign", start + "failed autosign with [tags]" + end);
         set(ConfPaths.STRINGS + ".bbfrequency", start + "tried to break too many blocks within time frame" + end);
-        set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of his line of sight" + end);
+        set(ConfPaths.STRINGS + ".bdirection", start + "tried to interact with a block out of their line of sight" + end);
         set(ConfPaths.STRINGS + ".bedleave", start + "sends bed leave packets (was not in bed)" + end);
         set(ConfPaths.STRINGS + ".bpspeed", start + "tried to throw projectiles too quickly" + end);
         set(ConfPaths.STRINGS + ".breach", start + "exceeds block-interact distance ([reachdistance])" + end);
@@ -518,7 +518,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".drop", start + "tried to drop more items than allowed" + end);
         set(ConfPaths.STRINGS + ".dropkick", "ncp delay ncp kick [player] Dropping items too fast.");
         set(ConfPaths.STRINGS + ".fastbreak", start + "tried to break blocks ([blockid]) faster than possible" + end);
-        set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in his inventory too quickly" + end);
+        set(ConfPaths.STRINGS + ".fastclick", start + "tried to move items in their inventory too quickly" + end);
         set(ConfPaths.STRINGS + ".fastconsume", start + "consumes [food] [tags] too fast" + end);
         set(ConfPaths.STRINGS + ".fastheal", start + "regenerates health faster than usual" + end);
         set(ConfPaths.STRINGS + ".fastplace", start + "tried to place too many blocks" + end);

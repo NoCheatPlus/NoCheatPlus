@@ -28,15 +28,15 @@ public class Captcha extends AsyncCheck implements ICaptcha{
     public void checkCaptcha(Player player, String message, ChatConfig cc, ChatData data, boolean isMainThread) {
     	// Correct answer to the captcha?
         if (message.equals(data.captchaGenerated)) {
-            // Yes, clear his data and do not worry anymore about him.
+            // Yes, clear their data and do not worry anymore about them.
             data.reset();
             data.captchaStarted = false;
             player.sendMessage(ColorUtil.replaceColors(cc.captchaSuccess));
         } else {
-        	// Increment his tries number counter.
+        	// Increment their tries number counter.
             data.captchTries++;
             data.captchaVL ++;
-            // Does he failed too much times?
+            // Have they failed too man times?
             if (data.captchTries > cc.captchaTries) {
                 // Find out if we need to kick the player or not.
                 executeActions(player, data.captchaVL, 1, cc.captchaActions, 

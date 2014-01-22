@@ -168,7 +168,7 @@ public class BlockBreakListener extends CheckListener {
 
     /**
      * We listen to PlayerAnimation events because it is (currently) equivalent to "player swings arm" and we want to
-     * check if he did that between block breaks.
+     * check if they did that between block breaks.
      * 
      * @param event
      *            the event

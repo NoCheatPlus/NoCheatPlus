@@ -85,7 +85,7 @@ public class MorePacketsVehicle extends Check {
         	return data.getMorePacketsVehicleSetBack();
         }
 
-        // Player used up buffer, he fails the check.
+        // Player used up buffer, they fail the check.
         if (data.morePacketsVehicleBuffer < 0) {
             data.morePacketsVehiclePackets = -data.morePacketsVehicleBuffer;
 

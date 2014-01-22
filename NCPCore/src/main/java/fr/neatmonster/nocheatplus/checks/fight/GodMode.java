@@ -173,7 +173,7 @@ public class GodMode extends Check {
     }
 
     /**
-     * If a player apparently died, make sure he really dies after some time if he didn't already, by setting up a
+     * If a player apparently died, make sure they really die after some time if they didn't already, by setting up a
      * Bukkit task.
      * 
      * @param player
@@ -190,9 +190,9 @@ public class GodMode extends Check {
                     @Override
                     public void run() {
                         try {
-                            // Check again if the player should be dead, and if the game didn't mark him as dead.
+                            // Check again if the player should be dead, and if the game didn't mark them as dead.
                             if (mcAccess.shouldBeZombie(player)){
-                                // Artificially "kill" him.
+                                // Artificially "kill" them.
                             	mcAccess.setDead(player, 19);
                             }
                         } catch (final Exception e) {}

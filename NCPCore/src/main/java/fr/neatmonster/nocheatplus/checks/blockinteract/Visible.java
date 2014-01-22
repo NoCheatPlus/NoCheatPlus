@@ -75,7 +75,7 @@ public class Visible extends Check {
 		// TODO: Reachable face check ?
 		
 		if (blockX == Location.locToBlock(eyeX) && blockZ == Location.locToBlock(eyeZ) && block.getY() == Location.locToBlock(eyeY)){
-			// Player is interacting with the block his head is in.
+			// Player is interacting with the block their head is in.
 			// TODO: Should the reachable-face-check be done here too (if it is added at all)?
 			collides = false;
 		}

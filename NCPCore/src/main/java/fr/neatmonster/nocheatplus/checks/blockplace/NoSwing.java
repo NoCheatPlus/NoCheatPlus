@@ -16,7 +16,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
  *                                                          d8888P  
  */
 /**
- * We require that the player moves his arm between block places, this is what gets checked here.
+ * We require that the player moves their arm between block places, this is what gets checked here.
  */
 public class NoSwing extends Check {
 
@@ -39,14 +39,14 @@ public class NoSwing extends Check {
 
         boolean cancel = false;
 
-        // Did he swing his arm before?
+        // Did they swing their arm before?
         if (data.noSwingArmSwung) {
             // "Consume" the flag.
             data.noSwingArmSwung = false;
             // Reward with lowering of the violation level.
             data.noSwingVL *= 0.9D;
         } else {
-            // He failed, increase violation level.
+            // They failed, increase violation level.
             data.noSwingVL += 1D;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
