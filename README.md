@@ -1,6 +1,32 @@
 ![NoCheatPlus](http://dev.bukkit.org/media/images/41/144/NoCheatPlus_doughnut_full.png)
 ===========
 
+```
+MMMMMMMMMMMMMMMMWKMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMNXK0KXNMMMMMMMMMMMMM
+MMMMMMMMMMMMMMW0000KMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMKc;lxWMMMMMMMMMMMMM
+MMMMMMMMMMMMM0x:;;,;KMMMMMMMMMMMMM
+MMMMMMMMMMMMWc;;:::;:kXMMMMMMMMMMM
+MMMMMMMMMMMXc;;:;;;:;;:WMMMMMMMMMM
+MMMMMMMMMMX;,;::;;,::;;OMMMMMMMMMM
+MMMMMMMMMMd;;::::;:::;;:OMMMMMMMMM
+MMMMMMMMMNo;;::::::::;;:KMMMMMMMMM
+MMMMMMMMMx,,;:::;;;:::;;;KMMMMMMMM				      Happy Holidays
+MMMMMMMMk:;:::::;;;::::;;cWMMMMMMM						    and
+MMMMMMMx,,;:;;;::::::::;;;oWMMMMMM				      A Happy New Year
+MMMMMWKl;;::;,,:::;;;:;,,;cKMMMMMM						  To all!
+MMMMX;,;:::::;:::;;;;::;;:;;dKMMMM
+MMMNl;;:::;;;::::::::::::::;,cNMMM
+MMM0c;::::;;;::::;;;::::;;;:;lNMMM
+MMK;,;:::::::::::;;;::::;;;:;;cXMM
+Wx;;;:::;;;;::::;;;::::::;;;:;;;lN
+Olccoooollloc,,,',',,:ooolllooollO
+MMMMMMWK0Okxl''''''''cxkO0KNMMMMMM
+MMMMMNoc;;;;;,,,,,,,,;;;;;:lXMMMMM
+MMMMMMMMWX0Oxxdooooddxk0XWMMMMMMMM
+```
+
 NoCheatPlus is an unofficial fork of the famous anti-cheat plugin [NoCheat] (http://dev.bukkit.org/server-mods/nocheat/) created by [Evenprime] (https://github.com/Evenprime). NoCheatPlus attempts to enforce "vanilla Minecraft" mechanics, as well as preventing players from abusing weaknesses in Minecraft or its protocol, making your server more safe. Organized in different sections, various checks are performed to test players doing, covering a wide range including flying and speeding, fighting hacks, fast block breaking and nukers, inventory hacks, chat spam and other types of malicious behaviour. For a more complete list have a look at the always outdated [Features Page] (https://github.com/asofold/NCPDocs/blob/master/Features.creole).
 
 Installation
