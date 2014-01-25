@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
  * MMMM                                                   MMMMMMMMMMMM                 
  */
 /**
- * The InstantEat check will find out if a player eats his food too fast.
+ * The InstantEat check will find out if a player eats their food too fast.
  */
 public class InstantEat extends Check {
 
@@ -64,7 +64,7 @@ public class InstantEat extends Check {
         else {
             final double difference = (expectedTimeWhenEatingFinished - time) / 100D;
 
-            // Player was too fast, increase his violation level.
+            // Player was too fast, increase their violation level.
             data.instantEatVL += difference;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should

@@ -291,7 +291,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	final boolean damagedIsDead = damaged.isDead();
     	if (damagedPlayer != null && !damagedIsDead) {
             if (!damagedPlayer.isDead() && godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, BridgeHealth.getDamage(event), damagedData)){
-                // It requested to "cancel" the players invulnerability, so set his noDamageTicks to 0.
+                // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
             	damagedPlayer.setNoDamageTicks(0);
             }
             if (BridgeHealth.getHealth(damagedPlayer) >= BridgeHealth.getMaxHealth(damagedPlayer)){

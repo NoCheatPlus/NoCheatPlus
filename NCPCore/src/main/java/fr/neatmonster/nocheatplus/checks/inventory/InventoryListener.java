@@ -232,7 +232,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             Items.checkIllegalEnchantments(player, item.getItemStack());
         }
         
-        // If the player died, all his items are dropped so ignore him.
+        // If the player died, all their items are dropped so ignore them.
         if (event.getPlayer().isDead())
             return;
 

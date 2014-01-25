@@ -359,7 +359,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * When a player changes his gamemode, all information related to the moving checks becomes invalid.
+     * When a player changes their gamemode, all information related to the moving checks becomes invalid.
      * 
      * @param event
      *            the event
@@ -390,7 +390,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
 
     /**
-     * When a player moves, he will be checked for various suspicious behaviors.<br>
+     * When a player moves, they will be checked for various suspicious behaviors.<br>
      * (lowest priority)
      * 
      * @param event
@@ -622,11 +622,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// Morepackets.
 		if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
-			// If he hasn't been stopped by any other check and is handled by the more packets check, execute it.
+			// If it hasn't been stopped by any other check and is handled by the more packets check, execute it.
 			// TODO: Still feed morepackets even if cancelled.
 			newTo = morePackets.check(player, pFrom, pTo, data, cc);
 		} else {
-			// Otherwise we need to clear his data.
+			// Otherwise we need to clear their data.
 			data.clearMorePacketsData();
 		}
 		
@@ -1098,7 +1098,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     			System.out.println("[NoCheatPlus] VehicleMoveEvent fired for: " + entityType);
     		}
     	}
-    	// TODO: Might account for the case of a player letting the vehicle move but not himself (do mind latency).
+    	// TODO: Might account for the case of a player letting the vehicle move but not themself (do mind latency).
     	// Mind that players could be riding horses inside of minecarts etc.
     	if (vehicle.getVehicle() != null) {
     		// Do ignore events for vehicles inside of other vehicles.
@@ -1154,7 +1154,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             newTo = morePacketsVehicle.check(player, from, to, data, cc);
         }
         else{
-            // Otherwise we need to clear his data.
+            // Otherwise we need to clear their data.
             data.clearMorePacketsData();
         }
         

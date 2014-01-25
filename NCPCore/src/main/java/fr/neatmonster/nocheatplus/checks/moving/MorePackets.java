@@ -49,7 +49,7 @@ public class MorePackets extends Check {
      * 
      * Players get assigned a certain amount of "free" packets as a limit initially. Every move packet reduces that
      * limit by 1. If more than 1 second of time passed, the limit gets increased by 22 * time in seconds, up to 50 and
-     * he gets a new "setback" location. If the player reaches limit = 0 -> teleport him back to "setback". If there was
+     * they get a new "setback" location. If the player reaches limit = 0 -> teleport them back to "setback". If there was
      * a long pause (maybe lag), limit may be up to 100.
      * 
      * @param player
@@ -76,7 +76,7 @@ public class MorePackets extends Check {
         // Take a packet from the buffer.
         data.morePacketsBuffer--;
 
-        // Player used up buffer, he fails the check.
+        // Player used up buffer, they fail the check.
         if (data.morePacketsBuffer < 0) {
             data.morePacketsPackets = -data.morePacketsBuffer;
 

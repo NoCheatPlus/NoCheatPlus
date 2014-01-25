@@ -91,7 +91,7 @@ public class Reach extends Check {
         
         final Vector pRel = dRef.toVector().subtract(pRef.toVector());
         
-        // Distance is calculated from eye location to center of targeted. If the player is further away from his target
+        // Distance is calculated from eye location to center of targeted. If the player is further away from their target
         // than allowed, the difference will be assigned to "distance".
         final double lenpRel = pRel.length();
         
@@ -100,7 +100,7 @@ public class Reach extends Check {
         final double reachMod = data.reachMod; 
 
         if (violation > 0) {
-            // He failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
+            // They failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
             if (TickTask.getLag(1000) < 1.5f){
             	// TODO: 1.5 is a fantasy value.
             	data.reachVL += violation;
@@ -124,7 +124,7 @@ public class Reach extends Check {
             Improbable.feed(player, (float) (lenpRel - distanceLimit * reachMod) / 4f, System.currentTimeMillis());
         }
         else{
-            // Player passed the check, reward him.
+            // Player passed the check, reward them.
             data.reachVL *= 0.8D;
             
         }
@@ -147,7 +147,7 @@ public class Reach extends Check {
             	data.reachLastViolationTime = 0;
             }
 
-            // He is in penalty time, therefore request cancelling of the event.
+            // They are in penalty time, therefore request cancelling of the event.
             cancelByPenalty = !cancel;
             cancel = true;
         }

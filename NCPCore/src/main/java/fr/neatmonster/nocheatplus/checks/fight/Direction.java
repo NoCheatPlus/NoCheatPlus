@@ -19,7 +19,7 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  * MMMMMMMMMMM                                                           
  */
 /**
- * The Direction check will find out if a player tried to interact with something that's not in his field of view.
+ * The Direction check will find out if a player tried to interact with something that's not in their field of view.
  */
 public class Direction extends Check {
 
@@ -60,7 +60,7 @@ public class Direction extends Check {
         
         // TODO: allow any hit on the y axis (might just adapt interface to use foot position + height)!
         
-        // How far "off" is the player with his aim. We calculate from the players eye location and view direction to
+        // How far "off" is the player with their aim. We calculate from the players eye location and view direction to
         // the center of the target entity. If the line of sight is more too far off, "off" will be bigger than 0.
         final Location loc = player.getLocation();
         final Vector direction = player.getEyeLocation().getDirection();
@@ -75,7 +75,7 @@ public class Direction extends Check {
         }
 
         if (off > 0.1) {
-            // Player failed the check. Let's try to guess how far he was from looking directly to the entity...
+            // Player failed the check. Let's try to guess how far they were from looking directly to the entity...
             final Vector blockEyes = new Vector(dLoc.getX() - loc.getX(),  dLoc.getY() + height / 2D - loc.getY() - player.getEyeHeight(), dLoc.getZ() - loc.getZ());
             final double distance = blockEyes.crossProduct(direction).length() / direction.length();
 
@@ -90,7 +90,7 @@ public class Direction extends Check {
                 // If we should cancel, remember the current time too.
                 data.directionLastViolationTime = System.currentTimeMillis();
         } else
-            // Reward the player by lowering his violation level.
+            // Reward the player by lowering their violation level.
             data.directionVL *= 0.8D;
 
         // If the player is still in penalty time, cancel the event anyway.
@@ -101,7 +101,7 @@ public class Direction extends Check {
             if (data.directionLastViolationTime > System.currentTimeMillis())
                 data.directionLastViolationTime = 0;
 
-            // He is in penalty time, therefore request cancelling of the event.
+            // They are in penalty time, therefore request cancelling of the event.
             return true;
         }
 

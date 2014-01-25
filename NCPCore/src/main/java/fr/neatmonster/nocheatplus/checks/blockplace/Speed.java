@@ -45,7 +45,7 @@ public class Speed extends Check {
             if (data.speedLastRefused) {
                 final double difference = cc.speedInterval - System.currentTimeMillis() + data.speedLastTime;
 
-                // He failed, increase this violation level.
+                // They failed, increase this violation level.
                 data.speedVL += difference;
 
                 // Execute whatever actions are associated with this check and the violation level and find out if we
@@ -55,7 +55,7 @@ public class Speed extends Check {
 
             data.speedLastRefused = true;
         } else {
-            // Reward him by lowering his violation level.
+            // Reward them by lowering their violation level.
             data.speedVL *= 0.9D;
 
             data.speedLastRefused = false;

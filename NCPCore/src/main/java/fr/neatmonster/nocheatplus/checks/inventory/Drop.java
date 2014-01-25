@@ -56,9 +56,9 @@ public class Drop extends Check {
 
         data.dropCount++;
 
-        // The player dropped more than he should.
+        // The player dropped more than they should.
         if (data.dropCount > cc.dropLimit) {
-            // Set his violation level.
+            // Set their violation level.
             data.dropVL = data.dropCount - cc.dropLimit;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should

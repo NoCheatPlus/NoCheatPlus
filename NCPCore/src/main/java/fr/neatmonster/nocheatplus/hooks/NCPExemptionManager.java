@@ -225,7 +225,7 @@ public class NCPExemptionManager {
         for (final CheckType checkType : CheckType.values())
             // Check if player is exempted from something.
             if (isExempted(entityId, checkType))
-                // If he is, we can't remove him so we return.
+                // If they are, we can't remove them so we return.
                 return;
         registeredPlayers.remove(player.getName());
     }
