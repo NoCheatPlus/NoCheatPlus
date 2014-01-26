@@ -87,7 +87,7 @@ public enum CheckType {
     FIGHT_KNOCKBACK(FIGHT, Permissions.FIGHT_KNOCKBACK),
     FIGHT_NOSWING(FIGHT, Permissions.FIGHT_NOSWING),
     FIGHT_REACH(FIGHT, Permissions.FIGHT_REACH),
-    FIGHT_SELFHIT(FIGHT, Permissions.FIGHT_SELFHIT),
+    FIGHT_SELFHIT(FIGHT, Permissions.FIGHT_SELFHIT, FightConfig.factory, FightData.selfHitDataFactory),
     FIGHT_SPEED(FIGHT, Permissions.FIGHT_SPEED),
 
     INVENTORY(InventoryConfig.factory, InventoryData.factory, Permissions.INVENTORY),
@@ -156,7 +156,7 @@ public enum CheckType {
 	}
 
 	/**
-	 * Root constructor.
+	 * General constructor (usually used for root check groups).
 	 * @param parent Super check type (usually the group).
 	 * @param permission Bypass permission.
 	 * @param configFactory Check config factory.

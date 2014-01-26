@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.fight;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -7,9 +8,12 @@ import java.util.TreeMap;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.checks.access.SubCheckDataFactory;
+import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
 /*
@@ -26,9 +30,13 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  * Player specific data for the fight checks.
  */
 public class FightData extends ACheckData {
-
-	/** The factory creating data. */
-	public static final CheckDataFactory factory = new CheckDataFactory() {
+	
+	public static class FightDataFactory implements CheckDataFactory {
+		
+		protected FightDataFactory() {
+			// Discourage creation here.
+		};
+		
 		@Override
 		public final ICheckData getData(final Player player) {
 			return FightData.getData(player);
@@ -43,10 +51,59 @@ public class FightData extends ACheckData {
 		public void removeAllData() {
 			clear();
 		}
+	}
+
+
+	/** The factory for general fight data. */
+	public static final CheckDataFactory factory = new FightDataFactory();
+	
+	/** SelfHit factory */
+	public static final CheckDataFactory selfHitDataFactory = new SubCheckDataFactory<FightData>(CheckType.FIGHT, factory) {
+
+		@Override
+		protected FightData getData(String playerName) {
+			return playersMap.get(playerName);
+		}
+
+		@Override
+		protected Collection<String> getPresentData() {
+			return playersMap.keySet();
+		}
+
+		@Override
+		protected boolean hasData(String playerName) {
+			return playersMap.containsKey(playerName);
+		}
+
+		@Override
+		protected boolean removeFromData(String playerName, FightData data) {
+			if (data.selfHitVL.score(1f) > 0f) {
+				data.selfHitVL.clear(System.currentTimeMillis());
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
 	};
+	
+	
+	public static CheckDataFactory getCheckDataFactory(CheckType checkType) {
+		if (checkType != CheckType.FIGHT && !APIUtils.isParent(CheckType.FIGHT, checkType)) {
+			throw new IllegalArgumentException("Can only return a CheckDataFactory for the check group FIGHT.");
+		}
+		switch(checkType) {
+			// Note that CheckType does need adaption for new entries (!).
+			case FIGHT_SELFHIT:
+				return selfHitDataFactory;
+			default:
+				return factory;
+		}
+	}
 
     /** The map containing the data per players. */
-    private static final Map<String, FightData> playersMap = new HashMap<String, FightData>();
+    protected static final Map<String, FightData> playersMap = new HashMap<String, FightData>(); // Not sure about visibility (selfhit).
 
     /**
      * Gets the data of a specified player.

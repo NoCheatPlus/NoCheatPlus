@@ -12,7 +12,7 @@ public interface IRemoveData {
 	/**
 	 * Remove the data of one player.
 	 * @param playerName
-	 * @return IData instance, if it was present.
+	 * @return IData instance if something was changed. Note that this should also return an existing data instance, if it is only partially cleared and not actually removed.
 	 */
 	public IData removeData(String playerName);
 	
