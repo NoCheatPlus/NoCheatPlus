@@ -86,24 +86,13 @@ public class Direction extends Check {
             // cancel the event.
             cancel = executeActions(player, data.directionVL, distance, cc.directionActions);
 
-            if (cancel)
-                // If we should cancel, remember the current time too.
-                data.directionLastViolationTime = System.currentTimeMillis();
+            if (cancel) {
+            	// Deal an attack penalty time.
+            	data.attackPenalty.applyPenalty(cc.directionPenalty);
+            }
         } else
             // Reward the player by lowering their violation level.
             data.directionVL *= 0.8D;
-
-        // If the player is still in penalty time, cancel the event anyway.
-        if (data.directionLastViolationTime + cc.directionPenalty > System.currentTimeMillis()) {
-            // A safeguard to avoid people getting stuck in penalty time indefinitely in case the system time of the
-            // server gets changed.
-        	// TODO: Change this to a general attack penalty time.
-            if (data.directionLastViolationTime > System.currentTimeMillis())
-                data.directionLastViolationTime = 0;
-
-            // They are in penalty time, therefore request cancelling of the event.
-            return true;
-        }
 
         return cancel;
     }

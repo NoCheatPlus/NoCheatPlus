@@ -16,7 +16,10 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
- * GarbageCollectior class to combine some things, make available for other checks, or just because they don't fit into another section.
+ * Class to combine some things, make available for other checks, or just because they don't fit into another section.<br>
+ * This is registered before the FightListener.
+ * Do note the registration order in fr.neatmonster.nocheatplus.NoCheatPlus.onEnable (within NCPPlugin).
+ * 
  * @author mc_dev
  *
  */

@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -46,7 +47,8 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  *                  d8888P                                                                                     
  */
 /**
- * Central location to listen to events that are relevant for the fight checks.
+ * Central location to listen to events that are relevant for the fight checks.<br>
+ * This listener is registered after the CombinedListener.
  * 
  * @see FightEvent
  */
@@ -247,6 +249,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     			}
     		}
     	}
+    	
+    	// Generic attacking penalty.
+    	// (Cancel after sprinting hacks, because of potential fp).
+        if (!cancelled && data.attackPenalty.isPenalty(now)) {
+        	cancelled = true;
+        	if (cc.debug) {
+        		System.out.println(player.getName() + " ~ attack penalty.");
+        	}
+        }
     	
         return cancelled;
     }
@@ -475,4 +486,14 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 		final FightData data = FightData.getData(event.getPlayer());
 		data.angleHits.clear();
 	}
+	
+	@EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
+    public void onItemHeld(final PlayerItemHeldEvent event) {
+		final Player player = event.getPlayer();
+		final long penalty = FightConfig.getConfig(player).toolChangeAttackPenalty;
+		if (penalty > 0 ) {
+			FightData.getData(player).attackPenalty.applyPenalty(penalty);
+		}
+	}
+
 }

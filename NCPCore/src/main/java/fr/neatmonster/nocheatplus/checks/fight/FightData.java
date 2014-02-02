@@ -15,6 +15,7 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.access.SubCheckDataFactory;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 
 /*
  * MM""""""""`M oo          dP         dP   M""""""'YMM            dP            
@@ -144,6 +145,9 @@ public class FightData extends ACheckData {
     public double lastAttackedY;
     public double lastAttackedZ;
     
+    /** Attack penalty (close combat, ENTITY_ATTACK). */
+    public final PenaltyTime attackPenalty = new PenaltyTime();
+    
     /** The entity id  which might get counter-attacked. */
     public int thornsId = Integer.MIN_VALUE;
     
@@ -154,9 +158,6 @@ public class FightData extends ACheckData {
 
     // Data of the angle check.
     public TreeMap<Long, Location> angleHits = new TreeMap<Long, Location>();
-
-    // Data of the direction check.
-    public long                    directionLastViolationTime = 0;
     
     // FastHeal
     public long					   fastHealRefTime = 0;
@@ -183,7 +184,6 @@ public class FightData extends ACheckData {
     public boolean                 noSwingArmSwung;
 
     // Data of the reach check.
-    public long                    reachLastViolationTime;
 	public double                  reachMod = 1;
     
     // Data of the SelfHit check.

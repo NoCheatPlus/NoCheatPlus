@@ -318,6 +318,7 @@ public class DefaultConfig extends ConfigFile {
          */
         set(ConfPaths.FIGHT_CANCELDEAD, true);
         set(ConfPaths.FIGHT_YAWRATE_CHECK, true);
+        set(ConfPaths.FIGHT_TOOLCHANGEPENALTY, 500L);
         
         set(ConfPaths.FIGHT_ANGLE_CHECK, true);
         set(ConfPaths.FIGHT_ANGLE_THRESHOLD, 50);

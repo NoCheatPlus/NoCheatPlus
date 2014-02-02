@@ -430,6 +430,7 @@ public abstract class ConfPaths {
     public static final String  FIGHT                                    = CHECKS + "fight.";
     
 	public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
+	public static final  String FIGHT_TOOLCHANGEPENALTY		 			 = FIGHT + "toolchangepenalty";
 
     private static final String FIGHT_ANGLE                              = FIGHT + "angle.";
     public static final String  FIGHT_ANGLE_CHECK                        = FIGHT_ANGLE + "active";

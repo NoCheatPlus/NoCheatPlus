@@ -9,6 +9,7 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 
 public class CombinedData extends ACheckData {
 	
@@ -65,8 +66,8 @@ public class CombinedData extends ACheckData {
 	public float sumYaw;
 	public final ActionFrequency yawFreq = new ActionFrequency(3, 333);
 
-	// General penalty time (used for fighting mainly, set by yawrate check).
-	public long timeFreeze = 0;
+	// General penalty time. Used for fighting mainly, but not only close combat (!), set by yawrate check.
+	public final PenaltyTime timeFreeze = new PenaltyTime();
 	
 	// Bedleave check
 	public boolean wasInBed = false;

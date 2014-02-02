@@ -66,6 +66,8 @@ public class FightConfig extends ACheckConfig {
     public final boolean    angleCheck;
     public final int        angleThreshold;
     public final ActionList angleActions;
+    
+    public final long		toolChangeAttackPenalty;
 
     public final boolean    criticalCheck;
     public final double     criticalFallDistance;
@@ -132,6 +134,8 @@ public class FightConfig extends ACheckConfig {
         angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
         angleThreshold = data.getInt(ConfPaths.FIGHT_ANGLE_THRESHOLD);
         angleActions = data.getOptimizedActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);
+        
+        toolChangeAttackPenalty = data.getLong(ConfPaths.FIGHT_TOOLCHANGEPENALTY);
 
         criticalCheck = data.getBoolean(ConfPaths.FIGHT_CRITICAL_CHECK);
         criticalFallDistance = data.getDouble(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE);

@@ -112,14 +112,16 @@ public class Reach extends Check {
             if (Improbable.check(player, (float) violation / 2f, System.currentTimeMillis(), "fight.reach")){
             	cancel = true;
             }
-            if (cancel){
-                // If we should cancel, remember the current time too.
-                data.reachLastViolationTime = System.currentTimeMillis();
+            if (cancel && cc.reachPenalty > 0){
+                // Apply an attack penalty time.
+                data.attackPenalty.applyPenalty(cc.reachPenalty);
             }
         }
         else if (lenpRel - distanceLimit * reachMod > 0){
         	// Silent cancel.
-            data.reachLastViolationTime = Math.max(data.reachLastViolationTime, System.currentTimeMillis() - cc.reachPenalty / 2);
+        	if (cc.reachPenalty > 0) {
+        		data.attackPenalty.applyPenalty(cc.reachPenalty / 2);
+        	}
             cancel = true;
             Improbable.feed(player, (float) (lenpRel - distanceLimit * reachMod) / 4f, System.currentTimeMillis());
         }
@@ -138,25 +140,9 @@ public class Reach extends Check {
         else{
         	data.reachMod = Math.min(1.0, data.reachMod + DYNAMIC_STEP);
         }
-        final boolean cancelByPenalty;
-        // If the player is still in penalty time, cancel the event anyway.
-        if (data.reachLastViolationTime + cc.reachPenalty > System.currentTimeMillis()) {
-            // A safeguard to avoid people getting stuck in penalty time indefinitely in case the system time of the
-            // server gets changed.
-            if (data.reachLastViolationTime > System.currentTimeMillis()){
-            	data.reachLastViolationTime = 0;
-            }
-
-            // They are in penalty time, therefore request cancelling of the event.
-            cancelByPenalty = !cancel;
-            cancel = true;
-        }
-        else{
-        	cancelByPenalty = false;
-        }
         
         if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-            player.sendMessage("NC+: Attack " + (cancel ? (cancelByPenalty ? "(cancel/penalty) ":"(cancel/reach) ") : "") + damaged.getType()+ " height="+ StringUtil.fdec3.format(height) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(reachMod));
+            player.sendMessage("NC+: Attack/reach " + damaged.getType()+ " height="+ StringUtil.fdec3.format(height) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(reachMod));
         }
 
         return cancel;
