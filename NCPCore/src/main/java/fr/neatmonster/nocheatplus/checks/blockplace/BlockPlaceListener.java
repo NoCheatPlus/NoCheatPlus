@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -24,6 +23,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -271,19 +271,12 @@ public class BlockPlaceListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onProjectileLaunch(final ProjectileLaunchEvent event) {
-        /*
-         *  ____            _           _   _ _        _                           _     
-         * |  _ \ _ __ ___ (_) ___  ___| |_(_) | ___  | |    __ _ _   _ _ __   ___| |__  
-         * | |_) | '__/ _ \| |/ _ \/ __| __| | |/ _ \ | |   / _` | | | | '_ \ / __| '_ \ 
-         * |  __/| | | (_) | |  __/ (__| |_| | |  __/ | |__| (_| | |_| | | | | (__| | | |
-         * |_|   |_|  \___// |\___|\___|\__|_|_|\___| |_____\__,_|\__,_|_| |_|\___|_| |_|
-         *               |__/                                                            
-         */
         // The shooter needs to be a player.
-    	final Projectile entity = event.getEntity();
-    	final Entity shooter = entity.getShooter();
-        if (!(shooter instanceof Player))
-            return;
+    	final Projectile projectile = event.getEntity();
+    	final Player player = BridgeMisc.getProjectileShooterPlayer(projectile);
+        if (player == null) {
+        	return;
+        }
 
         // And the projectile must be one the following:
         EntityType type = event.getEntityType();
@@ -303,8 +296,6 @@ public class BlockPlaceListener extends CheckListener {
         default:
             return;
         }
-
-        final Player player = (Player) shooter;
 
         // Do the actual check...
         boolean cancel = false;
@@ -331,13 +322,13 @@ public class BlockPlaceListener extends CheckListener {
         		// Do nothing !
         		// TODO: Might have further flags?
         	}
-        	else if (!BlockProperties.isPassable(entity.getLocation())){
+        	else if (!BlockProperties.isPassable(projectile.getLocation())){
         		// Launch into a block.
         		// TODO: This might be a general check later.       		
         		cancel = true;
         	}
         	else{
-            	if (!BlockProperties.isPassable(player.getEyeLocation(), entity.getLocation())){
+            	if (!BlockProperties.isPassable(player.getEyeLocation(), projectile.getLocation())){
             		// Something between player 
             		// TODO: This might be a general check later.
             		cancel = true;
@@ -347,7 +338,7 @@ public class BlockPlaceListener extends CheckListener {
             		final long flags = BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID | BlockProperties.F_IGN_PASSABLE;
             		if (mat != Material.AIR && (BlockProperties.getBlockFlags(mat.getId()) & flags) == 0 && !mcAccess.hasGravity(mat)){
             			// Still fails on piston traps etc.
-            			if (!BlockProperties.isPassable(player.getLocation(), entity.getLocation()) && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), MovingConfig.getConfig(player).yOnGround)){
+            			if (!BlockProperties.isPassable(player.getLocation(), projectile.getLocation()) && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), MovingConfig.getConfig(player).yOnGround)){
             				cancel = true;
             			}
             		}

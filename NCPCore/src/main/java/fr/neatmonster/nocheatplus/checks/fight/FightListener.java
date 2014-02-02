@@ -336,6 +336,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	final DamageCause damageCause = event.getCause();
         	final Player player = damager instanceof Player ? (Player) damager : null;
         	Player attacker = player;
+        	// TODO: deobfuscate.
         	if (damager instanceof TNTPrimed) {
         		final Entity source = ((TNTPrimed) damager).getSource();
         		if (source instanceof Player) {
