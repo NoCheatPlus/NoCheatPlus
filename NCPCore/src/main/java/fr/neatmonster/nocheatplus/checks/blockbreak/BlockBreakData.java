@@ -3,7 +3,10 @@ package fr.neatmonster.nocheatplus.checks.blockbreak;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
@@ -84,10 +87,12 @@ public class BlockBreakData extends ACheckData {
     public final ActionFrequency  wrongBlockVL;
     
     // Shared data.
-	public int     clickedX;
+	public int     clickedX = Integer.MAX_VALUE;
 	public int     clickedY;
 	public int     clickedZ;
 	public int     clickedTick;
+	/** Tool that the block was clicked with, null for the case of air. */
+	public Material clickedTool = null;
 	
 	// TODO: use tick here too  ?
 	public long    wasInstaBreak;
@@ -118,5 +123,44 @@ public class BlockBreakData extends ACheckData {
 		frequencyBuckets = new ActionFrequency(cc.frequencyBuckets, cc.frequencyBucketDur);
 		wrongBlockVL = new ActionFrequency(6, 20000);
 	}
+    
+    /**
+     * Meant to record the first click/damage on a block (not subsequent clicking), forces internals update.
+     * @param block
+     * @param tick
+     * @param now
+     * @param mat 
+     */
+    public void setClickedBlock(Block block, int tick, long now, Material tool) {
+    	fastBreakfirstDamage = now;
+        // Also set last clicked blocks position.
+        clickedX = block.getX();
+        clickedY = block.getY();
+        clickedZ = block.getZ();
+        clickedTick = tick;
+        clickedTool = tool == Material.AIR ? null : tool;
+    }
+    
+    /**
+     * Reset clicked block (as if not clicked anything before).
+     */
+    public void resetClickedBlock() {
+    	clickedX = Integer.MAX_VALUE;
+    	clickedTick = 0;
+    	fastBreakfirstDamage = 0;
+    	clickedTool = null;
+    }
+    
+    public boolean toolChanged(ItemStack stack) {
+    	return toolChanged(stack == null ? null: stack.getType());
+    }
+    
+    public boolean toolChanged(Material mat) {
+    	if (mat == Material.AIR) {
+    		return clickedTool != null;
+    	} else {
+    		return clickedTool != mat;
+    	}
+    }
 
 }

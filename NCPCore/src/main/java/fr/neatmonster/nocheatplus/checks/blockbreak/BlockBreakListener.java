@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -11,6 +12,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.ItemStack;
 
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -245,19 +248,29 @@ public class BlockBreakListener extends CheckListener {
         
         final int tick = TickTask.getTick();
         // Skip if already set to the same block without breaking within one tick difference.
-        if (tick < data.clickedTick);
-        else if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY()){
+        final ItemStack stack = player.getItemInHand();
+        final Material tool = stack == null ? null: stack.getType();
+        if (data.toolChanged(tool)) {
+        	// Update.
+        } else if (tick < data.clickedTick) {
+        	// Update.
+        } else if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY()){
         	if (tick - data.clickedTick <= 1 ) return;
         }
-        
         // (Always set, the interact event only fires once: the first time.)
         // Only record first damage:
-        data.fastBreakfirstDamage = now;
-        // Also set last clicked blocks position.
-        data.clickedX = block.getX();
-        data.clickedY = block.getY();
-        data.clickedZ = block.getZ();
-        data.clickedTick = tick;
+        data.setClickedBlock(block, tick, now, tool);
+    }
+    
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
+    public void onItemHeld(final PlayerItemHeldEvent event) {
+    	// Reset clicked block.
+    	// TODO: Not for 1.5.2 and before?
+    	final Player player = event.getPlayer();
+    	final BlockBreakData data = BlockBreakData.getData(player);
+    	if (data.toolChanged(player.getInventory().getItem(event.getNewSlot()))) {
+    		data.resetClickedBlock();
+    	}
     }
     
 }
