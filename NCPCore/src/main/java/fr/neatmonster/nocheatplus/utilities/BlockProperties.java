@@ -1599,6 +1599,15 @@ public class BlockProperties {
 		else if (id == Material.PISTON_EXTENSION.getId()){
 			return 0.625;
 		}
+		else if (id == Material.ENDER_PORTAL_FRAME.getId()) {
+			// TODO: Test
+			// TODO: Other concepts ...
+			if ((access.getData(x, y, z) & 0x04) != 0) {
+				return 1.0;
+			} else {
+				return bounds[4];
+			}
+		}
 		else if ((flags & F_GROUND_HEIGHT) != 0){
 			// All blocks that are not treated individually are ground all through.
 			// TODO: Experimental workaround.
@@ -1972,7 +1981,17 @@ public class BlockProperties {
             	else{
             		bmaxY = 1.0;
             	}
-            } 
+            }
+            else if (id == Material.ENDER_PORTAL_FRAME.getId()) {
+    			// TODO: Test
+    			// TODO: Other concepts ...
+            	bminY = 0;
+    			if ((access.getData(x, y, z) & 0x04) != 0) {
+    				bmaxY = 1.0;
+    			} else {
+    				bmaxY = bounds[4];
+    			}
+    		}
             else{
             	bminY = bounds[1]; // minY
             	bmaxY = bounds[4]; // maxY
