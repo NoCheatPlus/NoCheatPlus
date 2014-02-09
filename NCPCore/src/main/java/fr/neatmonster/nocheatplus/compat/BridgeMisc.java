@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.compat;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -16,7 +18,20 @@ public class BridgeMisc {
 	 * Return a shooter of a projectile if we get an entity, null otherwise.
 	 */
 	public static Player getShooterPlayer(Projectile projectile) {
-		Object source = projectile.getShooter();
+		Object source;
+		try {
+			source = projectile.getClass().getMethod("getShooter").invoke(projectile);
+		} catch (IllegalArgumentException e) {
+			return null;
+		} catch (SecurityException e) {
+			return null;
+		} catch (IllegalAccessException e) {
+			return null;
+		} catch (InvocationTargetException e) {
+			return null;
+		} catch (NoSuchMethodException e) {
+			return null;
+		}
 		if (source instanceof Player) {
 			return (Player) source;
 		} else {
