@@ -83,13 +83,13 @@ public class CombinedListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR) // HIGHEST)
     public void onPlayerToggleSprintHighest(final PlayerToggleSprintEvent event) {
-        // Some plugins cancel "sprinting", which makes no sense at all because it doesn't stop people from sprinting
-        // and rewards them by reducing their hunger bar as if they were walking instead of sprinting.
-        if (event.isCancelled() && event.isSprinting())
-            event.setCancelled(false);
+//    	// TODO: Check the un-cancelling.
+//        // Some plugins cancel "sprinting", which makes no sense at all because it doesn't stop people from sprinting
+//        // and rewards them by reducing their hunger bar as if they were walking instead of sprinting.
+//        if (event.isCancelled() && event.isSprinting())
+//            event.setCancelled(false);
         // Feed the improbable.
         Improbable.feed(event.getPlayer(), 0.35f, System.currentTimeMillis());
     }

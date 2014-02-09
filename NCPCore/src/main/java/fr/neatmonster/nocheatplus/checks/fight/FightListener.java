@@ -227,22 +227,22 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 //    	data.lastAttackedDist = targetDist;
     	
     	// Care for the "lost sprint problem": sprint resets, client moves as if still...
-    	if (!cancelled && player.isSprinting() && TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 4.5){
-    		// TODO: Reduce distance by width of other entity [make an auxiliary method, use same value for reach].
-    		// TODO: For pvp: make use of "player was there" heuristic later on.
+    	// TODO: Use stored distance calculation same as reach check?
+    	// TODO: For pvp: make use of "player was there" heuristic later on.
+    	// TODO: Confine further with simple pre-conditions.
+    	if (!cancelled && TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) < 4.5){
     		final MovingData mData = MovingData.getData(player);
+			// Check if fly checks is an issue at all, re-check "real sprinting".
     		if (mData.fromX != Double.MAX_VALUE && mData.mediumLiftOff != MediumLiftOff.LIMIT_JUMP){
-    			// TODO: What would mData.lostSprintCount > 0  mean here?
-    			// TODO: Confine further.
     			final double hDist = TrigUtil.distance(loc.getX(), loc.getZ(), mData.fromX, mData.fromZ);
     			if (hDist >= 0.23) {
     				// TODO: Might need to check hDist relative to speed / modifiers.
     				final MovingConfig mc = MovingConfig.getConfig(player);
-    				// Check if fly checks is an issue at all, re-check "real sprinting".
     				if (now <= mData.timeSprinting + mc.sprintingGrace && MovingListener.shouldCheckSurvivalFly(player, mData, mc)){
     					// Judge as "lost sprint" problem.
+    					// TODO: What would mData.lostSprintCount > 0  mean here?
         				mData.lostSprintCount = 7;
-        				if (cc.debug && BuildParameters.debugLevel > 0){
+        				if ((cc.debug || mc.debug) && BuildParameters.debugLevel > 0){
         					System.out.println(player.getName() + " (lostsprint) hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), targetLoc.getX(), targetLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
         				}
     				}
@@ -432,15 +432,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerToggleSprint(final PlayerToggleSprintEvent event) {
-        /*
-         *  ____  _                         _____                 _        ____             _       _   
-         * |  _ \| | __ _ _   _  ___ _ __  |_   _|__   __ _  __ _| | ___  / ___| _ __  _ __(_)_ __ | |_ 
-         * | |_) | |/ _` | | | |/ _ \ '__|   | |/ _ \ / _` |/ _` | |/ _ \ \___ \| '_ \| '__| | '_ \| __|
-         * |  __/| | (_| | |_| |  __/ |      | | (_) | (_| | (_| | |  __/  ___) | |_) | |  | | | | | |_ 
-         * |_|   |_|\__,_|\__, |\___|_|      |_|\___/ \__, |\__, |_|\___| |____/| .__/|_|  |_|_| |_|\__|
-         *                |___/                       |___/ |___/               |_|                     
-         */
-        if (event.isSprinting()) FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
+        if (event.isSprinting()) {
+        	FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
+        }
     }
     
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -448,10 +442,10 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	final Entity entity = event.getEntity();
     	if (!(entity instanceof Player)) return;
     	final Player player = (Player) entity;
-    	if (event.getRegainReason() != RegainReason.SATIATED){
+    	if (event.getRegainReason() != RegainReason.SATIATED) {
     		return;
     	}
-    	if (fastHeal.isEnabled(player) && fastHeal.check(player)){
+    	if (fastHeal.isEnabled(player) && fastHeal.check(player)) {
     		// TODO: Can clients force events with 0-re-gain ?
     		event.setCancelled(true);
     	}
