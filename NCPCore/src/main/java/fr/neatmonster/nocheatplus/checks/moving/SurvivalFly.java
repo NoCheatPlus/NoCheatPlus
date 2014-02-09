@@ -1439,6 +1439,7 @@ public class SurvivalFly extends Check {
 		}
 		if (player.isSleeping()) tags.add("sleeping");
 		if (player.getFoodLevel() <= 5 && player.isSprinting()) {
+			// Exception: does not take into account latency.
 			tags.add("lowfoodsprint");
 		}
 		if (!tags.isEmpty()) builder.append("\n" + " tags: " + StringUtil.join(tags, "+"));

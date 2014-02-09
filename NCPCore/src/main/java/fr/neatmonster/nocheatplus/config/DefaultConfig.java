@@ -410,15 +410,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_OPEN_CLOSE, true);
         set(ConfPaths.INVENTORY_OPEN_CANCELOTHER, true);
 
-        /*
-         *     e   e                         ,e,                  
-         *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
-         *   e Y8b Y8b   d888 888b  Y8b Y8P  888 888 88b d888 888 
-         *  d8b Y8b Y8b  Y888 888P   Y8b "   888 888 888 Y888 888 
-         * d888b Y8b Y8b  "88 88"     Y8P    888 888 888  "88 888 
-         *                                                 ,  88P 
-         *                                                "8",P"  
-         */
+        // MOVING
         set(ConfPaths.MOVING_CREATIVEFLY_CHECK, true);
         set(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT, false);
         set(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE, false);
@@ -484,6 +476,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
         set(ConfPaths.MOVING_LOADCHUNKS_JOIN, true);
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);
+        set(ConfPaths.MOVING_ASSUMESPRINT, false);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
         
         /*

@@ -640,6 +640,7 @@ public abstract class ConfPaths {
 	private static final String MOVING_LOADCHUNKS						 = MOVING + "loadchunks.";
 	public static final String  MOVING_LOADCHUNKS_JOIN					 = MOVING_LOADCHUNKS + "join";
 	public static final String  MOVING_SPRINTINGGRACE					 = MOVING + "sprintinggrace";
+	public static final String  MOVING_ASSUMESPRINT						 = MOVING + "assumesprint";
 	public static final String  MOVING_SPEEDGRACE					 	 = MOVING + "speedgrace";
 	
 	private static final String MOVING_VEHICLES							 = MOVING + "vehicles.";
