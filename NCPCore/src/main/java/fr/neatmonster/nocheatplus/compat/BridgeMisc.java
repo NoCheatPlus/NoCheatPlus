@@ -15,7 +15,7 @@ public class BridgeMisc {
 	/**
 	 * Return a shooter of a projectile if we get an entity, null otherwise.
 	 */
-	public static Player getProjectileShooterPlayer(Projectile projectile) {
+	public static Player getShooterPlayer(Projectile projectile) {
 		Object source = projectile.getShooter();
 		if (source instanceof Player) {
 			return (Player) source;
@@ -33,7 +33,7 @@ public class BridgeMisc {
 		if (damager instanceof Player) {
 			return (Player) damager;
 		} else if (damager instanceof Projectile) {
-			return getProjectileShooterPlayer((Projectile) damager);
+			return getShooterPlayer((Projectile) damager);
 		} else {
 			return null;
 		}

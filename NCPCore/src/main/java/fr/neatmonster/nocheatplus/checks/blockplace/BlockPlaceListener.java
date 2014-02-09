@@ -273,7 +273,7 @@ public class BlockPlaceListener extends CheckListener {
     public void onProjectileLaunch(final ProjectileLaunchEvent event) {
         // The shooter needs to be a player.
     	final Projectile projectile = event.getEntity();
-    	final Player player = BridgeMisc.getProjectileShooterPlayer(projectile);
+    	final Player player = BridgeMisc.getShooterPlayer(projectile);
         if (player == null) {
         	return;
         }
