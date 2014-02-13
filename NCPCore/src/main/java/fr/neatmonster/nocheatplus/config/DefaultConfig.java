@@ -307,18 +307,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.COMBINED_YAWRATE_PENALTY_MAX, 2000);
         set(ConfPaths.COMBINED_YAWRATE_IMPROBABLE, true);
         
-        /*
-         * 888'Y88 ,e,          888       d8   
-         * 888 ,'Y  "   e88 888 888 ee   d88   
-         * 888C8   888 d888 888 888 88b d88888 
-         * 888 "   888 Y888 888 888 888  888   
-         * 888     888  "88 888 888 888  888   
-         *               ,  88P                
-         *              "8",P"                 
-         */
+        // FIGHT
         set(ConfPaths.FIGHT_CANCELDEAD, true);
-        set(ConfPaths.FIGHT_YAWRATE_CHECK, true);
         set(ConfPaths.FIGHT_TOOLCHANGEPENALTY, 500L);
+        
+        set(ConfPaths.FIGHT_YAWRATE_CHECK, true);
         
         set(ConfPaths.FIGHT_ANGLE_CHECK, true);
         set(ConfPaths.FIGHT_ANGLE_THRESHOLD, 50);
