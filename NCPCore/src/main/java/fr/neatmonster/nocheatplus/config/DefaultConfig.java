@@ -26,7 +26,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 632;
+	public static final int buildNumber = 661;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -330,7 +330,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_CRITICAL_ACTIONS, "cancel vl>50 log:critical:0:5:cif cancel");
 
         set(ConfPaths.FIGHT_DIRECTION_CHECK, true);
-        set(ConfPaths.FIGHT_DIRECTION_STRICT, true);
+        set(ConfPaths.FIGHT_DIRECTION_STRICT, false);
         set(ConfPaths.FIGHT_DIRECTION_PENALTY, 500L);
         set(ConfPaths.FIGHT_DIRECTION_ACTIONS,
                 "cancel vl>5 log:fdirection:3:5:f cancel vl>20 log:fdirection:0:5:if cancel vl>50 log:fdirection:0:5:cif cancel");
