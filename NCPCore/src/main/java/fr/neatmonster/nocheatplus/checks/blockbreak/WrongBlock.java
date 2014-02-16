@@ -7,6 +7,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class WrongBlock extends Check {
 
@@ -30,7 +31,7 @@ public class WrongBlock extends Check {
         boolean cancel = false;
         
         final boolean wrongTime = data.fastBreakfirstDamage < data.fastBreakBreakTime;
-        final int dist = Math.abs(data.clickedX - block.getX()) + Math.abs(data.clickedY - block.getY()) + Math.abs(data.clickedZ - block.getZ());
+        final int dist = TrigUtil.manhattan(data.clickedX, data.clickedY, data.clickedZ, block);
         final boolean wrongBlock;
         final long now = System.currentTimeMillis();
         if (dist == 0){
@@ -54,9 +55,9 @@ public class WrongBlock extends Check {
         if (wrongBlock){
         	// Manhattan distance.
         	
-        	 if ((cc.fastBreakDebug || cc.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-        		 player.sendMessage("WrongBlock failure with dist: " + dist);
-        	 }
+        	if ((cc.fastBreakDebug || cc.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        		player.sendMessage("WrongBlock failure with dist: " + dist);
+        	}
         	data.wrongBlockVL.add(now, (float) (dist + 1) / 2f);
         	final float score = data.wrongBlockVL.score(0.9f);
         	if (score > cc.wrongBLockLevel){
