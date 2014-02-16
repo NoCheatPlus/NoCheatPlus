@@ -214,18 +214,16 @@ public abstract class ConfPaths {
 	public static final String  BLOCKINTERACT_VISIBLE_CHECK				 = BLOCKINTERACT_VISIBLE + "active";
 	public static final String  BLOCKINTERACT_VISIBLE_ACTIONS			 = BLOCKINTERACT_VISIBLE + "actions";
 
-    /*
-     * 888 88b, 888                    888    888 88e  888                          
-     * 888 88P' 888  e88 88e   e88'888 888 ee 888 888D 888  ,"Y88b  e88'888  ,e e,  
-     * 888 8K   888 d888 888b d888  '8 888 P  888 88"  888 "8" 888 d888  '8 d88 88b 
-     * 888 88b, 888 Y888 888P Y888   , 888 b  888      888 ,ee 888 Y888   , 888   , 
-     * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
-     */
+    // BLOCKPLACE
     public static final String  BLOCKPLACE                               = CHECKS + "blockplace.";
     
+    private static final String BLOCKPLACE_AGAINST						 = BLOCKPLACE + "against.";
+    public static final String  BLOCKPLACE_AGAINST_CHECK				 = BLOCKPLACE_AGAINST + "active";
+	public static final String BLOCKPLACE_AGAINST_ACTIONS				 = BLOCKPLACE_AGAINST + "actions";
+    
     private static final String BLOCKPLACE_AUTOSIGN						 = BLOCKPLACE + "autosign.";
-	public static final String BLOCKPLACE_AUTOSIGN_CHECK				 = BLOCKPLACE_AUTOSIGN + "active";
-	public static final String BLOCKPLACE_AUTOSIGN_ACTIONS				 = BLOCKPLACE_AUTOSIGN + "actions";
+	public static final String  BLOCKPLACE_AUTOSIGN_CHECK				 = BLOCKPLACE_AUTOSIGN + "active";
+	public static final String  BLOCKPLACE_AUTOSIGN_ACTIONS				 = BLOCKPLACE_AUTOSIGN + "actions";
 
     private static final String BLOCKPLACE_DIRECTION                     = BLOCKPLACE + "direction.";
     public static final String  BLOCKPLACE_DIRECTION_CHECK               = BLOCKPLACE_DIRECTION + "active";

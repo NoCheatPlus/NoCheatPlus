@@ -75,6 +75,7 @@ public class BlockPlaceData extends ACheckData {
     }
 
 	// Violation levels.
+    public double againstVL = 0;
 	public double autoSignVL = 0;
 	public double directionVL = 0;
 	public double fastPlaceVL = 0;

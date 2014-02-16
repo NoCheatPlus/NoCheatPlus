@@ -33,9 +33,10 @@ public class NoSwing extends Check {
      * @param player
      *            the player
      * @param data 
+     * @param cc 
      * @return true, if successful
      */
-    public boolean check(final Player player, final BlockPlaceData data) {
+    public boolean check(final Player player, final BlockPlaceData data, final BlockPlaceConfig cc) {
 
         boolean cancel = false;
 
@@ -51,7 +52,7 @@ public class NoSwing extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.noSwingVL, 1D, BlockPlaceConfig.getConfig(player).noSwingActions);
+            cancel = executeActions(player, data.noSwingVL, 1D, cc.noSwingActions);
         }
 
         return cancel;

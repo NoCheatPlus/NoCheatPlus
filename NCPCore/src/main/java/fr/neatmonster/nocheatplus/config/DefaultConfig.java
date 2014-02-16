@@ -158,13 +158,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK, true);
         set(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, "cancel vl>5 log:bvisible:0:2:if cancel");
         
-        /*
-         * 888 88b, 888                    888    888 88e  888                          
-         * 888 88P' 888  e88 88e   e88'888 888 ee 888 888D 888  ,"Y88b  e88'888  ,e e,  
-         * 888 8K   888 d888 888b d888  '8 888 P  888 88"  888 "8" 888 d888  '8 d88 88b 
-         * 888 88b, 888 Y888 888P Y888   , 888 b  888      888 ,ee 888 Y888   , 888   , 
-         * 888 88P' 888  "88 88"   "88,e8' 888 8b 888      888 "88 888  "88,e8'  "YeeP" 
-         */
+        // BLOCKPLACE
+        set(ConfPaths.BLOCKPLACE_AGAINST_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_AGAINST_ACTIONS, "cancel");
         
         set(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK, true);
         set(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, "cancel vl>10 log:bautosign:0:3:if cancel");

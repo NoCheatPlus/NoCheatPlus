@@ -35,11 +35,10 @@ public class FastPlace extends Check {
      *            the player
      * @param block
      *            the block
+     * @param cc 
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block) {
-        final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
-        final BlockPlaceData data = BlockPlaceData.getData(player);
+    public boolean check(final Player player, final Block block, final BlockPlaceData data, final BlockPlaceConfig cc) {
 
         data.fastPlaceBuckets.add(System.currentTimeMillis(), 1f);
         

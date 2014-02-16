@@ -36,11 +36,12 @@ public class Direction extends Check {
      * @param player
      *            the player
      * @param data 
+     * @param cc 
      * @param location
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block placed, final Block against, final BlockPlaceData data) {
+    public boolean check(final Player player, final Block placed, final Block against, final BlockPlaceData data, final BlockPlaceConfig cc) {
 
         boolean cancel = false;
 
@@ -82,8 +83,7 @@ public class Direction extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.directionVL, distance,
-                    BlockPlaceConfig.getConfig(player).directionActions);
+            cancel = executeActions(player, data.directionVL, distance, cc.directionActions);
         } else
             // Player did likely nothing wrong, reduce violation counter to reward them.
             data.directionVL *= 0.9D;

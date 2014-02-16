@@ -44,12 +44,13 @@ public class Reach extends Check {
      * 
      * @param player
      *            the player
+     * @param cc 
      * @param data2 
      * @param location
      *            the location
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block, final BlockPlaceData data) {
+    public boolean check(final Player player, final Block block, final BlockPlaceData data, final BlockPlaceConfig cc) {
 
         boolean cancel = false;
 
@@ -68,7 +69,7 @@ public class Reach extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.reachVL, distance, BlockPlaceConfig.getConfig(player).reachActions);
+            cancel = executeActions(player, data.reachVL, distance, cc.reachActions);
         } else{
             // Player passed the check, reward them.
             data.reachVL *= 0.9D;

@@ -71,6 +71,9 @@ public class BlockPlaceConfig extends ACheckConfig {
         return worldsMap.get(player.getWorld().getName());
     }
     
+    public final boolean	againstCheck;
+    public final ActionList againstActions;
+    
     public final boolean    autoSignCheck;
     public final ActionList autoSignActions;
 
@@ -102,6 +105,9 @@ public class BlockPlaceConfig extends ACheckConfig {
     public BlockPlaceConfig(final ConfigFile data) {
         super(data, ConfPaths.BLOCKPLACE);
         
+        againstCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AGAINST_CHECK);
+        againstActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AGAINST_ACTIONS, Permissions.BLOCKPLACE_AGAINST);
+
         autoSignCheck = data.getBoolean(ConfPaths.BLOCKPLACE_AUTOSIGN_CHECK);
         autoSignActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_AUTOSIGN_ACTIONS, Permissions.BLOCKPLACE_AUTOSIGN);
 
@@ -143,7 +149,7 @@ public class BlockPlaceConfig extends ACheckConfig {
         case BLOCKPLACE_SPEED:
             return speedCheck;
         case BLOCKPLACE_AGAINST:
-        	return true;
+        	return againstCheck;
         case BLOCKPLACE_AUTOSIGN:
         	return autoSignCheck;
         default:
