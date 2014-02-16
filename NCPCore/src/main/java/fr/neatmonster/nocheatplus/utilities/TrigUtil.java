@@ -383,6 +383,18 @@ public class TrigUtil {
 	}
 	
 	/**
+	 * Manhattan distance.
+	 * @param x1
+	 * @param y1
+	 * @param z1
+	 * @param block
+	 * @return
+	 */
+	public static int manhattan(final int x1, final int y1, final int  z1, final Block block) {
+		return manhattan(x1, y1, z1, block.getX(), block.getY(), block.getZ());
+	}
+	
+	/**
 	 * Manhattan distance (steps along the sides of an orthogonal grid).
 	 * @param x1
 	 * @param y1
