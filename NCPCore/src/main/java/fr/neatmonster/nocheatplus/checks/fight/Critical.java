@@ -79,6 +79,7 @@ public class Critical extends Check {
         		final MovingConfig ccM = MovingConfig.getConfig(player);
             	if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){
                     final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance()) / cc.criticalFallDistance;
+                    // TODO: Cleanup: velocity is more like the gravity constant.
                     final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY())) / cc.criticalVelocity;
                     double delta = deltaFallDistance > 0D ? deltaFallDistance : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
                     
