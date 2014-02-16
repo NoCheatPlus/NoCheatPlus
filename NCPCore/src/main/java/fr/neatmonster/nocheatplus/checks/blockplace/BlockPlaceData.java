@@ -85,6 +85,7 @@ public class BlockPlaceData extends ACheckData {
     
     // AutoSign.
     public long autoSignPlacedTime = 0;
+    /** Using Material.SIGN . */
     public long autoSignPlacedHash = 0;
     
     // Data of the fast place check.

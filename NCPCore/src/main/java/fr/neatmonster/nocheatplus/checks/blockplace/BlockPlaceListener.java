@@ -112,19 +112,22 @@ public class BlockPlaceListener extends CheckListener {
         if (block == null || blockAgainst == null)
             return;
         
-        final Material mat = block.getType();
+        // TODO: Revise material use (not block.get... ?)
+        //final Material mat = block.getType();
         final Player player = event.getPlayer();
+        final Material placedMat = player.getItemInHand().getType(); // Safety first.
         boolean cancelled = false;
         
         final BlockPlaceData data = BlockPlaceData.getData(player);
         final BlockPlaceConfig cc = BlockPlaceConfig.getConfig(player);
         
-        if (mat == Material.SIGN_POST || mat == Material.WALL_SIGN){
+        if (placedMat == Material.SIGN){
+        	// Might move to MONITOR priority.
         	data.autoSignPlacedTime = System.currentTimeMillis();
         	// Always hash as sign post for improved compatibility with Lockette etc.
-        	data.autoSignPlacedHash = getBlockPlaceHash(block, Material.SIGN_POST);
+        	data.autoSignPlacedHash = getBlockPlaceHash(block, Material.SIGN);
         }
-
+        
         // Fast place check.
         if (fastPlace.isEnabled(player)){
         	if (fastPlace.check(player, block, data, cc)) {
@@ -136,7 +139,7 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // No swing check (player doesn't swing their arm when placing a lily pad).
-        if (!cancelled && mat != Material.WATER_LILY && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
+        if (!cancelled && placedMat != Material.WATER_LILY && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
         	// Consider skipping all insta placables or using simplified version (true or true within time frame).
         	cancelled = true;
         }
@@ -152,7 +155,7 @@ public class BlockPlaceListener extends CheckListener {
         }
         
         // Surrounding material.
-        if (!cancelled && against.isEnabled(player) && against.check(player, block, mat, blockAgainst, data, cc)) {
+        if (!cancelled && against.isEnabled(player) && against.check(player, block, placedMat, blockAgainst, data, cc)) {
         	cancelled = true;
         }
 
@@ -239,6 +242,7 @@ public class BlockPlaceListener extends CheckListener {
         	final org.bukkit.block.Block relBlock = block.getRelative(event.getBlockFace());
         	final Material relMat = relBlock.getType();
         	
+        	// TODO: Placing inside of water, but not "against" ?
         	if (relMat == Material.WATER || relMat == Material.STATIONARY_WATER) return;
         	
         	if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)){

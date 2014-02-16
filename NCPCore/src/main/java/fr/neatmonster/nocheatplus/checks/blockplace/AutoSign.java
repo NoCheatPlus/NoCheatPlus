@@ -41,9 +41,8 @@ public class AutoSign extends Check {
 		tags.clear();
 		final BlockPlaceData data = BlockPlaceData.getData(player);
 		Material mat = block.getType();
-		if (mat == Material.WALL_SIGN){ 
-			// Use one thing for signs.
-			mat = Material.SIGN_POST;
+		if (mat == Material.SIGN_POST || mat == Material.WALL_SIGN) {
+			mat = Material.SIGN;
 		}
 		if (data.autoSignPlacedHash != BlockPlaceListener.getBlockPlaceHash(block, mat)){
 			tags.add("block_mismatch");
