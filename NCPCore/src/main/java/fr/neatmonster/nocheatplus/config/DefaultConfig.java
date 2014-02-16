@@ -445,7 +445,7 @@ public class DefaultConfig extends ConfigFile {
         // set(ConfPaths.MOVING_SURVIVALFLY_SPRINTINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_SWIMMINGSPEED, 100);
         // set(ConfPaths.MOVING_SURVIVALFLY_WALKINGSPEED, 100);
-        set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, "log:flyshort:3:10:f cancel vl>100 log:flyshort:0:10:if cancel vl>400 log:flylong:0:5:cif cancel vl>1000 log:flylong:0:5:cif cancel cmd:kickfly");
+        set(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, "log:flyshort:3:10:f cancel vl>100 log:flyshort:0:10:if cancel vl>400 log:flylong:0:5:cif cancel vl>1500 log:flylong:0:5:cif cancel cmd:kickfly");
 
         // sf / hover check.
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK, true);
