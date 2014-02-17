@@ -56,7 +56,7 @@ public class Against extends Check {
 			vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(placedMat.getId()));
 			return executeActions(vd);
 		} else {
-			data.againstVL *=  100; // Assume one false positive every 100 blocks.
+			data.againstVL *=  0.99; // Assume one false positive every 100 blocks.
 			return false;
 		}
 	}
