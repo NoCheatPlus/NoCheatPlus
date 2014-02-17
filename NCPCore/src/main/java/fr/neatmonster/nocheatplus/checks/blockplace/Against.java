@@ -9,7 +9,11 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
+import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 /**
  * Check if the placing is legitimate in terms of surrounding materials.
  * @author mc_dev
@@ -21,12 +25,24 @@ public class Against extends Check {
 		super(CheckType.BLOCKPLACE_AGAINST);
 	}
 	
-	public boolean check(final Player player, final Block block, final Material mat, final Block blockAgainst, final BlockPlaceData data, final BlockPlaceConfig cc) {
+	public boolean check(final Player player, final Block block, final Material placedMat, final Block blockAgainst, final BlockPlaceData data, final BlockPlaceConfig cc) {
 		boolean violation = false;
 		// TODO: Make more precise (workarounds like WATER_LILY, general points).
+		// Workaround for signs on cactus and similar.
         final int againstId = blockAgainst.getTypeId();
+        if (againstId == Material.AIR.getId()) {
+        	// Attempt to workaround blocks like cactus.
+        	final BlockInteractData bdata = BlockInteractData.getData(player);
+        	if (bdata.lastType != null && bdata.lastX != Integer.MAX_VALUE && TickTask.getTick() == bdata.lastTick && TrigUtil.manhattan(bdata.lastX, bdata.lastY, bdata.lastZ, blockAgainst) == 0) {
+        		// (Wide screen.)
+        		// Block was placed against something (e.g. cactus), allow it.
+        		// TODO: Later reset can conflict, though it makes sense to reset with placing blocks in general.
+        		bdata.resetLastBlock(); 
+        		return false;
+        	}
+        }
         if (BlockProperties.isLiquid(againstId)) {
-            if ((mat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getTypeId()))) {
+            if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getTypeId()))) {
             	violation = true;
             }
         }
@@ -37,7 +53,7 @@ public class Against extends Check {
 		if (violation) {
 			data.againstVL += 1.0;
 			final ViolationData vd = new ViolationData(this, player, data.againstVL, 1, cc.againstActions);
-			vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(mat.getId()));
+			vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(placedMat.getId()));
 			return executeActions(vd);
 		} else {
 			data.againstVL *=  100; // Assume one false positive every 100 blocks.

@@ -3,11 +3,15 @@ package fr.neatmonster.nocheatplus.checks.blockinteract;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /*
  * M#"""""""'M  dP                   dP       M""M            dP                                         dP   
@@ -78,6 +82,15 @@ public class BlockInteractData extends ACheckData {
     public double reachVL		= 0;
     public double speedVL		= 0;
     public double visibleVL		= 0;
+    
+    // General data
+    // Last block interacted with
+    public int lastX = Integer.MAX_VALUE;
+    public int lastY, lastZ;
+    /** null for air */
+    public Material lastType = null;
+    public long lastTick;
+    public Action lastAction = null;
 
     // Data of the reach check.
     public double reachDistance;
@@ -86,5 +99,28 @@ public class BlockInteractData extends ACheckData {
     public long speedTime	= 0;
     /** Number of interactions since last reset-time. */
     public int  speedCount	= 0;
+    
+    /**
+     * Last interacted block.
+     * @param block
+     */
+	public void setLastBlock(Block block, Action action) {
+		lastX = block.getX();
+		lastY = block.getY();
+		lastZ = block.getZ();
+		lastType = block.getType();
+		if (lastType == Material.AIR) {
+			lastType = null;
+		}
+		lastTick = TickTask.getTick();
+		lastAction = action;
+	}
+
+	public void resetLastBlock() {
+		lastTick = 0;
+		lastAction = null;
+		lastX = Integer.MAX_VALUE;
+		lastType = null;
+	}
     
 }

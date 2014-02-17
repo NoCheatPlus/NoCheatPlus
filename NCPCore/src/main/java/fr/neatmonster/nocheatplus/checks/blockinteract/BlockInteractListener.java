@@ -83,7 +83,8 @@ public class BlockInteractListener extends CheckListener {
         	return;
         }
     	final Player player = event.getPlayer();
-        
+    	final BlockInteractData data = BlockInteractData.getData(player);
+    	data.setLastBlock(block, action);
         switch(action){
         case LEFT_CLICK_BLOCK:
         	break;
@@ -106,9 +107,7 @@ public class BlockInteractListener extends CheckListener {
         	return;
         }
         
-        final BlockInteractData data = BlockInteractData.getData(player);
         final BlockInteractConfig cc = BlockInteractConfig.getConfig(player);
-
         boolean cancelled = false;
         
         final BlockFace face = event.getBlockFace();
