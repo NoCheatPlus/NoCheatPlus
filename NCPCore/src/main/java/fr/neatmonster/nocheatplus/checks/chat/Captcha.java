@@ -39,14 +39,14 @@ public class Captcha extends AsyncCheck implements ICaptcha{
             // Have they failed too man times?
             if (data.captchTries > cc.captchaTries) {
                 // Find out if we need to kick the player or not.
-                executeActions(player, data.captchaVL, 1, cc.captchaActions, 
-                		isMainThread);
+                executeActions(player, data.captchaVL, 1, cc.captchaActions, isMainThread);
                 // (Resetting captcha tries is done on quit/kick).
             }
 
             // Display the question again (if not kicked).
-            if (player.isOnline())
+            if (player.isOnline()) {
             	sendCaptcha(player, cc, data);
+            }
         }
 	}
 

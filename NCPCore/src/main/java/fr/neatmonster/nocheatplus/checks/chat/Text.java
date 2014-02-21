@@ -53,15 +53,16 @@ public class Text extends AsyncCheck implements INotifyReload{
 	 * 			The message to check.
 	 * @param captcha 
 	 * 			Used for starting captcha on failure, if configured so.
+	 * @param alreadyCancelled 
 	 * @return
 	 */
-	public boolean check(final Player player, final String message, final ICaptcha captcha, boolean isMainThread) {
+	public boolean check(final Player player, final String message, final ICaptcha captcha, boolean isMainThread, final boolean alreadyCancelled) {
 		
 		final ChatConfig cc = ChatConfig.getConfig(player);
 		final ChatData data = ChatData.getData(player);
 		
 		synchronized (data) {
-			return unsafeCheck(player, message, captcha, cc, data, isMainThread);
+			return unsafeCheck(player, message, captcha, cc, data, isMainThread, alreadyCancelled);
 		}
 	}
 	
@@ -93,14 +94,19 @@ public class Text extends AsyncCheck implements INotifyReload{
 	 * @param cc
 	 * @param data
 	 * @param isMainThread 
+	 * @param alreadyCancelled 
 	 * @return
 	 */
 	private boolean unsafeCheck(final Player player, final String message, final ICaptcha captcha,
-			final ChatConfig cc, final ChatData data, boolean isMainThread) {
+			final ChatConfig cc, final ChatData data, boolean isMainThread, final boolean alreadyCancelled) {
 		
 		// Test captcha.
-		if (captcha.shouldCheckCaptcha(cc, data)){
+		// TODO: Skip captcha for "handleaschat" commands? [controversial potential]
+		if (captcha.shouldCheckCaptcha(cc, data)) {
 			captcha.checkCaptcha(player, message, cc, data, isMainThread);
+			return true;
+		} else if (alreadyCancelled) {
+			// Skip checking.
 			return true;
 		}
 		
