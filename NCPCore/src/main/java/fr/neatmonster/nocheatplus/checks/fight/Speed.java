@@ -10,16 +10,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MP""""""`MM                                  dP 
- * M  mmmmm..M                                  88 
- * M.      `YM 88d888b. .d8888b. .d8888b. .d888b88 
- * MMMMMMM.  M 88'  `88 88ooood8 88ooood8 88'  `88 
- * M. .MMM'  M 88.  .88 88.  ... 88.  ... 88.  .88 
- * Mb.     .dM 88Y888P' `88888P' `88888P' `88888P8 
- * MMMMMMMMMMM 88                                  
- *             dP                                  
- */
 /**
  * The Speed check is used to detect players who are attacking entities too quickly.
  */

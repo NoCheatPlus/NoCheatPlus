@@ -1,14 +1,5 @@
 package fr.neatmonster.nocheatplus.config;
 
-/*
- * MM'""""'YMM                   .8888b MM"""""""`YM            dP   dP                
- * M' .mmm. `M                   88   " MM  mmmmm  M            88   88                
- * M  MMMMMooM .d8888b. 88d888b. 88aaa  M'        .M .d8888b. d8888P 88d888b. .d8888b. 
- * M  MMMMMMMM 88'  `88 88'  `88 88     MM  MMMMMMMM 88'  `88   88   88'  `88 Y8ooooo. 
- * M. `MMM' .M 88.  .88 88    88 88     MM  MMMMMMMM 88.  .88   88   88    88       88 
- * MM.     .dM `88888P' dP    dP dP     MM  MMMMMMMM `88888P8   dP   dP    dP `88888P' 
- * MMMMMMMMMMM                          MMMMMMMMMMMM                                   
- */
 /**
  * Paths for the configuration options. Making everything final static prevents accidentally modifying any of these.
  */
@@ -34,15 +25,6 @@ public abstract class ConfPaths {
 	/** Build number of the build for which the default config was first created (DefaultConfig.buildNumber), updated with each save. */
 	public static final String CONFIGVERSION_SAVED						 = CONFIGVERSION + "saved";
 
-    /*
-     * 888                                 ,e,                  
-     * 888      e88 88e   e88 888  e88 888  "  888 8e   e88 888 
-     * 888     d888 888b d888 888 d888 888 888 888 88b d888 888 
-     * 888  ,d Y888 888P Y888 888 Y888 888 888 888 888 Y888 888 
-     * 888,d88  "88 88"   "88 888  "88 888 888 888 888  "88 888 
-     *                     ,  88P   ,  88P               ,  88P 
-     *                    "8",P"   "8",P"               "8",P"  
-     */
 	@GlobalConfig
     private static final String LOGGING                                  = "logging.";
     public static final String  LOGGING_ACTIVE                           = LOGGING + "active";
@@ -61,13 +43,6 @@ public abstract class ConfPaths {
     public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
     public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX		 = LOGGING_BACKEND_INGAMECHAT + "prefix";
 
-    /*
-     *     e   e     ,e,                        888 888                                                   
-     *    d8b d8b     "   dP"Y  e88'888  ,e e,  888 888  ,"Y88b 888 8e   ,e e,   e88 88e  8888 8888  dP"Y 
-     *   e Y8b Y8b   888 C88b  d888  '8 d88 88b 888 888 "8" 888 888 88b d88 88b d888 888b 8888 8888 C88b  
-     *  d8b Y8b Y8b  888  Y88D Y888   , 888   , 888 888 ,ee 888 888 888 888   , Y888 888P Y888 888P  Y88D 
-     * d888b Y8b Y8b 888 d,dP   "88,e8'  "YeeP" 888 888 "88 888 888 888  "YeeP"  "88 88"   "88 88"  d,dP  
-     */
 	@GlobalConfig
 	private static final String MISCELLANEOUS = "miscellaneous.";
 	//public static final String  MISCELLANEOUS_CHECKFORUPDATES				= MISCELLANEOUS + "checkforupdates";
@@ -126,13 +101,6 @@ public abstract class ConfPaths {
     private static final String CHECKS                                   = "checks.";
     /** Debug flag to debug all checks (!), individual sections debug flags override this, if present. */
 	public static final  String CHECKS_DEBUG							 = CHECKS + SUB_DEBUG;
-    /*
-     * 888 88b, 888                    888    888 88b,                        888    
-     * 888 88P' 888  e88 88e   e88'888 888 ee 888 88P' 888,8,  ,e e,   ,"Y88b 888 ee 
-     * 888 8K   888 d888 888b d888  '8 888 P  888 8K   888 "  d88 88b "8" 888 888 P  
-     * 888 88b, 888 Y888 888P Y888   , 888 b  888 88b, 888    888   , ,ee 888 888 b  
-     * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 88P' 888     "YeeP" "88 888 888 8b 
-     */
     public static final String  BLOCKBREAK                               = CHECKS + "blockbreak.";
     
 	public static final String  BLOCKBREAK_DEBUG						 = BLOCKBREAK + "debug";
@@ -187,13 +155,6 @@ public abstract class ConfPaths {
 	public static final String  BLOCKBREAK_WRONGBLOCK_LEVEL              = BLOCKBREAK_WRONGBLOCK + "level";
 	public static final String  BLOCKBREAK_WRONGBLOCK_ACTIONS            = BLOCKBREAK_WRONGBLOCK + "actions";
 
-    /*
-     * 888 88b, 888                    888    888           d8                                     d8   
-     * 888 88P' 888  e88 88e   e88'888 888 ee 888 888 8e   d88    ,e e,  888,8,  ,"Y88b  e88'888  d88   
-     * 888 8K   888 d888 888b d888  '8 888 P  888 888 88b d88888 d88 88b 888 "  "8" 888 d888  '8 d88888 
-     * 888 88b, 888 Y888 888P Y888   , 888 b  888 888 888  888   888   , 888    ,ee 888 Y888   ,  888   
-     * 888 88P' 888  "88 88"   "88,e8' 888 8b 888 888 888  888    "YeeP" 888    "88 888  "88,e8'  888   
-     */
     public static final String BLOCKINTERACT                            = CHECKS + "blockinteract.";
 
     private static final String BLOCKINTERACT_DIRECTION                  = BLOCKINTERACT + "direction.";
@@ -250,13 +211,6 @@ public abstract class ConfPaths {
     public static final String  BLOCKPLACE_SPEED_INTERVAL                = BLOCKPLACE_SPEED + "interval";
     public static final String  BLOCKPLACE_SPEED_ACTIONS                 = BLOCKPLACE_SPEED + "actions";
 
-    /*
-     *   e88'Y88 888               d8   
-     *  d888  'Y 888 ee   ,"Y88b  d88   
-     * C8888     888 88b "8" 888 d88888 
-     *  Y888  ,d 888 888 ,ee 888  888   
-     *   "88,d88 888 888 "88 888  888   
-     */
     public static final String  CHAT                                     = CHECKS + "chat.";
 
     private static final String CHAT_CAPTCHA                    = CHAT + "captcha.";
@@ -416,15 +370,6 @@ public abstract class ConfPaths {
     public static final String  COMBINED_YAWRATE_PENALTY_MIN             = COMBINED_YAWRATE_PENALTY + "minimum";
     public static final String  COMBINED_YAWRATE_PENALTY_MAX             = COMBINED_YAWRATE_PENALTY + "maximum";
 	
-    /*
-     * 888'Y88 ,e,          888       d8   
-     * 888 ,'Y  "   e88 888 888 ee   d88   
-     * 888C8   888 d888 888 888 88b d88888 
-     * 888 "   888 Y888 888 888 888  888   
-     * 888     888  "88 888 888 888  888   
-     *               ,  88P                
-     *              "8",P"                 
-     */
     public static final String  FIGHT                                    = CHECKS + "fight.";
     
 	public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
@@ -500,15 +445,6 @@ public abstract class ConfPaths {
     private static final String FIGHT_YAWRATE                            = FIGHT + "yawrate.";
 	public static final String  FIGHT_YAWRATE_CHECK                      = FIGHT_YAWRATE + "active";
 
-    /*
-     * 888                                     d8                              
-     * 888 888 8e  Y8b Y888P  ,e e,  888 8e   d88    e88 88e  888,8, Y8b Y888P 
-     * 888 888 88b  Y8b Y8P  d88 88b 888 88b d88888 d888 888b 888 "   Y8b Y8P  
-     * 888 888 888   Y8b "   888   , 888 888  888   Y888 888P 888      Y8b Y   
-     * 888 888 888    Y8P     "YeeP" 888 888  888    "88 88"  888       888    
-     *                                                                  888    
-     *                                                                  888    
-     */
     public static final String  INVENTORY                                = CHECKS + "inventory.";
 
     private static final String INVENTORY_DROP                           = INVENTORY + "drop.";
@@ -552,15 +488,6 @@ public abstract class ConfPaths {
     public static final  String INVENTORY_OPEN_CLOSE					 = INVENTORY_OPEN + "close";
     public static final  String INVENTORY_OPEN_CANCELOTHER				 = INVENTORY_OPEN + "cancelother";
     
-    /*
-     *     e   e                         ,e,                  
-     *    d8b d8b     e88 88e  Y8b Y888P  "  888 8e   e88 888 
-     *   e Y8b Y8b   d888 888b  Y8b Y8P  888 888 88b d888 888 
-     *  d8b Y8b Y8b  Y888 888P   Y8b "   888 888 888 Y888 888 
-     * d888b Y8b Y8b  "88 88"     Y8P    888 888 888  "88 888 
-     *                                                 ,  88P 
-     *                                                "8",P"  
-     */
     public static final String  MOVING                                   = CHECKS + "moving.";
 
     private static final String MOVING_CREATIVEFLY                       = MOVING + "creativefly.";
@@ -645,15 +572,6 @@ public abstract class ConfPaths {
 	public static final String  MOVING_VEHICLES_ENFORCELOCATION			 = MOVING_VEHICLES + "enforcelocation";
 	public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN		 = MOVING_VEHICLES + "preventdestroyown";
 	
-    /*
-     *  dP"8   d8          ,e,                        
-     * C8b Y  d88   888,8,  "  888 8e   e88 888  dP"Y 
-     *  Y8b  d88888 888 "  888 888 88b d888 888 C88b  
-     * b Y8D  888   888    888 888 888 Y888 888  Y88D 
-     * 8edP   888   888    888 888 888  "88 888 d,dP  
-     *                                   ,  88P       
-     *                                  "8",P"        
-     */
     public static final String  STRINGS                                  = "strings";
 
     // Compatibility section (possibly temporary).

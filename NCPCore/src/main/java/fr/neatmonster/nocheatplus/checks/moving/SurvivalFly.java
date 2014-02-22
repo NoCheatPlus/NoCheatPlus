@@ -21,16 +21,6 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
-/*
- * MP""""""`MM                            oo                   dP MM""""""""`M dP          
- * M  mmmmm..M                                                 88 MM  mmmmmmmM 88          
- * M.      `YM dP    dP 88d888b. dP   .dP dP dP   .dP .d8888b. 88 M'      MMMM 88 dP    dP 
- * MMMMMMM.  M 88    88 88'  `88 88   d8' 88 88   d8' 88'  `88 88 MM  MMMMMMMM 88 88    88 
- * M. .MMM'  M 88.  .88 88       88 .88'  88 88 .88'  88.  .88 88 MM  MMMMMMMM 88 88.  .88 
- * Mb.     .dM `88888P' dP       8888P'   dP 8888P'   `88888P8 dP MM  MMMMMMMM dP `8888P88 
- * MMMMMMMMMMM                                                    MMMMMMMMMMMM         .88 
- *                                                                                 d8888P  
- */
 /**
  * The counterpart to the CreativeFly check. People that are not allowed to fly get checked by this. It will try to
  * identify when they are jumping, check if they aren't jumping too high or far, check if they aren't moving too fast on

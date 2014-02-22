@@ -11,15 +11,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
-/*
- * M"""""`'"""`YM                            MM"""""""`YM                   dP                  dP            
- * M  mm.  mm.  M                            MM  mmmmm  M                   88                  88            
- * M  MMM  MMM  M .d8888b. 88d888b. .d8888b. M'        .M .d8888b. .d8888b. 88  .dP  .d8888b. d8888P .d8888b. 
- * M  MMM  MMM  M 88'  `88 88'  `88 88ooood8 MM  MMMMMMMM 88'  `88 88'  `"" 88888"   88ooood8   88   Y8ooooo. 
- * M  MMM  MMM  M 88.  .88 88       88.  ... MM  MMMMMMMM 88.  .88 88.  ... 88  `8b. 88.  ...   88         88 
- * M  MMM  MMM  M `88888P' dP       `88888P' MM  MMMMMMMM `88888P8 `88888P' dP   `YP `88888P'   dP   `88888P' 
- * MMMMMMMMMMMMMM                            MMMMMMMMMMMM                                                     
- */
 /**
  * The MorePackets check (previously called Speedhack check) will try to identify players that send more than the usual
  * amount of move-packets to the server to be able to move faster than normal, without getting caught by the other

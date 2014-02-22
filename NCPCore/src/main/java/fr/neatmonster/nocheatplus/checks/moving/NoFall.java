@@ -12,15 +12,6 @@ import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-/*
- * M"""""""`YM          MM""""""""`M          dP dP 
- * M  mmmm.  M          MM  mmmmmmmM          88 88 
- * M  MMMMM  M .d8888b. M'      MMMM .d8888b. 88 88 
- * M  MMMMM  M 88'  `88 MM  MMMMMMMM 88'  `88 88 88 
- * M  MMMMM  M 88.  .88 MM  MMMMMMMM 88.  .88 88 88 
- * M  MMMMM  M `88888P' MM  MMMMMMMM `88888P8 dP dP 
- * MMMMMMMMMMM          MMMMMMMMMMMM                
- */
 /**
  * A check to see if people cheat by tricking the server to not deal them fall damage.
  */

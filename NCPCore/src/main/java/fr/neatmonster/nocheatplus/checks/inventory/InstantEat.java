@@ -9,15 +9,6 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 
-/*
- * M""M                     dP                       dP   MM""""""""`M            dP   
- * M  M                     88                       88   MM  mmmmmmmM            88   
- * M  M 88d888b. .d8888b. d8888P .d8888b. 88d888b. d8888P M`      MMMM .d8888b. d8888P 
- * M  M 88'  `88 Y8ooooo.   88   88'  `88 88'  `88   88   MM  MMMMMMMM 88'  `88   88   
- * M  M 88    88       88   88   88.  .88 88    88   88   MM  MMMMMMMM 88.  .88   88   
- * M  M dP    dP `88888P'   dP   `88888P8 dP    dP   dP   MM        .M `88888P8   dP   
- * MMMM                                                   MMMMMMMMMMMM                 
- */
 /**
  * The InstantEat check will find out if a player eats their food too fast.
  */

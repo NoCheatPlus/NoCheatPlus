@@ -36,23 +36,6 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
-/*
- * MM'""""'YMM                                                        dP 
- * M' .mmm. `M                                                        88 
- * M  MMMMMooM .d8888b. 88d8b.d8b. 88d8b.d8b. .d8888b. 88d888b. .d888b88 
- * M  MMMMMMMM 88'  `88 88'`88'`88 88'`88'`88 88'  `88 88'  `88 88'  `88 
- * M. `MMM' .M 88.  .88 88  88  88 88  88  88 88.  .88 88    88 88.  .88 
- * MM.     .dM `88888P' dP  dP  dP dP  dP  dP `88888P8 dP    dP `88888P8 
- * MMMMMMMMMMM                                                           
- * 
- * M""MMMMM""MM                         dP dP                   
- * M  MMMMM  MM                         88 88                   
- * M         `M .d8888b. 88d888b. .d888b88 88 .d8888b. 88d888b. 
- * M  MMMMM  MM 88'  `88 88'  `88 88'  `88 88 88ooood8 88'  `88 
- * M  MMMMM  MM 88.  .88 88    88 88.  .88 88 88.  ... 88       
- * M  MMMMM  MM `88888P8 dP    dP `88888P8 dP `88888P' dP       
- * MMMMMMMMMMMM                                                 
- */
 /**
  * The /nocheatplus or /ncp command handler, delegates to sub commands.
  */
@@ -139,13 +122,6 @@ public class NoCheatPlusCommand extends BaseCommand{
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String commandLabel,
             final String[] args) {
-        /*
-         *   ____                                          _ 
-         *  / ___|___  _ __ ___  _ __ ___   __ _ _ __   __| |
-         * | |   / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` |
-         * | |__| (_) | | | | | | | | | | | (_| | | | | (_| |
-         *  \____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|
-         */
     	
         if (!command.getName().equalsIgnoreCase("nocheatplus")){
         	// Not our command, how did it get here?

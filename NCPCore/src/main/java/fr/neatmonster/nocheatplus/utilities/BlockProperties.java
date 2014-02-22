@@ -445,10 +445,7 @@ public class BlockProperties {
 
     private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
 		Arrays.fill(blocks, null);
-		///////////////////////////
 		// Initalize block flags
-		///////////////////////////
-		
 		// Generic initialization.
 		for (int i = 0; i <maxBlocks; i++){
 			blockFlags[i] = 0;
@@ -599,10 +596,7 @@ public class BlockProperties {
 		}){
 			blockFlags[mat.getId()] |= F_GROUND_HEIGHT;
 		}
-		
-		////////////////////////////////
 		// Set block break properties.
-		////////////////////////////////
 		// Instantly breakable.
 		for (final Material mat : instantMat){
 			blocks[mat.getId()] = instantType;

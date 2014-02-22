@@ -19,15 +19,6 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MM'""""'YMM          oo   dP   oo                   dP 
- * M' .mmm. `M               88                        88 
- * M  MMMMMooM 88d888b. dP d8888P dP .d8888b. .d8888b. 88 
- * M  MMMMMMMM 88'  `88 88   88   88 88'  `"" 88'  `88 88 
- * M. `MMM' .M 88       88   88   88 88.  ... 88.  .88 88 
- * MM.     .dM dP       dP   dP   dP `88888P' `88888P8 dP 
- * MMMMMMMMMMM                                            
- */
 /**
  * A check used to verify that critical hits done by players are legit.
  */

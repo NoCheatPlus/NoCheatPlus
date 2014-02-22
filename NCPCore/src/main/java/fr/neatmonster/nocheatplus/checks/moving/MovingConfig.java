@@ -15,16 +15,6 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
-/*
- * M"""""`'"""`YM                   oo                   MM'""""'YMM                   .8888b oo          
- * M  mm.  mm.  M                                        M' .mmm. `M                   88   "             
- * M  MMM  MMM  M .d8888b. dP   .dP dP 88d888b. .d8888b. M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. 
- * M  MMM  MMM  M 88'  `88 88   d8' 88 88'  `88 88'  `88 M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 
- * M  MMM  MMM  M 88.  .88 88 .88'  88 88    88 88.  .88 M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 
- * M  MMM  MMM  M `88888P' 8888P'   dP dP    dP `8888P88 MM.     .dM `88888P' dP    dP dP     dP `8888P88 
- * MMMMMMMMMMMMMM                                    .88 MMMMMMMMMMM                                  .88 
- *                                               d8888P                                           d8888P  
- */
 /**
  * Configurations specific for the moving checks. Every world gets one of these assigned to it.
  */

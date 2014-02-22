@@ -21,10 +21,7 @@ public class DefaultComponentFactory {
 	public Collection<Object> getAvailableComponentsOnEnable(){
 		final List<Object> available = new LinkedList<Object>();
 		
-		//////////////////////////////////////
 		// Add components (try-catch).
-		//////////////////////////////////////
-		
 		// Check: inventory.fastconsume.
 		try{
 			FastConsume.testAvailability();

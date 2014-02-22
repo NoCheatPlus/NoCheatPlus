@@ -12,24 +12,6 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 
-/*
- * M""MMMMM""M oo          dP            dP   oo                   
- * M  MMMMM  M             88            88                        
- * M  MMMMP  M dP .d8888b. 88 .d8888b. d8888P dP .d8888b. 88d888b. 
- * M  MMMM' .M 88 88'  `88 88 88'  `88   88   88 88'  `88 88'  `88 
- * M  MMP' .MM 88 88.  .88 88 88.  .88   88   88 88.  .88 88    88 
- * M     .dMMM dP `88888P' dP `88888P8   dP   dP `88888P' dP    dP 
- * MMMMMMMMMMM                                                     
- * 
- * M""MMMMM""MM oo            dP                              
- * M  MMMMM  MM               88                              
- * M         `M dP .d8888b. d8888P .d8888b. 88d888b. dP    dP 
- * M  MMMMM  MM 88 Y8ooooo.   88   88'  `88 88'  `88 88    88 
- * M  MMMMM  MM 88       88   88   88.  .88 88       88.  .88 
- * M  MMMMM  MM dP `88888P'   dP   `88888P' dP       `8888P88 
- * MMMMMMMMMMMM                                           .88 
- *                                                    d8888P  
- */
 /**
  * The class containg the violation history of a player.
  */

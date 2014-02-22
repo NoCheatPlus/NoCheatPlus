@@ -36,16 +36,6 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 
-/*
- * MM""""""""`M oo          dP         dP   M""MMMMMMMM oo            dP                                       
- * MM  mmmmmmmM             88         88   M  MMMMMMMM               88                                       
- * M'      MMMM dP .d8888b. 88d888b. d8888P M  MMMMMMMM dP .d8888b. d8888P .d8888b. 88d888b. .d8888b. 88d888b. 
- * MM  MMMMMMMM 88 88'  `88 88'  `88   88   M  MMMMMMMM 88 Y8ooooo.   88   88ooood8 88'  `88 88ooood8 88'  `88 
- * MM  MMMMMMMM 88 88.  .88 88    88   88   M  MMMMMMMM 88       88   88   88.  ... 88    88 88.  ... 88       
- * MM  MMMMMMMM dP `8888P88 dP    dP   dP   M         M dP `88888P'   dP   `88888P' dP    dP `88888P' dP       
- * MMMMMMMMMMMM         .88                 MMMMMMMMMMM                                                        
- *                  d8888P                                                                                     
- */
 /**
  * Central location to listen to events that are relevant for the fight checks.<br>
  * This listener is registered after the CombinedListener.
@@ -287,14 +277,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityDamage(final EntityDamageEvent event) {
-        /*
-         *  _____       _   _ _           ____                                   
-         * | ____|_ __ | |_(_) |_ _   _  |  _ \  __ _ _ __ ___   __ _  __ _  ___ 
-         * |  _| | '_ \| __| | __| | | | | | | |/ _` | '_ ` _ \ / _` |/ _` |/ _ \
-         * | |___| | | | |_| | |_| |_| | | |_| | (_| | | | | | | (_| | (_| |  __/
-         * |_____|_| |_|\__|_|\__|\__, | |____/ \__,_|_| |_| |_|\__,_|\__, |\___|
-         *                        |___/                               |___/      
-         */
     	
     	final Entity damaged = event.getEntity();
     	final Player damagedPlayer = damaged instanceof Player ? (Player) damaged : null;
@@ -388,14 +370,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      */
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onEntityDeathEvent(final EntityDeathEvent event) {
-        /*
-         *  _____       _   _ _           ____             _   _     
-         * | ____|_ __ | |_(_) |_ _   _  |  _ \  ___  __ _| |_| |__  
-         * |  _| | '_ \| __| | __| | | | | | | |/ _ \/ _` | __| '_ \ 
-         * | |___| | | | |_| | |_| |_| | | |_| |  __/ (_| | |_| | | |
-         * |_____|_| |_|\__|_|\__|\__, | |____/ \___|\__,_|\__|_| |_|
-         *                        |___/                              
-         */
         // Only interested in dying players.
         final Entity entity = event.getEntity();
         if (entity instanceof Player){
@@ -412,14 +386,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      */
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPlayerAnimation(final PlayerAnimationEvent event) {
-        /*
-         *  ____  _                            _          _                 _   _             
-         * |  _ \| | __ _ _   _  ___ _ __     / \   _ __ (_)_ __ ___   __ _| |_(_) ___  _ __  
-         * | |_) | |/ _` | | | |/ _ \ '__|   / _ \ | '_ \| | '_ ` _ \ / _` | __| |/ _ \| '_ \ 
-         * |  __/| | (_| | |_| |  __/ |     / ___ \| | | | | | | | | | (_| | |_| | (_) | | | |
-         * |_|   |_|\__,_|\__, |\___|_|    /_/   \_\_| |_|_|_| |_| |_|\__,_|\__|_|\___/|_| |_|
-         *                |___/                                                               
-         */
         // Set a flag telling us that the arm has been swung.
         FightData.getData(event.getPlayer()).noSwingArmSwung = true;
     }

@@ -10,15 +10,6 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
-/*
- * MM'""""'YMM dP                  dP   M""""""'YMM            dP            
- * M' .mmm. `M 88                  88   M  mmmm. `M            88            
- *  * M  MMMMMooM 88d888b. .d8888b. d8888P M  MMMMM  M .d8888b. d8888P .d8888b. 
- * M  MMMMMMMM 88'  `88 88'  `88   88   M  MMMMM  M 88'  `88   88   88'  `88 
- * M. `MMM' .M 88    88 88.  .88   88   M  MMMM' .M 88.  .88   88   88.  .88 
- * MM.     .dM dP    dP `88888P8   dP   M       .MM `88888P8   dP   `88888P8 
- * MMMMMMMMMMM                          MMMMMMMMMMM                          
- */
 /**
  * Player specific data for the chat checks.
  */

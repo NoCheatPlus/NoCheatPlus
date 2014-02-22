@@ -12,7 +12,6 @@ import java.util.Map;
 public abstract class AsyncCheckData extends ACheckData {
 
 	// TODO: consider using a PermissionEntry class with a timestamp to schedule renewing it.
-	
 	// TODO: consider using a normal HashMap and ensure by contract that the permissions get filled at login, so updates are thread safe.
 	
 	/** The permissions that are actually cached. */

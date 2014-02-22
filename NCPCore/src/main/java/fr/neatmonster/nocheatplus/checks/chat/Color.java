@@ -5,15 +5,6 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.AsyncCheck;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
-/*
- * MM'""""'YMM          dP                   
- * M' .mmm. `M          88                   
- * M  MMMMMooM .d8888b. 88 .d8888b. 88d888b. 
- * M  MMMMMMMM 88'  `88 88 88'  `88 88'  `88 
- * M. `MMM' .M 88.  .88 88 88.  .88 88       
- * MM.     .dM `88888P' dP `88888P' dP       
- * MMMMMMMMMMM                               
- */
 /**
  * The Color check verifies that no color codes are sent in players' messages.
  */

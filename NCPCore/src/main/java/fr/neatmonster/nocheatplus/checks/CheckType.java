@@ -23,16 +23,6 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
-/*
- * MM'""""'YMM dP                         dP       M""""""""M                            
- * M' .mmm. `M 88                         88       Mmmm  mmmM                            
- * M  MMMMMooM 88d888b. .d8888b. .d8888b. 88  .dP  MMMM  MMMM dP    dP 88d888b. .d8888b. 
- * M  MMMMMMMM 88'  `88 88ooood8 88'  `"" 88888"   MMMM  MMMM 88    88 88'  `88 88ooood8 
- * M. `MMM' .M 88    88 88.  ... 88.  ... 88  `8b. MMMM  MMMM 88.  .88 88.  .88 88.  ... 
- * MM.     .dM dP    dP `88888P' `88888P' dP   `YP MMMM  MMMM `8888P88 88Y888P' `88888P' 
- * MMMMMMMMMMM                                     MMMMMMMMMM      .88 88                
- *                                                             d8888P  dP                
- */
 /**
  * Type of checks (containing configuration and dataFactory classes, name and permission).
  */

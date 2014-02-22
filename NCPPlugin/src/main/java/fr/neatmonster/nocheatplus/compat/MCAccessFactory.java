@@ -29,7 +29,6 @@ public class MCAccessFactory {
 	private final String[] updateLocs = new String[]{
 		"[NoCheatPlus]  Check for updates at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/",
 		"[NoCheatPlus]  Development builds: http://ci.ecocitycraft.com/job/NoCheatPlus/",
-//		"[NoCheatPlus]  Development builds: http://nocheatplus.org:8080/job/NoCheatPlus/",
 	};
 	
 	/**

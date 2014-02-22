@@ -7,16 +7,6 @@ import fr.neatmonster.nocheatplus.actions.types.LogAction;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
-/*
- * MMP"""""""MM            dP   oo                   MM""""""""`M                     dP                              
- * M' .mmmm  MM            88                        MM  mmmmmmmM                     88                              
- * M         `M .d8888b. d8888P dP .d8888b. 88d888b. M'      MMMM .d8888b. .d8888b. d8888P .d8888b. 88d888b. dP    dP 
- * M  MMMMM  MM 88'  `""   88   88 88'  `88 88'  `88 MM  MMMMMMMM 88'  `88 88'  `""   88   88'  `88 88'  `88 88    88 
- * M  MMMMM  MM 88.  ...   88   88 88.  .88 88    88 MM  MMMMMMMM 88.  .88 88.  ...   88   88.  .88 88       88.  .88 
- * M  MMMMM  MM `88888P'   dP   dP `88888P' dP    dP MM  MMMMMMMM `88888P8 `88888P'   dP   `88888P' dP       `8888P88 
- * MMMMMMMMMMMM                                      MMMMMMMMMMMM                                                 .88 
- *                                                                                                            d8888P  
- */
 /**
  * Helps with creating Actions out of text string definitions.
  */

@@ -65,10 +65,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	
 	protected static DataManager instance = null;
 	
-	//////////////////
-	// Not static.
-	//////////////////
-	
+	// Not static
 	private int foundInconsistencies = 0;
 	
 	/** PlayerData storage. */

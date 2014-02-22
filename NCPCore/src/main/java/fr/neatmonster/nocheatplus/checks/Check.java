@@ -17,15 +17,6 @@ import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MM'""""'YMM dP                         dP       
- * M' .mmm. `M 88                         88       
- * M  MMMMMooM 88d888b. .d8888b. .d8888b. 88  .dP  
- * M  MMMMMMMM 88'  `88 88ooood8 88'  `"" 88888"   
- * M. `MMM' .M 88    88 88.  ... 88.  ... 88  `8b. 
- * MM.     .dM dP    dP `88888P' `88888P' dP   `YP 
- * MMMMMMMMMMM                                     
- */
 /**
  * The parent class of all checks. Don't let this implement Listener without knowing that this might be registered as component with NCP before the check-listeners.
  */

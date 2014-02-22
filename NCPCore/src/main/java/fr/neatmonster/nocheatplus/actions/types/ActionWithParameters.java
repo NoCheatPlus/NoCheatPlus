@@ -7,23 +7,6 @@ import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ParameterHolder;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 
-/*
- * MMP"""""""MM            dP   oo                   M""MMM""MMM""M oo   dP   dP       
- * M' .mmmm  MM            88                        M  MMM  MMM  M      88   88       
- * M         `M .d8888b. d8888P dP .d8888b. 88d888b. M  MMP  MMP  M dP d8888P 88d888b. 
- * M  MMMMM  MM 88'  `""   88   88 88'  `88 88'  `88 M  MM'  MM' .M 88   88   88'  `88 
- * M  MMMMM  MM 88.  ...   88   88 88.  .88 88    88 M  `' . '' .MM 88   88   88    88 
- * M  MMMMM  MM `88888P'   dP   dP `88888P' dP    dP M    .d  .dMMM dP   dP   dP    dP 
- * MMMMMMMMMMMM                                      MMMMMMMMMMMMMM                    
- * 
- * MM"""""""`YM                                                  dP                              
- * MM  mmmmm  M                                                  88                              
- * M'        .M .d8888b. 88d888b. .d8888b. 88d8b.d8b. .d8888b. d8888P .d8888b. 88d888b. .d8888b. 
- * MM  MMMMMMMM 88'  `88 88'  `88 88'  `88 88'`88'`88 88ooood8   88   88ooood8 88'  `88 Y8ooooo. 
- * MM  MMMMMMMM 88.  .88 88       88.  .88 88  88  88 88.  ...   88   88.  ... 88             88 
- * MM  MMMMMMMM `88888P8 dP       `88888P8 dP  dP  dP `88888P'   dP   `88888P' dP       `88888P' 
- * MMMMMMMMMMMM                                                                                                                                                               
- */
 /**
  * Action with parameters is used for the messages (chat, console, log) or the commands.
  */

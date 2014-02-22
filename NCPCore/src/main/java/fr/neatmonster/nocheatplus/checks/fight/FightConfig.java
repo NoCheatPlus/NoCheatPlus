@@ -15,16 +15,6 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
-/*
- * MM""""""""`M oo          dP         dP   MM'""""'YMM                   .8888b oo          
- * MM  mmmmmmmM             88         88   M' .mmm. `M                   88   "             
- * M'      MMMM dP .d8888b. 88d888b. d8888P M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. 
- * MM  MMMMMMMM 88 88'  `88 88'  `88   88   M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 
- * MM  MMMMMMMM 88 88.  .88 88    88   88   M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 
- * MM  MMMMMMMM dP `8888P88 dP    dP   dP   MM.     .dM `88888P' dP    dP dP     dP `8888P88 
- * MMMMMMMMMMMM         .88                 MMMMMMMMMMM                                  .88 
- *                  d8888P                                                           d8888P  
- */
 /**
  * Configurations specific for the "fight" checks. Every world gets one of these assigned to it, or if a world doesn't
  * get it's own, it will use the "global" version.

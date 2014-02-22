@@ -12,16 +12,6 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.logging.StaticLogFile;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
-/*
- * M""MMMMMMMM                   MMP"""""""MM            dP   oo                   
- * M  MMMMMMMM                   M' .mmmm  MM            88                        
- * M  MMMMMMMM .d8888b. .d8888b. M         `M .d8888b. d8888P dP .d8888b. 88d888b. 
- * M  MMMMMMMM 88'  `88 88'  `88 M  MMMMM  MM 88'  `""   88   88 88'  `88 88'  `88 
- * M  MMMMMMMM 88.  .88 88.  .88 M  MMMMM  MM 88.  ...   88   88 88.  .88 88    88 
- * M         M `88888P' `8888P88 M  MMMMM  MM `88888P'   dP   dP `88888P' dP    dP 
- * MMMMMMMMMMM               .88 MMMMMMMMMMMM                                      
- *                       d8888P                                                    
- */
 /**
  * Print a log message to various locations.
  */

@@ -9,15 +9,6 @@ import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MM'"""""`MM                dP M"""""`'"""`YM                dP          
- * M' .mmm. `M                88 M  mm.  mm.  M                88          
- * M  MMMMMMMM .d8888b. .d888b88 M  MMM  MMM  M .d8888b. .d888b88 .d8888b. 
- * M  MMM   `M 88'  `88 88'  `88 M  MMM  MMM  M 88'  `88 88'  `88 88ooood8 
- * M. `MMM' .M 88.  .88 88.  .88 M  MMM  MMM  M 88.  .88 88.  .88 88.  ... 
- * MM.     .MM `88888P' `88888P8 M  MMM  MMM  M `88888P' `88888P8 `88888P' 
- * MMMMMMMMMMM                   MMMMMMMMMMMMMM                            
- */
 /**
  * The GodMode check will find out if a player tried to stay invulnerable after being hit or after dying.
  */

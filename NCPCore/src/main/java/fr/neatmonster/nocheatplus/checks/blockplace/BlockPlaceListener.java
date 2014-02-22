@@ -26,23 +26,6 @@ import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
-/*
- * M#"""""""'M  dP                   dP       MM"""""""`YM dP                            
- * ##  mmmm. `M 88                   88       MM  mmmmm  M 88                            
- * #'        .M 88 .d8888b. .d8888b. 88  .dP  M'        .M 88 .d8888b. .d8888b. .d8888b. 
- * M#  MMMb.'YM 88 88'  `88 88'  `"" 88888"   MM  MMMMMMMM 88 88'  `88 88'  `"" 88ooood8 
- * M#  MMMM'  M 88 88.  .88 88.  ... 88  `8b. MM  MMMMMMMM 88 88.  .88 88.  ... 88.  ... 
- * M#       .;M dP `88888P' `88888P' dP   `YP MM  MMMMMMMM dP `88888P8 `88888P' `88888P' 
- * M#########M                                MMMMMMMMMMMM                               
- * 
- * M""MMMMMMMM oo            dP                                       
- * M  MMMMMMMM               88                                       
- * M  MMMMMMMM dP .d8888b. d8888P .d8888b. 88d888b. .d8888b. 88d888b. 
- * M  MMMMMMMM 88 Y8ooooo.   88   88ooood8 88'  `88 88ooood8 88'  `88 
- * M  MMMMMMMM 88       88   88   88.  ... 88    88 88.  ... 88       
- * M         M dP `88888P'   dP   `88888P' dP    dP `88888P' dP       
- * MMMMMMMMMMM                                                        
- */
 /**
  * Central location to listen to events that are relevant for the block place checks.
  * 
@@ -194,14 +177,6 @@ public class BlockPlaceListener extends CheckListener {
     @EventHandler(
             priority = EventPriority.MONITOR)
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
-        /*
-         *  ____  _                            _          _                 _   _             
-         * |  _ \| | __ _ _   _  ___ _ __     / \   _ __ (_)_ __ ___   __ _| |_(_) ___  _ __  
-         * | |_) | |/ _` | | | |/ _ \ '__|   / _ \ | '_ \| | '_ ` _ \ / _` | __| |/ _ \| '_ \ 
-         * |  __/| | (_| | |_| |  __/ |     / ___ \| | | | | | | | | | (_| | |_| | (_) | | | |
-         * |_|   |_|\__,_|\__, |\___|_|    /_/   \_\_| |_|_|_| |_| |_|\__,_|\__|_|\___/|_| |_|
-         *                |___/                                                               
-         */
         // Just set a flag to true when the arm was swung.
         BlockPlaceData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
@@ -215,14 +190,6 @@ public class BlockPlaceListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
-        /*
-         *  ____  _                         ___       _                      _   
-         * |  _ \| | __ _ _   _  ___ _ __  |_ _|_ __ | |_ ___ _ __ __ _  ___| |_ 
-         * | |_) | |/ _` | | | |/ _ \ '__|  | || '_ \| __/ _ \ '__/ _` |/ __| __|
-         * |  __/| | (_| | |_| |  __/ |     | || | | | ||  __/ | | (_| | (__| |_ 
-         * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
-         *                |___/                                                  
-         */
     	if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
     	final Player player = event.getPlayer();
     	
