@@ -129,6 +129,7 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         
         // Tell TickTask to update cached permissions.
         // (Might omit this if already cancelled.)
+        // TODO: Implement to only update on "timeout" or checks being activated at all.
         TickTask.requestPermissionUpdate(player.getName(), CheckType.CHAT);
 
         // First the color check.
