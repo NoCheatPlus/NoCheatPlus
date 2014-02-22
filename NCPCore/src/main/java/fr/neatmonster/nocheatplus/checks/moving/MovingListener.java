@@ -1166,7 +1166,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// More resetting.
 		data.vDistAcc.clear();
-		data.toWasReset = BlockProperties.isOnGround(player, loc, cc.yOnGround);
+		data.toWasReset = BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround);
 		data.fromWasReset = data.toWasReset;
 		
 		// Hover.
