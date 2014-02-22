@@ -233,10 +233,9 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
-        if (sprinting && data.lostSprintCount == 0) {
-        	// (Ignore if lost sprint is active, in order to forestall false positives.)
-        	// TODO: Check if still necessary to check here with timeSprinting change (...).
-        	// TODO: Find more ways to confine conditions.
+        if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && data.hVelActive.isEmpty()) {
+        	// (Ignore some cases, in order to prevent false positives.)
+        	// TODO: speed effects ?
 			final float yaw = from.getYaw();
 			if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F
 					|| xDistance < 0D && zDistance < 0D && yaw > 270F && yaw < 360F 
