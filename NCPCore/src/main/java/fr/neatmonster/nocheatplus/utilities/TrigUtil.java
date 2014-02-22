@@ -435,5 +435,19 @@ public class TrigUtil {
 	public static double maxDistance(final double x1, final double y1, final double  z1, final double x2, final double y2, final double z2){
 		return Math.max(Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)), Math.abs(z1 - z2));
 	}
+	
+	/**
+	 * Check if the x-z plane move is "any backwards"  regarding the yaw direction.
+	 * @param xDistance
+	 * @param zDistance
+	 * @param yaw
+	 * @return
+	 */
+	public static boolean isMovingBackwards(final double xDistance, final double zDistance, final float yaw) {
+		return xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F
+			|| xDistance < 0D && zDistance < 0D && yaw > 270F && yaw < 360F 
+			|| xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F 
+			|| xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F;
+	}
 
 }

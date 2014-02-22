@@ -236,20 +236,12 @@ public class SurvivalFly extends Check {
         if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && data.hVelActive.isEmpty()) {
         	// (Ignore some cases, in order to prevent false positives.)
         	// TODO: speed effects ?
-			final float yaw = from.getYaw();
-			if (xDistance < 0D && zDistance > 0D && yaw > 180F && yaw < 270F
-					|| xDistance < 0D && zDistance < 0D && yaw > 270F && yaw < 360F 
-					|| xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F 
-					|| xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F) {
+        	if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
 				// (Might have to account for speeding permissions.)
-				if (!player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
-					// Expect full distance to be covered by buffers/velocity.
-					// TODO: Should this exclusively allow velocity (someone calculate margin)?
-					// TODO: Check if moving below is ok now (since sprinting flag was fixed).
-					hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-					tags.add("sprintback"); // Might add it anyway.
-				}
-			}
+				// TODO: hDistance is too harsh?
+				hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+				tags.add("sprintback"); // Might add it anyway.
+        	}
         }
 		
 		//////////////////////////
