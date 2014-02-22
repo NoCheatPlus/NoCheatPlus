@@ -26,7 +26,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 661;
+	public static final int buildNumber = 667;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -156,7 +156,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKINTERACT_SPEED_ACTIONS, "cancel vl>200 log:bspeed:0:2:if cancel vl>1000 cancel log:bspeed:0:2:icf cmd:kickbspeed");
         
         set(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK, true);
-        set(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, "cancel vl>5 log:bvisible:0:2:if cancel");
+        set(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, "cancel vl>100 log:bvisible:0:10:if cancel");
         
         // BLOCKPLACE
         set(ConfPaths.BLOCKPLACE_AGAINST_CHECK, true);
