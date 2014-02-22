@@ -1249,36 +1249,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@Override
 	public void playerJoins(final Player player) {
 		final MovingData data = MovingData.getData(player);
+		final MovingConfig cc = MovingConfig.getConfig(player);
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
 		data.removeAllVelocity();
 		final Location loc = player.getLocation();
 		
-		// Correct set-back on world changes.
-		if (loc == null) {
-			// Bug on server side ?
+		// Correct set-back on join.
+		if (data.hasSetBackWorldChanged(loc)) {
 			data.clearFlyData();
+			data.setSetBack(loc);
 		}
 		else if (!data.hasSetBack()) {
 			// TODO: Might consider something else like with respawn. Check if it is passable ?
 			data.setSetBack(loc);
 		}
-		else if (data.hasSetBackWorldChanged(loc)) {
-			data.clearFlyData();
-			data.setSetBack(loc);
-		}
-		if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE) {
-			// TODO: re-think: more fine grained reset?
-			data.resetPositions(loc);
-		}
+		
+		// Always reset position to this one.
+		// TODO: more fine grained reset?
+		data.resetPositions(loc);
 		
 		// More resetting.
 		data.vDistAcc.clear();
-		data.toWasReset = false;
-		data.fromWasReset = false;
+		data.toWasReset = BlockProperties.isOnGround(player, loc, cc.yOnGround);
+		data.fromWasReset = data.toWasReset;
 		
 		// Hover.
-		final MovingConfig cc = MovingConfig.getConfig(player);
 		// Reset hover ticks until a better method is used.
 		if (cc.sfHoverCheck) {
 			// Start as if hovering already.
