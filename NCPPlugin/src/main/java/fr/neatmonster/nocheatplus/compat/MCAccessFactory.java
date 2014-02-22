@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
-import fr.neatmonster.nocheatplus.compat.cb2511.MCAccessCB2511;
 import fr.neatmonster.nocheatplus.compat.cb2512.MCAccessCB2512;
 import fr.neatmonster.nocheatplus.compat.cb2545.MCAccessCB2545;
 import fr.neatmonster.nocheatplus.compat.cb2602.MCAccessCB2602;
@@ -135,13 +134,6 @@ public class MCAccessFactory {
 				throwables.add(t);
 			};
 			
-			// 1.4.2 ... 1.4.5 (up to CB2511).
-			try{
-				return new MCAccessCB2511();
-			}
-			catch(Throwable t){
-				throwables.add(t);
-			};
 		}
 		
 		// Try to set up api-only access (since 1.4.6).
