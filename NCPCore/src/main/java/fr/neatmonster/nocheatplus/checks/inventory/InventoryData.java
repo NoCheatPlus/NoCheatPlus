@@ -11,16 +11,6 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 
-/*
- * M""M                                       dP                              M""""""'YMM            dP            
- * M  M                                       88                              M  mmmm. `M            88            
- * M  M 88d888b. dP   .dP .d8888b. 88d888b. d8888P .d8888b. 88d888b. dP    dP M  MMMMM  M .d8888b. d8888P .d8888b. 
- * M  M 88'  `88 88   d8' 88ooood8 88'  `88   88   88'  `88 88'  `88 88    88 M  MMMMM  M 88'  `88   88   88'  `88 
- * M  M 88    88 88 .88'  88.  ... 88    88   88   88.  .88 88       88.  .88 M  MMMM' .M 88.  .88   88   88.  .88 
- * M  M dP    dP 8888P'   `88888P' dP    dP   dP   `88888P' dP       `8888P88 M       .MM `88888P8   dP   `88888P8 
- * MMMM                                                                   .88 MMMMMMMMMMM                          
- *                                                                    d8888P                                       
- */
 /**
  * Player specific dataFactory for the inventory checks.
  */

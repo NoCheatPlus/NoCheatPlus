@@ -12,15 +12,6 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MM""""""""`M                     dP   MM'""""'YMM dP oo          dP       
- * MM  mmmmmmmM                     88   M' .mmm. `M 88             88       
- * M'      MMMM .d8888b. .d8888b. d8888P M  MMMMMooM 88 dP .d8888b. 88  .dP  
- * MM  MMMMMMMM 88'  `88 Y8ooooo.   88   M  MMMMMMMM 88 88 88'  `"" 88888"   
- * MM  MMMMMMMM 88.  .88       88   88   M. `MMM' .M 88 88 88.  ... 88  `8b. 
- * MM  MMMMMMMM `88888P8 `88888P'   dP   MM.     .dM dP dP `88888P' dP   `YP 
- * MMMMMMMMMMMM                          MMMMMMMMMMM                         
- */
 /**
  * The FastClick check will prevents players from taking automatically all items from any inventory (chests, etc.).
  */

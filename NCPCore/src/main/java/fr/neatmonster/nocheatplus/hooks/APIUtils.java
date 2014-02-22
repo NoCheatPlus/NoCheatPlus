@@ -9,15 +9,6 @@ import java.util.Set;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
-/*
- * MMP"""""""MM MM"""""""`YM M""M M""MMMMM""M   dP   oo dP          
- * M' .mmmm  MM MM  mmmmm  M M  M M  MMMMM  M   88      88          
- * M         `M M'        .M M  M M  MMMMM  M d8888P dP 88 .d8888b. 
- * M  MMMMM  MM MM  MMMMMMMM M  M M  MMMMM  M   88   88 88 Y8ooooo. 
- * M  MMMMM  MM MM  MMMMMMMM M  M M  `MMM'  M   88   88 88       88 
- * M  MMMMM  MM MM  MMMMMMMM M  M Mb       dM   dP   dP dP `88888P' 
- * MMMMMMMMMMMM MMMMMMMMMMMM MMMM MMMMMMMMMMM                       
- */
 /**
  * A class providing utilities to the NoCheatPlus API.
  * 

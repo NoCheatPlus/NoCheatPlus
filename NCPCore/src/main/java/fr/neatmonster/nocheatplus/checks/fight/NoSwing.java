@@ -5,16 +5,6 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
-/*
- * M"""""""`YM          MP""""""`MM            oo                   
- * M  mmmm.  M          M  mmmmm..M                                 
- * M  MMMMM  M .d8888b. M.      `YM dP  dP  dP dP 88d888b. .d8888b. 
- * M  MMMMM  M 88'  `88 MMMMMMM.  M 88  88  88 88 88'  `88 88'  `88 
- * M  MMMMM  M 88.  .88 M. .MMM'  M 88.88b.88' 88 88    88 88.  .88 
- *  * M  MMMMM  M `88888P' Mb.     .dM 8888P Y8P  dP dP    dP `8888P88 
- * MMMMMMMMMMM          MMMMMMMMMMM                             .88 
- *                                                          d8888P  
- */
 /**
  * We require that the player moves their arm between attacks, this is basically what gets checked here.
  */

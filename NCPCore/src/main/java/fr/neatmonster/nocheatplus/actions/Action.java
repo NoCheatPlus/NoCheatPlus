@@ -2,15 +2,6 @@ package fr.neatmonster.nocheatplus.actions;
 
 import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
 
-/*
- * MMP"""""""MM            dP   oo                   
- * M' .mmmm  MM            88                        
- * M         `M .d8888b. d8888P dP .d8888b. 88d888b. 
- * M  MMMMM  MM 88'  `""   88   88 88'  `88 88'  `88 
- * M  MMMMM  MM 88.  ...   88   88 88.  .88 88    88 
- * M  MMMMM  MM `88888P'   dP   dP `88888P' dP    dP 
- * MMMMMMMMMMMM                                      
- */
 /**
  * An action gets executed as the result of a failed check. If it 'really' gets executed depends on how many executions
  * have occurred within the last 60 seconds and how much time was between this and the previous execution.

@@ -83,15 +83,6 @@ import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * M"""""""`YM          MM'""""'YMM dP                           dP   MM"""""""`YM dP                   
- * M  mmmm.  M          M' .mmm. `M 88                           88   MM  mmmmm  M 88                   
- * M  MMMMM  M .d8888b. M  MMMMMooM 88d888b. .d8888b. .d8888b. d8888P M'        .M 88 dP    dP .d8888b. 
- * M  MMMMM  M 88'  `88 M  MMMMMMMM 88'  `88 88ooood8 88'  `88   88   MM  MMMMMMMM 88 88    88 Y8ooooo. 
- * M  MMMMM  M 88.  .88 M. `MMM' .M 88    88 88.  ... 88.  .88   88   MM  MMMMMMMM 88 88.  .88       88 
- * M  MMMMM  M `88888P' MM.     .dM dP    dP `88888P' `88888P8   dP   MM  MMMMMMMM dP `88888P' `88888P' 
- * MMMMMMMMMMM          MMMMMMMMMMM                                   MMMMMMMMMMMM                      
- */
 /**
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
@@ -99,9 +90,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	
 	private static final String MSG_NOTIFY_OFF = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are turned " + ChatColor.RED + "OFF" + ChatColor.WHITE + ".";
 	
-	//////////////////
 	// Static API
-	//////////////////
 	
 	/**
 	 * Convenience method.
@@ -112,9 +101,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		return NCPAPIProvider.getNoCheatPlusAPI();
 	}
 	
-	//////////////////
 	// Not static.
-	//////////////////
 	
 	/** Names of players with a certain permission. */
 	protected final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.NOTIFY);
@@ -532,13 +519,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     @Override
     public void onDisable() {
-        /*
-         *  ____  _           _     _      
-         * |  _ \(_)___  __ _| |__ | | ___ 
-         * | | | | / __|/ _` | '_ \| |/ _ \
-         * | |_| | \__ \ (_| | |_) | |  __/
-         * |____/|_|___/\__,_|_.__/|_|\___|
-         */
         
     	final boolean verbose = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG);
     	
@@ -694,13 +674,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     @Override
     public void onEnable() {
-        /*
-         *  _____             _     _      
-         * | ____|_ __   __ _| |__ | | ___ 
-         * |  _| | '_ \ / _` | '_ \| |/ _ \
-         * | |___| | | | (_| | |_) | |  __/
-         * |_____|_| |_|\__,_|_.__/|_|\___|
-         */
     	
     	// Reset TickTask (just in case).
     	TickTask.setLocked(true);

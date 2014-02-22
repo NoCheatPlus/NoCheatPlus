@@ -10,16 +10,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
-/*
- * MMP"""""""MM                   dP          
- * M' .mmmm  MM                   88          
- * M         `M 88d888b. .d8888b. 88 .d8888b. 
- * M  MMMMM  MM 88'  `88 88'  `88 88 88ooood8 
- * M  MMMMM  MM 88    88 88.  .88 88 88.  ... 
- * M  MMMMM  MM dP    dP `8888P88 dP `88888P' 
- * MMMMMMMMMMMM               .88             
- *                        d8888P              
- */
 /**
  * A check used to verify if the player isn't using a forcefield in order to attack multiple entities at the same time.
  * 

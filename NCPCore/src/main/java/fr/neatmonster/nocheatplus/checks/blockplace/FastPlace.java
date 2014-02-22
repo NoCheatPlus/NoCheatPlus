@@ -7,15 +7,6 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MM""""""""`M                     dP   MM"""""""`YM dP                            
- * MM  mmmmmmmM                     88   MM  mmmmm  M 88                            
- * M'      MMMM .d8888b. .d8888b. d8888P M'        .M 88 .d8888b. .d8888b. .d8888b. 
- * MM  MMMMMMMM 88'  `88 Y8ooooo.   88   MM  MMMMMMMM 88 88'  `88 88'  `"" 88ooood8 
- * MM  MMMMMMMM 88.  .88       88   88   MM  MMMMMMMM 88 88.  .88 88.  ... 88.  ... 
- * MM  MMMMMMMM `88888P8 `88888P'   dP   MM  MMMMMMMM dP `88888P8 `88888P' `88888P' 
- * MMMMMMMMMMMM                          MMMMMMMMMMMM                               
- */
 /**
  * A check used to verify if the player isn't placing blocks too quickly.
  */

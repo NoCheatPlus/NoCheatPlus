@@ -21,24 +21,6 @@ import fr.neatmonster.nocheatplus.components.NCPListener;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-/*
- * M"""""""`YM MM'""""'YMM MM"""""""`YM MM""""""""`M                                         dP   oo                   
- * M  mmmm.  M M' .mmm. `M MM  mmmmm  M MM  mmmmmmmM                                         88                        
- * M  MMMMM  M M  MMMMMooM M'        .M M`      MMMM dP.  .dP .d8888b. 88d8b.d8b. 88d888b. d8888P dP .d8888b. 88d888b. 
- * M  MMMMM  M M  MMMMMMMM MM  MMMMMMMM MM  MMMMMMMM  `8bd8'  88ooood8 88'`88'`88 88'  `88   88   88 88'  `88 88'  `88 
- * M  MMMMM  M M. `MMM' .M MM  MMMMMMMM MM  MMMMMMMM  .d88b.  88.  ... 88  88  88 88.  .88   88   88 88.  .88 88    88 
- * M  MMMMM  M MM.     .dM MM  MMMMMMMM MM        .M dP'  `dP `88888P' dP  dP  dP 88Y888P'   dP   dP `88888P' dP    dP 
- * MMMMMMMMMMM MMMMMMMMMMM MMMMMMMMMMMM MMMMMMMMMMMM                              88                                   
- *                                                                                dP                                   
- * M"""""`'"""`YM                                                       
- * M  mm.  mm.  M                                                       
- * M  MMM  MMM  M .d8888b. 88d888b. .d8888b. .d8888b. .d8888b. 88d888b. 
- * M  MMM  MMM  M 88'  `88 88'  `88 88'  `88 88'  `88 88ooood8 88'  `88 
- * M  MMM  MMM  M 88.  .88 88    88 88.  .88 88.  .88 88.  ... 88       
- * M  MMM  MMM  M `88888P8 dP    dP `88888P8 `8888P88 `88888P' dP       
- * MMMMMMMMMMMMMM                                 .88                   
- *                                            d8888P                    
- */
 /**
  * API for exempting players of checks, checked before calculations are done.
  * 

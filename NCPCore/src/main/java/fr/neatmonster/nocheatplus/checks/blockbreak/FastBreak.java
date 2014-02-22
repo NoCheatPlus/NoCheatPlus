@@ -15,15 +15,6 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MM""""""""`M                     dP   M#"""""""'M                             dP       
- * MM  mmmmmmmM                     88   ##  mmmm. `M                            88       
- * M'      MMMM .d8888b. .d8888b. d8888P #'        .M 88d888b. .d8888b. .d8888b. 88  .dP  
- * MM  MMMMMMMM 88'  `88 Y8ooooo.   88   M#  MMMb.'YM 88'  `88 88ooood8 88'  `88 88888"   
- * MM  MMMMMMMM 88.  .88       88   88   M#  MMMM'  M 88       88.  ... 88.  .88 88  `8b. 
- * MM  MMMMMMMM `88888P8 `88888P'   dP   M#       .;M dP       `88888P' `88888P8 dP   `YP 
- * MMMMMMMMMMMM                          M#########M                                      
- */
 /**
  * A check used to verify if the player isn't breaking blocks faster than possible.
  */

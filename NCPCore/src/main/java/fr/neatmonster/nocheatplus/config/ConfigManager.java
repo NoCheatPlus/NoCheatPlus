@@ -12,16 +12,6 @@ import org.bukkit.plugin.Plugin;
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
-/*
- * MM'""""'YMM                   .8888b oo          M"""""`'"""`YM                                                       
- * M' .mmm. `M                   88   "             M  mm.  mm.  M                                                       
- * M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. M  MMM  MMM  M .d8888b. 88d888b. .d8888b. .d8888b. .d8888b. 88d888b. 
- * M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 M  MMM  MMM  M 88'  `88 88'  `88 88'  `88 88'  `88 88ooood8 88'  `88 
- * M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 M  MMM  MMM  M 88.  .88 88    88 88.  .88 88.  .88 88.  ... 88       
- * MM.     .dM `88888P' dP    dP dP     dP `8888P88 M  MMM  MMM  M `88888P8 dP    dP `88888P8 `8888P88 `88888P' dP       
- * MMMMMMMMMMM                                  .88 MMMMMMMMMMMMMM                                 .88                   
- *                                          d8888P                                             d8888P                    
- */
 /**
  * Central location for everything that's described in the configuration file(s).<br>
  * The synchronized methods are to ensure that changing the configurations won't lead to trouble for the asynchronous checks.

@@ -16,15 +16,6 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * MM"""""""`MM                            dP       
- * MM  mmmm,  M                            88       
- * M'        .M .d8888b. .d8888b. .d8888b. 88d888b. 
- * MM  MMMb. "M 88ooood8 88'  `88 88'  `"" 88'  `88 
- * MM  MMMMM  M 88.  ... 88.  .88 88.  ... 88    88 
- * MM  MMMMM  M `88888P' `88888P8 `88888P' dP    dP 
- * MMMMMMMMMMMM                                     
- */
 /**
  * The Reach check will find out if a player interacts with something that's too far away.
  */

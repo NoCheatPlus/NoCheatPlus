@@ -17,25 +17,6 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
-/*
- * M""M                                       dP                              
- * M  M                                       88                              
- * M  M 88d888b. dP   .dP .d8888b. 88d888b. d8888P .d8888b. 88d888b. dP    dP 
- * M  M 88'  `88 88   d8' 88ooood8 88'  `88   88   88'  `88 88'  `88 88    88 
- * M  M 88    88 88 .88'  88.  ... 88    88   88   88.  .88 88       88.  .88 
- * M  M dP    dP 8888P'   `88888P' dP    dP   dP   `88888P' dP       `8888P88 
- * MMMM                                                                   .88 
- *                                                                    d8888P  
- *                                                                    
- * MM'""""'YMM                   .8888b oo          
- * M' .mmm. `M                   88   "             
- * M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. 
- * M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 
- * M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 
- * MM.     .dM `88888P' dP    dP dP     dP `8888P88 
- * MMMMMMMMMMM                                  .88 
- *                                          d8888P  
- */
 /**
  * Configurations specific for the "inventory" checks. Every world gets one of
  * these assigned to it, or if a world doesn't get it's own, it will use the

@@ -93,11 +93,7 @@ public class TickTask implements Runnable {
 		}
 	}
 	
-	
-	//////////////////////////////////////////////////////////////
 	// Special static methods, usually not called from outside.
-	//////////////////////////////////////////////////////////////
-	
 	/**
 	 * Force executing actions.<br>
 	 * Note: Only call from the main thread!
@@ -138,11 +134,7 @@ public class TickTask implements Runnable {
 			}
 		}
 	}
-	
-	///////////////////////////////////
 	// Public static access methods
-	///////////////////////////////////
-	
 	/**
 	 * Access method to request permission updates.<br>
 	 * NOTE: Thread safe.
@@ -375,10 +367,7 @@ public class TickTask implements Runnable {
 		return locked;
 	}
 	
-	////////////////////////////////////////
 	// Public methods for internal use.
-	////////////////////////////////////////
-	
 	public static int start(final Plugin plugin){
 		cancel();
 		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new TickTask(), 1, 1);
@@ -432,10 +421,7 @@ public class TickTask implements Runnable {
 		}
 	}
 	
-	//////////////////////////
 	// Instance methods (meant private).
-	//////////////////////////
-	
 	/**
 	 * 
 	 * Notify all listeners. A copy of the listeners under lock, then processed without lock. Theoretically listeners can get processed though they have already been unregistered.

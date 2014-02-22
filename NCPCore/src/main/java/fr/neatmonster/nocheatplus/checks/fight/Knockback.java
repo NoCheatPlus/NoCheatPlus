@@ -7,15 +7,6 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * M""MMMMM""M                            dP       dP                         dP       
- * M  MMMM' .M                            88       88                         88       
- * M       .MM 88d888b. .d8888b. .d8888b. 88  .dP  88d888b. .d8888b. .d8888b. 88  .dP  
- * M  MMMb. YM 88'  `88 88'  `88 88'  `"" 88888"   88'  `88 88'  `88 88'  `"" 88888"   
- * M  MMMMb  M 88    88 88.  .88 88.  ... 88  `8b. 88.  .88 88.  .88 88.  ... 88  `8b. 
- * M  MMMMM  M dP    dP `88888P' `88888P' dP   `YP 88Y8888' `88888P8 `88888P' dP   `YP 
- * MMMMMMMMMMM                                                                         
- */
 /**
  * A check used to verify if players aren't "knockbacking" other players when it's not technically possible.
  */

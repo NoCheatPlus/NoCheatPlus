@@ -7,24 +7,6 @@ import fr.neatmonster.nocheatplus.actions.Action;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 
-/*
- * MM""""""""`M                                       dP   oo                   
- * MM  mmmmmmmM                                       88                        
- * M`      MMMM dP.  .dP .d8888b. .d8888b. dP    dP d8888P dP .d8888b. 88d888b. 
- * MM  MMMMMMMM  `8bd8'  88ooood8 88'  `"" 88    88   88   88 88'  `88 88'  `88 
- * MM  MMMMMMMM  .d88b.  88.  ... 88.  ... 88.  .88   88   88 88.  .88 88    88 
- * MM        .M dP'  `dP `88888P' `88888P' `88888P'   dP   dP `88888P' dP    dP 
- * MMMMMMMMMMMM                                                                 
-
- * M""MMMMM""MM oo            dP                              
- * M  MMMMM  MM               88                              
- * M         `M dP .d8888b. d8888P .d8888b. 88d888b. dP    dP 
- * M  MMMMM  MM 88 Y8ooooo.   88   88'  `88 88'  `88 88    88 
- * M  MMMMM  MM 88       88   88   88.  .88 88       88.  .88 
- * M  MMMMM  MM dP `88888P'   dP   `88888P' dP       `8888P88 
- * MMMMMMMMMMMM                                           .88 
- *                                                    d8888P  
- */
 /**
  * Store amount of action executions for last 60 seconds for various actions.<br>
  * TODO: Once away from static access, could put this to generic (Action<D extends ActionData>).

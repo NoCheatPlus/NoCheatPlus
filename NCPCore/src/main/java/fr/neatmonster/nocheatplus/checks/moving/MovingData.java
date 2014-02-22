@@ -16,16 +16,6 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
-/*
- * M"""""`'"""`YM                   oo                   M""""""'YMM            dP            
- * M  mm.  mm.  M                                        M  mmmm. `M            88            
- * M  MMM  MMM  M .d8888b. dP   .dP dP 88d888b. .d8888b. M  MMMMM  M .d8888b. d8888P .d8888b. 
- * M  MMM  MMM  M 88'  `88 88   d8' 88 88'  `88 88'  `88 M  MMMMM  M 88'  `88   88   88'  `88 
- * M  MMM  MMM  M 88.  .88 88 .88'  88 88    88 88.  .88 M  MMMM' .M 88.  .88   88   88.  .88 
- * M  MMM  MMM  M `88888P' 8888P'   dP dP    dP `8888P88 M       .MM `88888P8   dP   `88888P8 
- * MMMMMMMMMMMMMM                                    .88 MMMMMMMMMMM                          
- *                                               d8888P                                       
- */
 /**
  * Player specific data for the moving checks.
  */

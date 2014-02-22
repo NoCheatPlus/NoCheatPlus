@@ -2,15 +2,6 @@ package fr.neatmonster.nocheatplus.checks.access;
 
 import fr.neatmonster.nocheatplus.components.IData;
 
-/*
- * MM'""""'YMM dP                         dP       M""""""'YMM            dP            
- * M' .mmm. `M 88                         88       M  mmmm. `M            88            
- * M  MMMMMooM 88d888b. .d8888b. .d8888b. 88  .dP  M  MMMMM  M .d8888b. d8888P .d8888b. 
- * M  MMMMMMMM 88'  `88 88ooood8 88'  `"" 88888"   M  MMMMM  M 88'  `88   88   88'  `88 
- * M. `MMM' .M 88    88 88.  ... 88.  ... 88  `8b. M  MMMM' .M 88.  .88   88   88.  .88 
- * MM.     .dM dP    dP `88888P' `88888P' dP   `YP M       .MM `88888P8   dP   `88888P8 
- * MMMMMMMMMMM                                     MMMMMMMMMMM                          
- */
 /**
  * This is for future purposes. Might remove...<br>
  * Some checks in chat synchronize over data, so using this from exectueActions can deadlock.<br>

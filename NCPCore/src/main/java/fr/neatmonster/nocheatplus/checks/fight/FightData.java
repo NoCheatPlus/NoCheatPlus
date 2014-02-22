@@ -17,16 +17,6 @@ import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 
-/*
- * MM""""""""`M oo          dP         dP   M""""""'YMM            dP            
- * MM  mmmmmmmM             88         88   M  mmmm. `M            88            
- * M'      MMMM dP .d8888b. 88d888b. d8888P M  MMMMM  M .d8888b. d8888P .d8888b. 
- * MM  MMMMMMMM 88 88'  `88 88'  `88   88   M  MMMMM  M 88'  `88   88   88'  `88 
- * MM  MMMMMMMM 88 88.  .88 88    88   88   M  MMMM' .M 88.  .88   88   88.  .88 
- * MM  MMMMMMMM dP `8888P88 dP    dP   dP   M       .MM `88888P8   dP   `88888P8 
- * MMMMMMMMMMMM         .88                 MMMMMMMMMMM                          
- *                  d8888P                                                       
- */
 /**
  * Player specific data for the fight checks.
  */

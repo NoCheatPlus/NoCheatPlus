@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.access;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 
-
 /**
  * Minimal implementation, doing nothing.
  * @author mc_dev
@@ -43,7 +42,5 @@ public abstract class ACheckConfig implements ICheckConfig {
     public void setDebug(final boolean debug) {
         this.debug = debug;
     }
-
 	
-
 }

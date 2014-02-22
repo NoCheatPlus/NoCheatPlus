@@ -12,16 +12,6 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
-/*
- * MM'""""'YMM                              dP   oo                   MM""""""""`M dP          
- * M' .mmm. `M                              88                        MM  mmmmmmmM 88          
- * M  MMMMMooM 88d888b. .d8888b. .d8888b. d8888P dP dP   .dP .d8888b. M'      MMMM 88 dP    dP 
- * M  MMMMMMMM 88'  `88 88ooood8 88'  `88   88   88 88   d8' 88ooood8 MM  MMMMMMMM 88 88    88 
- * M. `MMM' .M 88       88.  ... 88.  .88   88   88 88 .88'  88.  ... MM  MMMMMMMM 88 88.  .88 
- * MM.     .dM dP       `88888P' `88888P8   dP   dP 8888P'   `88888P' MM  MMMMMMMM dP `8888P88 
- * MMMMMMMMMMM                                                        MMMMMMMMMMMM         .88 
- *                                                                                     d8888P  
- */
 /**
  * A check designed for people that are allowed to fly. The complement to the "SurvivalFly", which is for people that
  * aren't allowed to fly, and therefore have tighter rules to obey.

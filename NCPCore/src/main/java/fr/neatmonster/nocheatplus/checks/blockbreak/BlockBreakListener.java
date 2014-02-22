@@ -23,23 +23,6 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * M#"""""""'M  dP                   dP       M#"""""""'M                             dP       
- * ##  mmmm. `M 88                   88       ##  mmmm. `M                            88       
- * #'        .M 88 .d8888b. .d8888b. 88  .dP  #'        .M 88d888b. .d8888b. .d8888b. 88  .dP  
- * M#  MMMb.'YM 88 88'  `88 88'  `"" 88888"   M#  MMMb.'YM 88'  `88 88ooood8 88'  `88 88888"   
- * M#  MMMM'  M 88 88.  .88 88.  ... 88  `8b. M#  MMMM'  M 88       88.  ... 88.  .88 88  `8b. 
- * M#       .;M dP `88888P' `88888P' dP   `YP M#       .;M dP       `88888P' `88888P8 dP   `YP 
- * M#########M                                M#########M                                      
- * 
- * M""MMMMMMMM oo            dP                                       
- * M  MMMMMMMM               88                                       
- * M  MMMMMMMM dP .d8888b. d8888P .d8888b. 88d888b. .d8888b. 88d888b. 
- * M  MMMMMMMM 88 Y8ooooo.   88   88ooood8 88'  `88 88ooood8 88'  `88 
- * M  MMMMMMMM 88       88   88   88.  ... 88    88 88.  ... 88       
- * M         M dP `88888P'   dP   `88888P' dP    dP `88888P' dP       
- * MMMMMMMMMMM                                                        
- */
 /**
  * Central location to listen to events that are relevant for the block break checks.
  * 
@@ -80,13 +63,6 @@ public class BlockBreakListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onBlockBreak(final BlockBreakEvent event) {
-        /*
-         *  ____  _            _      ____                 _    
-         * | __ )| | ___   ___| | __ | __ ) _ __ ___  __ _| | __
-         * |  _ \| |/ _ \ / __| |/ / |  _ \| '__/ _ \/ _` | |/ /
-         * | |_) | | (_) | (__|   <  | |_) | | |  __/ (_| |   < 
-         * |____/|_|\___/ \___|_|\_\ |____/|_|  \___|\__,_|_|\_\
-         */
         
         final Player player = event.getPlayer();
         
@@ -179,14 +155,6 @@ public class BlockBreakListener extends CheckListener {
     @EventHandler(
             priority = EventPriority.MONITOR)
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
-        /*
-         *  ____  _                            _          _                 _   _             
-         * |  _ \| | __ _ _   _  ___ _ __     / \   _ __ (_)_ __ ___   __ _| |_(_) ___  _ __  
-         * | |_) | |/ _` | | | |/ _ \ '__|   / _ \ | '_ \| | '_ ` _ \ / _` | __| |/ _ \| '_ \ 
-         * |  __/| | (_| | |_| |  __/ |     / ___ \| | | | | | | | | | (_| | |_| | (_) | | | |
-         * |_|   |_|\__,_|\__, |\___|_|    /_/   \_\_| |_|_|_| |_| |_|\__,_|\__|_|\___/|_| |_|
-         *                |___/                                                               
-         */
         // Just set a flag to true when the arm was swung.
 //    	System.out.println("Animation");
         BlockBreakData.getData(event.getPlayer()).noSwingArmSwung = true;
@@ -202,15 +170,6 @@ public class BlockBreakListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
-        /*
-         *  ____  _                         ___       _                      _   
-         * |  _ \| | __ _ _   _  ___ _ __  |_ _|_ __ | |_ ___ _ __ __ _  ___| |_ 
-         * | |_) | |/ _` | | | |/ _ \ '__|  | || '_ \| __/ _ \ '__/ _` |/ __| __|
-         * |  __/| | (_| | |_| |  __/ |     | || | | | ||  __/ | | (_| | (__| |_ 
-         * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
-         *                |___/                                                  
-         */
-    	
 //    	System.out.println("Interact("+event.isCancelled()+"): " + event.getClickedBlock());
     	// The following is to set the "first damage time" for a block.
     	

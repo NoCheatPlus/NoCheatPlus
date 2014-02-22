@@ -17,23 +17,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
-/*
- * M#"""""""'M  dP                   dP       M""M            dP                                         dP   
- * ##  mmmm. `M 88                   88       M  M            88                                         88   
- * #'        .M 88 .d8888b. .d8888b. 88  .dP  M  M 88d888b. d8888P .d8888b. 88d888b. .d8888b. .d8888b. d8888P 
- * M#  MMMb.'YM 88 88'  `88 88'  `"" 88888"   M  M 88'  `88   88   88ooood8 88'  `88 88'  `88 88'  `""   88   
- * M#  MMMM'  M 88 88.  .88 88.  ... 88  `8b. M  M 88    88   88   88.  ... 88       88.  .88 88.  ...   88   
- * M#       .;M dP `88888P' `88888P' dP   `YP M  M dP    dP   dP   `88888P' dP       `88888P8 `88888P'   dP   
- * M#########M                                MMMM                                                            
- * 
- * M""MMMMMMMM oo            dP                                       
- * M  MMMMMMMM               88                                       
- * M  MMMMMMMM dP .d8888b. d8888P .d8888b. 88d888b. .d8888b. 88d888b. 
- * M  MMMMMMMM 88 Y8ooooo.   88   88ooood8 88'  `88 88ooood8 88'  `88 
- * M  MMMMMMMM 88       88   88   88.  ... 88    88 88.  ... 88       
- * M         M dP `88888P'   dP   `88888P' dP    dP `88888P' dP       
- * MMMMMMMMMMM                                                        
- */
 /**
  * Central location to listen to events that are relevant for the block interact checks.
  * 
@@ -66,14 +49,6 @@ public class BlockInteractListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
-        /*
-         *  ____  _                         ___       _                      _   
-         * |  _ \| | __ _ _   _  ___ _ __  |_ _|_ __ | |_ ___ _ __ __ _  ___| |_ 
-         * | |_) | |/ _` | | | |/ _ \ '__|  | || '_ \| __/ _ \ '__/ _` |/ __| __|
-         * |  __/| | (_| | |_| |  __/ |     | || | | | ||  __/ | | (_| | (__| |_ 
-         * |_|   |_|\__,_|\__, |\___|_|    |___|_| |_|\__\___|_|  \__,_|\___|\__|
-         *                |___/                                                  
-         */
     	
     	// TODO: Re-arrange for interact spam, possibly move ender pearl stuff to a method.
     	final Action action = event.getAction();

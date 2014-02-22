@@ -11,23 +11,6 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 
-/*
- * M"""""`'"""`YM                            MM"""""""`YM                   dP                  dP            
- * M  mm.  mm.  M                            MM  mmmmm  M                   88                  88            
- * M  MMM  MMM  M .d8888b. 88d888b. .d8888b. M'        .M .d8888b. .d8888b. 88  .dP  .d8888b. d8888P .d8888b. 
- * M  MMM  MMM  M 88'  `88 88'  `88 88ooood8 MM  MMMMMMMM 88'  `88 88'  `"" 88888"   88ooood8   88   Y8ooooo. 
- * M  MMM  MMM  M 88.  .88 88       88.  ... MM  MMMMMMMM 88.  .88 88.  ... 88  `8b. 88.  ...   88         88 
- * M  MMM  MMM  M `88888P' dP       `88888P' MM  MMMMMMMM `88888P8 `88888P' dP   `YP `88888P'   dP   `88888P' 
- * MMMMMMMMMMMMMM                            MMMMMMMMMMMM                                                     
- * 
- * M""MMMMM""M          dP       oo                   dP          
- * M  MMMMM  M          88                            88          
- * M  MMMMP  M .d8888b. 88d888b. dP .d8888b. dP    dP 88 .d8888b. 
- * M  MMMM' .M 88ooood8 88'  `88 88 88'  `"" 88    88 88 88ooood8 
- * M  MMP' .MM 88.  ... 88    88 88 88.  ... 88.  .88 88 88.  ... 
- * M     .dMMM `88888P' dP    dP dP `88888P' `88888P' dP `88888P' 
- * MMMMMMMMMMM                                                    
- */
 /**
  * This check does the exact same thing as the MorePacket check but this one works for players inside vehicles.
  */

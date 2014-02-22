@@ -9,15 +9,6 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
-/*
- * M""""""'YMM oo                              dP   oo                   
- * M  mmmm. `M                                 88                        
- * M  MMMMM  M dP 88d888b. .d8888b. .d8888b. d8888P dP .d8888b. 88d888b. 
- * M  MMMMM  M 88 88'  `88 88ooood8 88'  `""   88   88 88'  `88 88'  `88 
- * M  MMMM' .M 88 88       88.  ... 88.  ...   88   88 88.  .88 88    88 
- * M       .MM dP dP       `88888P' `88888P'   dP   dP `88888P' dP    dP 
- * MMMMMMMMMMM                                                           
- */
 /**
  * The Direction check will find out if a player tried to interact with something that's not in their field of view.
  */

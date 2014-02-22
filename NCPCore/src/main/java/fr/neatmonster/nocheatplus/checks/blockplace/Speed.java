@@ -5,16 +5,6 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
-/*
- * MP""""""`MM                                  dP 
- * M  mmmmm..M                                  88 
- * M.      `YM 88d888b. .d8888b. .d8888b. .d888b88 
- * MMMMMMM.  M 88'  `88 88ooood8 88ooood8 88'  `88 
- * M. .MMM'  M 88.  .88 88.  ... 88.  ... 88.  .88 
- * Mb.     .dM 88Y888P' `88888P' `88888P' `88888P8 
- * MMMMMMMMMMM 88                                  
- *             dP                                  
- */
 /**
  * This check verifies if the player isn't throwing items too quickly, like eggs or arrows.
  */

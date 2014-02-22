@@ -9,24 +9,6 @@ import org.bukkit.util.Vector;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 
-/*
- * MM"""""""`YM dP                                     
- * MM  mmmmm  M 88                                     
- * M'        .M 88 .d8888b. dP    dP .d8888b. 88d888b. 
- * MM  MMMMMMMM 88 88'  `88 88    88 88ooood8 88'  `88 
- * MM  MMMMMMMM 88 88.  .88 88.  .88 88.  ... 88       
- * MM  MMMMMMMM dP `88888P8 `8888P88 `88888P' dP       
- * MMMMMMMMMMMM                  .88                   
- *                           d8888P                    
- *                           
- * M""MMMMMMMM                              dP   oo                   
- * M  MMMMMMMM                              88                        
- * M  MMMMMMMM .d8888b. .d8888b. .d8888b. d8888P dP .d8888b. 88d888b. 
- * M  MMMMMMMM 88'  `88 88'  `"" 88'  `88   88   88 88'  `88 88'  `88 
- * M  MMMMMMMM 88.  .88 88.  ... 88.  .88   88   88 88.  .88 88    88 
- * M         M `88888P' `88888P' `88888P8   dP   dP `88888P' dP    dP 
- * MMMMMMMMMMM                                                        
- */
 /**
  * An utility class used to know a lot of things for a player and a location
  * given.

@@ -16,16 +16,6 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
-/*
- * MM'""""'YMM dP                  dP   MM'""""'YMM                   .8888b oo          
- * M' .mmm. `M 88                  88   M' .mmm. `M                   88   "             
- * M  MMMMMooM 88d888b. .d8888b. d8888P M  MMMMMooM .d8888b. 88d888b. 88aaa  dP .d8888b. 
- * M  MMMMMMMM 88'  `88 88'  `88   88   M  MMMMMMMM 88'  `88 88'  `88 88     88 88'  `88 
- * M. `MMM' .M 88    88 88.  .88   88   M. `MMM' .M 88.  .88 88    88 88     88 88.  .88 
- * MM.     .dM dP    dP `88888P8   dP   MM.     .dM `88888P' dP    dP dP     dP `8888P88 
- * MMMMMMMMMMM                          MMMMMMMMMMM                                  .88 
- *                                                                               d8888P  
- */
 /**
  * Configurations specific for the "chat" checks. Every world gets one of these assigned to it, or if a world doesn't
  * get it's own, it will use the "global" version.

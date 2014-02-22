@@ -8,15 +8,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
-/*
- * M""M                     dP                       dP   M#"""""""'M                      
- * M  M                     88                       88   ##  mmmm. `M                     
- * M  M 88d888b. .d8888b. d8888P .d8888b. 88d888b. d8888P #'        .M .d8888b. dP  dP  dP 
- * M  M 88'  `88 Y8ooooo.   88   88'  `88 88'  `88   88   M#  MMMb.'YM 88'  `88 88  88  88 
- * M  M 88    88       88   88   88.  .88 88    88   88   M#  MMMM'  M 88.  .88 88.88b.88' 
- * M  M dP    dP `88888P'   dP   `88888P8 dP    dP   dP   M#       .;M `88888P' 8888P Y8P  
- * MMMM                                                   M#########M                      
- */
 /**
  * The InstantBow check will find out if a player pulled the string of their bow too fast.
  */
