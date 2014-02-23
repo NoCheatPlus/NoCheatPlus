@@ -314,10 +314,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Maybe this helps with people teleporting through Multiverse portals having problems?
     	final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
         data.clearFlyData();
         data.clearMorePacketsData();
         // TODO: Might omit this if neither check is activated.
-        data.setSetBack(player.getLocation(useLoc));
+        final Location loc = player.getLocation(useLoc);
+        data.setSetBack(loc);
+        data.resetPositions(loc);
+        if (cc.enforceLocation) {
+        	// Just in case.
+        	playersEnforce.add(player.getName());
+        }
         useLoc.setWorld(null);
     }
 
@@ -417,9 +424,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			parkedInfo.add(moveInfo);
 			return;
 		}
+		
+		// The players location.
+		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation(moveInfo.useLoc) : null;
+				
+				
 		// Check for location consistency.
-		if (cc.enforceLocation) {
-			// TODO: Check if lastTo matches from.
+		if (cc.enforceLocation && playersEnforce.contains(playerName)) {
+			// NOTE: The setback should not be set before this, even if not yet set.
+			// Last to vs. from.
+			newTo = enforceLocation(player, from, data);
+			// TODO: Remove anyway ? 
+			playersEnforce.remove(playerName);
 		}
 		
 		final long time = System.currentTimeMillis();
@@ -461,10 +477,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final int tick = TickTask.getTick();
 		data.removeInvalidVelocity(tick - cc.velocityActivationTicks);
 		data.velocityTick();
-        
-        // The players location.
-		// TODO: Change to getLocation(moveInfo.loc) once 1.4.5 support is dropped.
-		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation(moveInfo.useLoc) : null;
 
 		// Check passable first to prevent set-back override.
 		// TODO: Redesign to set set-backs later (queue + invalidate).
@@ -1362,9 +1374,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@Override
 	public void onTick(final int tick, final long timeLast) {
 		final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
+		// TODO: Change to per world checking (as long as configs are per world).
+		
 		// Enforcing location check.
 		for (final String playerName : playersEnforce) {
-			// TODO: Check location consistency (depending on cc).
+			final Player player = DataManager.getPlayerExact(playerName);
+			if (player == null || !player.isOnline()) {
+				rem.add(playerName);
+				continue;
+			} else if (player.isDead() || player.isSleeping() || player.isInsideVehicle()) {
+				// Don't remove but also don't check [subject to change].
+				continue;
+			}
+			final MovingData data = MovingData.getData(player);
+			final Location newTo = enforceLocation(player, player.getLocation(useLoc), data);
+			if (newTo != null) {
+				data.setTeleported(newTo);
+				player.teleport(newTo);
+			}
 		}
 		if (!rem.isEmpty()) {
 			playersEnforce.removeAll(rem);
@@ -1423,6 +1450,23 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		info.cleanup();
 		parkedInfo.add(info);
 		useLoc.setWorld(null);
+	}
+
+	private Location enforceLocation(final Player player, final Location loc, final MovingData data) {
+		if (data.toX != Double.MAX_VALUE && TrigUtil.distanceSquared(data.toX, data.toY, data.toZ, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
+			// Teleport back. 
+			// TODO: Add history / alert?
+			//player.sendMessage(ChatColor.RED + "NCP: enforce location !"); // TODO: DEBUG - REMOVE.
+			if (data.hasSetBack()) {
+				// Might have to re-check all context with playerJoins and keeping old set-backs...
+				// Could use a flexible set-back policy (switch to in-air on login). 
+				return data.getSetBack(loc);
+			} else {
+				return new Location(player.getWorld(), data.toX, data.toY, data.toZ, loc.getYaw(), loc.getPitch());
+			}
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -1488,12 +1532,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@Override
 	public IData removeData(String playerName) {
 		hoverTicks.remove(playerName);
+		playersEnforce.remove(playerName);
 		return null;
 	}
 
 	@Override
 	public void removeAllData() {
 		hoverTicks.clear();
+		playersEnforce.clear();
 		parkedInfo.clear();
 	}
 
