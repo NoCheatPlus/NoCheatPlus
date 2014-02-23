@@ -19,6 +19,8 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  */
 public class DebugUtil {
 	
+	// TODO: Add useLoc1 and useLoc2.
+	
 	public static boolean isSamePos(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2){
 		return x1 == x2 && y1 == y2 && z1 == z2;
 	}

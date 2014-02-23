@@ -11,6 +11,9 @@ public class BlockCacheBukkit extends BlockCache{
 
 	protected World world;
 	
+	/** Temporary use. Use LocUtil.clone before passing on. Call setWorld(null) after use. */
+	protected final Location useLoc = new Location(null, 0, 0, 0);
+	
 	public BlockCacheBukkit(World world) {
 		setAccess(world);
 	}
@@ -49,8 +52,9 @@ public class BlockCacheBukkit extends BlockCache{
 				if (type != EntityType.BOAT){ //  && !(other instanceof Minecart)) 
 					continue; 
 				}
-				final Location loc = entity.getLocation();
-				if (Math.abs(loc.getY() - minY) < 0.7){
+				final double locY = entity.getLocation(useLoc).getY();
+				useLoc.setWorld(null);
+				if (Math.abs(locY - minY) < 0.7){
 					// TODO: A "better" estimate is possible, though some more tolerance would be good. 
 					return true; 
 				}

@@ -170,11 +170,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private final Map<String, PlayerMoveEvent> processingEvents = new HashMap<String, PlayerMoveEvent>();
     
-    private final Set<String> hoverTicks = new LinkedHashSet<String>(30);
+    /** Player names to check hover for, case insensitive. */
+    private final Set<String> hoverTicks = new LinkedHashSet<String>(30); // TODO: Rename
+    
+    /** Player names to check enforcing the location for in onTick, case insensitive. */
+    private final Set<String> playersEnforce = new LinkedHashSet<String>(30);
     
     private int hoverTicksStep = 5;
     
     private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
+    
+    /** Location for temporary use with getLocation(useLoc). Always call setWorld(null) after use. Use LocUtil.clone before passing to other API. */
+    private final Location useLoc = new Location(null, 0, 0, 0); // TODO: Put to use...
     
     public MovingListener() {
 		super(CheckType.MOVING);
@@ -212,7 +219,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) return;
 		
-		final Location loc = player.getLocation();
+		final Location loc = player.getLocation(useLoc);
 		if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
 				&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
 				&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
@@ -223,6 +230,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.setSetBackY(blockY + 1D);
 			data.sfJumpPhase = 0;
 		}
+		useLoc.setWorld(null);
     }
     
     /**
@@ -261,16 +269,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		if (bedLeave.isEnabled(player) && bedLeave.checkBed(player)) {
 			// Check if the player has to be reset.
 			// To "cancel" the event, we teleport the player.
-			final Location loc = player.getLocation();
+			final Location loc = player.getLocation(useLoc);
 			final MovingData data = MovingData.getData(player);
 			final MovingConfig cc = MovingConfig.getConfig(player); 
 			Location target = null;
 			final boolean sfCheck = shouldCheckSurvivalFly(player, data, cc);
-			if (sfCheck) target = data.getSetBack(loc);
+			if (sfCheck) {
+				target = data.getSetBack(loc);
+			}
 			if (target == null) {
 				// TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
-				target = loc;
+				target = LocUtil.clone(loc);
 			}
+			useLoc.setWorld(null);
 			if (target != null) {
 				// Actually this should not possibly be null, this is a block for "future" purpose, feel free to criticize it.
 				if (sfCheck && cc.sfFallDamage && noFall.isEnabled(player)) {
@@ -306,7 +317,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.clearFlyData();
         data.clearMorePacketsData();
         // TODO: Might omit this if neither check is activated.
-        data.setSetBack(player.getLocation());
+        data.setSetBack(player.getLocation(useLoc));
+        useLoc.setWorld(null);
     }
 
     /**
@@ -382,6 +394,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 			return;
 		}
+		// newTo should be null here.
 		
 		// TODO: Order this to above "early return"?
         // Set up data / caching.
@@ -403,6 +416,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			moveInfo.cleanup();
 			parkedInfo.add(moveInfo);
 			return;
+		}
+		// Check for location consistency.
+		if (cc.enforceLocation) {
+			// TODO: Check if lastTo matches from.
 		}
 		
 		final long time = System.currentTimeMillis();
@@ -447,7 +464,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         // The players location.
 		// TODO: Change to getLocation(moveInfo.loc) once 1.4.5 support is dropped.
-		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation() : null;
+		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation(moveInfo.useLoc) : null;
 
 		// Check passable first to prevent set-back override.
 		// TODO: Redesign to set set-backs later (queue + invalidate).
@@ -612,7 +629,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		data.sfLowJump = false;
 		// TODO: What with processingEvents.remove(player.getName());
 		if (vehicle != null) {
-			final Location vLoc = vehicle.getLocation();
+			final Location vLoc = vehicle.getLocation(); // TODO: Use a location as argument.
 			// (Auto detection of missing events, might fire one time too many per plugin run.)
 			if (!normalVehicles.contains(vehicle.getType())) {
 				onVehicleMove(vehicle, vLoc, vLoc, true);
@@ -688,7 +705,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	// TODO: maybe even not count vehicles at all ?
         	if (player.isInsideVehicle()) {
         		// TODO: refine (!).
-        		MovingData.getData(player).resetPositions(player.getVehicle().getLocation());
+        		MovingData.getData(player).resetPositions(player.getVehicle().getLocation(useLoc));
+        		useLoc.setWorld(null);
         	}
         	else if (!fromWorldName.equals(toWorldName)) {
                 MovingData.getData(player).resetPositions(to);
@@ -755,7 +773,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final MovingData data = MovingData.getData(player);
 		data.clearFlyData();
 		data.clearMorePacketsData();
-		data.setSetBack(player.getLocation()); // TODO: Monitor this change (!).
+		data.setSetBack(player.getLocation(useLoc)); // TODO: Monitor this change (!).
+		useLoc.setWorld(null);
 	}
 
     /**
@@ -843,7 +862,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 						event.setTo(ref);
 					}
 					else{
-						ref = from;
+						ref = from; // Player.getLocation ?
 						event.setCancelled(true);
 					}
 				}
@@ -1016,11 +1035,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (!from.getWorld().equals(to.getWorld())) return;
         
         final MovingData data = MovingData.getData(player);
-        data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation());
+        data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation(useLoc));
         switch (data.vehicleConsistency) {
         	case FROM:
         	case TO:
-        		data.resetPositions(player.getLocation()); // TODO: Drop MC 1.4!
+        		data.resetPositions(player.getLocation(useLoc)); // TODO: Drop MC 1.4!
         		break;
         	case INCONSISTENT:
         		// TODO: Any exploits exist? -> TeleportUtil.forceMount(player, vehicle)
@@ -1062,6 +1081,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	// TODO: Reset on world changes or not?
         	data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, cc.debug));
         }
+        useLoc.setWorld(null);
     }
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
@@ -1076,7 +1096,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.clearNoFallData();
             return;
         }
-        final Location loc = player.getLocation();
+        final Location loc = player.getLocation(useLoc);
         boolean allowReset = true;
         if (!data.noFallSkipAirCheck) {
         	final MoveInfo moveInfo;
@@ -1107,6 +1127,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	moveInfo.cleanup();
         	parkedInfo.add(moveInfo);
         }
+        useLoc.setWorld(null);
         final float fallDistance = player.getFallDistance();
         final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
@@ -1148,7 +1169,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
 		data.removeAllVelocity();
-		final Location loc = player.getLocation();
+		final Location loc = player.getLocation(useLoc);
 		
 		// Correct set-back on join.
 		if (data.hasSetBackWorldChanged(loc)) {
@@ -1168,6 +1189,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		data.vDistAcc.clear();
 		data.toWasReset = BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround);
 		data.fromWasReset = data.toWasReset;
+		
+		// Enforcing the location.
+		if (cc.enforceLocation) {
+			playersEnforce.add(player.getName());
+		}
 		
 		// Hover.
 		// Reset hover ticks until a better method is used.
@@ -1191,6 +1217,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
 			}
 		}
+		
+		// Cleanup.
+		useLoc.setWorld(null);
 		
 	}
 
@@ -1248,7 +1277,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	final MovingData data = MovingData.getData(player);
     	data.removeAllVelocity();
     	// Event should have a vehicle, in case check this last.
-    	data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation());
+    	data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation(useLoc));
+    	useLoc.setWorld(null); // TODO: A pool ?
     	// TODO: more resetting, visible check ?
     }
     
@@ -1268,7 +1298,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	
     	final MovingConfig cc = MovingConfig.getConfig(player);
     	// TODO: Loc can be inconsistent, determine which to use ! 
-    	final Location pLoc = player.getLocation();
+    	final Location pLoc = player.getLocation(useLoc);
     	Location loc = pLoc; // The location to use as set-back.
     	//  TODO: Which vehicle to use ?
     	// final Entity vehicle = player.getVehicle();
@@ -1314,6 +1344,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	data.verticalFreedom = 1.2;
     	data.verticalVelocity = 0.15;
     	data.verticalVelocityUsed = 0;
+    	useLoc.setWorld(null);
     }
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1330,7 +1361,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
 	@Override
 	public void onTick(final int tick, final long timeLast) {
-		// Hover checks !
+		final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
+		// Enforcing location check.
+		for (final String playerName : playersEnforce) {
+			// TODO: Check location consistency (depending on cc).
+		}
+		if (!rem.isEmpty()) {
+			playersEnforce.removeAll(rem);
+		}
+		// Hover check (survivalfly).
+		rem.clear();
 		if (tick % hoverTicksStep != 0) {
 			// Only check every so and so ticks.
 			return;
@@ -1338,7 +1378,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final MoveInfo info;
 		if (parkedInfo.isEmpty()) info = new MoveInfo(mcAccess);
 		else info = parkedInfo.remove(parkedInfo.size() - 1);
-		final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
 		for (final String playerName : hoverTicks) {
 			// TODO: put players into the set (+- one tick would not matter ?)
 			// TODO: might add an online flag to data !
@@ -1379,10 +1418,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				rem.add(playerName);
 			}
 		}
-		info.cleanup(); // Just in case.
-		parkedInfo.add(info);
 		hoverTicks.removeAll(rem);
 		rem.clear();
+		info.cleanup();
+		parkedInfo.add(info);
+		useLoc.setWorld(null);
 	}
 
 	/**
@@ -1395,7 +1435,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	 */
 	private boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final MoveInfo info) {
 		// Check if player is on ground.
-		final Location loc = player.getLocation();
+		final Location loc = player.getLocation(useLoc); // useLoc.setWorld(null) is done in onTick.
 		info.set(player, loc, null, cc.yOnGround);
 		final boolean res;
 		// TODO: Collect flags, more margin ?

@@ -55,6 +55,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     
     private final Open open 			= addCheck(new Open());
     
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
+    
     public InventoryListener(){
     	super(CheckType.INVENTORY);
     }
@@ -73,7 +76,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             final Player player = (Player) event.getEntity();
             if (instantBow.isEnabled(player)){
                 final long now = System.currentTimeMillis();
-                final Location loc = player.getLocation();
+                final Location loc = player.getLocation(useLoc);
                 if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())){
                     // No else if with this, could be cancelled due to other checks feeding, does not have actions.
                     event.setCancelled(true);
@@ -87,6 +90,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                     // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
                     event.setCancelled(true);
             	}
+            	useLoc.setWorld(null);
             }  
         }
     }

@@ -30,7 +30,7 @@ public class Direction extends Check {
      *            the damaged
      * @return true, if successful
      */
-    public boolean check(final Player player, final Entity damaged) {
+    public boolean check(final Player player, final Location loc, final Entity damaged, final Location dLoc) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
@@ -47,14 +47,11 @@ public class Direction extends Check {
         // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
         final double height = mcAccess.getHeight(damaged);
         
-        final Location dLoc = damaged.getLocation();
-        
         // TODO: allow any hit on the y axis (might just adapt interface to use foot position + height)!
         
         // How far "off" is the player with their aim. We calculate from the players eye location and view direction to
         // the center of the target entity. If the line of sight is more too far off, "off" will be bigger than 0.
-        final Location loc = player.getLocation();
-        final Vector direction = player.getEyeLocation().getDirection();
+        final Vector direction = loc.getDirection();
         
         final double off;
         if (cc.directionStrict){

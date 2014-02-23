@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.blockbreak;
 import java.util.Map;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -16,6 +17,9 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  * The Reach check will find out if a player interacts with something that's too far away.
  */
 public class Reach extends Check {
+	
+	/** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
 
     /** The maximum distance allowed to interact with a block in creative mode. */
     public static final double CREATIVE_DISTANCE = 5.6D;
@@ -47,7 +51,10 @@ public class Reach extends Check {
 
         // Distance is calculated from eye location to center of targeted block. If the player is further away from their
         // target than allowed, the difference will be assigned to "distance".
-        final double distance = TrigUtil.distance(player.getEyeLocation(), block) - distanceLimit;
+        final Location loc = player.getLocation(useLoc);
+        loc.setY(loc.getY() + player.getEyeHeight());
+        final double distance = TrigUtil.distance(loc, block) - distanceLimit;
+        useLoc.setWorld(null);
 
         if (distance > 0) {
             // They failed, increment violation level.

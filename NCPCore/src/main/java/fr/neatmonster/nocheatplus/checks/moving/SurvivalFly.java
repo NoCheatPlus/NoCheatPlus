@@ -65,6 +65,9 @@ public class SurvivalFly extends Check {
 	
 	private final Set<String> reallySneaking = new HashSet<String>(30);
 	
+	/** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
+	
     /**
      * Instantiates a new survival fly check.
      */
@@ -1344,7 +1347,10 @@ public class SurvivalFly extends Check {
 		}
 		if (data.sfCobwebVL < 550) { // Totally random !
 			// Silently set back.
-			if (!data.hasSetBack()) data.setSetBack(player.getLocation()); // ? check moment of call.
+			if (!data.hasSetBack()) {
+				data.setSetBack(player.getLocation(useLoc)); // ? check moment of call.
+				useLoc.setWorld(null);
+			}
 			data.sfJumpPhase = 0;
 			data.sfLastYDist = data.sfLastHDist = Double.MAX_VALUE;
 			return true;

@@ -355,6 +355,8 @@ public class BlockProperties {
      */
     private static final Map<String, Long> nameFlagMap = new LinkedHashMap<String, Long>();
     
+    private static final Location useLoc = new Location(null, 0, 0, 0);
+    
     static{
     	// Use reflection to get a flag -> name mapping and vice versa.
     	for (Field field : BlockProperties.class.getDeclaredFields()){
@@ -880,7 +882,9 @@ public class BlockProperties {
 	 * @return
 	 */
 	public static long getBreakingDuration(final int blockId, final Player player){
-		return getBreakingDuration(blockId, player.getItemInHand(), player.getInventory().getHelmet(), player, player.getLocation());
+		final long res = getBreakingDuration(blockId, player.getItemInHand(), player.getInventory().getHelmet(), player, player.getLocation(useLoc));
+		useLoc.setWorld(null);
+		return res;
 	}
 	
 	/**

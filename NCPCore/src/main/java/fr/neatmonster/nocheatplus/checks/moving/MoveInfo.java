@@ -16,6 +16,8 @@ public class MoveInfo {
 	public final BlockCache cache;
     public final PlayerLocation from;
     public final PlayerLocation to;
+    /** For temporary use. Might need cloning for passing to external API. */
+    public final Location useLoc = new Location(null, 0, 0, 0);
     
     public MoveInfo(final MCAccess mcAccess){
     	cache = mcAccess.getBlockCache(null);
@@ -38,10 +40,12 @@ public class MoveInfo {
             this.to.set(to, player, yOnGround);
             this.to.setBlockCache(cache);
         }
+        useLoc.setWorld(null); // Just in case of repeated setting.
     }
     public final void cleanup(){
         from.cleanup();
         to.cleanup();
         cache.cleanup();
+        useLoc.setWorld(null);
     }
 }

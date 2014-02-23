@@ -51,7 +51,7 @@ public class Reach extends Check {
      *            the damaged
      * @return true, if successful
      */
-    public boolean check(final Player player, final Entity damaged) {
+    public boolean check(final Player player, final Location pLoc, final Entity damaged, final Location dRef) {
         final FightConfig cc = FightConfig.getConfig(player);
         final FightData data = FightData.getData(player);
 
@@ -67,20 +67,17 @@ public class Reach extends Check {
         final double distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : SURVIVAL_DISTANCE + getDistMod(damaged);
         final double distanceMin = (distanceLimit - DYNAMIC_RANGE) / distanceLimit;
         
-        // Reference locations to check distance for.
-        final Location dRef = damaged.getLocation();
         final double height = mcAccess.getHeight(damaged);
-        final Location pRef = player.getEyeLocation();
         
         // Refine y position.
         // TODO: Make a little more accurate by counting in the actual bounding box.
-        final double pY = pRef.getY();
+        final double pY = pLoc.getY() + player.getEyeHeight();
         final double dY = dRef.getY();
         if (pY <= dY); // Keep the foot level y.
         else if (pY >= dY + height) dRef.setY(dY + height); // Highest ref y.
         else dRef.setY(pY); // Level with damaged.
         
-        final Vector pRel = dRef.toVector().subtract(pRef.toVector());
+        final Vector pRel = dRef.toVector().subtract(pLoc.toVector().setY(pY)); // TODO: Run calculations on numbers only :p.
         
         // Distance is calculated from eye location to center of targeted. If the player is further away from their target
         // than allowed, the difference will be assigned to "distance".

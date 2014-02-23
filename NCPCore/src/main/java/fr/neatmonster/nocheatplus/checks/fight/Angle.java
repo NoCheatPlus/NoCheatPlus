@@ -49,7 +49,7 @@ public class Angle extends Check {
                 data.angleHits.remove(time);
 
         // Add the new location to the map.
-        data.angleHits.put(System.currentTimeMillis(), player.getLocation());
+        data.angleHits.put(System.currentTimeMillis(), player.getLocation()); // This needs to be a copy at present.
 
         // Not enough data to calculate deltas.
         if (data.angleHits.size() < 2)

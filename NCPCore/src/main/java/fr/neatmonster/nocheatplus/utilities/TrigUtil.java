@@ -20,6 +20,8 @@ public class TrigUtil {
 	public static final double fRadToGrad = 360.0 / (2.0 * Math.PI);
 	/** Some default precision value for the directionCheck method. */
 	public static final double DIRECTION_PRECISION = 2.6;
+	
+	private static final Location useLoc = new Location(null, 0, 0, 0);
 
 	/**
 	 * Check if a player looks at a target of a specific size, with a specific
@@ -43,9 +45,11 @@ public class TrigUtil {
 	 */
 	public static double directionCheck(final Player player, final double targetX, final double targetY, final double targetZ, final double targetWidth, final double targetHeight, final double precision)
 	{
-		final Location loc = player.getLocation();
+		final Location loc = player.getLocation(useLoc);
 		final Vector dir = loc.getDirection();
-		return directionCheck(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), dir.getX(), dir.getY(), dir.getZ(), targetX, targetY, targetZ, targetWidth, targetHeight, precision);
+		final double res = directionCheck(loc.getX(), loc.getY() + player.getEyeHeight(), loc.getZ(), dir.getX(), dir.getY(), dir.getZ(), targetX, targetY, targetZ, targetWidth, targetHeight, precision);
+		useLoc.setWorld(null);
+		return res;
 	}
 
 	/**

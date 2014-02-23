@@ -139,6 +139,8 @@ public class MovingConfig extends ACheckConfig {
 	public final int speedGrace;
 	public final boolean vehicleEnforceLocation;
 	public final boolean vehiclePreventDestroyOwn;
+	
+	public final boolean enforceLocation = true; // TODO: Configurable + name.
 
     /**
      * Instantiates a new moving configuration.

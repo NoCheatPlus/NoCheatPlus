@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.blockplace;
 import java.util.Map;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -22,6 +23,9 @@ public class Reach extends Check {
 
     /** The maximum distance allowed to interact with a block in survival mode. */
     public static final double SURVIVAL_DISTANCE = 5.2D;
+    
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
 
     /**
      * Instantiates a new reach check.
@@ -35,6 +39,7 @@ public class Reach extends Check {
      * 
      * @param player
      *            the player
+     * @param loc 
      * @param cc 
      * @param data2 
      * @param location
@@ -49,7 +54,9 @@ public class Reach extends Check {
 
         // Distance is calculated from eye location to center of targeted block. If the player is further away from their
         // target than allowed, the difference will be assigned to "distance".
-        final double distance = TrigUtil.distance(player.getEyeLocation(), block) - distanceLimit;
+        final Location eyeLoc = player.getLocation(useLoc);
+        eyeLoc.setY(eyeLoc.getY() + player.getEyeHeight());
+        final double distance = TrigUtil.distance(eyeLoc, block) - distanceLimit;
 
         if (distance > 0) {
             // They failed, increment violation level.
@@ -66,7 +73,9 @@ public class Reach extends Check {
             data.reachVL *= 0.9D;
         }
 
-
+        // Cleanup.
+        useLoc.setWorld(null);
+        
         return cancel;
     }
     

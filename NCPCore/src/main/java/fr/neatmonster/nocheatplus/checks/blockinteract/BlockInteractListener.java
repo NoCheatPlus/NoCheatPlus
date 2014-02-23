@@ -36,6 +36,9 @@ public class BlockInteractListener extends CheckListener {
     /** Speed of interaction. */
     private final Speed speed = addCheck(new Speed());
     
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
+    
     public BlockInteractListener(){
     	super(CheckType.BLOCKINTERACT);
     }
@@ -86,7 +89,7 @@ public class BlockInteractListener extends CheckListener {
         boolean cancelled = false;
         
         final BlockFace face = event.getBlockFace();
-        final Location loc = player.getLocation();
+        final Location loc = player.getLocation(useLoc);
         
         // Interaction speed.
         if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)){
@@ -114,5 +117,6 @@ public class BlockInteractListener extends CheckListener {
         	event.setUseItemInHand(Result.DENY);
         	event.setCancelled(true);
         }
+        useLoc.setWorld(null);
     }
 }
