@@ -888,7 +888,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 //							public void run() {
 //								if (!data.hasSetBackWorldChanged(setBack)) { // && data.isSetBack(setBack)) {
 //									player.sendMessage("SETBACK FROM MC DERP.");
-//									player.teleport(setBack);
+//									player.teleport(setBack, TeleportCause.PLUGIN);
 //								}
 //							}
 //						});
@@ -1390,7 +1390,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			final Location newTo = enforceLocation(player, player.getLocation(useLoc), data);
 			if (newTo != null) {
 				data.setTeleported(newTo);
-				player.teleport(newTo);
+				player.teleport(newTo, TeleportCause.PLUGIN);
 			}
 		}
 		if (!rem.isEmpty()) {

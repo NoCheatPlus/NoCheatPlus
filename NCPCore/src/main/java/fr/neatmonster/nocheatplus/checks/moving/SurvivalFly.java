@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
@@ -1313,7 +1314,7 @@ public class SurvivalFly extends Check {
 			if (data.hasSetBack()) {
 				final Location newTo = data.getSetBack(loc);
 				data.prepareSetBack(newTo);
-				player.teleport(newTo);
+				player.teleport(newTo, TeleportCause.PLUGIN);
 			}
 			else{
 				// Solve by extra actions ? Special case (probably never happens)?
