@@ -23,6 +23,7 @@ public class TeleportUtil {
 		final boolean vehicleTeleported;
 		final boolean playerIsPassenger = player.equals(passenger);
 		if (playerIsPassenger && !vehicle.isDead()){ // && vehicle.equals(player.getVehicle).
+			// TODO: Does VehicleExit fire here !?  Consequences?
 			vehicle.eject();
 			vehicleTeleported = vehicle.teleport(location, TeleportCause.PLUGIN);
 			
@@ -34,6 +35,7 @@ public class TeleportUtil {
 		final boolean playerTeleported = player.teleport(location);
 		if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.0){
 			// Somewhat check against tp showing something wrong (< 1.0).
+			// TODO: Does VehicleEnter fire here !?  Consequences?
 			vehicle.setPassenger(player);
 		}
 		if (debug){
