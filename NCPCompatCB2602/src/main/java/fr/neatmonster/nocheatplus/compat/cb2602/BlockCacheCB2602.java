@@ -30,7 +30,12 @@ public class BlockCacheCB2602 extends BlockCache implements IBlockAccess{
 
 	@Override
 	public void setAccess(World world) {
-		this.world = world == null ? null : ((CraftWorld) world).getHandle();
+		if (world != null) {
+			this.maxBlockY = world.getMaxHeight() - 1;
+			this.world = ((CraftWorld) world).getHandle();
+		} else {
+			this.world = null;
+		}
 	}
 
 	@Override

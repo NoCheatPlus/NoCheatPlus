@@ -63,7 +63,7 @@ public abstract class BlockCache {
     /** Cached shape values. */
     private final CoordMap<double[]> boundsMap = new CoordMap<double[]>(23);
     
-    private int maxBlockY =  255;
+    protected int maxBlockY =  255;
     
     // TODO: switch to nodes with all details on, store a working node ?
     

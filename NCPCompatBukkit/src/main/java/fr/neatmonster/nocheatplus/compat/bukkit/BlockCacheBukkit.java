@@ -21,6 +21,9 @@ public class BlockCacheBukkit extends BlockCache{
 	@Override
 	public void setAccess(World world) {
 		this.world = world;
+		if (world != null) {
+			this.maxBlockY = world.getMaxHeight() - 1;
+		}
 	}
 
 	@Override
