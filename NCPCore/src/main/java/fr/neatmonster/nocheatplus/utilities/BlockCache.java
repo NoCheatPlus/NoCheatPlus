@@ -14,6 +14,8 @@ import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
  */
 public abstract class BlockCache {
 	
+	private static final int ID_AIR = 0;
+	
 	/**
 	 * Convenience method to check if the bounds as returned by getBounds cover a whole block.
 	 * @param bounds Can be null, must have 6 fields.
@@ -157,8 +159,10 @@ public abstract class BlockCache {
      */
 	public int getTypeId(final int x, final int y, final int z) {
 		final Integer pId = idMap.get(x, y, z);
-		if (pId != null) return pId;
-		final Integer nId = fetchTypeId(x, y, z);
+		if (pId != null) {
+			return pId;
+		}
+		final Integer nId = (y < 0 || y > maxBlockY) ? ID_AIR : fetchTypeId(x, y, z);
 		idMap.put(x, y, z, nId);
 		return nId;
 	}
@@ -172,8 +176,10 @@ public abstract class BlockCache {
 	 */
 	public int getData(final int x, final int y, final int z) {
 		final Integer pData = dataMap.get(x, y, z);
-		if (pData != null) return pData;
-		final Integer nData = fetchData(x, y, z);
+		if (pData != null) {
+			return pData;
+		}
+		final Integer nData = (y < 0 || y > maxBlockY) ? 0 : fetchData(x, y, z);
 		dataMap.put(x, y, z, nData);
 		return nData;
 	}
@@ -187,8 +193,10 @@ public abstract class BlockCache {
 	 */
 	public double[] getBounds(final int x, final int y, final int z){
 		final double[] pBounds = boundsMap.get(x, y, z);
-		if (pBounds != null) return pBounds;
-		final double[] nBounds = fetchBounds(x, y, z);
+		if (pBounds != null) {
+			return pBounds;
+		}
+		final double[] nBounds = (y < 0 || y > maxBlockY) ? null : fetchBounds(x, y, z);
 		boundsMap.put(x, y, z, nBounds);
 		return nBounds;
 	}
