@@ -407,7 +407,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
         set(ConfPaths.MOVING_LOADCHUNKS_JOIN, true);
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);
-        set(ConfPaths.MOVING_ASSUMESPRINT, false);
+        set(ConfPaths.MOVING_ASSUMESPRINT, true);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
         
         // TODO: An extra file might suit these.

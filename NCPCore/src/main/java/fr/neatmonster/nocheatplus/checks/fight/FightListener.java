@@ -114,7 +114,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final long msAge; // Milliseconds the ticks actually took.
         final double normalizedMove; // Blocks per second.
         // TODO: relative distance (player - target)!
-        if (data.lastAttackedX == Integer.MAX_VALUE || tick < data.lastAttackTick || worldChanged || tick - data.lastAttackTick > 20){
+        if (data.lastAttackedX == Double.MAX_VALUE || tick < data.lastAttackTick || worldChanged || tick - data.lastAttackTick > 20){
         	// TODO: 20 ?
         	tickAge = 0;
         	targetMove = 0.0;
@@ -460,8 +460,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 	
 	@EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerChangedWorld(final PlayerChangedWorldEvent event){
-		final FightData data = FightData.getData(event.getPlayer());
-		data.angleHits.clear();
+		FightData.getData(event.getPlayer()).onWorldChange();
 	}
 	
 	@EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)

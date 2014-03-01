@@ -1325,7 +1325,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     			loc = vLoc; // 
     			if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
     				final Location oldLoc = new Location(pLoc.getWorld(), data.toX, data.toY, data.toZ);
-    				if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
+    				if (data.toX != Double.MAX_VALUE && MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
     					loc = oldLoc;
     				}
     			}

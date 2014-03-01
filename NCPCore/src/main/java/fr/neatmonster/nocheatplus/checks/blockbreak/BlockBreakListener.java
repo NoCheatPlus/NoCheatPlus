@@ -67,10 +67,12 @@ public class BlockBreakListener extends CheckListener {
         final Player player = event.getPlayer();
         
         // Illegal enchantments hotfix check.
-        if (Items.checkIllegalEnchantments(player, player.getItemInHand())) event.setCancelled(true);
+        if (Items.checkIllegalEnchantments(player, player.getItemInHand())) {
+        	event.setCancelled(true);
+        }
         
     	// Cancelled events only leads to resetting insta break.
-    	if (event.isCancelled()){
+    	if (event.isCancelled()) {
     		isInstaBreak = false;
     		return;
     	}
@@ -92,38 +94,45 @@ public class BlockBreakListener extends CheckListener {
         final GameMode gameMode = player.getGameMode();
         
         // Has the player broken a block that was not damaged before?
-        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block, cc, data, isInstaBreak))
+        if (wrongBlock.isEnabled(player) && wrongBlock.check(player, block, cc, data, isInstaBreak)) {
         	cancelled = true;
+        }
 
         // Has the player broken more blocks per second than allowed?
-        if (!cancelled && frequency.isEnabled(player) && frequency.check(player, cc, data))
+        if (!cancelled && frequency.isEnabled(player) && frequency.check(player, cc, data)) {
         	cancelled = true;
+        }
         	
         // Has the player broken blocks faster than possible?
-        if (!cancelled && gameMode != GameMode.CREATIVE && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data))
-            cancelled = true;
+        if (!cancelled && gameMode != GameMode.CREATIVE && fastBreak.isEnabled(player) && fastBreak.check(player, block, isInstaBreak, cc, data)) {
+        	cancelled = true;
+        }
 
         // Did the arm of the player move before breaking this block?
-        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player, data))
-            cancelled = true;
+        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player, data)) {
+        	cancelled = true;
+        }
 
         // Is the block really in reach distance?
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, block, data))
-            cancelled = true;
+        if (!cancelled && reach.isEnabled(player) && reach.check(player, block, data)) {
+        	cancelled = true;
+        }
 
         // Did the player look at the block at all?
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, data))
-            cancelled = true;
+        if (!cancelled && direction.isEnabled(player) && direction.check(player, block, data)) {
+        	cancelled = true;
+        }
         
         // Destroying liquid blocks.
         if (!cancelled && BlockProperties.isLiquid(block.getTypeId()) && !player.hasPermission(Permissions.BLOCKBREAK_BREAK_LIQUID) && !NCPExemptionManager.isExempted(player, CheckType.BLOCKBREAK_BREAK)){
             cancelled = true;
         }
 
-        // At least one check failed and demanded to cancel the event.
-        if (cancelled){
+        // On cancel...
+        if (cancelled) {
         	event.setCancelled(cancelled);
         	// Reset damage position:
+        	// TODO: Review this (!), check if set at all !?
     		data.clickedX = block.getX();
     		data.clickedY = block.getY();
     		data.clickedZ = block.getZ();
@@ -133,11 +142,12 @@ public class BlockBreakListener extends CheckListener {
 //        	data.clickedX = Integer.MAX_VALUE;
         }
         
-        if (isInstaBreak){
+        if (isInstaBreak) {
         	data.wasInstaBreak = now;
         }
-        else
+        else {
         	data.wasInstaBreak = 0;
+        }
         
         // Adjust data.
         data.fastBreakBreakTime = now;
@@ -214,7 +224,9 @@ public class BlockBreakListener extends CheckListener {
         } else if (tick < data.clickedTick) {
         	// Update.
         } else if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY()){
-        	if (tick - data.clickedTick <= 1 ) return;
+        	if (tick - data.clickedTick <= 1 ) {
+        		return;
+        	}
         }
         // (Always set, the interact event only fires once: the first time.)
         // Only record first damage:
