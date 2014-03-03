@@ -344,7 +344,10 @@ public class BlockProperties {
     public static final long F_ICE 			= 0x20000;
     
     /** LEAVES */
-    public static final long F_LEAVES 			= 0x40000;
+    public static final long F_LEAVES 		= 0x40000;
+    
+    /** THIN FENCE (glass panes, iron fence) */
+    public static final long F_THIN_FENCE 	= 0x80000;
     
     /**
      * Map flag to names.
@@ -501,14 +504,6 @@ public class BlockProperties {
         // Snow (1.4.x)
         blockFlags[Material.SNOW.getId()] |= F_HEIGHT_8SIM_INC;
         
-        // 1.5 block high.
-        for (final Material mat : new Material[]{
-                Material.FENCE, Material.FENCE_GATE,
-                Material.NETHER_FENCE,
-        }){
-            blockFlags[mat.getId()] |= F_HEIGHT150;
-        }
-        
         // Climbable
         for (final Material mat : new Material[]{
                 Material.VINE, Material.LADDER,
@@ -572,16 +567,22 @@ public class BlockProperties {
 			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 		}
 		
-		// Blocks changing depending on neighbor blocks.
-		for (final Material mat : new Material[]{
-				Material.FENCE, Material.FENCE_GATE, Material.COBBLE_WALL,
-				Material.NETHER_FENCE,
-				Material.IRON_FENCE, Material.THIN_GLASS,
-				
-		}){
-			blockFlags[mat.getId()] |= F_VARIABLE;
-		}
 		// ? Extra flag for COCOA, ANVIL: depends on data value (other issue)
+		
+		// Fences, 1.5 block high.
+        for (final Material mat : new Material[]{
+                Material.FENCE, Material.FENCE_GATE,
+                Material.NETHER_FENCE, Material.COBBLE_WALL,
+        }){
+            blockFlags[mat.getId()] |= F_HEIGHT150 | F_VARIABLE;
+        }
+        
+        // Thin fences (iron fence, glass panes).
+        for (final Material mat : new Material[]{
+        		Material.IRON_FENCE, Material.THIN_GLASS,
+        }){
+            blockFlags[mat.getId()] |= F_THIN_FENCE | F_VARIABLE;
+        }
 		
 		// Flexible ground (height):
 		for (final Material mat : new Material[]{
@@ -625,7 +626,7 @@ public class BlockProperties {
 		}){
 			blocks[mat.getId()] = glassType;
 		}
-		blocks[102] = glassType; // glass panes
+		blocks[Material.THIN_GLASS.getId()] = glassType;
 		blocks[Material.NETHERRACK.getId()] = new BlockProps(woodPickaxe, 0.4f, secToMs(2, 0.3, 0.15, 0.1, 0.1, 0.05));
 		blocks[Material.LADDER.getId()] = new BlockProps(noTool, 0.4f, secToMs(0.6), 2.5f);
 		blocks[Material.CACTUS.getId()] = new BlockProps(noTool, 0.4f, secToMs(0.6));
@@ -1427,6 +1428,7 @@ public class BlockProperties {
 	 */
 	public static final boolean isPassableWorkaround(final BlockCache access, final int bx, final int by, final int bz, final double fx, final double fy, final double fz, final int id, final double dX, final double dY, final double dZ, final double dT){
 		// Note: Since this is only called if the bounding box collides, out-of-bounds checks should not be necessary.
+		// TODO: Add a flag if a workaround exists (!), might store the type of workaround extra (generic!), or extra flags.
 		final long flags = blockFlags[id];
 		if ((flags & F_STAIRS) != 0){
 			if ((access.getData(bx, by, bz) & 0x4) != 0){
@@ -1440,10 +1442,11 @@ public class BlockProperties {
 		else if (id == Material.SOUL_SAND.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.875) return true; // 0.125
 		}
-		else if (id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()){
+		else if ((flags & F_THIN_FENCE) != 0){
 			if (!collidesFence(fx, fz, dX, dZ, dT, 0.05)) return true;
 		}
 		else if (id == Material.FENCE.getId() || id == Material.NETHER_FENCE.getId()){
+			// TODO: Re-check if cobble fence is now like this.
 			if (!collidesFence(fx, fz, dX, dZ, dT, 0.425)) return true;
 		}
 		else if (id == Material.FENCE_GATE.getId()){
