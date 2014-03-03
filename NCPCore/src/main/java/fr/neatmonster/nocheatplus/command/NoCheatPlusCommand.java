@@ -83,7 +83,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         		new RemovePlayerCommand(plugin),
         		new TellCommand(plugin),
         		new TempKickCommand(plugin),
-                new TopCommand(plugin),
+        		new TopCommand(plugin),
         		new UnexemptCommand(plugin),
         		new UnKickCommand(plugin),
         }){
