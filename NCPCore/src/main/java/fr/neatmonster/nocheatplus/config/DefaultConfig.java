@@ -409,6 +409,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);
         set(ConfPaths.MOVING_ASSUMESPRINT, true);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
+        set(ConfPaths.MOVING_ENFORCELOCATION, true);
         
         // TODO: An extra file might suit these.
         final String start = "[player] failed [check]: ";

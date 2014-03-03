@@ -140,7 +140,7 @@ public class MovingConfig extends ACheckConfig {
 	public final boolean vehicleEnforceLocation;
 	public final boolean vehiclePreventDestroyOwn;
 	
-	public final boolean enforceLocation = true; // TODO: Configurable + name.
+	public final boolean enforceLocation;
 
     /**
      * Instantiates a new moving configuration.
@@ -219,6 +219,8 @@ public class MovingConfig extends ACheckConfig {
         
         vehicleEnforceLocation = config.getBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION);
         vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN);
+        
+        enforceLocation = config.getBoolean(ConfPaths.MOVING_ENFORCELOCATION);
     }
     
 
