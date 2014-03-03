@@ -1,30 +1,8 @@
 package fr.neatmonster.nocheatplus.command;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import fr.neatmonster.nocheatplus.command.actions.BanCommand;
-import fr.neatmonster.nocheatplus.command.actions.KickCommand;
-import fr.neatmonster.nocheatplus.command.actions.KickListCommand;
-import fr.neatmonster.nocheatplus.command.actions.TellCommand;
-import fr.neatmonster.nocheatplus.command.actions.TempKickCommand;
-import fr.neatmonster.nocheatplus.command.actions.UnKickCommand;
+import fr.neatmonster.nocheatplus.command.actions.*;
 import fr.neatmonster.nocheatplus.command.actions.delay.DelayCommand;
-import fr.neatmonster.nocheatplus.command.admin.CommandsCommand;
-import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
-import fr.neatmonster.nocheatplus.command.admin.InspectCommand;
-import fr.neatmonster.nocheatplus.command.admin.LagCommand;
-import fr.neatmonster.nocheatplus.command.admin.NCPVersionCommand;
-import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
-import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
+import fr.neatmonster.nocheatplus.command.admin.*;
 import fr.neatmonster.nocheatplus.command.admin.exemption.ExemptCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.ExemptionsCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.UnexemptCommand;
@@ -35,6 +13,16 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The /nocheatplus or /ncp command handler, delegates to sub commands.
@@ -95,6 +83,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         		new RemovePlayerCommand(plugin),
         		new TellCommand(plugin),
         		new TempKickCommand(plugin),
+                new TopCommand(plugin),
         		new UnexemptCommand(plugin),
         		new UnKickCommand(plugin),
         }){
