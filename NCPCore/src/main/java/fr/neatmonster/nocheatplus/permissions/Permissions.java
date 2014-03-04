@@ -39,6 +39,7 @@ public class Permissions {
 	public static final String  COMMAND_REMOVEPLAYER  	= COMMAND + ".removeplayer";
     public static final String  COMMAND_TELL          	= COMMAND + ".tell";
     public static final String  COMMAND_TEMPKICK      	= COMMAND + ".tempkick";
+    public static final String  COMMAND_TOP     	    = COMMAND + ".top";
 	public static final String  COMMAND_UNKICK        	= COMMAND + ".unkick";
 	public static final String  COMMAND_VERSION		  	= COMMAND + ".version";
 	

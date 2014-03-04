@@ -1,16 +1,9 @@
 package fr.neatmonster.nocheatplus.checks;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.hooks.APIUtils;
+import java.util.*;
 
 /**
  * The class containg the violation history of a player.
@@ -94,7 +87,7 @@ public class ViolationHistory {
     }
     
     /** Map the check string names to check types (workaround, keep at default, set by Check)*/
-    static Map<String, CheckType> checkTypeMap = new HashMap<String, CheckType>();
+    public static Map<String, CheckType> checkTypeMap = new HashMap<String, CheckType>();
 
     // TODO: Maybe add to metrics: average length of violation histories (does it pay to use SkipListSet or so).
     /** The histories of all the players. */
