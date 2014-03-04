@@ -35,8 +35,8 @@ public class TopCommand extends BaseCommand {
         public static Comparator<VLContainer> VLCComparator = new Comparator<TopCommand.VLContainer>() {
             @Override
             public int compare(final VLContainer vl1, final VLContainer vl2) {
-                if (vl1.violationLevel.time == vl2.violationLevel.time) return 0;
-                else if (vl1.violationLevel.time < vl2.violationLevel.time) return 1;
+                if (vl1.violationLevel.sumVL == vl2.violationLevel.sumVL) return 0;
+                else if (vl1.violationLevel.sumVL < vl2.violationLevel.sumVL) return 1;
                 else return -1;
             }
         };
