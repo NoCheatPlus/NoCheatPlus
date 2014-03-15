@@ -390,7 +390,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final Entity entity = event.getEntity();
         if (entity instanceof Player){
             final Player player = (Player) entity;
-            if (godMode.isEnabled(player)) godMode.death(player);
+            if (godMode.isEnabled(player)) {
+            	godMode.death(player);
+            }
         }
     }
 
