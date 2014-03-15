@@ -15,6 +15,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
  * Configurations specific for the "chat" checks. Every world gets one of these assigned to it, or if a world doesn't
@@ -120,6 +121,7 @@ public class ChatConfig extends AsyncCheckConfig {
     public final long         loginsStartupDelay;
 
     public final boolean      consoleOnlyCheck;
+    public final String		  consoleOnlyMessage;
 
     
     public final boolean      relogCheck;
@@ -214,6 +216,7 @@ public class ChatConfig extends AsyncCheckConfig {
         relogActions = config.getOptimizedActionList(ConfPaths.CHAT_RELOG_ACTIONS, Permissions.CHAT_RELOG);
 
         consoleOnlyCheck = config.getBoolean(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_ACTIVE);
+        consoleOnlyMessage = ColorUtil.replaceColors(config.getString(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_MSG));
 
     }
 

@@ -173,7 +173,7 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
         // Prevent /op and /deop commands from being used by players.
  		if (cc.consoleOnlyCheck && consoleOnlyCommands.hasAnyPrefixWords(lcMessage, lcAltMessage)) {
  			if (command == null || command.testPermission(player)){
- 	 			player.sendMessage(ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
+ 	 			player.sendMessage(cc.consoleOnlyMessage);
  			}
  			event.setCancelled(true);
  			return;

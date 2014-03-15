@@ -84,6 +84,7 @@ public abstract class ConfPaths {
 	private static final String PROTECT_COMMANDS						 = PROTECT + "commands.";
 	private static final String PROTECT_COMMANDS_CONSOLEONLY			 = PROTECT_COMMANDS + "consoleonly.";
 	public  static final String PROTECT_COMMANDS_CONSOLEONLY_ACTIVE		 = PROTECT_COMMANDS_CONSOLEONLY + "active";
+	public  static final String PROTECT_COMMANDS_CONSOLEONLY_MSG		 = PROTECT_COMMANDS_CONSOLEONLY + "message";
 	public  static final String PROTECT_COMMANDS_CONSOLEONLY_CMDS		 = PROTECT_COMMANDS_CONSOLEONLY + "commands";
 	// Plugins settings.
 	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
