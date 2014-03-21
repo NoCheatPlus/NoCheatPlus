@@ -29,7 +29,7 @@ public class NotifyOnCommand extends BaseCommand {
 			return true;
 		}
 		DataManager.getPlayerData(sender.getName(), true).setNotifyOff(false);
-		sender.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are now turned " + ChatColor.YELLOW + "on" + ChatColor.WHITE + ".");
+		sender.sendMessage(TAG + "Notifications are now turned " + ChatColor.YELLOW + "on" + ChatColor.WHITE + ".");
 		return true;
 	}
 
