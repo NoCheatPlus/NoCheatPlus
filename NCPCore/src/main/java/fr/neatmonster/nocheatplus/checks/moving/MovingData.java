@@ -57,9 +57,13 @@ public class MovingData extends ACheckData {
      * @return the data
      */
     public static MovingData getData(final Player player) {
-        if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new MovingData());
-        return playersMap.get(player.getName());
+    	// Note that the trace might be null after just calling this.
+    	MovingData data = playersMap.get(player.getName());
+        if (data == null) {
+        	data = new MovingData();
+        	playersMap.put(player.getName(), data);
+        }
+        return data;
     }
 
     public static ICheckData removeData(final String playerName) {
@@ -78,6 +82,12 @@ public class MovingData extends ACheckData {
     	final String worldName = world.getName();
     	for (final MovingData data : playersMap.values()) {
     		data.onWorldUnload(worldName);
+    	}
+    }
+    
+    public static void onReload() {
+    	for (final MovingData data : playersMap.values()) {
+    		data.deleteTrace(); // Safe side.
     	}
     }
     
@@ -119,6 +129,8 @@ public class MovingData extends ACheckData {
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. */
     public double 		  toX = Double.MAX_VALUE, toY, toZ;
+    /** Moving trace (to positions). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves."*/
+    private LocationTrace trace = null; 
     
     // sf rather
     /** To/from was ground or web or assumed to be etc. */
@@ -645,6 +657,7 @@ public class MovingData extends ACheckData {
 	 */
 	public void onPlayerLeave() {
 		removeAllVelocity();
+		deleteTrace();
 	}
 	
 	/**
@@ -691,6 +704,69 @@ public class MovingData extends ACheckData {
 		} else {
 			this.speedTick = tick;
 		}
+	}
+	
+	/**
+	 * This tests for a LocationTrace instance being set at all, not for locations having been added.
+	 * @return
+	 */
+	public boolean hasTrace() {
+		return trace != null;
+	}
+	
+	/**
+	 * Convenience: Access method to simplify coding, being aware of some plugins using Player implementations as NPCs, leading to traces not being present.
+	 * @return
+	 */
+	public LocationTrace getTrace(final Player player) {
+		if (trace == null) {
+			final MovingConfig cc = MovingConfig.getConfig(player);
+			trace = new LocationTrace(cc.traceSize, cc.traceMergeDist);
+		}
+		return trace;
+	}
+	
+	/**
+	 * Convenience
+	 * @param player
+	 * @param loc
+	 */
+	public void resetTrace(final Player player, final Location loc, final long time) {
+		final MovingConfig cc = MovingConfig.getConfig(player);
+		resetTrace(loc, time, cc.traceSize, cc.traceMergeDist);
+	}
+	
+	/**
+	 * Convenience method to add a location to the trace, creates the trace if necessary.
+	 * @param player
+	 * @param loc
+	 * @param time
+	 * @return Updated LocationTrace instance, for convenient use, without sticking too much to MovingData.
+	 */
+	public LocationTrace updateTrace(final Player player, final Location loc, final long time) {
+		final LocationTrace trace = getTrace(player);
+		trace.addEntry(time, loc.getX(), loc.getY(), loc.getZ());
+		return trace;
+	}
+	
+	/**
+	 * Convenience: Create or just reset the trace, add the current location.
+	 * @param loc 
+	 * @param size
+	 * @param mergeDist
+	 * @param traceMergeDist 
+	 */
+	public void resetTrace(final Location loc, final long time, final int size, double mergeDist) {
+		if (trace == null || trace.getMaxSize() != size || trace.getMergeDist() != mergeDist) {
+			trace = new LocationTrace(size, mergeDist);
+		} else {
+			trace.reset();
+		}
+		trace.addEntry(time, loc.getX(), loc.getY(), loc.getZ());
+	}
+	
+	public void deleteTrace() {
+		trace = null;
 	}
 	
 }

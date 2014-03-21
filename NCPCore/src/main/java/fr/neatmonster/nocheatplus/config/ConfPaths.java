@@ -574,6 +574,10 @@ public abstract class ConfPaths {
 	public static final String  MOVING_VEHICLES_ENFORCELOCATION			 = MOVING_VEHICLES + "enforcelocation";
 	public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN		 = MOVING_VEHICLES + "preventdestroyown";
 	
+	private static final String MOVING_TRACE							 = MOVING + "trace.";
+	public  static final String MOVING_TRACE_SIZE						 = MOVING_TRACE + "size";
+	public  static final String MOVING_TRACE_MERGEDIST					 = MOVING_TRACE + "mergedist";
+	
 	
     public static final String  STRINGS                                  = "strings";
 

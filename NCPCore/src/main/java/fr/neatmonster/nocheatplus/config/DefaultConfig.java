@@ -394,6 +394,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 500);
         
+        // Moving Trace
+        set(ConfPaths.MOVING_TRACE_SIZE, 60);
+        set(ConfPaths.MOVING_TRACE_MERGEDIST, 0.9752); // Let all the hackers read code!
+        
         // Vehicles.
         set(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN, true);
         set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, true);

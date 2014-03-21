@@ -66,9 +66,9 @@ public class TestLocationTrace {
 	
 	@Test
 	public void testMergeUpdateAlwaysDist() {
-		// This assumes the last location is always updated.
+		// Extreme merge dist.
 		int size = 80;
-		double mergeDist = Math.sqrt(0.6 * 0.6 * 3);
+		double mergeDist = Math.sqrt(1000.0);
 		LocationTrace trace = new LocationTrace(size, mergeDist);
 		double x = 0;
 		double y = 0;
@@ -79,13 +79,30 @@ public class TestLocationTrace {
 			y = rand(y, 0.5);
 			z = rand(z, 0.5);
 			trace.addEntry(i + 1, x, y, z);
-			if (trace.size() != 1) {
-				fail("Wrong size, expect 1, got instead: " + trace.size());
+			if (trace.size() != 2) {
+				fail("Wrong size, expect 2, got instead: " + trace.size());
 			}
 		}
 	}
 	
-	// TODO: Test iterators.
+	@Test
+	public void testMergeDist() {
+		// Deterministic steps => calculatable size.
+		int size = 80;
+		double mergeDist = 0.5;
+		LocationTrace trace = new LocationTrace(size, mergeDist);
+		double x = 0;
+		double y = 0;
+		double z = 0;
+		trace.addEntry(0 , x, y, z);
+		for (int i = 0; i < size * 2; i ++) {
+			x += 0.5;
+			trace.addEntry(i + 1, x, y, z);
+			if (Math.abs(trace.size() - (1 + i / 2)) > 1 ) {
+				fail("Wrong size, expect roughly half of " + (i + 1) + ", got instead: " + trace.size());
+			}
+		}
+	}
 	
 	@Test
 	public void testEmptyIterator() {
@@ -173,7 +190,5 @@ public class TestLocationTrace {
 			}
 		}
 	}
-	
-	// TODO: Iterator order for various iterators (!)
 	
 }

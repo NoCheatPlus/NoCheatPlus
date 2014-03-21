@@ -1,10 +1,18 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.Iterator;
+
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * This class is meant to record locations for players moving, in order to allow to be more   
- * lenient for the case of latency.
+ * lenient for the case of latency for player-player interaction such as with fighting.
+ * <br>
+ * NOTES on intended use:<br>
+ * <li>Is meant to always carry some location.</li>
+ * <li>Records only the end-positions of a move.</li>
+ * <li>Prefer calling add(...) with the current location, before iterating. Alternative: guard with isEmpty().</li>
+ * <li>Updating on teleport events is not intended - if the distance is too big, Minecraft should prevent interaction anyway.</li>
  * @author mc_dev
  *
  */
@@ -16,12 +24,14 @@ public class LocationTrace {
 		public long time;
 		/** Coordinates. */
 		public double x, y, z;
+		public double lastDistSq;
 		
-		public void set(long time, double x, double y, double z) {
+		public void set(long time, double x, double y, double z, double lastDistSq) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
 			this.time = time;
+			this.lastDistSq = lastDistSq;
 		}
 	}
 	
@@ -30,7 +40,7 @@ public class LocationTrace {
 	 * @author mc_dev
 	 *
 	 */
-	public static final class TraceIterator {
+	public static final class TraceIterator implements Iterator<TraceEntry>{
 		private final TraceEntry[] entries;
 		/** Index as in LocationTrace */
 		private final int index;
@@ -51,6 +61,7 @@ public class LocationTrace {
 			this.ascend = ascend;
 		}
 		
+		@Override
 		public final TraceEntry next() {
 			if (!hasNext()) {
 				throw new IndexOutOfBoundsException("No more entries to iterate.");
@@ -82,9 +93,15 @@ public class LocationTrace {
 			return entry;
 		}
 		
+		@Override
 		public final boolean hasNext() {
 			// Just check if currentIndex is within range.
 			return currentIndex >= 0 && currentIndex <= index && currentIndex > index - size || currentIndex > index && currentIndex >= index - size + entries.length;
+		}
+		
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
 		}
 		
 	}
@@ -95,12 +112,13 @@ public class LocationTrace {
 	private int index = -1;
 	/** Number of valid entries. */
 	private int size = 0;
+	private final double mergeDist;
 	private final double mergeDistSq;
 	
 	// (No world name stored: Should be reset on world changes.)
 	
 	public LocationTrace(int bufferSize, double mergeDist) {
-		// TODO: Specify entry-merging conditions.
+		// TODO: Might consider a cut-off distance/age (performance saving for iteration). 
 		if (bufferSize < 1) {
 			throw new IllegalArgumentException("Expect bufferSize > 0, got instead: " + bufferSize);
 		}
@@ -108,19 +126,23 @@ public class LocationTrace {
 		for (int i = 0; i < bufferSize; i++) {
 			entries[i] = new TraceEntry();
 		}
+		this.mergeDist = mergeDist;
 		this.mergeDistSq = mergeDist * mergeDist;
 	}
 	
 	public final void addEntry(final long time, final double x, final double y, final double z) {
 		// TODO: Consider setting the squared distance to last entry
+		double lastDistSq = 0.0;
 		if (size > 0) {
-			final TraceEntry oldEntry = entries[index];
+			final TraceEntry latestEntry = entries[index];
 			// TODO: Consider duration of staying there ?
-			if (x == oldEntry.x && y == oldEntry.y && z == oldEntry.z) {
-				oldEntry.time = time;
+			if (x == latestEntry.x && y == latestEntry.y && z == latestEntry.z) {
+				latestEntry.time = time;
 				return;
 			}
-			else if (TrigUtil.distanceSquared(x, y, z, oldEntry.x, oldEntry.y, oldEntry.z) <= mergeDistSq) {
+			lastDistSq = TrigUtil.distanceSquared(x, y, z, latestEntry.x, latestEntry.y, latestEntry.z);
+			// TODO: Think about minMergeSize (1 = never merge the first two, size = first fill the ring).
+			if (size > 1 && lastDistSq <= mergeDistSq) {
 				// TODO: Could use Manhattan, after all.
 				/**
 				 * TODO: <br>
@@ -128,8 +150,14 @@ public class LocationTrace {
 				 * Introducing a mergeTime could also help against keeping too many outdated entries.<br>
 				 * On merging conditions, checking dist/time vs. the second latest element could be feasible, supposedly with double distance. <br>
 				 */
-				oldEntry.set(time, x, y, z);
-				return;
+				// Only merge if last distance was not greater than mergeDist.
+				if (latestEntry.lastDistSq <= mergeDistSq) {
+					// Update lastDistSq, due to shifting the elements position.
+					final TraceEntry secondLatest = index - 1 < 0 ? entries[index - 1 + entries.length] : entries[index - 1];
+					lastDistSq = TrigUtil.distanceSquared(x, y, z, secondLatest.x, secondLatest.y, secondLatest.z);
+					latestEntry.set(time, x, y, z, lastDistSq);
+					return;
+				}
 			}
 		}
 		// Advance index.
@@ -141,7 +169,7 @@ public class LocationTrace {
 			size ++;
 		}
 		final TraceEntry newEntry = entries[index];
-		newEntry.set(time, x, y, z);
+		newEntry.set(time, x, y, z, lastDistSq);
 	}
 	
 	/** Reset content pointers - call with world changes. */
@@ -150,12 +178,27 @@ public class LocationTrace {
 		size = 0;
 	}
 	
+	/**
+	 * Get the actual number of valid elements. After some time of moving this should be entries.length.
+	 * @return
+	 */
 	public int size() {
 		return size;
 	}
-	
 	public boolean isEmpty() {
 		return size == 0;
+	}
+	
+	/**
+	 * Get size of ring buffer (maximal possible number of elements).
+	 * @return
+	 */
+	public int getMaxSize() {
+		return entries.length;
+	}
+	
+	public double getMergeDist() {
+		return mergeDist;
 	}
 	
 	/**

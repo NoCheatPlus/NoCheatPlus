@@ -318,6 +318,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location loc = player.getLocation(useLoc);
         data.setSetBack(loc);
         data.resetPositions(loc);
+        data.resetTrace(loc, TickTask.getTick(), cc.traceSize, cc.traceMergeDist);
         if (cc.enforceLocation) {
         	// Just in case.
         	playersEnforce.add(player.getName());
@@ -701,12 +702,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         // Feed combined check.
         final CombinedData data = CombinedData.getData(player);
-        data.lastMoveTime = now;
+        data.lastMoveTime = now; // TODO: Evaluate moving this to MovingData !?
         
         final Location from = event.getFrom();
         final String fromWorldName = from.getWorld().getName();
         
         // Feed yawrate and reset moving data positions if necessary.
+        final MovingData mData = MovingData.getData(player);
+        final long time = TickTask.getTick();
         if (!event.isCancelled()) {
         	final Location to = event.getTo();
         	final String toWorldName = to.getWorld().getName();
@@ -714,21 +717,26 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	// TODO: maybe even not count vehicles at all ?
         	if (player.isInsideVehicle()) {
         		// TODO: refine (!).
-        		MovingData.getData(player).resetPositions(player.getVehicle().getLocation(useLoc));
+        		final Location ref = player.getVehicle().getLocation(useLoc);
+        		mData.resetPositions(ref);
         		useLoc.setWorld(null);
+        		mData.resetTrace(player, ref, time);
         	}
         	else if (!fromWorldName.equals(toWorldName)) {
-                MovingData.getData(player).resetPositions(to);
+        		mData.resetPositions(to);
+        		mData.resetTrace(player, to, time);
             }
             else{
             	// Slightly redundant at present.
-            	MovingData.getData(player).setTo(to);
+            	mData.setTo(to);
+            	mData.resetTrace(player, to, time);
             }
         }
         else {
         	// TODO: teleported + other resetting ?
         	Combined.feedYawRate(player, from.getYaw(), now, fromWorldName, data);
-            MovingData.getData(player).resetPositions(from);
+        	mData.resetPositions(from);
+        	mData.resetTrace(player, from, time); // TODO: Should probably leave this to the teleport event!
         }
     }
 
@@ -1175,6 +1183,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	public void playerJoins(final Player player) {
 		final MovingData data = MovingData.getData(player);
 		final MovingConfig cc = MovingConfig.getConfig(player);
+		final int tick = TickTask.getTick();
 		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
 		data.clearMorePacketsData();
 		data.removeAllVelocity();
@@ -1193,6 +1202,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// Always reset position to this one.
 		// TODO: more fine grained reset?
 		data.resetPositions(loc);
+		data.resetTrace(loc, tick, cc.traceSize, cc.traceMergeDist);
 		
 		// More resetting.
 		data.vDistAcc.clear();
@@ -1548,6 +1558,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		}
 		parkedInfo.clear();
 		hoverTicksStep = Math.max(1, ConfigManager.getConfigFile().getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP));
+		MovingData.onReload();
 	}
 
 }
