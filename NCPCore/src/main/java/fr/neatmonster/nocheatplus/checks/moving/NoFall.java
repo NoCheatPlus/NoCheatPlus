@@ -211,14 +211,17 @@ public class NoFall extends Check {
         final MovingData data = MovingData.getData(player);
         final float fallDistance = player.getFallDistance();
         if (data.noFallFallDistance - fallDistance > 0.0) {
+        	final double playerY = player.getLocation(useLoc).getY();
+        	useLoc.setWorld(null);
         	if (player.getAllowFlight() || player.isFlying() || player.getGameMode() == GameMode.CREATIVE) {
         		// Forestall potential issues with flying plugins.
         		player.setFallDistance(0f);
+        		data.noFallFallDistance = 0f;
+        		data.noFallMaxY = playerY;
         	} else {
                 // Might use tolerance, might log, might use method (compare: MovingListener.onEntityDamage).
                 // Might consider triggering violations here as well.
-                final float yDiff = (float) (data.noFallMaxY - player.getLocation(useLoc).getY());
-                useLoc.setWorld(null);
+                final float yDiff = (float) (data.noFallMaxY - playerY);
                 final float maxDist = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
                 player.setFallDistance(maxDist);
         	}
