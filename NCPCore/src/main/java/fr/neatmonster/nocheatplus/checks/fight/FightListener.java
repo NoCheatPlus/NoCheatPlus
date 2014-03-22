@@ -25,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
+import fr.neatmonster.nocheatplus.checks.moving.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.MediumLiftOff;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
@@ -114,6 +115,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final long msAge; // Milliseconds the ticks actually took.
         final double normalizedMove; // Blocks per second.
         // TODO: relative distance (player - target)!
+        // TODO: Use trace for this ?
         if (data.lastAttackedX == Double.MAX_VALUE || tick < data.lastAttackTick || worldChanged || tick - data.lastAttackTick > 20){
         	// TODO: 20 ?
         	tickAge = 0;
@@ -132,15 +134,26 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         
         // TODO: dist < width => skip some checks (direction, ..)
     	
-        // Check for self hit exploits (mind that projectiles should be excluded)
+        final LocationTrace damagedTrace;
         if (damaged instanceof Player){
         	final Player damagedPlayer = (Player) damaged;
         	if (cc.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
         		damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
         	}
+        	// Check for self hit exploits (mind that projectiles are excluded from this.)
         	if (selfHit.isEnabled(player) && selfHit.check(player, damagedPlayer, data, cc)) {
         		cancelled = true;
         	}
+        	// Get+update the damaged players.
+        	// TODO: Problem with NPCs: data stays (not a big problem).
+        	// (This is done even if the event has already been cancelled, to keep track, if the player is on a horse.)
+        	damagedTrace = MovingData.getData(damagedPlayer).updateTrace(damagedPlayer, damagedLoc, tick);
+        } else {
+        	// Use a fake trace.
+        	// TODO: Provide for entities too? E.g. one per player, or a fully fledged bookkeeping thing (EntityData).
+        	final MovingConfig mcc = MovingConfig.getConfig(damagedLoc.getWorld().getName());
+        	damagedTrace = new LocationTrace(mcc.traceSize, mcc.traceMergeDist);
+        	damagedTrace.addEntry(tick, damagedLoc.getX(), damagedLoc.getY(), damagedLoc.getZ());
         }
         
         if (cc.cancelDead){
@@ -182,18 +195,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	}
         }
 
-		if (angle.isEnabled(player)) {
-			// The "fast turning" checks are checked in any case because they accumulate data.
-			// Improbable yaw changing.
-			if (Combined.checkYawRate(player, loc.getYaw(), now, worldName, cc.yawRateCheck)) {
-				// (Check or just feed).
-				// TODO: Work into this somehow attacking the same aim and/or similar aim position (not cancel then).
-				cancelled = true;
-			}
-			// Angle check.
-			if (angle.check(player, worldChanged)) cancelled = true;
-		}
-
         if (!cancelled && critical.isEnabled(player) && critical.check(player, loc)) {
         	cancelled = true;
         }
@@ -210,7 +211,10 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	cancelled = true;
         }
         
-        // TODO: Order of the last two [might put first] ?
+        // TODO: Order of all these checks ...
+        // Checks that use LocationTrace.
+        
+        // TODO: Each check a method to determine max. latency ?
         
         if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, damaged, damagedLoc)) {
         	cancelled = true;
@@ -219,6 +223,20 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, damaged, damagedLoc)) {
         	cancelled = true;
         }
+        
+        if (angle.isEnabled(player)) {
+			// The "fast turning" checks are checked in any case because they accumulate data.
+			// Improbable yaw changing.
+			if (Combined.checkYawRate(player, loc.getYaw(), now, worldName, cc.yawRateCheck)) {
+				// (Check or just feed).
+				// TODO: Work into this somehow attacking the same aim and/or similar aim position (not cancel then).
+				cancelled = true;
+			}
+			// Angle check.
+			if (angle.check(player, worldChanged)) {
+				cancelled = true;
+			}
+		}
         
         // Set values.
         data.lastWorld = worldName;
@@ -232,6 +250,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	// TODO: Use stored distance calculation same as reach check?
     	// TODO: For pvp: make use of "player was there" heuristic later on.
     	// TODO: Confine further with simple pre-conditions.
+    	// TODO: Evaluate if moving traces can help here.
     	if (!cancelled && TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) < 4.5){
     		final MovingData mData = MovingData.getData(player);
 			// Check if fly checks is an issue at all, re-check "real sprinting".
