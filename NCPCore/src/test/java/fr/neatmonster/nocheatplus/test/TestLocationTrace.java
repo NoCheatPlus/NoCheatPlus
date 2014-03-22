@@ -2,6 +2,7 @@ package fr.neatmonster.nocheatplus.test;
 
 import static org.junit.Assert.fail;
 
+import java.util.Iterator;
 import java.util.Random;
 
 import org.junit.Test;
@@ -102,6 +103,13 @@ public class TestLocationTrace {
 				fail("Wrong size, expect roughly half of " + (i + 1) + ", got instead: " + trace.size());
 			}
 		}
+		Iterator<TraceEntry> it = trace.oldestIterator();
+		while (it.hasNext()) {
+			if (it.next().lastDistSq > 1.0) {
+				fail("Spacing should be smaller than 1.0 (sq / actual).");
+			}
+		}
+		
 	}
 	
 	@Test
@@ -132,9 +140,8 @@ public class TestLocationTrace {
 	
 	@Test
 	public void testIteratorSizeAndOrder() {
-		// Expected to fail.
 		int size = 80;
-		double mergeDist = -0.1;
+		double mergeDist = -0.1; // Never merge.
 		LocationTrace trace = new LocationTrace(size, mergeDist);
 		// Adding up to size elements.
 		for (int i = 0; i < size; i++) {
@@ -187,6 +194,32 @@ public class TestLocationTrace {
 			}
 			if (n != size) {
 				fail("Iterator (" + iteratorNames[i] + ") should have " + size + " elements, found instead: " + n);
+			}
+		}
+	}
+	
+	@Test
+	public void testMaxAgeIterator() {
+		int size = 80;
+		double mergeDist = -0.1; // Never merge.
+		LocationTrace trace = new LocationTrace(size, mergeDist);
+		// Adding up to size elements.
+		for (int i = 0; i < size; i++) {
+			trace.addEntry(i, i, i, i);
+		}
+		for (int i = 0; i < size; i++) {
+			Iterator<TraceEntry> it = trace.maxAgeIterator(i);
+			long got = it.next().time;
+			if (got != i) {
+				fail("Bad entry point for iterator (maxAge), expected " + i + ", got instead: " + got);
+			}
+			int n = 1;
+			while (it.hasNext()) {
+				it.next();
+				n ++;
+			}
+			if (n != size - i) {
+				fail("Bad number of elements for iterator (maxAge), expected " + (size - i) + ", got instead: " + n);
 			}
 		}
 	}
