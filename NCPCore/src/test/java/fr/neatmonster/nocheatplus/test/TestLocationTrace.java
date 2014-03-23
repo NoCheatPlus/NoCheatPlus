@@ -224,4 +224,24 @@ public class TestLocationTrace {
 		}
 	}
 	
+	@Test
+	public void testMaxAgeFirstElementAnyway() {
+		int size = 80;
+		double mergeDist = -0.1; // Never merge.
+		LocationTrace trace = new LocationTrace(size, mergeDist);
+		trace.addEntry(0, 0, 0, 0);
+		if (!trace.maxAgeIterator(1000).hasNext()) {
+			fail("Expect iterator (maxAge) to always contain the latest element.");
+		}
+		trace.addEntry(1, 0, 0, 0);
+		final Iterator<TraceEntry> it = trace.maxAgeIterator(2);
+		if (!it.hasNext()) {
+			fail("Expect iterator (maxAge) to always contain the latest element.");
+		}
+		it.next();
+		if (it.hasNext()) {
+			fail("Expect iterator (maxAge) to have only the latest element for all out of range entries.");
+		}
+	}
+	
 }
