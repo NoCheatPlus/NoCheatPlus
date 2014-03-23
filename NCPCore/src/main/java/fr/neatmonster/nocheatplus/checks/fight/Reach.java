@@ -51,10 +51,7 @@ public class Reach extends Check {
      *            the damaged
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location pLoc, final Entity damaged, final Location dRef) {
-        final FightConfig cc = FightConfig.getConfig(player);
-        final FightData data = FightData.getData(player);
-
+    public boolean check(final Player player, final Location pLoc, final Entity damaged, final Location dRef, final FightData data, final FightConfig cc) {
         boolean cancel = false;
         
         // The maximum distance allowed to interact with an entity in survival mode.
@@ -135,4 +132,10 @@ public class Reach extends Check {
 
         return cancel;
     }
+
+	public ReachContext getContext(final Player player, final Location loc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
+		final ReachContext context = new ReachContext();
+		// TODO: Implement
+		return context;
+	}
 }

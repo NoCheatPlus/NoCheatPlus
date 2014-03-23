@@ -195,15 +195,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	}
         }
 
-        if (!cancelled && critical.isEnabled(player) && critical.check(player, loc)) {
+        if (!cancelled && critical.isEnabled(player) && critical.check(player, loc, data, cc)) {
         	cancelled = true;
         }
         
-        if (!cancelled && knockback.isEnabled(player) && knockback.check(player)) {
+        if (!cancelled && knockback.isEnabled(player) && knockback.check(player, data, cc)) {
         	cancelled = true;
         }
         
-        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player)) {
+        if (!cancelled && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
         	cancelled = true;
         }
         
@@ -214,16 +214,33 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // TODO: Order of all these checks ...
         // Checks that use LocationTrace.
         
-        // TODO: Each check a method to determine max. latency ?
+        /**
+         * Iterate trace for trigonometric checks.<br>
+         * Calculate shared data before checking.<br>
+         * Maintain a latency window.<br>
+         * Check all in one loop, with pre- and invalidation conditions.<br>
+         * If some checks are disabled, window estimation must still be done fro the remaining ones.
+         * 
+         */
         
-        if (!cancelled && reach.isEnabled(player) && reach.check(player, loc, damaged, damagedLoc)) {
+        // TODO: Later optimize (...)
+        
+        // First loop through reach and direction, to determine a window.
+        final boolean reachEnabled = !cancelled && reach.isEnabled(player);
+        //final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
+
+        if (reachEnabled && reach.check(player, loc, damaged, damagedLoc, data, cc)) {
         	cancelled = true;
         }
         
-        if (!cancelled && direction.isEnabled(player) && direction.check(player, loc, damaged, damagedLoc)) {
+        final boolean directionEnabled = !cancelled && direction.isEnabled(player);
+        //final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
+        
+        if (directionEnabled && direction.check(player, loc, damaged, damagedLoc, data, cc)) {
         	cancelled = true;
         }
         
+        // Check angle with allowed window.
         if (angle.isEnabled(player)) {
 			// The "fast turning" checks are checked in any case because they accumulate data.
 			// Improbable yaw changing.
@@ -233,7 +250,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 				cancelled = true;
 			}
 			// Angle check.
-			if (angle.check(player, worldChanged)) {
+			if (angle.check(player, worldChanged, data, cc)) {
 				cancelled = true;
 			}
 		}

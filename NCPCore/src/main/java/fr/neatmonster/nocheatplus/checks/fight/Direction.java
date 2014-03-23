@@ -30,11 +30,8 @@ public class Direction extends Check {
      *            the damaged
      * @return true, if successful
      */
-    public boolean check(final Player player, final Location loc, final Entity damaged, final Location dLoc) {
-        final FightConfig cc = FightConfig.getConfig(player);
-        final FightData data = FightData.getData(player);
-
-        boolean cancel = false;
+    public boolean check(final Player player, final Location loc, final Entity damaged, final Location dLoc, final FightData data, final FightConfig cc) {
+    	boolean cancel = false;
 
         // Safeguard, if entity is complex, this check will fail due to giant and hard to define hitboxes.
 //        if (damaged instanceof EntityComplex || damaged instanceof EntityComplexPart)
@@ -84,4 +81,10 @@ public class Direction extends Check {
 
         return cancel;
     }
+
+	public DirectionContext getContext(final Player player, final Location loc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
+		final DirectionContext context = new DirectionContext();
+		// TODO: implement...
+		return context;
+	}
 }

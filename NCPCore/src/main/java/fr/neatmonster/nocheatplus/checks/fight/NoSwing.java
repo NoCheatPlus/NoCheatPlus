@@ -24,9 +24,7 @@ public class NoSwing extends Check {
      *            the player
      * @return true, if successful
      */
-    public boolean check(final Player player) {
-        final FightData data = FightData.getData(player);
-
+    public boolean check(final Player player, final FightData data, final FightConfig cc) {
         boolean cancel = false;
 
         // Did they swing his arm before?
@@ -40,9 +38,10 @@ public class NoSwing extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            cancel = executeActions(player, data.noSwingVL, 1D, FightConfig.getConfig(player).noSwingActions);
+            cancel = executeActions(player, data.noSwingVL, 1D, cc.noSwingActions);
         }
 
         return cancel;
     }
+    
 }

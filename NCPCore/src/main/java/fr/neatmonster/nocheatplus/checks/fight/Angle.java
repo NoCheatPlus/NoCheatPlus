@@ -32,9 +32,7 @@ public class Angle extends Check {
      * @param worldChanged 
      * @return true, if successful
      */
-    public boolean check(final Player player, final boolean worldChanged) {
-        final FightConfig cc = FightConfig.getConfig(player);
-        final FightData data = FightData.getData(player);
+    public boolean check(final Player player, final boolean worldChanged, final FightData data, final FightConfig cc) {
         
         if (worldChanged){
         	// TODO: clear some data.
