@@ -1103,11 +1103,20 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onEntityDamage(final EntityDamageEvent event) {
-        if (event.getCause() != DamageCause.FALL) return;
+        if (event.getCause() != DamageCause.FALL) {
+        	return;
+        }
         final Entity entity = event.getEntity();
-        if (!(entity instanceof Player)) return;
+        if (!(entity instanceof Player)) {
+        	return;
+        }
         final Player player = (Player) entity;
         final MovingData data = MovingData.getData(player);
+        if (player.isInsideVehicle()) {
+        	// Ignore vehicles (noFallFallDistance will be inaccurate anyway).
+        	data.clearNoFallData();
+        	return;
+        }
         final MovingConfig cc = MovingConfig.getConfig(player);
         if (event.isCancelled() || !shouldCheckSurvivalFly(player, data, cc) || !noFall.isEnabled(player)) {
             data.clearNoFallData();
