@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcompatcbdev</artifactId>
+  <artifactId>ncpcompatcb2922</artifactId>
   <packaging>jar</packaging>
-  <name>NCPCompatCBDev</name>
+  <name>NCPCompatCB2922</name>
   <version>static</version>
 
   <parent>
@@ -22,16 +22,16 @@
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>craftbukkit</artifactId>
-    	<version>1.7.5-R0.1-SNAPSHOT</version>
+    	<version>1.7.2-R0.4-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>bukkit</artifactId>
-    	<version>1.7.5-R0.1-SNAPSHOT</version>
+    	<version>1.7.2-R0.4-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
-  <description>Compatibility for the development version (latest of the supported Minecraft versions).
+  <description>Compatibility for CB2922 (MC 1.7.5).
 
 Version updating is done for the NoCheatPlus sub-module.</description>
 </project>

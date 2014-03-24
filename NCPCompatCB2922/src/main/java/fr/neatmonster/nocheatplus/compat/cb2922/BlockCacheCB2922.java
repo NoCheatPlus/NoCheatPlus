@@ -1,29 +1,30 @@
-package fr.neatmonster.nocheatplus.compat.cbdev;
+package fr.neatmonster.nocheatplus.compat.cb2922;
 
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.server.v1_7_R2.AxisAlignedBB;
-import net.minecraft.server.v1_7_R2.Block;
-import net.minecraft.server.v1_7_R2.EntityBoat;
-import net.minecraft.server.v1_7_R2.IBlockAccess;
-import net.minecraft.server.v1_7_R2.TileEntity;
+import net.minecraft.server.v1_7_R1.AxisAlignedBB;
+import net.minecraft.server.v1_7_R1.Block;
+import net.minecraft.server.v1_7_R1.EntityBoat;
+import net.minecraft.server.v1_7_R1.IBlockAccess;
+import net.minecraft.server.v1_7_R1.TileEntity;
+import net.minecraft.server.v1_7_R1.Vec3DPool;
 
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_7_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
-public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
+public class BlockCacheCB2922 extends BlockCache implements IBlockAccess{
 	
 	/** Box for one time use, no nesting, no extra storing this(!). */
 	protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
-	protected net.minecraft.server.v1_7_R2.WorldServer world;
+	protected net.minecraft.server.v1_7_R1.WorldServer world;
 	
-	public BlockCacheCBDev(World world) {
+	public BlockCacheCB2922(World world) {
 		setAccess(world);
 	}
 
@@ -52,7 +53,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 		
 		// TODO: change api for this / use nodes (!)
 		final int id = getTypeId(x, y, z);		
-		final net.minecraft.server.v1_7_R2.Block block = net.minecraft.server.v1_7_R2.Block.e(id);
+		final net.minecraft.server.v1_7_R1.Block block = net.minecraft.server.v1_7_R1.Block.e(id);
 		if (block == null) return null;
 		block.updateShape(this, x, y, z); // TODO: use THIS instead of world.
 		
@@ -65,7 +66,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 		try{
 			// TODO: Probably check other ids too before doing this ?
 			
-			final net.minecraft.server.v1_7_R2.Entity mcEntity  = ((CraftEntity) entity).getHandle();
+			final net.minecraft.server.v1_7_R1.Entity mcEntity  = ((CraftEntity) entity).getHandle();
 			
 			final AxisAlignedBB box = useBox.b(minX, minY, minZ, maxX, maxY, maxZ);
 			@SuppressWarnings("rawtypes")
@@ -73,7 +74,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 			@SuppressWarnings("rawtypes")
 			final Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
-				final net.minecraft.server.v1_7_R2.Entity other = (net.minecraft.server.v1_7_R2.Entity) iterator.next();
+				final net.minecraft.server.v1_7_R1.Entity other = (net.minecraft.server.v1_7_R1.Entity) iterator.next();
 				if (!(other instanceof EntityBoat)){ // && !(other instanceof EntityMinecart)) continue;
 					continue;
 				}
@@ -116,6 +117,11 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 	@Override
 	public Block getType(int x, int y, int z) {
 		return world.getType(x, y, z);
+	}
+
+	@Override
+	public Vec3DPool getVec3DPool() {
+		return world.getVec3DPool();
 	}
     
 }
