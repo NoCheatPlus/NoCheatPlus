@@ -166,7 +166,10 @@ public class Direction extends Check {
 	public boolean loopFinish(final Player player, final Location loc, final Entity damaged, final DirectionContext context, final boolean forceViolation, final FightData data, final FightConfig cc) {
 		boolean cancel = false;
 		final double off = forceViolation && context.minViolation != Double.MAX_VALUE ? context.minViolation : context.minResult;
-		if (off > 0.1) {
+		if (off == Double.MAX_VALUE) {
+			return false;
+		}
+		else if (off > 0.1) {
             // Add the overall violation level of the check.
             data.directionVL += context.minViolation;
 
@@ -178,7 +181,8 @@ public class Direction extends Check {
             	// Deal an attack penalty time.
             	data.attackPenalty.applyPenalty(cc.directionPenalty);
             }
-        } else {
+        }
+		else {
         	// Reward the player by lowering their violation level.
             data.directionVL *= 0.8D;
         }

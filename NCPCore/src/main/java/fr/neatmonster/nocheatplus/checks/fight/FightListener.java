@@ -251,6 +251,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 			reachPassed = true;
                 		}
                 	}
+                	// TODO: For efficiency one could omit checking at all if reach is failed all the time.
                 	if (directionEnabled && (reachPassed || !directionPassed)) {
                 		if (direction.loopCheck(player, damagedLoc, damagedPlayer, entry, directionContext, data, cc)) {
                 			thisPassed = false;

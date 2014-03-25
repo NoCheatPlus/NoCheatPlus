@@ -215,6 +215,9 @@ public class Reach extends Check {
 	 */
 	public boolean loopFinish(final Player player, final Location pLoc, final Entity damaged, final ReachContext context, final boolean forceViolation, final FightData data, final FightConfig cc) {
 		final double lenpRel = forceViolation && context.minViolation != Double.MAX_VALUE ? context.minViolation : context.minResult;
+		if (lenpRel == Double.MAX_VALUE) {
+			return false;
+		}
 		double violation = lenpRel - context.distanceLimit;
 		boolean cancel = false;
 		if (violation > 0) {
