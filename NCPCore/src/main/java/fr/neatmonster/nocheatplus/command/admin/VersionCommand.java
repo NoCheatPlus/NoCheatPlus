@@ -18,9 +18,9 @@ import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-public class NCPVersionCommand extends BaseCommand{
+public class VersionCommand extends BaseCommand{
 
-	public NCPVersionCommand(JavaPlugin plugin) {
+	public VersionCommand(JavaPlugin plugin) {
 		super(plugin, "version", Permissions.COMMAND_VERSION, new String[]{"versions", "ver"});
 	}
 
