@@ -3,15 +3,15 @@ package fr.neatmonster.nocheatplus.compat.cbdev;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.server.v1_7_R2.AxisAlignedBB;
-import net.minecraft.server.v1_7_R2.Block;
-import net.minecraft.server.v1_7_R2.EntityBoat;
-import net.minecraft.server.v1_7_R2.IBlockAccess;
-import net.minecraft.server.v1_7_R2.TileEntity;
+import net.minecraft.server.v1_7_R3.AxisAlignedBB;
+import net.minecraft.server.v1_7_R3.Block;
+import net.minecraft.server.v1_7_R3.EntityBoat;
+import net.minecraft.server.v1_7_R3.IBlockAccess;
+import net.minecraft.server.v1_7_R3.TileEntity;
 
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_7_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_7_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_7_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -21,7 +21,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 	/** Box for one time use, no nesting, no extra storing this(!). */
 	protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
-	protected net.minecraft.server.v1_7_R2.WorldServer world;
+	protected net.minecraft.server.v1_7_R3.WorldServer world;
 	
 	public BlockCacheCBDev(World world) {
 		setAccess(world);
@@ -52,7 +52,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 		
 		// TODO: change api for this / use nodes (!)
 		final int id = getTypeId(x, y, z);		
-		final net.minecraft.server.v1_7_R2.Block block = net.minecraft.server.v1_7_R2.Block.e(id);
+		final net.minecraft.server.v1_7_R3.Block block = net.minecraft.server.v1_7_R3.Block.e(id);
 		if (block == null) return null;
 		block.updateShape(this, x, y, z); // TODO: use THIS instead of world.
 		
@@ -65,7 +65,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 		try{
 			// TODO: Probably check other ids too before doing this ?
 			
-			final net.minecraft.server.v1_7_R2.Entity mcEntity  = ((CraftEntity) entity).getHandle();
+			final net.minecraft.server.v1_7_R3.Entity mcEntity  = ((CraftEntity) entity).getHandle();
 			
 			final AxisAlignedBB box = useBox.b(minX, minY, minZ, maxX, maxY, maxZ);
 			@SuppressWarnings("rawtypes")
@@ -73,7 +73,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 			@SuppressWarnings("rawtypes")
 			final Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
-				final net.minecraft.server.v1_7_R2.Entity other = (net.minecraft.server.v1_7_R2.Entity) iterator.next();
+				final net.minecraft.server.v1_7_R3.Entity other = (net.minecraft.server.v1_7_R3.Entity) iterator.next();
 				if (!(other instanceof EntityBoat)){ // && !(other instanceof EntityMinecart)) continue;
 					continue;
 				}
