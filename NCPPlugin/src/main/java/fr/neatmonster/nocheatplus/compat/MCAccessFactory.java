@@ -16,7 +16,7 @@ import fr.neatmonster.nocheatplus.compat.cb2794.MCAccessCB2794;
 import fr.neatmonster.nocheatplus.compat.cb2808.MCAccessCB2808;
 import fr.neatmonster.nocheatplus.compat.cb2882.MCAccessCB2882;
 import fr.neatmonster.nocheatplus.compat.cb2922.MCAccessCB2922;
-import fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev;
+import fr.neatmonster.nocheatplus.compat.cb3026.MCAccessCB3026;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -38,7 +38,7 @@ public class MCAccessFactory {
 	 * @return MCAccess instance.
 	 * @throws RuntimeException if no access can be set.
 	 */
-	public MCAccess getMCAccess(){
+	public MCAccess getMCAccess() {
 		return getMCAccess(ConfigManager.getConfigFile().getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY));
 	}
 	
@@ -48,28 +48,36 @@ public class MCAccessFactory {
 	 * @return
 	 * @throws RuntimeException if no access can be set.
 	 */
-	public MCAccess getMCAccess(final boolean bukkitOnly){
+	public MCAccess getMCAccess(final boolean bukkitOnly) {
 		final List<Throwable> throwables = new ArrayList<Throwable>();
 		
 		// Try to set up native access.
-		if (!bukkitOnly){
+		if (!bukkitOnly) {
 			
 			// TEMP //
 			// Only add as long as no stable module has been added.
 			// 1.7.5
+//			try{
+//				return new MCAccessCBDev();
+//			}
+//			catch(Throwable t) {
+//				throwables.add(t);
+//			};
+			// TEMP END //
+			
+			// 1.7.5
 			try{
-				return new MCAccessCBDev();
+				return new MCAccessCB3026();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
-			// TEMP END //
 			
 			// 1.7.2
 			try{
 				return new MCAccessCB2922();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -77,7 +85,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2882();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -85,7 +93,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2808();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -93,7 +101,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2794();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 						
@@ -101,7 +109,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2763();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -109,7 +117,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2691();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -117,7 +125,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2645();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -125,7 +133,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2602();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -133,7 +141,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2545();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -141,7 +149,7 @@ public class MCAccessFactory {
 			try{
 				return new MCAccessCB2512();
 			}
-			catch(Throwable t){
+			catch(Throwable t) {
 				throwables.add(t);
 			};
 			
@@ -150,12 +158,12 @@ public class MCAccessFactory {
 		// Try to set up api-only access (since 1.4.6).
 		try{
 			final String msg;
-			if (bukkitOnly){
+			if (bukkitOnly) {
 				msg = "[NoCheatPlus] The plugin is configured for Bukkit-API-only access.";
 			}
 			else{
 				msg = "[NoCheatPlus] Could not set up native access for the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.";
-				for (String uMsg : updateLocs){
+				for (String uMsg : updateLocs) {
 					LogUtil.logWarning(uMsg);
 				}
 			}
@@ -164,18 +172,18 @@ public class MCAccessFactory {
 			LogUtil.logWarning("[NoCheatPlus] Bukkit-API-only access: Some features will likely not function properly, performance might suffer.");
 			return mcAccess;
 		}
-		catch(Throwable t){
+		catch(Throwable t) {
 			throwables.add(t);
 		};
 		
 		// All went wrong.
 		// TODO: Fall-back solution (disable plugin, disable checks).
 		LogUtil.logSevere("[NoCheatPlus] Your version of NoCheatPlus is not compatible with the version of the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.");
-		for (String msg : updateLocs){
+		for (String msg : updateLocs) {
 			LogUtil.logSevere(msg);
 		}
 		LogUtil.logSevere("[NoCheatPlus] >>> Failed to set up MCAccess <<<");
-		for (Throwable t : throwables ){
+		for (Throwable t : throwables ) {
 			LogUtil.logSevere(t);
 		}
 		// TODO: Schedule disabling the plugin or running in circles.

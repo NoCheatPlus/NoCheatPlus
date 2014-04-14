@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.compat.cbdev;
+package fr.neatmonster.nocheatplus.compat.cb3026;
 
 import net.minecraft.server.v1_7_R2.AxisAlignedBB;
 import net.minecraft.server.v1_7_R2.Block;
@@ -23,12 +23,12 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
-public class MCAccessCBDev implements MCAccess{
+public class MCAccessCB3026 implements MCAccess{
 	
 	/**
 	 * Constructor to let it fail.
 	 */
-	public MCAccessCBDev(){
+	public MCAccessCB3026(){
 		getCommandMap();
 		ReflectionUtil.checkMembers("net.minecraft.server.v1_7_R2.", new String[]{"Entity" , "dead"});
 		// block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
@@ -45,7 +45,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public String getServerVersionTag() {
-		return "CB3026-DEV";
+		return "CB3026";
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public BlockCache getBlockCache(final World world) {
-		return new BlockCacheCBDev(world);
+		return new BlockCacheCB3026(world);
 	}
 
 	@Override
