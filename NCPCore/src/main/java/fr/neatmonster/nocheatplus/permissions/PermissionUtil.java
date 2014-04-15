@@ -38,7 +38,7 @@ public class PermissionUtil {
 		 * @param permissionDefault
 		 * @param permissionMessage
 		 */
-		public CommandProtectionEntry(Command command, String label, String permission, PermissionDefault permissionDefault, String permissionMessage){
+		public CommandProtectionEntry(Command command, String label, String permission, PermissionDefault permissionDefault, String permissionMessage) {
 			this.command = command;
 			this.label = label;
 			this.permission = permission;
@@ -46,14 +46,19 @@ public class PermissionUtil {
 			this.permissionMessage = permissionMessage;
 		}
 		
-		public void restore(){
-			Command registered = CommandUtil.getCommand(label);
-			if (registered == null || registered != command) return;
-			if (!label.equalsIgnoreCase(command.getLabel().trim().toLowerCase())) command.setLabel(label);
+		public void restore() {
+			// (Don't skip resetting, as there could be fall-back aliases.)
+//			Command registered = CommandUtil.getCommand(label);
+//			if (registered == null || registered != command) return;
+			if (!label.equalsIgnoreCase(command.getLabel().trim().toLowerCase())) {
+				command.setLabel(label);
+			}
 			command.setPermission(permission);
-			if (permission != null && permissionDefault != null){
+			if (permission != null && permissionDefault != null) {
 				Permission perm = Bukkit.getPluginManager().getPermission(permission);
-				if (perm != null) perm.setDefault(permissionDefault);
+				if (perm != null && perm.getDefault() != permissionDefault) {
+					perm.setDefault(permissionDefault);
+				}
 			}
 			command.setPermissionMessage(permissionMessage);
 		}
@@ -61,12 +66,12 @@ public class PermissionUtil {
 	
 	/**
 	 * 
-	 * @param commands
+	 * @param commands Command white-list.
 	 * @param permissionBase
 	 * @param ops
 	 * @return
 	 */
-	public static List<CommandProtectionEntry> protectCommands(Collection<String> commands, String permissionBase, boolean ops){
+	public static List<CommandProtectionEntry> protectCommands(Collection<String> commands, String permissionBase, boolean ops) {
 		return protectCommands(permissionBase, commands, true, ops);
 	}
 	
@@ -78,7 +83,7 @@ public class PermissionUtil {
 	 * @param ops
 	 * @return
 	 */
-	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops){
+	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops) {
 		return protectCommands(permissionBase, ignoredCommands, invertIgnored, ops, ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)));
 	}
 	
@@ -91,30 +96,33 @@ public class PermissionUtil {
 	 * @param permissionMessage
 	 * @return
 	 */
-	public static List<CommandProtectionEntry> protectCommands(String permissionBase, Collection<String> ignoredCommands, boolean invertIgnored, boolean ops, String permissionMessage){
-		Set<String> checked = new HashSet<String>();
-		for (String label : ignoredCommands){
+	public static List<CommandProtectionEntry> protectCommands(final String permissionBase, final Collection<String> ignoredCommands, final boolean invertIgnored, final boolean ops, final String permissionMessage) {
+		final Set<String> checked = new HashSet<String>();
+		for (String label : ignoredCommands) {
 			checked.add(CommandUtil.getCommandLabel(label, false));
 		}
-		PluginManager pm = Bukkit.getPluginManager();
+		final PluginManager pm = Bukkit.getPluginManager();
 		Permission rootPerm = pm.getPermission(permissionBase);
-		if (rootPerm == null){
+		if (rootPerm == null) {
 			rootPerm = new Permission(permissionBase);
 			pm.addPermission(rootPerm);
 		}
-		List<CommandProtectionEntry> changed = new LinkedList<CommandProtectionEntry>();
-		for (Command command : CommandUtil.getCommands()){
-			String lcLabel = command.getLabel().trim().toLowerCase();
-			if (checked != null){
-				if (checked.contains(lcLabel)){
-					if (!invertIgnored) continue;
+		final List<CommandProtectionEntry> changed = new LinkedList<CommandProtectionEntry>();
+		// Apply protection based on white-list or black-list.
+		for (final Command command : CommandUtil.getCommands()) {
+			final String lcLabel = command.getLabel().trim().toLowerCase();
+			if (checked.contains(lcLabel) || containsAnyAliases(checked, command)) {
+				if (!invertIgnored) {
+					continue;
 				}
-				else if (invertIgnored) continue;
+			}
+			else if (invertIgnored) {
+				continue;
 			}
 			// Set the permission for the command.
 			String cmdPermName = command.getPermission();
 			boolean cmdHadPerm;
-			if (cmdPermName == null){
+			if (cmdPermName == null) {
 				// Set a permission.
 				cmdPermName = permissionBase + "." + lcLabel;
 				command.setPermission(cmdPermName);
@@ -125,21 +133,43 @@ public class PermissionUtil {
 			}
 			// Set permission default behavior.
 			Permission cmdPerm = pm.getPermission(cmdPermName);
-			if (cmdPerm == null){
-				if (!cmdHadPerm){
+			if (cmdPerm == null) {
+				if (!cmdHadPerm) {
 					cmdPerm = new Permission(cmdPermName);
 					cmdPerm.addParent(rootPerm, true);
 					pm.addPermission(cmdPerm);
 				}
 			}
 			// Create change history entry.
-			if (cmdHadPerm) changed.add(new CommandProtectionEntry(command, lcLabel, cmdPermName, cmdPerm.getDefault(), command.getPermissionMessage()));
-			else changed.add(new CommandProtectionEntry(command, lcLabel, null, null, command.getPermissionMessage()));
+			if (cmdHadPerm) {
+				changed.add(new CommandProtectionEntry(command, lcLabel, cmdPermName, cmdPerm.getDefault(), command.getPermissionMessage()));
+			}
+			else {
+				changed.add(new CommandProtectionEntry(command, lcLabel, null, null, command.getPermissionMessage()));
+			}
 			// Change 
 			cmdPerm.setDefault(ops ? PermissionDefault.OP : PermissionDefault.FALSE);
 			command.setPermissionMessage(permissionMessage);
 		}
 		return changed;
+	}
+	
+	/**
+	 * Check if the checked set contains any trim+lower-case alias of the command.
+	 * @param checked
+	 * @param command
+	 * @return
+	 */
+	private static final boolean containsAnyAliases(final Set<String> checked, final Command command) {
+		final Collection<String> aliases = command.getAliases();
+		if (aliases != null) {
+			for (final String alias : aliases) {
+				if (checked.contains(alias.trim().toLowerCase())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -150,17 +180,17 @@ public class PermissionUtil {
 	public static void addChildPermission(final Collection<String> permissions, final String childPermissionName, final PermissionDefault permissionDefault) {
 		final PluginManager pm = Bukkit.getPluginManager();
 		Permission childPermission = pm.getPermission(childPermissionName);
-		if (childPermission == null){
+		if (childPermission == null) {
 			childPermission = new Permission(childPermissionName, "auto-generated child permission (NoCheatPlus)", permissionDefault);
 			pm.addPermission(childPermission);
 		}
-		for (final String permissionName : permissions){
+		for (final String permissionName : permissions) {
 			Permission permission = pm.getPermission(permissionName);
-			if (permission == null){
+			if (permission == null) {
 				permission = new Permission(permissionName, "auto-generated permission (NoCheatPlus)", permissionDefault);
 				pm.addPermission(permission);
 			}
-			if (!permission.getChildren().containsKey(childPermissionName)){
+			if (!permission.getChildren().containsKey(childPermissionName)) {
 				childPermission.addParent(permission, true);
 			}
 		}
