@@ -369,11 +369,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// TODO: Check if vehicle move logs correctly (fake).
 		
 		// Early return checks (no full processing).
-		final boolean earlyReturn;
+		boolean earlyReturn = false;;
 		if (player.isInsideVehicle()) {
 			// No full processing for players in vehicles.
 			newTo = onPlayerMoveVehicle(player, from, to, data);
-			earlyReturn = true;
 		} else if (player.isDead() || player.isSleeping()) {
 			// Ignore dead players.
 			data.sfHoverTicks = -1;
@@ -387,14 +386,13 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// Keep hover ticks.
 			// Ignore changing worlds.
 			earlyReturn = true;
-		} else {
-			// COntinue with full processing.
-			earlyReturn = false;
-		}
+		} // else:  Continue with full processing.
+		
 		// TODO: Might log base parts here (+extras).
-		if (earlyReturn) {
+		if (earlyReturn || newTo != null) {
 			// TODO: Log "early return: " + tags.
 			if (newTo != null) {
+				newTo = checkLookingDirection(from, to, newTo);
 				event.setTo(newTo);
 			}
 			return;
@@ -590,6 +588,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				data.jumpAmplifier = jumpAmplifier;
 			}
 		}
+		
+		// Illegal Yaw/Pitch.
+		// TODO: Extra check, to be able to trigger violations.
+		newTo = checkLookingDirection(from, to, newTo);
 
         // Did one of the checks decide we need a new "to"-location?
         if (newTo != null) {
@@ -622,6 +624,60 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
     
     /**
+     * 
+     * @param from
+     * @param to
+     * @param newTo
+     * @return
+     */
+    private final Location checkLookingDirection(final Location from, final Location to, final Location newTo) {
+    	// TODO: Reduce signature, once decided.
+		final float  yaw;
+		if (newTo == null) {
+			yaw = to.getYaw();
+		} else {
+			yaw = newTo.getYaw();
+		}
+		final float newYaw = safeYaw(yaw);
+		if (yaw != newYaw) {
+			// TODO: Trigger a violation ?
+			if (newTo != null) {
+				newTo.setYaw(newYaw);
+				return newTo;
+			} else {
+				return LocUtil.clone(to, newYaw, to.getPitch());
+			}
+		} else {
+			// Return original newTo.
+			return newTo;
+		}
+	}
+    
+    /**
+     * Safe clamp "if necessary".
+     * @param val
+     * @return
+     */
+    private static final float safeYaw(float val) {
+    	// Safety first.
+    	if (val == Float.NaN || val > 100000f || val < -100000f) {
+    		return 180f;
+    	}
+    	if (val >= 720f) {
+    		while (val >= 360f) {
+        		// TODO: Allow 360f explicitly?
+        		val -= 360f;
+        	}
+    	}
+    	if (val <= -360f) {
+    		while (val < 0f) {
+        		val += 360f;
+        	}
+    	}
+    	return val;
+    }
+    
+	/**
      * Called from player-move checking, if the player is inside of a vehicle.
      * @param player
      * @param from
@@ -1244,6 +1300,24 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				// DEBUG
 				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
 			}
+		}
+		
+		// Bad pitch/yaw.
+		final Location newTo = checkLookingDirection(useLoc, useLoc, null);
+		if (newTo != null) {
+			// TODO: Make this kind of functionality part of PlayerTask (needs priority-handling, probably).
+			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+				@Override
+				public void run() {
+					player.getLocation(useLoc);
+					final Location newTo = checkLookingDirection(useLoc, useLoc, null);
+					if (newTo != null) {
+						player.teleport(newTo);
+					}
+					// Cleanup.
+					useLoc.setWorld(null);
+				}
+			});
 		}
 		
 		// Cleanup.
