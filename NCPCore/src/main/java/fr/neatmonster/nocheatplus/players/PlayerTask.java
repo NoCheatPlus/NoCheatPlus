@@ -2,7 +2,7 @@ package fr.neatmonster.nocheatplus.players;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NoCheatPlus;
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 
@@ -37,7 +37,7 @@ public class PlayerTask extends OnDemandTickListener {
 		if (player != null) {
 			if (player.isOnline()) {
 				if (correctDirection) {
-					final MCAccess access = NoCheatPlus.getAPI().getMCAccess();
+					final MCAccess access = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
 					access.correctDirection(player);
 				}
 				if (updateInventory) {
