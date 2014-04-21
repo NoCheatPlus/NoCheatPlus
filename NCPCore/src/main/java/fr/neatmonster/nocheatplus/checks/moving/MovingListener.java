@@ -365,11 +365,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final Location to = event.getTo();
 		Location newTo = null;
 		
+		// Check problematic yaw/pitch values.
+		if (LocUtil.needsDirectionCorrection(from.getYaw(), from.getPitch())
+				|| LocUtil.needsDirectionCorrection(to.getYaw(), to.getPitch())) {
+			DataManager.getPlayerData(player).task.correctDirection();
+		}
+		
 		// TODO: Check illegal moves here anyway (!).
 		// TODO: Check if vehicle move logs correctly (fake).
 		
 		// Early return checks (no full processing).
-		boolean earlyReturn = false;;
+		boolean earlyReturn = false;
 		if (player.isInsideVehicle()) {
 			// No full processing for players in vehicles.
 			newTo = onPlayerMoveVehicle(player, from, to, data);
@@ -392,7 +398,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		if (earlyReturn || newTo != null) {
 			// TODO: Log "early return: " + tags.
 			if (newTo != null) {
-				newTo = checkLookingDirection(from, to, newTo);
+				// Illegal Yaw/Pitch.
+	        	if (LocUtil.needsYawCorrection(newTo.getYaw())) {
+	        		newTo.setYaw(LocUtil.correctYaw(newTo.getYaw()));
+	        	}
+	        	if (LocUtil.needsPitchCorrection(newTo.getPitch())) {
+	        		newTo.setPitch(LocUtil.correctPitch(newTo.getPitch()));
+	        	}
+	        	// Set.
 				event.setTo(newTo);
 			}
 			return;
@@ -588,13 +601,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				data.jumpAmplifier = jumpAmplifier;
 			}
 		}
-		
-		// Illegal Yaw/Pitch.
-		// TODO: Extra check, to be able to trigger violations.
-		newTo = checkLookingDirection(from, to, newTo);
 
-        // Did one of the checks decide we need a new "to"-location?
+        // Set-back handling.
         if (newTo != null) {
+        	// Illegal Yaw/Pitch.
+        	if (LocUtil.needsYawCorrection(newTo.getYaw())) {
+        		newTo.setYaw(LocUtil.correctYaw(newTo.getYaw()));
+        	}
+        	if (LocUtil.needsPitchCorrection(newTo.getPitch())) {
+        		newTo.setPitch(LocUtil.correctPitch(newTo.getPitch()));
+        	}
+        	
         	// Reset some data.
         	data.prepareSetBack(newTo);
 			
@@ -621,60 +638,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Cleanup.
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
-    }
-    
-    /**
-     * 
-     * @param from
-     * @param to
-     * @param newTo
-     * @return
-     */
-    private final Location checkLookingDirection(final Location from, final Location to, final Location newTo) {
-    	// TODO: Reduce signature, once decided.
-		final float  yaw;
-		if (newTo == null) {
-			yaw = to.getYaw();
-		} else {
-			yaw = newTo.getYaw();
-		}
-		final float newYaw = safeYaw(yaw);
-		if (yaw != newYaw) {
-			// TODO: Trigger a violation ?
-			if (newTo != null) {
-				newTo.setYaw(newYaw);
-				return newTo;
-			} else {
-				return LocUtil.clone(to, newYaw, to.getPitch());
-			}
-		} else {
-			// Return original newTo.
-			return newTo;
-		}
-	}
-    
-    /**
-     * Safe clamp "if necessary".
-     * @param val
-     * @return
-     */
-    private static final float safeYaw(float val) {
-    	// Safety first.
-    	if (val == Float.NaN || val > 100000f || val < -100000f) {
-    		return 180f;
-    	}
-    	if (val >= 720f) {
-    		while (val >= 360f) {
-        		// TODO: Allow 360f explicitly?
-        		val -= 360f;
-        	}
-    	}
-    	if (val <= -360f) {
-    		while (val < 0f) {
-        		val += 360f;
-        	}
-    	}
-    	return val;
     }
     
 	/**
@@ -1302,22 +1265,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 		}
 		
-		// Bad pitch/yaw.
-		final Location newTo = checkLookingDirection(useLoc, useLoc, null);
-		if (newTo != null) {
-			// TODO: Make this kind of functionality part of PlayerTask (needs priority-handling, probably).
-			Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-				@Override
-				public void run() {
-					player.getLocation(useLoc);
-					final Location newTo = checkLookingDirection(useLoc, useLoc, null);
-					if (newTo != null) {
-						player.teleport(newTo);
-					}
-					// Cleanup.
-					useLoc.setWorld(null);
-				}
-			});
+		// Bad pitch/yaw, just in case.
+		if (LocUtil.needsDirectionCorrection(useLoc.getYaw(), useLoc.getPitch())) {
+			DataManager.getPlayerData(player).task.correctDirection();
 		}
 		
 		// Cleanup.
