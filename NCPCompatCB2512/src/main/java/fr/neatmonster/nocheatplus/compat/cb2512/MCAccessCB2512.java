@@ -18,6 +18,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.checks.moving.LocUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -99,7 +100,7 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public double getJumpAmplifier(final Player player) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 	
 		if (mcPlayer.hasEffect(MobEffectList.JUMP)) return mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
 		else return Double.NEGATIVE_INFINITY;
@@ -107,7 +108,7 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public double getFasterMovementAmplifier(final Player player) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
 		else return Double.NEGATIVE_INFINITY;
 	}
@@ -134,13 +135,13 @@ public class MCAccessCB2512 implements MCAccess{
 
 	@Override
 	public boolean shouldBeZombie(final Player player) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		return !mcPlayer.dead && mcPlayer.getHealth() <= 0 ;
 	}
 
 	@Override
 	public void setDead(final Player player, final int deathTicks) {
-		final net.minecraft.server.v1_4_5.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         mcPlayer.deathTicks = deathTicks;
         mcPlayer.dead = true;
 	}
@@ -160,6 +161,15 @@ public class MCAccessCB2512 implements MCAccess{
 		default:
 			return false;
 		}
+	}
+	
+	@Override
+	public void correctDirection(final Player player) {
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		// Main direction.
+		mcPlayer.yaw = LocUtil.correctYaw(mcPlayer.yaw);
+		mcPlayer.pitch = LocUtil.correctPitch(mcPlayer.pitch);
+		// Consider setting the lastYaw here too.
 	}
 	
 }
