@@ -99,5 +99,80 @@ public class LocUtil {
 			return world;
 		}
 	}
+	
+	/**
+	 * Quick out of bounds check for yaw.
+	 * @param yaw
+	 * @return
+	 */
+	public static final boolean needsYawCorrection(final float yaw) {
+		return yaw == Float.NaN || yaw < 0f || yaw >= 360f;
+	}
+	
+	/**
+	 * Quick out of bounds check for pitch.
+	 * @param pitch
+	 * @return
+	 */
+	public static final boolean needsPitchCorrection(final float pitch) {
+		return pitch == Float.NaN || pitch < -90f || pitch > 90f;
+	}
+	
+	/**
+	 * Quick out of bounds check for yaw and pitch.
+	 * @param yaw
+	 * @param pitch
+	 * @return
+	 */
+	public static final boolean needsDirectionCorrection(final float yaw, final float pitch) {
+		return needsYawCorrection(yaw) || needsPitchCorrection(pitch);
+	}
+	
+	/**
+	 * Ensure 0 <= yaw < 360.
+	 * @param yaw
+	 * @return
+	 */
+	public static final float correctYaw(float yaw) {
+		if (yaw == Float.NaN) {
+			return 0f;
+		}
+		if (yaw >= 360f) {
+			if (yaw > 10000f) {
+				yaw = 0f;
+			} else {
+				while (yaw > 360f) {
+					yaw -= 360f;
+				}
+			}
+		}
+		if (yaw < 0f) {
+			if (yaw < -10000f) {
+				yaw = 0f;
+			} else {
+				while (yaw < 0f) {
+					yaw += 360f;
+				}
+			}
+		}
+		return yaw;
+	}
+	
+	/**
+	 * Ensure -90 <= pitch <= 90.
+	 * @param pitch
+	 * @return
+	 */
+	public static final float correctPitch(float pitch) {
+		if (pitch == Float.NaN) {
+			return 0f;
+		} else if (pitch < -90f) {
+			return -90f;
+		} else if (pitch > 90f) {
+			return 90f;
+		} else {
+			return pitch;
+		}
+	}
 
 }
