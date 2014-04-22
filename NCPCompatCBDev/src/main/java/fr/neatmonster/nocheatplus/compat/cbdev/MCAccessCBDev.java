@@ -41,7 +41,7 @@ public class MCAccessCBDev implements MCAccess{
 	@Override
 	public String getMCVersion() {
 		// 1_7_R3
-		return "1.7.8";
+		return "1.7.8|1.7.9";
 	}
 
 	@Override
