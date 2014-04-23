@@ -2,6 +2,8 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import java.util.Iterator;
 
+import javax.management.MXBean;
+
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -29,6 +31,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceEntry;
+import fr.neatmonster.nocheatplus.checks.moving.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.MediumLiftOff;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
@@ -36,6 +39,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -111,6 +115,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final boolean worldChanged = !worldName.equals(data.lastWorld);
         
         final Location loc =  player.getLocation(useLoc1);
+        // Bad pitch/yaw, just in case.
+ 		if (LocUtil.needsDirectionCorrection(useLoc1.getYaw(), useLoc1.getPitch())) {
+ 			mcAccess.correctDirection(player);
+ 			player.getLocation(useLoc1);
+ 		}
         final Location damagedLoc = damaged.getLocation(useLoc2);
 //        final double targetDist = CheckUtils.distance(loc, targetLoc); // TODO: Calculate distance as is done in fight.reach !
         final double targetMove;
@@ -141,6 +150,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final Player damagedPlayer;
         if (damaged instanceof Player){
         	damagedPlayer = (Player) damaged;
+        	// Bad pitch/yaw, just in case.
+     		if (LocUtil.needsDirectionCorrection(useLoc2.getYaw(), useLoc2.getPitch())) {
+     			mcAccess.correctDirection(damagedPlayer);
+     			damagedPlayer.getLocation(useLoc2);
+     		}
+     		// Log.
         	if (cc.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
         		damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
         	}
