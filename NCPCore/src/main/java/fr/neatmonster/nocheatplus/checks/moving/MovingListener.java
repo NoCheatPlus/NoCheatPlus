@@ -375,10 +375,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// TODO: Check if vehicle move logs correctly (fake).
 		
 		// Early return checks (no full processing).
-		boolean earlyReturn = false;
+		final boolean earlyReturn;
 		if (player.isInsideVehicle()) {
 			// No full processing for players in vehicles.
 			newTo = onPlayerMoveVehicle(player, from, to, data);
+			earlyReturn = true;
 		} else if (player.isDead() || player.isSleeping()) {
 			// Ignore dead players.
 			data.sfHoverTicks = -1;
@@ -392,10 +393,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// Keep hover ticks.
 			// Ignore changing worlds.
 			earlyReturn = true;
-		} // else:  Continue with full processing.
+		} else {
+			earlyReturn = false;
+		}
 		
 		// TODO: Might log base parts here (+extras).
-		if (earlyReturn || newTo != null) {
+		if (earlyReturn) {
 			// TODO: Log "early return: " + tags.
 			if (newTo != null) {
 				// Illegal Yaw/Pitch.
