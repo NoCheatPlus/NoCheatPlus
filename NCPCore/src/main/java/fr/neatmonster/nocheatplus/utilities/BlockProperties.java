@@ -1649,7 +1649,8 @@ public class BlockProperties {
 	 */
 	public static final boolean isPassable(final Location from, final Location to){
 		blockCache.setAccess(from.getWorld());
-    	PassableRayTracing rt = new PassableRayTracing();
+    	final PassableRayTracing rt = new PassableRayTracing();
+    	rt.setMaxSteps(60); // TODO: Configurable ?
     	rt.setBlockCache(blockCache);
     	rt.set(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
     	rt.loop();
