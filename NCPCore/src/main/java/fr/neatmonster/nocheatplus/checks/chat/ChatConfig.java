@@ -105,7 +105,8 @@ public class ChatConfig extends AsyncCheckConfig {
     public final float        textMessageNoLetter;
 	public final float        textGlobalWeight;
 	public final float        textPlayerWeight;
-	public boolean            textEngineMaximum;
+	public final boolean      textEngineMaximum;
+	public final boolean	  textAllowVLReset;
 	public final boolean      textDebug;
     
     public final boolean      chatWarningCheck;
@@ -194,6 +195,7 @@ public class ChatConfig extends AsyncCheckConfig {
     	textEngineMaximum = config.getBoolean(ConfPaths.CHAT_TEXT_ENGINE_MAXIMUM, true);
     	textDebug = config.getBoolean(ConfPaths.CHAT_TEXT_DEBUG, false);
         textFreqNormActions = config.getOptimizedActionList(ConfPaths.CHAT_TEXT_FREQ_NORM_ACTIONS, Permissions.CHAT_TEXT);
+        textAllowVLReset = config.getBoolean(ConfPaths.CHAT_TEXT_ALLOWVLRESET);
         
         chatWarningCheck = config.getBoolean(ConfPaths.CHAT_WARNING_CHECK);
         chatWarningLevel = (float) config.getDouble(ConfPaths.CHAT_WARNING_LEVEL);

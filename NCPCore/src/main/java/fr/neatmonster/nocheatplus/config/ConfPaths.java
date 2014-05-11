@@ -244,6 +244,7 @@ public abstract class ConfPaths {
     public static final String CHAT_TEXT_CHECK                            = CHAT_TEXT + "active";
 	public static final String CHAT_TEXT_DEBUG                       = CHAT_TEXT + "debug";
 	public static final String CHAT_TEXT_ENGINE_MAXIMUM              = CHAT_TEXT + "maximum";
+	public static final String CHAT_TEXT_ALLOWVLRESET				 = CHAT_TEXT + "allowvlreset";
     public static final String CHAT_TEXT_FREQ                        = CHAT_TEXT + "frequency.";
     public static final String CHAT_TEXT_FREQ_NORM                   = CHAT_TEXT_FREQ + "normal.";
 	public static final String CHAT_TEXT_FREQ_NORM_FACTOR            = CHAT_TEXT_FREQ_NORM + "factor";
