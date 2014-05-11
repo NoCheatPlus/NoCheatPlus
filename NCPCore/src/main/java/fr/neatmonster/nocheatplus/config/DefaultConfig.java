@@ -168,7 +168,7 @@ public class DefaultConfig extends ConfigFile {
         
         // Text (ordering on purpose).
         set(ConfPaths.CHAT_TEXT_CHECK, true);
-        set(ConfPaths.CHAT_TEXT_ALLOWVLRESET, false);
+        set(ConfPaths.CHAT_TEXT_ALLOWVLRESET, true);
         set(ConfPaths.CHAT_TEXT_FREQ_NORM_MIN, 0.0);
         set(ConfPaths.CHAT_TEXT_FREQ_NORM_FACTOR, 0.9D);
         set(ConfPaths.CHAT_TEXT_FREQ_NORM_WEIGHT, 6);
