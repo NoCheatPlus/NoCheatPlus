@@ -79,7 +79,8 @@ public class InventoryData extends ACheckData {
 	public int fastClickLastCursorAmount = 0;
 
     // Data of the instant bow check.
-    public long     instantBowInteract;
+	/** Last time right click interact on bow. A value of 0 means 'invalid'.*/
+    public long     instantBowInteract = 0;
     public long     instantBowShoot;
 
     // Data of the instant eat check.

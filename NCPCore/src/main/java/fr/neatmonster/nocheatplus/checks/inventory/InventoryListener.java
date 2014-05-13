@@ -263,7 +263,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     public void onItemHeldChange(final PlayerItemHeldEvent event){
         final Player player = event.getPlayer();
         final InventoryData data = InventoryData.getData(player);
-        data.instantBowInteract = 0;
+        data.instantBowInteract = Long.MAX_VALUE;
         data.instantEatInteract = 0;
         data.instantEatFood = null;
         
