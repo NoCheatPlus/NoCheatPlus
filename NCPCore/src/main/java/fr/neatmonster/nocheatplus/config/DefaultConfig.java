@@ -16,7 +16,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 670;
+	public static final int buildNumber = 695;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -82,7 +82,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_STRICT, true);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 90);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_GRACE, 2000);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>0 log:fastbreak:3:5:cif cancel");
