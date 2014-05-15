@@ -105,8 +105,12 @@ public class PlayerLocation {
 	 * Gets the location.
 	 * 
 	 * @return the location
+	 * @throws NullPointerException, if the world stored internally is null.
 	 */
 	public Location getLocation() {
+		if (this.world == null) {
+			throw new NullPointerException("World is null.");
+		}
 		return new Location(world, x, y, z);
 	}
 	
@@ -716,6 +720,7 @@ public class PlayerLocation {
 	 *            the location
 	 * @param player
 	 *            the player
+	 * @throws NullPointerException, if player.getLocation.getWorld() returns null.
 	 */
 	public void set(final Location location, final Player player) {
 		set(location, player, 0.001);
@@ -728,6 +733,7 @@ public class PlayerLocation {
 	 *            the location
 	 * @param player
 	 *            the player
+	 * @throws NullPointerException, if Location.getWorld() returns null.
 	 */
 	public void set(final Location location, final Player player, final double yOnGround)
 	{
@@ -758,6 +764,10 @@ public class PlayerLocation {
 
 		// Set world / block access.
 		world = location.getWorld();
+		
+		if (world == null) {
+			throw new NullPointerException("World is null.");
+		}
 
 		// Reset cached values.
 		typeId = typeIdBelow = data = null;
