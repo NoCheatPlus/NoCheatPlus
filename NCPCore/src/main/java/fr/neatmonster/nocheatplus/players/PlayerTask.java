@@ -2,8 +2,6 @@ package fr.neatmonster.nocheatplus.players;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 
 /**
@@ -19,7 +17,7 @@ public class PlayerTask extends OnDemandTickListener {
 	
 	protected boolean updateInventory = false;
 	
-	protected boolean correctDirection = false;
+//	protected boolean correctDirection = false;
 
 	/**
 	 * 
@@ -36,10 +34,10 @@ public class PlayerTask extends OnDemandTickListener {
 		final Player player = DataManager.getPlayer(lcName);
 		if (player != null) {
 			if (player.isOnline()) {
-				if (correctDirection) {
-					final MCAccess access = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
-					access.correctDirection(player);
-				}
+//				if (correctDirection) {
+//					final MCAccess access = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
+//					access.correctDirection(player);
+//				}
 				if (updateInventory) {
 					player.updateInventory();
 				}
@@ -47,7 +45,7 @@ public class PlayerTask extends OnDemandTickListener {
 		}
 		// Reset values (players logging back in should be fine or handled differently).
 		updateInventory = false;
-		correctDirection = false;
+//		correctDirection = false;
 		return false;
 	}
 	
@@ -57,10 +55,10 @@ public class PlayerTask extends OnDemandTickListener {
 		register();
 	}
 	
-	public void correctDirection() {
-		correctDirection = true;
-		register();
-	}
+//	public void correctDirection() {
+//		correctDirection = true;
+//		register();
+//	}
 	
 	// TODO: updateHunger
 

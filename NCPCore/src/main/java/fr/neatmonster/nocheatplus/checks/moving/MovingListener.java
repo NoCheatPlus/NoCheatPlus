@@ -366,11 +366,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final Location to = event.getTo();
 		Location newTo = null;
 		
-		// Check problematic yaw/pitch values.
-		if (LocUtil.needsDirectionCorrection(from.getYaw(), from.getPitch())
-				|| LocUtil.needsDirectionCorrection(to.getYaw(), to.getPitch())) {
-			DataManager.getPlayerData(player).task.correctDirection();
-		}
+//		// Check problematic yaw/pitch values.
+//		if (LocUtil.needsDirectionCorrection(from.getYaw(), from.getPitch())
+//				|| LocUtil.needsDirectionCorrection(to.getYaw(), to.getPitch())) {
+//			DataManager.getPlayerData(player).task.correctDirection();
+//		}
 		
 		// TODO: Check illegal moves here anyway (!).
 		// TODO: Check if vehicle move logs correctly (fake).
@@ -1282,10 +1282,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// Hover.
 		initHover(player, data, cc, data.toWasReset); // isOnGroundOrResetCond
 		
-		// Bad pitch/yaw, just in case.
-		if (LocUtil.needsDirectionCorrection(useLoc.getYaw(), useLoc.getPitch())) {
-			DataManager.getPlayerData(player).task.correctDirection();
-		}
+//		// Bad pitch/yaw, just in case.
+//		if (LocUtil.needsDirectionCorrection(useLoc.getYaw(), useLoc.getPitch())) {
+//			DataManager.getPlayerData(player).task.correctDirection();
+//		}
 	}
 
 	/**

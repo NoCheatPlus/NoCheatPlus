@@ -233,9 +233,9 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		}
 	}
 
-	@Override
-	public void correctDirection(Player player) {
-		// TODO: Consider using reflection (detect CraftPlayer, access EntityPlayer + check if possible (!), use flags for if valid or invalid.)
-	}
+//	@Override
+//	public void correctDirection(Player player) {
+//		// TODO: Consider using reflection (detect CraftPlayer, access EntityPlayer + check if possible (!), use flags for if valid or invalid.)
+//	}
 	
 }

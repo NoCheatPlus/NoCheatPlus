@@ -136,11 +136,11 @@ public interface MCAccess {
 	 */
 	public boolean hasGravity(Material type);
 	
-	/**
-	 * Correct the direction (yaw + pitch). If this can't be done lightly it should just do nothing. Check pitch and yaw before calling, use auxiliary methods from LocUtil.
-	 * @param player
-	 */
-	public void correctDirection(Player player);
+//	/**
+//	 * Correct the direction (yaw + pitch). If this can't be done lightly it should just do nothing. Check pitch and yaw before calling, use auxiliary methods from LocUtil.
+//	 * @param player
+//	 */
+//	public void correctDirection(Player player);
 	
 	
 }

@@ -115,11 +115,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final boolean worldChanged = !worldName.equals(data.lastWorld);
         
         final Location loc =  player.getLocation(useLoc1);
-        // Bad pitch/yaw, just in case.
- 		if (LocUtil.needsDirectionCorrection(useLoc1.getYaw(), useLoc1.getPitch())) {
- 			mcAccess.correctDirection(player);
- 			player.getLocation(useLoc1);
- 		}
+//        // Bad pitch/yaw, just in case.
+// 		if (LocUtil.needsDirectionCorrection(useLoc1.getYaw(), useLoc1.getPitch())) {
+// 			mcAccess.correctDirection(player);
+// 			player.getLocation(useLoc1);
+// 		}
         final Location damagedLoc = damaged.getLocation(useLoc2);
 //        final double targetDist = CheckUtils.distance(loc, targetLoc); // TODO: Calculate distance as is done in fight.reach !
         final double targetMove;
@@ -150,11 +150,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final Player damagedPlayer;
         if (damaged instanceof Player){
         	damagedPlayer = (Player) damaged;
-        	// Bad pitch/yaw, just in case.
-     		if (LocUtil.needsDirectionCorrection(useLoc2.getYaw(), useLoc2.getPitch())) {
-     			mcAccess.correctDirection(damagedPlayer);
-     			damagedPlayer.getLocation(useLoc2);
-     		}
+//        	// Bad pitch/yaw, just in case.
+//     		if (LocUtil.needsDirectionCorrection(useLoc2.getYaw(), useLoc2.getPitch())) {
+//     			mcAccess.correctDirection(damagedPlayer);
+//     			damagedPlayer.getLocation(useLoc2);
+//     		}
      		// Log.
         	if (cc.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
         		damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());

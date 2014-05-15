@@ -18,7 +18,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.moving.LocUtil;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -181,13 +180,13 @@ public class MCAccessCBDev implements MCAccess{
 		return mat.hasGravity();
 	}
 	
-	@Override
-	public void correctDirection(final Player player) {
-		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-		// Main direction.
-		mcPlayer.yaw = LocUtil.correctYaw(mcPlayer.yaw);
-		mcPlayer.pitch = LocUtil.correctPitch(mcPlayer.pitch);
-		// Consider setting the lastYaw here too.
-	}
+//	@Override
+//	public void correctDirection(final Player player) {
+//		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+//		// Main direction.
+//		mcPlayer.yaw = LocUtil.correctYaw(mcPlayer.yaw);
+//		mcPlayer.pitch = LocUtil.correctPitch(mcPlayer.pitch);
+//		// Consider setting the lastYaw here too.
+//	}
 	
 }
