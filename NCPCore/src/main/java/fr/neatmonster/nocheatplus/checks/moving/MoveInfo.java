@@ -13,11 +13,12 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  *
  */
 public class MoveInfo {
+	
+	/** For temporary use. Might need cloning for passing to external API. Only use after calling MoveInfo.set! */
+    public final Location useLoc = new Location(null, 0, 0, 0);
 	public final BlockCache cache;
     public final PlayerLocation from;
     public final PlayerLocation to;
-    /** For temporary use. Might need cloning for passing to external API. */
-    public final Location useLoc = new Location(null, 0, 0, 0);
     
     public MoveInfo(final MCAccess mcAccess){
     	cache = mcAccess.getBlockCache(null);
@@ -26,26 +27,31 @@ public class MoveInfo {
     }
     
     /**
-     * Demands at least setting from.
+     * Initialize from, and if given to. Note that useLoc is left untouched (!).
      * @param player
-     * @param from
-     * @param to
+     * @param from Must not be null.
+     * @param to Can be null.
      * @param yOnGround
      */
     public final void set(final Player player, final Location from, final Location to, final double yOnGround){
+    	this.cache.setAccess(from.getWorld());
         this.from.set(from, player, yOnGround);
-        this.cache.setAccess(from.getWorld());
         this.from.setBlockCache(cache);
         if (to != null){
             this.to.set(to, player, yOnGround);
             this.to.setBlockCache(cache);
         }
-        useLoc.setWorld(null); // Just in case of repeated setting.
+        // Note: using set to reset to by passing null won't work. 
     }
+    
+    /**
+     * Clear caches and remove World references and such. Also resets the world of useLoc.
+     */
     public final void cleanup(){
+    	useLoc.setWorld(null);
         from.cleanup();
         to.cleanup();
         cache.cleanup();
-        useLoc.setWorld(null);
     }
+    
 }

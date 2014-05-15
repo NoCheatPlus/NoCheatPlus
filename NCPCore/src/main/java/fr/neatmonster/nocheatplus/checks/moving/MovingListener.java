@@ -281,13 +281,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				// TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
 				target = LocUtil.clone(loc);
 			}
-			useLoc.setWorld(null);
 			if (sfCheck && cc.sfFallDamage && noFall.isEnabled(player)) {
 				// Check if to deal damage.
 				double y = loc.getY();
 				if (data.hasSetBack()) y = Math.min(y, data.getSetBackY());
 				noFall.checkDamage(player, data, y);
 			}
+			// Cleanup
+			useLoc.setWorld(null);
 			// Teleport.
 			data.prepareSetBack(target); // Should be enough. | new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
 			player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
@@ -418,8 +419,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// TODO: Order this to above "early return"?
         // Set up data / caching.
         final MoveInfo moveInfo;
-        if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
-        else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        if (parkedInfo.isEmpty()) {
+        	moveInfo = new MoveInfo(mcAccess);
+        }
+        else {
+        	moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        }
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
         // TODO: Data resetting above ?
@@ -1123,8 +1128,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         boolean allowReset = true;
         if (!data.noFallSkipAirCheck) {
         	final MoveInfo moveInfo;
-        	if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
-            else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        	if (parkedInfo.isEmpty()) {
+        		moveInfo = new MoveInfo(mcAccess);
+        	}
+            else {
+            	moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+            }
         	moveInfo.set(player, loc, null, cc.noFallyOnGround);
         	// NOTE: No isIllegal check here.
         	final PlayerLocation pLoc = moveInfo.from;
@@ -1150,7 +1159,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	moveInfo.cleanup();
         	parkedInfo.add(moveInfo);
         }
-        useLoc.setWorld(null);
         final float fallDistance = player.getFallDistance();
         final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
@@ -1183,6 +1191,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	}
         }
         // Entity fall-distance should be reset elsewhere.
+        // Cleanup.
+        useLoc.setWorld(null);
     }
     
 	/**
@@ -1468,8 +1478,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			return;
 		}
 		final MoveInfo info;
-		if (parkedInfo.isEmpty()) info = new MoveInfo(mcAccess);
-		else info = parkedInfo.remove(parkedInfo.size() - 1);
+		if (parkedInfo.isEmpty()) {
+			info = new MoveInfo(mcAccess);
+		}
+		else {
+			info = parkedInfo.remove(parkedInfo.size() - 1);
+		}
 		for (final String playerName : hoverTicks) {
 			// TODO: put players into the set (+- one tick would not matter ?)
 			// TODO: might add an online flag to data !
@@ -1546,6 +1560,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		// Check if player is on ground.
 		final Location loc = player.getLocation(useLoc); // useLoc.setWorld(null) is done in onTick.
 		info.set(player, loc, null, cc.yOnGround);
+		// (Could use useLoc of MoveInfo here. Note orderm though.)
 		final boolean res;
 		// TODO: Collect flags, more margin ?
 		final int loaded = info.from.ensureChunksLoaded();

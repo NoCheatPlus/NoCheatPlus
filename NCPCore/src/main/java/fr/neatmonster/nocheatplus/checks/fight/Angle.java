@@ -42,11 +42,14 @@ public class Angle extends Check {
         boolean cancel = false;
 
         // Remove the old locations from the map.
-        for (final long time : new TreeMap<Long, Location>(data.angleHits).navigableKeySet())
-            if (System.currentTimeMillis() - time > 1000L)
-                data.angleHits.remove(time);
+        for (final long time : new TreeMap<Long, Location>(data.angleHits).navigableKeySet()) {
+        	if (System.currentTimeMillis() - time > 1000L) {
+        		data.angleHits.remove(time);
+        	}
+        }
 
         // Add the new location to the map.
+        // TODO: Alter method to store something less fat.
         data.angleHits.put(System.currentTimeMillis(), player.getLocation()); // This needs to be a copy at present.
 
         // Not enough data to calculate deltas.

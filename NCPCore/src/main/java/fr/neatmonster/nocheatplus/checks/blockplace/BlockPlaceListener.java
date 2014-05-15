@@ -134,7 +134,6 @@ public class BlockPlaceListener extends CheckListener {
         if (!cancelled && reach.isEnabled(player) && reach.check(player, block, data, cc)) {
         	cancelled = true;
         }
-        useLoc.setWorld(null);
 
         // Direction check.
         if (!cancelled && direction.isEnabled(player) && direction.check(player, block, blockAgainst, data, cc)) {
@@ -150,6 +149,8 @@ public class BlockPlaceListener extends CheckListener {
         if (cancelled) {
         	event.setCancelled(cancelled);
         }
+        // Cleanup
+        // Reminder(currently unused): useLoc.setWorld(null);
     }
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
