@@ -116,9 +116,11 @@ public class RawConfigFile  extends YamlConfiguration{
     /**
      * Attempt to get a type id from the path somehow, return null if nothing found.<br>
      * Will attempt to interpret strings, will return negative or out of range values.
+     * @deprecated Not used, will be replaced by getMaterial, if needed.
      * @param path
      * @return
      */
+    @Deprecated
     public Integer getTypeId(final String path){
         return getTypeId(path, null);
     }
@@ -126,10 +128,12 @@ public class RawConfigFile  extends YamlConfiguration{
     /**
      * Attempt to get a type id from the path somehow, return preset if nothing found.<br>
      * Will attempt to interpret strings, will return negative or out of range values.
+     * @deprecated Not used, will be replaced by getMaterial, if needed.
      * @param path
      * @param preset
      * @return
      */
+    @Deprecated
     public Integer getTypeId(final String path, final Integer preset){
         String content = getString(path, null);
         if (content != null){
