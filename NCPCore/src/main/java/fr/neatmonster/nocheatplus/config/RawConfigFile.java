@@ -12,21 +12,47 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 public class RawConfigFile  extends YamlConfiguration{
 	
+	private static String prepareMatchMaterial(String content) {
+		return content.replace(' ', '_').replace('-', '_').replace('.', '_');
+	}
+	
     /**
      * Attempt to get an int id from a string.<br>
      * Will return out of range numbers, attempts to parse materials.
      * @param content
      * @return
      */
-    public static Integer parseTypeId(String content) {
+    @SuppressWarnings("deprecation")
+	public static Integer parseTypeId(String content) {
         content = content.trim().toUpperCase();
         try{
             return Integer.parseInt(content);
         }
         catch(NumberFormatException e){}
         try{
-            Material mat = Material.matchMaterial(content.replace(' ', '_').replace('-', '_').replace('.', '_'));
+            Material mat = Material.matchMaterial(prepareMatchMaterial(content));
             if (mat != null) return mat.getId();
+        }
+        catch (Exception e) {}
+        return null;
+    }
+    
+    /**
+     * Attempt to get a Material from a string.<br>
+     * Will attempt to match the name but also type ids. 
+     * @param content
+     * @return
+     */
+    @SuppressWarnings("deprecation")
+	public static Material parseMaterial(String content) {
+        content = content.trim().toUpperCase();
+        try{
+            Integer id = Integer.parseInt(content);
+			return Material.getMaterial(id);
+        }
+        catch(NumberFormatException e){}
+        try{
+            return Material.matchMaterial(prepareMatchMaterial(content));
         }
         catch (Exception e) {}
         return null;
@@ -119,7 +145,7 @@ public class RawConfigFile  extends YamlConfiguration{
      * @param path
      * @param target Collection to fill ids into.
      */
-	public void readMaterialFromList(final String path, final Collection<Integer> target) {
+	public void readMaterialIdsFromList(final String path, final Collection<Integer> target) {
 		final List<String> content = getStringList(path);
 		if (content == null || content.isEmpty()) return;
 		for (final String entry : content){
@@ -129,6 +155,25 @@ public class RawConfigFile  extends YamlConfiguration{
 			}
 			else{
 				target.add(id);
+			}
+		}
+	}
+	
+	/**
+     * Outputs warnings to console.
+     * @param path
+     * @param target Collection to fill materials into.
+     */
+	public void readMaterialFromList(final String path, final Collection<Material> target) {
+		final List<String> content = getStringList(path);
+		if (content == null || content.isEmpty()) return;
+		for (final String entry : content){
+			final Material mat = parseMaterial(entry);
+			if (mat == null){
+				LogUtil.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+			}
+			else{
+				target.add(mat);
 			}
 		}
 	}

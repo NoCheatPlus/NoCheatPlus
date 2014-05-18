@@ -111,7 +111,7 @@ public class InventoryConfig extends ACheckConfig {
 		fastConsumeCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCONSUME_CHECK);
 		fastConsumeDuration = (long) (1000.0 * data.getDouble(ConfPaths.INVENTORY_FASTCONSUME_DURATION));
 		fastConsumeWhitelist = data.getBoolean(ConfPaths.INVENTORY_FASTCONSUME_WHITELIST);
-		data.readMaterialFromList(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, fastConsumeItems);
+		data.readMaterialIdsFromList(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, fastConsumeItems);
 		fastConsumeActions = data.getOptimizedActionList(ConfPaths.INVENTORY_FASTCONSUME_ACTIONS, Permissions.INVENTORY_FASTCONSUME);
 
 		instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);
