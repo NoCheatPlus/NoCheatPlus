@@ -125,7 +125,7 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // No swing check (player doesn't swing their arm when placing a lily pad).
-        if (!cancelled && placedMat != Material.WATER_LILY && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
+        if (!cancelled && !cc.noSwingExceptions.contains(placedMat) && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
         	// Consider skipping all insta placables or using simplified version (true or true within time frame).
         	cancelled = true;
         }

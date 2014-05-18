@@ -1,8 +1,11 @@
 package fr.neatmonster.nocheatplus.checks.blockplace;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
@@ -69,6 +72,7 @@ public class BlockPlaceConfig extends ACheckConfig {
     public final ActionList fastPlaceActions;
 
     public final boolean    noSwingCheck;
+    public final Set<Material> noSwingExceptions = new HashSet<Material>();
     public final ActionList noSwingActions;
 
     public final boolean    reachCheck;
@@ -104,6 +108,7 @@ public class BlockPlaceConfig extends ACheckConfig {
         fastPlaceActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_FASTPLACE_ACTIONS, Permissions.BLOCKPLACE_FASTPLACE);
 
         noSwingCheck = data.getBoolean(ConfPaths.BLOCKPLACE_NOSWING_CHECK);
+        data.readMaterialFromList(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, noSwingExceptions);
         noSwingActions = data.getOptimizedActionList(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, Permissions.BLOCKPLACE_NOSWING);
 
         reachCheck = data.getBoolean(ConfPaths.BLOCKPLACE_REACH_CHECK);

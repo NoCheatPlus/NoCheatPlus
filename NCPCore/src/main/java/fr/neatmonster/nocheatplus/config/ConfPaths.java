@@ -201,6 +201,7 @@ public abstract class ConfPaths {
 
     private static final String BLOCKPLACE_NOSWING                       = BLOCKPLACE + "noswing.";
     public static final String  BLOCKPLACE_NOSWING_CHECK                 = BLOCKPLACE_NOSWING + "active";
+    public static final String  BLOCKPLACE_NOSWING_EXCEPTIONS			 = BLOCKPLACE_NOSWING + "exceptions";
     public static final String  BLOCKPLACE_NOSWING_ACTIONS               = BLOCKPLACE_NOSWING + "actions";
 
     private static final String BLOCKPLACE_REACH                         = BLOCKPLACE + "reach.";

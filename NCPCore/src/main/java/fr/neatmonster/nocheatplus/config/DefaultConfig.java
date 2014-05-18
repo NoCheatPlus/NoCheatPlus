@@ -138,6 +138,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
 
         set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, Arrays.asList(Material.WATER_LILY.toString(), Material.FLINT_AND_STEEL.toString()));
         set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel");
 
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, true);
