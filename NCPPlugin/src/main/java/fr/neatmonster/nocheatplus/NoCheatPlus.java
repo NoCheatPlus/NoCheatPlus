@@ -655,8 +655,12 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 			changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
 		}
 		// Add to changes history for undoing.
-		if (this.changedCommands == null) this.changedCommands = changedCommands;
-		else this.changedCommands.addAll(changedCommands);
+		if (this.changedCommands == null) {
+			this.changedCommands = changedCommands;
+		}
+		else {
+			this.changedCommands.addAll(changedCommands);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -665,8 +669,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	@Override
 	public void onLoad() {
 		NCPAPIProvider.setNoCheatPlusAPI(this);
-		// TODO: Can not set to null in onDisable...
-		super.onLoad(); // TODO: Check what this does / order.
 	}
 
 	/* (non-Javadoc)
@@ -888,7 +890,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		initBlockProperties(config);
 		// Reset Command protection.
 		undoCommandChanges();
-		if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) setupCommandProtection();
+		if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
+			setupCommandProtection();
+		}
 		// (Re-) schedule consistency checking.
 		scheduleConsistencyCheckers();
 		// Cache some things.
