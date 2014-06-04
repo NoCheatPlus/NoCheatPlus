@@ -142,6 +142,7 @@ public class PermissionUtil {
 			}
 			// Create change history entry.
 			if (cmdHadPerm) {
+				// TODO: Find (local?) cause of NullPointerException...
 				changed.add(new CommandProtectionEntry(command, lcLabel, cmdPermName, cmdPerm.getDefault(), command.getPermissionMessage()));
 			}
 			else {
