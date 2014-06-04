@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
@@ -26,7 +27,7 @@ public class WrongBlock extends Check {
 	 * @param isInstaBreak 
 	 * @return
 	 */
-	public boolean check(final Player player, final Block block, final BlockBreakConfig cc, final BlockBreakData data, final boolean isInstaBreak) {
+	public boolean check(final Player player, final Block block, final BlockBreakConfig cc, final BlockBreakData data, final AlmostBoolean isInstaBreak) {
         
         boolean cancel = false;
         
@@ -34,6 +35,7 @@ public class WrongBlock extends Check {
         final int dist = Math.min(4, data.clickedX == Integer.MAX_VALUE ? 100 : TrigUtil.manhattan(data.clickedX, data.clickedY, data.clickedZ, block));
         final boolean wrongBlock;
         final long now = System.currentTimeMillis();
+        // TODO: Remove isInstaBreak argument or use it.
         if (dist == 0) {
         	if (wrongTime) {
         		data.fastBreakBreakTime = now;

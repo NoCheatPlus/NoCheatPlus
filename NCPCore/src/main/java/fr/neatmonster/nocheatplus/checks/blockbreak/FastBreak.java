@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PotionUtil;
@@ -40,7 +41,7 @@ public class FastBreak extends Check {
      * @param elaspedTime
      * @return true, if successful
      */
-    public boolean check(final Player player, final Block block, final boolean isInstaBreak, final BlockBreakConfig cc, final BlockBreakData data) {
+    public boolean check(final Player player, final Block block, final AlmostBoolean isInstaBreak, final BlockBreakConfig cc, final BlockBreakData data) {
     	final long now = System.currentTimeMillis();
         boolean cancel = false;
         
@@ -65,11 +66,12 @@ public class FastBreak extends Check {
         }
           
         // Check if the time used time is lower than expected.
-//        if (isInstaBreak){
-//        	// Ignore those for now.
-//        }
-//        else 
-        if (elapsedTime < 0){
+        if (isInstaBreak.decideOptimistically()){
+        	// Ignore those for now.
+        	// TODO: Find out why this was commented out long ago a) did not fix mcMMO b) exploits.
+        	// TODO: Maybe adjust time to min(time, SOMETHING) for MAYBE/YES.
+        }
+        else if (elapsedTime < 0){
         	// Ignore it. TODO: ?
         }
         else if (elapsedTime + cc.fastBreakDelay < breakingTime){
@@ -114,7 +116,7 @@ public class FastBreak extends Check {
         	final ItemStack stack = player.getItemInHand();
         	final boolean isValidTool = BlockProperties.isValidTool(blockId, stack);
         	final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
-        	String msg = (isInstaBreak ? "[Insta]" : "[Normal]") + "[" + blockId + "] "+ elapsedTime + "u / " + breakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (haste == Double.NEGATIVE_INFINITY ? "" : " haste=" + ((int) haste + 1));
+        	String msg = (isInstaBreak.decideOptimistically() ? ("[Insta=" + isInstaBreak + "]") : "[Normal]") + "[" + blockId + "] "+ elapsedTime + "u / " + breakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (haste == Double.NEGATIVE_INFINITY ? "" : " haste=" + ((int) haste + 1));
         	player.sendMessage(msg);
 //        	net.minecraft.server.Item mcItem = net.minecraft.server.Item.byId[stack.getTypeId()];
 //        	if (mcItem != null){

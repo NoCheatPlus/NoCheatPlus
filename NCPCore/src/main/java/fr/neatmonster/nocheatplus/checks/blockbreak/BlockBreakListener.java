@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -48,7 +49,7 @@ public class BlockBreakListener extends CheckListener {
     /** The wrong block check. */
     private final WrongBlock wrongBlock = addCheck(new WrongBlock());
     
-    private boolean isInstaBreak = false;
+    private AlmostBoolean isInstaBreak = AlmostBoolean.NO;
     
     public BlockBreakListener(){
     	super(CheckType.BLOCKBREAK);
@@ -73,7 +74,7 @@ public class BlockBreakListener extends CheckListener {
         
     	// Cancelled events only leads to resetting insta break.
     	if (event.isCancelled()) {
-    		isInstaBreak = false;
+    		isInstaBreak = AlmostBoolean.NO;
     		return;
     	}
     	
@@ -142,7 +143,7 @@ public class BlockBreakListener extends CheckListener {
 //        	data.clickedX = Integer.MAX_VALUE;
         }
         
-        if (isInstaBreak) {
+        if (isInstaBreak.decideOptimistically()) {
         	data.wasInstaBreak = now;
         }
         else {
@@ -152,7 +153,7 @@ public class BlockBreakListener extends CheckListener {
         // Adjust data.
         data.fastBreakBreakTime = now;
 //        data.fastBreakfirstDamage = now;
-        isInstaBreak = false;
+        isInstaBreak = AlmostBoolean.NO;
     }
 
     /**
@@ -185,18 +186,32 @@ public class BlockBreakListener extends CheckListener {
     	
     	// Return if it is not left clicking a block. 
     	// (Allows right click to be ignored.)
-    	isInstaBreak = false;
-        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+    	isInstaBreak = AlmostBoolean.NO;
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK) {
+        	return;
+        }
         checkBlockDamage(event.getPlayer(), event.getClickedBlock(), event);
-        
     }
     
-    @EventHandler(
-    		ignoreCancelled = false, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    public void onBlockDamageLowest(final BlockDamageEvent event) {
+    	if (event.getInstaBreak()) {
+    		// Indicate that this might have been set by CB/MC.
+    		isInstaBreak = AlmostBoolean.MAYBE;
+    	}
+    }
+    
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.MONITOR)
     public void onBlockDamage(final BlockDamageEvent event) {
-//    	System.out.println("Damage("+event.isCancelled()+"): " + event.getBlock());
-    	if (!event.isCancelled() && event.getInstaBreak()) isInstaBreak = true;
-    	else isInstaBreak = false;
+    	if (!event.isCancelled() && event.getInstaBreak()) {
+    		// Keep MAYBE.
+    		if (isInstaBreak != AlmostBoolean.MAYBE) {
+    			isInstaBreak = AlmostBoolean.YES;
+    		}
+    	}
+    	else {
+    		isInstaBreak = AlmostBoolean.NO;
+    	}
     	checkBlockDamage(event.getPlayer(), event.getBlock(), event);
     }
     
