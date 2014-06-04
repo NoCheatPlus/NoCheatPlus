@@ -1,21 +1,38 @@
 package fr.neatmonster.nocheatplus.compat;
 
+/**
+ * Some tri-state with booleans in mind.
+ * @author mc_dev
+ *
+ */
 public enum AlmostBoolean{
-	YES(true),
-	NO(false),
-	MAYBE(false);
-
+	YES,
+	NO,
+	MAYBE;
+	
+	/**
+	 * "Match" a boolean.
+	 * @param value
+	 * @return
+	 */
 	public static final AlmostBoolean match(final boolean value) {
 		return value ? YES : NO;
 	}
-
-	private final boolean decision;
 	
-	private AlmostBoolean(final boolean decision){
-		this.decision = decision;
-	}
-	
+	/**
+	 * Pessimistic interpretation: true iff YES.
+	 * @return
+	 */
 	public boolean decide(){
-		return decision;
+		return this == YES;
 	}
+	
+	/**
+	 * Optimistic interpretation: true iff not NO.
+	 * @return
+	 */
+	public boolean decideOptimistically() {
+		return this != NO;
+	}
+	
 }
