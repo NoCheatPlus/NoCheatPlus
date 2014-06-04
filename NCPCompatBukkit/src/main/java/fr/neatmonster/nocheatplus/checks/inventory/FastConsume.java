@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,6 +13,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -44,7 +46,14 @@ public class FastConsume extends Check implements Listener{
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onItemConsume(final PlayerItemConsumeEvent event){
 		final Player player = event.getPlayer();
-		if (!isEnabled(player)) return;
+		if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+    		// Eat after death.
+    		event.setCancelled(true);
+    		return;
+    	}
+		if (!isEnabled(player)) {
+			return;
+		}
 		final InventoryData data = InventoryData.getData(player);
 		if (check(player, event.getItem(), data)){
 			event.setCancelled(true);

@@ -533,6 +533,11 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	final Entity entity = event.getEntity();
     	if (!(entity instanceof Player)) return;
     	final Player player = (Player) entity;
+    	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+    		// Heal after death.
+    		event.setCancelled(true);
+    		return;
+    	}
     	if (event.getRegainReason() != RegainReason.SATIATED) {
     		return;
     	}

@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 
 import fr.neatmonster.nocheatplus.command.BaseCommand;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
@@ -53,7 +54,7 @@ public class InspectCommand extends BaseCommand {
 				builder.append(" (" + (player.isOnline() ? "online" : "offline") + (player.isDead() ? ",dead" : "") + (player.isValid() ? "" : ",invalid") + (player.isInsideVehicle() ? (",vehicle=" + player.getVehicle().getType() + "@" + locString(player.getVehicle().getLocation())) : "")+ "):");
 				// TODO: isValid, isDead,  isInsideVehicle ...
 				// Health.
-				builder.append(" health=" + f1.format(player.getHealth()) + "/" + f1.format(player.getMaxHealth()));
+				builder.append(" health=" + f1.format(BridgeHealth.getHealth(player)) + "/" + f1.format(BridgeHealth.getMaxHealth(player)));
 				// Food.
 				builder.append(" food=" + player.getFoodLevel());
 				// Exp.

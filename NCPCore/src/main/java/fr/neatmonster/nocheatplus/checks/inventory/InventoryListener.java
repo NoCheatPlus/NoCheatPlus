@@ -29,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
@@ -109,6 +110,10 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
             if (instantEat.isEnabled(player) && instantEat.check(player, event.getFoodLevel())){
+            	event.setCancelled(true);
+            }
+            else if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+            	// Eat after death.
             	event.setCancelled(true);
             }
         }
@@ -253,6 +258,11 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     public final void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
     	final Player player = event.getPlayer();
     	if (player.getGameMode() == GameMode.CREATIVE) return;
+    	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+    		// No zombies.
+    		event.setCancelled(true);
+    		return;
+    	}
     	final ItemStack stack = player.getItemInHand();
     	if (stack != null && stack.getTypeId() == Material.MONSTER_EGG.getId() && items.isEnabled(player)){
     		event.setCancelled(true);

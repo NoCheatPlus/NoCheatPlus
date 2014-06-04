@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /**
@@ -52,6 +53,15 @@ public class BlockInteractListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
+    	final Player player = event.getPlayer();
+    	// Cancel interact events for dead players.
+    	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+    		// Auto-soup after death.
+    		event.setUseInteractedBlock(Result.DENY);
+    		event.setUseItemInHand(Result.DENY);
+    		event.setCancelled(true);
+    		return;
+    	}
     	
     	// TODO: Re-arrange for interact spam, possibly move ender pearl stuff to a method.
     	final Action action = event.getAction();
@@ -60,7 +70,7 @@ public class BlockInteractListener extends CheckListener {
         if (block == null){
         	return;
         }
-    	final Player player = event.getPlayer();
+    	
     	final BlockInteractData data = BlockInteractData.getData(player);
     	data.setLastBlock(block, action);
         switch(action){
