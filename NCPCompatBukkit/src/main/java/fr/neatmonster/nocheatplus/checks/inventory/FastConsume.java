@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.Event.Result;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -55,24 +54,26 @@ public class FastConsume extends Check implements Listener{
 			return;
 		}
 		final InventoryData data = InventoryData.getData(player);
-		if (check(player, event.getItem(), data)){
+		final long time = System.currentTimeMillis();
+		if (check(player, event.getItem(), time, data)){
 			event.setCancelled(true);
 			DataManager.getPlayerData(player.getName(), true).task.updateInventory();
 		}
-		data.instantEatInteract = 0;
+		data.instantEatInteract = time;
 		data.instantEatFood = null;
 	}
 	
-	private boolean check(final Player player, final ItemStack stack, final InventoryData data){
+	private boolean check(final Player player, final ItemStack stack, final long time, final InventoryData data){
 		// Uses the instant-eat data for convenience.
 		// Consistency checks...
 		if (stack == null){ // || stack.getType() != data.instantEatFood){
 			// TODO: Strict version should prevent other material (?).
 			return false;
 		}
-		final long time = System.currentTimeMillis();
-		final long ref = Math.max(data.instantEatInteract, data.lastClickTime);
+		final long ref = data.instantEatInteract == 0 ? 0 : Math.max(data.instantEatInteract, data.lastClickTime);
 		if (time < ref){
+			// Time ran backwards.
+			data.instantEatInteract = data.lastClickTime = time;
 			return false;
 		}
 		// Check exceptions.

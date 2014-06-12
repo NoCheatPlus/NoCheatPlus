@@ -47,7 +47,7 @@ public class InstantBow extends Check {
         if (cc.instantBowStrict) {
         	// The interact time is invalid, if set to 0.
         	valid = data.instantBowInteract != 0; 
-        	pullDuration = valid ? (now - data.instantBowInteract) : 0L; 
+        	pullDuration = valid ? (now - data.instantBowInteract) : 0L;
         } else {
         	valid = true;
         	pullDuration = now - data.instantBowShoot;
