@@ -223,7 +223,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
 				&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
 				&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
-				&& (canJumpOffTop(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
+				&& (canJumpOffTop(mat) || BlockProperties.isLiquid(mat))) {
 			// The creative fly and/or survival fly check is enabled, the
 			// block was placed below the player and is
 			// solid, so do what we have to do.
@@ -238,9 +238,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param id
      * @return
      */
-	private static boolean canJumpOffTop(final int id) {
+	private static boolean canJumpOffTop(final Material blockType) {
 		// TODO: Test if this can be removed!
-		return BlockProperties.isGround(id) || BlockProperties.isSolid(id);
+		return BlockProperties.isGround(blockType) || BlockProperties.isSolid(blockType);
 	}
 
     /**
@@ -1415,7 +1415,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	}
     	
     	// Adjust loc if in liquid (meant for boats !?).
-    	if (BlockProperties.isLiquid(loc.getBlock().getTypeId())) {
+    	if (BlockProperties.isLiquid(loc.getBlock().getType())) {
     		loc.setY(Location.locToBlock(loc.getY()) + 1.25);
     	}
     	

@@ -5,7 +5,8 @@ package fr.neatmonster.nocheatplus.actions;
  */
 public enum ParameterName {
 	// TODO: Cleanup for some kind of policies: useful names, alternative names, prefer generic names.
-    BLOCK_ID("blockid"), // TODO: Block name ?
+    BLOCK_ID("blockid"),
+    BLOCK_TYPE("blocktype"),
     CHECK("check"),
     TAGS("tags"),
     DISTANCE("distance"),

@@ -81,11 +81,11 @@ public class FastConsume extends Check implements Listener{
 		final Material mat = stack == null ? null : stack.getType();
 		if (mat != null){
 			if (cc.fastConsumeWhitelist){
-				if (!cc.fastConsumeItems.contains(mat.getId())){
+				if (!cc.fastConsumeItems.contains(mat)){
 					return false;
 				}
 			}
-			else if (cc.fastConsumeItems.contains(mat.getId())){
+			else if (cc.fastConsumeItems.contains(mat)){
 				return false;
 			}
 		}

@@ -878,6 +878,16 @@ public class BlockProperties {
 	
 	/**
 	 * Convenience method.
+	 * @param blockType
+	 * @param player
+	 * @return
+	 */
+	public static long getBreakingDuration(final Material BlockType, final Player player){
+		return getBreakingDuration(BlockType.getId(), player);
+	}
+	
+	/**
+	 * Convenience method.
 	 * @param blockId
 	 * @param player
 	 * @return
@@ -1148,8 +1158,11 @@ public class BlockProperties {
 		if (blockId < 0 || blockId >= blocks.length) throw new IllegalArgumentException("The blockId is outside of supported range: " + blockId);
 		blocks[blockId] = blockProps;
 	}
-
-
+	
+	public static boolean isValidTool(final Material blockType, final ItemStack itemInHand) {
+		return isValidTool(blockType.getId(), itemInHand);
+	}
+	
 	public static boolean isValidTool(final int blockId, final ItemStack itemInHand) {
 		final BlockProps blockProps = getBlockProps(blockId);
 		final ToolProps toolProps = getToolProps(itemInHand);
@@ -1217,6 +1230,15 @@ public class BlockProperties {
 		pLoc.cleanup();
 		return res;
 	}
+	
+	/**
+	 * Straw-man-method to hide warnings. Rather intended for display in debug/alert messages.
+	 * @param blockType
+	 * @return
+	 */
+	public static int getId(final Material blockType) {
+		return blockType.getId();
+	}
 
 	/**
 	 * @deprecated Typo in method name.
@@ -1227,8 +1249,16 @@ public class BlockProperties {
 		return blockFlags[id];
 	}
 	
+	public static final long getBlockFlags(final Material blockType){
+		return getBlockFlags(blockType.getId());
+	}
+	
 	public static final long getBlockFlags(final int id){
 		return blockFlags[id];
+	}
+	
+	public static final void setBlockFlags(final Material blockType, final long flags){
+		setBlockFlags(blockType.getId(), flags);
 	}
 
 	public static final void setBlockFlags(final int id, final long flags){
@@ -1262,8 +1292,11 @@ public class BlockProperties {
 	public static final boolean isStairs(final int id) {
 		return (blockFlags[id] & F_STAIRS) != 0;
 	}
-
-
+	
+	public static final boolean isLiquid(final Material blockType) {
+		return isLiquid(blockType.getId());
+	}
+	
 	public static final boolean isLiquid(final int id) {
 		return (blockFlags[id] & F_LIQUID) != 0;
 	}
@@ -1278,11 +1311,29 @@ public class BlockProperties {
 	
 	/**
 	 * Might hold true for liquids too.
+	 * @param blockType
+	 * @return
+	 */
+	public static final boolean isSolid(final Material blockType){
+		return isSolid(blockType.getId());
+	}
+	
+	/**
+	 * Might hold true for liquids too.
 	 * @param id
 	 * @return
 	 */
 	public static final boolean isSolid(final int id){
 		return (blockFlags[id] & F_SOLID) != 0;
+	}
+	
+	/**
+	 * Might hold true for liquids too.
+	 * @param blockType
+	 * @return
+	 */
+	public static final boolean isGround(final Material blockType){
+		return isGround(blockType.getId());
 	}
 	
 	/**
@@ -1292,6 +1343,16 @@ public class BlockProperties {
      */
     public static final boolean isGround(final int id){
         return (blockFlags[id] & F_GROUND) != 0;
+    }
+    
+    /**
+     * Just check if a position is not inside of a block that has a bounding box.<br>
+	 * This is an inaccurate check, it also returns false for doors etc.
+     * @param blockType
+     * @return
+     */
+    public static final boolean isPassable(final Material blockType){
+    	return isPassable(blockType.getId());
     }
 	
 	/**

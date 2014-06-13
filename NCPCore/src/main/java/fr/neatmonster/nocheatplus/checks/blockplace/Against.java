@@ -9,7 +9,6 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -29,8 +28,8 @@ public class Against extends Check {
 		boolean violation = false;
 		// TODO: Make more precise (workarounds like WATER_LILY, general points).
 		// Workaround for signs on cactus and similar.
-        final int againstId = blockAgainst.getTypeId();
-        if (againstId == Material.AIR.getId()) {
+        final Material againstType = blockAgainst.getType();
+        if (againstType == null || againstType == Material.AIR) {
         	// Attempt to workaround blocks like cactus.
         	final BlockInteractData bdata = BlockInteractData.getData(player);
         	if (bdata.lastType != null && bdata.lastX != Integer.MAX_VALUE && TickTask.getTick() == bdata.lastTick && TrigUtil.manhattan(bdata.lastX, bdata.lastY, bdata.lastZ, blockAgainst) == 0) {
@@ -41,19 +40,20 @@ public class Against extends Check {
         		return false;
         	}
         }
-        if (BlockProperties.isLiquid(againstId)) {
-            if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getTypeId()))) {
+        if (BlockProperties.isLiquid(againstType)) {
+            if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))) {
             	violation = true;
             }
         }
-        else if (againstId == Material.AIR.getId()) {
+        else if (againstType == Material.AIR) {
         	violation = true;
         }
         // Handle violation and return.
 		if (violation) {
 			data.againstVL += 1.0;
 			final ViolationData vd = new ViolationData(this, player, data.againstVL, 1, cc.againstActions);
-			vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(placedMat.getId()));
+			vd.setParameter(ParameterName.BLOCK_TYPE, placedMat.toString());
+			vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(BlockProperties.getId(placedMat)));
 			return executeActions(vd);
 		} else {
 			data.againstVL *=  0.99; // Assume one false positive every 100 blocks.

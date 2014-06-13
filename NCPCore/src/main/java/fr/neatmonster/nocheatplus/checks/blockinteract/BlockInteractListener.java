@@ -78,8 +78,8 @@ public class BlockInteractListener extends CheckListener {
         	break;
         case RIGHT_CLICK_BLOCK:
         	final ItemStack stack = player.getItemInHand();
-    		if (stack != null && stack.getTypeId() == Material.ENDER_PEARL.getId()){
-    			if (!BlockProperties.isPassable(block.getTypeId())){
+    		if (stack != null && stack.getType() == Material.ENDER_PEARL){
+    			if (!BlockProperties.isPassable(block.getType())){
     				final CombinedConfig ccc = CombinedConfig.getConfig(player);
     				if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock){
     					event.setUseItemInHand(Result.DENY);

@@ -171,42 +171,43 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		// TODO: Might try stuff like setNoDamageTicks.
 		BridgeHealth.damage(player, 1.0);
 	}
-
-	@SuppressWarnings("deprecation")
+	
 	@Override
 	public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
 		// Note deprecation suppression: These ids should be unique for a server run, that should be ok for setting up generic properties.
 		// TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
-		final Set<Integer> fullBlocks = new HashSet<Integer>();
+		final Set<Material> fullBlocks = new HashSet<Material>();
 		for (final Material mat : new Material[]{
 				// TODO: Ice !? / Packed ice !?
 				Material.GLASS, Material.GLOWSTONE, Material.ICE, Material.LEAVES,
 				Material.COMMAND, Material.BEACON,
 				Material.PISTON_BASE,
 		}) {
-			fullBlocks.add(mat.getId());
+			fullBlocks.add(mat);
 		}
 		for (final Material mat : Material.values()) {
-			if (!mat.isBlock()) continue;
-			final int id = mat.getId();
-			if (id < 0 || id >= 4096 || fullBlocks.contains(id)) continue;
+			if (!mat.isBlock()) {
+				continue;
+			}
+			if (fullBlocks.contains(mat)) {
+				continue;
+			}
 			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()) {
 				// Uncertain bounding-box, allow passing through.
 				long flags = BlockProperties.F_IGN_PASSABLE;
-				if ((BlockProperties.isSolid(id) || BlockProperties.isGround(id)) && !BlockProperties.isLiquid(id)) {
+				if ((BlockProperties.isSolid(mat) || BlockProperties.isGround(mat)) && !BlockProperties.isLiquid(mat)) {
 					// Block can be ground, so allow standing on any height.
 					flags |= BlockProperties.F_GROUND_HEIGHT;
 				}
-				BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
+				BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
 			}
 		}
 		// Blocks that are reported to be full and solid, but which are not.
 		for (final Material mat : new Material[]{
 				Material.ENDER_PORTAL_FRAME,
 		}) {
-			final int id = mat.getId();
 			final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
-			BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
+			BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
 		}
 	}
 

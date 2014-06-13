@@ -31,7 +31,9 @@ public class RawConfigFile  extends YamlConfiguration{
         catch(NumberFormatException e){}
         try{
             Material mat = Material.matchMaterial(prepareMatchMaterial(content));
-            if (mat != null) return mat.getId();
+            if (mat != null) {
+            	return mat.getId();
+            }
         }
         catch (Exception e) {}
         return null;

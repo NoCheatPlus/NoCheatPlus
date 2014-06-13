@@ -152,8 +152,6 @@ public class SurvivalFly extends Check {
         // Mixed checks (lost ground).
         /////////////////////////////////
 		
-//		data.stats.addStats(data.stats.getId("sfCheck", true), 1);
-		
 		
 		// "Lost ground" workaround.
 		if (fromOnGround || from.isResetCond()) {
@@ -165,7 +163,6 @@ public class SurvivalFly extends Check {
 			// TODO: Consider if (!resetTo) ?
 			// Check lost-ground workarounds.
 			resetFrom = lostGround(player, from, to, hDistance, yDistance, sprinting, data, cc);
-//			data.stats.addStats(data.stats.getId("sfLostGround", true), resetFrom ? 1 : 0);
 			// Note: if not setting resetFrom, other places have to check assumeGround...
 		}
 		
@@ -1094,7 +1091,6 @@ public class SurvivalFly extends Check {
 			if (data.sfLastYDist < 0.0 || from.isOnGround(0.5 - Math.abs(yDistance))) {
 				return applyLostGround(player, from, true, data, "step");
 			}
-//			else data.stats.addStats(data.stats.getId("sfLostGround_" + "step", true), 0);
 		}
 		
 		// Interpolation check.
@@ -1123,7 +1119,6 @@ public class SurvivalFly extends Check {
 					if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
 						return applyLostGround(player, from, true, data, "interpolate");
 					}
-//					else data.stats.addStats(data.stats.getId("sfLostGround_" + "interpolate", true), 0);
 				}
 			}
 		}
@@ -1163,7 +1158,6 @@ public class SurvivalFly extends Check {
 					// Temporary "fix".
 					return applyLostGround(player, from, true, data, "pyramid");
 				}
-//				else data.stats.addStats(data.stats.getId("sfLostGround_" + "pyramid", true), 0);
 			}
 			
 			// Check for jumping up strange blocks like flower pots on top of other blocks.
@@ -1173,7 +1167,6 @@ public class SurvivalFly extends Check {
 					// Temporary "fix".
 					return applyLostGround(player, from, true, data, "ministep");
 				}
-//				else data.stats.addStats(data.stats.getId("sfLostGround_" + "ministep", true), 0);
 			}
 		}
 		// Lost ground while falling onto/over edges of blocks.
@@ -1185,7 +1178,6 @@ public class SurvivalFly extends Check {
 			if (from.isOnGround(0.5, 0.2, 0) || to.isOnGround(0.5, Math.min(0.2, 0.01 + hDistance), Math.min(0.1, 0.01 + -yDistance))) {
 				return applyLostGround(player, from, true, data, "edge");
 			}
-//			else data.stats.addStats(data.stats.getId("sfLostGround_" + "edge", true), 0);
 		}
 		
 		// Nothing found.
@@ -1220,7 +1212,6 @@ public class SurvivalFly extends Check {
 				// (Usually yDistance should be -0.078)
 				return applyLostGround(player, from, true, data, "fastedge");
 			}
-//			else data.stats.addStats(data.stats.getId("sfLostGround_" + "fastedge", true), 0);
 		}
 		return false;
 	}
@@ -1253,7 +1244,6 @@ public class SurvivalFly extends Check {
 		// Tell NoFall that we assume the player to have been on ground somehow.
 		data.noFallAssumeGround = true;
 		tags.add("lostground_" + tag);
-//		data.stats.addStats(data.stats.getId("sfLostGround_" + tag, true), 1);
 		return true;
 	}
 

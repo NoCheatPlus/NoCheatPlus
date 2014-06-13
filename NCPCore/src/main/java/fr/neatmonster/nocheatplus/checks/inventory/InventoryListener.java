@@ -271,7 +271,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     		return;
     	}
     	final ItemStack stack = player.getItemInHand();
-    	if (stack != null && stack.getTypeId() == Material.MONSTER_EGG.getId() && items.isEnabled(player)){
+    	if (stack != null && stack.getType() == Material.MONSTER_EGG && items.isEnabled(player)){
     		event.setCancelled(true);
     	}
     }

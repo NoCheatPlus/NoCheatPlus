@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
@@ -71,7 +72,7 @@ public class InventoryConfig extends ACheckConfig {
 	public final boolean    fastConsumeCheck;
 	public final long		fastConsumeDuration;
 	public final boolean    fastConsumeWhitelist;
-	public final Set<Integer> fastConsumeItems = new HashSet<Integer>();
+	public final Set<Material> fastConsumeItems = new HashSet<Material>();
 	public final ActionList fastConsumeActions;
 
 	public final boolean    instantBowCheck;
@@ -111,7 +112,7 @@ public class InventoryConfig extends ACheckConfig {
 		fastConsumeCheck = data.getBoolean(ConfPaths.INVENTORY_FASTCONSUME_CHECK);
 		fastConsumeDuration = (long) (1000.0 * data.getDouble(ConfPaths.INVENTORY_FASTCONSUME_DURATION));
 		fastConsumeWhitelist = data.getBoolean(ConfPaths.INVENTORY_FASTCONSUME_WHITELIST);
-		data.readMaterialIdsFromList(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, fastConsumeItems);
+		data.readMaterialFromList(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, fastConsumeItems);
 		fastConsumeActions = data.getOptimizedActionList(ConfPaths.INVENTORY_FASTCONSUME_ACTIONS, Permissions.INVENTORY_FASTCONSUME);
 
 		instantBowCheck = data.getBoolean(ConfPaths.INVENTORY_INSTANTBOW_CHECK);

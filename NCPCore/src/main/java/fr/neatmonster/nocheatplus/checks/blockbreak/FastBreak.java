@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.blockbreak;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -45,8 +46,8 @@ public class FastBreak extends Check {
         boolean cancel = false;
         
         // Determine expected breaking time by block type.
-        final int id = block.getTypeId();
-        final long expectedBreakingTime = Math.max(0, Math.round((double) BlockProperties.getBreakingDuration(id, player) * (double) cc.fastBreakModSurvival / 100D));
+        final Material blockType = block.getType();
+        final long expectedBreakingTime = Math.max(0, Math.round((double) BlockProperties.getBreakingDuration(blockType, player) * (double) cc.fastBreakModSurvival / 100D));
     	
         final long elapsedTime;
         // TODO: Concept for unbreakable blocks? Context: extreme VL.
@@ -89,7 +90,8 @@ public class FastBreak extends Check {
         			data.fastBreakVL += vlAdded;
         			final ViolationData vd = new ViolationData(this, player, data.fastBreakVL, vlAdded, cc.fastBreakActions);
         			if (vd.needsParameters()) {
-        				vd.setParameter(ParameterName.BLOCK_ID, "" + id);
+        				vd.setParameter(ParameterName.BLOCK_TYPE, blockType.toString());
+        				vd.setParameter(ParameterName.BLOCK_ID, Integer.toString(BlockProperties.getId(blockType)));
         			}
         			cancel = executeActions(vd);
         		}
@@ -104,16 +106,15 @@ public class FastBreak extends Check {
         if ((cc.fastBreakDebug || cc.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
         	// General stats:
         	if (data.stats != null) {
-                data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+"u", true), elapsedTime);
-                data.stats.addStats(data.stats.getId(Integer.toString(block.getTypeId())+ "r", true), expectedBreakingTime);
+                data.stats.addStats(data.stats.getId(blockType+ "/u", true), elapsedTime);
+                data.stats.addStats(data.stats.getId(blockType + "/r", true), expectedBreakingTime);
                 player.sendMessage(data.stats.getStatsStr(true));
             }
         	// Send info about current break:
-        	final int blockId = block.getTypeId();
         	final ItemStack stack = player.getItemInHand();
-        	final boolean isValidTool = BlockProperties.isValidTool(blockId, stack);
+        	final boolean isValidTool = BlockProperties.isValidTool(blockType, stack);
         	final double haste = PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.FAST_DIGGING);
-        	String msg = (isInstaBreak.decideOptimistically() ? ("[Insta=" + isInstaBreak + "]") : "[Normal]") + "[" + blockId + "] "+ elapsedTime + "u / " + expectedBreakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (haste == Double.NEGATIVE_INFINITY ? "" : " haste=" + ((int) haste + 1));
+        	String msg = (isInstaBreak.decideOptimistically() ? ("[Insta=" + isInstaBreak + "]") : "[Normal]") + "[" + blockType + "] "+ elapsedTime + "u / " + expectedBreakingTime +"r (" + (isValidTool?"tool":"no-tool") + ")" + (haste == Double.NEGATIVE_INFINITY ? "" : " haste=" + ((int) haste + 1));
         	player.sendMessage(msg);
 //        	net.minecraft.server.Item mcItem = net.minecraft.server.Item.byId[stack.getTypeId()];
 //        	if (mcItem != null) {
