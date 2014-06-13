@@ -124,7 +124,6 @@ public abstract class ConfPaths {
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR      = BLOCKBREAK_FASTBREAK_BUCKETS + "factor";
 	public static final String  BLOCKBREAK_FASTBREAK_DELAY               = BLOCKBREAK_FASTBREAK + "delay";
 	public static final String  BLOCKBREAK_FASTBREAK_GRACE               = BLOCKBREAK_FASTBREAK + "grace";
-	public static final String  BLOCKBREAK_FASTBREAK_MOD_CREATIVE        = BLOCKBREAK_FASTBREAK + "intervalcreative";
 	public static final String  BLOCKBREAK_FASTBREAK_MOD_SURVIVAL        = BLOCKBREAK_FASTBREAK + "intervalsurvival";
     public static final String  BLOCKBREAK_FASTBREAK_ACTIONS             = BLOCKBREAK_FASTBREAK + "actions";
     
@@ -617,5 +616,7 @@ public abstract class ConfPaths {
 	public static final String  INVENTORY_ENSURECLOSE					 = "checks.inventory.ensureclose";
 	@Deprecated
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS			 = "miscellaneous.reporttometrics";
+	@Deprecated
+	public static final String  BLOCKBREAK_FASTBREAK_MOD_CREATIVE        = "checks.blockbreak.fastbreak.intervalcreative";
 	
 }

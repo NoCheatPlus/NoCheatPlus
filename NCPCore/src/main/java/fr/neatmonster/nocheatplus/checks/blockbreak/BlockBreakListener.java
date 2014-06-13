@@ -61,8 +61,7 @@ public class BlockBreakListener extends CheckListener {
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = false, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onBlockBreak(final BlockBreakEvent event) {
         
         final Player player = event.getPlayer();
@@ -227,8 +226,9 @@ public class BlockBreakListener extends CheckListener {
 //        }
     	
         // Do not care about null blocks.
-        if (block == null)
-            return;
+        if (block == null) {
+        	return;
+        }
         
         final int tick = TickTask.getTick();
         // Skip if already set to the same block without breaking within one tick difference.
@@ -236,9 +236,11 @@ public class BlockBreakListener extends CheckListener {
         final Material tool = stack == null ? null: stack.getType();
         if (data.toolChanged(tool)) {
         	// Update.
-        } else if (tick < data.clickedTick) {
-        	// Update.
+        } else if (tick < data.clickedTick || now < data.fastBreakfirstDamage || now < data.fastBreakBreakTime) {
+        	// Time/tick ran backwards: Update.
+        	// Tick running backwards should not happen in the main thread unless for reload. A plugin could reset it (not intended).
         } else if (data.fastBreakBreakTime < data.fastBreakfirstDamage && data.clickedX == block.getX() &&  data.clickedZ == block.getZ() &&  data.clickedY == block.getY()){
+        	// Preserve first damage time.
         	if (tick - data.clickedTick <= 1 ) {
         		return;
         	}
