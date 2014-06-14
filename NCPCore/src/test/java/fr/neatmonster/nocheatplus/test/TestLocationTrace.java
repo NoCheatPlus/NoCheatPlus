@@ -3,8 +3,6 @@ package fr.neatmonster.nocheatplus.test;
 import static org.junit.Assert.fail;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
@@ -12,7 +10,6 @@ import org.junit.Test;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceIterator;
-import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 
 public class TestLocationTrace {
