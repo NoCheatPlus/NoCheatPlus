@@ -26,12 +26,14 @@ public class BlockCacheBukkit extends BlockCache{
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public int fetchTypeId(final int x, final int y, final int z) {
 		// TODO: consider setting type id and data at once.
 		return world.getBlockTypeIdAt(x, y, z);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public int fetchData(final int x, final int y, final int z) {
 		// TODO: consider setting type id and data at once.
