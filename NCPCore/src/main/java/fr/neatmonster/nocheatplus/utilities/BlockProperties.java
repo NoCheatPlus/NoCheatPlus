@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  * - reading (all) the default properties from a file too.
  *
  */
+@SuppressWarnings("deprecation")
 public class BlockProperties {
 	
 	/**
@@ -447,8 +448,8 @@ public class BlockProperties {
 		
 		tools.put(359, new ToolProps(ToolType.SHEARS, MaterialBase.NONE));
 	}
-
-    private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+	
+	private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
 		Arrays.fill(blocks, null);
 		// Initalize block flags
 		// Generic initialization.
