@@ -2,8 +2,6 @@ package fr.neatmonster.nocheatplus.checks.fight;
 
 import java.util.Iterator;
 
-import javax.management.MXBean;
-
 import org.bukkit.Location;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -31,7 +29,6 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceEntry;
-import fr.neatmonster.nocheatplus.checks.moving.LocUtil;
 import fr.neatmonster.nocheatplus.checks.moving.MediumLiftOff;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
@@ -39,7 +36,6 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -171,7 +167,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	damagedPlayer = null; // TODO: This is a temporary workaround.
         	// Use a fake trace.
         	// TODO: Provide for entities too? E.g. one per player, or a fully fledged bookkeeping thing (EntityData).
-        	final MovingConfig mcc = MovingConfig.getConfig(damagedLoc.getWorld().getName());
+        	//final MovingConfig mcc = MovingConfig.getConfig(damagedLoc.getWorld().getName());
         	damagedTrace = null; //new LocationTrace(mcc.traceSize, mcc.traceMergeDist);
         	//damagedTrace.addEntry(tick, damagedLoc.getX(), damagedLoc.getY(), damagedLoc.getZ());
         }
