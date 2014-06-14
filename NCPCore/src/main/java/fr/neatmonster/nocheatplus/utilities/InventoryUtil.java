@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.utilities;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -14,6 +15,10 @@ import org.bukkit.inventory.ItemStack;
  */
 public class InventoryUtil {
 	
+	private static boolean isEmpty(Material mat) {
+		return mat == null || mat == Material.AIR;
+	}
+	
 	/**
 	 * Does not account for special slots like armor.
 	 * @param inventory
@@ -24,7 +29,7 @@ public class InventoryUtil {
 		int count = 0;
 		for (int i = 0; i < contents.length; i++){
 			final ItemStack stack = contents[i];
-			if (stack == null || stack.getTypeId() == 0){
+			if (stack == null || isEmpty(stack.getType())){
 				count ++;
 			}
 		}
@@ -40,7 +45,7 @@ public class InventoryUtil {
 	public static int getStackCount(final Inventory inventory, final ItemStack reference) {
 		if (inventory == null) return 0;
 		if (reference == null) return getFreeSlots(inventory);
-		final int id = reference.getTypeId();
+		final Material mat = reference.getType();
 		final int durability = reference.getDurability();
 		final ItemStack[] contents = inventory.getContents();
 		int count = 0;
@@ -49,7 +54,7 @@ public class InventoryUtil {
 			if (stack == null){
 				continue;
 			}
-			else if (stack.getTypeId() == id && stack.getDurability() == durability){
+			else if (stack.getType() == mat && stack.getDurability() == durability){
 				count ++;
 			}
 		}
