@@ -63,7 +63,7 @@ public class BlockInit {
 	 * @param mat
 	 */
 	public static void setPropsAs(int newId, Material mat) {
-		setPropsAs(newId, mat);
+		BlockProperties.setBlockProps(newId, BlockProperties.getBlockProps(mat));
 	}
 	
 	/**
