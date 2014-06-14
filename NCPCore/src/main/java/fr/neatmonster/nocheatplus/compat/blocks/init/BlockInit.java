@@ -12,29 +12,29 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
  */
 public class BlockInit {
 	
-	// TODO: Add "assertMaterialExist" for id and id + name (name: add assertMaterialMatches) also with name with RuntimeException
+	// TODO: Change to assert names only?, would be better with being able to feed MC names or map them as well, though.
 	
 	/**
 	 * Check for Material existence, throw RuntimeException if not.
 	 * @param id
 	 */
 	public static void assertMaterialExists(int id) {
-		if (Material.getMaterial(id) == null){
+		if (Material.getMaterial(id) == null) {
 			throw new RuntimeException("Material " + id + " does not exist.");
 		}
 	}
 	
 	/**
-	 * Check for material existence and naming (exact match). 
+	 * Check for material existence and naming (exact match).
 	 * @param id
 	 * @param name
 	 */
 	public static void assertMaterialName(int id, String name) {
 		Material mat = Material.getMaterial(id);
-		if ( mat == null){
+		if ( mat == null) {
 			throw new RuntimeException("Material " + id + " does not exist.");
 		}
-		if (mat.name().equals(name)){
+		if (mat.name().equals(name)) {
 			throw new RuntimeException("Name for Material " + id + " ('" + mat.name() + "') does not match '" + name + "'.");
 		}
 	}
@@ -46,12 +46,12 @@ public class BlockInit {
 	 */
 	public static void assertMaterialNameMatch(int id, String... parts) {
 		Material mat = Material.getMaterial(id);
-		if ( mat == null){
+		if ( mat == null) {
 			throw new RuntimeException("Material " + id + " does not exist.");
 		}
 		String name = mat.name().toLowerCase();
-		for (String part : parts){
-			if (name.indexOf(part.toLowerCase()) < 0){
+		for (String part : parts) {
+			if (name.indexOf(part.toLowerCase()) < 0) {
 				throw new RuntimeException("Name for Material " + id + " ('" + mat.name() + "') should contain '" + part + "'.");
 			}
 		}
@@ -62,7 +62,7 @@ public class BlockInit {
 	 * @param newId
 	 * @param mat
 	 */
-	public static void setPropsAs(int newId, Material mat){
+	public static void setPropsAs(int newId, Material mat) {
 		setPropsAs(newId, mat.getId());
 	}
 	
@@ -71,7 +71,7 @@ public class BlockInit {
 	 * @param newId
 	 * @param mat
 	 */
-	public static void setPropsAs(int newId, int otherId){
+	public static void setPropsAs(int newId, int otherId) {
 		BlockProperties.setBlockProps(newId, BlockProperties.getBlockProps(otherId));
 	}
 
@@ -80,7 +80,7 @@ public class BlockInit {
 	 * @param newId
 	 * @param mat
 	 */
-	public static void setAs(int newId, Material mat){
+	public static void setAs(int newId, Material mat) {
 		BlockFlags.setFlagsAs(newId, mat);
 		setPropsAs(newId, mat);
 	}
@@ -90,7 +90,7 @@ public class BlockInit {
 	 * @param newId
 	 * @param mat
 	 */
-	public static void setAs(int newId, int otherId){
+	public static void setAs(int newId, int otherId) {
 		BlockFlags.setFlagsAs(newId, otherId);
 		setPropsAs(newId, otherId);
 	}

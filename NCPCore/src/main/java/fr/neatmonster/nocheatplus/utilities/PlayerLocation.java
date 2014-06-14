@@ -36,8 +36,17 @@ public class PlayerLocation {
 	/** Bounding box of the player. */
 	private double minX, maxX, minY, maxY, minZ, maxZ;
 	
-	// Object members (reset to null) //
-
+	// TODO: Check if onGround can be completely replaced by onGroundMinY and notOnGroundMaxY.
+	/** Minimal yOnGround for which the player is on ground. No extra xz/y margin.*/
+	private double onGroundMinY = Double.MAX_VALUE;
+	/** Maximal yOnGround for which the player is not on ground. No extra xz/y margin.*/
+	private double notOnGroundMaxY = Double.MIN_VALUE;
+	
+	// "Light" object members (reset to null) //
+	
+	// TODO: The following should be changed to primitive types, add one long for "checked"-flags. Booleans can be compressed into a long.
+	// TODO: All properties that can be set should have a "checked" flag, thus resetting the flag suffices.
+	
 	/** Type id of the block at the position. */
 	private Integer typeId = null;
 
@@ -46,7 +55,19 @@ public class PlayerLocation {
 
 	/** Data value of the block this position is on. */
 	private Integer data = null;
+	
+	/** All block flags collected for maximum used bounds. */
+	private Long blockFlags = null;
+	
+	/** Is the player on ice? */
+	private Boolean onIce = null;
 
+	/** Is the player on ladder? */
+	private Boolean onClimbable = null;
+
+	/** Simple test if the exact position is passable. */
+	private Boolean passable = null;
+	
 	/** Is the player above stairs? */
 	private Boolean aboveStairs = null;
 
@@ -61,38 +82,22 @@ public class PlayerLocation {
 
 	/** Is the player on the ground? */
 	private Boolean onGround = null;
-	
-	// TODO: Check if onGround can be completely replaced by onGroundMinY and notOnGroundMaxY.
-	/** Minimal yOnGround for which the player is on ground. No extra xz/y margin.*/
-	private double onGroundMinY = Double.MAX_VALUE;
-	/** Maximal yOnGround for which the player is not on ground. No extra xz/y margin.*/
-	private double notOnGroundMaxY = Double.MIN_VALUE;
 
-	/** Is the player on ice? */
-	private Boolean onIce = null;
-
-	/** Is the player on ladder? */
-	private Boolean onClimbable = null;
-
-	/** Simple test if the exact position is passable. */
-	private Boolean passable = null;
-	
-	/** All block flags collected for maximum used bounds. */
-	private Long blockFlags = null;
-
-	// "Heavy" members (should be reset to null or cleaned up at some point) //
+	// "Heavy" object members (reset to null for cleanup). //
 
 	/** The player ! */
 	private Player player = null;
 	
 	/** Bukkit world. */
 	private World world = null;
+	
+	// "Heavy" object members (further cleanup call needed + set to null for cleanup) //
 
 	/** Optional block property cache. */
 	private BlockCache blockCache = null;
 	
 	
-	public PlayerLocation(final MCAccess mcAccess, final BlockCache blockCache){
+	public PlayerLocation(final MCAccess mcAccess, final BlockCache blockCache) {
 		this.mcAccess = mcAccess;
 		this.blockCache = blockCache;
 	}
@@ -118,7 +123,7 @@ public class PlayerLocation {
 	 * Get the world!
 	 * @return
 	 */
-	public World getWorld(){
+	public World getWorld() {
 		return world;
 	}
 
@@ -222,7 +227,7 @@ public class PlayerLocation {
 	 * @param loc
 	 * @return
 	 */
-	public boolean isBlockAbove(final PlayerLocation loc){
+	public boolean isBlockAbove(final PlayerLocation loc) {
 		return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
 	}
 	
@@ -231,7 +236,7 @@ public class PlayerLocation {
 	 * @param loc
 	 * @return
 	 */
-	public boolean isBlockAbove(final Location loc){
+	public boolean isBlockAbove(final Location loc) {
 		return blockY == loc.getBlockY() + 1 && blockX == loc.getBlockX() && blockZ == loc.getBlockZ();
 	}
 
@@ -260,7 +265,7 @@ public class PlayerLocation {
 	 * @param other
 	 * @return
 	 */
-	public int manhattan(final PlayerLocation other){
+	public int manhattan(final PlayerLocation other) {
 		// TODO: Consider using direct field access from other methods as well.
 		return TrigUtil.manhattan(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
 	}
@@ -270,7 +275,7 @@ public class PlayerLocation {
 	 * @param other
 	 * @return
 	 */
-	public int maxBlockDist(final PlayerLocation other){
+	public int maxBlockDist(final PlayerLocation other) {
 		// TODO: Consider using direct field access from other methods as well.
 		return TrigUtil.maxDistance(this.blockX, this.blockY, this.blockZ, other.blockX, other.blockY, other.blockZ);
 	}
@@ -282,7 +287,7 @@ public class PlayerLocation {
 	 */
 	public boolean isAboveStairs() {
 		if (aboveStairs == null) {
-			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_STAIRS) == 0 ){
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_STAIRS) == 0 ) {
 				aboveStairs = false;
 				return false;
 			}
@@ -301,7 +306,7 @@ public class PlayerLocation {
 	 */
 	public boolean isInLava() {
 		if (inLava == null) {
-			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_LAVA) == 0 ){
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_LAVA) == 0 ) {
 				inLava = false;
 				return false;
 			}
@@ -322,7 +327,7 @@ public class PlayerLocation {
 	 */
 	public boolean isInWater() {
 		if (inWater == null) {
-			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_WATER) == 0 ){
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_WATER) == 0 ) {
 				inWater = false;
 				return false;
 			}
@@ -383,7 +388,7 @@ public class PlayerLocation {
 	public boolean isOnClimbable() {
 		if (onClimbable == null) {
 			// Climbable blocks.
-			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_CLIMBABLE) == 0 ){
+			if (blockFlags != null && (blockFlags.longValue() & BlockProperties.F_CLIMBABLE) == 0 ) {
 				onClimbable = false;
 				return false;
 			}
@@ -401,25 +406,25 @@ public class PlayerLocation {
 	 * @param jumpHeigth Height the player is allowed to have jumped.
 	 * @return
 	 */
-	public boolean canClimbUp(double jumpHeigth){
+	public boolean canClimbUp(double jumpHeigth) {
 		// TODO: distinguish vines.
-		if (getTypeId() == Material.VINE.getId()){
+		if (getTypeId() == Material.VINE.getId()) {
 			// Check if vine is attached to something solid
-			if (BlockProperties.canClimbUp(blockCache, blockX, blockY, blockZ)){
+			if (BlockProperties.canClimbUp(blockCache, blockX, blockY, blockZ)) {
 				return true;
 			}
 			// Check the block at head height.
 			final int headY = Location.locToBlock(y + player.getEyeHeight());
-			if (headY > blockY){
-				for (int cy = blockY + 1; cy <= headY; cy ++){
-					if (BlockProperties.canClimbUp(blockCache, blockX, cy, blockZ)){
+			if (headY > blockY) {
+				for (int cy = blockY + 1; cy <= headY; cy ++) {
+					if (BlockProperties.canClimbUp(blockCache, blockX, cy, blockZ)) {
 						return true;
 					}
 				}
 			}
 			// Finally check possible jump height.
 			// TODO: This too is inaccurate.
-			if (isOnGround(jumpHeigth)){
+			if (isOnGround(jumpHeigth)) {
 				// Here ladders are ok.
 				return true;
 			}
@@ -460,34 +465,34 @@ public class PlayerLocation {
 	 * @return true, if the player is on ground
 	 */
 	public boolean isOnGround() {
-		if (onGround != null){
+		if (onGround != null) {
 			return onGround;
 		}
 		// Check cached values and simplifications.
 		if (notOnGroundMaxY >= yOnGround) onGround = false;
 		else if (onGroundMinY <= yOnGround) onGround = true;
-		else{
+		else {
 			// Shortcut check (currently needed for being stuck + sf).
-			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0){
+			if (blockFlags == null || (blockFlags.longValue() & BlockProperties.F_GROUND) != 0) {
 				// TODO: Consider dropping this shortcut.
 				final int bY = Location.locToBlock(y - yOnGround);
 				final int id = bY == blockY ? getTypeId() : (bY == blockY -1 ? getTypeIdBelow() : blockCache.getTypeId(blockX,  bY, blockZ));
 				final long flags = BlockProperties.getBlockFlags(id);
 				// TODO: Might remove check for variable ?
-				if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0){
+				if ((flags & BlockProperties.F_GROUND) != 0 && (flags & BlockProperties.F_VARIABLE) == 0) {
 					final double[] bounds = blockCache.getBounds(blockX, bY, blockZ);
 					// Check collision if not inside of the block. [Might be a problem for cauldron or similar + something solid above.]
 					// TODO: Might need more refinement.
-					if (bounds != null && y - bY >= bounds[4] && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, id, bounds, flags)){
+					if (bounds != null && y - bY >= bounds[4] && BlockProperties.collidesBlock(blockCache, x, minY - yOnGround, z, x, minY, z, blockX, bY, blockZ, id, bounds, flags)) {
 						// TODO: BlockHeight is needed for fences, use right away (above)?
 						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)
-								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getGroundMinHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) <= y - bY){
+								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getGroundMinHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) <= y - bY) {
 //							System.out.println("*** onground SHORTCUT");
 							onGround = true;
 						}
 					}
 				}
-				if (onGround == null){
+				if (onGround == null) {
 //					System.out.println("*** fetch onground std");
 					// Full on-ground check (blocks).
 					// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
@@ -497,7 +502,7 @@ public class PlayerLocation {
 			else onGround = false;
 		}
 		if (onGround) onGroundMinY = Math.min(onGroundMinY, yOnGround);
-		else{
+		else {
 //			System.out.println("*** onground check entities");
 			// TODO: further confine this ?
 			notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
@@ -512,7 +517,7 @@ public class PlayerLocation {
 	 * @param yOnGround Margin below the player.
 	 * @return
 	 */
-	public boolean isOnGround(final double yOnGround){
+	public boolean isOnGround(final double yOnGround) {
 		if (notOnGroundMaxY >= yOnGround) return false;
 		else if (onGroundMinY <= yOnGround) return true;
 		return  isOnGround(yOnGround, 0D, 0D, 0L);
@@ -525,7 +530,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isOnGround(final double yOnGround, final long ignoreFlags) {
-		if (ignoreFlags == 0){
+		if (ignoreFlags == 0) {
 			if (notOnGroundMaxY >= yOnGround) return false;
 			else if (onGroundMinY <= yOnGround) return true;
 		}
@@ -542,7 +547,7 @@ public class PlayerLocation {
 	 */
 	public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin) {
 		if (xzMargin >= 0 && onGroundMinY <= yOnGround) return true;
-		if (xzMargin <= 0 && yMargin == 0){
+		if (xzMargin <= 0 && yMargin == 0) {
 			if (notOnGroundMaxY >= yOnGround) return false;
 		}
 		return isOnGround(yOnGround, xzMargin, yMargin, 0);
@@ -557,20 +562,24 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isOnGround(final double yOnGround, final double xzMargin, final double yMargin, final long ignoreFlags) {
-		if (ignoreFlags == 0){
+		if (ignoreFlags == 0) {
 			if (xzMargin >= 0 && onGroundMinY <= yOnGround) return true;
-			if (xzMargin <= 0 && yMargin == 0){
+			if (xzMargin <= 0 && yMargin == 0) {
 				if (notOnGroundMaxY >= yOnGround) return false;
 			}
 		}
 //		System.out.println("*** Fetch on-ground: yOnGround=" + yOnGround + " xzM=" + xzMargin + " yM=" + yMargin + " ign=" + ignoreFlags);
 		final boolean onGround = BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, ignoreFlags);
-		if (ignoreFlags == 0){
-			if (onGround){
-				if (xzMargin <= 0 && yMargin == 0) onGroundMinY = Math.min(onGroundMinY, yOnGround);
+		if (ignoreFlags == 0) {
+			if (onGround) {
+				if (xzMargin <= 0 && yMargin == 0) {
+					onGroundMinY = Math.min(onGroundMinY, yOnGround);
+				}
 			}
-			else{
-				if (xzMargin >= 0) notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
+			else {
+				if (xzMargin >= 0) {
+					notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
+				}
 			}
 		}
 		return onGround;
@@ -583,7 +592,7 @@ public class PlayerLocation {
 	 * @param yMargin Extra margin added below and above.
 	 * @return
 	 */
-	public boolean standsOnEntity(final double yOnGround, final double xzMargin, final double yMargin){
+	public boolean standsOnEntity(final double yOnGround, final double xzMargin, final double yMargin) {
 		return blockCache.standsOnEntity(player, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin);
 	}
 	
@@ -593,7 +602,7 @@ public class PlayerLocation {
 	 * @param yMargin
 	 * @return
 	 */
-	public boolean isNextToSolid(final double xzMargin, final double yMargin){
+	public boolean isNextToSolid(final double xzMargin, final double yMargin) {
 		// TODO: Adjust to check block flags ?
 		return BlockProperties.collides(blockCache, minX - xzMargin, minY - yMargin, minZ - xzMargin, maxX + xzMargin, maxY + yMargin, maxZ + xzMargin, BlockProperties.F_SOLID);
 	}
@@ -604,7 +613,7 @@ public class PlayerLocation {
 	 * @param yMargin
 	 * @return
 	 */
-	public boolean isNextToGround(final double xzMargin, final double yMargin){
+	public boolean isNextToGround(final double xzMargin, final double yMargin) {
 		// TODO: Adjust to check block flags ?
 		return BlockProperties.collides(blockCache, minX - xzMargin, minY - yMargin, minZ - xzMargin, maxX + xzMargin, maxY + yMargin, maxZ + xzMargin, BlockProperties.F_GROUND);
 	}
@@ -613,7 +622,7 @@ public class PlayerLocation {
 	 * Reset condition for flying checks (sf + nofall): liquids, web, ladder (not on-ground, though).
 	 * @return
 	 */
-	public boolean isResetCond(){
+	public boolean isResetCond() {
 		// NOTE: if optimizing, setYOnGround has to be kept in mind. 
 		return isInLiquid()  || isOnClimbable() || isInWeb();
 	}
@@ -638,7 +647,7 @@ public class PlayerLocation {
 	 * @return
 	 */
 	public boolean isPassable() {
-		if (passable == null){
+		if (passable == null) {
 			passable = BlockProperties.isPassable(blockCache, x, y, z, getTypeId());
 //			passable = BlockProperties.isPassableExact(blockCache, x, y, z, getTypeId());
 		}
@@ -784,7 +793,7 @@ public class PlayerLocation {
 	 * to have flags ready for faster denial.
 	 * @param maxYonGround
 	 */
-	public void collectBlockFlags(double maxYonGround){
+	public void collectBlockFlags(double maxYonGround) {
 		maxYonGround = Math.max(yOnGround, maxYonGround);
 		// TODO: Clearly refine this for 1.5 high blocks.
 		// TODO: Check which checks need blocks below.
@@ -845,7 +854,7 @@ public class PlayerLocation {
 	 * Set the block flags which are usually collected on base of bounding box, yOnGround and other considerations, such as 1.5 high blocks.
 	 * @param blockFlags
 	 */
-	public void setBlockFlags(Long blockFlags){
+	public void setBlockFlags(Long blockFlags) {
 		this.blockFlags = blockFlags;
 	}
 

@@ -15,7 +15,7 @@ public class BlockFlags {
 	 * @param id
 	 * @param mat
 	 */
-	public static void setFlagsAs(int id, Material mat){
+	public static void setFlagsAs(int id, Material mat) {
 		setFlagsAs(id, mat.getId());
 	}
 	
@@ -24,7 +24,7 @@ public class BlockFlags {
 	 * @param id
 	 * @param mat
 	 */
-	public static void setFlagsAs(int id, int otherId){
+	public static void setFlagsAs(int id, int otherId) {
 		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(otherId));
 	}
 
@@ -33,7 +33,7 @@ public class BlockFlags {
 	 * @param id
 	 * @param flags
 	 */
-	public static void addFlags(int id, long flags){
+	public static void addFlags(int id, long flags) {
 		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
 	}
 
@@ -42,7 +42,7 @@ public class BlockFlags {
 	 * @param id
 	 * @param flags
 	 */
-	public static void removeFlags(int id, long flags){
+	public static void removeFlags(int id, long flags) {
 		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) & ~flags);
 	}
 
