@@ -21,12 +21,12 @@ Compiling NoCheatPlus
 * We use [Maven] (http://maven.apache.org/download.cgi) 3 to handle the dependencies.
 * You can compile it with this Maven goal: `mvn clean package`
 * NoCheatPlus is compiled for Java 6.
-* If you run into trouble with dependencies, because they have been removed from the repository for obscure reasons, or if the repository prevents you from accessing it, you can install the dependency manually.\\
-Example for Eclipse with embedded maven:\\
-Add a new maven build run configuration, name it appropriately, e.g. {{{Install CB 1.7.5}}}.
-Set goals to: {{{install:install-file -Dfile=<PATH TO JAR> -DgroupId=org.bukkit -DartifactId=craftbukkit -Dversion=1.7.5-R0.1-SNAPSHOT -Dpackaging=jar}}}\\
-On Windows the <PATH TO JAR> might look like:  {{{X:\...\craftbukkit\3042\craftbukkit-1.7.5-R0.1-20140408.020329-16.jar}}}\\
-To let it run you might have to set the base directory, e.g. to {{{ ${workspace_loc} }}}, it does not seem to have significance.\\
+* If you run into trouble with dependencies, because they have been removed from the repository for obscure reasons, or if the repository prevents you from accessing it, you can install the dependency manually.
+Example for Eclipse with embedded maven:
+Add a new maven build run configuration, name it appropriately, e.g. ```Install CB 1.7.5```.
+Set goals to: ```install:install-file -Dfile=<PATH TO JAR> -DgroupId=org.bukkit -DartifactId=craftbukkit -Dversion=1.7.5-R0.1-SNAPSHOT -Dpackaging=jar```
+On Windows the <PATH TO JAR> might look like:  ```X:\...\craftbukkit\3042\craftbukkit-1.7.5-R0.1-20140408.020329-16.jar```
+To let it run you might have to set the base directory, e.g. to ```${workspace_loc}```, it does not seem to have significance.
 Do set the correct version alongside the file name. On newer version of maven, you might do with much simplified goals, because the pom inside the jars are parsed. 
 
 Links
