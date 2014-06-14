@@ -24,11 +24,6 @@
     	<artifactId>craftbukkit</artifactId>
     	<version>1.7.2-R0.4-SNAPSHOT</version>
     </dependency>
-    <dependency>
-    	<groupId>org.bukkit</groupId>
-    	<artifactId>bukkit</artifactId>
-    	<version>1.7.2-R0.4-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <description>Compatibility for CB2922 (MC 1.7.2).

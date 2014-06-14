@@ -24,11 +24,6 @@
     	<artifactId>craftbukkit</artifactId>
     	<version>1.6.2-R1.0</version>
     </dependency>
-    <dependency>
-    	<groupId>org.bukkit</groupId>
-    	<artifactId>bukkit</artifactId>
-    	<version>1.6.2-R1.0</version>
-    </dependency>
   </dependencies>
 
   <description>Compatibility for CB2808 (MC 1.6.2).
