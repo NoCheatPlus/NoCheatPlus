@@ -16,7 +16,7 @@ public class BlockFlags {
 	 * @param mat
 	 */
 	public static void setFlagsAs(int id, Material mat) {
-		setFlagsAs(id, mat.getId());
+		BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(mat));
 	}
 	
 	/**

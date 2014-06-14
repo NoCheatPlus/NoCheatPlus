@@ -408,7 +408,7 @@ public class PlayerLocation {
 	 */
 	public boolean canClimbUp(double jumpHeigth) {
 		// TODO: distinguish vines.
-		if (getTypeId() == Material.VINE.getId()) {
+		if (BlockProperties.isAttachedClimbable(getTypeId())) {
 			// Check if vine is attached to something solid
 			if (BlockProperties.canClimbUp(blockCache, blockX, blockY, blockZ)) {
 				return true;
@@ -454,7 +454,7 @@ public class PlayerLocation {
 		if (inWeb == null) {
 			// TODO: inset still needed ?
 			final double inset = 0.001d;
-			inWeb = BlockProperties.collidesId(blockCache, minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB.getId());
+			inWeb = BlockProperties.collidesId(blockCache, minX + inset, minY + inset, minZ + inset, maxX - inset, maxY - inset, maxZ - inset, Material.WEB);
 		}
 		return inWeb;
 	}

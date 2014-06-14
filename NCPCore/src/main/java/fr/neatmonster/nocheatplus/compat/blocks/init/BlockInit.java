@@ -19,7 +19,7 @@ public class BlockInit {
 	 * @param id
 	 */
 	public static void assertMaterialExists(int id) {
-		if (Material.getMaterial(id) == null) {
+		if (BlockProperties.getMaterial(id) == null) {
 			throw new RuntimeException("Material " + id + " does not exist.");
 		}
 	}
@@ -30,7 +30,7 @@ public class BlockInit {
 	 * @param name
 	 */
 	public static void assertMaterialName(int id, String name) {
-		Material mat = Material.getMaterial(id);
+		Material mat = BlockProperties.getMaterial(id);
 		if ( mat == null) {
 			throw new RuntimeException("Material " + id + " does not exist.");
 		}
@@ -45,7 +45,7 @@ public class BlockInit {
 	 * @param parts
 	 */
 	public static void assertMaterialNameMatch(int id, String... parts) {
-		Material mat = Material.getMaterial(id);
+		Material mat = BlockProperties.getMaterial(id);
 		if ( mat == null) {
 			throw new RuntimeException("Material " + id + " does not exist.");
 		}
@@ -63,7 +63,7 @@ public class BlockInit {
 	 * @param mat
 	 */
 	public static void setPropsAs(int newId, Material mat) {
-		setPropsAs(newId, mat.getId());
+		setPropsAs(newId, mat);
 	}
 	
 	/**

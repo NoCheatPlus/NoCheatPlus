@@ -1240,6 +1240,15 @@ public class BlockProperties {
 	public static int getId(final Material blockType) {
 		return blockType.getId();
 	}
+	
+	/**
+	 * Straw-man method to hide warnings.
+	 * @param id
+	 * @return
+	 */
+	public static Material getMaterial(final int id) {
+		return Material.getMaterial(id);
+	}
 
 	/**
 	 * @deprecated Typo in method name.
@@ -1288,6 +1297,16 @@ public class BlockProperties {
 	
 	public static final boolean isClimbable(final int id) {
 		return (blockFlags[id] & F_CLIMBABLE) != 0;
+	}
+	
+	/**
+	 * Climbable material that needs to be attached to a block, to allow players to climb up.<br>
+	 * Currently only applies to vines. There is no flag for such, yet.
+	 * @param id
+	 * @return
+	 */
+	public static final boolean isAttachedClimbable(final int id) {
+		return id == Material.VINE.getId();
 	}
 
 	public static final boolean isStairs(final int id) {
@@ -1878,6 +1897,22 @@ public class BlockProperties {
             }
         }
         return false;
+    }
+    
+    /**
+     * Convenience method for Material instead of block id.
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param mat
+     * @return
+     */
+    public static final boolean collidesId(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final Material mat){
+    	return collidesId(access, minX, minY, minZ, maxX, maxY, maxZ, mat.getId());
     }
     
     /**
