@@ -131,7 +131,6 @@ public class LocationTrace {
 	}
 	
 	public final void addEntry(final long time, final double x, final double y, final double z) {
-		// TODO: Consider setting the squared distance to last entry
 		double lastDistSq = 0.0;
 		if (size > 0) {
 			final TraceEntry latestEntry = entries[index];
@@ -144,13 +143,7 @@ public class LocationTrace {
 			// TODO: Think about minMergeSize (1 = never merge the first two, size = first fill the ring).
 			if (size > 1 && lastDistSq <= mergeDistSq) {
 				// TODO: Could use Manhattan, after all.
-				/**
-				 * TODO: <br>
-				 * The last entry has to be up to date, but it can lead to a "stray entry" far off the second one on time.<br>
-				 * Introducing a mergeTime could also help against keeping too many outdated entries.<br>
-				 * On merging conditions, checking dist/time vs. the second latest element could be feasible, supposedly with double distance. <br>
-				 */
-				// Only merge if last distance was not greater than mergeDist.
+				// Only merge if last distance was not greater than mergeDist, to prevent too-far-off entries.
 				if (latestEntry.lastDistSq <= mergeDistSq) {
 					// Update lastDistSq, due to shifting the elements position.
 					final TraceEntry secondLatest = index - 1 < 0 ? entries[index - 1 + entries.length] : entries[index - 1];

@@ -3,6 +3,8 @@ package fr.neatmonster.nocheatplus.test;
 import static org.junit.Assert.fail;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
@@ -10,18 +12,40 @@ import org.junit.Test;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceIterator;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 
 public class TestLocationTrace {
 	
 	protected static final Random random = new Random(System.nanoTime() + 133345691);
 	
+	/**
+	 * +- radius around 0.0.
+	 * @param radius
+	 * @return
+	 */
 	public static double rand(double radius) {
 		return rand(0.0, radius);
 	}
 	
+	/**
+	 * +- radius around center.
+	 * @param center
+	 * @param radius
+	 * @return
+	 */
 	public static double rand(double center, double radius) {
 		return center + 2.0 * radius * (random.nextDouble() - 0.5);
+	}
+	
+	/**
+	 * center +- step
+	 * @param center
+	 * @param step
+	 * @return
+	 */
+	public static double randStep(double center, double step) {
+		return center + (random.nextBoolean() ? step : -step);
 	}
 	
 	@Test
@@ -69,16 +93,17 @@ public class TestLocationTrace {
 	public void testMergeUpdateAlwaysDist() {
 		// Extreme merge dist.
 		int size = 80;
-		double mergeDist = Math.sqrt(1000.0);
+		double mergeDist = 1000.0;
 		LocationTrace trace = new LocationTrace(size, mergeDist);
 		double x = 0;
 		double y = 0;
 		double z = 0;
 		trace.addEntry(0 , x, y, z);
+		// Note that entries might get split, if the distance to the second last gets too big, so the maximum number of steps must be limited.
 		for (int i = 0; i < 1000; i ++) {
-			x = rand(x, 0.5);
-			y = rand(y, 0.5);
-			z = rand(z, 0.5);
+			x = randStep(x, 0.5);
+			y = randStep(y, 0.5);
+			z = randStep(z, 0.5);
 			trace.addEntry(i + 1, x, y, z);
 			if (trace.size() != 2) {
 				fail("Wrong size, expect 2, got instead: " + trace.size());
