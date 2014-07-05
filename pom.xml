@@ -34,7 +34,7 @@
     <module>NoCheatPlus</module>
   </modules>
 
-<!--   <distributionManagement>
+   <distributionManagement>
         <repository>
             <id>md_5-releases</id>
             <url>http://repo.md-5.net/content/repositories/releases/</url>
@@ -43,7 +43,7 @@
             <id>md_5-snapshots</id>
             <url>http://repo.md-5.net/content/repositories/snapshots/</url>
         </snapshotRepository>
-    </distributionManagement> -->
+    </distributionManagement>
   <repositories>
     <repository>
 	    <id>bukkit</id>
