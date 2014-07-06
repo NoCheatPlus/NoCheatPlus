@@ -4,12 +4,22 @@
   <!-- Informations -->
   <artifactId>nocheatplus</artifactId>
   <name>NoCheatPlus</name>
-  <version>3.10.13-BACKFLAP</version>
+  <version>3.10.13-SNAPSHOT</version>
   <description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
   <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
   
   <packaging>jar</packaging>
   
+  <repositories>
+    <repository>
+      <id>md_5-releases</id>
+      <url>http://repo.md-5.net/content/repositories/releases/</url>
+	</repository>
+	<repository>
+      <id>md_5-snapshots</id>
+      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
+	</repository>
+  </repositories>
   <distributionManagement>
     <repository>
       <id>md_5-releases</id>
