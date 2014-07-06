@@ -10,6 +10,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractData;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
@@ -41,11 +42,11 @@ public class Against extends Check {
         	}
         }
         if (BlockProperties.isLiquid(againstType)) {
-            if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))) {
+            if ((placedMat != Material.WATER_LILY || !BlockProperties.isLiquid(block.getRelative(BlockFace.DOWN).getType()))  && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_LIQUIDS)) {
             	violation = true;
             }
         }
-        else if (againstType == Material.AIR) {
+        else if (againstType == Material.AIR && !player.hasPermission(Permissions.BLOCKPLACE_AGAINST_AIR)) {
         	violation = true;
         }
         // Handle violation and return.
