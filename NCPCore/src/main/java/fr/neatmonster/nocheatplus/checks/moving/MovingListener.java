@@ -114,7 +114,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				event.setTo(setBack);
 				restored = true;
 			}
-			else data.resetSetBack();
+			else {
+				data.resetSetBack();
+			}
 		} 
 		if (!restored) {
 			pLoc.set(loc, player);
@@ -129,8 +131,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// TODO: reset the bounding box of the player ?
 			if (MovingConfig.getConfig(player).tempKickIllegal) {
 				NCPAPIProvider.getNoCheatPlusAPI().denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
+				LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
+			} else {
+				LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking he player.");
 			}
-			LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
 			CheckUtils.kickIllegalMove(player);
 		}
 	}
