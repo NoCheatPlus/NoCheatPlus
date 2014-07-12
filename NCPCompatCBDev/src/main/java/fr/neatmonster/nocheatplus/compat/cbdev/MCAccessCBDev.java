@@ -1,19 +1,19 @@
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
-import net.minecraft.server.v1_7_R3.AxisAlignedBB;
-import net.minecraft.server.v1_7_R3.Block;
-import net.minecraft.server.v1_7_R3.DamageSource;
-import net.minecraft.server.v1_7_R3.EntityComplexPart;
-import net.minecraft.server.v1_7_R3.EntityPlayer;
-import net.minecraft.server.v1_7_R3.MobEffectList;
+import net.minecraft.server.v1_7_R4.AxisAlignedBB;
+import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_7_R4.DamageSource;
+import net.minecraft.server.v1_7_R4.EntityComplexPart;
+import net.minecraft.server.v1_7_R4.EntityPlayer;
+import net.minecraft.server.v1_7_R4.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.v1_7_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_7_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_7_R4.CraftServer;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,22 +30,22 @@ public class MCAccessCBDev implements MCAccess{
 	 */
 	public MCAccessCBDev() {
 		getCommandMap();
-		ReflectionUtil.checkMembers("net.minecraft.server.v1_7_R3.", new String[] {"Entity" , "dead"});
+		ReflectionUtil.checkMembers("net.minecraft.server.v1_7_R4.", new String[] {"Entity" , "dead"});
 		// block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
-		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_7_R3.Block.class, 
+		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_7_R4.Block.class, 
 				new String[]{"x", "y", "z", "A", "B", "C"}, double.class);
 		// TODO: Nail it down further.
 	}
 
 	@Override
 	public String getMCVersion() {
-		// 1_7_R3
-		return "1.7.8|1.7.9";
+		// 1_7_R4
+		return "1.7.10";
 	}
 
 	@Override
 	public String getServerVersionTag() {
-		return "CB3043-DEV";
+		return "CB3100-DEV";
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public double getHeight(final Entity entity) {
-		final net.minecraft.server.v1_7_R3.Entity mcEntity = ((CraftEntity) entity).getHandle();
+		final net.minecraft.server.v1_7_R4.Entity mcEntity = ((CraftEntity) entity).getHandle();
 		final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.height, mcEntity.boundingBox.e - mcEntity.boundingBox.b));
 		if (entity instanceof LivingEntity) {
 			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
@@ -69,7 +69,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public AlmostBoolean isBlockSolid(final int id) {
-		final Block block = Block.e(id);
+		final Block block = Block.getById(id);
 		if (block == null || block.getMaterial() == null) {
 			return AlmostBoolean.MAYBE;
 		}
@@ -80,7 +80,7 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public AlmostBoolean isBlockLiquid(final int id) {
-		final Block block = Block.e(id);
+		final Block block = Block.getById(id);
 		if (block == null || block.getMaterial() == null) {
 			return AlmostBoolean.MAYBE;
 		}
