@@ -29,7 +29,6 @@ public class ProtocolLibComponent implements DisableListener{
 			PacketAdapter adapter = new MoveFrequency(plugin);
 			protocolManager.addPacketListener(adapter); 
 			registeredPacketAdapters.add(adapter);
-			LogUtil.logWarning("[NoCheatPlus] Registered some packet-level hook.");
 		} catch (Throwable t) {
 			LogUtil.logWarning("[NoCheatPlus] Could not register some packet-level hook.");
 			LogUtil.logWarning(t); // TODO: Maybe temporary.
