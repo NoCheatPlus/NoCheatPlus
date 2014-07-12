@@ -766,7 +766,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         
         // Register optional default components.
         final DefaultComponentFactory dcf = new DefaultComponentFactory();
-        for (final Object obj : dcf.getAvailableComponentsOnEnable()){
+        for (final Object obj : dcf.getAvailableComponentsOnEnable(this)){
         	addComponent(obj);
         	// Register sub-components to enable registries for optional components.
             processQueuedSubComponentHolders();

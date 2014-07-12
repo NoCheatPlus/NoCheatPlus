@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.neatmonster</groupId>
+  <artifactId>ncpcompatprotocollib</artifactId>
+  <packaging>jar</packaging>
+  <name>NCPCompatProtocolLib</name>
+  <version>static</version>
+
+  <parent>
+    <groupId>fr.neatmonster</groupId>
+    <artifactId>nocheatplus-parent</artifactId>
+    <version>static</version>
+  </parent>
+  
+  <repositories>
+  <repository>
+    <id>comphenix-rep</id>
+    <name>Comphenix Repository</name>
+    <url>http://repo.comphenix.net/content/groups/public</url>
+  </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcore</artifactId>
+    	<version>static</version>
+    </dependency>
+	<dependency>
+	  <groupId>com.comphenix.protocol</groupId>
+	  <artifactId>ProtocolLib</artifactId>
+	  <version>LATEST</version>
+	</dependency>
+  </dependencies>
+
+  <description>Features using the plugin ProtocolLib:
+http://dev.bukkit.org/bukkit-plugins/protocollib/</description>
+</project>
