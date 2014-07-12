@@ -97,7 +97,9 @@ public class MCAccessCBDev implements MCAccess{
 	@Override
 	public AlmostBoolean isIllegalBounds(final Player player) {
 		final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-		if (entityPlayer.dead) return AlmostBoolean.NO;
+		if (entityPlayer.dead) {
+			return AlmostBoolean.NO;
+		}
 		// TODO: Does this need a method call for the "real" box? Might be no problem during moving events, though.
 		final AxisAlignedBB box = entityPlayer.boundingBox;
 		if (!entityPlayer.isSleeping()) {
