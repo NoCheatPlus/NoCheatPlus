@@ -17,6 +17,7 @@ import fr.neatmonster.nocheatplus.compat.cb2808.MCAccessCB2808;
 import fr.neatmonster.nocheatplus.compat.cb2882.MCAccessCB2882;
 import fr.neatmonster.nocheatplus.compat.cb2922.MCAccessCB2922;
 import fr.neatmonster.nocheatplus.compat.cb3026.MCAccessCB3026;
+import fr.neatmonster.nocheatplus.compat.cb3043.MCAccessCB3043;
 import fr.neatmonster.nocheatplus.compat.cbdev.MCAccessCBDev;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -57,14 +58,23 @@ public class MCAccessFactory {
 			
 			// TEMP //
 			// Only add as long as no stable module has been added.
+			// Note: 1_7_R4 is build 3100 :p
+			// 1.7.10
+//			try{
+//				return new MCAccessCBDev();
+//			}
+//			catch(Throwable t) {
+//				throwables.add(t);
+//			};
+			// TEMP END //
+			
 			// 1.7.8|1.7.9
 			try{
-				return new MCAccessCBDev();
+				return new MCAccessCB3043();
 			}
 			catch(Throwable t) {
 				throwables.add(t);
 			};
-			// TEMP END //
 			
 			// 1.7.5
 			try{
