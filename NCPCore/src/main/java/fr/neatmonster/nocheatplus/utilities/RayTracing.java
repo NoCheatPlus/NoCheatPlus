@@ -76,7 +76,7 @@ public abstract class RayTracing {
 	
 	private static final double tDiff(final double dTotal, final double offset){
 		if (dTotal > 0.0){
-			return (1 - offset) / dTotal; 
+			return (1.0 - offset) / dTotal; 
 		}
 		else if (dTotal < 0.0){
 			return offset / -dTotal; 
@@ -101,11 +101,22 @@ public abstract class RayTracing {
 			tY = tDiff(dY, oY);
 			tZ = tDiff(dZ, oZ);
 			tMin = Math.min(tX,  Math.min(tY, tZ));
-			if (tMin == Double.MAX_VALUE || t + tMin > 1.0) tMin = 1.0 - t;
+			if (tMin == Double.MAX_VALUE) {
+				// All differences are 0 (no progress).
+				break;
+			}
+			if (t + tMin > 1.0) {
+				// Set to the remaining distance (does trigger).
+				tMin = 1.0 - t;
+			}
 			// Call step with appropriate arguments.
 			step ++;
-			if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin)) break; // || tMin == 0) break;
-			if (t + tMin >= 1.0 - tol) break;
+			if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin)) {
+				break; // || tMin == 0) break;
+			}
+			if (t + tMin >= 1.0 - tol) {
+				break;
+			}
 			// Advance (add to t etc.).
 			changed = false;
 			// TODO: Some not handled cases would mean errors.
@@ -113,23 +124,23 @@ public abstract class RayTracing {
 			oX += tMin * dX;
 			if (tX == tMin){
 				if (dX < 0){
-					oX = 1;
+					oX = 1.0;
 					blockX --;
 					changed = true;
 				}
 				else if (dX > 0){
-					oX = 0;
+					oX = 0.0;
 					blockX ++;
 					changed = true;
 				}
 			}
-			else if (oX >= 1 && dX > 0.0){
-				oX -= 1;
+			else if (oX >= 1.0 && dX > 0.0){
+				oX -= 1.0;
 				blockX ++;
 				changed = true;
 			}
 			else if (oX < 0 && dX < 0.0){
-				oX += 1;
+				oX += 1.0;
 				blockX --;
 				changed = true;
 			}
@@ -137,23 +148,23 @@ public abstract class RayTracing {
 			oY += tMin * dY;
 			if (tY == tMin){
 				if (dY < 0){
-					oY = 1;
+					oY = 1.0;
 					blockY --;
 					changed = true;
 				}
 				else if (dY > 0){
-					oY = 0;
+					oY = 0.0;
 					blockY ++;
 					changed = true;
 				}
 			}
 			else if (oY >= 1 && dY > 0.0){
-				oY -= 1;
+				oY -= 1.0;
 				blockY ++;
 				changed = true;
 			}
 			else if (oY < 0 && dY < 0.0){
-				oY += 1;
+				oY += 1.0;
 				blockY --;
 				changed = true;
 			}
@@ -161,23 +172,23 @@ public abstract class RayTracing {
 			oZ += tMin * dZ;
 			if (tZ == tMin){
 				if (dZ < 0){
-					oZ = 1;
+					oZ = 1.0;
 					blockZ --;
 					changed = true;
 				}
 				else if (dZ > 0){
-					oZ = 0;
+					oZ = 0.0;
 					blockZ ++;
 					changed = true;
 				}
 			}
 			else if (oZ >= 1 && dZ > 0.0){
-				oZ -= 1;
+				oZ -= 1.0;
 				blockZ ++;
 				changed = true;
 			}
 			else if (oZ < 0 && dZ < 0.0){
-				oZ += 1;
+				oZ += 1.0;
 				blockZ --;
 				changed = true;
 			}
