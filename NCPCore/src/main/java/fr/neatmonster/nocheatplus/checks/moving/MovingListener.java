@@ -405,6 +405,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		// TODO: Might log base parts here (+extras).
 		if (earlyReturn) {
+			// TODO: Remove player from enforceLocation ?
 			// TODO: Log "early return: " + tags.
 			if (newTo != null) {
 				// Illegal Yaw/Pitch.
@@ -615,44 +616,57 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 		}
 
-        // Set-back handling.
-        if (newTo != null) {
-        	// Illegal Yaw/Pitch.
-        	if (LocUtil.needsYawCorrection(newTo.getYaw())) {
-        		newTo.setYaw(LocUtil.correctYaw(newTo.getYaw()));
-        	}
-        	if (LocUtil.needsPitchCorrection(newTo.getPitch())) {
-        		newTo.setPitch(LocUtil.correctPitch(newTo.getPitch()));
-        	}
-        	
-        	// Reset some data.
-        	data.prepareSetBack(newTo);
-			
-            // Set new to-location.
-			// TODO: Clone here for the case of using loc with loc = player.getLocation(moveInfo.loc).
-			// TODO: Actually should be a newly created location already (data.getSetBack).
-            event.setTo(newTo);
-            
-            // Debug.
-            if (cc.debug) {
-            	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
-            }
-        }
         
-        // Set positions.
-        // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
-        data.fromX = from.getX();
-        data.fromY = from.getY();
-        data.fromZ = from.getZ();
-        data.toX = to.getX();
-        data.toY = to.getY();
-        data.toZ = to.getZ();
+        if (newTo == null) {
+            // Set positions.
+            // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
+            data.fromX = from.getX();
+            data.fromY = from.getY();
+            data.fromZ = from.getZ();
+            data.toX = to.getX();
+            data.toY = to.getY();
+            data.toZ = to.getZ();
+        }
+        else {
+        	// Set-back handling.
+        	onSetBack(player, event, newTo, data, cc);
+        }
         
         // Cleanup.
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
     }
     
+    /**
+     * 
+     * @param player
+     * @param event
+     * @param newTo Must be a cloned or new Location instance, free for whatever other plugins do with it.
+     * @param data
+     * @param cc
+     */
+	private void onSetBack(final Player player, final PlayerMoveEvent event, final Location newTo, final MovingData data, final MovingConfig cc) {
+		// Illegal Yaw/Pitch.
+    	if (LocUtil.needsYawCorrection(newTo.getYaw())) {
+    		newTo.setYaw(LocUtil.correctYaw(newTo.getYaw()));
+    	}
+    	if (LocUtil.needsPitchCorrection(newTo.getPitch())) {
+    		newTo.setPitch(LocUtil.correctPitch(newTo.getPitch()));
+    	}
+    	
+    	// Reset some data.
+    	data.prepareSetBack(newTo);
+    	data.resetPositions(newTo); // TODO: Might move into prepareSetBack, experimental here.
+		
+        // Set new to-location.
+        event.setTo(newTo);
+        
+        // Debug.
+        if (cc.debug) {
+        	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
+        }
+	}
+
 	/**
      * Called from player-move checking, if the player is inside of a vehicle.
      * @param player
