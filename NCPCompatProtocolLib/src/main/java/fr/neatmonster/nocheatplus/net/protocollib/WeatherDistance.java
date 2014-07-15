@@ -29,7 +29,6 @@ public class WeatherDistance extends PacketAdapter {
         double locZ = packetContainer.getIntegers().read(2) / 8;
 
         Location weatherLocation = new Location(player.getWorld(), locX, locY, locZ);
-        Location location = player.getLocation().clone();
 
         if (player.getLocation().distance(weatherLocation) > 512.0F) {
             event.setCancelled(true);
