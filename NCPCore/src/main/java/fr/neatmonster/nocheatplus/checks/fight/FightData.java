@@ -131,7 +131,7 @@ public class FightData extends ACheckData {
     // Shared
     public String lastWorld			= "";
     public int lastAttackTick		= 0;
-    public double lastAttackedX		= Integer.MAX_VALUE;
+    public double lastAttackedX		= Double.MAX_VALUE;
     public double lastAttackedY;
     public double lastAttackedZ;
     
@@ -197,4 +197,12 @@ public class FightData extends ACheckData {
 		// Start with full fast-heal buffer.
 		fastHealBuffer = cc.fastHealBuffer; 
 	}
+
+	public void onWorldChange() {
+		angleHits.clear();
+		lastAttackedX = Double.MAX_VALUE;
+		lastAttackTick = 0;
+		lastWorld = "";
+	}
+	
 }

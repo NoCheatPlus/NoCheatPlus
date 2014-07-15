@@ -38,14 +38,14 @@ public class FastPlace extends Check {
         
         // Short term arrivals.
         final int tick = TickTask.getTick();
-        if (tick < data.fastPlaceShortTermTick ){
+        if (tick < data.fastPlaceShortTermTick ) {
         	// TickTask got reset.
         	data.fastPlaceShortTermTick = tick;
         	data.fastPlaceShortTermCount = 1;
         }
         else if (tick - data.fastPlaceShortTermTick < cc.fastPlaceShortTermTicks){
         	// Account for server side lag.
-        	if (!cc.lag || TickTask.getLag(50L * (tick - data.fastPlaceShortTermTick), true) < 1.2){
+        	if (!cc.lag || TickTask.getLag(50L * (tick - data.fastPlaceShortTermTick), true) < 1.2f){
         		// Within range, add.
         		data.fastPlaceShortTermCount ++;
         	}
@@ -62,9 +62,9 @@ public class FastPlace extends Check {
         
         // Find if one of both or both are violations:
         final float fullViolation;
-        if (fullScore > cc.fastPlaceLimit){
+        if (fullScore > cc.fastPlaceLimit) {
         	// Account for server side lag.
-        	if (cc.lag){
+        	if (cc.lag) {
         		fullViolation = fullScore / TickTask.getLag(data.fastPlaceBuckets.bucketDuration() * data.fastPlaceBuckets.numberOfBuckets(), true) - cc.fastPlaceLimit;
         	}
         	else{
@@ -78,14 +78,16 @@ public class FastPlace extends Check {
         final float violation = Math.max(fullViolation, shortTermViolation);
         
         boolean cancel = false;
-        if (violation > 0){
-        	final double change = violation / 1000;
+        if (violation > 0f) {
+        	final double change = (double) violation;
         	data.fastPlaceVL += change;
         	cancel = executeActions(player, data.fastPlaceVL, change, cc.fastPlaceActions);
         }
-        else if (data.fastPlaceVL > 0d && fullScore < cc.fastPlaceLimit * .75)
+        else if (data.fastPlaceVL > 0d && fullScore < cc.fastPlaceLimit * .75) {
         	data.fastPlaceVL *= 0.95;
+        }
         
 		return cancel;
     }
+    
 }

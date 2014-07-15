@@ -6,6 +6,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 public class TeleportUtil {
+	
+	/** Temp use. LocUtil.clone on passing. setWorld(null) after use. */
+	private static final Location useLoc = new Location(null, 0, 0, 0);
 
 	/**
 	 * Teleport the player with vehicle, temporarily eject the passenger and set teleported in MovingData.
@@ -20,6 +23,7 @@ public class TeleportUtil {
 		final boolean vehicleTeleported;
 		final boolean playerIsPassenger = player.equals(passenger);
 		if (playerIsPassenger && !vehicle.isDead()){ // && vehicle.equals(player.getVehicle).
+			// TODO: Does VehicleExit fire here !?  Consequences?
 			vehicle.eject();
 			vehicleTeleported = vehicle.teleport(location, TeleportCause.PLUGIN);
 			
@@ -29,13 +33,15 @@ public class TeleportUtil {
 		}
 		else vehicleTeleported = false;
 		final boolean playerTeleported = player.teleport(location);
-		if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation()) < 1.0){
+		if (playerIsPassenger && playerTeleported && vehicleTeleported && player.getLocation().distance(vehicle.getLocation(useLoc)) < 1.0){
 			// Somewhat check against tp showing something wrong (< 1.0).
+			// TODO: Does VehicleEnter fire here !?  Consequences?
 			vehicle.setPassenger(player);
 		}
 		if (debug){
 			System.out.println(player.getName() + " vehicle set back: " + location);
 		}
+		useLoc.setWorld(null);
 	}
 	
 	/**

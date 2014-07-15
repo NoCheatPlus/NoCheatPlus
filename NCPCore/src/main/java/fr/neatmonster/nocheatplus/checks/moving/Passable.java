@@ -136,7 +136,7 @@ public class Passable extends Check {
 					System.out.println(player.getName() + " Using set-back location for passable.");
 				}
 			} else if (cc.debug) {
-				System.out.println(player.getName() + " Ignorng set-back for passable.");
+				System.out.println(player.getName() + " Ignoring set-back for passable.");
 			}
 		}
 
@@ -155,7 +155,8 @@ public class Passable extends Check {
 			// TODO: Consider another set back position for this, also keeping track of players moving around in blocks.
 			final Location newTo;
 			if (loc != null) {
-				newTo = loc;
+				// Ensure the given location is cloned.
+				newTo = LocUtil.clone(loc);
 			} else {
 				newTo = from.getLocation();
 				if (cc.debug) {

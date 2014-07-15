@@ -4,19 +4,22 @@ package fr.neatmonster.nocheatplus.actions;
  * Some wildcards that are used in commands and log messages.
  */
 public enum ParameterName {
+	// TODO: Cleanup for some kind of policies: useful names, alternative names, prefer generic names.
     BLOCK_ID("blockid"),
+    BLOCK_TYPE("blocktype"),
     CHECK("check"),
     TAGS("tags"),
     DISTANCE("distance"),
-    FALL_DISTANCE("falldistance"),
+    FALL_DISTANCE("falldistance"), // TODO: rather not deprecate ?
     FOOD("food"),
     IP("ip"),
     LIMIT("limit"),
     LOCATION_FROM("locationfrom"),
     LOCATION_TO("locationto"),
     PACKETS("packets"),
-    PLAYER("player"),
-    REACH_DISTANCE("reachdistance"),
+    PLAYER("player"), // TODO: playername rather ? + displayname ?
+    REACH_DISTANCE("reachdistance"), // TODO: deprecate ?
+    UUID("uuid"),
     VIOLATIONS("violations"),
     WORLD("world");
 

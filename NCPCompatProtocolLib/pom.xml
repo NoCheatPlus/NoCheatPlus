@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcompatcb2511</artifactId>
+  <artifactId>ncpcompatprotocollib</artifactId>
   <packaging>jar</packaging>
-  <name>NCPCompatCB2511</name>
+  <name>NCPCompatProtocolLib</name>
   <version>static</version>
 
   <parent>
@@ -12,6 +12,14 @@
     <artifactId>nocheatplus-parent</artifactId>
     <version>static</version>
   </parent>
+  
+  <repositories>
+  <repository>
+    <id>comphenix-rep</id>
+    <name>Comphenix Repository</name>
+    <url>http://repo.comphenix.net/content/groups/public</url>
+  </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -19,14 +27,13 @@
     	<artifactId>ncpcore</artifactId>
     	<version>static</version>
     </dependency>
-    <dependency>
-    	<groupId>org.bukkit</groupId>
-    	<artifactId>craftbukkit</artifactId>
-    	<version>1.4.5-R0.2</version>
-    </dependency>
+	<dependency>
+	  <groupId>com.comphenix.protocol</groupId>
+	  <artifactId>ProtocolLib</artifactId>
+	  <version>LATEST</version>
+	</dependency>
   </dependencies>
 
-  <description>Compatibility up to CB2512 (i.e. 1.4.5-R0.2).
-
-Version updating is done for the NoCheatPlus sub-module.</description>
+  <description>Features using the plugin ProtocolLib:
+http://dev.bukkit.org/bukkit-plugins/protocollib/</description>
 </project>

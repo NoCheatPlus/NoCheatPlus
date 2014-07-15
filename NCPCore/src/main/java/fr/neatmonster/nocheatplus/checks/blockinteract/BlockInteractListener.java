@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /**
@@ -36,6 +37,9 @@ public class BlockInteractListener extends CheckListener {
     /** Speed of interaction. */
     private final Speed speed = addCheck(new Speed());
     
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
+    
     public BlockInteractListener(){
     	super(CheckType.BLOCKINTERACT);
     }
@@ -49,6 +53,15 @@ public class BlockInteractListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onPlayerInteract(final PlayerInteractEvent event) {
+    	final Player player = event.getPlayer();
+    	// Cancel interact events for dead players.
+    	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+    		// Auto-soup after death.
+    		event.setUseInteractedBlock(Result.DENY);
+    		event.setUseItemInHand(Result.DENY);
+    		event.setCancelled(true);
+    		return;
+    	}
     	
     	// TODO: Re-arrange for interact spam, possibly move ender pearl stuff to a method.
     	final Action action = event.getAction();
@@ -57,7 +70,7 @@ public class BlockInteractListener extends CheckListener {
         if (block == null){
         	return;
         }
-    	final Player player = event.getPlayer();
+    	
     	final BlockInteractData data = BlockInteractData.getData(player);
     	data.setLastBlock(block, action);
         switch(action){
@@ -65,8 +78,8 @@ public class BlockInteractListener extends CheckListener {
         	break;
         case RIGHT_CLICK_BLOCK:
         	final ItemStack stack = player.getItemInHand();
-    		if (stack != null && stack.getTypeId() == Material.ENDER_PEARL.getId()){
-    			if (!BlockProperties.isPassable(block.getTypeId())){
+    		if (stack != null && stack.getType() == Material.ENDER_PEARL){
+    			if (!BlockProperties.isPassable(block.getType())){
     				final CombinedConfig ccc = CombinedConfig.getConfig(player);
     				if (ccc.enderPearlCheck && ccc.enderPearlPreventClickBlock){
     					event.setUseItemInHand(Result.DENY);
@@ -86,7 +99,7 @@ public class BlockInteractListener extends CheckListener {
         boolean cancelled = false;
         
         final BlockFace face = event.getBlockFace();
-        final Location loc = player.getLocation();
+        final Location loc = player.getLocation(useLoc);
         
         // Interaction speed.
         if (!cancelled && speed.isEnabled(player) && speed.check(player, data, cc)){
@@ -114,5 +127,6 @@ public class BlockInteractListener extends CheckListener {
         	event.setUseItemInHand(Result.DENY);
         	event.setCancelled(true);
         }
+        useLoc.setWorld(null);
     }
 }

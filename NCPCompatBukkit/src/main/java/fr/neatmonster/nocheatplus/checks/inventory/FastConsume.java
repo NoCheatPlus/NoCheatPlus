@@ -12,6 +12,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
@@ -44,26 +45,35 @@ public class FastConsume extends Check implements Listener{
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	public void onItemConsume(final PlayerItemConsumeEvent event){
 		final Player player = event.getPlayer();
-		if (!isEnabled(player)) return;
+		if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+    		// Eat after death.
+    		event.setCancelled(true);
+    		return;
+    	}
+		if (!isEnabled(player)) {
+			return;
+		}
 		final InventoryData data = InventoryData.getData(player);
-		if (check(player, event.getItem(), data)){
+		final long time = System.currentTimeMillis();
+		if (check(player, event.getItem(), time, data)){
 			event.setCancelled(true);
 			DataManager.getPlayerData(player.getName(), true).task.updateInventory();
 		}
-		data.instantEatInteract = 0;
+		data.instantEatInteract = time;
 		data.instantEatFood = null;
 	}
 	
-	private boolean check(final Player player, final ItemStack stack, final InventoryData data){
+	private boolean check(final Player player, final ItemStack stack, final long time, final InventoryData data){
 		// Uses the instant-eat data for convenience.
 		// Consistency checks...
 		if (stack == null){ // || stack.getType() != data.instantEatFood){
 			// TODO: Strict version should prevent other material (?).
 			return false;
 		}
-		final long time = System.currentTimeMillis();
-		final long ref = Math.max(data.instantEatInteract, data.lastClickTime);
+		final long ref = data.instantEatInteract == 0 ? 0 : Math.max(data.instantEatInteract, data.lastClickTime);
 		if (time < ref){
+			// Time ran backwards.
+			data.instantEatInteract = data.lastClickTime = time;
 			return false;
 		}
 		// Check exceptions.
@@ -71,11 +81,11 @@ public class FastConsume extends Check implements Listener{
 		final Material mat = stack == null ? null : stack.getType();
 		if (mat != null){
 			if (cc.fastConsumeWhitelist){
-				if (!cc.fastConsumeItems.contains(mat.getId())){
+				if (!cc.fastConsumeItems.contains(mat)){
 					return false;
 				}
 			}
-			else if (cc.fastConsumeItems.contains(mat.getId())){
+			else if (cc.fastConsumeItems.contains(mat)){
 				return false;
 			}
 		}

@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
  * - reading (all) the default properties from a file too.
  *
  */
+@SuppressWarnings("deprecation")
 public class BlockProperties {
 	
 	/**
@@ -344,7 +345,10 @@ public class BlockProperties {
     public static final long F_ICE 			= 0x20000;
     
     /** LEAVES */
-    public static final long F_LEAVES 			= 0x40000;
+    public static final long F_LEAVES 		= 0x40000;
+    
+    /** THIN FENCE (glass panes, iron fence) */
+    public static final long F_THIN_FENCE 	= 0x80000;
     
     /**
      * Map flag to names.
@@ -354,6 +358,8 @@ public class BlockProperties {
      * Map flag name to flag, both names starting with F_... and the name without F_.
      */
     private static final Map<String, Long> nameFlagMap = new LinkedHashMap<String, Long>();
+    
+    private static final Location useLoc = new Location(null, 0, 0, 0);
     
     static{
     	// Use reflection to get a flag -> name mapping and vice versa.
@@ -442,8 +448,8 @@ public class BlockProperties {
 		
 		tools.put(359, new ToolProps(ToolType.SHEARS, MaterialBase.NONE));
 	}
-
-    private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+	
+	private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
 		Arrays.fill(blocks, null);
 		// Initalize block flags
 		// Generic initialization.
@@ -498,14 +504,6 @@ public class BlockProperties {
         
         // Snow (1.4.x)
         blockFlags[Material.SNOW.getId()] |= F_HEIGHT_8SIM_INC;
-        
-        // 1.5 block high.
-        for (final Material mat : new Material[]{
-                Material.FENCE, Material.FENCE_GATE,
-                Material.NETHER_FENCE,
-        }){
-            blockFlags[mat.getId()] |= F_HEIGHT150;
-        }
         
         // Climbable
         for (final Material mat : new Material[]{
@@ -570,16 +568,22 @@ public class BlockProperties {
 			blockFlags[mat.getId()] |= F_IGN_PASSABLE;
 		}
 		
-		// Blocks changing depending on neighbor blocks.
-		for (final Material mat : new Material[]{
-				Material.FENCE, Material.FENCE_GATE, Material.COBBLE_WALL,
-				Material.NETHER_FENCE,
-				Material.IRON_FENCE, Material.THIN_GLASS,
-				
-		}){
-			blockFlags[mat.getId()] |= F_VARIABLE;
-		}
 		// ? Extra flag for COCOA, ANVIL: depends on data value (other issue)
+		
+		// Fences, 1.5 block high.
+        for (final Material mat : new Material[]{
+                Material.FENCE, Material.FENCE_GATE,
+                Material.NETHER_FENCE, Material.COBBLE_WALL,
+        }){
+            blockFlags[mat.getId()] |= F_HEIGHT150 | F_VARIABLE;
+        }
+        
+        // Thin fences (iron fence, glass panes).
+        for (final Material mat : new Material[]{
+        		Material.IRON_FENCE, Material.THIN_GLASS,
+        }){
+            blockFlags[mat.getId()] |= F_THIN_FENCE | F_VARIABLE;
+        }
 		
 		// Flexible ground (height):
 		for (final Material mat : new Material[]{
@@ -623,7 +627,7 @@ public class BlockProperties {
 		}){
 			blocks[mat.getId()] = glassType;
 		}
-		blocks[102] = glassType; // glass panes
+		blocks[Material.THIN_GLASS.getId()] = glassType;
 		blocks[Material.NETHERRACK.getId()] = new BlockProps(woodPickaxe, 0.4f, secToMs(2, 0.3, 0.15, 0.1, 0.1, 0.05));
 		blocks[Material.LADDER.getId()] = new BlockProps(noTool, 0.4f, secToMs(0.6), 2.5f);
 		blocks[Material.CACTUS.getId()] = new BlockProps(noTool, 0.4f, secToMs(0.6));
@@ -875,12 +879,24 @@ public class BlockProperties {
 	
 	/**
 	 * Convenience method.
+	 * @param blockType
+	 * @param player
+	 * @return
+	 */
+	public static long getBreakingDuration(final Material BlockType, final Player player){
+		return getBreakingDuration(BlockType.getId(), player);
+	}
+	
+	/**
+	 * Convenience method.
 	 * @param blockId
 	 * @param player
 	 * @return
 	 */
 	public static long getBreakingDuration(final int blockId, final Player player){
-		return getBreakingDuration(blockId, player.getItemInHand(), player.getInventory().getHelmet(), player, player.getLocation());
+		final long res = getBreakingDuration(blockId, player.getItemInHand(), player.getInventory().getHelmet(), player, player.getLocation(useLoc));
+		useLoc.setWorld(null);
+		return res;
 	}
 	
 	/**
@@ -1143,8 +1159,11 @@ public class BlockProperties {
 		if (blockId < 0 || blockId >= blocks.length) throw new IllegalArgumentException("The blockId is outside of supported range: " + blockId);
 		blocks[blockId] = blockProps;
 	}
-
-
+	
+	public static boolean isValidTool(final Material blockType, final ItemStack itemInHand) {
+		return isValidTool(blockType.getId(), itemInHand);
+	}
+	
 	public static boolean isValidTool(final int blockId, final ItemStack itemInHand) {
 		final BlockProps blockProps = getBlockProps(blockId);
 		final ToolProps toolProps = getToolProps(itemInHand);
@@ -1212,6 +1231,24 @@ public class BlockProperties {
 		pLoc.cleanup();
 		return res;
 	}
+	
+	/**
+	 * Straw-man-method to hide warnings. Rather intended for display in debug/alert messages.
+	 * @param blockType
+	 * @return
+	 */
+	public static int getId(final Material blockType) {
+		return blockType.getId();
+	}
+	
+	/**
+	 * Straw-man method to hide warnings.
+	 * @param id
+	 * @return
+	 */
+	public static Material getMaterial(final int id) {
+		return Material.getMaterial(id);
+	}
 
 	/**
 	 * @deprecated Typo in method name.
@@ -1222,8 +1259,16 @@ public class BlockProperties {
 		return blockFlags[id];
 	}
 	
+	public static final long getBlockFlags(final Material blockType){
+		return getBlockFlags(blockType.getId());
+	}
+	
 	public static final long getBlockFlags(final int id){
 		return blockFlags[id];
+	}
+	
+	public static final void setBlockFlags(final Material blockType, final long flags){
+		setBlockFlags(blockType.getId(), flags);
 	}
 
 	public static final void setBlockFlags(final int id, final long flags){
@@ -1253,12 +1298,25 @@ public class BlockProperties {
 	public static final boolean isClimbable(final int id) {
 		return (blockFlags[id] & F_CLIMBABLE) != 0;
 	}
+	
+	/**
+	 * Climbable material that needs to be attached to a block, to allow players to climb up.<br>
+	 * Currently only applies to vines. There is no flag for such, yet.
+	 * @param id
+	 * @return
+	 */
+	public static final boolean isAttachedClimbable(final int id) {
+		return id == Material.VINE.getId();
+	}
 
 	public static final boolean isStairs(final int id) {
 		return (blockFlags[id] & F_STAIRS) != 0;
 	}
-
-
+	
+	public static final boolean isLiquid(final Material blockType) {
+		return isLiquid(blockType.getId());
+	}
+	
 	public static final boolean isLiquid(final int id) {
 		return (blockFlags[id] & F_LIQUID) != 0;
 	}
@@ -1273,11 +1331,29 @@ public class BlockProperties {
 	
 	/**
 	 * Might hold true for liquids too.
+	 * @param blockType
+	 * @return
+	 */
+	public static final boolean isSolid(final Material blockType){
+		return isSolid(blockType.getId());
+	}
+	
+	/**
+	 * Might hold true for liquids too.
 	 * @param id
 	 * @return
 	 */
 	public static final boolean isSolid(final int id){
 		return (blockFlags[id] & F_SOLID) != 0;
+	}
+	
+	/**
+	 * Might hold true for liquids too.
+	 * @param blockType
+	 * @return
+	 */
+	public static final boolean isGround(final Material blockType){
+		return isGround(blockType.getId());
 	}
 	
 	/**
@@ -1287,6 +1363,16 @@ public class BlockProperties {
      */
     public static final boolean isGround(final int id){
         return (blockFlags[id] & F_GROUND) != 0;
+    }
+    
+    /**
+     * Just check if a position is not inside of a block that has a bounding box.<br>
+	 * This is an inaccurate check, it also returns false for doors etc.
+     * @param blockType
+     * @return
+     */
+    public static final boolean isPassable(final Material blockType){
+    	return isPassable(blockType.getId());
     }
 	
 	/**
@@ -1423,6 +1509,7 @@ public class BlockProperties {
 	 */
 	public static final boolean isPassableWorkaround(final BlockCache access, final int bx, final int by, final int bz, final double fx, final double fy, final double fz, final int id, final double dX, final double dY, final double dZ, final double dT){
 		// Note: Since this is only called if the bounding box collides, out-of-bounds checks should not be necessary.
+		// TODO: Add a flag if a workaround exists (!), might store the type of workaround extra (generic!), or extra flags.
 		final long flags = blockFlags[id];
 		if ((flags & F_STAIRS) != 0){
 			if ((access.getData(bx, by, bz) & 0x4) != 0){
@@ -1436,10 +1523,11 @@ public class BlockProperties {
 		else if (id == Material.SOUL_SAND.getId()){
 			if (Math.min(fy, fy + dY * dT) >= 0.875) return true; // 0.125
 		}
-		else if (id == Material.IRON_FENCE.getId() || id == Material.THIN_GLASS.getId()){
+		else if ((flags & F_THIN_FENCE) != 0){
 			if (!collidesFence(fx, fz, dX, dZ, dT, 0.05)) return true;
 		}
 		else if (id == Material.FENCE.getId() || id == Material.NETHER_FENCE.getId()){
+			// TODO: Re-check if cobble fence is now like this.
 			if (!collidesFence(fx, fz, dX, dZ, dT, 0.425)) return true;
 		}
 		else if (id == Material.FENCE_GATE.getId()){
@@ -1642,7 +1730,8 @@ public class BlockProperties {
 	 */
 	public static final boolean isPassable(final Location from, final Location to){
 		blockCache.setAccess(from.getWorld());
-    	PassableRayTracing rt = new PassableRayTracing();
+    	final PassableRayTracing rt = new PassableRayTracing();
+    	rt.setMaxSteps(60); // TODO: Configurable ?
     	rt.setBlockCache(blockCache);
     	rt.set(from.getX(), from.getY(), from.getZ(), to.getX(), to.getY(), to.getZ());
     	rt.loop();
@@ -1808,6 +1897,22 @@ public class BlockProperties {
             }
         }
         return false;
+    }
+    
+    /**
+     * Convenience method for Material instead of block id.
+     * @param access
+     * @param minX
+     * @param minY
+     * @param minZ
+     * @param maxX
+     * @param maxY
+     * @param maxZ
+     * @param mat
+     * @return
+     */
+    public static final boolean collidesId(final BlockCache access, final double minX, double minY, final double minZ, final double maxX, final double maxY, final double maxZ, final Material mat){
+    	return collidesId(access, minX, minY, minZ, maxX, maxY, maxZ, mat.getId());
     }
     
     /**
@@ -2063,7 +2168,10 @@ public class BlockProperties {
     	final int iMinX = Location.locToBlock(minX);
     	final int iMaxX = Location.locToBlock(maxX);
     	final int iMinY = Location.locToBlock(minY - 0.5626);
-    	if (iMinY > maxBlockY) return false;
+    	if (iMinY > maxBlockY) {
+    		// TODO: Keep checking this, does not apply for biger values of yOnGround.
+    		return false;
+    	}
     	final int iMaxY = Math.min(Location.locToBlock(maxY), maxBlockY);
     	final int iMinZ = Location.locToBlock(minZ);
     	final int iMaxZ = Location.locToBlock(maxZ);

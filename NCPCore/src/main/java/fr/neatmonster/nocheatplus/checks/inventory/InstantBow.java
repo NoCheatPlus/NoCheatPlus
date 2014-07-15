@@ -42,20 +42,30 @@ public class InstantBow extends Check {
         final long expectedPullDuration = (long) (maxTime - maxTime * (1f - force) * (1f - force)) - cc.instantBowDelay;
         
         // Time taken to pull the string.
-        final long pullDuration = now - (cc.instantBowStrict ? data.instantBowInteract : data.instantBowShoot);
+        final long pullDuration;
+        final boolean valid;
+        if (cc.instantBowStrict) {
+        	// The interact time is invalid, if set to 0.
+        	valid = data.instantBowInteract != 0; 
+        	pullDuration = valid ? (now - data.instantBowInteract) : 0L;
+        } else {
+        	valid = true;
+        	pullDuration = now - data.instantBowShoot;
+        }
 
-        if ((!cc.instantBowStrict || data.instantBowInteract > 0) && pullDuration >= expectedPullDuration){
+        if (valid && (!cc.instantBowStrict || data.instantBowInteract > 0L) && pullDuration >= expectedPullDuration) {
             // The player was slow enough, reward them by lowering their violation level.
             data.instantBowVL *= 0.9D;
         }
-        else if (data.instantBowInteract > now){
+        else if (valid && data.instantBowInteract > now) {
             // Security check if time ran backwards.
             // TODO: Maybe this can be removed, though TickTask does not reset at the exact moment.
         }
         else {
         	// Account for server side lag.
-        	final long correctedPullduration = cc.lag ? (long) (TickTask.getLag(expectedPullDuration, true) * pullDuration) : pullDuration;
-        	if (correctedPullduration < expectedPullDuration){
+        	// (Do not apply correction to invalid pulling.)
+        	final long correctedPullduration = valid ? (cc.lag ? (long) (TickTask.getLag(expectedPullDuration, true) * pullDuration) : pullDuration) : 0;
+        	if (correctedPullduration < expectedPullDuration) {
                 // TODO: Consider: Allow one time but set yawrate penalty time ?
                 final double difference = (expectedPullDuration - pullDuration) / 100D;
 
@@ -68,7 +78,7 @@ public class InstantBow extends Check {
         	}
         }
         
-        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
             player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", " + (cc.instantBowStrict || pullDuration < 2 * expectedPullDuration ? ("pull time: " + pullDuration) : "") + "(" + expectedPullDuration +")");
         }
         

@@ -4,11 +4,32 @@
   <!-- Informations -->
   <artifactId>nocheatplus</artifactId>
   <name>NoCheatPlus</name>
-  <version>3.10.9-SNAPSHOT</version>
+  <version>3.10.13-SNAPSHOT</version>
   <description>Detect and fight the exploitation of various flaws/bugs in Minecraft.</description>
   <url>http://dev.bukkit.org/server-mods/nocheatplus</url>
   
   <packaging>jar</packaging>
+  
+  <repositories>
+    <repository>
+      <id>md_5-releases</id>
+      <url>http://repo.md-5.net/content/repositories/releases/</url>
+	</repository>
+	<repository>
+      <id>md_5-snapshots</id>
+      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
+	</repository>
+  </repositories>
+  <distributionManagement>
+    <repository>
+      <id>md_5-releases</id>
+      <url>http://repo.md-5.net/content/repositories/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>md_5-snapshots</id>
+      <url>http://repo.md-5.net/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
   
   <dependencies>
     <dependency>
@@ -69,7 +90,6 @@
                   <include>fr.neatmonster:ncpcommons</include>
                   <include>fr.neatmonster:ncpcore</include>
                   <include>fr.neatmonster:ncpcompatbukkit</include>
-                  <include>fr.neatmonster:ncpcompatcb2511</include>
                   <include>fr.neatmonster:ncpcompatcb2512</include>
                   <include>fr.neatmonster:ncpcompatcb2545</include>
                   <include>fr.neatmonster:ncpcompatcb2602</include>
@@ -79,7 +99,11 @@
                   <include>fr.neatmonster:ncpcompatcb2794</include>
                   <include>fr.neatmonster:ncpcompatcb2808</include>
                   <include>fr.neatmonster:ncpcompatcb2882</include>
+                  <include>fr.neatmonster:ncpcompatcb2922</include>
+                  <include>fr.neatmonster:ncpcompatcb3026</include>
+                  <include>fr.neatmonster:ncpcompatcb3043</include>
                   <include>fr.neatmonster:ncpcompatcbdev</include>
+                  <include>fr.neatmonster:ncpcompatprotocollib</include>
                   <include>fr.neatmonster:ncpplugin</include>
 <!--                   <include>fr.neatmonster:nocheatplus-parent</include> -->
                 </includes>

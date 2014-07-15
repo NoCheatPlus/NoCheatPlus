@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.neatmonster</groupId>
+  <artifactId>ncpcompatcb2922</artifactId>
+  <packaging>jar</packaging>
+  <name>NCPCompatCB2922</name>
+  <version>static</version>
+
+  <parent>
+    <groupId>fr.neatmonster</groupId>
+    <artifactId>nocheatplus-parent</artifactId>
+    <version>static</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcore</artifactId>
+    	<version>static</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.bukkit</groupId>
+    	<artifactId>craftbukkit</artifactId>
+    	<version>1.7.2-R0.4-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <description>Compatibility for CB2922 (MC 1.7.2).
+
+Version updating is done for the NoCheatPlus sub-module.</description>
+</project>

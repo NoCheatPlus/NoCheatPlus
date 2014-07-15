@@ -38,14 +38,8 @@ public class Critical extends Check {
      *            the player
      * @return true, if successful
      */
-    public boolean check(final Player player) {
-        final FightConfig cc = FightConfig.getConfig(player);
-        final FightData data = FightData.getData(player);
-
+    public boolean check(final Player player, final Location loc, final FightData data, final FightConfig cc) {
         boolean cancel = false;
-
-        // We'll need the PlayerLocation to know some important stuff.
-        final Location loc = player.getLocation();
 		
 		final float mcFallDistance = player.getFallDistance();
 		final MovingConfig mCc = MovingConfig.getConfig(player);

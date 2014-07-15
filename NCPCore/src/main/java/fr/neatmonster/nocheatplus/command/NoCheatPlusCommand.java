@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.command.admin.CommandsCommand;
 import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
 import fr.neatmonster.nocheatplus.command.admin.InspectCommand;
 import fr.neatmonster.nocheatplus.command.admin.LagCommand;
-import fr.neatmonster.nocheatplus.command.admin.NCPVersionCommand;
+import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
 import fr.neatmonster.nocheatplus.command.admin.ReloadCommand;
 import fr.neatmonster.nocheatplus.command.admin.RemovePlayerCommand;
 import fr.neatmonster.nocheatplus.command.admin.exemption.ExemptCommand;
@@ -89,7 +89,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         		new KickCommand(plugin),
         		new KickListCommand(plugin),
         		new LagCommand(plugin),
-        		new NCPVersionCommand(plugin),
+        		new VersionCommand(plugin),
         		new NotifyCommand(plugin),
         		new ReloadCommand(plugin, notifyReload),
         		new RemovePlayerCommand(plugin),

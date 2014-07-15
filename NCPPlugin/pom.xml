@@ -35,11 +35,6 @@
     </dependency>
     <dependency>
     	<groupId>fr.neatmonster</groupId>
-    	<artifactId>ncpcompatcb2511</artifactId>
-    	<version>static</version>
-    </dependency>
-    <dependency>
-    	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcb2512</artifactId>
     	<version>static</version>
     </dependency>
@@ -84,8 +79,28 @@
         <version>static</version>
     </dependency>
     <dependency>
+        <groupId>fr.neatmonster</groupId>
+        <artifactId>ncpcompatcb2922</artifactId>
+        <version>static</version>
+    </dependency>
+    <dependency>
+        <groupId>fr.neatmonster</groupId>
+        <artifactId>ncpcompatcb3026</artifactId>
+        <version>static</version>
+    </dependency>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcompatcb3043</artifactId>
+    	<version>static</version>
+    </dependency>
+    <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcbdev</artifactId>
+    	<version>static</version>
+    </dependency>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcompatprotocollib</artifactId>
     	<version>static</version>
     </dependency>
   </dependencies>

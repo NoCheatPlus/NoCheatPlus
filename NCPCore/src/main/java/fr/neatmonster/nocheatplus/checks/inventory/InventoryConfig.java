@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
@@ -71,7 +72,7 @@ public class InventoryConfig extends ACheckConfig {
 	public final boolean    fastConsumeCheck;
 	public final long		fastConsumeDuration;
 	public final boolean    fastConsumeWhitelist;
-	public final Set<Integer> fastConsumeItems = new HashSet<Integer>();
+	public final Set<Material> fastConsumeItems = new HashSet<Material>();
 	public final ActionList fastConsumeActions;
 
 	public final boolean    instantBowCheck;

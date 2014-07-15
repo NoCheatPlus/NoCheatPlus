@@ -22,16 +22,17 @@
     <dependency>
     	<groupId>org.bukkit</groupId>
     	<artifactId>craftbukkit</artifactId>
-    	<version>1.7.2-R0.4-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.bukkit</groupId>
-    	<artifactId>bukkit</artifactId>
-    	<version>1.7.2-R0.4-SNAPSHOT</version>
+    	<version>1.7.10-R0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
   <description>Compatibility for the development version (latest of the supported Minecraft versions).
 
-Version updating is done for the NoCheatPlus sub-module.</description>
+Version updating is done for the NoCheatPlus sub-module.
+
+To add a new compat module three other pom.xml files have to be modified:
+- Root pom (parent): Add as module.
+- NCPPlugin: Add as dependency.
+- NochCheatPlus: Add as include (source).
+</description>
 </project>

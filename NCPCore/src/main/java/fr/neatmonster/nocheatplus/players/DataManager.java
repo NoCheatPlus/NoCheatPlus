@@ -483,6 +483,15 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
 	}
 	
 	/**
+	 * Convenience method, also hiding how player data is stored for a Player instance - always creates a PlayerData instance, if not already present.
+	 * @param player
+	 * @return
+	 */
+	public static PlayerData getPlayerData(final Player player) {
+		return getPlayerData(player.getName(), true);
+	}
+	
+	/**
 	 * 
 	 * @param playerName
 	 * @param create

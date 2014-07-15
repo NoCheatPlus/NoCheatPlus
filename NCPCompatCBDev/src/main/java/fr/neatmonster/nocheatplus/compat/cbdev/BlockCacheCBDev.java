@@ -3,16 +3,15 @@ package fr.neatmonster.nocheatplus.compat.cbdev;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.server.v1_7_R1.AxisAlignedBB;
-import net.minecraft.server.v1_7_R1.Block;
-import net.minecraft.server.v1_7_R1.EntityBoat;
-import net.minecraft.server.v1_7_R1.IBlockAccess;
-import net.minecraft.server.v1_7_R1.TileEntity;
-import net.minecraft.server.v1_7_R1.Vec3DPool;
+import net.minecraft.server.v1_7_R4.AxisAlignedBB;
+import net.minecraft.server.v1_7_R4.Block;
+import net.minecraft.server.v1_7_R4.EntityBoat;
+import net.minecraft.server.v1_7_R4.IBlockAccess;
+import net.minecraft.server.v1_7_R4.TileEntity;
 
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_7_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_7_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
@@ -22,7 +21,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 	/** Box for one time use, no nesting, no extra storing this(!). */
 	protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
 
-	protected net.minecraft.server.v1_7_R1.WorldServer world;
+	protected net.minecraft.server.v1_7_R4.WorldServer world;
 	
 	public BlockCacheCBDev(World world) {
 		setAccess(world);
@@ -30,7 +29,12 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 
 	@Override
 	public void setAccess(World world) {
-		this.world = world == null ? null : ((CraftWorld) world).getHandle();
+		if (world != null) {
+			this.maxBlockY = world.getMaxHeight() - 1;
+			this.world = ((CraftWorld) world).getHandle();
+		} else {
+			this.world = null;
+		}
 	}
 
 	@Override
@@ -48,8 +52,10 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 		
 		// TODO: change api for this / use nodes (!)
 		final int id = getTypeId(x, y, z);		
-		final net.minecraft.server.v1_7_R1.Block block = net.minecraft.server.v1_7_R1.Block.e(id);
-		if (block == null) return null;
+		final net.minecraft.server.v1_7_R4.Block block = net.minecraft.server.v1_7_R4.Block.getById(id);
+		if (block == null) {
+			return null;
+		}
 		block.updateShape(this, x, y, z); // TODO: use THIS instead of world.
 		
 		// minX, minY, minZ, maxX, maxY, maxZ
@@ -61,7 +67,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 		try{
 			// TODO: Probably check other ids too before doing this ?
 			
-			final net.minecraft.server.v1_7_R1.Entity mcEntity  = ((CraftEntity) entity).getHandle();
+			final net.minecraft.server.v1_7_R4.Entity mcEntity  = ((CraftEntity) entity).getHandle();
 			
 			final AxisAlignedBB box = useBox.b(minX, minY, minZ, maxX, maxY, maxZ);
 			@SuppressWarnings("rawtypes")
@@ -69,7 +75,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 			@SuppressWarnings("rawtypes")
 			final Iterator iterator = list.iterator();
 			while (iterator.hasNext()) {
-				final net.minecraft.server.v1_7_R1.Entity other = (net.minecraft.server.v1_7_R1.Entity) iterator.next();
+				final net.minecraft.server.v1_7_R4.Entity other = (net.minecraft.server.v1_7_R4.Entity) iterator.next();
 				if (!(other instanceof EntityBoat)){ // && !(other instanceof EntityMinecart)) continue;
 					continue;
 				}
@@ -78,7 +84,9 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 				}
 				// Still check this for some reason.
 				final AxisAlignedBB otherBox = other.boundingBox;
-				if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) continue;
+				if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) {
+					continue;
+				}
 				else {
 					return true;
 				}
@@ -102,11 +110,6 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 	@Override
 	public TileEntity getTileEntity(final int x, final int y, final int z) {
 		return world.getTileEntity(x, y, z);
-	}
-
-	@Override
-	public Vec3DPool getVec3DPool() {
-		return world.getVec3DPool();
 	}
 
 	@Override

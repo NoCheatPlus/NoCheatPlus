@@ -28,10 +28,12 @@ import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	
+	// private AlmostBoolean entityPlayerAvailable = AlmostBoolean.MAYBE;
+	
 	/**
 	 * Constructor to let it fail.
 	 */
-	public MCAccessBukkit(){
+	public MCAccessBukkit() {
 		// TODO: Add more that might fail if not supported ?
 		Material.AIR.isSolid();
 		Material.AIR.isOccluding();
@@ -43,7 +45,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	public String getMCVersion() {
 		// Bukkit API.
 		// TODO: maybe output something else.
-		return "1.4.6|1.4.7|1.5.x|1.6.1|1.6.2|?";
+		return "1.4.6|1.4.7|1.5.x|1.6.x|1.7.x"; // 1.7.x is bold!
 	}
 
 	@Override
@@ -55,7 +57,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 	public CommandMap getCommandMap() {
 		try{
 			return (CommandMap) ReflectionUtil.invokeMethodNoArgs(Bukkit.getServer(), "getCommandMap");
-		} catch (Throwable t){
+		} catch (Throwable t) {
 			// Nasty.
 			return null;
 		}
@@ -76,13 +78,19 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 
 	@Override
 	public AlmostBoolean isBlockSolid(final int id) {
+		@SuppressWarnings("deprecation")
 		final Material mat = Material.getMaterial(id); 
-		if (mat == null) return AlmostBoolean.MAYBE;
-		else return AlmostBoolean.match(mat.isSolid());
+		if (mat == null) {
+			return AlmostBoolean.MAYBE;
+		}
+		else {
+			return AlmostBoolean.match(mat.isSolid());
+		}
 	}
 
 	@Override
 	public AlmostBoolean isBlockLiquid(final int id) {
+		@SuppressWarnings("deprecation")
 		final Material mat = Material.getMaterial(id); 
 		if (mat == null) return AlmostBoolean.MAYBE;
 		switch (mat) {
@@ -104,8 +112,10 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 
 	@Override
 	public AlmostBoolean isIllegalBounds(final Player player) {
-		if (player.isDead()) return AlmostBoolean.NO;
-		if (!player.isSleeping()){ // TODO: ignored sleeping ?
+		if (player.isDead()) {
+			return AlmostBoolean.NO;
+		}
+		if (!player.isSleeping()) { // TODO: ignored sleeping ?
 			// TODO: This can test like ... nothing !
 			// (Might not be necessary.)
 		}
@@ -161,40 +171,43 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		// TODO: Might try stuff like setNoDamageTicks.
 		BridgeHealth.damage(player, 1.0);
 	}
-
+	
 	@Override
 	public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
+		// Note deprecation suppression: These ids should be unique for a server run, that should be ok for setting up generic properties.
 		// TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
-		final Set<Integer> fullBlocks = new HashSet<Integer>();
+		final Set<Material> fullBlocks = new HashSet<Material>();
 		for (final Material mat : new Material[]{
 				// TODO: Ice !? / Packed ice !?
 				Material.GLASS, Material.GLOWSTONE, Material.ICE, Material.LEAVES,
 				Material.COMMAND, Material.BEACON,
 				Material.PISTON_BASE,
-		}){
-			fullBlocks.add(mat.getId());
+		}) {
+			fullBlocks.add(mat);
 		}
-		for (final Material mat : Material.values()){
-			if (!mat.isBlock()) continue;
-			final int id = mat.getId();
-			if (id < 0 || id >= 4096 || fullBlocks.contains(id)) continue;
-			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()){
+		for (final Material mat : Material.values()) {
+			if (!mat.isBlock()) {
+				continue;
+			}
+			if (fullBlocks.contains(mat)) {
+				continue;
+			}
+			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()) {
 				// Uncertain bounding-box, allow passing through.
 				long flags = BlockProperties.F_IGN_PASSABLE;
-				if ((BlockProperties.isSolid(id) || BlockProperties.isGround(id)) && !BlockProperties.isLiquid(id)){
+				if ((BlockProperties.isSolid(mat) || BlockProperties.isGround(mat)) && !BlockProperties.isLiquid(mat)) {
 					// Block can be ground, so allow standing on any height.
 					flags |= BlockProperties.F_GROUND_HEIGHT;
 				}
-				BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
+				BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
 			}
 		}
 		// Blocks that are reported to be full and solid, but which are not.
 		for (final Material mat : new Material[]{
 				Material.ENDER_PORTAL_FRAME,
-		}){
-			final int id = mat.getId();
+		}) {
 			final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
-			BlockProperties.setBlockFlags(id, BlockProperties.getBlockFlags(id) | flags);
+			BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
 		}
 	}
 
@@ -209,9 +222,9 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 		try{
 			return mat.hasGravity();
 		}
-		catch(Throwable t){
+		catch(Throwable t) {
 			// Backwards compatibility.
-			switch(mat){
+			switch(mat) {
 			case SAND:
 			case GRAVEL:
 				return true;
@@ -220,5 +233,10 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
 			}
 		}
 	}
+
+//	@Override
+//	public void correctDirection(Player player) {
+//		// TODO: Consider using reflection (detect CraftPlayer, access EntityPlayer + check if possible (!), use flags for if valid or invalid.)
+//	}
 	
 }

@@ -29,6 +29,7 @@ import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
+import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
@@ -55,6 +56,9 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     
     private final Open open 			= addCheck(new Open());
     
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
+    
     public InventoryListener(){
     	super(CheckType.INVENTORY);
     }
@@ -73,7 +77,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             final Player player = (Player) event.getEntity();
             if (instantBow.isEnabled(player)){
                 final long now = System.currentTimeMillis();
-                final Location loc = player.getLocation();
+                final Location loc = player.getLocation(useLoc);
                 if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())){
                     // No else if with this, could be cancelled due to other checks feeding, does not have actions.
                     event.setCancelled(true);
@@ -87,6 +91,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                     // Combined fighting speed (Else if: Matter of taste, preventing extreme cascading and actions spam).
                     event.setCancelled(true);
             	}
+            	useLoc.setWorld(null);
             }  
         }
     }
@@ -105,6 +110,10 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
             if (instantEat.isEnabled(player) && instantEat.check(player, event.getFoodLevel())){
+            	event.setCancelled(true);
+            }
+            else if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+            	// Eat after death.
             	event.setCancelled(true);
             }
         }
@@ -219,6 +228,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         if (event.hasItem()){
             final ItemStack item = event.getItem();
             final Material type = item.getType();
+            // TODO: Get Magic values (800) from the config.
             if (type == Material.BOW){
                 final long now = System.currentTimeMillis();
                 // It was a bow, the player starts to pull the string, remember this time.
@@ -233,9 +243,13 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             } else resetAll = true;
             
             // Illegal enchantments hotfix check.
-            if (Items.checkIllegalEnchantments(player, item)) event.setCancelled(true);
+            if (Items.checkIllegalEnchantments(player, item)) {
+            	event.setCancelled(true);
+            }
         }
-        else resetAll = true;
+        else {
+        	resetAll = true;
+        }
         
         if (resetAll){
             // Nothing that we are interested in, reset data.
@@ -248,9 +262,16 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public final void onPlayerInteractEntity(final PlayerInteractEntityEvent event) {
     	final Player player = event.getPlayer();
-    	if (player.getGameMode() == GameMode.CREATIVE) return;
+    	if (player.getGameMode() == GameMode.CREATIVE) {
+    		return;
+    	}
+    	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
+    		// No zombies.
+    		event.setCancelled(true);
+    		return;
+    	}
     	final ItemStack stack = player.getItemInHand();
-    	if (stack != null && stack.getTypeId() == Material.MONSTER_EGG.getId() && items.isEnabled(player)){
+    	if (stack != null && stack.getType() == Material.MONSTER_EGG && items.isEnabled(player)){
     		event.setCancelled(true);
     	}
     }

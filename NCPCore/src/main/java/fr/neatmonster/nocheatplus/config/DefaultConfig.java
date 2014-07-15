@@ -16,7 +16,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 661;
+	public static final int buildNumber = 695;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -71,6 +71,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS, new LinkedList<String>());
         // Commands (other).
         set(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_ACTIVE, false);
+        set(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_MSG, "&cI'm sorry, but this command can't be executed in chat. Use the console instead!");
         set(ConfPaths.PROTECT_COMMANDS_CONSOLEONLY_CMDS, Arrays.asList("op", "deop"));
         // Client motd.
         set(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE, true);
@@ -81,7 +82,7 @@ public class DefaultConfig extends ConfigFile {
 
         set(ConfPaths.BLOCKBREAK_FASTBREAK_CHECK, true);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_STRICT, true);
-        set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 90);
+        set(ConfPaths.BLOCKBREAK_FASTBREAK_DELAY, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL, 100);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_GRACE, 2000);
         set(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, "cancel vl>0 log:fastbreak:3:5:cif cancel");
@@ -115,7 +116,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKINTERACT_SPEED_ACTIONS, "cancel vl>200 log:bspeed:0:2:if cancel vl>1000 cancel log:bspeed:0:2:icf cmd:kickbspeed");
         
         set(ConfPaths.BLOCKINTERACT_VISIBLE_CHECK, true);
-        set(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, "cancel vl>5 log:bvisible:0:2:if cancel");
+        set(ConfPaths.BLOCKINTERACT_VISIBLE_ACTIONS, "cancel vl>100 log:bvisible:0:10:if cancel");
         
         // BLOCKPLACE
         set(ConfPaths.BLOCKPLACE_AGAINST_CHECK, true);
@@ -137,6 +138,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.BLOCKPLACE_REACH_ACTIONS, "cancel vl>5 log:breach:0:2:if cancel");
 
         set(ConfPaths.BLOCKPLACE_NOSWING_CHECK, true);
+        set(ConfPaths.BLOCKPLACE_NOSWING_EXCEPTIONS, Arrays.asList(Material.WATER_LILY.toString(), Material.FLINT_AND_STEEL.toString()));
         set(ConfPaths.BLOCKPLACE_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel");
 
         set(ConfPaths.BLOCKPLACE_SPEED_CHECK, true);
@@ -167,6 +169,7 @@ public class DefaultConfig extends ConfigFile {
         
         // Text (ordering on purpose).
         set(ConfPaths.CHAT_TEXT_CHECK, true);
+        set(ConfPaths.CHAT_TEXT_ALLOWVLRESET, true);
         set(ConfPaths.CHAT_TEXT_FREQ_NORM_MIN, 0.0);
         set(ConfPaths.CHAT_TEXT_FREQ_NORM_FACTOR, 0.9D);
         set(ConfPaths.CHAT_TEXT_FREQ_NORM_WEIGHT, 6);
@@ -393,6 +396,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE, true);
         set(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION, 500);
         
+        // Moving Trace
+        set(ConfPaths.MOVING_TRACE_SIZE, 60);
+        set(ConfPaths.MOVING_TRACE_MERGEDIST, 0.9752); // Let all the hackers read code!
+        
         // Vehicles.
         set(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN, true);
         set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, true);
@@ -407,8 +414,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_TEMPKICKILLEGAL, true);
         set(ConfPaths.MOVING_LOADCHUNKS_JOIN, true);
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);
-        set(ConfPaths.MOVING_ASSUMESPRINT, false);
+        set(ConfPaths.MOVING_ASSUMESPRINT, true);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
+        set(ConfPaths.MOVING_ENFORCELOCATION, true);
         
         // TODO: An extra file might suit these.
         final String start = "[player] failed [check]: ";

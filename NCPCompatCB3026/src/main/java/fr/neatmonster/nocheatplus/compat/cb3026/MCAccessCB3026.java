@@ -1,19 +1,19 @@
-package fr.neatmonster.nocheatplus.compat.cb2511;
+package fr.neatmonster.nocheatplus.compat.cb3026;
 
-import net.minecraft.server.AxisAlignedBB;
-import net.minecraft.server.Block;
-import net.minecraft.server.DamageSource;
-import net.minecraft.server.EntityComplexPart;
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.MobEffectList;
+import net.minecraft.server.v1_7_R2.AxisAlignedBB;
+import net.minecraft.server.v1_7_R2.Block;
+import net.minecraft.server.v1_7_R2.DamageSource;
+import net.minecraft.server.v1_7_R2.EntityComplexPart;
+import net.minecraft.server.v1_7_R2.EntityPlayer;
+import net.minecraft.server.v1_7_R2.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_7_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_7_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_7_R2.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,33 +23,29 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
-
-public class MCAccessCB2511 implements MCAccess {
+public class MCAccessCB3026 implements MCAccess{
 	
 	/**
-	 * Constructor to let it fail in time.
+	 * Constructor to let it fail.
 	 */
-	public MCAccessCB2511(){
+	public MCAccessCB3026(){
 		getCommandMap();
-		ReflectionUtil.checkMembers("net.minecraft.server.", new String[]{"Entity" , "dead"});
-		ReflectionUtil.checkMembers("net.minecraft.server.", new String[]{"EntityPlayer" , "netServerHandler"});
-		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.Block.class, 
-				new String[]{"v", "w", "x", "y", "z", "A"}, double.class);
+		ReflectionUtil.checkMembers("net.minecraft.server.v1_7_R2.", new String[]{"Entity" , "dead"});
+		// block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
+		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_7_R2.Block.class, 
+				new String[]{"x", "y", "z", "A", "B", "C"}, double.class);
+		// TODO: Nail it down further.
 	}
 
 	@Override
 	public String getMCVersion() {
-		return "1.4.2|1.4.4|1.4.5";
+		// 1_7_R2
+		return "1.7.5";
 	}
 
 	@Override
 	public String getServerVersionTag() {
-		return "CB2511";
-	}
-
-	@Override
-	public BlockCache getBlockCache(World world) {
-		return new BlockCacheCB2511(world);
+		return "CB3026";
 	}
 
 	@Override
@@ -58,8 +54,13 @@ public class MCAccessCB2511 implements MCAccess {
 	}
 
 	@Override
+	public BlockCache getBlockCache(final World world) {
+		return new BlockCacheCB3026(world);
+	}
+
+	@Override
 	public double getHeight(final Entity entity) {
-		final net.minecraft.server.Entity mcEntity = ((CraftEntity) entity).getHandle();
+		final net.minecraft.server.v1_7_R2.Entity mcEntity = ((CraftEntity) entity).getHandle();
 		final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.height, mcEntity.boundingBox.e - mcEntity.boundingBox.b));
 		if (entity instanceof LivingEntity) {
 			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
@@ -68,16 +69,16 @@ public class MCAccessCB2511 implements MCAccess {
 
 	@Override
 	public AlmostBoolean isBlockSolid(final int id) {
-		final Block block = Block.byId[id];
-		if (block == null || block.material == null) return AlmostBoolean.MAYBE;
-		else return AlmostBoolean.match(block.material.isSolid());
+		final Block block = Block.e(id);
+		if (block == null || block.getMaterial() == null) return AlmostBoolean.MAYBE;
+		else return AlmostBoolean.match(block.getMaterial().isSolid());
 	}
 
 	@Override
 	public AlmostBoolean isBlockLiquid(final int id) {
-		final Block block = Block.byId[id];
-		if (block == null || block.material == null) return AlmostBoolean.MAYBE;
-		else return AlmostBoolean.match(block.material.isLiquid());
+		final Block block = Block.e(id);
+		if (block == null || block.getMaterial() == null) return AlmostBoolean.MAYBE;
+		else return AlmostBoolean.match(block.getMaterial().isLiquid());
 	}
 
 	@Override
@@ -89,6 +90,7 @@ public class MCAccessCB2511 implements MCAccess {
 	public AlmostBoolean isIllegalBounds(final Player player) {
 		final EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 		if (entityPlayer.dead) return AlmostBoolean.NO;
+		// TODO: Does this need a method call for the "real" box? Might be no problem during moving events, though.
 		final AxisAlignedBB box = entityPlayer.boundingBox;
 		if (!entityPlayer.isSleeping()){
 			// This can not really test stance but height of bounding box.
@@ -101,7 +103,7 @@ public class MCAccessCB2511 implements MCAccess {
 
 	@Override
 	public double getJumpAmplifier(final Player player) {
-		final net.minecraft.server.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 	
 		if (mcPlayer.hasEffect(MobEffectList.JUMP)) return mcPlayer.getEffect(MobEffectList.JUMP).getAmplifier();
 		else return Double.NEGATIVE_INFINITY;
@@ -109,7 +111,7 @@ public class MCAccessCB2511 implements MCAccess {
 
 	@Override
 	public double getFasterMovementAmplifier(final Player player) {
-		final net.minecraft.server.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
 		if (mcPlayer.hasEffect(MobEffectList.FASTER_MOVEMENT)) return mcPlayer.getEffect(MobEffectList.FASTER_MOVEMENT).getAmplifier();
 		else return Double.NEGATIVE_INFINITY;
 	}
@@ -126,7 +128,7 @@ public class MCAccessCB2511 implements MCAccess {
 
 	@Override
 	public void dealFallDamage(final Player player, final double damage) {
-		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, (int) Math.round(damage));
+		((CraftPlayer) player).getHandle().damageEntity(DamageSource.FALL, (float) damage);
 	}
 
 	@Override
@@ -136,13 +138,13 @@ public class MCAccessCB2511 implements MCAccess {
 
 	@Override
 	public boolean shouldBeZombie(final Player player) {
-		final net.minecraft.server.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
-		return !mcPlayer.dead && mcPlayer.getHealth() <= 0 ;
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		return !mcPlayer.dead && mcPlayer.getHealth() <= 0.0f ;
 	}
 
 	@Override
 	public void setDead(final Player player, final int deathTicks) {
-		final net.minecraft.server.EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
         mcPlayer.deathTicks = deathTicks;
         mcPlayer.dead = true;
 	}
@@ -155,13 +157,17 @@ public class MCAccessCB2511 implements MCAccess {
 	
 	@Override
 	public boolean hasGravity(final Material mat) {
-		switch(mat){
-		case SAND:
-		case GRAVEL:
-			return true;
-		default:
-			return false;
-		}
+		// TODO: Test/check.
+		return mat.hasGravity();
 	}
-
+	
+//	@Override
+//	public void correctDirection(final Player player) {
+//		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();
+//		// Main direction.
+//		mcPlayer.yaw = LocUtil.correctYaw(mcPlayer.yaw);
+//		mcPlayer.pitch = LocUtil.correctPitch(mcPlayer.pitch);
+//		// Consider setting the lastYaw here too.
+//	}
+	
 }

@@ -114,7 +114,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				event.setTo(setBack);
 				restored = true;
 			}
-			else data.resetSetBack();
+			else {
+				data.resetSetBack();
+			}
 		} 
 		if (!restored) {
 			pLoc.set(loc, player);
@@ -125,13 +127,16 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 		}
 		pLoc.cleanup();
-		if (!restored && MovingConfig.getConfig(player).tempKickIllegal) {
-			 // TODO: correct the location ?
-			NCPAPIProvider.getNoCheatPlusAPI().denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
-			LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + " deny login for 24 hours");
+		if (!restored) {
+			// TODO: reset the bounding box of the player ?
+			if (MovingConfig.getConfig(player).tempKickIllegal) {
+				NCPAPIProvider.getNoCheatPlusAPI().denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
+				LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them and deny login for 24 hours");
+			} else {
+				LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them.");
+			}
+			CheckUtils.kickIllegalMove(player);
 		}
-		// TODO: reset the bounding box of the player ?
-		CheckUtils.kickIllegalMove(player);
 	}
 	
 
@@ -170,11 +175,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private final Map<String, PlayerMoveEvent> processingEvents = new HashMap<String, PlayerMoveEvent>();
     
-    private final Set<String> hoverTicks = new LinkedHashSet<String>(30);
+    /** Player names to check hover for, case insensitive. */
+    private final Set<String> hoverTicks = new LinkedHashSet<String>(30); // TODO: Rename
+    
+    /** Player names to check enforcing the location for in onTick, case insensitive. */
+    private final Set<String> playersEnforce = new LinkedHashSet<String>(30);
     
     private int hoverTicksStep = 5;
     
     private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
+    
+    /** Location for temporary use with getLocation(useLoc). Always call setWorld(null) after use. Use LocUtil.clone before passing to other API. */
+    private final Location useLoc = new Location(null, 0, 0, 0); // TODO: Put to use...
     
     public MovingListener() {
 		super(CheckType.MOVING);
@@ -212,17 +224,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		
 		if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) return;
 		
-		final Location loc = player.getLocation();
+		final Location loc = player.getLocation(useLoc);
 		if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
 				&& Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
 				&& loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
-				&& (canJumpOffTop(mat.getId()) || BlockProperties.isLiquid(mat.getId()))) {
+				&& (canJumpOffTop(mat) || BlockProperties.isLiquid(mat))) {
 			// The creative fly and/or survival fly check is enabled, the
 			// block was placed below the player and is
 			// solid, so do what we have to do.
 			data.setSetBackY(blockY + 1D);
 			data.sfJumpPhase = 0;
 		}
+		useLoc.setWorld(null);
     }
     
     /**
@@ -230,9 +243,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param id
      * @return
      */
-	private static boolean canJumpOffTop(final int id) {
+	private static boolean canJumpOffTop(final Material blockType) {
 		// TODO: Test if this can be removed!
-		return BlockProperties.isGround(id) || BlockProperties.isSolid(id);
+		return BlockProperties.isGround(blockType) || BlockProperties.isSolid(blockType);
 	}
 
     /**
@@ -261,28 +274,29 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		if (bedLeave.isEnabled(player) && bedLeave.checkBed(player)) {
 			// Check if the player has to be reset.
 			// To "cancel" the event, we teleport the player.
-			final Location loc = player.getLocation();
+			final Location loc = player.getLocation(useLoc);
 			final MovingData data = MovingData.getData(player);
 			final MovingConfig cc = MovingConfig.getConfig(player); 
 			Location target = null;
 			final boolean sfCheck = shouldCheckSurvivalFly(player, data, cc);
-			if (sfCheck) target = data.getSetBack(loc);
+			if (sfCheck) {
+				target = data.getSetBack(loc);
+			}
 			if (target == null) {
 				// TODO: Add something to guess the best set back location (possibly data.guessSetBack(Location)).
-				target = loc;
+				target = LocUtil.clone(loc);
 			}
-			if (target != null) {
-				// Actually this should not possibly be null, this is a block for "future" purpose, feel free to criticize it.
-				if (sfCheck && cc.sfFallDamage && noFall.isEnabled(player)) {
-					// Check if to deal damage.
-					double y = loc.getY();
-					if (data.hasSetBack()) y = Math.min(y, data.getSetBackY());
-					noFall.checkDamage(player, data, y);
-				}
-				// Teleport.
-				data.setTeleported(target); // Should be enough. | new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
-				player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
+			if (sfCheck && cc.sfFallDamage && noFall.isEnabled(player)) {
+				// Check if to deal damage.
+				double y = loc.getY();
+				if (data.hasSetBack()) y = Math.min(y, data.getSetBackY());
+				noFall.checkDamage(player, data, y);
 			}
+			// Cleanup
+			useLoc.setWorld(null);
+			// Teleport.
+			data.prepareSetBack(target); // Should be enough. | new Location(target.getWorld(), target.getX(), target.getY(), target.getZ(), target.getYaw(), target.getPitch());
+			player.teleport(target, TeleportCause.PLUGIN);// TODO: schedule / other measures ?
 		}
 		else{
 			// Reset bed ...
@@ -303,10 +317,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Maybe this helps with people teleporting through Multiverse portals having problems?
     	final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
+        final MovingConfig cc = MovingConfig.getConfig(player);
         data.clearFlyData();
         data.clearMorePacketsData();
         // TODO: Might omit this if neither check is activated.
-        data.setSetBack(player.getLocation());
+        final Location loc = player.getLocation(useLoc);
+        data.setSetBack(loc);
+        data.resetPositions(loc);
+        data.resetTrace(loc, TickTask.getTick(), cc.traceSize, cc.traceMergeDist);
+        if (cc.enforceLocation) {
+        	// Just in case.
+        	playersEnforce.add(player.getName());
+        }
+        useLoc.setWorld(null);
     }
 
     /**
@@ -348,6 +371,12 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final Location to = event.getTo();
 		Location newTo = null;
 		
+//		// Check problematic yaw/pitch values.
+//		if (LocUtil.needsDirectionCorrection(from.getYaw(), from.getPitch())
+//				|| LocUtil.needsDirectionCorrection(to.getYaw(), to.getPitch())) {
+//			DataManager.getPlayerData(player).task.correctDirection();
+//		}
+		
 		// TODO: Check illegal moves here anyway (!).
 		// TODO: Check if vehicle move logs correctly (fake).
 		
@@ -371,23 +400,38 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			// Ignore changing worlds.
 			earlyReturn = true;
 		} else {
-			// COntinue with full processing.
 			earlyReturn = false;
 		}
+		
 		// TODO: Might log base parts here (+extras).
 		if (earlyReturn) {
+			// TODO: Remove player from enforceLocation ?
 			// TODO: Log "early return: " + tags.
 			if (newTo != null) {
+				// Illegal Yaw/Pitch.
+	        	if (LocUtil.needsYawCorrection(newTo.getYaw())) {
+	        		newTo.setYaw(LocUtil.correctYaw(newTo.getYaw()));
+	        	}
+	        	if (LocUtil.needsPitchCorrection(newTo.getPitch())) {
+	        		newTo.setPitch(LocUtil.correctPitch(newTo.getPitch()));
+	        	}
+	        	// Set.
+	        	// TODO: Reset positions? enforceLocation?
 				event.setTo(newTo);
 			}
 			return;
 		}
+		// newTo should be null here.
 		
 		// TODO: Order this to above "early return"?
         // Set up data / caching.
         final MoveInfo moveInfo;
-        if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
-        else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        if (parkedInfo.isEmpty()) {
+        	moveInfo = new MoveInfo(mcAccess);
+        }
+        else {
+        	moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        }
         final MovingConfig cc = MovingConfig.getConfig(player);
         moveInfo.set(player, from, to, cc.yOnGround);
         // TODO: Data resetting above ?
@@ -403,6 +447,19 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			moveInfo.cleanup();
 			parkedInfo.add(moveInfo);
 			return;
+		}
+		
+		// The players location.
+		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation(moveInfo.useLoc) : null;
+				
+				
+		// Check for location consistency.
+		if (cc.enforceLocation && playersEnforce.contains(playerName)) {
+			// NOTE: The setback should not be set before this, even if not yet set.
+			// Last to vs. from.
+			newTo = enforceLocation(player, from, data);
+			// TODO: Remove anyway ? 
+			playersEnforce.remove(playerName);
 		}
 		
 		final long time = System.currentTimeMillis();
@@ -444,10 +501,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final int tick = TickTask.getTick();
 		data.removeInvalidVelocity(tick - cc.velocityActivationTicks);
 		data.velocityTick();
-        
-        // The players location.
-		// TODO: Change to getLocation(moveInfo.loc) once 1.4.5 support is dropped.
-		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation() : null;
 
 		// Check passable first to prevent set-back override.
 		// TODO: Redesign to set set-backs later (queue + invalidate).
@@ -564,30 +617,21 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			}
 		}
 
-        // Did one of the checks decide we need a new "to"-location?
-        if (newTo != null) {
-        	// Reset some data.
-        	data.prepareSetBack(newTo);
-			
-            // Set new to-location.
-			// TODO: Clone here for the case of using loc with loc = player.getLocation(moveInfo.loc).
-			// TODO: Actually should be a newly created location already (data.getSetBack).
-            event.setTo(newTo);
-            
-            // Debug.
-            if (cc.debug) {
-            	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
-            }
-        }
         
-        // Set positions.
-        // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
-        data.fromX = from.getX();
-        data.fromY = from.getY();
-        data.fromZ = from.getZ();
-        data.toX = to.getX();
-        data.toY = to.getY();
-        data.toZ = to.getZ();
+        if (newTo == null) {
+            // Set positions.
+            // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
+            data.fromX = from.getX();
+            data.fromY = from.getY();
+            data.fromZ = from.getZ();
+            data.toX = to.getX();
+            data.toY = to.getY();
+            data.toZ = to.getZ();
+        }
+        else {
+        	// Set-back handling.
+        	onSetBack(player, event, newTo, data, cc);
+        }
         
         // Cleanup.
         moveInfo.cleanup();
@@ -595,6 +639,36 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     }
     
     /**
+     * 
+     * @param player
+     * @param event
+     * @param newTo Must be a cloned or new Location instance, free for whatever other plugins do with it.
+     * @param data
+     * @param cc
+     */
+	private void onSetBack(final Player player, final PlayerMoveEvent event, final Location newTo, final MovingData data, final MovingConfig cc) {
+		// Illegal Yaw/Pitch.
+    	if (LocUtil.needsYawCorrection(newTo.getYaw())) {
+    		newTo.setYaw(LocUtil.correctYaw(newTo.getYaw()));
+    	}
+    	if (LocUtil.needsPitchCorrection(newTo.getPitch())) {
+    		newTo.setPitch(LocUtil.correctPitch(newTo.getPitch()));
+    	}
+    	
+    	// Reset some data.
+    	data.prepareSetBack(newTo);
+    	data.resetPositions(newTo); // TODO: Might move into prepareSetBack, experimental here.
+		
+        // Set new to-location.
+        event.setTo(newTo);
+        
+        // Debug.
+        if (cc.debug) {
+        	System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
+        }
+	}
+
+	/**
      * Called from player-move checking, if the player is inside of a vehicle.
      * @param player
      * @param from
@@ -612,7 +686,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		data.sfLowJump = false;
 		// TODO: What with processingEvents.remove(player.getName());
 		if (vehicle != null) {
-			final Location vLoc = vehicle.getLocation();
+			final Location vLoc = vehicle.getLocation(); // TODO: Use a location as argument.
 			// (Auto detection of missing events, might fire one time too many per plugin run.)
 			if (!normalVehicles.contains(vehicle.getType())) {
 				onVehicleMove(vehicle, vLoc, vLoc, true);
@@ -675,12 +749,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         // Feed combined check.
         final CombinedData data = CombinedData.getData(player);
-        data.lastMoveTime = now;
+        data.lastMoveTime = now; // TODO: Evaluate moving this to MovingData !?
         
         final Location from = event.getFrom();
         final String fromWorldName = from.getWorld().getName();
         
         // Feed yawrate and reset moving data positions if necessary.
+        final MovingData mData = MovingData.getData(player);
+        final long time = TickTask.getTick();
         if (!event.isCancelled()) {
         	final Location to = event.getTo();
         	final String toWorldName = to.getWorld().getName();
@@ -688,20 +764,26 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	// TODO: maybe even not count vehicles at all ?
         	if (player.isInsideVehicle()) {
         		// TODO: refine (!).
-        		MovingData.getData(player).resetPositions(player.getVehicle().getLocation());
+        		final Location ref = player.getVehicle().getLocation(useLoc);
+        		mData.resetPositions(ref);
+        		useLoc.setWorld(null);
+        		mData.resetTrace(player, ref, time);
         	}
         	else if (!fromWorldName.equals(toWorldName)) {
-                MovingData.getData(player).resetPositions(to);
+        		mData.resetPositions(to);
+        		mData.resetTrace(player, to, time);
             }
             else{
             	// Slightly redundant at present.
-            	MovingData.getData(player).setTo(to);
+            	mData.setTo(to);
+            	mData.resetTrace(player, to, time);
             }
         }
         else {
         	// TODO: teleported + other resetting ?
         	Combined.feedYawRate(player, from.getYaw(), now, fromWorldName, data);
-            MovingData.getData(player).resetPositions(from);
+        	mData.resetPositions(from);
+        	mData.resetTrace(player, from, time); // TODO: Should probably leave this to the teleport event!
         }
     }
 
@@ -719,31 +801,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.clearMorePacketsData();
         // TODO: This event might be redundant (!).
     }
-
-	/**
-	 * When a player respawns, all information related to the moving checks
-	 * becomes invalid.
-	 * 
-	 * @param event
-	 *            the event
-	 */
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerRespawn(final PlayerRespawnEvent event) {
-		final Player player = event.getPlayer();
-		final MovingData data = MovingData.getData(player);
-		data.clearFlyData();
-		data.clearMorePacketsData();
-		data.setSetBack(event.getRespawnLocation());
-		// TODO: consider data.resetPositions(data.setBack);
-		// (Not putting hover in at respawn due to chunk sending.)
-		// TODO: Might use grace ticks for this too (and bigger teleports).
-//		final MovingConfig cc = MovingConfig.getConfig(player);
-//		if (cc.sfHoverCheck) {
-//			// Assume the player might be hovering.
-//			data.sfHoverTicks = 0;
-//			hoverTicks.add(player.getName());
-//		}
-	}
 	
 	/**
 	 * Clear fly data on death.
@@ -755,7 +812,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		final MovingData data = MovingData.getData(player);
 		data.clearFlyData();
 		data.clearMorePacketsData();
-		data.setSetBack(player.getLocation()); // TODO: Monitor this change (!).
+		data.setSetBack(player.getLocation(useLoc)); // TODO: Monitor this change (!).
+		useLoc.setWorld(null);
 	}
 
     /**
@@ -843,7 +901,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 						event.setTo(ref);
 					}
 					else{
-						ref = from;
+						ref = from; // Player.getLocation ?
 						event.setCancelled(true);
 					}
 				}
@@ -857,7 +915,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 //							public void run() {
 //								if (!data.hasSetBackWorldChanged(setBack)) { // && data.isSetBack(setBack)) {
 //									player.sendMessage("SETBACK FROM MC DERP.");
-//									player.teleport(setBack);
+//									player.teleport(setBack, TeleportCause.PLUGIN);
 //								}
 //							}
 //						});
@@ -1016,11 +1074,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (!from.getWorld().equals(to.getWorld())) return;
         
         final MovingData data = MovingData.getData(player);
-        data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation());
+        data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation(useLoc));
         switch (data.vehicleConsistency) {
         	case FROM:
         	case TO:
-        		data.resetPositions(player.getLocation()); // TODO: Drop MC 1.4!
+        		data.resetPositions(player.getLocation(useLoc)); // TODO: Drop MC 1.4!
         		break;
         	case INCONSISTENT:
         		// TODO: Any exploits exist? -> TeleportUtil.forceMount(player, vehicle)
@@ -1062,26 +1120,40 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	// TODO: Reset on world changes or not?
         	data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, cc.debug));
         }
+        useLoc.setWorld(null);
     }
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onEntityDamage(final EntityDamageEvent event) {
-        if (event.getCause() != DamageCause.FALL) return;
+        if (event.getCause() != DamageCause.FALL) {
+        	return;
+        }
         final Entity entity = event.getEntity();
-        if (!(entity instanceof Player)) return;
+        if (!(entity instanceof Player)) {
+        	return;
+        }
         final Player player = (Player) entity;
         final MovingData data = MovingData.getData(player);
+        if (player.isInsideVehicle()) {
+        	// Ignore vehicles (noFallFallDistance will be inaccurate anyway).
+        	data.clearNoFallData();
+        	return;
+        }
         final MovingConfig cc = MovingConfig.getConfig(player);
         if (event.isCancelled() || !shouldCheckSurvivalFly(player, data, cc) || !noFall.isEnabled(player)) {
             data.clearNoFallData();
             return;
         }
-        final Location loc = player.getLocation();
+        final Location loc = player.getLocation(useLoc);
         boolean allowReset = true;
         if (!data.noFallSkipAirCheck) {
         	final MoveInfo moveInfo;
-        	if (parkedInfo.isEmpty()) moveInfo = new MoveInfo(mcAccess);
-            else moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+        	if (parkedInfo.isEmpty()) {
+        		moveInfo = new MoveInfo(mcAccess);
+        	}
+            else {
+            	moveInfo = parkedInfo.remove(parkedInfo.size() - 1);
+            }
         	moveInfo.set(player, loc, null, cc.noFallyOnGround);
         	// NOTE: No isIllegal check here.
         	final PlayerLocation pLoc = moveInfo.from;
@@ -1139,43 +1211,113 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         	}
         }
         // Entity fall-distance should be reset elsewhere.
+        // Cleanup.
+        useLoc.setWorld(null);
     }
+    
+	/**
+	 * When a player respawns, all information related to the moving checks
+	 * becomes invalid.
+	 * 
+	 * @param event
+	 *            the event
+	 */
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerRespawn(final PlayerRespawnEvent event) {
+		final Player player = event.getPlayer();
+		final MovingData data = MovingData.getData(player);
+		final MovingConfig cc = MovingConfig.getConfig(player);
+		
+		final Location loc = event.getRespawnLocation();
+		data.clearFlyData();
+		data.setSetBack(loc);
+		
+		// Handle respawn like join.
+		dataOnJoin(player, loc, data, cc);
+	}
     
 	@Override
 	public void playerJoins(final Player player) {
 		final MovingData data = MovingData.getData(player);
-		// TODO: on existing set back: detect world changes and loss of world on join (+ set up some paradigm).
-		data.clearMorePacketsData();
-		data.removeAllVelocity();
-		final Location loc = player.getLocation();
+		final MovingConfig cc = MovingConfig.getConfig(player);
+
+		final Location loc = player.getLocation(useLoc);
 		
-		// Correct set-back on world changes.
-		if (loc == null) {
-			// Bug on server side ?
+		// Correct set-back on join.
+		if (data.hasSetBackWorldChanged(loc)) {
 			data.clearFlyData();
+			data.setSetBack(loc);
 		}
 		else if (!data.hasSetBack()) {
 			// TODO: Might consider something else like with respawn. Check if it is passable ?
 			data.setSetBack(loc);
 		}
-		else if (data.hasSetBackWorldChanged(loc)) {
-			data.clearFlyData();
-			data.setSetBack(loc);
+		
+		dataOnJoin(player, loc, data, cc);
+		
+		// Cleanup.
+		useLoc.setWorld(null);
+		
+	}
+	
+	
+	/**
+	 * Alter data for players joining (join, respawn).<br>
+	 * Do before, if necessary:<br>
+	 * <li>data.clearFlyData()</li>
+	 * <li>data.setSetBack(...)</li>
+	 * @param player
+	 * @param loc Can be useLoc (!).
+	 * @param data
+	 * @param cc
+	 */
+	private void dataOnJoin(Player player, Location loc, MovingData data, MovingConfig cc) {
+		final int tick = TickTask.getTick();
+		// Check loaded chunks.
+		if (cc.loadChunksOnJoin) {
+			final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
+			if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0) {
+				// DEBUG
+				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+			}
 		}
-		if (data.fromX == Double.MAX_VALUE && data.toX == Double.MAX_VALUE) {
-			// TODO: re-think: more fine grained reset?
-			data.resetPositions(loc);
-		}
+		
+		// Always reset position to this one.
+		// TODO: more fine grained reset?
+		data.resetPositions(loc);
+		data.clearMorePacketsData();
+		data.removeAllVelocity();
+		data.resetTrace(loc, tick, cc.traceSize, cc.traceMergeDist);
 		
 		// More resetting.
 		data.vDistAcc.clear();
-		data.toWasReset = false;
-		data.fromWasReset = false;
+		data.toWasReset = BlockProperties.isOnGroundOrResetCond(player, loc, cc.yOnGround);
+		data.fromWasReset = data.toWasReset;
+		
+		// Enforcing the location.
+		if (cc.enforceLocation) {
+			playersEnforce.add(player.getName());
+		}
 		
 		// Hover.
-		final MovingConfig cc = MovingConfig.getConfig(player);
+		initHover(player, data, cc, data.toWasReset); // isOnGroundOrResetCond
+		
+//		// Bad pitch/yaw, just in case.
+//		if (LocUtil.needsDirectionCorrection(useLoc.getYaw(), useLoc.getPitch())) {
+//			DataManager.getPlayerData(player).task.correctDirection();
+//		}
+	}
+
+	/**
+	 * Initialize the hover check for a player (login, respawn). 
+	 * @param player
+	 * @param data
+	 * @param cc
+	 * @param isOnGroundOrResetCond 
+	 */
+	private void initHover(final Player player, final MovingData data, final MovingConfig cc, final boolean isOnGroundOrResetCond) {
 		// Reset hover ticks until a better method is used.
-		if (cc.sfHoverCheck) {
+		if (!isOnGroundOrResetCond && cc.sfHoverCheck) {
 			// Start as if hovering already.
 			// Could check shouldCheckSurvivalFly(player, data, cc), but this should be more sharp (gets checked on violation).
 			data.sfHoverTicks = 0;
@@ -1186,16 +1328,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			data.sfHoverLoginTicks = 0;
 			data.sfHoverTicks = -1;
 		}
-		
-		// Check loaded chunks.
-		if (cc.loadChunksOnJoin) {
-			final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
-			if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0) {
-				// DEBUG
-				LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
-			}
-		}
-		
 	}
 
 	@Override
@@ -1252,7 +1384,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	final MovingData data = MovingData.getData(player);
     	data.removeAllVelocity();
     	// Event should have a vehicle, in case check this last.
-    	data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation());
+    	data.vehicleConsistency = MoveConsistency.getConsistency(event.getVehicle().getLocation(), null, player.getLocation(useLoc));
+    	useLoc.setWorld(null); // TODO: A pool ?
     	// TODO: more resetting, visible check ?
     }
     
@@ -1272,7 +1405,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	
     	final MovingConfig cc = MovingConfig.getConfig(player);
     	// TODO: Loc can be inconsistent, determine which to use ! 
-    	final Location pLoc = player.getLocation();
+    	final Location pLoc = player.getLocation(useLoc);
     	Location loc = pLoc; // The location to use as set-back.
     	//  TODO: Which vehicle to use ?
     	// final Entity vehicle = player.getVehicle();
@@ -1290,7 +1423,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     			loc = vLoc; // 
     			if (data.vehicleConsistency != MoveConsistency.INCONSISTENT) {
     				final Location oldLoc = new Location(pLoc.getWorld(), data.toX, data.toY, data.toZ);
-    				if (MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
+    				if (data.toX != Double.MAX_VALUE && MoveConsistency.getConsistency(oldLoc, null, pLoc) != MoveConsistency.INCONSISTENT) {
     					loc = oldLoc;
     				}
     			}
@@ -1302,7 +1435,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	}
     	
     	// Adjust loc if in liquid (meant for boats !?).
-    	if (BlockProperties.isLiquid(loc.getBlock().getTypeId())) {
+    	if (BlockProperties.isLiquid(loc.getBlock().getType())) {
     		loc.setY(Location.locToBlock(loc.getY()) + 1.25);
     	}
     	
@@ -1318,6 +1451,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	data.verticalFreedom = 1.2;
     	data.verticalVelocity = 0.15;
     	data.verticalVelocityUsed = 0;
+    	useLoc.setWorld(null);
     }
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1334,15 +1468,42 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
 	@Override
 	public void onTick(final int tick, final long timeLast) {
-		// Hover checks !
+		final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
+		// TODO: Change to per world checking (as long as configs are per world).
+		
+		// Enforcing location check.
+		for (final String playerName : playersEnforce) {
+			final Player player = DataManager.getPlayerExact(playerName);
+			if (player == null || !player.isOnline()) {
+				rem.add(playerName);
+				continue;
+			} else if (player.isDead() || player.isSleeping() || player.isInsideVehicle()) {
+				// Don't remove but also don't check [subject to change].
+				continue;
+			}
+			final MovingData data = MovingData.getData(player);
+			final Location newTo = enforceLocation(player, player.getLocation(useLoc), data);
+			if (newTo != null) {
+				data.prepareSetBack(newTo);
+				player.teleport(newTo, TeleportCause.PLUGIN);
+			}
+		}
+		if (!rem.isEmpty()) {
+			playersEnforce.removeAll(rem);
+		}
+		// Hover check (survivalfly).
+		rem.clear();
 		if (tick % hoverTicksStep != 0) {
 			// Only check every so and so ticks.
 			return;
 		}
 		final MoveInfo info;
-		if (parkedInfo.isEmpty()) info = new MoveInfo(mcAccess);
-		else info = parkedInfo.remove(parkedInfo.size() - 1);
-		final List<String> rem = new ArrayList<String>(hoverTicks.size()); // Pessimistic.
+		if (parkedInfo.isEmpty()) {
+			info = new MoveInfo(mcAccess);
+		}
+		else {
+			info = parkedInfo.remove(parkedInfo.size() - 1);
+		}
 		for (final String playerName : hoverTicks) {
 			// TODO: put players into the set (+- one tick would not matter ?)
 			// TODO: might add an online flag to data !
@@ -1383,10 +1544,28 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 				rem.add(playerName);
 			}
 		}
-		info.cleanup(); // Just in case.
-		parkedInfo.add(info);
 		hoverTicks.removeAll(rem);
 		rem.clear();
+		info.cleanup();
+		parkedInfo.add(info);
+		useLoc.setWorld(null);
+	}
+
+	private Location enforceLocation(final Player player, final Location loc, final MovingData data) {
+		if (data.toX != Double.MAX_VALUE && TrigUtil.distanceSquared(data.toX, data.toY, data.toZ, loc.getX(), loc.getY(), loc.getZ()) > 1.0 / 256.0) {
+			// Teleport back. 
+			// TODO: Add history / alert?
+			//player.sendMessage(ChatColor.RED + "NCP: enforce location !"); // TODO: DEBUG - REMOVE.
+			if (data.hasSetBack()) {
+				// Might have to re-check all context with playerJoins and keeping old set-backs...
+				// Could use a flexible set-back policy (switch to in-air on login). 
+				return data.getSetBack(loc);
+			} else {
+				return new Location(player.getWorld(), data.toX, data.toY, data.toZ, loc.getYaw(), loc.getPitch());
+			}
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -1399,8 +1578,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	 */
 	private boolean checkHover(final Player player, final MovingData data, final MovingConfig cc, final MoveInfo info) {
 		// Check if player is on ground.
-		final Location loc = player.getLocation();
+		final Location loc = player.getLocation(useLoc); // useLoc.setWorld(null) is done in onTick.
 		info.set(player, loc, null, cc.yOnGround);
+		// (Could use useLoc of MoveInfo here. Note orderm though.)
 		final boolean res;
 		// TODO: Collect flags, more margin ?
 		final int loaded = info.from.ensureChunksLoaded();
@@ -1452,12 +1632,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 	@Override
 	public IData removeData(String playerName) {
 		hoverTicks.remove(playerName);
+		playersEnforce.remove(playerName);
 		return null;
 	}
 
 	@Override
 	public void removeAllData() {
 		hoverTicks.clear();
+		playersEnforce.clear();
 		parkedInfo.clear();
 	}
 
@@ -1469,6 +1651,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		}
 		parkedInfo.clear();
 		hoverTicksStep = Math.max(1, ConfigManager.getConfigFile().getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_STEP));
+		MovingData.onReload();
 	}
 
 }

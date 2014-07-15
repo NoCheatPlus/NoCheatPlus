@@ -1,8 +1,9 @@
 package fr.neatmonster.nocheatplus.checks.chat;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -159,39 +160,46 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
      // Trim is necessary because the server accepts leading spaces with commands.
         final String message = event.getMessage();
         final String lcMessage = message.trim().toLowerCase();
+        // TODO: Remove bukkit: etc.
+        
         final String[] split = lcMessage.split(" ", 2);
         final String alias = split[0].substring(1);
 		final Command command = CommandUtil.getCommand(alias);
-		final String lcAltMessage;
+		
+		final List<String> messageVars = new ArrayList<String>(); // Could as well use an array and allow null on input of SimpleCharPrefixTree.
+		messageVars.add(lcMessage);
+		String checkMessage = message; // Message to run chat checks on.
 		if (command != null){
-			lcAltMessage = "/" + command.getLabel().toLowerCase() + (split.length > 1 ? (" " + split[1]) : "");
+			messageVars.add("/" + command.getLabel().toLowerCase() + (split.length > 1 ? (" " + split[1]) : ""));
 		}
-		else{
-			lcAltMessage = lcMessage;
-		}
-        
-        // Prevent /op and /deop commands from being used by players.
- 		if (cc.consoleOnlyCheck && consoleOnlyCommands.hasAnyPrefixWords(lcMessage, lcAltMessage)) {
+        if (alias.indexOf(":") != -1) {
+        	final int index = message.indexOf(":") + 1;
+        	if (index < message.length()) {
+            	checkMessage = message.substring(index);
+            	messageVars.add(checkMessage.toLowerCase());
+        	}
+        }
+        // Prevent commands from being used by players (e.g. /op /deop /reload).
+ 		if (cc.consoleOnlyCheck && consoleOnlyCommands.hasAnyPrefixWords(messageVars)) {
  			if (command == null || command.testPermission(player)){
- 	 			player.sendMessage(ChatColor.RED + "I'm sorry, but this command can't be executed in chat. Use the console instead!");
+ 	 			player.sendMessage(cc.consoleOnlyMessage);
  			}
  			event.setCancelled(true);
  			return;
  		}
 
         // Handle as chat or command.
- 		final boolean handleAsChat = chatCommands.hasAnyPrefixWords(lcMessage, lcAltMessage);
-        if (handleAsChat){
+        if (chatCommands.hasAnyPrefixWords(messageVars)){
             // Treat as chat.
         	// TODO: Consider requesting permission updates on these, for consistency.
-        	// TODO: Cut off the command (?).
-            if (textChecks(player, message, true, false)) {
+        	// TODO: Cut off the command ?.
+            if (textChecks(player, checkMessage, true, false)) {
             	event.setCancelled(true);
             }
         }
-        else if (!commandExclusions.hasAnyPrefixWords(lcMessage, lcAltMessage)){
+        else if (!commandExclusions.hasAnyPrefixWords(messageVars)){
             // Treat as command.
-            if (commands.isEnabled(player) && commands.check(player, message, captcha)) {
+            if (commands.isEnabled(player) && commands.check(player, checkMessage, captcha)) {
             	event.setCancelled(true);
             }
         }

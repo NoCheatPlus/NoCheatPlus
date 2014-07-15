@@ -18,7 +18,6 @@
     <module>NCPCommons</module>
     <module>NCPCore</module>
     <module>NCPCompatBukkit</module>
-    <module>NCPCompatCB2511</module>
     <module>NCPCompatCB2512</module>
     <module>NCPCompatCB2545</module>
     <module>NCPCompatCB2602</module>
@@ -28,21 +27,15 @@
     <module>NCPCompatCB2794</module>
     <module>NCPCompatCB2808</module>
     <module>NCPCompatCB2882</module>
+    <module>NCPCompatCB2922</module>
+    <module>NCPCompatCB3026</module>
+    <module>NCPCompatCB3043</module>
     <module>NCPCompatCBDev</module>
+    <module>NCPCompatProtocolLib</module>
     <module>NCPPlugin</module>
     <module>NoCheatPlus</module>
   </modules>
 
-<!--   <distributionManagement>
-        <repository>
-            <id>md_5-releases</id>
-            <url>http://repo.md-5.net/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>md_5-snapshots</id>
-            <url>http://repo.md-5.net/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement> -->
   <repositories>
     <repository>
 	    <id>bukkit</id>

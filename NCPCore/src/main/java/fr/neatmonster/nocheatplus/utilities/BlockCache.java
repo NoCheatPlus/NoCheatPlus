@@ -14,6 +14,10 @@ import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
  */
 public abstract class BlockCache {
 	
+	// TODO: New concepts (Might switch to material, inspect MC+CB code for reliability and performance of block-ids during runtime).
+	
+	private static final int ID_AIR = 0;
+	
 	/**
 	 * Convenience method to check if the bounds as returned by getBounds cover a whole block.
 	 * @param bounds Can be null, must have 6 fields.
@@ -21,7 +25,7 @@ public abstract class BlockCache {
 	 */
 	public static final boolean isFullBounds(final double[] bounds) {
 		if (bounds == null) return false;
-		for (int i = 0; i < 3; i ++){
+		for (int i = 0; i < 3; i ++) {
 			if (bounds[i] > 0.0) return false;
 			if (bounds[i + 3] < 1.0) return false;
 		}
@@ -43,9 +47,9 @@ public abstract class BlockCache {
 		final int maxX = Location.locToBlock(x + xzMargin) / 16;
 		final int minZ = Location.locToBlock(z - xzMargin) / 16;
 		final int maxZ = Location.locToBlock(z + xzMargin) / 16;
-		for (int cx = minX; cx <= maxX; cx ++){
-			for (int cz = minZ; cz <= maxZ; cz ++){
-				if (!world.isChunkLoaded(cx, cz)){
+		for (int cx = minX; cx <= maxX; cx ++) {
+			for (int cz = minZ; cz <= maxZ; cz ++) {
+				if (!world.isChunkLoaded(cx, cz)) {
 					world.loadChunk(cx, cz);
 					loaded ++;
 				}
@@ -63,7 +67,7 @@ public abstract class BlockCache {
     /** Cached shape values. */
     private final CoordMap<double[]> boundsMap = new CoordMap<double[]>(23);
     
-    private int maxBlockY =  255;
+    protected int maxBlockY =  255;
     
     // TODO: switch to nodes with all details on, store a working node ?
     
@@ -71,10 +75,10 @@ public abstract class BlockCache {
 //    private int[] id = null;
 //    private int[] data = null;
     
-    public BlockCache(){
+    public BlockCache() {
     }
     
-    public BlockCache(final World world){
+    public BlockCache(final World world) {
         setAccess(world);
     }
     
@@ -122,7 +126,7 @@ public abstract class BlockCache {
      * Remove references.<br>
      * NOTE: You must delete world references with this one.
      */
-    public void cleanup(){
+    public void cleanup() {
         idMap.clear();
         dataMap.clear();
         boundsMap.clear();
@@ -157,8 +161,10 @@ public abstract class BlockCache {
      */
 	public int getTypeId(final int x, final int y, final int z) {
 		final Integer pId = idMap.get(x, y, z);
-		if (pId != null) return pId;
-		final Integer nId = fetchTypeId(x, y, z);
+		if (pId != null) {
+			return pId;
+		}
+		final Integer nId = (y < 0 || y > maxBlockY) ? ID_AIR : fetchTypeId(x, y, z);
 		idMap.put(x, y, z, nId);
 		return nId;
 	}
@@ -172,8 +178,10 @@ public abstract class BlockCache {
 	 */
 	public int getData(final int x, final int y, final int z) {
 		final Integer pData = dataMap.get(x, y, z);
-		if (pData != null) return pData;
-		final Integer nData = fetchData(x, y, z);
+		if (pData != null) {
+			return pData;
+		}
+		final Integer nData = (y < 0 || y > maxBlockY) ? 0 : fetchData(x, y, z);
 		dataMap.put(x, y, z, nData);
 		return nData;
 	}
@@ -185,10 +193,12 @@ public abstract class BlockCache {
 	 * @param z
 	 * @return Array of floats (minX, minY, minZ, maxX, maxY, maxZ), may be null theoretically. Do not change these in place, because they might get cached.
 	 */
-	public double[] getBounds(final int x, final int y, final int z){
+	public double[] getBounds(final int x, final int y, final int z) {
 		final double[] pBounds = boundsMap.get(x, y, z);
-		if (pBounds != null) return pBounds;
-		final double[] nBounds = fetchBounds(x, y, z);
+		if (pBounds != null) {
+			return pBounds;
+		}
+		final double[] nBounds = (y < 0 || y > maxBlockY) ? null : fetchBounds(x, y, z);
 		boundsMap.put(x, y, z, nBounds);
 		return nBounds;
 	}
@@ -200,7 +210,7 @@ public abstract class BlockCache {
 	 * @param z
 	 * @return
 	 */
-	public boolean isFullBounds(final int x, final int y, final int z){
+	public boolean isFullBounds(final int x, final int y, final int z) {
 		return isFullBounds(getBounds(x, y, z));
 	}
 	
@@ -208,7 +218,7 @@ public abstract class BlockCache {
 	 * Get the maximal y coordinate a block can be at (non air).
 	 * @return
 	 */
-	public int getMaxBlockY(){
+	public int getMaxBlockY() {
 		return maxBlockY;
 	}
     

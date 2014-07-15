@@ -75,6 +75,9 @@ public class BlockPlaceListener extends CheckListener {
     /** The speed check. */
     private final Speed     speed     = addCheck(new Speed());
     
+    /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
+    
     public BlockPlaceListener(){
     	super(CheckType.BLOCKPLACE);
     }
@@ -122,7 +125,7 @@ public class BlockPlaceListener extends CheckListener {
         }
 
         // No swing check (player doesn't swing their arm when placing a lily pad).
-        if (!cancelled && placedMat != Material.WATER_LILY && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
+        if (!cancelled && !cc.noSwingExceptions.contains(placedMat) && noSwing.isEnabled(player) && noSwing.check(player, data, cc)) {
         	// Consider skipping all insta placables or using simplified version (true or true within time frame).
         	cancelled = true;
         }
@@ -146,6 +149,8 @@ public class BlockPlaceListener extends CheckListener {
         if (cancelled) {
         	event.setCancelled(cancelled);
         }
+        // Cleanup
+        // Reminder(currently unused): useLoc.setWorld(null);
     }
     
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -264,7 +269,7 @@ public class BlockPlaceListener extends CheckListener {
         boolean cancel = false;
         if (speed.isEnabled(player)){
             final long now = System.currentTimeMillis();
-            final Location loc = player.getLocation();
+            final Location loc = player.getLocation(useLoc);
             if (Combined.checkYawRate(player, loc.getYaw(), now, loc.getWorld().getName())){
             	// Yawrate (checked extra).
             	cancel = true;
@@ -285,21 +290,22 @@ public class BlockPlaceListener extends CheckListener {
         		// Do nothing !
         		// TODO: Might have further flags?
         	}
-        	else if (!BlockProperties.isPassable(projectile.getLocation())){
+        	else if (!BlockProperties.isPassable(projectile.getLocation(useLoc))){
         		// Launch into a block.
         		// TODO: This might be a general check later.       		
         		cancel = true;
         	}
         	else{
-            	if (!BlockProperties.isPassable(player.getEyeLocation(), projectile.getLocation())){
+            	if (!BlockProperties.isPassable(player.getEyeLocation(), projectile.getLocation(useLoc))){
+            		// (Spare a useLoc2, for this is seldom rather.)
             		// Something between player 
             		// TODO: This might be a general check later.
             		cancel = true;
             	}
             	else{
-            		final Material mat = player.getLocation().getBlock().getType();
+            		final Material mat = player.getLocation(useLoc).getBlock().getType();
             		final long flags = BlockProperties.F_CLIMBABLE | BlockProperties.F_LIQUID | BlockProperties.F_IGN_PASSABLE;
-            		if (mat != Material.AIR && (BlockProperties.getBlockFlags(mat.getId()) & flags) == 0 && !mcAccess.hasGravity(mat)){
+            		if (mat != null && mat != Material.AIR && (BlockProperties.getBlockFlags(mat) & flags) == 0 && !mcAccess.hasGravity(mat)){
             			// Still fails on piston traps etc.
             			if (!BlockProperties.isPassable(player.getLocation(), projectile.getLocation()) && !BlockProperties.isOnGroundOrResetCond(player, player.getLocation(), MovingConfig.getConfig(player).yOnGround)){
             				cancel = true;
@@ -313,5 +319,7 @@ public class BlockPlaceListener extends CheckListener {
         if (cancel){
         	event.setCancelled(true);
         }
+        // Cleanup.
+        useLoc.setWorld(null);
     }
 }

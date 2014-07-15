@@ -70,7 +70,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 		// Set some things from the global config.
 		final ConfigFile config = ConfigManager.getConfigFile();
 		final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
-		if (engine != null){
+		if (engine != null) {
 			engine.clear();
 			api.removeComponent(engine);
 		}
@@ -80,7 +80,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 
 	@Override
 	public void onReload() {
-		synchronized(engine){
+		synchronized(engine) {
 			engine.clear();
 		}
 		init();
@@ -120,7 +120,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 		boolean debug = cc.textDebug || cc.debug;
 		
 		final List<String> debugParts;
-		if (debug){
+		if (debug) {
 			debugParts = new LinkedList<String>();
 			debugParts.add("[NoCheatPlus][chat.text] Message ("+player.getName()+"/"+message.length()+"): ");
 		}
@@ -143,13 +143,13 @@ public class Text extends AsyncCheck implements INotifyReload{
 		// Full message processing. ------------
 		
 		// Upper case.
-		if (letterCounts.fullCount.upperCase > msgLen / 3){
+		if (letterCounts.fullCount.upperCase > msgLen / 3) {
 			final float wUpperCase = 0.6f * letterCounts.fullCount.getUpperCaseRatio();
 			score += wUpperCase  * cc.textMessageUpperCase;
 		}
 		
 		// Letters vs. word length.
-		if (msgLen > 4){
+		if (msgLen > 4) {
 			final float fullRep = letterCounts.fullCount.getLetterCountRatio();
 			// Long messages: very small and very big are bad !
 			final float wRepetition = (float) msgLen / 15.0f * Math.abs(0.5f - fullRep);
@@ -157,7 +157,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 			
 			// Number of words vs. length of message
 			final float fnWords = (float) letterCounts.words.length / (float) msgLen;
-			if (fnWords > 0.75f){ // TODO: balance or configure or remove ?
+			if (fnWords > 0.75f) { // TODO: balance or configure or remove ?
 				score += fnWords  * cc.textMessagePartition;
 			}
 		}
@@ -165,40 +165,40 @@ public class Text extends AsyncCheck implements INotifyReload{
 		final CombinedData cData = CombinedData.getData(player);
 		final long timeout = 8000; // TODO: maybe set dynamically in data.
 		// Repetition of last message.
-        if (cc.textMsgRepeatSelf != 0f && time - data.chatLastTime < timeout){
-            if (StringUtil.isSimilar(lcMessage, data.chatLastMessage, 0.8f)){
+        if (cc.textMsgRepeatSelf != 0f && time - data.chatLastTime < timeout) {
+            if (StringUtil.isSimilar(lcMessage, data.chatLastMessage, 0.8f)) {
                 final float timeWeight = (float) (timeout - (time - data.chatLastTime)) / (float) timeout; 
                 score += cc.textMsgRepeatSelf * timeWeight;
             }
         }
         // Repetition of last global message.
-        if (cc.textMsgRepeatGlobal != 0f && time - lastGlobalTime < timeout){
-            if (StringUtil.isSimilar(lcMessage, lastGlobalMessage, 0.8f)){
+        if (cc.textMsgRepeatGlobal != 0f && time - lastGlobalTime < timeout) {
+            if (StringUtil.isSimilar(lcMessage, lastGlobalMessage, 0.8f)) {
                 final float timeWeight = (float) (timeout - (time - lastGlobalTime)) / (float) timeout; 
                 score += cc.textMsgRepeatGlobal * timeWeight;
             }
         }
         // Repetition of last cancelled message.
-		if (cc.textMsgRepeatCancel != 0f && time - lastCancelledTime < timeout){
-		    if (StringUtil.isSimilar(lcMessage, lastCancelledMessage, 0.8f)){
+		if (cc.textMsgRepeatCancel != 0f && time - lastCancelledTime < timeout) {
+		    if (StringUtil.isSimilar(lcMessage, lastCancelledMessage, 0.8f)) {
 		        final float timeWeight = (float) (timeout - (time - lastCancelledTime)) / (float) timeout; 
 		        score += cc.textMsgRepeatCancel * timeWeight;
 		    }
 		}
 		// Chat quickly after join.
-		if (cc.textMsgAfterJoin != 0f && time - cData.lastJoinTime < timeout){
+		if (cc.textMsgAfterJoin != 0f && time - cData.lastJoinTime < timeout) {
 		    final float timeWeight = (float) (timeout - (time - cData.lastJoinTime)) / (float) timeout;
 		    score += cc.textMsgAfterJoin * timeWeight; 
 		}
 		// Chat without moving.
-        if (cc.textMsgNoMoving != 0f && time - cData.lastMoveTime > timeout){
+        if (cc.textMsgNoMoving != 0f && time - cData.lastMoveTime > timeout) {
             score += cc.textMsgNoMoving;
         }
 		
 		// Per word checks. -------------------
 		float wWords = 0.0f;
 		final float avwLen = (float) msgLen / (float) letterCounts.words.length; 
-		for (final WordLetterCount word: letterCounts.words){
+		for (final WordLetterCount word: letterCounts.words) {
 			float wWord = 0.0f;
 			final int wLen = word.word.length();
 			// TODO: ? used letters vs. word length.
@@ -232,7 +232,7 @@ public class Text extends AsyncCheck implements INotifyReload{
 			 engMap = engine.process(letterCounts, player.getName(), cc, data);
 			 // TODO: more fine grained sync !s
 			 // TODO: different methods (add or max or add+max or something else).
-			 for (final  Float res : engMap.values()){
+			 for (final  Float res : engMap.values()) {
 				 if (cc.textEngineMaximum) wEngine = Math.max(wEngine, res.floatValue());
 				 else wEngine += res.floatValue();
 			 }
@@ -252,40 +252,46 @@ public class Text extends AsyncCheck implements INotifyReload{
 		final float shortTermAccumulated = cc.textFreqShortTermWeight * data.chatShortTermFrequency.score(cc.textFreqShortTermFactor);
 		final boolean shortTermViolation = shortTermAccumulated > cc.textFreqShortTermLevel;
 		
-		if (normalViolation || shortTermViolation){
+		if (normalViolation || shortTermViolation) {
 		    lastCancelledMessage = lcMessage;
 		    lastCancelledTime = time;
 		    
 		    final double added;
-		    if (shortTermViolation) added = (shortTermAccumulated - cc.textFreqShortTermLevel)/ 3.0;
-		    else added = (accumulated - cc.textFreqNormLevel) / 10.0; 
-		    data.textVL += added; 
+		    if (shortTermViolation) {
+		    	added = (shortTermAccumulated - cc.textFreqShortTermLevel)/ 3.0;
+		    } else {
+		    	added = (accumulated - cc.textFreqNormLevel) / 10.0; 
+		    }
+		    data.textVL += added;
 		    
-			if (captcha.shouldStartCaptcha(cc, data)){
+			if (captcha.shouldStartCaptcha(cc, data)) {
 				captcha.sendNewCaptcha(player, cc, data);
 				cancel = true;
 			}
 			else{
-			    if (shortTermViolation){
-                    if (executeActions(player, data.textVL, added, cc.textFreqShortTermActions, isMainThread))
-                        cancel = true;
+			    if (shortTermViolation) {
+                    if (executeActions(player, data.textVL, added, cc.textFreqShortTermActions, isMainThread)) {
+                    	cancel = true;
+                    }
                 }
-			    else if (normalViolation){
-		             if (executeActions(player, data.textVL, added, cc.textFreqNormActions, isMainThread))
-		                    cancel = true;
+			    else if (normalViolation) {
+		             if (executeActions(player, data.textVL, added, cc.textFreqNormActions, isMainThread)) {
+		            	 cancel = true;
+		             }
 			    }
 			}
 		}
-		else if (cc.chatWarningCheck && time - data.chatWarningTime > cc.chatWarningTimeout && (100f * accumulated / cc.textFreqNormLevel > cc.chatWarningLevel || 100f * shortTermAccumulated / cc.textFreqShortTermLevel > cc.chatWarningLevel)){
+		else if (cc.chatWarningCheck && time - data.chatWarningTime > cc.chatWarningTimeout && (100f * accumulated / cc.textFreqNormLevel > cc.chatWarningLevel || 100f * shortTermAccumulated / cc.textFreqShortTermLevel > cc.chatWarningLevel)) {
 			NCPAPIProvider.getNoCheatPlusAPI().sendMessageOnTick(player.getName(), ColorUtil.replaceColors(cc.chatWarningMessage));
             data.chatWarningTime = time;
 		}
 		else {
             data.textVL *= 0.95;
-            if (normalScore < 2.0f * cc.textFreqNormWeight && shortTermScore < 2.0f * cc.textFreqShortTermWeight)
-                // Reset the VL.
+            if (cc.textAllowVLReset && normalScore < 2.0f * cc.textFreqNormWeight && shortTermScore < 2.0f * cc.textFreqShortTermWeight) {
+            	// Reset the VL.
                 // TODO: maybe elaborate on resetting conditions (after some timeout just divide by two or so?).
                 data.textVL = 0.0;
+            }
         }
 
 		if (debug) {

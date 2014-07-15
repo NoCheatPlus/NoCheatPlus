@@ -84,6 +84,7 @@ public abstract class ConfPaths {
 	private static final String PROTECT_COMMANDS						 = PROTECT + "commands.";
 	private static final String PROTECT_COMMANDS_CONSOLEONLY			 = PROTECT_COMMANDS + "consoleonly.";
 	public  static final String PROTECT_COMMANDS_CONSOLEONLY_ACTIVE		 = PROTECT_COMMANDS_CONSOLEONLY + "active";
+	public  static final String PROTECT_COMMANDS_CONSOLEONLY_MSG		 = PROTECT_COMMANDS_CONSOLEONLY + "message";
 	public  static final String PROTECT_COMMANDS_CONSOLEONLY_CMDS		 = PROTECT_COMMANDS_CONSOLEONLY + "commands";
 	// Plugins settings.
 	private static final String PROTECT_PLUGINS							 = PROTECT + "plugins.";
@@ -123,7 +124,6 @@ public abstract class ConfPaths {
 	public static final String  BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR      = BLOCKBREAK_FASTBREAK_BUCKETS + "factor";
 	public static final String  BLOCKBREAK_FASTBREAK_DELAY               = BLOCKBREAK_FASTBREAK + "delay";
 	public static final String  BLOCKBREAK_FASTBREAK_GRACE               = BLOCKBREAK_FASTBREAK + "grace";
-	public static final String  BLOCKBREAK_FASTBREAK_MOD_CREATIVE        = BLOCKBREAK_FASTBREAK + "intervalcreative";
 	public static final String  BLOCKBREAK_FASTBREAK_MOD_SURVIVAL        = BLOCKBREAK_FASTBREAK + "intervalsurvival";
     public static final String  BLOCKBREAK_FASTBREAK_ACTIONS             = BLOCKBREAK_FASTBREAK + "actions";
     
@@ -200,6 +200,7 @@ public abstract class ConfPaths {
 
     private static final String BLOCKPLACE_NOSWING                       = BLOCKPLACE + "noswing.";
     public static final String  BLOCKPLACE_NOSWING_CHECK                 = BLOCKPLACE_NOSWING + "active";
+    public static final String  BLOCKPLACE_NOSWING_EXCEPTIONS			 = BLOCKPLACE_NOSWING + "exceptions";
     public static final String  BLOCKPLACE_NOSWING_ACTIONS               = BLOCKPLACE_NOSWING + "actions";
 
     private static final String BLOCKPLACE_REACH                         = BLOCKPLACE + "reach.";
@@ -243,6 +244,7 @@ public abstract class ConfPaths {
     public static final String CHAT_TEXT_CHECK                            = CHAT_TEXT + "active";
 	public static final String CHAT_TEXT_DEBUG                       = CHAT_TEXT + "debug";
 	public static final String CHAT_TEXT_ENGINE_MAXIMUM              = CHAT_TEXT + "maximum";
+	public static final String CHAT_TEXT_ALLOWVLRESET				 = CHAT_TEXT + "allowvlreset";
     public static final String CHAT_TEXT_FREQ                        = CHAT_TEXT + "frequency.";
     public static final String CHAT_TEXT_FREQ_NORM                   = CHAT_TEXT_FREQ + "normal.";
 	public static final String CHAT_TEXT_FREQ_NORM_FACTOR            = CHAT_TEXT_FREQ_NORM + "factor";
@@ -567,10 +569,16 @@ public abstract class ConfPaths {
 	public static final String  MOVING_SPRINTINGGRACE					 = MOVING + "sprintinggrace";
 	public static final String  MOVING_ASSUMESPRINT						 = MOVING + "assumesprint";
 	public static final String  MOVING_SPEEDGRACE					 	 = MOVING + "speedgrace";
+	public static final String  MOVING_ENFORCELOCATION					 = MOVING + "enforcelocation";
 	
 	private static final String MOVING_VEHICLES							 = MOVING + "vehicles.";
 	public static final String  MOVING_VEHICLES_ENFORCELOCATION			 = MOVING_VEHICLES + "enforcelocation";
 	public static final String  MOVING_VEHICLES_PREVENTDESTROYOWN		 = MOVING_VEHICLES + "preventdestroyown";
+	
+	private static final String MOVING_TRACE							 = MOVING + "trace.";
+	public  static final String MOVING_TRACE_SIZE						 = MOVING_TRACE + "size";
+	public  static final String MOVING_TRACE_MERGEDIST					 = MOVING_TRACE + "mergedist";
+	
 	
     public static final String  STRINGS                                  = "strings";
 
@@ -608,5 +616,7 @@ public abstract class ConfPaths {
 	public static final String  INVENTORY_ENSURECLOSE					 = "checks.inventory.ensureclose";
 	@Deprecated
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS			 = "miscellaneous.reporttometrics";
+	@Deprecated
+	public static final String  BLOCKBREAK_FASTBREAK_MOD_CREATIVE        = "checks.blockbreak.fastbreak.intervalcreative";
 	
 }

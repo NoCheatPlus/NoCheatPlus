@@ -65,7 +65,6 @@ public class BlockBreakConfig extends ACheckConfig {
 	public final long       fastBreakGrace;
 	public final long       fastBreakDelay;	
 	public final int        fastBreakModSurvival;
-	public final int        fastBreakModCreative;
     public final ActionList fastBreakActions;
     
     
@@ -112,7 +111,6 @@ public class BlockBreakConfig extends ACheckConfig {
         fastBreakBucketDur = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_DUR, 4000);
         fastBreakBucketFactor = (float) data.getDouble(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_FACTOR, 0.99);
         fastBreakBuckets = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_BUCKETS_N, 30);
-        fastBreakModCreative = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_CREATIVE, 0);
         fastBreakModSurvival = data.getInt(ConfPaths.BLOCKBREAK_FASTBREAK_MOD_SURVIVAL);
         // Fastbreak  actions, shared.
         fastBreakActions = data.getOptimizedActionList(ConfPaths.BLOCKBREAK_FASTBREAK_ACTIONS, Permissions.BLOCKBREAK_FASTBREAK);

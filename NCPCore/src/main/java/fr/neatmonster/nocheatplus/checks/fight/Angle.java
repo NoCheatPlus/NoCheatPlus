@@ -32,9 +32,7 @@ public class Angle extends Check {
      * @param worldChanged 
      * @return true, if successful
      */
-    public boolean check(final Player player, final boolean worldChanged) {
-        final FightConfig cc = FightConfig.getConfig(player);
-        final FightData data = FightData.getData(player);
+    public boolean check(final Player player, final boolean worldChanged, final FightData data, final FightConfig cc) {
         
         if (worldChanged){
         	// TODO: clear some data.
@@ -44,12 +42,15 @@ public class Angle extends Check {
         boolean cancel = false;
 
         // Remove the old locations from the map.
-        for (final long time : new TreeMap<Long, Location>(data.angleHits).navigableKeySet())
-            if (System.currentTimeMillis() - time > 1000L)
-                data.angleHits.remove(time);
+        for (final long time : new TreeMap<Long, Location>(data.angleHits).navigableKeySet()) {
+        	if (System.currentTimeMillis() - time > 1000L) {
+        		data.angleHits.remove(time);
+        	}
+        }
 
         // Add the new location to the map.
-        data.angleHits.put(System.currentTimeMillis(), player.getLocation());
+        // TODO: Alter method to store something less fat.
+        data.angleHits.put(System.currentTimeMillis(), player.getLocation()); // This needs to be a copy at present.
 
         // Not enough data to calculate deltas.
         if (data.angleHits.size() < 2)

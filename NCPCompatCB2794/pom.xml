@@ -24,11 +24,6 @@
     	<artifactId>craftbukkit</artifactId>
     	<version>1.6.1-R0.1-SNAPSHOT</version>
     </dependency>
-    <dependency>
-    	<groupId>org.bukkit</groupId>
-    	<artifactId>bukkit</artifactId>
-    	<version>1.6.1-R0.1-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <description>Compatibility for CB 2794 (MC 1.6.1).

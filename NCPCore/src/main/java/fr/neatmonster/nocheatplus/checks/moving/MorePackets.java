@@ -60,8 +60,12 @@ public class MorePackets extends Check {
 
         if (!data.hasMorePacketsSetBack()){
         	// TODO: Check if other set-back is appropriate or if to set on other events.
-        	if (data.hasSetBack()) data.setMorePacketsSetBack(data.getSetBack(to));
-        	else data.setMorePacketsSetBack(from);
+        	if (data.hasSetBack()) {
+        		data.setMorePacketsSetBack(data.getSetBack(to));
+        	}
+        	else {
+        		data.setMorePacketsSetBack(from);
+        	}
         }
 
         // Take a packet from the buffer.
@@ -76,10 +80,8 @@ public class MorePackets extends Check {
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player, data.morePacketsVL, -data.morePacketsBuffer,
-                    MovingConfig.getConfig(player).morePacketsActions)){
+            if (executeActions(player, data.morePacketsVL, -data.morePacketsBuffer, MovingConfig.getConfig(player).morePacketsActions)){
             	newTo = data.getMorePacketsSetBack(); 
-                data.setTeleported(newTo);
             }
                 
         }
@@ -93,23 +95,28 @@ public class MorePackets extends Check {
 
             // If there was a long pause (maybe server lag?), allow buffer to grow up to 100.
             if (seconds > 2) {
-                if (data.morePacketsBuffer > 100)
-                    data.morePacketsBuffer = 100;
-            } else if (data.morePacketsBuffer > 50)
+                if (data.morePacketsBuffer > 100) {
+                	data.morePacketsBuffer = 100;
+                }
+            } else if (data.morePacketsBuffer > 50) {
                 // Only allow growth up to 50.
                 data.morePacketsBuffer = 50;
-
+            }
             // Set the new "last" time.
             data.morePacketsLastTime = time;
 
             // Set the new "setback" location.
-            if (newTo == null) data.setMorePacketsSetBack(from);
-        } else if (data.morePacketsLastTime > time)
+            if (newTo == null) {
+            	data.setMorePacketsSetBack(from);
+            }
+        } else if (data.morePacketsLastTime > time) {
             // Security check, maybe system time changed.
-            data.morePacketsLastTime = time;
+            data.morePacketsLastTime = time;	
+        }
 
-        if (newTo == null)
-            return null;
+        if (newTo == null) {
+        	return null;
+        }
 
         // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to allow the
         // player to look somewhere else despite getting pulled back by NoCheatPlus.

@@ -1,6 +1,7 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -16,6 +17,9 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * A check to see if people cheat by tricking the server to not deal them fall damage.
  */
 public class NoFall extends Check {
+	
+	/** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
+	private final Location useLoc = new Location(null, 0, 0, 0);
 
     /**
      * Instantiates a new no fall check.
@@ -206,12 +210,21 @@ public class NoFall extends Check {
     public void onLeave(final Player player) {
         final MovingData data = MovingData.getData(player);
         final float fallDistance = player.getFallDistance();
-        if (data.noFallFallDistance - fallDistance > 0){
-            // Might use tolerance, might log, might use method (compare: MovingListener.onEntityDamage).
-            // Might consider triggering violations here as well.
-            final float yDiff = (float) (data.noFallMaxY - player.getLocation().getY());
-            final float maxDist = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
-            player.setFallDistance(maxDist);
+        if (data.noFallFallDistance - fallDistance > 0.0) {
+        	final double playerY = player.getLocation(useLoc).getY();
+        	useLoc.setWorld(null);
+        	if (player.getAllowFlight() || player.isFlying() || player.getGameMode() == GameMode.CREATIVE) {
+        		// Forestall potential issues with flying plugins.
+        		player.setFallDistance(0f);
+        		data.noFallFallDistance = 0f;
+        		data.noFallMaxY = playerY;
+        	} else {
+                // Might use tolerance, might log, might use method (compare: MovingListener.onEntityDamage).
+                // Might consider triggering violations here as well.
+                final float yDiff = (float) (data.noFallMaxY - playerY);
+                final float maxDist = Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance));
+                player.setFallDistance(maxDist);
+        	}
         }
     }
 
