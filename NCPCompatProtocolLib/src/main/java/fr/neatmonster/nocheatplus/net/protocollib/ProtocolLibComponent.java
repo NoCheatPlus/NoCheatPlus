@@ -27,7 +27,10 @@ public class ProtocolLibComponent implements DisableListener{
 		LogUtil.logInfo("[NoCheatPlus] ProtocolLib seems to be available.");
 		try {
 			PacketAdapter adapter = new MoveFrequency(plugin);
-			protocolManager.addPacketListener(adapter); 
+            PacketAdapter weatherAdapter = new WeatherDistance(plugin);
+
+			protocolManager.addPacketListener(adapter);
+            protocolManager.addPacketListener(weatherAdapter);
 			registeredPacketAdapters.add(adapter);
 		} catch (Throwable t) {
 			LogUtil.logWarning("[NoCheatPlus] Could not register some packet-level hook.");
