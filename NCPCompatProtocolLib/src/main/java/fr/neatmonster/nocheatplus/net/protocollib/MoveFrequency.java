@@ -26,6 +26,7 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class MoveFrequency extends PacketAdapter implements Listener, JoinLeaveListener {
 	
+	// TODO: Configuration.
 	// TODO: Optimized options (receive only, other?).
 	// TODO: Async version ?
 	
@@ -69,8 +70,8 @@ public class MoveFrequency extends PacketAdapter implements Listener, JoinLeaveL
 		removeName(player.getName());
 	}
 	
-	private ActionFrequency getFreq(String name) {
-		ActionFrequency freq = this.freqMap.get(name);
+	private ActionFrequency getFreq(final String name) {
+		final ActionFrequency freq = this.freqMap.get(name);
 		if (freq == null) {
 			return addName(name);
 		} else {
@@ -79,9 +80,9 @@ public class MoveFrequency extends PacketAdapter implements Listener, JoinLeaveL
 	}
 
 	@Override
-	public void onPacketReceiving(PacketEvent event) {
+	public void onPacketReceiving(final PacketEvent event) {
 		// TODO: Add several (at least has look + has pos individually, maybe none/onground)
-		ActionFrequency freq = getFreq(event.getPlayer().getName());
+		final ActionFrequency freq = getFreq(event.getPlayer().getName());
 		freq.add(System.currentTimeMillis(), 1f);
 		if (freq.score(1f) > 300) {
 			event.setCancelled(true);

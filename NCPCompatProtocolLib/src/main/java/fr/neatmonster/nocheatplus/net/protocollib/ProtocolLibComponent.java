@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.net.protocollib;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,16 +26,21 @@ public class ProtocolLibComponent implements DisableListener{
 		// Register with ProtocolLib
 		final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 		LogUtil.logInfo("[NoCheatPlus] ProtocolLib seems to be available.");
-		try {
-			PacketAdapter adapter = new MoveFrequency(plugin);
-            PacketAdapter weatherAdapter = new WeatherDistance(plugin);
-
-			protocolManager.addPacketListener(adapter);
-            protocolManager.addPacketListener(weatherAdapter);
-			registeredPacketAdapters.add(adapter);
-		} catch (Throwable t) {
-			LogUtil.logWarning("[NoCheatPlus] Could not register some packet-level hook.");
-			LogUtil.logWarning(t); // TODO: Maybe temporary.
+		// Classes having a constructor with Plugin as argument.
+		List<Class<? extends PacketAdapter>> adapterClasses = Arrays.asList(
+			MoveFrequency.class,
+			WeatherDistance.class
+			);
+		for (Class<? extends PacketAdapter> clazz : adapterClasses) {
+			try {
+				// Construct a new instance using reflection.
+				PacketAdapter adapter = clazz.getDeclaredConstructor(Plugin.class).newInstance(plugin);
+				protocolManager.addPacketListener(adapter);
+				registeredPacketAdapters.add(adapter);
+			} catch (Throwable t) {
+				LogUtil.logWarning("[NoCheatPlus] Could not register packet level hook: " + clazz.getSimpleName());
+				LogUtil.logWarning(t); // TODO: Maybe temporary.
+			}
 		}
 	}
 
