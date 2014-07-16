@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.net.protocollib;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +13,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 
 import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * Quick and dirty ProtocolLib setup.
@@ -42,6 +44,13 @@ public class ProtocolLibComponent implements DisableListener{
 				LogUtil.logWarning("[NoCheatPlus] Could not register packet level hook: " + clazz.getSimpleName());
 				LogUtil.logWarning(t); // TODO: Maybe temporary.
 			}
+		}
+		if (!registeredPacketAdapters.isEmpty()) {
+			List<String> names = new ArrayList<String>(registeredPacketAdapters.size());
+			for (PacketAdapter adapter : registeredPacketAdapters) {
+				names.add(adapter.getClass().getSimpleName());
+			}
+			LogUtil.logInfo("[NoCheatPlus] Available packet level hooks: " + StringUtil.join(names, " | "));
 		}
 	}
 
