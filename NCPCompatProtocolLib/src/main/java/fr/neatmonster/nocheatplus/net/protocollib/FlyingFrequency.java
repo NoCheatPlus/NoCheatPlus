@@ -37,7 +37,7 @@ public class FlyingFrequency extends PacketAdapter implements Listener, JoinLeav
 		super(plugin, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
 	}
 	
-	private ActionFrequency addName(String name) {
+	private synchronized ActionFrequency addName(String name) {
 		Map<String, ActionFrequency> freqMap = new HashMap<String, ActionFrequency>(this.freqMap);
 		ActionFrequency freq = new ActionFrequency(5, 1000);
 		freqMap.put(name, freq);
