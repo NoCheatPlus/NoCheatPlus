@@ -24,7 +24,7 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  * @author dev1mc
  *
  */
-public class MoveFrequency extends PacketAdapter implements Listener, JoinLeaveListener {
+public class FlyingFrequency extends PacketAdapter implements Listener, JoinLeaveListener {
 	
 	// TODO: Configuration.
 	// TODO: Optimized options (receive only, other?).
@@ -32,7 +32,7 @@ public class MoveFrequency extends PacketAdapter implements Listener, JoinLeaveL
 	
 	private Map<String, ActionFrequency> freqMap = new LinkedHashMap<String, ActionFrequency>();  
 	
-	public MoveFrequency(Plugin plugin) {
+	public FlyingFrequency(Plugin plugin) {
 		// PacketPlayInFlying[3, legacy: 10]
 		super(plugin, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
 	}

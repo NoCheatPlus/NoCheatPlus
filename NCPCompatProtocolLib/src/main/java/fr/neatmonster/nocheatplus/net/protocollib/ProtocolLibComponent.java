@@ -28,8 +28,8 @@ public class ProtocolLibComponent implements DisableListener{
 		LogUtil.logInfo("[NoCheatPlus] ProtocolLib seems to be available.");
 		// Classes having a constructor with Plugin as argument.
 		List<Class<? extends PacketAdapter>> adapterClasses = Arrays.asList(
-			MoveFrequency.class,
-			WeatherDistance.class
+			FlyingFrequency.class,
+			SoundDistance.class
 			);
 		// TODO: Configurability.
 		for (Class<? extends PacketAdapter> clazz : adapterClasses) {

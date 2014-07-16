@@ -280,6 +280,12 @@ public class TrigUtil {
 		final double dz = Math.abs(z1 - z2);
 		return dx * dx + dy * dy + dz * dz;
 	}
+	
+	public static final double distanceSquared(final double x1, final double z1, final double x2, final double z2) {
+		final double dx = Math.abs(x1 - x2);
+		final double dz = Math.abs(z1 - z2);
+		return dx * dx + dz * dz;
+	}
 
 	/**
 	 * 2D-distance in x-z plane.

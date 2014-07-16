@@ -12,15 +12,31 @@ import com.comphenix.protocol.reflect.StructureModifier;
 
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
-public class WeatherDistance extends PacketAdapter {
+public class SoundDistance extends PacketAdapter {
 	
 	// TODO: Will not be effective with 512 radius, if they add the patch by @Amranth.
 	// TODO: For lower distances more packets might need to be intercepted.
 	
 	/** Maximum distance for thunder effects (squared). */
     private static final double distSq = 512.0 * 512.0; // TODO: Maybe configurable.
+    
+    private static final String[] effectNames = new String[] { // Prefix tree?
+    	"ambient.weather.thunder",
+    	"wither-spawn-sound-radius", 
+    	"dragon-death-sound-radius"
+    	// other ?
+    };
+    
+    private static final boolean contains(final String ref) {
+    	for (int i = 0; i < effectNames.length; i++) {
+    		if (effectNames[i].equals(ref)) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 
-	public WeatherDistance(Plugin plugin) {
+	public SoundDistance(Plugin plugin) {
         super(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT);
     }
 
@@ -30,8 +46,7 @@ public class WeatherDistance extends PacketAdapter {
         final Player player = event.getPlayer();
         
         // Compare sound effect name.
-        // TODO: wither-spawn-sound-radius, dragon-death-sound-radius, other ?
-        if (!packetContainer.getStrings().read(0).equals("ambient.weather.thunder")) {
+        if (!contains(packetContainer.getStrings().read(0))) {
         	return;
         }
         
@@ -39,7 +54,7 @@ public class WeatherDistance extends PacketAdapter {
         
         // Compare distance of player to the weather location.
         final StructureModifier<Integer> ints = packetContainer.getIntegers();
-        if (TrigUtil.distanceSquared(ints.read(0) / 8, ints.read(1) / 8, ints.read(2) / 8, loc.getX(), loc.getY(), loc.getZ()) > distSq) {
+        if (TrigUtil.distanceSquared(ints.read(0) / 8, ints.read(2) / 8, loc.getX(), loc.getZ()) > distSq) {
             event.setCancelled(true);
         }
     }
