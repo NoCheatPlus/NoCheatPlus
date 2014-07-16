@@ -25,13 +25,13 @@ public class ProtocolLibComponent implements DisableListener{
 	public ProtocolLibComponent(Plugin plugin) {
 		// Register with ProtocolLib
 		final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-		LogUtil.logInfo("[NoCheatPlus] ProtocolLib seems to be available.");
+		LogUtil.logInfo("[NoCheatPlus] ProtocolLib seems to be available, attempt to add packet level hooks...");
 		// Classes having a constructor with Plugin as argument.
 		List<Class<? extends PacketAdapter>> adapterClasses = Arrays.asList(
 			FlyingFrequency.class,
-			SoundDistance.class
+			SoundDistance.class // Need too: SPAWN_ENTITY_WEATHER, wither/dragon: WORLD_EVENT
 			);
-		// TODO: Configurability.
+		// TODO: Configurability (INotifyConfig, method to set up hooks).
 		for (Class<? extends PacketAdapter> clazz : adapterClasses) {
 			try {
 				// Construct a new instance using reflection.
@@ -52,13 +52,10 @@ public class ProtocolLibComponent implements DisableListener{
 			try {
 				protocolManager.removePacketListener(adapter);
 			} catch (Throwable t) {
-				LogUtil.logWarning("[NoCheatPlus] Failed to unregister protocol listener: " + adapter.getClass().getName());
+				LogUtil.logWarning("[NoCheatPlus] Failed to unregister packet level hook: " + adapter.getClass().getName());
 			}
 		}
+		registeredPacketAdapters.clear();
 	}
-	
-	
-	
-	
 
 }
