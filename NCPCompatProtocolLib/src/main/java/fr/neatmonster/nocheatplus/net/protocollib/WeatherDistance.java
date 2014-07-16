@@ -14,6 +14,9 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class WeatherDistance extends PacketAdapter {
 	
+	// TODO: Will not be effective with 512 radius, if they add the patch by @Amranth.
+	// TODO: For lower distances more packets might need to be intercepted.
+	
 	/** Maximum distance for thunder effects (squared). */
     private static final double distSq = 512.0 * 512.0; // TODO: Maybe configurable.
 
@@ -27,6 +30,7 @@ public class WeatherDistance extends PacketAdapter {
         final Player player = event.getPlayer();
         
         // Compare sound effect name.
+        // TODO: wither-spawn-sound-radius, dragon-death-sound-radius, other ?
         if (!packetContainer.getStrings().read(0).equals("ambient.weather.thunder")) {
         	return;
         }

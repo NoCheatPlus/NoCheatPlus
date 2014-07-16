@@ -31,6 +31,7 @@ public class ProtocolLibComponent implements DisableListener{
 			MoveFrequency.class,
 			WeatherDistance.class
 			);
+		// TODO: Configurability.
 		for (Class<? extends PacketAdapter> clazz : adapterClasses) {
 			try {
 				// Construct a new instance using reflection.

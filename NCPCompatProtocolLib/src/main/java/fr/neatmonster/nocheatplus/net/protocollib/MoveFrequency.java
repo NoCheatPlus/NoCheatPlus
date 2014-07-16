@@ -30,20 +30,11 @@ public class MoveFrequency extends PacketAdapter implements Listener, JoinLeaveL
 	// TODO: Optimized options (receive only, other?).
 	// TODO: Async version ?
 	
-//	private static Collection<PacketType> getPacketTypes() {
-//		final Collection<PacketType> packetTypes = PacketType.fromName("C03PacketPlayer");
-//		if (packetTypes.isEmpty()) {
-//			throw new RuntimeException("Packet types not available.");
-//		}
-//		return packetTypes;
-//	}
-	
 	private Map<String, ActionFrequency> freqMap = new LinkedHashMap<String, ActionFrequency>();  
 	
 	public MoveFrequency(Plugin plugin) {
 		// PacketPlayInFlying[3, legacy: 10]
-		super(plugin, PacketType.findCurrent(Protocol.PLAY, Sender.CLIENT, 3)); //getPacketTypes());
-		// TODO: Try to get packet by name first + legacy first.
+		super(plugin, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
 	}
 	
 	private ActionFrequency addName(String name) {
