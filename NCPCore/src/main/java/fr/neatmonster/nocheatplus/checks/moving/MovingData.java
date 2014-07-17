@@ -149,13 +149,11 @@ public class MovingData extends ACheckData {
     // Data of the more packets check.
     public int            morePacketsBuffer        = 50;
     public long           morePacketsLastTime;
-    public int            morePacketsPackets;
     private Location      morePacketsSetback = null;
 
     // Data of the more packets vehicle check.
     public int            morePacketsVehicleBuffer = 50;
     public long           morePacketsVehicleLastTime;
-    public int            morePacketsVehiclePackets;
     private Location      morePacketsVehicleSetback = null;
     /** Task id of the morepackets set-back task. */ 
 	public int			  morePacketsVehicleTaskId = -1;

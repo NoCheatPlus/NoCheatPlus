@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import java.util.Map;
-
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -73,17 +71,20 @@ public class MorePackets extends Check {
 
         // Player used up buffer, they fail the check.
         if (data.morePacketsBuffer < 0) {
-            data.morePacketsPackets = -data.morePacketsBuffer;
-
+        	
             // Increment violation level.
             data.morePacketsVL = -data.morePacketsBuffer;
-
+            
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player, data.morePacketsVL, -data.morePacketsBuffer, MovingConfig.getConfig(player).morePacketsActions)){
+            final ViolationData vd = new ViolationData(this, player, data.morePacketsVL, -data.morePacketsBuffer, cc.morePacketsActions);
+            if (cc.debug || vd.needsParameters()) {
+            	vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.morePacketsBuffer));
+            }
+            if (executeActions(vd)){
             	newTo = data.getMorePacketsSetBack(); 
             }
-                
+            
         }
 
         if (data.morePacketsLastTime + 1000 < time) {
@@ -111,7 +112,7 @@ public class MorePackets extends Check {
             }
         } else if (data.morePacketsLastTime > time) {
             // Security check, maybe system time changed.
-            data.morePacketsLastTime = time;	
+            data.morePacketsLastTime = time;
         }
 
         if (newTo == null) {
@@ -123,10 +124,4 @@ public class MorePackets extends Check {
         return new Location(player.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), to.getYaw(), to.getPitch());
     }
     
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.PACKETS, String.valueOf(MovingData.getData(violationData.player).morePacketsPackets));
-		return parameters;
-	}
 }

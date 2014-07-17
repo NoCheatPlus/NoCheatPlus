@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -70,14 +68,17 @@ public class MorePacketsVehicle extends Check {
 
         // Player used up buffer, they fail the check.
         if (data.morePacketsVehicleBuffer < 0) {
-            data.morePacketsVehiclePackets = -data.morePacketsVehicleBuffer;
 
             // Increment violation level.
             data.morePacketsVehicleVL = -data.morePacketsVehicleBuffer;
 
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
-            if (executeActions(player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer, cc.morePacketsVehicleActions)){
+            final ViolationData vd = new ViolationData(this, player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer, cc.morePacketsVehicleActions);
+            if (cc.debug || vd.needsParameters()) {
+            	vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.morePacketsVehicleBuffer));
+            }
+            if (executeActions(vd)){
             	newTo = data.getMorePacketsVehicleSetBack();
             }
         }
@@ -91,34 +92,33 @@ public class MorePacketsVehicle extends Check {
 
             // If there was a long pause (maybe server lag?), allow buffer to grow up to 100.
             if (seconds > 2) {
-                if (data.morePacketsVehicleBuffer > 100)
-                    data.morePacketsVehicleBuffer = 100;
-            } else if (data.morePacketsVehicleBuffer > 50)
-                // Only allow growth up to 50.
+                if (data.morePacketsVehicleBuffer > 100) {
+                	data.morePacketsVehicleBuffer = 100;
+                }
+            } else if (data.morePacketsVehicleBuffer > 50) {
+            	// Only allow growth up to 50.
                 data.morePacketsVehicleBuffer = 50;
-
+            }
+            
             // Set the new "last" time.
             data.morePacketsVehicleLastTime = time;
 
             // Set the new "setback" location.
-            if (newTo == null)
-                data.setMorePacketsVehicleSetBack(from);
-        } else if (data.morePacketsVehicleLastTime > time)
-            // Security check, maybe system time changed.
+            if (newTo == null) {
+            	data.setMorePacketsVehicleSetBack(from);
+            }
+        } else if (data.morePacketsVehicleLastTime > time) {
+        	// Security check, maybe system time changed.
             data.morePacketsVehicleLastTime = time;
+        }
 
-        if (newTo == null)
-            return null;
+        if (newTo == null) {
+        	return null;
+        }
 
         // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to allow the
         // player to look somewhere else despite getting pulled back by NoCheatPlus.
         return new Location(player.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), to.getYaw(), to.getPitch());
     }
     
-	@Override
-	protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-		final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-		parameters.put(ParameterName.PACKETS, String.valueOf(MovingData.getData(violationData.player).morePacketsVehiclePackets));
-		return parameters;
-	}
 }
