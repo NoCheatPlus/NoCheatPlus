@@ -65,29 +65,36 @@ public class MorePackets extends Check {
         // Add packet to frequency count.
         data.morePacketsFreq.add(time, 1f);
         
-        // Fill up all "used" time windows (minimum we can do without other events.
-        boolean used = false;
+        // Fill up all "used" time windows (minimum we can do without other events).
         final float burnScore = (float) idealPackets * (float) data.morePacketsFreq.bucketDuration() / 1000f;
-        for (int i = 1; i < data.morePacketsFreq.numberOfBuckets(); i++) {
-        	final float score = data.morePacketsFreq.bucketScore(i);
-        	if (score > 0f) {
+        // Find index.
+        int i;
+        boolean used = false;
+        for (i = 1; i < data.morePacketsFreq.numberOfBuckets(); i++) {
+        	if (data.morePacketsFreq.bucketScore(i) > 0f) {
         		if (used) {
-        			// Burn this one.
-        			data.morePacketsFreq.setBucket(i, Math.max(score, burnScore));
-        		}
-        		else {
-        			// Burn all after this.
+        			break;
+        		} else {
         			used = true;
         		}
         	}
         }
+        final double fullCount;
+        if (i < data.morePacketsFreq.numberOfBuckets() - 1) {
+        	// Assume all following time windows are burnt.
+        	final float trailing = Math.max(data.morePacketsFreq.trailingScore(1, 1f), burnScore * (data.morePacketsFreq.numberOfBuckets() - (i + 1)));
+        	final float leading = data.morePacketsFreq.leadingScore(1, 1f);
+        	fullCount = leading + trailing;
+        } else {
+        	// All time windows are used.
+        	fullCount = data.morePacketsFreq.score(1f);
+        	
+        }
+        
+        final double violation = (double) fullCount - (double) (burnScore * data.morePacketsFreq.numberOfBuckets());
         
         // TODO: Burn time windows based on other activity counting [e.g. same resolution ActinFrequency with keep-alive].
-        
-        // Compare score to maximum allowed.
-        final float fullCount = data.morePacketsFreq.score(1f);
-        final double violation = (double) fullCount - (double) (data.morePacketsFreq.bucketDuration() * data.morePacketsFreq.numberOfBuckets() * maxPackets / 1000);
-        
+
         // Player used up buffer, they fail the check.
         if (violation > 0.0) {
         	
