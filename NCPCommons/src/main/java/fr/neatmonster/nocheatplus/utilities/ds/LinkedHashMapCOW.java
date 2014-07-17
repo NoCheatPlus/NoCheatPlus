@@ -110,7 +110,7 @@ public class LinkedHashMapCOW<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public V put(K key, V value) {
+	public V put(final K key, final V value) {
 		final V out;
 		synchronized (this) {
 			final LinkedHashMap<K, V> newMap = copyMap();
@@ -121,7 +121,7 @@ public class LinkedHashMapCOW<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends V> m) {
+	public void putAll(final Map<? extends K, ? extends V> m) {
 		synchronized (this) {
 			final LinkedHashMap<K, V> newMap = copyMap();
 			newMap.putAll(m);
@@ -130,7 +130,7 @@ public class LinkedHashMapCOW<K, V> implements Map<K, V> {
 	}
 
 	@Override
-	public V remove(Object key) {
+	public V remove(final Object key) {
 		final V out;
 		synchronized (this) {
 			final LinkedHashMap<K, V> newMap = copyMap();
@@ -138,6 +138,23 @@ public class LinkedHashMapCOW<K, V> implements Map<K, V> {
 			this.map = newMap;
 		}
 		return out;
+	}
+	
+	/**
+	 * Remove all given keys.<br>
+	 * Not the most efficient implementation, copying the map and then removing
+	 * keys, but still better than iterating remove(key).
+	 * 
+	 * @param keys
+	 */
+	public void removeAll(final Collection<K> keys) {
+		synchronized (this) {
+			final LinkedHashMap<K, V> newMap = copyMap();
+			for (final K key : keys) {
+				newMap.remove(key);
+			}
+			this.map = newMap;
+		}
 	}
 
 	@Override
