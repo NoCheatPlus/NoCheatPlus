@@ -19,12 +19,11 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  */
 public class MorePackets extends Check {
 
-    /**
-     * The usual number of packets per timeframe.
-     * 
-     * 20 would be for perfect internet connections, 22 is good enough.
-     */
-    private final static int packetsPerTimeframe = 22;
+    /** The maximum number of packets per second that we accept. */
+    private final static int maxPackets = 22;
+    
+    /** Assumed number of packets per second under ideal conditions. */
+    private final static int idealPackets = 20;
 
     /**
      * Instantiates a new more packets check.
@@ -52,9 +51,6 @@ public class MorePackets extends Check {
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
     	// Take time once, first:
     	final long time = System.currentTimeMillis();
-    	
-
-        Location newTo = null;
 
         if (!data.hasMorePacketsSetBack()){
         	// TODO: Check if other set-back is appropriate or if to set on other events.
@@ -65,63 +61,57 @@ public class MorePackets extends Check {
         		data.setMorePacketsSetBack(from);
         	}
         }
-
-        // Take a packet from the buffer.
-        data.morePacketsBuffer--;
-
+        
+        // Add packet to frequency count.
+        data.morePacketsFreq.add(time, 1f);
+        
+        // Fill up all "used" time windows (minimum we can do without other events.
+        boolean used = false;
+        final float burnScore = (float) idealPackets * (float) data.morePacketsFreq.bucketDuration() / 1000f;
+        for (int i = 1; i < data.morePacketsFreq.numberOfBuckets(); i++) {
+        	final float score = data.morePacketsFreq.bucketScore(i);
+        	if (score > 0f) {
+        		if (used) {
+        			// Burn this one.
+        			data.morePacketsFreq.setBucket(i, Math.max(score, burnScore));
+        		}
+        		else {
+        			// Burn all after this.
+        			used = true;
+        		}
+        	}
+        }
+        
+        // TODO: Burn time windows based on other activity counting [e.g. same resolution ActinFrequency with keep-alive].
+        
+        // Compare score to maximum allowed.
+        final float fullCount = data.morePacketsFreq.score(1f);
+        final double violation = (double) fullCount - (double) (data.morePacketsFreq.bucketDuration() * data.morePacketsFreq.numberOfBuckets() * maxPackets / 1000);
+        
         // Player used up buffer, they fail the check.
-        if (data.morePacketsBuffer < 0) {
+        if (violation > 0.0) {
         	
             // Increment violation level.
-            data.morePacketsVL = -data.morePacketsBuffer;
+            data.morePacketsVL = violation; // TODO: Accumulate somehow [e.g. always += 1, decrease with continuous moving without violation]?
             
-            // Execute whatever actions are associated with this check and the violation level and find out if we should
-            // cancel the event.
-            final ViolationData vd = new ViolationData(this, player, data.morePacketsVL, -data.morePacketsBuffer, cc.morePacketsActions);
+            // Violation handling.
+            final ViolationData vd = new ViolationData(this, player, data.morePacketsVL, violation, cc.morePacketsActions);
             if (cc.debug || vd.needsParameters()) {
-            	vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.morePacketsBuffer));
+            	vd.setParameter(ParameterName.PACKETS, Integer.toString(new Double(violation).intValue()));
             }
             if (executeActions(vd)){
-            	newTo = data.getMorePacketsSetBack(); 
-            }
-            
+            	return data.getMorePacketsSetBack(); 
+            } 
+        } 
+        else {
+        	// Set the new "setback" location. (CHANGED to only update, if not a violation.)
+        	// (Might update whenever newTo == null)
+        	data.setMorePacketsSetBack(from);
         }
-
-        if (data.morePacketsLastTime + 1000 < time) {
-            // More than 1 second elapsed, but how many?
-            final double seconds = (time - data.morePacketsLastTime) / 1000D;
-
-            // For each second, fill the buffer.
-            data.morePacketsBuffer += packetsPerTimeframe * seconds;
-
-            // If there was a long pause (maybe server lag?), allow buffer to grow up to 100.
-            if (seconds > 2) {
-                if (data.morePacketsBuffer > 100) {
-                	data.morePacketsBuffer = 100;
-                }
-            } else if (data.morePacketsBuffer > 50) {
-                // Only allow growth up to 50.
-                data.morePacketsBuffer = 50;
-            }
-            // Set the new "last" time.
-            data.morePacketsLastTime = time;
-
-            // Set the new "setback" location.
-            if (newTo == null) {
-            	data.setMorePacketsSetBack(from);
-            }
-        } else if (data.morePacketsLastTime > time) {
-            // Security check, maybe system time changed.
-            data.morePacketsLastTime = time;
-        }
-
-        if (newTo == null) {
-        	return null;
-        }
-
-        // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()" to allow the
-        // player to look somewhere else despite getting pulled back by NoCheatPlus.
-        return new Location(player.getWorld(), newTo.getX(), newTo.getY(), newTo.getZ(), to.getYaw(), to.getPitch());
+        
+        // No set-back.
+        return null;
+        
     }
     
 }

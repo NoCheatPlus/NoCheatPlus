@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /**
@@ -147,8 +148,7 @@ public class MovingData extends ACheckData {
     public boolean        creativeFlyPreviousRefused;
 
     // Data of the more packets check.
-    public int            morePacketsBuffer        = 50;
-    public long           morePacketsLastTime;
+    public final ActionFrequency morePacketsFreq = new ActionFrequency(10, 500);
     private Location      morePacketsSetback = null;
 
     // Data of the more packets vehicle check.
