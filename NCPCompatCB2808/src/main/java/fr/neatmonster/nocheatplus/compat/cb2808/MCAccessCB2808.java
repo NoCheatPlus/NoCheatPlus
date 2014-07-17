@@ -149,12 +149,6 @@ public class MCAccessCB2808 implements MCAccess{
 	}
 	
 	@Override
-	public long getKeepAliveTime(final Player player) {
-		// TODO: Implement if possible.
-		return Long.MIN_VALUE;
-	}
-	
-	@Override
 	public boolean hasGravity(final Material mat) {
 		// TODO: Test/check.
 		return mat.hasGravity();

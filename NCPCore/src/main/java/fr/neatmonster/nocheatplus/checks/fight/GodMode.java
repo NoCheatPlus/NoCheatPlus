@@ -128,8 +128,9 @@ public class GodMode extends Check {
     	// Check for client side lag.
     	final long now = System.currentTimeMillis();
     	final long maxAge = cc.godModeLagMaxAge;
-    	long keepAlive = mcAccess.getKeepAliveTime(player);
-    	if (keepAlive > now || keepAlive == Long.MIN_VALUE){
+    	long keepAlive = Long.MIN_VALUE;
+    	// TODO: Get keepAlive from NetData, if available.
+    	if (keepAlive > now || keepAlive == Long.MIN_VALUE) {
     		keepAlive = CheckUtils.guessKeepAliveTime(player, now, maxAge);
     	}
     	// TODO: else: still check the other time stamp ?
