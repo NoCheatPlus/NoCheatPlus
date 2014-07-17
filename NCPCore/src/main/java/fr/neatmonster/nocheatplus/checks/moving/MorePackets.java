@@ -80,10 +80,10 @@ public class MorePackets extends Check {
         	}
         }
         final double fullCount;
-        if (i < data.morePacketsFreq.numberOfBuckets() - 1) {
+        if (i < data.morePacketsFreq.numberOfBuckets()) {
         	// Assume all following time windows are burnt.
-        	final float trailing = Math.max(data.morePacketsFreq.trailingScore(1, 1f), burnScore * (data.morePacketsFreq.numberOfBuckets() - (i + 1)));
-        	final float leading = data.morePacketsFreq.leadingScore(1, 1f);
+        	final float trailing = Math.max(data.morePacketsFreq.trailingScore(i, 1f), burnScore * (data.morePacketsFreq.numberOfBuckets() - i));
+        	final float leading = data.morePacketsFreq.leadingScore(i, 1f);
         	fullCount = leading + trailing;
         } else {
         	// All time windows are used.
