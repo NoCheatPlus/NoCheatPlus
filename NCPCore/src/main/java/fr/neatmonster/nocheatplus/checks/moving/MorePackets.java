@@ -8,6 +8,7 @@ import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
  * The MorePackets check (previously called Speedhack check) will try to identify players that send more than the usual
@@ -85,6 +86,14 @@ public class MorePackets extends Check {
         		}
         	}
         }
+        
+        // Adjust empty based on server side lag.
+        final float lag = cc.lag ? TickTask.getLag(data.morePacketsFreq.bucketDuration() * data.morePacketsFreq.numberOfBuckets(), true): 1f;
+        if (lag >= 1f) {
+        	// This is more strict than without lag adaption (!).
+        	empty = Math.min(empty, (int) Math.round((lag - 1f) * data.morePacketsFreq.numberOfBuckets()));
+        }
+        
         final double fullCount;
         if (i < data.morePacketsFreq.numberOfBuckets()) {
         	// Assume all following time windows are burnt.
