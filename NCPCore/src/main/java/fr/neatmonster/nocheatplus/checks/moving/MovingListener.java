@@ -604,7 +604,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 		if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
 			// If it hasn't been stopped by any other check and is handled by the more packets check, execute it.
 			// TODO: Still feed morepackets even if cancelled.
-			newTo = morePackets.check(player, pFrom, pTo, data, cc);
+			if (pFrom.manhattan(pTo) > 0.0) {
+				newTo = morePackets.check(player, pFrom, pTo, data, cc);
+			}
 		} else {
 			// Otherwise we need to clear their data.
 			data.clearMorePacketsData();
