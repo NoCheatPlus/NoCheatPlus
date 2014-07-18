@@ -97,7 +97,7 @@ public class MorePackets extends Check {
         	
         }
         
-        final double violation = (double) fullCount - (double) (burnScore * data.morePacketsFreq.numberOfBuckets());
+        final double violation = (double) fullCount - (double) (maxPackets * data.morePacketsFreq.numberOfBuckets() * data.morePacketsFreq.bucketDuration() / 1000f);
         
         // TODO: Burn time windows based on other activity counting [e.g. same resolution ActinFrequency with keep-alive].
 
