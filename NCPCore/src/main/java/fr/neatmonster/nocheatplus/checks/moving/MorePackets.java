@@ -7,16 +7,14 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.net.NetStatic;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.TickTask;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
- * The MorePackets check (previously called Speedhack check) will try to identify players that send more than the usual
+ * The MorePackets check will try to identify players that send more than the usual
  * amount of move-packets to the server to be able to move faster than normal, without getting caught by the other
  * checks (flying/running).
- * 
- * It monitors the number of packets sent to the server within 1 second and compares it to the "legal" number of packets
- * for that timeframe (22).
  */
 public class MorePackets extends Check {
 
@@ -33,28 +31,33 @@ public class MorePackets extends Check {
         super(CheckType.MOVING_MOREPACKETS);
     }
 
-    /**
-     * Checks a player.
-     * 
-     * Players get assigned a certain amount of "free" packets as a limit initially. Every move packet reduces that
-     * limit by 1. If more than 1 second of time passed, the limit gets increased by 22 * time in seconds, up to 50 and
-     * they get a new "setback" location. If the player reaches limit = 0 -> teleport them back to "setback". If there was
-     * a long pause (maybe lag), limit may be up to 100.
-     * 
-     * @param player
-     *            the player
-     * @param from
-     *            the from
-     * @param to
-     *            the to
-     * @return the location
-     */
+	/**
+	 * Check for speeding by sending too many packets. We assume 22 packets per
+	 * second to be legitimate, while 20 would be ideal. See
+	 * PlayerData.morePacketsFreq for the monitored amount of time and the
+	 * resolution. See NetStatic for the actual check code.
+	 * 
+	 * @param player
+	 *            the player
+	 * @param from
+	 *            the from
+	 * @param to
+	 *            the to
+	 * @return the location
+	 */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
     	// Take time once, first:
     	final long time = System.currentTimeMillis();
-
+    	
+    	if (from.isSamePos(to)) {
+    		// Ignore moves with "just look" for now.
+    		// TODO: Extra ActionFrequency for "just look" + use to burn, maybe also check individually.
+    		return null;
+    	}
+    	
+    	// Ensure we have a set-back location.
         if (!data.hasMorePacketsSetBack()){
-        	// TODO: Check if other set-back is appropriate or if to set on other events.
+        	// TODO: Check if other set-back is appropriate or if to set/reset on other events.
         	if (data.hasSetBack()) {
         		data.setMorePacketsSetBack(data.getSetBack(to));
         	}
@@ -63,54 +66,10 @@ public class MorePackets extends Check {
         	}
         }
         
-        // Add packet to frequency count.
-        data.morePacketsFreq.add(time, 1f);
+        // Check for a violation of the set limits.
+        final double violation = NetStatic.morePacketsCheck(data.morePacketsFreq, time, 1f, maxPackets, idealPackets);
         
-        // Fill up all "used" time windows (minimum we can do without other events).
-        final float burnScore = (float) idealPackets * (float) data.morePacketsFreq.bucketDuration() / 1000f;
-        // Find index.
-        int i;
-        int empty = 0;
-        boolean used = false;
-        for (i = 1; i < data.morePacketsFreq.numberOfBuckets(); i++) {
-        	if (data.morePacketsFreq.bucketScore(i) > 0f) {
-        		if (used) {
-        			for (int j = i; j < data.morePacketsFreq.numberOfBuckets(); j ++) {
-        				if (data.morePacketsFreq.bucketScore(j) == 0f) {
-        					empty += 1;
-        				}
-        			}
-        			break;
-        		} else {
-        			used = true;
-        		}
-        	}
-        }
-        
-        // Adjust empty based on server side lag.
-        final float lag = cc.lag ? TickTask.getLag(data.morePacketsFreq.bucketDuration() * data.morePacketsFreq.numberOfBuckets(), true): 1f;
-        if (lag >= 1f) {
-        	// This is more strict than without lag adaption (!).
-        	empty = Math.min(empty, (int) Math.round((lag - 1f) * data.morePacketsFreq.numberOfBuckets()));
-        }
-        
-        final double fullCount;
-        if (i < data.morePacketsFreq.numberOfBuckets()) {
-        	// Assume all following time windows are burnt.
-        	final float trailing = Math.max(data.morePacketsFreq.trailingScore(i, 1f), burnScore * (data.morePacketsFreq.numberOfBuckets() - i - empty));
-        	final float leading = data.morePacketsFreq.leadingScore(i, 1f);
-        	fullCount = leading + trailing;
-        } else {
-        	// All time windows are used.
-        	fullCount = data.morePacketsFreq.score(1f);
-        	
-        }
-        
-        final double violation = (double) fullCount - (double) (maxPackets * data.morePacketsFreq.numberOfBuckets() * data.morePacketsFreq.bucketDuration() / 1000f);
-        
-        // TODO: Burn time windows based on other activity counting [e.g. same resolution ActinFrequency with keep-alive].
-
-        // Player used up buffer, they fail the check.
+        // Process violation result.
         if (violation > 0.0) {
         	
             // Increment violation level.
@@ -121,12 +80,13 @@ public class MorePackets extends Check {
             if (cc.debug || vd.needsParameters()) {
             	vd.setParameter(ParameterName.PACKETS, Integer.toString(new Double(violation).intValue()));
             }
-            if (executeActions(vd)){
+            if (executeActions(vd)) {
+            	// Set to cancel the move.
             	return data.getMorePacketsSetBack(); 
             } 
         } 
         else {
-        	// Set the new "setback" location. (CHANGED to only update, if not a violation.)
+        	// Update the set-back location. (CHANGED to only update, if not a violation.)
         	// (Might update whenever newTo == null)
         	data.setMorePacketsSetBack(from);
         }
