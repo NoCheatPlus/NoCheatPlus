@@ -69,10 +69,16 @@ public class MorePackets extends Check {
         final float burnScore = (float) idealPackets * (float) data.morePacketsFreq.bucketDuration() / 1000f;
         // Find index.
         int i;
+        int empty = 0;
         boolean used = false;
         for (i = 1; i < data.morePacketsFreq.numberOfBuckets(); i++) {
         	if (data.morePacketsFreq.bucketScore(i) > 0f) {
         		if (used) {
+        			for (int j = i; j < data.morePacketsFreq.numberOfBuckets(); j ++) {
+        				if (data.morePacketsFreq.bucketScore(j) == 0f) {
+        					empty += 1;
+        				}
+        			}
         			break;
         		} else {
         			used = true;
@@ -82,7 +88,7 @@ public class MorePackets extends Check {
         final double fullCount;
         if (i < data.morePacketsFreq.numberOfBuckets()) {
         	// Assume all following time windows are burnt.
-        	final float trailing = Math.max(data.morePacketsFreq.trailingScore(i, 1f), burnScore * (data.morePacketsFreq.numberOfBuckets() - i));
+        	final float trailing = Math.max(data.morePacketsFreq.trailingScore(i, 1f), burnScore * (data.morePacketsFreq.numberOfBuckets() - i - empty));
         	final float leading = data.morePacketsFreq.leadingScore(i, 1f);
         	fullCount = leading + trailing;
         } else {
