@@ -49,11 +49,11 @@ public class MorePackets extends Check {
     	// Take time once, first:
     	final long time = System.currentTimeMillis();
     	
-    	if (from.isSamePos(to)) {
-    		// Ignore moves with "just look" for now.
-    		// TODO: Extra ActionFrequency for "just look" + use to burn, maybe also check individually.
-    		return null;
-    	}
+//    	if (from.isSamePos(to)) {
+//    		// Ignore moves with "just look" for now.
+//    		// TODO: Extra ActionFrequency for "just look" + use to burn, maybe also check individually.
+//    		return null;
+//    	}
     	
     	// Ensure we have a set-back location.
         if (!data.hasMorePacketsSetBack()){
