@@ -503,6 +503,8 @@ public abstract class ConfPaths {
 
     private static final String MOVING_MOREPACKETS                       = MOVING + "morepackets.";
     public static final String  MOVING_MOREPACKETS_CHECK                 = MOVING_MOREPACKETS + "active";
+    public static final String  MOVING_MOREPACKETS_EPSIDEAL				 = MOVING_MOREPACKETS + "epsideal";
+	public static final String  MOVING_MOREPACKETS_EPSMAX				 = MOVING_MOREPACKETS + "epsmax";
     public static final String  MOVING_MOREPACKETS_ACTIONS               = MOVING_MOREPACKETS + "actions";
 
     private static final String MOVING_MOREPACKETSVEHICLE                = MOVING + "morepacketsvehicle.";

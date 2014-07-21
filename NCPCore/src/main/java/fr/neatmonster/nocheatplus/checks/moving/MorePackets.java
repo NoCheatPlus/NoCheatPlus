@@ -9,7 +9,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.net.NetStatic;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * The MorePackets check will try to identify players that send more than the usual
@@ -17,13 +16,7 @@ import fr.neatmonster.nocheatplus.utilities.TrigUtil;
  * checks (flying/running).
  */
 public class MorePackets extends Check {
-
-    /** The maximum number of packets per second that we accept. */
-    private final static int maxPackets = 22;
-    
-    /** Assumed number of packets per second under ideal conditions. */
-    private final static int idealPackets = 20;
-
+	
     /**
      * Instantiates a new more packets check.
      */
@@ -67,7 +60,7 @@ public class MorePackets extends Check {
         }
         
         // Check for a violation of the set limits.
-        final double violation = NetStatic.morePacketsCheck(data.morePacketsFreq, time, 1f, maxPackets, idealPackets);
+        final double violation = NetStatic.morePacketsCheck(data.morePacketsFreq, time, 1f, cc.morePacketsEPSMax, cc.morePacketsEPSIdeal);
         
         // Process violation result.
         if (violation > 0.0) {

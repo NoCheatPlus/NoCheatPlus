@@ -355,6 +355,8 @@ public class DefaultConfig extends ConfigFile {
             "log:flyshort:3:5:f cancel vl>100 log:flyshort:0:5:if cancel vl>400 log:flylong:0:5:cif cancel");
 
         set(ConfPaths.MOVING_MOREPACKETS_CHECK, true);
+        set(ConfPaths.MOVING_MOREPACKETS_EPSIDEAL, 20);
+        set(ConfPaths.MOVING_MOREPACKETS_EPSMAX, 22);
         set(ConfPaths.MOVING_MOREPACKETS_ACTIONS, "cancel vl>10 log:morepackets:0:2:if cancel vl>100 log:morepackets:0:2:if cancel cmd:kickpackets");
 
         set(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK, true);

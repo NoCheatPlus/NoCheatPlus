@@ -76,6 +76,10 @@ public class MovingConfig extends ACheckConfig {
     public final ActionList creativeFlyActions;
 
     public final boolean    morePacketsCheck;
+    /** Assumed number of packets per second under ideal conditions. */
+    public final float      morePacketsEPSIdeal;
+    /** The maximum number of packets per second that we accept. */
+    public final float      morePacketsEPSMax;
     public final ActionList morePacketsActions;
 
     public final boolean    morePacketsVehicleCheck;
@@ -167,6 +171,8 @@ public class MovingConfig extends ACheckConfig {
         creativeFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_CREATIVEFLY_ACTIONS, Permissions.MOVING_CREATIVEFLY);
 
         morePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
+        morePacketsEPSIdeal = config.getInt(ConfPaths.MOVING_MOREPACKETS_EPSIDEAL);
+        morePacketsEPSMax = Math.max(morePacketsEPSIdeal, config.getInt(ConfPaths.MOVING_MOREPACKETS_EPSMAX));
         morePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
 
         morePacketsVehicleCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETSVEHICLE_CHECK);
