@@ -38,6 +38,7 @@ public class NetStatic {
 		final int winNum = packetFreq.numberOfBuckets();
 		// Add packet to frequency count.
         packetFreq.add(time, packets);
+        // TODO: Add a per-bucket violation AF (once first bucket > thresh => pbvAF.add(now, 1f) + if total score > xyz => extra violation).
         
         // Fill up all "used" time windows (minimum we can do without other events).
         final float burnScore = (float) idealPackets * (float) winDur / 1000f;
@@ -47,6 +48,7 @@ public class NetStatic {
         boolean used = false;
         for (burnStart = 1; burnStart < winNum; burnStart ++) {
         	if (packetFreq.bucketScore(burnStart) > 0f) {
+        		// TODO: burnStart ++; Fill up all ? ~ e.g. what with filled up half? 
         		if (used) {
         			for (int j = burnStart; j < winNum; j ++) {
         				if (packetFreq.bucketScore(j) == 0f) {
@@ -63,14 +65,17 @@ public class NetStatic {
         // TODO: Burn time windows based on other activity counting [e.g. same resolution ActinFrequency with keep-alive].
         
         // Adjust empty based on server side lag, this makes the check more strict.
-        // TODO: Consider to add a config flag for skipping the lag adaption (e.g. strict).
-    	final float lag = TickTask.getLag(winDur * winNum, true);
-    	// TODO: Consider increasing the allowed maximum, for extreme server-side lag.
-        empty = Math.min(empty, (int) Math.round((lag - 1f) * winNum));
+        if (empty > 0) {
+            // TODO: Consider to add a config flag for skipping the lag adaption (e.g. strict).
+        	final float lag = TickTask.getLag(winDur * winNum, true);
+        	// TODO: Consider increasing the allowed maximum, for extreme server-side lag.
+            empty = Math.min(empty, (int) Math.round((lag - 1f) * winNum));
+        }
         
         final double fullCount;
         if (burnStart < winNum) {
         	// Assume all following time windows are burnt.
+        	// TODO: empty score + trailing score !? max with trailing bukkets * ideal (!)
         	final float trailing = Math.max(packetFreq.trailingScore(burnStart, 1f), burnScore * (winNum - burnStart - empty));
         	final float leading = packetFreq.leadingScore(burnStart, 1f);
         	fullCount = leading + trailing;
