@@ -123,7 +123,7 @@ public class MovingData extends ACheckData {
     /** Active velocity entries (horizontal distance). */
     public final List<Velocity> hVelActive = new LinkedList<Velocity>();
     /** Queued velocity entries (horizontal distance). */
-    public final List<Velocity> hVelQueued = new LinkedList<Velocity>(); 
+    public final List<Velocity> hVelQueued = new LinkedList<Velocity>();
     
     // Coordinates.
     /** Last from coordinates. */
@@ -148,7 +148,10 @@ public class MovingData extends ACheckData {
     public boolean        creativeFlyPreviousRefused;
 
     // Data of the more packets check.
+    /** Packet frequency count. */
     public final ActionFrequency morePacketsFreq = new ActionFrequency(10, 500);
+    /** Burst count. */
+    public final ActionFrequency morePacketsBurstFreq = new ActionFrequency(12, 5000);
     private Location      morePacketsSetback = null;
 
     // Data of the more packets vehicle check.

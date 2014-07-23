@@ -60,7 +60,7 @@ public class MorePackets extends Check {
         }
         
         // Check for a violation of the set limits.
-        final double violation = NetStatic.morePacketsCheck(data.morePacketsFreq, time, 1f, cc.morePacketsEPSMax, cc.morePacketsEPSIdeal);
+        final double violation = NetStatic.morePacketsCheck(data.morePacketsFreq, time, 1f, cc.morePacketsEPSMax, cc.morePacketsEPSIdeal, data.morePacketsBurstFreq, cc.morePacketsBurstPackets, cc.morePacketsBurstEPM);
         
         // Process violation result.
         if (violation > 0.0) {
