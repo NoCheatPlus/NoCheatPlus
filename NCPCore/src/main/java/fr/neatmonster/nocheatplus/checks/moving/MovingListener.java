@@ -1003,7 +1003,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         double newVal = velocity.getY();
         boolean used = false;
-        if (newVal >= 0D) {
+        if (newVal >= 0D) { // TODO: Just >, not >=.
             used = true;
         	if (data.verticalFreedom <= 0.001 && data.verticalVelocityCounter >= 0) {
         		data.verticalVelocity = 0;

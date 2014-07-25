@@ -534,12 +534,6 @@ public class SurvivalFly extends Check {
 			else {
 				hAllowedDistance = walkSpeed * modSprint * cc.survivalFlySprintingSpeed / 100D;
 			}
-
-			// Speeding bypass permission (can be combined with other bypasses).
-			// TODO: How exactly to bring it on finally.
-			if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
-				hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
-			}
 		}
 		
 		// Account for flowing liquids (only if needed).
@@ -550,6 +544,7 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Short cut.
+		// TODO: Check if a) early return makes sense and b) do it ofr all following parts.
 		if (hDistance <= hAllowedDistance && !cc.debug) {
 			// Shortcut for debug disabled.
 			return hAllowedDistance;
@@ -564,6 +559,11 @@ public class SurvivalFly extends Check {
 		final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);
 		if (speedAmplifier != Double.NEGATIVE_INFINITY) {
 			hAllowedDistance *= 1.0D + 0.2D * (speedAmplifier + 1);
+		}
+		
+		// Speeding bypass permission (can be combined with other bypasses).
+		if (checkPermissions && player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPEEDING)) {
+			hAllowedDistance *= cc.survivalFlySpeedingSpeed / 100D;
 		}
 		
 		return hAllowedDistance;
@@ -999,6 +999,7 @@ public class SurvivalFly extends Check {
 //    	if (vDistanceAboveLimit > 0) tags.add("vclimb");
     	final double jumpHeight = 1.35 + (data.jumpAmplifier > 0 ? (0.6 + data.jumpAmplifier - 1.0) : 0.0);
     	// TODO: ladders are ground !
+    	// TODO: yDistance < 0.0 ?
     	if (yDistance > climbSpeed && !from.isOnGround(jumpHeight, 0D, 0D, BlockProperties.F_CLIMBABLE)) {
     		// Ignore ladders. TODO: Check for false positives...
     		tags.add("climbspeed");
