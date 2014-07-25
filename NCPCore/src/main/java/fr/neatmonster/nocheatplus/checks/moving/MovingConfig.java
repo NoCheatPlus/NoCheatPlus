@@ -81,6 +81,7 @@ public class MovingConfig extends ACheckConfig {
     /** The maximum number of packets per second that we accept. */
     public final float      morePacketsEPSMax;
     public final float		morePacketsBurstPackets;
+    public final double		morePacketsBurstDirect;
     public final double		morePacketsBurstEPM;
     public final ActionList morePacketsActions;
 
@@ -175,7 +176,8 @@ public class MovingConfig extends ACheckConfig {
         morePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
         morePacketsEPSIdeal = config.getInt(ConfPaths.MOVING_MOREPACKETS_EPSIDEAL);
         morePacketsEPSMax = Math.max(morePacketsEPSIdeal, config.getInt(ConfPaths.MOVING_MOREPACKETS_EPSMAX));
-        morePacketsBurstPackets = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_PACKETS);
+        morePacketsBurstPackets = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
+        morePacketsBurstDirect = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_DIRECT);
         morePacketsBurstEPM = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
         morePacketsActions = config.getOptimizedActionList(ConfPaths.MOVING_MOREPACKETS_ACTIONS, Permissions.MOVING_MOREPACKETS);
 
