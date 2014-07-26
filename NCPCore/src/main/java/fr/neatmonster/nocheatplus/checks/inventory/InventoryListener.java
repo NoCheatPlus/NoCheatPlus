@@ -224,7 +224,6 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         
         boolean resetAll = false;
         
-        
         if (event.hasItem()){
             final ItemStack item = event.getItem();
             final Material type = item.getType();
@@ -234,7 +233,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                 // It was a bow, the player starts to pull the string, remember this time.
                 data.instantBowInteract = (data.instantBowInteract > 0 && now - data.instantBowInteract < 800) ? Math.min(System.currentTimeMillis(), data.instantBowInteract) : System.currentTimeMillis();
             }
-            else if (type.isEdible() || type == Material.POTION) {
+            else if (type.isEdible() || type == Material.POTION || type == Material.MILK_BUCKET) {
                 final long now = System.currentTimeMillis();
                 // It was food, the player starts to eat some food, remember this time and the type of food.
                 data.instantEatFood = type;

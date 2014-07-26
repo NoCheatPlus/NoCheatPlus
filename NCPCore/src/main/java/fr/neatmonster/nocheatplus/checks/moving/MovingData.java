@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
+import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /**
@@ -122,7 +123,7 @@ public class MovingData extends ACheckData {
     /** Active velocity entries (horizontal distance). */
     public final List<Velocity> hVelActive = new LinkedList<Velocity>();
     /** Queued velocity entries (horizontal distance). */
-    public final List<Velocity> hVelQueued = new LinkedList<Velocity>(); 
+    public final List<Velocity> hVelQueued = new LinkedList<Velocity>();
     
     // Coordinates.
     /** Last from coordinates. */
@@ -147,15 +148,15 @@ public class MovingData extends ACheckData {
     public boolean        creativeFlyPreviousRefused;
 
     // Data of the more packets check.
-    public int            morePacketsBuffer        = 50;
-    public long           morePacketsLastTime;
-    public int            morePacketsPackets;
+    /** Packet frequency count. */
+    public final ActionFrequency morePacketsFreq = new ActionFrequency(10, 500);
+    /** Burst count. */
+    public final ActionFrequency morePacketsBurstFreq = new ActionFrequency(12, 5000);
     private Location      morePacketsSetback = null;
 
     // Data of the more packets vehicle check.
     public int            morePacketsVehicleBuffer = 50;
     public long           morePacketsVehicleLastTime;
-    public int            morePacketsVehiclePackets;
     private Location      morePacketsVehicleSetback = null;
     /** Task id of the morepackets set-back task. */ 
 	public int			  morePacketsVehicleTaskId = -1;

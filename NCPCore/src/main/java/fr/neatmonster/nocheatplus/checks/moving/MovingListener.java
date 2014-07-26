@@ -601,9 +601,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     	}
 		
 		// Morepackets.
+    	// TODO: Also update counters if newTo == null?
 		if (newTo == null && cc.morePacketsCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_MOREPACKETS) && !player.hasPermission(Permissions.MOVING_MOREPACKETS)) {
 			// If it hasn't been stopped by any other check and is handled by the more packets check, execute it.
-			// TODO: Still feed morepackets even if cancelled.
 			newTo = morePackets.check(player, pFrom, pTo, data, cc);
 		} else {
 			// Otherwise we need to clear their data.
@@ -1003,7 +1003,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         
         double newVal = velocity.getY();
         boolean used = false;
-        if (newVal >= 0D) {
+        if (newVal >= 0D) { // TODO: Just >, not >=.
             used = true;
         	if (data.verticalFreedom <= 0.001 && data.verticalVelocityCounter >= 0) {
         		data.verticalVelocity = 0;

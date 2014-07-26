@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.config;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -30,7 +31,7 @@ public class ConfigManager {
     };
     
     /** The map containing the configuration files per world. */
-    private static final Map<String, ConfigFile> worldsMap   = new HashMap<String, ConfigFile>();
+    private static Map<String, ConfigFile> worldsMap = new LinkedHashMap<String, ConfigFile>();
     
     private static final WorldConfigProvider<ConfigFile> worldConfigProvider = new WorldConfigProvider<ConfigFile>() {
 		
@@ -118,7 +119,7 @@ public class ConfigManager {
     }
 
     /**
-     * Gets the configuration file.
+     * Gets the configuration file. Can be called from any thread.
      * 
      * @return the configuration file
      */
@@ -129,13 +130,15 @@ public class ConfigManager {
     /**
      * (Synchronized version).
      * @return
+     * @deprecated getConfigFile() is thread-safe now.
      */
+    @Deprecated
     public static synchronized ConfigFile getConfigFileSync() {
     	return getConfigFile();
     }
 
     /**
-     * Gets the configuration file.
+     * Gets the configuration file. Can be called from any thread.
      * 
      * @param worldName
      *            the world name
@@ -146,14 +149,17 @@ public class ConfigManager {
         if (configFile != null){
         	return configFile;
         }
-        // Expensive only once, for the rest of runtime the file is returned fast.
+        // Expensive only once per world, for the rest of the runtime the file is returned fast.
     	synchronized(ConfigManager.class){
     		// Need to check again.
     		if (worldsMap.containsKey(worldName)){
     			return worldsMap.get(worldName);
     		}
-    		final ConfigFile globalConfig = getConfigFile();
-    		worldsMap.put(worldName, globalConfig);
+    		// Copy the whole map with the default configuration set for this world.
+    		final Map<String, ConfigFile> newWorldsMap = new LinkedHashMap<String, ConfigFile>(ConfigManager.worldsMap);
+    		final ConfigFile globalConfig = newWorldsMap.get(null);
+    		newWorldsMap.put(worldName, globalConfig);
+    		ConfigManager.worldsMap = newWorldsMap;
     		return globalConfig;
     	}
     }
@@ -162,13 +168,15 @@ public class ConfigManager {
      * (Synchronized version).
      * @param worldName
      * @return
+     * @deprecated getConfigFile() is thread-safe now.
      */
+    @Deprecated
     public static synchronized ConfigFile getConfigFileSync(final String worldName) {
     	return getConfigFile(worldName);
     }
 
     /**
-     * Initializes the configuration manager.
+     * Initializes the configuration manager. Must be called in the main thread.
      * 
      * @param plugin
      *            the instance of NoCheatPlus

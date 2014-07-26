@@ -54,7 +54,7 @@ public class ChatConfig extends AsyncCheckConfig {
         synchronized (worldsMap) {
             if (!worldsMap.containsKey(player.getWorld().getName()))
                 worldsMap.put(player.getWorld().getName(),
-                        new ChatConfig(ConfigManager.getConfigFileSync(player.getWorld().getName())));
+                        new ChatConfig(ConfigManager.getConfigFile(player.getWorld().getName())));
             return worldsMap.get(player.getWorld().getName());
         }
     }
