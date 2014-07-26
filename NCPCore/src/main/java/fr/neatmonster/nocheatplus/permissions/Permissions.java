@@ -8,43 +8,42 @@ public class Permissions {
 
     private static final String ADMINISTRATION               = NOCHEATPLUS + ".admin";
     // Debug permission, for player spam (not in plugin.yml, currently).
-	public static final String  ADMINISTRATION_DEBUG         = ADMINISTRATION + ".debug";
-	
+    public static final String  ADMINISTRATION_DEBUG         = ADMINISTRATION + ".debug";
+
     // Bypasses held extra from command permissions.
     private final static String BYPASS                       = NOCHEATPLUS + ".bypass";
     public static final  String BYPASS_DENY_LOGIN            = BYPASS + "denylogin";
-    
-    private static final String FILTER						 = NOCHEATPLUS + ".filter";
-    public static final String  FILTER_COMMAND				 = FILTER + ".command";
-    public static final String  FILTER_COMMAND_NOCHEATPLUS   = FILTER_COMMAND + ".nocheatplus";
-    
-    // Notifications (in-game).
-    public static final String  NOTIFY       				 = NOCHEATPLUS + ".notify";
-    
-    // Command permissions.
-    public static final String  COMMAND					= NOCHEATPLUS + ".command";
-    public static final String  COMMAND_BAN				= COMMAND + ".ban";
-	public static final String  COMMAND_DELAY			= COMMAND + ".delay";
-	
-	public static final String  COMMAND_EXEMPT        	= COMMAND + ".exempt";
-	public static final String  COMMAND_UNEXEMPT      	= COMMAND + ".unexempt";
-	public static final String  COMMAND_EXEMPTIONS    	= COMMAND + ".exemptions";
-	public static final String  COMMAND_NOTIFY       	= COMMAND + ".notify";
-    public static final String  COMMAND_INFO          	= COMMAND + ".info";
-    public static final String  COMMAND_COMMANDS      	= COMMAND + ".commands";
-    public static final String  COMMAND_KICK        	= COMMAND + ".kick";
-	public static final String  COMMAND_KICKLIST    	= COMMAND + ".kicklist";
-	public static final String  COMMAND_LAG 			= COMMAND + ".lag";
-    public static final String  COMMAND_RELOAD        	= COMMAND + ".reload";
-	public static final String  COMMAND_REMOVEPLAYER  	= COMMAND + ".removeplayer";
-    public static final String  COMMAND_TELL          	= COMMAND + ".tell";
-    public static final String  COMMAND_TEMPKICK      	= COMMAND + ".tempkick";
-	public static final String  COMMAND_UNKICK        	= COMMAND + ".unkick";
-	public static final String  COMMAND_VERSION		  	= COMMAND + ".version";
-	
-	public static final String COMMAND_INSPECT			= COMMAND + ".inspect";
 
- 
+    private static final String FILTER                       = NOCHEATPLUS + ".filter";
+    public static final String  FILTER_COMMAND               = FILTER + ".command";
+    public static final String  FILTER_COMMAND_NOCHEATPLUS   = FILTER_COMMAND + ".nocheatplus";
+
+    // Notifications (in-game).
+    public static final String  NOTIFY                       = NOCHEATPLUS + ".notify";
+
+    // Command permissions.
+    public static final String  COMMAND                 = NOCHEATPLUS + ".command";
+    public static final String  COMMAND_COMMANDS        = COMMAND + ".commands";
+    public static final String  COMMAND_EXEMPT          = COMMAND + ".exempt";
+    public static final String  COMMAND_EXEMPTIONS      = COMMAND + ".exemptions";
+    public static final String  COMMAND_INFO            = COMMAND + ".info";
+    public static final String  COMMAND_INSPECT         = COMMAND + ".inspect";
+    public static final String  COMMAND_LAG             = COMMAND + ".lag";
+    public static final String  COMMAND_NOTIFY          = COMMAND + ".notify";
+    public static final String  COMMAND_RELOAD          = COMMAND + ".reload";
+    public static final String  COMMAND_REMOVEPLAYER    = COMMAND + ".removeplayer";
+    public static final String  COMMAND_UNEXEMPT        = COMMAND + ".unexempt";
+    public static final String  COMMAND_VERSION         = COMMAND + ".version";
+
+    // Auxiliary Commands permissions.
+    public static final String  COMMAND_BAN             = COMMAND + ".ban";
+    public static final String  COMMAND_DELAY           = COMMAND + ".delay";
+    public static final String  COMMAND_KICK            = COMMAND + ".kick";
+    public static final String  COMMAND_KICKLIST        = COMMAND + ".kicklist";
+    public static final String  COMMAND_TELL            = COMMAND + ".tell";
+    public static final String  COMMAND_TEMPKICK        = COMMAND + ".tempkick";
+    public static final String  COMMAND_UNKICK          = COMMAND + ".unkick";
+
     // Permissions for the individual checks.
     public static final String  CHECKS                       = NOCHEATPLUS + ".checks";
 
@@ -53,22 +52,22 @@ public class Permissions {
     public static final String  BLOCKBREAK_BREAK_LIQUID      = BLOCKBREAK_BREAK + ".liquid";
     public static final String  BLOCKBREAK_DIRECTION         = BLOCKBREAK + ".direction";
     public static final String  BLOCKBREAK_FASTBREAK         = BLOCKBREAK + ".fastbreak";
-	public static final String  BLOCKBREAK_FREQUENCY         = BLOCKBREAK + ".frequency";
+    public static final String  BLOCKBREAK_FREQUENCY         = BLOCKBREAK + ".frequency";
     public static final String  BLOCKBREAK_NOSWING           = BLOCKBREAK + ".noswing";
     public static final String  BLOCKBREAK_REACH             = BLOCKBREAK + ".reach";
-	public static final String  BLOCKBREAK_WRONGBLOCK        = BLOCKBREAK + ".wrongblock";
+    public static final String  BLOCKBREAK_WRONGBLOCK        = BLOCKBREAK + ".wrongblock";
 
     public static final String  BLOCKINTERACT                = CHECKS + ".blockinteract";
     public static final String  BLOCKINTERACT_DIRECTION      = BLOCKINTERACT + ".direction";
     public static final String  BLOCKINTERACT_REACH          = BLOCKINTERACT + ".reach";
     public static final String  BLOCKINTERACT_SPEED          = BLOCKINTERACT + ".speed";
-	public static final String  BLOCKINTERACT_VISIBLE		 = BLOCKINTERACT + ".visible";
+    public static final String  BLOCKINTERACT_VISIBLE        = BLOCKINTERACT + ".visible";
 
     public static final String  BLOCKPLACE                   = CHECKS + ".blockplace";
     public static final String  BLOCKPLACE_AGAINST           = BLOCKPLACE + ".against";
     public static final String  BLOCKPLACE_AGAINST_AIR       = BLOCKPLACE_AGAINST + ".air";
-	public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
-	public static final String  BLOCKPLACE_AUTOSIGN			 = BLOCKPLACE + ".autosign";
+    public static final String  BLOCKPLACE_AGAINST_LIQUIDS   = BLOCKPLACE_AGAINST + ".liquids";
+    public static final String  BLOCKPLACE_AUTOSIGN          = BLOCKPLACE + ".autosign";
     public static final String  BLOCKPLACE_BOATSANYWHERE     = BLOCKPLACE + ".boatsanywhere";
     public static final String  BLOCKPLACE_DIRECTION         = BLOCKPLACE + ".direction";
     public static final String  BLOCKPLACE_FASTPLACE         = BLOCKPLACE + ".fastplace";
@@ -85,41 +84,41 @@ public class Permissions {
     public static final String  CHAT_TEXT                    = CHAT + ".text";
 
     public static final String  COMBINED                     = CHECKS + ".combined";
-	public static final String  COMBINED_BEDLEAVE			 = COMBINED + ".bedleave";
-	public static final String  COMBINED_IMPROBABLE          = COMBINED + ".improbable";
-	public static final String  COMBINED_MUNCHHAUSEN		 = COMBINED + ".munchhausen";
+    public static final String  COMBINED_BEDLEAVE            = COMBINED + ".bedleave";
+    public static final String  COMBINED_IMPROBABLE          = COMBINED + ".improbable";
+    public static final String  COMBINED_MUNCHHAUSEN         = COMBINED + ".munchhausen";
 
     public static final String  FIGHT                        = CHECKS + ".fight";
     public static final String  FIGHT_ANGLE                  = FIGHT + ".angle";
     public static final String  FIGHT_CRITICAL               = FIGHT + ".critical";
     public static final String  FIGHT_DIRECTION              = FIGHT + ".direction";
-	public static final String  FIGHT_FASTHEAL				 = FIGHT + ".fastheal";
+    public static final String  FIGHT_FASTHEAL               = FIGHT + ".fastheal";
     public static final String  FIGHT_GODMODE                = FIGHT + ".godmode";
     public static final String  FIGHT_KNOCKBACK              = FIGHT + ".knockback";
     public static final String  FIGHT_NOSWING                = FIGHT + ".noswing";
     public static final String  FIGHT_REACH                  = FIGHT + ".reach";
-	public static final String  FIGHT_SELFHIT                = FIGHT + ".selfhit";
+    public static final String  FIGHT_SELFHIT                = FIGHT + ".selfhit";
     public static final String  FIGHT_SPEED                  = FIGHT + ".speed";
 
     public static final String  INVENTORY                    = CHECKS + ".inventory";
     public static final String  INVENTORY_DROP               = INVENTORY + ".drop";
     public static final String  INVENTORY_FASTCLICK          = INVENTORY + ".fastclick";
-	public static final String  INVENTORY_FASTCONSUME		 = INVENTORY + ".fastconsume";
+    public static final String  INVENTORY_FASTCONSUME        = INVENTORY + ".fastconsume";
     public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
     public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
     public static final String  INVENTORY_ITEMS              = INVENTORY + ".items";
-	public static final String  INVENTORY_OPEN				 = INVENTORY + ".open";
+    public static final String  INVENTORY_OPEN               = INVENTORY + ".open";
 
     public static final String  MOVING                       = CHECKS + ".moving";
     public static final String  MOVING_CREATIVEFLY           = MOVING + ".creativefly";
     public static final String  MOVING_MOREPACKETS           = MOVING + ".morepackets";
     public static final String  MOVING_MOREPACKETSVEHICLE    = MOVING + ".morepacketsvehicle";
     public static final String  MOVING_NOFALL                = MOVING + ".nofall";
-	public static final String  MOVING_PASSABLE              = MOVING + ".passable";
+    public static final String  MOVING_PASSABLE              = MOVING + ".passable";
     public static final String  MOVING_SURVIVALFLY           = MOVING + ".survivalfly";
     public static final String  MOVING_SURVIVALFLY_BLOCKING  = MOVING_SURVIVALFLY + ".blocking";
     public static final String  MOVING_SURVIVALFLY_SNEAKING  = MOVING_SURVIVALFLY + ".sneaking";
-	public static final String  MOVING_SURVIVALFLY_SPEEDING  = MOVING_SURVIVALFLY + ".speeding";
+    public static final String  MOVING_SURVIVALFLY_SPEEDING  = MOVING_SURVIVALFLY + ".speeding";
     public static final String  MOVING_SURVIVALFLY_SPRINTING = MOVING_SURVIVALFLY + ".sprinting";
     public static final String  MOVING_SURVIVALFLY_STEP      = MOVING_SURVIVALFLY + ".step";
 
@@ -139,12 +138,11 @@ public class Permissions {
     public static final String  REI_CAVE                     = REI + ".cave";
     public static final String  REI_RADAR                    = REI + ".radar";
     public static final String  REI_RADAR_PLAYER             = REI_RADAR + ".player";
-	public static final String  REI_RADAR_ANIMAL             = REI_RADAR + ".animal";
-	public static final String  REI_RADAR_MOB                = REI_RADAR + ".mob";
-	public static final String  REI_RADAR_SLIME              = REI_RADAR + ".slime";
-	public static final String  REI_RADAR_SQUID              = REI_RADAR + ".squid";
-	public static final String  REI_RADAR_OTHER              = REI_RADAR + ".other";
-
+    public static final String  REI_RADAR_ANIMAL             = REI_RADAR + ".animal";
+    public static final String  REI_RADAR_MOB                = REI_RADAR + ".mob";
+    public static final String  REI_RADAR_SLIME              = REI_RADAR + ".slime";
+    public static final String  REI_RADAR_SQUID              = REI_RADAR + ".squid";
+    public static final String  REI_RADAR_OTHER              = REI_RADAR + ".other";
 
     private static final String SMARTMOVING                  = MODS + ".smartmoving";
     public static final String  SMARTMOVING_CLIMBING         = SMARTMOVING + ".climbing";
@@ -158,5 +156,5 @@ public class Permissions {
     public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
     public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
-    
+
 }
