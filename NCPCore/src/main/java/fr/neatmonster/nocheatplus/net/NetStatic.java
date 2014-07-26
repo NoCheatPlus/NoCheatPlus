@@ -90,10 +90,14 @@ public class NetStatic {
         double violation = (double) fullCount - (double) (maxPackets * winNum * winDur / 1000f);
         final float burst = packetFreq.bucketScore(0);
         if (burst > burstPackets) {
-        	// TODO: Account for "just now lag", i.e. time until first occupied one > 0.
-        	burstFreq.add(time, 1f); // TODO: Remove float packets or do this properly.
-        	violation = Math.max(violation, burst - burstDirect);
-        	violation = Math.max(violation, burstEPM * (double) (burstFreq.bucketDuration() * burstFreq.numberOfBuckets()) / 60000.0 - (double) burstFreq.score(0f));
+        	// Account for server-side lag "minimally".
+        	if (burst > burstPackets * TickTask.getLag(winDur, true)) {
+            	// TODO: Does lag adaption suffice this way ?
+            	burstFreq.add(time, 1f); // TODO: Remove float packets or do this properly.
+            	violation = Math.max(violation, burst - burstDirect);
+            	violation = Math.max(violation, burstEPM * (double) (burstFreq.bucketDuration() * burstFreq.numberOfBuckets()) / 60000.0 - (double) burstFreq.score(0f));
+
+        	}
         }
         return Math.max(0.0, violation);
 	}
