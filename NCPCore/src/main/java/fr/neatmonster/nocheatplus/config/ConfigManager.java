@@ -282,6 +282,20 @@ public class ConfigManager {
     }
     
     /**
+     * Check if any config has a boolean set to true for the given path.
+     * @param path
+     * @return True if any config has a boolean set to true for the given path.
+     */
+    public static boolean isTrueForAnyConfig(String path) {
+    	for (final ConfigFile cfg : worldsMap.values()){
+    		if (cfg.getBoolean(path, false)) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    /**
      * Get the maximally found number for the given config path. This does not throw errors. It will return null, if nothing is found or all lookups failed otherwise.
      * <br>
      * Note: What happens with things like NaN is unspecified.
