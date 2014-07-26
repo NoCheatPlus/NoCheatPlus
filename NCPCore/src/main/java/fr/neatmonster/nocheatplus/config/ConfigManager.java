@@ -183,7 +183,7 @@ public class ConfigManager {
      */
     public static synchronized void init(final Plugin plugin) {
     	// (This can lead to minor problems with async checks during reloading.)
-    	worldsMap.clear();
+    	LinkedHashMap<String, ConfigFile> newWorldsMap = new LinkedHashMap<String, ConfigFile>();
         // Try to obtain and parse the global configuration file.
         final File globalFile = new File(plugin.getDataFolder(), "config.yml");
         PathUtils.processPaths(globalFile, "global config", false);
@@ -224,7 +224,7 @@ public class ConfigManager {
             }
         }
 //        globalConfig.setActionFactory();
-        worldsMap.put(null, globalConfig);
+        newWorldsMap.put(null, globalConfig);
 
         
         final MemoryConfiguration worldDefaults = PathUtils.getWorldsDefaultConfig(globalConfig); 
@@ -250,7 +250,7 @@ public class ConfigManager {
             worldConfig.options().copyDefaults(true);
             try {
             	worldConfig.load(worldFile);
-                worldsMap.put(worldEntry.getKey(), worldConfig);
+            	newWorldsMap.put(worldEntry.getKey(), worldConfig);
                 try{
                 	if (worldConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) worldConfig.save(worldFile);
                 } catch (final Exception e){
@@ -265,17 +265,20 @@ public class ConfigManager {
             worldConfig.options().copyDefaults(true);
 //            worldConfig.setActionFactory();
         }
+        ConfigManager.worldsMap = newWorldsMap;
     }
     
     /**
-     * Set a property in all configs. Might use with DataManager.clearConfigs if configs might already be in use.
+     * Set a property for all configurations. Might use with DataManager.clearConfigs if check-configurations might already be in use.
      * @param path
      * @param value
      */
-    public static void setForAllConfigs(String path, Object value){
-    	for (final ConfigFile cfg : worldsMap.values()){
+    public static synchronized void setForAllConfigs(String path, Object value){
+    	final Map<String, ConfigFile> newWorldsMap = new LinkedHashMap<String, ConfigFile>(ConfigManager.worldsMap);
+    	for (final ConfigFile cfg : newWorldsMap.values()){
     		cfg.set(path, value);
     	}
+    	ConfigManager.worldsMap = newWorldsMap;
     }
     
     /**
