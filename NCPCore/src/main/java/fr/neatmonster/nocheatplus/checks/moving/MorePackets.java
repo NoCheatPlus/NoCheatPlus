@@ -1,5 +1,8 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -9,6 +12,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.net.NetStatic;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * The MorePackets check will try to identify players that send more than the usual
@@ -16,6 +20,8 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  * checks (flying/running).
  */
 public class MorePackets extends Check {
+	
+	private final List<String> tags = new ArrayList<String>();
 	
     /**
      * Instantiates a new more packets check.
@@ -60,7 +66,8 @@ public class MorePackets extends Check {
         }
         
         // Check for a violation of the set limits.
-        final double violation = NetStatic.morePacketsCheck(data.morePacketsFreq, time, 1f, cc.morePacketsEPSMax, cc.morePacketsEPSIdeal, data.morePacketsBurstFreq, cc.morePacketsBurstPackets, cc.morePacketsBurstDirect, cc.morePacketsBurstEPM);
+        tags.clear();
+        final double violation = NetStatic.morePacketsCheck(data.morePacketsFreq, time, 1f, cc.morePacketsEPSMax, cc.morePacketsEPSIdeal, data.morePacketsBurstFreq, cc.morePacketsBurstPackets, cc.morePacketsBurstDirect, cc.morePacketsBurstEPM, tags);
         
         // Process violation result.
         if (violation > 0.0) {
@@ -72,6 +79,7 @@ public class MorePackets extends Check {
             final ViolationData vd = new ViolationData(this, player, data.morePacketsVL, violation, cc.morePacketsActions);
             if (cc.debug || vd.needsParameters()) {
             	vd.setParameter(ParameterName.PACKETS, Integer.toString(new Double(violation).intValue()));
+            	vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
             }
             if (executeActions(vd)) {
             	// Set to cancel the move.
