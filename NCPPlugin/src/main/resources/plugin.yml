@@ -9,6 +9,9 @@ dev-url: ${project.url}
 
 main: ${project.groupId}.${project.artifactId}.${project.name}
 
+softdepend:
+- ProtocolLib
+
 commands:
     nocheatplus:
         aliases: [ncp]
