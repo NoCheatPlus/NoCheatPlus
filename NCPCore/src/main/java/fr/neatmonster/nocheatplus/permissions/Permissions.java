@@ -37,13 +37,13 @@ public class Permissions {
     public static final String  COMMAND_VERSION              = COMMAND + ".version";
 
     // Auxiliary Command permissions.
+    public static final String  COMMAND_ALLOWLOGIN           = COMMAND + ".allowlogin";
     public static final String  COMMAND_BAN                  = COMMAND + ".ban";
     public static final String  COMMAND_DELAY                = COMMAND + ".delay";
+    public static final String  COMMAND_DENYLOGIN            = COMMAND + ".denylogin";
     public static final String  COMMAND_KICK                 = COMMAND + ".kick";
     public static final String  COMMAND_KICKLIST             = COMMAND + ".kicklist";
     public static final String  COMMAND_TELL                 = COMMAND + ".tell";
-    public static final String  COMMAND_TEMPKICK             = COMMAND + ".tempkick";
-    public static final String  COMMAND_UNKICK               = COMMAND + ".unkick";
 
     // Permissions for the individual checks.
     public static final String  CHECKS                       = NOCHEATPLUS + ".checks";

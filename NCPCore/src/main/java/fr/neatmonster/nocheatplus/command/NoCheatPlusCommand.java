@@ -15,8 +15,8 @@ import fr.neatmonster.nocheatplus.command.actions.BanCommand;
 import fr.neatmonster.nocheatplus.command.actions.KickCommand;
 import fr.neatmonster.nocheatplus.command.actions.KickListCommand;
 import fr.neatmonster.nocheatplus.command.actions.TellCommand;
-import fr.neatmonster.nocheatplus.command.actions.TempKickCommand;
-import fr.neatmonster.nocheatplus.command.actions.UnKickCommand;
+import fr.neatmonster.nocheatplus.command.actions.DenyLoginCommand;
+import fr.neatmonster.nocheatplus.command.actions.AllowLoginCommand;
 import fr.neatmonster.nocheatplus.command.actions.delay.DelayCommand;
 import fr.neatmonster.nocheatplus.command.admin.CommandsCommand;
 import fr.neatmonster.nocheatplus.command.admin.InfoCommand;
@@ -94,9 +94,9 @@ public class NoCheatPlusCommand extends BaseCommand{
         		new ReloadCommand(plugin, notifyReload),
         		new RemovePlayerCommand(plugin),
         		new TellCommand(plugin),
-        		new TempKickCommand(plugin),
+        		new DenyLoginCommand(plugin),
         		new UnexemptCommand(plugin),
-        		new UnKickCommand(plugin),
+        		new AllowLoginCommand(plugin),
         }){
         	addSubCommands(cmd);
         	rootLabels.add(cmd.label);

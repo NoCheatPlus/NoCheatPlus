@@ -14,11 +14,11 @@ import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
-public class TempKickCommand extends BaseCommand {
+public class DenyLoginCommand extends BaseCommand {
 
-	public TempKickCommand(JavaPlugin plugin) {
-		super(plugin, "tempkick", Permissions.COMMAND_TEMPKICK, 
-				new String[]{"tkick", "tempban", "tban",});
+	public DenyLoginCommand(JavaPlugin plugin) {
+		super(plugin, "denylogin", Permissions.COMMAND_DENYLOGIN,
+				new String[]{"tempkick", "tkick", "tempban", "tban",});
 	}
 
 	@Override
@@ -38,12 +38,12 @@ public class TempKickCommand extends BaseCommand {
 		final String reason;
 		if (args.length > 3) reason = AbstractCommand.join(args, 3);
 		else reason = "";
-		tempKick(sender, name, finalDuration, reason);
+		denyLogin(sender, name, finalDuration, reason);
 		return true;
 	}
 
 	
-	protected void tempKick(CommandSender sender, String name, long duration, String reason){
+	protected void denyLogin(CommandSender sender, String name, long duration, String reason){
 		Player player = DataManager.getPlayer(name);
 		NCPAPIProvider.getNoCheatPlusAPI().denyLogin(name, duration);
 		if (player == null) return;

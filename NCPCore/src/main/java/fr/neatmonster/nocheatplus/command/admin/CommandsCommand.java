@@ -20,8 +20,8 @@ public class CommandsCommand extends BaseCommand {
 	final String[] moreCommands = new String[]{
 	        "/<command> ban [delay=(ticks)] (player) [(reason)...]: ban player",
 	        "/<command> kick [delay=(ticks)] (player) [(reason)...]: kick player",
-	        "/<command> tempkick [delay=(ticks)] (player) (minutes) [(reason)...]",
-	        "/<command> unkick (player): Allow a player to login again.",
+	        "/<command> denylogin [delay=(ticks)] (player) (minutes) [(reason)...]",
+	        "/<command> allowlogin (player): Allow a player to login again.",
 	        "/<command> kicklist: Show temporarily kicked players.",
 	        "/<command> tell [delay=(ticks)] (player) (message)...: tell a message",
 	        "/<command> delay [delay=(ticks)] (command)...: delay a command",

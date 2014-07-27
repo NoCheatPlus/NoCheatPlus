@@ -10,10 +10,11 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 
-public class UnKickCommand extends BaseCommand {
+public class AllowLoginCommand extends BaseCommand {
 
-	public UnKickCommand(JavaPlugin plugin) {
-		super(plugin, "unkick", Permissions.COMMAND_UNKICK);
+	public AllowLoginCommand(JavaPlugin plugin) {
+		super(plugin, "allowlogin", Permissions.COMMAND_ALLOWLOGIN,
+				new String[]{"unkick"});
 	}
 
 	@Override
