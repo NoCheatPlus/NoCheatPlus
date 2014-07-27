@@ -13,6 +13,9 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -61,7 +64,7 @@ public class MovingData extends ACheckData {
     	// Note that the trace might be null after just calling this.
     	MovingData data = playersMap.get(player.getName());
         if (data == null) {
-        	data = new MovingData();
+        	data = new MovingData(ConfigManager.getConfigFile(player.getWorld().getName()));
         	playersMap.put(player.getName(), data);
         }
         return data;
@@ -149,9 +152,9 @@ public class MovingData extends ACheckData {
 
     // Data of the more packets check.
     /** Packet frequency count. */
-    public final ActionFrequency morePacketsFreq = new ActionFrequency(10, 500);
+    public final ActionFrequency morePacketsFreq;
     /** Burst count. */
-    public final ActionFrequency morePacketsBurstFreq = new ActionFrequency(12, 5000);
+    public final ActionFrequency morePacketsBurstFreq;
     private Location      morePacketsSetback = null;
 
     // Data of the more packets vehicle check.
@@ -207,6 +210,13 @@ public class MovingData extends ACheckData {
 	/** Inconsistency-flag. Set on moving inside of vehicles, reset on exiting properly. Workaround for VehicleLeaveEvent missing. */ 
 	public boolean wasInVehicle = false;
 	public MoveConsistency vehicleConsistency = MoveConsistency.INCONSISTENT;
+	
+	public MovingData(final ConfigFile config) {
+		// TODO: Parameters from cc.
+		final int nob = 2 * Math.max(1, Math.min(60, config.getInt(ConfPaths.MOVING_MOREPACKETS_SECONDS)));
+		morePacketsFreq = new ActionFrequency(nob, 500);
+		morePacketsBurstFreq = new ActionFrequency(12, 5000);
+	}
     
 	/**
 	 * Clear the data of the fly checks (not more-packets).
