@@ -16,7 +16,7 @@ package fr.neatmonster.nocheatplus.components;
  * @author mc_dev
  *
  */
-public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegistryProvider, MCAccessHolder{
+public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegistryProvider, GenericInstanceRegistry, MCAccessHolder {
 	
 	/**
 	 * By default addComponent(Object) will register ComponentFactories as well.

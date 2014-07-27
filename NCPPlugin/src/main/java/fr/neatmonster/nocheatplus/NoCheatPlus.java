@@ -137,6 +137,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 	/** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
     
+    /** Storage for generic instances registration. */
+    private final Map<Class<?>, Object> genericInstances = new HashMap<Class<?>, Object>();
+    
     /** Components that need notification on reloading.
      * (Kept here, for if during runtime some might get added.)*/
     private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
@@ -597,6 +600,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		subRegistries.clear();
 		// Just in case: clear the subComponentHolders.
 		subComponentholders.clear();
+		// Generic instances registry.
+		genericInstances.clear();
 
 		// Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
 		if (changedCommands != null){
@@ -1150,6 +1155,35 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 		else if (debug){
 			LogUtil.logInfo("[NoCheatPlus] Consistency-checks run.");
 		}
+	}
+
+	@Override
+	public <T> T registerGenericInstance(T instance) {
+		@SuppressWarnings("unchecked")
+		Class<T> clazz = (Class<T>) instance.getClass();
+		T registered = getGenericInstance(clazz);
+		genericInstances.put(clazz,  instance);
+		return registered;
+	}
+
+	@Override
+	public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance) {
+		T registered = getGenericInstance(registerFor);
+		genericInstances.put(registerFor, instance);
+		return registered;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getGenericInstance(Class<T> registeredFor) {
+		return (T) genericInstances.get(registeredFor);
+	}
+
+	@Override
+	public <T> T unregisterGenericInstance(Class<T> registeredFor) {
+		T registered = getGenericInstance(registeredFor); // Convenience.
+		genericInstances.remove(registeredFor);
+		return registered;
 	}
 
 }
