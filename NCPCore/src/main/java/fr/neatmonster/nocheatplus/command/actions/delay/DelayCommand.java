@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.command.AbstractCommand;
@@ -18,12 +19,14 @@ public class DelayCommand extends DelayableCommand {
 
 	public DelayCommand(JavaPlugin plugin){
 		super(plugin, "delay", Permissions.COMMAND_DELAY, 1, 0, true);
+		demandConsoleCommandSender = true;
 	}
 	
 	@Override
-	public boolean execute(CommandSender sender, Command command, String label,
-			String[] alteredArgs, long delay) {
-		if (alteredArgs.length < 2) return false;
+	public boolean execute(CommandSender sender, Command command, String label, String[] alteredArgs, long delay) {
+		if (alteredArgs.length < 2) {
+			return false;
+		}
 		final String cmd = AbstractCommand.join(alteredArgs, 1);
 		schedule(new Runnable() {
 			@Override

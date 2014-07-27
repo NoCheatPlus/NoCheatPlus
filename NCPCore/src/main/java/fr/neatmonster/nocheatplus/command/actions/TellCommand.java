@@ -26,7 +26,12 @@ public class TellCommand extends BaseCommand {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, final String[] args) {
-		if (args.length < 3) return false;
+		if (!demandConsoleCommandSender(sender)) {
+			return true;
+		}
+		if (args.length < 3) {
+			return false;
+		}
 		final String name = args[1].trim();
 		final String message = AbstractCommand.join(args, 2);
 		tell(name, message);
@@ -39,7 +44,7 @@ public class TellCommand extends BaseCommand {
 	}
 
 	/* (non-Javadoc)
-	 * @see fr.neatmonster.nocheatplus.command.actions.delay.DelayableCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
+	 * @see fr.neatmonster.nocheatplus.command.BaseCommand#onTabComplete(org.bukkit.command.CommandSender, org.bukkit.command.Command, java.lang.String, java.lang.String[])
 	 */
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command,

@@ -25,7 +25,9 @@ public class BanCommand extends BaseCommand {
 
 	@Override
 	public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
-		
+		if (!demandConsoleCommandSender(sender)) {
+			return true;
+		}
 		// TODO: Consider supporting vanilla syntax or removing this command :p.
 		
 		// Args contains "ban" as first arg.

@@ -12,7 +12,9 @@ import java.util.Set;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 
 /**
  * Base command class, featuring some features.<br>
@@ -48,6 +50,34 @@ public abstract class AbstractCommand<A> implements TabExecutor{
 			b.append(args[i]);
 		}
 		return b.toString();
+	}
+	
+	/**
+	 * 
+	 * @param sender
+	 * @return True if sender is a Player, otherwise false is returned and a message sent.
+	 */
+	public static boolean demandPlayer(CommandSender sender) {
+		if (sender instanceof Player) {
+			return true;
+		} else {
+			sender.sendMessage("[NoCheatPlus] A player is required to run this command.");
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param sender
+	 * @return True if sender is a Player, otherwise false is returned and a message sent.
+	 */
+	public static boolean demandConsoleCommandSender(CommandSender sender) {
+		if (sender instanceof ConsoleCommandSender) {
+			return true;
+		} else {
+			sender.sendMessage("[NoCheatPlus] This command can only be run from the console.");
+			return false;
+		}
 	}
 	
 	////////////////

@@ -52,6 +52,7 @@ public abstract class DelayableCommand extends BaseCommand {
 	protected final int delayIndex;
 	protected final boolean mustHaveDelay;
 	protected final int delayPreset;
+	protected boolean demandConsoleCommandSender = false;
 	
 	/**
 	 * (Delay is not obligatory, inserted after the first argument.)
@@ -115,6 +116,9 @@ public abstract class DelayableCommand extends BaseCommand {
 	@Override
 	public boolean onCommand(final CommandSender sender, final Command command, 
 			final String label, final String[] args ) {
+		if (demandConsoleCommandSender && !demandConsoleCommandSender(sender)) {
+			return true;
+		}
 		// Parse the delay and alter the args accordingly.
 		long delay = parseDelay(args, delayIndex, delayPreset);
 		String[] alteredArgs;
