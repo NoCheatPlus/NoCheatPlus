@@ -10,15 +10,15 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class SoundDistance extends PacketAdapter {
 	
 	// TODO: Will not be effective with 512 radius, if they add the patch by @Amranth.
 	// TODO: For lower distances more packets might need to be intercepted.
-	
-	/** Maximum distance for thunder effects (squared). */
-    private static final double distSq = 320.0 * 320.0; // TODO:configurable.
     
     private static final String[] effectNames = new String[] { // Prefix tree?
     	"ambient.weather.thunder",
@@ -35,9 +35,15 @@ public class SoundDistance extends PacketAdapter {
     	}
     	return false;
     }
+    
+    /** Maximum distance for thunder effects (squared). */
+    private final double distSq;
 
 	public SoundDistance(Plugin plugin) {
         super(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT);
+        ConfigFile config = ConfigManager.getConfigFile();
+        double dist = config.getDouble(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE);
+        distSq = dist * dist;
     }
 
     @Override

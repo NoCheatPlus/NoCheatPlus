@@ -423,6 +423,18 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
         set(ConfPaths.MOVING_ENFORCELOCATION, true);
         
+        // NET
+        
+        // FlyingFrequency
+        set(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE, true);
+        set(ConfPaths.NET_FLYINGFREQUENCY_SECONDS, 5);
+        set(ConfPaths.NET_FLYINGFREQUENCY_MAXPACKETS, 300);
+        
+        // SoundDistance
+        set(ConfPaths.NET_SOUNDDISTANCE_ACTIVE, true);
+        set(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE, 320);
+        
+        
         // TODO: An extra file might suit these.
         final String start = "[player] failed [check]: ";
         final String end = ". VL [violations].";

@@ -11,6 +11,9 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
+import fr.neatmonster.nocheatplus.config.ConfPaths;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
+import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.ds.LinkedHashMapCOW;
@@ -33,9 +36,15 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
 	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
 	private final int idSilent = counters.registerKey("packet.flying.silentcancel");
 	
+	private final int seconds;
+	private final float maxPackets;
+	
 	public FlyingFrequency(Plugin plugin) {
 		// PacketPlayInFlying[3, legacy: 10]
 		super(plugin, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
+		ConfigFile config = ConfigManager.getConfigFile();
+		seconds = Math.max(1, config.getInt(ConfPaths.NET_FLYINGFREQUENCY_SECONDS));
+		maxPackets = Math.max(1, config.getInt(ConfPaths.NET_FLYINGFREQUENCY_MAXPACKETS));
 	}
 
 	@Override
@@ -53,10 +62,10 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
 		if (freq != null) {
 			return freq;
 		} else {
-			final ActionFrequency newFreq = new ActionFrequency(5, 1000);
+			final ActionFrequency newFreq = new ActionFrequency(seconds, 1000);
 			this.freqMap.put(name, newFreq);
 			return newFreq;
-		} 
+		}
 	}
 
 	@Override
@@ -64,7 +73,7 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
 		// TODO: Add several (at least has look + has pos individually, maybe none/onground)
 		final ActionFrequency freq = getFreq(event.getPlayer().getName());
 		freq.add(System.currentTimeMillis(), 1f);
-		if (freq.score(1f) > 300) {
+		if (freq.score(1f) > maxPackets) {
 			event.setCancelled(true);
 			counters.add(idSilent, 1); // Until it is sure if we can get these async.
 		}

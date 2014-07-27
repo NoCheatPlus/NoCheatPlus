@@ -585,6 +585,20 @@ public abstract class ConfPaths {
 	public  static final String MOVING_TRACE_SIZE						 = MOVING_TRACE + "size";
 	public  static final String MOVING_TRACE_MERGEDIST					 = MOVING_TRACE + "mergedist";
 	
+	private static final String NET										 = CHECKS + "net.";
+	
+	private static final String NET_SOUNDDISTANCE						 = NET + "sounddistance.";
+	public static final String  NET_SOUNDDISTANCE_ACTIVE				 = NET_SOUNDDISTANCE + "active";
+	@GlobalConfig
+	public static final String  NET_SOUNDDISTANCE_MAXDISTANCE			 = NET_SOUNDDISTANCE + "maxdistance";
+	
+	private static final String NET_FLYINGFREQUENCY						 = NET + "flyingfrequency.";
+	public static final String  NET_FLYINGFREQUENCY_ACTIVE				 = NET_FLYINGFREQUENCY + "active";
+	@GlobalConfig
+	public static final String  NET_FLYINGFREQUENCY_SECONDS				 = NET_FLYINGFREQUENCY + "seconds";
+	@GlobalConfig
+	public static final String  NET_FLYINGFREQUENCY_MAXPACKETS			 = NET_FLYINGFREQUENCY + "maxpackets";
+	
 	
     public static final String  STRINGS                                  = "strings";
 
