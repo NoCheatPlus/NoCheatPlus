@@ -299,6 +299,10 @@ permissions:
                         description: Allow use of the ncp removeplayer command.
                     nocheatplus.command.commands:
                         description: Allow use of the ncp commands command.
+                    nocheatplus.command.log:
+                        description: Show various stats/debugging information. [Incomplete, experimental.]
+                    nocheatplus.command.reset:
+                        description: Reset statistics or debugging counters.
                     # Legacy:
                     nocheatplus.command.tempkick:
                         description: Obsolete, use nocheatplus.command.denylogin instead.

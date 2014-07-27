@@ -30,9 +30,11 @@ public class Permissions {
     public static final String  COMMAND_INFO                 = COMMAND + ".info";
     public static final String  COMMAND_INSPECT              = COMMAND + ".inspect";
     public static final String  COMMAND_LAG                  = COMMAND + ".lag";
+    public static final String  COMMAND_LOG					 = COMMAND + ".log";
     public static final String  COMMAND_NOTIFY               = COMMAND + ".notify";
     public static final String  COMMAND_RELOAD               = COMMAND + ".reload";
     public static final String  COMMAND_REMOVEPLAYER         = COMMAND + ".removeplayer";
+    public static final String  COMMAND_RESET				 = COMMAND + ".reset";
     public static final String  COMMAND_UNEXEMPT             = COMMAND + ".unexempt";
     public static final String  COMMAND_VERSION              = COMMAND + ".version";
 
