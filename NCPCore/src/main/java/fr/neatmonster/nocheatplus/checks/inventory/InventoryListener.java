@@ -25,12 +25,14 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.InventoryUtil;
 
 /**
@@ -58,6 +60,11 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
 	private final Location useLoc = new Location(null, 0, 0, 0);
+	
+	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idCancelDead = counters.registerKey("canceldead");
+    private final int idIllegalItem = counters.registerKey("illegalitem");
+    private final int idEggOnEntity = counters.registerKey("eggonentity");
     
     public InventoryListener(){
     	super(CheckType.INVENTORY);
@@ -115,6 +122,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             else if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
             	// Eat after death.
             	event.setCancelled(true);
+            	counters.addPrimaryThread(idCancelDead, 1);
             }
         }
     }
@@ -143,14 +151,20 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
         	
         	final ItemStack cursor = event.getCursor();
         	final ItemStack clicked = event.getCurrentItem();
-            
+            boolean cancel = false;
             // Illegal enchantment checks.
             try{
-                if (Items.checkIllegalEnchantments(player, clicked)) event.setCancelled(true);
+                if (!cancel && Items.checkIllegalEnchantments(player, clicked)) {
+                	cancel = true;
+                	counters.addPrimaryThread(idIllegalItem, 1);
+                }
             }
             catch(final ArrayIndexOutOfBoundsException e){} // Hotfix (CB)
             try{
-                if (Items.checkIllegalEnchantments(player, cursor)) event.setCancelled(true);
+                if (!cancel && Items.checkIllegalEnchantments(player, cursor)) {
+                	cancel = true;
+                	counters.addPrimaryThread(idIllegalItem, 1);
+                }
             }
             catch(final ArrayIndexOutOfBoundsException e){} // Hotfix (CB)
             
@@ -162,13 +176,16 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
                 if (player.getGameMode() != GameMode.CREATIVE || !cc.fastClickSpareCreative){
                     if (fastClick.check(player, now, event.getView(), slot, cursor, clicked, event.isShiftClick(), data, cc)){
                         // The check requested the event to be cancelled.
-                        event.setCancelled(true);
+                        cancel = true;
                     }
                     // Feed the improbable.
                     Improbable.feed(player, 0.7f, System.currentTimeMillis());
                 }
             }
             data.lastClickTime = now;
+            if (cancel) {
+            	event.setCancelled(true);
+            }
         }
     }
 
@@ -244,6 +261,7 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
             // Illegal enchantments hotfix check.
             if (Items.checkIllegalEnchantments(player, item)) {
             	event.setCancelled(true);
+            	counters.addPrimaryThread(idIllegalItem, 1);
             }
         }
         else {
@@ -267,11 +285,14 @@ public class InventoryListener  extends CheckListener implements JoinLeaveListen
     	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
     		// No zombies.
     		event.setCancelled(true);
+    		counters.addPrimaryThread(idCancelDead, 1);
     		return;
     	}
     	final ItemStack stack = player.getItemInHand();
     	if (stack != null && stack.getType() == Material.MONSTER_EGG && items.isEnabled(player)){
     		event.setCancelled(true);
+    		counters.addPrimaryThread(idEggOnEntity, 1);
+    		return;
     	}
     }
     

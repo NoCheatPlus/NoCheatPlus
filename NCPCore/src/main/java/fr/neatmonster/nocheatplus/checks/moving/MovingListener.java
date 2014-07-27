@@ -65,6 +65,7 @@ import fr.neatmonster.nocheatplus.logging.DebugUtil;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
@@ -187,6 +188,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     
     /** Location for temporary use with getLocation(useLoc). Always call setWorld(null) after use. Use LocUtil.clone before passing to other API. */
     private final Location useLoc = new Location(null, 0, 0, 0); // TODO: Put to use...
+    
+    /** Statistics / debugging counters. */
+    private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idMoveHandled = counters.registerKey("event.player.move.handled");
+    private final int idMoveHandledPos = counters.registerKey("event.player.move.handled.pos");
+    private final int idMoveHandledLook = counters.registerKey("event.player.move.handled.look");
+    private final int idMoveHandledPosAndLook = counters.registerKey("event.player.move.handled.pos_look");
+    
     
     public MovingListener() {
 		super(CheckType.MOVING);
@@ -356,8 +365,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onPlayerMove(final PlayerMoveEvent event) {
 		final Player player = event.getPlayer();
 		
@@ -449,9 +457,31 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 			return;
 		}
 		
+		{
+			// Debugging statistics, rather light weight.
+			final boolean hasPos = !moveInfo.from.isSamePos(moveInfo.to);
+			final boolean hasLook = from.getYaw() != to.getYaw() || from.getPitch() != to.getPitch();
+			counters.addPrimaryThread(idMoveHandled, 1);
+			final int counterId;
+			if (hasPos && hasLook) {
+				counterId = idMoveHandledPosAndLook;
+			}
+			else if (hasPos) {
+				counterId = idMoveHandledPos;
+			}
+			else if (hasLook) {
+				counterId = idMoveHandledLook;
+			}
+			else {
+				counterId = -1;
+			}
+			if (counterId != -1) {
+				counters.addPrimaryThread(counterId, 1);
+			}
+		}
+		
 		// The players location.
 		final Location loc = (cc.noFallCheck || cc.passableCheck) ? player.getLocation(moveInfo.useLoc) : null;
-				
 				
 		// Check for location consistency.
 		if (cc.enforceLocation && playersEnforce.contains(playerName)) {

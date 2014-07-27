@@ -11,8 +11,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -28,6 +30,9 @@ public class CombinedListener extends CheckListener {
 	protected final Improbable improbable 	= addCheck(new Improbable());
 	
 	protected final MunchHausen munchHausen = addCheck(new MunchHausen());
+	
+	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idFakeInvulnerable = counters.registerKey("fakeinvulnerable");
 
 	public CombinedListener(){
 		super(CheckType.COMBINED);
@@ -75,6 +80,7 @@ public class CombinedListener extends CheckListener {
         if (TickTask.getTick() >= data.invulnerableTick + modifier.intValue()) return;
         // Still invulnerable.
         event.setCancelled(true);
+        counters.addPrimaryThread(idFakeInvulnerable, 1);
     }
     
     /**

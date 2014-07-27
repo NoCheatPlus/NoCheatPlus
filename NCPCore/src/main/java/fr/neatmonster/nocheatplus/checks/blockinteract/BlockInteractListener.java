@@ -12,10 +12,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /**
@@ -40,6 +42,9 @@ public class BlockInteractListener extends CheckListener {
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
 	private final Location useLoc = new Location(null, 0, 0, 0);
     
+	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idCancelDead = counters.registerKey("canceldead");
+	
     public BlockInteractListener(){
     	super(CheckType.BLOCKINTERACT);
     }
@@ -60,6 +65,7 @@ public class BlockInteractListener extends CheckListener {
     		event.setUseInteractedBlock(Result.DENY);
     		event.setUseItemInHand(Result.DENY);
     		event.setCancelled(true);
+    		counters.addPrimaryThread(idCancelDead, 1);
     		return;
     	}
     	

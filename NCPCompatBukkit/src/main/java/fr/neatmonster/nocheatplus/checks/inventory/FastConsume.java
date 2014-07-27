@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
@@ -17,6 +18,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -35,6 +37,9 @@ public class FastConsume extends Check implements Listener{
 		}
 	}
 	
+    private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idCancelDead = counters.registerKey("canceldead");
+	
 	public FastConsume() {
 		super(CheckType.INVENTORY_FASTCONSUME);
 		// Overrides the instant-eat check.
@@ -48,6 +53,7 @@ public class FastConsume extends Check implements Listener{
 		if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
     		// Eat after death.
     		event.setCancelled(true);
+    		counters.addPrimaryThread(idCancelDead, 1);
     		return;
     	}
 		if (!isEnabled(player)) {

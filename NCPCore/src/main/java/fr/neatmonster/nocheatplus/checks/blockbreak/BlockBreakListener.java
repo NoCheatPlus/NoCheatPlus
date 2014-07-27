@@ -15,12 +15,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.inventory.Items;
 import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
@@ -51,6 +53,9 @@ public class BlockBreakListener extends CheckListener {
     
     private AlmostBoolean isInstaBreak = AlmostBoolean.NO;
     
+    private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idCancelDIllegalItem = counters.registerKey("illegalitem");
+    
     public BlockBreakListener(){
     	super(CheckType.BLOCKBREAK);
     }
@@ -69,6 +74,7 @@ public class BlockBreakListener extends CheckListener {
         // Illegal enchantments hotfix check.
         if (Items.checkIllegalEnchantments(player, player.getItemInHand())) {
         	event.setCancelled(true);
+        	counters.addPrimaryThread(idCancelDIllegalItem, 1);
         }
         
     	// Cancelled events only leads to resetting insta break.

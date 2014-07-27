@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
@@ -24,6 +25,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Improbable;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /**
@@ -77,6 +79,10 @@ public class BlockPlaceListener extends CheckListener {
     
     /** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
 	private final Location useLoc = new Location(null, 0, 0, 0);
+	
+	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idBoatsAnywhere = counters.registerKey("boatsanywhere");
+    private final int idEnderPearl = counters.registerKey("throwenderpearl");
     
     public BlockPlaceListener(){
     	super(CheckType.BLOCKPLACE);
@@ -219,14 +225,16 @@ public class BlockPlaceListener extends CheckListener {
         	
         	if (!player.hasPermission(Permissions.BLOCKPLACE_BOATSANYWHERE)){
         		event.setCancelled(true);
+        		counters.addPrimaryThread(idBoatsAnywhere, 1);
         	}
             
     	}
     	else if (type == Material.MONSTER_EGG){
     		// Check blockplace.speed.
-    		if (speed.isEnabled(player) && speed.check(player))
+    		if (speed.isEnabled(player) && speed.check(player)) {
                 // If the check was positive, cancel the event.
                 event.setCancelled(true);
+    		}
     	} 
     }
 
@@ -312,6 +320,9 @@ public class BlockPlaceListener extends CheckListener {
             			}
             		}
             	}
+        	}
+        	if (cancel) {
+        		counters.addPrimaryThread(idEnderPearl, 1);
         	}
         }
          

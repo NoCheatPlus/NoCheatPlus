@@ -3,14 +3,15 @@ package fr.neatmonster.nocheatplus.net.protocollib;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.ds.LinkedHashMapCOW;
 
@@ -21,13 +22,16 @@ import fr.neatmonster.nocheatplus.utilities.ds.LinkedHashMapCOW;
  * @author dev1mc
  *
  */
-public class FlyingFrequency extends PacketAdapter implements Listener, JoinLeaveListener {
+public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener {
 	
+	// TODO: Silent cancel count.
 	// TODO: Configuration.
 	// TODO: Optimized options (receive only, other?).
-	// TODO: Async version ?
+	// TODO: Forced async version ?
 	
 	private final Map<String, ActionFrequency> freqMap = new LinkedHashMapCOW<String, ActionFrequency>();  
+	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+	private final int idSilent = counters.registerKey("packet.flying.silentcancel");
 	
 	public FlyingFrequency(Plugin plugin) {
 		// PacketPlayInFlying[3, legacy: 10]
@@ -62,6 +66,7 @@ public class FlyingFrequency extends PacketAdapter implements Listener, JoinLeav
 		freq.add(System.currentTimeMillis(), 1f);
 		if (freq.score(1f) > 300) {
 			event.setCancelled(true);
+			counters.add(idSilent, 1); // Until it is sure if we can get these async.
 		}
 	}
 	

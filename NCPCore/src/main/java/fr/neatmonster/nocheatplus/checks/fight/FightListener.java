@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.combined.Combined;
@@ -36,6 +37,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -83,6 +85,9 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 	
 	/** For temporary use: LocUtil.clone before passing deeply, call setWorld(null) after use. */
 	private final Location useLoc2 = new Location(null, 0, 0, 0);
+	
+	private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
+    private final int idCancelDead = counters.registerKey("canceldead");
     
     public FightListener(){
     	super(CheckType.FIGHT);
@@ -532,6 +537,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     	if (player.isDead() && BridgeHealth.getHealth(player) <= 0.0) {
     		// Heal after death.
     		event.setCancelled(true);
+    		counters.addPrimaryThread(idCancelDead, 1);
     		return;
     	}
     	if (event.getRegainReason() != RegainReason.SATIATED) {
