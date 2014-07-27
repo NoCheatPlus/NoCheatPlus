@@ -17,6 +17,7 @@ commands:
         usage: |
                Administrative commands overview:
                /<command> info (player): Violation summary for a player.
+               /<command> inspect (player): Status info for a player.
                /<command> notify on|off: In-game notifications per player.
                /<command> removeplayer (player) [(check type)]: Remove data.
                /<command> reload: Reload the configuration.
