@@ -18,7 +18,7 @@ public class SoundDistance extends PacketAdapter {
 	// TODO: For lower distances more packets might need to be intercepted.
 	
 	/** Maximum distance for thunder effects (squared). */
-    private static final double distSq = 512.0 * 512.0; // TODO: Maybe configurable.
+    private static final double distSq = 320.0 * 320.0; // TODO:configurable.
     
     private static final String[] effectNames = new String[] { // Prefix tree?
     	"ambient.weather.thunder",
