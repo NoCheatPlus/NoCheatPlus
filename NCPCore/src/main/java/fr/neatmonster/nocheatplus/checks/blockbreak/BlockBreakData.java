@@ -11,8 +11,8 @@ import org.bukkit.inventory.ItemStack;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.stats.Timings;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
-import fr.neatmonster.nocheatplus.utilities.Stats;
 
 /**
  * Player specific data for the block break checks.
@@ -80,7 +80,7 @@ public class BlockBreakData extends ACheckData {
 	// TODO: use tick here too  ?
 	public long    wasInstaBreak;
 	
-	public final Stats stats;
+	public final Timings stats;
 
     // Data of the fast break check.
 	public final ActionFrequency fastBreakPenalties;
@@ -101,7 +101,7 @@ public class BlockBreakData extends ACheckData {
     
 
     public BlockBreakData(final BlockBreakConfig cc) {
-		stats = cc.fastBreakDebug?(new Stats("NCP/FASTBREAK")):null;
+		stats = cc.fastBreakDebug?(new Timings("NCP/FASTBREAK")):null;
 		fastBreakPenalties = new ActionFrequency(cc.fastBreakBuckets, cc.fastBreakBucketDur);
 		frequencyBuckets = new ActionFrequency(cc.frequencyBuckets, cc.frequencyBucketDur);
 		wrongBlockVL = new ActionFrequency(6, 20000);

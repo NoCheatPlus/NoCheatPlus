@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.utilities;
+package fr.neatmonster.nocheatplus.stats;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -10,11 +10,11 @@ import org.bukkit.ChatColor;
 import fr.neatmonster.nocheatplus.logging.LogUtil;
 
 /**
- * A not too fat stats class re-used from other plugins.
+ * A not too fat timings class re-used from other plugins.
  * @author asofold
  *
  */
-public final class Stats {
+public final class Timings {
 	
 	public static final class Entry{
 		public long val = 0;
@@ -30,7 +30,7 @@ public final class Stats {
 	private boolean logStats = false;
 	private boolean showRange = true;
 	
-	private final Map<Integer, Entry> entries = new HashMap<Integer, Stats.Entry>();
+	private final Map<Integer, Entry> entries = new HashMap<Integer, Timings.Entry>();
 	private final DecimalFormat f;
 	private final String label;
 	
@@ -46,11 +46,11 @@ public final class Stats {
 	
 	int maxId = 0;
 	
-	public Stats(){
+	public Timings(){
 		this("[STATS]");
 	}
 	
-	public Stats(final String label){
+	public Timings(final String label){
 		this.label = label;
 		f = new DecimalFormat();
 		f.setGroupingUsed(true);
