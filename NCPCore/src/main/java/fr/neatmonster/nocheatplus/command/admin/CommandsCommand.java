@@ -18,13 +18,20 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 public class CommandsCommand extends BaseCommand {
 	
 	final String[] moreCommands = new String[]{
+			"Console commands (actions):",
 	        "/<command> ban [delay=(ticks)] (player) [(reason)...]: ban player",
 	        "/<command> kick [delay=(ticks)] (player) [(reason)...]: kick player",
-	        "/<command> denylogin [delay=(ticks)] (player) (minutes) [(reason)...]",
-	        "/<command> allowlogin (player): Allow a player to login again.",
-	        "/<command> kicklist: Show temporarily kicked players.",
 	        "/<command> tell [delay=(ticks)] (player) (message)...: tell a message",
 	        "/<command> delay [delay=(ticks)] (command)...: delay a command",
+	        "/<command> denylogin [delay=(ticks)] (player) (minutes) [(reason)...]",
+	        "More administrative commands:",
+	        "/<command> kicklist: Show players, currently denied to log in.",
+	        "/<command> allowlogin (player): Allow a player to login again.",
+	        "/<command> exemptions (player): Show exemptions.",
+            "/<command> exempt (player) [(check type)]: Exempt a player.",
+            "/<command> unexempt (player) [(check type)]: Unexempt a player.",
+            "/<command> log counters: Show some stats/debug counters summary.",
+            "/<command> reset counters: Reset some stats/debug counters",
 	};
 	
 	final String allCommands;
@@ -37,7 +44,7 @@ public class CommandsCommand extends BaseCommand {
 		String all = TAG + "All commands info:\n";
 		Command cmd = plugin.getCommand("nocheatplus");
 		if (cmd != null){
-			all += cmd.getUsage().replace("<command>", "ncp") + "Auxiliary commands (actions):\n";
+			all += cmd.getUsage().replace("<command>", "ncp");
 		}
 		all += StringUtil.join(Arrays.asList(moreCommands), "\n");
 		allCommands = all;
