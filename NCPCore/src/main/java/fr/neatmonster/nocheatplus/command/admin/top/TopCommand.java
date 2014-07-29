@@ -187,7 +187,7 @@ public class TopCommand extends BaseCommand{
         Comparator<VLView> comparator = VLView.parseMixedComparator(args, startIndex);
         if (comparator == null) {
             // TODO: Default comparator ?
-            comparator = new FCFSComparator<ViolationHistory.VLView>(Arrays.asList(VLView.CmpnVL), true);
+            comparator = new FCFSComparator<VLView>(Arrays.asList(VLView.CmpnVL, VLView.CmpSumVL), true);
         }
         
         // Run a worker task.
