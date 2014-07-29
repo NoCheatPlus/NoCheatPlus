@@ -11,17 +11,18 @@ import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
-public class KickListCommand extends BaseCommand {
+public class DenyListCommand extends BaseCommand {
 
-	public KickListCommand(JavaPlugin plugin) {
-		super(plugin, "kicklist", Permissions.COMMAND_KICKLIST);
+	public DenyListCommand(JavaPlugin plugin) {
+		super(plugin, "denylist", Permissions.COMMAND_KICKLIST,
+		    new String[]{"kicklist", "tempbanned", "deniedlist", "denyloginlist", "deniedlogin"});
 		}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		final String[] kicked = NCPAPIProvider.getNoCheatPlusAPI().getLoginDeniedPlayers();
 		if (kicked.length < 100) Arrays.sort(kicked);
-		sender.sendMessage(TAG + "Temporarily kicked players:");
+		sender.sendMessage(TAG + "Players denied to login (temporarily):");
 		sender.sendMessage(StringUtil.join(Arrays.asList(kicked), " "));
 		return true;
 	}

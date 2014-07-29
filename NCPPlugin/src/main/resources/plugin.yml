@@ -284,8 +284,8 @@ permissions:
                         description: Allow use of the ncp ban command.
                     nocheatplus.command.kick:
                         description: Allow use of the ncp kick command.
-                    nocheatplus.command.kicklist:
-                        description: Allow use of the ncp kicklist command.
+                    nocheatplus.command.denylist:
+                        description: Allow use of the ncp denylist command (view players who are denied to login right now).
                     nocheatplus.command.lag:
                         description: Allow use of the ncp lag command.
                     nocheatplus.command.tell:
@@ -334,7 +334,7 @@ permissions:
                             nocheatplus.command.top: true
                             nocheatplus.command.info: true
                             nocheatplus.command.exemptions: true
-                            nocheatplus.command.kicklist: true
+                            nocheatplus.command.denylist: true
                             nocheatplus.command.commands: true
                             # TODO: Put lag here ?
                     nocheatplus.shortcut.monitor:
@@ -425,9 +425,9 @@ permissions:
                         children:
                             nocheatplus.command.kick: true
                     nocheatplus.admin.kicklist:
-                        description: Obsolete, use nocheatplus.command.kicklist instead.
+                        description: Obsolete, use nocheatplus.command.denylist instead.
                         children:
-                            nocheatplus.command.kicklist: true
+                            nocheatplus.command.denylist: true
                     nocheatplus.admin.lag:
                         description: Obsolete, use nocheatplus.command.lag instead.
                         children:

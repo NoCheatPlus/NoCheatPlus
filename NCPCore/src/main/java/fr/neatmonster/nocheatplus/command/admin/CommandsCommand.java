@@ -25,7 +25,7 @@ public class CommandsCommand extends BaseCommand {
 	        "/<command> delay [delay=(ticks)] (command)...: delay a command",
 	        "/<command> denylogin [delay=(ticks)] (player) (minutes) [(reason)...]",
 	        "More administrative commands:",
-	        "/<command> kicklist: Show players, currently denied to log in.",
+	        "/<command> denylist: Show players, currently denied to log in.",
 	        "/<command> allowlogin (player): Allow a player to login again.",
 	        "/<command> exemptions (player): Show exemptions.",
             "/<command> exempt (player) [(check type)]: Exempt a player.",
