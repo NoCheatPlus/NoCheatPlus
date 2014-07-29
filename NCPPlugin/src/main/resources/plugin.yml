@@ -19,6 +19,7 @@ commands:
         # permissions: nocheatplus.admin.(...)
         usage: |
                Administrative commands overview:
+               /<command> top (entries) (check/s...) (sort by...) NEW.
                /<command> info (player): Violation summary for a player.
                /<command> inspect (player): Status info for a player.
                /<command> notify on|off: In-game notifications per player.
@@ -267,6 +268,8 @@ permissions:
                             nocheatplus.notify: true
                     nocheatplus.command.reload:
                         description: Allow the player to reload NoCheatPlus configuration.
+                    nocheatplus.command.top:
+                        description: Allow to search violation history for top violations.
                     nocheatplus.command.info:
                         description: Allow to see violation info about a player.
                     nocheatplus.command.inspect:
@@ -328,6 +331,7 @@ permissions:
                         description: Info commands about players.
                         children:
                             nocheatplus.command.notify: true
+                            nocheatplus.command.top: true
                             nocheatplus.command.info: true
                             nocheatplus.command.exemptions: true
                             nocheatplus.command.kicklist: true

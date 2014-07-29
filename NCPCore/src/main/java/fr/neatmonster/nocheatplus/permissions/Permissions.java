@@ -35,6 +35,7 @@ public class Permissions {
     public static final String  COMMAND_RELOAD               = COMMAND + ".reload";
     public static final String  COMMAND_REMOVEPLAYER         = COMMAND + ".removeplayer";
     public static final String  COMMAND_RESET                = COMMAND + ".reset";
+    public static final String  COMMAND_TOP                  = COMMAND + ".top";
     public static final String  COMMAND_UNEXEMPT             = COMMAND + ".unexempt";
     public static final String  COMMAND_VERSION              = COMMAND + ".version";
 

@@ -31,6 +31,7 @@ import fr.neatmonster.nocheatplus.command.admin.exemption.UnexemptCommand;
 import fr.neatmonster.nocheatplus.command.admin.log.LogCommand;
 import fr.neatmonster.nocheatplus.command.admin.notify.NotifyCommand;
 import fr.neatmonster.nocheatplus.command.admin.reset.ResetCommand;
+import fr.neatmonster.nocheatplus.command.admin.top.TopCommand;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
@@ -69,7 +70,7 @@ public class NoCheatPlusCommand extends BaseCommand{
         }
     }
 
-	private Set<String> rootLabels = new LinkedHashSet<String>();
+    private Set<String> rootLabels = new LinkedHashSet<String>();
 
     /**
      * Instantiates a new command handler.
@@ -78,45 +79,46 @@ public class NoCheatPlusCommand extends BaseCommand{
      *            the instance of NoCheatPlus
      */
     public NoCheatPlusCommand(final JavaPlugin plugin, final List<INotifyReload> notifyReload) {
-    	super(plugin, "nocheatplus", null, new String[]{"ncp"});
+        super(plugin, "nocheatplus", null, new String[]{"ncp"});
         // Register sub commands (special order):
         for (BaseCommand cmd : new BaseCommand[]{
-        		new BanCommand(plugin),
-        		new CommandsCommand(plugin),
-        		new DelayCommand(plugin),
-        		new ExemptCommand(plugin),
-        		new ExemptionsCommand(plugin),
-        		new InfoCommand(plugin),
-        		new InspectCommand(plugin),
-        		new KickCommand(plugin),
-        		new KickListCommand(plugin),
-        		new LagCommand(plugin),
-        		new VersionCommand(plugin),
-        		new NotifyCommand(plugin),
-        		new ReloadCommand(plugin, notifyReload),
-        		new RemovePlayerCommand(plugin),
-        		new TellCommand(plugin),
-        		new DenyLoginCommand(plugin),
-        		new UnexemptCommand(plugin),
-        		new AllowLoginCommand(plugin),
-        		new LogCommand(plugin),
-        		new ResetCommand(plugin),
+                new BanCommand(plugin),
+                new CommandsCommand(plugin),
+                new DelayCommand(plugin),
+                new ExemptCommand(plugin),
+                new ExemptionsCommand(plugin),
+                new TopCommand(plugin),
+                new InfoCommand(plugin),
+                new InspectCommand(plugin),
+                new KickCommand(plugin),
+                new KickListCommand(plugin),
+                new LagCommand(plugin),
+                new VersionCommand(plugin),
+                new NotifyCommand(plugin),
+                new ReloadCommand(plugin, notifyReload),
+                new RemovePlayerCommand(plugin),
+                new TellCommand(plugin),
+                new DenyLoginCommand(plugin),
+                new UnexemptCommand(plugin),
+                new AllowLoginCommand(plugin),
+                new LogCommand(plugin),
+                new ResetCommand(plugin),
         }){
-        	addSubCommands(cmd);
-        	rootLabels.add(cmd.label);
+            addSubCommands(cmd);
+            rootLabels.add(cmd.label);
         }
     }
-    
+
     /**
      * Retrieve a collection with all sub-command permissions.
      * @return
      */
     public Collection<String> getAllSubCommandPermissions(){
-    	final Set<String> set = new LinkedHashSet<String>(rootLabels.size());
-    	for (final String label : rootLabels){
-    		set.add(subCommands.get(label).permission);
-    	}
-    	return set;
+        final Set<String> set = new LinkedHashSet<String>(rootLabels.size());
+        for (final String label : rootLabels){
+            set.add(subCommands.get(label).permission);
+        }
+        return set;
     }
 
     /* (non-Javadoc)
@@ -126,82 +128,88 @@ public class NoCheatPlusCommand extends BaseCommand{
     @Override
     public boolean onCommand(final CommandSender sender, final Command command, final String commandLabel,
             final String[] args) {
-    	
+
         if (!command.getName().equalsIgnoreCase("nocheatplus")){
-        	// Not our command, how did it get here?
-        	return false;
+            // Not our command, how did it get here?
+            return false;
         }
-        
+
         if (sender.hasPermission(Permissions.FILTER_COMMAND_NOCHEATPLUS)){
-        	// Check sub-commands.
+            // Check sub-commands.
             if (args.length > 0){
-            	AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());
-            	if (subCommand != null && subCommand.testPermission(sender, command, commandLabel, args)){
-            		// Sender has permission to run the command.
-            		return subCommand.onCommand(sender, command, commandLabel, args);
-            	}
+                AbstractCommand<?> subCommand = subCommands.get(args[0].trim().toLowerCase());
+                if (subCommand != null && subCommand.testPermission(sender, command, commandLabel, args)){
+                    // Sender has permission to run the command.
+                    final boolean res = subCommand.onCommand(sender, command, commandLabel, args);
+                    if (!res && subCommand.usage != null) {
+                        sender.sendMessage(subCommand.usage);
+                        return true;
+                    } else {
+                        return res;
+                    }
+                }
             }
-        	// No sub command worked, print usage.
-        	return false;
+            // No sub command worked, print usage.
+            return false;
         }
-        
+
         final ConfigFile config = ConfigManager.getConfigFile();
         if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)){
-        	// Prevent the NCP usage printout:
-        	// TODO: GetColoredString
-        	sender.sendMessage(ColorUtil.replaceColors(config.getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)));
-        	return true; 
+            // Prevent the NCP usage printout:
+            // TODO: GetColoredString
+            sender.sendMessage(ColorUtil.replaceColors(config.getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)));
+            return true; 
         }
         else{
-        	return false;
+            return false;
         }
     }
 
-//	/**
-//	 * Check which of the choices starts with prefix
-//	 * @param sender
-//	 * @param choices
-//	 * @return
-//	 */
-//	protected List<String> getTabMatches(CommandSender sender, Collection<String> choices, String prefix){
-//		final List<String> res = new ArrayList<String>(choices.size());
-//		final Set<BaseCommand> done = new HashSet<BaseCommand>();
-//		for (final String label : choices){
-//			if (!label.startsWith(prefix)) continue;
-//			final BaseCommand cmd = commands.get(label);
-//			if (done.contains(cmd)) continue;
-//			done.add(cmd);
-//			if (sender.hasPermission(cmd.permission)) res.add(cmd.label);
-//		}
-//		if (!res.isEmpty()){
-//			Collections.sort(res);
-//			return res;
-//		}
-//		return null;
-//	}
+    //	/**
+    //	 * Check which of the choices starts with prefix
+    //	 * @param sender
+    //	 * @param choices
+    //	 * @return
+    //	 */
+    //	protected List<String> getTabMatches(CommandSender sender, Collection<String> choices, String prefix){
+    //		final List<String> res = new ArrayList<String>(choices.size());
+    //		final Set<BaseCommand> done = new HashSet<BaseCommand>();
+    //		for (final String label : choices){
+    //			if (!label.startsWith(prefix)) continue;
+    //			final BaseCommand cmd = commands.get(label);
+    //			if (done.contains(cmd)) continue;
+    //			done.add(cmd);
+    //			if (sender.hasPermission(cmd.permission)) res.add(cmd.label);
+    //		}
+    //		if (!res.isEmpty()){
+    //			Collections.sort(res);
+    //			return res;
+    //		}
+    //		return null;
+    //	}
 
-//	@Override
-//	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
-//	{
-//		// TODO: TabComplete check ?
-//		if (args.length == 0 || args.length == 1 && args[0].trim().isEmpty()){
-//			// Add labels without aliases.
-//			return getTabMatches(sender, rootLabels, "");
-//		}
-//		else {
-//			final String subLabel = args[0].trim().toLowerCase();
-//			if (args.length == 1){
-//				// Also check aliases for matches.
-//				return getTabMatches(sender, commands.keySet(), subLabel);
-//			}
-//			else{
-//				final NCPCommand cmd = commands.get(subLabel);
-//				if (cmd.testPermission...){
-//					// Delegate the tab-completion.
-//					return cmd.onTabComplete(sender, command, alias, args);
-//				}
-//			}
-//		}
-//		return null;
-//	}
+    //	@Override
+    //	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args)
+    //	{
+    //		// TODO: TabComplete check ?
+    //		if (args.length == 0 || args.length == 1 && args[0].trim().isEmpty()){
+    //			// Add labels without aliases.
+    //			return getTabMatches(sender, rootLabels, "");
+    //		}
+    //		else {
+    //			final String subLabel = args[0].trim().toLowerCase();
+    //			if (args.length == 1){
+    //				// Also check aliases for matches.
+    //				return getTabMatches(sender, commands.keySet(), subLabel);
+    //			}
+    //			else{
+    //				final NCPCommand cmd = commands.get(subLabel);
+    //				if (cmd.testPermission...){
+    //					// Delegate the tab-completion.
+    //					return cmd.onTabComplete(sender, command, alias, args);
+    //				}
+    //			}
+    //		}
+    //		return null;
+    //	}
 }
