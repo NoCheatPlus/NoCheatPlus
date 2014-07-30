@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.hooks;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +25,7 @@ public class APIUtils {
     static {
         final Map<CheckType, Set<CheckType>> map = new HashMap<CheckType, Set<CheckType>>();
         for (final CheckType type : CheckType.values())
-            map.put(type, new HashSet<CheckType>());
+            map.put(type, new LinkedHashSet<CheckType>());
         for (final CheckType type : CheckType.values()){
         	if (type != CheckType.ALL) map.get(CheckType.ALL).add(type);
             for (final CheckType other : CheckType.values()){
