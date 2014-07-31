@@ -39,12 +39,40 @@ public class NetStatic {
      * @return The violation amount, i.e. "count above limit", 0.0 if no violation.
      */
     public static double morePacketsCheck(final ActionFrequency packetFreq, final long time, final float packets, final float maxPackets, final float idealPackets, final ActionFrequency burstFreq, final float burstPackets, final double burstDirect, final double burstEPM, final List<String> tags) {
+        // TODO: Push most stuff into a new class (e.g. PacketFrequency).
         // Pull down stuff.
         final long winDur = packetFreq.bucketDuration();
         final int winNum = packetFreq.numberOfBuckets();
+        final long totalDur = winDur * winNum;
 
-        // TODO: "Relax" bursts from i = 1 on, i.e. distribute to following intervals (if zero ~ ?or lower).
-        //  [relax based on checking, not updating first (!).]
+        // "Relax" bursts from i = 1 on, i.e. distribute to following intervals (if zero ~ ?or lower).
+        // TODO: Configurability? Cleanup/optimize! Rename to smoothing or what not.
+        final long tDiff = time - packetFreq.lastAccess();
+        if (tDiff >= winDur && tDiff < totalDur) {
+            // There will be some shift, so check if to relax, only if there could be some congestion. 
+            float sc0 = packetFreq.bucketScore(0);
+            if (sc0 > maxPackets) { // TODO: Ideal vs. max. packets.
+                // TODO: Keep in mind: potential exploits, a la burst to burst !?
+                sc0 -= maxPackets; // Count this down.
+                for (int i = 1; i < winNum; i++) {
+                    final float sci = packetFreq.bucketScore(i);
+                    if (sci < maxPackets) {
+                        // Smoothen, using following empty spots including one occupied spot at most..
+                        float consume = Math.min(sc0, maxPackets - sci);
+                        sc0 -= consume;
+                        packetFreq.setBucket(i, sci + consume);
+                        if (sci > 0f) {
+                            // Only allow relaxing "into" the next occupied spot.
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                // Finally adjust the first bucket score.
+                packetFreq.setBucket(0, maxPackets + sc0);
+            }
+        }
 
         // Add packet to frequency count.
         packetFreq.add(time, packets);
@@ -76,7 +104,7 @@ public class NetStatic {
         // Adjust empty based on server side lag, this makes the check more strict.
         if (empty > 0) {
             // TODO: Consider to add a config flag for skipping the lag adaption (e.g. strict).
-            final float lag = TickTask.getLag(winDur * winNum, true);
+            final float lag = TickTask.getLag(totalDur, true); // Full seconds range considered.
             // TODO: Consider increasing the allowed maximum, for extreme server-side lag.
             empty = Math.min(empty, (int) Math.round((lag - 1f) * winNum));
         }
@@ -102,7 +130,7 @@ public class NetStatic {
         float burst = packetFreq.bucketScore(0);
         if (burst > burstPackets) {
             // Account for server-side lag "minimally".
-            burst /= TickTask.getLag(winDur, true);
+            burst /= TickTask.getLag(winDur, true); // First window lag.
             if (burst > burstPackets) {
                 final double vBurstDirect = burst - burstDirect;
                 if (vBurstDirect > 0.0) {
