@@ -120,6 +120,7 @@ public class TopCommand extends BaseCommand{
                 builder.append("/max=");
                 builder.append(format.format(view.maxVL));
                 builder.append(")");
+                done ++;
                 if (done >= n) {
                     break;
                 }
@@ -153,7 +154,7 @@ public class TopCommand extends BaseCommand{
             return false;
         }
         int startIndex = 1;
-        Integer n = 10;
+        int n = 10;
         try {
             n = Integer.parseInt(args[1].trim());
             startIndex = 2;
