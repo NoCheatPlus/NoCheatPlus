@@ -38,6 +38,7 @@ import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakListener;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
 import fr.neatmonster.nocheatplus.checks.chat.ChatListener;
+import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedListener;
 import fr.neatmonster.nocheatplus.checks.fight.FightListener;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
@@ -862,22 +863,25 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      * Actions to be done after enable of  all plugins. This aims at reloading mainly.
      */
     private void postEnable(final Player[] onlinePlayers, Runnable... runnables){
-    	LogUtil.logInfo("[NoCheatPlus] Post-enable running...");
-    	for (final Runnable runnable : runnables){
-    		try{
-    			runnable.run();
-    		}
-    		catch(Throwable t){
-    			LogUtil.logSevere("[NoCheatPlus] Encountered a problem during post-enable: " + t.getClass().getSimpleName());
-    			LogUtil.logSevere(t);
-    		}
-    	}
-    	for (final Player player : onlinePlayers){
-    		updatePermStateReceivers(player);
-    		NCPExemptionManager.registerPlayer(player);
-    	}
-    	// TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
-    	LogUtil.logInfo("[NoCheatPlus] Post-enable finished.");
+        LogUtil.logInfo("[NoCheatPlus] Post-enable running...");
+        for (final Runnable runnable : runnables){
+            try{
+                runnable.run();
+            }
+            catch(Throwable t){
+                LogUtil.logSevere("[NoCheatPlus] Encountered a problem during post-enable: " + t.getClass().getSimpleName());
+                LogUtil.logSevere(t);
+            }
+        }
+        for (final Player player : onlinePlayers){
+            updatePermStateReceivers(player);
+            NCPExemptionManager.registerPlayer(player);
+            if (player.isSleeping()) {
+                CombinedData.getData(player).wasInBed = true;
+            }
+        }
+        // TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
+        LogUtil.logInfo("[NoCheatPlus] Post-enable finished.");
     }
 
 	/**
