@@ -22,11 +22,22 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory.VLView;
 import fr.neatmonster.nocheatplus.command.BaseCommand;
+import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.FCFSComparator;
 
 public class TopCommand extends BaseCommand{
+    
+    private static final String[][] comparatorArgs = new String[][]{
+        //{"-player", "-name", "-playername"},
+        //{"-check", "-type", "-checktype}
+        {"-sumvl", "-sum", "-vl"},
+        {"-n", "-number", "-num", "-nvl"},
+        {"-avgvl", "-avg", "-avl", "-av", "-average", "-averagevl", "-avvl"},
+        {"-maxvl", "-max", "-maximum", "-maximumvl"},
+        {"-time", "-"},
+    };
     
     protected static class PrimaryThreadWorker implements Runnable{
         private final Collection<CheckType> checkTypes;
@@ -197,7 +208,19 @@ public class TopCommand extends BaseCommand{
         
         return true;
     }
-    
-    // TODO: Tab completion (!).
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        String arg = args[args.length - 1];
+        if (arg.startsWith("-")) {
+            while (arg.startsWith("-")) {
+                arg = arg.substring(1);
+            }
+            arg = "-" + arg;
+            return CommandUtil.getTabMatches(arg.toLowerCase(), comparatorArgs);
+        } else {
+            return CommandUtil.getCheckTypeTabMatches(arg);
+        }
+    }
     
 }
