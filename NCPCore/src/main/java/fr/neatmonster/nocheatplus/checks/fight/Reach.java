@@ -88,7 +88,7 @@ public class Reach extends Check {
 
         if (violation > 0) {
             // They failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
-            if (TickTask.getLag(1000) < 1.5f){
+            if (TickTask.getLag(1000, true) < 1.5f){
             	// TODO: 1.5 is a fantasy value.
             	data.reachVL += violation;
             }
@@ -222,7 +222,7 @@ public class Reach extends Check {
 		boolean cancel = false;
 		if (violation > 0) {
             // They failed, increment violation level. This is influenced by lag, so don't do it if there was lag.
-            if (TickTask.getLag(1000) < 1.5f){
+            if (TickTask.getLag(1000, true) < 1.5f){
             	// TODO: 1.5 is a fantasy value.
             	data.reachVL += violation;
             }

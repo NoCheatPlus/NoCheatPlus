@@ -53,7 +53,7 @@ public class LagCommand extends BaseCommand {
 		long second = 1200L;
 		builder.append("#### TPS lag ####\nPerc.[time]:");
 		for (long ms : new long[]{second, medium, max}){
-			double lag = TickTask.getLag(ms);
+			double lag = TickTask.getLag(ms, true);
 			int p = Math.max(0, (int) ((lag - 1.0) * 100.0));
 			builder.append(" " + p + "%[" + StringUtil.fdec1.format((double) ms / 1200.0) + "s]" );
 		}

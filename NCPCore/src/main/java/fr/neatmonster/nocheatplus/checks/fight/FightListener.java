@@ -140,7 +140,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         	tickAge = tick - data.lastAttackTick;
         	// TODO: Maybe use 3d distance if dy(normalized) is too big. 
         	targetMove = TrigUtil.distance(data.lastAttackedX, data.lastAttackedZ, damagedLoc.getX(), damagedLoc.getZ());
-        	msAge = (long) (50f * TickTask.getLag(50L * tickAge) * (float) tickAge);
+        	msAge = (long) (50f * TickTask.getLag(50L * tickAge, true) * (float) tickAge);
         	normalizedMove = msAge == 0 ? targetMove : targetMove * Math.min(20.0, 1000.0 / (double) msAge);
         }
         // TODO: calculate factor for dists: ticks * 50 * lag

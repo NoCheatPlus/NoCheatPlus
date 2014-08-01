@@ -29,7 +29,7 @@ public class Speed extends Check {
 		
 		if (data.speedCount > cc.speedLimit){
 			// Lag correction
-			final int correctedCount = (int) ((double) data.speedCount / TickTask.getLag(time - data.speedTime));
+			final int correctedCount = (int) ((double) data.speedCount / TickTask.getLag(time - data.speedTime, true));
 			if (correctedCount > cc.speedLimit){
 				data.speedVL ++;
 				if (executeActions(player, data.speedVL, 1, cc.speedActions)){

@@ -100,7 +100,7 @@ public class FastConsume extends Check implements Listener{
 		final long expectedDuration = cc.fastConsumeDuration;
 		if (timeSpent < expectedDuration){
 			// TODO: Might have to do a specialized check for lag spikes here instead.
-			final float lag = TickTask.getLag(expectedDuration);
+			final float lag = TickTask.getLag(expectedDuration, true);
 			if (timeSpent * lag < expectedDuration){
 				final double difference = (expectedDuration - timeSpent * lag) / 100.0;
 				data.instantEatVL += difference;

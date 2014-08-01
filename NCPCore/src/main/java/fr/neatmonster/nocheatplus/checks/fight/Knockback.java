@@ -38,7 +38,7 @@ public class Knockback extends Check {
 
         // How long ago has the player started sprinting?
         final long usedTime = (time - data.knockbackSprintTime);
-        final long effectiveTime = (long) ((float)  usedTime * (cc.lag ? TickTask.getLag(usedTime): 1f));
+        final long effectiveTime = (long) ((float)  usedTime * (cc.lag ? TickTask.getLag(usedTime, true): 1f));
         // Pretty rough: Completely skip on lag.
         if (data.knockbackSprintTime > 0L && effectiveTime < cc.knockbackInterval) {
             final double difference = cc.knockbackInterval - time + data.knockbackSprintTime;

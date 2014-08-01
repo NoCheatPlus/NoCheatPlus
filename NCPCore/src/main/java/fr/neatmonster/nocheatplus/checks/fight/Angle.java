@@ -113,7 +113,7 @@ public class Angle extends Check {
         // Is the violation is superior to the threshold defined in the configuration?
         if (violation > cc.angleThreshold) {
             // Has the server lagged?
-            if (TickTask.getLag(1000) < 1.5f){
+            if (TickTask.getLag(1000, true) < 1.5f){
             	// TODO: 1.5 is a fantasy value.
                 // If it hasn't, increment the violation level.
                 data.angleVL += violation;

@@ -71,7 +71,7 @@ public class Critical extends Check {
                     final List<String> tags = new ArrayList<String>();
                     
                     // Player failed the check, but this is influenced by lag so don't do it if there was lag.
-                    if (TickTask.getLag(1000) < 1.5){
+                    if (TickTask.getLag(1000, true) < 1.5){
                     	// TODO: 1.5 is a fantasy value.
                         // Increment the violation level.
                         data.criticalVL += delta;

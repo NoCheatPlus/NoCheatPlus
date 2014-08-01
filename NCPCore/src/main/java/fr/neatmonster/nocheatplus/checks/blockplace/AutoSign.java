@@ -57,7 +57,7 @@ public class AutoSign extends Check {
 		
 		final long editTime = time - data.autoSignPlacedTime;
 		long expected = getExpectedEditTime(lines);
-		expected = (long) (expected / TickTask.getLag(expected));
+		expected = (long) (expected / TickTask.getLag(expected, true));
 		
 		if (expected > editTime){
 			tags.add("edit_time");

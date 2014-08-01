@@ -48,7 +48,7 @@ public class FastClick extends Check {
 //                final double difference = 45L - time + data.fastClickLastTime;
 //                final InventoryConfig cc = InventoryConfig.getConfig(player);
 //                final ViolationData vd = new ViolationData(this, player, data.fastClickVL + difference, difference, cc.fastClickActions);
-//                if (TickTask.getLag(150) > 1.7f){
+//                if (TickTask.getLag(150, true) > 1.7f){
 //                	// Don't increase vl here.
 //                	cancel = vd.hasCancel();
 //                }
@@ -110,14 +110,14 @@ public class FastClick extends Check {
         float shortTerm = data.fastClickFreq.bucketScore(0);
         if (shortTerm > cc.fastClickShortTermLimit){
         	// Check for lag.
-        	shortTerm /= (float) TickTask.getLag(data.fastClickFreq.bucketDuration());
+        	shortTerm /= (float) TickTask.getLag(data.fastClickFreq.bucketDuration(), true);
         }
         shortTerm -= cc.fastClickShortTermLimit;
         
         float normal = data.fastClickFreq.score(1f);
         if (normal > cc.fastClickNormalLimit){
         	// Check for lag.
-        	normal /= (float) TickTask.getLag(data.fastClickFreq.bucketDuration() * data.fastClickFreq.numberOfBuckets());
+        	normal /= (float) TickTask.getLag(data.fastClickFreq.bucketDuration() * data.fastClickFreq.numberOfBuckets(), true);
         }
         normal -= cc.fastClickNormalLimit;
 

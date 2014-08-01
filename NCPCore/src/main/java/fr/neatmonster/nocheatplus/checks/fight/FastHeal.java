@@ -31,7 +31,7 @@ public class FastHeal extends Check {
 		}
 		else{
 			// Violation.
-			final double correctedDiff = ((double) time - data.fastHealRefTime) * TickTask.getLag(cc.fastHealInterval);
+			final double correctedDiff = ((double) time - data.fastHealRefTime) * TickTask.getLag(cc.fastHealInterval, true);
 			// TODO: Consider using a simple buffer as well (to get closer to the correct interval).
 			// TODO: Check if we added a buffer.
 			if (correctedDiff < cc.fastHealInterval){
