@@ -350,6 +350,9 @@ public class BlockProperties {
     /** THIN FENCE (glass panes, iron fence) */
     public static final long F_THIN_FENCE 	= 0x80000;
     
+    /** Meta-flag to indicate that the (max.-) edges should mean a collision, can be passed to collidesBlock. */
+    public static final long F_COLLIDE_EDGES = 0x100000;
+    
     /**
      * Map flag to names.
      */
@@ -2096,10 +2099,21 @@ public class BlockProperties {
             	bmaxY = bounds[4]; // maxY
             }
         }
-        if (minX >= bmaxX + x || maxX < bminX + x) return false;
-        else if (minY >= bmaxY + y || maxY < bminY + y) return false;
-        else if (minZ >= bmaxZ + z || maxZ < bminZ + z) return false;
-        else return true;
+        // Clearly outside of bounds.
+        if (minX > bmaxX + x || maxX < bminX + x
+                || minY > bmaxY + y || maxY < bminY + y
+                || minZ > bmaxZ + z || maxZ < bminZ + z) {
+            return false;
+        }
+        // Hitting the max-edges (if allowed).
+        final boolean allowEdge = (flags & F_COLLIDE_EDGES) == 0;
+        if (minX == bmaxX + x && (bmaxX < 1.0 || allowEdge)
+                || minY == bmaxY + y && (bmaxY < 1.0 || allowEdge)
+                || minZ == bmaxZ + z && (bmaxZ < 1.0 || allowEdge)) {
+            return false;
+        }
+        // Collision.
+        return true;
    }
    
    /**
@@ -2536,7 +2550,7 @@ public class BlockProperties {
 			maxZ = dZ * dT + oZ + blockZ;
 			minZ = oZ + blockZ;
 		}
-		if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, id, bounds, blockFlags[id])){
+		if (!collidesBlock(access, minX, minY, minZ, maxX, maxY, maxZ, blockX, blockY, blockZ, id, bounds, blockFlags[id] | F_COLLIDE_EDGES)){
 			// TODO: Might check for fence too, here.
 			return true;
 		}
