@@ -76,10 +76,20 @@ public abstract class RayTracing {
 
     private static final double tDiff(final double dTotal, final double offset){
         if (dTotal > 0.0){
-            return (1.0 - offset) / dTotal; 
+            if (offset >= 1.0) {
+                // Static block change (e.g. diagonal move).
+                return 0.0;
+            } else {
+                return (1.0 - offset) / dTotal; 
+            }
         }
         else if (dTotal < 0.0){
-            return offset / -dTotal; 
+            if (offset <= 0.0) {
+             // Static block change (e.g. diagonal move).
+                return 0.0;
+            } else {
+                return offset / -dTotal;
+            }
         }
         else{
             return Double.MAX_VALUE;
@@ -103,7 +113,12 @@ public abstract class RayTracing {
             tMin = Math.min(tX,  Math.min(tY, tZ));
             if (tMin == Double.MAX_VALUE) {
                 // All differences are 0 (no progress).
-                break;
+                if (step < 1) {
+                    // Allow one step.
+                    tMin = 0.0;
+                } else {
+                    break;
+                }
             }
             if (t + tMin > 1.0) {
                 // Set to the remaining distance (does trigger).
@@ -112,16 +127,17 @@ public abstract class RayTracing {
             // Call step with appropriate arguments.
             step ++;
             if (!step(blockX, blockY, blockZ, oX, oY, oZ, tMin)) {
-                break; // || tMin == 0) break;
+                break;
             }
             if (t + tMin >= 1.0 - tol) {
                 break;
             }
             // Advance (add to t etc.).
             changed = false;
-            // TODO: Some not handled cases would mean errors.
+            oX = Math.min(1.0, Math.max(0.0, oX + tMin * dX));
+            oY = Math.min(1.0, Math.max(0.0, oY + tMin * dY));
+            oZ = Math.min(1.0, Math.max(0.0, oZ + tMin * dZ)); 
             // x
-            oX += tMin * dX;
             if (tX == tMin){
                 if (dX < 0){
                     oX = 1.0;
@@ -134,63 +150,35 @@ public abstract class RayTracing {
                     changed = true;
                 }
             }
-            else if (oX >= 1.0 && dX > 0.0){
-                oX -= 1.0;
-                blockX ++;
-                changed = true;
-            }
-            else if (oX < 0 && dX < 0.0){
-                oX += 1.0;
-                blockX --;
-                changed = true;
-            }
-            // y
-            oY += tMin * dY;
-            if (tY == tMin){
-                if (dY < 0){
-                    oY = 1.0;
-                    blockY --;
-                    changed = true;
+            if (!changed) {
+                // y
+                if (tY == tMin){
+                    if (dY < 0){
+                        oY = 1.0;
+                        blockY --;
+                        changed = true;
+                    }
+                    else if (dY > 0){
+                        oY = 0.0;
+                        blockY ++;
+                        changed = true;
+                    }
                 }
-                else if (dY > 0){
-                    oY = 0.0;
-                    blockY ++;
-                    changed = true;
+                if (!changed) {
+                    // z
+                    if (tZ == tMin){
+                        if (dZ < 0){
+                            oZ = 1.0;
+                            blockZ --;
+                            changed = true;
+                        }
+                        else if (dZ > 0){
+                            oZ = 0.0;
+                            blockZ ++;
+                            changed = true;
+                        }
+                    }
                 }
-            }
-            else if (oY >= 1 && dY > 0.0){
-                oY -= 1.0;
-                blockY ++;
-                changed = true;
-            }
-            else if (oY < 0 && dY < 0.0){
-                oY += 1.0;
-                blockY --;
-                changed = true;
-            }
-            // z
-            oZ += tMin * dZ;
-            if (tZ == tMin){
-                if (dZ < 0){
-                    oZ = 1.0;
-                    blockZ --;
-                    changed = true;
-                }
-                else if (dZ > 0){
-                    oZ = 0.0;
-                    blockZ ++;
-                    changed = true;
-                }
-            }
-            else if (oZ >= 1 && dZ > 0.0){
-                oZ -= 1.0;
-                blockZ ++;
-                changed = true;
-            }
-            else if (oZ < 0 && dZ < 0.0){
-                oZ += 1.0;
-                blockZ --;
-                changed = true;
             }
             t += tMin;
             if (!changed || step >= maxSteps){
