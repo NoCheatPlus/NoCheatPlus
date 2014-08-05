@@ -51,7 +51,7 @@ public class InspectCommand extends BaseCommand {
 			} else {
 				final StringBuilder builder = new StringBuilder(256);
 				builder.append(player.getName() + c1);
-				builder.append(" (" + (player.isOnline() ? "online" : "offline") + "," + player.getGameMode() + (player.isDead() ? ",dead" : "") + (player.isValid() ? "" : ",invalid") + (player.isInsideVehicle() ? (",vehicle=" + player.getVehicle().getType() + "@" + locString(player.getVehicle().getLocation())) : "")+ "):");
+				builder.append(" (" + (player.isOnline() ? "online" : "offline") + "," + (player.isOp() ? "!OP!," : "") + player.getGameMode() + (player.isDead() ? ",dead" : "") + (player.isValid() ? "" : ",invalid") + (player.isInsideVehicle() ? (",vehicle=" + player.getVehicle().getType() + "@" + locString(player.getVehicle().getLocation())) : "")+ "):");
 				// TODO: isValid, isDead,  isInsideVehicle ...
 				// Health.
 				builder.append(" health=" + f1.format(BridgeHealth.getHealth(player)) + "/" + f1.format(BridgeHealth.getMaxHealth(player)));
