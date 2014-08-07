@@ -89,776 +89,800 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  * This is the main class of NoCheatPlus. The commands, events listeners and tasks are registered here.
  */
 public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
-	
-	private static final String MSG_NOTIFY_OFF = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are turned " + ChatColor.RED + "OFF" + ChatColor.WHITE + ".";
-	
-	// Static API
-	
-	/**
-	 * Convenience method.
-	 * @deprecated Use fr.neatmonster.nocheatplus.utilities.NCPAPIProvider.getNoCheatPlusAPI() instead, this method might get removed.
-	 * @return
-	 */
-	public static NoCheatPlusAPI getAPI() {
-		return NCPAPIProvider.getNoCheatPlusAPI();
-	}
-	
-	// Not static.
-	
-	/** Names of players with a certain permission. */
-	protected final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.NOTIFY);
-	
-	/** Lower case player name to milliseconds point of time of release */
-	private final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
-	
-	/** MCAccess instance. */
-	protected MCAccess mcAccess = null;
+
+    private static final String MSG_NOTIFY_OFF = ChatColor.RED + "NCP: " + ChatColor.WHITE + "Notifications are turned " + ChatColor.RED + "OFF" + ChatColor.WHITE + ".";
+
+    // Static API
+
+    /**
+     * Convenience method.
+     * @deprecated Use fr.neatmonster.nocheatplus.utilities.NCPAPIProvider.getNoCheatPlusAPI() instead, this method might get removed.
+     * @return
+     */
+    public static NoCheatPlusAPI getAPI() {
+        return NCPAPIProvider.getNoCheatPlusAPI();
+    }
+
+    // Not static.
+
+    /** Names of players with a certain permission. */
+    protected final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.NOTIFY);
+
+    /** Lower case player name to milliseconds point of time of release */
+    private final Map<String, Long> denyLoginNames = Collections.synchronizedMap(new HashMap<String, Long>());
+
+    /** MCAccess instance. */
+    protected MCAccess mcAccess = null;
 
     /** Configuration problems (likely put to ConfigManager later). */
     protected String configProblems = null;
 
-//    /** Is a new update available? */
-//    private boolean              updateAvailable = false;
-    
+    //    /** Is a new update available? */
+    //    private boolean              updateAvailable = false;
+
     /** Player data future stuff. */
     protected final DataManager dataMan = new DataManager();
-    
-	private int dataManTaskId = -1;
-    
-	/**
-	 * Commands that were changed for protecting them against tab complete or
-	 * use.
-	 */
-	protected List<CommandProtectionEntry> changedCommands = null;
-	
-	
-	private final ListenerManager listenerManager = new ListenerManager(this, false);
-	
-	private boolean manageListeners = true;
-	
-	/** The event listeners. */
+
+    private int dataManTaskId = -1;
+
+    /**
+     * Commands that were changed for protecting them against tab complete or
+     * use.
+     */
+    protected List<CommandProtectionEntry> changedCommands = null;
+
+
+    private final ListenerManager listenerManager = new ListenerManager(this, false);
+
+    private boolean manageListeners = true;
+
+    /** The event listeners. */
     private final List<Listener> listeners       = new ArrayList<Listener>();
-    
+
     /** Storage for generic instances registration. */
     private final Map<Class<?>, Object> genericInstances = new HashMap<Class<?>, Object>();
-    
+
     /** Components that need notification on reloading.
      * (Kept here, for if during runtime some might get added.)*/
     private final List<INotifyReload> notifyReload = new LinkedList<INotifyReload>();
-    
+
     /** If to use subscriptions or not. */
     protected boolean useSubscriptions = false;
-	
-	/** Permission states stored on a per-world basis, updated with join/quit/kick.  */
-	protected final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
-	
-	/** Components that check consistency. */
-	protected final List<ConsistencyChecker> consistencyCheckers = new ArrayList<ConsistencyChecker>();
-	
-	/** Index at which to continue. */
-	protected int consistencyCheckerIndex = 0;
-	
-	protected int consistencyCheckerTaskId = -1;
-	
-	/** Listeners for players joining and leaving (monitor level) */
-	protected final List<JoinLeaveListener> joinLeaveListeners = new ArrayList<JoinLeaveListener>();
-	
-	/** Sub component registries. */
-	protected final List<ComponentRegistry<?>> subRegistries = new ArrayList<ComponentRegistry<?>>();
-	
-	/** Queued sub component holders, emptied on the next tick usually. */
-	protected final List<IHoldSubComponents> subComponentholders = new ArrayList<IHoldSubComponents>(20);
-	
-	private final List<DisableListener> disableListeners = new ArrayList<DisableListener>();
-	
-	/** All registered components.  */
-	protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
-	
-	/** Tick listener that is only needed sometimes (component registration). */
-	protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
-		@Override
-		public boolean delegateTick(final int tick, final long timeLast) {
-			processQueuedSubComponentHolders();
-			return false;
-		}
-	};
-	
-	/** Access point for thread safe message queuing. */
-	private final PlayerMessageSender playerMessageSender  = new PlayerMessageSender();
 
-	/**
-	 * Remove expired entries.
-	 */
+    /** Permission states stored on a per-world basis, updated with join/quit/kick.  */
+    protected final List<PermStateReceiver> permStateReceivers = new ArrayList<PermStateReceiver>();
+
+    /** Components that check consistency. */
+    protected final List<ConsistencyChecker> consistencyCheckers = new ArrayList<ConsistencyChecker>();
+
+    /** Index at which to continue. */
+    protected int consistencyCheckerIndex = 0;
+
+    protected int consistencyCheckerTaskId = -1;
+
+    /** Listeners for players joining and leaving (monitor level) */
+    protected final List<JoinLeaveListener> joinLeaveListeners = new ArrayList<JoinLeaveListener>();
+
+    /** Sub component registries. */
+    protected final List<ComponentRegistry<?>> subRegistries = new ArrayList<ComponentRegistry<?>>();
+
+    /** Queued sub component holders, emptied on the next tick usually. */
+    protected final List<IHoldSubComponents> subComponentholders = new ArrayList<IHoldSubComponents>(20);
+
+    private final List<DisableListener> disableListeners = new ArrayList<DisableListener>();
+
+    /** All registered components.  */
+    protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
+
+    /** Tick listener that is only needed sometimes (component registration). */
+    protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
+        @Override
+        public boolean delegateTick(final int tick, final long timeLast) {
+            processQueuedSubComponentHolders();
+            return false;
+        }
+    };
+
+    /** Access point for thread safe message queuing. */
+    private final PlayerMessageSender playerMessageSender  = new PlayerMessageSender();
+
+    /**
+     * Remove expired entries.
+     */
     private void checkDenyLoginsNames() {
-		final long ts = System.currentTimeMillis();
-		final List<String> rem = new LinkedList<String>();
-		synchronized (denyLoginNames) {
-			for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
-				if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
-			}
-			for (final String name : rem){
-				denyLoginNames.remove(name);
-			}
-		}
-	}
-    
+        final long ts = System.currentTimeMillis();
+        final List<String> rem = new LinkedList<String>();
+        synchronized (denyLoginNames) {
+            for (final Entry<String, Long> entry : denyLoginNames.entrySet()){
+                if (entry.getValue().longValue() < ts)  rem.add(entry.getKey());
+            }
+            for (final String name : rem){
+                denyLoginNames.remove(name);
+            }
+        }
+    }
+
     @Override
     public boolean allowLogin(String playerName){
-    	playerName = playerName.trim().toLowerCase();
-    	final Long time = denyLoginNames.remove(playerName);
-    	if (time == null) return false;
-    	return System.currentTimeMillis() <= time;
+        playerName = playerName.trim().toLowerCase();
+        final Long time = denyLoginNames.remove(playerName);
+        if (time == null) return false;
+        return System.currentTimeMillis() <= time;
     }
-    
+
     @Override
     public int allowLoginAll(){
-    	int denied = 0;
-    	final long now = System.currentTimeMillis();
-    	for (final String playerName : denyLoginNames.keySet()){
-    		final Long time = denyLoginNames.get(playerName);
-        	if (time != null && time > now) denied ++;
-    	}
-    	denyLoginNames.clear();
-    	return denied;
+        int denied = 0;
+        final long now = System.currentTimeMillis();
+        for (final String playerName : denyLoginNames.keySet()){
+            final Long time = denyLoginNames.get(playerName);
+            if (time != null && time > now) denied ++;
+        }
+        denyLoginNames.clear();
+        return denied;
     }
-    
-    @Override
-	public void denyLogin(String playerName, long duration){
-		final long ts = System.currentTimeMillis() + duration;
-		playerName = playerName.trim().toLowerCase();
-		synchronized (denyLoginNames) {
-			final Long oldTs = denyLoginNames.get(playerName);
-			if (oldTs != null && ts < oldTs.longValue()) return;
-			denyLoginNames.put(playerName, ts);
-			// TODO: later maybe save these ?
-		}
-		checkDenyLoginsNames();
-	}
-	
-    @Override
-	public boolean isLoginDenied(String playerName){
-		return isLoginDenied(playerName, System.currentTimeMillis());
-	}
-	
-    @Override
-	public String[] getLoginDeniedPlayers() {
-		checkDenyLoginsNames();
-		String[] kicked = new String[denyLoginNames.size()];
-		denyLoginNames.keySet().toArray(kicked);
-		return kicked;
-	}
 
     @Override
-	public boolean isLoginDenied(String playerName, long time) {
-		playerName = playerName.trim().toLowerCase();
-		final Long oldTs = denyLoginNames.get(playerName);
-		if (oldTs == null) return false; 
-		else return time < oldTs.longValue();
-	}
-	
+    public void denyLogin(String playerName, long duration){
+        final long ts = System.currentTimeMillis() + duration;
+        playerName = playerName.trim().toLowerCase();
+        synchronized (denyLoginNames) {
+            final Long oldTs = denyLoginNames.get(playerName);
+            if (oldTs != null && ts < oldTs.longValue()) return;
+            denyLoginNames.put(playerName, ts);
+            // TODO: later maybe save these ?
+        }
+        checkDenyLoginsNames();
+    }
+
     @Override
-	public int sendAdminNotifyMessage(final String message){
-		if (useSubscriptions){
-			// TODO: Might respect console settings, or add extra config section (e.g. notifications).
-			return sendAdminNotifyMessageSubscriptions(message);
-		}
-		else{
-			return sendAdminNotifyMessageStored(message);
-		}
-	}
-    
+    public boolean isLoginDenied(String playerName){
+        return isLoginDenied(playerName, System.currentTimeMillis());
+    }
+
+    @Override
+    public String[] getLoginDeniedPlayers() {
+        checkDenyLoginsNames();
+        String[] kicked = new String[denyLoginNames.size()];
+        denyLoginNames.keySet().toArray(kicked);
+        return kicked;
+    }
+
+    @Override
+    public boolean isLoginDenied(String playerName, long time) {
+        playerName = playerName.trim().toLowerCase();
+        final Long oldTs = denyLoginNames.get(playerName);
+        if (oldTs == null) return false; 
+        else return time < oldTs.longValue();
+    }
+
+    @Override
+    public int sendAdminNotifyMessage(final String message){
+        if (useSubscriptions){
+            // TODO: Might respect console settings, or add extra config section (e.g. notifications).
+            return sendAdminNotifyMessageSubscriptions(message);
+        }
+        else{
+            return sendAdminNotifyMessageStored(message);
+        }
+    }
+
     private final boolean hasTurnedOffNotifications(final String playerName){
-    	final PlayerData data = DataManager.getPlayerData(playerName, false);
-    	return data != null && data.getNotifyOff();
+        final PlayerData data = DataManager.getPlayerData(playerName, false);
+        return data != null && data.getNotifyOff();
     }
-	
-	/**
-	 * Send notification to players with stored notify-permission (world changes, login, permissions are not re-checked here). 
-	 * @param message
-	 * @return
-	 */
-	public int sendAdminNotifyMessageStored(final String message){
-		final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
-		if (names == null) return 0;
-		int done = 0;
-		for (final String name : names){
-			if (hasTurnedOffNotifications(name)){
-				// Has turned off notifications.
-				continue;
-			}
-			final Player player = DataManager.getPlayerExact(name);
-			if (player != null){
-				player.sendMessage(message);
-				done ++;
-			}
-		}
-		return done;
-	}
-	
-	/**
-	 * Send notification to all CommandSenders found in permission subscriptions for the notify-permission as well as players that have stored permissions (those get re-checked here).
-	 * @param message
-	 * @return
-	 */
-	public int sendAdminNotifyMessageSubscriptions(final String message){
-		final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.NOTIFY);
-		final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
-		final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
-		for (final Permissible permissible : permissibles){
-			if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.NOTIFY)){
-				final CommandSender sender = (CommandSender) permissible;
-				if ((sender instanceof Player) && hasTurnedOffNotifications(((Player) sender).getName())){
-					continue;
-				}
 
-				sender.sendMessage(message);
-				done.add(sender.getName());
-			}
-		}
-		// Fall-back checking for players.
-		if (names != null){
-			for (final String name : names){
-				if (!done.contains(name)){
-					final Player player = DataManager.getPlayerExact(name);
-					if (player != null && player.hasPermission(Permissions.NOTIFY)){
-						if (hasTurnedOffNotifications(player.getName())){
-							continue;
-						}
-						player.sendMessage(message); 
-						done.add(name);
-					}
-				}
-			}
-		}
-		return done.size();
-	}
-	
-	/* (non-Javadoc)
-	 * @see fr.neatmonster.nocheatplus.components.NoCheatPlusAPI#sendMessageDelayed(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void sendMessageOnTick(final String playerName, final String message) {
-		playerMessageSender.sendMessageThreadSafe(playerName, message);
-	}
+    /**
+     * Send notification to players with stored notify-permission (world changes, login, permissions are not re-checked here). 
+     * @param message
+     * @return
+     */
+    public int sendAdminNotifyMessageStored(final String message){
+        final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
+        if (names == null) return 0;
+        int done = 0;
+        for (final String name : names){
+            if (hasTurnedOffNotifications(name)){
+                // Has turned off notifications.
+                continue;
+            }
+            final Player player = DataManager.getPlayerExact(name);
+            if (player != null){
+                player.sendMessage(message);
+                done ++;
+            }
+        }
+        return done;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> Collection<ComponentRegistry<T>> getComponentRegistries(final Class<ComponentRegistry<T>> clazz) {
-		final List<ComponentRegistry<T>> result = new LinkedList<ComponentRegistry<T>>();
-		for (final ComponentRegistry<?> registry : subRegistries){
-			if (clazz.isAssignableFrom(registry.getClass())){
-				try{
-					result.add((ComponentRegistry<T>) registry);
-				}
-				catch(Throwable t){
-					// Ignore.
-				}
-			}
-		}
-		return result;
-	}
+    /**
+     * Send notification to all CommandSenders found in permission subscriptions for the notify-permission as well as players that have stored permissions (those get re-checked here).
+     * @param message
+     * @return
+     */
+    public int sendAdminNotifyMessageSubscriptions(final String message){
+        final Set<Permissible> permissibles = Bukkit.getPluginManager().getPermissionSubscriptions(Permissions.NOTIFY);
+        final Set<String> names = nameSetPerms.getPlayers(Permissions.NOTIFY);
+        final Set<String> done = new HashSet<String>(permissibles.size() + (names == null ? 0 : names.size()));
+        for (final Permissible permissible : permissibles){
+            if (permissible instanceof CommandSender && permissible.hasPermission(Permissions.NOTIFY)){
+                final CommandSender sender = (CommandSender) permissible;
+                if ((sender instanceof Player) && hasTurnedOffNotifications(((Player) sender).getName())){
+                    continue;
+                }
 
-	/**
-	 * Convenience method to add components according to implemented interfaces,
+                sender.sendMessage(message);
+                done.add(sender.getName());
+            }
+        }
+        // Fall-back checking for players.
+        if (names != null){
+            for (final String name : names){
+                if (!done.contains(name)){
+                    final Player player = DataManager.getPlayerExact(name);
+                    if (player != null && player.hasPermission(Permissions.NOTIFY)){
+                        if (hasTurnedOffNotifications(player.getName())){
+                            continue;
+                        }
+                        player.sendMessage(message); 
+                        done.add(name);
+                    }
+                }
+            }
+        }
+        return done.size();
+    }
+
+    /* (non-Javadoc)
+     * @see fr.neatmonster.nocheatplus.components.NoCheatPlusAPI#sendMessageDelayed(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void sendMessageOnTick(final String playerName, final String message) {
+        playerMessageSender.sendMessageThreadSafe(playerName, message);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Collection<ComponentRegistry<T>> getComponentRegistries(final Class<ComponentRegistry<T>> clazz) {
+        final List<ComponentRegistry<T>> result = new LinkedList<ComponentRegistry<T>>();
+        for (final ComponentRegistry<?> registry : subRegistries){
+            if (clazz.isAssignableFrom(registry.getClass())){
+                try{
+                    result.add((ComponentRegistry<T>) registry);
+                }
+                catch(Throwable t){
+                    // Ignore.
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Convenience method to add components according to implemented interfaces,
      * like Listener, INotifyReload, INeedConfig.<br>
      * For the NoCheatPlus instance this must be done after the configuration has been initialized.
      * This will also register ComponentRegistry instances if given.
-	 */
-	@Override
-	public boolean addComponent(final Object obj) {
-		return addComponent(obj, true);
-	}
-	
-	/**
-	 * Convenience method to add components according to implemented interfaces,
+     */
+    @Override
+    public boolean addComponent(final Object obj) {
+        return addComponent(obj, true);
+    }
+
+    /**
+     * Convenience method to add components according to implemented interfaces,
      * like Listener, INotifyReload, INeedConfig.<br>
      * For the NoCheatPlus instance this must be done after the configuration has been initialized.
      * @param allowComponentRegistry Only registers ComponentRegistry instances if this is set to true. 
-	 */
-	@Override
-	public boolean addComponent(final Object obj, final boolean allowComponentRegistry) {
-		
-		// TODO: Allow to add ComponentFactory + contract (renew with reload etc.)?
-		if (obj == this) throw new IllegalArgumentException("Can not register NoCheatPlus with itself.");
-		
-		if (allComponents.contains(obj)){
-			// All added components are in here.
-			return false;
-		}
-		boolean added = false;
-		if (obj instanceof Listener) {
-			addListener((Listener) obj);
-			added = true;
-		}
-		if (obj instanceof INotifyReload) {
-			notifyReload.add((INotifyReload) obj);
-			if (obj instanceof INeedConfig) {
-				((INeedConfig) obj).onReload();
-			}
-			added = true;
-		}
-		if (obj instanceof TickListener){
-			TickTask.addTickListener((TickListener) obj);
-			added = true;
-		}
-		if (obj instanceof PermStateReceiver){
-			// No immediate update done.
-			permStateReceivers.add((PermStateReceiver) obj);
-			added = true;
-		}
-		if (obj instanceof MCAccessHolder){
-			// These will get notified in initMcAccess (iterates over allComponents).
-			((MCAccessHolder) obj).setMCAccess(getMCAccess());
-			added = true;
-		}
-		if (obj instanceof ConsistencyChecker){
-			consistencyCheckers.add((ConsistencyChecker) obj);
-			added = true;
-		}
-		if (obj instanceof JoinLeaveListener){
-			joinLeaveListeners.add((JoinLeaveListener) obj);
-			added = true;
-		}
-		if (obj instanceof DisableListener) {
-			disableListeners.add((DisableListener) obj);
-			added = true;
-		}
-		
-		// Add to sub registries.
-		for (final ComponentRegistry<?> registry : subRegistries){
-			final Object res = ReflectionUtil.invokeGenericMethodOneArg(registry, "addComponent", obj);
-			if (res != null && (res instanceof Boolean) && ((Boolean) res).booleanValue()){
-				added = true;
-			}
-		}
-		
-		// Add ComponentRegistry instances after adding to sub registries to prevent adding it to itself.
-		if (allowComponentRegistry && (obj instanceof ComponentRegistry<?>)){
-			subRegistries.add((ComponentRegistry<?>) obj);
-			added = true;
-		}
-		
-		// Components holding more components to register later.
-		if (obj instanceof IHoldSubComponents){
-			subComponentholders.add((IHoldSubComponents) obj);
-			onDemandTickListener.register();
-			added = true; // Convention.
-		}
-		
-		// Add to allComponents if in fact added.
-		if (added) allComponents.add(obj);
-		return added;
-	}
-	
-	/**
-	 * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
-	 * @param listener
-	 */
-	private void addListener(final Listener listener) {
-		// private: Use addComponent.
-		if (manageListeners){
-			String tag = "NoCheatPlus";
-			if (listener instanceof ComponentWithName){
-				tag = ((ComponentWithName) listener).getComponentName();
-			}
-			listenerManager.registerAllEventHandlers(listener, tag);
-			listeners.add(listener);
-		}
-		else{
-			Bukkit.getPluginManager().registerEvents(listener, this);
-			if (listener instanceof IHaveMethodOrder){
-				// TODO: Might log the order too, might prevent registration ?
-				// TODO: Alternative: queue listeners and register after startup (!)
-				LogUtil.logWarning("[NoCheatPlus] Listener demands registration order, but listeners are not managed: " + listener.getClass().getName());
-			}
-		}
-	}
-	
-	/**
-	 * Test if NCP uses the ListenerManager at all.
-	 * @return If so.
-	 */
-	public boolean doesManageListeners(){
-		return manageListeners;
-	}
+     */
+    @Override
+    public boolean addComponent(final Object obj, final boolean allowComponentRegistry) {
 
-	@Override
-	public void removeComponent(final Object obj) {
-		if (obj instanceof Listener){
-			listeners.remove(obj);
-			listenerManager.remove((Listener) obj);
-		}
-		if (obj instanceof PermStateReceiver){
-			permStateReceivers.remove((PermStateReceiver) obj);
-		}
-		if (obj instanceof TickListener){
-			TickTask.removeTickListener((TickListener) obj);
-		}
-		if (obj instanceof INotifyReload) {
-			notifyReload.remove(obj);
-		}
-		if (obj instanceof ConsistencyChecker){
-			consistencyCheckers.remove(obj);
-		}
-		if (obj instanceof JoinLeaveListener){
-			joinLeaveListeners.remove((JoinLeaveListener) obj);
-		}
-		if (obj instanceof DisableListener) {
-			disableListeners.remove(obj);
-		}
-		
-		// Remove sub registries.
-		if (obj instanceof ComponentRegistry<?>){
-			subRegistries.remove(obj);
-		}
-		// Remove from present registries, order prevents to remove from itself.
-		for (final ComponentRegistry<?> registry : subRegistries){
-			ReflectionUtil.invokeGenericMethodOneArg(registry, "removeComponent", obj);
-		}
+        // TODO: Allow to add ComponentFactory + contract (renew with reload etc.)?
+        if (obj == this) throw new IllegalArgumentException("Can not register NoCheatPlus with itself.");
 
-		allComponents.remove(obj);
-	}
-    
+        if (allComponents.contains(obj)){
+            // All added components are in here.
+            return false;
+        }
+        boolean added = false;
+        if (obj instanceof Listener) {
+            addListener((Listener) obj);
+            added = true;
+        }
+        if (obj instanceof INotifyReload) {
+            notifyReload.add((INotifyReload) obj);
+            if (obj instanceof INeedConfig) {
+                ((INeedConfig) obj).onReload();
+            }
+            added = true;
+        }
+        if (obj instanceof TickListener){
+            TickTask.addTickListener((TickListener) obj);
+            added = true;
+        }
+        if (obj instanceof PermStateReceiver){
+            // No immediate update done.
+            permStateReceivers.add((PermStateReceiver) obj);
+            added = true;
+        }
+        if (obj instanceof MCAccessHolder){
+            // These will get notified in initMcAccess (iterates over allComponents).
+            ((MCAccessHolder) obj).setMCAccess(getMCAccess());
+            added = true;
+        }
+        if (obj instanceof ConsistencyChecker){
+            consistencyCheckers.add((ConsistencyChecker) obj);
+            added = true;
+        }
+        if (obj instanceof JoinLeaveListener){
+            joinLeaveListeners.add((JoinLeaveListener) obj);
+            added = true;
+        }
+        if (obj instanceof DisableListener) {
+            disableListeners.add((DisableListener) obj);
+            added = true;
+        }
+
+        // Add to sub registries.
+        for (final ComponentRegistry<?> registry : subRegistries){
+            final Object res = ReflectionUtil.invokeGenericMethodOneArg(registry, "addComponent", obj);
+            if (res != null && (res instanceof Boolean) && ((Boolean) res).booleanValue()){
+                added = true;
+            }
+        }
+
+        // Add ComponentRegistry instances after adding to sub registries to prevent adding it to itself.
+        if (allowComponentRegistry && (obj instanceof ComponentRegistry<?>)){
+            subRegistries.add((ComponentRegistry<?>) obj);
+            added = true;
+        }
+
+        // Components holding more components to register later.
+        if (obj instanceof IHoldSubComponents){
+            subComponentholders.add((IHoldSubComponents) obj);
+            onDemandTickListener.register();
+            added = true; // Convention.
+        }
+
+        // Add to allComponents if in fact added.
+        if (added) allComponents.add(obj);
+        return added;
+    }
+
+    /**
+     * Interfaces checked for managed listeners: IHaveMethodOrder (method), ComponentWithName (tag)<br>
+     * @param listener
+     */
+    private void addListener(final Listener listener) {
+        // private: Use addComponent.
+        if (manageListeners){
+            String tag = "NoCheatPlus";
+            if (listener instanceof ComponentWithName){
+                tag = ((ComponentWithName) listener).getComponentName();
+            }
+            listenerManager.registerAllEventHandlers(listener, tag);
+            listeners.add(listener);
+        }
+        else{
+            Bukkit.getPluginManager().registerEvents(listener, this);
+            if (listener instanceof IHaveMethodOrder){
+                // TODO: Might log the order too, might prevent registration ?
+                // TODO: Alternative: queue listeners and register after startup (!)
+                LogUtil.logWarning("[NoCheatPlus] Listener demands registration order, but listeners are not managed: " + listener.getClass().getName());
+            }
+        }
+    }
+
+    /**
+     * Test if NCP uses the ListenerManager at all.
+     * @return If so.
+     */
+    public boolean doesManageListeners(){
+        return manageListeners;
+    }
+
+    @Override
+    public void removeComponent(final Object obj) {
+        if (obj instanceof Listener){
+            listeners.remove(obj);
+            listenerManager.remove((Listener) obj);
+        }
+        if (obj instanceof PermStateReceiver){
+            permStateReceivers.remove((PermStateReceiver) obj);
+        }
+        if (obj instanceof TickListener){
+            TickTask.removeTickListener((TickListener) obj);
+        }
+        if (obj instanceof INotifyReload) {
+            notifyReload.remove(obj);
+        }
+        if (obj instanceof ConsistencyChecker){
+            consistencyCheckers.remove(obj);
+        }
+        if (obj instanceof JoinLeaveListener){
+            joinLeaveListeners.remove((JoinLeaveListener) obj);
+        }
+        if (obj instanceof DisableListener) {
+            disableListeners.remove(obj);
+        }
+
+        // Remove sub registries.
+        if (obj instanceof ComponentRegistry<?>){
+            subRegistries.remove(obj);
+        }
+        // Remove from present registries, order prevents to remove from itself.
+        for (final ComponentRegistry<?> registry : subRegistries){
+            ReflectionUtil.invokeGenericMethodOneArg(registry, "removeComponent", obj);
+        }
+
+        allComponents.remove(obj);
+    }
+
     /* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onDisable()
      */
     @Override
     public void onDisable() {
-        
-    	final boolean verbose = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG);
-    	
-		// Remove listener references.
-    	if (verbose){
-    		if (listenerManager.hasListenerMethods()) LogUtil.logInfo("[NoCheatPlus] Cleanup ListenerManager...");
-    		else LogUtil.logInfo("[NoCheatPlus] (ListenerManager not in use, prevent registering...)");
-    	}
-		listenerManager.setRegisterDirectly(false);
-		listenerManager.clear();
-		
-		BukkitScheduler sched = getServer().getScheduler();
-		
-		// Stop data-man task.
-		if (dataManTaskId != -1){
-			sched.cancelTask(dataManTaskId);
-			dataManTaskId = -1;
-		}
-        
+
+        final boolean verbose = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG);
+
+        // Remove listener references.
+        if (verbose){
+            if (listenerManager.hasListenerMethods()) {
+                LogUtil.logInfo("[NoCheatPlus] Cleanup ListenerManager...");
+            }
+            else {
+                LogUtil.logInfo("[NoCheatPlus] (ListenerManager not in use, prevent registering...)");
+            }
+        }
+        listenerManager.setRegisterDirectly(false);
+        listenerManager.clear();
+
+        BukkitScheduler sched = getServer().getScheduler();
+
+        // Stop data-man task.
+        if (dataManTaskId != -1){
+            sched.cancelTask(dataManTaskId);
+            dataManTaskId = -1;
+        }
+
         // Stop the tickTask.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop TickTask...");
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Stop TickTask...");
+        }
         TickTask.setLocked(true);
         TickTask.purge();
         TickTask.cancel();
         TickTask.removeAllTickListeners();
         // (Keep the tick task locked!)
-		
-		// Stop consistency checking task.
-		if (consistencyCheckerTaskId != -1){
-			sched.cancelTask(consistencyCheckerTaskId);
-			consistencyCheckerTaskId = -1;
-		}
-        
+
+        // Stop consistency checking task.
+        if (consistencyCheckerTaskId != -1){
+            sched.cancelTask(consistencyCheckerTaskId);
+            consistencyCheckerTaskId = -1;
+        }
+
         // Just to be sure nothing gets left out.
-        if (verbose) LogUtil.logInfo("[NoCheatPlus] Stop all remaining tasks...");
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Stop all remaining tasks...");
+        }
         sched.cancelTasks(this);
 
         // Exemptions cleanup.
-        if (verbose) LogUtil.logInfo("[NoCheatPlus] Reset ExemptionManager...");
-        NCPExemptionManager.clear();
-        
-		// Data cleanup.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] onDisable calls (include DataManager cleanup)...");
-		for (final DisableListener dl : disableListeners) {
-			try {
-				dl.onDisable();
-			} catch (Throwable t) {
-				// bad :)
-				LogUtil.logSevere("DisableListener (" + dl.getClass().getName() + "): " + t.getClass().getSimpleName() + " / " + t.getMessage());
-				LogUtil.logSevere(t);
-			}
-		}
-		
-		// Write some debug/statistics.
-		final Counters counters = getGenericInstance(Counters.class);
-		if (counters != null) {
-			LogUtil.logInfo(counters.getMergedCountsString(true));
-		}
-		
-		// Hooks:
-		// (Expect external plugins to unregister their hooks on their own.)
-		// (No native hooks present, yet.)
-     	
-		// Unregister all added components explicitly.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Unregister all registered components...");
-		final ArrayList<Object> allComponents = new ArrayList<Object>(this.allComponents);
-        for (int i = allComponents.size() - 1; i >= 0; i--){
-        	removeComponent(allComponents.get(i));
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Reset ExemptionManager...");
         }
-        
+        NCPExemptionManager.clear();
+
+        // Data cleanup.
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] onDisable calls (include DataManager cleanup)...");
+        }
+        for (final DisableListener dl : disableListeners) {
+            try {
+                dl.onDisable();
+            } catch (Throwable t) {
+                // bad :)
+                LogUtil.logSevere("DisableListener (" + dl.getClass().getName() + "): " + t.getClass().getSimpleName() + " / " + t.getMessage());
+                LogUtil.logSevere(t);
+            }
+        }
+
+        // Write some debug/statistics.
+        final Counters counters = getGenericInstance(Counters.class);
+        if (verbose && counters != null) {
+            LogUtil.logInfo(counters.getMergedCountsString(true));
+        }
+
+        // Hooks:
+        // (Expect external plugins to unregister their hooks on their own.)
+        // (No native hooks present, yet.)
+
+        // Unregister all added components explicitly.
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Unregister all registered components...");
+        }
+        final ArrayList<Object> allComponents = new ArrayList<Object>(this.allComponents);
+        for (int i = allComponents.size() - 1; i >= 0; i--){
+            removeComponent(allComponents.get(i));
+        }
+
         // Cleanup BlockProperties.
-        if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup BlockProperties...");
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Cleanup BlockProperties...");
+        }
         BlockProperties.cleanup();
-        
-        if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup some mappings...");
+
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Cleanup some mappings...");
+        }
         // Remove listeners.
         listeners.clear();
         // Remove config listeners.
         notifyReload.clear();
         // World specific permissions.
-		permStateReceivers.clear();
-		// Sub registries.
-		subRegistries.clear();
-		// Just in case: clear the subComponentHolders.
-		subComponentholders.clear();
-		// Generic instances registry.
-		genericInstances.clear();
+        permStateReceivers.clear();
+        // Sub registries.
+        subRegistries.clear();
+        // Just in case: clear the subComponentHolders.
+        subComponentholders.clear();
+        // Generic instances registry.
+        genericInstances.clear();
 
-		// Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
-		if (changedCommands != null){
-			changedCommands.clear();
-			changedCommands = null;
-		}
-//		// Restore changed commands.
-//		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
-//		undoCommandChanges();
-		
-		// Cleanup the configuration manager.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup ConfigManager...");
-		ConfigManager.cleanup();
-		
-		// Cleanup file logger.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] Cleanup file logger...");
-		StaticLogFile.cleanup();
+        // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
+        if (changedCommands != null){
+            changedCommands.clear();
+            changedCommands = null;
+        }
+        //		// Restore changed commands.
+        //		if (verbose) LogUtil.logInfo("[NoCheatPlus] Undo command changes...");
+        //		undoCommandChanges();
 
-		// Tell the server administrator the we finished unloading NoCheatPlus.
-		if (verbose) LogUtil.logInfo("[NoCheatPlus] All cleanup done.");
-		final PluginDescriptionFile pdfFile = getDescription();
-		LogUtil.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
-	}
+        // Cleanup the configuration manager.
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Cleanup ConfigManager...");
+        }
+        ConfigManager.cleanup();
 
-	/**
-	 * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
-	 * @deprecated Leads to compatibility issues with NPC plugins such as Citizens 2, due to recalculation of permissions (specifically during disabling).
-	 */
-	public void undoCommandChanges() {
-		if (changedCommands != null){
-			while (!changedCommands.isEmpty()){
-				final CommandProtectionEntry entry = changedCommands.remove(changedCommands.size() - 1);
-				entry.restore();
-			}
-			changedCommands = null;
-		}
-	}
-	
-	protected void setupCommandProtection() {
-		// TODO: Might re-check with plugins enabling during runtime (!).
-		final List<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
-		// Read lists and messages from config.
-		final ConfigFile config = ConfigManager.getConfigFile();
-		// (Might add options to invert selection.)
-		// "No permission".
-		// TODO: Could/should set permission message to null here (server default), might use keyword "default".
-		final List<String> noPerm = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS);
-		if (noPerm != null && !noPerm.isEmpty()){
-			final String noPermMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG));
-			changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noPerm,  true, false, noPermMsg));
-		}
-		// "Unknown command", override the other option.
-		final List<String> noCommand = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS);
-		if (noCommand != null && !noCommand.isEmpty()){
-			final String noCommandMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG));
-			changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
-		}
-		// Add to changes history for undoing.
-		if (this.changedCommands == null) {
-			this.changedCommands = changedCommands;
-		}
-		else {
-			this.changedCommands.addAll(changedCommands);
-		}
-	}
+        // Cleanup file logger.
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] Cleanup file logger...");
+        }
+        StaticLogFile.cleanup();
 
-	/* (non-Javadoc)
-	 * @see org.bukkit.plugin.java.JavaPlugin#onLoad()
-	 */
-	@Override
-	public void onLoad() {
-		NCPAPIProvider.setNoCheatPlusAPI(this);
-	}
+        // Tell the server administrator the we finished unloading NoCheatPlus.
+        if (verbose) {
+            LogUtil.logInfo("[NoCheatPlus] All cleanup done.");
+        }
+        final PluginDescriptionFile pdfFile = getDescription();
+        LogUtil.logInfo("[NoCheatPlus] Version " + pdfFile.getVersion() + " is disabled.");
+    }
 
-	/* (non-Javadoc)
+    /**
+     * Does not undo 100%, but restore old permission, permission-message, label (unlikely to be changed), permission default.
+     * @deprecated Leads to compatibility issues with NPC plugins such as Citizens 2, due to recalculation of permissions (specifically during disabling).
+     */
+    public void undoCommandChanges() {
+        if (changedCommands != null){
+            while (!changedCommands.isEmpty()){
+                final CommandProtectionEntry entry = changedCommands.remove(changedCommands.size() - 1);
+                entry.restore();
+            }
+            changedCommands = null;
+        }
+    }
+
+    protected void setupCommandProtection() {
+        // TODO: Might re-check with plugins enabling during runtime (!).
+        final List<CommandProtectionEntry> changedCommands = new LinkedList<CommandProtectionEntry>();
+        // Read lists and messages from config.
+        final ConfigFile config = ConfigManager.getConfigFile();
+        // (Might add options to invert selection.)
+        // "No permission".
+        // TODO: Could/should set permission message to null here (server default), might use keyword "default".
+        final List<String> noPerm = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_CMDS);
+        if (noPerm != null && !noPerm.isEmpty()){
+            final String noPermMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG));
+            changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noPerm,  true, false, noPermMsg));
+        }
+        // "Unknown command", override the other option.
+        final List<String> noCommand = config.getStringList(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_CMDS);
+        if (noCommand != null && !noCommand.isEmpty()){
+            final String noCommandMsg = ColorUtil.replaceColors(ConfigManager.getConfigFile().getString(ConfPaths.PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG));
+            changedCommands.addAll(PermissionUtil.protectCommands(Permissions.FILTER_COMMAND, noCommand,  true, false, noCommandMsg));
+        }
+        // Add to changes history for undoing.
+        if (this.changedCommands == null) {
+            this.changedCommands = changedCommands;
+        }
+        else {
+            this.changedCommands.addAll(changedCommands);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.bukkit.plugin.java.JavaPlugin#onLoad()
+     */
+    @Override
+    public void onLoad() {
+        NCPAPIProvider.setNoCheatPlusAPI(this);
+    }
+
+    /* (non-Javadoc)
      * @see org.bukkit.plugin.java.JavaPlugin#onEnable()
      */
     @Override
     public void onEnable() {
-    	
-    	// Reset TickTask (just in case).
-    	TickTask.setLocked(true);
-    	TickTask.purge();
-    	TickTask.cancel();
-    	TickTask.reset();
-    	
-    	// Register some generic stuff.
-    	// Counters: debugging purposes, maybe integrated for statistics later.
-    	registerGenericInstance(new Counters());
-    	
+
+        // Reset TickTask (just in case).
+        TickTask.setLocked(true);
+        TickTask.purge();
+        TickTask.cancel();
+        TickTask.reset();
+
+        // Register some generic stuff.
+        // Counters: debugging purposes, maybe integrated for statistics later.
+        registerGenericInstance(new Counters());
+
         // Read the configuration files.
         ConfigManager.init(this);
-        
+
         // Setup file logger.
         StaticLogFile.setupLogger(new File(getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
-        
+
         final ConfigFile config = ConfigManager.getConfigFile();
-        
+
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
-        
+
         // Initialize MCAccess.
         initMCAccess(config);
-        
+
         // Initialize BlockProperties.
-		initBlockProperties(config);
-		
-		// Initialize data manager.
-		disableListeners.add(0, dataMan);
-		dataMan.onEnable();
-        
+        initBlockProperties(config);
+
+        // Initialize data manager.
+        disableListeners.add(0, dataMan);
+        dataMan.onEnable();
+
         // Allow entries to TickTask (just in case).
         TickTask.setLocked(false);
 
-		// List the events listeners and register.
-		manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
-		if (manageListeners) {
-			listenerManager.setRegisterDirectly(true);
-			listenerManager.registerAllWithBukkit();
-		}
-		else{
-			// Just for safety.
-			listenerManager.setRegisterDirectly(false);
-			listenerManager.clear();
-		}
-		
-		@SetupOrder(priority = - 100)
-		class ReloadHook implements INotifyReload{
-			@Override
-			public void onReload() {
-				// Only for reloading, not INeedConfig.
-				processReload();
-			}
-		}
-		
-		// Add the "low level" system components first.
-		for (final Object obj : new Object[]{
-				nameSetPerms,
-				getCoreListener(),
-				// Put ReloadListener first, because Checks could also listen to it.
-				new ReloadHook(),
-	        	NCPExemptionManager.getListener(),
-	        	new ConsistencyChecker() {
-					@Override
-					public void checkConsistency(final Player[] onlinePlayers) {
-						NCPExemptionManager.checkConsistency(onlinePlayers);
-					}
-				},
-	        	dataMan,
-		}){
-			addComponent(obj);
-			// Register sub-components (allow later added to use registries, if any).
-            processQueuedSubComponentHolders();
-		}
-        
-		// Register "higher level" components (check listeners).
+        // List the events listeners and register.
+        manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
+        if (manageListeners) {
+            listenerManager.setRegisterDirectly(true);
+            listenerManager.registerAllWithBukkit();
+        }
+        else{
+            // Just for safety.
+            listenerManager.setRegisterDirectly(false);
+            listenerManager.clear();
+        }
+
+        @SetupOrder(priority = - 100)
+        class ReloadHook implements INotifyReload{
+            @Override
+            public void onReload() {
+                // Only for reloading, not INeedConfig.
+                processReload();
+            }
+        }
+
+        // Add the "low level" system components first.
         for (final Object obj : new Object[]{
-        	new BlockInteractListener(),
-        	new BlockBreakListener(),
-        	new BlockPlaceListener(),
-        	new ChatListener(),
-        	new CombinedListener(),
-        	// Do mind registration order: Combined must come before Fight.
-        	new FightListener(),
-        	new InventoryListener(),
-        	new MovingListener(),
+                nameSetPerms,
+                getCoreListener(),
+                // Put ReloadListener first, because Checks could also listen to it.
+                new ReloadHook(),
+                NCPExemptionManager.getListener(),
+                new ConsistencyChecker() {
+                    @Override
+                    public void checkConsistency(final Player[] onlinePlayers) {
+                        NCPExemptionManager.checkConsistency(onlinePlayers);
+                    }
+                },
+                dataMan,
         }){
-        	addComponent(obj);
+            addComponent(obj);
             // Register sub-components (allow later added to use registries, if any).
             processQueuedSubComponentHolders();
         }
-        
+
+        // Register "higher level" components (check listeners).
+        for (final Object obj : new Object[]{
+                new BlockInteractListener(),
+                new BlockBreakListener(),
+                new BlockPlaceListener(),
+                new ChatListener(),
+                new CombinedListener(),
+                // Do mind registration order: Combined must come before Fight.
+                new FightListener(),
+                new InventoryListener(),
+                new MovingListener(),
+        }){
+            addComponent(obj);
+            // Register sub-components (allow later added to use registries, if any).
+            processQueuedSubComponentHolders();
+        }
+
         // Register optional default components.
         final DefaultComponentFactory dcf = new DefaultComponentFactory();
         for (final Object obj : dcf.getAvailableComponentsOnEnable(this)){
-        	addComponent(obj);
-        	// Register sub-components to enable registries for optional components.
+            addComponent(obj);
+            // Register sub-components to enable registries for optional components.
             processQueuedSubComponentHolders();
         }
-        
+
         // Register the commands handler.
         final PluginCommand command = getCommand("nocheatplus");
         final NoCheatPlusCommand commandHandler = new NoCheatPlusCommand(this, notifyReload);
         command.setExecutor(commandHandler);
         // (CommandHandler is TabExecutor.)
-        
+
         // Set up the tick task.
         TickTask.start(this);
-        
+
         this.dataManTaskId  = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-			@Override
-			public void run() {
-				dataMan.checkExpiration();
-			}
-		}, 1207, 1207);
-        
+            @Override
+            public void run() {
+                dataMan.checkExpiration();
+            }
+        }, 1207, 1207);
+
         // Set up consistency checking.
         scheduleConsistencyCheckers();
 
-//        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
-//            // Is a new update available?
-//        	final int timeout = config.getInt(ConfPaths.MISCELLANEOUS_UPDATETIMEOUT, 4) * 1000;
-//        	getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
-//				@Override
-//				public void run() {
-//					updateAvailable = Updates.checkForUpdates(getDescription().getVersion(), timeout);
-//				}
-//			});
-//        }
+        //        if (config.getBoolean(ConfPaths.MISCELLANEOUS_CHECKFORUPDATES)){
+        //            // Is a new update available?
+        //        	final int timeout = config.getInt(ConfPaths.MISCELLANEOUS_UPDATETIMEOUT, 4) * 1000;
+        //        	getServer().getScheduler().scheduleAsyncDelayedTask(this, new Runnable() {
+        //				@Override
+        //				public void run() {
+        //					updateAvailable = Updates.checkForUpdates(getDescription().getVersion(), timeout);
+        //				}
+        //			});
+        //        }
 
         // Is the version the configuration was created with consistent with the current one?
         configProblems = Updates.isConfigUpToDate(config);
         if (configProblems != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)){
-        	// Could use custom prefix from logging, however ncp should be mentioned then.
-        	LogUtil.logWarning("[NoCheatPlus] " + configProblems);
+            // Could use custom prefix from logging, however ncp should be mentioned then.
+            LogUtil.logWarning("[NoCheatPlus] " + configProblems);
         }
-		
-		// Care for already online players.
-		final Player[] onlinePlayers = getServer().getOnlinePlayers();
-		// TODO: re-map ExemptionManager !
-		// TODO: Disable all checks for these players for one tick ?
-		// TODO: Prepare check data for players [problem: permissions]?
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			@Override
-			public void run() {
-				postEnable(onlinePlayers,
-					new Runnable() {
-						@Override
-						public void run() {
-					        // Set child permissions for commands for faster checking.
-					        PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FILTER_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
-						}
-					},
-					new Runnable() {
-						@Override
-						public void run() {
-							if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
-								setupCommandProtection();
-							}
-						}
-					}
-					);
-			}
-		});
 
-		// Tell the server administrator that we finished loading NoCheatPlus now.
-		LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
-	}
-    
+        // Care for already online players.
+        final Player[] onlinePlayers = getServer().getOnlinePlayers();
+        // TODO: re-map ExemptionManager !
+        // TODO: Disable all checks for these players for one tick ?
+        // TODO: Prepare check data for players [problem: permissions]?
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+            @Override
+            public void run() {
+                postEnable(onlinePlayers,
+                        new Runnable() {
+                    @Override
+                    public void run() {
+                        // Set child permissions for commands for faster checking.
+                        PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FILTER_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
+                    }
+                },
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
+                            setupCommandProtection();
+                        }
+                    }
+                }
+                        );
+            }
+        });
+
+        // Tell the server administrator that we finished loading NoCheatPlus now.
+        LogUtil.logInfo("[NoCheatPlus] Version " + getDescription().getVersion() + " is enabled.");
+    }
+
     /**
      * Actions to be done after enable of  all plugins. This aims at reloading mainly.
      */
@@ -884,95 +908,95 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         LogUtil.logInfo("[NoCheatPlus] Post-enable finished.");
     }
 
-	/**
+    /**
      * Empties and registers the subComponentHolders list.
      */
     protected void processQueuedSubComponentHolders(){
-    	if (subComponentholders.isEmpty()) return;
-    	final List<IHoldSubComponents> copied = new ArrayList<IHoldSubComponents>(subComponentholders);
-    	subComponentholders.clear();
-    	for (final IHoldSubComponents holder : copied){
-    		for (final Object component : holder.getSubComponents()){
-    			addComponent(component);
-    		}
-    	}
+        if (subComponentholders.isEmpty()) return;
+        final List<IHoldSubComponents> copied = new ArrayList<IHoldSubComponents>(subComponentholders);
+        subComponentholders.clear();
+        for (final IHoldSubComponents holder : copied){
+            for (final Object component : holder.getSubComponents()){
+                addComponent(component);
+            }
+        }
     }
-    
+
     /**
      * All action done on reload.
      */
     protected void processReload(){
-    	final ConfigFile config = ConfigManager.getConfigFile();
-    	configProblems = Updates.isConfigUpToDate(config);
-    	// TODO: Process registered ComponentFactory instances.
-		// Set up MCAccess.
-		initMCAccess(config);
-		// Initialize BlockProperties
-		initBlockProperties(config);
-		// Reset Command protection.
-		undoCommandChanges();
-		if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
-			setupCommandProtection();
-		}
-		// (Re-) schedule consistency checking.
-		scheduleConsistencyCheckers();
-		// Cache some things.
-		useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
+        final ConfigFile config = ConfigManager.getConfigFile();
+        configProblems = Updates.isConfigUpToDate(config);
+        // TODO: Process registered ComponentFactory instances.
+        // Set up MCAccess.
+        initMCAccess(config);
+        // Initialize BlockProperties
+        initBlockProperties(config);
+        // Reset Command protection.
+        undoCommandChanges();
+        if (config.getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
+            setupCommandProtection();
+        }
+        // (Re-) schedule consistency checking.
+        scheduleConsistencyCheckers();
+        // Cache some things.
+        useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
     }
-    
-	@Override
-	public MCAccess getMCAccess(){
-		if (mcAccess == null) initMCAccess();
-		return mcAccess;
-	}
-	
-	/**
-	 * Fall-back method to initialize from factory, only if not yet set. Uses the BukkitScheduler to ensure this works if called from async checks.
-	 */
-	private void initMCAccess() {
-		getServer().getScheduler().callSyncMethod(this, new Callable<MCAccess>() {
-			@Override
-			public MCAccess call() throws Exception {
-				if (mcAccess != null) return mcAccess;
-				return initMCAccess(ConfigManager.getConfigFile());
-			}
-		});
-	}
-    
+
+    @Override
+    public MCAccess getMCAccess(){
+        if (mcAccess == null) initMCAccess();
+        return mcAccess;
+    }
+
+    /**
+     * Fall-back method to initialize from factory, only if not yet set. Uses the BukkitScheduler to ensure this works if called from async checks.
+     */
+    private void initMCAccess() {
+        getServer().getScheduler().callSyncMethod(this, new Callable<MCAccess>() {
+            @Override
+            public MCAccess call() throws Exception {
+                if (mcAccess != null) return mcAccess;
+                return initMCAccess(ConfigManager.getConfigFile());
+            }
+        });
+    }
+
     /**
      * Re-setup MCAccess from internal factory and pass it to MCAccessHolder components, only call from the main thread.
      * @param config
      */
     public MCAccess initMCAccess(final ConfigFile config) {
-    	// Reset MCAccess.
-    	// TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
-    	final MCAccess mcAccess = new MCAccessFactory().getMCAccess(config.getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY));
-    	setMCAccess(mcAccess);
-    	return mcAccess;
-	}
-    
+        // Reset MCAccess.
+        // TODO: Might fire a NCPSetMCAccessFromFactoryEvent (include getting and setting)!
+        final MCAccess mcAccess = new MCAccessFactory().getMCAccess(config.getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY));
+        setMCAccess(mcAccess);
+        return mcAccess;
+    }
+
     /**
      * Set and propagate to registered MCAccessHolder instances.
      */
     @Override
     public void setMCAccess(final MCAccess mcAccess){
-    	// Just sets it and propagates it.
-    	// TODO: Might fire a NCPSetMCAccessEvent (include getting and setting)!
-    	this.mcAccess = mcAccess;
-    	for (final Object obj : this.allComponents){
-    		if (obj instanceof MCAccessHolder){
-    			try{
-    				((MCAccessHolder) obj).setMCAccess(mcAccess);
-    			} catch(Throwable t){
-    				LogUtil.logSevere("[NoCheatPlus] MCAccessHolder(" + obj.getClass().getName() + ") failed to set MCAccess: " + t.getClass().getSimpleName());
-    				LogUtil.logSevere(t);
-    			}
-    		}
-    	}
-		LogUtil.logInfo("[NoCheatPlus] McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
+        // Just sets it and propagates it.
+        // TODO: Might fire a NCPSetMCAccessEvent (include getting and setting)!
+        this.mcAccess = mcAccess;
+        for (final Object obj : this.allComponents){
+            if (obj instanceof MCAccessHolder){
+                try{
+                    ((MCAccessHolder) obj).setMCAccess(mcAccess);
+                } catch(Throwable t){
+                    LogUtil.logSevere("[NoCheatPlus] MCAccessHolder(" + obj.getClass().getName() + ") failed to set MCAccess: " + t.getClass().getSimpleName());
+                    LogUtil.logSevere(t);
+                }
+            }
+        }
+        LogUtil.logInfo("[NoCheatPlus] McAccess set to: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag());
     }
 
-	/**
+    /**
      * Initialize BlockProperties, including config.
      */
     protected void initBlockProperties(ConfigFile config){
@@ -981,225 +1005,225 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         BlockProperties.applyConfig(config, ConfPaths.COMPATIBILITY_BLOCKS);
         // Schedule dumping the blocks properties (to let other plugins override).
         Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-			@Override
-			public void run() {
-		        // Debug information about unknown blocks.
-		        // (Probably removed later.)
-				ConfigFile config = ConfigManager.getConfigFile();
-		        BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, config.getBoolean(ConfPaths.BLOCKBREAK_DEBUG, config.getBoolean(ConfPaths.CHECKS_DEBUG, false))));
-			}
-		});
+            @Override
+            public void run() {
+                // Debug information about unknown blocks.
+                // (Probably removed later.)
+                ConfigFile config = ConfigManager.getConfigFile();
+                BlockProperties.dumpBlocks(config.getBoolean(ConfPaths.BLOCKBREAK_FASTBREAK_DEBUG, config.getBoolean(ConfPaths.BLOCKBREAK_DEBUG, config.getBoolean(ConfPaths.CHECKS_DEBUG, false))));
+            }
+        });
     }
-    
+
     /**
-	 * Quick solution to hide the listener methods, expect refactoring.
-	 * @return
-	 */
-	private Listener getCoreListener() {
-		return new NCPListener() {
-			@EventHandler(priority = EventPriority.NORMAL)
-			public void onPlayerLogin(final PlayerLoginEvent event) {
-				// (NORMAL to have chat checks come after this.)
-				if (event.getResult() != Result.ALLOWED) return;
-				final Player player = event.getPlayer();
-				// Check if login is denied:
-				checkDenyLoginsNames();
-				if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) return;
-				if (isLoginDenied(player.getName())) {
-					// TODO: display time for which the player is banned.
-					event.setResult(Result.KICK_OTHER);
-					// TODO: Make message configurable.
-					event.setKickMessage("You are temporarily denied to join this server.");
-				}
-			}
-			
-			@EventHandler(priority = EventPriority.LOWEST) // Do update comment in NoCheatPlusAPI with changing.
-			public void onPlayerJoinLowest(final PlayerJoinEvent event) {
-				final Player player = event.getPlayer();
-				updatePermStateReceivers(player);
-			}
+     * Quick solution to hide the listener methods, expect refactoring.
+     * @return
+     */
+    private Listener getCoreListener() {
+        return new NCPListener() {
+            @EventHandler(priority = EventPriority.NORMAL)
+            public void onPlayerLogin(final PlayerLoginEvent event) {
+                // (NORMAL to have chat checks come after this.)
+                if (event.getResult() != Result.ALLOWED) return;
+                final Player player = event.getPlayer();
+                // Check if login is denied:
+                checkDenyLoginsNames();
+                if (player.hasPermission(Permissions.BYPASS_DENY_LOGIN)) return;
+                if (isLoginDenied(player.getName())) {
+                    // TODO: display time for which the player is banned.
+                    event.setResult(Result.KICK_OTHER);
+                    // TODO: Make message configurable.
+                    event.setKickMessage("You are temporarily denied to join this server.");
+                }
+            }
 
-			@EventHandler(priority = EventPriority.LOW)
-			public void onPlayerJoinLow(final PlayerJoinEvent event) {
-				// LOWEST is for DataMan and CombinedListener.
-				onJoinLow(event.getPlayer());
-			}
+            @EventHandler(priority = EventPriority.LOWEST) // Do update comment in NoCheatPlusAPI with changing.
+            public void onPlayerJoinLowest(final PlayerJoinEvent event) {
+                final Player player = event.getPlayer();
+                updatePermStateReceivers(player);
+            }
 
-			@EventHandler(priority = EventPriority.LOWEST)
-			public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
-			{
-				final Player player = event.getPlayer();
-				updatePermStateReceivers(player);
-			}
+            @EventHandler(priority = EventPriority.LOW)
+            public void onPlayerJoinLow(final PlayerJoinEvent event) {
+                // LOWEST is for DataMan and CombinedListener.
+                onJoinLow(event.getPlayer());
+            }
 
-			@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-			public void onPlayerKick(final PlayerKickEvent event) {
-				onLeave(event.getPlayer());
-			}
+            @EventHandler(priority = EventPriority.LOWEST)
+            public void onPlayerchangedWorld(final PlayerChangedWorldEvent event)
+            {
+                final Player player = event.getPlayer();
+                updatePermStateReceivers(player);
+            }
 
-			@EventHandler(priority = EventPriority.MONITOR)
-			public void onPlayerQuit(final PlayerQuitEvent event) {
-				onLeave(event.getPlayer());
-			}
-		};
-	}
-	
-	protected void onJoinLow(final Player player){
-		final String playerName = player.getName();
-		if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY)){
-			// Login notifications...
-			final PlayerData data = DataManager.getPlayerData(playerName, true);
-//			// Update available.
-//			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
-			
-			// Inconsistent config version.
-			if (configProblems != null && ConfigManager.getConfigFile().getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
-				// Could use custom prefix from logging, however ncp should be mentioned then.
-				sendMessageOnTick(playerName, ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
-			}
-			// Message if notify is turned off.
-			if (data.getNotifyOff()) {
-				sendMessageOnTick(playerName, MSG_NOTIFY_OFF);
-			}
-		}
-		// JoinLeaveListenerS: Do update comment in NoCheatPlusAPI with changing event priority.
-		for (final JoinLeaveListener jlListener : joinLeaveListeners){
-			try{
-				jlListener.playerJoins(player);
-			}
-			catch(Throwable t){
-				LogUtil.logSevere("[NoCheatPlus] JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (join): " + t.getClass().getSimpleName());
-				LogUtil.logSevere(t);
-			}
-		}
-		// Mod message (left on low instead of lowest to allow some permissions plugins compatibility).
-		ModUtil.motdOnJoin(player);
-	}
-	
-	protected void onLeave(final Player player) {
-		for (final PermStateReceiver pr : permStateReceivers) {
-			pr.removePlayer(player.getName());
-		}
-		for (final JoinLeaveListener jlListener : joinLeaveListeners){
-			try{
-				jlListener.playerLeaves(player);
-			}
-			catch(Throwable t){
-				LogUtil.logSevere("[NoCheatPlus] JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (leave): " + t.getClass().getSimpleName());
-				LogUtil.logSevere(t);
-			}
-		}
-	}
-	
-	protected void updatePermStateReceivers(final Player player) {
-		final Map<String, Boolean> checked = new HashMap<String, Boolean>(20);
-		final String name = player.getName();
-		for (final PermStateReceiver pr : permStateReceivers) {
-			for (final String permission : pr.getDefaultPermissions()) {
-				Boolean state = checked.get(permission);
-				if (state == null) {
-					state = player.hasPermission(permission);
-					checked.put(permission, state);
-				}
-				pr.setPermission(name, permission, state);
-			}
-		}
-	}
-	
-	protected void scheduleConsistencyCheckers(){
-		BukkitScheduler sched = getServer().getScheduler();
-		if (consistencyCheckerTaskId != -1){
-			sched.cancelTask(consistencyCheckerTaskId);
-		}
-		ConfigFile config = ConfigManager.getConfigFile();
-		if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true)) return;
-		// Schedule task in seconds.
-		final long delay = 20L * config.getInt(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 1, 3600, 10);
-		consistencyCheckerTaskId = sched.scheduleSyncRepeatingTask(this, new Runnable() {
-			@Override
-			public void run() {
-				runConsistencyChecks();
-			}
-		}, delay, delay );
-	}
-	
-	/**
-	 * Run consistency checks for at most the configured duration. If not finished, a task will be scheduled to continue.
-	 */
-	protected void runConsistencyChecks(){
-		final long tStart = System.currentTimeMillis();
-		final ConfigFile config = ConfigManager.getConfigFile();
-		if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK) || consistencyCheckers.isEmpty()){
-			consistencyCheckerIndex = 0;
-			return;
-		}
-		final long tEnd = tStart + config.getLong(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 1, 50, 2);
-		if (consistencyCheckerIndex >= consistencyCheckers.size()) consistencyCheckerIndex = 0;
-		final Player[] onlinePlayers = getServer().getOnlinePlayers();
-		// Loop
-		while (consistencyCheckerIndex < consistencyCheckers.size()){
-			final ConsistencyChecker checker = consistencyCheckers.get(consistencyCheckerIndex);
-			try{
-				checker.checkConsistency(onlinePlayers);
-			}
-			catch (Throwable t){
-				LogUtil.logSevere("[NoCheatPlus] ConsistencyChecker(" + checker.getClass().getName() + ") encountered an exception:");
-				LogUtil.logSevere(t);
-			}
-			consistencyCheckerIndex ++; // Do not remove :).
-			final long now = System.currentTimeMillis();
-			if (now < tStart || now >= tEnd){
-				break;
-			}
-		}
-		// (The index might be bigger than size by now.)
-		
-		final boolean debug = config.getBoolean(ConfPaths.LOGGING_DEBUG);
-		
-		// If not finished, schedule further checks.
-		if (consistencyCheckerIndex < consistencyCheckers.size()){
-			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-				@Override
-				public void run() {
-					runConsistencyChecks();
-				}
-			});
-			if (debug){
-				LogUtil.logInfo("[NoCheatPlus] Re-scheduled consistency-checks.");
-			}
-		}
-		else if (debug){
-			LogUtil.logInfo("[NoCheatPlus] Consistency-checks run.");
-		}
-	}
+            @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+            public void onPlayerKick(final PlayerKickEvent event) {
+                onLeave(event.getPlayer());
+            }
 
-	@Override
-	public <T> T registerGenericInstance(T instance) {
-		@SuppressWarnings("unchecked")
-		Class<T> clazz = (Class<T>) instance.getClass();
-		T registered = getGenericInstance(clazz);
-		genericInstances.put(clazz,  instance);
-		return registered;
-	}
+            @EventHandler(priority = EventPriority.MONITOR)
+            public void onPlayerQuit(final PlayerQuitEvent event) {
+                onLeave(event.getPlayer());
+            }
+        };
+    }
 
-	@Override
-	public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance) {
-		T registered = getGenericInstance(registerFor);
-		genericInstances.put(registerFor, instance);
-		return registered;
-	}
+    protected void onJoinLow(final Player player){
+        final String playerName = player.getName();
+        if (nameSetPerms.hasPermission(playerName, Permissions.NOTIFY)){
+            // Login notifications...
+            final PlayerData data = DataManager.getPlayerData(playerName, true);
+            //			// Update available.
+            //			if (updateAvailable) player.sendMessage(ChatColor.RED + "NCP: " + ChatColor.WHITE + "A new update of NoCheatPlus is available.\n" + "Download it at http://nocheatplus.org/update");
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getGenericInstance(Class<T> registeredFor) {
-		return (T) genericInstances.get(registeredFor);
-	}
+            // Inconsistent config version.
+            if (configProblems != null && ConfigManager.getConfigFile().getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)) {
+                // Could use custom prefix from logging, however ncp should be mentioned then.
+                sendMessageOnTick(playerName, ChatColor.RED + "NCP: " + ChatColor.WHITE + configProblems);
+            }
+            // Message if notify is turned off.
+            if (data.getNotifyOff()) {
+                sendMessageOnTick(playerName, MSG_NOTIFY_OFF);
+            }
+        }
+        // JoinLeaveListenerS: Do update comment in NoCheatPlusAPI with changing event priority.
+        for (final JoinLeaveListener jlListener : joinLeaveListeners){
+            try{
+                jlListener.playerJoins(player);
+            }
+            catch(Throwable t){
+                LogUtil.logSevere("[NoCheatPlus] JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (join): " + t.getClass().getSimpleName());
+                LogUtil.logSevere(t);
+            }
+        }
+        // Mod message (left on low instead of lowest to allow some permissions plugins compatibility).
+        ModUtil.motdOnJoin(player);
+    }
 
-	@Override
-	public <T> T unregisterGenericInstance(Class<T> registeredFor) {
-		T registered = getGenericInstance(registeredFor); // Convenience.
-		genericInstances.remove(registeredFor);
-		return registered;
-	}
+    protected void onLeave(final Player player) {
+        for (final PermStateReceiver pr : permStateReceivers) {
+            pr.removePlayer(player.getName());
+        }
+        for (final JoinLeaveListener jlListener : joinLeaveListeners){
+            try{
+                jlListener.playerLeaves(player);
+            }
+            catch(Throwable t){
+                LogUtil.logSevere("[NoCheatPlus] JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (leave): " + t.getClass().getSimpleName());
+                LogUtil.logSevere(t);
+            }
+        }
+    }
+
+    protected void updatePermStateReceivers(final Player player) {
+        final Map<String, Boolean> checked = new HashMap<String, Boolean>(20);
+        final String name = player.getName();
+        for (final PermStateReceiver pr : permStateReceivers) {
+            for (final String permission : pr.getDefaultPermissions()) {
+                Boolean state = checked.get(permission);
+                if (state == null) {
+                    state = player.hasPermission(permission);
+                    checked.put(permission, state);
+                }
+                pr.setPermission(name, permission, state);
+            }
+        }
+    }
+
+    protected void scheduleConsistencyCheckers(){
+        BukkitScheduler sched = getServer().getScheduler();
+        if (consistencyCheckerTaskId != -1){
+            sched.cancelTask(consistencyCheckerTaskId);
+        }
+        ConfigFile config = ConfigManager.getConfigFile();
+        if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK, true)) return;
+        // Schedule task in seconds.
+        final long delay = 20L * config.getInt(ConfPaths.DATA_CONSISTENCYCHECKS_INTERVAL, 1, 3600, 10);
+        consistencyCheckerTaskId = sched.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                runConsistencyChecks();
+            }
+        }, delay, delay );
+    }
+
+    /**
+     * Run consistency checks for at most the configured duration. If not finished, a task will be scheduled to continue.
+     */
+    protected void runConsistencyChecks(){
+        final long tStart = System.currentTimeMillis();
+        final ConfigFile config = ConfigManager.getConfigFile();
+        if (!config.getBoolean(ConfPaths.DATA_CONSISTENCYCHECKS_CHECK) || consistencyCheckers.isEmpty()){
+            consistencyCheckerIndex = 0;
+            return;
+        }
+        final long tEnd = tStart + config.getLong(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 1, 50, 2);
+        if (consistencyCheckerIndex >= consistencyCheckers.size()) consistencyCheckerIndex = 0;
+        final Player[] onlinePlayers = getServer().getOnlinePlayers();
+        // Loop
+        while (consistencyCheckerIndex < consistencyCheckers.size()){
+            final ConsistencyChecker checker = consistencyCheckers.get(consistencyCheckerIndex);
+            try{
+                checker.checkConsistency(onlinePlayers);
+            }
+            catch (Throwable t){
+                LogUtil.logSevere("[NoCheatPlus] ConsistencyChecker(" + checker.getClass().getName() + ") encountered an exception:");
+                LogUtil.logSevere(t);
+            }
+            consistencyCheckerIndex ++; // Do not remove :).
+            final long now = System.currentTimeMillis();
+            if (now < tStart || now >= tEnd){
+                break;
+            }
+        }
+        // (The index might be bigger than size by now.)
+
+        final boolean debug = config.getBoolean(ConfPaths.LOGGING_DEBUG);
+
+        // If not finished, schedule further checks.
+        if (consistencyCheckerIndex < consistencyCheckers.size()){
+            getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    runConsistencyChecks();
+                }
+            });
+            if (debug){
+                LogUtil.logInfo("[NoCheatPlus] Re-scheduled consistency-checks.");
+            }
+        }
+        else if (debug){
+            LogUtil.logInfo("[NoCheatPlus] Consistency-checks run.");
+        }
+    }
+
+    @Override
+    public <T> T registerGenericInstance(T instance) {
+        @SuppressWarnings("unchecked")
+        Class<T> clazz = (Class<T>) instance.getClass();
+        T registered = getGenericInstance(clazz);
+        genericInstances.put(clazz,  instance);
+        return registered;
+    }
+
+    @Override
+    public <T, TI extends T> T registerGenericInstance(Class<T> registerFor, TI instance) {
+        T registered = getGenericInstance(registerFor);
+        genericInstances.put(registerFor, instance);
+        return registered;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T getGenericInstance(Class<T> registeredFor) {
+        return (T) genericInstances.get(registeredFor);
+    }
+
+    @Override
+    public <T> T unregisterGenericInstance(Class<T> registeredFor) {
+        T registered = getGenericInstance(registeredFor); // Convenience.
+        genericInstances.remove(registeredFor);
+        return registered;
+    }
 
 }
