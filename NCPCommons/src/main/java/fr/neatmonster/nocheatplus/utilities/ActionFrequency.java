@@ -11,6 +11,7 @@ public class ActionFrequency {
     /** Reference time for filling in. */
     private long time = 0;
     private long lastUpdate = 0;
+    private final boolean noAutoReset;
 
     /**
      * Buckets to fill weights in, each represents an interval of durBucket duration, 
@@ -21,10 +22,26 @@ public class ActionFrequency {
 
     /** Duration in milliseconds that oe bucket covers. */
     private final long durBucket;
-
+    
+    /**
+     * This constructor will set noAutoReset to false, optimized for short term accounting.
+     * @param nBuckets
+     * @param durBucket
+     */
     public ActionFrequency(final int nBuckets, final long durBucket) {
+        this(nBuckets, durBucket, false);
+    }
+    
+    /**
+     * 
+     * @param nBuckets
+     * @param durBucket
+     * @param noAutoReset Set to true, to prevent auto-resetting with "time ran backwards".
+     */
+    public ActionFrequency(final int nBuckets, final long durBucket, final boolean noAutoReset) {
         this.buckets = new float[nBuckets];
         this.durBucket = durBucket;
+        this.noAutoReset = noAutoReset;
     }
 
     /**
@@ -51,7 +68,16 @@ public class ActionFrequency {
      */
     public final void update(final long now) {
         final long diff = now - time;
-        if (now < lastUpdate || diff >= durBucket * buckets.length) {
+        if (now < lastUpdate) {
+            // Clear (beyond range).
+            if (noAutoReset) {
+                time = lastUpdate = now;
+            } else {
+                clear(now);
+                return;
+            }
+        }
+        else if (diff >= durBucket * buckets.length) {
             // Clear (beyond range).
             clear(now);
             return;
