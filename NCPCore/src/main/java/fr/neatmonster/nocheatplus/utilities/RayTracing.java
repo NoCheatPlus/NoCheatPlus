@@ -85,7 +85,7 @@ public abstract class RayTracing {
         }
         else if (dTotal < 0.0){
             if (offset <= 0.0) {
-             // Static block change (e.g. diagonal move).
+                // Static block change (e.g. diagonal move).
                 return 0.0;
             } else {
                 return offset / -dTotal;
@@ -136,7 +136,8 @@ public abstract class RayTracing {
             changed = false;
             oX = Math.min(1.0, Math.max(0.0, oX + tMin * dX));
             oY = Math.min(1.0, Math.max(0.0, oY + tMin * dY));
-            oZ = Math.min(1.0, Math.max(0.0, oZ + tMin * dZ)); 
+            oZ = Math.min(1.0, Math.max(0.0, oZ + tMin * dZ));
+            // TODO: Consider Heuristic change of the checking order for dy > 0 vs. dy < 0. 
             // x
             if (tX == tMin){
                 if (dX < 0){
