@@ -530,7 +530,6 @@ public abstract class ConfPaths {
 	private static final String MOVING_PASSABLE_RAYTRACING				 = MOVING_PASSABLE + "raytracing.";
 	public static final String MOVING_PASSABLE_RAYTRACING_CHECK 		 = MOVING_PASSABLE_RAYTRACING + "active";
 	public static final String MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY= MOVING_PASSABLE_RAYTRACING + "blockchangeonly";
-	public static final String MOVING_PASSABLE_RAYTRACING_VCLIPONLY      = MOVING_PASSABLE_RAYTRACING + "vcliponly";
 	public static final String MOVING_PASSABLE_ACTIONS                   = MOVING_PASSABLE + "actions";
 
 	private static final String MOVING_SURVIVALFLY						= MOVING + "survivalfly.";
@@ -639,5 +638,8 @@ public abstract class ConfPaths {
 	public static final String  MISCELLANEOUS_REPORTTOMETRICS			 = "miscellaneous.reporttometrics";
 	@Deprecated
 	public static final String  BLOCKBREAK_FASTBREAK_MOD_CREATIVE        = "checks.blockbreak.fastbreak.intervalcreative";
+	@Deprecated
+	public static final String MOVING_PASSABLE_RAYTRACING_VCLIPONLY      = "checks.moving.passable.raytracing.vcliponly";
+
 	
 }

@@ -104,7 +104,6 @@ public class MovingConfig extends ACheckConfig {
 	public final boolean    passableCheck;
 	public final boolean	passableRayTracingCheck;
 	public final boolean	passableRayTracingBlockChangeOnly;
-	public final boolean	passableRayTracingVclipOnly;
 	// TODO: passableAccuracy: also use if not using ray-tracing
 	public final ActionList passableActions;
 
@@ -196,7 +195,6 @@ public class MovingConfig extends ACheckConfig {
         passableCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
     	passableRayTracingCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK);
     	passableRayTracingBlockChangeOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY);
-    	passableRayTracingVclipOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_VCLIPONLY);
         passableActions = config.getOptimizedActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
 
         survivalFlyCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);

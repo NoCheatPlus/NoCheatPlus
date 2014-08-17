@@ -34,7 +34,8 @@ public class Passable extends Check {
 		}
 		boolean toPassable = to.isPassable();
 		// General condition check for using ray-tracing.
-		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingVclipOnly || from.getY() != to.getY()) && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
+		// TODO: Optimize: manhattan <= 1 and all blocks are completely passable.
+		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
 			rayTracing.set(from, to);
 			rayTracing.loop();
 			if (rayTracing.collides() || rayTracing.getStepsDone() >= rayTracing.getMaxSteps()) {
