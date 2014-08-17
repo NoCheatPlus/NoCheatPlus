@@ -16,7 +16,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 727;
+	public static final int buildNumber = 741;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
