@@ -1379,13 +1379,14 @@ public class BlockProperties {
     }
 	
 	/**
-	 * Just check if a position is not inside of a block that has a bounding box.<br>
+	 * Just check if a block type is fully passable by default.<br>
 	 * This is an inaccurate check, it also returns false for doors etc.
 	 * @param id
 	 * @return
 	 */
 	public static final boolean isPassable(final int id){
 	    final long flags = blockFlags[id];
+	    // TODO: What with non-solid blocks that are not passable ?
 		if ((flags & (F_LIQUID | F_IGN_PASSABLE)) != 0) return true;
 		else return (flags & F_SOLID) == 0;
 	}

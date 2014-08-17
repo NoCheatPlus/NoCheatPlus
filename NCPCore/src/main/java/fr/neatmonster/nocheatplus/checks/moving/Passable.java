@@ -28,13 +28,20 @@ public class Passable extends Check {
 		String tags = "";
 		// Block distances (sum, max) for from-to (not for loc!).
 		final int manhattan = from.manhattan(to);
-		// Skip moves inside of ignored blocks right away.
-		if (manhattan == 0 && (BlockProperties.getBlockFlags(from.getTypeId()) & BlockProperties.F_IGN_PASSABLE) != 0) {
-			return null;
-		}
+		// Skip moves inside of ignored blocks right away [works as long as we only check between foot-locations].
+		if (manhattan <= 1 && BlockProperties.isPassable(from.getTypeId())) {
+		    // TODO: Monitor: BlockProperties.isPassable checks slightly different than before.
+		    if (manhattan == 0){
+		        return null;
+		    } else {
+		        // manhattan == 1
+		        if (BlockProperties.isPassable(to.getTypeId())) {
+		            return null;
+		        }
+		    }
+		} 
 		boolean toPassable = to.isPassable();
 		// General condition check for using ray-tracing.
-		// TODO: Optimize: manhattan <= 1 and all blocks are completely passable.
 		if (toPassable && cc.passableRayTracingCheck && (!cc.passableRayTracingBlockChangeOnly || manhattan > 0)) {
 			rayTracing.set(from, to);
 			rayTracing.loop();
