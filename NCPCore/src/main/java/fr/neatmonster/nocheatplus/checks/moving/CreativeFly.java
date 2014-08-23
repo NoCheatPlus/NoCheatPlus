@@ -96,7 +96,7 @@ public class CreativeFly extends Check {
 			}
 		}
 		else{
-			data.hVelActive.clear(); // TODO: test/check !
+			data.clearActiveHVel(); // TODO: test/check !
 		}
 
         final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;

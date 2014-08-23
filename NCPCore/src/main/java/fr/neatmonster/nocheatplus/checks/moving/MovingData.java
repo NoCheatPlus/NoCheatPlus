@@ -1,9 +1,6 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
@@ -123,10 +120,8 @@ public class MovingData extends ACheckData {
     public double         verticalFreedom;
     public double         verticalVelocity;
     public int 		      verticalVelocityUsed = 0;
-    /** Active velocity entries (horizontal distance). */
-    public final List<Velocity> hVelActive = new LinkedList<Velocity>();
-    /** Queued velocity entries (horizontal distance). */
-    public final List<Velocity> hVelQueued = new LinkedList<Velocity>();
+    /** Horizontal velocity modeled as an axis (always positive) */
+    private final AxisVelocity hVel = new AxisVelocity();
     
     // Coordinates.
     /** Last from coordinates. */
@@ -524,16 +519,14 @@ public class MovingData extends ACheckData {
 	 * @param vel
 	 */
 	public void addHorizontalVelocity(final Velocity vel) {
-		// TODO: Might merge entries !
-		hVelQueued.add(vel);
+		hVel.add(vel);
 	}
 	
 	/**
 	 * Currently only applies to horizontal velocity.
 	 */
 	public void removeAllVelocity() {
-		hVelActive.clear();
-		hVelQueued.clear();
+		hVel.clear();
 	}
 
 	/**
@@ -542,28 +535,22 @@ public class MovingData extends ACheckData {
 	 * @param tick All velocity added before this tick gets removed.
 	 */
 	public void removeInvalidVelocity(final int tick) {
-		// TODO: Also merge entries here, or just on adding?
-		Iterator<Velocity> it;
-		// Active.
-		it = hVelActive.iterator();
-		while (it.hasNext()) {
-			final Velocity vel = it.next();
-			// TODO: 0.001 can be stretched somewhere else, most likely...
-			// TODO: Somehow use tick here too (actCount, valCount)?
-			if (vel.valCount <= 0 || vel.value <= 0.001) {
-//				System.out.prsintln("Invalidate active: " + vel);
-				it.remove();
-			}
-		}
-		// Queued.
-		it = hVelQueued.iterator();
-		while (it.hasNext()) {
-			final Velocity vel = it.next();
-			if (vel.actCount <= 0 || vel.tick < tick) {
-//				System.out.println("Invalidate queued: " + vel);
-				it.remove();
-			}
-		}
+		hVel.removeInvalid(tick);
+	}
+	
+	/**
+	 * Clear only active horizontal velocity.
+	 */
+	public void clearActiveHVel() {
+	    hVel.clearActive();
+	}
+	
+	public boolean hasActiveHVel() {
+	    return hVel.hasActive();
+	}
+	
+	public boolean hasQueuedHVel() {
+	    return hVel.hasQueued();
 	}
 	
 	/**
@@ -571,44 +558,31 @@ public class MovingData extends ACheckData {
 	 */
 	public void velocityTick() {
 		// Horizontal velocity (intermediate concept).
-		// Decrease counts for active.
-		// TODO: Actual friction. Could pass as an argument (special value for not to be used).
-		// TODO: Consider removing already invalidated here.
-		for (final Velocity vel : hVelActive) {
-			vel.valCount --;
-			vel.sum += vel.value;
-			vel.value *= 0.93; // vel.frictionFactor;
-			// (Altered entries should be kept, since they get used right away.)
-		}
-		// Decrease counts for queued.
-		final Iterator<Velocity> it = hVelQueued.iterator();
-		while (it.hasNext()) {
-			it.next().actCount --;
-		}
+		hVel.tick();
 		
 		// Vertical velocity (old concept).
-        if (verticalVelocity <= 0.09D) {
-        	verticalVelocityUsed ++;
-        	verticalVelocityCounter--;
-        }
-        else if (verticalVelocityCounter > 0) {
-        	verticalVelocityUsed ++;
-            verticalFreedom += verticalVelocity;
-            verticalVelocity = Math.max(0.0, verticalVelocity -0.09);
-            // TODO: Consider using up counter ? / better use velocity entries / even better use x,y,z entries right away .
-        } else if (verticalFreedom > 0.001D) {
-        	if (verticalVelocityUsed == 1 && verticalVelocity > 1.0) {
-        		// Workarounds.
-        		verticalVelocityUsed = 0;
-        		verticalVelocity = 0;
-        		verticalFreedom = 0;
-        	}
-        	else{
-        		 // Counter has run out, now reduce the vertical freedom over time.
-            	verticalVelocityUsed ++;
-                verticalFreedom *= 0.93D;
-        	}
-        }
+		if (verticalVelocity <= 0.09D) {
+		    verticalVelocityUsed ++;
+		    verticalVelocityCounter--;
+		}
+		else if (verticalVelocityCounter > 0) {
+		    verticalVelocityUsed ++;
+		    verticalFreedom += verticalVelocity;
+		    verticalVelocity = Math.max(0.0, verticalVelocity -0.09);
+		    // TODO: Consider using up counter ? / better use velocity entries / even better use x,y,z entries right away .
+		} else if (verticalFreedom > 0.001D) {
+		    if (verticalVelocityUsed == 1 && verticalVelocity > 1.0) {
+		        // Workarounds.
+		        verticalVelocityUsed = 0;
+		        verticalVelocity = 0;
+		        verticalFreedom = 0;
+		    }
+		    else{
+		        // Counter has run out, now reduce the vertical freedom over time.
+		        verticalVelocityUsed ++;
+		        verticalFreedom *= 0.93D;
+		    }
+		}
 	}
 
 	/**
@@ -616,12 +590,7 @@ public class MovingData extends ACheckData {
 	 * @return
 	 */
 	public double getHorizontalFreedom() {
-		// TODO: model/calculate it as accurate as possible...
-		double f = 0;
-		for (final Velocity vel : hVelActive) {
-			f += vel.value;
-		}
-		return f;
+		return hVel.getFreedom();
 	}
 
 	/**
@@ -633,19 +602,22 @@ public class MovingData extends ACheckData {
 	 * @return
 	 */
 	public double useHorizontalVelocity(final double amount) {
-		final Iterator<Velocity> it = hVelQueued.iterator();
-		double used = 0;
-		while (it.hasNext()) {
-			final Velocity vel = it.next();
-			used += vel.value;
-			hVelActive.add(vel);
-			it.remove();
-			if (used >= amount) {
-				break;
-			}
-		}
-		// TODO: Add to sum.
-		return used;
+		return hVel.use(amount);
+	}
+	
+	/**
+	 * Debugging.
+	 * @param builder
+	 */
+	public void addHorizontalVelocity(final StringBuilder builder) {
+	    if (hVel.hasActive()) {
+	        builder.append("\n" + " horizontal velocity (active):");
+	        hVel.addActive(builder);
+	    }
+	    if (hVel.hasQueued()) {
+	        builder.append("\n" + " horizontal velocity (queued):");
+	        hVel.AddQueued(builder);
+	    }
 	}
 
 	/**

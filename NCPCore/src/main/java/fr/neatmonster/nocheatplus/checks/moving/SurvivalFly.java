@@ -2,7 +2,6 @@ package fr.neatmonster.nocheatplus.checks.moving;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -205,7 +204,7 @@ public class SurvivalFly extends Check {
 			hFreedom = res[2];
 		}
 		else{
-			data.hVelActive.clear();
+			data.clearActiveHVel();
 			hFreedom = 0.0;
 			if (resetFrom && data.bunnyhopDelay <= 6) {
 				data.bunnyhopDelay = 0;
@@ -224,7 +223,7 @@ public class SurvivalFly extends Check {
 		}
 		
 		// Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
-        if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && data.hVelActive.isEmpty()) {
+        if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && !data.hasActiveHVel()) {
         	// (Ignore some cases, in order to prevent false positives.)
         	// TODO: speed effects ?
         	if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
@@ -475,7 +474,7 @@ public class SurvivalFly extends Check {
         	// TODO: Should there be other side conditions?
         	// Invalidate used horizontal velocity.
 //        	System.out.println("*** INVALIDATE ON SPEED");
-        	data.hVelActive.clear();
+        	data.clearActiveHVel();
 //          if (data.horizontalVelocityUsed > cc.velocityGraceTicks) {
 //        	data.horizontalFreedom = 0;
 //        	data.horizontalVelocityCounter = 0;
@@ -1408,14 +1407,7 @@ public class SurvivalFly extends Check {
 //		if (data.horizontalVelocityCounter > 0 || data.horizontalFreedom >= 0.001) {
 //			builder.append("\n" + player.getName() + " horizontal freedom: " +  StringUtil.fdec3.format(data.horizontalFreedom) + " (counter=" + data.horizontalVelocityCounter +"/used="+data.horizontalVelocityUsed);
 //		}
-		if (!data.hVelActive.isEmpty()) {
-			builder.append("\n" + " horizontal velocity (active):");
-			addVeloctiy(builder, data.hVelActive);
-		}
-		if (!data.hVelQueued.isEmpty()) {
-			builder.append("\n" + " horizontal velocity (queued):");
-			addVeloctiy(builder, data.hVelQueued);
-		}
+		data.addHorizontalVelocity(builder);
 		if (!resetFrom && !resetTo) {
 			if (cc.survivalFlyAccountingV && data.vDistAcc.count() > data.vDistAcc.bucketCapacity()) builder.append("\n" + " vacc=" + data.vDistAcc.toInformalString());
 		}
@@ -1428,13 +1420,6 @@ public class SurvivalFly extends Check {
 		builder.append("\n");
 //		builder.append(data.stats.getStatsStr(false));
 		System.out.print(builder.toString());
-	}
-	
-	private void addVeloctiy(final StringBuilder builder, final List<Velocity> entries) {
-		for (final Velocity vel: entries) {
-			 builder.append(" ");
-			 builder.append(vel);
-		}
 	}
 	
 }
