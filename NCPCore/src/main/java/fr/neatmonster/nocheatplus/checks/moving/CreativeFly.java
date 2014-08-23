@@ -46,7 +46,7 @@ public class CreativeFly extends Check {
 
         // If we have no setback, define one now.
         if (!data.hasSetBack())
-           data.setSetBack(from);
+            data.setSetBack(from);
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final int maximumHeight = cc.creativeFlyMaxHeight + player.getWorld().getMaxHeight();
@@ -63,48 +63,48 @@ public class CreativeFly extends Check {
         final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
 
         // If the player is affected by potion of swiftness.
-        
+
         final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
         double fSpeed;
-        
+
         // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
         if (speedModifier == Double.NEGATIVE_INFINITY) fSpeed = 1D;
         else fSpeed = 1D + 0.2D * (speedModifier + 1D);
-        
+
         if (player.isFlying()){
-        	fSpeed *= data.flySpeed / 0.1;
+            fSpeed *= data.flySpeed / 0.1;
         }
         else {
-        	fSpeed *= data.walkSpeed / 0.2;
+            fSpeed *= data.walkSpeed / 0.2;
         }
-        
+
         final double limitH = cc.creativeFlyHorizontalSpeed / 100D * HORIZONTAL_SPEED * fSpeed;
 
         // Finally, determine how far the player went beyond the set limits.
-//        double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
+        //        double resultH = Math.max(0.0D, hDistance - data.horizontalFreedom - limitH);
         double resultH = Math.max(0.0D, hDistance - limitH);
-        
+
         // Check velocity.
-		if (resultH > 0){
-			double hFreedom = data.getHorizontalFreedom();
-			if (hFreedom < resultH){
-				// Use queued velocity if possible.
-				hFreedom += data.useHorizontalVelocity(resultH - hFreedom);
-			}
-			if (hFreedom > 0.0){
-				resultH = Math.max(0.0, resultH - hFreedom);
-			}
-		}
-		else{
-			data.clearActiveHVel(); // TODO: test/check !
-		}
+        if (resultH > 0){
+            double hFreedom = data.getHorizontalFreedom();
+            if (hFreedom < resultH){
+                // Use queued velocity if possible.
+                hFreedom += data.useHorizontalVelocity(resultH - hFreedom);
+            }
+            if (hFreedom > 0.0){
+                resultH = Math.max(0.0, resultH - hFreedom);
+            }
+        }
+        else{
+            data.clearActiveHVel(); // TODO: test/check !
+        }
 
         final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
 
         data.bunnyhopDelay--;
 
         if (resultH > 0 && sprinting){
-        	// TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
+            // TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
             // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
             // again leads to a player moving almost twice as far in that step.
             if (data.bunnyhopDelay <= 0 && resultH < 0.4D) {
@@ -125,7 +125,7 @@ public class CreativeFly extends Check {
 
         // The player went to far, either horizontal or vertical.
         if (result > 0D) {
-        	// TODO: Get rid of creativeFlyPreviousRefused.
+            // TODO: Get rid of creativeFlyPreviousRefused.
             if (data.creativeFlyPreviousRefused) {
                 // Increment violation level.
                 data.creativeFlyVL += result;
