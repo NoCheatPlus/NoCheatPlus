@@ -735,7 +735,7 @@ public class BlockProperties {
 		blocks[Material.IRON_BLOCK.getId()] = ironBlockType;
 		blocks[Material.DIAMOND_BLOCK.getId()] = diamondBlockType;
 		blocks[Material.ENDER_CHEST.getId()] = new BlockProps(woodPickaxe, 22.5f);
-		blocks[Material.OBSIDIAN.getId()] = new BlockProps(diamondPickaxe, 50, secToMs(250, 250, 250, 250, 9.4, 250));
+		blocks[Material.OBSIDIAN.getId()] = new BlockProps(diamondPickaxe, 50, secToMs(250, 125, 62.5, 41.6, 9.4, 20.8));
 		
 		// More 1.4 (not insta).
 		// TODO: Either move all to an extra setup class, or integrate above.
