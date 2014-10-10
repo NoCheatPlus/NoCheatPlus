@@ -116,12 +116,15 @@ public class MovingData extends ACheckData {
 
     // Velocity handling.
     // TODO: consider resetting these with clearFlyData and onSetBack.
+    /** Vertical velocity modeled as an axis (positive and negative possible) */
+    //private final AxisVelocity verVel = new AxisVelocity();
     public int            verticalVelocityCounter;
     public double         verticalFreedom;
     public double         verticalVelocity;
-    public int 		      verticalVelocityUsed = 0;
+    public int            verticalVelocityUsed = 0;
+    
     /** Horizontal velocity modeled as an axis (always positive) */
-    private final AxisVelocity hVel = new AxisVelocity();
+    private final AxisVelocity horVel = new AxisVelocity();
 
     // Coordinates.
     /** Last from coordinates. */
@@ -515,18 +518,26 @@ public class MovingData extends ACheckData {
 
     /**
      * Add horizontal velocity (distance). <br>
-     * Since velocity is seldom an access method should be better. Flying players are expensive anyway, so this should not matter too much.
-     * @param vel
+     * @param vel Assumes positive values always.
      */
     public void addHorizontalVelocity(final Velocity vel) {
-        hVel.add(vel);
+        horVel.add(vel);
+    }
+    
+    /**
+     * Add vertical velocity (distance). <br>
+     * @param vel
+     */
+    public void addVerticalVelocity(final Velocity vel) {
+        horVel.add(vel);
     }
 
     /**
-     * Currently only applies to horizontal velocity.
+     * Remove all vertical and horizontal velocity.
      */
     public void removeAllVelocity() {
-        hVel.clear();
+        horVel.clear();
+//        verVel.clear();
     }
 
     /**
@@ -535,32 +546,49 @@ public class MovingData extends ACheckData {
      * @param tick All velocity added before this tick gets removed.
      */
     public void removeInvalidVelocity(final int tick) {
-        hVel.removeInvalid(tick);
+        horVel.removeInvalid(tick);
+//        verVel.removeInvalid(tick);
     }
 
     /**
      * Clear only active horizontal velocity.
      */
-    public void clearActiveHVel() {
-        hVel.clearActive();
+    public void clearActiveHorVel() {
+        horVel.clearActive();
+    }
+    
+    /**
+     * Clear only active horizontal velocity.
+     */
+    public void clearActiveVerVel() {
+        horVel.clearActive();
     }
 
-    public boolean hasActiveHVel() {
-        return hVel.hasActive();
+    public boolean hasActiveHorVel() {
+        return horVel.hasActive();
     }
 
-    public boolean hasQueuedHVel() {
-        return hVel.hasQueued();
+    public boolean hasQueuedHorVel() {
+        return horVel.hasQueued();
     }
+    
+//    public boolean hasActiveVerVel() {
+//        return verVel.hasActive();
+//    }
+
+//    public boolean hasQueuedVerVel() {
+//        return verVel.hasQueued();
+//    }
 
     /**
      * Called for moving events, increase age of velocity, decrease amounts, check which entries are invalid. Both horizontal and vertical.
      */
     public void velocityTick() {
         // Horizontal velocity (intermediate concept).
-        hVel.tick();
-
-        // Vertical velocity (old concept).
+        horVel.tick();
+        
+        // Vertical velocity (new concept).
+//        verVel.tick();
         if (verticalVelocity <= 0.09D) {
             verticalVelocityUsed ++;
             verticalVelocityCounter--;
@@ -590,7 +618,7 @@ public class MovingData extends ACheckData {
      * @return
      */
     public double getHorizontalFreedom() {
-        return hVel.getFreedom();
+        return horVel.getFreedom();
     }
 
     /**
@@ -602,7 +630,7 @@ public class MovingData extends ACheckData {
      * @return
      */
     public double useHorizontalVelocity(final double amount) {
-        return hVel.use(amount);
+        return horVel.use(amount);
     }
 
     /**
@@ -610,13 +638,13 @@ public class MovingData extends ACheckData {
      * @param builder
      */
     public void addHorizontalVelocity(final StringBuilder builder) {
-        if (hVel.hasActive()) {
+        if (horVel.hasActive()) {
             builder.append("\n" + " horizontal velocity (active):");
-            hVel.addActive(builder);
+            horVel.addActive(builder);
         }
-        if (hVel.hasQueued()) {
+        if (horVel.hasQueued()) {
             builder.append("\n" + " horizontal velocity (queued):");
-            hVel.AddQueued(builder);
+            horVel.AddQueued(builder);
         }
     }
 

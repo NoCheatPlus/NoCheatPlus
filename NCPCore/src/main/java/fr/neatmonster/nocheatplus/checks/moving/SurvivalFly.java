@@ -204,7 +204,7 @@ public class SurvivalFly extends Check {
             hFreedom = res[2];
         }
         else{
-            data.clearActiveHVel();
+            data.clearActiveHorVel();
             hFreedom = 0.0;
             if (resetFrom && data.bunnyhopDelay <= 6) {
                 data.bunnyhopDelay = 0;
@@ -223,7 +223,7 @@ public class SurvivalFly extends Check {
         }
 
         // Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
-        if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && !data.hasActiveHVel()) {
+        if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && !data.hasActiveHorVel()) {
             // (Ignore some cases, in order to prevent false positives.)
             // TODO: speed effects ?
             if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
@@ -474,7 +474,7 @@ public class SurvivalFly extends Check {
             // TODO: Should there be other side conditions?
             // Invalidate used horizontal velocity.
             //        	System.out.println("*** INVALIDATE ON SPEED");
-            data.clearActiveHVel();
+            data.clearActiveHorVel();
             //          if (data.horizontalVelocityUsed > cc.velocityGraceTicks) {
             //        	data.horizontalFreedom = 0;
             //        	data.horizontalVelocityCounter = 0;
@@ -727,6 +727,8 @@ public class SurvivalFly extends Check {
     private double yDirChange(final PlayerLocation from, final PlayerLocation to, final double yDistance, double vDistanceAboveLimit, final MovingData data) {
         // TODO: Does this account for velocity in a sufficient way?
         if (yDistance > 0) {
+            // TODO: Clear active vertical velocity here ?
+            // TODO: Demand consuming queued velocity for valid change (!).
             // Increase
             if (data.toWasReset) {
                 tags.add("ychinc");
@@ -747,6 +749,7 @@ public class SurvivalFly extends Check {
             // Decrease
             tags.add("ychdec");
             // Detect low jumping.
+            // TODO: sfDirty: Account for actual velocity (demands consuming queued for dir-change(!))!
             if (!data.sfNoLowJump && !data.sfDirty && data.mediumLiftOff == MediumLiftOff.GROUND) {
                 final double setBackYDistance = to.getY() - data.getSetBackY();
                 if (setBackYDistance > 0.0) {

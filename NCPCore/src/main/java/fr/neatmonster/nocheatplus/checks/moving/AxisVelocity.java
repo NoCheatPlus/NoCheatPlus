@@ -11,12 +11,19 @@ import java.util.List;
  */
 public class AxisVelocity {
     
+    /** Velocity with a smaller absolute amount is removed. */
+    private static final double minValue = 0.001;
+    
+    private static final double frictionFactor = 0.93;
+    
     private final List<Velocity> queued = new ArrayList<Velocity>();
     private final List<Velocity> active = new ArrayList<Velocity>();
     
     public void add(Velocity vel) {
         // TODO: Merging behavior?
-        queued.add(vel);
+        if (Math.abs(vel.value) != 0.0) {
+            queued.add(vel);
+        }
     }
     
     public boolean hasActive() {
@@ -34,10 +41,11 @@ public class AxisVelocity {
      // Decrease counts for active.
         // TODO: Actual friction. Could pass as an argument (special value for not to be used).
         // TODO: Consider removing already invalidated here.
+        // TODO: Consider working removeInvalid into this ?
         for (final Velocity vel : active) {
             vel.valCount --;
             vel.sum += vel.value;
-            vel.value *= 0.93; // vel.frictionFactor;
+            vel.value *= frictionFactor; // vel.frictionFactor;
             // (Altered entries should be kept, since they get used right away.)
         }
         // Decrease counts for queued.
@@ -61,7 +69,7 @@ public class AxisVelocity {
             final Velocity vel = it.next();
             // TODO: 0.001 can be stretched somewhere else, most likely...
             // TODO: Somehow use tick here too (actCount, valCount)?
-            if (vel.valCount <= 0 || vel.value <= 0.001) {
+            if (vel.valCount <= 0 || Math.abs(vel.value) <= minValue) {
 //              System.out.prsintln("Invalidate active: " + vel);
                 it.remove();
             }
@@ -69,6 +77,7 @@ public class AxisVelocity {
         // Queued.
         it = queued.iterator();
         while (it.hasNext()) {
+            // TODO: Could check for alternating signum (error).
             final Velocity vel = it.next();
             if (vel.actCount <= 0 || vel.tick < tick) {
 //              System.out.println("Invalidate queued: " + vel);
@@ -79,10 +88,10 @@ public class AxisVelocity {
     
     /**
      * Get the sum of active velocity values.
-     * @return
+     * @return Can be positive or negative.
      */
     public double getFreedom() {
-     // TODO: model/calculate it as accurate as possible...
+        // TODO: model/calculate it as accurate as possible...
         double f = 0;
         for (final Velocity vel : active) {
             f += vel.value;
@@ -95,18 +104,31 @@ public class AxisVelocity {
      * Amount is the horizontal distance that is to be covered by velocity (active has already been checked).
      * <br>
      * If the modeling changes (max instead of sum or similar), then this will be affected.
-     * @param amount The amount used.
+     * @param amount The amount used, should be negative or positive depending on direction.
      * @return
      */
     public double use(final double amount) {
+        if (!active.isEmpty()) {
+            // Invalidate active on "direction change" [direction of consumption].
+            if (amount * active.get(0).value < 0.0) {
+                active.clear();
+            }
+        }
         final Iterator<Velocity> it = queued.iterator();
         double used = 0;
         while (it.hasNext()) {
             final Velocity vel = it.next();
+            if (vel.value * amount < 0.0) {
+                // Not aligned.
+                // TODO: This could be a problem with small amounts of velocity.
+                // TODO: break or remove !? -> need find "next fitting one" and remove all non-fitting before (iff fitting found) ...
+                it.remove(); // TODO: queues ~ continue? vs. invalidate (remove) vs. break; vs. collect and invalidate non-matching BEFORE.
+                continue;
+            }
             used += vel.value;
             active.add(vel);
             it.remove();
-            if (used >= amount) {
+            if (Math.abs(used) >= Math.abs(amount)) {
                 break;
             }
         }

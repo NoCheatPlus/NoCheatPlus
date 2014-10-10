@@ -50,9 +50,10 @@ public class CreativeFly extends Check {
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final int maximumHeight = cc.creativeFlyMaxHeight + player.getWorld().getMaxHeight();
-        if (to.getY() - data.verticalFreedom > maximumHeight)
-            return new Location(player.getWorld(), data.getSetBackX(), maximumHeight - 10D, data.getSetBackZ(),
-                    to.getYaw(), to.getPitch());
+        if (to.getY() > maximumHeight) {
+            // TODO: USE velocity if possible.
+            return new Location(player.getWorld(), data.getSetBackX(), Math.max(maximumHeight - 10D, to.getWorld().getMaxHeight()), data.getSetBackZ(), to.getYaw(), to.getPitch());
+        }
 
         // Calculate some distances.
         final double xDistance = to.getX() - from.getX();
@@ -96,7 +97,7 @@ public class CreativeFly extends Check {
             }
         }
         else{
-            data.clearActiveHVel(); // TODO: test/check !
+            data.clearActiveHorVel(); // TODO: test/check !
         }
 
         final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
@@ -119,8 +120,16 @@ public class CreativeFly extends Check {
 
         // Super simple, just check distance compared to max distance vertical.
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
+        
+        // TODO:_ signum considerations (aligned ...).
+//        double vDistanceAboveLimit = yDistance - data.getVerticalFreedom() - limitV;
+//        if (vDistanceAboveLimit > 0.0) {
+//            // TODO: consume / use vvel
+//        }
+//        final double resultV = (vDistanceAboveLimit - limitV) * 100D;
+//        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
+        // Old handling.
         final double resultV = (yDistance - data.verticalFreedom - limitV) * 100D;
-
         final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
 
         // The player went to far, either horizontal or vertical.
