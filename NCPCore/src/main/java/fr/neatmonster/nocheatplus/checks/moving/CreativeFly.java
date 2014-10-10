@@ -44,9 +44,10 @@ public class CreativeFly extends Check {
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
 
-        // If we have no setback, define one now.
-        if (!data.hasSetBack())
+        // Ensure we have a set-back location.
+        if (!data.hasSetBack()) {
             data.setSetBack(from);
+        }
 
         // Before doing anything, do a basic height check to determine if players are flying too high.
         final int maximumHeight = cc.creativeFlyMaxHeight + player.getWorld().getMaxHeight();
@@ -69,10 +70,14 @@ public class CreativeFly extends Check {
         double fSpeed;
 
         // TODO: Make this configurable ! [Speed effect should not affect flying if not on ground.]
-        if (speedModifier == Double.NEGATIVE_INFINITY) fSpeed = 1D;
-        else fSpeed = 1D + 0.2D * (speedModifier + 1D);
+        if (speedModifier == Double.NEGATIVE_INFINITY) {
+            fSpeed = 1D;
+        }
+        else {
+            fSpeed = 1D + 0.2D * (speedModifier + 1D);
+        }
 
-        if (player.isFlying()){
+        if (player.isFlying()) {
             fSpeed *= data.flySpeed / 0.1;
         }
         else {
@@ -86,17 +91,17 @@ public class CreativeFly extends Check {
         double resultH = Math.max(0.0D, hDistance - limitH);
 
         // Check velocity.
-        if (resultH > 0){
+        if (resultH > 0) {
             double hFreedom = data.getHorizontalFreedom();
-            if (hFreedom < resultH){
+            if (hFreedom < resultH) {
                 // Use queued velocity if possible.
                 hFreedom += data.useHorizontalVelocity(resultH - hFreedom);
             }
-            if (hFreedom > 0.0){
+            if (hFreedom > 0.0) {
                 resultH = Math.max(0.0, resultH - hFreedom);
             }
         }
-        else{
+        else {
             data.clearActiveHorVel(); // TODO: test/check !
         }
 
@@ -104,7 +109,7 @@ public class CreativeFly extends Check {
 
         data.bunnyhopDelay--;
 
-        if (resultH > 0 && sprinting){
+        if (resultH > 0 && sprinting) {
             // TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
             // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
             // again leads to a player moving almost twice as far in that step.
@@ -142,19 +147,22 @@ public class CreativeFly extends Check {
                 // Execute whatever actions are associated with this check and the violation level and find out if we
                 // should cancel the event.
                 final ViolationData vd = new ViolationData(this, player, data.creativeFlyVL, result, cc.creativeFlyActions);
-                if (vd.needsParameters()){
+                if (vd.needsParameters()) {
                     vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
                     vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
                     vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from,  to)));
                 }
-                if (executeActions(vd))
+                if (executeActions(vd)) {
                     // Compose a new location based on coordinates of "newTo" and viewing direction of "event.getTo()"
                     // to allow the player to look somewhere else despite getting pulled back by NoCheatPlus.
                     return data.getSetBack(to);
-            } else
+                }
+            } else {
                 data.creativeFlyPreviousRefused = true;
-        } else
+            }
+        } else {
             data.creativeFlyPreviousRefused = false;
+        }
 
         // Slowly reduce the violation level with each event.
         data.creativeFlyVL *= 0.97D;
