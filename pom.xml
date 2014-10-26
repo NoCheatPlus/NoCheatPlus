@@ -32,6 +32,7 @@
     <module>NCPCompatCB3043</module>
     <module>NCPCompatCBDev</module>
     <module>NCPCompatProtocolLib</module>
+    <module>NCPCompatGlowstone</module>
     <module>NCPPlugin</module>
     <module>NoCheatPlus</module>
   </modules>

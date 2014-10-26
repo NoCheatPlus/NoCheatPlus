@@ -103,6 +103,11 @@
     	<artifactId>ncpcompatprotocollib</artifactId>
     	<version>static</version>
     </dependency>
+    <dependency>
+        <groupId>fr.neatmonster</groupId>
+        <artifactId>ncpcompatglowstone</artifactId>
+        <version>static</version>
+    </dependency>
   </dependencies>
 
   <!-- Properties -->

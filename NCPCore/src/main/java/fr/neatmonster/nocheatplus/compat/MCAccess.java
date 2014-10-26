@@ -61,21 +61,21 @@ public interface MCAccess {
 	/**
 	 * NMS Block static.
 	 * @param id
-	 * @return
+	 * @return MAYBE if undecided, TRUE or FALSE if decided.
 	 */
 	public AlmostBoolean isBlockSolid(int id);
 	
 	/**
 	 * NMS Block static..
 	 * @param id
-	 * @return
+	 * @return MAYBE if undecided, TRUE or FALSE if decided.
 	 */
 	public AlmostBoolean isBlockLiquid(int id);
 
 	/**
 	 * Does only check y bounds, returns false if dead. this is half a check as auxiliary means for PlayerLocation.isIllegal.
 	 * @param player
-	 * @return null If undecided, true / false if decided.
+	 * @return MAYBE if undecided, TRUE or FALSE if decided.
 	 */
 	public AlmostBoolean isIllegalBounds(Player player);
 	

@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.neatmonster</groupId>
+  <artifactId>ncpcompatglowstone</artifactId>
+  <packaging>jar</packaging>
+  <name>NCPCompatGlowstone</name>
+  <version>static</version>
+
+  <parent>
+    <groupId>fr.neatmonster</groupId>
+    <artifactId>nocheatplus-parent</artifactId>
+    <version>static</version>
+  </parent>
+  
+  <repositories>
+  <repository>
+    <id>glowstone-repo</id>
+    <name>Glowstone Repository</name>
+    <url>http://repo.glowstone.net/content/groups/public/</url>
+  </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcore</artifactId>
+    	<version>static</version>
+    </dependency>
+    <dependency>
+    	<groupId>net.glowstone</groupId>
+    	<artifactId>glowstone</artifactId>
+    	<version>LATEST</version>
+    </dependency>
+    <dependency>
+    	<groupId>fr.neatmonster</groupId>
+    	<artifactId>ncpcompatbukkit</artifactId>
+    	<version>static</version>
+    </dependency>
+  </dependencies>
+
+  <description>Native compatibility for Glowstone (experimental):
+http://glowstone.net
+</description>
+</project>

@@ -104,6 +104,7 @@
                   <include>fr.neatmonster:ncpcompatcb3043</include>
                   <include>fr.neatmonster:ncpcompatcbdev</include>
                   <include>fr.neatmonster:ncpcompatprotocollib</include>
+                  <include>fr.neatmonster:ncpcompatglowstone</include>
                   <include>fr.neatmonster:ncpplugin</include>
 <!--                   <include>fr.neatmonster:nocheatplus-parent</include> -->
                 </includes>
