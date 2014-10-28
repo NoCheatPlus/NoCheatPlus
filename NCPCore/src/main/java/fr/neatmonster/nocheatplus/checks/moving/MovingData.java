@@ -502,6 +502,9 @@ public class MovingData extends ACheckData {
         teleported = null;
     }
 
+    /**
+     * Set set-back location to null.
+     */
     public final void resetSetBack() {
         setBack = null;
     }

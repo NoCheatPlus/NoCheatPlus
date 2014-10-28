@@ -1256,40 +1256,18 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     public void onPlayerRespawn(final PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
-        final MovingConfig cc = MovingConfig.getConfig(player);
-
-        final Location loc = event.getRespawnLocation();
         data.clearFlyData();
-        data.setSetBack(loc);
-
+        data.resetSetBack(); // To force dataOnJoin to set it to loc.
         // Handle respawn like join.
-        dataOnJoin(player, loc, data, cc);
+        dataOnJoin(player, event.getRespawnLocation(), data, MovingConfig.getConfig(player));
     }
 
     @Override
     public void playerJoins(final Player player) {
-        final MovingData data = MovingData.getData(player);
-        final MovingConfig cc = MovingConfig.getConfig(player);
-
-        final Location loc = player.getLocation(useLoc);
-
-        // Correct set-back on join.
-        if (data.hasSetBackWorldChanged(loc)) {
-            data.clearFlyData();
-            data.setSetBack(loc);
-        }
-        else if (!data.hasSetBack()) {
-            // TODO: Might consider something else like with respawn. Check if it is passable ?
-            data.setSetBack(loc);
-        }
-
-        dataOnJoin(player, loc, data, cc);
-
+        dataOnJoin(player, player.getLocation(useLoc), MovingData.getData(player), MovingConfig.getConfig(player));
         // Cleanup.
         useLoc.setWorld(null);
-
     }
-
 
     /**
      * Alter data for players joining (join, respawn).<br>
@@ -1302,6 +1280,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param cc
      */
     private void dataOnJoin(Player player, Location loc, MovingData data, MovingConfig cc) {
+        
         final int tick = TickTask.getTick();
         // Check loaded chunks.
         if (cc.loadChunksOnJoin) {
@@ -1311,13 +1290,25 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
             }
         }
-
+        
+        // Correct set-back on join.
+        if (!data.hasSetBack() || data.hasSetBackWorldChanged(loc)) {
+            data.clearFlyData();
+            data.setSetBack(loc);
+            data.resetPositions(loc);
+        } else {
+            // TODO: Check consistency/distance.
+            //final Location setBack = data.getSetBack(loc);
+            //final double d = loc.distanceSquared(setBack);
+            // TODO: If to reset positions: relate to previous ones and set-back.
+            data.resetPositions(loc); // TODO: See above.
+        }
+        
         // Always reset position to this one.
         // TODO: more fine grained reset?
-        data.resetPositions(loc);
         data.clearMorePacketsData();
         data.removeAllVelocity();
-        data.resetTrace(loc, tick, cc.traceSize, cc.traceMergeDist);
+        data.resetTrace(loc, tick, cc.traceSize, cc.traceMergeDist); // Might reset to loc instead of set-back ?
 
         // More resetting.
         data.vDistAcc.clear();
