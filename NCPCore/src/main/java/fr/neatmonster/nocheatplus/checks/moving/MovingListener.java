@@ -1353,9 +1353,31 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     @Override
     public void playerLeaves(final Player player) {
+        final MovingData data = MovingData.getData(player);
+        // Check for missed moves.
+        final Location loc = player.getLocation(useLoc);
+        if (!BlockProperties.isPassable(loc)) {
+            boolean warn = false;
+            if (data.toX != Double.MAX_VALUE) {
+                final Location refLoc = new Location(loc.getWorld(), data.toX, data.toY, data.toZ);
+                final double d = refLoc.distanceSquared(loc);
+                if (d > 0.0) {
+                    if (BlockProperties.isPassable(refLoc)) {
+                        warn = true;
+                        StringBuilder builder = new StringBuilder(128);
+                        DebugUtil.addMove(refLoc, loc, null, builder);
+                        LogUtil.logWarning("[NoCheatPlus] Potential exploit: Player " + player.getName() + " logs out having moved into a block: " + builder.toString());
+                    }
+                }
+            }
+            if (warn) {
+                // TODO: Additional debug info. Might include full moving trace ?
+            }
+        }
+        useLoc.setWorld(null);
+        // Adjust data.
         survivalFly.setReallySneaking(player, false);
         noFall.onLeave(player);
-        final MovingData data = MovingData.getData(player);
         // TODO: Add a method for ordinary presence-change resetting (use in join + leave).
         data.onPlayerLeave();
     }
