@@ -391,6 +391,16 @@ public class TrigUtil {
         else if (yawDiff > 180f) yawDiff -= 360f;
         return yawDiff;
     }
+    
+    /**
+     * Manhattan distance.
+     * @param loc1
+     * @param loc2
+     * @return
+     */
+    public static int manhattan(final Location loc1, final Location loc2) {
+        return manhattan(loc1.getBlockX(), loc1.getBlockY(), loc1.getBlockZ(), loc2.getBlockX(), loc2.getBlockY(), loc2.getBlockZ());
+    }
 
     /**
      * Manhattan distance.
@@ -405,7 +415,7 @@ public class TrigUtil {
     }
 
     public static double manhattan(final double x1,final double  z1, final double x2, final double z2){
-        return Math.abs(x1 - x2) + Math.abs(z1 - z2);
+        return manhattan(Location.locToBlock(x1), Location.locToBlock(z1), Location.locToBlock(x2), Location.locToBlock(z2));
     }
 
     /**
@@ -423,7 +433,7 @@ public class TrigUtil {
     }
 
     public static double manhattan(final double x1, final double y1, final double  z1, final double x2, final double y2, final double z2){
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2) + Math.abs(z1 - z2);
+        return manhattan(Location.locToBlock(x1), Location.locToBlock(y1), Location.locToBlock(z1), Location.locToBlock(x2), Location.locToBlock(y2), Location.locToBlock(z2));
     }
 
     /**
