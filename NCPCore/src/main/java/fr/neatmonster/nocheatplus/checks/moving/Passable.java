@@ -103,7 +103,7 @@ public class Passable extends Check {
 			loc = null;
 			tags += "into";
 		} else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {
-		    // Keep loc.
+		    // Keep loc, because it it is passable.
 			tags += "into_shift";
 		}
 //				} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {
@@ -111,12 +111,14 @@ public class Passable extends Check {
 			// Keep loc as set-back.
 //				}
 		else if (!from.isSameBlock(lbX, lbY, lbZ)) {
-			// Otherwise keep loc as set-back.
+			// Both loc and from are not passable. Use from as set.back (earliest).
 			tags += "cross_shift";
+			loc = null; 
 		}
 		else if (manhattan == 1 && to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))) {
 //				else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))) {
 			// Allow the move up if the head is free.
+		    // TODO: Better distinguish ray-tracing (through something thin) or check to-head-passable too?
 			return null;
 		}
 		else if (manhattan > 0) {
@@ -137,6 +139,7 @@ public class Passable extends Check {
 		
 		// Prefer the set-back location from the data.
 		if (data.hasSetBack()) {
+		    // TODO: Review or make configurable.
 			final Location ref = data.getSetBack(to);
 			if (BlockProperties.isPassable(from.getBlockCache(), ref) || loc == null || TrigUtil.distance(from, loc) > 0.13) {
 //					if (BlockProperties.isPassableExact(from.getBlockCache(), ref)) {
