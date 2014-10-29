@@ -12,7 +12,7 @@ public class BlocksMC1_8 implements BlockPropertiesSetup {
     
     public BlocksMC1_8() {
         BlockInit.assertMaterialNameMatch(166, "barrier");
-        BlockInit.assertMaterialNameMatch(165, "slime", "block");
+        BlockInit.assertMaterialNameMatch(165, "slime");
         BlockInit.assertMaterialNameMatch(187, "fence", "gate");
         BlockInit.assertMaterialNameMatch(176, "banner");
         BlockInit.assertMaterialNameMatch(169, "sea", "lantern");
