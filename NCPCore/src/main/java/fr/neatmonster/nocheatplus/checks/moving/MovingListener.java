@@ -1387,8 +1387,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     }
                 }
             }
-            useLoc.setWorld(null);
         }
+        useLoc.setWorld(null);
         // Adjust data.
         survivalFly.setReallySneaking(player, false);
         noFall.onLeave(player);
