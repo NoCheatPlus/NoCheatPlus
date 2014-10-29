@@ -103,6 +103,7 @@ public class Passable extends Check {
 			loc = null;
 			tags += "into";
 		} else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {
+		    // Keep loc.
 			tags += "into_shift";
 		}
 //				} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {

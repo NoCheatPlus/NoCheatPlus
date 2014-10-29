@@ -1353,28 +1353,42 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     @Override
     public void playerLeaves(final Player player) {
+        final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
-        // Check for missed moves.
         final Location loc = player.getLocation(useLoc);
-        if (!BlockProperties.isPassable(loc)) {
-            boolean warn = false;
-            if (data.toX != Double.MAX_VALUE) {
-                final Location refLoc = new Location(loc.getWorld(), data.toX, data.toY, data.toZ);
-                final double d = refLoc.distanceSquared(loc);
-                if (d > 0.0) {
-                    if (BlockProperties.isPassable(refLoc)) {
-                        warn = true;
-                        StringBuilder builder = new StringBuilder(128);
-                        DebugUtil.addMove(refLoc, loc, null, builder);
-                        LogUtil.logWarning("[NoCheatPlus] Potential exploit: Player " + player.getName() + " logs out having moved into a block: " + builder.toString());
+        // Debug logout.
+        if (cc.debug) {
+            LogUtil.logInfo("[NoCheatPlus] Player " + player.getName() + " leaves at location: " + loc.toString());
+        }
+        if (!player.isSleeping() && !player.isDead()) {
+            // Check for missed moves.
+            // TODO: Consider to catch all, at least (debug-) logging-wise.
+            if (!BlockProperties.isPassable(loc)) {
+                if (data.toX != Double.MAX_VALUE) {
+                    final Location refLoc = new Location(loc.getWorld(), data.toX, data.toY, data.toZ);
+                    final double d = refLoc.distanceSquared(loc);
+                    if (d > 0.0) {
+                        // TODO: Consider to always set back here. Might skip on big distances.
+                        if (TrigUtil.manhattan(loc, refLoc) > 0 || BlockProperties.isPassable(refLoc)) {
+                            if (passable.isEnabled(player)) {
+                                LogUtil.logWarning("[NoCheatPlus] Potential exploit: Player " + player.getName() + " leaves, having moved into a block (not tracked by moving checks): " + player.getWorld().getName() + " / " + DebugUtil.formatMove(refLoc, loc));
+                                // TODO: Actually trigger a passable violation (+tag).
+                                if (d > 1.25) {
+                                    LogUtil.logWarning("[NoCheatPlus] SKIP set-back for " + player.getName() + ", because distance is too high (risk of false positives): " + d);
+                                } else {
+                                    LogUtil.logInfo("[NoCheatPlus] Set back player " + player.getName() + ": " + DebugUtil.formatLocation(refLoc));
+                                    data.prepareSetBack(refLoc);
+                                    if (!player.teleport(refLoc)) {
+                                        LogUtil.logWarning("[NoCheatPlus] FAILED to set back player " + player.getName());
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            if (warn) {
-                // TODO: Additional debug info. Might include full moving trace ?
-            }
+            useLoc.setWorld(null);
         }
-        useLoc.setWorld(null);
         // Adjust data.
         survivalFly.setReallySneaking(player, false);
         noFall.onLeave(player);

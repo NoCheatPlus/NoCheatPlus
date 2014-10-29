@@ -20,6 +20,29 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
 public class DebugUtil {
 	
 	// TODO: Add useLoc1 and useLoc2.
+    
+    /**
+     * Just the coordinates.
+     * @param loc
+     * @return
+     */
+    public static String formatLocation(final Location loc) {
+        StringBuilder b = new StringBuilder(128);
+        addLocation(loc, b);
+        return b.toString();
+    }
+    
+    /**
+     * Just the coordinates.
+     * @param from
+     * @param to
+     * @return
+     */
+    public static String formatMove(Location from, Location to) {
+        StringBuilder builder = new StringBuilder(128);
+        DebugUtil.addMove(from, to, null, builder);
+        return builder.toString();
+    }
 	
 	public static boolean isSamePos(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2){
 		return x1 == x2 && y1 == y2 && z1 == z2;
