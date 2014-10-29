@@ -6,7 +6,7 @@ NoCheatPlus is an unofficial fork of the famous anti-cheat plugin [NoCheat] (htt
 Installation
 ---------
 * Get [CraftBukkit] (http://wiki.bukkit.org/Setting_up_a_server)
-* Download NoCheatPlus from either [BukkitDev (staff approved)] (http://dev.bukkit.org/server-mods/nocheatplus/files/) or [Jenkins (development versions)] (http://ci.ecocitycraft.com/job/NoCheatPlus/).
+* Download NoCheatPlus from either [BukkitDev (staff approved)] (http://dev.bukkit.org/server-mods/nocheatplus/files/) or [Jenkins (development versions)] (http://ci.md-5.net/job/NoCheatPlus/).
 * Drop the NoCheatPlus.jar in to your plugins folder.
 * Start or /reload your CraftBukkit server. (Using /reload can have unwanted side effects with players still online.)
 
@@ -37,7 +37,7 @@ Project
 
 Download
 * [BukkitDev (staff approved)] (http://dev.bukkit.org/server-mods/nocheatplus/files/)
-* [Jenkins (development versions)] (http://ci.ecocitycraft.com/)
+* [Jenkins (development versions)] (http://ci.md-5.net/job/NoCheatPlus/)
 
 Support and Documentation
 * [Tickets] (http://dev.bukkit.org/server-mods/nocheatplus/tickets/)
