@@ -69,7 +69,7 @@ public abstract class AbstractCommand<A> implements TabExecutor{
     /**
      * 
      * @param sender
-     * @return True if sender is a Player, otherwise false is returned and a message sent.
+     * @return True if sender is a ConsoleCommandSender, otherwise false is returned and a message sent.
      */
     public static boolean demandConsoleCommandSender(CommandSender sender) {
         if (sender instanceof ConsoleCommandSender) {
