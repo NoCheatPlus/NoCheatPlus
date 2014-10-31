@@ -9,7 +9,9 @@ import java.util.Set;
 /**
  * More cows, more fun: Copy on write for a LinkedHashMap (optimized for fast reading from any thread).
  * <hr>
- * This does not allow access-ordered maps, use Collections.synchronizedMap(LinkedHashMap...) for that case.
+ * Shortcomings:<br>
+ * <li>This does not allow access-ordered maps, use Collections.synchronizedMap(LinkedHashMap...) for that case.</li>
+ * <li>Behavior of equals and hashCode could be problematic, because they have not been overridden, but in fact should be processed on copies of this map.</li>
  * @author dev1mc
  *
  */
