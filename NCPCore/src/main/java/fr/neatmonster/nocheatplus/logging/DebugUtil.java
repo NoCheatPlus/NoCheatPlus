@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -202,6 +203,8 @@ public class DebugUtil {
 					// TODO: Check backwards compatibility (1.4.2). Remove try-catch
 					builder.append("\n(walkspeed=" + player.getWalkSpeed() + " flyspeed=" + player.getFlySpeed() + ")");
 				} catch (Throwable t){}
+				final Vector v = player.getVelocity();
+				builder.append("(svel=" + v.getX() + "," + v.getY() + "," + v.getZ() + ")");
 				if (player.isSprinting()){
 					builder.append("(sprinting)");
 				}
