@@ -15,25 +15,25 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
  *
  */
 public class Captcha extends Check implements ICaptcha{
-	
-    public Captcha() {
-		super(CheckType.CHAT_CAPTCHA);
-	}
 
-	/** The random number generator. */
+    public Captcha() {
+        super(CheckType.CHAT_CAPTCHA);
+    }
+
+    /** The random number generator. */
     private final Random random = new Random();
 
-    
+
     @Override
     public void checkCaptcha(Player player, String message, ChatConfig cc, ChatData data, boolean isMainThread) {
-    	// Correct answer to the captcha?
+        // Correct answer to the captcha?
         if (message.equals(data.captchaGenerated)) {
             // Yes, clear their data and do not worry anymore about them.
             data.reset();
             data.captchaStarted = false;
             player.sendMessage(ColorUtil.replaceColors(cc.captchaSuccess));
         } else {
-        	// Increment their tries number counter.
+            // Increment their tries number counter.
             data.captchTries++;
             data.captchaVL ++;
             // Have they failed too man times?
@@ -45,58 +45,58 @@ public class Captcha extends Check implements ICaptcha{
 
             // Display the question again (if not kicked).
             if (player.isOnline()) {
-            	sendCaptcha(player, cc, data);
+                sendCaptcha(player, cc, data);
             }
         }
-	}
+    }
 
     @Override
-	public void sendNewCaptcha(Player player, ChatConfig cc, ChatData data) {
-    	// Display a captcha to the player.
+    public void sendNewCaptcha(Player player, ChatConfig cc, ChatData data) {
+        // Display a captcha to the player.
         generateCaptcha(cc, data, true);
         sendCaptcha(player, cc, data);
         data.captchaStarted = true;
-	}
+    }
 
     @Override
     public void generateCaptcha(ChatConfig cc, ChatData data, boolean reset) {
-    	if (reset) data.captchTries = 0;
-    	final char[] chars = new char[cc.captchaLength];
+        if (reset) data.captchTries = 0;
+        final char[] chars = new char[cc.captchaLength];
         for (int i = 0; i < cc.captchaLength; i++)
             chars[i] = cc.captchaCharacters.charAt(random
                     .nextInt(cc.captchaCharacters.length()));
         data.captchaGenerated = new String(chars);
-	}
-    
+    }
+
     @Override
     public void resetCaptcha(Player player){
-    	ChatData data = ChatData.getData(player);
-    	synchronized (data) {
-    		resetCaptcha(ChatConfig.getConfig(player), data);
-		}
+        ChatData data = ChatData.getData(player);
+        synchronized (data) {
+            resetCaptcha(ChatConfig.getConfig(player), data);
+        }
     }
-    
+
     @Override
     public void resetCaptcha(ChatConfig cc, ChatData data){
-    	data.captchTries = 0;
-    	if (shouldCheckCaptcha(cc, data) || shouldStartCaptcha(cc, data)){
-    		generateCaptcha(cc, data, true);
-    	}
+        data.captchTries = 0;
+        if (shouldCheckCaptcha(cc, data) || shouldStartCaptcha(cc, data)){
+            generateCaptcha(cc, data, true);
+        }
     }
 
-	@Override
-	public void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
-		player.sendMessage(ColorUtil.replaceColors(cc.captchaQuestion.replace("[captcha]",
+    @Override
+    public void sendCaptcha(Player player, ChatConfig cc, ChatData data) {
+        player.sendMessage(ColorUtil.replaceColors(cc.captchaQuestion.replace("[captcha]",
                 data.captchaGenerated)));
-	}
+    }
 
     @Override
-	public boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
-		return cc.captchaCheck && !data.captchaStarted && !data.hasCachedPermission(Permissions.CHAT_CAPTCHA);
-	}
+    public boolean shouldStartCaptcha(ChatConfig cc, ChatData data) {
+        return cc.captchaCheck && !data.captchaStarted && !data.hasCachedPermission(Permissions.CHAT_CAPTCHA);
+    }
 
     @Override
-	public boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
-		return cc.captchaCheck && data.captchaStarted  && !data.hasCachedPermission(Permissions.CHAT_CAPTCHA);
-	}
+    public boolean shouldCheckCaptcha(ChatConfig cc, ChatData data) {
+        return cc.captchaCheck && data.captchaStarted  && !data.hasCachedPermission(Permissions.CHAT_CAPTCHA);
+    }
 }

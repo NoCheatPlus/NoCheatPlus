@@ -13,7 +13,6 @@ import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.components.MCAccessHolder;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.players.ExecutionHistory;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -41,7 +40,7 @@ public abstract class Check implements MCAccessHolder{
 
     /** The type. */
     protected final CheckType type;
-    
+
     protected MCAccess mcAccess;
 
     /**
@@ -56,7 +55,7 @@ public abstract class Check implements MCAccessHolder{
         ViolationHistory.checkTypeMap.put(getClass().getName(), type);
         DataManager.registerExecutionHistory(type, histories);
     }
-    
+
     /**
      * Execute actions, possibly thread safe according to the isMainThread flag.<br>
      * This does not use extra synchronization.
@@ -94,7 +93,7 @@ public abstract class Check implements MCAccessHolder{
             final ActionList actions) {
         return executeActions(new ViolationData(this, player, vL, addedVL, actions), true);
     }
-    
+
     /**
      * Execute some actions for the specified player, only for the main thread.
      * 
@@ -103,7 +102,7 @@ public abstract class Check implements MCAccessHolder{
      * @return true, if the event should be cancelled
      */
     protected boolean executeActions(final ViolationData violationData){
-    	return executeActions(violationData, true);
+        return executeActions(violationData, true);
     }
 
     /**
@@ -115,24 +114,24 @@ public abstract class Check implements MCAccessHolder{
      * @return true, if the event should be cancelled
      */
     protected boolean executeActions(final ViolationData violationData, final boolean isMainThread) {
-    	
-    	// Dispatch the VL processing to the hook manager (now thread safe).
+
+        // Dispatch the VL processing to the hook manager (now thread safe).
         if (NCPHookManager.shouldCancelVLProcessing(violationData))
             // One of the hooks has decided to cancel the VL processing, return false.
             return false;
-   
+
         final boolean hasCancel = violationData.hasCancel(); 
-    	
+
         if (isMainThread) 
-        	return violationData.executeActions();
+            return violationData.executeActions();
         else 
-        	// Always schedule to add to ViolationHistory.
-        	TickTask.requestActionsExecution(violationData);
-        
-    	// (Design change: Permission checks are moved to cached permissions, lazily updated.)
-    	return hasCancel;
+            // Always schedule to add to ViolationHistory.
+            TickTask.requestActionsExecution(violationData);
+
+        // (Design change: Permission checks are moved to cached permissions, lazily updated.)
+        return hasCancel;
     }
-    
+
     /**
      * Fill in parameters for creating violation data. 
      * Individual checks should override this to fill in check specific parameters,
@@ -141,9 +140,9 @@ public abstract class Check implements MCAccessHolder{
      * @return
      */
     protected Map<ParameterName, String> getParameterMap(final ViolationData violationData){
-    	final Map<ParameterName, String> params = new HashMap<ParameterName, String>();
-    	// (Standard parameters like player, vl, check name are filled in in ViolationData.getParameter!)
-    	return params;
+        final Map<ParameterName, String> params = new HashMap<ParameterName, String>();
+        // (Standard parameters like player, vl, check name are filled in in ViolationData.getParameter!)
+        return params;
     }
 
     /**
@@ -180,14 +179,14 @@ public abstract class Check implements MCAccessHolder{
         return !NCPExemptionManager.isExempted(player, type);
     }
 
-	@Override
-	public void setMCAccess(MCAccess mcAccess) {
-		this.mcAccess = mcAccess;
-	}
+    @Override
+    public void setMCAccess(MCAccess mcAccess) {
+        this.mcAccess = mcAccess;
+    }
 
-	@Override
-	public MCAccess getMCAccess() {
-		return mcAccess;
-	}
-	
+    @Override
+    public MCAccess getMCAccess() {
+        return mcAccess;
+    }
+
 }

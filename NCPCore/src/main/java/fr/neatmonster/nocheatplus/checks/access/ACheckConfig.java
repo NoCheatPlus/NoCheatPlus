@@ -12,13 +12,13 @@ public abstract class ACheckConfig implements ICheckConfig {
 
     /** For on the fly debug setting. */
     public boolean debug = false;
-    
+
     /** If to adapt to server side lag. */
     public final boolean lag;
-    
+
     /** Permissions to hold in player data cache, not final for flexibility. */
     protected String[] cachePermissions;
-    
+
     /**
      * 
      * @param config
@@ -26,8 +26,8 @@ public abstract class ACheckConfig implements ICheckConfig {
      */
     public ACheckConfig(final ConfigFile config, final String pathPrefix){
         this(config, pathPrefix, null);
-        }
-    
+    }
+
     /**
      * 
      * @param config
@@ -41,11 +41,11 @@ public abstract class ACheckConfig implements ICheckConfig {
         lag = config.getBoolean(pathPrefix + ConfPaths.SUB_LAG, true) && config.getBoolean(ConfPaths.MISCELLANEOUS_LAG, true);
         this.cachePermissions = cachePermissions;
     }
-    
-	@Override
-	public String[] getCachePermissions() {
-		return cachePermissions;
-	}
+
+    @Override
+    public String[] getCachePermissions() {
+        return cachePermissions;
+    }
 
     @Override
     public boolean getDebug() {
@@ -56,5 +56,5 @@ public abstract class ACheckConfig implements ICheckConfig {
     public void setDebug(final boolean debug) {
         this.debug = debug;
     }
-	
+
 }
