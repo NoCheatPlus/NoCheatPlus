@@ -30,78 +30,78 @@ import fr.neatmonster.nocheatplus.utilities.PotionUtil;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
-	
-	// private AlmostBoolean entityPlayerAvailable = AlmostBoolean.MAYBE;
-	
-	/**
-	 * Constructor to let it fail.
-	 */
-	public MCAccessBukkit() {
-		// TODO: Add more that might fail if not supported ?
-		Material.AIR.isSolid();
-		Material.AIR.isOccluding();
-		Material.AIR.isTransparent();
-		// TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
-	}
 
-	@Override
-	public String getMCVersion() {
-		// Bukkit API.
-		// TODO: maybe output something else.
-		return "1.4.6|1.4.7|1.5.x|1.6.x|1.7.x"; // 1.7.x is bold!
-	}
+    // private AlmostBoolean entityPlayerAvailable = AlmostBoolean.MAYBE;
 
-	@Override
-	public String getServerVersionTag() {
-		return "Bukkit-API";
-	}
+    /**
+     * Constructor to let it fail.
+     */
+    public MCAccessBukkit() {
+        // TODO: Add more that might fail if not supported ?
+        Material.AIR.isSolid();
+        Material.AIR.isOccluding();
+        Material.AIR.isTransparent();
+        // TODO: Deactivate checks that might not work. => MCAccess should have availability method, NCP deactivates check on base of that.
+    }
 
-	@Override
-	public CommandMap getCommandMap() {
-		try{
-			return (CommandMap) ReflectionUtil.invokeMethodNoArgs(Bukkit.getServer(), "getCommandMap");
-		} catch (Throwable t) {
-			// Nasty.
-			return null;
-		}
-	}
+    @Override
+    public String getMCVersion() {
+        // Bukkit API.
+        // TODO: maybe output something else.
+        return "1.4.6|1.4.7|1.5.x|1.6.x|1.7.x"; // 1.7.x is bold!
+    }
 
-	@Override
-	public BlockCache getBlockCache(final World world) {
-		return new BlockCacheBukkit(world);
-	}
+    @Override
+    public String getServerVersionTag() {
+        return "Bukkit-API";
+    }
 
-	@Override
-	public double getHeight(final Entity entity) {
-	    // TODO: Copy defaults like with widths.
-		final double entityHeight = 1.0;
-		if (entity instanceof LivingEntity) {
-			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
-		} else {
-		    return entityHeight;
-		}
-	}
+    @Override
+    public CommandMap getCommandMap() {
+        try{
+            return (CommandMap) ReflectionUtil.invokeMethodNoArgs(Bukkit.getServer(), "getCommandMap");
+        } catch (Throwable t) {
+            // Nasty.
+            return null;
+        }
+    }
 
-	@Override
-	public AlmostBoolean isBlockSolid(final int id) {
-		@SuppressWarnings("deprecation")
-		final Material mat = Material.getMaterial(id); 
-		if (mat == null) {
-			return AlmostBoolean.MAYBE;
-		}
-		else {
-			return AlmostBoolean.match(mat.isSolid());
-		}
-	}
-	
-	@Override
+    @Override
+    public BlockCache getBlockCache(final World world) {
+        return new BlockCacheBukkit(world);
+    }
+
+    @Override
+    public double getHeight(final Entity entity) {
+        // TODO: Copy defaults like with widths.
+        final double entityHeight = 1.0;
+        if (entity instanceof LivingEntity) {
+            return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
+        } else {
+            return entityHeight;
+        }
+    }
+
+    @Override
+    public AlmostBoolean isBlockSolid(final int id) {
+        @SuppressWarnings("deprecation")
+        final Material mat = Material.getMaterial(id); 
+        if (mat == null) {
+            return AlmostBoolean.MAYBE;
+        }
+        else {
+            return AlmostBoolean.match(mat.isSolid());
+        }
+    }
+
+    @Override
     public double getWidth(final Entity entity) {
         // TODO: Make readable from file for defaults + register individual getters where appropriate.
-	    // TODO: For height too. [Automatize most by spawning + checking?]
-	    // Values taken from 1.7.10.
-	    final EntityType type = entity.getType();
-	    switch(type){
-	    // TODO: case COMPLEX_PART:
+        // TODO: For height too. [Automatize most by spawning + checking?]
+        // Values taken from 1.7.10.
+        final EntityType type = entity.getType();
+        switch(type){
+        // TODO: case COMPLEX_PART:
         case ENDER_SIGNAL: // this.a(0.25F, 0.25F);
         case FIREWORK: // this.a(0.25F, 0.25F);
         case FISHING_HOOK: // this.a(0.25F, 0.25F);
@@ -160,7 +160,7 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
             return 3.6f; // (Better than nothing.)
         case ENDER_DRAGON: // this.a(16.0F, 8.0F);
             return 16.0f;
-        // Variable size:
+            // Variable size:
         case SLIME:
         case MAGMA_CUBE:
             if (entity instanceof Slime) {
@@ -170,163 +170,163 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
         default:
             break;
         }
-	    // Check by instance for minecarts (too many).
-	    if (entity instanceof Minecart) {
+        // Check by instance for minecarts (too many).
+        if (entity instanceof Minecart) {
             return 0.98f; // this.a(0.98F, 0.7F);
         }
-	    // Latest Bukkit API.
-	    try {
-	        switch (type) {
-	        case LEASH_HITCH: // hanging: this.a(0.5F, 0.5F);
+        // Latest Bukkit API.
+        try {
+            switch (type) {
+            case LEASH_HITCH: // hanging: this.a(0.5F, 0.5F);
                 return 0.5;
-	        case HORSE: // this.a(1.4F, 1.6F);
-	            return 1.4f;
-	        default:
-	            break;
-	        }
-	    } catch (Throwable t) {}
-	    // Default entity width.
+            case HORSE: // this.a(1.4F, 1.6F);
+                return 1.4f;
+            default:
+                break;
+            }
+        } catch (Throwable t) {}
+        // Default entity width.
         return 0.6f;
-        
+
     }
 
-	@Override
-	public AlmostBoolean isBlockLiquid(final int id) {
-		@SuppressWarnings("deprecation")
-		final Material mat = Material.getMaterial(id); 
-		if (mat == null) return AlmostBoolean.MAYBE;
-		switch (mat) {
-			case STATIONARY_LAVA:
-			case STATIONARY_WATER:
-			case WATER:
-			case LAVA:
-				return AlmostBoolean.YES;
-			default:
-				return AlmostBoolean.NO;
-		}
-	}
+    @Override
+    public AlmostBoolean isBlockLiquid(final int id) {
+        @SuppressWarnings("deprecation")
+        final Material mat = Material.getMaterial(id); 
+        if (mat == null) return AlmostBoolean.MAYBE;
+        switch (mat) {
+        case STATIONARY_LAVA:
+        case STATIONARY_WATER:
+        case WATER:
+        case LAVA:
+            return AlmostBoolean.YES;
+        default:
+            return AlmostBoolean.NO;
+        }
+    }
 
-	@Override
-	public AlmostBoolean isIllegalBounds(final Player player) {
-		if (player.isDead()) {
-			return AlmostBoolean.NO;
-		}
-		if (!player.isSleeping()) { // TODO: ignored sleeping ?
-			// TODO: This can test like ... nothing !
-			// (Might not be necessary.)
-		}
-		return AlmostBoolean.MAYBE;
-	}
+    @Override
+    public AlmostBoolean isIllegalBounds(final Player player) {
+        if (player.isDead()) {
+            return AlmostBoolean.NO;
+        }
+        if (!player.isSleeping()) { // TODO: ignored sleeping ?
+            // TODO: This can test like ... nothing !
+            // (Might not be necessary.)
+        }
+        return AlmostBoolean.MAYBE;
+    }
 
-	@Override
-	public double getJumpAmplifier(final Player player) {
-		return PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.JUMP);
-	}
+    @Override
+    public double getJumpAmplifier(final Player player) {
+        return PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.JUMP);
+    }
 
-	@Override
-	public double getFasterMovementAmplifier(final Player player) {
-		return PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SPEED);
-	}
+    @Override
+    public double getFasterMovementAmplifier(final Player player) {
+        return PotionUtil.getPotionEffectAmplifier(player, PotionEffectType.SPEED);
+    }
 
-	@Override
-	public int getInvulnerableTicks(final Player player) {
-		// TODO: Ahhh...
-		return player.getNoDamageTicks();
-	}
+    @Override
+    public int getInvulnerableTicks(final Player player) {
+        // TODO: Ahhh...
+        return player.getNoDamageTicks();
+    }
 
-	@Override
-	public void setInvulnerableTicks(final Player player, final int ticks) {
-		// TODO: Not really.
-		player.setLastDamageCause(BridgeHealth.getEntityDamageEvent(player, DamageCause.CUSTOM, 500.0));
-		player.setNoDamageTicks(ticks);
-	}
+    @Override
+    public void setInvulnerableTicks(final Player player, final int ticks) {
+        // TODO: Not really.
+        player.setLastDamageCause(BridgeHealth.getEntityDamageEvent(player, DamageCause.CUSTOM, 500.0));
+        player.setNoDamageTicks(ticks);
+    }
 
-	@Override
-	public void dealFallDamage(final Player player, final double damage) {
-		// TODO: Document in knowledge base.
-		// TODO: Account for armor, other.
-		// TODO: use setLastDamageCause here ?
-		BridgeHealth.damage(player, damage);
-	}
+    @Override
+    public void dealFallDamage(final Player player, final double damage) {
+        // TODO: Document in knowledge base.
+        // TODO: Account for armor, other.
+        // TODO: use setLastDamageCause here ?
+        BridgeHealth.damage(player, damage);
+    }
 
-	@Override
-	public boolean isComplexPart(final Entity entity) {
-		return entity instanceof ComplexEntityPart || entity instanceof ComplexLivingEntity;
-	}
+    @Override
+    public boolean isComplexPart(final Entity entity) {
+        return entity instanceof ComplexEntityPart || entity instanceof ComplexLivingEntity;
+    }
 
-	@Override
-	public boolean shouldBeZombie(final Player player) {
-		// Not sure :) ...
-		return BridgeHealth.getHealth(player) <= 0.0 && !player.isDead();
-	}
+    @Override
+    public boolean shouldBeZombie(final Player player) {
+        // Not sure :) ...
+        return BridgeHealth.getHealth(player) <= 0.0 && !player.isDead();
+    }
 
-	@Override
-	public void setDead(final Player player, final int deathTicks) {
-		// TODO: Test / kick ? ...
-		BridgeHealth.setHealth(player, 0.0);
-		// TODO: Might try stuff like setNoDamageTicks.
-		BridgeHealth.damage(player, 1.0);
-	}
-	
-	@Override
-	public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
-		// Note deprecation suppression: These ids should be unique for a server run, that should be ok for setting up generic properties.
-		// TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
-		final Set<Material> fullBlocks = new HashSet<Material>();
-		for (final Material mat : new Material[]{
-				// TODO: Ice !? / Packed ice !?
-				Material.GLASS, Material.GLOWSTONE, Material.ICE, Material.LEAVES,
-				Material.COMMAND, Material.BEACON,
-				Material.PISTON_BASE,
-		}) {
-			fullBlocks.add(mat);
-		}
-		for (final Material mat : Material.values()) {
-			if (!mat.isBlock()) {
-				continue;
-			}
-			if (fullBlocks.contains(mat)) {
-				continue;
-			}
-			if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()) {
-				// Uncertain bounding-box, allow passing through.
-				long flags = BlockProperties.F_IGN_PASSABLE;
-				if ((BlockProperties.isSolid(mat) || BlockProperties.isGround(mat)) && !BlockProperties.isLiquid(mat)) {
-					// Block can be ground, so allow standing on any height.
-					flags |= BlockProperties.F_GROUND_HEIGHT;
-				}
-				BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
-			}
-		}
-		// Blocks that are reported to be full and solid, but which are not.
-		for (final Material mat : new Material[]{
-				Material.ENDER_PORTAL_FRAME,
-		}) {
-			final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
-			BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
-		}
-	}
-	
-	@Override
-	public boolean hasGravity(final Material mat) {
-		try{
-			return mat.hasGravity();
-		}
-		catch(Throwable t) {
-			// Backwards compatibility.
-			switch(mat) {
-			case SAND:
-			case GRAVEL:
-				return true;
-			default:
-				return false;
-			}
-		}
-	}
+    @Override
+    public void setDead(final Player player, final int deathTicks) {
+        // TODO: Test / kick ? ...
+        BridgeHealth.setHealth(player, 0.0);
+        // TODO: Might try stuff like setNoDamageTicks.
+        BridgeHealth.damage(player, 1.0);
+    }
 
-//	@Override
-//	public void correctDirection(Player player) {
-//		// TODO: Consider using reflection (detect CraftPlayer, access EntityPlayer + check if possible (!), use flags for if valid or invalid.)
-//	}
-	
+    @Override
+    public void setupBlockProperties(final WorldConfigProvider<?> worldConfigProvider) {
+        // Note deprecation suppression: These ids should be unique for a server run, that should be ok for setting up generic properties.
+        // TODO: (?) Set some generic properties matching what BlockCache.getShape returns.
+        final Set<Material> fullBlocks = new HashSet<Material>();
+        for (final Material mat : new Material[]{
+                // TODO: Ice !? / Packed ice !?
+                Material.GLASS, Material.GLOWSTONE, Material.ICE, Material.LEAVES,
+                Material.COMMAND, Material.BEACON,
+                Material.PISTON_BASE,
+        }) {
+            fullBlocks.add(mat);
+        }
+        for (final Material mat : Material.values()) {
+            if (!mat.isBlock()) {
+                continue;
+            }
+            if (fullBlocks.contains(mat)) {
+                continue;
+            }
+            if (!mat.isOccluding() || !mat.isSolid() || mat.isTransparent()) {
+                // Uncertain bounding-box, allow passing through.
+                long flags = BlockProperties.F_IGN_PASSABLE;
+                if ((BlockProperties.isSolid(mat) || BlockProperties.isGround(mat)) && !BlockProperties.isLiquid(mat)) {
+                    // Block can be ground, so allow standing on any height.
+                    flags |= BlockProperties.F_GROUND_HEIGHT;
+                }
+                BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
+            }
+        }
+        // Blocks that are reported to be full and solid, but which are not.
+        for (final Material mat : new Material[]{
+                Material.ENDER_PORTAL_FRAME,
+        }) {
+            final long flags = BlockProperties.F_IGN_PASSABLE | BlockProperties.F_GROUND_HEIGHT;
+            BlockProperties.setBlockFlags(mat, BlockProperties.getBlockFlags(mat) | flags);
+        }
+    }
+
+    @Override
+    public boolean hasGravity(final Material mat) {
+        try{
+            return mat.hasGravity();
+        }
+        catch(Throwable t) {
+            // Backwards compatibility.
+            switch(mat) {
+            case SAND:
+            case GRAVEL:
+                return true;
+            default:
+                return false;
+            }
+        }
+    }
+
+    //	@Override
+    //	public void correctDirection(Player player) {
+    //		// TODO: Consider using reflection (detect CraftPlayer, access EntityPlayer + check if possible (!), use flags for if valid or invalid.)
+    //	}
+
 }
