@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
@@ -162,12 +163,19 @@ public abstract class Check implements MCAccessHolder{
      * @return true, if the check is enabled
      */
     public boolean isEnabled(final Player player) {
-        try {
-            if (!type.isEnabled(player) || player.hasPermission(type.getPermission()))
+        if (!type.isEnabled(player)) {
+            return false;
+        }
+        // TODO: Checking for the thread might be a temporary measure.
+        if (Bukkit.isPrimaryThread()) {
+            // Check permissions directly.
+            if (player.hasPermission(type.getPermission())) {
                 return false;
-        } catch (final Exception e) {
-        	// TODO: this should be mostly obsolete.
-        	LogUtil.logSevere(e);
+            }
+        }
+        else if (type.hasCachedPermission(player)) {
+            // Assume asynchronously running check.
+            return false;
         }
         return !NCPExemptionManager.isExempted(player, type);
     }

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
-import fr.neatmonster.nocheatplus.checks.AsyncCheck;
+import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
@@ -29,7 +29,7 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author mc_dev
  *
  */
-public class Text extends AsyncCheck implements INotifyReload{
+public class Text extends Check implements INotifyReload {
 
 	private LetterEngine engine = null;
 	

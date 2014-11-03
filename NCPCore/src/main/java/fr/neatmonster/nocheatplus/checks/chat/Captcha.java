@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.AsyncCheck;
+import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
  * @author mc_dev
  *
  */
-public class Captcha extends AsyncCheck implements ICaptcha{
+public class Captcha extends Check implements ICaptcha{
 	
     public Captcha() {
 		super(CheckType.CHAT_CAPTCHA);

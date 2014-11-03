@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.access.AsyncCheckConfig;
+import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.EnginePlayerConfig;
@@ -21,7 +21,7 @@ import fr.neatmonster.nocheatplus.utilities.ColorUtil;
  * Configurations specific for the "chat" checks. Every world gets one of these assigned to it, or if a world doesn't
  * get it's own, it will use the "global" version.
  */
-public class ChatConfig extends AsyncCheckConfig {
+public class ChatConfig extends ACheckConfig {
 
     /** The factory creating configurations. */
     public static final CheckConfigFactory factory   = new CheckConfigFactory() {

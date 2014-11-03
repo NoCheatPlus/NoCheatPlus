@@ -2,13 +2,13 @@ package fr.neatmonster.nocheatplus.checks.chat;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.checks.AsyncCheck;
+import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 
 /**
  * The Color check verifies that no color codes are sent in players' messages.
  */
-public class Color extends AsyncCheck {
+public class Color extends Check {
 
     /**
      * Instantiates a new color check.
