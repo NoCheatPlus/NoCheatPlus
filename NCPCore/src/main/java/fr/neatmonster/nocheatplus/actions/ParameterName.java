@@ -4,11 +4,10 @@ package fr.neatmonster.nocheatplus.actions;
  * Some wildcards that are used in commands and log messages.
  */
 public enum ParameterName {
-	// TODO: Cleanup for some kind of policies: useful names, alternative names, prefer generic names.
+    // TODO: Cleanup for some kind of policies: useful names, alternative names, prefer generic names.
     BLOCK_ID("blockid"),
     BLOCK_TYPE("blocktype"),
     CHECK("check"),
-    TAGS("tags"),
     DISTANCE("distance"),
     FALL_DISTANCE("falldistance"), // TODO: rather not deprecate ?
     FOOD("food"),
@@ -17,8 +16,11 @@ public enum ParameterName {
     LOCATION_FROM("locationfrom"),
     LOCATION_TO("locationto"),
     PACKETS("packets"),
-    PLAYER("player"), // TODO: playername rather ? + displayname ?
+    PLAYER("player"),
+    PLAYER_DISPLAY_NAME("displayname"),
+    PLAYER_NAME("name"),
     REACH_DISTANCE("reachdistance"), // TODO: deprecate ?
+    TAGS("tags"),
     UUID("uuid"),
     VIOLATIONS("violations"),
     WORLD("world");
@@ -50,4 +52,13 @@ public enum ParameterName {
     private ParameterName(final String text) {
         this.text = text;
     }
+
+    /**
+     * Get the text for parsing this parameter in actions.
+     * @return
+     */
+    public String getText() {
+        return text;
+    }
+
 }

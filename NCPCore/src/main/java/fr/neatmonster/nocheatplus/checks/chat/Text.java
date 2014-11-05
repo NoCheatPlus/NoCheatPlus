@@ -8,10 +8,8 @@ import java.util.Map;
 import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
-import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.MessageLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.WordLetterCount;
 import fr.neatmonster.nocheatplus.checks.chat.analysis.engine.LetterEngine;
@@ -317,13 +315,6 @@ public class Text extends Check implements INotifyReload {
         lastGlobalTime = data.chatLastTime = time;
 
         return cancel;
-    }
-
-    @Override
-    protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
-        final Map<ParameterName, String> parameters = super.getParameterMap(violationData);
-        parameters.put(ParameterName.IP, violationData.player.getAddress().toString().substring(1).split(":")[0]);
-        return parameters;
     }
 
 }

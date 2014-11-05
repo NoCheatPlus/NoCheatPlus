@@ -135,20 +135,26 @@ public class ViolationData implements IViolationInfo, ActionData{
         switch (parameterName) {
         case CHECK:
             return check.getClass().getSimpleName();
+        case IP:
+            return player.getAddress().toString().substring(1).split(":")[0];
         case PLAYER:
+        case PLAYER_NAME:
             return player.getName();
-        case VIOLATIONS:
-            return String.valueOf((long) Math.round(vL));
+        case PLAYER_DISPLAY_NAME:
+            return player.getDisplayName();
         case UUID:
             return player.getUniqueId().toString();
+        case VIOLATIONS:
+            return String.valueOf((long) Math.round(vL));
         default:
             break;
         }
         if (parameters == null) {
-            return "<?" + parameterName + ">";
+            // Return what would have been parsed to get the parameter.
+            return "[" + parameterName.getText() + "]";
         }
         final String value = parameters.get(parameterName);
-        return(value == null) ? ("<?" + parameterName + ">") : value;
+        return(value == null) ? ("[" + parameterName.getText() + "]") : value;
     }
 
     @Override
