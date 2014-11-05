@@ -22,6 +22,7 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public abstract class Check implements MCAccessHolder{
 
+    // TODO: Do these get cleaned up ?
     /** The execution histories of each check. */
     protected static Map<String, ExecutionHistory> histories = new HashMap<String, ExecutionHistory>();
 
@@ -33,8 +34,9 @@ public abstract class Check implements MCAccessHolder{
      * @return the history
      */
     protected static ExecutionHistory getHistory(final Player player) {
-        if (!histories.containsKey(player.getName()))
+        if (!histories.containsKey(player.getName())) {
             histories.put(player.getName(), new ExecutionHistory());
+        }
         return histories.get(player.getName());
     }
 
@@ -101,7 +103,7 @@ public abstract class Check implements MCAccessHolder{
      *            the violation data
      * @return true, if the event should be cancelled
      */
-    protected boolean executeActions(final ViolationData violationData){
+    protected boolean executeActions(final ViolationData violationData) {
         return executeActions(violationData, true);
     }
 
@@ -116,17 +118,20 @@ public abstract class Check implements MCAccessHolder{
     protected boolean executeActions(final ViolationData violationData, final boolean isMainThread) {
 
         // Dispatch the VL processing to the hook manager (now thread safe).
-        if (NCPHookManager.shouldCancelVLProcessing(violationData))
+        if (NCPHookManager.shouldCancelVLProcessing(violationData)) {
             // One of the hooks has decided to cancel the VL processing, return false.
             return false;
+        }
 
         final boolean hasCancel = violationData.hasCancel(); 
 
-        if (isMainThread) 
+        if (isMainThread) {
             return violationData.executeActions();
-        else 
+        }
+        else {
             // Always schedule to add to ViolationHistory.
             TickTask.requestActionsExecution(violationData);
+        }
 
         // (Design change: Permission checks are moved to cached permissions, lazily updated.)
         return hasCancel;
@@ -139,7 +144,7 @@ public abstract class Check implements MCAccessHolder{
      * @param player
      * @return
      */
-    protected Map<ParameterName, String> getParameterMap(final ViolationData violationData){
+    protected Map<ParameterName, String> getParameterMap(final ViolationData violationData) {
         final Map<ParameterName, String> params = new HashMap<ParameterName, String>();
         // (Standard parameters like player, vl, check name are filled in in ViolationData.getParameter!)
         return params;

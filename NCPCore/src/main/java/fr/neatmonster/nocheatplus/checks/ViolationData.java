@@ -24,7 +24,7 @@ public class ViolationData implements IViolationInfo, ActionData{
 
     /** The actions to be executed. */
     public final ActionList actions;
-    
+
     /** The actions applicable for the violation level. */
     public final Action<ViolationData, ActionList>[] applicableActions;
 
@@ -39,10 +39,10 @@ public class ViolationData implements IViolationInfo, ActionData{
 
     /** The violation level. */
     public final double     vL;
-    
+
     /** Filled in parameters. */
     private Map<ParameterName, String> parameters;
-    
+
     private boolean needsParameters = false;
 
     /**
@@ -68,11 +68,11 @@ public class ViolationData implements IViolationInfo, ActionData{
         this.actions = actions;
         this.applicableActions = actions.getActions(vL);
         boolean needsParameters = false;
-        for (int i = 0; i < applicableActions.length; i++){
-        	if (applicableActions[i].needsParameters()){
-        		needsParameters = true;
-        		break;
-        	}
+        for (int i = 0; i < applicableActions.length; i++) {
+            if (applicableActions[i].needsParameters()) {
+                needsParameters = true;
+                break;
+            }
         }
         parameters = needsParameters ? check.getParameterMap(this) : null;
         this.needsParameters = needsParameters;
@@ -86,84 +86,90 @@ public class ViolationData implements IViolationInfo, ActionData{
     public Action<ViolationData, ActionList> [] getActions() {
         return applicableActions;
     }
-    
-	/**
-	 * Execute actions and return if cancel. Does add it to history.
-	 * @return
-	 */
-	public boolean executeActions(){
-		try {
 
-       	   ViolationHistory.getHistory(player).log(check.getClass().getName(), addedVL);
+    /**
+     * Execute actions and return if cancel. Does add it to history.
+     * @return
+     */
+    public boolean executeActions() {
+        try {
+            // Statistics.
+            ViolationHistory.getHistory(player).log(check.getClass().getName(), addedVL);
+            // TODO: the time is taken here, which makes sense for delay, but otherwise ?
+            final long time = System.currentTimeMillis() / 1000L;
+            boolean cancel = false;
+            for (final Action<ViolationData, ActionList>  action : getActions()) {
+                if (Check.getHistory(player).executeAction(this, action, time)) {
+                    // The execution history said it really is time to execute the action, find out what it is and do
+                    // what is needed.
+                    if (action.execute(this)) {
+                        cancel = true;
+                    }
+                }
+            }
+            return cancel;
+        } catch (final Exception e) {
+            LogUtil.logSevere(e);
+            // On exceptions cancel events.
+            return true;
+        }
+    }
 
-           // TODO: the time is taken here, which makes sense for delay, but otherwise ?
-           final long time = System.currentTimeMillis() / 1000L;
-           boolean cancel = false;
-           for (final Action<ViolationData, ActionList>  action : getActions())
-               if (Check.getHistory(player).executeAction(this, action, time))
-                   // The execution history said it really is time to execute the action, find out what it is and do
-                   // what is needed.
-                   if (action.execute(this)) cancel = true;
+    /**
+     * Check if the actions contain a cancel. 
+     * @return
+     */
+    @Override
+    public boolean hasCancel() {
+        for (final Action<ViolationData, ActionList>  action : applicableActions) {
+            if (action instanceof CancelAction) return true;
+        }
+        return false;
+    }
 
-           return cancel;
-       } catch (final Exception e) {
-    	   LogUtil.logSevere(e);
-           // On exceptions cancel events.
-           return true;
-       }
-	}
-    
-	/**
-	 * Check if the actions contain a cancel. 
-	 * @return
-	 */
-	@Override
-	public boolean hasCancel(){
-		for (final Action<ViolationData, ActionList>  action : applicableActions){
-			if (action instanceof CancelAction) return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public String getParameter(final ParameterName parameterName){
-		if (parameterName == null) return "<???>";
-		switch (parameterName) {
-		case CHECK:
-			return check.getClass().getSimpleName();
-		case PLAYER:
-			return player.getName();
-		case VIOLATIONS:
-			return String.valueOf((long) Math.round(vL));
-		case UUID:
-			return player.getUniqueId().toString();
-		default:
-			break;
-		}
-		if (parameters == null) return "<?" + parameterName + ">";
-		final String value = parameters.get(parameterName);
-		return(value == null) ? ("<?" + parameterName + ">") : value;
-	}
-	
-	@Override
-	public void setParameter(final ParameterName parameterName, String value){
-		if (parameters == null) {
-			parameters = new HashMap<ParameterName, String>();
-		}
-		parameters.put(parameterName, value);
-	}
+    @Override
+    public String getParameter(final ParameterName parameterName) {
+        if (parameterName == null) {
+            return "<???>";
+        }
+        switch (parameterName) {
+        case CHECK:
+            return check.getClass().getSimpleName();
+        case PLAYER:
+            return player.getName();
+        case VIOLATIONS:
+            return String.valueOf((long) Math.round(vL));
+        case UUID:
+            return player.getUniqueId().toString();
+        default:
+            break;
+        }
+        if (parameters == null) {
+            return "<?" + parameterName + ">";
+        }
+        final String value = parameters.get(parameterName);
+        return(value == null) ? ("<?" + parameterName + ">") : value;
+    }
 
-	@Override
+    @Override
+    public void setParameter(final ParameterName parameterName, String value) {
+        if (parameters == null) {
+            parameters = new HashMap<ParameterName, String>();
+        }
+        parameters.put(parameterName, value);
+    }
+
+    @Override
     public boolean needsParameters() {
         return needsParameters;
     }
 
-	@Override
-	public boolean hasParameters() {
-		return parameters != null && !parameters.isEmpty();
-	}
+    @Override
+    public boolean hasParameters() {
+        return parameters != null && !parameters.isEmpty();
+    }
 
-	@Override
+    @Override
     public double getAddedVl() {
         return addedVL;
     }
@@ -173,11 +179,11 @@ public class ViolationData implements IViolationInfo, ActionData{
         return vL;
     }
 
-	public String getPermissionSilent() {
-		return actions.permissionSilent;
-	}
-	
-	public ActionList getActionList(){
-		return actions;
-	}
+    public String getPermissionSilent() {
+        return actions.permissionSilent;
+    }
+
+    public ActionList getActionList() {
+        return actions;
+    }
 }

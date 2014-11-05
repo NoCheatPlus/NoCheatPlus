@@ -45,36 +45,36 @@ public abstract class Action <D extends ActionData, L extends AbstractActionList
      * 
      * @param violationData
      *            the violation data
-     * @return true, if successful
+     * @return true, if to cancel players actions, false otherwise. [SUBJECT TO REMOVAL]
      */
     public abstract boolean execute(final D violationData);
-    
+
     /**
      * Check if parameters are needed at all for faster processing.
      * @return
      */
-    public boolean needsParameters(){
-    	return false;
+    public boolean needsParameters() {
+        return false;
     }
 
-	/**
-	 * Indicates that the action will be executed in any case (delay, repeat).
-	 * executed at all.
-	 * 
-	 * @return
-	 */
-	public boolean executesAlways() {
-		return delay == 0 && repeat == 0;
-	}
+    /**
+     * Indicates that the action will be executed in any case (delay, repeat).
+     * executed at all.
+     * 
+     * @return
+     */
+    public boolean executesAlways() {
+        return delay == 0 && repeat == 0;
+    }
 
-	/**
-	 * Get an optimized copy, given the config in use. The default implementation returns this instance.<br>
-	 * TODO: "Copy" does not match this.
-	 * @param config
-	 * @param threshold
-	 * @return Can return this (unchanged), null (not to be executed ever) or a new instance (changed, optimized).
-	 */
-	public Action<D, L> getOptimizedCopy(final ConfigFileWithActions<D, L> config, final Integer threshold) {
-		return this;
-	}
+    /**
+     * Get an optimized copy, given the config in use. The default implementation returns this instance.<br>
+     * TODO: "Copy" does not match this.
+     * @param config
+     * @param threshold
+     * @return Can return this (unchanged), null (not to be executed ever) or a new instance (changed, optimized).
+     */
+    public Action<D, L> getOptimizedCopy(final ConfigFileWithActions<D, L> config, final Integer threshold) {
+        return this;
+    }
 }
