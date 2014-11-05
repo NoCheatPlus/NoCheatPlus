@@ -99,9 +99,15 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
 	public boolean execute(final ViolationData violationData) {
 		if (!violationData.player.hasPermission(violationData.getPermissionSilent())) {
 			final String message = super.getMessage(violationData);
-			if (toChat) NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(ColorUtil.replaceColors(prefixChat + message));
-			if (toConsole) LogUtil.logInfo(ColorUtil.removeColors(prefixConsole + message));
-			if (toFile) StaticLogFile.fileLogger.info(ColorUtil.removeColors(prefixFile + message));
+			if (toChat) {
+			    NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(ColorUtil.replaceColors(prefixChat + message));
+			}
+			if (toConsole) {
+			    LogUtil.logInfo(ColorUtil.removeColors(prefixConsole + message));
+			}
+			if (toFile) {
+			    StaticLogFile.fileLogger.info(ColorUtil.removeColors(prefixFile + message));
+			}
 		}
 		return false;
 	}
@@ -119,27 +125,31 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
 
 	@Override
 	public Action<ViolationData, ActionList> getOptimizedCopy(final ConfigFileWithActions<ViolationData, ActionList> config, final Integer threshold) {
-		if (!config.getBoolean(ConfPaths.LOGGING_ACTIVE)) return null;
+		if (!config.getBoolean(ConfPaths.LOGGING_ACTIVE)) {
+		    return null;
+		}
 		final String prefixChat = filterPrefix(config, ConfPaths.LOGGING_BACKEND_INGAMECHAT_PREFIX, PREFIX_CHAT,  this.toChat && config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_ACTIVE));
 		final String prefixConsole = filterPrefix(config, ConfPaths.LOGGING_BACKEND_CONSOLE_PREFIX, PREFIX_CONSOLE,  this.toConsole && config.getBoolean(ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE));
 		final String prefixFile = filterPrefix(config, ConfPaths.LOGGING_BACKEND_FILE_PREFIX, PREFIX_FILE,  this.toFile && config.getBoolean(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE));
-		if (allNull(toChat, toConsole, toFile)){
+		if (allNull(prefixChat, prefixConsole, prefixFile)) {
 			return null;
 		}
 		return new LogAction(name, delay, repeat, prefixChat, prefixConsole, prefixFile, message);
 	}
 	
-	private static boolean allNull(Object... objects){
-		for (int i = 0; i < objects.length; i++){
-			if (objects[i] != null){
+	private static boolean allNull(Object... objects) {
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] != null) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-	private static final String filterPrefix(final ConfigFileWithActions<ViolationData, ActionList> config, final String path, final String defaultValue, final boolean use){
-		if (!use) return null;
+	private static final String filterPrefix(final ConfigFileWithActions<ViolationData, ActionList> config, final String path, final String defaultValue, final boolean use) {
+		if (!use) {
+		    return null;
+		}
 		final String prefix = config.getString(path);
 		return prefix == null ? defaultValue : prefix;
 	}
