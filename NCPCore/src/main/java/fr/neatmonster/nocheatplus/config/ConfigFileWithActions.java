@@ -44,11 +44,7 @@ public abstract class ConfigFileWithActions<D extends ActionData, L extends Abst
      */
     public L getOptimizedActionList(final String path, final String permission)
     {
-        if (factory == null){
-            setActionFactory();
-        }
-        final String value = this.getString(path);
-        return factory.createActionList(value, permission).getOptimizedCopy(this);
+        return getDefaultActionList(path, permission).getOptimizedCopy(this);
     }
 
     /**
