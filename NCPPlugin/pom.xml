@@ -94,6 +94,11 @@
     	<version>static</version>
     </dependency>
     <dependency>
+        <groupId>fr.neatmonster</groupId>
+        <artifactId>ncpcompatcb3100</artifactId>
+        <version>static</version>
+    </dependency>
+    <dependency>
     	<groupId>fr.neatmonster</groupId>
     	<artifactId>ncpcompatcbdev</artifactId>
     	<version>static</version>

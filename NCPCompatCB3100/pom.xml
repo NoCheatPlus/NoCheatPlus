@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.neatmonster</groupId>
-  <artifactId>ncpcompatcbdev</artifactId>
+  <artifactId>ncpcompatcb3100</artifactId>
   <packaging>jar</packaging>
-  <name>NCPCompatCBDev</name>
+  <name>NCPCompatCB3100</name>
   <version>static</version>
 
   <parent>
@@ -26,14 +26,8 @@
     </dependency>
   </dependencies>
 
-  <description>Compatibility for the development version (latest of the supported Minecraft versions).
+  <description>Compatibility for CraftBukkit build 3100 (MC 1.7.10).
 
 Version updating is done for the NoCheatPlus sub-module.
-
-To add a new compat module three other pom.xml files have to be modified:
-- Root pom (parent): Add as module.
-- NCPPlugin: Add as dependency.
-- NoCheatPlus: Add as include (source).
-
-The NCPPlugin sub-project contains the MCAccessFactory.</description>
+</description>
 </project>
