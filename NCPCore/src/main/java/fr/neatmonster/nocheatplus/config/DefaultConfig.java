@@ -16,7 +16,7 @@ public class DefaultConfig extends ConfigFile {
 	 * NCP build needed for this config.
 	 * (Should only increment with changing or removing paths.) 
 	 */
-	public static final int buildNumber = 741;
+	public static final int buildNumber = 754;
 	
 	// TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -496,7 +496,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".nofall", start + "tried to avoid fall damage" + end);
         set(ConfPaths.STRINGS + ".chatfast", start + "acted like spamming (IP: [ip])" + end);
         set(ConfPaths.STRINGS + ".noswing", start + "didn't swing arm" + end);
-        set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid])" + end);
+        set(ConfPaths.STRINGS + ".passable", start + "moved into a block ([blockid]) from [locationfrom] to [locationto] distance [distance] " + end);
         set(ConfPaths.STRINGS + ".relog", start + "relogs too fast" + end);
         set(ConfPaths.STRINGS + ".tellchatnormal", tell + "&cNCP: &eToo many messages, slow down...");
         set(ConfPaths.STRINGS + ".tempkick1", "ncp tempkick [player] 1 Wait a minute!");
