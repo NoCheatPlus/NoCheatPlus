@@ -11,6 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
+
 /**
  * Could not think of anything better, likely a refactoring stage.
  * @author mc_dev
@@ -58,9 +60,7 @@ public class StaticLogFile {
             builder.append('\n');
 
             if (ex != null) {
-                final StringWriter writer = new StringWriter();
-                ex.printStackTrace(new PrintWriter(writer));
-                builder.append(writer);
+                builder.append(StringUtil.throwableToString(ex));
             }
 
             return builder.toString();

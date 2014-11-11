@@ -28,10 +28,7 @@ public class LogUtil {
     }
 
     public static String toString(final Throwable t){
-        // TODO: Find the fastest way.
-        final StringWriter w = new StringWriter();
-        t.printStackTrace(new PrintWriter(w));
-        return w.toString();
+        return StringUtil.throwableToString(t);
     }
 
 

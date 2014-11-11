@@ -164,5 +164,36 @@ public class StringUtil {
 
         return p[n];
     }
+    
+    /**
+     * Just return the stack trace as new-line-separated string. 
+     * @param t
+     * @param header Add a header about the exception itself, if set to true.
+     * @return
+     */
+    public static final String stackTraceToString(final Throwable t, final boolean header) {
+        // TODO: Consider to use System.getProperty("line.separator").
+        final StringBuilder b = new StringBuilder(325);
+        if (header) {
+            b.append(t.toString()); // TODO: Check.
+            b.append("\n");
+        }
+        final StackTraceElement[] elements = t.getStackTrace();
+        for (int i = 0; i < elements.length; i++) {
+            b.append(elements[i]);
+            b.append("\n");
+        }
+        return b.toString();
+    }
+    
+    /**
+     *  Convenience method for stackTraceToString(t).
+     * @param t
+     * @return
+     */
+    public static final String throwableToString(final Throwable t) {
+        return stackTraceToString(t, true);
+    }
+    
 
 }
