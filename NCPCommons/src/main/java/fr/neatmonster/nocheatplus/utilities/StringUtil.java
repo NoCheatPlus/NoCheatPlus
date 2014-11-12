@@ -169,31 +169,78 @@ public class StringUtil {
      * Just return the stack trace as new-line-separated string. 
      * @param t
      * @param header Add a header about the exception itself, if set to true.
+     * @param trim If to make the output more compact in case of repetitions.
      * @return
      */
-    public static final String stackTraceToString(final Throwable t, final boolean header) {
+    public static final String stackTraceToString(final Throwable t, final boolean header, final boolean trim) {
         // TODO: Consider to use System.getProperty("line.separator").
+        // TODO: Consider to add a trimDepth argument, for repetition of a sequence of elements.
         final StringBuilder b = new StringBuilder(325);
         if (header) {
             b.append(t.toString()); // TODO: Check.
             b.append("\n");
         }
         final StackTraceElement[] elements = t.getStackTrace();
+        StackTraceElement last = null; // Assume this is faster than operating on the strings.
+        int repetition = 0;
         for (int i = 0; i < elements.length; i++) {
-            b.append(elements[i]);
+            final StackTraceElement element = elements[i];
+            if (trim) {
+                if (element.equals(last)) {
+                    repetition += 1;
+                    continue;
+                } else {
+                    if (repetition > 0) {
+                        if (header) {
+                            b.append("\t");
+                        }
+                        b.append("(... repeated " + repetition + " times.)\n");
+                        repetition = 0;
+                    }
+                    last = element;
+                }
+            }
+            if (header) {
+                b.append("\t");
+            }
+            b.append(element);
             b.append("\n");
+        }
+        if (repetition > 0) {
+            if (header) {
+                b.append("\t");
+            }
+            b.append("(... repeated " + repetition + " times.)\n");
         }
         return b.toString();
     }
     
     /**
-     *  Convenience method for stackTraceToString(t).
+     * Convenience method for stackTraceToString(t).
      * @param t
      * @return
      */
     public static final String throwableToString(final Throwable t) {
-        return stackTraceToString(t, true);
+        return stackTraceToString(t, true, true);
     }
     
+    /**
+     * Count number of needles left in a dart board.
+     * @param dartBoard
+     * @param needles
+     * @return
+     */
+    public static final int count(final String dartBoard, final char needles) {
+        int n = 0;
+        int index = 0;
+        while (index != -1) {
+            index = dartBoard.indexOf(needles, index);
+            if (index != -1) {
+                n ++;
+                index ++;
+            }
+        }
+        return n;
+    }
 
 }
