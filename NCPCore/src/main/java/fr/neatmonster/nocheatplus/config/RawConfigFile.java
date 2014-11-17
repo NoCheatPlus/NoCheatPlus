@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.yaml.snakeyaml.DumperOptions;
 
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 public class RawConfigFile  extends YamlConfiguration{
 	
@@ -157,7 +157,7 @@ public class RawConfigFile  extends YamlConfiguration{
 		for (final String entry : content){
 			final Integer id = parseTypeId(entry);
 			if (id == null){
-				LogUtil.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+				StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
 			}
 			else{
 				target.add(id);
@@ -176,7 +176,7 @@ public class RawConfigFile  extends YamlConfiguration{
 		for (final String entry : content){
 			final Material mat = parseMaterial(entry);
 			if (mat == null){
-				LogUtil.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+				StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
 			}
 			else{
 				target.add(mat);

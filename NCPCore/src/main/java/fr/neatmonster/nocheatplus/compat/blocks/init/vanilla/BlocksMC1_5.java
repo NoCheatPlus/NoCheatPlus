@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.BlockFlags;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
@@ -87,7 +87,7 @@ public class BlocksMC1_5 implements BlockPropertiesSetup {
 		// 95 Locked chest
 		BlockProperties.setBlockProps(95, BlockProperties.instantType);
 		
-		LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.5 blocks.");
+		StaticLog.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.5 blocks.");
 	}
 
 }

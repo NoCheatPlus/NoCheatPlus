@@ -3,7 +3,7 @@ package fr.neatmonster.nocheatplus.test;
 import org.bukkit.Material;
 import org.junit.Test;
 
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.FakeBlockCache;
 import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
 
@@ -17,9 +17,9 @@ public class TestPassableRayTracing {
     // TODO: Randomized tests (Collide with inner sphere, not collide with outer sphere).
     
     public TestPassableRayTracing() {
-        LogUtil.setUseBukkitLogger(false);
+        StaticLog.setUseBukkitLogger(false);
         BlockTests.initBlockProperties();
-        LogUtil.setUseBukkitLogger(true);
+        StaticLog.setUseBukkitLogger(true);
     }
     
     @Test

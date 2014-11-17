@@ -16,7 +16,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
-import fr.neatmonster.nocheatplus.utilities.ds.LinkedHashMapCOW;
+import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
 
 /**
  * Prevent extremely fast ticking by just sending packets that don't do anything

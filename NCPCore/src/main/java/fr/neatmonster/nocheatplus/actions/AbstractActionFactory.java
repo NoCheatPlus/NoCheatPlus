@@ -8,7 +8,7 @@ import java.util.Map;
 import fr.neatmonster.nocheatplus.actions.AbstractActionList.ActionListFactory;
 import fr.neatmonster.nocheatplus.actions.types.CommandAction;
 import fr.neatmonster.nocheatplus.actions.types.DummyAction;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 public abstract class AbstractActionFactory <D extends ActionData, L extends AbstractActionList<D, L>>{
 	
@@ -70,7 +70,7 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
                 }
                 list.setActions(vl, createActions(def.split("\\s+")));
             } catch (final Exception e) {
-                LogUtil.logWarning("[NoCheatPlus] Couldn't parse action definition 'vl:" + s + "'.");
+                StaticLog.logWarning("[NoCheatPlus] Couldn't parse action definition 'vl:" + s + "'.");
             }
         }
 
@@ -94,7 +94,7 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
             try {
                 actions.add(createAction(def));
             } catch (final IllegalArgumentException e) {
-            	LogUtil.logWarning("[NoCheatPlus] Failed to create action: " + e.getMessage());
+            	StaticLog.logWarning("[NoCheatPlus] Failed to create action: " + e.getMessage());
                 actions.add(new DummyAction<D, L>(def));
             }
         }
@@ -125,7 +125,7 @@ public abstract class AbstractActionFactory <D extends ActionData, L extends Abs
                 delay = Integer.parseInt(parts[1]);
                 repeat = Integer.parseInt(parts[2]);
             } catch (final Exception e) {
-            	LogUtil.logWarning("[NoCheatPlus] Couldn't parse details of command '" + definition
+            	StaticLog.logWarning("[NoCheatPlus] Couldn't parse details of command '" + definition
                         + "', will use default values instead.");
                 delay = 0;
                 repeat = 0;

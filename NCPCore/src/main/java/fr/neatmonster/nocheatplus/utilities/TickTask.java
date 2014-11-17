@@ -14,7 +14,7 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.components.TickListener;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
 /**
@@ -237,8 +237,8 @@ public class TickTask implements Runnable {
                     }
                     catch(Throwable t) {
                         // Unlikely.
-                        LogUtil.logWarning("[NoCheatPlus] Failed to set OnDemandTickListener to unregistered state: " + t.getClass().getSimpleName());
-                        LogUtil.logWarning(t);
+                        StaticLog.logWarning("[NoCheatPlus] Failed to set OnDemandTickListener to unregistered state: " + t.getClass().getSimpleName());
+                        StaticLog.logWarning(t);
                     }
                 }
             }
@@ -417,6 +417,7 @@ public class TickTask implements Runnable {
      * @param locked
      */
     public static void setLocked(boolean locked) {
+        // TODO: synchronize over lists !?
         TickTask.locked = locked;
     }
 
@@ -475,8 +476,8 @@ public class TickTask implements Runnable {
                 listener.onTick(tick, timeLast);
             }
             catch(Throwable t) {
-                LogUtil.logSevere("[NoCheatPlus] (TickTask) TickListener generated an exception:");
-                LogUtil.logSevere(t);
+                StaticLog.logSevere("[NoCheatPlus] (TickTask) TickListener generated an exception:");
+                StaticLog.logSevere(t);
             }
         }
     }
@@ -496,7 +497,7 @@ public class TickTask implements Runnable {
 
         // Time running backwards check (not only players can!).
         if (timeLast > time) {
-            LogUtil.logWarning("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
+            StaticLog.logWarning("[NoCheatPlus] System time ran backwards (" + timeLast + "->" + time + "), clear all data and history...");
             DataManager.clearData(CheckType.ALL);
             lastDur = 50;
             for (int i = 0; i < spikeDurations.length; i++) {

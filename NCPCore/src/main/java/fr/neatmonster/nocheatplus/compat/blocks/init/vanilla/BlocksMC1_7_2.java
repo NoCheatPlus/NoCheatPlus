@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 
 public class BlocksMC1_7_2 implements BlockPropertiesSetup{
@@ -34,7 +34,7 @@ public class BlocksMC1_7_2 implements BlockPropertiesSetup{
 		// Large flowers
 		BlockInit.setAs(175, Material.YELLOW_FLOWER);
 		
-		LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.7.2 blocks.");
+		StaticLog.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.7.2 blocks.");
 	}
 
 }

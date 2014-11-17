@@ -7,7 +7,7 @@ import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakData;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.fight.FightData;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * Random auxiliary gear, some might have general quality. Contents are likely to get moved to other classes.
@@ -20,7 +20,7 @@ public class CheckUtils {
 	 */
 	public static void kickIllegalMove(final Player player){
 		player.kickPlayer("Illegal move.");
-		LogUtil.logWarning("[NCP] Disconnect " + player.getName() + " due to illegal move!");
+		StaticLog.logWarning("[NCP] Disconnect " + player.getName() + " due to illegal move!");
 	}
 
 	/**

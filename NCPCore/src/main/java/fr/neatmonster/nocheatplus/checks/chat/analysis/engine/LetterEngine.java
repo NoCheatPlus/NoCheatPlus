@@ -24,7 +24,7 @@ import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.IRemoveData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 
 /**
@@ -78,8 +78,8 @@ public class LetterEngine implements IRemoveData, IHaveCheckType, ConsistencyChe
 					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textGlobalWeight);
 				}
 				catch( final Exception e){
-					LogUtil.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-					LogUtil.logSevere(e);
+					StaticLog.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					StaticLog.logSevere(e);
 					continue;
 				}
 			}
@@ -93,8 +93,8 @@ public class LetterEngine implements IRemoveData, IHaveCheckType, ConsistencyChe
 					result.put(processor.getProcessorName(), processor.process(letterCount) * cc.textPlayerWeight);
 				}
 				catch( final Exception e){
-					LogUtil.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
-					LogUtil.logSevere(e);
+					StaticLog.logSevere("[NoCheatPlus] chat.text: processor("+processor.getProcessorName()+") generated an exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+					StaticLog.logSevere(e);
 					continue;
 				}
 			}

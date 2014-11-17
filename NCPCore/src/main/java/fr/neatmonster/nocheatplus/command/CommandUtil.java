@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 public class CommandUtil {
 
@@ -30,7 +30,7 @@ public class CommandUtil {
             return NCPAPIProvider.getNoCheatPlusAPI().getMCAccess().getCommandMap();
         }
         catch (Throwable t) {
-            LogUtil.logSevere(t);
+            StaticLog.logSevere(t);
             return null;
         }
     }

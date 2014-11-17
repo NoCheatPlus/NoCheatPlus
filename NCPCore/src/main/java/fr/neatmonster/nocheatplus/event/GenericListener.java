@@ -14,7 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * listener registered for one event only. Allows to delegate to other registered listeners.
@@ -116,11 +116,11 @@ public class GenericListener<E extends Event> implements Listener, EventExecutor
 		try{
 			final EventException e = new EventException(t, descr);
 			// TODO: log it / more details!
-			if (event.isAsynchronous()) LogUtil.scheduleLogSevere(e);
-			else LogUtil.logSevere(e);
+			if (event.isAsynchronous()) StaticLog.scheduleLogSevere(e);
+			else StaticLog.logSevere(e);
 		}
 		catch (Throwable t2){
-			LogUtil.scheduleLogSevere("Could not log exception: " + descr);
+			StaticLog.scheduleLogSevere("Could not log exception: " + descr);
 		}
 	}
 

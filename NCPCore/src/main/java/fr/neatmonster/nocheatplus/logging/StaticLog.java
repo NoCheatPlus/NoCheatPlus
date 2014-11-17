@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.logging;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -11,11 +9,11 @@ import org.bukkit.Bukkit;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
- * Static access methods for logging access (mostly uses the Bukkit logger).
+ * Static access methods for more or less direct logging using either Bukkit.getLogger() or System.out.
  * @author mc_dev
  *
  */
-public class LogUtil {
+public class StaticLog {
 
     private static boolean useBukkitLogger = true;
 
@@ -27,6 +25,7 @@ public class LogUtil {
         useBukkitLogger = use;
     }
 
+    // TODO: Remove toString method !
     public static String toString(final Throwable t){
         return StringUtil.throwableToString(t);
     }
@@ -119,7 +118,7 @@ public class LogUtil {
             return Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"), new Runnable() {
                 @Override
                 public final void run() {
-                    Bukkit.getLogger().log(level, message);
+                    StaticLog.log(level, message);
                 }
             }) != -1;
         } catch (final Exception exc) {

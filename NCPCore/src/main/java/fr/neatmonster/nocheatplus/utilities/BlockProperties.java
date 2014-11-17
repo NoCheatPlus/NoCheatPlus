@@ -26,7 +26,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactor
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * Properties of blocks.
@@ -417,8 +417,8 @@ public class BlockProperties {
                 new VanillaBlocksFactory().setupBlockProperties(worldConfigProvider);
             }
             catch(Throwable t) {
-                LogUtil.logSevere("[NoCheatPlus] Could not initialize vanilla blocks: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-                LogUtil.logSevere(t);
+                StaticLog.logSevere("[NoCheatPlus] Could not initialize vanilla blocks: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                StaticLog.logSevere(t);
             }
             // Allow mcAccess to setup block properties.
             if (mcAccess instanceof BlockPropertiesSetup) {
@@ -426,14 +426,14 @@ public class BlockProperties {
                     ((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
                 }
                 catch(Throwable t) {
-                    LogUtil.logSevere("[NoCheatPlus] McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-                    LogUtil.logSevere(t);
+                    StaticLog.logSevere("[NoCheatPlus] McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                    StaticLog.logSevere(t);
                 }
             }
             // TODO: Add registry for further BlockPropertiesSetup instances.
         }
         catch(Throwable t) {
-            LogUtil.logSevere(t);
+            StaticLog.logSevere(t);
         }
     }
 
@@ -777,8 +777,8 @@ public class BlockProperties {
     public static void dumpBlocks(boolean all) {
         List<String> missing = new LinkedList<String>();
         if (all) {
-            LogUtil.logInfo("[NoCheatPlus] Dump block properties for fastbreak check:");
-            LogUtil.logInfo("--- Present entries -------------------------------");
+            StaticLog.logInfo("[NoCheatPlus] Dump block properties for fastbreak check:");
+            StaticLog.logInfo("--- Present entries -------------------------------");
         }
         List<String> tags = new ArrayList<String>();
         for (int i = 0; i < blocks.length; i++) {
@@ -804,15 +804,15 @@ public class BlockProperties {
             }
             else {
                 if (all) {
-                    LogUtil.logInfo(i + ": (" + mat + tagsJoined + ") " + blocks[i].toString());
+                    StaticLog.logInfo(i + ": (" + mat + tagsJoined + ") " + blocks[i].toString());
                 }
             }
         }
         if (!missing.isEmpty()) {
             Bukkit.getLogger().warning("[NoCheatPlus] The block breaking data is incomplete, default to allow instant breaking:");
-            LogUtil.logWarning("--- Missing entries -------------------------------");
+            StaticLog.logWarning("--- Missing entries -------------------------------");
             for (String spec : missing) {
-                LogUtil.logWarning(spec);
+                StaticLog.logWarning(spec);
             }
         }
     }
@@ -1906,7 +1906,7 @@ public class BlockProperties {
         for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_IGNOREPASSABLE)) {
             final Integer id = RawConfigFile.parseTypeId(input);
             if (id == null || id < 0 || id >= 4096) {
-                LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
+                StaticLog.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_IGNOREPASSABLE + "): " + input);
             }
             else {
                 blockFlags[id] |= F_IGN_PASSABLE;
@@ -1917,7 +1917,7 @@ public class BlockProperties {
         for (final String input : config.getStringList(pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK)) {
             final Integer id = RawConfigFile.parseTypeId(input);
             if (id == null || id < 0 || id >= 4096) {
-                LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK + "): " + input);
+                StaticLog.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_ALLOWINSTANTBREAK + "): " + input);
             }
             else {
                 setBlockProps(id, instantType);
@@ -1933,12 +1933,12 @@ public class BlockProperties {
                 final String key = entry.getKey();
                 final Integer id = RawConfigFile.parseTypeId(key);
                 if (id == null || id < 0 || id >= 4096) {
-                    LogUtil.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + "): " + key);
+                    StaticLog.logWarning("[NoCheatplus] Bad block id (" + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + "): " + key);
                     continue;
                 }
                 final Object obj = entry.getValue();
                 if (!(obj instanceof String)) {
-                    LogUtil.logWarning("[NoCheatplus] Bad flags at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key: " + key);
+                    StaticLog.logWarning("[NoCheatplus] Bad flags at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key: " + key);
                     hasErrors = true;
                     continue;
                 }
@@ -1957,7 +1957,7 @@ public class BlockProperties {
                     try{
                         flags |= parseFlag(input);
                     } catch(InputMismatchException e) {
-                        LogUtil.logWarning("[NoCheatplus] Bad flag at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key " + key + " (skip setting flags for this block): " + input);
+                        StaticLog.logWarning("[NoCheatplus] Bad flag at " + pathPrefix + ConfPaths.SUB_OVERRIDEFLAGS + " for key " + key + " (skip setting flags for this block): " + input);
                         error = true;
                         hasErrors = true;
                         break;
@@ -1969,7 +1969,7 @@ public class BlockProperties {
                 blockFlags[id] = flags;
             }
             if (hasErrors) {
-                LogUtil.logInfo("[NoCheatPlus] Overriding block-flags was not entirely successful, all available flags: \n" + StringUtil.join(flagNameMap.values(), "|"));
+                StaticLog.logInfo("[NoCheatPlus] Overriding block-flags was not entirely successful, all available flags: \n" + StringUtil.join(flagNameMap.values(), "|"));
             }
         }
     }

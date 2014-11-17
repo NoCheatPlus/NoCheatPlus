@@ -8,7 +8,7 @@ import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.StaticLogFile;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
@@ -103,7 +103,7 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
                 NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(ColorUtil.replaceColors(prefixChat + message));
             }
             if (toConsole) {
-                LogUtil.logInfo(ColorUtil.removeColors(prefixConsole + message));
+                StaticLog.logInfo(ColorUtil.removeColors(prefixConsole + message));
             }
             if (toFile) {
                 StaticLogFile.fileLogger.info(ColorUtil.removeColors(prefixFile + message));

@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
 
 /**
@@ -213,7 +213,7 @@ public class BridgeHealth {
 	private static void checkLogEntry(final String tag) {
 		// New entry.
 		if (ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG)){
-			LogUtil.logWarning("[NoCheatPlus] API incompatibility detected: " + tag);
+			StaticLog.logWarning("[NoCheatPlus] API incompatibility detected: " + tag);
 		}
 	}
 	

@@ -22,7 +22,7 @@ import fr.neatmonster.nocheatplus.compat.cb3100.MCAccessCB3100;
 import fr.neatmonster.nocheatplus.compat.glowstone.MCAccessGlowstone;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * Factory class to hide potentially dirty stuff.
@@ -76,12 +76,12 @@ public class MCAccessFactory {
             else{
                 msg = "[NoCheatPlus] Could not set up native access for the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.";
                 for (String uMsg : updateLocs) {
-                    LogUtil.logWarning(uMsg);
+                    StaticLog.logWarning(uMsg);
                 }
             }
-            LogUtil.logWarning(msg);
+            StaticLog.logWarning(msg);
             final MCAccess mcAccess = new MCAccessBukkit();
-            LogUtil.logWarning("[NoCheatPlus] Bukkit-API-only access: Some features will likely not function properly, performance might suffer.");
+            StaticLog.logWarning("[NoCheatPlus] Bukkit-API-only access: Some features will likely not function properly, performance might suffer.");
             return mcAccess;
         }
         catch(Throwable t) {
@@ -90,13 +90,13 @@ public class MCAccessFactory {
 
         // All went wrong.
         // TODO: Fall-back solution (disable plugin, disable checks).
-        LogUtil.logSevere("[NoCheatPlus] Your version of NoCheatPlus is not compatible with the version of the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.");
+        StaticLog.logSevere("[NoCheatPlus] Your version of NoCheatPlus is not compatible with the version of the server-mod (" + Bukkit.getServer().getVersion() + "). Please check for updates and consider to request support.");
         for (String msg : updateLocs) {
-            LogUtil.logSevere(msg);
+            StaticLog.logSevere(msg);
         }
-        LogUtil.logSevere("[NoCheatPlus] >>> Failed to set up MCAccess <<<");
+        StaticLog.logSevere("[NoCheatPlus] >>> Failed to set up MCAccess <<<");
         for (Throwable t : throwables ) {
-            LogUtil.logSevere(t);
+            StaticLog.logSevere(t);
         }
         // TODO: Schedule disabling the plugin or running in circles.
         throw new RuntimeException("Could not set up native access to the server mod, neither to the Bukkit-API.");

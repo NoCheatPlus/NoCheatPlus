@@ -5,7 +5,7 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 public class VanillaBlocksFactory implements BlockPropertiesSetup{
 
@@ -26,8 +26,8 @@ public class VanillaBlocksFactory implements BlockPropertiesSetup{
 				setup.setupBlockProperties(worldConfigProvider);
 			}
 			catch(Throwable t){
-				LogUtil.logSevere("[NoCheatPlus] " + setup.getClass().getSimpleName() + ".setupBlockProperties could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
-		    	LogUtil.logSevere(t);
+				StaticLog.logSevere("[NoCheatPlus] " + setup.getClass().getSimpleName() + ".setupBlockProperties could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+		    	StaticLog.logSevere(t);
 		    	// Abort further processing.
 		    	break;
 			}

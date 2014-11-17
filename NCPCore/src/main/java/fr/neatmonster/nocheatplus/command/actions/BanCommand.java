@@ -12,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.command.AbstractCommand;
 import fr.neatmonster.nocheatplus.command.BaseCommand;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.utilities.IdUtil;
@@ -59,9 +59,9 @@ public class BanCommand extends BaseCommand {
 		if (player == null && !IdUtil.isValidMinecraftUserName(name)) {
 			UUID id = IdUtil.UUIDFromStringSafe(name);
 			if (id != null) {
-				LogUtil.logWarning("Banning by UUID might not work (" + id.toString()+"), relay to the vanilla command.");
+				StaticLog.logWarning("Banning by UUID might not work (" + id.toString()+"), relay to the vanilla command.");
 			} else {
-				LogUtil.logWarning("Might not be a valid user name: " + name);
+				StaticLog.logWarning("Might not be a valid user name: " + name);
 			}
 		}
 		if (player != null){
@@ -74,7 +74,7 @@ public class BanCommand extends BaseCommand {
 	}
 	
 	private void logBan(CommandSender sender, Player player, String name, String reason) {
-		LogUtil.logInfo("[NoCheatPlus] (" + sender.getName() + ") Banned " + name + (player != null ? ("/" + player.getName()) : "") + " : " + reason);
+		StaticLog.logInfo("[NoCheatPlus] (" + sender.getName() + ") Banned " + name + (player != null ? ("/" + player.getName()) : "") + " : " + reason);
 	}
 
 	/* (non-Javadoc)

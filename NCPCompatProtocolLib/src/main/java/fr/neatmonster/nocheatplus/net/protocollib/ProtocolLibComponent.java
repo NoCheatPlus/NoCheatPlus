@@ -17,7 +17,7 @@ import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -30,7 +30,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
 	private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 	
 	public ProtocolLibComponent(Plugin plugin) {
-		LogUtil.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
+		StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
 		register(plugin);
 	}
 
@@ -47,7 +47,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
 			for (PacketAdapter adapter : registeredPacketAdapters) {
 				names.add(adapter.getClass().getSimpleName());
 			}
-			LogUtil.logInfo("[NoCheatPlus] Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
+			StaticLog.logInfo("[NoCheatPlus] Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
 		}
 	}
 	
@@ -58,8 +58,8 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
 			ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
 			registeredPacketAdapters.add(adapter);
 		} catch (Throwable t) {
-			LogUtil.logWarning("[NoCheatPlus] Could not register packet level hook: " + clazz.getSimpleName());
-			LogUtil.logWarning(t);
+			StaticLog.logWarning("[NoCheatPlus] Could not register packet level hook: " + clazz.getSimpleName());
+			StaticLog.logWarning(t);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
 				protocolManager.removePacketListener(adapter);
 				api.removeComponent(adapter); // Bit heavy, but consistent.
 			} catch (Throwable t) {
-				LogUtil.logWarning("[NoCheatPlus] Failed to unregister packet level hook: " + adapter.getClass().getName());
+				StaticLog.logWarning("[NoCheatPlus] Failed to unregister packet level hook: " + adapter.getClass().getName());
 			}
 		}
 		registeredPacketAdapters.clear();

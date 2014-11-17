@@ -11,7 +11,7 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.actions.ActionFactory;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * Central location for everything that's described in the configuration file(s).<br>
@@ -204,12 +204,12 @@ public class ConfigManager {
                     	globalConfig.save(globalFile);
                     }
                 } catch (final Exception e) {
-                	LogUtil.logSevere("[NoCheatPlus] Could not save back config.yml (see exception below).");
-                    LogUtil.logSevere(e);
+                	StaticLog.logSevere("[NoCheatPlus] Could not save back config.yml (see exception below).");
+                    StaticLog.logSevere(e);
                 }
             } catch (final Exception e) {
-            	LogUtil.logSevere("[NoCheatPlus] Could not load config.yml (see exception below).  Continue with default settings...");
-            	LogUtil.logSevere(e);
+            	StaticLog.logSevere("[NoCheatPlus] Could not load config.yml (see exception below).  Continue with default settings...");
+            	StaticLog.logSevere(e);
             }
         }
         else {
@@ -220,7 +220,7 @@ public class ConfigManager {
             	globalConfig.set(ConfPaths.CONFIGVERSION_SAVED, DefaultConfig.buildNumber);
                 globalConfig.save(globalFile);
             } catch (final Exception e) {
-            	LogUtil.logSevere(e);
+            	StaticLog.logSevere(e);
             }
         }
 //        globalConfig.setActionFactory();
@@ -254,12 +254,12 @@ public class ConfigManager {
                 try{
                 	if (worldConfig.getBoolean(ConfPaths.SAVEBACKCONFIG)) worldConfig.save(worldFile);
                 } catch (final Exception e){
-                	LogUtil.logSevere("[NoCheatPlus] Couldn't save back world-specific configuration for " + worldEntry.getKey() + " (see exception below).");
-                	LogUtil.logSevere(e);
+                	StaticLog.logSevere("[NoCheatPlus] Couldn't save back world-specific configuration for " + worldEntry.getKey() + " (see exception below).");
+                	StaticLog.logSevere(e);
                 }
             } catch (final Exception e) {
-            	LogUtil.logSevere("[NoCheatPlus] Couldn't load world-specific configuration for " + worldEntry.getKey() + " (see exception below). Continue with global default settings...");
-            	LogUtil.logSevere(e);
+            	StaticLog.logSevere("[NoCheatPlus] Couldn't load world-specific configuration for " + worldEntry.getKey() + " (see exception below). Continue with global default settings...");
+            	StaticLog.logSevere(e);
             }
             worldConfig.setDefaults(globalConfig);
             worldConfig.options().copyDefaults(true);

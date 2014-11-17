@@ -16,7 +16,7 @@ import org.bukkit.plugin.Plugin;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry;
 import fr.neatmonster.nocheatplus.event.GenericListener.MethodEntry.MethodOrder;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * This class allows to register event-listeners which will all be called form within one event handler per event+priority combination.<br>
@@ -144,17 +144,17 @@ public class ListenerManager {
 				try{
 					method.setAccessible(true);
 				} catch (SecurityException e){
-					LogUtil.logWarning("[ListenerManager]  Can not set method accessible: " + method.toGenericString() +" registered in " + clazz.getName()+ ", ignoring it!");
+					StaticLog.logWarning("[ListenerManager]  Can not set method accessible: " + method.toGenericString() +" registered in " + clazz.getName()+ ", ignoring it!");
 				}
 			}
 			Class<?>[] argTypes = method.getParameterTypes();
 			if (argTypes.length != 1){
-				LogUtil.logWarning("[ListenerManager] Bad method signature (number of arguments not 1): " + method.toGenericString() +" registered in " + clazz.getName()+ ", ignoring it!");
+				StaticLog.logWarning("[ListenerManager] Bad method signature (number of arguments not 1): " + method.toGenericString() +" registered in " + clazz.getName()+ ", ignoring it!");
 				continue;
 			}
 			Class<?> eventType = argTypes[0];
 			if (!Event.class.isAssignableFrom(eventType)){
-				LogUtil.logWarning("[ListenerManager] Bad method signature (argument does not extend Event): " + method.toGenericString() +" registered in " + clazz.getName()+ ", ignoring it!");
+				StaticLog.logWarning("[ListenerManager] Bad method signature (argument does not extend Event): " + method.toGenericString() +" registered in " + clazz.getName()+ ", ignoring it!");
 				continue;
 			}
 			Class<? extends Event> checkedEventType = eventType.asSubclass(Event.class);

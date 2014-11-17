@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.TeleportUtil;
 
 /**
@@ -34,7 +34,7 @@ public class VehicleSetBack implements Runnable{
         	TeleportUtil.teleport(vehicle, player, location, debug);
         }
         catch(Throwable t){
-        	LogUtil.logSevere(t);
+        	StaticLog.logSevere(t);
         }
     }
     

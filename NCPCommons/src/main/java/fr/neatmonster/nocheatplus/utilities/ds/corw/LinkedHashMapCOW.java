@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.utilities.ds;
+package fr.neatmonster.nocheatplus.utilities.ds.corw;
 
 import java.util.Collection;
 import java.util.Collections;

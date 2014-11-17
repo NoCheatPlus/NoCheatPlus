@@ -16,7 +16,7 @@ import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -44,7 +44,7 @@ public class FastConsume extends Check implements Listener{
 		super(CheckType.INVENTORY_FASTCONSUME);
 		// Overrides the instant-eat check.
 		ConfigManager.setForAllConfigs(ConfPaths.INVENTORY_INSTANTEAT_CHECK, false);
-		LogUtil.logInfo("[NoCheatPlus] Inventory checks: FastConsume is available, disabled InstantEat.");
+		StaticLog.logInfo("[NoCheatPlus] Inventory checks: FastConsume is available, disabled InstantEat.");
 	}
 	
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

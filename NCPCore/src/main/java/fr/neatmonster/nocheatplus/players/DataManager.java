@@ -46,7 +46,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -457,7 +457,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
         onlinePlayers.clear();
         // Finally alert (summary) if inconsistencies found.
         if (foundInconsistencies > 0) {
-            LogUtil.logWarning("[NoCheatPlus] DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
+            StaticLog.logWarning("[NoCheatPlus] DataMan found " + foundInconsistencies + " inconsistencies (warnings suppressed).");
             foundInconsistencies = 0;
         }
     }
@@ -508,7 +508,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
                     details.add("changed player instances (" + changed + ")");
                 }
 
-                LogUtil.logWarning("[NoCheatPlus] DataMan inconsistencies: " + StringUtil.join(details, " | "));
+                StaticLog.logWarning("[NoCheatPlus] DataMan inconsistencies: " + StringUtil.join(details, " | "));
             }
         }
     }

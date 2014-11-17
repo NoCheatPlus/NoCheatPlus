@@ -62,7 +62,7 @@ import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.DebugUtil;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -132,9 +132,9 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: reset the bounding box of the player ?
             if (MovingConfig.getConfig(player).tempKickIllegal) {
                 NCPAPIProvider.getNoCheatPlusAPI().denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
-                LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them and deny login for 24 hours");
+                StaticLog.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them and deny login for 24 hours");
             } else {
-                LogUtil.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them.");
+                StaticLog.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them.");
             }
             CheckUtils.kickIllegalMove(player);
         }
@@ -747,7 +747,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      */
     private void onVehicleLeaveMiss(final Player player, final MovingData data, final MovingConfig cc) {
         if (cc.debug) {
-            LogUtil.logWarning("[NoCheatPlus] VehicleExitEvent missing for: " + player.getName());
+            StaticLog.logWarning("[NoCheatPlus] VehicleExitEvent missing for: " + player.getName());
         }
         onPlayerVehicleLeave(player, null);
         //		if (BlockProperties.isRails(pFrom.getTypeId())) {
@@ -1287,7 +1287,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
             if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0) {
                 // DEBUG
-                LogUtil.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
+                StaticLog.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
             }
         }
         
@@ -1358,7 +1358,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location loc = player.getLocation(useLoc);
         // Debug logout.
         if (cc.debug) {
-            LogUtil.logInfo("[NoCheatPlus] Player " + player.getName() + " leaves at location: " + loc.toString());
+            StaticLog.logInfo("[NoCheatPlus] Player " + player.getName() + " leaves at location: " + loc.toString());
         }
         if (!player.isSleeping() && !player.isDead()) {
             // Check for missed moves.
@@ -1371,15 +1371,15 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                         // TODO: Consider to always set back here. Might skip on big distances.
                         if (TrigUtil.manhattan(loc, refLoc) > 0 || BlockProperties.isPassable(refLoc)) {
                             if (passable.isEnabled(player)) {
-                                LogUtil.logWarning("[NoCheatPlus] Potential exploit: Player " + player.getName() + " leaves, having moved into a block (not tracked by moving checks): " + player.getWorld().getName() + " / " + DebugUtil.formatMove(refLoc, loc));
+                                StaticLog.logWarning("[NoCheatPlus] Potential exploit: Player " + player.getName() + " leaves, having moved into a block (not tracked by moving checks): " + player.getWorld().getName() + " / " + DebugUtil.formatMove(refLoc, loc));
                                 // TODO: Actually trigger a passable violation (+tag).
                                 if (d > 1.25) {
-                                    LogUtil.logWarning("[NoCheatPlus] SKIP set-back for " + player.getName() + ", because distance is too high (risk of false positives): " + d);
+                                    StaticLog.logWarning("[NoCheatPlus] SKIP set-back for " + player.getName() + ", because distance is too high (risk of false positives): " + d);
                                 } else {
-                                    LogUtil.logInfo("[NoCheatPlus] Set back player " + player.getName() + ": " + DebugUtil.formatLocation(refLoc));
+                                    StaticLog.logInfo("[NoCheatPlus] Set back player " + player.getName() + ": " + DebugUtil.formatLocation(refLoc));
                                     data.prepareSetBack(refLoc);
                                     if (!player.teleport(refLoc)) {
-                                        LogUtil.logWarning("[NoCheatPlus] FAILED to set back player " + player.getName());
+                                        StaticLog.logWarning("[NoCheatPlus] FAILED to set back player " + player.getName());
                                     }
                                 }
                             }
@@ -1643,7 +1643,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final int loaded = info.from.ensureChunksLoaded();
         if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0) {
             // DEBUG
-            LogUtil.logInfo("[NoCheatPlus] Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
+            StaticLog.logInfo("[NoCheatPlus] Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
         }
         if (info.from.isOnGround() || info.from.isResetCond() || info.from.isAboveLadder() || info.from.isAboveStairs()) {
             res = true;

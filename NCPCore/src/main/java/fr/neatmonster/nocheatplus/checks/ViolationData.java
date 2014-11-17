@@ -11,7 +11,7 @@ import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.checks.access.IViolationInfo;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * Violation specific data, for executing actions.<br>
@@ -109,7 +109,7 @@ public class ViolationData implements IViolationInfo, ActionData{
             }
             return cancel;
         } catch (final Exception e) {
-            LogUtil.logSevere(e);
+            StaticLog.logSevere(e);
             // On exceptions cancel events.
             return true;
         }

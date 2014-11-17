@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.bukkit.ChatColor;
 
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * A not too fat timings class re-used from other plugins.
@@ -83,7 +83,7 @@ public final class Timings {
 			if ( ts > tsStats+periodStats){
 				tsStats = ts;
 				// print out stats !
-				LogUtil.logInfo(getStatsStr());
+				StaticLog.logInfo(getStatsStr());
 			}
 		}
 	}

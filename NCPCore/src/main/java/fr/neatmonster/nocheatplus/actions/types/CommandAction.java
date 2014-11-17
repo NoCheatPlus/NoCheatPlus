@@ -5,7 +5,7 @@ import org.bukkit.command.CommandException;
 
 import fr.neatmonster.nocheatplus.actions.AbstractActionList;
 import fr.neatmonster.nocheatplus.actions.ParameterHolder;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * Execute a command by imitating an administrator typing the command directly into the console.
@@ -38,7 +38,7 @@ public class CommandAction<D extends ParameterHolder, L extends AbstractActionLi
         try {
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
         } catch (final CommandException e) {
-            LogUtil.logWarning("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
+            StaticLog.logWarning("[NoCheatPlus] Failed to execute the command '" + command + "': " + e.getMessage()
                     + ", please check if everything is setup correct.");
         } catch (final Exception e) {
             // I don't care in this case, your problem if your command fails.

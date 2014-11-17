@@ -6,7 +6,7 @@ import java.util.List;
 
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.net.protocollib.ProtocolLibComponent;
 
 /**
@@ -32,14 +32,14 @@ public class DefaultComponentFactory {
 			available.add(new FastConsume());
 		}
 		catch (Throwable t){
-			LogUtil.logInfo("[NoCheatPlus] Inventory checks: FastConsume is not available.");
+			StaticLog.logInfo("[NoCheatPlus] Inventory checks: FastConsume is not available.");
 		}
 		
 		// ProtocolLib dependencies.
 		try {
 			available.add(new ProtocolLibComponent(plugin));
 		} catch (Throwable t){
-			LogUtil.logInfo("[NoCheatPlus] Packet level access: ProtocolLib is not available.");
+			StaticLog.logInfo("[NoCheatPlus] Packet level access: ProtocolLib is not available.");
 		}
 		
 		return available;

@@ -1,8 +1,6 @@
 package fr.neatmonster.nocheatplus.logging;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -97,14 +95,14 @@ public class StaticLogFile {
             try {
                 logFile.getParentFile().mkdirs();
             } catch (final Exception e) {
-                LogUtil.logSevere(e);
+                StaticLog.logSevere(e);
             }
             fileHandler = new FileHandler(logFile.getCanonicalPath(), true);
             fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(StaticLogFile.LogFileFormatter.newInstance());
             logger.addHandler(fileHandler);
         } catch (final Exception e) {
-            LogUtil.logSevere(e);
+            StaticLog.logSevere(e);
         }
         fileLogger = logger;
     }

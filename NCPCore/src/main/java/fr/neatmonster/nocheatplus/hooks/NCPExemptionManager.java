@@ -18,7 +18,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.components.NCPListener;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -307,7 +307,7 @@ public class NCPExemptionManager {
     		if (wrong != 0){
     			details.add("wrong entity-ids (" + wrong + ")");
     		}
-    		LogUtil.logWarning("[NoCheatPlus] ExemptionManager inconsistencies: " + StringUtil.join(details, " | "));
+    		StaticLog.logWarning("[NoCheatPlus] ExemptionManager inconsistencies: " + StringUtil.join(details, " | "));
     	}
     }
 

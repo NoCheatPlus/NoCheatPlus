@@ -5,7 +5,7 @@ import java.util.Map;
 import fr.neatmonster.nocheatplus.actions.types.CancelAction;
 import fr.neatmonster.nocheatplus.actions.types.LogAction;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
  * Helps with creating Actions out of text string definitions.
@@ -76,9 +76,9 @@ public class ActionFactory extends AbstractActionFactory<ViolationData, ActionLi
             toChat = parts[3].contains("i");
             toFile = parts[3].contains("f");
         } catch (final Exception e) {
-        	LogUtil.logWarning("[NoCheatPlus] Couldn't parse details of log action '" + definition
+        	StaticLog.logWarning("[NoCheatPlus] Couldn't parse details of log action '" + definition
                     + "', will use default values instead.");
-        	LogUtil.logWarning(e);
+        	StaticLog.logWarning(e);
             delay = 0;
             repeat = 1;
             toConsole = true;

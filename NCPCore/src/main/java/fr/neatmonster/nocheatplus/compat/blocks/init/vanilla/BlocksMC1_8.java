@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.BlockFlags;
 
 public class BlocksMC1_8 implements BlockPropertiesSetup {
@@ -102,7 +102,7 @@ public class BlocksMC1_8 implements BlockPropertiesSetup {
         // 197(DARK_OAK_DOOR
         BlockInit.setAs(197, Material.WOODEN_DOOR);
         
-        LogUtil.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.8 blocks.");
+        StaticLog.logInfo("[NoCheatPlus] Added block-info for Minecraft 1.8 blocks.");
     }
 
 }

@@ -19,7 +19,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.MemoryConfiguration;
 
-import fr.neatmonster.nocheatplus.logging.LogUtil;
+import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.CharPrefixTree;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
@@ -151,8 +151,8 @@ public class PathUtils {
 				}
 				catch(Throwable t){
 					// Do log this one.
-					LogUtil.logSevere("[NoCheatPlus] Failed to save configuration (" + configName + ") with changes: " + t.getClass().getSimpleName());
-					LogUtil.logSevere(t);
+					StaticLog.logSevere("[NoCheatPlus] Failed to save configuration (" + configName + ") with changes: " + t.getClass().getSimpleName());
+					StaticLog.logSevere(t);
 				}
 			}
 		} catch (FileNotFoundException e) {
