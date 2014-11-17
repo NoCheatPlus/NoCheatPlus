@@ -36,6 +36,7 @@ public class DefaultConfig extends ConfigFile {
 //        not set(ConfPaths.CONFIGVERSION_SAVED, -1);
         set(ConfPaths.LOGGING_ACTIVE, true);
         set(ConfPaths.LOGGING_DEBUG, false);
+        set(ConfPaths.LOGGING_MAXQUEUESIZE, 5000);
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_ACTIVE, true);
         set(ConfPaths.LOGGING_BACKEND_CONSOLE_PREFIX, "[NoCheatPlus] ");
         set(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE, true);
