@@ -64,6 +64,7 @@ public class StaticLogFile {
             return builder.toString();
         }
     }
+    
     /** The file logger. */
     public static Logger			fileLogger = null;
     /** The file handler. */
@@ -79,13 +80,19 @@ public class StaticLogFile {
         logger.removeHandler(fileHandler);
         fileHandler = null;
     }
+    
+    /**
+     * @throws RuntimeException wrapping actual exceptions (crate directories, file handlers).
+     * @param logFile
+     */
     public static void setupLogger(File logFile){
         // Setup the file logger.
         final Logger logger = Logger.getAnonymousLogger();
         logger.setLevel(Level.INFO);
         logger.setUseParentHandlers(false);
-        for (final Handler h : logger.getHandlers())
+        for (final Handler h : logger.getHandlers()) {
             logger.removeHandler(h);
+        }
         if (fileHandler != null) {
             fileHandler.close();
             logger.removeHandler(fileHandler);
@@ -95,14 +102,14 @@ public class StaticLogFile {
             try {
                 logFile.getParentFile().mkdirs();
             } catch (final Exception e) {
-                StaticLog.logSevere(e);
+                throw new RuntimeException(e); // TODO
             }
             fileHandler = new FileHandler(logFile.getCanonicalPath(), true);
             fileHandler.setLevel(Level.ALL);
             fileHandler.setFormatter(StaticLogFile.LogFileFormatter.newInstance());
             logger.addHandler(fileHandler);
         } catch (final Exception e) {
-            StaticLog.logSevere(e);
+            throw new RuntimeException(e); // TODO
         }
         fileLogger = logger;
     }

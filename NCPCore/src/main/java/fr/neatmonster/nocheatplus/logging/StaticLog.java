@@ -114,6 +114,9 @@ public class StaticLog {
      * @return
      */
     public static boolean scheduleLog(final Level level, final String message) {
+        if (!useBukkitLogger) {
+            return false;
+        }
         try {
             return Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"), new Runnable() {
                 @Override
