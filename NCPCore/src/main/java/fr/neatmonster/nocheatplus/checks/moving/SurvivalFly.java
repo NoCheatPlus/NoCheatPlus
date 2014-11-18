@@ -9,10 +9,12 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
@@ -473,7 +475,7 @@ public class SurvivalFly extends Check {
         if (hDistance <= (cc.velocityStrictInvalidation ? hAllowedDistance : hAllowedDistance / 2.0)) {
             // TODO: Should there be other side conditions?
             // Invalidate used horizontal velocity.
-            //        	System.out.println("*** INVALIDATE ON SPEED");
+            //        	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "*** INVALIDATE ON SPEED");
             data.clearActiveHorVel();
             //          if (data.horizontalVelocityUsed > cc.velocityGraceTicks) {
             //        	data.horizontalFreedom = 0;
@@ -1422,7 +1424,7 @@ public class SurvivalFly extends Check {
         if (!tags.isEmpty()) builder.append("\n" + " tags: " + StringUtil.join(tags, "+"));
         builder.append("\n");
         //		builder.append(data.stats.getStatsStr(false));
-        System.out.print(builder.toString());
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
     }
 
 }

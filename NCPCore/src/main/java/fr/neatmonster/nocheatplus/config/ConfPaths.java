@@ -29,6 +29,7 @@ public abstract class ConfPaths {
     private static final String LOGGING                                  = "logging.";
     public static final String  LOGGING_ACTIVE                           = LOGGING + "active";
     public static final String  LOGGING_DEBUG                            = LOGGING + "debug";
+    public static final String  LOGGING_MAXQUEUESIZE                     = LOGGING + "maxqueuesize";
     
     private static final String LOGGING_BACKEND							 = LOGGING + "backend.";
     private static final String LOGGING_BACKEND_CONSOLE					 = LOGGING_BACKEND + "console.";

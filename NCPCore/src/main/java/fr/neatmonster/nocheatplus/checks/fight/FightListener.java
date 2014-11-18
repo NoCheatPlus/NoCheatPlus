@@ -36,6 +36,7 @@ import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
@@ -321,7 +322,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 			// Angle check.
 			if (angle.check(player, worldChanged, data, cc)) {
 				if (!cancelled && cc.debug) {
-					System.out.println(player.getName() + " fight.angle cancel without yawrate cancel.");
+					NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " fight.angle cancel without yawrate cancel.");
 				}
 				cancelled = true;
 			}
@@ -353,7 +354,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     					// TODO: What would mData.lostSprintCount > 0  mean here?
         				mData.lostSprintCount = 7;
         				if ((cc.debug || mc.debug) && BuildParameters.debugLevel > 0){
-        					System.out.println(player.getName() + " (lostsprint) hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
+        					NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " (lostsprint) hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
         				}
     				}
     			}
@@ -365,7 +366,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (!cancelled && data.attackPenalty.isPenalty(now)) {
         	cancelled = true;
         	if (cc.debug) {
-        		System.out.println(player.getName() + " ~ attack penalty.");
+        		NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " ~ attack penalty.");
         	}
         }
         
@@ -421,7 +422,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             	damagedData.fastHealRefTime = System.currentTimeMillis();
             }
         }
-//    	System.out.println(event.getCause());
+//    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, event.getCause());
     	// Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;

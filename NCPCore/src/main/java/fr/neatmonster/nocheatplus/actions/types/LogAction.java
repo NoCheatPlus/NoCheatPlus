@@ -8,8 +8,8 @@ import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFileWithActions;
-import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.logging.StaticLogFile;
+import fr.neatmonster.nocheatplus.logging.LogManager;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 
 /**
@@ -99,14 +99,15 @@ public class LogAction extends ActionWithParameters<ViolationData, ActionList> {
     public boolean execute(final ViolationData violationData) {
         if (!violationData.player.hasPermission(violationData.getPermissionSilent())) {
             final String message = super.getMessage(violationData);
+            final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
             if (toChat) {
-                NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(ColorUtil.replaceColors(prefixChat + message));
+                logManager.info(Streams.NOTIFY_INGAME, ColorUtil.replaceColors(prefixChat + message));
             }
             if (toConsole) {
-                StaticLog.logInfo(ColorUtil.removeColors(prefixConsole + message));
+                logManager.info(Streams.SERVER_LOGGER, ColorUtil.removeColors(prefixConsole + message));
             }
             if (toFile) {
-                StaticLogFile.fileLogger.info(ColorUtil.removeColors(prefixFile + message));
+                logManager.info(Streams.DEFAULT_FILE, ColorUtil.removeColors(prefixFile + message));
             }
         }
         return false;

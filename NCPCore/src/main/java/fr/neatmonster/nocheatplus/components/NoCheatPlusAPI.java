@@ -1,5 +1,7 @@
 package fr.neatmonster.nocheatplus.components;
 
+import fr.neatmonster.nocheatplus.logging.LogManager;
+
 
 
 /**
@@ -83,4 +85,11 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
 	 * @return
 	 */
 	public boolean isLoginDenied(String playerName, long time);
+	
+	/**
+	 * Get the central access point for logging (LogManager),
+	 * @return
+	 */
+	public LogManager getLogManager();
+	
 }

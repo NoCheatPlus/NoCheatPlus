@@ -5,10 +5,12 @@ import java.util.Locale;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PassableRayTracing;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -56,7 +58,7 @@ public class Passable extends Check {
                         tags = "raytracing_2x_";
                     }
                     else if (cc.debug) {
-                        System.out.println(player.getName() + " passable: allow moving out of a block.");
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " passable: allow moving out of a block.");
                     }
                 }
                 else{
@@ -147,10 +149,10 @@ public class Passable extends Check {
                 //					if (BlockProperties.isPassableExact(from.getBlockCache(), ref)) {
                 loc = ref;
                 if (cc.debug) {
-                    System.out.println(player.getName() + " Using set-back location for passable.");
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Using set-back location for passable.");
                 }
             } else if (cc.debug) {
-                System.out.println(player.getName() + " Ignoring set-back for passable.");
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Ignoring set-back for passable.");
             }
         }
 
@@ -178,7 +180,7 @@ public class Passable extends Check {
             } else {
                 newTo = from.getLocation();
                 if (cc.debug) {
-                    System.out.println(player.getName() + " Using from location for passable.");
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Using from location for passable.");
                 }
             }
             newTo.setYaw(to.getYaw());

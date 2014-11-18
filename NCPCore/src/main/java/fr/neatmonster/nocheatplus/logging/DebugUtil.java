@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
@@ -216,7 +217,7 @@ public class DebugUtil {
 				builder.append(" (" + (speed != Double.NEGATIVE_INFINITY ? ("e_speed=" + (speed + 1)) : "") + (jump != Double.NEGATIVE_INFINITY ? ("e_jump=" + (jump + 1)) : "") + ")");
 			}
 			// Print basic info first in order
-			System.out.print(builder.toString());
+			NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
 			// Extended info.
 			if (BuildParameters.debugLevel > 0){
 				builder.setLength(0);
@@ -231,7 +232,7 @@ public class DebugUtil {
 				if (to.getTypeId() != 0) addBlockInfo(builder, to, "\nto");
 				if (to.getTypeIdBelow() != 0) addBlockBelowInfo(builder, to, "\nto");
 				if (!to.isOnGround() && to.isOnGround(0.5)) builder.append(" (ground within 0.5)");
-				System.out.print(builder.toString());
+				NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
 			}
 			
 		}
@@ -278,7 +279,7 @@ public class DebugUtil {
 			addFormattedLocation(loc, builder);
 		}
 		builder.append("\n Vehicle type: " + vehicle.getType() + (wrongVehicle ? (actualVehicle == null ? " (exited?)" : " actual: " + actualVehicle.getType()) : ""));
-		System.out.print(builder.toString());
+		NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
 	}
 
 }

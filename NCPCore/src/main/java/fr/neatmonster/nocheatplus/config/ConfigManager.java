@@ -51,6 +51,8 @@ public class ConfigManager {
 		}
 		
 	};
+	
+	private static boolean isInitialized = false;
     
     /**
      * Factory method.
@@ -114,8 +116,9 @@ public class ConfigManager {
      * Cleanup.
      */
     public static void cleanup() {
-    	
+        isInitialized = false;
         setActionFactoryFactory(null);
+        // TODO: Remove references of config files ?
     }
 
     /**
@@ -266,6 +269,15 @@ public class ConfigManager {
 //            worldConfig.setActionFactory();
         }
         ConfigManager.worldsMap = newWorldsMap;
+        isInitialized = true;
+    }
+    
+    /**
+     * Informal test if the init method completed (no details are reflected).
+     * @return
+     */
+    public static boolean isInitialized() {
+        return isInitialized;
     }
     
     /**

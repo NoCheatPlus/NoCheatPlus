@@ -63,6 +63,7 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.DebugUtil;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 import fr.neatmonster.nocheatplus.stats.Counters;
@@ -400,7 +401,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             earlyReturn = true;
         } else if (player.isSleeping()) {
             // Ignore sleeping playerrs.
-            // TODO: sleeping: (which cb!) System.out.println("-> " + player.isSleepingIgnored());
+            // TODO: sleeping: (which cb!) NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "-> " + player.isSleepingIgnored());
             data.sfHoverTicks = -1;
             earlyReturn = true;
         } else if (!from.getWorld().equals(to.getWorld())) {
@@ -694,7 +695,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         // Debug.
         if (cc.debug) {
-            System.out.println(player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
         }
     }
 
@@ -981,7 +982,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
 
                 if (cc.debug && BuildParameters.debugLevel > 0) {
-                    System.out.println(player.getName() + " TP" + (smallRange ? " (small-range)" : "") + (cancel ? " (cancelled)" : "") +  ": " + to);
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP" + (smallRange ? " (small-range)" : "") + (cancel ? " (cancelled)" : "") +  ": " + to);
                 }
             }
             else{
@@ -989,7 +990,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Better reset teleported (compatibility). Might have drawbacks.
                 data.resetTeleported();
                 if (cc.debug && BuildParameters.debugLevel > 0) {
-                    System.out.println(player.getName() + " TP (cancelled): " + to);
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP (cancelled): " + to);
                 }
                 return;
             }
@@ -1028,7 +1029,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Vector velocity = event.getVelocity();
 
         if (cc.debug) {
-            System.out.println(event.getPlayer().getName() + " new velocity: " + velocity);
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, event.getPlayer().getName() + " new velocity: " + velocity);
         }
 
         double newVal = velocity.getY();
@@ -1078,7 +1079,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // A little extra sweep to check for debug flags.
             normalVehicles.add(entityType);
             if (MovingConfig.getConfig(vehicle.getWorld().getName()).debug) {
-                System.out.println("[NoCheatPlus] VehicleMoveEvent fired for: " + entityType);
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "[NoCheatPlus] VehicleMoveEvent fired for: " + entityType);
             }
         }
         // TODO: Might account for the case of a player letting the vehicle move but not themself (do mind latency).
@@ -1213,7 +1214,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
         if (cc.debug) {
-            System.out.println(player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         }
         // Fall-back check.
         final double maxD = NoFall.getDamage(Math.max(yDiff, Math.max(data.noFallFallDistance, fallDistance))) + (allowReset ? 0.0 : 3.0);
@@ -1221,7 +1222,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: respect dealDamage ?
             BridgeHealth.setDamage(event, maxD);
             if (cc.debug) {
-                System.out.println(player.getName() + " Adjust fall damage to: " + maxD);
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Adjust fall damage to: " + maxD);
             }
         }
         if (allowReset) {
@@ -1487,7 +1488,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
             }
             if (cc.debug) {
-                System.out.println(player.getName() + " vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
             }
         }
 
@@ -1497,7 +1498,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
 
         if (cc.debug) {
-            System.out.println(player.getName() + " vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
         }
         data.resetPositions(loc);
         data.setSetBack(loc);

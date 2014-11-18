@@ -1,6 +1,5 @@
 package fr.neatmonster.nocheatplus.command.admin;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand.NCPReloadEvent;
@@ -18,7 +18,8 @@ import fr.neatmonster.nocheatplus.components.order.Order;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.logging.StaticLogFile;
+import fr.neatmonster.nocheatplus.logging.LogManager;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
 
@@ -48,13 +49,17 @@ public class ReloadCommand extends BaseCommand {
      * @return true, if successful
      */
     private void handleReloadCommand(final CommandSender sender) {
-        sender.sendMessage(TAG + "Reloading configuration...");
+        final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
+        if (!sender.equals(Bukkit.getConsoleSender())) {
+            sender.sendMessage(TAG + "Reloading configuration...");
+        }
+        logManager.info(Streams.INIT, "[NoCheatPlus] Reloading configuration...");
 
         // Do the actual reload.
         ConfigManager.cleanup();
         ConfigManager.init(access);
-        StaticLogFile.cleanup();
-        StaticLogFile.setupLogger(new File(access.getDataFolder(), ConfigManager.getConfigFile().getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME)));
+        logManager.onReload(); // Does not get exchanged (!).
+        
         // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
         // Remove some checks data.
@@ -72,12 +77,12 @@ public class ReloadCommand extends BaseCommand {
 
         // Say to the other plugins that we've reloaded the configuration.
         Bukkit.getPluginManager().callEvent(new NCPReloadEvent());
-
-        sender.sendMessage(TAG + "Configuration reloaded!");
-        final String info = "[NoCheatPlus] Configuration reloaded.";
-        if (!(sender instanceof ConsoleCommandSender)) Bukkit.getLogger().info(info);
-        final ConfigFile config = ConfigManager.getConfigFile();
-        if (config.getBoolean(ConfPaths.LOGGING_ACTIVE) && config.getBoolean(ConfPaths.LOGGING_BACKEND_FILE_ACTIVE)) StaticLogFile.fileLogger.info(info);
+        
+        // Log reloading done.
+        if (!sender.equals(Bukkit.getConsoleSender())) {
+            sender.sendMessage(TAG + "Configuration reloaded!");
+        }
+        logManager.info(Streams.INIT, "[NoCheatPlus] Configuration reloaded.");
     }
 
 }

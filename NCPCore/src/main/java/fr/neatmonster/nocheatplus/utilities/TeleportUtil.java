@@ -5,6 +5,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.logging.Streams;
+
 public class TeleportUtil {
 	
 	/** Temp use. LocUtil.clone on passing. setWorld(null) after use. */
@@ -39,7 +42,7 @@ public class TeleportUtil {
 			vehicle.setPassenger(player);
 		}
 		if (debug){
-			System.out.println(player.getName() + " vehicle set back: " + location);
+			NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " vehicle set back: " + location);
 		}
 		useLoc.setWorld(null);
 	}

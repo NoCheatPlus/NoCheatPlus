@@ -4,18 +4,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
-
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
- * Static access methods for more or less direct logging using either Bukkit.getLogger() or System.out.
+ * Static access methods for more or less direct logging using either LogManager/INIT or System.out.
  * @author mc_dev
  *
  */
 public class StaticLog {
+    
+    // TODO: Remove this class (needs a version of LogManager for testing, i.e. ).
 
-    private static boolean useBukkitLogger = true;
+    private static boolean useBukkitLogger = false; // Let the plugin control this.
 
     /**
      * This is for testing purposes only.
@@ -57,7 +58,7 @@ public class StaticLog {
 
     public static void log(final Level level, final String msg) {
         if (useBukkitLogger) {
-            Bukkit.getLogger().log(level, msg);
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().log(Streams.INIT, level, msg);
         } else {
             System.out.println("[" + level + "] " + new Date());
             System.out.println(msg);
@@ -107,30 +108,21 @@ public class StaticLog {
     }
 
     /**
-     * Schedule a log message with given level for the Bukkit logger with the NoCheatPlus plugin.<br>
+     * Same as log(level, message).
+     * 
+     * @deprecated Same as log(level, message).
      * 
      * @param level
      * @param message
      * @return
      */
     public static boolean scheduleLog(final Level level, final String message) {
-        if (!useBukkitLogger) {
-            return false;
-        }
-        try {
-            return Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("NoCheatPlus"), new Runnable() {
-                @Override
-                public final void run() {
-                    StaticLog.log(level, message);
-                }
-            }) != -1;
-        } catch (final Exception exc) {
-            return false;
-        }
+        StaticLog.log(level, message);
+        return true;
     }
 
     /**
-     * Schedule joined parts for info level.
+     * Log joined parts on info level.
      * @param level
      * @param parts
      * @param link
@@ -142,7 +134,7 @@ public class StaticLog {
     }
 
     /**
-     * Schedule joined.
+     * Log joined parts on the given level.
      * @param level
      * @param parts
      * @param link

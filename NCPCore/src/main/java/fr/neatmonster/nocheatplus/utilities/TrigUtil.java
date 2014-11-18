@@ -104,7 +104,7 @@ public class TrigUtil {
     {
 
         //		// TODO: Here we have 0.x vs. 2.x, sometimes !
-        //		System.out.println("COMBINED: " + combinedDirectionCheck(sourceX, sourceY, sourceZ, dirX, dirY, dirZ, targetX, targetY, targetZ, targetWidth, targetHeight, precision, 60));
+        //		NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "COMBINED: " + combinedDirectionCheck(sourceX, sourceY, sourceZ, dirX, dirY, dirZ, targetX, targetY, targetZ, targetWidth, targetHeight, precision, 60));
 
         // TODO: rework / standardize.
 
