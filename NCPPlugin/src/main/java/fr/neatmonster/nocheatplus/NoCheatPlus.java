@@ -732,36 +732,23 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         TickTask.cancel();
         TickTask.reset();
         
-        // Start logger task(s).
-        logManager.startTasks();
-
-        // Register some generic stuff.
-        // Counters: debugging purposes, maybe integrated for statistics later.
-        registerGenericInstance(new Counters());
+        // Allow entries to TickTask (just in case).
+        TickTask.setLocked(false);
         
+        // Initialize configuration, if needed.
         if (!ConfigManager.isInitialized()) {
             // Read the configuration files (should only happen on reloading).
             ConfigManager.init(this);
         }
 
         final ConfigFile config = ConfigManager.getConfigFile();
-
+        
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
-
-        // Initialize MCAccess.
-        initMCAccess(config);
-
-        // Initialize BlockProperties.
-        initBlockProperties(config);
-
-        // Initialize data manager.
-        disableListeners.add(0, dataMan);
-        dataMan.onEnable();
-
-        // Allow entries to TickTask (just in case).
-        TickTask.setLocked(false);
-
-        // List the events listeners and register.
+        
+        // Start logger task(s).
+        logManager.startTasks();
+        
+        
         manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
         if (manageListeners) {
             listenerManager.setRegisterDirectly(true);
@@ -773,6 +760,21 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             listenerManager.clear();
         }
 
+        // Register some generic stuff.
+        // Counters: debugging purposes, maybe integrated for statistics later.
+        registerGenericInstance(new Counters());
+
+        // Initialize MCAccess.
+        initMCAccess(config);
+
+        // Initialize BlockProperties.
+        initBlockProperties(config);
+
+        // Initialize data manager.
+        disableListeners.add(0, dataMan);
+        dataMan.onEnable();
+        
+        // Register components. 
         @SetupOrder(priority = - 100)
         class ReloadHook implements INotifyReload{
             @Override
