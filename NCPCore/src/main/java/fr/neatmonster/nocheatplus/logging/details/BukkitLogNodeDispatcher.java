@@ -40,12 +40,6 @@ public class BukkitLogNodeDispatcher extends AbstractLogNodeDispatcher { // TODO
     }
     
     @Override
-    protected void logINIT(Level level, String message) {
-        // TODO: This is cheating !
-        
-    }
-
-    @Override
     protected void scheduleAsynchronous() {
         synchronized (queueAsynchronous) {
             if (taskAsynchronousID == -1) {
