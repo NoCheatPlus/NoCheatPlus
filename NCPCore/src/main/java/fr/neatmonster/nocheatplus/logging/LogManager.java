@@ -92,14 +92,8 @@ public class LogManager extends AbstractLogManager {
         LoggerID tempID;
         
         // Server logger.
-        tempID = registerStringLogger(new ContentLogger<String>() {
-
-            @Override
-            public void log(Level level, String content) {
-                Bukkit.getLogger().log(level, content);
-            }
-            
-        }, new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerContext));
+        tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerContext));
+        attachStringLogger(tempID, Streams.SERVER_LOGGER);
         
         // Plugin logger.
         tempID = registerStringLogger(plugin.getLogger(), new LogOptions(Streams.PLUGIN_LOGGER.name, bukkitLoggerContext));
