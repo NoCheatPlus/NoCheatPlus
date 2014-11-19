@@ -24,27 +24,31 @@ public class PlayerMessageSender extends OnDemandTickListener {
 	}
 	
 	/** Queued entries, also used as lock. */
-	private final List<MessageEntry> messageEntries = new LinkedList<MessageEntry>();
+	private List<MessageEntry> messageEntries = new LinkedList<MessageEntry>();
 
 	@Override
 	public boolean delegateTick(int tick, long timeLast) {
 		// Copy entries.
-		final MessageEntry[] entries;
-		synchronized (messageEntries) {
-			entries = new MessageEntry[messageEntries.size()];
-			messageEntries.toArray(entries);
-			messageEntries.clear();
+		final List<MessageEntry> entries;
+		synchronized (this) {
+		    if (messageEntries.isEmpty()){
+                // Force unregister.
+                unRegister(true);
+                // Always continue here to never use external setRegistered.
+                return true;
+            }
+			entries = messageEntries;
+			messageEntries = new LinkedList<PlayerMessageSender.MessageEntry>();
 		}
 		// Do messaging.
-		for (int i = 0; i < entries.length; i++){
-			final MessageEntry entry = entries[i];
+		for (final MessageEntry entry : entries){
 			final Player player = DataManager.getPlayerExact(entry.playerName);
 			if (player != null && player.isOnline()){
 				player.sendMessage(entry.message);
 			}
 		}
 		// Unregister if no further entries are there.
-		synchronized (messageEntries) {
+		synchronized (this) {
 			if (messageEntries.isEmpty()){
 				// Force unregister.
 				unRegister(true);
@@ -56,7 +60,7 @@ public class PlayerMessageSender extends OnDemandTickListener {
 	
 	public void sendMessageThreadSafe(final String playerName, final String message){
 		final MessageEntry entry = new MessageEntry(playerName.toLowerCase(), message);
-		synchronized (messageEntries) {
+		synchronized (this) {
 			messageEntries.add(entry);
 			// Called register asynchronously, potentially.
 			register();
