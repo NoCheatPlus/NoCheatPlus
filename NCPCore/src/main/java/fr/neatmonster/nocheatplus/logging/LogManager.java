@@ -55,7 +55,7 @@ public class LogManager extends AbstractLogManager {
             if (!hasStream(Streams.INIT)) {
                 createInitStream();
             }
-            else if (hasLogger("init")) {
+            else if (hasLogger(Streams.INIT.name)) {
                 // Shallow check.
                 return;
             }
