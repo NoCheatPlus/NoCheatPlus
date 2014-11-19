@@ -1,7 +1,5 @@
 package fr.neatmonster.nocheatplus.logging.details;
 
-import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
