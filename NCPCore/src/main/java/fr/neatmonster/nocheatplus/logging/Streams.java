@@ -7,7 +7,7 @@ package fr.neatmonster.nocheatplus.logging;
  */
 public class Streams {
 
-    // Maybe temporary: StremID instances for default usage (custom registrations can not start with "default.").
+    // Maybe temporary: StreamID instances for default usage (custom registrations can not start with "default.").
     /**
      * Default prefix, should not be used with custom registration (LoggerID, StreamID).
      */
