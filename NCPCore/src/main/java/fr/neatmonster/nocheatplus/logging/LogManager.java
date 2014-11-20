@@ -108,17 +108,21 @@ public class LogManager extends AbstractLogManager {
                 NCPAPIProvider.getNoCheatPlusAPI().sendAdminNotifyMessage(content);
             }
             
-        }, new LogOptions(Streams.NOTIFY_INGAME.name, CallContext.PRIMARY_THREAD_DIRECT));
+        }, new LogOptions(Streams.NOTIFY_INGAME.name, CallContext.PRIMARY_THREAD_DIRECT)); // TODO: Consider task.
         attachStringLogger(tempID, Streams.NOTIFY_INGAME);
         
         File file;
-        // TODO: Allow absolute paths ?
         // Default file logger.
-        file = new File(plugin.getDataFolder(), config.getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME));
-        ContentLogger<String> defaultFileLogger = new FileLoggerAdapter(file);
+        file = new File(config.getString(ConfPaths.LOGGING_BACKEND_FILE_FILENAME));
+        if (!file.isAbsolute()) {
+            file = new File(plugin.getDataFolder(), file.getPath());
+        }
+        // TODO: Sanity check file+extensions and fall-back if not valid [make an auxiliary method doing all this at once]!
+        // TODO: Option to assume directory (no ext = directory).
+        ContentLogger<String> defaultFileLogger = new FileLoggerAdapter(file); // TODO: Method to get-or-create these.
         tempID = registerStringLogger(defaultFileLogger, new LogOptions(Streams.DEFAULT_FILE.name, CallContext.ASYNCHRONOUS_DIRECT));
         attachStringLogger(tempID, Streams.DEFAULT_FILE);
-        // Attach default file logger to init too, to log something, even if asynchronous, direct from any thread.
+        // Attach default file logger to init too, to log something, even if asynchronous, directly from any thread.
         tempID = registerStringLogger(defaultFileLogger, new LogOptions(Streams.DEFAULT_FILE.name +".init", CallContext.ANY_THREAD_DIRECT));
         attachStringLogger(tempID, Streams.INIT);
         
