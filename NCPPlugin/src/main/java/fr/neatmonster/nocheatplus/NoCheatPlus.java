@@ -653,7 +653,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         if (verbose) {
             logManager.info(Streams.INIT, "[NoCheatPlus] Shutdown LogManager...");
         }
-        StaticLog.setUseBukkitLogger(false);
+        StaticLog.setUseLogManager(false);
         logManager.shutdown();
 
         // Tell the server administrator the we finished unloading NoCheatPlus.
@@ -716,7 +716,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Read the configuration files.
         ConfigManager.init(this); // TODO: Only load the bootstrap config (not all).
         logManager = new LogManager(this);
-        StaticLog.setUseBukkitLogger(true);
+        StaticLog.setUseLogManager(true);
         logManager.info(Streams.INIT, "[NoCheatPlus] Logging system initialized.");
     }
 

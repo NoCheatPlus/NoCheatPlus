@@ -17,9 +17,9 @@ public class TestPassableRayTracing {
     // TODO: Randomized tests (Collide with inner sphere, not collide with outer sphere).
     
     public TestPassableRayTracing() {
-        StaticLog.setUseBukkitLogger(false);
+        StaticLog.setUseLogManager(false);
         BlockTests.initBlockProperties();
-        StaticLog.setUseBukkitLogger(true);
+        StaticLog.setUseLogManager(true);
     }
     
     @Test
