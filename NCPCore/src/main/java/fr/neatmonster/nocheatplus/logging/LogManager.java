@@ -88,17 +88,18 @@ public class LogManager extends AbstractLogManager {
         }) {
             createStringStream(streamID);
         }
+        // TODO: More configurability.
         // TODO: Might attempt to detect if a thread-safe logging framework is in use ("default" instead of false/true).
         boolean bukkitLoggerAsynchronous = config.getBoolean(ConfPaths.LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS);
         LoggerID tempID;
         
         // Server logger.
-        tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerAsynchronous ? CallContext.ASYNCHRONOUS_TASK : CallContext.PRIMARY_THREAD_TASK));
+        tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerAsynchronous ? CallContext.ASYNCHRONOUS_DIRECT : CallContext.PRIMARY_THREAD_TASK));
         attachStringLogger(tempID, Streams.SERVER_LOGGER);
         attachStringLogger(tempID, Streams.STATUS); // Log STATUS to console "efficiently".
         
         // Plugin logger.
-        tempID = registerStringLogger(plugin.getLogger(), new LogOptions(Streams.PLUGIN_LOGGER.name, bukkitLoggerAsynchronous ? CallContext.ASYNCHRONOUS_TASK : CallContext.PRIMARY_THREAD_TASK));
+        tempID = registerStringLogger(plugin.getLogger(), new LogOptions(Streams.PLUGIN_LOGGER.name, bukkitLoggerAsynchronous ? CallContext.ASYNCHRONOUS_DIRECT : CallContext.PRIMARY_THREAD_TASK));
         attachStringLogger(tempID, Streams.PLUGIN_LOGGER);
         
         // Ingame logger (assume not thread-safe at first).
@@ -121,7 +122,6 @@ public class LogManager extends AbstractLogManager {
             file = new File(plugin.getDataFolder(), file.getPath());
         }
         // TODO: Sanity check file+extensions and fall-back if not valid [make an auxiliary method doing all this at once]!
-        // TODO: Option to assume directory (no ext = directory).
         ContentLogger<String> defaultFileLogger = new FileLoggerAdapter(file); // TODO: Method to get-or-create these.
         tempID = registerStringLogger(defaultFileLogger, new LogOptions(Streams.DEFAULT_FILE.name, CallContext.ASYNCHRONOUS_DIRECT));
         attachStringLogger(tempID, Streams.DEFAULT_FILE);
