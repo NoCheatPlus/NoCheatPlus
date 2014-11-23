@@ -5,6 +5,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
 
 /**
@@ -50,8 +52,14 @@ public abstract class BlockCache {
         for (int cx = minX; cx <= maxX; cx ++) {
             for (int cz = minZ; cz <= maxZ; cz ++) {
                 if (!world.isChunkLoaded(cx, cz)) {
-                    world.loadChunk(cx, cz);
-                    loaded ++;
+                    try {
+                        world.loadChunk(cx, cz);
+                        loaded ++;
+                    } catch (Exception ex) {
+                        // (Can't seem to catch more precisely: TileEntity with CB 1.7.10)
+                        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().severe(Streams.STATUS, "Failed to load chunk at " + (cx * 16) + "," + (cz * 16) + " (real coordinates):\n" + StringUtil.throwableToString(ex));
+                        // (Don't count as loaded.)
+                    }
                 }
             }
         }
