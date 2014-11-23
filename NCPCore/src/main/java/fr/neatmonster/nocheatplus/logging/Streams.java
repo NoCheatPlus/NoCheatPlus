@@ -23,7 +23,7 @@ public class Streams {
      */
     public static final String defaultPrefix = "default.";
     
-    // More or less raw default streams.
+    // Abstract default streams ---
     
     /**
      * Default stream for initialization and shutdown, should always be
@@ -33,6 +33,17 @@ public class Streams {
      * logging from other threads.
      */
     public static final StreamID INIT = new StreamID(defaultPrefix + "init");
+    
+    /**
+     * Stream for status and error messages similar to INIT, but using queues
+     * and scheduling. Potentially more efficient, for less severe cases.
+     * Usually logging both to console and log file.
+     */
+    public static final StreamID STATUS = new StreamID(defaultPrefix + "status");
+    
+    // TODO: Consider TRACE.
+    
+    // Raw default streams ---
     
     /**
      * Default stream for the server logger (think of console). Might not allow
@@ -64,6 +75,4 @@ public class Streams {
      */
     public static final StreamID TRACE_FILE = new StreamID(defaultPrefix + "file.trace");
     
-    // TODO: Abstract streams: INIT, STATUS, ACTIONS, TRACE. STATUS being similar to INIT, just allowing to use tasks.
-
 }

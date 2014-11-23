@@ -7,7 +7,9 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
- * Static access methods for more or less direct logging using either LogManager/INIT or System.out.
+ * Static access methods for more or less direct logging using either LogManager
+ * (usually INIT or STATUS) or System.out.
+ * 
  * @author mc_dev
  *
  */
@@ -15,7 +17,9 @@ public class StaticLog {
     
     // TODO: Remove this class, instead use an implementation of LogManager for testing.
 
-    private static boolean useLogManager = false; // Let the plugin control this.
+    private static boolean useLogManager = false;
+    
+    private static StreamID streamID = Streams.INIT;
 
     /**
      * Now needs to be set, in order to log to the INIT stream instead of the console.
@@ -23,6 +27,13 @@ public class StaticLog {
      */
     public static void setUseLogManager(boolean useLogManager) {
         StaticLog.useLogManager = useLogManager;
+    }
+    
+    public static void setStreamID(StreamID streamID) {
+        if (streamID == null) {
+            throw new NullPointerException("StreamID must not be null, use setUseLogManager(false) instead.");
+        }
+        StaticLog.streamID = streamID;
     }
 
     public static void logInfo(final String msg) {
@@ -51,7 +62,7 @@ public class StaticLog {
 
     public static void log(final Level level, final String msg) {
         if (useLogManager) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().log(Streams.INIT, level, msg);
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().log(streamID, level, msg);
         } else {
             System.out.println("[" + level + "] " + new Date());
             System.out.println(msg);

@@ -80,6 +80,7 @@ public class LogManager extends AbstractLogManager {
      */
     protected void createDefaultLoggers(ConfigFile config) {
         for (StreamID streamID : new StreamID[] {
+                Streams.STATUS,
                 Streams.SERVER_LOGGER, Streams.PLUGIN_LOGGER, 
                 Streams.NOTIFY_INGAME,
                 Streams.DEFAULT_FILE, Streams.TRACE_FILE,
@@ -94,6 +95,7 @@ public class LogManager extends AbstractLogManager {
         // Server logger.
         tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerContext));
         attachStringLogger(tempID, Streams.SERVER_LOGGER);
+        attachStringLogger(tempID, Streams.STATUS); // Log STATUS to console "efficiently".
         
         // Plugin logger.
         tempID = registerStringLogger(plugin.getLogger(), new LogOptions(Streams.PLUGIN_LOGGER.name, bukkitLoggerContext));
@@ -122,6 +124,7 @@ public class LogManager extends AbstractLogManager {
         ContentLogger<String> defaultFileLogger = new FileLoggerAdapter(file); // TODO: Method to get-or-create these.
         tempID = registerStringLogger(defaultFileLogger, new LogOptions(Streams.DEFAULT_FILE.name, CallContext.ASYNCHRONOUS_DIRECT));
         attachStringLogger(tempID, Streams.DEFAULT_FILE);
+        attachStringLogger(tempID, Streams.STATUS); // Log STATUS to the default file.
         // Attach default file logger to init too, to log something, even if asynchronous, directly from any thread.
         tempID = registerStringLogger(defaultFileLogger, new LogOptions(Streams.DEFAULT_FILE.name +".init", CallContext.ANY_THREAD_DIRECT));
         attachStringLogger(tempID, Streams.INIT);
