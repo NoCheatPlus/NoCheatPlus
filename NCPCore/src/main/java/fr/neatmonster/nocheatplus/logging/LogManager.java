@@ -60,7 +60,7 @@ public class LogManager extends AbstractLogManager {
                 return;
             }
             // Attach a new restrictive init logger.
-            // TODO: If thread-safe use ANY_THREAD_DIRECT (should then allow to interrupt).
+            boolean bukkitLoggerAsynchronous = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS);
             LoggerID initLoggerID = registerStringLogger(new ContentLogger<String>() {
                 
                 @Override
@@ -70,7 +70,7 @@ public class LogManager extends AbstractLogManager {
                     } catch (Throwable t) {}
                 }
                 
-            }, new LogOptions(Streams.INIT.name, CallContext.PRIMARY_THREAD_ONLY));
+            }, new LogOptions(Streams.INIT.name, bukkitLoggerAsynchronous ? CallContext.ANY_THREAD_DIRECT : CallContext.PRIMARY_THREAD_ONLY));
             attachStringLogger(initLoggerID, Streams.INIT);
         }
     }
@@ -88,20 +88,21 @@ public class LogManager extends AbstractLogManager {
         }) {
             createStringStream(streamID);
         }
-        // TODO: Consult configuration and/or detect what options can or want to be used here.
-        CallContext bukkitLoggerContext = CallContext.PRIMARY_THREAD_TASK; // TODO: Config + individually.
+        // TODO: Might attempt to detect if a thread-safe logging framework is in use ("default" instead of false/true).
+        boolean bukkitLoggerAsynchronous = config.getBoolean(ConfPaths.LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS);
         LoggerID tempID;
         
         // Server logger.
-        tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerContext));
+        tempID = registerStringLogger(Bukkit.getLogger(), new LogOptions(Streams.SERVER_LOGGER.name, bukkitLoggerAsynchronous ? CallContext.ASYNCHRONOUS_TASK : CallContext.PRIMARY_THREAD_TASK));
         attachStringLogger(tempID, Streams.SERVER_LOGGER);
         attachStringLogger(tempID, Streams.STATUS); // Log STATUS to console "efficiently".
         
         // Plugin logger.
-        tempID = registerStringLogger(plugin.getLogger(), new LogOptions(Streams.PLUGIN_LOGGER.name, bukkitLoggerContext));
+        tempID = registerStringLogger(plugin.getLogger(), new LogOptions(Streams.PLUGIN_LOGGER.name, bukkitLoggerAsynchronous ? CallContext.ASYNCHRONOUS_TASK : CallContext.PRIMARY_THREAD_TASK));
         attachStringLogger(tempID, Streams.PLUGIN_LOGGER);
         
         // Ingame logger (assume not thread-safe at first).
+        // TODO: Thread-safe ProtocolLib-based implementation?
         tempID = registerStringLogger(new ContentLogger<String>() {
             
             @Override
@@ -126,6 +127,7 @@ public class LogManager extends AbstractLogManager {
         attachStringLogger(tempID, Streams.DEFAULT_FILE);
         attachStringLogger(tempID, Streams.STATUS); // Log STATUS to the default file.
         // Attach default file logger to init too, to log something, even if asynchronous, directly from any thread.
+        // TODO: Consider configurability of skipping, depending on bukkitLoggerAsynchronous.
         tempID = registerStringLogger(defaultFileLogger, new LogOptions(Streams.DEFAULT_FILE.name +".init", CallContext.ANY_THREAD_DIRECT));
         attachStringLogger(tempID, Streams.INIT);
         

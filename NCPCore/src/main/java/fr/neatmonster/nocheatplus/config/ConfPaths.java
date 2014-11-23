@@ -35,6 +35,7 @@ public abstract class ConfPaths {
     private static final String LOGGING_BACKEND_CONSOLE					 = LOGGING_BACKEND + "console.";
     public static final String  LOGGING_BACKEND_CONSOLE_ACTIVE           = LOGGING_BACKEND_CONSOLE + "active";
     public static final String  LOGGING_BACKEND_CONSOLE_PREFIX			 = LOGGING_BACKEND_CONSOLE + "prefix";
+    public static final String  LOGGING_BACKEND_CONSOLE_ASYNCHRONOUS     = LOGGING_BACKEND_CONSOLE + "asynchronous";
     private static final String LOGGING_BACKEND_FILE					 = LOGGING_BACKEND + "file.";
     public static final String  LOGGING_BACKEND_FILE_ACTIVE	        	 = LOGGING_BACKEND_FILE + "active";
     public static final String  LOGGING_BACKEND_FILE_FILENAME	         = LOGGING_BACKEND_FILE + "filename";

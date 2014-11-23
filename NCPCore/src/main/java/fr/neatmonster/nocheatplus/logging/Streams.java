@@ -1,14 +1,14 @@
 package fr.neatmonster.nocheatplus.logging;
 
 /**
- * Default StreamIDs. Before the server is running, it's recommended only to log
- * to the INIT stream, because tasks won't be processed before all plugins have
- * been loaded.
+ * Default StreamIDs. Before the server tick loop is running, it's recommended
+ * only to log to the INIT stream, because tasks won't be processed before all
+ * plugins have been loaded.
  * <hr>
  * Default LoggerIDs have the same names and are atached to the stream of the
  * same name. Additionally there might be default loggers attached to several
  * streams with different name and options (e.g. DEFAULT_FILE.name + ".init"
- * allowing for direct asynchronous logging on the INIT stream).
+ * ensuring for direct asynchronous logging on the INIT stream).
  * <hr>
  * All names are processed case-insensitive within LogManager.
  * <hr>
@@ -29,8 +29,8 @@ public class Streams {
      * Default stream for initialization and shutdown, should always be
      * available (fall-back). Loggers must not use tasks, not more than primary
      * thread only is guaranteed here, might drop messages sent from other
-     * threads. By default the file logger gets attached, to allow direct
-     * logging from other threads.
+     * threads. By default the file logger gets attached, to ensure that direct
+     * logging from other threads arrives somewhere.
      */
     public static final StreamID INIT = new StreamID(defaultPrefix + "init");
     
@@ -46,32 +46,32 @@ public class Streams {
     // Raw default streams ---
     
     /**
-     * Default stream for the server logger (think of console). Might not allow
-     * asynchronous access, thus using a task in the primary thread by default.
+     * Default stream for the server logger (think of console). Using log4j this
+     * should run in an asynchronous task, configurable.
      */
     public static final StreamID SERVER_LOGGER = new StreamID(defaultPrefix + "logger.server");
     
     /**
      * Default stream for the plugin logger (Usually the server logger using a
-     * plugin-dependent prefix.). Might not allow asynchronous access, thus
-     * using a task in the primary thread by default.
+     * plugin-dependent prefix.). Using log4j this should run in an asynchronous
+     * task, configurable.
      */
     public static final StreamID PLUGIN_LOGGER = new StreamID(defaultPrefix + "logger.plugin");
     
     /**
      * Default ingame notifications (game chat), using a task in the primary
      * thread. (The implementation is not thread-safe, even if message sending
-     * was thread-safe.)
+     * was thread-safe. Thus sending is tied to the primary thread.)
      */
     public static final StreamID NOTIFY_INGAME = new StreamID(defaultPrefix + "chat.notify");
     
     /**
-     * Default file (defaults to nocheatplus.log), thread-safe.
+     * Default file (defaults to nocheatplus.log), always using an asynchronous task.
      */
     public static final StreamID DEFAULT_FILE = new StreamID(defaultPrefix + "file");
     
     /**
-     * Trace file (might lead to the default file), thread-safe.
+     * Trace file (might lead to the default file), always using an asynchronous task.
      */
     public static final StreamID TRACE_FILE = new StreamID(defaultPrefix + "file.trace");
     
