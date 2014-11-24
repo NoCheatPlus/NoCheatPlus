@@ -32,12 +32,12 @@ public class Direction extends Check {
      * @return true, if successful
      */
     public boolean check(final Player player, final Location loc, final Entity damaged, final Location dLoc, final FightData data, final FightConfig cc) {
-    	boolean cancel = false;
+        boolean cancel = false;
 
         // Safeguard, if entity is complex, this check will fail due to giant and hard to define hitboxes.
-//        if (damaged instanceof EntityComplex || damaged instanceof EntityComplexPart)
+        //        if (damaged instanceof EntityComplex || damaged instanceof EntityComplexPart)
         if (mcAccess.isComplexPart(damaged)) {
-        	return false;
+            return false;
         }
 
         // Find out how wide the entity is.
@@ -45,20 +45,20 @@ public class Direction extends Check {
 
         // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
         final double height = mcAccess.getHeight(damaged);
-        
+
         // TODO: allow any hit on the y axis (might just adapt interface to use foot position + height)!
-        
+
         // How far "off" is the player with their aim. We calculate from the players eye location and view direction to
         // the center of the target entity. If the line of sight is more too far off, "off" will be bigger than 0.
         final Vector direction = loc.getDirection();
-        
+
         final double off;
         if (cc.directionStrict){
-        	off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION, 80.0);
+            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION, 80.0);
         }
         else{
-        	// Also take into account the angle.
-        	off = TrigUtil.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION);
+            // Also take into account the angle.
+            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), direction, dLoc.getX(), dLoc.getY() + height / 2D, dLoc.getZ(), width, height, TrigUtil.DIRECTION_PRECISION);
         }
 
         if (off > 0.1) {
@@ -74,17 +74,17 @@ public class Direction extends Check {
             cancel = executeActions(player, data.directionVL, distance, cc.directionActions);
 
             if (cancel) {
-            	// Deal an attack penalty time.
-            	data.attackPenalty.applyPenalty(cc.directionPenalty);
+                // Deal an attack penalty time.
+                data.attackPenalty.applyPenalty(cc.directionPenalty);
             }
         } else {
-        	// Reward the player by lowering their violation level.
+            // Reward the player by lowering their violation level.
             data.directionVL *= 0.8D;
         }
-        
+
         return cancel;
     }
-    
+
     /**
      * Data context for iterating over TraceEntry instances.
      * @param player
@@ -95,50 +95,50 @@ public class Direction extends Check {
      * @param cc
      * @return
      */
-	public DirectionContext getContext(final Player player, final Location loc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
-		final DirectionContext context = new DirectionContext();
-		context.damagedComplex = mcAccess.isComplexPart(damaged);
-		// Find out how wide the entity is.
+    public DirectionContext getContext(final Player player, final Location loc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
+        final DirectionContext context = new DirectionContext();
+        context.damagedComplex = mcAccess.isComplexPart(damaged);
+        // Find out how wide the entity is.
         context.damagedWidth = mcAccess.getWidth(damaged);
         // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
         context.damagedHeight = mcAccess.getHeight(damaged);
         context.direction = loc.getDirection();
         context.lengthDirection = context.direction.length();
-		return context;
-	}
-	
-	/**
-	 * Check if the player fails the direction check, no change of FightData.
-	 * @param player
-	 * @param loc
-	 * @param damaged
-	 * @param dLoc
-	 * @param context
-	 * @param data
-	 * @param cc
-	 * @return
-	 */
-	public boolean loopCheck(final Player player, final Location loc, final Entity damaged, final TraceEntry dLoc, final DirectionContext context, final FightData data, final FightConfig cc) {
-		
-		// Ignore complex entities for the moment.
-		if (context.damagedComplex) {
-			// TODO: Revise :p
-			return false;
-		}
-		boolean cancel = false;
-        
+        return context;
+    }
+
+    /**
+     * Check if the player fails the direction check, no change of FightData.
+     * @param player
+     * @param loc
+     * @param damaged
+     * @param dLoc
+     * @param context
+     * @param data
+     * @param cc
+     * @return
+     */
+    public boolean loopCheck(final Player player, final Location loc, final Entity damaged, final TraceEntry dLoc, final DirectionContext context, final FightData data, final FightConfig cc) {
+
+        // Ignore complex entities for the moment.
+        if (context.damagedComplex) {
+            // TODO: Revise :p
+            return false;
+        }
+        boolean cancel = false;
+
         // TODO: allow any hit on the y axis (might just adapt interface to use foot position + height)!
-        
+
         // How far "off" is the player with their aim. We calculate from the players eye location and view direction to
         // the center of the target entity. If the line of sight is more too far off, "off" will be bigger than 0.
-        
+
         final double off;
         if (cc.directionStrict){
-        	off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_PRECISION, 80.0);
+            off = TrigUtil.combinedDirectionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_PRECISION, 80.0);
         }
         else{
-        	// Also take into account the angle.
-        	off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_PRECISION);
+            // Also take into account the angle.
+            off = TrigUtil.directionCheck(loc, player.getEyeHeight(), context.direction, dLoc.x, dLoc.y + context.damagedHeight / 2D, dLoc.z, context.damagedWidth, context.damagedHeight, TrigUtil.DIRECTION_PRECISION);
         }
 
         if (off > 0.1) {
@@ -148,28 +148,28 @@ public class Direction extends Check {
             context.minViolation = Math.min(context.minViolation, distance);
         }
         context.minResult = Math.min(context.minResult, off);
-        
+
         return cancel;
-	}
-	
-	/**
-	 * Apply changes to FightData according to check results (context), trigger violations.
-	 * @param player
-	 * @param loc
-	 * @param damaged
-	 * @param context
-	 * @param forceViolation
-	 * @param data
-	 * @param cc
-	 * @return
-	 */
-	public boolean loopFinish(final Player player, final Location loc, final Entity damaged, final DirectionContext context, final boolean forceViolation, final FightData data, final FightConfig cc) {
-		boolean cancel = false;
-		final double off = forceViolation && context.minViolation != Double.MAX_VALUE ? context.minViolation : context.minResult;
-		if (off == Double.MAX_VALUE) {
-			return false;
-		}
-		else if (off > 0.1) {
+    }
+
+    /**
+     * Apply changes to FightData according to check results (context), trigger violations.
+     * @param player
+     * @param loc
+     * @param damaged
+     * @param context
+     * @param forceViolation
+     * @param data
+     * @param cc
+     * @return
+     */
+    public boolean loopFinish(final Player player, final Location loc, final Entity damaged, final DirectionContext context, final boolean forceViolation, final FightData data, final FightConfig cc) {
+        boolean cancel = false;
+        final double off = forceViolation && context.minViolation != Double.MAX_VALUE ? context.minViolation : context.minResult;
+        if (off == Double.MAX_VALUE) {
+            return false;
+        }
+        else if (off > 0.1) {
             // Add the overall violation level of the check.
             data.directionVL += context.minViolation;
 
@@ -178,16 +178,16 @@ public class Direction extends Check {
             cancel = executeActions(player, data.directionVL, context.minViolation, cc.directionActions);
 
             if (cancel) {
-            	// Deal an attack penalty time.
-            	data.attackPenalty.applyPenalty(cc.directionPenalty);
+                // Deal an attack penalty time.
+                data.attackPenalty.applyPenalty(cc.directionPenalty);
             }
         }
-		else {
-        	// Reward the player by lowering their violation level.
+        else {
+            // Reward the player by lowering their violation level.
             data.directionVL *= 0.8D;
         }
-		
-		return cancel;
-	}
-	
+
+        return cancel;
+    }
+
 }

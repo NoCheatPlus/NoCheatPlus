@@ -21,13 +21,13 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
  */
 public class FightConfig extends ACheckConfig {
 
-	/** The factory creating configurations. */
-	public static final CheckConfigFactory factory = new CheckConfigFactory() {
-		@Override
-		public final ICheckConfig getConfig(final Player player) {
-			return FightConfig.getConfig(player);
-		}
-	};
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory factory = new CheckConfigFactory() {
+        @Override
+        public final ICheckConfig getConfig(final Player player) {
+            return FightConfig.getConfig(player);
+        }
+    };
 
     /** The map containing the configurations per world. */
     private static final Map<String, FightConfig> worldsMap = new HashMap<String, FightConfig>();
@@ -56,7 +56,7 @@ public class FightConfig extends ACheckConfig {
     public final boolean    angleCheck;
     public final int        angleThreshold;
     public final ActionList angleActions;
-    
+
     public final long		toolChangeAttackPenalty;
 
     public final boolean    criticalCheck;
@@ -65,18 +65,18 @@ public class FightConfig extends ACheckConfig {
     public final ActionList criticalActions;
 
     public final boolean    directionCheck;
-	public final boolean	directionStrict;
+    public final boolean	directionStrict;
     public final long       directionPenalty;
     public final ActionList directionActions;
-    
+
     public final boolean	fastHealCheck;
     public final long		fastHealInterval;
     public final long		fastHealBuffer;
     public final ActionList fastHealActions;
 
     public final boolean    godModeCheck;
-	public final long 		godModeLagMinAge;
-	public final long 		godModeLagMaxAge;
+    public final long 		godModeLagMinAge;
+    public final long 		godModeLagMaxAge;
     public final ActionList godModeActions;
 
     public final boolean    knockbackCheck;
@@ -89,30 +89,30 @@ public class FightConfig extends ACheckConfig {
     public final boolean    reachCheck;
     public final long       reachPenalty;
     public final boolean    reachPrecision;
-	public final boolean    reachReduce;
-	public final double		reachSurvivalDistance;
-	public final double		reachReduceDistance;
-	public final double		reachReduceStep;
+    public final boolean    reachReduce;
+    public final double		reachSurvivalDistance;
+    public final double		reachReduceDistance;
+    public final double		reachReduceStep;
 
     public final ActionList reachActions;
-    
+
     public final boolean    selfHitCheck;
-	public final ActionList selfHitActions;
+    public final ActionList selfHitActions;
 
     public final boolean    speedCheck;
     public final int        speedLimit;
-	public final int        speedBuckets;
-	public final long       speedBucketDur;
-	public final float      speedBucketFactor;  
+    public final int        speedBuckets;
+    public final long       speedBucketDur;
+    public final float      speedBucketFactor;  
 
     public final int        speedShortTermLimit;
-	public final int        speedShortTermTicks;
+    public final int        speedShortTermTicks;
     public final ActionList speedActions;
-    
+
     // Special flags:
-	public final boolean    yawRateCheck;
-	public final boolean    cancelDead;
-	
+    public final boolean    yawRateCheck;
+    public final boolean    cancelDead;
+
     /**
      * Instantiates a new fight configuration.
      * 
@@ -124,7 +124,7 @@ public class FightConfig extends ACheckConfig {
         angleCheck = data.getBoolean(ConfPaths.FIGHT_ANGLE_CHECK);
         angleThreshold = data.getInt(ConfPaths.FIGHT_ANGLE_THRESHOLD);
         angleActions = data.getOptimizedActionList(ConfPaths.FIGHT_ANGLE_ACTIONS, Permissions.FIGHT_ANGLE);
-        
+
         toolChangeAttackPenalty = data.getLong(ConfPaths.FIGHT_TOOLCHANGEPENALTY);
 
         criticalCheck = data.getBoolean(ConfPaths.FIGHT_CRITICAL_CHECK);
@@ -136,7 +136,7 @@ public class FightConfig extends ACheckConfig {
         directionStrict = data.getBoolean(ConfPaths.FIGHT_DIRECTION_STRICT);
         directionPenalty = data.getLong(ConfPaths.FIGHT_DIRECTION_PENALTY);
         directionActions = data.getOptimizedActionList(ConfPaths.FIGHT_DIRECTION_ACTIONS, Permissions.FIGHT_DIRECTION);
-        
+
         fastHealCheck = data.getBoolean(ConfPaths.FIGHT_FASTHEAL_CHECK);;
         fastHealInterval = data.getLong(ConfPaths.FIGHT_FASTHEAL_INTERVAL);
         fastHealBuffer = data.getLong(ConfPaths.FIGHT_FASTHEAL_BUFFER);
@@ -165,7 +165,7 @@ public class FightConfig extends ACheckConfig {
 
         selfHitCheck = data.getBoolean(ConfPaths.FIGHT_SELFHIT_CHECK);
         selfHitActions = data.getOptimizedActionList(ConfPaths.FIGHT_SELFHIT_ACTIONS, Permissions.FIGHT_SELFHIT);
-        
+
         speedCheck = data.getBoolean(ConfPaths.FIGHT_SPEED_CHECK);
         speedLimit = data.getInt(ConfPaths.FIGHT_SPEED_LIMIT);
         speedBuckets = data.getInt(ConfPaths.FIGHT_SPEED_BUCKETS_N, 6);
@@ -174,8 +174,8 @@ public class FightConfig extends ACheckConfig {
         speedShortTermLimit = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_LIMIT);
         speedShortTermTicks = data.getInt(ConfPaths.FIGHT_SPEED_SHORTTERM_TICKS);
         speedActions = data.getOptimizedActionList(ConfPaths.FIGHT_SPEED_ACTIONS, Permissions.FIGHT_SPEED);
-        
-        
+
+
         yawRateCheck = data.getBoolean(ConfPaths.FIGHT_YAWRATE_CHECK, true);
         cancelDead = data.getBoolean(ConfPaths.FIGHT_CANCELDEAD);
     }
@@ -203,9 +203,9 @@ public class FightConfig extends ACheckConfig {
         case FIGHT_SPEED:
             return speedCheck;
         case FIGHT_SELFHIT:
-        	return selfHitCheck;
+            return selfHitCheck;
         case FIGHT_FASTHEAL:
-        	return fastHealCheck;
+            return fastHealCheck;
         default:
             return true;
         }

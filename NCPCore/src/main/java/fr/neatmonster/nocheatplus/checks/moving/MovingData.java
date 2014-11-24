@@ -131,7 +131,7 @@ public class MovingData extends ACheckData {
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. */
     public double 		  toX = Double.MAX_VALUE, toY, toZ;
-    /** Moving trace (to positions). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves."*/
+    /** Moving trace (to-positions, use tick as time). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves."*/
     private LocationTrace trace = null; 
 
     // sf rather
