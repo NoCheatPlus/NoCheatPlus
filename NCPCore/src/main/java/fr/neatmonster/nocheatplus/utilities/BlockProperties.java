@@ -1325,6 +1325,23 @@ public class BlockProperties {
         pLoc.cleanup();
         return res;
     }
+    
+    /**
+     * Simple checking method, heavy. No isIllegal check.
+     * @param player
+     * @param location
+     * @param yOnGround
+     * @return
+     */
+    public static boolean isResetCond(final Player player, final Location location, final double yOnGround) {
+        blockCache.setAccess(location.getWorld());
+        pLoc.setBlockCache(blockCache);
+        pLoc.set(location, player, yOnGround);
+        final boolean res = pLoc.isResetCond();
+        blockCache.cleanup();
+        pLoc.cleanup();
+        return res;
+    }
 
     /**
      * Straw-man-method to hide warnings. Rather intended for display in debug/alert messages.

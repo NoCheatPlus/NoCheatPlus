@@ -387,7 +387,6 @@ public abstract class ConfPaths {
     private static final String FIGHT_CRITICAL                           = FIGHT + "critical.";
     public static final String  FIGHT_CRITICAL_CHECK                     = FIGHT_CRITICAL + "active";
     public static final String  FIGHT_CRITICAL_FALLDISTANCE              = FIGHT_CRITICAL + "falldistance";
-    public static final String  FIGHT_CRITICAL_VELOCITY                  = FIGHT_CRITICAL + "velocity";
     public static final String  FIGHT_CRITICAL_ACTIONS                   = FIGHT_CRITICAL + "actions";
 
     private static final String FIGHT_DIRECTION                          = FIGHT + "direction.";
@@ -642,6 +641,8 @@ public abstract class ConfPaths {
 	public static final String  BLOCKBREAK_FASTBREAK_MOD_CREATIVE        = "checks.blockbreak.fastbreak.intervalcreative";
 	@Deprecated
 	public static final String MOVING_PASSABLE_RAYTRACING_VCLIPONLY      = "checks.moving.passable.raytracing.vcliponly";
+	@Deprecated
+	public static final String  FIGHT_CRITICAL_VELOCITY                  = "checks.fight.critical.velocity";
 
 	
 }

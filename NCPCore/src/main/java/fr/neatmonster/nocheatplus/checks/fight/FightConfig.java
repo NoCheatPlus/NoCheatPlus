@@ -61,7 +61,6 @@ public class FightConfig extends ACheckConfig {
 
     public final boolean    criticalCheck;
     public final double     criticalFallDistance;
-    public final double     criticalVelocity;
     public final ActionList criticalActions;
 
     public final boolean    directionCheck;
@@ -129,7 +128,6 @@ public class FightConfig extends ACheckConfig {
 
         criticalCheck = data.getBoolean(ConfPaths.FIGHT_CRITICAL_CHECK);
         criticalFallDistance = data.getDouble(ConfPaths.FIGHT_CRITICAL_FALLDISTANCE);
-        criticalVelocity = data.getDouble(ConfPaths.FIGHT_CRITICAL_VELOCITY);
         criticalActions = data.getOptimizedActionList(ConfPaths.FIGHT_CRITICAL_ACTIONS, Permissions.FIGHT_CRITICAL);
 
         directionCheck = data.getBoolean(ConfPaths.FIGHT_DIRECTION_CHECK);
