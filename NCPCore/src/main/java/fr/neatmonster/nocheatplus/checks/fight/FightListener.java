@@ -190,7 +190,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         if (damage <= 4.0 && tick == data.damageTakenByEntityTick && data.thornsId != Integer.MIN_VALUE && data.thornsId == damaged.getEntityId()){
             // Don't handle further, but do respect selfhit/canceldead.
-            // TODO: Remove soon.
+            // TODO: Remove soon, at least version-dependent.
             data.thornsId = Integer.MIN_VALUE;
             return cancelled;
         }
@@ -230,85 +230,30 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         if (!cancelled && player.isBlocking() && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_BLOCKING)) {
+            // TODO: Permission ?
             cancelled = true;
         }
-
-        // TODO: Order of all these checks ...
-        // Checks that use LocationTrace.
-
-        // TODO: Later optimize (...), should reverse check window ?
-
-        // First loop through reach and direction, to determine a window.
-        final boolean reachEnabled = !cancelled && reach.isEnabled(player);
-        final boolean directionEnabled = !cancelled && direction.isEnabled(player);
-
-        if (reachEnabled || directionEnabled) {
-            if (damagedPlayer != null) {
-                // TODO: Move to a method (trigonometric checks).
-                final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
-                final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
-
-                final long traceOldest = tick; // - damagedTrace.getMaxSize(); // TODO: Set by window.
-                // TODO: Iterating direction: could also start from latest, be it on occasion.
-                final Iterator<TraceEntry> traceIt = damagedTrace.maxAgeIterator(traceOldest);
-
-                boolean violation = true; // No tick with all checks passed.
-                boolean reachPassed = !reachEnabled; // Passed individually for some tick.
-                boolean directionPassed = !directionEnabled; // Passed individually for some tick.
-                // TODO: Maintain a latency estimate + max diff and invalidate completely (i.e. iterate from latest NEXT time)], or just max latency.
-                while (traceIt.hasNext()) {
-                    final TraceEntry entry = traceIt.next();
-                    // Simplistic just check both until end or hit.
-                    // TODO: Other default distances/tolerances.
-                    boolean thisPassed = true;
-                    if (reachEnabled) {
-                        if (reach.loopCheck(player, loc, damagedPlayer, entry, reachContext, data, cc)) {
-                            thisPassed = false;
-                        } else {
-                            reachPassed = true;
-                        }
-                    }
-                    // TODO: For efficiency one could omit checking at all if reach is failed all the time.
-                    if (directionEnabled && (reachPassed || !directionPassed)) {
-                        if (direction.loopCheck(player, damagedLoc, damagedPlayer, entry, directionContext, data, cc)) {
-                            thisPassed = false;
-                        } else {
-                            directionPassed = true;
-                        }
-                    }
-                    if (thisPassed) {
-                        // TODO: Log/set estimated latency.
-                        violation = false;
-                        break;
-                    }
-                }
-                // TODO: How to treat mixed state: violation && reachPassed && directionPassed [current: use min violation // thinkable: silent cancel, if actions have cancel (!)]
-                // TODO: Adapt according to strictness settings?
-                if (reachEnabled) {
-                    // TODO: Might ignore if already cancelled by mixed/silent cancel.
-                    if (reach.loopFinish(player, loc, damagedPlayer, reachContext, violation, data, cc)) {
+        
+        if (!cancelled) {
+            final boolean reachEnabled = reach.isEnabled(player);
+            final boolean directionEnabled = direction.isEnabled(player);
+            if (reachEnabled || directionEnabled) {
+                if (damagedTrace != null) {
+                    // Checks that use the LocationTrace instance of the attacked entity/player.
+                    cancelled = movingTraceChecks(player, loc, data, cc, damaged, damagedLoc, damagedTrace, tick, reachEnabled, directionEnabled);
+                } else {
+                    // Still use the classic methods for non-players. maybe[]
+                    if (reachEnabled && reach.check(player, loc, damaged, damagedLoc, data, cc)) {
                         cancelled = true;
                     }
-                }
-                if (directionEnabled) {
-                    // TODO: Might ignore if already cancelled.
-                    if (direction.loopFinish(player, loc, damagedPlayer, directionContext, violation, data, cc)) {
+
+                    if (directionEnabled && direction.check(player, loc, damaged, damagedLoc, data, cc)) {
                         cancelled = true;
                     }
-                }
-                // TODO: Log exact state, probably record min/max latency (individually).
-            } else {
-                // Still use the classic methods for non-players. maybe[]
-                if (reachEnabled && reach.check(player, loc, damaged, damagedLoc, data, cc)) {
-                    cancelled = true;
-                }
-
-                if (directionEnabled && direction.check(player, loc, damaged, damagedLoc, data, cc)) {
-                    cancelled = true;
                 }
             }
         }
-
+        
         // Check angle with allowed window.
         if (angle.isEnabled(player)) {
             // TODO: Revise, use own trace.
@@ -376,7 +321,81 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         return cancelled;
     }
+    
+    /**
+     * Quick split-off: Checks using a moving trace.
+     * @param player
+     * @param loc
+     * @param data
+     * @param cc
+     * @param damaged
+     * @param damagedPlayer
+     * @param damagedLoc
+     * @param damagedTrace
+     * @param tick
+     * @param reachEnabled
+     * @param directionEnabled
+     * @return If to cancel (true) or not (false).
+     */
+    private boolean movingTraceChecks(Player player, Location loc, FightData data, FightConfig cc, Entity damaged, Location damagedLoc, LocationTrace damagedTrace, long tick, boolean reachEnabled, boolean directionEnabled) {
+        boolean cancelled = false;
+        // TODO: Order / splitting off generic stuff.
+        final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
+        final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
 
+        final long traceOldest = tick; // - damagedTrace.getMaxSize(); // TODO: Set by window.
+        // TODO: Iterating direction, which, static/dynamic choice.
+        final Iterator<TraceEntry> traceIt = damagedTrace.maxAgeIterator(traceOldest);
+        
+        boolean violation = true; // No tick with all checks passed.
+        boolean reachPassed = !reachEnabled; // Passed individually for some tick.
+        boolean directionPassed = !directionEnabled; // Passed individually for some tick.
+        // TODO: Maintain a latency estimate + max diff and invalidate completely (i.e. iterate from latest NEXT time)], or just max latency.
+        // TODO: Consider a max-distance to "now", for fast invalidation.
+        while (traceIt.hasNext()) {
+            final TraceEntry entry = traceIt.next();
+            // Simplistic just check both until end or hit.
+            // TODO: Other default distances/tolerances.
+            boolean thisPassed = true;
+            if (reachEnabled) {
+                if (reach.loopCheck(player, loc, damaged, entry, reachContext, data, cc)) {
+                    thisPassed = false;
+                } else {
+                    reachPassed = true;
+                }
+            }
+            // TODO: For efficiency one could omit checking at all if reach is failed all the time.
+            if (directionEnabled && (reachPassed || !directionPassed)) {
+                if (direction.loopCheck(player, damagedLoc, damaged, entry, directionContext, data, cc)) {
+                    thisPassed = false;
+                } else {
+                    directionPassed = true;
+                }
+            }
+            if (thisPassed) {
+                // TODO: Log/set estimated latency.
+                violation = false;
+                break;
+            }
+        }
+        // TODO: How to treat mixed state: violation && reachPassed && directionPassed [current: use min violation // thinkable: silent cancel, if actions have cancel (!)]
+        // TODO: Adapt according to strictness settings?
+        if (reachEnabled) {
+            // TODO: Might ignore if already cancelled by mixed/silent cancel.
+            if (reach.loopFinish(player, loc, damaged, reachContext, violation, data, cc)) {
+                cancelled = true;
+            }
+        }
+        if (directionEnabled) {
+            // TODO: Might ignore if already cancelled.
+            if (direction.loopFinish(player, loc, damaged, directionContext, violation, data, cc)) {
+                cancelled = true;
+            }
+        }
+        // TODO: Log exact state, probably record min/max latency (individually).
+        return cancelled;
+    }
+    
     /**
      * Check if a player might return some damage due to the "thorns" enchantment.
      * @param player
