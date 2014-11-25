@@ -40,58 +40,58 @@ public class Critical extends Check {
      */
     public boolean check(final Player player, final Location loc, final FightData data, final FightConfig cc) {
         boolean cancel = false;
-		
-		final float mcFallDistance = player.getFallDistance();
-		final MovingConfig mCc = MovingConfig.getConfig(player);
-		if (mcFallDistance > 0.0 && cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
-			final MovingData mData = MovingData.getData(player);
-			
-			if (MovingListener.shouldCheckSurvivalFly(player, mData, mCc) && CheckType.MOVING_NOFALL.isEnabled(player)){
-				// TODO: Set max y in MovingListener, to be independent of sf/nofall!
-				player.sendMessage("Critical: fd=" + mcFallDistance + "(" + mData.noFallFallDistance +") y=" + loc.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
-			}
-		}
+
+        final float mcFallDistance = player.getFallDistance();
+        final MovingConfig mCc = MovingConfig.getConfig(player);
+        if (mcFallDistance > 0.0 && cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+            final MovingData mData = MovingData.getData(player);
+
+            if (MovingListener.shouldCheckSurvivalFly(player, mData, mCc) && CheckType.MOVING_NOFALL.isEnabled(player)){
+                // TODO: Set max y in MovingListener, to be independent of sf/nofall!
+                player.sendMessage("Critical: fd=" + mcFallDistance + "(" + mData.noFallFallDistance +") y=" + loc.getY() + ((mData.hasSetBack() && mData.getSetBackY() < mData.noFallMaxY) ? (" jumped=" + StringUtil.fdec3.format(mData.noFallMaxY - mData.getSetBackY())): ""));
+            }
+        }
 
         // Check if the hit was a critical hit (positive fall distance, entity in the air, not on ladder, not in liquid
         // and without blindness effect).
-		
-		// TODO: Skip the on-ground check somehow?
-		// TODO: Implement low jump penalty.
+
+        // TODO: Skip the on-ground check somehow?
+        // TODO: Implement low jump penalty.
         if (mcFallDistance > 0f && !player.hasPotionEffect(PotionEffectType.BLINDNESS)){
-        	// Might be a violation.
-        	final MovingData dataM = MovingData.getData(player);
-        	if (dataM.sfLowJump || player.getFallDistance() < cc.criticalFallDistance && !BlockProperties.isOnGroundOrResetCond(player, loc, mCc.yOnGround)){
-        		final MovingConfig ccM = MovingConfig.getConfig(player);
-            	if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){
+            // Might be a violation.
+            final MovingData dataM = MovingData.getData(player);
+            if (dataM.sfLowJump || player.getFallDistance() < cc.criticalFallDistance && !BlockProperties.isOnGroundOrResetCond(player, loc, mCc.yOnGround)){
+                final MovingConfig ccM = MovingConfig.getConfig(player);
+                if (MovingListener.shouldCheckSurvivalFly(player, dataM, ccM)){
                     final double deltaFallDistance = (cc.criticalFallDistance - player.getFallDistance()) / cc.criticalFallDistance;
                     // TODO: Cleanup: velocity is more like the gravity constant.
                     final double deltaVelocity = (cc.criticalVelocity - Math.abs(player.getVelocity().getY())) / cc.criticalVelocity;
                     double delta = deltaFallDistance > 0D ? deltaFallDistance : 0D + deltaVelocity > 0D ? deltaVelocity : 0D;
-                    
+
                     final List<String> tags = new ArrayList<String>();
-                    
+
                     // Player failed the check, but this is influenced by lag so don't do it if there was lag.
                     if (TickTask.getLag(1000, true) < 1.5){
-                    	// TODO: 1.5 is a fantasy value.
+                        // TODO: 1.5 is a fantasy value.
                         // Increment the violation level.
                         data.criticalVL += delta;
                     }
                     else{
-                    	tags.add("lag");
-                    	delta = 0;
+                        tags.add("lag");
+                        delta = 0;
                     }
-                    
+
                     // Execute whatever actions are associated with this check and the violation level and find out if we
                     // should cancel the event.
                     final ViolationData vd = new ViolationData(this, player, data.criticalVL, delta, cc.criticalActions);
                     if (vd.needsParameters()){
-                    	if (dataM.sfLowJump){
-                    		tags.add("sf_lowjump");
-                    	}
-                    	vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
+                        if (dataM.sfLowJump){
+                            tags.add("sf_lowjump");
+                        }
+                        vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
                     }
                     cancel = executeActions(vd);	
-            	}
+                }
             }
         }
 
