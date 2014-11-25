@@ -13,7 +13,6 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
-import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
  * A check to see if people cheat by tricking the server to not deal them fall damage.
@@ -175,7 +174,7 @@ public class NoFall extends Check {
         	final double max = Math.max(data.noFallFallDistance, mcFallDistance);
         	if (max > 0.0 && max < 0.75){ // (Ensure this does not conflict with deal-damage set to false.) 
                 if (cc.debug){
-                	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: Reset fall distance (anticriticals): mc=" + StringUtil.fdec3.format(mcFallDistance) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) );
+                	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: Reset fall distance (anticriticals): mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance);
                 }
             	if (data.noFallFallDistance > 0){
             		data.noFallFallDistance = 0;
@@ -187,7 +186,7 @@ public class NoFall extends Check {
         }
         
         if (cc.debug){
-        	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: mc=" + StringUtil.fdec3.format(mcFallDistance) +" / nf=" + StringUtil.fdec3.format(data.noFallFallDistance) + (oldNFDist < data.noFallFallDistance ? " (+" + StringUtil.fdec3.format(data.noFallFallDistance - oldNFDist) + ")" : "") + " | ymax=" + StringUtil.fdec3.format(data.noFallMaxY));
+        	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance + (oldNFDist < data.noFallFallDistance ? " (+" + (data.noFallFallDistance - oldNFDist) + ")" : "") + " | ymax=" + data.noFallMaxY);
         }
         
     }
