@@ -95,13 +95,13 @@ public class Direction extends Check {
      * @param cc
      * @return
      */
-    public DirectionContext getContext(final Player player, final Location loc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
+    public DirectionContext getContext(final Player player, final Location loc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc, final SharedContext sharedContext) {
         final DirectionContext context = new DirectionContext();
         context.damagedComplex = mcAccess.isComplexPart(damaged);
         // Find out how wide the entity is.
         context.damagedWidth = mcAccess.getWidth(damaged);
         // entity.height is broken and will always be 0, therefore. Calculate height instead based on boundingBox.
-        context.damagedHeight = mcAccess.getHeight(damaged);
+        context.damagedHeight = sharedContext.damagedHeight;
         context.direction = loc.getDirection();
         context.lengthDirection = context.direction.length();
         return context;

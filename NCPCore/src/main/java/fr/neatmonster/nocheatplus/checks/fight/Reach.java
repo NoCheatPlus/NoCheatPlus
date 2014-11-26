@@ -145,11 +145,11 @@ public class Reach extends Check {
      * @param cc
      * @return
      */
-    public ReachContext getContext(final Player player, final Location pLoc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc) {
+    public ReachContext getContext(final Player player, final Location pLoc, final Entity damaged, final Location damagedLoc, final FightData data, final FightConfig cc, final SharedContext sharedContext) {
         final ReachContext context = new ReachContext();
         context.distanceLimit = player.getGameMode() == GameMode.CREATIVE ? CREATIVE_DISTANCE : cc.reachSurvivalDistance + getDistMod(damaged);
         context.distanceMin = (context.distanceLimit - cc.reachReduceDistance) / context.distanceLimit;
-        context.damagedHeight = mcAccess.getHeight(damaged);
+        context.damagedHeight = sharedContext.damagedHeight;
         //context.eyeHeight = player.getEyeHeight();
         context.pY = pLoc.getY() + player.getEyeHeight();
         return context;

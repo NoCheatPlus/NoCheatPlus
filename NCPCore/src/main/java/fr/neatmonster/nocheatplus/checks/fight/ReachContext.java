@@ -10,8 +10,8 @@ public class ReachContext {
     public double distanceLimit;
     public double distanceMin;
     public double damagedHeight;
-    /** Attacking player. */
-    public double eyeHeight;
+//    /** Attacking player. */
+//    public double eyeHeight;
     /** Eye location y of the attacking player. */
     public double pY;
     /** Minimum value of lenpRel that was a violation. */

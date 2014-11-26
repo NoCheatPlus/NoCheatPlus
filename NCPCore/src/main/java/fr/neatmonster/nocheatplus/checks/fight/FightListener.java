@@ -240,7 +240,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             if (reachEnabled || directionEnabled) {
                 if (damagedTrace != null) {
                     // Checks that use the LocationTrace instance of the attacked entity/player.
-                    cancelled = movingTraceChecks(player, loc, data, cc, damaged, damagedLoc, damagedTrace, tick, reachEnabled, directionEnabled);
+                    cancelled = locationTraceChecks(player, loc, data, cc, damaged, damagedLoc, damagedTrace, tick, reachEnabled, directionEnabled);
                 } else {
                     // Still use the classic methods for non-players. maybe[]
                     if (reachEnabled && reach.check(player, loc, damaged, damagedLoc, data, cc)) {
@@ -323,7 +323,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     }
     
     /**
-     * Quick split-off: Checks using a moving trace.
+     * Quick split-off: Checks using a location trace.
      * @param player
      * @param loc
      * @param data
@@ -337,12 +337,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @param directionEnabled
      * @return If to cancel (true) or not (false).
      */
-    private boolean movingTraceChecks(Player player, Location loc, FightData data, FightConfig cc, Entity damaged, Location damagedLoc, LocationTrace damagedTrace, long tick, boolean reachEnabled, boolean directionEnabled) {
+    private boolean locationTraceChecks(Player player, Location loc, FightData data, FightConfig cc, Entity damaged, Location damagedLoc, LocationTrace damagedTrace, long tick, boolean reachEnabled, boolean directionEnabled) {
+     // TODO: Order / splitting off generic stuff.
         boolean cancelled = false;
-        // TODO: Order / splitting off generic stuff.
-        final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
-        final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc) : null;
-
+        
+        // (Might pass generic context to factories, for shared + heavy properties.)
+        final SharedContext sharedContext = new SharedContext(damaged, mcAccess);
+        final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
+        final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
+        
         final long traceOldest = tick; // - damagedTrace.getMaxSize(); // TODO: Set by window.
         // TODO: Iterating direction, which, static/dynamic choice.
         final Iterator<TraceEntry> traceIt = damagedTrace.maxAgeIterator(traceOldest);
@@ -364,7 +367,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                     reachPassed = true;
                 }
             }
-            // TODO: For efficiency one could omit checking at all if reach is failed all the time.
+            // TODO: Efficiency: don't check at all, if strict and !thisPassed.
             if (directionEnabled && (reachPassed || !directionPassed)) {
                 if (direction.loopCheck(player, damagedLoc, damaged, entry, directionContext, data, cc)) {
                     thisPassed = false;
@@ -380,6 +383,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
         // TODO: How to treat mixed state: violation && reachPassed && directionPassed [current: use min violation // thinkable: silent cancel, if actions have cancel (!)]
         // TODO: Adapt according to strictness settings?
+        // TODO: violation vs. reachPassed + directionPassed (current: fail one = fail all).
         if (reachEnabled) {
             // TODO: Might ignore if already cancelled by mixed/silent cancel.
             if (reach.loopFinish(player, loc, damaged, reachContext, violation, data, cc)) {
