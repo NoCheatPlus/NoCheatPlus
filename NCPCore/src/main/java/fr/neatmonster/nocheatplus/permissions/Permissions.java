@@ -161,5 +161,8 @@ public class Permissions {
     public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
     public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
-
+    
+    private static final String JOURNEY                      = MODS + ".journey";
+    public static final String  JOURNEY_RADAR                = JOURNEY + ".radar";
+    public static final String  JOURNEY_CAVE              = JOURNEY + ".cavemap";
 }
