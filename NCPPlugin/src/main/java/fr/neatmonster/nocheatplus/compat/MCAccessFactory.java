@@ -20,8 +20,6 @@ import fr.neatmonster.nocheatplus.compat.cb3026.MCAccessCB3026;
 import fr.neatmonster.nocheatplus.compat.cb3043.MCAccessCB3043;
 import fr.neatmonster.nocheatplus.compat.cb3100.MCAccessCB3100;
 import fr.neatmonster.nocheatplus.compat.glowstone.MCAccessGlowstone;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 /**
@@ -35,15 +33,6 @@ public class MCAccessFactory {
             "[NoCheatPlus]  Check for updates and support at BukkitDev: http://dev.bukkit.org/server-mods/nocheatplus/",
             "[NoCheatPlus]  Development builds (unsupported by the Bukkit Staff, at your own risk): http://ci.md-5.net/job/NoCheatPlus/changes",
     };
-
-    /**
-     * Get a new MCAccess instance using the config value for ConfPaths.COMPATIBILITY_BUKKITONLY.
-     * @return MCAccess instance.
-     * @throws RuntimeException if no access can be set.
-     */
-    public MCAccess getMCAccess() {
-        return getMCAccess(ConfigManager.getConfigFile().getBoolean(ConfPaths.COMPATIBILITY_BUKKITONLY));
-    }
 
     /**
      * Get a new MCAccess instance.
