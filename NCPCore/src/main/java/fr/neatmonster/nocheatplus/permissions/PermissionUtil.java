@@ -121,7 +121,7 @@ public class PermissionUtil {
             }
             // Set the permission for the command.
             String cmdPermName = command.getPermission();
-            boolean cmdHadPerm;
+            final boolean cmdHadPerm;
             if (cmdPermName == null) {
                 // Set a permission.
                 cmdPermName = permissionBase + "." + lcLabel;
@@ -133,23 +133,21 @@ public class PermissionUtil {
             }
             // Set permission default behavior.
             Permission cmdPerm = pm.getPermission(cmdPermName);
-            if (cmdPerm == null) {
+            final boolean permRegistered = cmdPerm != null;
+            if (!permRegistered) {
+                cmdPerm = new Permission(cmdPermName);
                 if (!cmdHadPerm) {
-                    cmdPerm = new Permission(cmdPermName);
+                    // NCP added the permission, allow root.
                     cmdPerm.addParent(rootPerm, true);
-                    pm.addPermission(cmdPerm);
-                }
+                } // else: permission was present, but not registered.
+                pm.addPermission(cmdPerm);
             }
             // Create change history entry.
-            if (cmdHadPerm) {
-                if (cmdPerm == null) {
-                    changed.add(new CommandProtectionEntry(command, lcLabel, cmdPermName, null, command.getPermissionMessage()));
-                }
-                else {
-                    changed.add(new CommandProtectionEntry(command, lcLabel, cmdPermName, cmdPerm.getDefault(), command.getPermissionMessage()));
-                }
+            if (cmdHadPerm && permRegistered) {
+                changed.add(new CommandProtectionEntry(command, lcLabel, cmdPermName, cmdPerm.getDefault(), command.getPermissionMessage()));
             }
             else {
+                // (New Permission instances will not be touched on restore.)
                 changed.add(new CommandProtectionEntry(command, lcLabel, null, null, command.getPermissionMessage()));
             }
             // Change 
