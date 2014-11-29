@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.clients.motd.CJBMOTD;
 import fr.neatmonster.nocheatplus.clients.motd.ClientMOTD;
+import fr.neatmonster.nocheatplus.clients.motd.JourneyMapMOTD;
 import fr.neatmonster.nocheatplus.clients.motd.MCAutoMapMOTD;
 import fr.neatmonster.nocheatplus.clients.motd.ReiMOTD;
 import fr.neatmonster.nocheatplus.clients.motd.SmartMovingMOTD;
@@ -24,7 +25,8 @@ public class ModUtil {
 		new ZombeMOTD(),
 		new SmartMovingMOTD(),
 		new CJBMOTD(),
-		new MCAutoMapMOTD()
+		new MCAutoMapMOTD(),
+                new JourneyMapMOTD()
 	};
 
 	/**
