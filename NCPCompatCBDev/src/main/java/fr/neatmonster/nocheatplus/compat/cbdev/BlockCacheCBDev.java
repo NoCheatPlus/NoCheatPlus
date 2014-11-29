@@ -3,25 +3,25 @@ package fr.neatmonster.nocheatplus.compat.cbdev;
 import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.server.v1_7_R4.AxisAlignedBB;
-import net.minecraft.server.v1_7_R4.Block;
-import net.minecraft.server.v1_7_R4.EntityBoat;
-import net.minecraft.server.v1_7_R4.IBlockAccess;
-import net.minecraft.server.v1_7_R4.TileEntity;
+import net.minecraft.server.v1_8_R1.AxisAlignedBB;
+import net.minecraft.server.v1_8_R1.BlockPosition;
+import net.minecraft.server.v1_8_R1.EntityBoat;
+import net.minecraft.server.v1_8_R1.EnumDirection;
+import net.minecraft.server.v1_8_R1.IBlockAccess;
+import net.minecraft.server.v1_8_R1.IBlockData;
+import net.minecraft.server.v1_8_R1.TileEntity;
 
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
 public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
 
-    /** Box for one time use, no nesting, no extra storing this(!). */
-    protected static final AxisAlignedBB useBox = AxisAlignedBB.a(0, 0, 0, 0, 0, 0);
-
-    protected net.minecraft.server.v1_7_R4.WorldServer world;
+    protected net.minecraft.server.v1_8_R1.WorldServer world;
+    protected World bukkitWorld; // WHACKS
 
     public BlockCacheCBDev(World world) {
         setAccess(world);
@@ -32,33 +32,37 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
         if (world != null) {
             this.maxBlockY = world.getMaxHeight() - 1;
             this.world = ((CraftWorld) world).getHandle();
+            this.bukkitWorld = world;
         } else {
             this.world = null;
+            this.bukkitWorld = null;
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int fetchTypeId(final int x, final int y, final int z) {
-        return world.getTypeId(x, y, z);
+        return bukkitWorld.getBlockTypeIdAt(x, y, z);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int fetchData(final int x, final int y, final int z) {
-        return world.getData(x, y, z);
+        return bukkitWorld.getBlockAt(x, y, z).getData();
     }
 
     @Override
     public double[] fetchBounds(final int x, final int y, final int z){
         final int id = getTypeId(x, y, z);		
-        final net.minecraft.server.v1_7_R4.Block block = net.minecraft.server.v1_7_R4.Block.getById(id);
+        final net.minecraft.server.v1_8_R1.Block block = net.minecraft.server.v1_8_R1.Block.getById(id);
         if (block == null) {
             // TODO: Convention for null bounds -> full ?
             return null;
         }
-        block.updateShape(this, x, y, z);
+        block.updateShape(this, new BlockPosition(x, y, z));
 
         // minX, minY, minZ, maxX, maxY, maxZ
-        return new double[]{block.x(), block.z(), block.B(), block.y(),  block.A(),  block.C()};
+        return new double[]{block.z(), block.B(), block.D(), block.A(),  block.C(),  block.E()};
     }
 
     @Override
@@ -66,15 +70,15 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
         try{
             // TODO: Find some simplification!
 
-            final net.minecraft.server.v1_7_R4.Entity mcEntity  = ((CraftEntity) entity).getHandle();
+            final net.minecraft.server.v1_8_R1.Entity mcEntity  = ((CraftEntity) entity).getHandle();
 
-            final AxisAlignedBB box = useBox.b(minX, minY, minZ, maxX, maxY, maxZ);
+            final AxisAlignedBB box = new AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
             @SuppressWarnings("rawtypes")
             final List list = world.getEntities(mcEntity, box);
             @SuppressWarnings("rawtypes")
             final Iterator iterator = list.iterator();
             while (iterator.hasNext()) {
-                final net.minecraft.server.v1_7_R4.Entity other = (net.minecraft.server.v1_7_R4.Entity) iterator.next();
+                final net.minecraft.server.v1_8_R1.Entity other = (net.minecraft.server.v1_8_R1.Entity) iterator.next();
                 if (!(other instanceof EntityBoat)){ // && !(other instanceof EntityMinecart)) continue;
                     continue;
                 }
@@ -82,7 +86,7 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
                     return true;
                 }
                 // Still check this for some reason.
-                final AxisAlignedBB otherBox = other.boundingBox;
+                final AxisAlignedBB otherBox = other.getBoundingBox();
                 if (box.a > otherBox.d || box.d < otherBox.a || box.b > otherBox.e || box.e < otherBox.b || box.c > otherBox.f || box.f < otherBox.c) {
                     continue;
                 }
@@ -104,21 +108,27 @@ public class BlockCacheCBDev extends BlockCache implements IBlockAccess{
     public void cleanup() {
         super.cleanup();
         world = null;
+        bukkitWorld = null;
     }
 
     @Override
-    public TileEntity getTileEntity(final int x, final int y, final int z) {
-        return world.getTileEntity(x, y, z);
+    public int getBlockPower(BlockPosition pos, EnumDirection dir) {
+        return world.getBlockPower(pos, dir);
     }
 
     @Override
-    public int getBlockPower(final int arg0, final int arg1, final int arg2, final int arg3) {
-        return world.getBlockPower(arg0, arg1, arg2, arg3);
+    public TileEntity getTileEntity(BlockPosition pos) {
+        return world.getTileEntity(pos);
     }
 
     @Override
-    public Block getType(int x, int y, int z) {
-        return world.getType(x, y, z);
+    public IBlockData getType(BlockPosition pos) {
+        return world.getType(pos);
+    }
+
+    @Override
+    public boolean isEmpty(BlockPosition pos) {
+        return world.isEmpty(pos);
     }
 
 }

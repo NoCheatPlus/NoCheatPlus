@@ -1,19 +1,19 @@
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
-import net.minecraft.server.v1_7_R4.AxisAlignedBB;
-import net.minecraft.server.v1_7_R4.Block;
-import net.minecraft.server.v1_7_R4.DamageSource;
-import net.minecraft.server.v1_7_R4.EntityComplexPart;
-import net.minecraft.server.v1_7_R4.EntityPlayer;
-import net.minecraft.server.v1_7_R4.MobEffectList;
+import net.minecraft.server.v1_8_R1.AxisAlignedBB;
+import net.minecraft.server.v1_8_R1.Block;
+import net.minecraft.server.v1_8_R1.DamageSource;
+import net.minecraft.server.v1_8_R1.EntityComplexPart;
+import net.minecraft.server.v1_8_R1.EntityPlayer;
+import net.minecraft.server.v1_8_R1.MobEffectList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.craftbukkit.v1_7_R4.CraftServer;
-import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,22 +30,22 @@ public class MCAccessCBDev implements MCAccess{
 	 */
 	public MCAccessCBDev() {
 		getCommandMap();
-		ReflectionUtil.checkMembers("net.minecraft.server.v1_7_R4.", new String[] {"Entity" , "dead"});
+		ReflectionUtil.checkMembers("net.minecraft.server.v1_8_R1.", new String[] {"Entity" , "dead"});
 		// block bounds, original: minX, maxX, minY, maxY, minZ, maxZ
-		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_7_R4.Block.class, 
-				new String[]{"x", "y", "z", "A", "B", "C"}, double.class);
+		ReflectionUtil.checkMethodReturnTypesNoArgs(net.minecraft.server.v1_8_R1.Block.class, 
+				new String[]{"z", "A", "B", "C", "D", "E"}, double.class);
 		// TODO: Nail it down further.
 	}
 
 	@Override
 	public String getMCVersion() {
-		// 1_7_R4
-		return "1.7.10";
+		// 1_8_R1
+		return "1.8";
 	}
 
 	@Override
 	public String getServerVersionTag() {
-		return "CB3100-DEV";
+		return "Spigot-CB-1.8-DEV";
 	}
 
 	@Override
@@ -60,8 +60,9 @@ public class MCAccessCBDev implements MCAccess{
 
 	@Override
 	public double getHeight(final Entity entity) {
-		final net.minecraft.server.v1_7_R4.Entity mcEntity = ((CraftEntity) entity).getHandle();
-		final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.height, mcEntity.boundingBox.e - mcEntity.boundingBox.b));
+		final net.minecraft.server.v1_8_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
+		AxisAlignedBB boundingBox = mcEntity.getBoundingBox();
+		final double entityHeight = Math.max(mcEntity.length, Math.max(mcEntity.getHeadHeight(), boundingBox.e - boundingBox.b));
 		if (entity instanceof LivingEntity) {
 			return Math.max(((LivingEntity) entity).getEyeHeight(), entityHeight);
 		} else return entityHeight;
@@ -101,7 +102,7 @@ public class MCAccessCBDev implements MCAccess{
 			return AlmostBoolean.NO;
 		}
 		// TODO: Does this need a method call for the "real" box? Might be no problem during moving events, though.
-		final AxisAlignedBB box = entityPlayer.boundingBox;
+		final AxisAlignedBB box = entityPlayer.getBoundingBox();
 		if (!entityPlayer.isSleeping()) {
 			// This can not really test stance but height of bounding box.
 			final double dY = Math.abs(box.e - box.b);
