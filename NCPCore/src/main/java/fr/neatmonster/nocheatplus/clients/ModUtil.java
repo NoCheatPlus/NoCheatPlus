@@ -19,40 +19,41 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
  *
  */
 public class ModUtil {
-	
-	private static final ClientMOTD[] motdS = new ClientMOTD[]{
-		new ReiMOTD(),
-		new ZombeMOTD(),
-		new SmartMovingMOTD(),
-		new CJBMOTD(),
-		new MCAutoMapMOTD(),
-                new JourneyMapMOTD()
-	};
 
-	/**
-	 * Send block codes to the player according to allowed or disallowed client-mods or client-mod features.
-	 * @param player
-	 */
-	public static void motdOnJoin(final Player player) {
-		final ConfigFile config = ConfigManager.getConfigFile(); 
-		if (!config.getBoolean(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE)){
-			// No message is to be sent.
-			return;
-		}
-		// TODO: Somebody test this all !
-	    // TODO: add feature to check world specific (!).
-	
-	    // Check if we allow all the client mods.
-	    final boolean allowAll = config.getBoolean(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL);
-	    
-	    String message = "";
-	    for (int i = 0; i < motdS.length; i++){
-	    	message = motdS[i].onPlayerJoin(message, player, allowAll);
-	    }
-	
-	    if (!message.isEmpty()){
-	    	player.sendMessage(message);
-	    }
-	}
+    // TODO: Consider to register individual codes in a generic way, detect conflicts (+tests?).
+    private static final ClientMOTD[] motdS = new ClientMOTD[]{
+        new ReiMOTD(),
+        new ZombeMOTD(),
+        new SmartMovingMOTD(),
+        new CJBMOTD(),
+        new MCAutoMapMOTD(),
+        new JourneyMapMOTD()
+    };
+
+    /**
+     * Send block codes to the player according to allowed or disallowed client-mods or client-mod features.
+     * @param player
+     */
+    public static void motdOnJoin(final Player player) {
+        final ConfigFile config = ConfigManager.getConfigFile(); 
+        if (!config.getBoolean(ConfPaths.PROTECT_CLIENTS_MOTD_ACTIVE)){
+            // No message is to be sent.
+            return;
+        }
+        // TODO: Somebody test this all !
+        // TODO: add feature to check world specific (!).
+
+        // Check if we allow all the client mods.
+        final boolean allowAll = config.getBoolean(ConfPaths.PROTECT_CLIENTS_MOTD_ALLOWALL);
+
+        String message = "";
+        for (int i = 0; i < motdS.length; i++){
+            message = motdS[i].onPlayerJoin(message, player, allowAll);
+        }
+
+        if (!message.isEmpty()){
+            player.sendMessage(message);
+        }
+    }
 
 }
