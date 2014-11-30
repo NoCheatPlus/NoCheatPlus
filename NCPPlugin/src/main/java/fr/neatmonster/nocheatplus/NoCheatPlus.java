@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -45,6 +44,7 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
@@ -869,7 +869,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
 
         // Care for already online players.
-        final Player[] onlinePlayers = getServer().getOnlinePlayers();
+        final Player[] onlinePlayers = BridgeMisc.getOnlinePlayers();
         // TODO: re-map ExemptionManager !
         // TODO: Disable all checks for these players for one tick ?
         // TODO: Prepare check data for players [problem: permissions]?
@@ -1183,7 +1183,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         final long tEnd = tStart + config.getLong(ConfPaths.DATA_CONSISTENCYCHECKS_MAXTIME, 1, 50, 2);
         if (consistencyCheckerIndex >= consistencyCheckers.size()) consistencyCheckerIndex = 0;
-        final Player[] onlinePlayers = getServer().getOnlinePlayers();
+        final Player[] onlinePlayers = BridgeMisc.getOnlinePlayers();
         // Loop
         while (consistencyCheckerIndex < consistencyCheckers.size()){
             final ConsistencyChecker checker = consistencyCheckers.get(consistencyCheckerIndex);
