@@ -1,10 +1,13 @@
 package fr.neatmonster.nocheatplus.compat.cbdev;
 
+import net.minecraft.server.v1_8_R1.AttributeInstance;
 import net.minecraft.server.v1_8_R1.AxisAlignedBB;
 import net.minecraft.server.v1_8_R1.Block;
 import net.minecraft.server.v1_8_R1.DamageSource;
 import net.minecraft.server.v1_8_R1.EntityComplexPart;
+import net.minecraft.server.v1_8_R1.EntityInsentient;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
+import net.minecraft.server.v1_8_R1.GenericAttributes;
 import net.minecraft.server.v1_8_R1.MobEffectList;
 
 import org.bukkit.Bukkit;
@@ -45,7 +48,7 @@ public class MCAccessCBDev implements MCAccess{
 
     @Override
     public String getServerVersionTag() {
-        return "Spigot-CB-1.8-DEV";
+        return "Spigot-CB-DEV";
     }
 
     @Override
@@ -136,6 +139,17 @@ public class MCAccessCBDev implements MCAccess{
         else {
             return Double.NEGATIVE_INFINITY;
         }
+    }
+    
+    public double getSpeedAttributeValue(Entity entity) {
+        net.minecraft.server.v1_8_R1.Entity mcEntity = ((CraftEntity) entity).getHandle();
+        if (mcEntity instanceof EntityInsentient) {
+            AttributeInstance attr = ((EntityInsentient) mcEntity).getAttributeInstance(GenericAttributes.d);
+            if (attr != null) {
+                return attr.getValue();
+            }
+        }
+        return Double.NEGATIVE_INFINITY;
     }
 
     @Override
