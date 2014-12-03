@@ -301,72 +301,78 @@ public class BlockProperties {
     protected static final long[] blockFlags = new long[maxBlocks];
 
     /** Flag position for stairs. */
-    public static final long F_STAIRS 		 = 0x1;
-    public static final long F_LIQUID 		 = 0x2;
+    public static final long F_STAIRS               = 0x1;
+    public static final long F_LIQUID               = 0x2;
     // TODO: maybe remove F_SOLID use (unless for setting F_GROUND on init).
     /** Minecraft isSolid result. Used for setting ground flag - Subject to change / rename.*/
-    public static final long F_SOLID 		 = 0x4;
+    public static final long F_SOLID                = 0x4;
     /** Compatibility flag: regard this block as passable always. */
-    public static final long F_IGN_PASSABLE	 = 0x8;
-    public static final long F_WATER         = 0x10;
-    public static final long F_LAVA          = 0x20;
+    public static final long F_IGN_PASSABLE         = 0x8;
+    public static final long F_WATER                = 0x10;
+    public static final long F_LAVA                 = 0x20;
     /** Override bounding box: 1.5 blocks high, like fences.<br>
      *  NOTE: This might have relevance for passable later.
      */
-    public static final long F_HEIGHT150     = 0x40;
+    public static final long F_HEIGHT150             = 0x40;
     /** The player can stand on these, sneaking or not. */
-    public static final long F_GROUND        = 0x80; // TODO: 
+    public static final long F_GROUND               = 0x80; // TODO: 
     /** Override bounding box: 1 block height.<br>
      * NOTE: This should later be ignored by passable, rather.
      */
-    public static final long F_HEIGHT100	= 0x100;
+    public static final long F_HEIGHT100            = 0x100;
     /** Climbable like ladder and vine (allow to land on without taking damage). */
-    public static final long F_CLIMBABLE	= 0x200;
+    public static final long F_CLIMBABLE            = 0x200;
     /** The block can change shape. This is most likely not 100% accurate... */
-    public static final long F_VARIABLE		= 0x400;
+    public static final long F_VARIABLE             = 0x400;
     //    /** The block has full bounds (0..1), inaccurate! */
     //    public static final int F_FULL   		= 0x800;
     /** Block has full xz-bounds. */
-    public static final long F_XZ100		= 0x800;
+    public static final long F_XZ100                = 0x800;
 
     /** This flag indicates that even though a passable workaround, everything above passable height is still ground. */
-    public static final long F_GROUND_HEIGHT	= 0x1000;
+    public static final long F_GROUND_HEIGHT        = 0x1000;
 
     /** 
      * The height is assumed to decrease from 1.0 with increasing data value from 0 to 0x7, with 0x7 being the lowest.
      * (repeating till 0x15)). 0x8 means falling/full block. This is meant to model flowing water/lava. <br>
      * However the hit-box for collision checks  will be set to 0.5 height or 1.0 height only.
      */
-    public static final long F_HEIGHT_8SIM_DEC		= 0x2000;
+    public static final long F_HEIGHT_8SIM_DEC      = 0x2000;
 
     /**
      * The height is assumed to increase with data value up to 0x7, repeating up to 0x15.<br>
      * However the hit-box for collision checks  will be set to 0.5 height or 1.0 height only,<br>
      * as with the 1.4.x snow levels.
      */
-    public static final long F_HEIGHT_8SIM_INC		= 0x4000;
+    public static final long F_HEIGHT_8SIM_INC      = 0x4000;
 
 
     /**
      * The height increases with data value (8 heights).<br>
      * This is for MC 1.5 snow levels.
      */
-    public static final long F_HEIGHT_8_INC			= 0x8000;
+    public static final long F_HEIGHT_8_INC         = 0x8000;
 
     /** All rail types a minecart can move on. */
-    public static final long F_RAILS		= 0x10000;
+    public static final long F_RAILS                = 0x10000;
 
     /** ICE */
-    public static final long F_ICE 			= 0x20000;
+    public static final long F_ICE                  = 0x20000;
 
     /** LEAVES */
-    public static final long F_LEAVES 		= 0x40000;
+    public static final long F_LEAVES               = 0x40000;
 
     /** THIN FENCE (glass panes, iron fence) */
-    public static final long F_THIN_FENCE 	= 0x80000;
+    public static final long F_THIN_FENCE           = 0x80000;
 
     /** Meta-flag to indicate that the (max.-) edges should mean a collision, can be passed to collidesBlock. */
-    public static final long F_COLLIDE_EDGES = 0x100000;
+    public static final long F_COLLIDE_EDGES        = 0x100000;
+    
+    /** Thick fence (default wooden fence). */
+    public static final long F_THICK_FENCE          = 0x200000;
+    
+    /** Fence gate style with 0x04 being fully passable. */
+    public static final long F_PASSABLE_X4          = 0x200000;
 
     /**
      * Map flag to names.
@@ -593,7 +599,14 @@ public class BlockProperties {
                 Material.FENCE, Material.FENCE_GATE,
                 Material.NETHER_FENCE, Material.COBBLE_WALL,
         }) {
-            blockFlags[mat.getId()] |= F_HEIGHT150 | F_VARIABLE;
+            blockFlags[mat.getId()] |= F_HEIGHT150 | F_VARIABLE | F_THICK_FENCE;
+        }
+        
+        // Fence gate(s).
+        for (final Material mat : new Material[]{
+                Material.FENCE_GATE,
+        }) {
+            blockFlags[mat.getId()] |= F_PASSABLE_X4;
         }
 
         // Thin fences (iron fence, glass panes).
@@ -1657,19 +1670,19 @@ public class BlockProperties {
                 return true; // 0.125
             }
         }
+        else if ((flags & F_PASSABLE_X4) != 0) {
+            if ((access.getData(bx, by, bz) & 0x4) != 0) {
+                return true;
+            }
+        }
         else if ((flags & F_THIN_FENCE) != 0) {
             if (!collidesFence(fx, fz, dX, dZ, dT, 0.05)) {
                 return true;
             }
         }
-        else if (id == Material.FENCE.getId() || id == Material.NETHER_FENCE.getId()) {
+        else if ((flags & F_THICK_FENCE) != 0) {
             // TODO: Re-check if cobble fence is now like this.
             if (!collidesFence(fx, fz, dX, dZ, dT, 0.425)) {
-                return true;
-            }
-        }
-        else if (id == Material.FENCE_GATE.getId()) {
-            if ((access.getData(bx, by, bz) & 0x4)!= 0) {
                 return true;
             }
         }
