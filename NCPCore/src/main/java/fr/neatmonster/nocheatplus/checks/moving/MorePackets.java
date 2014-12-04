@@ -77,7 +77,7 @@ public class MorePackets extends Check {
             
             // Violation handling.
             final ViolationData vd = new ViolationData(this, player, data.morePacketsVL, violation, cc.morePacketsActions);
-            if (cc.debug || vd.needsParameters()) {
+            if (data.debug || vd.needsParameters()) {
             	vd.setParameter(ParameterName.PACKETS, Integer.toString(new Double(violation).intValue()));
             	vd.setParameter(ParameterName.TAGS, StringUtil.join(tags, "+"));
             }

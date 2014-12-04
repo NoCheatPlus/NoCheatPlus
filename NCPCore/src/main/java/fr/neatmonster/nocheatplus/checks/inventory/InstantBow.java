@@ -78,7 +78,7 @@ public class InstantBow extends Check {
         	}
         }
         
-        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
             player.sendMessage(ChatColor.YELLOW + "NCP: " + ChatColor.GRAY + "Bow shot - force: " + force +", " + (cc.instantBowStrict || pullDuration < 2 * expectedPullDuration ? ("pull time: " + pullDuration) : "") + "(" + expectedPullDuration +")");
         }
         

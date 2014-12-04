@@ -131,7 +131,7 @@ public class FastClick extends Check {
         	cancel = executeActions(vd);
         }
         
-        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
         	player.sendMessage("FastClick: " + data.fastClickFreq.bucketScore(0) + " | " + data.fastClickFreq.score(1f) + " | cursor=" + cursor + " | clicked=" + clicked);
         }
         

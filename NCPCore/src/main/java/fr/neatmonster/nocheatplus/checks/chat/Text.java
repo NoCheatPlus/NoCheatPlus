@@ -115,7 +115,7 @@ public class Text extends Check implements INotifyReload {
 
         boolean cancel = false;
 
-        boolean debug = cc.textDebug || cc.debug;
+        boolean debug = data.debug;
 
         final List<String> debugParts;
         if (debug) {

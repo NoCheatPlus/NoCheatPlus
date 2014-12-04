@@ -192,10 +192,11 @@ public class FightData extends ACheckData {
     public int						lastExplosionEntityId	= Integer.MAX_VALUE;
 
 
-    public FightData(final FightConfig cc){
-        speedBuckets = new ActionFrequency(cc.speedBuckets, cc.speedBucketDur);
+    public FightData(final FightConfig config){
+        super(config);
+        speedBuckets = new ActionFrequency(config.speedBuckets, config.speedBucketDur);
         // Start with full fast-heal buffer.
-        fastHealBuffer = cc.fastHealBuffer; 
+        fastHealBuffer = config.fastHealBuffer; 
     }
 
     public void onWorldChange() {

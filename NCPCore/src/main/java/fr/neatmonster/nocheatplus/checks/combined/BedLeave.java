@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
-import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 
 public class BedLeave extends Check {
 

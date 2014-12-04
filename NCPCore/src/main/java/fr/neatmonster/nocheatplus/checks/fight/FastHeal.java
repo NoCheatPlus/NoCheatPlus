@@ -46,7 +46,7 @@ public class FastHeal extends Check {
 			}
 		}
 		
-		if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+		if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
 			player.sendMessage("Regain health(SATIATED): " + (time - data.fastHealRefTime) + " ms "+ "(buffer=" + data.fastHealBuffer + ")" +" , cancel=" + cancel);
 		}
 		

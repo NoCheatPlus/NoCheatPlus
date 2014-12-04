@@ -261,7 +261,7 @@ public class SurvivalFly extends Check {
             vDistanceAboveLimit = res[1];
             if (res[0] == Double.MIN_VALUE && res[1] == Double.MIN_VALUE) {
                 // Silent set-back.
-                if (cc.debug) {
+                if (data.debug) {
                     tags.add("silentsbcobweb");
                     outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
                 }
@@ -357,7 +357,7 @@ public class SurvivalFly extends Check {
         // TODO: on ground -> on ground improvements
 
         // Debug output.
-        if (cc.debug) {
+        if (data.debug) {
             outputDebug(player, to, data, cc, hDistance, hAllowedDistance, hFreedom, yDistance, vAllowedDistance, fromOnGround, resetFrom, toOnGround, resetTo);
         }
 
@@ -522,6 +522,7 @@ public class SurvivalFly extends Check {
             // TODO: too many false positives with just checking from ?
             // TODO: Sneaking and blocking applies to when in water !
             hAllowedDistance = modSwim * walkSpeed * cc.survivalFlySwimmingSpeed / 100D;
+            // TODO: Depth strider.
         } else if (!sfDirty && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
         }
@@ -545,8 +546,10 @@ public class SurvivalFly extends Check {
         }
 
         // Short cut.
-        // TODO: Check if a) early return makes sense and b) do it ofr all following parts.
-        if (hDistance <= hAllowedDistance && !cc.debug) {
+        // TODO: Check if a) early return makes sense and b) do it for each of the following parts.
+        // TODO: Should debug really make a difference? Do early return before permission check only?
+        // TODO: Consider logging early vs. full.
+        if (hDistance <= hAllowedDistance && !data.debug) {
             // Shortcut for debug disabled.
             return hAllowedDistance;
         }
@@ -555,6 +558,8 @@ public class SurvivalFly extends Check {
         if (data.sfOnIce > 0) {
             hAllowedDistance *= modIce;
         }
+        
+        // TODO: Attributes
 
         // Speed amplifier.
         final double speedAmplifier = mcAccess.getFasterMovementAmplifier(player);

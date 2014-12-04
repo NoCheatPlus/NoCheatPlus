@@ -20,13 +20,13 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
  */
 public class MovingConfig extends ACheckConfig {
 
-	/** The factory creating configurations. */
-	public static final CheckConfigFactory factory = new CheckConfigFactory() {
-		@Override
-		public final ICheckConfig getConfig(final Player player) {
-			return MovingConfig.getConfig(player);
-		}
-	};
+    /** The factory creating configurations. */
+    public static final CheckConfigFactory factory = new CheckConfigFactory() {
+        @Override
+        public final ICheckConfig getConfig(final Player player) {
+            return MovingConfig.getConfig(player);
+        }
+    };
 
     /** The map containing the configurations per world. */
     private static final Map<String, MovingConfig> worldsMap = new HashMap<String, MovingConfig>();
@@ -49,26 +49,26 @@ public class MovingConfig extends ACheckConfig {
     public static MovingConfig getConfig(final Player player) {
         return getConfig(player.getWorld().getName());
     }
-    
+
     /**
      * Get a per-world config.
      * @param worldName Exact case world name.
      * @return
      */
     public static MovingConfig getConfig(final String worldName) {
-    	final MovingConfig cc = worldsMap.get(worldName); 
+        final MovingConfig cc = worldsMap.get(worldName); 
         if (cc != null){
-        	return cc;
+            return cc;
         }
         final MovingConfig ccNew = new MovingConfig(ConfigManager.getConfigFile(worldName));
         worldsMap.put(worldName, ccNew);
         return ccNew;
     }
 
-    
-	public final boolean    ignoreCreative;
-	public final boolean    ignoreAllowFlight;
-    
+
+    public final boolean    ignoreCreative;
+    public final boolean    ignoreAllowFlight;
+
     public final boolean    creativeFlyCheck;
     public final int        creativeFlyHorizontalSpeed;
     public final int        creativeFlyMaxHeight;
@@ -80,6 +80,7 @@ public class MovingConfig extends ACheckConfig {
     public final float      morePacketsEPSIdeal;
     /** The maximum number of packets per second that we accept. */
     public final float      morePacketsEPSMax;
+    public final int        morePacketsEPSBuckets;
     public final float		morePacketsBurstPackets;
     public final double		morePacketsBurstDirect;
     public final double		morePacketsBurstEPM;
@@ -92,20 +93,20 @@ public class MovingConfig extends ACheckConfig {
     /** Deal damage instead of Minecraft, whenever a player is judged to be on ground. */
     public final boolean    noFallDealDamage;
     /** Reset data on violation, i.e. a player taking fall damage without being on ground. */
-	public final boolean    noFallViolationReset;
-	/** Reset data on tp. */
-	public final boolean 	noFallTpReset;
-	/** Reset if in vehicle. */
-	public final boolean noFallVehicleReset;
+    public final boolean    noFallViolationReset;
+    /** Reset data on tp. */
+    public final boolean 	noFallTpReset;
+    /** Reset if in vehicle. */
+    public final boolean noFallVehicleReset;
     /** Reset fd to 0  if on ground (dealdamage only). */
-	public final boolean noFallAntiCriticals;
+    public final boolean noFallAntiCriticals;
     public final ActionList noFallActions;
-    
-	public final boolean    passableCheck;
-	public final boolean	passableRayTracingCheck;
-	public final boolean	passableRayTracingBlockChangeOnly;
-	// TODO: passableAccuracy: also use if not using ray-tracing
-	public final ActionList passableActions;
+
+    public final boolean    passableCheck;
+    public final boolean	passableRayTracingCheck;
+    public final boolean	passableRayTracingBlockChangeOnly;
+    // TODO: passableAccuracy: also use if not using ray-tracing
+    public final ActionList passableActions;
 
     public final boolean    survivalFlyCheck;
     public final int        survivalFlyBlockingSpeed;
@@ -120,39 +121,39 @@ public class MovingConfig extends ACheckConfig {
     public final boolean    sfFallDamage;
     public final long       survivalFlyVLFreeze;
     public final ActionList survivalFlyActions;
-    
-	public final boolean 	sfHoverCheck;
-	public final int 		sfHoverTicks;
-	public final int		sfHoverLoginTicks;
-	public final boolean    sfHoverFallDamage;
-	public final double		sfHoverViolation;
-    
+
+    public final boolean 	sfHoverCheck;
+    public final int 		sfHoverTicks;
+    public final int		sfHoverLoginTicks;
+    public final boolean    sfHoverFallDamage;
+    public final double		sfHoverViolation;
+
     // Special tolerance values:
-	/** This is not strictly ticks, but packets, for now.*/
-	public final int 		velocityGraceTicks;
-	public final int		velocityActivationCounter;
-	public final int		velocityActivationTicks;
-	public final boolean	velocityStrictInvalidation;
+    /** This is not strictly ticks, but packets, for now.*/
+    public final int 		velocityGraceTicks;
+    public final int		velocityActivationCounter;
+    public final int		velocityActivationTicks;
+    public final boolean	velocityStrictInvalidation;
     public final double     noFallyOnGround;
     public final double     yOnGround;
-	public final double     yStep;
-	
-	// General things.
-	public final boolean tempKickIllegal;
-	public final boolean loadChunksOnJoin;
-	public final long sprintingGrace;
-	public final boolean assumeSprint;
-	public final int speedGrace;
-	public final boolean enforceLocation;
-	
-	// Vehicles
-	public final boolean vehicleEnforceLocation;
-	public final boolean vehiclePreventDestroyOwn;
-	
-	// Trace
-	public final int traceSize;
-	public final double traceMergeDist;
-	
+    public final double     yStep;
+
+    // General things.
+    public final boolean tempKickIllegal;
+    public final boolean loadChunksOnJoin;
+    public final long sprintingGrace;
+    public final boolean assumeSprint;
+    public final int speedGrace;
+    public final boolean enforceLocation;
+
+    // Vehicles
+    public final boolean vehicleEnforceLocation;
+    public final boolean vehiclePreventDestroyOwn;
+
+    // Trace
+    public final int traceSize;
+    public final double traceMergeDist;
+
 
     /**
      * Instantiates a new moving configuration.
@@ -162,10 +163,10 @@ public class MovingConfig extends ACheckConfig {
      */
     public MovingConfig(final ConfigFile config) {
         super(config, ConfPaths.MOVING);
-    	
-    	ignoreCreative = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE);
-    	ignoreAllowFlight = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);
-    	
+
+        ignoreCreative = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNORECREATIVE);
+        ignoreAllowFlight = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_IGNOREALLOWFLIGHT);
+
         creativeFlyCheck = config.getBoolean(ConfPaths.MOVING_CREATIVEFLY_CHECK);
         creativeFlyHorizontalSpeed = config.getInt(ConfPaths.MOVING_CREATIVEFLY_HORIZONTALSPEED);
         creativeFlyMaxHeight = config.getInt(ConfPaths.MOVING_CREATIVEFLY_MAXHEIGHT);
@@ -175,6 +176,7 @@ public class MovingConfig extends ACheckConfig {
         morePacketsCheck = config.getBoolean(ConfPaths.MOVING_MOREPACKETS_CHECK);
         morePacketsEPSIdeal = config.getInt(ConfPaths.MOVING_MOREPACKETS_EPSIDEAL);
         morePacketsEPSMax = Math.max(morePacketsEPSIdeal, config.getInt(ConfPaths.MOVING_MOREPACKETS_EPSMAX));
+        morePacketsEPSBuckets = 2 * Math.max(1, Math.min(60, config.getInt(ConfPaths.MOVING_MOREPACKETS_SECONDS)));
         morePacketsBurstPackets = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
         morePacketsBurstDirect = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_DIRECT);
         morePacketsBurstEPM = config.getInt(ConfPaths.MOVING_MOREPACKETS_BURST_EPM);
@@ -191,10 +193,10 @@ public class MovingConfig extends ACheckConfig {
         noFallVehicleReset = config.getBoolean(ConfPaths.MOVING_NOFALL_RESETONVEHICLE);
         noFallAntiCriticals = config.getBoolean(ConfPaths.MOVING_NOFALL_ANTICRITICALS);
         noFallActions = config.getOptimizedActionList(ConfPaths.MOVING_NOFALL_ACTIONS, Permissions.MOVING_NOFALL);
-        
+
         passableCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_CHECK);
-    	passableRayTracingCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK);
-    	passableRayTracingBlockChangeOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY);
+        passableRayTracingCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK);
+        passableRayTracingBlockChangeOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY);
         passableActions = config.getOptimizedActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
 
         survivalFlyCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
@@ -211,13 +213,13 @@ public class MovingConfig extends ACheckConfig {
         sfFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_FALLDAMAGE);
         survivalFlyVLFreeze = config.getLong(ConfPaths.MOVING_SURVIVALFLY_VLFREEZE, 2000L);
         survivalFlyActions = config.getOptimizedActionList(ConfPaths.MOVING_SURVIVALFLY_ACTIONS, Permissions.MOVING_SURVIVALFLY);
-        
+
         sfHoverCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_CHECK);
         sfHoverTicks = config.getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_TICKS);
         sfHoverLoginTicks = Math.max(0, config.getInt(ConfPaths.MOVING_SURVIVALFLY_HOVER_LOGINTICKS));
         sfHoverFallDamage = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_HOVER_FALLDAMAGE);
         sfHoverViolation = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_HOVER_SFVIOLATION);
-        
+
         velocityGraceTicks = config.getInt(ConfPaths.MOVING_VELOCITY_GRACETICKS);
         velocityActivationCounter = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONCOUNTER);
         velocityActivationTicks = config.getInt(ConfPaths.MOVING_VELOCITY_ACTIVATIONTICKS);
@@ -226,22 +228,22 @@ public class MovingConfig extends ACheckConfig {
         noFallyOnGround = config.getDouble(ConfPaths.MOVING_NOFALL_YONGROUND, 0.001, 2.0, yOnGround);
         // ystep is set to 0.45 by default, for stairs / steps.
         yStep = config.getDouble(ConfPaths.MOVING_SURVIVALFLY_YSTEP, 0.001, 0.45, 0.1);
-        
+
         tempKickIllegal = config.getBoolean(ConfPaths.MOVING_TEMPKICKILLEGAL);
         loadChunksOnJoin = config.getBoolean(ConfPaths.MOVING_LOADCHUNKS_JOIN);
         sprintingGrace = Math.max(0L, (long) (config.getDouble(ConfPaths.MOVING_SPRINTINGGRACE) * 1000.0)); // Config: seconds.
         assumeSprint = config.getBoolean(ConfPaths.MOVING_ASSUMESPRINT);
         speedGrace = Math.max(0, (int) Math.round(config.getDouble(ConfPaths.MOVING_SPEEDGRACE) * 20.0)); // Config: seconds
         enforceLocation = config.getBoolean(ConfPaths.MOVING_ENFORCELOCATION);
-        
+
         vehicleEnforceLocation = config.getBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION);
         vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN);
-        
+
         traceSize = config.getInt(ConfPaths.MOVING_TRACE_SIZE);
         traceMergeDist = config.getDouble(ConfPaths.MOVING_TRACE_MERGEDIST);
-        
+
     }
-    
+
 
 
     /* (non-Javadoc)
@@ -255,7 +257,7 @@ public class MovingConfig extends ACheckConfig {
         case MOVING_SURVIVALFLY:
             return survivalFlyCheck;
         case MOVING_PASSABLE:
-        	return passableCheck;
+            return passableCheck;
         case MOVING_MOREPACKETS:
             return morePacketsCheck;
         case MOVING_MOREPACKETSVEHICLE:

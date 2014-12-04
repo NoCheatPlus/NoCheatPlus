@@ -43,7 +43,7 @@ public class Critical extends Check {
         final double mcFallDistance = (double) player.getFallDistance();
         final MovingConfig mCc = MovingConfig.getConfig(player);
         // TODO: All debugging to the trace (later allow hooking your own trace).
-        if (mcFallDistance > 0.0 && cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        if (mcFallDistance > 0.0 && data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
             final MovingData mData = MovingData.getData(player);
 
             if (MovingListener.shouldCheckSurvivalFly(player, mData, mCc) && CheckType.MOVING_NOFALL.isEnabled(player)) {

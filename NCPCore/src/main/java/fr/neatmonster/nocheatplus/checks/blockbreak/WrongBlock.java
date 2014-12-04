@@ -59,7 +59,7 @@ public class WrongBlock extends Check {
         }
         
         if (wrongBlock) {
-        	if ((cc.fastBreakDebug || cc.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        	if ((data.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
         		player.sendMessage("WrongBlock failure with dist: " + dist);
         	}
         	data.wrongBlockVL.add(now, (float) (dist + 1) / 2f);

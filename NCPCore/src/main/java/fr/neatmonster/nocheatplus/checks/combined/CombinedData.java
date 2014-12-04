@@ -8,83 +8,81 @@ import org.bukkit.entity.Player;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
-import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PenaltyTime;
 
 public class CombinedData extends ACheckData {
-	
-	/** The factory creating data. */
-	public static final CheckDataFactory factory = new CheckDataFactory() {
-		@Override
-		public final ICheckData getData(final Player player) {
-			return CombinedData.getData(player);
-		}
 
-		@Override
-		public ICheckData removeData(final String playerName) {
-			return CombinedData.removeData(playerName);
-		}
+    /** The factory creating data. */
+    public static final CheckDataFactory factory = new CheckDataFactory() {
+        @Override
+        public final ICheckData getData(final Player player) {
+            return CombinedData.getData(player);
+        }
 
-		@Override
-		public void removeAllData() {
-			clear();
-		}
-	};
-                                                    
+        @Override
+        public ICheckData removeData(final String playerName) {
+            return CombinedData.removeData(playerName);
+        }
+
+        @Override
+        public void removeAllData() {
+            clear();
+        }
+    };
+
     private static final Map<String, CombinedData> playersMap = new HashMap<String, CombinedData>();
 
-	public static CombinedData getData(final Player player) {
-		final String playerName = player.getName(); 
-		CombinedData data = playersMap.get(playerName);
-		if (data == null){
-			data = new CombinedData(player);
-			playersMap.put(playerName, data);
-		}
-		return data;
-	}
-	
-	public static ICheckData removeData(final String playerName) {
-		return playersMap.remove(playerName);
-	}
-	
+    public static CombinedData getData(final Player player) {
+        final String playerName = player.getName(); 
+        CombinedData data = playersMap.get(playerName);
+        if (data == null){
+            data = new CombinedData(CombinedConfig.getConfig(player));
+            playersMap.put(playerName, data);
+        }
+        return data;
+    }
+
+    public static ICheckData removeData(final String playerName) {
+        return playersMap.remove(playerName);
+    }
+
     public static void clear(){
-    	playersMap.clear();
+        playersMap.clear();
     }
 
     // VLs
-	public double bedLeaveVL = 0;
-	public double improbableVL = 0;
-	public double munchHausenVL = 0;
-	
-	// Invulnerable management:
+    public double bedLeaveVL = 0;
+    public double improbableVL = 0;
+    public double munchHausenVL = 0;
+
+    // Invulnerable management:
     /** This is the tick from which on the player is vulnerable again. */
     public int            invulnerableTick = Integer.MIN_VALUE;
-	
+
     // Yawrate check.
-	public float lastYaw;
-	public long  lastYawTime;
-	public float sumYaw;
-	public final ActionFrequency yawFreq = new ActionFrequency(3, 333);
+    public float lastYaw;
+    public long  lastYawTime;
+    public float sumYaw;
+    public final ActionFrequency yawFreq = new ActionFrequency(3, 333);
 
-	// General penalty time. Used for fighting mainly, but not only close combat (!), set by yawrate check.
-	public final PenaltyTime timeFreeze = new PenaltyTime();
-	
-	// Bedleave check
-	public boolean wasInBed = false;
-	
-	// Improbable check
-	public final ActionFrequency improbableCount = new ActionFrequency(20, 3000);
+    // General penalty time. Used for fighting mainly, but not only close combat (!), set by yawrate check.
+    public final PenaltyTime timeFreeze = new PenaltyTime();
 
-	// General data
-	public String lastWorld = "";
-	public long lastJoinTime;
-	public long lastLogoutTime;
-	public long lastMoveTime;
-	
-	public CombinedData(final Player player){
-//		final CombinedConfig cc = CombinedConfig.getConfig(player);
-		// TODO: Get some things from the config.
-	}
+    // Bedleave check
+    public boolean wasInBed = false;
+
+    // Improbable check
+    public final ActionFrequency improbableCount = new ActionFrequency(20, 3000);
+
+    // General data
+    public String lastWorld = "";
+    public long lastJoinTime;
+    public long lastLogoutTime;
+    public long lastMoveTime;
+
+    public CombinedData(final CombinedConfig config){
+        super(config);
+    }
 
 }

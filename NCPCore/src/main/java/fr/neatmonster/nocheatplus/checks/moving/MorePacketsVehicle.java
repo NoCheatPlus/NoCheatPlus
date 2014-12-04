@@ -75,7 +75,7 @@ public class MorePacketsVehicle extends Check {
             // Execute whatever actions are associated with this check and the violation level and find out if we should
             // cancel the event.
             final ViolationData vd = new ViolationData(this, player, data.morePacketsVehicleVL, -data.morePacketsVehicleBuffer, cc.morePacketsVehicleActions);
-            if (cc.debug || vd.needsParameters()) {
+            if (data.debug || vd.needsParameters()) {
             	vd.setParameter(ParameterName.PACKETS, Integer.toString(-data.morePacketsVehicleBuffer));
             }
             if (executeActions(vd)){

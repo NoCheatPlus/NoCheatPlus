@@ -18,23 +18,23 @@ import fr.neatmonster.nocheatplus.utilities.TickTask;
  */
 public class BlockInteractData extends ACheckData {
 
-	/** The factory creating data. */
-	public static final CheckDataFactory factory = new CheckDataFactory() {
-		@Override
-		public final ICheckData getData(final Player player) {
-			return BlockInteractData.getData(player);
-		}
+    /** The factory creating data. */
+    public static final CheckDataFactory factory = new CheckDataFactory() {
+        @Override
+        public final ICheckData getData(final Player player) {
+            return BlockInteractData.getData(player);
+        }
 
-		@Override
-		public ICheckData removeData(final String playerName) {
-			return BlockInteractData.removeData(playerName);
-		}
+        @Override
+        public ICheckData removeData(final String playerName) {
+            return BlockInteractData.removeData(playerName);
+        }
 
-		@Override
-		public void removeAllData() {
-			clear();
-		}
-	};
+        @Override
+        public void removeAllData() {
+            clear();
+        }
+    };
 
     /** The map containing the data per players. */
     private static final Map<String, BlockInteractData> playersMap = new HashMap<String, BlockInteractData>();
@@ -48,24 +48,24 @@ public class BlockInteractData extends ACheckData {
      */
     public static BlockInteractData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new BlockInteractData());
+            playersMap.put(player.getName(), new BlockInteractData(BlockInteractConfig.getConfig(player)));
         return playersMap.get(player.getName());
     }
 
     public static ICheckData removeData(final String playerName) {
-		return playersMap.remove(playerName);
-	}
-    
-    public static void clear(){
-    	playersMap.clear();
+        return playersMap.remove(playerName);
     }
 
-	// Violation levels.
+    public static void clear(){
+        playersMap.clear();
+    }
+
+    // Violation levels.
     public double directionVL	= 0;
     public double reachVL		= 0;
     public double speedVL		= 0;
     public double visibleVL		= 0;
-    
+
     // General data
     // Last block interacted with
     public int lastX = Integer.MAX_VALUE;
@@ -77,33 +77,37 @@ public class BlockInteractData extends ACheckData {
 
     // Data of the reach check.
     public double reachDistance;
-    
+
     /** Last reset time. */
     public long speedTime	= 0;
     /** Number of interactions since last reset-time. */
     public int  speedCount	= 0;
-    
+
+    public BlockInteractData(final BlockInteractConfig config) {
+        super(config);
+    }
+
     /**
      * Last interacted block.
      * @param block
      */
-	public void setLastBlock(Block block, Action action) {
-		lastX = block.getX();
-		lastY = block.getY();
-		lastZ = block.getZ();
-		lastType = block.getType();
-		if (lastType == Material.AIR) {
-			lastType = null;
-		}
-		lastTick = TickTask.getTick();
-		lastAction = action;
-	}
+    public void setLastBlock(Block block, Action action) {
+        lastX = block.getX();
+        lastY = block.getY();
+        lastZ = block.getZ();
+        lastType = block.getType();
+        if (lastType == Material.AIR) {
+            lastType = null;
+        }
+        lastTick = TickTask.getTick();
+        lastAction = action;
+    }
 
-	public void resetLastBlock() {
-		lastTick = 0;
-		lastAction = null;
-		lastX = Integer.MAX_VALUE;
-		lastType = null;
-	}
-    
+    public void resetLastBlock() {
+        lastTick = 0;
+        lastAction = null;
+        lastX = Integer.MAX_VALUE;
+        lastType = null;
+    }
+
 }

@@ -42,7 +42,7 @@ public class Speed extends Check {
 			data.speedVL *= 0.99;
 		}
 		
-		if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+		if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
 			player.sendMessage("Interact speed: " + data.speedCount);
 		}
 		

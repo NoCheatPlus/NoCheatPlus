@@ -91,7 +91,7 @@ public class Visible extends Check {
 	    	blockCache.cleanup();
 		}
     	
-		if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+		if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
 			// TODO: Tags
         	player.sendMessage("Interact visible: " + (action == Action.RIGHT_CLICK_BLOCK ? "right" : "left") + " collide=" + rayTracing.collides());
         }

@@ -128,7 +128,7 @@ public class Reach extends Check {
             data.reachMod = Math.min(1.0, data.reachMod + DYNAMIC_STEP);
         }
 
-        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
             player.sendMessage("NC+: Attack/reach " + damaged.getType()+ " height="+ StringUtil.fdec3.format(height) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(reachMod));
         }
 
@@ -263,7 +263,7 @@ public class Reach extends Check {
             data.reachMod = Math.min(1.0, data.reachMod + DYNAMIC_STEP);
         }
 
-        if (cc.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+        if (data.debug && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
             player.sendMessage("NC+: Attack/reach " + damaged.getType()+ " height="+ StringUtil.fdec3.format(context.damagedHeight) + " dist=" + StringUtil.fdec3.format(lenpRel) +" @" + StringUtil.fdec3.format(data.reachMod));
         }
 

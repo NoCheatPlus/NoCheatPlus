@@ -15,23 +15,23 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class ChatData extends AsyncCheckData {
 
-	/** The factory creating data. */
-	public static final CheckDataFactory factory = new CheckDataFactory() {
-		@Override
-		public final ICheckData getData(final Player player) {
-			return ChatData.getData(player);
-		}
+    /** The factory creating data. */
+    public static final CheckDataFactory factory = new CheckDataFactory() {
+        @Override
+        public final ICheckData getData(final Player player) {
+            return ChatData.getData(player);
+        }
 
-		@Override
-		public ICheckData removeData(final String playerName) {
-			return ChatData.removeData(playerName);
-		}
+        @Override
+        public ICheckData removeData(final String playerName) {
+            return ChatData.removeData(playerName);
+        }
 
-		@Override
-		public void removeAllData() {
-			clear();
-		}
-	};
+        @Override
+        public void removeAllData() {
+            clear();
+        }
+    };
 
     /** The map containing the data per players. */
     private static final Map<String, ChatData> playersMap = new HashMap<String, ChatData>();
@@ -45,49 +45,53 @@ public class ChatData extends AsyncCheckData {
      */
     public static synchronized ChatData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new ChatData());
+            playersMap.put(player.getName(), new ChatData(ChatConfig.getConfig(player)));
         return playersMap.get(player.getName());
     }
 
     public static synchronized ICheckData removeData(final String playerName) {
-		return playersMap.remove(playerName);
-	}
-    
-    public static synchronized void clear(){
-    	playersMap.clear();
+        return playersMap.remove(playerName);
     }
 
-	// Violation levels.
+    public static synchronized void clear(){
+        playersMap.clear();
+    }
+
+    // Violation levels.
     public double  captchaVL;
     public double  colorVL;
     public double  commandsVL;
     public double  textVL;
     public double  relogVL;
-    
+
     // Captcha data.
     public int     captchTries;
     public String  captchaGenerated;
     public boolean captchaStarted;
-    
+
     /// Commands data.
     public final ActionFrequency commandsWeights = new ActionFrequency(5, 1000);
     public long commandsShortTermTick;
     public double commandsShortTermWeight;
-    
+
     // Data of the text check.
     public final ActionFrequency chatFrequency = new ActionFrequency(10, 3000);
     public final ActionFrequency chatShortTermFrequency = new ActionFrequency(6, 500);
-    
-    
+
+
     // Data of the no pwnage check.     
     public String  chatLastMessage;
     public long    chatLastTime;
     public long    chatWarningTime;
-    
 
-    
+
+
     public int     relogWarnings;
     public long    relogWarningTime;
+
+    public ChatData(final ChatConfig config) {
+        super(config);
+    }
 
     /**
      * Clear the data of the no pwnage check.

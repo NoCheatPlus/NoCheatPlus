@@ -158,7 +158,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             //     			damagedPlayer.getLocation(useLoc2);
             //     		}
             // Log.
-            if (cc.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
+            if (data.debug && damagedPlayer.hasPermission(Permissions.ADMINISTRATION_DEBUG)){
                 damagedPlayer.sendMessage("Attacked by " + player.getName() + ": inv=" + mcAccess.getInvulnerableTicks(damagedPlayer) + " ndt=" + damagedPlayer.getNoDamageTicks());
             }
             // Check for self hit exploits (mind that projectiles are excluded from this.)
@@ -266,7 +266,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
             // Angle check.
             if (angle.check(player, worldChanged, data, cc)) {
-                if (!cancelled && cc.debug) {
+                if (!cancelled && data.debug) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " fight.angle cancel without yawrate cancel.");
                 }
                 cancelled = true;
@@ -298,7 +298,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                         // Judge as "lost sprint" problem.
                         // TODO: What would mData.lostSprintCount > 0  mean here?
                         mData.lostSprintCount = 7;
-                        if ((cc.debug || mc.debug) && BuildParameters.debugLevel > 0){
+                        if ((data.debug || mc.debug) && BuildParameters.debugLevel > 0){
                             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " (lostsprint) hDist to last from: " + hDist + " | targetdist=" + TrigUtil.distance(loc.getX(), loc.getZ(), damagedLoc.getX(), damagedLoc.getZ()) + " | sprinting=" + player.isSprinting() + " | food=" + player.getFoodLevel() +" | hbuf=" + mData.sfHorizontalBuffer);
                         }
                     }
@@ -310,7 +310,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // (Cancel after sprinting hacks, because of potential fp).
         if (!cancelled && data.attackPenalty.isPenalty(now)) {
             cancelled = true;
-            if (cc.debug) {
+            if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " ~ attack penalty.");
             }
         }

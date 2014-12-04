@@ -11,24 +11,37 @@ import fr.neatmonster.nocheatplus.components.IData;
  * @author asofold
  */
 public interface ICheckData extends IData{
-	
-	/**
-	 * Check if an entry for the given permission exists.
-	 * @param permission
-	 * @return
-	 */
-	public boolean hasCachedPermissionEntry(String permission);
-	/**
-	 * Check if the user has the permission. If no entry is present, a false result is assumed an after failure check is made and the cache must be registered for updating.
-	 * @param permission
-	 * @return
-	 */
-	public boolean hasCachedPermission(String permission);
-	
-	/**
-	 * Set a cached permission.
-	 * @param permission
-	 * @param value
-	 */
-	public void setCachedPermission(String permission, boolean value);
+
+    /**
+     * Set if to trace/debug this player for the associated checks.
+     * @param debug
+     */
+    public void setDebug(boolean debug);
+
+    /**
+     * Test if to trace/debug this player for the associated checks.
+     * @return
+     */
+    public boolean getDebug();
+
+
+    /**
+     * Check if an entry for the given permission exists.
+     * @param permission
+     * @return
+     */
+    public boolean hasCachedPermissionEntry(String permission);
+    /**
+     * Check if the user has the permission. If no entry is present, a false result is assumed an after failure check is made and the cache must be registered for updating.
+     * @param permission
+     * @return
+     */
+    public boolean hasCachedPermission(String permission);
+
+    /**
+     * Set a cached permission.
+     * @param permission
+     * @param value
+     */
+    public void setCachedPermission(String permission, boolean value);
 }

@@ -15,23 +15,23 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class BlockPlaceData extends ACheckData {
 
-	/** The factory creating data. */
-	public static final CheckDataFactory factory = new CheckDataFactory() {
-		@Override
-		public final ICheckData getData(final Player player) {
-			return BlockPlaceData.getData(player);
-		}
+    /** The factory creating data. */
+    public static final CheckDataFactory factory = new CheckDataFactory() {
+        @Override
+        public final ICheckData getData(final Player player) {
+            return BlockPlaceData.getData(player);
+        }
 
-		@Override
-		public ICheckData removeData(final String playerName) {
-			return BlockPlaceData.removeData(playerName);
-		}
+        @Override
+        public ICheckData removeData(final String playerName) {
+            return BlockPlaceData.removeData(playerName);
+        }
 
-		@Override
-		public void removeAllData() {
-			clear();
-		}
-	};
+        @Override
+        public void removeAllData() {
+            clear();
+        }
+    };
 
     /** The map containing the data per players. */
     private static final Map<String, BlockPlaceData> playersMap = new HashMap<String, BlockPlaceData>();
@@ -45,32 +45,32 @@ public class BlockPlaceData extends ACheckData {
      */
     public static BlockPlaceData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new BlockPlaceData());
+            playersMap.put(player.getName(), new BlockPlaceData(BlockPlaceConfig.getConfig(player)));
         return playersMap.get(player.getName());
     }
 
     public static ICheckData removeData(final String playerName) {
-		return playersMap.remove(playerName);
-	}
-    
-    public static void clear(){
-    	playersMap.clear();
+        return playersMap.remove(playerName);
     }
 
-	// Violation levels.
+    public static void clear(){
+        playersMap.clear();
+    }
+
+    // Violation levels.
     public double againstVL = 0;
-	public double autoSignVL = 0;
-	public double directionVL = 0;
-	public double fastPlaceVL = 0;
-	public double noSwingVL = 0;
-	public double reachVL = 0;
-	public double speedVL = 0;
-    
+    public double autoSignVL = 0;
+    public double directionVL = 0;
+    public double fastPlaceVL = 0;
+    public double noSwingVL = 0;
+    public double reachVL = 0;
+    public double speedVL = 0;
+
     // AutoSign.
     public long autoSignPlacedTime = 0;
     /** Using Material.SIGN . */
     public long autoSignPlacedHash = 0;
-    
+
     // Data of the fast place check.
     public final ActionFrequency fastPlaceBuckets	= new ActionFrequency(2, 1000);
     public int fastPlaceShortTermTick				= 0;
@@ -85,4 +85,9 @@ public class BlockPlaceData extends ACheckData {
     // Data of the speed check;
     public boolean speedLastRefused;
     public long    speedLastTime;
+
+    public BlockPlaceData(final BlockPlaceConfig config) {
+        super (config);
+    }
+
 }

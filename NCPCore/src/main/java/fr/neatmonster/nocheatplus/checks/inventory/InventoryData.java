@@ -16,23 +16,23 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class InventoryData extends ACheckData {
 
-	/** The factory creating data. */
-	public static final CheckDataFactory factory = new CheckDataFactory() {
-		@Override
-		public final ICheckData getData(final Player player) {
-			return InventoryData.getData(player);
-		}
+    /** The factory creating data. */
+    public static final CheckDataFactory factory = new CheckDataFactory() {
+        @Override
+        public final ICheckData getData(final Player player) {
+            return InventoryData.getData(player);
+        }
 
-		@Override
-		public ICheckData removeData(final String playerName) {
-			return InventoryData.removeData(playerName);
-		}
+        @Override
+        public ICheckData removeData(final String playerName) {
+            return InventoryData.removeData(playerName);
+        }
 
-		@Override
-		public void removeAllData() {
-			clear();
-		}
-	};
+        @Override
+        public void removeAllData() {
+            clear();
+        }
+    };
 
     /** The map containing the data per players. */
     private static final Map<String, InventoryData> playersMap = new HashMap<String, InventoryData>();
@@ -46,24 +46,24 @@ public class InventoryData extends ACheckData {
      */
     public static InventoryData getData(final Player player) {
         if (!playersMap.containsKey(player.getName()))
-            playersMap.put(player.getName(), new InventoryData());
+            playersMap.put(player.getName(), new InventoryData(InventoryConfig.getConfig(player)));
         return playersMap.get(player.getName());
     }
 
     public static ICheckData removeData(final String playerName) {
-		return playersMap.remove(playerName);
-	}
-    
-    public static void clear(){
-    	playersMap.clear();
+        return playersMap.remove(playerName);
     }
 
-	// Violation levels.
+    public static void clear(){
+        playersMap.clear();
+    }
+
+    // Violation levels.
     public double   dropVL;
     public double   fastClickVL;
     public double   instantBowVL;
     public double   instantEatVL;
-    
+
     // General.
     public long     lastClickTime = 0;
 
@@ -72,19 +72,23 @@ public class InventoryData extends ACheckData {
     public long     dropLastTime;
 
     // Data of the fast click check.
-//    public boolean  fastClickLastCancelled;
+    //    public boolean  fastClickLastCancelled;
     public final ActionFrequency fastClickFreq = new ActionFrequency(5, 200L);
-	public Material fastClickLastCursor = null;
-	public Material fastClickLastClicked = null;
-	public int fastClickLastCursorAmount = 0;
+    public Material fastClickLastCursor = null;
+    public Material fastClickLastClicked = null;
+    public int fastClickLastCursorAmount = 0;
 
     // Data of the instant bow check.
-	/** Last time right click interact on bow. A value of 0 means 'invalid'.*/
+    /** Last time right click interact on bow. A value of 0 means 'invalid'.*/
     public long     instantBowInteract = 0;
     public long     instantBowShoot;
 
     // Data of the instant eat check.
     public Material instantEatFood;
     public long     instantEatInteract;
+
+    public InventoryData(final InventoryConfig config) {
+        super(config);
+    }
 
 }

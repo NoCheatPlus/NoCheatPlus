@@ -57,7 +57,7 @@ public class Passable extends Check {
                         toPassable = false;
                         tags = "raytracing_2x_";
                     }
-                    else if (cc.debug) {
+                    else if (data.debug) {
                         NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " passable: allow moving out of a block.");
                     }
                 }
@@ -148,10 +148,10 @@ public class Passable extends Check {
             if (BlockProperties.isPassable(from.getBlockCache(), ref) || loc == null || TrigUtil.distance(from, loc) > 0.13) {
                 //					if (BlockProperties.isPassableExact(from.getBlockCache(), ref)) {
                 loc = ref;
-                if (cc.debug) {
+                if (data.debug) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Using set-back location for passable.");
                 }
-            } else if (cc.debug) {
+            } else if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Ignoring set-back for passable.");
             }
         }
@@ -161,7 +161,7 @@ public class Passable extends Check {
         // Return the reset position.
         data.passableVL += 1d;
         final ViolationData vd = new ViolationData(this, player, data.passableVL, 1, cc.passableActions);
-        if (cc.debug || vd.needsParameters()) {
+        if (data.debug || vd.needsParameters()) {
             vd.setParameter(ParameterName.LOCATION_FROM, String.format(Locale.US, "%.2f, %.2f, %.2f", from.getX(), from.getY(), from.getZ()));
             vd.setParameter(ParameterName.LOCATION_TO, String.format(Locale.US, "%.2f, %.2f, %.2f", to.getX(), to.getY(), to.getZ()));
             vd.setParameter(ParameterName.DISTANCE, String.format(Locale.US, "%.2f", TrigUtil.distance(from, to)));
@@ -179,7 +179,7 @@ public class Passable extends Check {
                 newTo = LocUtil.clone(loc);
             } else {
                 newTo = from.getLocation();
-                if (cc.debug) {
+                if (data.debug) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Using from location for passable.");
                 }
             }

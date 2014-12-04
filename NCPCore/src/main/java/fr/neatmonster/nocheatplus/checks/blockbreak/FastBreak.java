@@ -103,7 +103,7 @@ public class FastBreak extends Check {
     		data.fastBreakVL *= 0.9D;
     	}
     	
-        if ((cc.fastBreakDebug || cc.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
+        if ((data.debug) && player.hasPermission(Permissions.ADMINISTRATION_DEBUG)) {
         	// General stats:
         	if (data.stats != null) {
                 data.stats.addStats(data.stats.getId(blockType+ "/u", true), elapsedTime);

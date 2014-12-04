@@ -11,7 +11,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 public abstract class ACheckConfig implements ICheckConfig {
 
     /** For on the fly debug setting. */
-    public boolean debug = false;
+    public boolean debug = false; // TODO: Might make private.
 
     /** If to adapt to server side lag. */
     public final boolean lag;

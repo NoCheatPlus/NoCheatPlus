@@ -447,7 +447,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         data.noFallAssumeGround = false;
         data.resetTeleported();
         // Debug.
-        if (cc.debug) {
+        if (data.debug) {
             DebugUtil.outputMoveDebug(player, moveInfo.from, moveInfo.to, Math.max(cc.noFallyOnGround, cc.yOnGround), mcAccess);
         }
         // Check for illegal move and bounding box etc.
@@ -694,7 +694,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         event.setTo(newTo);
 
         // Debug.
-        if (cc.debug) {
+        if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " set back to: " + newTo.getWorld() + StringUtil.fdec3.format(newTo.getX()) + ", " + StringUtil.fdec3.format(newTo.getY()) + ", " + StringUtil.fdec3.format(newTo.getZ()));
         }
     }
@@ -747,7 +747,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param cc
      */
     private void onVehicleLeaveMiss(final Player player, final MovingData data, final MovingConfig cc) {
-        if (cc.debug) {
+        if (data.debug) {
             StaticLog.logWarning("[NoCheatPlus] VehicleExitEvent missing for: " + player.getName());
         }
         onPlayerVehicleLeave(player, null);
@@ -981,7 +981,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     data.sfHoverTicks = -1; // Important against concurrent modification exception.
                 }
 
-                if (cc.debug && BuildParameters.debugLevel > 0) {
+                if (data.debug && BuildParameters.debugLevel > 0) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP" + (smallRange ? " (small-range)" : "") + (cancel ? " (cancelled)" : "") +  ": " + to);
                 }
             }
@@ -989,7 +989,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Cancelled, not a set back, ignore it, basically.
                 // Better reset teleported (compatibility). Might have drawbacks.
                 data.resetTeleported();
-                if (cc.debug && BuildParameters.debugLevel > 0) {
+                if (data.debug && BuildParameters.debugLevel > 0) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " TP (cancelled): " + to);
                 }
                 return;
@@ -1028,7 +1028,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
         final Vector velocity = event.getVelocity();
 
-        if (cc.debug) {
+        if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, event.getPlayer().getName() + " new velocity: " + velocity);
         }
 
@@ -1128,7 +1128,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.clearNoFallData();
         }
 
-        if (cc.debug) {
+        if (data.debug) {
             // Log move.
             DebugUtil.outputDebugVehicleMove(player, vehicle, from, to, fake);
         }
@@ -1149,7 +1149,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Might log debug if skipping.
             // TODO: Problem: scheduling allows a lot of things to happen until the task is run. Thus control about some things might be necessary.
             // TODO: Reset on world changes or not?
-            data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, cc.debug));
+            data.morePacketsVehicleTaskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new VehicleSetBack(vehicle, player, newTo, data.debug));
         }
         useLoc.setWorld(null);
     }
@@ -1213,7 +1213,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final float fallDistance = player.getFallDistance();
         final double damage = BridgeHealth.getDamage(event);
         final float yDiff = (float) (data.noFallMaxY - loc.getY());
-        if (cc.debug) {
+        if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " damage(FALL): " + damage + " / dist=" + player.getFallDistance() + " nf=" + data.noFallFallDistance + " yDiff=" + yDiff);
         }
         // Fall-back check.
@@ -1221,7 +1221,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (maxD > damage) {
             // TODO: respect dealDamage ?
             BridgeHealth.setDamage(event, maxD);
-            if (cc.debug) {
+            if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Adjust fall damage to: " + maxD);
             }
         }
@@ -1286,7 +1286,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Check loaded chunks.
         if (cc.loadChunksOnJoin) {
             final int loaded = BlockCache.ensureChunksLoaded(loc.getWorld(), loc.getX(), loc.getZ(), 3.0);
-            if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0) {
+            if (loaded > 0 && data.debug && BuildParameters.debugLevel > 0) {
                 // DEBUG
                 StaticLog.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
             }
@@ -1354,11 +1354,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
 
     @Override
     public void playerLeaves(final Player player) {
-        final MovingConfig cc = MovingConfig.getConfig(player);
         final MovingData data = MovingData.getData(player);
         final Location loc = player.getLocation(useLoc);
         // Debug logout.
-        if (cc.debug) {
+        if (data.debug) {
             StaticLog.logInfo("[NoCheatPlus] Player " + player.getName() + " leaves at location: " + loc.toString());
         }
         if (!player.isSleeping() && !player.isDead()) {
@@ -1487,7 +1486,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 }
 
             }
-            if (cc.debug) {
+            if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " vehicle leave: " + vehicle.getType() + "@" + pLoc.distance(vLoc));
             }
         }
@@ -1497,7 +1496,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             loc.setY(Location.locToBlock(loc.getY()) + 1.25);
         }
 
-        if (cc.debug) {
+        if (data.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " vehicle leave: " + pLoc.toString() + (pLoc.equals(loc) ? "" : " / player at: " + pLoc.toString()));
         }
         data.resetPositions(loc);
@@ -1642,7 +1641,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final boolean res;
         // TODO: Collect flags, more margin ?
         final int loaded = info.from.ensureChunksLoaded();
-        if (loaded > 0 && cc.debug && BuildParameters.debugLevel > 0) {
+        if (loaded > 0 && data.debug && BuildParameters.debugLevel > 0) {
             // DEBUG
             StaticLog.logInfo("[NoCheatPlus] Hover check: Needed to load " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " around " + loc.getBlockX() + "," + loc.getBlockZ() + " in order to check player: " + player.getName());
         }

@@ -7,18 +7,34 @@ package fr.neatmonster.nocheatplus.checks.access;
  */
 public abstract class ACheckData implements ICheckData {
 
-	@Override
-	public boolean hasCachedPermissionEntry(String permission) {
-		return false;
-	}
+    public boolean debug; // TODO: Might make private.
+    
+    public ACheckData(ICheckConfig config) {
+        setDebug(config.getDebug());
+    }
 
-	@Override
-	public boolean hasCachedPermission(String permission) {
-		return false;
-	}
+    @Override
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
 
-	@Override
-	public void setCachedPermission(String permission, boolean value) {
-	}
-	
+    @Override
+    public boolean getDebug() {
+        return debug;
+    }
+
+    @Override
+    public boolean hasCachedPermissionEntry(String permission) {
+        return false;
+    }
+
+    @Override
+    public boolean hasCachedPermission(String permission) {
+        return false;
+    }
+
+    @Override
+    public void setCachedPermission(String permission, boolean value) {
+    }
+
 }

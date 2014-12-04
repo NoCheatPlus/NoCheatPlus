@@ -53,7 +53,7 @@ public class NoFall extends Check {
         if (maxD >= 1.0){
             // Damage to be dealt.
             // TODO: more effects like sounds, maybe use custom event with violation added.
-            if (cc.debug) {
+            if (data.debug) {
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall deal damage" + (reallyOnGround ? "" : "violation") + ": " + maxD);
             }
             // TODO: might not be necessary: if (mcPlayer.invulnerableTicks <= 0)  [no damage event for resetting]
@@ -173,7 +173,7 @@ public class NoFall extends Check {
         else if (cc.noFallAntiCriticals && (toReset || toOnGround || (fromReset || fromOnGround || data.noFallAssumeGround) && yDiff >= 0)){
             final double max = Math.max(data.noFallFallDistance, mcFallDistance);
             if (max > 0.0 && max < 0.75){ // (Ensure this does not conflict with deal-damage set to false.) 
-                if (cc.debug){
+                if (data.debug){
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: Reset fall distance (anticriticals): mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance);
                 }
                 if (data.noFallFallDistance > 0){
@@ -185,7 +185,7 @@ public class NoFall extends Check {
             }
         }
 
-        if (cc.debug){
+        if (data.debug){
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " NoFall: mc=" + mcFallDistance +" / nf=" + data.noFallFallDistance + (oldNFDist < data.noFallFallDistance ? " (+" + (data.noFallFallDistance - oldNFDist) + ")" : "") + " | ymax=" + data.noFallMaxY);
         }
 
