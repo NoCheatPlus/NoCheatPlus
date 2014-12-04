@@ -59,12 +59,17 @@ public class ReloadCommand extends BaseCommand {
         
         // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
+        
         // Remove some checks data.
+        // TODO: Better concept (INotifyReload).
         for (final CheckType checkType : new CheckType[]{
         		CheckType.BLOCKBREAK, CheckType.FIGHT,
         }){
         	DataManager.clearData(checkType);
         }
+        
+        // Reset debug flags to default (temp, heavy).
+        DataManager.restoreDefaultDebugFlags();
         
         // Tell the registered listeners to adapt to new config, first sort them (!).
         Collections.sort(notifyReload, Order.cmpSetupOrder);

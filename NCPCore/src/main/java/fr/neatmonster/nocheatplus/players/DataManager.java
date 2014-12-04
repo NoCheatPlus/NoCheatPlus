@@ -23,7 +23,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationHistory;
+import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
+import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
+import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.checks.blockbreak.BlockBreakConfig;
 import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractConfig;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceConfig;
@@ -33,6 +36,7 @@ import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.checks.fight.FightConfig;
 import fr.neatmonster.nocheatplus.checks.inventory.InventoryConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
@@ -295,6 +299,40 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
         ViolationHistory.clear(checkType);
         if (checkType == CheckType.ALL) {
             instance.playerData.clear(); // TODO
+        }
+    }
+    
+    /**
+     * Restore the default debug flags within player data, as given in
+     * corresponding configurations. This only yields the correct result, if the
+     * the data uses the same configuration for initialization which is
+     * registered under the same check type.
+     */
+    public static void restoreDefaultDebugFlags() {
+        final Player[] players = BridgeMisc.getOnlinePlayers();
+        for (final CheckType checkType : CheckType.values()) {
+            final CheckConfigFactory configFactory = checkType.getConfigFactory();
+            if (configFactory == null) {
+                continue;
+            }
+            final CheckDataFactory dataFactory = checkType.getDataFactory();
+            if (dataFactory == null) {
+                continue;
+            }
+            for (int i = 0; i < players.length; i++) {
+                final Player player = players[i];
+                final ICheckConfig config = configFactory.getConfig(player);
+                if (config == null) {
+                    continue;
+                }
+                final ICheckData data = dataFactory.getData(player);
+                if (data == null) {
+                    continue;
+                }
+                if (config.getDebug() != data.getDebug()) {
+                    data.setDebug(config.getDebug());
+                }
+            }
         }
     }
 

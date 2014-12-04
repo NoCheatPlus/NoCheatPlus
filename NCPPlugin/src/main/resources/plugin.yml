@@ -313,6 +313,8 @@ permissions:
                         description: Show various stats/debugging information. [Incomplete, experimental.]
                     nocheatplus.command.reset:
                         description: Reset statistics or debugging counters.
+                    nocheatplus.command.debug:
+                        description: Start logging debug information for a player (lots of output, log file).
                     # Legacy:
                     nocheatplus.command.tempkick:
                         description: Obsolete, use nocheatplus.command.denylogin instead.

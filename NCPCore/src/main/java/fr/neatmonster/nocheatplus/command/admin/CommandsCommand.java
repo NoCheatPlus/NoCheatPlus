@@ -25,13 +25,14 @@ public class CommandsCommand extends BaseCommand {
 	        "/<command> delay [delay=(ticks)] (command)...: delay a command",
 	        "/<command> denylogin [delay=(ticks)] (player) (minutes) [(reason)...]",
 	        "More administrative commands:",
+	        "/<command> log counters: Show some stats/debug counters summary.",
+            "/<command> reset counters: Reset some stats/debug counters",
+            "/<command> debug player (player): Log debug info for the player.",
 	        "/<command> denylist: Show players, currently denied to log in.",
 	        "/<command> allowlogin (player): Allow a player to login again.",
 	        "/<command> exemptions (player): Show exemptions.",
             "/<command> exempt (player) [(check type)]: Exempt a player.",
             "/<command> unexempt (player) [(check type)]: Unexempt a player.",
-            "/<command> log counters: Show some stats/debug counters summary.",
-            "/<command> reset counters: Reset some stats/debug counters",
 	};
 	
 	final String allCommands;
