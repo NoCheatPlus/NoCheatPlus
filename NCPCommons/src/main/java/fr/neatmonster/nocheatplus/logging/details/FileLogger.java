@@ -70,9 +70,13 @@ public class FileLogger {
         logger = Logger.getAnonymousLogger();
         detachLogger();
         final File container;
+        if (!file.exists() && file.getName().indexOf('.') == -1) {
+            // Make it a directory, if no extension is given.
+            file.mkdirs();
+        }
         if (file.isDirectory()) {
             container  = file;
-            // Find a file name.
+            // File-name by date within the given folder.
             SimpleDateFormat dateFormat = new SimpleDateFormat("yy-MM-dd");
             String prefix = dateFormat.format(System.currentTimeMillis());
             int n = 1;
@@ -84,6 +88,7 @@ public class FileLogger {
                 n ++;
             }
         } else {
+            // Directly use the given file.
             container = file.getParentFile();
         }
         // Ensure the container exists.
