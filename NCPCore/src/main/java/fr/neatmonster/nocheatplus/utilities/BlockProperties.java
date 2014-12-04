@@ -1670,19 +1670,17 @@ public class BlockProperties {
                 return true; // 0.125
             }
         }
-        else if ((flags & F_PASSABLE_X4) != 0) {
-            if ((access.getData(bx, by, bz) & 0x4) != 0) {
+        else if ((flags & F_PASSABLE_X4) != 0 && (access.getData(bx, by, bz) & 0x4) != 0) {
+            // (Allow checking further entries.)
+            return true; 
+        }
+        else if ((flags & F_THICK_FENCE) != 0) {
+            if (!collidesFence(fx, fz, dX, dZ, dT, 0.425)) {
                 return true;
             }
         }
         else if ((flags & F_THIN_FENCE) != 0) {
             if (!collidesFence(fx, fz, dX, dZ, dT, 0.05)) {
-                return true;
-            }
-        }
-        else if ((flags & F_THICK_FENCE) != 0) {
-            // TODO: Re-check if cobble fence is now like this.
-            if (!collidesFence(fx, fz, dX, dZ, dT, 0.425)) {
                 return true;
             }
         }
