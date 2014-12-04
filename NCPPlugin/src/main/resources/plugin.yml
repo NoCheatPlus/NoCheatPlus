@@ -195,6 +195,13 @@ permissions:
                                 description: Allow the player to use CJB's radar.
                             nocheatplus.mods.cjb.xray:
                                 description: Allow the player to use CJB's xray.
+                    nocheatplus.mods.journey:
+                        description: Allow players too use mapping features of the JourneyMap mod (Same codes as VoxelMap).
+                        children:
+                            nocheatplus.mods.journey.radar:
+                                description: Radar features (JourneyMap, VoxelMap).
+                            nocheatplus.mods.journey.cavemap:
+                                description: Cave map features (JourneyMap, VoxelMap).
                     nocheatplus.mods.minecraftautomap:
                         description: Allow the player to use the Minecraft AutoMap mod.
                         children:

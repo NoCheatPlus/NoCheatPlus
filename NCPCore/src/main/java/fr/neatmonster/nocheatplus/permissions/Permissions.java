@@ -25,6 +25,7 @@ public class Permissions {
     // Command permissions.
     public static final String  COMMAND                      = NOCHEATPLUS + ".command";
     public static final String  COMMAND_COMMANDS             = COMMAND + ".commands";
+    public static final String  COMMAND_DEBUG                = COMMAND + ".debug";
     public static final String  COMMAND_EXEMPT               = COMMAND + ".exempt";
     public static final String  COMMAND_EXEMPTIONS           = COMMAND + ".exemptions";
     public static final String  COMMAND_INFO                 = COMMAND + ".info";
@@ -161,8 +162,9 @@ public class Permissions {
     public static final String  ZOMBE_CHEAT                  = ZOMBE + ".cheat";
     public static final String  ZOMBE_FLY                    = ZOMBE + ".fly";
     public static final String  ZOMBE_NOCLIP                 = ZOMBE + ".noclip";
-    
+
     private static final String JOURNEY                      = MODS + ".journey";
     public static final String  JOURNEY_RADAR                = JOURNEY + ".radar";
-    public static final String  JOURNEY_CAVE              = JOURNEY + ".cavemap";
+    public static final String  JOURNEY_CAVE                 = JOURNEY + ".cavemap";
+    
 }
