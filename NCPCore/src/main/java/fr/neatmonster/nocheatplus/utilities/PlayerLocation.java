@@ -487,13 +487,13 @@ public class PlayerLocation {
 						// TODO: BlockHeight is needed for fences, use right away (above)?
 						if (!BlockProperties.isPassableWorkaround(blockCache, blockX, bY, blockZ, minX - blockX, minY - yOnGround - bY, minZ - blockZ, id, maxX - minX, yOnGround, maxZ - minZ,  1.0)
 								|| (flags & BlockProperties.F_GROUND_HEIGHT) != 0 &&  BlockProperties.getGroundMinHeight(blockCache, blockX, bY, blockZ, id, bounds, flags) <= y - bY) {
-//							NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "*** onground SHORTCUT");
+//							NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** onground SHORTCUT");
 							onGround = true;
 						}
 					}
 				}
 				if (onGround == null) {
-//					NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "*** fetch onground std");
+//					NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** fetch onground std");
 					// Full on-ground check (blocks).
 					// Note: Might check for half-block height too (getTypeId), but that is much more seldom.
 					onGround = BlockProperties.isOnGround(blockCache, minX, minY - yOnGround, minZ, maxX, minY, maxZ, 0L);
@@ -503,7 +503,7 @@ public class PlayerLocation {
 		}
 		if (onGround) onGroundMinY = Math.min(onGroundMinY, yOnGround);
 		else {
-//			NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "*** onground check entities");
+//			NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** onground check entities");
 			// TODO: further confine this ?
 			notOnGroundMaxY = Math.max(notOnGroundMaxY, yOnGround);
 			final double d1 = 0.25D;
@@ -568,7 +568,7 @@ public class PlayerLocation {
 				if (notOnGroundMaxY >= yOnGround) return false;
 			}
 		}
-//		NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "*** Fetch on-ground: yOnGround=" + yOnGround + " xzM=" + xzMargin + " yM=" + yMargin + " ign=" + ignoreFlags);
+//		NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** Fetch on-ground: yOnGround=" + yOnGround + " xzM=" + xzMargin + " yM=" + yMargin + " ign=" + ignoreFlags);
 		final boolean onGround = BlockProperties.isOnGround(blockCache, minX - xzMargin, minY - yOnGround - yMargin, minZ - xzMargin, maxX + xzMargin, minY + yMargin, maxZ + xzMargin, ignoreFlags);
 		if (ignoreFlags == 0) {
 			if (onGround) {

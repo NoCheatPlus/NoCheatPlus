@@ -69,6 +69,7 @@ import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.event.IHaveMethodOrder;
 import fr.neatmonster.nocheatplus.event.ListenerManager;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
+import fr.neatmonster.nocheatplus.logging.BukkitLogManager;
 import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -107,7 +108,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     // Not static.
     
     /** Central logging access point. */
-    private LogManager logManager = null; // Not final, but intended to stay, once set [change to init=syso?].
+    private BukkitLogManager logManager = null; // Not final, but intended to stay, once set [change to init=syso?].
 
     /** Names of players with a certain permission. */
     protected final NameSetPermState nameSetPerms = new NameSetPermState(Permissions.NOTIFY);
@@ -716,7 +717,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         NCPAPIProvider.setNoCheatPlusAPI(this);
         // Read the configuration files.
         ConfigManager.init(this); // TODO: Only load the bootstrap config (not all).
-        logManager = new LogManager(this);
+        logManager = new BukkitLogManager(this);
         StaticLog.setStreamID(Streams.INIT);
         StaticLog.setUseLogManager(true);
         logManager.info(Streams.INIT, "[NoCheatPlus] Logging system initialized.");

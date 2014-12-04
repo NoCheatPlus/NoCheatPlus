@@ -475,7 +475,7 @@ public class SurvivalFly extends Check {
         if (hDistance <= (cc.velocityStrictInvalidation ? hAllowedDistance : hAllowedDistance / 2.0)) {
             // TODO: Should there be other side conditions?
             // Invalidate used horizontal velocity.
-            //        	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "*** INVALIDATE ON SPEED");
+            //        	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "*** INVALIDATE ON SPEED");
             data.clearActiveHorVel();
             //          if (data.horizontalVelocityUsed > cc.velocityGraceTicks) {
             //        	data.horizontalFreedom = 0;

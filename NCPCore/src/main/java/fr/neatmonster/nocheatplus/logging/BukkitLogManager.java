@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.components.INotifyReload;
+import fr.neatmonster.nocheatplus.components.order.SetupOrder;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -23,12 +25,14 @@ import fr.neatmonster.nocheatplus.logging.details.LogOptions.CallContext;
  * at least as prefixes).<br>
  * Note that logging to the init/plugin/server with debug/fine or finer, might
  * result in the server loggers suppressing those. As long as default file is
- * activated, logging to init will log all levels to the file.
+ * activated, logging to init will log all levels to the file.<hr>
+ * Not intended to be added as a component (INotifyReload is a band-aid and may be checked "early" by the reloading routine).
  * 
  * @author dev1mc
  *
  */
-public class LogManager extends AbstractLogManager {
+@SetupOrder(priority = Integer.MIN_VALUE) // Just in case.
+public class BukkitLogManager extends AbstractLogManager implements INotifyReload {
     
     // TODO: Make LogManager an interface <- AbstractLogManager <- BukkitLogManager (hide some / instanceof).
     
@@ -41,7 +45,7 @@ public class LogManager extends AbstractLogManager {
      * This will create all default loggers as well.
      * @param plugin
      */
-    public LogManager(Plugin plugin) {
+    public BukkitLogManager(Plugin plugin) {
         super(new BukkitLogNodeDispatcher(plugin), Streams.defaultPrefix, Streams.INIT);
         this.plugin = plugin;
         ConfigFile config = ConfigManager.getConfigFile();
@@ -148,11 +152,10 @@ public class LogManager extends AbstractLogManager {
         //
     }
     
-    /**
-     * Not "official". TODO: Hide.
-     */
+    @Override
     public void onReload() {
         // Hard clear and re-do loggers. Might result in loss of content.
+        // TODO: Register for "early onReload call", needs API addition.
         clear(0L, true); // Can not afford to wait.
         createDefaultLoggers(ConfigManager.getConfigFile());
     }

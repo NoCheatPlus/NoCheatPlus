@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.LoggerID;
 import fr.neatmonster.nocheatplus.logging.StreamID;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
@@ -16,20 +17,17 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author dev1mc
  *
  */
-public abstract class AbstractLogManager {
+public abstract class AbstractLogManager implements LogManager {
     
     // TODO: Visibility of methods.
     // TODO: Add option for per stream prefixes.
     // TODO: Concept for adding in the time at the point of call/scheduling.
     
-    // TODO: Add a void stream (no loggers, allow logging unknown ids to void).
-    // TODO: Allow route log with non existing stream to init or void (flag). 
-    // TODO: Attaching loggers with different options to different streams is necessary (e.g. normal -> async logging, but any thread with init).
     // TODO: Re-register with other options: Add methods for LoggerID + StreamID + options.
     // TODO: Hierarchical LogNode relations, to ensure other log nodes with the same logger are removed too [necessary to allow removing individual loggers].
     
     // TODO: Temporary streams, e.g. for players, unregistering with command and/or logout.
-    // TODO: Mechanics of removing temporary streams: 1. remove 
+    // TODO: Mechanics of removing temporary streams (flush stream, remove entries from queues, wait with removal until tasks have run once more).
     
     // TODO: Consider generalizing the (internal) implementation right away (sub registry by content class).
     // TODO: Consider adding a global cache (good for re-mapping, contra: reload is not intended to happen on a regular basis).
@@ -124,66 +122,52 @@ public abstract class AbstractLogManager {
         return dispatcher;
     }
     
-    /**
-     * Don't use this prefix for custom registrations with StreamID and LoggerID.
-     * @return
-     */
+    @Override
     public String getDefaultPrefix() {
         return defaultPrefix;
     }
     
-    /**
-     * This should be a fail-safe direct String-logger, that has the highest probability of working
-     * within the default context and rather skips messages instead of failing or scheduling tasks,
-     * typically the main application primary thread.
-     * 
-     * @return
-     */
+    @Override
     public StreamID getInitStreamID() {
         return initStreamID;
     }
     
-    /**
-     * A stream that skips all messages. It's not registered officially.
-     * @return
-     */
+    @Override
     public StreamID getVoidStreamID() {
         return voidStreamID;
     }
     
-    /**
-     * Case-insensitive lookup.
-     * @param name
-     * @return Returns the registered StreamID or null, if not present.
-     */
+    @Override
     public StreamID getStreamID(String name) {
         return nameStreamIDMap.get(name.toLowerCase());
     }
     
-    /**
-     * Case-insensitive lookup.
-     * @param name
-     * @return Returns the registered StreamID or null, if not present.
-     */
+    @Override
     public LoggerID getLoggerID(String name) {
         return nameLoggerIDMap.get(name.toLowerCase());
     }
     
+    @Override
     public void debug(final StreamID streamID, final String message) {
         log(streamID, Level.FINE, message); // TODO: Not sure what happens with FINE and provided Logger instances.
     }
     
+    @Override
     public void info(final StreamID streamID, final String message) {
         log(streamID, Level.INFO, message);
     }
     
+    @Override
     public void warning(final StreamID streamID, final String message) {
         log(streamID, Level.WARNING, message);
     }
+    
+    @Override
     public void severe(final StreamID streamID, final String message) {
         log(streamID, Level.SEVERE, message);
     }
     
+    @Override
     public void log(final StreamID streamID, final Level level, final String message) {
         if (streamID != voidStreamID) {
             final ContentStream<String> stream = idStreamMap.get(streamID);
@@ -203,36 +187,38 @@ public abstract class AbstractLogManager {
         }
     }
     
+    @Override
     public void debug(final StreamID streamID, final Throwable t) {
         log(streamID, Level.FINE, t); // TODO: Not sure what happens with FINE and provided Logger instances.
     }
     
+    @Override
     public void info(final StreamID streamID, final Throwable t) {
         log(streamID, Level.INFO, t);
     }
     
+    @Override
     public void warning(final StreamID streamID, final Throwable t) {
         log(streamID, Level.WARNING, t);
     }
     
+    @Override
     public void severe(final StreamID streamID, final Throwable t) {
         log(streamID, Level.SEVERE, t);
     }
 
+    @Override
     public void log(final StreamID streamID, final Level level, final Throwable t) {
         // Not sure adding streams for Throwable would be better.
         log(streamID, level, StringUtil.throwableToString(t));
     }
     
-    /**
-     * A newly created id can be used here. For logging use existing ids always.
-     * @param streamID
-     * @return
-     */
+    @Override
     public boolean hasStream(final StreamID streamID) {
         return this.idStreamMap.containsKey(streamID) || this.nameStreamMap.containsKey(streamID.name.toLowerCase());
     }
     
+    @Override
     public boolean hasStream(String name) {
         return getStreamID(name) != null;
     }
@@ -275,15 +261,12 @@ public abstract class AbstractLogManager {
         return stream;
     }
     
-    /**
-     * A newly created id can be used here. For logging use existing ids always.
-     * @param loggerID
-     * @return
-     */
+    @Override
     public boolean hasLogger(final LoggerID loggerID) {
         return this.idNodeMap.containsKey(loggerID) || this.nameNodeMap.containsKey(loggerID.name.toLowerCase());
     }
     
+    @Override
     public boolean hasLogger(String name) {
         return getLoggerID(name) != null;
     }

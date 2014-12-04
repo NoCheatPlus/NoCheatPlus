@@ -401,7 +401,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             earlyReturn = true;
         } else if (player.isSleeping()) {
             // Ignore sleeping playerrs.
-            // TODO: sleeping: (which cb!) NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "-> " + player.isSleepingIgnored());
+            // TODO: sleeping: (which cb!) NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "-> " + player.isSleepingIgnored());
             data.sfHoverTicks = -1;
             earlyReturn = true;
         } else if (!from.getWorld().equals(to.getWorld())) {

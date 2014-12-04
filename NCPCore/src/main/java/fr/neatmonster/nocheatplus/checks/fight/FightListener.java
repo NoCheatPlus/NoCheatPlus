@@ -445,7 +445,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 damagedData.fastHealRefTime = System.currentTimeMillis();
             }
         }
-        //    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, event.getCause());
+        //    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, event.getCause());
         // Attacking entities.
         if (event instanceof EntityDamageByEntityEvent) {
             final EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;

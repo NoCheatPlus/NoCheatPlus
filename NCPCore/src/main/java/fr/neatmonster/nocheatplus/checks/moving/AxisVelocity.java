@@ -80,7 +80,7 @@ public class AxisVelocity {
             // TODO: Could check for alternating signum (error).
             final Velocity vel = it.next();
             if (vel.actCount <= 0 || vel.tick < tick) {
-//              NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "Invalidate queued: " + vel);
+//              NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Invalidate queued: " + vel);
                 it.remove();
             }
         }

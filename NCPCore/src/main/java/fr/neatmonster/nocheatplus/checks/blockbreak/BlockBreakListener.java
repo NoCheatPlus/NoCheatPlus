@@ -172,7 +172,7 @@ public class BlockBreakListener extends CheckListener {
             priority = EventPriority.MONITOR)
     public void onPlayerAnimation(final PlayerAnimationEvent event) {
         // Just set a flag to true when the arm was swung.
-//    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "Animation");
+//    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Animation");
         BlockBreakData.getData(event.getPlayer()).noSwingArmSwung = true;
     }
 
@@ -186,7 +186,7 @@ public class BlockBreakListener extends CheckListener {
     @EventHandler(
             ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onPlayerInteract(final PlayerInteractEvent event) {
-//    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(LogManager.TRACE_FILE, "Interact("+event.isCancelled()+"): " + event.getClickedBlock());
+//    	NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "Interact("+event.isCancelled()+"): " + event.getClickedBlock());
     	// The following is to set the "first damage time" for a block.
     	
     	// Return if it is not left clicking a block. 

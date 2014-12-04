@@ -55,7 +55,9 @@ public class ReloadCommand extends BaseCommand {
         // Do the actual reload.
         ConfigManager.cleanup();
         ConfigManager.init(access);
-        logManager.onReload(); // Does not get exchanged (!).
+        if (logManager instanceof INotifyReload) { // TODO: This is a band-aid.
+            ((INotifyReload) logManager).onReload();
+        }
         
         // Remove all cached configs.
         DataManager.clearConfigs(); // There you have to add XConfig.clear() form now on.
