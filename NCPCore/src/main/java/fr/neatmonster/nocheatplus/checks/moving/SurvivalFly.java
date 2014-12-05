@@ -34,7 +34,7 @@ public class SurvivalFly extends Check {
     // Tags
     private static final String DOUBLE_BUNNY = "doublebunny";
 
-    // Horizontal speeds/modifiers/factors (modifier: speed = walkspeed * modX, factors: speed *= fY).
+    // Horizontal speeds/modifiers.
     public static final double walkSpeed            = 0.221D;
 
     public static final double modSneak             = 0.13D / walkSpeed;
@@ -42,7 +42,7 @@ public class SurvivalFly extends Check {
 
     public static final double modBlock             = 0.16D / walkSpeed;
     public static final double modSwim              = 0.115D / walkSpeed;
-    public static final double[] fDepthStrider    = new double[] {
+    public static final double[] modDepthStrider    = new double[] {
         1.0,
         0.1645 / modSwim / walkSpeed,
         0.1995 / modSwim / walkSpeed,
@@ -51,7 +51,7 @@ public class SurvivalFly extends Check {
 
     public static final double modWeb               = 0.105D / walkSpeed; // TODO: walkingSpeed * 0.15D; <- does not work
 
-    public static final double fIce                 = 2.5D; // 
+    public static final double modIce                 = 2.5D; // 
 
     /** Faster moving down stream (water mainly). */
     public static final double modDownStream	= 0.19 / (walkSpeed * modSwim);
@@ -532,7 +532,10 @@ public class SurvivalFly extends Check {
             final int level = BridgeEnchant.getDepthStriderLevel(player);
             if (level > 0) {
                 // The hard way.
-                hAllowedDistance *= fDepthStrider[level];
+                hAllowedDistance *= modDepthStrider[level];
+                if (sprinting) {
+                    hAllowedDistance *= modSprint;
+                }
             }
         } else if (!sfDirty && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
@@ -567,7 +570,7 @@ public class SurvivalFly extends Check {
 
         // If the player is on ice, give them a higher maximum speed.
         if (data.sfOnIce > 0) {
-            hAllowedDistance *= fIce;
+            hAllowedDistance *= modIce;
         }
 
         // TODO: Attributes
