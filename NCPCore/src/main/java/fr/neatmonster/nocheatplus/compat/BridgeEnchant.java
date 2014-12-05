@@ -6,15 +6,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public final class BridgeEnchant {
-
-    private static Enchantment DEPTH_STRIDER = null;
-
-    static {
+    
+    private static final Enchantment parseEnchantment(final String name) {
         try {
-            DEPTH_STRIDER = Enchantment.DEPTH_STRIDER;
-        } catch (Throwable t) {}
+            return Enchantment.getByName(name);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
+    private final static Enchantment DEPTH_STRIDER = parseEnchantment("DEPTH_STRIDER");
+
+    /**
+     * 
+     * @param player
+     * @return Level of DEPTH_STRIDER capped at 3. Will return 0 if not available.
+     */
     public static int getDepthStriderLevel(Player player) {
         if (DEPTH_STRIDER != null) {
             final ItemStack boots = player.getInventory().getBoots();
