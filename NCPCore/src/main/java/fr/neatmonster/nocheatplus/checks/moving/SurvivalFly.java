@@ -14,6 +14,7 @@ import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.compat.BridgeEnchant;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
@@ -33,18 +34,24 @@ public class SurvivalFly extends Check {
     // Tags
     private static final String DOUBLE_BUNNY = "doublebunny";
 
-    // Horizontal speeds/modifiers.
-    public static final double walkSpeed 		= 0.221D;
+    // Horizontal speeds/modifiers/factors (modifier: speed = walkspeed * modX, factors: speed *= fY).
+    public static final double walkSpeed            = 0.221D;
 
-    public static final double modSneak	 		= 0.13D / walkSpeed;
-    public static final double modSprint	 	= 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
+    public static final double modSneak             = 0.13D / walkSpeed;
+    public static final double modSprint            = 0.29D / walkSpeed; // TODO: without bunny  0.29 / practical is 0.35
 
-    public static final double modBlock		 	= 0.16D / walkSpeed;
-    public static final double modSwim		    = 0.115D / walkSpeed;
+    public static final double modBlock             = 0.16D / walkSpeed;
+    public static final double modSwim              = 0.115D / walkSpeed;
+    public static final double[] fDepthStrider    = new double[] {
+        1.0,
+        0.1645 / modSwim / walkSpeed,
+        0.1995 / modSwim / walkSpeed,
+        1.0 / modSwim, // Results in walkspeed.
+    };
 
-    public static final double modWeb	        = 0.105D / walkSpeed; // TODO: walkingSpeed * 0.15D; <- does not work
+    public static final double modWeb               = 0.105D / walkSpeed; // TODO: walkingSpeed * 0.15D; <- does not work
 
-    public static final double modIce			= 2.5D;
+    public static final double fIce                 = 2.5D; // 
 
     /** Faster moving down stream (water mainly). */
     public static final double modDownStream	= 0.19 / (walkSpeed * modSwim);
@@ -519,10 +526,14 @@ public class SurvivalFly extends Check {
             hAllowedDistance = modWeb * walkSpeed * cc.survivalFlyWalkingSpeed / 100D;
         } else if (from.isInLiquid() && to.isInLiquid()) {
             // Check all liquids (lava might demand even slower speed though).
-            // TODO: too many false positives with just checking from ?
+            // TODO: Test how to go with only checking from (less dolphins).
             // TODO: Sneaking and blocking applies to when in water !
             hAllowedDistance = modSwim * walkSpeed * cc.survivalFlySwimmingSpeed / 100D;
-            // TODO: Depth strider.
+            final int level = BridgeEnchant.getDepthStriderLevel(player);
+            if (level > 0) {
+                // The hard way.
+                hAllowedDistance *= fDepthStrider[level];
+            }
         } else if (!sfDirty && player.isSneaking() && reallySneaking.contains(player.getName()) && (!checkPermissions || !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SNEAKING))) {
             hAllowedDistance = modSneak * walkSpeed * cc.survivalFlySneakingSpeed / 100D;
         }
@@ -556,9 +567,9 @@ public class SurvivalFly extends Check {
 
         // If the player is on ice, give them a higher maximum speed.
         if (data.sfOnIce > 0) {
-            hAllowedDistance *= modIce;
+            hAllowedDistance *= fIce;
         }
-        
+
         // TODO: Attributes
 
         // Speed amplifier.
