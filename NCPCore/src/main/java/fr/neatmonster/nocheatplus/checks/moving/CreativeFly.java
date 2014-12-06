@@ -5,10 +5,12 @@ import java.util.Locale;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ParameterName;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.ViolationData;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
@@ -23,6 +25,9 @@ public class CreativeFly extends Check {
 
     /** The vertical speed in creative mode. */
     private static final double VERTICAL_SPEED   = 1D;
+    
+    /** Modifier for sprinting (1.8 feature). */
+    public static final double modSprintFly = 1.92;
 
     /**
      * Instantiates a new creative fly check.
@@ -32,15 +37,14 @@ public class CreativeFly extends Check {
     }
 
     /**
-     * Checks a player.
      * 
      * @param player
-     *            the player
      * @param from
-     *            the from
      * @param to
-     *            the to
-     * @return the location
+     * @param data
+     * @param cc
+     * @param time Millis.
+     * @return
      */
     public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long time) {
 
@@ -64,6 +68,9 @@ public class CreativeFly extends Check {
         // How far did the player move horizontally?
         final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
 
+        // Sprinting.
+        final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
+
         // If the player is affected by potion of swiftness.
 
         final double speedModifier = mcAccess.getFasterMovementAmplifier(player);
@@ -77,10 +84,17 @@ public class CreativeFly extends Check {
             fSpeed = 1D + 0.2D * (speedModifier + 1D);
         }
 
-        if (player.isFlying()) {
+        final boolean flying = player.isFlying();
+        if (flying) {
+            // TODO: Consider mechanichs for flying backwards.
             fSpeed *= data.flySpeed / 0.1;
+            if (sprinting) {
+                // TODO: Prevent for pre-1.8?
+                fSpeed *= modSprintFly;
+            }
         }
         else {
+            // (Ignore sprinting here).
             fSpeed *= data.walkSpeed / 0.2;
         }
 
@@ -105,14 +119,13 @@ public class CreativeFly extends Check {
             data.clearActiveHorVel(); // TODO: test/check !
         }
 
-        final boolean sprinting = time <= data.timeSprinting + cc.sprintingGrace;
-
         data.bunnyhopDelay--;
 
-        if (resultH > 0 && sprinting) {
+        if (!flying && resultH > 0 && sprinting) {
             // TODO: Flying and bunnyhop ? <- 8 blocks per second - could be a case.
             // Try to treat it as a the "bunnyhop" problem. The bunnyhop problem is that landing and immediately jumping
             // again leads to a player moving almost twice as far in that step.
+            // TODO: Real modeling for that kind of moving pattern (same with sf?).
             if (data.bunnyhopDelay <= 0 && resultH < 0.4D) {
                 data.bunnyhopDelay = 9;
                 resultH = 0D;
@@ -125,17 +138,21 @@ public class CreativeFly extends Check {
 
         // Super simple, just check distance compared to max distance vertical.
         // TODO: max descending speed ! [max fall speed, use maximum with speed or added ?]
-        
+
         // TODO:_ signum considerations (aligned ...).
-//        double vDistanceAboveLimit = yDistance - data.getVerticalFreedom() - limitV;
-//        if (vDistanceAboveLimit > 0.0) {
-//            // TODO: consume / use vvel
-//        }
-//        final double resultV = (vDistanceAboveLimit - limitV) * 100D;
-//        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
+        //        double vDistanceAboveLimit = yDistance - data.getVerticalFreedom() - limitV;
+        //        if (vDistanceAboveLimit > 0.0) {
+        //            // TODO: consume / use vvel
+        //        }
+        //        final double resultV = (vDistanceAboveLimit - limitV) * 100D;
+        //        final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
         // Old handling.
         final double resultV = (yDistance - data.verticalFreedom - limitV) * 100D;
         final double result = Math.max(0.0, resultH) + Math.max(0D, resultV);
+
+        if (cc.debug) {
+            outpuDebugMove(player, hDistance, limitH, yDistance, data.verticalFreedom, limitV);
+        }
 
         // The player went to far, either horizontal or vertical.
         if (result > 0D) {
@@ -170,5 +187,12 @@ public class CreativeFly extends Check {
         // If the event did not get cancelled, define a new setback point.
         data.setSetBack(to);
         return null;
+    }
+
+    private void outpuDebugMove(final Player player, final double hDistance, final double limitH, final double yDistance, final double verticalFreedom, final double limitV) {
+        StringBuilder builder = new StringBuilder(350);
+        builder.append(player.getName());
+        builder.append(" CreativeFly hdist=" + hDistance + " hlimit=" + limitH + " ydist=" + yDistance + " vfreedom=" + verticalFreedom + " vlimit=" + limitV);
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, builder.toString());
     }
 }
