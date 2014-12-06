@@ -702,7 +702,7 @@ public class BlockProperties {
         blocks[Material.SIGN_POST.getId()] = pumpkinType;
         blocks[Material.PUMPKIN.getId()] = pumpkinType;
         blocks[Material.JACK_O_LANTERN.getId()] = pumpkinType;
-        blocks[Material.MELON_BLOCK.getId()] = new BlockProps(noTool, 1, secToMs(1.45), 3); // 1.5 but maybe event delay one tick.
+        blocks[Material.MELON_BLOCK.getId()] = new BlockProps(woodAxe, 1f, secToMs(1.5, 0.75, 0.375, 0.25, 0.1875, 0.125), 3f);
         blocks[Material.BOOKSHELF.getId()] = new BlockProps(woodAxe, 1.5f, secToMs(2.25, 1.15, 0.6, 0.4, 0.3, 0.2));
         for (Material mat : new Material[]{
                 Material.WOOD_STAIRS, Material.WOOD, Material.WOOD_STEP, Material.LOG,
@@ -1051,9 +1051,11 @@ public class BlockProperties {
         return haste > 0 ? (long) (Math.pow(0.8, haste) * dur): dur;
     }
 
-    public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {	
+    public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {
+        boolean isValidTool = isValidTool(blockId, blockProps, toolProps, efficiency);
         if (efficiency > 0) {
             // Workaround until something better is found..
+            // TODO: Re-evaluate.ww
             if (isLeaves(blockId) || blockProps == glassType) {
                 /*
                  * TODO: Some might be dealt with by insta break, by now, 
@@ -1067,10 +1069,6 @@ public class BlockProperties {
                     return 0; // insta break.
                 }
             }
-            else if (blockId == Material.MELON_BLOCK.getId()) {
-                // 450, 200 , 100 , 50 , 0
-                return 450 / (long) Math.pow(2, efficiency - 1); 
-            }
             else if (blockProps == chestType) {
                 // TODO: The no tool time might be reference anyway for some block types.
                 return (long) ((double )blockProps.breakingTimes[0] / 5f / efficiency);
@@ -1078,8 +1076,6 @@ public class BlockProperties {
         }
 
         long duration;
-
-        boolean isValidTool = isValidTool(blockId, blockProps, toolProps, efficiency);
 
         if (isValidTool) {
             // appropriate tool
