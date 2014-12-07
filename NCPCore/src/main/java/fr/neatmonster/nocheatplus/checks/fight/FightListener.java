@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.fight;
 import java.util.Iterator;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -21,6 +22,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
@@ -39,6 +41,7 @@ import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.stats.Counters;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
@@ -233,7 +236,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             // TODO: Permission ?
             cancelled = true;
         }
-        
+
         if (!cancelled) {
             final boolean reachEnabled = reach.isEnabled(player);
             final boolean directionEnabled = direction.isEnabled(player);
@@ -253,7 +256,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 }
             }
         }
-        
+
         // Check angle with allowed window.
         if (angle.isEnabled(player)) {
             // TODO: Revise, use own trace.
@@ -321,7 +324,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
         return cancelled;
     }
-    
+
     /**
      * Quick split-off: Checks using a location trace.
      * @param player
@@ -338,18 +341,18 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
      * @return If to cancel (true) or not (false).
      */
     private boolean locationTraceChecks(Player player, Location loc, FightData data, FightConfig cc, Entity damaged, Location damagedLoc, LocationTrace damagedTrace, long tick, boolean reachEnabled, boolean directionEnabled) {
-     // TODO: Order / splitting off generic stuff.
+        // TODO: Order / splitting off generic stuff.
         boolean cancelled = false;
-        
+
         // (Might pass generic context to factories, for shared + heavy properties.)
         final SharedContext sharedContext = new SharedContext(damaged, mcAccess);
         final ReachContext reachContext = reachEnabled ? reach.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
         final DirectionContext directionContext = directionEnabled ? direction.getContext(player, loc, damaged, damagedLoc, data, cc, sharedContext) : null;
-        
+
         final long traceOldest = tick; // - damagedTrace.getMaxSize(); // TODO: Set by window.
         // TODO: Iterating direction, which, static/dynamic choice.
         final Iterator<TraceEntry> traceIt = damagedTrace.maxAgeIterator(traceOldest);
-        
+
         boolean violation = true; // No tick with all checks passed.
         boolean reachPassed = !reachEnabled; // Passed individually for some tick.
         boolean directionPassed = !directionEnabled; // Passed individually for some tick.
@@ -399,7 +402,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // TODO: Log exact state, probably record min/max latency (individually).
         return cancelled;
     }
-    
+
     /**
      * Check if a player might return some damage due to the "thorns" enchantment.
      * @param player
@@ -431,10 +434,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         final FightData damagedData = damagedPlayer == null ? null : FightData.getData(damagedPlayer);
         final boolean damagedIsDead = damaged.isDead();
         if (damagedPlayer != null && !damagedIsDead) {
-            if (!damagedPlayer.isDead() && godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, BridgeHealth.getDamage(event), damagedData)){
+            // God mode check.
+            if (godMode.isEnabled(damagedPlayer) && godMode.check(damagedPlayer, BridgeHealth.getDamage(event), damagedData)){
                 // It requested to "cancel" the players invulnerability, so set their noDamageTicks to 0.
                 damagedPlayer.setNoDamageTicks(0);
             }
+            // Adjust buffer for fast heal checks.
             if (BridgeHealth.getHealth(damagedPlayer) >= BridgeHealth.getMaxHealth(damagedPlayer)){
                 // TODO: Might use the same FightData instance for GodMode.
                 if (damagedData.fastHealBuffer < 0){
@@ -500,14 +505,63 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     public void onEntityDamageMonitor(final EntityDamageEvent event) {
         final Entity damaged = event.getEntity();
         if (damaged instanceof Player){
-            final Player player = (Player) damaged;
-            final FightData data = FightData.getData(player);
-            final int ndt = player.getNoDamageTicks();
-            if (data.lastDamageTick == TickTask.getTick() && data.lastNoDamageTicks != ndt){
+            final Player damagedPlayer = (Player) damaged;
+            final FightData damagedData = FightData.getData(damagedPlayer);
+            final int ndt = damagedPlayer.getNoDamageTicks();
+            if (damagedData.lastDamageTick == TickTask.getTick() && damagedData.lastNoDamageTicks != ndt){
                 // Plugin compatibility thing.
-                data.lastNoDamageTicks = ndt;
+                damagedData.lastNoDamageTicks = ndt;
+            }
+            // Knockback calculation.
+            switch (event.getCause()) {
+            case ENTITY_ATTACK:
+                if (event instanceof EntityDamageByEntityEvent) {
+                    final Entity entity = ((EntityDamageByEntityEvent) event).getDamager();
+                    if ((entity instanceof Player) && FightConfig.getConfig(damagedPlayer).knockBackVelocityPvP) {
+                        checkKnockBack((Player) entity, damagedPlayer, damagedData);
+                    }
+                }
+            default:
+                break;
             }
         }
+    }
+
+    /**
+     * Knockback accounting: Add velocity.
+     * @param attacker
+     * @param damagedPlayer
+     * @param damagedData
+     */
+    private void checkKnockBack(final Player attacker, final Player damagedPlayer, final FightData damagedData) {
+        double level = 1.0; // Assume "some knock-back" always.
+        if (attacker.isSprinting()) {
+            level += 1.0;
+        }
+        final ItemStack stack = attacker.getItemInHand();
+        if (stack != null && stack.getType() != Material.AIR) {
+            level += (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK);
+        }
+        if (level > 0.0) {
+            final MovingData mdata = MovingData.getData(damagedPlayer);
+            final MovingConfig mcc = MovingConfig.getConfig(damagedPlayer);
+            // Cap the level to something reasonable. TODO: Config.
+            level = Math.min(20.0, level);
+            // TODO: How is the direction really calculated?
+            final Vector dir = attacker.getLocation(useLoc1).getDirection().multiply(0.5 * level);
+
+            double vy = dir.getY();
+            if (BlockProperties.isOnGround(damagedPlayer, damagedPlayer.getLocation(useLoc1), mcc.yOnGround)) {
+                // (Re-used useLoc1 without need for cleanup.)
+                vy = 0.365;
+            }
+            useLoc1.setWorld(null); // Cleanup.
+            if (damagedData.debug || mdata.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, damagedPlayer.getName() + " received knockback level: " + level);
+            }
+            MovingListener.addVelocity(damagedPlayer, mdata, mcc, dir.getX(), vy, dir.getZ());
+        }
+
     }
 
     /**

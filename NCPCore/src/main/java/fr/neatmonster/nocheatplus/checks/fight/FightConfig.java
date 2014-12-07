@@ -111,6 +111,7 @@ public class FightConfig extends ACheckConfig {
     // Special flags:
     public final boolean    yawRateCheck;
     public final boolean    cancelDead;
+    public final boolean    knockBackVelocityPvP;
 
     /**
      * Instantiates a new fight configuration.
@@ -176,6 +177,7 @@ public class FightConfig extends ACheckConfig {
 
         yawRateCheck = data.getBoolean(ConfPaths.FIGHT_YAWRATE_CHECK, true);
         cancelDead = data.getBoolean(ConfPaths.FIGHT_CANCELDEAD);
+        knockBackVelocityPvP = data.getBoolean(ConfPaths.FIGHT_PVP_KNOCKBACKVELOCITY);
     }
 
     /* (non-Javadoc)

@@ -262,6 +262,7 @@ public class DefaultConfig extends ConfigFile {
         // FIGHT
         set(ConfPaths.FIGHT_CANCELDEAD, true);
         set(ConfPaths.FIGHT_TOOLCHANGEPENALTY, 500L);
+        set(ConfPaths.FIGHT_PVP_KNOCKBACKVELOCITY, true);
         
         set(ConfPaths.FIGHT_YAWRATE_CHECK, true);
         

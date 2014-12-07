@@ -376,7 +376,9 @@ public abstract class ConfPaths {
     public static final String  FIGHT                                    = CHECKS + "fight.";
 
     public static final String  FIGHT_CANCELDEAD                         = FIGHT + "canceldead";
-    public static final  String FIGHT_TOOLCHANGEPENALTY		 			 = FIGHT + "toolchangepenalty";
+    public static final String  FIGHT_TOOLCHANGEPENALTY                  = FIGHT + "toolchangepenalty";
+    private static final String FIGHT_PVP                                = FIGHT + "pvp."; 
+    public static final String  FIGHT_PVP_KNOCKBACKVELOCITY              = FIGHT_PVP + "knockbackvelocity";
 
     private static final String FIGHT_ANGLE                              = FIGHT + "angle.";
     public static final String  FIGHT_ANGLE_CHECK                        = FIGHT_ANGLE + "active";
@@ -644,6 +646,5 @@ public abstract class ConfPaths {
     public static final String  FIGHT_CRITICAL_VELOCITY                  = "checks.fight.critical.velocity";
     @Deprecated
     public static final  String BLOCKBREAK_FASTBREAK_DEBUG               = "checks.blockbreak.fastbreak.debug";
-
 
 }

@@ -1010,57 +1010,64 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onPlayerVelocity(final PlayerVelocityEvent event) {
         final Player player = event.getPlayer();
         final MovingData data = MovingData.getData(player);
-        // Ignore velocity if inside of vehicles.
+        // Ignore players who are in vehicles.
         if (player.isInsideVehicle()) {
             data.removeAllVelocity();
             return;
         }
+        // Process velocity.
+        final Vector velocity = event.getVelocity();
         final MovingConfig cc = MovingConfig.getConfig(player);
+        addVelocity(player, data, cc, velocity.getX(), velocity.getY(), velocity.getZ());
+    }
+
+    /**
+     * Add velocity to internal book-keeping.
+     * @param player
+     * @param data
+     * @param cc
+     * @param vx
+     * @param vy
+     * @param vz
+     */
+    public static void addVelocity(final Player player, final MovingData data, final MovingConfig cc, final double vx, final double vy, final double vz) {
 
         final int tick = TickTask.getTick();
         data.removeInvalidVelocity(tick  - cc.velocityActivationTicks);
 
-
-        final Vector velocity = event.getVelocity();
-
         if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, event.getPlayer().getName() + " new velocity: " + velocity);
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " new velocity: " + vx + ", " + vy + ", " + vz);
         }
 
-        double newVal = velocity.getY();
         boolean used = false;
-        if (newVal >= 0D) { // TODO: Just >, not >=.
+        if (vy > 0D) {
             used = true;
             if (data.verticalFreedom <= 0.001 && data.verticalVelocityCounter >= 0) {
                 data.verticalVelocity = 0;
             }
-            data.verticalVelocity += newVal;
+            data.verticalVelocity += vy;
             data.verticalFreedom += data.verticalVelocity;
-            data.verticalVelocityCounter = Math.min(100, Math.max(data.verticalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 50;
+            data.verticalVelocityCounter = Math.min(100, Math.max(data.verticalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(vy * 10.0)); // 50;
             data.verticalVelocityUsed = 0;
         }
 
-        newVal = Math.sqrt(velocity.getX() * velocity.getX() + velocity.getZ() * velocity.getZ());
-        if (newVal > 0D) {
+
+        if (vx != 0.0 && vz != 0.0) {
+            final double newVal = Math.sqrt(vx * vx + vz * vz);
             used = true;
             final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
             data.addHorizontalVelocity(vel);
-            //            data.horizontalFreedom += newVal;
-            //            data.horizontalVelocityCounter = Math.min(100, Math.max(data.horizontalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(newVal * 10.0)); // 30;
-            //            data.horizontalVelocityUsed = 0;
         }
 
         // Set dirty flag here.
         if (used) {
-            data.sfDirty = true;
+            data.sfDirty = true; // TODO: Only needed for vertical velocity? Get rid anyway :p.
             data.sfNoLowJump = true;
         }
-
         // TODO: clear accounting here ?
     }
 
@@ -1281,7 +1288,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param cc
      */
     private void dataOnJoin(Player player, Location loc, MovingData data, MovingConfig cc) {
-        
+
         final int tick = TickTask.getTick();
         // Check loaded chunks.
         if (cc.loadChunksOnJoin) {
@@ -1291,7 +1298,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 StaticLog.logInfo("[NoCheatPlus] Player join: Loaded " + loaded + " chunk" + (loaded == 1 ? "" : "s") + " for the world " + loc.getWorld().getName() +  " for player: " + player.getName());
             }
         }
-        
+
         // Correct set-back on join.
         if (!data.hasSetBack() || data.hasSetBackWorldChanged(loc)) {
             data.clearFlyData();
@@ -1304,7 +1311,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: If to reset positions: relate to previous ones and set-back.
             data.resetPositions(loc); // TODO: See above.
         }
-        
+
         // Always reset position to this one.
         // TODO: more fine grained reset?
         data.clearMorePacketsData();
