@@ -503,6 +503,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void onEntityDamageMonitor(final EntityDamageEvent event) {
+        // TODO: Do rule out events that don't count (ndt) !
         final Entity damaged = event.getEntity();
         if (damaged instanceof Player){
             final Player damagedPlayer = (Player) damaged;
@@ -517,8 +518,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             case ENTITY_ATTACK:
                 if (event instanceof EntityDamageByEntityEvent) {
                     final Entity entity = ((EntityDamageByEntityEvent) event).getDamager();
-                    if ((entity instanceof Player) && FightConfig.getConfig(damagedPlayer).knockBackVelocityPvP) {
-                        checkKnockBack((Player) entity, damagedPlayer, damagedData);
+                    if ((entity instanceof Player) && !entity.isInsideVehicle() && FightConfig.getConfig(damagedPlayer).knockBackVelocityPvP) {
+                        applyKnockBack((Player) entity, damagedPlayer, damagedData);
                     }
                 }
             default:
@@ -528,12 +529,12 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     }
 
     /**
-     * Knockback accounting: Add velocity.
+     * Knock-back accounting: Add velocity.
      * @param attacker
      * @param damagedPlayer
      * @param damagedData
      */
-    private void checkKnockBack(final Player attacker, final Player damagedPlayer, final FightData damagedData) {
+    private void applyKnockBack(final Player attacker, final Player damagedPlayer, final FightData damagedData) {
         double level = 1.0; // Assume "some knock-back" always.
         if (attacker.isSprinting()) {
             level += 1.0;
@@ -542,26 +543,23 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (stack != null && stack.getType() != Material.AIR) {
             level += (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK);
         }
-        if (level > 0.0) {
-            final MovingData mdata = MovingData.getData(damagedPlayer);
-            final MovingConfig mcc = MovingConfig.getConfig(damagedPlayer);
-            // Cap the level to something reasonable. TODO: Config.
-            level = Math.min(20.0, level);
-            // TODO: How is the direction really calculated?
-            final Vector dir = attacker.getLocation(useLoc1).getDirection().multiply(0.5 * level);
+        final MovingData mdata = MovingData.getData(damagedPlayer);
+        final MovingConfig mcc = MovingConfig.getConfig(damagedPlayer);
+        // Cap the level to something reasonable. TODO: Config.
+        level = Math.min(20.0, level);
+        // TODO: How is the direction really calculated?
+        final Vector dir = attacker.getLocation(useLoc1).getDirection().multiply(0.5 * level);
 
-            double vy = dir.getY();
-            if (BlockProperties.isOnGround(damagedPlayer, damagedPlayer.getLocation(useLoc1), mcc.yOnGround)) {
-                // (Re-used useLoc1 without need for cleanup.)
-                vy = 0.365;
-            }
-            useLoc1.setWorld(null); // Cleanup.
-            if (damagedData.debug || mdata.debug) {
-                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, damagedPlayer.getName() + " received knockback level: " + level);
-            }
-            MovingListener.addVelocity(damagedPlayer, mdata, mcc, dir.getX(), vy, dir.getZ());
+        double vy = dir.getY();
+        if (BlockProperties.isOnGround(damagedPlayer, damagedPlayer.getLocation(useLoc1), mcc.yOnGround)) {
+            // (Re-used useLoc1 without need for cleanup.)
+            vy = 0.365;
         }
-
+        useLoc1.setWorld(null); // Cleanup.
+        if (damagedData.debug || mdata.debug) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, damagedPlayer.getName() + " received knockback level: " + level);
+        }
+        MovingListener.addVelocity(damagedPlayer, mdata, mcc, dir.getX(), vy, dir.getZ());
     }
 
     /**
