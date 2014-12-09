@@ -83,65 +83,6 @@ import fr.neatmonster.nocheatplus.utilities.build.BuildParameters;
  */
 public class MovingListener extends CheckListener implements TickListener, IRemoveData, IHaveCheckType, INotifyReload, INeedConfig, JoinLeaveListener{
 
-    /**
-     * Check if the player is to be checked by the survivalfly check.
-     * @param player
-     * @param data
-     * @param cc
-     * @return
-     */
-    public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc) {
-        return cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY) &&
-                (cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && !player.isFlying() && (cc.ignoreAllowFlight || !player.getAllowFlight());
-    }
-
-    /**
-     * Handle an illegal move by a player, attempt to restore a valid location.
-     * @param event
-     * @param player
-     * @param data
-     */
-    public static void handleIllegalMove(final PlayerMoveEvent event, final Player player, final MovingData data)
-    {
-        // This might get extended to a check-like thing.
-        boolean restored = false;
-        final PlayerLocation pLoc = new PlayerLocation(NCPAPIProvider.getNoCheatPlusAPI().getMCAccess(), null);
-        // (Mind that we don't set the block cache here).
-        final Location loc = player.getLocation();
-        if (!restored && data.hasSetBack()) {
-            final Location setBack = data.getSetBack(loc); 
-            pLoc.set(setBack, player);
-            if (!pLoc.isIllegal()) {
-                event.setFrom(setBack);
-                event.setTo(setBack);
-                restored = true;
-            }
-            else {
-                data.resetSetBack();
-            }
-        } 
-        if (!restored) {
-            pLoc.set(loc, player);
-            if (!pLoc.isIllegal()) {
-                event.setFrom(loc);
-                event.setTo(loc);
-                restored = true;
-            }
-        }
-        pLoc.cleanup();
-        if (!restored) {
-            // TODO: reset the bounding box of the player ?
-            if (MovingConfig.getConfig(player).tempKickIllegal) {
-                NCPAPIProvider.getNoCheatPlusAPI().denyLogin(player.getName(), 24L * 60L * 60L * 1000L);
-                StaticLog.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them and deny login for 24 hours");
-            } else {
-                StaticLog.logSevere("[NCP] could not restore location for " + player.getName() + ", kicking them.");
-            }
-            CheckUtils.kickIllegalMove(player);
-        }
-    }
-
-
     /** The instance of NoCheatPlus. */
     private final Plugin plugin = Bukkit.getPluginManager().getPlugin("NoCheatPlus"); // TODO
 
@@ -238,7 +179,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
                 && Math.abs(loc.getZ() - 0.5 - block.getZ()) <= 1D
                 && loc.getY() - blockY > 0D && loc.getY() - blockY < 2D
-                && (canJumpOffTop(mat) || BlockProperties.isLiquid(mat))) {
+                && (MovingUtil.canJumpOffTop(mat) || BlockProperties.isLiquid(mat))) {
             // The creative fly and/or survival fly check is enabled, the
             // block was placed below the player and is
             // solid, so do what we have to do.
@@ -246,16 +187,6 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             data.sfJumpPhase = 0;
         }
         useLoc.setWorld(null);
-    }
-
-    /**
-     * Used for a workaround that resets the set-back for the case of jumping on just placed blocks.
-     * @param id
-     * @return
-     */
-    private static boolean canJumpOffTop(final Material blockType) {
-        // TODO: Test if this can be removed!
-        return BlockProperties.isGround(blockType) || BlockProperties.isSolid(blockType);
     }
 
     /**
@@ -288,7 +219,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             final MovingData data = MovingData.getData(player);
             final MovingConfig cc = MovingConfig.getConfig(player); 
             Location target = null;
-            final boolean sfCheck = shouldCheckSurvivalFly(player, data, cc);
+            final boolean sfCheck = MovingUtil.shouldCheckSurvivalFly(player, data, cc);
             if (sfCheck) {
                 target = data.getSetBack(loc);
             }
@@ -452,7 +383,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         // Check for illegal move and bounding box etc.
         if (moveInfo.from.isIllegal() || moveInfo.to.isIllegal()) {
-            handleIllegalMove(event, player, data);
+            MovingUtil.handleIllegalMove(event, player, data);
             moveInfo.cleanup();
             parkedInfo.add(moveInfo);
             return;
@@ -548,7 +479,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Check which fly check to use.
         final boolean checkCf;
         final boolean checkSf;
-        if (shouldCheckSurvivalFly(player, data, cc)) {
+        if (MovingUtil.shouldCheckSurvivalFly(player, data, cc)) {
             checkCf = false;
             checkSf = true;
             data.adjustWalkSpeed(player.getWalkSpeed(), tick, cc.speedGrace);
@@ -562,6 +493,17 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         }
         else{
             checkCf = checkSf = false;
+        }
+        
+        boolean checkNf = true;
+        if (checkSf || checkCf) {
+            // Check jumping on things like slime blocks.
+            if (to.getY() < from.getY() && player.getFallDistance() > 1f && (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L) {
+                // Apply changes to NoFall and other.
+                processTrampoline(player, pFrom, pTo, data, cc);
+                // Skip NoFall.
+                checkNf = false;
+            }
         }
 
         // Flying checks.
@@ -587,7 +529,10 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 // Only check if passable has not already set back.
                 newTo = survivalFly.check(player, pFrom, pTo, data, cc, time);
             }
-            final boolean checkNf = cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL);
+            // Only check NoFall, if not already vetoed.
+            if (checkNf) {
+                checkNf = cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL);
+            }
             if (newTo == null) {
                 // Hover.
                 // TODO: Could reset for from-on-ground as well, for not too big moves.
@@ -667,6 +612,32 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Cleanup.
         moveInfo.cleanup();
         parkedInfo.add(moveInfo);
+    }
+
+    private void processTrampoline(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
+        // TODO: Where to put...
+        // TODO: Other side conditions (fluids, web)
+        // TODO: Fake fall distance exploit (to bounce off slime blocks :p).
+        // TODO: Confine further (depends on which checks are enabled, if possible to check, e.g. noFallMaxY).
+        // Check for slime block below explicitly.
+        // The center of the player must be above the block.
+        if (cc.debug) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Trampoline effect..."); 
+        }
+        // TODO: Consider making this just a checking method (use result for applying effects).
+        // CHEATING: Add velocity.
+        // TODO: 1. Confine for direct use (no latency here). 2. Hard set velocity? 3.. Switch to friction based.
+        if (!survivalFly.isReallySneaking(player)) {
+            data.addVelocity(player, cc, 0.0, (double) player.getFallDistance() / 30.0, 0.0);
+        }
+        // CHEATING: Remove fall distance:
+        // TODO: Test under which conditions the player would still take fall damage.
+        // TODO: Depends on NoFall being enabled as well.
+        player.setFallDistance(0f);
+        data.noFallFallDistance = 0f;
+        data.noFallMaxY = 0.0;
+        data.noFallSkipAirCheck = true;
+        // (Skipping the NoFall check is necessary, because THIS move can be big.)
     }
 
     /**
@@ -1022,53 +993,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Process velocity.
         final Vector velocity = event.getVelocity();
         final MovingConfig cc = MovingConfig.getConfig(player);
-        addVelocity(player, data, cc, velocity.getX(), velocity.getY(), velocity.getZ());
-    }
-
-    /**
-     * Add velocity to internal book-keeping.
-     * @param player
-     * @param data
-     * @param cc
-     * @param vx
-     * @param vy
-     * @param vz
-     */
-    public static void addVelocity(final Player player, final MovingData data, final MovingConfig cc, final double vx, final double vy, final double vz) {
-
-        final int tick = TickTask.getTick();
-        data.removeInvalidVelocity(tick  - cc.velocityActivationTicks);
-
-        if (data.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " new velocity: " + vx + ", " + vy + ", " + vz);
-        }
-
-        boolean used = false;
-        if (vy > 0D) {
-            used = true;
-            if (data.verticalFreedom <= 0.001 && data.verticalVelocityCounter >= 0) {
-                data.verticalVelocity = 0;
-            }
-            data.verticalVelocity += vy;
-            data.verticalFreedom += data.verticalVelocity;
-            data.verticalVelocityCounter = Math.min(100, Math.max(data.verticalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(vy * 10.0)); // 50;
-            data.verticalVelocityUsed = 0;
-        }
-
-
-        if (vx != 0.0 && vz != 0.0) {
-            final double newVal = Math.sqrt(vx * vx + vz * vz);
-            used = true;
-            final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
-            data.addHorizontalVelocity(vel);
-        }
-
-        // Set dirty flag here.
-        if (used) {
-            data.sfDirty = true; // TODO: Only needed for vertical velocity? Get rid anyway :p.
-            data.sfNoLowJump = true;
-        }
-        // TODO: clear accounting here ?
+        data.addVelocity(player, cc, velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
     /**
@@ -1178,7 +1103,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
         }
         final MovingConfig cc = MovingConfig.getConfig(player);
-        if (event.isCancelled() || !shouldCheckSurvivalFly(player, data, cc) || !noFall.isEnabled(player)) {
+        if (event.isCancelled() || !MovingUtil.shouldCheckSurvivalFly(player, data, cc) || !noFall.isEnabled(player)) {
             data.clearNoFallData();
             return;
         }
@@ -1659,7 +1584,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else{
             if (data.sfHoverTicks > cc.sfHoverTicks) {
                 // Re-Check if survivalfly can apply at all.
-                if (shouldCheckSurvivalFly(player, data, cc)) {
+                if (MovingUtil.shouldCheckSurvivalFly(player, data, cc)) {
                     handleHoverViolation(player, loc, cc, data);
                     // Assume the player might still be hovering.
                     res = false;

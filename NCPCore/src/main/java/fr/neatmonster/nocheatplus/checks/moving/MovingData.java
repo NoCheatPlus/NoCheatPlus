@@ -7,12 +7,15 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.access.ACheckData;
 import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.ActionAccumulator;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
  * Player specific data for the moving checks.
@@ -119,7 +122,7 @@ public class MovingData extends ACheckData {
     public double         verticalFreedom;
     public double         verticalVelocity;
     public int            verticalVelocityUsed = 0;
-    
+
     /** Horizontal velocity modeled as an axis (always positive) */
     private final AxisVelocity horVel = new AxisVelocity();
 
@@ -522,21 +525,13 @@ public class MovingData extends ACheckData {
     public void addHorizontalVelocity(final Velocity vel) {
         horVel.add(vel);
     }
-    
-    /**
-     * Add vertical velocity (distance). <br>
-     * @param vel
-     */
-    public void addVerticalVelocity(final Velocity vel) {
-        horVel.add(vel);
-    }
 
     /**
      * Remove all vertical and horizontal velocity.
      */
     public void removeAllVelocity() {
         horVel.clear();
-//        verVel.clear();
+        //        verVel.clear();
     }
 
     /**
@@ -546,7 +541,7 @@ public class MovingData extends ACheckData {
      */
     public void removeInvalidVelocity(final int tick) {
         horVel.removeInvalid(tick);
-//        verVel.removeInvalid(tick);
+        //        verVel.removeInvalid(tick);
     }
 
     /**
@@ -555,7 +550,7 @@ public class MovingData extends ACheckData {
     public void clearActiveHorVel() {
         horVel.clearActive();
     }
-    
+
     /**
      * Clear only active horizontal velocity.
      */
@@ -570,14 +565,14 @@ public class MovingData extends ACheckData {
     public boolean hasQueuedHorVel() {
         return horVel.hasQueued();
     }
-    
-//    public boolean hasActiveVerVel() {
-//        return verVel.hasActive();
-//    }
 
-//    public boolean hasQueuedVerVel() {
-//        return verVel.hasQueued();
-//    }
+    //    public boolean hasActiveVerVel() {
+    //        return verVel.hasActive();
+    //    }
+
+    //    public boolean hasQueuedVerVel() {
+    //        return verVel.hasQueued();
+    //    }
 
     /**
      * Called for moving events, increase age of velocity, decrease amounts, check which entries are invalid. Both horizontal and vertical.
@@ -585,9 +580,9 @@ public class MovingData extends ACheckData {
     public void velocityTick() {
         // Horizontal velocity (intermediate concept).
         horVel.tick();
-        
+
         // Vertical velocity (new concept).
-//        verVel.tick();
+        //        verVel.tick();
         if (verticalVelocity <= 0.09D) {
             verticalVelocityUsed ++;
             verticalVelocityCounter--;
@@ -777,6 +772,52 @@ public class MovingData extends ACheckData {
 
     public void deleteTrace() {
         trace = null;
+    }
+
+    /**
+     * Add velocity to internal book-keeping.
+     * @param player
+     * @param data
+     * @param cc
+     * @param vx
+     * @param vy
+     * @param vz
+     */
+    public void addVelocity(final Player player, final MovingConfig cc, final double vx, final double vy, final double vz) {
+
+        final int tick = TickTask.getTick();
+        removeInvalidVelocity(tick  - cc.velocityActivationTicks);
+
+        if (debug) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " new velocity: " + vx + ", " + vy + ", " + vz);
+        }
+
+        boolean used = false;
+        if (vy > 0D) {
+            used = true;
+            if (verticalFreedom <= 0.001 && verticalVelocityCounter >= 0) {
+                verticalVelocity = 0;
+            }
+            verticalVelocity += vy;
+            verticalFreedom += verticalVelocity;
+            verticalVelocityCounter = Math.min(100, Math.max(verticalVelocityCounter, cc.velocityGraceTicks ) + 1 + (int) Math.round(vy * 10.0)); // 50;
+            verticalVelocityUsed = 0;
+        }
+
+
+        if (vx != 0.0 && vz != 0.0) {
+            final double newVal = Math.sqrt(vx * vx + vz * vz);
+            used = true;
+            final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
+            addHorizontalVelocity(vel);
+        }
+
+        // Set dirty flag here.
+        if (used) {
+            sfDirty = true; // TODO: Only needed for vertical velocity? Get rid anyway :p.
+            sfNoLowJump = true;
+        }
+        // TODO: clear accounting here ?
     }
 
 }

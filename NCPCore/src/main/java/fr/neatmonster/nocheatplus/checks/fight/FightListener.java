@@ -35,7 +35,7 @@ import fr.neatmonster.nocheatplus.checks.moving.LocationTrace.TraceEntry;
 import fr.neatmonster.nocheatplus.checks.moving.MediumLiftOff;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
-import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
+import fr.neatmonster.nocheatplus.checks.moving.MovingUtil;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.logging.Streams;
@@ -297,7 +297,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 if (hDist >= 0.23) {
                     // TODO: Might need to check hDist relative to speed / modifiers.
                     final MovingConfig mc = MovingConfig.getConfig(player);
-                    if (now <= mData.timeSprinting + mc.sprintingGrace && MovingListener.shouldCheckSurvivalFly(player, mData, mc)){
+                    if (now <= mData.timeSprinting + mc.sprintingGrace && MovingUtil.shouldCheckSurvivalFly(player, mData, mc)){
                         // Judge as "lost sprint" problem.
                         // TODO: What would mData.lostSprintCount > 0  mean here?
                         mData.lostSprintCount = 7;
@@ -566,7 +566,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         if (damagedData.debug || mdata.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, damagedPlayer.getName() + " received knockback level: " + level);
         }
-        MovingListener.addVelocity(damagedPlayer, mdata, mcc, dir.getX(), vy, dir.getZ());
+        mdata.addVelocity(damagedPlayer, mcc, dir.getX(), vy, dir.getZ());
     }
 
     /**

@@ -20,120 +20,126 @@ import fr.neatmonster.nocheatplus.utilities.BlockCache;
  *
  */
 public interface MCAccess {
-	
-	/**
-	 * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5", to indicate multiple sub-versions supported use "1.5.x", use "?" to indicate general future support.
-	 * @return
-	 */
-	public String getMCVersion();
-	
-	/**
-	 * Server version tag, like CB 2511.
-	 * @return
-	 */
-	public String getServerVersionTag();
-	
-	/**
-	 * Get the servers command map.
-	 * @return May return null if not supported.
-	 */
-	public CommandMap getCommandMap();
-	
-	/**
-	 * Get a BlockCache implementation.
-	 * @param world May be null to store an instance of BlockCache for future use.
-	 * @return
-	 */
-	public BlockCache getBlockCache(World world);
-	
-	/**
-	 * Get height of an entity (attack relevant, the maximal "thing" found).
-	 */
-	public double  getHeight(Entity entity);
-	
-	/**
-	 * Return some width.
-	 * @param entity
-	 * @return
-	 */
-	public double getWidth(Entity entity);
-	
-	/**
-	 * NMS Block static.
-	 * @param id
-	 * @return MAYBE if undecided, YES or NO if decided.
-	 */
-	public AlmostBoolean isBlockSolid(int id);
-	
-	/**
-	 * NMS Block static..
-	 * @param id
-	 * @return MAYBE if undecided, YES or NO if decided.
-	 */
-	public AlmostBoolean isBlockLiquid(int id);
 
-	/**
-	 * Does only check y bounds, returns false if dead. this is half a check as auxiliary means for PlayerLocation.isIllegal.
-	 * @param player
-	 * @return MAYBE if undecided, YES or NO if decided.
-	 */
-	public AlmostBoolean isIllegalBounds(Player player);
-	
-	/**
-	 * 
-	 * @param player
-	 * @return Double.NEGATIVE_INFINITY if not present.
-	 */
-	public double getJumpAmplifier(Player player);
-	
-	/**
-	 * 
-	 * @return Double.NEGATIVE_INFINITY if not present.
-	 */
-	public double getFasterMovementAmplifier(Player player);
+    /**
+     * Simple version identifiers, if several must be separated by '|' like "1.4.2|1.4.4|1.4.5", to indicate multiple sub-versions supported use "1.5.x", use "?" to indicate general future support.
+     * @return
+     */
+    public String getMCVersion();
 
-	public int getInvulnerableTicks(Player player);
+    /**
+     * Server version tag, like CB 2511.
+     * @return
+     */
+    public String getServerVersionTag();
 
-	public void setInvulnerableTicks(Player player, int ticks);
+    /**
+     * Get the servers command map.
+     * @return May return null if not supported.
+     */
+    public CommandMap getCommandMap();
 
-	public void dealFallDamage(Player player, double damage);
+    /**
+     * Get a BlockCache implementation.
+     * @param world May be null to store an instance of BlockCache for future use.
+     * @return
+     */
+    public BlockCache getBlockCache(World world);
 
-	/**
-	 * This may well be removed, if possible to check with Bukkit.
-	 * @param damaged
-	 * @return
-	 */
-	public boolean isComplexPart(Entity damaged);
+    /**
+     * Get height of an entity (attack relevant, the maximal "thing" found).
+     */
+    public double  getHeight(Entity entity);
 
-	/**
-	 * Tests if player is not set to dead but has no health.
-	 * @param player
-	 * @return
-	 */
-	public boolean shouldBeZombie(Player player);
+    /**
+     * Return some width.
+     * @param entity
+     * @return
+     */
+    public double getWidth(Entity entity);
 
-	/**
-	 * Ensure the player is really taken out: Set flag + death ticks.
-	 * 
-	 * TODO: Check if still necessary + make knowledge-base entries for what to check.
-	 * 
-	 * @param player
-	 * @param deathTicks
-	 */
-	public void setDead(Player player, int deathTicks);
-	
-	/**
-	 * Usually sand and gravel. Not for fastest access.
-	 * @param type
-	 * @return
-	 */
-	public boolean hasGravity(Material type);
-	
-//	/**
-//	 * Correct the direction (yaw + pitch). If this can't be done lightly it should just do nothing. Check pitch and yaw before calling, use auxiliary methods from LocUtil.
-//	 * @param player
-//	 */
-//	public void correctDirection(Player player);
-	
-	
+    /**
+     * NMS Block static.
+     * @param id
+     * @return MAYBE if undecided, YES or NO if decided.
+     */
+    public AlmostBoolean isBlockSolid(int id);
+
+    /**
+     * NMS Block static..
+     * @param id
+     * @return MAYBE if undecided, YES or NO if decided.
+     */
+    public AlmostBoolean isBlockLiquid(int id);
+
+    /**
+     * Does only check y bounds, returns false if dead. this is half a check as auxiliary means for PlayerLocation.isIllegal.
+     * @param player
+     * @return MAYBE if undecided, YES or NO if decided.
+     */
+    public AlmostBoolean isIllegalBounds(Player player);
+
+    /**
+     * 
+     * @param player
+     * @return Double.NEGATIVE_INFINITY if not present.
+     */
+    public double getJumpAmplifier(Player player);
+
+    /**
+     * 
+     * @return Double.NEGATIVE_INFINITY if not present.
+     */
+    public double getFasterMovementAmplifier(Player player);
+
+    public int getInvulnerableTicks(Player player);
+
+    public void setInvulnerableTicks(Player player, int ticks);
+
+    public void dealFallDamage(Player player, double damage);
+
+    /**
+     * If dealFallDamage(Player, double) will fire a damage event.
+     * @return
+     */
+    public AlmostBoolean dealFallDamageFiresAnEvent();
+
+    /**
+     * This may well be removed, if possible to check with Bukkit.
+     * @param damaged
+     * @return
+     */
+    public boolean isComplexPart(Entity damaged);
+
+    /**
+     * Tests if player is not set to dead but has no health.
+     * @param player
+     * @return
+     */
+    public boolean shouldBeZombie(Player player);
+
+    /**
+     * Ensure the player is really taken out: Set flag + death ticks.
+     * 
+     * TODO: Check if still necessary + make knowledge-base entries for what to check.
+     * 
+     * @param player
+     * @param deathTicks
+     */
+    public void setDead(Player player, int deathTicks);
+
+    /**
+     * Usually sand and gravel. Not for fastest access.
+     * @param type
+     * @return
+     */
+    public boolean hasGravity(Material type);
+
+    //	/**
+    //	 * Correct the direction (yaw + pitch). If this can't be done lightly it should just do nothing. Check pitch and yaw before calling, use auxiliary methods from LocUtil.
+    //	 * @param player
+    //	 */
+    //	public void correctDirection(Player player);
+
+
 }

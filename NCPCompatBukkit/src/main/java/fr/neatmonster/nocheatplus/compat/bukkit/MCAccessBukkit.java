@@ -324,6 +324,11 @@ public class MCAccessBukkit implements MCAccess, BlockPropertiesSetup{
         }
     }
 
+    @Override
+    public AlmostBoolean dealFallDamageFiresAnEvent() {
+        return AlmostBoolean.NO; // Assumption.
+    }
+
     //	@Override
     //	public void correctDirection(Player player) {
     //		// TODO: Consider using reflection (detect CraftPlayer, access EntityPlayer + check if possible (!), use flags for if valid or invalid.)

@@ -176,6 +176,11 @@ public class MCAccessCBDev implements MCAccess{
         return mat.hasGravity();
     }
 
+    @Override
+    public AlmostBoolean dealFallDamageFiresAnEvent() {
+        return AlmostBoolean.YES;
+    }
+
     //	@Override
     //	public void correctDirection(final Player player) {
     //		final EntityPlayer mcPlayer = ((CraftPlayer) player).getHandle();

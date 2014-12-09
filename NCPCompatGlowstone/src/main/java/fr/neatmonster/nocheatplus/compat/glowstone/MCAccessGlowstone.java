@@ -9,6 +9,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.utilities.BlockCache;
 
@@ -51,6 +52,11 @@ public class MCAccessGlowstone extends MCAccessBukkit{
     public void dealFallDamage(final Player player, final double damage) {
         // NOTE: Fires a damage event.
         ((GlowPlayer) player).damage(damage, DamageCause.FALL);
+    }
+
+    @Override
+    public AlmostBoolean dealFallDamageFiresAnEvent() {
+        return AlmostBoolean.YES; // Assumption (it's native access).
     }
 
 }

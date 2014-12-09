@@ -367,13 +367,19 @@ public class BlockProperties {
 
     /** Meta-flag to indicate that the (max.-) edges should mean a collision, can be passed to collidesBlock. */
     public static final long F_COLLIDE_EDGES        = 0x100000;
-    
+
     /** Thick fence (default wooden fence). */
     public static final long F_THICK_FENCE          = 0x200000;
-    
+
     /** Fence gate style with 0x04 being fully passable. */
     public static final long F_PASSABLE_X4          = 0x200000;
+    
+    // TODO: Separate no fall damage flag ? [-> on ground could return "dominating" flags, or extra flags]
+    /** Like slime block: bounce back 25% of fall height without taking fall damage [TODO: Check/adjust]. */
+    public static final long F_BOUNCE25             = 0x400000;
 
+    // TODO: When flags are out, switch to per-block classes :p.
+    
     /**
      * Map flag to names.
      */
@@ -601,7 +607,7 @@ public class BlockProperties {
         }) {
             blockFlags[mat.getId()] |= F_HEIGHT150 | F_VARIABLE | F_THICK_FENCE;
         }
-        
+
         // Fence gate(s).
         for (final Material mat : new Material[]{
                 Material.FENCE_GATE,
@@ -1334,7 +1340,7 @@ public class BlockProperties {
         pLoc.cleanup();
         return res;
     }
-    
+
     /**
      * Simple checking method, heavy. No isIllegal check.
      * @param player

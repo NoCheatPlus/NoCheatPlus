@@ -590,6 +590,15 @@ public class SurvivalFly extends Check {
     }
 
     /**
+     * Access method from outside.
+     * @param player
+     * @return
+     */
+    public boolean isReallySneaking(final Player player) {
+        return reallySneaking.contains(player.getName());
+    }
+
+    /**
      * Check if touching the ground was lost (client did not send, or server did not put it through).
      * @param player
      * @param from
@@ -1140,6 +1149,7 @@ public class SurvivalFly extends Check {
                     double yMargin = cc.yOnGround;
                     // TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
                     // TODO: check with iY + 0.25 removed.
+                    // TODO: Slime blocks ?
                     if (BlockProperties.isOnGround(from.getBlockCache(), Math.min(data.fromX, from.getX()) - r, iY - yMargin, Math.min(data.fromZ, from.getZ()) - r, Math.max(data.fromX, from.getX()) + r, iY + 0.25, Math.max(data.fromZ, from.getZ()) + r, 0L)) {
                         return applyLostGround(player, from, true, data, "interpolate");
                     }

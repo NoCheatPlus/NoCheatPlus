@@ -76,14 +76,20 @@ public class NoFall extends Check {
 
 
     private void dealFallDamage(final Player player, final double damage) {
-        // TODO: Byte code compatibility ?
-        final EntityDamageEvent event = BridgeHealth.getEntityDamageEvent(player, DamageCause.FALL, damage);
-        Bukkit.getPluginManager().callEvent(event);
-        if (!event.isCancelled()){
-            // TODO: account for no damage ticks etc.
-            player.setLastDamageCause(event);
-            mcAccess.dealFallDamage(player, BridgeHealth.getDamage(event));
+        if (mcAccess.dealFallDamageFiresAnEvent().decide()) {
+            // TODO: Better decideOptimistically?
+            mcAccess.dealFallDamage(player, damage);
         }
+        else {
+            final EntityDamageEvent event = BridgeHealth.getEntityDamageEvent(player, DamageCause.FALL, damage);
+            Bukkit.getPluginManager().callEvent(event);
+            if (!event.isCancelled()){
+                // TODO: account for no damage ticks etc.
+                player.setLastDamageCause(event);
+                mcAccess.dealFallDamage(player, BridgeHealth.getDamage(event));
+            }
+        }
+        
         // TODO: let this be done by the damage event (!).
         //        data.clearNoFallData(); // -> currently done in the damage eventhandling method.
         player.setFallDistance(0);

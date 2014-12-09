@@ -7,6 +7,7 @@ import fr.neatmonster.nocheatplus.compat.blocks.init.BlockInit;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.utilities.BlockFlags;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 public class BlocksMC1_8 implements BlockPropertiesSetup {
     
@@ -22,6 +23,8 @@ public class BlocksMC1_8 implements BlockPropertiesSetup {
     public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
         // 165(SLIME_BLOCK
         BlockInit.setAs(165, Material.TNT); // Full block, instant break.
+        // Add the bouncing flag.
+        BlockProperties.setBlockFlags(165, BlockProperties.getBlockFlags(165) | BlockProperties.F_BOUNCE25);
         
         // 166(BARRIER
         BlockInit.setAs(166, Material.BEDROCK); // Full block, unbreakable.
