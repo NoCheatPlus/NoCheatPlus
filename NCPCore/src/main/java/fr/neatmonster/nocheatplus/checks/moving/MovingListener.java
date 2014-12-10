@@ -498,7 +498,11 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         boolean checkNf = true;
         if (checkSf || checkCf) {
             // Check jumping on things like slime blocks.
-            if (to.getY() < from.getY() && player.getFallDistance() > 1f && (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L) {
+            // The center of the player must be above the block.
+            if (to.getY() < from.getY() && player.getFallDistance() > 1f 
+                    && (BlockProperties.getBlockFlags(pTo.getTypeIdBelow()) & BlockProperties.F_BOUNCE25) != 0L
+                    && to.getY() - to.getBlockY() <= Math.max(cc.yOnGround, cc.noFallyOnGround)) {
+                // TODO: Check other side conditions (fluids, web, max. distance to the block top (!))
                 // Apply changes to NoFall and other.
                 processTrampoline(player, pFrom, pTo, data, cc);
                 // Skip NoFall.
@@ -531,7 +535,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {
-                checkNf = cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL);
+                checkNf = noFall.isEnabled(player, cc);
             }
             if (newTo == null) {
                 // Hover.
@@ -614,30 +618,50 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         parkedInfo.add(moveInfo);
     }
 
+    /**
+     * Adjust data to allow bouncing back and/or removing fall damage.<br>
+     * yDistance is < 0, the middle of the player is above a slime block (to) + on ground.
+     * @param player
+     * @param from
+     * @param to
+     * @param data
+     * @param cc
+     */
     private void processTrampoline(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
-        // TODO: Where to put...
-        // TODO: Other side conditions (fluids, web)
-        // TODO: Fake fall distance exploit (to bounce off slime blocks :p).
-        // TODO: Confine further (depends on which checks are enabled, if possible to check, e.g. noFallMaxY).
-        // Check for slime block below explicitly.
-        // The center of the player must be above the block.
-        if (cc.debug) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Trampoline effect..."); 
-        }
+        
         // TODO: Consider making this just a checking method (use result for applying effects).
         // CHEATING: Add velocity.
         // TODO: 1. Confine for direct use (no latency here). 2. Hard set velocity? 3.. Switch to friction based.
         if (!survivalFly.isReallySneaking(player)) {
-            data.addVelocity(player, cc, 0.0, (double) player.getFallDistance() / 30.0, 0.0);
+            final double fallDistance;
+            if (noFall.isEnabled(player, cc)) {
+                // (NoFall will not be checked, if this method is called.)
+                if (data.noFallMaxY >= from.getY() ) {
+                    fallDistance = data.noFallMaxY - to.getY();
+                } else {
+                    fallDistance = from.getY() - to.getY();
+                }
+            } else {
+                fallDistance = player.getFallDistance() + from.getY() - to.getY();
+            }
+            final double effect = Math.min(3.14, Math.sqrt(fallDistance) / 3.3); // Ancient Greek technology.
+            // (Actually observed max. is near 3.5.)
+            if (cc.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Trampoline effect (dY=" + fallDistance + "): " + effect); 
+            }
+            data.addVelocity(player, cc, 0.0, effect, 0.0);
+        } else {
+            if (cc.debug) {
+                NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Trampoline effect (sneaking)."); 
+            }
         }
         // CHEATING: Remove fall distance:
-        // TODO: Test under which conditions the player would still take fall damage.
-        // TODO: Depends on NoFall being enabled as well.
         player.setFallDistance(0f);
+        // (Ignore if NoFall is enabled or not here.)
         data.noFallFallDistance = 0f;
         data.noFallMaxY = 0.0;
         data.noFallSkipAirCheck = true;
-        // (Skipping the NoFall check is necessary, because THIS move can be big.)
+        // (After this the NoFall check should be skipped.)
     }
 
     /**

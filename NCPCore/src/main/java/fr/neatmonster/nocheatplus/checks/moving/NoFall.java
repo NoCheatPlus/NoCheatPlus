@@ -11,7 +11,9 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.Check;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
+import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
 
 /**
@@ -246,6 +248,16 @@ public class NoFall extends Check {
         final MovingConfig cc = MovingConfig.getConfig(player);
         // Deal damage.
         handleOnGround(player, y, false, data, cc);
+    }
+    
+    /**
+     * Convenience method bypassing the factories.
+     * @param player
+     * @param cc
+     * @return
+     */
+    public boolean isEnabled(final Player player , final MovingConfig cc) {
+        return cc.noFallCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_NOFALL) && !player.hasPermission(Permissions.MOVING_NOFALL);
     }
 
 }
