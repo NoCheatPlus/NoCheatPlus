@@ -84,7 +84,7 @@ public class Passable extends Check {
 
     }
 
-    private Location potentialViolation(final Player player, Location loc, final PlayerLocation from, final PlayerLocation to, final int manhattan, String tags, final MovingData data, final MovingConfig cc) {
+    private Location potentialViolation(final Player player, final Location loc, final PlayerLocation from, final PlayerLocation to, final int manhattan, String tags, final MovingData data, final MovingConfig cc) {
         // Moving into a block, possibly a violation.
 
         // Check the players location if different from others.
@@ -92,6 +92,7 @@ public class Passable extends Check {
         final int lbX = loc.getBlockX();
         final int lbY = loc.getBlockY();
         final int lbZ = loc.getBlockZ();
+        Location setBackLoc = null; // Alternative to from.getLocation().
         // First check if the player is moving from a passable location.
         // If not, the move might still be allowed, if moving inside of the same block, or from and to have head position passable.
         if (from.isPassable()) {
@@ -104,11 +105,11 @@ public class Passable extends Check {
                 }
             }
             // From should be the set-back.
-            loc = null;
             tags += "into";
         } else if (BlockProperties.isPassable(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {
             // Keep loc, because it it is passable.
             tags += "into_shift";
+            setBackLoc = loc;
         }
         //				} else if (BlockProperties.isPassableExact(from.getBlockCache(), loc.getX(), loc.getY(), loc.getZ(), from.getTypeId(lbX, lbY, lbZ))) {
         // (Mind that this can be the case on the same block theoretically.)
@@ -117,7 +118,6 @@ public class Passable extends Check {
         else if (!from.isSameBlock(lbX, lbY, lbZ)) {
             // Both loc and from are not passable. Use from as set.back (earliest).
             tags += "cross_shift";
-            loc = null; 
         }
         else if (manhattan == 1 && to.isBlockAbove(from) && BlockProperties.isPassable(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))) {
             //				else if (to.isBlockAbove(from) && BlockProperties.isPassableExact(from.getBlockCache(), from.getX(), from.getY() + player.getEyeHeight(), from.getZ(), from.getTypeId(from.getBlockX(), Location.locToBlock(from.getY() + player.getEyeHeight()), from.getBlockZ()))) {
@@ -127,7 +127,6 @@ public class Passable extends Check {
         }
         else if (manhattan > 0) {
             // Otherwise keep from as set-back.
-            loc = null;
             tags += "cross";
         }
         else{
@@ -137,17 +136,17 @@ public class Passable extends Check {
 
         // Discard inconsistent locations.
         // TODO: Might get rid of using the in-between loc - needs use-case checking.
-        if (loc != null && (TrigUtil.distance(from,  to) > 0.75 || TrigUtil.distance(from, loc) > 0.125)) {
-            loc = null;
+        if (setBackLoc != null && (TrigUtil.distance(from,  to) > 0.75 || TrigUtil.distance(from, setBackLoc) > 0.125)) {
+            setBackLoc = null;
         }
 
         // Prefer the set-back location from the data.
         if (data.hasSetBack()) {
             // TODO: Review or make configurable.
             final Location ref = data.getSetBack(to);
-            if (BlockProperties.isPassable(from.getBlockCache(), ref) || loc == null || TrigUtil.distance(from, loc) > 0.13) {
+            if (BlockProperties.isPassable(from.getBlockCache(), ref) || setBackLoc == null || TrigUtil.distance(from, setBackLoc) > 0.13) {
                 //					if (BlockProperties.isPassableExact(from.getBlockCache(), ref)) {
-                loc = ref;
+                setBackLoc = ref;
                 if (data.debug) {
                     NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, player.getName() + " Using set-back location for passable.");
                 }
@@ -174,9 +173,9 @@ public class Passable extends Check {
         if (executeActions(vd)) {
             // TODO: Consider another set back position for this, also keeping track of players moving around in blocks.
             final Location newTo;
-            if (loc != null) {
+            if (setBackLoc != null) {
                 // Ensure the given location is cloned.
-                newTo = LocUtil.clone(loc);
+                newTo = LocUtil.clone(setBackLoc);
             } else {
                 newTo = from.getLocation();
                 if (data.debug) {
