@@ -164,7 +164,7 @@ public class StringUtil {
 
         return p[n];
     }
-    
+
     /**
      * Just return the stack trace as new-line-separated string. 
      * @param t
@@ -214,7 +214,7 @@ public class StringUtil {
         }
         return b.toString();
     }
-    
+
     /**
      * Convenience method for stackTraceToString(t).
      * @param t
@@ -223,7 +223,7 @@ public class StringUtil {
     public static final String throwableToString(final Throwable t) {
         return stackTraceToString(t, true, true);
     }
-    
+
     /**
      * Count number of needles left in a dart board.
      * @param dartBoard
@@ -241,6 +241,39 @@ public class StringUtil {
             }
         }
         return n;
+    }
+
+    /**
+     * Get a version of a String with all leading whitespace removed.
+     * 
+     * @param input
+     * @return String with leading whitespace removed. Returns the original
+     *         reference, if there is no leading whitespace.
+     */
+    public static final String leftTrim(final String input) {
+        if (input == null) {
+            return null;
+        }
+        final int len = input.length();
+        int beginIndex = 0;
+        for (int i = 0; i < len; i++) {
+            if (Character.isWhitespace(input.charAt(i))) {
+                ++beginIndex;
+            }
+            else {
+                break;
+            }
+        }
+        if (beginIndex > 0) {
+            if (beginIndex >= len) {
+                return "";
+            } else {
+                return input.substring(beginIndex);
+            }
+        }
+        else {
+            return input;
+        }
     }
 
 }

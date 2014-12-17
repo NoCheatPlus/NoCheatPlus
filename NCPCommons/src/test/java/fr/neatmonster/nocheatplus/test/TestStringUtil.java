@@ -13,14 +13,14 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  *
  */
 public class TestStringUtil {
-    
+
     private void assertCount(String data, char searchFor, int num) {
         int res = StringUtil.count(data, searchFor);
         if (res != num) {
             fail("Expect to find '" + searchFor + "' " + num + " times in '" + data + "', got instead: " + res);
         }
     }
-    
+
     @Test
     public void testCount() {
         assertCount("" , 'x', 0);
@@ -34,7 +34,7 @@ public class TestStringUtil {
         assertCount("oxx" , 'x', 2);
         assertCount("230489tuvn1374z1hxk,34htmc1", '3', 3);
     }
-    
+
     private void recursiveFail(int now, int max) {
         now ++;
         if (now >= max) {
@@ -44,7 +44,7 @@ public class TestStringUtil {
             recursiveFail(now, max);
         }
     }
-    
+
     /**
      * Indirectly by counting line breaks with StringUtil.
      * @param recursionDepth
@@ -62,7 +62,7 @@ public class TestStringUtil {
             }
         }
     }
-    
+
     /**
      * Indirectly by counting line breaks with StringUtil.
      * @param recursionDepth
@@ -80,15 +80,37 @@ public class TestStringUtil {
             }
         }
     }
-    
+
     @Test
     public void testStackTraceLinear() {
         assertMinimumStackTraceLength(1000, 1000, false);
     }
-    
+
     @Test
     public void testStackTraceTrimmed() {
         assertMaximumStackTraceLength(1000, 50, true);
     }
-    
+
+    private void testLeftTrim(String input, String expectedResult) {
+        String result = StringUtil.leftTrim(input);
+        if (!expectedResult.equals(result)) {
+            fail("Expect leftTrim for '" + input + "' to return '" + expectedResult + "', got instead: '" + result + "'.");
+        }
+    }
+
+    @Test
+    public void testLeftTrim() {
+        if (StringUtil.leftTrim(null) != null) {
+            fail("Expect leftTrim to return null for null input, got instead: '" + StringUtil.leftTrim(null) + "'.");
+        }
+        for (String[] spec : new String[][]{
+                {"", ""},
+                {" \t", ""},
+                {"  TEST", "TEST"},
+                {"\t\n TEST", "TEST"},
+                {"   TEST ", "TEST "}
+        }) {
+            testLeftTrim(spec[0], spec[1]);
+        }
+    }
 }

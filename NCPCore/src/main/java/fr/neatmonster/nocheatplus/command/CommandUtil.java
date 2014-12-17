@@ -17,7 +17,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
 public class CommandUtil {
 
@@ -152,6 +155,57 @@ public class CommandUtil {
             }
         }
         return res;
+    }
+
+    /**
+     * Clear tree and feed lower case. Adds versions with "/" if missing, also adds input without the first "/". No trimming is used, except left-trim.
+     * @param tree
+     * @param inputs
+     */
+    public static void feedCommands(SimpleCharPrefixTree tree, Collection<String> inputs, boolean clear) {
+        if (clear) {
+            tree.clear();
+        }
+        for (String input : inputs) {
+            if (input == null) {
+                continue;
+            }
+            if (!input.isEmpty()) {
+                // Do feed the original input.
+                tree.feed(input);
+            }
+            input = StringUtil.leftTrim(input).toLowerCase();
+            if (input.isEmpty()) {
+                continue;
+            }
+            tree.feed(input);
+            if (!input.startsWith("/")) {
+                // Add version with '/'.
+                tree.feed("/" + input);
+            } else {
+                // Add version without the first '/'.
+                // TODO: Consider removing all leading '/' here.
+                input = input.substring(1);
+                if (!input.isEmpty()) {
+                    tree.feed(input);
+                }
+            }
+        }
+    }
+
+    /**
+     * Read string list from config and call feedCommands(tree, list).
+     * 
+     * @param tree
+     * @param config
+     * @param configPath
+     * @param clear If to clear the map before inserting anything.
+     */
+    public static void feedCommands(SimpleCharPrefixTree tree, ConfigFile config, String configPath, boolean clear) {
+        final List<String> prefixes = config.getStringList(configPath);
+        if (prefixes != null) {
+            feedCommands(tree, prefixes, clear);
+        }
     }
 
 }
