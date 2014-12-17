@@ -3,6 +3,7 @@ package fr.neatmonster.nocheatplus.checks.chat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,15 +13,20 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
+import fr.neatmonster.nocheatplus.checks.moving.MovingUtil;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
@@ -62,6 +68,9 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
 
     /** Commands not to be executed in-game.  */
     private final SimpleCharPrefixTree consoleOnlyCommands = new SimpleCharPrefixTree(); 
+
+    /** Set world to null after use, primary thread only. */
+    private final Location useLoc = new Location(null, 0, 0, 0);
 
     public ChatListener() {
         super(CheckType.CHAT);
@@ -176,9 +185,38 @@ public class ChatListener extends CheckListener implements INotifyReload, JoinLe
             // Treat as command.
             if (commands.isEnabled(player) && commands.check(player, checkMessage, captcha)) {
                 event.setCancelled(true);
+            } else {
+                // TODO: Consider always checking these?
+                // Note that this checks for prefixes, not prefix words.
+                final MovingConfig mcc = MovingConfig.getConfig(player);
+                if (mcc.passableUntrackedCommandCheck && mcc.passableUntrackedCommandPrefixes.hasAnyPrefix(messageVars)) {
+                    if (checkUntrackedLocation(player, message, mcc)) {
+                        event.setCancelled(true);
+                    }
+                }
             }
         }
 
+    }
+    
+    private boolean checkUntrackedLocation(final Player player, final String message, final MovingConfig mcc) {
+        final Location loc = player.getLocation(useLoc);
+        boolean cancel = false;
+        if (MovingUtil.shouldCheckUntrackedLocation(player, loc)) {
+            final Location newTo = MovingUtil.checkUntrackedLocation(loc);
+            if (newTo != null) {
+                if (mcc.passableUntrackedCommandTryTeleport && player.teleport(newTo, TeleportCause.PLUGIN)) {
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.TRACE_FILE, player.getName() + " runs the command '" + message + "' at an untracked location: " + loc + " , teleport to: " + newTo);
+                } else {
+                    // TODO: Allow disabling cancel?
+                    // TODO: Should message the player?
+                    NCPAPIProvider.getNoCheatPlusAPI().getLogManager().info(Streams.TRACE_FILE, player.getName() + " runs the command '" + message + "' at an untracked location: " + loc + " , cancel the command.");
+                    cancel = true;
+                }
+            }
+        }
+        useLoc.setWorld(null); // Cleanup.
+        return cancel;
     }
 
     private boolean textChecks(final Player player, final String message, final boolean isMainThread, final boolean alreadyCancelled) {

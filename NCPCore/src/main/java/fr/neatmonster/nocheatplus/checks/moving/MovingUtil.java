@@ -1,8 +1,11 @@
 package fr.neatmonster.nocheatplus.checks.moving;
 
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -14,6 +17,7 @@ import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.CheckUtils;
 import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Static utility methods.
@@ -21,6 +25,11 @@ import fr.neatmonster.nocheatplus.utilities.PlayerLocation;
  *
  */
 public class MovingUtil {
+
+    /**
+     * Always set world to null after use, careful with nested methods. Main thread only.
+     */
+    private static final Location useLoc = new Location(null, 0, 0, 0);
 
     /**
      * Check if the player is to be checked by the survivalfly check.
@@ -87,6 +96,81 @@ public class MovingUtil {
      */
     public static boolean canJumpOffTop(final Material blockType) {
         return BlockProperties.isGround(blockType) || BlockProperties.isSolid(blockType);
+    }
+
+    /**
+     * Check the context-independent pre-conditions for checking for untracked
+     * locations (not the world spawn, location is not passable, passable is
+     * enabled for the player).
+     * 
+     * @param player
+     * @param loc
+     * @return
+     */
+    public static boolean shouldCheckUntrackedLocation(final Player player, final Location loc) {
+        return !TrigUtil.isSamePos(loc, loc.getWorld().getSpawnLocation()) 
+                && !BlockProperties.isPassable(loc)
+                && CheckType.MOVING_PASSABLE.isEnabled(player);
+    }
+
+    /**
+     * Detect if the given location is an untracked spot. This is spots for
+     * which a player is at the location, but the moving data has another
+     * "last to" position set for that player. Note that one matching player
+     * with "last to" being consistent is enough to let this return null, world spawn is exempted.
+     * <hr>
+     * Pre-conditions:<br>
+     * <li>Context-specific (e.g. activation flags for command, teleport).</li>
+     * <li>See MovingUtils.shouldCheckUntrackedLocation.</li>
+     * 
+     * @param loc
+     * @return Corrected location, if loc is an "untracked location".
+     */
+    public static Location checkUntrackedLocation(final Location loc) {
+        // TODO: More efficient method to get entities at the same position (might use MCAccess).
+        final Chunk toChunk = loc.getChunk();
+        final Entity[] entities = toChunk.getEntities();
+        MovingData untrackedData = null;
+        for (int i = 0; i < entities.length; i++) {
+            final Entity entity = entities[i];
+            if (entity.getType() != EntityType.PLAYER) {
+                continue;
+            }
+            final Location refLoc = entity.getLocation(useLoc);
+            // Exempt world spawn.
+            // TODO: Exempt other warps -> HASH based exemption (expire by time, keep high count)?
+            if (TrigUtil.isSamePos(loc, refLoc) && (entity instanceof Player)) {
+                final Player other = (Player) entity;
+                final MovingData otherData = MovingData.getData(other);
+                if (otherData.toX == Double.MAX_VALUE) {
+                    // Data might have been removed.
+                    // TODO: Consider counting as tracked?
+                    continue;
+                }
+                else if (TrigUtil.isSamePos(refLoc, otherData.toX, otherData.toY, otherData.toZ)) {
+                    // Tracked.
+                    return null;
+                }
+                else {
+                    // Untracked location.
+                    // TODO: Discard locations in the same block, if passable.
+                    // TODO: Sanity check distance?
+                    // More leniency: allow moving inside of the same block.
+                    if (TrigUtil.isSameBlock(loc, otherData.toX, otherData.toY, otherData.toZ) && !BlockProperties.isPassable(refLoc.getWorld(), otherData.toX, otherData.toY, otherData.toZ)) {
+                        continue;
+                    }
+                    untrackedData = otherData;
+                }
+            }
+        }
+        useLoc.setWorld(null); // Cleanup.
+        if (untrackedData == null) {
+            return null;
+        }
+        else {
+            // TODO: Count and log to TRACE_FILE, if multiple locations would match (!).
+            return new Location(loc.getWorld(), untrackedData.toX, untrackedData.toY, untrackedData.toZ, loc.getYaw(), loc.getPitch());
+        }
     }
 
 }

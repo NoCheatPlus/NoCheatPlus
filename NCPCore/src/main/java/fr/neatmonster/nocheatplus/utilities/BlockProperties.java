@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -373,13 +374,13 @@ public class BlockProperties {
 
     /** Fence gate style with 0x04 being fully passable. */
     public static final long F_PASSABLE_X4          = 0x200000;
-    
+
     // TODO: Separate no fall damage flag ? [-> on ground could return "dominating" flags, or extra flags]
     /** Like slime block: bounce back 25% of fall height without taking fall damage [TODO: Check/adjust]. */
     public static final long F_BOUNCE25             = 0x400000;
 
     // TODO: When flags are out, switch to per-block classes :p.
-    
+
     /**
      * Map flag to names.
      */
@@ -1886,13 +1887,25 @@ public class BlockProperties {
     }
 
     /**
-     * Convenience method for debugging purposes. 
+     * Convenience method.
      * @param loc
      * @return
      */
     public static final boolean isPassable(final Location loc) {
-        blockCache.setAccess(loc.getWorld());
-        boolean res = isPassable(blockCache, loc.getX(), loc.getY(), loc.getZ(), blockCache.getTypeId(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        return isPassable(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    /**
+     * Convenience method.
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static final boolean isPassable(final World world, final double x, final double y, final double z) {
+        blockCache.setAccess(world);
+        boolean res = isPassable(blockCache, x, y, z, blockCache.getTypeId(x, y, z));
         blockCache.cleanup();
         return res;
     }

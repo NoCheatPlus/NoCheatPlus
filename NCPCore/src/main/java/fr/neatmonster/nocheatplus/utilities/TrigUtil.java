@@ -391,7 +391,7 @@ public class TrigUtil {
         else if (yawDiff > 180f) yawDiff -= 360f;
         return yawDiff;
     }
-    
+
     /**
      * Manhattan distance.
      * @param loc1
@@ -476,6 +476,41 @@ public class TrigUtil {
                 || xDistance < 0D && zDistance < 0D && yaw > 270F && yaw < 360F 
                 || xDistance > 0D && zDistance < 0D && yaw > 0F && yaw < 90F 
                 || xDistance > 0D && zDistance > 0D && yaw > 90F && yaw < 180F;
+    }
+
+    /**
+     * Test if both locations have the exact same coordinates. Does not check yaw/pitch.
+     * @param loc1
+     * @param loc2
+     * @return Returns false if either is null.
+     */
+    public static boolean isSamePos(final Location loc1, final Location loc2) {
+        if (loc1 == null || loc2 == null) {
+            return false;
+        }
+        return loc1.getX() == loc2.getX() && loc1.getZ() == loc2.getZ() && loc1.getY() == loc2.getY();
+    }
+
+    /**
+     * Test if the location has the given coordinates.
+     * @param loc
+     * @param x
+     * @param y
+     * @param z
+     * @return Returns false if loc is null;
+     */
+    public static boolean isSamePos(final Location loc, final double x, final double y, final double z) {
+        if (loc == null) {
+            return false;
+        }
+        return loc.getX() == x && loc.getZ() == z && loc.getY() == y;
+    }
+
+    public static boolean isSameBlock(final Location loc, final double x, final double y, final double z) {
+        if (loc == null) {
+            return false;
+        }
+        return loc.getBlockX() == Location.locToBlock(x) && loc.getBlockZ() == Location.locToBlock(z) && loc.getBlockY() == Location.locToBlock(y);
     }
 
 }

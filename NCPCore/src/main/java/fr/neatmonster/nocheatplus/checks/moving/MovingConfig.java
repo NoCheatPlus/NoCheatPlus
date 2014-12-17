@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
@@ -13,7 +14,9 @@ import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
+import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
 /**
  * Configurations specific for the moving checks. Every world gets one of these assigned to it.
@@ -107,6 +110,10 @@ public class MovingConfig extends ACheckConfig {
     public final boolean	passableRayTracingBlockChangeOnly;
     // TODO: passableAccuracy: also use if not using ray-tracing
     public final ActionList passableActions;
+    public final boolean    passableUntrackedTeleportCheck;
+    public final boolean    passableUntrackedCommandCheck;
+    public final boolean    passableUntrackedCommandTryTeleport;
+    public final SimpleCharPrefixTree passableUntrackedCommandPrefixes = new SimpleCharPrefixTree();
 
     public final boolean    survivalFlyCheck;
     public final int        survivalFlyBlockingSpeed;
@@ -198,6 +205,18 @@ public class MovingConfig extends ACheckConfig {
         passableRayTracingCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK);
         passableRayTracingBlockChangeOnly = config.getBoolean(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY);
         passableActions = config.getOptimizedActionList(ConfPaths.MOVING_PASSABLE_ACTIONS, Permissions.MOVING_PASSABLE);
+        passableUntrackedTeleportCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_TELEPORT_ACTIVE);
+        passableUntrackedCommandCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_ACTIVE);
+        passableUntrackedCommandTryTeleport = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_TRYTELEPORT);
+        try {
+            for (String prefix : config.getStringList(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES)) {
+                if (prefix != null && !prefix.isEmpty()) {
+                    passableUntrackedCommandPrefixes.feed(prefix.toLowerCase());
+                }
+            }
+        } catch (Exception e) {
+            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "[NoCheatPlus] Bad prefixes definition (String list) for " + ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES); 
+        }
 
         survivalFlyCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
         // Default values are specified here because this settings aren't showed by default into the configuration file.

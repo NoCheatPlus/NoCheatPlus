@@ -381,6 +381,10 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_PASSABLE_RAYTRACING_CHECK, true);
         set(ConfPaths.MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY, false);
         set(ConfPaths.MOVING_PASSABLE_ACTIONS, "cancel vl>10 log:passable:0:5:if cancel vl>50 log:passable:0:5:icf cancel");
+        set(ConfPaths.MOVING_PASSABLE_UNTRACKED_TELEPORT_ACTIVE, true);
+        set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_ACTIVE, true);
+        set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_TRYTELEPORT, true);
+        set(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES, Arrays.asList("sethome", "home set", "setwarp", "warp set", "setback", "set back", "back set"));
 
         set(ConfPaths.MOVING_SURVIVALFLY_CHECK, true);
         //        set(ConfPaths.MOVING_SURVIVALFLY_EXTENDED_HACC, false);

@@ -129,7 +129,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
     private final Set<EntityType> normalVehicles = new HashSet<EntityType>();
 
     /** Location for temporary use with getLocation(useLoc). Always call setWorld(null) after use. Use LocUtil.clone before passing to other API. */
-    private final Location useLoc = new Location(null, 0, 0, 0); // TODO: Put to use...
+    final Location useLoc = new Location(null, 0, 0, 0); // TODO: Put to use...
 
     /** Statistics / debugging counters. */
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
@@ -494,7 +494,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         else{
             checkCf = checkSf = false;
         }
-        
+
         boolean checkNf = true;
         if (checkSf || checkCf) {
             // Check jumping on things like slime blocks.
@@ -628,7 +628,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param cc
      */
     private void processTrampoline(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc) {
-        
+
         // TODO: Consider making this just a checking method (use result for applying effects).
         // CHEATING: Add velocity.
         // TODO: 1. Confine for direct use (no latency here). 2. Hard set velocity? 3.. Switch to friction based.
@@ -858,7 +858,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final Location teleported = data.getTeleported();
 
         // If it was a teleport initialized by NoCheatPlus, do it anyway even if another plugin said "no".
-        final Location to = event.getTo();
+        Location to = event.getTo();
         final Location ref;
         if (teleported != null && teleported.equals(to)) {
             // Teleport by NCP.
@@ -913,6 +913,22 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                     }
                     else{
                         //						pass = true;
+                    }
+                }
+                else if (cause == TeleportCause.COMMAND) {
+                    // Attempt to prevent teleporting to players inside of blocks at untracked coordinates.
+                    // TODO: Consider checking this on low or lowest (!).
+                    // TODO: Other like TeleportCause.PLUGIN?
+                    if (cc.passableUntrackedTeleportCheck && MovingUtil.shouldCheckUntrackedLocation(player, to)) {
+                        final Location newTo = MovingUtil.checkUntrackedLocation(to);
+                        if (newTo != null) {
+                            // Adjust the teleport to go to the last tracked to-location of the other player.
+                            to = newTo;
+                            event.setTo(newTo);
+                            cancel = smallRange = false;
+                            // TODO: Consider console, consider data.debug.
+                            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.TRACE_FILE, player.getName() + " correct untracked teleport destination (" + to + " corrected to " + newTo + ").");
+                        }
                     }
                 }
 

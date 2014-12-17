@@ -527,12 +527,19 @@ public abstract class ConfPaths {
     public static final String  MOVING_NOFALL_ANTICRITICALS				 = MOVING_NOFALL + "anticriticals";
     public static final String  MOVING_NOFALL_ACTIONS                    = MOVING_NOFALL + "actions";
 
-    public static final String MOVING_PASSABLE                           = MOVING + "passable.";
-    public static final String MOVING_PASSABLE_CHECK                     = MOVING_PASSABLE + "active";
-    private static final String MOVING_PASSABLE_RAYTRACING				 = MOVING_PASSABLE + "raytracing.";
-    public static final String MOVING_PASSABLE_RAYTRACING_CHECK 		 = MOVING_PASSABLE_RAYTRACING + "active";
-    public static final String MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY= MOVING_PASSABLE_RAYTRACING + "blockchangeonly";
-    public static final String MOVING_PASSABLE_ACTIONS                   = MOVING_PASSABLE + "actions";
+    public static final String  MOVING_PASSABLE                             = MOVING + "passable.";
+    public static final String  MOVING_PASSABLE_CHECK                       = MOVING_PASSABLE + "active";
+    private static final String MOVING_PASSABLE_RAYTRACING                  = MOVING_PASSABLE + "raytracing.";
+    public static final String  MOVING_PASSABLE_RAYTRACING_CHECK            = MOVING_PASSABLE_RAYTRACING + "active";
+    public static final String  MOVING_PASSABLE_RAYTRACING_BLOCKCHANGEONLY  = MOVING_PASSABLE_RAYTRACING + "blockchangeonly";
+    public static final String  MOVING_PASSABLE_ACTIONS                     = MOVING_PASSABLE + "actions";
+    private static final String MOVING_PASSABLE_UNTRACKED                   = MOVING_PASSABLE + "untracked.";
+    private static final String MOVING_PASSABLE_UNTRACKED_TELEPORT          = MOVING_PASSABLE_UNTRACKED + "teleport.";
+    public static final String  MOVING_PASSABLE_UNTRACKED_TELEPORT_ACTIVE   = MOVING_PASSABLE_UNTRACKED_TELEPORT + "active";
+    private static final String MOVING_PASSABLE_UNTRACKED_CMD               = MOVING_PASSABLE_UNTRACKED + "command.";
+    public static final String  MOVING_PASSABLE_UNTRACKED_CMD_ACTIVE        = MOVING_PASSABLE_UNTRACKED_CMD + "active";
+    public static final String  MOVING_PASSABLE_UNTRACKED_CMD_TRYTELEPORT   = MOVING_PASSABLE_UNTRACKED_CMD + "tryteleport";
+    public static final String  MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES      = MOVING_PASSABLE_UNTRACKED_CMD + "prefixes";
 
     private static final String MOVING_SURVIVALFLY						= MOVING + "survivalfly.";
     public static final String MOVING_SURVIVALFLY_CHECK 				= MOVING_SURVIVALFLY + "active";

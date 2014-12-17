@@ -127,11 +127,11 @@ public class MovingData extends ACheckData {
     private final AxisVelocity horVel = new AxisVelocity();
 
     // Coordinates.
-    /** Last from coordinates. */
+    /** Last from coordinates. X is at Double.MAX_VALUE, if not set. */
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
-    /** Last to coordinates. */
+    /** Last to coordinates. X is at Double.MAX_VALUE, if not set. */
     public double 		  toX = Double.MAX_VALUE, toY, toZ;
-    /** Moving trace (to-positions, use tick as time). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves."*/
+    /** Moving trace (to-positions, use tick as time). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves." */
     private LocationTrace trace = null; 
 
     // sf rather
