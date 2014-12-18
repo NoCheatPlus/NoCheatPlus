@@ -5,16 +5,15 @@ import java.util.Map;
 
 import org.bukkit.entity.Player;
 
-import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.actions.ActionList;
 import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
+import fr.neatmonster.nocheatplus.command.CommandUtil;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
-import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.utilities.ds.prefixtree.SimpleCharPrefixTree;
 
@@ -208,15 +207,7 @@ public class MovingConfig extends ACheckConfig {
         passableUntrackedTeleportCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_TELEPORT_ACTIVE);
         passableUntrackedCommandCheck = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_ACTIVE);
         passableUntrackedCommandTryTeleport = config.getBoolean(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_TRYTELEPORT);
-        try {
-            for (String prefix : config.getStringList(ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES)) {
-                if (prefix != null && !prefix.isEmpty()) {
-                    passableUntrackedCommandPrefixes.feed(prefix.toLowerCase());
-                }
-            }
-        } catch (Exception e) {
-            NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "[NoCheatPlus] Bad prefixes definition (String list) for " + ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES); 
-        }
+        CommandUtil.feedCommands(passableUntrackedCommandPrefixes, config, ConfPaths.MOVING_PASSABLE_UNTRACKED_CMD_PREFIXES, true);
 
         survivalFlyCheck = config.getBoolean(ConfPaths.MOVING_SURVIVALFLY_CHECK);
         // Default values are specified here because this settings aren't showed by default into the configuration file.
