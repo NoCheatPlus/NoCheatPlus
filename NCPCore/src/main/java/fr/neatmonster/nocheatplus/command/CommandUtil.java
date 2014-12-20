@@ -132,7 +132,7 @@ public class CommandUtil {
         }
         return null;
     }
-    
+
     /**
      * Convenience method to map all matches within one of the String[] arrays
      * to its first element.<br>
@@ -158,9 +158,10 @@ public class CommandUtil {
     }
 
     /**
-     * Clear tree and feed lower case. Adds versions with "/" if missing, also adds input without the first "/". No trimming is used, except left-trim.
+     * Feed lower-case inputs. Adds versions with "/" if missing, also adds input without the first "/". Trimming from the left side is used, but the original input is also added.
      * @param tree
      * @param inputs
+     * @param clear If to clear the tree, before feeding.
      */
     public static void feedCommands(SimpleCharPrefixTree tree, Collection<String> inputs, boolean clear) {
         if (clear) {
@@ -199,7 +200,7 @@ public class CommandUtil {
      * @param tree
      * @param config
      * @param configPath
-     * @param clear If to clear the map before inserting anything.
+     * @param clear If to clear the tree before inserting anything.
      */
     public static void feedCommands(SimpleCharPrefixTree tree, ConfigFile config, String configPath, boolean clear) {
         final List<String> prefixes = config.getStringList(configPath);
