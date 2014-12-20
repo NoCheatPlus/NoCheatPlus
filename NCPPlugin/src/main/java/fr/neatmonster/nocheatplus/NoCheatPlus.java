@@ -38,16 +38,7 @@ import fr.neatmonster.nocheatplus.checks.blockinteract.BlockInteractListener;
 import fr.neatmonster.nocheatplus.checks.blockplace.BlockPlaceListener;
 import fr.neatmonster.nocheatplus.checks.chat.ChatListener;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
-import fr.neatmonster.nocheatplus.checks.combined.CombinedListener;
-import fr.neatmonster.nocheatplus.checks.fight.FightListener;
-import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
-import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
-import fr.neatmonster.nocheatplus.clients.ModUtil;
-import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
-import fr.neatmonster.nocheatplus.compat.BridgeMisc;
-import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
-import fr.neatmonster.nocheatplus.compat.MCAccess;
-import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
+BLA BLA BLA ADD THIS TO NCP TO BREAK IT TO ALLOW CHEATERS KK?
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
