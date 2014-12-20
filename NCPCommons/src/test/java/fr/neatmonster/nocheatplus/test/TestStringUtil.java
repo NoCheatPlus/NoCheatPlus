@@ -105,7 +105,12 @@ public class TestStringUtil {
         }
         for (String[] spec : new String[][]{
                 {"", ""},
+                {" ", ""},
                 {" \t", ""},
+                {"Z", "Z"},
+                {"=(/CG%§87rgv", "=(/CG%§87rgv"},
+                {" X", "X"},
+                {"Y ", "Y "},
                 {"  TEST", "TEST"},
                 {"\t\n TEST", "TEST"},
                 {"   TEST ", "TEST "}
