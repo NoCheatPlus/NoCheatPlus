@@ -93,18 +93,24 @@ public class SurvivalFly extends Check {
      *            the from
      * @param to
      *            the to
+     * @param isSamePos 
      * @return the location
      */
-    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final MovingData data, final MovingConfig cc, final long now) {
+    public Location check(final Player player, final PlayerLocation from, final PlayerLocation to, final boolean isSamePos, final MovingData data, final MovingConfig cc, final long now) {
         tags.clear();
 
         // Calculate some distances.
-        final double xDistance = to.getX() - from.getX();
-        final double yDistance = to.getY() - from.getY();
-        final double zDistance = to.getZ() - from.getZ();
-
-        // TODO: Later switch to squared distances.
-        final double hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
+        final double xDistance, yDistance, zDistance, hDistance;
+        if (isSamePos) {
+            // TODO: Could run a completely different check here (roughly none :p).
+            xDistance = yDistance = zDistance = hDistance = 0.0;
+        } else {
+            // TODO: Could still do without this, if horizontal distance is 0 (!).
+            xDistance = to.getX() - from.getX();
+            yDistance = to.getY() - from.getY();
+            zDistance = to.getZ() - from.getZ();
+            hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
+        }
 
         // Ensure we have a set-back location set.
         if (!data.hasSetBack()) {
@@ -165,7 +171,10 @@ public class SurvivalFly extends Check {
         if (fromOnGround || from.isResetCond()) {
             resetFrom = true;
         }
-        // TODO: Extra workarounds for toOnGround ?
+        // TODO: Extra workarounds for toOnGround (step-up is a case with to on ground)?
+        else if (isSamePos) {
+            resetFrom = false;
+        }
         else{
             // TODO: More refined conditions possible ?
             // TODO: Consider if (!resetTo) ?
@@ -197,51 +206,55 @@ public class SurvivalFly extends Check {
             data.sfOnIce--;
         }
 
-        // Get the allowed distance.
-        double hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, false);
+        double hAllowedDistance = 0.0, hDistanceAboveLimit = 0.0, hFreedom = 0.0;
+        if (!isSamePos) {
+            // Check allowed vs. taken horizontal distance.
+            // Get the allowed distance.
+            hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, false);
 
-        // Judge if horizontal speed is above limit.
-        double hDistanceAboveLimit = hDistance - hAllowedDistance;
+            // Judge if horizontal speed is above limit.
+            hDistanceAboveLimit = hDistance - hAllowedDistance;
 
-        // Velocity, buffers and after failure checks.
-        final double hFreedom;
-        if (hDistanceAboveLimit > 0) {
-            // TODO: Move more of the workarounds (buffer, bunny, ...) into this method.
-            final double[] res = hDistAfterFailure(player, from, to, walkSpeed, hAllowedDistance, hDistance, hDistanceAboveLimit, yDistance, sprinting, downStream, data, cc, false);
-            hAllowedDistance = res[0];
-            hDistanceAboveLimit = res[1];
-            hFreedom = res[2];
-        }
-        else{
-            data.clearActiveHorVel();
-            hFreedom = 0.0;
-            if (resetFrom && data.bunnyhopDelay <= 6) {
-                data.bunnyhopDelay = 0;
+            // Velocity, buffers and after failure checks.
+            if (hDistanceAboveLimit > 0) {
+                // TODO: Move more of the workarounds (buffer, bunny, ...) into this method.
+                final double[] res = hDistAfterFailure(player, from, to, walkSpeed, hAllowedDistance, hDistance, hDistanceAboveLimit, yDistance, sprinting, downStream, data, cc, false);
+                hAllowedDistance = res[0];
+                hDistanceAboveLimit = res[1];
+                hFreedom = res[2];
             }
-        }
+            else{
+                data.clearActiveHorVel();
+                hFreedom = 0.0;
+                if (resetFrom && data.bunnyhopDelay <= 6) {
+                    data.bunnyhopDelay = 0;
+                }
+            }
 
-        // Prevent players from walking on a liquid in a too simple way.
-        // TODO: Find something more effective against more smart methods (limitjump helps already).
-        // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
-        // TODO: Complete re-modeling.
-        if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && data.sfLastYDist == 0D && !toOnGround && !fromOnGround && BlockProperties.isLiquid(to.getTypeId())) {
-            // TODO: Relative hdistance.
-            // TODO: Might check actual bounds (collidesBlock). Might implement + use BlockProperties.getCorrectedBounds or getSomeHeight.
-            hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-            tags.add("waterwalk");
-        }
-
-        // Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
-        if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && !data.hasActiveHorVel()) {
-            // (Ignore some cases, in order to prevent false positives.)
-            // TODO: speed effects ?
-            if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
-                // (Might have to account for speeding permissions.)
-                // TODO: hDistance is too harsh?
+            // Prevent players from walking on a liquid in a too simple way.
+            // TODO: Find something more effective against more smart methods (limitjump helps already).
+            // TODO: yDistance == 0D <- should there not be a tolerance +- or 0...x ?
+            // TODO: Complete re-modeling.
+            if (hDistanceAboveLimit <= 0D && hDistance > 0.1D && yDistance == 0D && data.sfLastYDist == 0D && !toOnGround && !fromOnGround && BlockProperties.isLiquid(to.getTypeId())) {
+                // TODO: Relative hdistance.
+                // TODO: Might check actual bounds (collidesBlock). Might implement + use BlockProperties.getCorrectedBounds or getSomeHeight.
                 hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
-                tags.add("sprintback"); // Might add it anyway.
+                tags.add("waterwalk");
+            }
+
+            // Prevent players from sprinting if they're moving backwards (allow buffers to cover up !?).
+            if (sprinting && data.lostSprintCount == 0 && !cc.assumeSprint && hDistance > walkSpeed && !data.hasActiveHorVel()) {
+                // (Ignore some cases, in order to prevent false positives.)
+                // TODO: speed effects ?
+                if (TrigUtil.isMovingBackwards(xDistance, zDistance, from.getYaw()) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY_SPRINTING)) {
+                    // (Might have to account for speeding permissions.)
+                    // TODO: hDistance is too harsh?
+                    hDistanceAboveLimit = Math.max(hDistanceAboveLimit, hDistance);
+                    tags.add("sprintback"); // Might add it anyway.
+                }
             }
         }
+
 
         //////////////////////////
         // Vertical move.
@@ -381,7 +394,7 @@ public class SurvivalFly extends Check {
             }
 
             // Finally check horizontal buffer regain.
-            if (hDistanceAboveLimit < 0.0  && result <= 0.0 && hDistance > 0.0 && data.sfHorizontalBuffer < hBufMax) {
+            if (hDistanceAboveLimit < 0.0  && result <= 0.0 && !isSamePos && data.sfHorizontalBuffer < hBufMax) {
                 // TODO: max min other conditions ?
                 hBufRegain(hDistance, Math.min(0.2, Math.abs(hDistanceAboveLimit)), data);
             }
@@ -437,10 +450,12 @@ public class SurvivalFly extends Check {
         }
 
         // Invalidation of vertical velocity.
+        // TODO: This invalidation is wrong in case of already jumped higher (can not be repaired?).
         if (data.verticalVelocityUsed > cc.velocityGraceTicks && yDistance <= 0 && data.sfLastYDist > 0 && data.sfLastYDist != Double.MAX_VALUE) {
             //        	data.verticalFreedom = 0; // TODO: <- why?
             data.verticalVelocityCounter = 0;
             data.verticalVelocity = 0;
+            tags.add("invalidate_vvel"); // TODO: Test / validate by logs.
         }
 
         // Apply reset conditions.

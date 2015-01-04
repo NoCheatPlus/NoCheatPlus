@@ -251,8 +251,6 @@ public class BlockProperties {
 
     public static final BlockProps sandStoneType = new BlockProps(woodPickaxe, 0.8f);
 
-    public static final BlockProps pumpkinType = new BlockProps(woodAxe, 1, secToMs(1.5, 0.75, 0.4, 0.25, 0.2, 0.15));
-
     public static final BlockProps chestType = new BlockProps(woodAxe, 2.5f, secToMs(3.75, 1.9, 0.95, 0.65, 0.5, 0.35));
 
     public static final BlockProps woodDoorType = new BlockProps(woodAxe, 3.0f, secToMs(4.5, 2.25, 1.15, 0.75, 0.6, 0.4));
@@ -705,11 +703,12 @@ public class BlockProperties {
             blocks[mat.getId()] =  stoneType;
         }
         blocks[Material.NOTE_BLOCK.getId()] = new BlockProps(woodAxe, 0.8f, secToMs(1.2, 0.6, 0.3, 0.2, 0.15, 0.1));
+        final BlockProps pumpkinType = new BlockProps(woodAxe, 1, secToMs(1.5, 0.75, 0.4, 0.25, 0.2, 0.15));
         blocks[Material.WALL_SIGN.getId()] = pumpkinType;
         blocks[Material.SIGN_POST.getId()] = pumpkinType;
         blocks[Material.PUMPKIN.getId()] = pumpkinType;
         blocks[Material.JACK_O_LANTERN.getId()] = pumpkinType;
-        blocks[Material.MELON_BLOCK.getId()] = new BlockProps(woodAxe, 1f, secToMs(1.5, 0.75, 0.375, 0.25, 0.1875, 0.125), 3f);
+        blocks[Material.MELON_BLOCK.getId()] = new BlockProps(noTool, 1, secToMs(1.45), 3);
         blocks[Material.BOOKSHELF.getId()] = new BlockProps(woodAxe, 1.5f, secToMs(2.25, 1.15, 0.6, 0.4, 0.3, 0.2));
         for (Material mat : new Material[]{
                 Material.WOOD_STAIRS, Material.WOOD, Material.WOOD_STEP, Material.LOG,
@@ -1021,7 +1020,6 @@ public class BlockProperties {
         return getBreakingDuration(blockId, itemInHand, onGround, inWater, helmet != null && helmet.containsEnchantment(Enchantment.WATER_WORKER), haste == Double.NEGATIVE_INFINITY ? 0 : 1 + (int) haste);
     }
 
-
     /**
      * Get the normal breaking duration, including enchantments, and tool properties.
      * @param blockId
@@ -1030,12 +1028,14 @@ public class BlockProperties {
      */
     public static long getBreakingDuration(final int blockId, final ItemStack itemInHand, final boolean onGround, final boolean inWater, final boolean aquaAffinity, final int haste) {
         // TODO: more configurability / load from file for blocks (i.e. set for shears etc.
-        if (itemInHand == null) {
+        if (isAir(itemInHand)) {
             return getBreakingDuration(blockId, getBlockProps(blockId), noTool, onGround, inWater, aquaAffinity, 0);
         }
         else {
             int efficiency = 0;
-            if (itemInHand.containsEnchantment(Enchantment.DIG_SPEED)) efficiency = itemInHand.getEnchantmentLevel(Enchantment.DIG_SPEED);
+            if (itemInHand.containsEnchantment(Enchantment.DIG_SPEED)) {
+                efficiency = itemInHand.getEnchantmentLevel(Enchantment.DIG_SPEED);
+            }
             return getBreakingDuration(blockId, getBlockProps(blockId), getToolProps(itemInHand.getTypeId()), onGround, inWater, aquaAffinity, efficiency, haste);
         }
     }
@@ -1054,21 +1054,15 @@ public class BlockProperties {
      */
     public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency, int haste) {
         final long dur = getBreakingDuration(blockId, blockProps, toolProps, onGround, inWater, aquaAffinity, efficiency);
-        // TODO: haste ...
-        return haste > 0 ? (long) (Math.pow(0.8, haste) * dur): dur;
+        return haste > 0 ? (long) (Math.pow(0.8, haste) * dur) : dur;
     }
 
     public static long getBreakingDuration(final int blockId, final BlockProps blockProps, final ToolProps toolProps, final  boolean onGround, final boolean inWater, boolean aquaAffinity, int efficiency) {
         boolean isValidTool = isValidTool(blockId, blockProps, toolProps, efficiency);
         if (efficiency > 0) {
             // Workaround until something better is found..
-            // TODO: Re-evaluate.ww
+            // TODO: Re-evaluate.
             if (isLeaves(blockId) || blockProps == glassType) {
-                /*
-                 * TODO: Some might be dealt with by insta break, by now, 
-                 * still getting exact durations would be nice to have, for expected breaking times and 
-                 * general API use (spin off, analysis?).
-                 */
                 if (efficiency == 1) {
                     return 100;
                 }
@@ -1148,16 +1142,16 @@ public class BlockProperties {
                 if (blockId == Material.WOODEN_DOOR.getId() && toolProps.toolType != ToolType.AXE) {
                     // Heck [Cleanup pending]...
                     switch (efficiency) {
-                    case 1:
-                        return (long) (mult * 1500);
-                    case 2:
-                        return (long) (mult * 750);
-                    case 3:
-                        return (long) (mult * 450);
-                    case 4:
-                        return (long) (mult * 250);
-                    case 5:
-                        return (long) (mult * 150);
+                        case 1:
+                            return (long) (mult * 1500);
+                        case 2:
+                            return (long) (mult * 750);
+                        case 3:
+                            return (long) (mult * 450);
+                        case 4:
+                            return (long) (mult * 250);
+                        case 5:
+                            return (long) (mult * 150);
                     }
                 }
                 // This seems roughly correct.
@@ -1197,6 +1191,14 @@ public class BlockProperties {
                         duration -= 100;
                     }
                 }
+            }
+        }
+        // Post/legacy workarounds for efficiency tools ("improper").
+        if (efficiency > 0 && !isValidTool) {
+            if (!isValidTool && blockId == Material.MELON_BLOCK.getId()) {
+                // Fall back to pre-1.8 behavior.
+                // 450, 200 , 100 , 50 , 0
+                duration = Math.min(duration, 450 / (long) Math.pow(2, efficiency - 1)); 
             }
         }
         return Math.max(0, duration);
@@ -1502,6 +1504,24 @@ public class BlockProperties {
      */
     public static final boolean isGround(final int id) {
         return (blockFlags[id] & F_GROUND) != 0;
+    }
+
+    /**
+     * Convenience method including null checks.
+     * @param type
+     * @return
+     */
+    public static final boolean isAir(Material type) {
+        return type == null || type == Material.AIR;
+    }
+
+    /**
+     * Convenience method including null checks.
+     * @param stack
+     * @return
+     */
+    public static final boolean isAir(ItemStack stack) {
+        return stack == null || isAir(stack.getType());
     }
 
     /**

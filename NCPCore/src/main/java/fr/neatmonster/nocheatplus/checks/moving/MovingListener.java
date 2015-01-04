@@ -518,7 +518,8 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // TODO: Could further differentiate if really needed to (newTo / NoFall).
             final double maxYNoFall = Math.max(cc.noFallyOnGround, cc.yOnGround);
             pFrom.collectBlockFlags(maxYNoFall);
-            if (pFrom.isSamePos(pTo)) {
+            final boolean isSamePos = pFrom.isSamePos(pTo);
+            if (isSamePos) {
                 // TODO: Could consider pTo = pFrom, set pitch / yaw elsewhere.
                 // Sets all properties, but only once.
                 pTo.prepare(pFrom);
@@ -531,7 +532,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             // Actual check.
             if (newTo == null) {
                 // Only check if passable has not already set back.
-                newTo = survivalFly.check(player, pFrom, pTo, data, cc, time);
+                newTo = survivalFly.check(player, pFrom, pTo, isSamePos, data, cc, time);
             }
             // Only check NoFall, if not already vetoed.
             if (checkNf) {
@@ -1054,7 +1055,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, "[NoCheatPlus] VehicleMoveEvent fired for: " + entityType);
             }
         }
-        // TODO: Might account for the case of a player letting the vehicle move but not themself (do mind latency).
+        // TODO: Might account for the case of a player letting the vehicle move but not themselves (do mind latency).
         // Mind that players could be riding horses inside of minecarts etc.
         if (vehicle.getVehicle() != null) {
             // Do ignore events for vehicles inside of other vehicles.
@@ -1079,14 +1080,14 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         final MovingData data = MovingData.getData(player);
         data.vehicleConsistency = MoveConsistency.getConsistency(from, to, player.getLocation(useLoc));
         switch (data.vehicleConsistency) {
-        case FROM:
-        case TO:
-            data.resetPositions(player.getLocation(useLoc)); // TODO: Drop MC 1.4!
-            break;
-        case INCONSISTENT:
-            // TODO: Any exploits exist? -> TeleportUtil.forceMount(player, vehicle)
-            // TODO: Test with latency.
-            break;
+            case FROM:
+            case TO:
+                data.resetPositions(player.getLocation(useLoc)); // TODO: Drop MC 1.4!
+                break;
+            case INCONSISTENT:
+                // TODO: Any exploits exist? -> TeleportUtil.forceMount(player, vehicle)
+                // TODO: Test with latency.
+                break;
         }
 
         Location newTo = null;

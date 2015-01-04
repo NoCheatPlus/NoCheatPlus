@@ -12,16 +12,16 @@ import fr.neatmonster.nocheatplus.utilities.ds.CoordMap;
  *
  */
 public class FakeBlockCache extends BlockCache {
-    
+
     /** Cached type-ids. */
     private final CoordMap<Integer> idMapStored = new CoordMap<Integer>(23);
-    
+
     /** Cached data values. */
     private final CoordMap<Integer> dataMapStored = new CoordMap<Integer>(23);
-    
+
     /** Cached shape values. */
     private final CoordMap<double[]> boundsMapStored = new CoordMap<double[]>(23);
-    
+
     /**
      * Set with data=0 and bounds=full.
      * @param x
@@ -32,7 +32,7 @@ public class FakeBlockCache extends BlockCache {
     public void set(int x, int y, int z, Material type) {
         set(x, y, z, BlockProperties.getId(type));
     }
-    
+
     /**
      * Set with data=0-
      * @param x
@@ -44,7 +44,7 @@ public class FakeBlockCache extends BlockCache {
     public void set(int x, int y, int z, Material type, double[] bounds) {
         set(x, y, z, BlockProperties.getId(type), 0, bounds);
     }
-    
+
     /**
      * Set with data=0 and bounds=full.
      * @param x
@@ -55,7 +55,7 @@ public class FakeBlockCache extends BlockCache {
     public void set(int x, int y, int z, int typeId) {
         set(x, y, z, typeId, 0);
     }
-    
+
     /**
      * Set with bounds=full.
      * @param x
@@ -67,7 +67,7 @@ public class FakeBlockCache extends BlockCache {
     public void set(int x, int y, int z, int typeId, int data) {
         set(x, y, z, typeId, data, new double[]{0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
     }
-    
+
     /**
      * Set custom properties.
      * @param x

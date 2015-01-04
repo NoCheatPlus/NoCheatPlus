@@ -15,21 +15,16 @@ import org.bukkit.inventory.ItemStack;
  */
 public class InventoryUtil {
 	
-	private static boolean isEmpty(Material mat) {
-		return mat == null || mat == Material.AIR;
-	}
-	
 	/**
 	 * Does not account for special slots like armor.
 	 * @param inventory
 	 * @return
 	 */
-	public static int getFreeSlots(final Inventory inventory){
+	public static int getFreeSlots(final Inventory inventory) {
 		final ItemStack[] contents = inventory.getContents();
 		int count = 0;
-		for (int i = 0; i < contents.length; i++){
-			final ItemStack stack = contents[i];
-			if (stack == null || isEmpty(stack.getType())){
+		for (int i = 0; i < contents.length; i++) {
+			if (BlockProperties.isAir(contents[i])) {
 				count ++;
 			}
 		}
@@ -49,12 +44,12 @@ public class InventoryUtil {
 		final int durability = reference.getDurability();
 		final ItemStack[] contents = inventory.getContents();
 		int count = 0;
-		for (int i = 0; i < contents.length; i++){
+		for (int i = 0; i < contents.length; i++) {
 			final ItemStack stack = contents[i];
-			if (stack == null){
+			if (stack == null) {
 				continue;
 			}
-			else if (stack.getType() == mat && stack.getDurability() == durability){
+			else if (stack.getType() == mat && stack.getDurability() == durability) {
 				count ++;
 			}
 		}
@@ -75,7 +70,7 @@ public class InventoryUtil {
 	 * Search for players / passengers (broken by name: closes the inventory of first player found including entity and passengers recursively).
 	 * @param entity
 	 */
-	public static boolean closePlayerInventoryRecursively(Entity entity){
+	public static boolean closePlayerInventoryRecursively(Entity entity) {
 		// Find a player.
 		final Player player = getPlayerPassengerRecursively(entity);
 		if (player != null && closeOpenInventory((Player) entity)) {
@@ -91,17 +86,17 @@ public class InventoryUtil {
 	 * @return
 	 */
 	public static Player getPlayerPassengerRecursively(Entity entity) {
-		while (entity != null){
-			if (entity instanceof Player){
+		while (entity != null) {
+			if (entity instanceof Player) {
 				// Scrap the case of players riding players for the moment.
 				return (Player) entity;
 			}
 			final Entity passenger = entity.getPassenger();
-			if (entity.equals(passenger)){
+			if (entity.equals(passenger)) {
 				// Just in case :9.
 				break;
 			}
-			else{
+			else {
 				entity = passenger;
 			}
 		}
@@ -113,7 +108,7 @@ public class InventoryUtil {
 	 * @param player
 	 * @return If closed.
 	 */
-	public static boolean closeOpenInventory(final Player player){
+	public static boolean closeOpenInventory(final Player player) {
 		if (hasInventoryOpen(player)) {
 			player.closeInventory();
 			return true;

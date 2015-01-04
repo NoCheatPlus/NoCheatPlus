@@ -13,6 +13,7 @@ import fr.neatmonster.nocheatplus.checks.access.CheckDataFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckData;
 import fr.neatmonster.nocheatplus.stats.Timings;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 
 /**
  * Player specific data for the block break checks.
@@ -156,8 +157,8 @@ public class BlockBreakData extends ACheckData {
     }
 
     public boolean toolChanged(Material mat) {
-        if (mat == Material.AIR) {
-            return clickedTool != null;
+        if (BlockProperties.isAir(mat)) {
+            return !BlockProperties.isAir(clickedTool);
         } else {
             return clickedTool != mat;
         }

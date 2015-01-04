@@ -3,7 +3,6 @@ package fr.neatmonster.nocheatplus.checks.fight;
 import java.util.Iterator;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -522,15 +521,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
             // Knockback calculation.
             switch (event.getCause()) {
-            case ENTITY_ATTACK:
-                if (event instanceof EntityDamageByEntityEvent) {
-                    final Entity entity = ((EntityDamageByEntityEvent) event).getDamager();
-                    if ((entity instanceof Player) && !entity.isInsideVehicle() && FightConfig.getConfig(damagedPlayer).knockBackVelocityPvP) {
-                        applyKnockBack((Player) entity, damagedPlayer, damagedData);
+                case ENTITY_ATTACK:
+                    if (event instanceof EntityDamageByEntityEvent) {
+                        final Entity entity = ((EntityDamageByEntityEvent) event).getDamager();
+                        if ((entity instanceof Player) && !entity.isInsideVehicle() && FightConfig.getConfig(damagedPlayer).knockBackVelocityPvP) {
+                            applyKnockBack((Player) entity, damagedPlayer, damagedData);
+                        }
                     }
-                }
-            default:
-                break;
+                default:
+                    break;
             }
         }
     }
@@ -547,7 +546,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             level += 1.0;
         }
         final ItemStack stack = attacker.getItemInHand();
-        if (stack != null && stack.getType() != Material.AIR) {
+        if (!BlockProperties.isAir(stack)) {
             level += (double) stack.getEnchantmentLevel(Enchantment.KNOCKBACK);
         }
         final MovingData mdata = MovingData.getData(damagedPlayer);
@@ -560,6 +559,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         double vy = dir.getY();
         if (BlockProperties.isOnGround(damagedPlayer, damagedPlayer.getLocation(useLoc1), mcc.yOnGround)) {
             // (Re-used useLoc1 without need for cleanup.)
+            // TODO: What here ? 
+            // vy = Math.max(vy, 0.365);
             vy = 0.365;
         }
         useLoc1.setWorld(null); // Cleanup.
