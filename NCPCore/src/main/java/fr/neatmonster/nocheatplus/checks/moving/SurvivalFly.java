@@ -101,15 +101,22 @@ public class SurvivalFly extends Check {
 
         // Calculate some distances.
         final double xDistance, yDistance, zDistance, hDistance;
+        final boolean hasHdist;
         if (isSamePos) {
             // TODO: Could run a completely different check here (roughly none :p).
             xDistance = yDistance = zDistance = hDistance = 0.0;
+            hasHdist = false;
         } else {
-            // TODO: Could still do without this, if horizontal distance is 0 (!).
             xDistance = to.getX() - from.getX();
             yDistance = to.getY() - from.getY();
             zDistance = to.getZ() - from.getZ();
-            hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
+            if (xDistance == 0.0 && zDistance == 0.0) {
+                hDistance = 0.0;
+                hasHdist = false;
+            } else {
+                hDistance = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
+                hasHdist = true;
+            }
         }
 
         // Ensure we have a set-back location set.
@@ -207,7 +214,7 @@ public class SurvivalFly extends Check {
         }
 
         double hAllowedDistance = 0.0, hDistanceAboveLimit = 0.0, hFreedom = 0.0;
-        if (!isSamePos) {
+        if (hasHdist) {
             // Check allowed vs. taken horizontal distance.
             // Get the allowed distance.
             hAllowedDistance = getAllowedhDist(player, from, to, sprinting, downStream, hDistance, walkSpeed, data, cc, false);
@@ -253,6 +260,8 @@ public class SurvivalFly extends Check {
                     tags.add("sprintback"); // Might add it anyway.
                 }
             }
+        } else {
+            data.clearActiveHorVel();
         }
 
 
@@ -307,13 +316,17 @@ public class SurvivalFly extends Check {
                 // TODO: In normal water this is 0. Could set higher for special cases only (needs efficient data + flags collection?).
                 maxJumpPhase = 3;
                 data.sfNoLowJump = true;
-                if (data.sfJumpPhase > 0) tags.add("limitjump");
+                if (data.sfJumpPhase > 0) {
+                    tags.add("limitjump");
+                }
             }
             else if (data.jumpAmplifier > 0) {
                 vAllowedDistance += 0.6 + data.jumpAmplifier - 1.0;
                 maxJumpPhase = (int) (9 + (data.jumpAmplifier - 1.0) * 6);
             }
-            else maxJumpPhase = 6;
+            else {
+                maxJumpPhase = 6;
+            }
             // TODO: consider tags for jumping as well (!).
             if (data.sfJumpPhase > maxJumpPhase && data.verticalVelocityCounter <= 0) {
                 // Could use dirty flag here !
