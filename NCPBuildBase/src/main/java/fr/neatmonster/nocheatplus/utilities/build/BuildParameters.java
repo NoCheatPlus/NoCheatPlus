@@ -99,6 +99,6 @@ public class BuildParameters {
 	 * <li>Consequently minor levels are between major levels to distinguish minor differences like flags</li>
 	 * 
 	 */
-	public static final int debugLevel = getInteger("DEBUG_LEVEL", 0);
+	public static final int debugLevel = getInteger("DEBUG_LEVEL", 10000);
 	
 }
