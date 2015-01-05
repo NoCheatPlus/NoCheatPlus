@@ -16,160 +16,162 @@ import java.util.Set;
  *
  */
 public class LinkedHashMapCOW<K, V> implements Map<K, V> {
-	
-	private LinkedHashMap<K, V> map;
-	
-	private final int initialCapacity;
-	private final float loadFactor;
-	
-	/**
-	 * Uses: 16, 0.75f, false (default settings, insertion ordered).
-	 */
-	public LinkedHashMapCOW() {
-		this(16, 0.75f);
-	}
-	
-	/**
-	 * Uses extra: 0.75f, false (default settings, insertion ordered).
-	 * @param initialCapacity
-	 */
-	public LinkedHashMapCOW(int initialCapacity) {
-		this(initialCapacity, 0.75f);
-	}
-	
-	/**
-	 * Uses extra: false (default settings, insertion ordered).
-	 * @param initialCapacity
-	 * @param loadFactor
-	 */
-	public LinkedHashMapCOW(int initialCapacity, float loadFactor) {
-		this.initialCapacity = initialCapacity;
-		this.loadFactor = loadFactor;
-		this.map = new LinkedHashMap<K, V>(initialCapacity, loadFactor, false);
-	}
-	
-	/**
-	 * Uses: 16, 0.75f, false (default settings, insertion ordered).
-	 * @param map
-	 */
-	public LinkedHashMapCOW(Map<K, V> map) {
-		this();
-		this.map.putAll(map);
-	}
-	
-	/**
-	 * Not synchronized: return a copy of the internal map.
-	 * @return
-	 */
-	private LinkedHashMap<K, V> copyMap() {
-		final LinkedHashMap<K, V> newMap = new LinkedHashMap<K, V>(initialCapacity, loadFactor, false);
-		newMap.putAll(this.map);
-		return newMap;
-	}
-	
-	@Override
-	public void clear() {
-		synchronized (this) {
-			this.map.clear();
-		}
-	}
 
-	@Override
-	public boolean containsKey(Object key) {
-		return this.map.containsKey(key);
-	}
+    // TODO: Consider a) add removeEldest... b) add option: copyMap(K) -> only copy if needed.  
 
-	@Override
-	public boolean containsValue(Object value) {
-		return this.map.containsValue(value);
-	}
-	
-	/**
-	 * Unmodifiable version of the EntrySet. Entry.setValue might be possible, but dangerous :p
-	 */
-	@Override
-	public Set<java.util.Map.Entry<K, V>> entrySet() {
-		return Collections.unmodifiableSet(map.entrySet());
-	}
+    private LinkedHashMap<K, V> map;
 
-	@Override
-	public V get(Object key) {
-		// NOTE: If accessOrder can be true, there needs to be synchronization here, defeating any purpose, better use Collections.synchronizedMap(LinkedHashMap...) for that case.
-		return map.get(key);
-	}
+    private final int initialCapacity;
+    private final float loadFactor;
 
-	@Override
-	public boolean isEmpty() {
-		return map.isEmpty();
-	}
-	
-	/**
-	 * Unmodifiable version of the KeySet.
-	 */
-	@Override
-	public Set<K> keySet() {
-		return Collections.unmodifiableSet(map.keySet());
-	}
+    /**
+     * Uses: 16, 0.75f, false (default settings, insertion ordered).
+     */
+    public LinkedHashMapCOW() {
+        this(16, 0.75f);
+    }
 
-	@Override
-	public V put(final K key, final V value) {
-		final V out;
-		synchronized (this) {
-			final LinkedHashMap<K, V> newMap = copyMap();
-			out = newMap.put(key, value);
-			this.map = newMap;
-		}
-		return out;
-	}
+    /**
+     * Uses extra: 0.75f, false (default settings, insertion ordered).
+     * @param initialCapacity
+     */
+    public LinkedHashMapCOW(int initialCapacity) {
+        this(initialCapacity, 0.75f);
+    }
 
-	@Override
-	public void putAll(final Map<? extends K, ? extends V> m) {
-		synchronized (this) {
-			final LinkedHashMap<K, V> newMap = copyMap();
-			newMap.putAll(m);
-			this.map = newMap;
-		}
-	}
+    /**
+     * Uses extra: false (default settings, insertion ordered).
+     * @param initialCapacity
+     * @param loadFactor
+     */
+    public LinkedHashMapCOW(int initialCapacity, float loadFactor) {
+        this.initialCapacity = initialCapacity;
+        this.loadFactor = loadFactor;
+        this.map = new LinkedHashMap<K, V>(initialCapacity, loadFactor, false);
+    }
 
-	@Override
-	public V remove(final Object key) {
-		final V out;
-		synchronized (this) {
-			final LinkedHashMap<K, V> newMap = copyMap();
-			out = newMap.remove(key);
-			this.map = newMap;
-		}
-		return out;
-	}
-	
-	/**
-	 * Remove all given keys.<br>
-	 * Not the most efficient implementation, copying the map and then removing
-	 * keys, but still better than iterating remove(key).
-	 * 
-	 * @param keys
-	 */
-	public void removeAll(final Collection<K> keys) {
-		synchronized (this) {
-			final LinkedHashMap<K, V> newMap = copyMap();
-			for (final K key : keys) {
-				newMap.remove(key);
-			}
-			this.map = newMap;
-		}
-	}
+    /**
+     * Uses: 16, 0.75f, false (default settings, insertion ordered).
+     * @param map
+     */
+    public LinkedHashMapCOW(Map<K, V> map) {
+        this();
+        this.map.putAll(map);
+    }
 
-	@Override
-	public int size() {
-		return map.size();
-	}
-	
-	/**
-	 * Unmodifiable version of the values (Collection).
-	 */
-	@Override
-	public Collection<V> values() {
-		return Collections.unmodifiableCollection(map.values());
-	}
+    /**
+     * Not synchronized: return a copy of the internal map.
+     * @return
+     */
+    private LinkedHashMap<K, V> copyMap() {
+        final LinkedHashMap<K, V> newMap = new LinkedHashMap<K, V>(initialCapacity, loadFactor, false);
+        newMap.putAll(this.map);
+        return newMap;
+    }
+
+    @Override
+    public void clear() {
+        synchronized (this) {
+            this.map.clear();
+        }
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        return this.map.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return this.map.containsValue(value);
+    }
+
+    /**
+     * Unmodifiable version of the EntrySet. Entry.setValue might be possible, but dangerous :p
+     */
+    @Override
+    public Set<java.util.Map.Entry<K, V>> entrySet() {
+        return Collections.unmodifiableSet(map.entrySet());
+    }
+
+    @Override
+    public V get(Object key) {
+        // NOTE: If accessOrder can be true, there needs to be synchronization here, defeating any purpose, better use Collections.synchronizedMap(LinkedHashMap...) for that case.
+        return map.get(key);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+
+    /**
+     * Unmodifiable version of the KeySet.
+     */
+    @Override
+    public Set<K> keySet() {
+        return Collections.unmodifiableSet(map.keySet());
+    }
+
+    @Override
+    public V put(final K key, final V value) {
+        final V out;
+        synchronized (this) {
+            final LinkedHashMap<K, V> newMap = copyMap();
+            out = newMap.put(key, value);
+            this.map = newMap;
+        }
+        return out;
+    }
+
+    @Override
+    public void putAll(final Map<? extends K, ? extends V> m) {
+        synchronized (this) {
+            final LinkedHashMap<K, V> newMap = copyMap();
+            newMap.putAll(m);
+            this.map = newMap;
+        }
+    }
+
+    @Override
+    public V remove(final Object key) {
+        final V out;
+        synchronized (this) {
+            final LinkedHashMap<K, V> newMap = copyMap();
+            out = newMap.remove(key);
+            this.map = newMap;
+        }
+        return out;
+    }
+
+    /**
+     * Remove all given keys.<br>
+     * Not the most efficient implementation, copying the map and then removing
+     * keys, but still better than iterating remove(key).
+     * 
+     * @param keys
+     */
+    public void removeAll(final Collection<K> keys) {
+        synchronized (this) {
+            final LinkedHashMap<K, V> newMap = copyMap();
+            for (final K key : keys) {
+                newMap.remove(key);
+            }
+            this.map = newMap;
+        }
+    }
+
+    @Override
+    public int size() {
+        return map.size();
+    }
+
+    /**
+     * Unmodifiable version of the values (Collection).
+     */
+    @Override
+    public Collection<V> values() {
+        return Collections.unmodifiableCollection(map.values());
+    }
 
 }
