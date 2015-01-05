@@ -11,9 +11,9 @@ import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
  *
  */
 public interface BlockPropertiesSetup {
-	/**
-	 * Additional initialization.
-	 * @param worldConfigProvider Configuration provider if needed.
-	 */
-	public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider);
+    /**
+     * Additional initialization.
+     * @param worldConfigProvider Configuration provider if needed.
+     */
+    public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider);
 }

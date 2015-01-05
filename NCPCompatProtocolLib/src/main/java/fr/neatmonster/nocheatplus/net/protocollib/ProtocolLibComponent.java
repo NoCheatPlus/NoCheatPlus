@@ -26,66 +26,66 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  *
  */
 public class ProtocolLibComponent implements DisableListener, INotifyReload{
-	
-	private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
-	
-	public ProtocolLibComponent(Plugin plugin) {
-		StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
-		register(plugin);
-	}
 
-	private void register(Plugin plugin) {	
-		// Register Classes having a constructor with Plugin as argument.
-		if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
-			register(FlyingFrequency.class, plugin);
-		}
-		if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
-			register(SoundDistance.class, plugin);
-		}
-		if (!registeredPacketAdapters.isEmpty()) {
-			List<String> names = new ArrayList<String>(registeredPacketAdapters.size());
-			for (PacketAdapter adapter : registeredPacketAdapters) {
-				names.add(adapter.getClass().getSimpleName());
-			}
-			StaticLog.logInfo("[NoCheatPlus] Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
-		}
-	}
-	
-	private void register(Class<? extends PacketAdapter> clazz, Plugin plugin) {
-		try {
-			// Construct a new instance using reflection.
-			PacketAdapter adapter = clazz.getDeclaredConstructor(Plugin.class).newInstance(plugin);
-			ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
-			registeredPacketAdapters.add(adapter);
-		} catch (Throwable t) {
-			StaticLog.logWarning("[NoCheatPlus] Could not register packet level hook: " + clazz.getSimpleName());
-			StaticLog.logWarning(t);
-		}
-	}
+    private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
-	@Override
-	public void onDisable() {
-		unregister();
-	}
+    public ProtocolLibComponent(Plugin plugin) {
+        StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
+        register(plugin);
+    }
 
-	@Override
-	public void onReload() {
-		unregister();
-		register(Bukkit.getPluginManager().getPlugin("NoCheatPlus")); // Store instead ?
-	}
-	
-	private void unregister() {
-		final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-		final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
-		for (PacketAdapter adapter : registeredPacketAdapters) {
-			try {
-				protocolManager.removePacketListener(adapter);
-				api.removeComponent(adapter); // Bit heavy, but consistent.
-			} catch (Throwable t) {
-				StaticLog.logWarning("[NoCheatPlus] Failed to unregister packet level hook: " + adapter.getClass().getName());
-			}
-		}
-		registeredPacketAdapters.clear();
-	}
+    private void register(Plugin plugin) {	
+        // Register Classes having a constructor with Plugin as argument.
+        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
+            register(FlyingFrequency.class, plugin);
+        }
+        if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
+            register(SoundDistance.class, plugin);
+        }
+        if (!registeredPacketAdapters.isEmpty()) {
+            List<String> names = new ArrayList<String>(registeredPacketAdapters.size());
+            for (PacketAdapter adapter : registeredPacketAdapters) {
+                names.add(adapter.getClass().getSimpleName());
+            }
+            StaticLog.logInfo("[NoCheatPlus] Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
+        }
+    }
+
+    private void register(Class<? extends PacketAdapter> clazz, Plugin plugin) {
+        try {
+            // Construct a new instance using reflection.
+            PacketAdapter adapter = clazz.getDeclaredConstructor(Plugin.class).newInstance(plugin);
+            ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
+            registeredPacketAdapters.add(adapter);
+        } catch (Throwable t) {
+            StaticLog.logWarning("[NoCheatPlus] Could not register packet level hook: " + clazz.getSimpleName());
+            StaticLog.logWarning(t);
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        unregister();
+    }
+
+    @Override
+    public void onReload() {
+        unregister();
+        register(Bukkit.getPluginManager().getPlugin("NoCheatPlus")); // Store instead ?
+    }
+
+    private void unregister() {
+        final ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        final NoCheatPlusAPI api = NCPAPIProvider.getNoCheatPlusAPI();
+        for (PacketAdapter adapter : registeredPacketAdapters) {
+            try {
+                protocolManager.removePacketListener(adapter);
+                api.removeComponent(adapter); // Bit heavy, but consistent.
+            } catch (Throwable t) {
+                StaticLog.logWarning("[NoCheatPlus] Failed to unregister packet level hook: " + adapter.getClass().getName());
+            }
+        }
+        registeredPacketAdapters.clear();
+    }
 
 }

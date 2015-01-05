@@ -20,32 +20,33 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class VersionCommand extends BaseCommand{
 
-	public VersionCommand(JavaPlugin plugin) {
-		super(plugin, "version", Permissions.COMMAND_VERSION, new String[]{"versions", "ver"});
-	}
+    public VersionCommand(JavaPlugin plugin) {
+        super(plugin, "version", Permissions.COMMAND_VERSION, new String[]{"versions", "ver"});
+    }
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
-		final MCAccess mc = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
-		sender.sendMessage(new String[]{
-				"---- Version information ----",
-				"#### Server ####",
-				Bukkit.getServer().getVersion(),
-				"#### NoCheatPlus ####",
-				"Plugin: " + access.getDescription().getVersion(),
-				"MCAccess: " + mc.getMCVersion() + " / " + mc.getServerVersionTag(),
-				});
-		final Collection<NCPHook> hooks = NCPHookManager.getAllHooks();
-		if (!hooks.isEmpty()){
-			final List<String> fullNames = new LinkedList<String>();
-			for (final NCPHook hook : hooks){
-				fullNames.add(hook.getHookName() + " " + hook.getHookVersion());
-			}
-			Collections.sort(fullNames, String.CASE_INSENSITIVE_ORDER);
-			sender.sendMessage("Hooks: " + StringUtil.join(fullNames, " | "));
-		}
-		return true;
-	}
+    @Override
+    public boolean onCommand(CommandSender sender, Command command,
+            String label, String[] args) {
+        final MCAccess mc = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
+        sender.sendMessage(new String[]{
+                "---- Version information ----",
+                "#### Server ####",
+                Bukkit.getServer().getVersion(),
+                "#### NoCheatPlus ####",
+                "Plugin: " + access.getDescription().getVersion(),
+                "MCAccess: " + mc.getMCVersion() + " / " + mc.getServerVersionTag(),
+        });
+
+        final Collection<NCPHook> hooks = NCPHookManager.getAllHooks();
+        if (!hooks.isEmpty()){
+            final List<String> fullNames = new LinkedList<String>();
+            for (final NCPHook hook : hooks){
+                fullNames.add(hook.getHookName() + " " + hook.getHookVersion());
+            }
+            Collections.sort(fullNames, String.CASE_INSENSITIVE_ORDER);
+            sender.sendMessage("Hooks: " + StringUtil.join(fullNames, " | "));
+        }
+        return true;
+    }
 
 }
