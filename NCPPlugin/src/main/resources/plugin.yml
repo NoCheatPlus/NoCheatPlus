@@ -11,6 +11,7 @@ main: ${project.groupId}.${project.artifactId}.${project.name}
 
 softdepend:
 - ProtocolLib
+- Carbon
 
 commands:
     nocheatplus:
