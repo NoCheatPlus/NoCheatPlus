@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -106,7 +107,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     }
 
     // Not static.
-    
+
     /** Central logging access point. */
     private BukkitLogManager logManager = null; // Not final, but intended to stay, once set [change to init=syso?].
 
@@ -178,6 +179,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
     /** All registered components.  */
     protected Set<Object> allComponents = new LinkedHashSet<Object>(50);
+
+    /** Feature tags by keys, for features that might not be available. */
+    private final LinkedHashMap<String, LinkedHashSet<String>> featureTags = new LinkedHashMap<String, LinkedHashSet<String>>();
 
     /** Tick listener that is only needed sometimes (component registration). */
     protected final OnDemandTickListener onDemandTickListener = new OnDemandTickListener() {
@@ -634,6 +638,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         subComponentholders.clear();
         // Generic instances registry.
         genericInstances.clear();
+        // Feature tags.
+        featureTags.clear();
 
         // Clear command changes list (compatibility issues with NPCs, leads to recalculation of perms).
         if (changedCommands != null){
@@ -734,10 +740,10 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         TickTask.purge();
         TickTask.cancel();
         TickTask.reset();
-        
+
         // Allow entries to TickTask (just in case).
         TickTask.setLocked(false);
-        
+
         // Initialize configuration, if needed.
         if (!ConfigManager.isInitialized()) {
             // Read the configuration files (should only happen on reloading).
@@ -745,13 +751,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
 
         final ConfigFile config = ConfigManager.getConfigFile();
-        
+
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
-        
+
         // Start logger task(s).
         logManager.startTasks();
-        
-        
+
+
         manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
         if (manageListeners) {
             listenerManager.setRegisterDirectly(true);
@@ -776,7 +782,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Initialize data manager.
         disableListeners.add(0, dataMan);
         dataMan.onEnable();
-        
+
         // Register components. 
         @SetupOrder(priority = - 100)
         class ReloadHook implements INotifyReload{
@@ -896,7 +902,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                         );
             }
         });
-        
+
         // Set StaticLog to more efficient output.
         StaticLog.setStreamID(Streams.STATUS);
         // Tell the server administrator that we finished loading NoCheatPlus now.
@@ -963,7 +969,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // Cache some things.
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
     }
-    
+
     @Override
     public LogManager getLogManager() {
         return logManager;
@@ -1249,6 +1255,32 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         T registered = getGenericInstance(registeredFor); // Convenience.
         genericInstances.remove(registeredFor);
         return registered;
+    }
+
+    @Override
+    public void addFeatureTags(String key, Collection<String> featureTags) {
+        LinkedHashSet<String> present = this.featureTags.get(key);
+        if (present == null) {
+            present = new LinkedHashSet<String>();
+            this.featureTags.put(key, present);
+        }
+        present.addAll(featureTags);
+    }
+
+    @Override
+    public void setFeatureTags(String key, Collection<String> featureTags) {
+        LinkedHashSet<String> present = new LinkedHashSet<String>();
+        this.featureTags.put(key, present);
+        present.addAll(featureTags);
+    }
+
+    @Override
+    public Map<String, Set<String>> getAllFeatureTags() {
+        final LinkedHashMap<String, Set<String>> allTags = new LinkedHashMap<String, Set<String>>();
+        for (final Entry<String, LinkedHashSet<String>> entry : this.featureTags.entrySet()) {
+            allTags.put(entry.getKey(), Collections.unmodifiableSet(entry.getValue()));
+        }
+        return Collections.unmodifiableMap(allTags);
     }
 
 }

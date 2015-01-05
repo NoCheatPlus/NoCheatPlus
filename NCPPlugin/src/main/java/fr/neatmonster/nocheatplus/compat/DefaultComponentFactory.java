@@ -1,9 +1,11 @@
 package fr.neatmonster.nocheatplus.compat;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -30,6 +32,7 @@ public class DefaultComponentFactory {
 			// TODO: Static test methods !?
 			FastConsume.testAvailability();
 			available.add(new FastConsume());
+			NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(FastConsume.class.getSimpleName()));
 		}
 		catch (Throwable t){
 			StaticLog.logInfo("[NoCheatPlus] Inventory checks: FastConsume is not available.");

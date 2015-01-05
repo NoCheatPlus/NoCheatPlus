@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -36,7 +39,18 @@ public class VersionCommand extends BaseCommand{
                 "Plugin: " + access.getDescription().getVersion(),
                 "MCAccess: " + mc.getMCVersion() + " / " + mc.getServerVersionTag(),
         });
-
+        final Map<String, Set<String>> featureTags = NCPAPIProvider.getNoCheatPlusAPI().getAllFeatureTags();
+        if (!featureTags.isEmpty()) {
+            final List<String> features = new LinkedList<String>();
+            // Add present features.
+            for (final Entry<String, Set<String>> entry : featureTags.entrySet()) {
+                features.add("  " + entry.getKey() + ": " + StringUtil.join(entry.getValue(), " | "));
+            }
+            // Sort and add.
+            Collections.sort(features, String.CASE_INSENSITIVE_ORDER);
+            features.add(0, "Features:");
+            sender.sendMessage(features.toArray(new String[features.size()]));
+        }
         final Collection<NCPHook> hooks = NCPHookManager.getAllHooks();
         if (!hooks.isEmpty()){
             final List<String> fullNames = new LinkedList<String>();

@@ -1,5 +1,9 @@
 package fr.neatmonster.nocheatplus.components;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
 import fr.neatmonster.nocheatplus.logging.LogManager;
 
 
@@ -23,10 +27,36 @@ public interface NoCheatPlusAPI extends ComponentRegistry<Object>, ComponentRegi
     /**
      * By default addComponent(Object) will register ComponentFactories as well.
      * @param obj
-     * @param allowComponentRegistry If to allow registering ComponentFactories.
+     * @param allowComponentFactory If to allow registering ComponentFactories.
      * @return
      */
-    public boolean addComponent(Object obj, boolean allowComponentRegistry);
+    public boolean addComponent(Object obj, boolean allowComponentFactory);
+
+    /**
+     * Tell NCP that certain features are present, e.g. for display with the
+     * "ncp version" command. Version tags get cleared with disabling the
+     * plugin.
+     * 
+     * @param key
+     * @param featureTags
+     */
+    public void addFeatureTags(String key, Collection<String> featureTags);
+
+    /**
+     * Tell NCP that certain features are present, e.g. for display with the
+     * "ncp version" command. Overrides all present definitions for the given
+     * key. Version tags get cleared with disabling the plugin.
+     * 
+     * @param key
+     * @param featureTags
+     */
+    public void setFeatureTags(String key, Collection<String> featureTags);
+
+    /**
+     * Get a map with all feature tags that have been set.
+     * @return
+     */
+    public Map<String, Set<String>> getAllFeatureTags();
 
     /**
      * Send all players with the nocheatplus.admin.notify permission a message.<br>

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.PluginTests;
 import fr.neatmonster.nocheatplus.compat.bukkit.MCAccessBukkit;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.DefaultConfig;
@@ -17,9 +19,9 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
  *
  */
 public class BlockTests {
-    
+
     public static class SimpleWorldConfigProvider <C extends RawConfigFile> implements WorldConfigProvider <C>{
-        
+
         private final C config;
 
         public SimpleWorldConfigProvider(C config) {
@@ -42,20 +44,21 @@ public class BlockTests {
             list.add(config);
             return list;
         }
-        
+
     }
-    
+
     public static class DefaultConfigWorldConfigProvider extends SimpleWorldConfigProvider<ConfigFile> {
         public DefaultConfigWorldConfigProvider() {
             super(new DefaultConfig());
         }
     }
-    
+
     /**
      * Initialize BlockProperties with default config and Bukkit-API compliance :p.
      */
     public static void initBlockProperties() {
-        BlockProperties.init(new MCAccessBukkit(), new DefaultConfigWorldConfigProvider());
+        PluginTests.setDummNoCheatPlusAPI(false);
+        BlockProperties.init(NCPAPIProvider.getNoCheatPlusAPI().getMCAccess(), new DefaultConfigWorldConfigProvider());
     }
-    
+
 }

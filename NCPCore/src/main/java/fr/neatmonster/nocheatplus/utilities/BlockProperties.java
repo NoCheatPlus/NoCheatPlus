@@ -6,10 +6,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -21,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.blocks.BlockPropertiesSetup;
 import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactory;
@@ -420,12 +423,14 @@ public class BlockProperties {
     public static void init(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
         blockCache = mcAccess.getBlockCache(null);
         pLoc = new PlayerLocation(mcAccess, null);
+        final Set<String> blocksFeatures = new LinkedHashSet<String>(); // getClass().getName() or some abstract.
         try{
             initTools(mcAccess, worldConfigProvider);
             initBlocks(mcAccess, worldConfigProvider);
+            blocksFeatures.add("BlocksMC1_4(base)");
             // Extra hand picked setups.
             try{
-                new VanillaBlocksFactory().setupBlockProperties(worldConfigProvider);
+                blocksFeatures.addAll(new VanillaBlocksFactory().setupVanillaBlocks(worldConfigProvider));
             }
             catch(Throwable t) {
                 StaticLog.logSevere("[NoCheatPlus] Could not initialize vanilla blocks: " + t.getClass().getSimpleName() + " - " + t.getMessage());
@@ -435,6 +440,7 @@ public class BlockProperties {
             if (mcAccess instanceof BlockPropertiesSetup) {
                 try{
                     ((BlockPropertiesSetup) mcAccess).setupBlockProperties(worldConfigProvider);
+                    blocksFeatures.add(mcAccess.getClass().getSimpleName());
                 }
                 catch(Throwable t) {
                     StaticLog.logSevere("[NoCheatPlus] McAccess.setupBlockProperties (" + mcAccess.getClass().getSimpleName() + ") could not execute properly: " + t.getClass().getSimpleName() + " - " + t.getMessage());
@@ -446,6 +452,8 @@ public class BlockProperties {
         catch(Throwable t) {
             StaticLog.logSevere(t);
         }
+        // Override feature tags for blocks.
+        NCPAPIProvider.getNoCheatPlusAPI().setFeatureTags("blocks", blocksFeatures);
     }
 
     private static void initTools(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {

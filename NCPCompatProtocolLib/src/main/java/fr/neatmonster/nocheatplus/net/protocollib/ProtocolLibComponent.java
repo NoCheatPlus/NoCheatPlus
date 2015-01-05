@@ -48,6 +48,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
                 names.add(adapter.getClass().getSimpleName());
             }
             StaticLog.logInfo("[NoCheatPlus] Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
+            NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", names);
         }
     }
 
