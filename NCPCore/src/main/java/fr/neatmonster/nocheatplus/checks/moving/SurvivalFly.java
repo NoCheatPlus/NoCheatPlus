@@ -476,8 +476,9 @@ public class SurvivalFly extends Check {
             // The player has moved onto ground.
             if (toOnGround) {
                 // Reset bunny-hop-delay.
-                if (data.bunnyhopDelay > 0 && yDistance > 0.0 && to.getY() > data.getSetBackY() && !from.isResetCond() && !to.isResetCond()) {
+                if (data.bunnyhopDelay > 0 && yDistance > 0.0 && to.getY() > data.getSetBackY() + 0.12 && !from.isResetCond() && !to.isResetCond()) {
                     data.bunnyhopDelay = 0;
+                    tags.add("resetbunny");
                 }
                 // TODO: Experimental: reset vertical velocity.
                 if (data.verticalVelocityUsed > cc.velocityGraceTicks && yDistance < 0) {
