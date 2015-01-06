@@ -492,8 +492,11 @@ public class SurvivalFly extends Check {
             data.setSetBack(to);
             data.sfJumpPhase = 0;
             data.clearAccounting();
-            data.sfLowJump = false;
             data.sfNoLowJump = false;
+            if (data.sfLowJump && resetFrom) {
+                // Prevent reset if coming from air (purpose of the flag).
+                data.sfLowJump = false;
+            }
         }
         else if (resetFrom) {
             // The player moved from ground.
@@ -822,14 +825,11 @@ public class SurvivalFly extends Check {
                     }
                     if (setBackYDistance < estimate) {
                         // Low jump, further check if there might have been a reason for low jumping.
-                        final long flags = BlockProperties.F_GROUND | BlockProperties.F_SOLID;
-                        if ((BlockProperties.getBlockFlags(from.getTypeIdAbove()) & flags) == 0) {
-                            // Check block above that too (if high enough).
-                            final int refY = Location.locToBlock(from.getY() + 0.5);
-                            if (refY == from.getBlockY() || (BlockProperties.getBlockFlags(from.getTypeId(from.getBlockX(), refY, from.getBlockZ())) & flags) == 0) {
-                                tags.add("lowjump");
-                                data.sfLowJump = true;
-                            }
+                        final double width = from.getWidth();
+                        final long aboveFlags = BlockProperties.collectFlagsSimple(from.getBlockCache(), from.getX() - width, from.getY(), from.getZ() - width, from.getX() + width, from.getY() + 0.1, from.getZ() + width);
+                        if ((aboveFlags & (BlockProperties.F_GROUND | BlockProperties.F_SOLID)) == 0) {
+                            tags.add("lowjump");
+                            data.sfLowJump = true;
                         }
                     }
                 }
