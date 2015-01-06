@@ -825,8 +825,10 @@ public class SurvivalFly extends Check {
                     }
                     if (setBackYDistance < estimate) {
                         // Low jump, further check if there might have been a reason for low jumping.
-                        final double width = from.getWidth();
-                        final long aboveFlags = BlockProperties.collectFlagsSimple(from.getBlockCache(), from.getX() - width, from.getY(), from.getZ() - width, from.getX() + width, from.getY() + 0.1, from.getZ() + width);
+                        // TODO: Might provide access methods in PlayerLoction instead.
+                        final double width = Math.round(from.getWidth() * 500.0) / 1000.0;
+                        final double eyeHeight = player.getEyeHeight();
+                        final long aboveFlags = BlockProperties.collectFlagsSimple(from.getBlockCache(), from.getX() - width, from.getY() + eyeHeight, from.getZ() - width, from.getX() + width, from.getY() + eyeHeight + 0.25, from.getZ() + width);
                         if ((aboveFlags & (BlockProperties.F_GROUND | BlockProperties.F_SOLID)) == 0) {
                             tags.add("lowjump");
                             data.sfLowJump = true;
@@ -1174,7 +1176,7 @@ public class SurvivalFly extends Check {
                     // Check full bounding box since last from.
                     final double minY = Math.min(data.toY, Math.min(data.fromY, from.getY()));
                     final double iY = minY; // TODO ...
-                    final double r = from.getWidth() / 2.0; // TODO: check + 0.35;
+                    final double r = Math.round(from.getWidth() * 500.0) / 1000.0 / 2.0; // TODO: check + 0.35;
                     double yMargin = cc.yOnGround;
                     // TODO: Might set margin higher depending on distance to 0 of block and last y distance etc.
                     // TODO: check with iY + 0.25 removed.
