@@ -178,7 +178,13 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
         }
         // TODO: Sanity check file+extensions and fall-back if not valid [make an auxiliary method doing all this at once]!
         try {
-            return new FileLoggerAdapter(file); // TODO: Method to get-or-create these (store logger by canonical abs paths).
+            FileLoggerAdapter logger = new FileLoggerAdapter(file); // TODO: Method to get-or-create these (store logger by canonical abs paths).
+            if (logger.isInoperable()) {
+                logger.detachLogger();
+                return null;
+            } else {
+                return logger;
+            }
         } catch (Throwable t) {
             // TODO: Complain.
         }
