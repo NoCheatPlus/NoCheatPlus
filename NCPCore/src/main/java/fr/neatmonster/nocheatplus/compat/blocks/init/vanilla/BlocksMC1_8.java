@@ -23,8 +23,10 @@ public class BlocksMC1_8 implements BlockPropertiesSetup {
 
     @Override
     public void setupBlockProperties(WorldConfigProvider<?> worldConfigProvider) {
+        
+        // ---- Changed block break timings ----
 
-        // Melon/pumpkin block breaking times.
+        // Melon/pumpkin/like.
         BlockProps props = new BlockProps(BlockProperties.woodAxe, 1f, BlockProperties.secToMs(1.45, 0.70, 0.325, 0.2, 0.13, 0.075), 3f);
         for (Material mat : new Material[] {
                 Material.MELON_BLOCK,
@@ -36,6 +38,12 @@ public class BlocksMC1_8 implements BlockPropertiesSetup {
         }) {
             BlockProperties.setBlockProps(BlockProperties.getId(mat), props);
         }
+        
+        // Ladder.
+        props = new BlockProps(BlockProperties.woodAxe, 0.4f, BlockProperties.secToMs(0.6, 0.3, 0.15, 0.1, 0.075, 0.05));
+        BlockProperties.setBlockProps(BlockProperties.getId(Material.LADDER), props);
+        
+        // ---- New blocks ----
 
         // 165(SLIME_BLOCK
         BlockInit.setAs(165, Material.TNT); // Full block, instant break.
@@ -56,7 +64,9 @@ public class BlocksMC1_8 implements BlockPropertiesSetup {
         BlockInit.setAs(169, Material.REDSTONE_LAMP_OFF);
 
         // 176(STANDING_BANNER
-        BlockInit.setInstantAir(176);
+        BlockProperties.setBlockFlags(176, 0L);
+        props = new BlockProps(BlockProperties.woodAxe, 0.4f, BlockProperties.secToMs(1.5, 0.75, 0.4, 0.25, 0.2, 0.15));
+        BlockProperties.setBlockProps(176, props);
 
         // 177(WALL_BANNER
         BlockInit.setInstantAir(177);
