@@ -10,9 +10,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.net.NetConfig;
+import fr.neatmonster.nocheatplus.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class SoundDistance extends PacketAdapter {
@@ -36,14 +35,12 @@ public class SoundDistance extends PacketAdapter {
         return false;
     }
 
-    /** Maximum distance for thunder effects (squared). */
-    private final double distSq;
+    private final NetConfigCache configs;
+    private final Location useLoc = new Location(null, 0, 0, 0);
 
-    public SoundDistance(Plugin plugin) {
+    public SoundDistance(NetConfigCache configs, Plugin plugin) {
         super(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT);
-        ConfigFile config = ConfigManager.getConfigFile();
-        double dist = config.getDouble(ConfPaths.NET_SOUNDDISTANCE_MAXDISTANCE);
-        distSq = dist * dist;
+        this.configs = configs;
     }
 
     @Override
@@ -56,16 +53,18 @@ public class SoundDistance extends PacketAdapter {
         }
 
         final Player player = event.getPlayer();
-        final Location loc = player.getLocation(); // TODO: Use getLocation(useLoc) [synced if async].
+        final NetConfig cc = configs.getConfig(player.getWorld());
+        if (!cc.soundDistanceActive) {
+            return;
+        }
 
+        final Location loc = player.getLocation(useLoc);
         // Compare distance of player to the weather location.
         final StructureModifier<Integer> ints = packetContainer.getIntegers();
-        if (TrigUtil.distanceSquared(ints.read(0) / 8, ints.read(2) / 8, loc.getX(), loc.getZ()) > distSq) {
-            // TODO: Get from a NetConfig (optimized).
-            if (ConfigManager.getConfigFile(player.getWorld().getName()).getBoolean(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
-                event.setCancelled(true);
-            }
+        if (TrigUtil.distanceSquared(ints.read(0) / 8, ints.read(2) / 8, loc.getX(), loc.getZ()) > cc.soundDistanceSq) {
+            event.setCancelled(true);
         }
+        useLoc.setWorld(null);
     }
 
 }

@@ -435,6 +435,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE, true);
         set(ConfPaths.NET_FLYINGFREQUENCY_SECONDS, 5);
         set(ConfPaths.NET_FLYINGFREQUENCY_MAXPACKETS, 300);
+        set(ConfPaths.NET_FLYINGFREQUENCY_CANCELREDUNDANT, true);
 
         // SoundDistance
         set(ConfPaths.NET_SOUNDDISTANCE_ACTIVE, true);

@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.net.protocollib;
 
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.entity.Player;
@@ -7,13 +8,13 @@ import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
-import fr.neatmonster.nocheatplus.config.ConfPaths;
-import fr.neatmonster.nocheatplus.config.ConfigFile;
-import fr.neatmonster.nocheatplus.config.ConfigManager;
+import fr.neatmonster.nocheatplus.net.NetConfig;
+import fr.neatmonster.nocheatplus.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
 import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
@@ -27,30 +28,44 @@ import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
  */
 public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener {
 
-    // TODO: Silent cancel count.
-    // TODO: Configuration.
-    // TODO: Optimized options (receive only, other?).
-    // TODO: Forced async version ?
+    // TODO: Most efficient registration + optimize (primary thread or asynchronous).
 
-    private final Map<String, ActionFrequency> freqMap = new LinkedHashMapCOW<String, ActionFrequency>();  
+    private class FFData {
+        public static final int numBooleans = 3;
+        public static final int indexOnGround = 0;
+        public static final int indexhasPos = 1;
+        public static final int indexhasLook = 2;
+
+        public final ActionFrequency all;
+        // Last move.
+        public final double[] doubles = new double[3]; // x, y, z
+        public final float[] floats = new float[2]; // yaw, pitch
+        //public final boolean[] booleans = new boolean[3]; // ground, hasPos, hasLook
+        public boolean onGround = false;
+        public FFData(int seconds) {
+            all = new ActionFrequency(seconds, 1000L);
+        }
+    }
+
+    private final Map<String, FFData> freqMap = new LinkedHashMapCOW<String, FFData>();  
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idSilent = counters.registerKey("packet.flying.silentcancel");
+    private final int idRedundant = counters.registerKey("packet.flying.silentcancel.redundant");
     private final int idNullPlayer = counters.registerKey("packet.flying.nullplayer");
 
-    private final int seconds;
-    private final float maxPackets;
+    private boolean cancelRedundant = true;
 
-    public FlyingFrequency(Plugin plugin) {
+    private final NetConfigCache configs;
+
+    public FlyingFrequency(NetConfigCache configs, Plugin plugin) {
         // PacketPlayInFlying[3, legacy: 10]
         super(plugin, PacketType.Play.Client.FLYING); // TODO: How does POS and POS_LOOK relate/translate?
-        ConfigFile config = ConfigManager.getConfigFile();
-        seconds = Math.max(1, config.getInt(ConfPaths.NET_FLYINGFREQUENCY_SECONDS));
-        maxPackets = Math.max(1, config.getInt(ConfPaths.NET_FLYINGFREQUENCY_MAXPACKETS));
+        this.configs = configs;
     }
 
     @Override
     public void playerJoins(Player player) {
-        getFreq(player.getName());
+        // Ignore.
     }
 
     @Override
@@ -58,12 +73,12 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
         freqMap.remove(player.getName());
     }
 
-    private ActionFrequency getFreq(final String name) {
-        final ActionFrequency freq = this.freqMap.get(name);
+    private FFData getFreq(final String name, final NetConfig cc) {
+        final FFData freq = this.freqMap.get(name);
         if (freq != null) {
             return freq;
         } else {
-            final ActionFrequency newFreq = new ActionFrequency(seconds, 1000);
+            final FFData newFreq = new FFData(cc.flyingFrequencySeconds);
             this.freqMap.put(name, newFreq);
             return newFreq;
         }
@@ -71,40 +86,84 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
 
     @Override
     public void onPacketReceiving(final PacketEvent event) {
+
         final Player player = event.getPlayer();
         if (player == null) {
-            if (onNullPlayer(event)) {
-                event.setCancelled(true);
-            }
+            // TODO: Need config?
+            counters.add(idNullPlayer, 1);
+            event.setCancelled(true);
             return;
         }
-        // TODO: Consider using similar heuristic as CB does for when to count.
-        // TODO: Consider detecting "untracked moves" early.
-        // TODO: Add more counters/cases (at least has look + has pos individually, maybe none/onground)
-        final ActionFrequency freq = getFreq(player.getName());
-        freq.add(System.currentTimeMillis(), 1f);
-        if (freq.score(1f) > maxPackets) {
-            if (onViolation(player)) {
+
+        final NetConfig cc = configs.getConfig(player.getWorld());
+        if (!cc.flyingFrequencyActive) {
+            return;
+        }
+
+        final FFData freq = getFreq(player.getName(), cc);
+        final long t = System.currentTimeMillis();
+        // Counting all packets.
+        freq.all.add(t, 1f);
+        final float allScore = freq.all.score(1f);
+        if (allScore > cc.flyingFrequencyMaxPackets) {
+            counters.add(idSilent, 1); // Until it is sure if we can get these async.
+            event.setCancelled(true);
+            return;
+        }
+
+        // Cancel redundant packets, when frequency is high anyway.
+        if (!cancelRedundant || !cc.flyingFrequencyCancelRedundant) {
+            return;
+        }
+        // TODO: Consider to detect if a moving event would fire (...).
+        boolean redundant = true;
+        final PacketContainer packet = event.getPacket();
+        final List<Boolean> booleans = packet.getBooleans().getValues();
+        if (booleans.size() != FFData.numBooleans) {
+            cancelRedundant = false;
+            return;
+        }
+        final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue(); 
+        if (onGround != freq.onGround) {
+            redundant = false;
+        }
+        freq.onGround = onGround;
+        // TODO: Consider to verify on ground somehow.
+        if (booleans.get(FFData.indexhasPos)) {
+            final List<Double> doubles = packet.getDoubles().getValues();
+            if (doubles.size() != freq.doubles.length) {
+                cancelRedundant = false;
+                return;
+            }
+            for (int i = 0; i < freq.doubles.length; i++) {
+                final double val = doubles.get(i).doubleValue();
+                if (val != freq.doubles[i]) {
+                    redundant = false;
+                    freq.doubles[i] = val;
+                }
+            }
+        }
+        if (booleans.get(FFData.indexhasLook)) {
+            final List<Float> floats = packet.getFloat().getValues();
+            if (floats.size() != freq.floats.length) {
+                cancelRedundant = false;
+                return;
+            }
+            for (int i = 0; i < freq.floats.length; i++) {
+                final float val = floats.get(i).floatValue();
+                if (val != freq.floats[i]) {
+                    redundant = false;
+                    freq.floats[i] = val;
+                }
+            }
+        }
+        if (redundant) {
+            // TODO: Could check first bucket or even just 50 ms to last packet.
+            if (allScore / cc.flyingFrequencySeconds > 20f) {
+                counters.add(idRedundant, 1);
                 event.setCancelled(true);
             }
         }
-    }
-
-    private boolean onViolation(final Player player) {
-        // TODO: Get from a NetConfig (optimized).
-        if (ConfigManager.getConfigFile(player.getWorld().getName()).getBoolean(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
-            counters.add(idSilent, 1); // Until it is sure if we can get these async.
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    private boolean onNullPlayer(final PacketEvent event) {
-        // TODO: Config (global?) ?
-        counters.add(idNullPlayer, 1);
-        return true;
     }
 
 }

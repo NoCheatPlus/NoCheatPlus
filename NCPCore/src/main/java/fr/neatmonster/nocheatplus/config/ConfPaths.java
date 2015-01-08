@@ -598,7 +598,6 @@ public abstract class ConfPaths {
 
     private static final String NET_SOUNDDISTANCE						 = NET + "sounddistance.";
     public static final String  NET_SOUNDDISTANCE_ACTIVE				 = NET_SOUNDDISTANCE + "active";
-    @GlobalConfig
     public static final String  NET_SOUNDDISTANCE_MAXDISTANCE			 = NET_SOUNDDISTANCE + "maxdistance";
 
     private static final String NET_FLYINGFREQUENCY						 = NET + "flyingfrequency.";
@@ -607,6 +606,7 @@ public abstract class ConfPaths {
     public static final String  NET_FLYINGFREQUENCY_SECONDS				 = NET_FLYINGFREQUENCY + "seconds";
     @GlobalConfig
     public static final String  NET_FLYINGFREQUENCY_MAXPACKETS			 = NET_FLYINGFREQUENCY + "maxpackets";
+    public static final String  NET_FLYINGFREQUENCY_CANCELREDUNDANT      = NET_FLYINGFREQUENCY + "cancelredundant";
 
 
     public static final String  STRINGS                                  = "strings";

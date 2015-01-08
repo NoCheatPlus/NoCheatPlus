@@ -18,6 +18,7 @@ import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -25,8 +26,9 @@ import fr.neatmonster.nocheatplus.utilities.StringUtil;
  * @author dev1mc
  *
  */
-public class ProtocolLibComponent implements DisableListener, INotifyReload{
+public class ProtocolLibComponent implements DisableListener, INotifyReload {
 
+    private final NetConfigCache configs = new NetConfigCache();
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
     public ProtocolLibComponent(Plugin plugin) {
@@ -34,7 +36,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
         register(plugin);
     }
 
-    private void register(Plugin plugin) {	
+    private void register(Plugin plugin) {
         // Register Classes having a constructor with Plugin as argument.
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
             register(FlyingFrequency.class, plugin);
@@ -55,7 +57,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
     private void register(Class<? extends PacketAdapter> clazz, Plugin plugin) {
         try {
             // Construct a new instance using reflection.
-            PacketAdapter adapter = clazz.getDeclaredConstructor(Plugin.class).newInstance(plugin);
+            PacketAdapter adapter = clazz.getDeclaredConstructor(Plugin.class).newInstance(configs, plugin);
             ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
             registeredPacketAdapters.add(adapter);
         } catch (Throwable t) {
@@ -87,6 +89,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload{
             }
         }
         registeredPacketAdapters.clear();
+        configs.clearAllConfigs();
     }
 
 }
