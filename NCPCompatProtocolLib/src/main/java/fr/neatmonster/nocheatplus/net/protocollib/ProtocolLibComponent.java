@@ -57,7 +57,7 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
     private void register(Class<? extends PacketAdapter> clazz, Plugin plugin) {
         try {
             // Construct a new instance using reflection.
-            PacketAdapter adapter = clazz.getDeclaredConstructor(Plugin.class).newInstance(configs, plugin);
+            PacketAdapter adapter = clazz.getDeclaredConstructor(NetConfigCache.class, Plugin.class).newInstance(configs, plugin);
             ProtocolLibrary.getProtocolManager().addPacketListener(adapter);
             registeredPacketAdapters.add(adapter);
         } catch (Throwable t) {
