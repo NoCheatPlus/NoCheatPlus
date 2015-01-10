@@ -51,6 +51,7 @@ import fr.neatmonster.nocheatplus.checks.combined.Combined;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedConfig;
 import fr.neatmonster.nocheatplus.checks.combined.CombinedData;
 import fr.neatmonster.nocheatplus.compat.BridgeHealth;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.components.IData;
 import fr.neatmonster.nocheatplus.components.IHaveCheckType;
 import fr.neatmonster.nocheatplus.components.INeedConfig;
@@ -155,8 +156,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
      * @param event
      *            the event
      */
-    @EventHandler(
-            ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onBlockPlace(final BlockPlaceEvent event) {
         final Player player = event.getPlayer();
 
@@ -165,15 +165,21 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
             return;
 
         final org.bukkit.block.Block block = event.getBlock();
-        if (block == null) return;
+        if (block == null) {
+            return;
+        }
         final int blockY = block.getY();
 
         final Material mat = block.getType();
 
         final MovingData data = MovingData.getData(player);
-        if (!creativeFly.isEnabled(player) && !survivalFly.isEnabled(player)) return;
+        if (!MovingUtil.shouldCheckSurvivalFly(player, data, MovingConfig.getConfig(player))) {
+            return;
+        }
 
-        if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) return;
+        if (!data.hasSetBack() || blockY + 1D < data.getSetBackY()) {
+            return;
+        }
 
         final Location loc = player.getLocation(useLoc);
         if (Math.abs(loc.getX() - 0.5 - block.getX()) <= 1D
@@ -431,6 +437,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
                 data.timeSprinting = time;
             }
             else if (time < data.timeSprinting) {
+                // TODO: Ensure that its not reset within latency/cooldown.
                 data.timeSprinting = 0;
             }
             // else: keep sprinting time.
@@ -467,7 +474,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         // Check passable first to prevent set-back override.
         // TODO: Redesign to set set-backs later (queue + invalidate).
         boolean mightSkipNoFall = false; // If to skip nofall check (mainly on violation of other checks).
-        if (newTo == null && cc.passableCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
+        if (newTo == null && cc.passableCheck && player.getGameMode() != BridgeMisc.GAME_MODE_SPECTATOR && !NCPExemptionManager.isExempted(player, CheckType.MOVING_PASSABLE) && !player.hasPermission(Permissions.MOVING_PASSABLE)) {
             // Passable is checked first to get the original set-back locations from the other checks, if needed. 
             newTo = passable.check(player, loc, pFrom, pTo, data, cc);
             if (newTo != null) {

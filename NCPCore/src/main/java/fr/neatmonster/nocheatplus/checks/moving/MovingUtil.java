@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckType;
+import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -39,8 +40,12 @@ public class MovingUtil {
      * @return
      */
     public static final boolean shouldCheckSurvivalFly(final Player player, final MovingData data, final MovingConfig cc) {
-        return cc.survivalFlyCheck && !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) && !player.hasPermission(Permissions.MOVING_SURVIVALFLY) &&
-                (cc.ignoreCreative || player.getGameMode() != GameMode.CREATIVE) && !player.isFlying() && (cc.ignoreAllowFlight || !player.getAllowFlight());
+        final GameMode gameMode = player.getGameMode();
+        return  cc.survivalFlyCheck && gameMode != BridgeMisc.GAME_MODE_SPECTATOR && 
+                !NCPExemptionManager.isExempted(player, CheckType.MOVING_SURVIVALFLY) 
+                && !player.hasPermission(Permissions.MOVING_SURVIVALFLY) &&
+                (cc.ignoreCreative || gameMode != GameMode.CREATIVE) && !player.isFlying() 
+                && (cc.ignoreAllowFlight || !player.getAllowFlight());
     }
 
     /**

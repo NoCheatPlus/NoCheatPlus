@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -15,6 +16,15 @@ import org.bukkit.entity.Projectile;
  *
  */
 public class BridgeMisc {
+
+    private static GameMode getSpectatorGameMode() {
+        try {
+            return GameMode.SPECTATOR;
+        } catch (Throwable t) {}
+        return null;
+    }
+
+    public static final GameMode GAME_MODE_SPECTATOR = getSpectatorGameMode(); 
 
     /**
      * Return a shooter of a projectile if we get an entity, null otherwise.
