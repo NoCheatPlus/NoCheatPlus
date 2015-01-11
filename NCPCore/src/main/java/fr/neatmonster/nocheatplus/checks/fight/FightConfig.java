@@ -10,6 +10,8 @@ import fr.neatmonster.nocheatplus.checks.CheckType;
 import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.versions.Bugs;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -177,7 +179,8 @@ public class FightConfig extends ACheckConfig {
 
         yawRateCheck = data.getBoolean(ConfPaths.FIGHT_YAWRATE_CHECK, true);
         cancelDead = data.getBoolean(ConfPaths.FIGHT_CANCELDEAD);
-        knockBackVelocityPvP = data.getBoolean(ConfPaths.FIGHT_PVP_KNOCKBACKVELOCITY);
+        AlmostBoolean ref = data.getAlmostBoolean(ConfPaths.FIGHT_PVP_KNOCKBACKVELOCITY, AlmostBoolean.MAYBE);
+        knockBackVelocityPvP = ref == AlmostBoolean.MAYBE ? Bugs.shouldPvpKnockBackVelocity() : ref.decide();
     }
 
     /* (non-Javadoc)
@@ -186,28 +189,28 @@ public class FightConfig extends ACheckConfig {
     @Override
     public final boolean isEnabled(final CheckType checkType) {
         switch (checkType) {
-        case FIGHT_ANGLE:
-            return angleCheck;
-        case FIGHT_CRITICAL:
-            return criticalCheck;
-        case FIGHT_DIRECTION:
-            return directionCheck;
-        case FIGHT_GODMODE:
-            return godModeCheck;
-        case FIGHT_KNOCKBACK:
-            return knockbackCheck;
-        case FIGHT_NOSWING:
-            return noSwingCheck;
-        case FIGHT_REACH:
-            return reachCheck;
-        case FIGHT_SPEED:
-            return speedCheck;
-        case FIGHT_SELFHIT:
-            return selfHitCheck;
-        case FIGHT_FASTHEAL:
-            return fastHealCheck;
-        default:
-            return true;
+            case FIGHT_ANGLE:
+                return angleCheck;
+            case FIGHT_CRITICAL:
+                return criticalCheck;
+            case FIGHT_DIRECTION:
+                return directionCheck;
+            case FIGHT_GODMODE:
+                return godModeCheck;
+            case FIGHT_KNOCKBACK:
+                return knockbackCheck;
+            case FIGHT_NOSWING:
+                return noSwingCheck;
+            case FIGHT_REACH:
+                return reachCheck;
+            case FIGHT_SPEED:
+                return speedCheck;
+            case FIGHT_SELFHIT:
+                return selfHitCheck;
+            case FIGHT_FASTHEAL:
+                return fastHealCheck;
+            default:
+                return true;
         }
     }
 }

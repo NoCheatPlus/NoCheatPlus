@@ -20,6 +20,29 @@ public enum AlmostBoolean{
     }
 
     /**
+     * Match yes/true/y, no/false/n, maybe/default, otherwise returns null.
+     * @param input Can be null.
+     * @return
+     */
+    public static final AlmostBoolean match(String input) {
+        if (input == null) {
+            return null;
+        }
+        input = input.trim().toLowerCase();
+        if (input.equals("true") || input.equals("yes") || input.equals("y")) {
+            return AlmostBoolean.YES;
+        }
+        else if (input.equals("false") || input.equals("no") || input.equals("n")) {
+            return AlmostBoolean.NO;
+        }
+        else if (input.equals("default") || input.equals("maybe")) {
+            return AlmostBoolean.MAYBE;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Pessimistic interpretation: true iff YES.
      * @return
      */

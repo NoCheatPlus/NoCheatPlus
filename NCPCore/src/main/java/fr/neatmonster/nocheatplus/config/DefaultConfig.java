@@ -12,11 +12,12 @@ import org.bukkit.Material;
  */
 public class DefaultConfig extends ConfigFile {
 
-    /** 
-     * NCP build needed for this config.
-     * (Should only increment with changing or removing paths.) 
+    /**
+     * NCP build number, for which an existing entry has been changed. (Should
+     * only increment, if the user is advised to change to that value instead of
+     * the former default one.)
      */
-    public static final int buildNumber = 754;
+    public static final int buildNumber = 785;
 
     // TODO: auto input full version or null to an extra variable or several [fail safe for other syntax checking]?
 
@@ -262,7 +263,7 @@ public class DefaultConfig extends ConfigFile {
         // FIGHT
         set(ConfPaths.FIGHT_CANCELDEAD, true);
         set(ConfPaths.FIGHT_TOOLCHANGEPENALTY, 500L);
-        set(ConfPaths.FIGHT_PVP_KNOCKBACKVELOCITY, true);
+        set(ConfPaths.FIGHT_PVP_KNOCKBACKVELOCITY, "default");
 
         set(ConfPaths.FIGHT_YAWRATE_CHECK, true);
 
@@ -413,7 +414,7 @@ public class DefaultConfig extends ConfigFile {
 
         // Vehicles.
         set(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN, true);
-        set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, true);
+        set(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, "default");
 
         // Velocity.
         set(ConfPaths.MOVING_VELOCITY_GRACETICKS, 20);
@@ -427,7 +428,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.MOVING_SPRINTINGGRACE, 2.0);
         set(ConfPaths.MOVING_ASSUMESPRINT, true);
         set(ConfPaths.MOVING_SPEEDGRACE, 4.0);
-        set(ConfPaths.MOVING_ENFORCELOCATION, true);
+        set(ConfPaths.MOVING_ENFORCELOCATION, "default");
 
         // NET
 

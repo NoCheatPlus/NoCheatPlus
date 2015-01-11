@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.command.admin;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -16,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.command.BaseCommand;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.hooks.NCPHook;
 import fr.neatmonster.nocheatplus.hooks.NCPHookManager;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
@@ -28,17 +30,24 @@ public class VersionCommand extends BaseCommand{
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command,
-            String label, String[] args) {
-        final MCAccess mc = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
-        sender.sendMessage(new String[]{
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        List<String> lines = getVersionInfo();
+        sender.sendMessage(lines.toArray(new String[lines.size()]));
+        return true;
+    }
+
+    public static List<String> getVersionInfo() {
+        final List<String> lines = new LinkedList<String>();
+        final MCAccess mcAccess = NCPAPIProvider.getNoCheatPlusAPI().getMCAccess();
+        lines.addAll(Arrays.asList(new String[]{
                 "---- Version information ----",
                 "#### Server ####",
                 Bukkit.getServer().getVersion(),
+                "(detected: " + ServerVersion.getMinecraftVersion() + ")",
                 "#### NoCheatPlus ####",
-                "Plugin: " + access.getDescription().getVersion(),
-                "MCAccess: " + mc.getMCVersion() + " / " + mc.getServerVersionTag(),
-        });
+                "Plugin: " + Bukkit.getPluginManager().getPlugin("NoCheatPlus").getDescription().getVersion(),
+                "MCAccess: " + mcAccess.getMCVersion() + " / " + mcAccess.getServerVersionTag(),
+        }));
         final Map<String, Set<String>> featureTags = NCPAPIProvider.getNoCheatPlusAPI().getAllFeatureTags();
         if (!featureTags.isEmpty()) {
             final List<String> features = new LinkedList<String>();
@@ -49,7 +58,7 @@ public class VersionCommand extends BaseCommand{
             // Sort and add.
             Collections.sort(features, String.CASE_INSENSITIVE_ORDER);
             features.add(0, "Features:");
-            sender.sendMessage(features.toArray(new String[features.size()]));
+            lines.addAll(features);
         }
         final Collection<NCPHook> hooks = NCPHookManager.getAllHooks();
         if (!hooks.isEmpty()){
@@ -58,9 +67,9 @@ public class VersionCommand extends BaseCommand{
                 fullNames.add(hook.getHookName() + " " + hook.getHookVersion());
             }
             Collections.sort(fullNames, String.CASE_INSENSITIVE_ORDER);
-            sender.sendMessage("Hooks: " + StringUtil.join(fullNames, " | "));
+            lines.add("Hooks: " + StringUtil.join(fullNames, " | "));
         }
-        return true;
+        return lines;
     }
 
 }

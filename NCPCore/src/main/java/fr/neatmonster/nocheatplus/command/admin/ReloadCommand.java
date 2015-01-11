@@ -19,6 +19,7 @@ import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import fr.neatmonster.nocheatplus.players.DataManager;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 public class ReloadCommand extends BaseCommand {
 	
@@ -87,6 +88,7 @@ public class ReloadCommand extends BaseCommand {
             sender.sendMessage(TAG + "Configuration reloaded!");
         }
         logManager.info(Streams.INIT, "[NoCheatPlus] Configuration reloaded.");
+        logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n")); // Queued (!).
     }
 
 }

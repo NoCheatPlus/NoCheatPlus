@@ -8,14 +8,16 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.yaml.snakeyaml.DumperOptions;
 
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
 
 public class RawConfigFile  extends YamlConfiguration{
-	
-	private static String prepareMatchMaterial(String content) {
-		return content.replace(' ', '_').replace('-', '_').replace('.', '_');
-	}
-	
+
+    private static String prepareMatchMaterial(String content) {
+        return content.replace(' ', '_').replace('-', '_').replace('.', '_');
+    }
+
     /**
      * Attempt to get an int id from a string.<br>
      * Will return out of range numbers, attempts to parse materials.
@@ -23,7 +25,7 @@ public class RawConfigFile  extends YamlConfiguration{
      * @return
      */
     @SuppressWarnings("deprecation")
-	public static Integer parseTypeId(String content) {
+    public static Integer parseTypeId(String content) {
         content = content.trim().toUpperCase();
         try{
             return Integer.parseInt(content);
@@ -32,13 +34,13 @@ public class RawConfigFile  extends YamlConfiguration{
         try{
             Material mat = Material.matchMaterial(prepareMatchMaterial(content));
             if (mat != null) {
-            	return mat.getId();
+                return mat.getId();
             }
         }
         catch (Exception e) {}
         return null;
     }
-    
+
     /**
      * Attempt to get a Material from a string.<br>
      * Will attempt to match the name but also type ids. 
@@ -46,11 +48,11 @@ public class RawConfigFile  extends YamlConfiguration{
      * @return
      */
     @SuppressWarnings("deprecation")
-	public static Material parseMaterial(String content) {
+    public static Material parseMaterial(String content) {
         content = content.trim().toUpperCase();
         try{
             Integer id = Integer.parseInt(content);
-			return Material.getMaterial(id);
+            return Material.getMaterial(id);
         }
         catch(NumberFormatException e){}
         try{
@@ -59,11 +61,24 @@ public class RawConfigFile  extends YamlConfiguration{
         catch (Exception e) {}
         return null;
     }
-    
+
     ////////////////
     // Not static.
     ////////////////
-	
+
+    /**
+     * Set a value depending on the detected Minecraft version.
+     * @param path
+     * @param cmpVersion The version to compare to (N.N.N).
+     * @param valueLT Value to use if the detected version is smaller/less than the given one.
+     * @param valueEQ Value to use if the detected version is equal to the given one.
+     * @param valueGT Value to use if the detected version is greater than the detected one.
+     * @param valueUnknown Value to use if the version could not be detected (e.g. unknown format).
+     */
+    public void setVersionDependent(final String path, final String cmpVersion, final Object valueLT, final Object valueEQ, final Object valueGT, final Object valueUnknown) {
+        set(path, ServerVersion.select(cmpVersion, valueLT, valueEQ, valueGT, valueUnknown));
+    }
+
     /**
      * Return a double value within given bounds, with preset.
      * 
@@ -75,12 +90,12 @@ public class RawConfigFile  extends YamlConfiguration{
      * @return
      */
     public double getDouble(final String path, final double min, final double max, final double preset){
-    	final double value = getDouble(path, preset);
-    	if (value < min) return min;
-    	else if (value > max) return max;
+        final double value = getDouble(path, preset);
+        if (value < min) return min;
+        else if (value > max) return max;
         else return value;
     }
-    
+
     /**
      * Return a long value within given bounds, with preset.
      * 
@@ -92,12 +107,12 @@ public class RawConfigFile  extends YamlConfiguration{
      * @return
      */
     public long getLong(final String path, final long min, final long max, final long preset){
-    	final long value = getLong(path, preset);
-    	if (value < min) return min;
-    	else if (value > max) return max;
+        final long value = getLong(path, preset);
+        if (value < min) return min;
+        else if (value > max) return max;
         else return value;
     }
-    
+
     /**
      * Return an int value within given bounds, with preset.
      * 
@@ -109,12 +124,12 @@ public class RawConfigFile  extends YamlConfiguration{
      * @return
      */
     public long getInt(final String path, final int min, final int max, final int preset){
-    	final int value = getInt(path, preset);
-    	if (value < min) return min;
-    	else if (value > max) return max;
+        final int value = getInt(path, preset);
+        if (value < min) return min;
+        else if (value > max) return max;
         else return value;
     }
-    
+
     /**
      * Attempt to get a type id from the path somehow, return null if nothing found.<br>
      * Will attempt to interpret strings, will return negative or out of range values.
@@ -126,7 +141,7 @@ public class RawConfigFile  extends YamlConfiguration{
     public Integer getTypeId(final String path){
         return getTypeId(path, null);
     }
-    
+
     /**
      * Attempt to get a type id from the path somehow, return preset if nothing found.<br>
      * Will attempt to interpret strings, will return negative or out of range values.
@@ -145,52 +160,57 @@ public class RawConfigFile  extends YamlConfiguration{
         int id = getInt(path, Integer.MAX_VALUE);
         return id == Integer.MAX_VALUE ? preset : id;
     }
-    
+
     /**
      * Outputs warnings to console.
      * @param path
      * @param target Collection to fill ids into.
      */
-	public void readMaterialIdsFromList(final String path, final Collection<Integer> target) {
-		final List<String> content = getStringList(path);
-		if (content == null || content.isEmpty()) return;
-		for (final String entry : content){
-			final Integer id = parseTypeId(entry);
-			if (id == null){
-				StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
-			}
-			else{
-				target.add(id);
-			}
-		}
-	}
-	
-	/**
+    public void readMaterialIdsFromList(final String path, final Collection<Integer> target) {
+        final List<String> content = getStringList(path);
+        if (content == null || content.isEmpty()) return;
+        for (final String entry : content){
+            final Integer id = parseTypeId(entry);
+            if (id == null){
+                StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+            }
+            else{
+                target.add(id);
+            }
+        }
+    }
+
+    public AlmostBoolean getAlmostBoolean(final String path, final AlmostBoolean defaultValue) {
+        final AlmostBoolean choice = AlmostBoolean.match(getString(path, null));
+        return choice == null ? defaultValue : choice;
+    }
+
+    /**
      * Outputs warnings to console.
      * @param path
      * @param target Collection to fill materials into.
      */
-	public void readMaterialFromList(final String path, final Collection<Material> target) {
-		final List<String> content = getStringList(path);
-		if (content == null || content.isEmpty()) return;
-		for (final String entry : content){
-			final Material mat = parseMaterial(entry);
-			if (mat == null){
-				StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
-			}
-			else{
-				target.add(mat);
-			}
-		}
-	}
-    
+    public void readMaterialFromList(final String path, final Collection<Material> target) {
+        final List<String> content = getStringList(path);
+        if (content == null || content.isEmpty()) return;
+        for (final String entry : content){
+            final Material mat = parseMaterial(entry);
+            if (mat == null){
+                StaticLog.logWarning("[NoCheatPlus] Bad material entry (" + path +"): " + entry);
+            }
+            else{
+                target.add(mat);
+            }
+        }
+    }
+
     /* (non-Javadoc)
      * @see org.bukkit.configuration.file.YamlConfiguration#saveToString()
      */
     @Override
     public String saveToString() {
         // Some reflection wizardly to avoid having a lot of linebreaks in the yaml file, and get a "footer" into the file.
-    	// TODO: Interesting, but review this: still necessary/useful in CB-1.4 ?.
+        // TODO: Interesting, but review this: still necessary/useful in CB-1.4 ?.
         try {
             Field op;
             op = YamlConfiguration.class.getDeclaredField("yamlOptions");

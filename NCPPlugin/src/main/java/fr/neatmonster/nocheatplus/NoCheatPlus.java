@@ -45,10 +45,13 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryListener;
 import fr.neatmonster.nocheatplus.checks.moving.MovingListener;
 import fr.neatmonster.nocheatplus.clients.ModUtil;
 import fr.neatmonster.nocheatplus.command.NoCheatPlusCommand;
+import fr.neatmonster.nocheatplus.command.admin.VersionCommand;
 import fr.neatmonster.nocheatplus.compat.BridgeMisc;
 import fr.neatmonster.nocheatplus.compat.DefaultComponentFactory;
 import fr.neatmonster.nocheatplus.compat.MCAccess;
 import fr.neatmonster.nocheatplus.compat.MCAccessFactory;
+import fr.neatmonster.nocheatplus.compat.versions.BukkitVersion;
+import fr.neatmonster.nocheatplus.compat.versions.ServerVersion;
 import fr.neatmonster.nocheatplus.components.ComponentRegistry;
 import fr.neatmonster.nocheatplus.components.ComponentWithName;
 import fr.neatmonster.nocheatplus.components.ConsistencyChecker;
@@ -86,6 +89,7 @@ import fr.neatmonster.nocheatplus.utilities.BlockProperties;
 import fr.neatmonster.nocheatplus.utilities.ColorUtil;
 import fr.neatmonster.nocheatplus.utilities.OnDemandTickListener;
 import fr.neatmonster.nocheatplus.utilities.ReflectionUtil;
+import fr.neatmonster.nocheatplus.utilities.StringUtil;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 /**
@@ -721,12 +725,14 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     public void onLoad() {
         Bukkit.getLogger().info("[NoCheatPlus] Setting up static API, config, logging.");
         NCPAPIProvider.setNoCheatPlusAPI(this);
+        BukkitVersion.init();
         // Read the configuration files.
         ConfigManager.init(this); // TODO: Only load the bootstrap config (not all).
         logManager = new BukkitLogManager(this);
         StaticLog.setStreamID(Streams.INIT);
         StaticLog.setUseLogManager(true);
         logManager.info(Streams.INIT, "[NoCheatPlus] Logging system initialized.");
+        logManager.info(Streams.INIT, "[NoCheatPlus] Detected Minecraft version: " + ServerVersion.getMinecraftVersion());
     }
 
     /* (non-Javadoc)
@@ -932,6 +938,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         // TODO: if (online.lenght > 0) LogUtils.logInfo("[NCP] Updated " + online.length + "players (post-enable).")
         logManager.info(Streams.INIT, "[NoCheatPlus] Post-enable finished.");
+        logManager.info(Streams.DEFAULT_FILE, StringUtil.join(VersionCommand.getVersionInfo(), "\n")); // Queued (!).
     }
 
     /**

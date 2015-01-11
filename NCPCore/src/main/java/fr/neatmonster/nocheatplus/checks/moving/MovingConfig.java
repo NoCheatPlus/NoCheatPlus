@@ -11,6 +11,8 @@ import fr.neatmonster.nocheatplus.checks.access.ACheckConfig;
 import fr.neatmonster.nocheatplus.checks.access.CheckConfigFactory;
 import fr.neatmonster.nocheatplus.checks.access.ICheckConfig;
 import fr.neatmonster.nocheatplus.command.CommandUtil;
+import fr.neatmonster.nocheatplus.compat.AlmostBoolean;
+import fr.neatmonster.nocheatplus.compat.versions.Bugs;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
@@ -244,9 +246,15 @@ public class MovingConfig extends ACheckConfig {
         sprintingGrace = Math.max(0L, (long) (config.getDouble(ConfPaths.MOVING_SPRINTINGGRACE) * 1000.0)); // Config: seconds.
         assumeSprint = config.getBoolean(ConfPaths.MOVING_ASSUMESPRINT);
         speedGrace = Math.max(0, (int) Math.round(config.getDouble(ConfPaths.MOVING_SPEEDGRACE) * 20.0)); // Config: seconds
-        enforceLocation = config.getBoolean(ConfPaths.MOVING_ENFORCELOCATION);
+        AlmostBoolean ref = config.getAlmostBoolean(ConfPaths.MOVING_ENFORCELOCATION, AlmostBoolean.MAYBE);
+        if (ref == AlmostBoolean.MAYBE) {
+            enforceLocation = Bugs.shouldEnforceLocation();
+        } else {
+            enforceLocation = ref.decide();
+        }
 
-        vehicleEnforceLocation = config.getBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION);
+        ref = config.getAlmostBoolean(ConfPaths.MOVING_VEHICLES_ENFORCELOCATION, AlmostBoolean.MAYBE);
+        vehicleEnforceLocation = ref.decideOptimistically(); // Currently rather enabled.
         vehiclePreventDestroyOwn = config.getBoolean(ConfPaths.MOVING_VEHICLES_PREVENTDESTROYOWN);
 
         traceSize = config.getInt(ConfPaths.MOVING_TRACE_SIZE);
@@ -262,20 +270,20 @@ public class MovingConfig extends ACheckConfig {
     @Override
     public final boolean isEnabled(final CheckType checkType) {
         switch (checkType) {
-        case MOVING_NOFALL:
-            return noFallCheck;
-        case MOVING_SURVIVALFLY:
-            return survivalFlyCheck;
-        case MOVING_PASSABLE:
-            return passableCheck;
-        case MOVING_MOREPACKETS:
-            return morePacketsCheck;
-        case MOVING_MOREPACKETSVEHICLE:
-            return morePacketsVehicleCheck;
-        case MOVING_CREATIVEFLY:
-            return creativeFlyCheck;
-        default:
-            return true;
+            case MOVING_NOFALL:
+                return noFallCheck;
+            case MOVING_SURVIVALFLY:
+                return survivalFlyCheck;
+            case MOVING_PASSABLE:
+                return passableCheck;
+            case MOVING_MOREPACKETS:
+                return morePacketsCheck;
+            case MOVING_MOREPACKETSVEHICLE:
+                return morePacketsVehicleCheck;
+            case MOVING_CREATIVEFLY:
+                return creativeFlyCheck;
+            default:
+                return true;
         }
     }
 }
