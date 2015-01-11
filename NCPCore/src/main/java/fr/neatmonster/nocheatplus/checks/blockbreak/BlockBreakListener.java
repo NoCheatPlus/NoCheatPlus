@@ -68,6 +68,10 @@ public class BlockBreakListener extends CheckListener {
      */
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     public void onBlockBreak(final BlockBreakEvent event) {
+        // So plugins can use fake break events with ease.
+        if (event.getBlock().hasMetadata("nocheatplus_ignore")) {
+            return;
+        }
         
         final Player player = event.getPlayer();
         
