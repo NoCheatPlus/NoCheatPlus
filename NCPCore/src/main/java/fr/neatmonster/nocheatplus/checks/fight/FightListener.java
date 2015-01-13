@@ -554,8 +554,8 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         level = Math.min(20.0, level);
         // TODO: How is the direction really calculated?
         // Aim at sqrt(vx * vx + vz * vz, 2), not the exact direction.
-        final double vx = Math.sqrt(0.125 * level * level);
-        final double vz = Math.sqrt(0.125 * level * level);
+        final double vx = level / Math.sqrt(8.0);
+        final double vz = vx;
         final double vy = 0.365;
         useLoc1.setWorld(null); // Cleanup.
         if (damagedData.debug || mdata.debug) {
