@@ -21,7 +21,6 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.util.Vector;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.CheckListener;
@@ -554,20 +553,15 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         // Cap the level to something reasonable. TODO: Config.
         level = Math.min(20.0, level);
         // TODO: How is the direction really calculated?
-        final Vector dir = attacker.getLocation(useLoc1).getDirection().multiply(0.5 * level);
-
-        double vy = dir.getY();
-        if (BlockProperties.isOnGround(damagedPlayer, damagedPlayer.getLocation(useLoc1), mcc.yOnGround)) {
-            // (Re-used useLoc1 without need for cleanup.)
-            // TODO: What here ? 
-            // vy = Math.max(vy, 0.365);
-            vy = 0.365;
-        }
+        // Aim at sqrt(vx * vx + vz * vz, 2), not the exact direction.
+        final double vx = Math.sqrt(0.125 * level * level);
+        final double vz = Math.sqrt(0.125 * level * level);
+        final double vy = 0.365;
         useLoc1.setWorld(null); // Cleanup.
         if (damagedData.debug || mdata.debug) {
             NCPAPIProvider.getNoCheatPlusAPI().getLogManager().debug(Streams.TRACE_FILE, damagedPlayer.getName() + " received knockback level: " + level);
         }
-        mdata.addVelocity(damagedPlayer, mcc, dir.getX(), vy, dir.getZ());
+        mdata.addVelocity(damagedPlayer, mcc,  vx, vy, vz);
     }
 
     /**
