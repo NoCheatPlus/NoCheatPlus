@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -30,7 +29,9 @@ import fr.neatmonster.nocheatplus.compat.blocks.init.vanilla.VanillaBlocksFactor
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.RawConfigFile;
 import fr.neatmonster.nocheatplus.config.WorldConfigProvider;
+import fr.neatmonster.nocheatplus.logging.LogManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.logging.Streams;
 
 /**
  * Properties of blocks.
@@ -802,10 +803,12 @@ public class BlockProperties {
     }
 
     public static void dumpBlocks(boolean all) {
+        final LogManager logManager = NCPAPIProvider.getNoCheatPlusAPI().getLogManager();
         List<String> missing = new LinkedList<String>();
+        List<String> allBlocks = new LinkedList<String>();
         if (all) {
-            StaticLog.logInfo("[NoCheatPlus] Dump block properties for fastbreak check:");
-            StaticLog.logInfo("--- Present entries -------------------------------");
+            allBlocks.add("[NoCheatPlus] Dump block properties for fastbreak check:");
+            allBlocks.add("--- Present entries -------------------------------");
         }
         List<String> tags = new ArrayList<String>();
         for (int i = 0; i < blocks.length; i++) {
@@ -831,16 +834,17 @@ public class BlockProperties {
             }
             else {
                 if (all) {
-                    StaticLog.logInfo(i + ": (" + mat + tagsJoined + ") " + blocks[i].toString());
+                    allBlocks.add(i + ": (" + mat + tagsJoined + ") " + blocks[i].toString());
                 }
             }
         }
+        if (all) {
+            logManager.info(Streams.DEFAULT_FILE, StringUtil.join(allBlocks, "\n"));
+        }
         if (!missing.isEmpty()) {
-            Bukkit.getLogger().warning("[NoCheatPlus] The block breaking data is incomplete, default to allow instant breaking:");
-            StaticLog.logWarning("--- Missing entries -------------------------------");
-            for (String spec : missing) {
-                StaticLog.logWarning(spec);
-            }
+            missing.add(0, "--- Missing entries -------------------------------");
+            missing.add(0, "[NoCheatPlus] The block breaking data is incomplete, default to allow instant breaking:");
+            logManager.warning(Streams.INIT, StringUtil.join(missing,  "\n"));
         }
     }
 
