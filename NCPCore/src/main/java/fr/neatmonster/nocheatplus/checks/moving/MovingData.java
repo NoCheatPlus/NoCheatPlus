@@ -805,7 +805,7 @@ public class MovingData extends ACheckData {
         }
 
 
-        if (vx != 0.0 && vz != 0.0) {
+        if (vx != 0.0 || vz != 0.0) {
             final double newVal = Math.sqrt(vx * vx + vz * vz);
             used = true;
             final Velocity vel = new Velocity(tick, newVal, cc.velocityActivationCounter, Math.max(20,  1 + (int) Math.round(newVal * 10.0)));
