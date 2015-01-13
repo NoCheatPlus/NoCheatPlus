@@ -196,6 +196,23 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
     };
 
+    private class PostEnableTask implements Runnable {
+
+        private final NoCheatPlusCommand commandHandler;
+        private final Player[] onlinePlayers;
+
+        protected PostEnableTask(NoCheatPlusCommand commandHandler, Player[] onlinePlayers) {
+            this.commandHandler = commandHandler;
+            this.onlinePlayers = onlinePlayers;
+        }
+
+        @Override
+        public void run() {
+            postEnable(commandHandler, onlinePlayers);
+        }
+
+    }
+
     /** Access point for thread safe message queuing. */
     private final PlayerMessageSender playerMessageSender  = new PlayerMessageSender();
 
@@ -886,28 +903,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // TODO: re-map ExemptionManager !
         // TODO: Disable all checks for these players for one tick ?
         // TODO: Prepare check data for players [problem: permissions]?
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-            @Override
-            public void run() {
-                postEnable(onlinePlayers,
-                        new Runnable() {
-                    @Override
-                    public void run() {
-                        // Set child permissions for commands for faster checking.
-                        PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FILTER_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
-                            setupCommandProtection();
-                        }
-                    }
-                }
-                        );
-            }
-        });
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new PostEnableTask(commandHandler, onlinePlayers));
 
         // Set StaticLog to more efficient output.
         StaticLog.setStreamID(Streams.STATUS);
@@ -918,16 +914,23 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /**
      * Actions to be done after enable of  all plugins. This aims at reloading mainly.
      */
-    private void postEnable(final Player[] onlinePlayers, Runnable... runnables){
+    protected void postEnable(final NoCheatPlusCommand commandHandler, final Player[] onlinePlayers){
         logManager.info(Streams.INIT, "[NoCheatPlus] Post-enable running...");
-        for (final Runnable runnable : runnables){
-            try{
-                runnable.run();
+        try {
+            // Set child permissions for commands for faster checking.
+            PermissionUtil.addChildPermission(commandHandler.getAllSubCommandPermissions(), Permissions.FILTER_COMMAND_NOCHEATPLUS, PermissionDefault.OP);
+        } catch (Throwable t) {
+            logManager.severe(Streams.INIT, "[NoCheatPlus] Failed to complement permissions: " + t.getClass().getSimpleName());
+            logManager.severe(Streams.INIT, t);
+        }
+        try {
+            // Command protection feature.
+            if (ConfigManager.getConfigFile().getBoolean(ConfPaths.PROTECT_PLUGINS_HIDE_ACTIVE)) {
+                setupCommandProtection();
             }
-            catch(Throwable t){
-                logManager.severe(Streams.INIT, "[NoCheatPlus] Encountered a problem during post-enable: " + t.getClass().getSimpleName());
-                logManager.severe(Streams.INIT, t);
-            }
+        } catch (Throwable t) {
+            logManager.severe(Streams.INIT, "[NoCheatPlus] Failed to apply command protection: " + t.getClass().getSimpleName());
+            logManager.severe(Streams.INIT, t);
         }
         for (final Player player : onlinePlayers){
             updatePermStateReceivers(player);
