@@ -512,14 +512,14 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
                 // Plugin compatibility thing.
                 damagedData.lastNoDamageTicks = ndt;
             }
-            // Skip events that would not count.
-            if (ndt >= damagedPlayer.getMaximumNoDamageTicks() / 2) { // TODO: Exact bounds.
-                final EntityDamageEvent lastDamage = damaged.getLastDamageCause();
-                if (lastDamage != null && BridgeHealth.getFinalDamage(lastDamage) <= BridgeHealth.getFinalDamage(event)) {
-                    return;
-                }
-            }
-            // Knockback calculation.
+            //            // Skip events that would not count.
+            //            if (ndt >= damagedPlayer.getMaximumNoDamageTicks() / 2) { // TODO: Exact bounds.
+            //                final EntityDamageEvent lastDamage = damaged.getLastDamageCause();
+            //                if (lastDamage != null && BridgeHealth.getFinalDamage(lastDamage) <= BridgeHealth.getFinalDamage(event)) {
+            //                    return;
+            //                }
+            //            }
+            // Knock-back calculation (1.8: events only fire if they would count).
             switch (event.getCause()) {
                 case ENTITY_ATTACK:
                     if (event instanceof EntityDamageByEntityEvent) {
