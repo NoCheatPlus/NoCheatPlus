@@ -183,6 +183,7 @@ public class TickTask implements Runnable {
      * <li>Thread safe.</li>
      * <li>Does not work if the TickTask is locked.</li>
      * <li>For OnDemandTickListenerS, setRegistered(true) will get called if not locked.</li>
+     * <li>Will not add the same instance twice, but will call setRegistered each time for OnDemandTickListener instances.</li>
      * @param listener
      */
     public static void addTickListener(TickListener listener) {

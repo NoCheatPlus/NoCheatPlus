@@ -200,7 +200,8 @@ public class BukkitLogManager extends AbstractLogManager implements INotifyReloa
     }
 
     /**
-     * Necessary logging to a primary thread task (TickTask).
+     * Necessary logging to a primary thread task (TickTask) or asynchronously.
+     * This can be called multiple times without causing damage.
      */
     public void startTasks() {
         // TODO: Schedule / hide (redundant calls mean no harm, at present). 

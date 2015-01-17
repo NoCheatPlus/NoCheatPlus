@@ -7,37 +7,41 @@ import fr.neatmonster.nocheatplus.components.TickListener;
 import fr.neatmonster.nocheatplus.utilities.TickTask;
 
 public class BukkitLogNodeDispatcher extends AbstractLogNodeDispatcher { // TODO: Name.
-    
-    
+
+
     /**
      * Permanent TickListener for logging [TODO: on-demand scheduling, but thread-safe. With extra lock.]
      */
     private final TickListener taskPrimary = new TickListener() {
-        
+
         @Override
         public void onTick(final int tick, final long timeLast) {
             if (runLogsPrimary()) {
                 // TODO: Here or within runLogsPrimary, handle rescheduling.
             }
         }
-        
+
     };
-    
+
     /**
      * Needed for scheduling.
      */
     private final Plugin plugin;
-    
+
     public BukkitLogNodeDispatcher(Plugin plugin) {
         this.plugin = plugin;
     }
-    
+
+    /**
+     * Necessary logging to a primary thread task (TickTask) or asynchronously.
+     * This can be called multiple times without causing damage.
+     */
     public void startTasks() {
         // TODO: This is a temporary solution. Needs on-demand scheduling [or a wrapper task].
         TickTask.addTickListener(taskPrimary);
         scheduleAsynchronous(); // Just in case.
     }
-    
+
     @Override
     protected void scheduleAsynchronous() {
         synchronized (queueAsynchronous) {
