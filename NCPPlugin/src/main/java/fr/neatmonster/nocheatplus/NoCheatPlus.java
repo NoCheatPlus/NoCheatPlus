@@ -740,16 +740,30 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     @Override
     public void onLoad() {
-        Bukkit.getLogger().info("[NoCheatPlus] Setting up static API, config, logging.");
-        NCPAPIProvider.setNoCheatPlusAPI(this);
-        BukkitVersion.init();
-        // Read the configuration files.
-        ConfigManager.init(this); // TODO: Only load the bootstrap config (not all).
-        logManager = new BukkitLogManager(this);
-        StaticLog.setStreamID(Streams.INIT);
-        StaticLog.setUseLogManager(true);
-        logManager.info(Streams.INIT, "[NoCheatPlus] Logging system initialized.");
-        logManager.info(Streams.INIT, "[NoCheatPlus] Detected Minecraft version: " + ServerVersion.getMinecraftVersion());
+        Bukkit.getLogger().info("[NoCheatPlus] onLoad: Early set up of static API, configuration, logging.");
+        setupBasics();
+    }
+
+    /**
+     * Lazy initialization of basics (static API, configuration, logging).
+     */
+    private void setupBasics() {
+        if (NCPAPIProvider.getNoCheatPlusAPI() == null) {
+            NCPAPIProvider.setNoCheatPlusAPI(this);
+        }
+        if (ServerVersion.getMinecraftVersion() == ServerVersion.UNKNOWN_VERSION) {
+            BukkitVersion.init();
+        }
+        if (!ConfigManager.isInitialized()) {
+            ConfigManager.init(this);
+        }
+        if (logManager == null || logManager.getStreamID(Streams.STATUS.name) != Streams.STATUS) {
+            logManager = new BukkitLogManager(this);
+            StaticLog.setStreamID(Streams.INIT);
+            StaticLog.setUseLogManager(true);
+            logManager.info(Streams.INIT, "[NoCheatPlus] Logging system initialized.");
+            logManager.info(Streams.INIT, "[NoCheatPlus] Detected Minecraft version: " + ServerVersion.getMinecraftVersion());
+        }
     }
 
     /* (non-Javadoc)
@@ -764,23 +778,20 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         TickTask.cancel();
         TickTask.reset();
 
-        // Allow entries to TickTask (just in case).
+        // Allow entries to TickTask.
         TickTask.setLocked(false);
 
-        // Initialize configuration, if needed.
-        if (!ConfigManager.isInitialized()) {
-            // Read the configuration files (should only happen on reloading).
-            ConfigManager.init(this);
-        }
+        // Re-check basic setup (if onLoad gets skipped by some custom thing).
+        setupBasics();
+
+        // Start logger task(s).
+        logManager.startTasks();
 
         final ConfigFile config = ConfigManager.getConfigFile();
 
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
 
-        // Start logger task(s).
-        logManager.startTasks();
-
-
+        // Listener manager.
         manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
         if (manageListeners) {
             listenerManager.setRegisterDirectly(true);
