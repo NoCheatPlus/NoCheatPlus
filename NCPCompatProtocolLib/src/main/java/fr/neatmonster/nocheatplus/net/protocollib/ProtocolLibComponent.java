@@ -32,17 +32,17 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
     private final List<PacketAdapter> registeredPacketAdapters = new LinkedList<PacketAdapter>();
 
     public ProtocolLibComponent(Plugin plugin) {
-        StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
         register(plugin);
     }
 
     private void register(Plugin plugin) {
+        StaticLog.logInfo("Adding packet level hooks for ProtocolLib (MC " + ProtocolLibrary.getProtocolManager().getMinecraftVersion().getVersion() + ")...");
         // Register Classes having a constructor with Plugin as argument.
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_FLYINGFREQUENCY_ACTIVE)) {
-            register(FlyingFrequency.class, plugin);
+            register("fr.neatmonster.nocheatplus.net.protocollib.FlyingFrequency", plugin);
         }
         if (ConfigManager.isTrueForAnyConfig(ConfPaths.NET_SOUNDDISTANCE_ACTIVE)) {
-            register(SoundDistance.class, plugin);
+            register("fr.neatmonster.nocheatplus.net.protocollib.SoundDistance", plugin);
         }
         if (!registeredPacketAdapters.isEmpty()) {
             List<String> names = new ArrayList<String>(registeredPacketAdapters.size());
@@ -51,7 +51,25 @@ public class ProtocolLibComponent implements DisableListener, INotifyReload {
             }
             StaticLog.logInfo("[NoCheatPlus] Available (and activated) packet level hooks: " + StringUtil.join(names, " | "));
             NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", names);
+        } else {
+            StaticLog.logInfo("[NoCheatPlus] No packet level hooks activated.");
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void register(String name, Plugin plugin) {
+        Throwable t = null;
+        try {
+            Class<?> clazz = Class.forName(name);
+            register((Class<? extends PacketAdapter>) clazz, plugin);
+            return;
+        } catch (ClassNotFoundException e) {
+            t = e;
+        } catch (ClassCastException e) {
+            t = e;
+        }
+        StaticLog.logWarning("[NoCheatPlus] Could not register packet level hook: " + name);
+        StaticLog.logWarning(t);
     }
 
     private void register(Class<? extends PacketAdapter> clazz, Plugin plugin) {
