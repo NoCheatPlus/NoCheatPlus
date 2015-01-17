@@ -25,6 +25,7 @@ public class ServerVersion {
      */
     public static String parseMinecraftVersion(String... versionCandidates) {
         for (String serverVersion : versionCandidates) {
+            serverVersion = serverVersion.trim();
             for (String minecraftVersion : new String[]{
                     collectVersion(serverVersion, 0),
                     parseMinecraftVersionGeneric(serverVersion),
@@ -108,7 +109,7 @@ public class ServerVersion {
     private static String parseMinecraftVersionGeneric(String serverVersion) {
         String lcServerVersion = serverVersion.trim().toLowerCase();
         for (String candidate : new String[] {
-                // git-bukkit-MC_VERSION-rX.Y
+                parseVersionDelimiters(lcServerVersion, "(mc:", ")"),
                 parseVersionDelimiters(lcServerVersion, "git-bukkit-", "-r"),
                 parseVersionDelimiters(lcServerVersion, "", "-r"),
                 // TODO: Other server mods + custom builds !?.
@@ -133,7 +134,7 @@ public class ServerVersion {
             String candidate = input.substring(preIndex + prefix.length());
             int postIndex = suffix.isEmpty() ? candidate.length() : candidate.indexOf(suffix);
             if (postIndex != -1) {
-                return collectVersion(candidate.substring(0, postIndex), 0);
+                return collectVersion(candidate.substring(0, postIndex).trim(), 0);
             }
         }
         return null;
