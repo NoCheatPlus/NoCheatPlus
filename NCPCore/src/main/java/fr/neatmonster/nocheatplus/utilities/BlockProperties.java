@@ -213,12 +213,7 @@ public class BlockProperties {
 
     public static final long[] woodTimes = secToMs(3, 1.5, 0.75, 0.5, 0.4, 0.25);
 
-    public static final long[] ironTimes = secToMs(15, 15, 1.15, 0.75, 0.6, 15);
-
-    public static final long[] diamondTimes = secToMs(15, 15, 15, 0.75, 0.6, 15);
-
     private static final long[] indestructibleTimes = new long[] {indestructible, indestructible, indestructible, indestructible, indestructible, indestructible}; 
-
 
     /** Instantly breakable. */ 
     public static final BlockProps instantType = new BlockProps(noTool, 0, instantTimes);
@@ -234,10 +229,6 @@ public class BlockProperties {
     public static final BlockProps brickType = new BlockProps(woodPickaxe, 2);
 
     public static final BlockProps coalType = new BlockProps(woodPickaxe, 3);
-
-    public static final BlockProps ironType = new BlockProps(stonePickaxe, 3, ironTimes);
-
-    public static final BlockProps diamondType = new BlockProps(ironPickaxe, 3, diamondTimes);
 
     public static final BlockProps goldBlockType = new BlockProps(woodPickaxe, 3, secToMs(15, 7.5, 3.75, 0.7, 0.55, 1.2));
 
@@ -488,10 +479,11 @@ public class BlockProperties {
     }
 
     private static void initBlocks(final MCAccess mcAccess, final WorldConfigProvider<?> worldConfigProvider) {
+        // Reset tool props.
         Arrays.fill(blocks, null);
-        // Initalize block flags
+        // Initialize block flags
         // Generic initialization.
-        for (int i = 0; i <maxBlocks; i++) {
+        for (int i = 0; i < maxBlocks; i++) {
             blockFlags[i] = 0;
 
             if (mcAccess.isBlockLiquid(i).decide()) {
@@ -749,16 +741,18 @@ public class BlockProperties {
         }) {
             blocks[mat.getId()] =  coalType;
         }
+        final long[] ironTimes = secToMs(15, 15, 1.15, 0.75, 0.6, 15);
+        final BlockProps ironType = new BlockProps(stonePickaxe, 3, ironTimes);
         for (Material mat : new Material[]{
                 Material.LAPIS_ORE, Material.LAPIS_BLOCK, Material.IRON_ORE,
-
         }) {
             blocks[mat.getId()] =  ironType;
         }
+        final long[] diamondTimes = secToMs(15, 15, 15, 0.75, 0.6, 15);
+        final BlockProps diamondType = new BlockProps(ironPickaxe, 3, diamondTimes);
         for (Material mat : new Material[]{
                 Material.REDSTONE_ORE, Material.GLOWING_REDSTONE_ORE,
                 Material.EMERALD_ORE, Material.GOLD_ORE, Material.DIAMOND_ORE,
-
         }) {
             blocks[mat.getId()] =  diamondType;
         }
