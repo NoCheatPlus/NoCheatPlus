@@ -3,6 +3,11 @@ package fr.neatmonster.nocheatplus.clients.motd;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
 import org.bukkit.entity.Player;
 
+/**
+ * JourneyMap + VoxelMap mod.
+ * @author web4web1
+ *
+ */
 public class JourneyMapMOTD extends ClientMOTD {
 
     @Override
