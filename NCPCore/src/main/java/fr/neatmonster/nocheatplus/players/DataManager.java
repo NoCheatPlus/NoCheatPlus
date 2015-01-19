@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -51,6 +52,7 @@ import fr.neatmonster.nocheatplus.config.ConfigFile;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.hooks.APIUtils;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
+import fr.neatmonster.nocheatplus.utilities.IdUtil;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**
@@ -301,7 +303,7 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
             instance.playerData.clear(); // TODO
         }
     }
-    
+
     /**
      * Restore the default debug flags within player data, as given in
      * corresponding configurations. This only yields the correct result, if the
@@ -426,6 +428,23 @@ public class DataManager implements Listener, INotifyReload, INeedConfig, Compon
      */
     public static Player getPlayerExact(final String playerName) {
         return instance.onlinePlayers.get(playerName);
+    }
+
+    /**
+     * Retrieve the UUID for a given input (name or UUID string of with or
+     * without '-'). Might later also query a cache, if appropriate. Convenience
+     * method for use with commands.
+     * 
+     * @param input
+     * @return
+     */
+    public static UUID getUUID(final String input) {
+        // TODO: Maintain a name-UUID mapping?
+        final Player player = getPlayer(input);
+        if (player != null) {
+            return player.getUniqueId();
+        }
+        return IdUtil.UUIDFromStringSafe(input);
     }
 
     /**

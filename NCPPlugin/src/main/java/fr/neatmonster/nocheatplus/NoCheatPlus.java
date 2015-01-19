@@ -833,13 +833,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 getCoreListener(),
                 // Put ReloadListener first, because Checks could also listen to it.
                 new ReloadHook(),
-                NCPExemptionManager.getListener(),
-                new ConsistencyChecker() {
-                    @Override
-                    public void checkConsistency(final Player[] onlinePlayers) {
-                        NCPExemptionManager.checkConsistency(onlinePlayers);
-                    }
-                },
                 dataMan,
         }){
             addComponent(obj);
@@ -945,7 +938,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         for (final Player player : onlinePlayers){
             updatePermStateReceivers(player);
-            NCPExemptionManager.registerPlayer(player);
             if (player.isSleeping()) {
                 CombinedData.getData(player).wasInBed = true;
             }
