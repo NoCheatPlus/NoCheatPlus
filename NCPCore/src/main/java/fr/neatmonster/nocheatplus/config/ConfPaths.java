@@ -613,6 +613,10 @@ public abstract class ConfPaths {
     // Compatibility section (possibly temporary).
     @GlobalConfig
     public static final String COMPATIBILITY                             = "compatibility.";
+    public static final String COMPATIBILITY_EXEMPTIONS                  = COMPATIBILITY + "exemptions.";
+    public static final String COMPATIBILITY_EXEMPTIONS_REMOVE           = COMPATIBILITY_EXEMPTIONS + "remove.";
+    public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN      = COMPATIBILITY_EXEMPTIONS_REMOVE + "join";
+    public static final String COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE     = COMPATIBILITY_EXEMPTIONS_REMOVE + "leave";
     public static final String COMPATIBILITY_MANAGELISTENERS			 = COMPATIBILITY + "managelisteners";
     public static final String COMPATIBILITY_BUKKITONLY                  = COMPATIBILITY + "bukkitapionly";
     public static final String COMPATIBILITY_BLOCKS                      = COMPATIBILITY + "blocks.";

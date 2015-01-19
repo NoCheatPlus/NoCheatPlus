@@ -216,6 +216,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     /** Access point for thread safe message queuing. */
     private final PlayerMessageSender playerMessageSender  = new PlayerMessageSender();
 
+    private boolean clearExemptionsOnJoin = true;
+    private boolean clearExemptionsOnLeave = true;
+
     /**
      * Remove expired entries.
      */
@@ -789,7 +792,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         final ConfigFile config = ConfigManager.getConfigFile();
 
-        useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
+        // Set some instance members.
+        setInstanceMembers(config);
 
         // Listener manager.
         manageListeners = config.getBoolean(ConfPaths.COMPATIBILITY_MANAGELISTENERS);
@@ -896,7 +900,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         //        }
 
         // Is the version the configuration was created with consistent with the current one?
-        configProblems = Updates.isConfigUpToDate(config);
         if (configProblems != null && config.getBoolean(ConfPaths.CONFIGVERSION_NOTIFY)){
             // Could use custom prefix from logging, however ncp should be mentioned then.
             logManager.warning(Streams.INIT, "[NoCheatPlus] " + configProblems);
@@ -966,7 +969,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
      */
     protected void processReload(){
         final ConfigFile config = ConfigManager.getConfigFile();
-        configProblems = Updates.isConfigUpToDate(config);
+        setInstanceMembers(config);
         // TODO: Process registered ComponentFactory instances.
         // Set up MCAccess.
         initMCAccess(config);
@@ -980,7 +983,19 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         // (Re-) schedule consistency checking.
         scheduleConsistencyCheckers();
         // Cache some things.
+    }
+
+    /**
+     * Set instance members based on the given configuration. This is meant to
+     * work after reloading the configuration too.
+     * 
+     * @param config
+     */
+    private void setInstanceMembers(final ConfigFile config) {
+        configProblems = Updates.isConfigUpToDate(config);
         useSubscriptions = config.getBoolean(ConfPaths.LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS);
+        clearExemptionsOnJoin = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_JOIN);
+        clearExemptionsOnLeave = config.getBoolean(ConfPaths.COMPATIBILITY_EXEMPTIONS_REMOVE_LEAVE);
     }
 
     @Override
@@ -1085,6 +1100,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             public void onPlayerJoinLowest(final PlayerJoinEvent event) {
                 final Player player = event.getPlayer();
                 updatePermStateReceivers(player);
+                if (clearExemptionsOnJoin) {
+                    NCPExemptionManager.unexempt(player);
+                }
             }
 
             @EventHandler(priority = EventPriority.LOW)
@@ -1156,6 +1174,9 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 logManager.severe(Streams.INIT, "[NoCheatPlus] JoinLeaveListener(" + jlListener.getClass().getName() + ") generated an exception (leave): " + t.getClass().getSimpleName());
                 logManager.severe(Streams.INIT, t);
             }
+        }
+        if (clearExemptionsOnLeave) {
+            NCPExemptionManager.unexempt(player);
         }
     }
 
