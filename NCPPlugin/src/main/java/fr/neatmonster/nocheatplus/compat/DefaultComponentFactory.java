@@ -8,6 +8,7 @@ import java.util.List;
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
+import fr.neatmonster.nocheatplus.checks.inventory.Gutenberg;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
@@ -29,6 +30,8 @@ public class DefaultComponentFactory {
         final List<Object> available = new LinkedList<Object>();
 
         // Add components (try-catch).
+        // TODO: catch ClassNotFound, incompatibleXY rather !?
+        
         // Check: inventory.fastconsume.
         try{
             // TODO: Static test methods !?
@@ -40,6 +43,17 @@ public class DefaultComponentFactory {
         }
         catch (Throwable t){
             StaticLog.logInfo("[NoCheatPlus] Inventory checks: FastConsume is not available.");
+        }
+        
+        // Check: inventory.gutenberg.
+        try {
+            Gutenberg.testAvailability();
+            available.add(new Gutenberg());
+            if (ConfigManager.isTrueForAnyConfig(ConfPaths.INVENTORY_GUTENBERG_CHECK)) {
+                NCPAPIProvider.getNoCheatPlusAPI().addFeatureTags("checks", Arrays.asList(Gutenberg.class.getSimpleName()));
+            }
+        } catch (Throwable t) {
+            StaticLog.logInfo("[NoCheatPlus] Inventory checks: Gutenberg is not available.");
         }
 
         // ProtocolLib dependencies.

@@ -341,6 +341,9 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.INVENTORY_FASTCONSUME_ITEMS, new LinkedList<String>());
         set(ConfPaths.INVENTORY_FASTCONSUME_ACTIONS, "log:fastconsume:2:5:if cancel");
 
+        set(ConfPaths.INVENTORY_GUTENBERG_CHECK, true);
+        set(ConfPaths.INVENTORY_GUTENBERG_ACTIONS, "cancel log:gutenberg:0:10:icf cmd:kickinvaliddata");
+
         set(ConfPaths.INVENTORY_ITEMS_CHECK, true);
 
         set(ConfPaths.INVENTORY_OPEN_CHECK, true);

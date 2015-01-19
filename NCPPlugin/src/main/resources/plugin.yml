@@ -15,7 +15,7 @@ softdepend:
 
 commands:
     nocheatplus:
-        aliases: [ncp]
+        aliases: [ncp]f
         description: NoCheatPlus command(s).
         # permissions: nocheatplus.admin.(...)
         usage: |
@@ -149,6 +149,8 @@ permissions:
                                 description: Allow the player to bypass the FastClick check.
                             nocheatplus.checks.inventory.fastconsume:
                                 description: Allow to bypass the FastConsume check.
+                            nocheatplus.checks.inventory.gutenberg:
+                                description: Allow to bypass the Gutenberg check.
                             nocheatplus.checks.inventory.instantbow:
                                 description: Allow the player to bypass the InstantBow check.
                             nocheatplus.checks.inventory.instanteat:

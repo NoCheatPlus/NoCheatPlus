@@ -109,6 +109,7 @@ public class Permissions {
     public static final String  INVENTORY_DROP               = INVENTORY + ".drop";
     public static final String  INVENTORY_FASTCLICK          = INVENTORY + ".fastclick";
     public static final String  INVENTORY_FASTCONSUME        = INVENTORY + ".fastconsume";
+    public static final String  INVENTORY_GUTENBERG          = INVENTORY + ".gutenberg";
     public static final String  INVENTORY_INSTANTBOW         = INVENTORY + ".instantbow";
     public static final String  INVENTORY_INSTANTEAT         = INVENTORY + ".instanteat";
     public static final String  INVENTORY_ITEMS              = INVENTORY + ".items";
