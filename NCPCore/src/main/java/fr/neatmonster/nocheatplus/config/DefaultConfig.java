@@ -459,6 +459,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".bvisible", start + "interacts with a block out of sight" + end);
         set(ConfPaths.STRINGS + ".bwrong", start + "broke another block than clicked" + end);
         set(ConfPaths.STRINGS + ".captcha", "[player] failed captcha repeatedly" + end);
+        set(ConfPaths.STRINGS + ".chatnormal", start + "potentially annoying chat" + end);
         set(ConfPaths.STRINGS + ".color", start + "sent colored chat message" + end);
         set(ConfPaths.STRINGS + ".commands", start + "issued too many commands" + end);
         set(ConfPaths.STRINGS + ".combspeed", start + "performs different actions at very high speed" + end);
@@ -477,7 +478,7 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".freach", start + "tried to attack entity out of reach" + end);
         set(ConfPaths.STRINGS + ".fselfhit", start + "tried to self-hit" + end);
         set(ConfPaths.STRINGS + ".fspeed", start + "tried to attack with too high a frequency" + end);
-        set(ConfPaths.STRINGS + ".chatnormal", start + "potentially annoying chat" + end);
+        set(ConfPaths.STRINGS + ".gutenberg", start + "created a book with too many pages" + end);
         set(ConfPaths.STRINGS + ".godmode", start + "avoided taking damage or lagging" + end);
         set(ConfPaths.STRINGS + ".improbable", start + "meets the improbable more than expected" + end);
         set(ConfPaths.STRINGS + ".instantbow", start + "fires bow too fast" + end);
@@ -490,10 +491,11 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.STRINGS + ".kickchat5", "ncp tempkick [player] 5 You're not intended to spam!");
         set(ConfPaths.STRINGS + ".kickchatfast", "ncp kick [player] You're not allowed to spam in chat!");
         set(ConfPaths.STRINGS + ".kickchatnormal", "ncp kick [player] Too many chat messages, take a break.");
-        set(ConfPaths.STRINGS + ".kickfly", "ncp delay ncp kick [player] Kicked for flying (or related)");
         set(ConfPaths.STRINGS + ".kickcommands", "ncp tempkick [player] 1 You're not allowed to spam commands!");
+        set(ConfPaths.STRINGS + ".kickfly", "ncp delay ncp kick [player] Kicked for flying (or related)");
         set(ConfPaths.STRINGS + ".kickfrequency", "ncp kick [player] You did something too fast!");
         set(ConfPaths.STRINGS + ".kickgod", "ncp kick [player] God mode?");
+        set(ConfPaths.STRINGS + ".kickinvaliddata", "ncp kick [player] Invalid data.");
         set(ConfPaths.STRINGS + ".kickpackets", "ncp delay ncp kick [player] Too many packets (extreme lag?)");
         set(ConfPaths.STRINGS + ".kickselfhit", "ncp kick [player] You tried to hit yourself!");
         set(ConfPaths.STRINGS + ".kickwb", "ncp kick [player] Block breaking out of sync!");
