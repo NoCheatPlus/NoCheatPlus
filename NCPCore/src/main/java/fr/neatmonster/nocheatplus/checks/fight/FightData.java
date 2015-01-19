@@ -123,7 +123,6 @@ public class FightData extends ACheckData {
     public double                  directionVL;
     public double                  fastHealVL;
     public double                  godModeVL;
-    public double                  knockbackVL;
     public double                  noSwingVL;
     public double                  reachVL;
     public double                  speedVL;
@@ -166,9 +165,6 @@ public class FightData extends ACheckData {
     public int                     lastNoDamageTicks 			= 0;
     /** Accumulator. */
     public int					   godModeAcc 					= 0;
-
-    // Data of the knockback check.
-    public long                    knockbackSprintTime;
 
     // Data of the no swing check.
     public boolean                 noSwingArmSwung;

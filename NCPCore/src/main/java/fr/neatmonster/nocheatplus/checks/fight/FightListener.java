@@ -18,7 +18,6 @@ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -66,9 +65,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
 
     /** The god mode check. */
     private final GodMode     godMode     = addCheck(new GodMode());
-
-    /** The knockback check. */
-    private final Knockback   knockback   = addCheck(new Knockback());
 
     /** The no swing check. */
     private final NoSwing     noSwing     = addCheck(new NoSwing());
@@ -219,10 +215,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
         }
 
         if (!cancelled && critical.isEnabled(player) && critical.check(player, loc, data, cc)) {
-            cancelled = true;
-        }
-
-        if (!cancelled && knockback.isEnabled(player) && knockback.check(player, data, cc)) {
             cancelled = true;
         }
 
@@ -592,19 +584,6 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
     protected void onPlayerAnimation(final PlayerAnimationEvent event) {
         // Set a flag telling us that the arm has been swung.
         FightData.getData(event.getPlayer()).noSwingArmSwung = true;
-    }
-
-    /**
-     * We listen to the PlayerToggleSprint events for the Knockback check.
-     * 
-     * @param event
-     *            the event
-     */
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onPlayerToggleSprint(final PlayerToggleSprintEvent event) {
-        if (event.isSprinting()) {
-            FightData.getData(event.getPlayer()).knockbackSprintTime = System.currentTimeMillis();
-        }
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

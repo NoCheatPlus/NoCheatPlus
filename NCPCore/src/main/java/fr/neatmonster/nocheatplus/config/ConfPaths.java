@@ -408,11 +408,6 @@ public abstract class ConfPaths {
     public static final String  FIGHT_GODMODE_LAGMAXAGE 				 = FIGHT_GODMODE + "maxage";
     public static final String  FIGHT_GODMODE_ACTIONS                    = FIGHT_GODMODE + "actions";
 
-    private static final String FIGHT_KNOCKBACK                          = FIGHT + "knockback.";
-    public static final String  FIGHT_KNOCKBACK_CHECK                    = FIGHT_KNOCKBACK + "active";
-    public static final String  FIGHT_KNOCKBACK_INTERVAL                 = FIGHT_KNOCKBACK + "interval";
-    public static final String  FIGHT_KNOCKBACK_ACTIONS                  = FIGHT_KNOCKBACK + "actions";
-
     private static final String FIGHT_NOSWING                            = FIGHT + "noswing.";
     public static final String  FIGHT_NOSWING_CHECK                      = FIGHT_NOSWING + "active";
     public static final String  FIGHT_NOSWING_ACTIONS                    = FIGHT_NOSWING + "actions";
@@ -657,5 +652,11 @@ public abstract class ConfPaths {
     public static final String  FIGHT_CRITICAL_VELOCITY                  = "checks.fight.critical.velocity";
     @Deprecated
     public static final  String BLOCKBREAK_FASTBREAK_DEBUG               = "checks.blockbreak.fastbreak.debug";
+    @Deprecated
+    public static final String  FIGHT_KNOCKBACK_CHECK                    = "checks.fight.knockback.active";
+    @Deprecated
+    public static final String  FIGHT_KNOCKBACK_INTERVAL                 = "checks.fight.knockback.interval";
+    @Deprecated
+    public static final String  FIGHT_KNOCKBACK_ACTIONS                  = "checks.fight.knockback.actions";
 
 }

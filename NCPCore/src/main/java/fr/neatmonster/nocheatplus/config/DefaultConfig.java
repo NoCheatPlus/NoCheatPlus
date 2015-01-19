@@ -291,10 +291,6 @@ public class DefaultConfig extends ConfigFile {
         set(ConfPaths.FIGHT_GODMODE_LAGMAXAGE, 5000);
         set(ConfPaths.FIGHT_GODMODE_ACTIONS, "log:godmode:2:5:if cancel vl>60 log:godmode:2:5:icf cancel"); // cmd:kickgod");
 
-        set(ConfPaths.FIGHT_KNOCKBACK_CHECK, true);
-        set(ConfPaths.FIGHT_KNOCKBACK_INTERVAL, 50L);
-        set(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, "cancel vl>50 log:knockback:0:5:cif cancel");
-
         set(ConfPaths.FIGHT_NOSWING_CHECK, true);
         set(ConfPaths.FIGHT_NOSWING_ACTIONS, "cancel vl>10 log:noswing:0:5:if cancel");
 

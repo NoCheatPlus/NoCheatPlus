@@ -74,7 +74,6 @@ public enum CheckType {
     FIGHT_DIRECTION(FIGHT, Permissions.FIGHT_DIRECTION),
     FIGHT_FASTHEAL(FIGHT, Permissions.FIGHT_FASTHEAL),
     FIGHT_GODMODE(FIGHT, Permissions.FIGHT_GODMODE),
-    FIGHT_KNOCKBACK(FIGHT, Permissions.FIGHT_KNOCKBACK),
     FIGHT_NOSWING(FIGHT, Permissions.FIGHT_NOSWING),
     FIGHT_REACH(FIGHT, Permissions.FIGHT_REACH),
     FIGHT_SELFHIT(FIGHT, Permissions.FIGHT_SELFHIT, FightConfig.factory, FightData.selfHitDataFactory),

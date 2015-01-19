@@ -80,10 +80,6 @@ public class FightConfig extends ACheckConfig {
     public final long 		godModeLagMaxAge;
     public final ActionList godModeActions;
 
-    public final boolean    knockbackCheck;
-    public final long       knockbackInterval;
-    public final ActionList knockbackActions;
-
     public final boolean    noSwingCheck;
     public final ActionList noSwingActions;
 
@@ -148,10 +144,6 @@ public class FightConfig extends ACheckConfig {
         godModeLagMaxAge = data.getLong(ConfPaths.FIGHT_GODMODE_LAGMAXAGE);
         godModeActions = data.getOptimizedActionList(ConfPaths.FIGHT_GODMODE_ACTIONS, Permissions.FIGHT_GODMODE);
 
-        knockbackCheck = data.getBoolean(ConfPaths.FIGHT_KNOCKBACK_CHECK);
-        knockbackInterval = data.getLong(ConfPaths.FIGHT_KNOCKBACK_INTERVAL);
-        knockbackActions = data.getOptimizedActionList(ConfPaths.FIGHT_KNOCKBACK_ACTIONS, Permissions.FIGHT_KNOCKBACK);
-
         noSwingCheck = data.getBoolean(ConfPaths.FIGHT_NOSWING_CHECK);
         noSwingActions = data.getOptimizedActionList(ConfPaths.FIGHT_NOSWING_ACTIONS, Permissions.FIGHT_NOSWING);
 
@@ -197,8 +189,6 @@ public class FightConfig extends ACheckConfig {
                 return directionCheck;
             case FIGHT_GODMODE:
                 return godModeCheck;
-            case FIGHT_KNOCKBACK:
-                return knockbackCheck;
             case FIGHT_NOSWING:
                 return noSwingCheck;
             case FIGHT_REACH:

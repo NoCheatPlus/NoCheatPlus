@@ -99,7 +99,6 @@ public class Permissions {
     public static final String  FIGHT_DIRECTION              = FIGHT + ".direction";
     public static final String  FIGHT_FASTHEAL               = FIGHT + ".fastheal";
     public static final String  FIGHT_GODMODE                = FIGHT + ".godmode";
-    public static final String  FIGHT_KNOCKBACK              = FIGHT + ".knockback";
     public static final String  FIGHT_NOSWING                = FIGHT + ".noswing";
     public static final String  FIGHT_REACH                  = FIGHT + ".reach";
     public static final String  FIGHT_SELFHIT                = FIGHT + ".selfhit";

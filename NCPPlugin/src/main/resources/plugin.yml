@@ -130,8 +130,6 @@ permissions:
                                 description: Allow the player to bypass the FastHeal check.
                             nocheatplus.checks.fight.godmode:
                                 description: Allow the player to bypass the GodMode check.
-                            nocheatplus.checks.fight.knockback:
-                                description: Allow the player to bypass the Knockback check.
                             nocheatplus.checks.fight.noswing:
                                 description: Allow the player to bypass the NoSwing check.
                             nocheatplus.checks.fight.reach:
