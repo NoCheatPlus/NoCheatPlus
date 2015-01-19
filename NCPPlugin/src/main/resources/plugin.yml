@@ -15,7 +15,7 @@ softdepend:
 
 commands:
     nocheatplus:
-        aliases: [ncp]f
+        aliases: [ncp]
         description: NoCheatPlus command(s).
         # permissions: nocheatplus.admin.(...)
         usage: |
