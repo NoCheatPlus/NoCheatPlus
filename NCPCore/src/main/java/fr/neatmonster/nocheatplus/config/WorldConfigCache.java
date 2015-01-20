@@ -10,10 +10,19 @@ import org.bukkit.World;
  */
 public abstract class WorldConfigCache<C> extends ConfigCache<String, C> {
 
+    /**
+     * 
+     * @param cow If true, copy-on-write is used (thread-safe), otherwise an ordinary HashMap.
+     */
     public WorldConfigCache(boolean cow) {
         this(cow, 10);
     }
 
+    /**
+     * 
+     * @param cow If true, copy-on-write is used (thread-safe), otherwise an ordinary HashMap.
+     * @param initialCapacity
+     */
     public WorldConfigCache(boolean cow, int initialCapacity) {
         super(cow, initialCapacity);
     }

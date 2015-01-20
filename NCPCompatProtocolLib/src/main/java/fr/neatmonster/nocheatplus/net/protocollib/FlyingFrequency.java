@@ -1,5 +1,6 @@
 package fr.neatmonster.nocheatplus.net.protocollib;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,11 +14,12 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
+import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.net.NetConfig;
 import fr.neatmonster.nocheatplus.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.stats.Counters;
+import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
-import fr.neatmonster.nocheatplus.utilities.ds.corw.LinkedHashMapCOW;
 
 /**
  * Prevent extremely fast ticking by just sending packets that don't do anything
@@ -42,12 +44,15 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
         public final float[] floats = new float[2]; // yaw, pitch
         //public final boolean[] booleans = new boolean[3]; // ground, hasPos, hasLook
         public boolean onGround = false;
+        public long timeOnGround = 0;
+        public long timeNotOnGround = 0;
+
         public FFData(int seconds) {
             all = new ActionFrequency(seconds, 1000L);
         }
     }
 
-    private final Map<String, FFData> freqMap = new LinkedHashMapCOW<String, FFData>();  
+    private final Map<String, FFData> freqMap = new HashMap<String, FFData>();  
     private final Counters counters = NCPAPIProvider.getNoCheatPlusAPI().getGenericInstance(Counters.class);
     private final int idSilent = counters.registerKey("packet.flying.silentcancel");
     private final int idRedundant = counters.registerKey("packet.flying.silentcancel.redundant");
@@ -73,7 +78,7 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
         freqMap.remove(player.getName());
     }
 
-    private FFData getFreq(final String name, final NetConfig cc) {
+    private FFData getData(final String name, final NetConfig cc) {
         final FFData freq = this.freqMap.get(name);
         if (freq != null) {
             return freq;
@@ -100,11 +105,11 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
             return;
         }
 
-        final FFData freq = getFreq(player.getName(), cc);
+        final FFData data = getData(player.getName(), cc);
         final long t = System.currentTimeMillis();
         // Counting all packets.
-        freq.all.add(t, 1f);
-        final float allScore = freq.all.score(1f);
+        data.all.add(t, 1f);
+        final float allScore = data.all.score(1f);
         if (allScore > cc.flyingFrequencyMaxPackets) {
             counters.add(idSilent, 1); // Until it is sure if we can get these async.
             event.setCancelled(true);
@@ -112,58 +117,91 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
         }
 
         // Cancel redundant packets, when frequency is high anyway.
-        if (!cancelRedundant || !cc.flyingFrequencyCancelRedundant) {
-            return;
+        if (cancelRedundant && cc.flyingFrequencyCancelRedundant && checkRedundantPackets(event, allScore, data, cc)) {
+            event.setCancelled(true);
         }
-        // TODO: Consider to detect if a moving event would fire (...).
+
+    }
+
+    private boolean checkRedundantPackets(final PacketEvent event, final float allScore, final FFData data, final NetConfig cc) {
+        // TODO: Check vs. MovingData last-to.
+        // TODO: Consider quick return conditions.
+        // TODO: Debug logging (better with integration into DataManager).
+
         boolean redundant = true;
         final PacketContainer packet = event.getPacket();
         final List<Boolean> booleans = packet.getBooleans().getValues();
         if (booleans.size() != FFData.numBooleans) {
-            cancelRedundant = false;
-            return;
+            return packetMismatch();
         }
-        final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue(); 
-        if (onGround != freq.onGround) {
-            redundant = false;
-        }
-        freq.onGround = onGround;
-        // TODO: Consider to verify on ground somehow.
-        if (booleans.get(FFData.indexhasPos)) {
+        final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue();
+        final boolean hasPos = booleans.get(FFData.indexhasPos);
+        final boolean hasLook = booleans.get(FFData.indexhasLook);
+
+        if (hasPos) {
             final List<Double> doubles = packet.getDoubles().getValues();
-            if (doubles.size() != freq.doubles.length) {
-                cancelRedundant = false;
-                return;
+            if (doubles.size() != data.doubles.length) {
+                return packetMismatch();
             }
-            for (int i = 0; i < freq.doubles.length; i++) {
+            for (int i = 0; i < data.doubles.length; i++) {
                 final double val = doubles.get(i).doubleValue();
-                if (val != freq.doubles[i]) {
+                if (val != data.doubles[i]) {
                     redundant = false;
-                    freq.doubles[i] = val;
+                    data.doubles[i] = val;
                 }
             }
         }
-        if (booleans.get(FFData.indexhasLook)) {
+
+        if (hasLook) {
             final List<Float> floats = packet.getFloat().getValues();
-            if (floats.size() != freq.floats.length) {
-                cancelRedundant = false;
-                return;
+            if (floats.size() != data.floats.length) {
+                return packetMismatch();
             }
-            for (int i = 0; i < freq.floats.length; i++) {
+            for (int i = 0; i < data.floats.length; i++) {
                 final float val = floats.get(i).floatValue();
-                if (val != freq.floats[i]) {
+                if (val != data.floats[i]) {
                     redundant = false;
-                    freq.floats[i] = val;
+                    data.floats[i] = val;
                 }
             }
         }
+
+        // TODO: Consider to verify on ground somehow (could tell MovingData the state).
+        if (onGround != data.onGround) {
+            // Regard as not redundant only if sending the same state happened at least a second ago. 
+            final long time = Monotonic.millis();
+            final long lastTime;
+            if (onGround) {
+                lastTime = data.timeOnGround;
+                data.timeOnGround = time;
+            } else {
+                lastTime = data.timeNotOnGround;
+                data.timeNotOnGround = time;
+            }
+            if (time - lastTime < 1000) {
+                redundant = false;
+            }
+        }
+        data.onGround = onGround;
+
         if (redundant) {
             // TODO: Could check first bucket or even just 50 ms to last packet.
             if (allScore / cc.flyingFrequencySeconds > 20f) {
                 counters.add(idRedundant, 1);
-                event.setCancelled(true);
+                return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * Log warning to console, halt checking for redundant packets.
+     * @return Always returns false;
+     */
+    private boolean packetMismatch() {
+        cancelRedundant = false;
+        NCPAPIProvider.getNoCheatPlusAPI().getLogManager().warning(Streams.STATUS, "[NoCheatPlus] Data mismatch: disable cancelling of redundant packets.");
+        return false;
     }
 
 }
