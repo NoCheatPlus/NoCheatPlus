@@ -609,12 +609,7 @@ public class MovingListener extends CheckListener implements TickListener, IRemo
         if (newTo == null) {
             // Set positions.
             // TODO: Consider setting in Monitor (concept missing for changing coordinates, could double-check).
-            data.fromX = from.getX();
-            data.fromY = from.getY();
-            data.fromZ = from.getZ();
-            data.toX = to.getX();
-            data.toY = to.getY();
-            data.toZ = to.getZ();
+            data.setPositions(from, to);
         }
         else {
             // Set-back handling.

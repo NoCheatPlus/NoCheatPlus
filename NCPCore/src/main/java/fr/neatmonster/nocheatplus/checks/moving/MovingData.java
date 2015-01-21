@@ -130,7 +130,9 @@ public class MovingData extends ACheckData {
     /** Last from coordinates. X is at Double.MAX_VALUE, if not set. */
     public double         fromX = Double.MAX_VALUE, fromY, fromZ;
     /** Last to coordinates. X is at Double.MAX_VALUE, if not set. */
-    public double 		  toX = Double.MAX_VALUE, toY, toZ;
+    public double         toX = Double.MAX_VALUE, toY, toZ;
+    /** Last to looking direction. Yaw is at Float.MAX_VALUE if not set. */
+    public float          toYaw = Float.MAX_VALUE, toPitch ;
     /** Moving trace (to-positions, use tick as time). This is initialized on "playerJoins, i.e. MONITOR, and set to null on playerLeaves." */
     private LocationTrace trace = null; 
 
@@ -225,6 +227,7 @@ public class MovingData extends ACheckData {
         setBack = null;
         sfLastYDist = sfLastHDist = Double.MAX_VALUE;
         fromX = toX = Double.MAX_VALUE;
+        toYaw = Float.MAX_VALUE;
         clearAccounting();
         clearNoFallData();
         removeAllVelocity();
@@ -290,10 +293,10 @@ public class MovingData extends ACheckData {
      */
     public void resetPositions(final Location loc) {
         if (loc == null) {
-            resetPositions(Double.MAX_VALUE, 0, 0);
+            resetPositions();
         }
         else {
-            resetPositions(loc.getX(), loc.getY(), loc.getZ());
+            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         }
     }
 
@@ -303,11 +306,18 @@ public class MovingData extends ACheckData {
      */
     public void resetPositions(PlayerLocation loc) {
         if (loc == null) {
-            resetPositions(Double.MAX_VALUE, 0, 0);
+            resetPositions();
         }
         else {
-            resetPositions(loc.getX(), loc.getY(), loc.getZ());
+            resetPositions(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         }
+    }
+
+    /**
+     * Reset the "last locations" to "not set".
+     */
+    public void resetPositions() {
+        resetPositions(Double.MAX_VALUE, 0.0, 0.0, Float.MAX_VALUE, 0f);
     }
 
     /**
@@ -316,16 +326,34 @@ public class MovingData extends ACheckData {
      * @param y
      * @param z
      */
-    public void resetPositions(final double x, final double y, final double z) {
+    public void resetPositions(final double x, final double y, final double z, final float yaw, final float pitch) {
         fromX = toX = x;
         fromY = toY = y;
         fromZ = toZ = z;
+        toYaw = yaw;
+        toPitch = pitch;
         sfLastYDist = sfLastHDist = Double.MAX_VALUE;
         sfDirty = false;
         sfLowJump = false;
         mediumLiftOff = defaultMediumLiftOff;
         // TODO: other buffers ?
         // No reset of vehicleConsistency.
+    }
+
+    /**
+     * Set positions according to a move (just to and from).
+     * @param from
+     * @param to
+     */
+    public void setPositions(final Location from, final Location to) {
+        fromX = from.getX();
+        fromY = from.getY();
+        fromZ = from.getZ();
+        toX = to.getX();
+        toY = to.getY();
+        toZ = to.getZ();
+        toYaw = to.getYaw();
+        toPitch = to.getPitch();
     }
 
     /**
@@ -516,6 +544,8 @@ public class MovingData extends ACheckData {
         toX = to.getX();
         toY = to.getY();
         toZ = to.getZ();
+        toYaw = to.getYaw();
+        toPitch = to.getPitch();
     }
 
     /**

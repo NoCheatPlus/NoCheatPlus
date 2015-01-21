@@ -13,6 +13,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.logging.Streams;
 import fr.neatmonster.nocheatplus.net.NetConfig;
@@ -20,6 +21,8 @@ import fr.neatmonster.nocheatplus.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
+import fr.neatmonster.nocheatplus.utilities.CheckUtils;
+import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 /**
  * Prevent extremely fast ticking by just sending packets that don't do anything
@@ -30,6 +33,10 @@ import fr.neatmonster.nocheatplus.utilities.ActionFrequency;
  */
 public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener {
 
+    public static final double minMoveDistSq = 1f / 256; // PlayerConnection magic.
+
+    public static final float minLookChange = 10f;
+
     // TODO: Most efficient registration + optimize (primary thread or asynchronous).
 
     private class FFData {
@@ -39,10 +46,7 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
         public static final int indexhasLook = 2;
 
         public final ActionFrequency all;
-        // Last move.
-        public final double[] doubles = new double[3]; // x, y, z
-        public final float[] floats = new float[2]; // yaw, pitch
-        //public final boolean[] booleans = new boolean[3]; // ground, hasPos, hasLook
+        // Last move on-ground.
         public boolean onGround = false;
         public long timeOnGround = 0;
         public long timeNotOnGround = 0;
@@ -117,55 +121,34 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
         }
 
         // Cancel redundant packets, when frequency is high anyway.
-        if (cancelRedundant && cc.flyingFrequencyCancelRedundant && checkRedundantPackets(event, allScore, data, cc)) {
+        if (cancelRedundant && cc.flyingFrequencyCancelRedundant && checkRedundantPackets(player, event, allScore, data, cc)) {
             event.setCancelled(true);
         }
 
     }
 
-    private boolean checkRedundantPackets(final PacketEvent event, final float allScore, final FFData data, final NetConfig cc) {
-        // TODO: Check vs. MovingData last-to.
+    private boolean checkRedundantPackets(final Player player, final PacketEvent event, final float allScore, final FFData data, final NetConfig cc) {
         // TODO: Consider quick return conditions.
         // TODO: Debug logging (better with integration into DataManager).
+        // TODO: Consider to compare to moving data directly, skip keeping track extra.
 
-        boolean redundant = true;
         final PacketContainer packet = event.getPacket();
         final List<Boolean> booleans = packet.getBooleans().getValues();
         if (booleans.size() != FFData.numBooleans) {
             return packetMismatch();
         }
-        final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue();
+
+        final MovingData mData = MovingData.getData(player);
+        if (mData.toX == Double.MAX_VALUE && mData.toYaw == Float.MAX_VALUE) {
+            // Can not check.
+            return false;
+        }
         final boolean hasPos = booleans.get(FFData.indexhasPos);
         final boolean hasLook = booleans.get(FFData.indexhasLook);
+        final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue();
+        boolean onGroundSkip = false;
 
-        if (hasPos) {
-            final List<Double> doubles = packet.getDoubles().getValues();
-            if (doubles.size() != data.doubles.length) {
-                return packetMismatch();
-            }
-            for (int i = 0; i < data.doubles.length; i++) {
-                final double val = doubles.get(i).doubleValue();
-                if (val != data.doubles[i]) {
-                    redundant = false;
-                    data.doubles[i] = val;
-                }
-            }
-        }
-
-        if (hasLook) {
-            final List<Float> floats = packet.getFloat().getValues();
-            if (floats.size() != data.floats.length) {
-                return packetMismatch();
-            }
-            for (int i = 0; i < data.floats.length; i++) {
-                final float val = floats.get(i).floatValue();
-                if (val != data.floats[i]) {
-                    redundant = false;
-                    data.floats[i] = val;
-                }
-            }
-        }
-
+        // Allow at least one on-ground change per second.
         // TODO: Consider to verify on ground somehow (could tell MovingData the state).
         if (onGround != data.onGround) {
             // Regard as not redundant only if sending the same state happened at least a second ago. 
@@ -178,20 +161,58 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
                 lastTime = data.timeNotOnGround;
                 data.timeNotOnGround = time;
             }
+            // Only invalidate if there is no look/pos.
             if (time - lastTime < 1000) {
-                redundant = false;
+                onGroundSkip = true;
             }
         }
         data.onGround = onGround;
 
-        if (redundant) {
-            // TODO: Could check first bucket or even just 50 ms to last packet.
-            if (allScore / cc.flyingFrequencySeconds > 20f) {
-                counters.add(idRedundant, 1);
+        if (hasPos) {
+            final List<Double> doubles = packet.getDoubles().getValues();
+            if (doubles.size() != 3) {
+                return packetMismatch();
+            }
+            final double x = doubles.get(0).doubleValue();
+            final double y = doubles.get(1).doubleValue();
+            final double z = doubles.get(2).doubleValue();
+            if (CheckUtils.isBadCoordinate(x, y, z)) {
+                // TODO: Alert, counters, kick.
                 return true;
             }
+            if (TrigUtil.distanceSquared(x, y, z, mData.toX, mData.toY, mData.toZ) > minMoveDistSq) {
+                return false;
+            }
         }
-        return false;
+
+        if (hasLook) {
+            final List<Float> floats = packet.getFloat().getValues();
+            if (floats.size() != 2) {
+                return packetMismatch();
+            }
+            final float yaw = floats.get(0).floatValue();
+            final float pitch = floats.get(1).floatValue();
+            // TODO: Consider to detect bad pitch too.
+            if (CheckUtils.isBadCoordinate(yaw, pitch)) {
+                // TODO: Alert, counters, kick.
+                return true;
+            }
+            if (Math.abs(TrigUtil.yawDiff(yaw, mData.toYaw)) > minLookChange || Math.abs(TrigUtil.yawDiff(pitch, mData.toPitch)) > minLookChange) {
+                return false;
+            }
+        }
+
+        if (onGroundSkip) {
+            return false;
+        }
+
+        // TODO: Could check first bucket or even just 50 ms to last packet.
+        if (allScore / cc.flyingFrequencySeconds > 20f) {
+            counters.add(idRedundant, 1);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
