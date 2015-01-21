@@ -148,7 +148,7 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
         final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue();
         boolean onGroundSkip = false;
 
-        // Allow at least one on-ground change per second.
+        // Allow at least one on-ground change per state and second.
         // TODO: Consider to verify on ground somehow (could tell MovingData the state).
         if (onGround != data.onGround) {
             // Regard as not redundant only if sending the same state happened at least a second ago. 
@@ -161,8 +161,8 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
                 lastTime = data.timeNotOnGround;
                 data.timeNotOnGround = time;
             }
-            // Only invalidate if there is no look/pos.
-            if (time - lastTime < 1000) {
+            if (time - lastTime > 1000) {
+                // Override 
                 onGroundSkip = true;
             }
         }
