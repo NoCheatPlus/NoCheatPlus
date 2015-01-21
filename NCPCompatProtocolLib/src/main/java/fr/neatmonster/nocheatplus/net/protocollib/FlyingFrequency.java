@@ -143,8 +143,8 @@ public class FlyingFrequency extends PacketAdapter implements JoinLeaveListener 
             // Can not check.
             return false;
         }
-        final boolean hasPos = booleans.get(FFData.indexhasPos);
-        final boolean hasLook = booleans.get(FFData.indexhasLook);
+        final boolean hasPos = booleans.get(FFData.indexhasPos).booleanValue();
+        final boolean hasLook = booleans.get(FFData.indexhasLook).booleanValue();
         final boolean onGround = booleans.get(FFData.indexOnGround).booleanValue();
         boolean onGroundSkip = false;
 
