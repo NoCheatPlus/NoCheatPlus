@@ -110,6 +110,7 @@ public class ServerVersion {
         String lcServerVersion = serverVersion.trim().toLowerCase();
         for (String candidate : new String[] {
                 parseVersionDelimiters(lcServerVersion, "(mc:", ")"),
+                parseVersionDelimiters(lcServerVersion, "mcpc-plus-", "-"),
                 parseVersionDelimiters(lcServerVersion, "git-bukkit-", "-r"),
                 parseVersionDelimiters(lcServerVersion, "", "-r"),
                 // TODO: Other server mods + custom builds !?.
