@@ -18,7 +18,8 @@ public interface GenericInstanceRegistry {
 	public <T> T registerGenericInstance(T instance);
 	
 	/**
-	 * Register an instance under for a super-class. The registry implementation might specify id overriding is allowed.
+	 * Register an instance under for a super-class. 
+	 * @todo The registry implementation might specify if overriding is allowed.
 	 * @param registerAs
 	 * @param instance
 	 * @return The previously registered instance. If none was registered, null is returned.
