@@ -1258,7 +1258,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 }
             });
             if (debug){
-                logManager.info(Streams.TRACE_FILE, "[NoCheatPlus] Interrupted consistency checking until next tick.");
+                logManager.info(Streams.STATUS, "[NoCheatPlus] Interrupted consistency checking until next tick.");
             }
         }
     }
