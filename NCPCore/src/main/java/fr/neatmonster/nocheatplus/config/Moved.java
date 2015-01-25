@@ -16,5 +16,18 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Moved{
-	public String newPath() default "";
+
+    /**
+     * The new path where the content has moved to.
+     * @return
+     */
+    public String newPath() default "";
+
+    /**
+     * Only added to be able to explicitly deny moving configuration sections.
+     * Moving configuration sections might not actually be supported.
+     * 
+     * @return If to allow moving configuration sections.
+     */
+    public boolean configurationSection() default false;
 }
