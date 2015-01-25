@@ -28,7 +28,6 @@ public abstract class ConfPaths {
     @GlobalConfig
     private static final String LOGGING                                  = "logging.";
     public static final String  LOGGING_ACTIVE                           = LOGGING + "active";
-    public static final String  LOGGING_DEBUG                            = LOGGING + "debug";
     public static final String  LOGGING_MAXQUEUESIZE                     = LOGGING + "maxqueuesize";
 
     private static final String LOGGING_BACKEND							 = LOGGING + "backend.";
@@ -44,6 +43,9 @@ public abstract class ConfPaths {
     public static final String  LOGGING_BACKEND_INGAMECHAT_ACTIVE      	 = LOGGING_BACKEND_INGAMECHAT + "active";
     public static final String  LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS = LOGGING_BACKEND_INGAMECHAT + "subscriptions";
     public static final String  LOGGING_BACKEND_INGAMECHAT_PREFIX		 = LOGGING_BACKEND_INGAMECHAT + "prefix";
+
+    private static final String LOGGING_EXTENDED                         = LOGGING + "extended.";
+    public static final String  LOGGING_EXTENDED_STATUS                  = LOGGING_EXTENDED + "status";
 
     @GlobalConfig
     private static final String MISCELLANEOUS = "miscellaneous.";
@@ -631,23 +633,25 @@ public abstract class ConfPaths {
     @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_ACTIVE)
     public static final String  LOGGING_INGAMECHAT                       = "logging.ingamechat";
     @Moved(newPath = LOGGING_BACKEND_INGAMECHAT_SUBSCRIPTIONS)
-    public static final String  LOGGING_USESUBSCRIPTIONS  		 		 = "logging.usesubscriptions";
+    public static final String  LOGGING_USESUBSCRIPTIONS                 = "logging.usesubscriptions";
     @Moved(newPath = PROTECT_PLUGINS_HIDE_ACTIVE)
-    public static final String  MISCELLANEOUS_PROTECTPLUGINS			 = "miscellaneous.protectplugins";
+    public static final String  MISCELLANEOUS_PROTECTPLUGINS             = "miscellaneous.protectplugins";
     @Moved(newPath = PROTECT_CLIENTS_MOTD_ALLOWALL)
-    public static final String  MISCELLANEOUS_ALLOWCLIENTMODS			 = "miscellaneous.allowclientmods";
+    public static final String  MISCELLANEOUS_ALLOWCLIENTMODS            = "miscellaneous.allowclientmods";
     @Moved(newPath = PROTECT_PLUGINS_HIDE_NOCOMMAND_MSG)
-    public static  final String PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND		 = "protection.plugins.hide.messages.unknowncommand";
+    public static  final String PROTECT_PLUGINS_HIDE_MSG_NOCOMMAND       = "protection.plugins.hide.messages.unknowncommand";
     @Moved(newPath = PROTECT_PLUGINS_HIDE_NOPERMISSION_MSG)
-    public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION	 = "protection.plugins.hide.messages.nopermission";
+    public static  final String PROTECT_PLUGINS_HIDE_MSG_NOPERMISSION    = "protection.plugins.hide.messages.nopermission";
     @Moved(newPath = PROTECT_COMMANDS_CONSOLEONLY_ACTIVE)
-    public static final String  MISCELLANEOUS_OPINCONSOLEONLY			 = "miscellaneous.opinconsoleonly";
+    public static final String  MISCELLANEOUS_OPINCONSOLEONLY            = "miscellaneous.opinconsoleonly";
     @Moved(newPath = COMPATIBILITY_MANAGELISTENERS)
-    public static final String  MISCELLANEOUS_MANAGELISTENERS			 = "miscellaneous.managelisteners";
+    public static final String  MISCELLANEOUS_MANAGELISTENERS            = "miscellaneous.managelisteners";
     @Moved(newPath = INVENTORY_OPEN_CHECK)
-    public static final String  INVENTORY_ENSURECLOSE					 = "checks.inventory.ensureclose";
+    public static final String  INVENTORY_ENSURECLOSE                    = "checks.inventory.ensureclose";
+    @Moved(newPath = LOGGING_EXTENDED_STATUS)
+    public static final String LOGGING_DEBUG                             = "logging.debug";
     @Deprecated
-    public static final String  MISCELLANEOUS_REPORTTOMETRICS			 = "miscellaneous.reporttometrics";
+    public static final String  MISCELLANEOUS_REPORTTOMETRICS            = "miscellaneous.reporttometrics";
     @Deprecated
     public static final String  BLOCKBREAK_FASTBREAK_MOD_CREATIVE        = "checks.blockbreak.fastbreak.intervalcreative";
     @Deprecated

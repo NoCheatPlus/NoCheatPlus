@@ -558,7 +558,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
     @Override
     public void onDisable() {
 
-        final boolean verbose = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_DEBUG);
+        final boolean verbose = ConfigManager.getConfigFile().getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS);
 
         // Remove listener references.
         if (verbose){
@@ -616,7 +616,6 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
             try {
                 dl.onDisable();
             } catch (Throwable t) {
-                // bad :)
                 logManager.severe(Streams.INIT, "DisableListener (" + dl.getClass().getName() + "): " + t.getClass().getSimpleName() + " / " + t.getMessage());
                 logManager.severe(Streams.INIT, t);
             }
@@ -624,8 +623,13 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
 
         // Write some debug/statistics.
         final Counters counters = getGenericInstance(Counters.class);
-        if (verbose && counters != null) {
-            logManager.info(Streams.INIT, counters.getMergedCountsString(true));
+        if (counters != null) {
+            // Ensure we get this kind of information for the time being.
+            if (verbose) {
+                logManager.info(Streams.INIT, counters.getMergedCountsString(true)); // Server logger needs info level.
+            } else {
+                logManager.debug(Streams.TRACE_FILE, counters.getMergedCountsString(true));
+            }
         }
 
         // Hooks:
@@ -1243,7 +1247,7 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
         }
         // (The index might be bigger than size by now.)
 
-        final boolean debug = config.getBoolean(ConfPaths.LOGGING_DEBUG);
+        final boolean debug = config.getBoolean(ConfPaths.LOGGING_EXTENDED_STATUS);
 
         // If not finished, schedule further checks.
         if (consistencyCheckerIndex < consistencyCheckers.size()){
@@ -1254,11 +1258,8 @@ public class NoCheatPlus extends JavaPlugin implements NoCheatPlusAPI {
                 }
             });
             if (debug){
-                logManager.info(Streams.TRACE_FILE, "[NoCheatPlus] Re-scheduled consistency-checks.");
+                logManager.info(Streams.TRACE_FILE, "[NoCheatPlus] Interrupted consistency checking until next tick.");
             }
-        }
-        else if (debug){
-            logManager.info(Streams.TRACE_FILE, "[NoCheatPlus] Consistency-checks run.");
         }
     }
 
