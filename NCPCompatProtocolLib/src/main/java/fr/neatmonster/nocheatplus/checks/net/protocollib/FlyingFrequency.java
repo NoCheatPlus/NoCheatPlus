@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.net.protocollib;
+package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +14,10 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
+import fr.neatmonster.nocheatplus.checks.net.NetConfig;
+import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.components.JoinLeaveListener;
 import fr.neatmonster.nocheatplus.logging.Streams;
-import fr.neatmonster.nocheatplus.net.NetConfig;
-import fr.neatmonster.nocheatplus.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.stats.Counters;
 import fr.neatmonster.nocheatplus.time.monotonic.Monotonic;
 import fr.neatmonster.nocheatplus.utilities.ActionFrequency;

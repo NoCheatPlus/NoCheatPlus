@@ -9,10 +9,10 @@ import fr.neatmonster.nocheatplus.NCPAPIProvider;
 import fr.neatmonster.nocheatplus.NoCheatPlus;
 import fr.neatmonster.nocheatplus.checks.inventory.FastConsume;
 import fr.neatmonster.nocheatplus.checks.inventory.Gutenberg;
+import fr.neatmonster.nocheatplus.checks.net.protocollib.ProtocolLibComponent;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.net.protocollib.ProtocolLibComponent;
 
 /**
  * Default factory for add-in components which might only be available under certain circumstances.

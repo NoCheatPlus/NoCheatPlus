@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.net;
+package fr.neatmonster.nocheatplus.checks.net;
 
 import java.util.List;
 

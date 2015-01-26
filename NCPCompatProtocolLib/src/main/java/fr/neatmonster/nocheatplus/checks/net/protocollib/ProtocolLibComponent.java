@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.net.protocollib;
+package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -12,13 +12,13 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketAdapter;
 
 import fr.neatmonster.nocheatplus.NCPAPIProvider;
+import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.components.DisableListener;
 import fr.neatmonster.nocheatplus.components.INotifyReload;
 import fr.neatmonster.nocheatplus.components.NoCheatPlusAPI;
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigManager;
 import fr.neatmonster.nocheatplus.logging.StaticLog;
-import fr.neatmonster.nocheatplus.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.utilities.StringUtil;
 
 /**

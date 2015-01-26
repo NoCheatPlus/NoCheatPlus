@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.net.protocollib;
+package fr.neatmonster.nocheatplus.checks.net.protocollib;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -10,8 +10,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 
-import fr.neatmonster.nocheatplus.net.NetConfig;
-import fr.neatmonster.nocheatplus.net.NetConfigCache;
+import fr.neatmonster.nocheatplus.checks.net.NetConfig;
+import fr.neatmonster.nocheatplus.checks.net.NetConfigCache;
 import fr.neatmonster.nocheatplus.utilities.TrigUtil;
 
 public class SoundDistance extends PacketAdapter {

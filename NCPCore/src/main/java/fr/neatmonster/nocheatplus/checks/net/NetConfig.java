@@ -1,4 +1,4 @@
-package fr.neatmonster.nocheatplus.net;
+package fr.neatmonster.nocheatplus.checks.net;
 
 import fr.neatmonster.nocheatplus.config.ConfPaths;
 import fr.neatmonster.nocheatplus.config.ConfigFile;
