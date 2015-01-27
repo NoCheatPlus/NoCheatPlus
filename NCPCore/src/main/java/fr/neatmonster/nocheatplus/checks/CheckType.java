@@ -21,7 +21,6 @@ import fr.neatmonster.nocheatplus.checks.inventory.InventoryData;
 import fr.neatmonster.nocheatplus.checks.moving.MovingConfig;
 import fr.neatmonster.nocheatplus.checks.moving.MovingData;
 import fr.neatmonster.nocheatplus.permissions.Permissions;
-import fr.neatmonster.nocheatplus.players.DataManager;
 
 /**
  * Type of checks (containing configuration and dataFactory classes, name and permission).
@@ -234,14 +233,4 @@ public enum CheckType {
         return configFactory.getConfig(player).isEnabled(this);
     }
 
-    /**
-     * Remove the player data for a given player and a given check type. CheckType.ALL and null will be interpreted as removing all data.<br>
-     * @deprecated Will be removed, use DataManager.removeData instead.
-     * @param playerName
-     * @param checkType 
-     * @return If any data was present.
-     */
-	public static boolean removeData(final String playerName, final CheckType checkType) {
-		return DataManager.removeData(playerName, checkType);
-	}
 }
