@@ -362,7 +362,7 @@ public class FightListener extends CheckListener implements JoinLeaveListener{
             }
             // TODO: Efficiency: don't check at all, if strict and !thisPassed.
             if (directionEnabled && (reachPassed || !directionPassed)) {
-                if (direction.loopCheck(player, damagedLoc, damaged, entry, directionContext, data, cc)) {
+                if (direction.loopCheck(player, loc, damaged, entry, directionContext, data, cc)) {
                     thisPassed = false;
                 } else {
                     directionPassed = true;
